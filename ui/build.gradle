@@ -36,14 +36,12 @@ abstract class BootBuildImageTask extends DefaultTask {
 
   @TaskAction
   void bootBuildImage() {
-    println("****************************")
-    println(new String(System.getenv("GHCR_TOKEN").decodeBase64()))
     String image = "ghcr.io/ashraf-revo/${project.name}:${project.version.replaceAll("\'", "")}"
     project.exec {
       workingDir '.'
       commandLine "docker", "build", "-t", image, "."
     }
-    if (publishImage) {
+    if (!publishImage) {
       project.exec {
         workingDir '.'
         commandLine "docker", "login", "--username", "ashraf-revo", "--password", System.getenv("GHCR_TOKEN")
