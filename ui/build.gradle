@@ -37,7 +37,7 @@ abstract class BootBuildImageTask extends DefaultTask {
   @TaskAction
   void bootBuildImage() {
     println("****************************")
-    println(System.getenv("GHCR_TOKEN"))
+    println(new String(System.getenv("GHCR_TOKEN").decodeBase64()))
     String image = "ghcr.io/ashraf-revo/${project.name}:${project.version.replaceAll("\'", "")}"
     project.exec {
       workingDir '.'
