@@ -8,22 +8,22 @@ task "bootJar" {
   doLast {
     exec {
       workingDir '.'
-      commandLine "npm","i"
+      commandLine "npm", "i"
     }
     exec {
       workingDir '.'
-      commandLine "npm","run","ng", "build"
+      commandLine "npm", "run", "ng", "build"
     }
   }
 }
 
-tasks.register('bootBuildImage', BootBuildImageTask){
+tasks.register('bootBuildImage', BootBuildImageTask) {
   dependsOn('bootJar')
 }
 
 
 abstract class BootBuildImageTask extends DefaultTask {
-  private Boolean publishImage=false
+  private Boolean publishImage = false
 
 
   @Option(option = "publishImage", description = "Configures PublishImage.")
@@ -36,15 +36,17 @@ abstract class BootBuildImageTask extends DefaultTask {
 
   @TaskAction
   void bootBuildImage() {
+    println("****************************")
+    println(System.getenv("GHCR_TOKEN"))
     String image = "ghcr.io/ashraf-revo/${project.name}:${project.version.replaceAll("\'", "")}"
     project.exec {
       workingDir '.'
-      commandLine "docker", "build" ,"-t", image, "."
+      commandLine "docker", "build", "-t", image, "."
     }
-    if (publishImage){
+    if (publishImage) {
       project.exec {
         workingDir '.'
-        commandLine "docker","login", "--username", "ashraf-revo","--password",System.getenv("GHCR_TOKEN")
+        commandLine "docker", "login", "--username", "ashraf-revo", "--password", System.getenv("GHCR_TOKEN")
       }
       project.exec {
         workingDir '.'
