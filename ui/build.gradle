@@ -8,6 +8,10 @@ task "bootJar" {
   doLast {
     exec {
       workingDir '.'
+      commandLine "npm","i"
+    }
+    exec {
+      workingDir '.'
       commandLine "npm","run","ng", "build"
     }
   }
