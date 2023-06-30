@@ -13,13 +13,45 @@ task "bootJar" {
   }
 }
 
-task "bootBuildImage" {
-  doLast {
-    exec {
-      workingDir '.'
-      commandLine "docker", "build" ,"-t", "ghcr.io/ashraf-revo/${project.name}:${project.version}", "."
-    }
-  }
+//task "bootBuildImage" {
+//  doLast {
+//    exec {
+//      workingDir '.'
+//      commandLine "docker", "build" ,"-t", "ghcr.io/ashraf-revo/${project.name}:${project.version}", "."
+//    }
+//  }
+//  dependsOn('bootJar')
+//}
+//
+tasks.register('bootBuildImage', BootBuildImageTask){
   dependsOn('bootJar')
 }
 
+
+abstract class BootBuildImageTask extends DefaultTask {
+  private Boolean publishImage=false
+
+
+  @Option(option = "publishImage", description = "Configures PublishImage.")
+  void setPublishImage(Boolean publishImage) {
+    this.publishImage = publishImage;
+  }
+
+  BootBuildImageTask() {
+  }
+
+  @TaskAction
+  void bootBuildImage() {
+    String image = "ghcr.io/ashraf-revo/${project.name}:${project.version.replaceAll("\'", "")}"
+    project.exec {
+      workingDir '.'
+      commandLine "docker", "build" ,"-t", image, "."
+    }
+    if (publishImage){
+      project.exec {
+        workingDir '.'
+        commandLine "docker", "push", "image"
+      }
+    }
+  }
+}
