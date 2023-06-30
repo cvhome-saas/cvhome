@@ -44,6 +44,13 @@ tasks.named('test') {
 bootBuildImage {
     builder = "paketobuildpacks/builder:tiny"
     imageName = "ghcr.io/ashraf-revo/${project.name}:${project.version.replaceAll("\'", "")}"
+    docker {
+        publishRegistry {
+            url = "https://ghcr.io"
+            username = "ashraf-revo"
+            password = System.getenv("GHCR_TOKEN")
+        }
+    }
 }
 /*
 subprojects {
