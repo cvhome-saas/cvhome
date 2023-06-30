@@ -41,7 +41,7 @@ abstract class BootBuildImageTask extends DefaultTask {
       workingDir '.'
       commandLine "docker", "build", "-t", image, "."
     }
-    if (!publishImage) {
+    if (publishImage) {
       project.exec {
         workingDir '.'
         commandLine "docker", "login","https://ghcr.io", "--username", "ashraf-revo", "--password", System.getenv("GHCR_TOKEN")

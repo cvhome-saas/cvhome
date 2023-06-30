@@ -33,7 +33,7 @@ jobs:
       - name: Build Docker with Gradle
         uses: gradle/gradle-build-action@749f47bda3e44aa060e82d7b3ef7e40d953bd629
         with:
-          arguments: :ui:bootBuildImage -x test --publishImage
+          arguments: bootBuildImage -x test --publishImage
         env: # Or as an environment variable
           GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
       - uses: actions/upload-artifact@v3
