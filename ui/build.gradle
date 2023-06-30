@@ -8,21 +8,11 @@ task "bootJar" {
   doLast {
     exec {
       workingDir '.'
-      commandLine "ng", "build"
+      commandLine "npm","run","ng", "build"
     }
   }
 }
 
-//task "bootBuildImage" {
-//  doLast {
-//    exec {
-//      workingDir '.'
-//      commandLine "docker", "build" ,"-t", "ghcr.io/ashraf-revo/${project.name}:${project.version}", "."
-//    }
-//  }
-//  dependsOn('bootJar')
-//}
-//
 tasks.register('bootBuildImage', BootBuildImageTask){
   dependsOn('bootJar')
 }

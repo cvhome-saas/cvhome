@@ -22,6 +22,10 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
+      - name: Use Node.js 20.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20.x
       - name: Make gradlew executable
         run: chmod +x ./gradlew
       - name: Validate Gradle wrapper
@@ -29,7 +33,7 @@ jobs:
       - name: Build Docker with Gradle
         uses: gradle/gradle-build-action@749f47bda3e44aa060e82d7b3ef7e40d953bd629
         with:
-          arguments: bootBuildImage -x test --publishImage
+          arguments: :ui:bootBuildImage -x test --publishImage
         env: # Or as an environment variable
           GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
       - uses: actions/upload-artifact@v3
