@@ -18,7 +18,7 @@ task "bootJar" {
 }
 
 tasks.register('bootBuildImage', BootBuildImageTask) {
-  dependsOn('bootJar')
+//  dependsOn('bootJar')
 }
 
 
@@ -36,11 +36,11 @@ abstract class BootBuildImageTask extends DefaultTask {
 
   @TaskAction
   void bootBuildImage() {
-    String image = "ghcr.io/ashraf-revo/${project.name}:${project.version.replaceAll("\'", "")}"
-    project.exec {
-      workingDir '.'
-      commandLine "docker", "build", "-t", image, "."
-    }
+//    String image = "ghcr.io/ashraf-revo/${project.name}:${project.version.replaceAll("\'", "")}"
+//    project.exec {
+//      workingDir '.'
+//      commandLine "docker", "build", "-t", image, "."
+//    }
     if (!publishImage) {
       project.exec {
         workingDir '.'
