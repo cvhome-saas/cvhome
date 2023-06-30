@@ -50,7 +50,7 @@ abstract class BootBuildImageTask extends DefaultTask {
     if (publishImage){
       project.exec {
         workingDir '.'
-        commandLine "docker", "push", "image"
+        commandLine "docker", "push", image
       }
     }
   }
