@@ -1,0 +1,2 @@
+#docker rmi $(docker images |grep 'ashraf' | awk '{print $3}')
+gradle clean bootBuildImage -x test -Dorg.gradle.project.version=5.0.0

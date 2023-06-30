@@ -1,0 +1,25 @@
+task "clean" {
+  doLast {
+    delete files('dist/')
+  }
+}
+
+task "bootJar" {
+  doLast {
+    exec {
+      workingDir '.'
+      commandLine "ng", "build"
+    }
+  }
+}
+
+task "bootBuildImage" {
+  doLast {
+    exec {
+      workingDir '.'
+      commandLine "docker", "build" ,"-t", "ghcr.io/ashraf-revo/${project.name}:${project.version}", "."
+    }
+  }
+  dependsOn('bootJar')
+}
+

@@ -1,0 +1,48 @@
+spring:
+  application:
+    name: certificate-manager
+  cloud:
+    loadbalancer:
+      eager-load:
+        clients:
+          - "gateway"
+          - "uxb-ui"
+          - "calculator-ui"
+          - "uxplore-ui"
+          - "certificate-manager"
+          - "uxplore"
+    aws:
+      region:
+        static: eu-central-1
+    ecs:
+      discovery:
+        enabled: true
+        namespace: "uxplore-dev.local"
+  main:
+    lazy-initialization: true
+info:
+  app:
+    name: ${spring.application.name}
+management:
+  info:
+    env:
+      enabled: true
+    os:
+      enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: [ '*' ]
+logging:
+  file:
+    name: target/${spring.application.name}.log
+#  level:
+#    org.springframework: debug
+server:
+  forward-headers-strategy: FRAMEWORK

@@ -1,0 +1,37 @@
+version: "3.1"
+services:
+  db:
+    image: postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    network_mode: host
+  ui:
+    image: ghcr.io/ashraf-revo/ui:5.0.0
+    restart: always
+    ports:
+      - "4200:80"
+    environment:
+      SERVER_PORT: 4200
+    network_mode: host
+  user:
+    image: ghcr.io/ashraf-revo/user:5.0.0
+    restart: always
+    ports:
+      - "8081:8081"
+    environment:
+      SERVER_PORT: 8081
+    network_mode: host
+  gateway:
+    image: ghcr.io/ashraf-revo/gateway:5.0.0
+    restart: always
+    ports:
+      - "8443:8443"
+    environment:
+      SERVER_PORT: 8443
+    network_mode: host
