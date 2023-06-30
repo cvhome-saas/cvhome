@@ -43,7 +43,7 @@ tasks.named('test') {
 }
 bootBuildImage {
     builder = "paketobuildpacks/builder:tiny"
-    imageName = "ghcr.io/ashraf-revo/${project.name}:${project.version}"
+    imageName = "ghcr.io/ashraf-revo/${project.name}:${project.version.replaceAll("\'", "")}"
 }
 /*
 subprojects {
@@ -68,7 +68,7 @@ subprojects {
 
     bootBuildImage {
         builder = "paketobuildpacks/builder:tiny"
-        imageName = "ghcr.io/ashraf-revo/${project.name}:${project.version}"
+        imageName = "ghcr.io/ashraf-revo/${project.name}:${project.version.replaceAll("\'", "")}"
     }
 }
 */
