@@ -18,3 +18,31 @@ spring:
             - Host={domain}.{x},{sub}.{domain}.{x}
 server:
   port: 8443
+info:
+  app:
+    name: ${spring.application.name}
+management:
+  info:
+    env:
+      enabled: true
+    os:
+      enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: [ '*' ]
+  tracing:
+    sampling:
+      probability: 1.0
+  otlp:
+    tracing:
+      endpoint: http://localhost:4318/v1/traces
+    metrics:
+      export:
+        url: http://localhost:4318/v1/metrics
