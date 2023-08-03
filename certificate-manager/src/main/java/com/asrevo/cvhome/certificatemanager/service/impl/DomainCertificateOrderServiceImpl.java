@@ -7,7 +7,7 @@ import com.asrevo.cvhome.certificatemanager.domain.DomainCertificate;
 import com.asrevo.cvhome.certificatemanager.domain.DomainCertificateOrder;
 import com.asrevo.cvhome.certificatemanager.repository.DomainCertificateRepository;
 import com.asrevo.cvhome.certificatemanager.service.DomainCertificateOrderService;
-import com.asrevo.cvhome.certificatemanager.service.S3Service;
+import com.asrevo.cvhome.certificatemanager.service.FileService;
 import org.shredzone.acme4j.Order;
 import org.shredzone.acme4j.Status;
 import org.shredzone.acme4j.challenge.TlsAlpn01Challenge;
@@ -32,17 +32,17 @@ public class DomainCertificateOrderServiceImpl implements DomainCertificateOrder
 
     private final AcmeManagerService acmeManagerService;
 
-    private final S3Service s3Service;
+    private final FileService fileService;
 
     public DomainCertificateOrderServiceImpl(
             DomainCertificateOrderRepository domainCertificateOrderRepository,
             DomainCertificateRepository domainCertificateRepository,
             AcmeManagerService acmeManagerService,
-            S3Service s3Service) {
+            FileService fileService) {
         this.domainCertificateOrderRepository = domainCertificateOrderRepository;
         this.domainCertificateRepository = domainCertificateRepository;
         this.acmeManagerService = acmeManagerService;
-        this.s3Service = s3Service;
+        this.fileService = fileService;
     }
 
     @Override
@@ -70,7 +70,7 @@ public class DomainCertificateOrderServiceImpl implements DomainCertificateOrder
             if (type.equals(TlsAlpn01Challenge.TYPE)) {
                 // @TODO should check if dns pointing to my server to generate Temp
                 // certification
-                acmeManagerService.generateTemporalTlsAlpn01Certificate(certificateOrder, s3Service::uploadFile);
+                acmeManagerService.generateTemporalTlsAlpn01Certificate(certificateOrder, fileService::uploadFile);
             }
             Status status = acmeManagerService.validate(new URL(certificateOrder.getLocation()), type);
 
@@ -109,7 +109,7 @@ public class DomainCertificateOrderServiceImpl implements DomainCertificateOrder
             status = acmeManagerService.validate(new URL(one.getLocation()), validationType.get());
         }
         if (one != null && status == Status.VALID) {
-            DomainCertificate domainCertificate = acmeManagerService.generate(one, s3Service::uploadFile);
+            DomainCertificate domainCertificate = acmeManagerService.generate(one, fileService::uploadFile);
             one.setCertificateOrderStatus(CertificateOrderStatus.GENERATED);
             domainCertificateOrderRepository.put(one);
             return domainCertificateRepository.put(domainCertificate);

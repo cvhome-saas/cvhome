@@ -4,7 +4,7 @@ import com.asrevo.cvhome.certificatemanager.service.AcmeManagerService;
 import com.asrevo.cvhome.certificatemanager.domain.DomainCertificate;
 import com.asrevo.cvhome.certificatemanager.domain.DomainCertificateOrder;
 import com.asrevo.cvhome.certificatemanager.domain.DomainRequest;
-import com.asrevo.cvhome.certificatemanager.service.S3Service;
+import com.asrevo.cvhome.certificatemanager.service.FileService;
 import lombok.extern.slf4j.Slf4j;
 import org.shredzone.acme4j.Account;
 import org.shredzone.acme4j.Authorization;
@@ -53,12 +53,12 @@ public class AcmeManagerServiceImpl implements AcmeManagerService {
 
     private final Login login;
 
-    private final S3Service s3Service;
+    private final FileService fileService;
 
-    public AcmeManagerServiceImpl(Account account, Login login, S3Service s3Service) {
+    public AcmeManagerServiceImpl(Account account, Login login, FileService fileService) {
         this.account = account;
         this.login = login;
-        this.s3Service = s3Service;
+        this.fileService = fileService;
     }
 
     private static void storeCertificate(
@@ -212,15 +212,15 @@ public class AcmeManagerServiceImpl implements AcmeManagerService {
     @Override
     public KeyPair generateOrGetDomainKeyPair(String domain) throws IOException {
         Path domainKey = Paths.get(String.valueOf(domain.hashCode()), "domain.key");
-        if (s3Service.checkExist(domainKey.toString())) {
-            InputStream stream = s3Service.getFile(domainKey.toString());
+        if (fileService.checkExist(domainKey.toString())) {
+            InputStream stream = fileService.getFile(domainKey.toString());
             return KeyPairUtils.readKeyPair(new InputStreamReader(stream));
         } else {
             KeyPair domainKeyPair = KeyPairUtils.createKeyPair(2048);
             Path domainPath = Files.createTempFile("domain", ".key");
             FileWriter fileWriter = new FileWriter(domainPath.toFile());
             KeyPairUtils.writeKeyPair(domainKeyPair, fileWriter);
-            s3Service.uploadFile(domainPath.toFile(), domainKey.toString());
+            fileService.uploadFile(domainPath.toFile(), domainKey.toString());
             return domainKeyPair;
         }
     }

@@ -36,9 +36,8 @@ ext {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    implementation 'software.amazon.awssdk:s3:2.20.93'
-    implementation 'software.amazon.awssdk:dynamodb:2.20.93'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
+    runtimeOnly 'org.postgresql:postgresql'
 
     implementation 'org.shredzone.acme4j:acme4j-client:2.15'
     implementation 'org.shredzone.acme4j:acme4j-utils:2.15'
@@ -47,6 +46,10 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.boot:spring-boot-testcontainers'
+    testImplementation 'io.projectreactor:reactor-test'
+    testImplementation 'org.testcontainers:junit-jupiter'
+    testImplementation 'org.testcontainers:postgresql'
 }
 
 dependencyManagement {

@@ -1,6 +1,6 @@
 package com.asrevo.cvhome.certificatemanager.service.impl;
 
-import com.asrevo.cvhome.certificatemanager.service.S3Service;
+import com.asrevo.cvhome.certificatemanager.service.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -12,7 +12,7 @@ import java.io.File;
 import java.io.InputStream;
 
 @Service
-public class S3ServiceImpl implements S3Service {
+public class FileServiceImpl implements FileService {
 
     private final String bucketName = "uxplore-acm-storage-dev";
 

@@ -1,15 +1,15 @@
 version: "3.1"
 services:
-#  db:
-#    image: postgres
-#    restart: always
-#    ports:
-#      - "5432:5432"
-#    environment:
-#      POSTGRES_USER: postgres
-#      POSTGRES_PASSWORD: password
-#    volumes:
-#      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+  db:
+    image: "postgres:13"
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
 #    network_mode: host
 #  ui:
 #    image: ghcr.io/ashraf-revo/ui:5.0.0
@@ -43,18 +43,18 @@ services:
 #    environment:
 #      SERVER_PORT: 8443
 #    network_mode: host
-  jaeger:
-    image: jaegertracing/all-in-one:latest
-    ports:
-      - "16686:16686"
-      - "14250:14250"
-  otel-collector:
-    image: otel/opentelemetry-collector-contrib:0.80.0
-    command: ["--config=/etc/otel-collector-config.yaml"]
-    volumes:
-      - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml
-    ports:
-      - "4317:4317"
-      - "4318:4318"
-    depends_on:
-      - jaeger
+#  jaeger:
+#    image: jaegertracing/all-in-one:latest
+#    ports:
+#      - "16686:16686"
+#      - "14250:14250"
+#  otel-collector:
+#    image: otel/opentelemetry-collector-contrib:0.80.0
+#    command: ["--config=/etc/otel-collector-config.yaml"]
+#    volumes:
+#      - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml
+#    ports:
+#      - "4317:4317"
+#      - "4318:4318"
+#    depends_on:
+#      - jaeger

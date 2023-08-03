@@ -3,7 +3,7 @@ package com.asrevo.cvhome.certificatemanager.service;
 import java.io.File;
 import java.io.InputStream;
 
-public interface S3Service {
+public interface FileService {
 
     void uploadFile(File file, String fileName);
 

@@ -5,7 +5,7 @@ import com.asrevo.cvhome.certificatemanager.domain.DomainCertificate;
 import com.asrevo.cvhome.certificatemanager.domain.DomainCertificateOrder;
 import com.asrevo.cvhome.certificatemanager.domain.DomainRequest;
 import com.asrevo.cvhome.certificatemanager.service.DomainCertificateOrderService;
-import com.asrevo.cvhome.certificatemanager.service.S3Service;
+import com.asrevo.cvhome.certificatemanager.service.FileService;
 import org.shredzone.acme4j.exception.AcmeException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -31,7 +31,7 @@ public class AcmController {
     private AcmeManagerService acmeManagerService;
 
     @Autowired
-    private S3Service s3Service;
+    private FileService fileService;
 
     @Autowired
     @Lazy
@@ -74,7 +74,7 @@ public class AcmController {
     private ResponseEntity<InputStreamResource> download(DomainRequest domainRequest) {
         String fileName = Paths.get(String.valueOf(domainRequest.getDomain().hashCode()), domainRequest.getFile())
                 .toString();
-        InputStreamResource body = new InputStreamResource(s3Service.getFile(fileName));
+        InputStreamResource body = new InputStreamResource(fileService.getFile(fileName));
         return ResponseEntity.ok()
                 .headers(httpHeaders -> httpHeaders.add(
                         HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + domainRequest.getFile()))

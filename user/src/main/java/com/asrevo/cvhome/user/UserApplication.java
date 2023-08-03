@@ -3,13 +3,14 @@ package com.asrevo.cvhome.user;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.stereotype.Service;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Table;
+import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Map;
+import reactor.core.publisher.Mono;
 
 @SpringBootApplication
 @RestController
@@ -23,24 +24,15 @@ public class UserApplication {
     }
 
     @GetMapping(params = "userId")
-    public User findOne(@RequestParam(value = "userId") String id) {
-        return userRepository.findOne(id);
+    public Mono<User> findOne(@RequestParam(value = "userId") String id) {
+        return userRepository.findById(id);
     }
 }
 
-record User(String id, String name, String email) {
+@Table("x_user")
+record User(@Id String id, String name, String email) {
 }
 
-interface UserRepository {
-    User findOne(String id);
-}
+interface UserRepository extends ReactiveCrudRepository<User, String> {
 
-@Service
-class UserRepositoryImpl implements UserRepository {
-    private final Map<String, User> dbUserMap = Map.of("1", new User("1", "jhon", "jhon@email.com"));
-
-    @Override
-    public User findOne(String id) {
-        return dbUserMap.get(id);
-    }
 }
