@@ -4,9 +4,6 @@ spring:
   docker:
     compose:
       file: ${spring.application.name}/compose.yml
-  sql:
-    init:
-      mode: never
   r2dbc:
     url: r2dbc:postgresql://localhost:5432/userdb
     username: postgres

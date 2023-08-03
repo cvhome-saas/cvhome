@@ -8,19 +8,19 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.cloud.gateway.support.ServerWebExchangeUtils;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Map;
 
 import static org.springframework.web.util.UriComponentsBuilder.fromUri;
 
@@ -33,28 +33,21 @@ public class GatewayApplication {
 
 }
 
-interface DomainRepository {
-    Mono<String> findByDomainName(String hostName);
+record DomainReference(@Id String domain, String reference) {
 }
 
-@Service
-class DomainRepositoryImpl implements DomainRepository {
-    private final Map<String, String> dbDomainMap = Map.of("john.com", "1");
+interface DomainReferenceRepository extends ReactiveCrudRepository<DomainReference, String> {
 
-    @Override
-    public Mono<String> findByDomainName(String domain) {
-        return Mono.justOrEmpty(dbDomainMap.get(domain));
-    }
 }
 
 @Component
 @Slf4j
 class MapHostAsRequestParamGatewayFilterFactory extends AbstractGatewayFilterFactory<MapHostAsRequestParamGatewayFilterFactory.Config> {
     public static final String TEMPLATE_KEY = "template";
-    private final DomainRepository repository;
+    private final DomainReferenceRepository repository;
     private final String MapHostAsRequestParamHeader = "Map-Host-As-Request-Param";
 
-    public MapHostAsRequestParamGatewayFilterFactory(DomainRepository repository) {
+    public MapHostAsRequestParamGatewayFilterFactory(DomainReferenceRepository repository) {
         super(MapHostAsRequestParamGatewayFilterFactory.Config.class);
         this.repository = repository;
     }
@@ -70,7 +63,7 @@ class MapHostAsRequestParamGatewayFilterFactory extends AbstractGatewayFilterFac
             URI uri = exchange.getRequest().getURI();
             String hostName = exchange.getRequest().getHeaders().getHost().getHostName();
             if (checkingIfHostMappingNeeded(exchange, config)) {
-                Mono<String> domainReference = this.repository.findByDomainName(hostName);
+                Mono<String> domainReference = this.repository.findById(hostName).map(DomainReference::domain);
                 try {
                     return domainReference.flatMap(itx -> {
                         if (itx != null && !itx.isEmpty()) {
