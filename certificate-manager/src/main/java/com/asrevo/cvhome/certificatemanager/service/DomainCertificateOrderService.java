@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.certificatemanager.service;
 
-import com.asrevo.cvhome.certificatemanager.domain.DomainCertificateOrder;
 import com.asrevo.cvhome.certificatemanager.domain.DomainCertificate;
+import com.asrevo.cvhome.certificatemanager.domain.DomainCertificateOrder;
 import org.shredzone.acme4j.exception.AcmeException;
 
 import java.io.IOException;

@@ -43,6 +43,7 @@ dependencies {
     implementation 'org.shredzone.acme4j:acme4j-utils:2.15'
     implementation 'commons-codec:commons-codec:1.15'
 
+    developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'

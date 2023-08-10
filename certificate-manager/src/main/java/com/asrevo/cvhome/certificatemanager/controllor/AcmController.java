@@ -1,9 +1,9 @@
 package com.asrevo.cvhome.certificatemanager.controllor;
 
-import com.asrevo.cvhome.certificatemanager.service.AcmeManagerService;
 import com.asrevo.cvhome.certificatemanager.domain.DomainCertificate;
 import com.asrevo.cvhome.certificatemanager.domain.DomainCertificateOrder;
 import com.asrevo.cvhome.certificatemanager.domain.DomainRequest;
+import com.asrevo.cvhome.certificatemanager.service.AcmeManagerService;
 import com.asrevo.cvhome.certificatemanager.service.DomainCertificateOrderService;
 import com.asrevo.cvhome.certificatemanager.service.FileService;
 import org.shredzone.acme4j.exception.AcmeException;
@@ -12,11 +12,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.net.MalformedURLException;

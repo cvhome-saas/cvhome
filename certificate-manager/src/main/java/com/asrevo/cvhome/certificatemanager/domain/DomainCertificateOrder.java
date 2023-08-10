@@ -3,19 +3,18 @@ package com.asrevo.cvhome.certificatemanager.domain;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.Map;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Table;
 
 @Getter
 @Setter
+@Table("domain_certificate_order")
 @Builder
 public class DomainCertificateOrder {
-
+    private @Id Long id;
+    private String location;
     private String domain;
 
-    private String location;
-
     private CertificateOrderStatus certificateOrderStatus;
-
-    private Map<String, Map<String, String>> challenges;
+    private Challenges challenges;
 }

@@ -1,15 +1,10 @@
 package com.asrevo.cvhome.certificatemanager.repository;
 
-import com.asrevo.cvhome.certificatemanager.domain.CertificateOrderStatus;
-import com.asrevo.cvhome.certificatemanager.domain.DomainCertificate;
-import com.asrevo.cvhome.certificatemanager.domain.DomainCertificateOrder;
-import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
-
-import java.util.HashMap;
-import java.util.Map;
+//import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 
 public class DomainUtils {
 
+/*
     static HashMap<String, AttributeValue> marshall(DomainCertificateOrder order) {
         HashMap<String, AttributeValue> challengesItem = new HashMap<>();
         order.getChallenges().forEach((key, value) -> {
@@ -87,4 +82,5 @@ public class DomainUtils {
                 .certificateOrderStatus(orderStatus)
                 .build();
     }
+*/
 }

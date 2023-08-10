@@ -1,17 +1,12 @@
 package com.asrevo.cvhome.certificatemanager.service.impl;
 
-import com.asrevo.cvhome.certificatemanager.service.AcmeManagerService;
 import com.asrevo.cvhome.certificatemanager.domain.DomainCertificate;
 import com.asrevo.cvhome.certificatemanager.domain.DomainCertificateOrder;
 import com.asrevo.cvhome.certificatemanager.domain.DomainRequest;
+import com.asrevo.cvhome.certificatemanager.service.AcmeManagerService;
 import com.asrevo.cvhome.certificatemanager.service.FileService;
 import lombok.extern.slf4j.Slf4j;
-import org.shredzone.acme4j.Account;
-import org.shredzone.acme4j.Authorization;
-import org.shredzone.acme4j.Certificate;
-import org.shredzone.acme4j.Login;
-import org.shredzone.acme4j.Order;
-import org.shredzone.acme4j.Status;
+import org.shredzone.acme4j.*;
 import org.shredzone.acme4j.challenge.Challenge;
 import org.shredzone.acme4j.challenge.Dns01Challenge;
 import org.shredzone.acme4j.challenge.Http01Challenge;
@@ -24,11 +19,7 @@ import org.shredzone.acme4j.util.KeyPairUtils;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -232,6 +223,7 @@ public class AcmeManagerServiceImpl implements AcmeManagerService {
                 certificateOrder, order.getCertificate(), order.getStatus().name());
     }
 
+    @Override
     public void generateTemporalTlsAlpn01Certificate(
             DomainCertificateOrder certificateOrder, BiConsumer<File, String> writer) throws IOException {
         URL location = new URL(certificateOrder.getLocation());

@@ -1,8 +1,18 @@
 spring:
   application:
     name: certificate-manager
+  docker:
+    compose:
+      file: ${spring.application.name}/compose.yml
+  datasource:
+    url: jdbc:postgresql://localhost:5432/certificatemanagerdb
+    username: postgres
+    password: password
   main:
     lazy-initialization: true
+  sql:
+    init:
+      mode: always
 server:
   forward-headers-strategy: FRAMEWORK
   port: 8082
