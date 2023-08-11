@@ -8,7 +8,7 @@ import java.io.IOException;
 
 public interface DomainCertificateOrderService {
 
-    DomainCertificateOrder order(String domain) throws AcmeException, IOException;
+    DomainCertificateOrder order(DomainCertificateOrder order) throws AcmeException, IOException;
 
     DomainCertificateOrder validate(DomainCertificateOrder certificateOrder, String type)
             throws AcmeException, IOException;

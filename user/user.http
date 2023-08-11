@@ -1,0 +1,2 @@
+### get user
+GET http://localhost:8081/api/v1/user?userId=1

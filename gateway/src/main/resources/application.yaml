@@ -1,9 +1,6 @@
 spring:
   application:
     name: gateway
-  docker:
-    compose:
-      file: ${spring.application.name}/compose.yml
   r2dbc:
     url: r2dbc:postgresql://localhost:5432/gatewaydb
     username: postgres

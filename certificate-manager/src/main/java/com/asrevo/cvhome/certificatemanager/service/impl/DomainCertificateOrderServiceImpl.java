@@ -1,14 +1,9 @@
 package com.asrevo.cvhome.certificatemanager.service.impl;
 
-import com.asrevo.cvhome.certificatemanager.domain.CertificateOrderStatus;
-import com.asrevo.cvhome.certificatemanager.domain.Challenges;
-import com.asrevo.cvhome.certificatemanager.domain.DomainCertificate;
-import com.asrevo.cvhome.certificatemanager.domain.DomainCertificateOrder;
+import com.asrevo.cvhome.certificatemanager.domain.*;
 import com.asrevo.cvhome.certificatemanager.repository.DomainCertificateRepository;
-import com.asrevo.cvhome.certificatemanager.service.AcmeManagerService;
-import com.asrevo.cvhome.certificatemanager.service.DomainCertificateOrderService;
-import com.asrevo.cvhome.certificatemanager.service.FileService;
-import com.asrevo.cvhome.certificatemanager.service.IDomainCertificateOrderService;
+import com.asrevo.cvhome.certificatemanager.service.*;
+import lombok.AllArgsConstructor;
 import org.shredzone.acme4j.Order;
 import org.shredzone.acme4j.Status;
 import org.shredzone.acme4j.challenge.TlsAlpn01Challenge;
@@ -23,6 +18,7 @@ import java.util.Optional;
 
 @Service
 @Lazy
+@AllArgsConstructor
 public class DomainCertificateOrderServiceImpl implements DomainCertificateOrderService {
 
     private final String validationTypeFlag = "usedInValidation";
@@ -35,26 +31,20 @@ public class DomainCertificateOrderServiceImpl implements DomainCertificateOrder
 
     private final FileService fileService;
 
-    public DomainCertificateOrderServiceImpl(
-            IDomainCertificateOrderService iDomainCertificateOrderService,
-            DomainCertificateRepository domainCertificateRepository,
-            AcmeManagerService acmeManagerService,
-            FileService fileService) {
-        this.iDomainCertificateOrderService = iDomainCertificateOrderService;
-        this.domainCertificateRepository = domainCertificateRepository;
-        this.acmeManagerService = acmeManagerService;
-        this.fileService = fileService;
-    }
+    private final DomainReferenceService domainReferenceService;
+
+
 
     @Override
-    public DomainCertificateOrder order(String domain) throws AcmeException, IOException {
-        Order order = acmeManagerService.order(domain);
+    public DomainCertificateOrder order(DomainCertificateOrder order) throws AcmeException, IOException {
+        Order o = acmeManagerService.order(order.getDomain());
 
         DomainCertificateOrder certificateOrder = DomainCertificateOrder.builder()
-                .domain(domain)
-                .location(order.getLocation().toString())
+                .domain(order.getDomain())
+                .reference(order.getReference())
+                .location(o.getLocation().toString())
                 .certificateOrderStatus(CertificateOrderStatus.REQUESTED)
-                .challenges(new Challenges(AcmeManagerServiceImpl.getChallenges(domain, order)))
+                .challenges(new Challenges(AcmeManagerServiceImpl.getChallenges(order.getDomain(), o)))
                 .build();
         return iDomainCertificateOrderService.save(certificateOrder);
     }
@@ -113,6 +103,7 @@ public class DomainCertificateOrderServiceImpl implements DomainCertificateOrder
             DomainCertificate domainCertificate = acmeManagerService.generate(one, fileService::uploadFile);
             one.setCertificateOrderStatus(CertificateOrderStatus.GENERATED);
             iDomainCertificateOrderService.save(one);
+            domainReferenceService.saveOrUpdate(new DomainReference(null,one.getDomain(),one.getReference()));
             return domainCertificateRepository.put(domainCertificate);
         }
         return DomainCertificate.from(certificateOrder, status.name());

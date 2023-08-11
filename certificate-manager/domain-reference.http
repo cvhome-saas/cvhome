@@ -1,0 +1,2 @@
+### generate a domain challenge
+GET http://localhost:8082/api/domain-reference/get-domain-reference?domain=wwwx.asrevo.com

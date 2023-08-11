@@ -1,0 +1,25 @@
+### order a domain certificate
+POST http://localhost:8082/api/acm/order
+Content-Type: application/json
+
+{
+  "domain": "wwwx.asrevo.com",
+  "reference": "1"
+}
+
+### validate a domain challenge
+POST http://localhost:8082/api/acm/validate
+Content-Type: application/json
+
+{
+  "location": "https://acme-v02.api.letsencrypt.org/acme/order/593265476/200956001666"
+}
+
+
+### generate a domain challenge
+POST http://localhost:8082/api/acm/generate
+Content-Type: application/json
+
+{
+  "location": "https://acme-v02.api.letsencrypt.org/acme/order/593265476/200956001666"
+}
