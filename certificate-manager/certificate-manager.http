@@ -3,8 +3,8 @@ POST http://localhost:8082/api/acm/order
 Content-Type: application/json
 
 {
-  "domain": "wwwx.asrevo.com",
-  "reference": "1"
+  "domain": "wl.asrevo.com",
+  "reference": "32"
 }
 
 ### validate a domain challenge
@@ -12,14 +12,38 @@ POST http://localhost:8082/api/acm/validate
 Content-Type: application/json
 
 {
-  "location": "https://acme-v02.api.letsencrypt.org/acme/order/593265476/200956001666"
+  "location": "https://acme-v02.api.letsencrypt.org/acme/order/593265476/201156275356"
 }
-
 
 ### generate a domain challenge
 POST http://localhost:8082/api/acm/generate
 Content-Type: application/json
 
 {
-  "location": "https://acme-v02.api.letsencrypt.org/acme/order/593265476/200956001666"
+  "location": "https://acme-v02.api.letsencrypt.org/acme/order/593265476/201156275356"
+}
+
+### downoad a domain crt file
+POST http://localhost:8082/api/acm/domain-certificate-file?fileType=CRT
+Content-Type: application/json
+
+{
+  "domain": "wl.asrevo.com"
+}
+
+### downoad a domain key file
+POST http://localhost:8082/api/acm/domain-certificate-file?fileType=KEY
+Content-Type: application/json
+
+{
+  "domain": "wl.asrevo.com"
+}
+
+
+### downoad a domain csr file
+POST http://localhost:8082/api/acm/domain-certificate-file?fileType=CSR
+Content-Type: application/json
+
+{
+  "domain": "wl.asrevo.com"
 }

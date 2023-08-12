@@ -1,10 +1,13 @@
 package com.asrevo.cvhome.certificatemanager.service;
 
+import com.asrevo.cvhome.certificatemanager.domain.CertificateFileType;
 import com.asrevo.cvhome.certificatemanager.domain.DomainCertificate;
 import com.asrevo.cvhome.certificatemanager.domain.DomainCertificateOrder;
+import com.asrevo.cvhome.certificatemanager.domain.DomainRequest;
 import org.shredzone.acme4j.Order;
 import org.shredzone.acme4j.Status;
 import org.shredzone.acme4j.exception.AcmeException;
+import org.springframework.core.io.InputStreamResource;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,4 +31,7 @@ public interface AcmeManagerService {
 
     void generateTemporalTlsAlpn01Certificate(DomainCertificateOrder certificateOrder, BiConsumer<File, String> writer)
             throws IOException;
+
+    InputStreamResource getDomainCertificateFile(DomainRequest domainRequest, CertificateFileType fileType);
+
 }

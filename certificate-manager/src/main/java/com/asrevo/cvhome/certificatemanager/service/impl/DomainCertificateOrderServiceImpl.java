@@ -61,7 +61,7 @@ public class DomainCertificateOrderServiceImpl implements DomainCertificateOrder
             if (type.equals(TlsAlpn01Challenge.TYPE)) {
                 // @TODO should check if dns pointing to my server to generate Temp
                 // certification
-                acmeManagerService.generateTemporalTlsAlpn01Certificate(certificateOrder, fileService::uploadFile);
+                acmeManagerService.generateTemporalTlsAlpn01Certificate(certificateOrder, fileService::upload);
             }
             Status status = acmeManagerService.validate(new URL(certificateOrder.getLocation()), type);
 
@@ -100,7 +100,7 @@ public class DomainCertificateOrderServiceImpl implements DomainCertificateOrder
             status = acmeManagerService.validate(new URL(one.getLocation()), validationType.get());
         }
         if (one != null && status == Status.VALID) {
-            DomainCertificate domainCertificate = acmeManagerService.generate(one, fileService::uploadFile);
+            DomainCertificate domainCertificate = acmeManagerService.generate(one, fileService::upload);
             one.setCertificateOrderStatus(CertificateOrderStatus.GENERATED);
             iDomainCertificateOrderService.save(one);
             domainReferenceService.saveOrUpdate(new DomainReference(null,one.getDomain(),one.getReference()));

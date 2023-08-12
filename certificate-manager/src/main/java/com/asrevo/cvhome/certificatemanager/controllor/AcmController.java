@@ -1,11 +1,11 @@
 package com.asrevo.cvhome.certificatemanager.controllor;
 
+import com.asrevo.cvhome.certificatemanager.domain.CertificateFileType;
 import com.asrevo.cvhome.certificatemanager.domain.DomainCertificate;
 import com.asrevo.cvhome.certificatemanager.domain.DomainCertificateOrder;
 import com.asrevo.cvhome.certificatemanager.domain.DomainRequest;
 import com.asrevo.cvhome.certificatemanager.service.AcmeManagerService;
 import com.asrevo.cvhome.certificatemanager.service.DomainCertificateOrderService;
-import com.asrevo.cvhome.certificatemanager.service.FileService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.shredzone.acme4j.exception.AcmeException;
@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.nio.file.Paths;
 
 @RestController
 @RequestMapping("api/acm")
@@ -26,7 +25,6 @@ import java.nio.file.Paths;
 public class AcmController {
 
     private final AcmeManagerService acmeManagerService;
-    private final FileService fileService;
     private final DomainCertificateOrderService domainCertificateOrderService;
 
     /*
@@ -53,14 +51,9 @@ public class AcmController {
         return acmeManagerService.info(certificateOrder);
     }
 
-    @PostMapping("domain-file")
-    public ResponseEntity<InputStreamResource> getDomainFile(@RequestBody DomainRequest domainRequest) {
-        return download(domainRequest);
-    }
-
-    private ResponseEntity<InputStreamResource> download(DomainRequest domainRequest) {
-        String fileName = Paths.get(String.valueOf(domainRequest.getDomain().hashCode()), domainRequest.getFile()).toString();
-        InputStreamResource body = new InputStreamResource(fileService.getFile(fileName));
-        return ResponseEntity.ok().headers(httpHeaders -> httpHeaders.add(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + domainRequest.getFile())).body(body);
+    @PostMapping("domain-certificate-file")
+    public ResponseEntity<InputStreamResource> getDomainCertificateFile(@RequestBody DomainRequest domainRequest, @RequestParam(name = "fileType", defaultValue = "CRT") CertificateFileType fileType) {
+        InputStreamResource body = acmeManagerService.getDomainCertificateFile(domainRequest, fileType);
+        return ResponseEntity.ok().headers(httpHeaders -> httpHeaders.add(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + fileType.getFile())).body(body);
     }
 }

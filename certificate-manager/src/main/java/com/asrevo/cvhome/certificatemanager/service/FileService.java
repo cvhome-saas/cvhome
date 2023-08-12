@@ -5,9 +5,9 @@ import java.io.InputStream;
 
 public interface FileService {
 
-    void uploadFile(File file, String fileName);
+    void upload(File file, String fileName);
 
     InputStream getFile(String fileName);
 
-    boolean checkExist(String domainPrivateKey);
+    boolean exist(String fileName);
 }

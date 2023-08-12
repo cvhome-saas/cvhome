@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.certificatemanager.service.impl;
 
+import com.asrevo.cvhome.certificatemanager.domain.CertificateFileType;
 import com.asrevo.cvhome.certificatemanager.domain.DomainCertificate;
 import com.asrevo.cvhome.certificatemanager.domain.DomainCertificateOrder;
 import com.asrevo.cvhome.certificatemanager.domain.DomainRequest;
@@ -17,6 +18,7 @@ import org.shredzone.acme4j.util.CSRBuilder;
 import org.shredzone.acme4j.util.CertificateUtils;
 import org.shredzone.acme4j.util.KeyPairUtils;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -33,6 +35,7 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
+import static com.asrevo.cvhome.certificatemanager.utils.Utils.getDomainCode;
 import static org.apache.commons.codec.binary.Hex.encodeHexString;
 
 @Service
@@ -67,7 +70,7 @@ public class AcmeManagerServiceImpl implements AcmeManagerService {
         }
         writer.accept(
                 domainCrt,
-                Paths.get(String.valueOf(domainRequest.hashCode()), "domain.crt")
+                Paths.get(getDomainCode(domainRequest.getDomain()), "domain.crt")
                         .toString());
     }
 
@@ -173,7 +176,7 @@ public class AcmeManagerServiceImpl implements AcmeManagerService {
         csrBuilder.write(csrFileWriter);
         writer.accept(
                 domainCsr,
-                Paths.get(String.valueOf(domainRequest.hashCode()), "domain.csr")
+                Paths.get(getDomainCode(domainRequest.getDomain()), "domain.csr")
                         .toString());
         order.execute(csrBuilder.getEncoded());
         tryUntilTrue(10, () -> {
@@ -202,8 +205,8 @@ public class AcmeManagerServiceImpl implements AcmeManagerService {
 
     @Override
     public KeyPair generateOrGetDomainKeyPair(String domain) throws IOException {
-        Path domainKey = Paths.get(String.valueOf(domain.hashCode()), "domain.key");
-        if (fileService.checkExist(domainKey.toString())) {
+        Path domainKey = Paths.get(getDomainCode(domain), "domain.key");
+        if (fileService.exist(domainKey.toString())) {
             InputStream stream = fileService.getFile(domainKey.toString());
             return KeyPairUtils.readKeyPair(new InputStreamReader(stream));
         } else {
@@ -211,7 +214,7 @@ public class AcmeManagerServiceImpl implements AcmeManagerService {
             Path domainPath = Files.createTempFile("domain", ".key");
             FileWriter fileWriter = new FileWriter(domainPath.toFile());
             KeyPairUtils.writeKeyPair(domainKeyPair, fileWriter);
-            fileService.uploadFile(domainPath.toFile(), domainKey.toString());
+            fileService.upload(domainPath.toFile(), domainKey.toString());
             return domainKeyPair;
         }
     }
@@ -241,4 +244,12 @@ public class AcmeManagerServiceImpl implements AcmeManagerService {
             storeCertificate(writer, domainRequest, cert);
         }
     }
+
+
+    @Override
+    public InputStreamResource getDomainCertificateFile(DomainRequest domainRequest, CertificateFileType fileType) {
+        String fileName = Paths.get(getDomainCode(domainRequest.getDomain()), fileType.getFile()).toString();
+        return new InputStreamResource(fileService.getFile(fileName));
+    }
+
 }
