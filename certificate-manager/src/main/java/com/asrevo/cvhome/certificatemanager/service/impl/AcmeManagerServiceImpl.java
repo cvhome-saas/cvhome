@@ -247,8 +247,8 @@ public class AcmeManagerServiceImpl implements AcmeManagerService {
 
 
     @Override
-    public InputStreamResource getDomainCertificateFile(DomainRequest domainRequest, CertificateFileType fileType) {
-        String fileName = Paths.get(getDomainCode(domainRequest.getDomain()), fileType.getFile()).toString();
+    public InputStreamResource getDomainCertificateFile(String domain, CertificateFileType fileType) {
+        String fileName = Paths.get(getDomainCode(domain), fileType.getFile()).toString();
         return new InputStreamResource(fileService.getFile(fileName));
     }
 

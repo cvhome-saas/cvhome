@@ -32,6 +32,6 @@ public interface AcmeManagerService {
     void generateTemporalTlsAlpn01Certificate(DomainCertificateOrder certificateOrder, BiConsumer<File, String> writer)
             throws IOException;
 
-    InputStreamResource getDomainCertificateFile(DomainRequest domainRequest, CertificateFileType fileType);
+    InputStreamResource getDomainCertificateFile(String domain, CertificateFileType fileType);
 
 }
