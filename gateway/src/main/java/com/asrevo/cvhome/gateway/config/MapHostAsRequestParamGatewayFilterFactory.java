@@ -34,10 +34,32 @@ public class MapHostAsRequestParamGatewayFilterFactory extends AbstractGatewayFi
         this.domainReferenceService = domainReferenceService;
     }
 
+    private static Mono<Void> response(ServerWebExchange exchange, HttpStatus httpStatus, String message) {
+        ServerHttpResponse response = exchange.getResponse();
+        response.setStatusCode(httpStatus);
+        return response.writeWith(Mono.just(response.bufferFactory().wrap(message.getBytes())));
+    }
+
+    private static ServerHttpRequest createHttpRequestWithNewParams(MapHostAsRequestParamGatewayFilterFactory.Config config, ServerWebExchange exchange, URI uri, String itx) {
+        StringBuilder query = new StringBuilder();
+        String originalQuery = uri.getRawQuery();
+        if (StringUtils.hasText(originalQuery)) {
+            query.append(originalQuery);
+            if (originalQuery.charAt(originalQuery.length() - 1) != '&') {
+                query.append('&');
+            }
+        }
+        String value = ServerWebExchangeUtils.expand(exchange, itx);
+        query.append(config.getTemplate());
+        query.append('=');
+        query.append(value);
+        URI newUri = fromUri(uri).replaceQuery(query.toString()).build(true).toUri();
+        return exchange.getRequest().mutate().uri(newUri).build();
+    }
+
     public List<String> shortcutFieldOrder() {
         return List.of(TEMPLATE_KEY);
     }
-
 
     @Override
     public GatewayFilter apply(MapHostAsRequestParamGatewayFilterFactory.Config config) {
@@ -63,29 +85,6 @@ public class MapHostAsRequestParamGatewayFilterFactory extends AbstractGatewayFi
                 return chain.filter(exchange);
             }
         };
-    }
-
-    private static Mono<Void> response(ServerWebExchange exchange, HttpStatus httpStatus, String message) {
-        ServerHttpResponse response = exchange.getResponse();
-        response.setStatusCode(httpStatus);
-        return response.writeWith(Mono.just(response.bufferFactory().wrap(message.getBytes())));
-    }
-
-    private static ServerHttpRequest createHttpRequestWithNewParams(MapHostAsRequestParamGatewayFilterFactory.Config config, ServerWebExchange exchange, URI uri, String itx) {
-        StringBuilder query = new StringBuilder();
-        String originalQuery = uri.getRawQuery();
-        if (StringUtils.hasText(originalQuery)) {
-            query.append(originalQuery);
-            if (originalQuery.charAt(originalQuery.length() - 1) != '&') {
-                query.append('&');
-            }
-        }
-        String value = ServerWebExchangeUtils.expand(exchange, itx);
-        query.append(config.getTemplate());
-        query.append('=');
-        query.append(value);
-        URI newUri = fromUri(uri).replaceQuery(query.toString()).build(true).toUri();
-        return exchange.getRequest().mutate().uri(newUri).build();
     }
 
     public boolean checkingIfHostMappingNeeded(ServerWebExchange exchange, MapHostAsRequestParamGatewayFilterFactory.Config config) {

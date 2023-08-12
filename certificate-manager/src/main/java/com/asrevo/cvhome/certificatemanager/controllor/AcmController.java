@@ -3,7 +3,6 @@ package com.asrevo.cvhome.certificatemanager.controllor;
 import com.asrevo.cvhome.certificatemanager.domain.CertificateFileType;
 import com.asrevo.cvhome.certificatemanager.domain.DomainCertificate;
 import com.asrevo.cvhome.certificatemanager.domain.DomainCertificateOrder;
-import com.asrevo.cvhome.certificatemanager.domain.DomainRequest;
 import com.asrevo.cvhome.certificatemanager.service.AcmeManagerService;
 import com.asrevo.cvhome.certificatemanager.service.DomainCertificateOrderService;
 import lombok.AllArgsConstructor;

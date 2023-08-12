@@ -34,7 +34,6 @@ public class DomainCertificateOrderServiceImpl implements DomainCertificateOrder
     private final DomainReferenceService domainReferenceService;
 
 
-
     @Override
     public DomainCertificateOrder order(DomainCertificateOrder order) throws AcmeException, IOException {
         Order o = acmeManagerService.order(order.getDomain());
@@ -103,7 +102,7 @@ public class DomainCertificateOrderServiceImpl implements DomainCertificateOrder
             DomainCertificate domainCertificate = acmeManagerService.generate(one, fileService::upload);
             one.setCertificateOrderStatus(CertificateOrderStatus.GENERATED);
             iDomainCertificateOrderService.save(one);
-            domainReferenceService.saveOrUpdate(new DomainReference(null,one.getDomain(),one.getReference()));
+            domainReferenceService.saveOrUpdate(new DomainReference(null, one.getDomain(), one.getReference()));
             return domainCertificateRepository.put(domainCertificate);
         }
         return DomainCertificate.from(certificateOrder, status.name());

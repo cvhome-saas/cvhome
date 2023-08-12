@@ -13,12 +13,11 @@ import reactor.test.StepVerifier;
 @SpringBootTest(properties = {"spring.sql.init.mode=always"})
 @Testcontainers
 class UserApplicationTests {
-    @Autowired
-    private UserRepository userRepository;
-
     @Container
     @ServiceConnection
     static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:13");
+    @Autowired
+    private UserRepository userRepository;
 
     @Test
     void contextLoads() {

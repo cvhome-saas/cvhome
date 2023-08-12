@@ -21,12 +21,10 @@ public class LocalFileServiceImpl implements FileService {
         root = createTempDirectory();
     }
 
-    private Path createTempDirectory() throws IOException {
-        this.root = Paths.get(System.getProperty("java.io.tmpdir"), "cvhome-acm");
-        if (!this.root.toFile().exists()) {
-            Files.createDirectory(this.root);
+    private static void createParentDirectory(Path destination) {
+        if (!destination.getParent().toFile().exists()) {
+            destination.getParent().toFile().mkdir();
         }
-        return this.root;
     }
 
 /*
@@ -34,6 +32,14 @@ public class LocalFileServiceImpl implements FileService {
     @Autowired
     private S3Client s3Client;
 */
+
+    private Path createTempDirectory() throws IOException {
+        this.root = Paths.get(System.getProperty("java.io.tmpdir"), "cvhome-acm");
+        if (!this.root.toFile().exists()) {
+            Files.createDirectory(this.root);
+        }
+        return this.root;
+    }
 
     @SneakyThrows
     @Override
@@ -46,12 +52,6 @@ public class LocalFileServiceImpl implements FileService {
                 PutObjectRequest.builder().bucket(bucketName).key(fileName).build();
         s3Client.putObject(request, file.toPath());
 */
-    }
-
-    private static void createParentDirectory(Path destination) {
-        if (!destination.getParent().toFile().exists()) {
-            destination.getParent().toFile().mkdir();
-        }
     }
 
     @SneakyThrows

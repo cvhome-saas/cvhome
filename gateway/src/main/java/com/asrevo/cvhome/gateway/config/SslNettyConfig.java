@@ -16,6 +16,10 @@ import reactor.netty.tcp.SslProvider;
 import java.util.HashMap;
 import java.util.Map;
 
+interface InMemorySslProviderAdapter extends AsyncMapping<String, SslProvider> {
+    SslProvider load(String domain);
+}
+
 @Configuration
 public class SslNettyConfig {
     @Bean
@@ -44,10 +48,6 @@ class DynamicSslLoaderNettyCustomizer implements NettyServerCustomizer {
                             .setSniAsyncMappings(this.loader);
                 });
     }
-}
-
-interface InMemorySslProviderAdapter extends AsyncMapping<String, SslProvider> {
-    SslProvider load(String domain);
 }
 
 @Slf4j
