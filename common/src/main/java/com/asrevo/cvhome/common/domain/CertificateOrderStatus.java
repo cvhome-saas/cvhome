@@ -1,4 +1,4 @@
-package com.asrevo.cvhome.certificatemanager.domain;
+package com.asrevo.cvhome.common.domain;
 
 public enum CertificateOrderStatus {
     REQUESTED,

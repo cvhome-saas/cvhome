@@ -1,9 +1,9 @@
 package com.asrevo.cvhome.certificatemanager.service.impl;
 
-import com.asrevo.cvhome.certificatemanager.domain.CertificateFileType;
+import com.asrevo.cvhome.common.domain.CertificateFileType;
 import com.asrevo.cvhome.certificatemanager.domain.DomainCertificate;
 import com.asrevo.cvhome.certificatemanager.domain.DomainCertificateOrder;
-import com.asrevo.cvhome.certificatemanager.domain.DomainRequest;
+import com.asrevo.cvhome.common.domain.DomainRequest;
 import com.asrevo.cvhome.certificatemanager.service.AcmeManagerService;
 import com.asrevo.cvhome.certificatemanager.service.FileService;
 import lombok.extern.slf4j.Slf4j;

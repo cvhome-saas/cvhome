@@ -1,6 +1,6 @@
 package com.asrevo.cvhome.certificatemanager.controllor;
 
-import com.asrevo.cvhome.certificatemanager.domain.CertificateFileType;
+import com.asrevo.cvhome.common.domain.CertificateFileType;
 import com.asrevo.cvhome.certificatemanager.domain.DomainCertificate;
 import com.asrevo.cvhome.certificatemanager.domain.DomainCertificateOrder;
 import com.asrevo.cvhome.certificatemanager.service.AcmeManagerService;
