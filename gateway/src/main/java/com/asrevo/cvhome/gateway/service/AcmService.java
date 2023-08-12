@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.service.annotation.HttpExchange;
 import org.springframework.web.service.annotation.PostExchange;
 import reactor.core.publisher.Mono;
-import com.asrevo.cvhome.common.domain.CertificateFileType;
+import com.asrevo.cvhome.commons.domain.CertificateFileType;
 
 
 @HttpExchange("api/acm")

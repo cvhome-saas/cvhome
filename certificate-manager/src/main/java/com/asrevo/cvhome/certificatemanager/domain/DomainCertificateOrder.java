@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.certificatemanager.domain;
 
-import com.asrevo.cvhome.common.domain.CertificateOrderStatus;
-import com.asrevo.cvhome.common.domain.Challenges;
+import com.asrevo.cvhome.commons.domain.CertificateOrderStatus;
+import com.asrevo.cvhome.commons.domain.Challenges;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;

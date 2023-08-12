@@ -1,6 +1,6 @@
 package com.asrevo.cvhome.certificatemanager.config.converters;
 
-import com.asrevo.cvhome.common.domain.Challenges;
+import com.asrevo.cvhome.commons.domain.Challenges;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
