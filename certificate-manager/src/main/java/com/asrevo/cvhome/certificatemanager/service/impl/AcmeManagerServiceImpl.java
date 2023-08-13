@@ -1,11 +1,11 @@
 package com.asrevo.cvhome.certificatemanager.service.impl;
 
-import com.asrevo.cvhome.commons.domain.CertificateFileType;
 import com.asrevo.cvhome.certificatemanager.domain.DomainCertificate;
 import com.asrevo.cvhome.certificatemanager.domain.DomainCertificateOrder;
-import com.asrevo.cvhome.commons.domain.DomainRequest;
 import com.asrevo.cvhome.certificatemanager.service.AcmeManagerService;
 import com.asrevo.cvhome.certificatemanager.service.FileService;
+import com.asrevo.cvhome.commons.domain.CertificateFileType;
+import com.asrevo.cvhome.commons.domain.DomainRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.shredzone.acme4j.*;
 import org.shredzone.acme4j.challenge.Challenge;
@@ -249,7 +249,11 @@ public class AcmeManagerServiceImpl implements AcmeManagerService {
     @Override
     public InputStreamResource getDomainCertificateFile(String domain, CertificateFileType fileType) {
         String fileName = Paths.get(getDomainCode(domain), fileType.getFile()).toString();
-        return new InputStreamResource(fileService.getFile(fileName));
+        if (fileService.exist(fileName)) {
+            return new InputStreamResource(fileService.getFile(fileName));
+        } else {
+            return null;
+        }
     }
 
 }

@@ -7,6 +7,7 @@ import io.netty.handler.ssl.util.SelfSignedCertificate;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.shredzone.acme4j.util.KeyPairUtils;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import reactor.core.publisher.Mono;
 import reactor.netty.http.Http2SslContextSpec;
@@ -34,7 +35,7 @@ public class AcmCertificateLoaderImpl implements SSlProviderLoader {
         return it -> {
             String ourDomain = "." + sslProperties.getDefaultDomain();
             if (it == null || it.endsWith(ourDomain) || Utils.isValidInet4Address(it) || !InternetDomainName.isValid(it) || "localhost".equals(it)) {
-                return "*" + ourDomain;
+                return sslProperties.getSubDomainFallback();
             } else {
                 return it;
             }
@@ -111,7 +112,7 @@ public class AcmCertificateLoaderImpl implements SSlProviderLoader {
         Mono<ResponseEntity<byte[]>> certificateResponse = acmService.getDomainCertificateFile(domainRequest, fileType);
         try {
             ResponseEntity<byte[]> responseEntity = certificateResponse.toFuture().get();
-            if (responseEntity.getStatusCode().is2xxSuccessful() && responseEntity.getBody() != null) {
+            if (HttpStatus.OK.equals(responseEntity.getStatusCode()) && responseEntity.getBody() != null) {
                 return new ByteArrayInputStream(responseEntity.getBody());
             } else {
                 log.warn("did not get file because status is {} and body is nullable {}", responseEntity.getStatusCode().value(), Objects.isNull(responseEntity.getBody()));

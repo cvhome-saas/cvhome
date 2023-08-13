@@ -46,3 +46,4 @@ com:
     cvhome:
       ssl:
         default-domain: "wl.asrevo.com"
+        sub-domain-fallback: "*.wl.asrevo.com"

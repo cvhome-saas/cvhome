@@ -1,10 +1,10 @@
 package com.asrevo.cvhome.certificatemanager.controllor;
 
-import com.asrevo.cvhome.commons.domain.CertificateFileType;
 import com.asrevo.cvhome.certificatemanager.domain.DomainCertificate;
 import com.asrevo.cvhome.certificatemanager.domain.DomainCertificateOrder;
 import com.asrevo.cvhome.certificatemanager.service.AcmeManagerService;
 import com.asrevo.cvhome.certificatemanager.service.DomainCertificateOrderService;
+import com.asrevo.cvhome.commons.domain.CertificateFileType;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.shredzone.acme4j.exception.AcmeException;
@@ -53,6 +53,10 @@ public class AcmController {
     @PostMapping("domain-certificate-file")
     public ResponseEntity<InputStreamResource> getDomainCertificateFile(@RequestParam("domain") String domain, @RequestParam(name = "fileType", defaultValue = "CRT") CertificateFileType fileType) {
         InputStreamResource body = acmeManagerService.getDomainCertificateFile(domain, fileType);
-        return ResponseEntity.ok().headers(httpHeaders -> httpHeaders.add(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + fileType.getFile())).body(body);
+        if (body != null) {
+            return ResponseEntity.ok().headers(httpHeaders -> httpHeaders.add(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + fileType.getFile())).body(body);
+        } else {
+            return ResponseEntity.noContent().build();
+        }
     }
 }
