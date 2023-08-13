@@ -1,5 +1,7 @@
 rootProject.name = 'cvhome'
 include 'ui'
+include 'common'
+include 'commons'
 include 'user'
 include 'gateway'
 include 'certificate-manager'

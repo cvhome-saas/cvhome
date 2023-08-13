@@ -1,0 +1,35 @@
+### order a domain certificate
+POST http://localhost:8082/api/acm/order
+Content-Type: application/json
+
+{
+  "domain": "wl.asrevo.com",
+  "reference": "45"
+}
+
+### validate a domain challenge
+POST http://localhost:8082/api/acm/validate
+Content-Type: application/json
+
+{
+  "location": "https://acme-v02.api.letsencrypt.org/acme/order/593265476/201332016326"
+}
+
+### generate a domain challenge
+POST http://localhost:8082/api/acm/generate
+Content-Type: application/json
+
+{
+  "location": "https://acme-v02.api.letsencrypt.org/acme/order/593265476/201332016326"
+}
+
+### downoad a domain crt file
+POST http://localhost:8082/api/acm/domain-certificate-file?domain=wl.asrevo.com&fileType=CRT
+
+
+### downoad a domain key file
+POST http://localhost:8082/api/acm/domain-certificate-file?domain=wl.asrevo.com&fileType=KEY
+
+
+### downoad a domain csr file
+POST http://localhost:8082/api/acm/domain-certificate-file?domain=wl.asrevo.com&fileType=CSR

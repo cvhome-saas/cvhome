@@ -1,17 +1,13 @@
 package com.asrevo.cvhome.certificatemanager.service.impl;
 
-import com.asrevo.cvhome.certificatemanager.service.AcmeManagerService;
 import com.asrevo.cvhome.certificatemanager.domain.DomainCertificate;
 import com.asrevo.cvhome.certificatemanager.domain.DomainCertificateOrder;
-import com.asrevo.cvhome.certificatemanager.domain.DomainRequest;
-import com.asrevo.cvhome.certificatemanager.service.S3Service;
+import com.asrevo.cvhome.certificatemanager.service.AcmeManagerService;
+import com.asrevo.cvhome.certificatemanager.service.FileService;
+import com.asrevo.cvhome.commons.domain.CertificateFileType;
+import com.asrevo.cvhome.commons.domain.DomainRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.shredzone.acme4j.Account;
-import org.shredzone.acme4j.Authorization;
-import org.shredzone.acme4j.Certificate;
-import org.shredzone.acme4j.Login;
-import org.shredzone.acme4j.Order;
-import org.shredzone.acme4j.Status;
+import org.shredzone.acme4j.*;
 import org.shredzone.acme4j.challenge.Challenge;
 import org.shredzone.acme4j.challenge.Dns01Challenge;
 import org.shredzone.acme4j.challenge.Http01Challenge;
@@ -22,13 +18,10 @@ import org.shredzone.acme4j.util.CSRBuilder;
 import org.shredzone.acme4j.util.CertificateUtils;
 import org.shredzone.acme4j.util.KeyPairUtils;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -42,6 +35,7 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
+import static com.asrevo.cvhome.certificatemanager.utils.Utils.getDomainCode;
 import static org.apache.commons.codec.binary.Hex.encodeHexString;
 
 @Service
@@ -53,12 +47,12 @@ public class AcmeManagerServiceImpl implements AcmeManagerService {
 
     private final Login login;
 
-    private final S3Service s3Service;
+    private final FileService fileService;
 
-    public AcmeManagerServiceImpl(Account account, Login login, S3Service s3Service) {
+    public AcmeManagerServiceImpl(Account account, Login login, FileService fileService) {
         this.account = account;
         this.login = login;
-        this.s3Service = s3Service;
+        this.fileService = fileService;
     }
 
     private static void storeCertificate(
@@ -76,7 +70,7 @@ public class AcmeManagerServiceImpl implements AcmeManagerService {
         }
         writer.accept(
                 domainCrt,
-                Paths.get(String.valueOf(domainRequest.hashCode()), "domain.crt")
+                Paths.get(getDomainCode(domainRequest.getDomain()), "domain.crt")
                         .toString());
     }
 
@@ -182,7 +176,7 @@ public class AcmeManagerServiceImpl implements AcmeManagerService {
         csrBuilder.write(csrFileWriter);
         writer.accept(
                 domainCsr,
-                Paths.get(String.valueOf(domainRequest.hashCode()), "domain.csr")
+                Paths.get(getDomainCode(domainRequest.getDomain()), "domain.csr")
                         .toString());
         order.execute(csrBuilder.getEncoded());
         tryUntilTrue(10, () -> {
@@ -211,16 +205,16 @@ public class AcmeManagerServiceImpl implements AcmeManagerService {
 
     @Override
     public KeyPair generateOrGetDomainKeyPair(String domain) throws IOException {
-        Path domainKey = Paths.get(String.valueOf(domain.hashCode()), "domain.key");
-        if (s3Service.checkExist(domainKey.toString())) {
-            InputStream stream = s3Service.getFile(domainKey.toString());
+        Path domainKey = Paths.get(getDomainCode(domain), "domain.key");
+        if (fileService.exist(domainKey.toString())) {
+            InputStream stream = fileService.getFile(domainKey.toString());
             return KeyPairUtils.readKeyPair(new InputStreamReader(stream));
         } else {
             KeyPair domainKeyPair = KeyPairUtils.createKeyPair(2048);
             Path domainPath = Files.createTempFile("domain", ".key");
             FileWriter fileWriter = new FileWriter(domainPath.toFile());
             KeyPairUtils.writeKeyPair(domainKeyPair, fileWriter);
-            s3Service.uploadFile(domainPath.toFile(), domainKey.toString());
+            fileService.upload(domainPath.toFile(), domainKey.toString());
             return domainKeyPair;
         }
     }
@@ -232,6 +226,7 @@ public class AcmeManagerServiceImpl implements AcmeManagerService {
                 certificateOrder, order.getCertificate(), order.getStatus().name());
     }
 
+    @Override
     public void generateTemporalTlsAlpn01Certificate(
             DomainCertificateOrder certificateOrder, BiConsumer<File, String> writer) throws IOException {
         URL location = new URL(certificateOrder.getLocation());
@@ -249,4 +244,16 @@ public class AcmeManagerServiceImpl implements AcmeManagerService {
             storeCertificate(writer, domainRequest, cert);
         }
     }
+
+
+    @Override
+    public InputStreamResource getDomainCertificateFile(String domain, CertificateFileType fileType) {
+        String fileName = Paths.get(getDomainCode(domain), fileType.getFile()).toString();
+        if (fileService.exist(fileName)) {
+            return new InputStreamResource(fileService.getFile(fileName));
+        } else {
+            return null;
+        }
+    }
+
 }

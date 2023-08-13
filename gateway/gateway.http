@@ -1,0 +1,2 @@
+### get actuator info
+GET https://gateway.lcl:8443/actuator/info

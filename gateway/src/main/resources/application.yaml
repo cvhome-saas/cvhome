@@ -1,6 +1,10 @@
 spring:
   application:
     name: gateway
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5432/gatewaydb
+    username: postgres
+    password: password
   cloud:
     gateway:
       default-filters:
@@ -37,12 +41,9 @@ management:
     web:
       exposure:
         include: [ '*' ]
-  tracing:
-    sampling:
-      probability: 1.0
-  otlp:
-    tracing:
-      endpoint: http://localhost:4318/v1/traces
-    metrics:
-      export:
-        url: http://localhost:4318/v1/metrics
+com:
+  asrevo:
+    cvhome:
+      ssl:
+        default-domain: "wl.asrevo.com"
+        sub-domain-fallback: "*.wl.asrevo.com"

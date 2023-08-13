@@ -1,14 +1,14 @@
 package com.asrevo.cvhome.certificatemanager.service;
 
-import com.asrevo.cvhome.certificatemanager.domain.DomainCertificateOrder;
 import com.asrevo.cvhome.certificatemanager.domain.DomainCertificate;
+import com.asrevo.cvhome.certificatemanager.domain.DomainCertificateOrder;
 import org.shredzone.acme4j.exception.AcmeException;
 
 import java.io.IOException;
 
 public interface DomainCertificateOrderService {
 
-    DomainCertificateOrder order(String domain) throws AcmeException, IOException;
+    DomainCertificateOrder order(DomainCertificateOrder order) throws AcmeException, IOException;
 
     DomainCertificateOrder validate(DomainCertificateOrder certificateOrder, String type)
             throws AcmeException, IOException;

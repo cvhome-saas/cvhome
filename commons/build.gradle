@@ -1,0 +1,43 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.1.2'
+    id 'io.spring.dependency-management' version '1.1.2'
+//    id 'org.graalvm.buildtools.native' version '0.9.23'
+}
+group = 'com.asrevo.cvhome'
+
+java {
+    sourceCompatibility = '17'
+}
+
+repositories {
+    mavenCentral()
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+springBoot {
+    buildInfo()
+}
+
+bootBuildImage {
+    builder = "paketobuildpacks/builder:tiny"
+    imageName = "ghcr.io/ashraf-revo/${project.name}:${project.version.replaceAll("\'", "")}"
+    docker {
+        publishRegistry {
+            url = "https://ghcr.io"
+            username = "ashraf-revo"
+            password = System.getenv("GHCR_TOKEN")
+        }
+    }
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
