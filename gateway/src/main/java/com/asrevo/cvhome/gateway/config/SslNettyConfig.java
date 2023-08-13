@@ -20,7 +20,7 @@ interface InMemorySslProviderAdapter extends AsyncMapping<String, SslProvider> {
     SslProvider load(String domain);
 }
 
-@Configuration
+//@Configuration
 public class SslNettyConfig {
     @Bean
     public NettyServerCustomizer customizer() {

@@ -26,6 +26,7 @@ public class WebConfig {
         WebClient client = builder
                 .baseUrl("http://localhost:8082")
                 .build();
+
         HttpServiceProxyFactory proxy =
                 HttpServiceProxyFactory.builder(WebClientAdapter.forClient(client))
                         .build();

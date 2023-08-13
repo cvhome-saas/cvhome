@@ -41,3 +41,8 @@ management:
     web:
       exposure:
         include: [ '*' ]
+com:
+  asrevo:
+    cvhome:
+      ssl:
+        default-domain: "wl.asrevo.com"

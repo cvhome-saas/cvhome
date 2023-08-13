@@ -18,12 +18,13 @@ public class LocalFileServiceImpl implements FileService {
 
     @SneakyThrows
     public LocalFileServiceImpl() {
-        root = createTempDirectory();
+        root = createBaseDirectory();
     }
 
+    @SneakyThrows
     private static void createParentDirectory(Path destination) {
         if (!destination.getParent().toFile().exists()) {
-            destination.getParent().toFile().mkdir();
+            Files.createDirectories(destination.getParent());
         }
     }
 
@@ -33,11 +34,9 @@ public class LocalFileServiceImpl implements FileService {
     private S3Client s3Client;
 */
 
-    private Path createTempDirectory() throws IOException {
-        this.root = Paths.get(System.getProperty("java.io.tmpdir"), "cvhome-acm");
-        if (!this.root.toFile().exists()) {
-            Files.createDirectory(this.root);
-        }
+    private Path createBaseDirectory() throws IOException {
+        this.root = Paths.get(System.getProperty("user.home"), "cvhome/certificate-manager/acm");
+        createParentDirectory(this.root);
         return this.root;
     }
 
