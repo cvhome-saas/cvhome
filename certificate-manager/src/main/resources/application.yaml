@@ -10,9 +10,6 @@ spring:
     password: password
   main:
     lazy-initialization: true
-  sql:
-    init:
-      mode: always
 server:
   forward-headers-strategy: FRAMEWORK
   port: 8082

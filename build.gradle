@@ -25,6 +25,10 @@ ext {
     set('springCloudVersion', "2022.0.4")
 }
 
+springBoot {
+    buildInfo()
+}
+
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter'
     compileOnly 'org.projectlombok:lombok'
