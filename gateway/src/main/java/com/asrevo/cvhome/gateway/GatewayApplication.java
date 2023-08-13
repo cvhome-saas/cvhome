@@ -8,6 +8,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 @SpringBootApplication
 @EnableConfigurationProperties(value = SslProperties.class)
 public class GatewayApplication {
+    @lombok.Generated
     public static void main(String[] args) {
         SpringApplication.run(GatewayApplication.class, args);
     }

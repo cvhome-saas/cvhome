@@ -8,6 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @Getter
 public class CvhomeApplication {
 
+    @lombok.Generated
     public static void main(String[] args) {
         SpringApplication.run(CvhomeApplication.class, args);
     }
