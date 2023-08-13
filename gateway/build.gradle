@@ -3,6 +3,7 @@ plugins {
     id 'org.springframework.boot' version '3.1.2'
     id 'io.spring.dependency-management' version '1.1.2'
     id 'org.graalvm.buildtools.native' version '0.9.23'
+    id 'jacoco'
 }
 group = 'com.asrevo.cvhome'
 
@@ -43,8 +44,6 @@ dependencies {
     implementation 'com.github.ben-manes.caffeine:caffeine:3.1.5'
     implementation 'org.shredzone.acme4j:acme4j-utils:2.15'
     implementation 'com.google.guava:guava:31.1-jre'
-    implementation project(':commons')
-//    testImplementation project (path: ':common', configuration: 'testArchives')
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
@@ -56,4 +55,11 @@ dependencyManagement {
     imports {
         mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
     }
+}
+
+test {
+    finalizedBy jacocoTestReport // report is always generated after tests run
+}
+jacocoTestReport {
+    dependsOn test // tests are required to run before generating the report
 }
