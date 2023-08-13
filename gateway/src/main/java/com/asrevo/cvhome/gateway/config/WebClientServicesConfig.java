@@ -9,7 +9,7 @@ import org.springframework.web.reactive.function.client.support.WebClientAdapter
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 
 @Configuration
-public class WebConfig {
+public class WebClientServicesConfig {
     @Bean
     DomainReferenceService domainReferenceService(WebClient.Builder builder) {
         WebClient client = builder
