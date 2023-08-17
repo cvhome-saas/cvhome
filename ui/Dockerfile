@@ -1,4 +1,4 @@
-FROM nginx:latest
+FROM nginx:1.25
 
 # Copy the build output to replace the default nginx contents.
 ADD  /dist/ui/ /usr/share/nginx/html

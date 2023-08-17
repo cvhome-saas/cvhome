@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.gateway.config.ssl;
 
-import com.asrevo.cvhome.gateway.cache.Cache;
-import com.asrevo.cvhome.gateway.cache.CacheBuilder;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import lombok.extern.slf4j.Slf4j;
 import reactor.netty.tcp.SslProvider;
 
@@ -10,13 +10,13 @@ import java.time.temporal.ChronoUnit;
 
 @Slf4j
 public class SSlProviderCacheLoader implements SSlProviderLoader {
+    private final LoadingCache<String, SslProvider> cache;
     private final SSlProviderLoader loader;
-    private final Cache<String, SslProvider> cache;
 
     SSlProviderCacheLoader(SSlProviderLoader loader) {
         this.loader = loader;
-        this.cache = new CacheBuilder<String, SslProvider>() {
-        }.loader(loader::load).expiry(new SslExpirePolicy(Duration.of(1, ChronoUnit.DAYS))).build();
+        this.cache = Caffeine.newBuilder().expireAfter(new SslExpirePolicy(Duration.of(1, ChronoUnit.DAYS)))
+                .build(loader::load);
     }
 
 
@@ -25,14 +25,5 @@ public class SSlProviderCacheLoader implements SSlProviderLoader {
         return this.cache.get(key);
     }
 
-    @Override
-    public SslProvider defaultSslProvider() {
-        return this.cache.get(loader.getDefaultDomain());
-    }
-
-    @Override
-    public String getDefaultDomain() {
-        return loader.getDefaultDomain();
-    }
 
 }

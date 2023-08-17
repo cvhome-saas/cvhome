@@ -6,7 +6,7 @@ import org.springframework.web.service.annotation.GetExchange;
 import org.springframework.web.service.annotation.HttpExchange;
 import reactor.core.publisher.Mono;
 
-@HttpExchange("api/domain-reference")
+@HttpExchange("api/v1/domain-reference")
 public interface DomainReferenceService {
     @GetExchange("/get-domain-reference")
     Mono<DomainReference> getDomainReference(@RequestParam(name = "domain") String domain);

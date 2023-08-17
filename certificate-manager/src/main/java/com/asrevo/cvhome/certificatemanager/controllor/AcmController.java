@@ -18,7 +18,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 
 @RestController
-@RequestMapping("api/acm")
+@RequestMapping("api/v1/acm")
 @AllArgsConstructor
 @Slf4j
 public class AcmController {
@@ -32,26 +32,31 @@ public class AcmController {
      */
     @PostMapping("order")
     public DomainCertificateOrder order(@RequestBody @Validated DomainCertificateOrder domainOrder) throws AcmeException, IOException {
+        log.info("will order a certificate for domain {}", domainOrder.getDomain());
         return domainCertificateOrderService.order(domainOrder);
     }
 
     @PostMapping("validate")
     public DomainCertificateOrder validate(@RequestBody DomainCertificateOrder certificateOrder, @RequestParam(value = "type", defaultValue = "dns-01") String type) throws AcmeException, IOException {
+        log.info("will validate a domain challenge for {}", certificateOrder.getLocation());
         return domainCertificateOrderService.validate(certificateOrder, type);
     }
 
     @PostMapping("generate")
     public DomainCertificate generate(@RequestBody DomainCertificateOrder certificateOrder) throws AcmeException, IOException {
+        log.info("will generate a certification for {}", certificateOrder.getLocation());
         return domainCertificateOrderService.generate(certificateOrder);
     }
 
     @PostMapping("info")
     public DomainCertificate info(@RequestBody DomainCertificateOrder certificateOrder) throws MalformedURLException {
+        log.info("will get info for {}", certificateOrder.getLocation());
         return acmeManagerService.info(certificateOrder);
     }
 
     @PostMapping("domain-certificate-file")
     public ResponseEntity<InputStreamResource> getDomainCertificateFile(@RequestParam("domain") String domain, @RequestParam(name = "fileType", defaultValue = "CRT") CertificateFileType fileType) {
+        log.info("will download certificate {} for domain {}",fileType.getType(), domain);
         InputStreamResource body = acmeManagerService.getDomainCertificateFile(domain, fileType);
         if (body != null) {
             return ResponseEntity.ok().headers(httpHeaders -> httpHeaders.add(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + fileType.getFile())).body(body);

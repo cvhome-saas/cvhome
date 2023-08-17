@@ -1,5 +1,5 @@
 ### order a domain certificate
-POST http://localhost:8082/api/acm/order
+POST http://localhost:8082/api/v1/acm/order
 Content-Type: application/json
 
 {
@@ -8,7 +8,7 @@ Content-Type: application/json
 }
 
 ### validate a domain challenge
-POST http://localhost:8082/api/acm/validate
+POST http://localhost:8082/api/v1/acm/validate
 Content-Type: application/json
 
 {
@@ -16,7 +16,7 @@ Content-Type: application/json
 }
 
 ### generate a domain challenge
-POST http://localhost:8082/api/acm/generate
+POST http://localhost:8082/api/v1/acm/generate
 Content-Type: application/json
 
 {
@@ -24,12 +24,12 @@ Content-Type: application/json
 }
 
 ### downoad a domain crt file
-POST http://localhost:8082/api/acm/domain-certificate-file?domain=wl.asrevo.com&fileType=CRT
+POST http://localhost:8082/api/v1/acm/domain-certificate-file?domain=wl.asrevo.com&fileType=CRT
 
 
 ### downoad a domain key file
-POST http://localhost:8082/api/acm/domain-certificate-file?domain=wl.asrevo.com&fileType=KEY
+POST http://localhost:8082/api/v1/acm/domain-certificate-file?domain=wl.asrevo.com&fileType=KEY
 
 
 ### downoad a domain csr file
-POST http://localhost:8082/api/acm/domain-certificate-file?domain=wl.asrevo.com&fileType=CSR
+POST http://localhost:8082/api/v1/acm/domain-certificate-file?domain=wl.asrevo.com&fileType=CSR

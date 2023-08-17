@@ -5,7 +5,4 @@ import reactor.netty.tcp.SslProvider;
 public interface SSlProviderLoader {
     SslProvider load(String key);
 
-    SslProvider defaultSslProvider();
-
-    String getDefaultDomain();
 }
