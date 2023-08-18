@@ -56,7 +56,7 @@ public class AcmController {
 
     @PostMapping("domain-certificate-file")
     public ResponseEntity<InputStreamResource> getDomainCertificateFile(@RequestParam("domain") String domain, @RequestParam(name = "fileType", defaultValue = "CRT") CertificateFileType fileType) {
-        log.info("will download certificate {} for domain {}",fileType.getType(), domain);
+        log.info("will download certificate {} for domain {}", fileType.getType(), domain);
         InputStreamResource body = acmeManagerService.getDomainCertificateFile(domain, fileType);
         if (body != null) {
             return ResponseEntity.ok().headers(httpHeaders -> httpHeaders.add(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + fileType.getFile())).body(body);

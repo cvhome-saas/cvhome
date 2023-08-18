@@ -17,18 +17,16 @@ import java.util.function.Supplier;
 public class SslNettyConfig {
 
     @Bean
-    public NettyServerCustomizer customizer(SSlProviderLoader slProviderLoader, Supplier<SslContext> defaultSslContextSupplier) {
+    public NettyServerCustomizer customizer(SSlProviderLoader slProviderLoader, Supplier<SslContext> defaultSslContextSupplier, SslProperties sslProperties) {
         SSlProviderLoader loader = new SSlProviderCacheLoader(slProviderLoader);
-        return new DynamicSslLoaderNettyCustomizer(defaultSslContextSupplier, loader);
+        return new DynamicSslLoaderNettyCustomizer(defaultSslContextSupplier, loader, sslProperties);
     }
 
 
     @SneakyThrows
     @Bean
-    SSlProviderLoader slProviderLoader(AcmService acmService, CertificateFactory cf, SslProperties sslProperties) {
-        return new AcmCertificateLoaderImpl(acmService, cf, sslProperties);
+    SSlProviderLoader slProviderLoader(AcmService acmService, CertificateFactory cf) {
+        return new AcmCertificateLoaderImpl(acmService, cf);
     }
 
 }
-
-

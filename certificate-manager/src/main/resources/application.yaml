@@ -32,3 +32,8 @@ management:
     web:
       exposure:
         include: [ '*' ]
+logging:
+  level:
+    org.springframework.boot: debug
+    org.springframework.web: debug
+    org.springframework.security: debug

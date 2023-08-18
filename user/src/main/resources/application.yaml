@@ -8,7 +8,13 @@ spring:
     url: r2dbc:postgresql://localhost:5432/userdb
     username: postgres
     password: password
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost:9999/realms/cvhome/protocol/openid-connect/certs
 server:
+  forward-headers-strategy: FRAMEWORK
   port: 8081
 info:
   app:
@@ -29,3 +35,8 @@ management:
     web:
       exposure:
         include: [ '*' ]
+logging:
+  level:
+    org.springframework.boot: debug
+    org.springframework.web: debug
+    org.springframework.security: debug

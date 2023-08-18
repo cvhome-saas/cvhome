@@ -1,0 +1,33 @@
+version: '3'
+services:
+  postgres:
+    image: postgres:13
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: kc
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: password
+  keycloak:
+    image: quay.io/keycloak/keycloak:21.0
+    environment:
+      KC_HOSTNAME: localhost
+      KC_HTTP_ENABLED: true
+      KC_HOSTNAME_STRICT_HTTPS: false
+
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/kc
+      KC_DB_USERNAME: root
+      KC_DB_PASSWORD: password
+
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+
+#    command:  --verbose start --proxy=edge --hostname-path=/auth --import-realm
+    command:  --verbose start  --import-realm
+    volumes:
+      - ./keycloak/imports:/opt/keycloak/data/import
+    ports:
+      - "9999:8080"
+    depends_on:
+      - postgres

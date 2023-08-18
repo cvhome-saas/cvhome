@@ -19,6 +19,11 @@ spring:
               metadata:
                 service-name: certificate-manager
                 instance: certificate-manager-1
+          auth:
+            - url: "http://localhost:9999"
+              metadata:
+                service-name: auth
+                instance: auth-1
           ui:
             - url: "http://localhost:4200"
               metadata:
@@ -30,6 +35,8 @@ spring:
           enabled: true
       default-filters:
         - MapHostAsRequestParam=userId
+        - TokenRelay
+        - PreserveHostHeader
       routes:
         - id: user
           uri: lb://user
@@ -43,10 +50,33 @@ spring:
             - Path=/certificate-manager/**
           filters:
             - StripPrefix=1
+        - id: auth
+          uri: lb://auth
+          predicates:
+            - Path=/auth/**
+          filters:
+            - StripPrefix=1
         - id: ui
           uri: lb://ui:4200
           predicates:
             - Host={domain}.{x},{sub}.{domain}.{x}
+  security:
+    oauth2:
+      client:
+        registration:
+          keycloak:
+            client-id: web-app
+            client-authentication-method: client_secret_basic
+            authorization-grant-type: authorization_code
+            scope: openid, profile, email
+            redirect-uri: https://wl.asrevo.com:8443/login/oauth2/code/keycloak
+            provider: keycloak
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:9999/realms/cvhome
+            jwk-set-uri: http://localhost:9999/realms/cvhome/protocol/openid-connect/certs
+            authorization-uri: http://localhost:9999/realms/cvhome/protocol/openid-connect/auth
+            token-uri: http://localhost:9999/realms/cvhome/protocol/openid-connect/token
 server:
   port: 8443
 info:
@@ -76,4 +106,6 @@ com:
         sub-domain-fallback: "*.wl.asrevo.com"
 logging:
   level:
+    org.springframework.boot: debug
     org.springframework.web: debug
+    org.springframework.security: debug
