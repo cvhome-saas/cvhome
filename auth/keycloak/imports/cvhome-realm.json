@@ -53,6 +53,22 @@
       "containerId" : "c4e1ca23-4168-4488-88b3-dc009dea7b85",
       "attributes" : { }
     }, {
+      "id" : "b4b43bb1-a0eb-4127-a01d-6bb9516461e9",
+      "name" : "ROLE_MICROSERVICE_USER",
+      "description" : "",
+      "composite" : false,
+      "clientRole" : false,
+      "containerId" : "c4e1ca23-4168-4488-88b3-dc009dea7b85",
+      "attributes" : { }
+    }, {
+      "id" : "30236b4d-0a81-4ead-99bb-c995eea2fd7c",
+      "name" : "ROLE_MICROSERVICE",
+      "description" : "",
+      "composite" : false,
+      "clientRole" : false,
+      "containerId" : "c4e1ca23-4168-4488-88b3-dc009dea7b85",
+      "attributes" : { }
+    }, {
       "id" : "56ced1fb-c426-4054-8bb1-95acec11045a",
       "name" : "uma_authorization",
       "description" : "${role_uma_authorization}",
@@ -71,6 +87,22 @@
           "account" : [ "view-profile", "manage-account" ]
         }
       },
+      "clientRole" : false,
+      "containerId" : "c4e1ca23-4168-4488-88b3-dc009dea7b85",
+      "attributes" : { }
+    }, {
+      "id" : "e7dcc9b1-44e4-49e1-9278-620d73b17195",
+      "name" : "ROLE_MICROSERVICE_CERTIFICATE_MANAGER",
+      "description" : "",
+      "composite" : false,
+      "clientRole" : false,
+      "containerId" : "c4e1ca23-4168-4488-88b3-dc009dea7b85",
+      "attributes" : { }
+    }, {
+      "id" : "bf10d7a3-60e5-450b-93b8-e6c60ed041bf",
+      "name" : "ROLE_MICROSERVICE_GATEWAY",
+      "description" : "",
+      "composite" : false,
       "clientRole" : false,
       "containerId" : "c4e1ca23-4168-4488-88b3-dc009dea7b85",
       "attributes" : { }
@@ -347,6 +379,14 @@
         "clientRole" : true,
         "containerId" : "e196b198-c4b0-4d65-843e-03d8836f60b7",
         "attributes" : { }
+      } ],
+      "microservice-app" : [ {
+        "id" : "41f99fda-01c4-4c3d-8c82-ed64f19fe695",
+        "name" : "uma_protection",
+        "composite" : false,
+        "clientRole" : true,
+        "containerId" : "ab7db3f8-256a-47f8-b74f-2cb1325555eb",
+        "attributes" : { }
       } ]
     }
   },
@@ -356,6 +396,14 @@
     "path" : "/admin",
     "attributes" : { },
     "realmRoles" : [ "ROLE_ADMIN", "ROLE_USER" ],
+    "clientRoles" : { },
+    "subGroups" : [ ]
+  }, {
+    "id" : "cbc43d1f-54f9-4fb7-93c5-166780785f54",
+    "name" : "microservice",
+    "path" : "/microservice",
+    "attributes" : { },
+    "realmRoles" : [ "ROLE_MICROSERVICE" ],
     "clientRoles" : { },
     "subGroups" : [ ]
   }, {
@@ -383,7 +431,7 @@
   "otpPolicyLookAheadWindow" : 1,
   "otpPolicyPeriod" : 30,
   "otpPolicyCodeReusable" : false,
-  "otpSupportedApplications" : [ "totpAppFreeOTPName", "totpAppGoogleName", "totpAppMicrosoftAuthenticatorName" ],
+  "otpSupportedApplications" : [ "totpAppGoogleName", "totpAppFreeOTPName", "totpAppMicrosoftAuthenticatorName" ],
   "webAuthnPolicyRpEntityName" : "keycloak",
   "webAuthnPolicySignatureAlgorithms" : [ "ES256" ],
   "webAuthnPolicyRpId" : "",
@@ -426,6 +474,72 @@
     "realmRoles" : [ "default-roles-cvhome" ],
     "notBefore" : 0,
     "groups" : [ "/admin" ]
+  }, {
+    "id" : "4003ef66-915e-47f5-9e01-6eb8dbbee38c",
+    "createdTimestamp" : 1692367604799,
+    "username" : "microservice-certificate-manager",
+    "enabled" : true,
+    "totp" : false,
+    "emailVerified" : false,
+    "firstName" : "",
+    "lastName" : "",
+    "credentials" : [ {
+      "id" : "9175ec8f-3bae-4f4c-b1b5-0e431da3d012",
+      "type" : "password",
+      "userLabel" : "My password",
+      "createdDate" : 1692367688110,
+      "secretData" : "{\"value\":\"b4m6Qz9U7jEf9O/r5+cHSnpeFW+4QiMD/3Ll/ZgFlg8=\",\"salt\":\"lJKDqCti8FFXtNMEt8R6rQ==\",\"additionalParameters\":{}}",
+      "credentialData" : "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}"
+    } ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "default-roles-cvhome", "ROLE_MICROSERVICE_CERTIFICATE_MANAGER" ],
+    "notBefore" : 0,
+    "groups" : [ "/microservice" ]
+  }, {
+    "id" : "fcad941c-aea5-426f-8f17-428add82aeb1",
+    "createdTimestamp" : 1692367555378,
+    "username" : "microservice-gateway",
+    "enabled" : true,
+    "totp" : false,
+    "emailVerified" : false,
+    "firstName" : "",
+    "lastName" : "",
+    "credentials" : [ {
+      "id" : "bbbc0a92-425b-46fe-b716-686430c02b7a",
+      "type" : "password",
+      "userLabel" : "My password",
+      "createdDate" : 1692367677685,
+      "secretData" : "{\"value\":\"dVULH+xcETcQzDdppP13t8llS5G65RLgvC6vtKPl5XA=\",\"salt\":\"mhkfclFHollmYUmNVUpZEw==\",\"additionalParameters\":{}}",
+      "credentialData" : "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}"
+    } ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "default-roles-cvhome", "ROLE_MICROSERVICE_GATEWAY" ],
+    "notBefore" : 0,
+    "groups" : [ "/microservice" ]
+  }, {
+    "id" : "9f9c63a1-cab9-4396-9be2-e52441eecb8b",
+    "createdTimestamp" : 1692367580050,
+    "username" : "microservice-user",
+    "enabled" : true,
+    "totp" : false,
+    "emailVerified" : false,
+    "firstName" : "",
+    "lastName" : "",
+    "credentials" : [ {
+      "id" : "20b337cd-f81d-4db4-b5f4-4d128acaf2ce",
+      "type" : "password",
+      "userLabel" : "My password",
+      "createdDate" : 1692367664250,
+      "secretData" : "{\"value\":\"X63n91+yjzBfHd82zHR/P5u2wyxYQ8foc42PdMdNBCw=\",\"salt\":\"xzjsIQOt7RgYrWjOiW7R6w==\",\"additionalParameters\":{}}",
+      "credentialData" : "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}"
+    } ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "ROLE_MICROSERVICE_USER", "default-roles-cvhome" ],
+    "notBefore" : 0,
+    "groups" : [ "/microservice" ]
   }, {
     "id" : "3dea29fd-f6b2-48b1-8231-f4b5f1c68714",
     "createdTimestamp" : 1692299391986,
@@ -582,6 +696,90 @@
     "authenticationFlowBindingOverrides" : { },
     "fullScopeAllowed" : false,
     "nodeReRegistrationTimeout" : 0,
+    "defaultClientScopes" : [ "web-origins", "acr", "profile", "roles", "email" ],
+    "optionalClientScopes" : [ "address", "phone", "offline_access", "microprofile-jwt" ]
+  }, {
+    "id" : "ab7db3f8-256a-47f8-b74f-2cb1325555eb",
+    "clientId" : "microservice-app",
+    "name" : "",
+    "description" : "",
+    "rootUrl" : "",
+    "adminUrl" : "",
+    "baseUrl" : "",
+    "surrogateAuthRequired" : false,
+    "enabled" : true,
+    "alwaysDisplayInConsole" : false,
+    "clientAuthenticatorType" : "client-secret",
+    "secret" : "r1nuVn4HefusLGwHIeRxbdOzdTZLEMvQ",
+    "redirectUris" : [ "/*" ],
+    "webOrigins" : [ "/*" ],
+    "notBefore" : 0,
+    "bearerOnly" : false,
+    "consentRequired" : false,
+    "standardFlowEnabled" : false,
+    "implicitFlowEnabled" : false,
+    "directAccessGrantsEnabled" : true,
+    "serviceAccountsEnabled" : false,
+    "publicClient" : false,
+    "frontchannelLogout" : true,
+    "protocol" : "openid-connect",
+    "attributes" : {
+      "client.secret.creation.time" : "1692366825",
+      "oauth2.device.authorization.grant.enabled" : "false",
+      "backchannel.logout.revoke.offline.tokens" : "false",
+      "use.refresh.tokens" : "true",
+      "oidc.ciba.grant.enabled" : "false",
+      "backchannel.logout.session.required" : "true",
+      "client_credentials.use_refresh_token" : "false",
+      "acr.loa.map" : "{}",
+      "require.pushed.authorization.requests" : "false",
+      "tls.client.certificate.bound.access.tokens" : "false",
+      "display.on.consent.screen" : "false",
+      "token.response.type.bearer.lower-case" : "false"
+    },
+    "authenticationFlowBindingOverrides" : { },
+    "fullScopeAllowed" : true,
+    "nodeReRegistrationTimeout" : -1,
+    "protocolMappers" : [ {
+      "id" : "51e0ae33-796a-4918-92f6-c8b71bcd8f60",
+      "name" : "Client ID",
+      "protocol" : "openid-connect",
+      "protocolMapper" : "oidc-usersessionmodel-note-mapper",
+      "consentRequired" : false,
+      "config" : {
+        "user.session.note" : "clientId",
+        "id.token.claim" : "true",
+        "access.token.claim" : "true",
+        "claim.name" : "clientId",
+        "jsonType.label" : "String"
+      }
+    }, {
+      "id" : "7aad3046-0603-457b-9224-6610a05330ca",
+      "name" : "Client Host",
+      "protocol" : "openid-connect",
+      "protocolMapper" : "oidc-usersessionmodel-note-mapper",
+      "consentRequired" : false,
+      "config" : {
+        "user.session.note" : "clientHost",
+        "id.token.claim" : "true",
+        "access.token.claim" : "true",
+        "claim.name" : "clientHost",
+        "jsonType.label" : "String"
+      }
+    }, {
+      "id" : "5e9ebd4c-9d45-4c9e-b29a-57387d3916cc",
+      "name" : "Client IP Address",
+      "protocol" : "openid-connect",
+      "protocolMapper" : "oidc-usersessionmodel-note-mapper",
+      "consentRequired" : false,
+      "config" : {
+        "user.session.note" : "clientAddress",
+        "id.token.claim" : "true",
+        "access.token.claim" : "true",
+        "claim.name" : "clientAddress",
+        "jsonType.label" : "String"
+      }
+    } ],
     "defaultClientScopes" : [ "web-origins", "acr", "profile", "roles", "email" ],
     "optionalClientScopes" : [ "address", "phone", "offline_access", "microprofile-jwt" ]
   }, {
