@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("api/domain-reference")
+@RequestMapping("api/v1/domain-reference")
 @AllArgsConstructor
 @Slf4j
 public class DomainReferenceController {
