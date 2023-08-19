@@ -29,6 +29,11 @@ spring:
               metadata:
                 service-name: ui
                 instance: ui-1
+          gateway:
+            - url: "http://localhost:8080"
+              metadata:
+                service-name: gateway
+                instance: gateway-1
     gateway:
       discovery:
         locator:
@@ -64,6 +69,11 @@ spring:
     oauth2:
       client:
         registration:
+          microservice:
+            provider: microservice
+            client-id: microservice-app
+            client-secret: r1nuVn4HefusLGwHIeRxbdOzdTZLEMvQ
+            authorization-grant-type: password
           keycloak:
             client-id: web-app
             client-authentication-method: client_secret_basic
@@ -72,6 +82,8 @@ spring:
             redirect-uri: https://wl.asrevo.com:8443/login/oauth2/code/keycloak
             provider: keycloak
         provider:
+          microservice:
+            token-uri: http://localhost:9999/realms/cvhome/protocol/openid-connect/token?username=microservice-gateway&password=microservice-gateway
           keycloak:
             issuer-uri: http://localhost:9999/realms/cvhome
             jwk-set-uri: http://localhost:9999/realms/cvhome/protocol/openid-connect/certs
@@ -109,3 +121,4 @@ logging:
     org.springframework.boot: debug
     org.springframework.web: debug
     org.springframework.security: debug
+    reactor.netty.http: debug
