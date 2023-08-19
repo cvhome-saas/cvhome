@@ -19,6 +19,11 @@ import static org.springframework.security.web.server.util.matcher.ServerWebExch
 @Configuration
 @EnableWebFluxSecurity
 public class SecurityConfig {
+    private static Mono<ServerWebExchangeMatcher.MatchResult> matches(ServerWebExchange exchange) {
+        ServerHttpRequest request = exchange.getRequest();
+        return (request.getMethod() != HttpMethod.GET && !request.getPath().toString().startsWith("/auth")) ? match() : notMatch();
+    }
+
     @Bean
     SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http, CookieServerCsrfTokenRepository tokenRepository) {
         // @formatter:off
@@ -38,10 +43,5 @@ public class SecurityConfig {
     @Bean
     public CookieServerCsrfTokenRepository cookieServerCsrfTokenRepository() {
         return CookieServerCsrfTokenRepository.withHttpOnlyFalse();
-    }
-
-    private static Mono<ServerWebExchangeMatcher.MatchResult> matches(ServerWebExchange exchange) {
-        ServerHttpRequest request = exchange.getRequest();
-        return (request.getMethod() != HttpMethod.GET && !request.getPath().toString().startsWith("/auth")) ? match() : notMatch();
     }
 }

@@ -24,7 +24,8 @@ public class ServerCallBearerExchangeFilterFunction implements ExchangeFilterFun
     private final String registrationId;
     private final String username;
     private final String password;
-
+    private OAuth2AccessTokenResponse accessToken;
+    private ClientRegistration registration;
     public ServerCallBearerExchangeFilterFunction(WebClientReactivePasswordTokenResponseClient tokenClient,
                                                   WebClientReactiveRefreshTokenTokenResponseClient refreshTokenClient,
                                                   ReactiveClientRegistrationRepository registrationRepository, String registrationId, String username, String password) {
@@ -35,9 +36,6 @@ public class ServerCallBearerExchangeFilterFunction implements ExchangeFilterFun
         this.password = password;
         this.refreshTokenClient = refreshTokenClient;
     }
-
-    private OAuth2AccessTokenResponse accessToken;
-    private ClientRegistration registration;
 
     @Override
     public Mono<ClientResponse> filter(ClientRequest request, ExchangeFunction next) {
