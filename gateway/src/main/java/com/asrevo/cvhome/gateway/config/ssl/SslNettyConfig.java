@@ -43,8 +43,8 @@ public class SslNettyConfig {
             RestTemplate template = new RestTemplate();
             ParameterizedTypeReference<byte[]> responseType = new ParameterizedTypeReference<>() {
             };
-            AcmService acmService = (domain1, fileType) -> {
-                String url = "http://localhost:8082/api/v1/acm/domain-certificate-file?domain=" + domain1 + "&fileType=" + fileType.name();
+            AcmService acmService = (d, fileType) -> {
+                String url = "http://localhost:8082/api/v1/acm/domain-certificate-file?domain=" + d + "&fileType=" + fileType.name();
                 return template.exchange(url, POST, null, responseType);
             };
             SslContext sslContext = acmService.getSslContext(cf, domain);
