@@ -37,10 +37,9 @@ public class SslNettyConfig {
     }
 
     @Bean
-    public Supplier<SslContext> defaultSslContextSupplier(SslProperties sslProperties, CertificateFactory cf) {
+    public Supplier<SslContext> defaultSslContextSupplier(RestTemplate template ,SslProperties sslProperties, CertificateFactory cf) {
         return () -> {
             String domain = sslProperties.getDefaultDomain();
-            RestTemplate template = new RestTemplate();
             ParameterizedTypeReference<byte[]> responseType = new ParameterizedTypeReference<>() {
             };
             AcmService acmService = (d, fileType) -> {
