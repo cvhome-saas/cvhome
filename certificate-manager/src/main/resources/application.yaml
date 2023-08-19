@@ -8,8 +8,40 @@ spring:
     url: jdbc:postgresql://localhost:5432/certificatemanagerdb
     username: postgres
     password: password
-  main:
-    lazy-initialization: true
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost:9999/realms/cvhome/protocol/openid-connect/certs
+  cloud:
+    local:
+      discovery:
+        services:
+          user:
+            - url: "http://localhost:8081"
+              metadata:
+                service-name: user
+                instance: user-1
+          certificate-manager:
+            - url: "http://localhost:8082"
+              metadata:
+                service-name: certificate-manager
+                instance: certificate-manager-1
+          auth:
+            - url: "http://localhost:9999"
+              metadata:
+                service-name: auth
+                instance: auth-1
+          ui:
+            - url: "http://localhost:4200"
+              metadata:
+                service-name: ui
+                instance: ui-1
+          gateway:
+            - url: "http://localhost:8080"
+              metadata:
+                service-name: gateway
+                instance: gateway-1
 server:
   forward-headers-strategy: FRAMEWORK
   port: 8082
@@ -37,3 +69,4 @@ logging:
     org.springframework.boot: debug
     org.springframework.web: debug
     org.springframework.security: debug
+    reactor.netty.http: debug
