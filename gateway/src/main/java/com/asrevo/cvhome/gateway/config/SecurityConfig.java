@@ -21,11 +21,18 @@ import static org.springframework.security.web.server.util.matcher.ServerWebExch
 public class SecurityConfig {
     @Bean
     SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http, CookieServerCsrfTokenRepository tokenRepository) {
-        return http.authorizeExchange(it -> it.anyExchange().permitAll())
+        // @formatter:off
+        return http.authorizeExchange(it ->
+                        it.anyExchange().permitAll()
+                )
                 .oauth2Login(withDefaults())
                 .oauth2Client(withDefaults())
-                .csrf(it -> it.csrfTokenRepository(tokenRepository).requireCsrfProtectionMatcher(SecurityConfig::matches))
+                .csrf(it ->
+                        it.csrfTokenRepository(tokenRepository)
+                                .requireCsrfProtectionMatcher(SecurityConfig::matches)
+                )
                 .build();
+        // @formatter:on
     }
 
     @Bean
@@ -37,6 +44,4 @@ public class SecurityConfig {
         ServerHttpRequest request = exchange.getRequest();
         return (request.getMethod() != HttpMethod.GET && !request.getPath().toString().startsWith("/auth")) ? match() : notMatch();
     }
-
-
 }
