@@ -10,6 +10,8 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.csrf.CookieServerCsrfTokenRepository;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher;
 import org.springframework.web.server.ServerWebExchange;
+import org.springframework.web.server.session.CookieWebSessionIdResolver;
+import org.springframework.web.server.session.WebSessionIdResolver;
 import reactor.core.publisher.Mono;
 
 import static org.springframework.security.config.Customizer.withDefaults;
@@ -21,7 +23,14 @@ import static org.springframework.security.web.server.util.matcher.ServerWebExch
 public class SecurityConfig {
     private static Mono<ServerWebExchangeMatcher.MatchResult> matches(ServerWebExchange exchange) {
         ServerHttpRequest request = exchange.getRequest();
-        return (request.getMethod() != HttpMethod.GET && !request.getPath().toString().startsWith("/auth")) ? match() : notMatch();
+        // @formatter:off
+        return (
+                request.getMethod() != HttpMethod.GET
+                && !request.getPath().toString().startsWith("/auth")
+                && !request.getPath().toString().startsWith("/realms")
+                && !request.getPath().toString().startsWith("/resources")
+        ) ? match() : notMatch();
+        // @formatter:on
     }
 
     @Bean
@@ -43,5 +52,13 @@ public class SecurityConfig {
     @Bean
     public CookieServerCsrfTokenRepository cookieServerCsrfTokenRepository() {
         return CookieServerCsrfTokenRepository.withHttpOnlyFalse();
+    }
+
+    @Bean
+    public WebSessionIdResolver webSessionIdResolver() {
+        CookieWebSessionIdResolver resolver = new CookieWebSessionIdResolver();
+        resolver.setCookieName("GATEWAY-JSESSIONID");
+        resolver.addCookieInitializer((builder) -> builder.path("/"));
+        return resolver;
     }
 }

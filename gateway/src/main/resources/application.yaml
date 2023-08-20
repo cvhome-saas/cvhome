@@ -61,6 +61,18 @@ spring:
             - Path=/auth/**
           filters:
             - StripPrefix=1
+        - id: realms
+          uri: lb://auth
+          predicates:
+            - Path=/realms/**
+        - id: resources
+          uri: lb://auth
+          predicates:
+            - Path=/resources/**
+        - id: js
+          uri: lb://auth
+          predicates:
+            - Path=/js/**
         - id: ui
           uri: lb://ui:4200
           predicates:
@@ -81,6 +93,7 @@ spring:
             scope: openid, profile, email
             redirect-uri: https://wl.asrevo.com:8443/login/oauth2/code/keycloak
             provider: keycloak
+            client-secret: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
         provider:
           microservice:
             token-uri: http://localhost:9999/realms/cvhome/protocol/openid-connect/token?username=microservice-gateway&password=microservice-gateway

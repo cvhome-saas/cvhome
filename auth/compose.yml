@@ -11,7 +11,6 @@ services:
   keycloak:
     image: quay.io/keycloak/keycloak:21.0
     environment:
-      KC_HOSTNAME: localhost
       KC_HTTP_ENABLED: true
       KC_HOSTNAME_STRICT_HTTPS: false
 
@@ -23,8 +22,9 @@ services:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
 
+#    command:  --verbose start --proxy=edge  --hostname-strict=false --import-realm
 #    command:  --verbose start --proxy=edge --hostname-path=/auth --import-realm
-    command:  --verbose start  --import-realm
+    command:  --verbose start  --hostname-strict=false --import-realm
     volumes:
       - ./keycloak/imports:/opt/keycloak/data/import
     ports:
