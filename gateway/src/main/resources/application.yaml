@@ -98,9 +98,10 @@ spring:
           microservice:
             token-uri: http://localhost:9999/realms/cvhome/protocol/openid-connect/token?username=microservice-gateway&password=microservice-gateway
           keycloak:
-            issuer-uri: http://localhost:9999/realms/cvhome
+#            comment issuer-uri to skip validation
+#            issuer-uri: https://wl.asrevo.com:8443/realms/cvhome
             jwk-set-uri: http://localhost:9999/realms/cvhome/protocol/openid-connect/certs
-            authorization-uri: http://localhost:9999/realms/cvhome/protocol/openid-connect/auth
+            authorization-uri: https://wl.asrevo.com:8443/realms/cvhome/protocol/openid-connect/auth
             token-uri: http://localhost:9999/realms/cvhome/protocol/openid-connect/token
 server:
   port: 8443
