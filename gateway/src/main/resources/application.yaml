@@ -42,6 +42,7 @@ spring:
         - MapHostAsRequestParam=userId
         - TokenRelay
         - PreserveHostHeader
+        - AddResponseHeader=X-Frame-Options, SAMEORIGIN
       routes:
         - id: user
           uri: lb://user
@@ -101,7 +102,9 @@ spring:
             jwk-set-uri: http://localhost:9999/realms/cvhome/protocol/openid-connect/certs
             authorization-uri: https://wl.asrevo.com:8443/realms/cvhome/protocol/openid-connect/auth
             token-uri: http://localhost:9999/realms/cvhome/protocol/openid-connect/token
-            user-info-uri: http://localhost:9999/realms/cvhome/protocol/openid-connect/userinfo
+#            need to trace why getting 401
+#            user-info-uri: http://localhost:9999/realms/cvhome/protocol/openid-connect/userinfo
+#            user-name-attribute: sub
 server:
   port: 8443
 info:
