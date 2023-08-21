@@ -37,7 +37,7 @@ public class SslNettyConfig {
     }
 
     @Bean
-    public Supplier<SslContext> defaultSslContextSupplier(RestTemplate template ,SslProperties sslProperties, CertificateFactory cf) {
+    public Supplier<SslContext> defaultSslContextSupplier(RestTemplate template, SslProperties sslProperties, CertificateFactory cf) {
         return () -> {
             String domain = sslProperties.getDefaultDomain();
             ParameterizedTypeReference<byte[]> responseType = new ParameterizedTypeReference<>() {
