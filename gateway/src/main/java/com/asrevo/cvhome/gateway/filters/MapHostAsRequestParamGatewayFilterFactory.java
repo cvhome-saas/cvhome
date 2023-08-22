@@ -1,4 +1,4 @@
-package com.asrevo.cvhome.gateway.config;
+package com.asrevo.cvhome.gateway.filters;
 
 import com.asrevo.cvhome.gateway.models.DomainReference;
 import com.asrevo.cvhome.gateway.service.DomainReferenceService;

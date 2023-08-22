@@ -1,4 +1,4 @@
-package com.asrevo.cvhome.gateway.config;
+package com.asrevo.cvhome.gateway.config.oauth2;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.client.endpoint.OAuth2PasswordGrantRequest;
@@ -26,6 +26,7 @@ public class ServerCallBearerExchangeFilterFunction implements ExchangeFilterFun
     private final String password;
     private OAuth2AccessTokenResponse accessToken;
     private ClientRegistration registration;
+
     public ServerCallBearerExchangeFilterFunction(WebClientReactivePasswordTokenResponseClient tokenClient,
                                                   WebClientReactiveRefreshTokenTokenResponseClient refreshTokenClient,
                                                   ReactiveClientRegistrationRepository registrationRepository, String registrationId, String username, String password) {

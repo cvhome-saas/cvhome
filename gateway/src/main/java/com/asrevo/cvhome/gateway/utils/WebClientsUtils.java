@@ -1,4 +1,4 @@
-package com.asrevo.cvhome.gateway.config;
+package com.asrevo.cvhome.gateway.utils;
 
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.support.WebClientAdapter;

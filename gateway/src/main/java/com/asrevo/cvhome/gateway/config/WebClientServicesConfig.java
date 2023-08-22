@@ -1,17 +1,29 @@
 package com.asrevo.cvhome.gateway.config;
 
+import com.asrevo.cvhome.gateway.config.oauth2.PasswordTokenResponseClient;
+import com.asrevo.cvhome.gateway.config.oauth2.RefreshTokenTokenResponseClient;
+import com.asrevo.cvhome.gateway.config.oauth2.ServerCallBearerExchangeFilterFunction;
+import com.asrevo.cvhome.gateway.config.oauth2.ServerCallBearerExchangeInterceptor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
+import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientPropertiesMapper;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.oauth2.client.endpoint.WebClientReactivePasswordTokenResponseClient;
 import org.springframework.security.oauth2.client.endpoint.WebClientReactiveRefreshTokenTokenResponseClient;
+import org.springframework.security.oauth2.client.registration.ClientRegistration;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
 import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
 import org.springframework.security.oauth2.client.web.reactive.function.client.ServerOAuth2AuthorizedClientExchangeFilterFunction;
 import org.springframework.security.oauth2.client.web.server.ServerOAuth2AuthorizedClientRepository;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Configuration
 @Slf4j
@@ -44,19 +56,38 @@ public class WebClientServicesConfig {
     }
 
     @Bean
-    public RestTemplate restTemplate() {
-        return new RestTemplate();
+    public PasswordTokenResponseClient passwordTokenResponseClient() {
+        return new PasswordTokenResponseClient();
     }
 
     @Bean
-    public WebClientReactivePasswordTokenResponseClient passwordTokenResponseClient(@Qualifier("defaultBuilder") WebClient.Builder defaultBuilder) {
+    public RefreshTokenTokenResponseClient refreshTokenTokenResponseClient() {
+        return new RefreshTokenTokenResponseClient();
+    }
+
+    ClientRegistrationRepository getClientRegistrationRepository(OAuth2ClientProperties properties) {
+        List<ClientRegistration> registrations = new ArrayList<>(
+                new OAuth2ClientPropertiesMapper(properties).asClientRegistrations().values());
+        return new InMemoryClientRegistrationRepository(registrations);
+    }
+
+    @Bean
+    public RestTemplate restTemplate(PasswordTokenResponseClient responseClient, RefreshTokenTokenResponseClient refreshTokenTokenResponseClient, OAuth2ClientProperties properties) {
+        RestTemplate restTemplate = new RestTemplate();
+        ClientRegistrationRepository registrationRepository = getClientRegistrationRepository(properties);
+        restTemplate.setInterceptors(List.of(new ServerCallBearerExchangeInterceptor(responseClient, refreshTokenTokenResponseClient, registrationRepository, "microservice", "microservice-gateway", "microservice-gateway")));
+        return restTemplate;
+    }
+
+    @Bean
+    public WebClientReactivePasswordTokenResponseClient reactivePasswordTokenResponseClient(@Qualifier("defaultBuilder") WebClient.Builder defaultBuilder) {
         WebClientReactivePasswordTokenResponseClient client = new WebClientReactivePasswordTokenResponseClient();
         client.setWebClient(defaultBuilder.build());
         return client;
     }
 
     @Bean
-    public WebClientReactiveRefreshTokenTokenResponseClient refreshTokenClient(@Qualifier("defaultBuilder") WebClient.Builder defaultBuilder) {
+    public WebClientReactiveRefreshTokenTokenResponseClient reactiveRefreshTokenTokenResponseClient(@Qualifier("defaultBuilder") WebClient.Builder defaultBuilder) {
         WebClientReactiveRefreshTokenTokenResponseClient refreshTokenClient = new WebClientReactiveRefreshTokenTokenResponseClient();
         refreshTokenClient.setWebClient(defaultBuilder.build());
         return refreshTokenClient;
