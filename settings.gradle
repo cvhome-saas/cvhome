@@ -1,5 +1,6 @@
 rootProject.name = 'cvhome'
 include 'ui'
+include 'profile'
 include 'auth'
 include 'commons'
 include 'user'

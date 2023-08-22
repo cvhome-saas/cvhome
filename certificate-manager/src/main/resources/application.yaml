@@ -37,6 +37,11 @@ spring:
               metadata:
                 service-name: ui
                 instance: ui-1
+          profile:
+            - url: "http://localhost:4300"
+              metadata:
+                service-name: profile
+                instance: profile-1
           gateway:
             - url: "http://localhost:8080"
               metadata:
