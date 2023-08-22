@@ -10,6 +10,7 @@ import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFac
 import org.springframework.cloud.gateway.support.ServerWebExchangeUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
@@ -67,17 +68,19 @@ public class MapHostAsRequestParamGatewayFilterFactory extends AbstractGatewayFi
             URI uri = exchange.getRequest().getURI();
             String hostName = exchange.getRequest().getHeaders().getHost().getHostName();
             if (checkingIfHostMappingNeeded(exchange, config)) {
-                Mono<String> domainReference = this.domainReferenceService.getDomainReference(hostName).map(DomainReference::reference);
+                Mono<ResponseEntity<DomainReference>> domainReferenceResponse = this.domainReferenceService.getDomainReference(hostName);
                 try {
-                    return domainReference.flatMap(itx -> {
-                        if (itx != null && !itx.isEmpty()) {
-                            ServerHttpRequest request = createHttpRequestWithNewParams(config, exchange, uri, itx);
-                            return chain.filter(exchange.mutate().request(request).build());
-                        } else {
-                            log.warn("will reject " + uri + " with headers " + exchange.getRequest().getHeaders());
-                            return response(exchange, HttpStatus.BAD_REQUEST, "invalid host header " + hostName);
-                        }
-                    });
+                    return domainReferenceResponse
+                            .flatMap(itx -> {
+                                if (itx.getStatusCode().isSameCodeAs(HttpStatus.OK)) {
+                                    if (itx.getBody() != null && itx.getBody().domain() != null) {
+                                        ServerHttpRequest request = createHttpRequestWithNewParams(config, exchange, uri, itx.getBody().domain());
+                                        return chain.filter(exchange.mutate().request(request).build());
+                                    }
+                                }
+                                log.warn("will reject " + uri + " with headers " + exchange.getRequest().getHeaders());
+                                return response(exchange, HttpStatus.BAD_REQUEST, "invalid host header " + hostName);
+                            });
                 } catch (RuntimeException ex) {
                     throw new IllegalStateException("Invalid URI query: \"" + uri.getRawQuery() + "\"");
                 }

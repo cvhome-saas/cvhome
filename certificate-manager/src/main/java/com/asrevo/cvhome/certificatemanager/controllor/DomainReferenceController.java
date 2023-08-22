@@ -24,6 +24,10 @@ public class DomainReferenceController {
     @PreAuthorize("hasAnyAuthority('ROLE_MICROSERVICE')")
     public Optional<DomainReference> getDomainReference(@RequestParam("domain") String domain) {
         log.info("getting domain reference for domain {}", domain);
-        return domainReferenceService.getDomainReference(domain);
+        Optional<DomainReference> domainReference = domainReferenceService.getDomainReference(domain);
+        if (domainReference.isEmpty()) {
+            log.warn("did not get domain reference for domain {}", domain);
+        }
+        return domainReference;
     }
 }
