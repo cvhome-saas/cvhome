@@ -1,13 +1,21 @@
-version: '3'
+version: "3.1"
 services:
   postgres:
-    image: postgres:13
+    image: "postgres:13"
+    restart: always
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_DB: kc
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+  rabbitmq:
+    image: "rabbitmq:3.12-management"
+    restart: always
+    ports:
+      - "15672:15672"
+      - "5672:5672"
   keycloak:
     image: quay.io/keycloak/keycloak:21.0
     environment:
@@ -23,10 +31,10 @@ services:
       KEYCLOAK_ADMIN_PASSWORD: admin
 
     command:  --verbose start --proxy=edge  --hostname-strict=false --import-realm
-#    command:  --verbose start --proxy=edge --hostname-strict=false --hostname-path=/auth --import-realm
-#    command:  --verbose start  --hostname-strict=false --import-realm
+    #    command:  --verbose start --proxy=edge --hostname-strict=false --hostname-path=/auth --import-realm
+    #    command:  --verbose start  --hostname-strict=false --import-realm
     volumes:
-      - ./keycloak/imports:/opt/keycloak/data/import
+      - ../auth/keycloak/imports:/opt/keycloak/data/import
     ports:
       - "9999:8080"
     depends_on:
