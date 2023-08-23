@@ -80,13 +80,13 @@ spring:
           predicates:
             - Path=/js/**
         - id: ui
-          uri: lb://ui:4200
+          uri: lb://ui
           predicates:
-            - Host={domain}.{x},{sub}.{domain}.{x}
+            - FHost=gateway.com,www.gateway.com
         - id: profile
-          uri: lb://profile:4200
+          uri: lb://profile
           predicates:
-            - Host={domain}.{x},{sub}.{domain}.{x}
+            - FHost={domain}.{x},{sub}.{domain}.{x}
   security:
     oauth2:
       client:
@@ -101,15 +101,15 @@ spring:
             client-authentication-method: client_secret_basic
             authorization-grant-type: authorization_code
             scope: openid, profile, email
-            redirect-uri: https://wl.asrevo.com:8443/login/oauth2/code/keycloak
+            redirect-uri: https://gateway.com:8443/login/oauth2/code/keycloak
             provider: keycloak
             client-secret: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
         provider:
           keycloak:
 #            comment issuer-uri to skip validation
-#            issuer-uri: https://wl.asrevo.com:8443/realms/cvhome
+#            issuer-uri: https://gateway.com:8443/realms/cvhome
             jwk-set-uri: http://localhost:9999/realms/cvhome/protocol/openid-connect/certs
-            authorization-uri: https://wl.asrevo.com:8443/realms/cvhome/protocol/openid-connect/auth
+            authorization-uri: https://gateway.com:8443/realms/cvhome/protocol/openid-connect/auth
             token-uri: http://localhost:9999/realms/cvhome/protocol/openid-connect/token
 #            need to trace why getting 401
 #            user-info-uri: http://localhost:9999/realms/cvhome/protocol/openid-connect/userinfo
@@ -139,8 +139,8 @@ com:
   asrevo:
     cvhome:
       ssl:
-        default-domain: "wl.asrevo.com"
-        sub-domain-fallback: "*.wl.asrevo.com"
+        default-domain: "gateway.com"
+        sub-domain-fallback: "*.gateway.com"
 logging:
   level:
     org.springframework.boot: debug

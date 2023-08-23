@@ -1,8 +1,8 @@
 ### get actuator info
-GET https://gateway.lcl:8443/actuator/info
+GET https://gateway.com:8443/actuator/info
 
 
 ### get get user
-GET https://wl.asrevo.com:8443/user/api/v1/user
+GET https://gateway.com:8443/user/api/v1/user
 Map-Host-As-Request-Param: true
 Accept: application/json

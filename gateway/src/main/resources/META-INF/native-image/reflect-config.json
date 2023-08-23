@@ -5,43 +5,36 @@
       {
         "name": "<init>",
         "parameterTypes": [
-
         ]
       },
       {
         "name": "getServiceId",
         "parameterTypes": [
-
         ]
       },
       {
         "name": "getHost",
         "parameterTypes": [
-
         ]
       },
       {
         "name": "getPort",
         "parameterTypes": [
-
         ]
       },
       {
         "name": "getUri",
         "parameterTypes": [
-
         ]
       },
       {
         "name": "getMetadata",
         "parameterTypes": [
-
         ]
       },
       {
         "name": "getScheme",
         "parameterTypes": [
-
         ]
       }
     ]
@@ -54,6 +47,18 @@
   },
   {
     "name": "com.asrevo.cvhome.gateway.filters.MapHostAsRequestParamGatewayFilterFactory$Config",
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.asrevo.cvhome.gateway.predicates.FHostRoutePredicateFactory",
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.asrevo.cvhome.gateway.predicates.FHostRoutePredicateFactory$Config",
     "allDeclaredFields": true,
     "allDeclaredConstructors": true,
     "allDeclaredMethods": true
