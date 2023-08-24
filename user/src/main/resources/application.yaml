@@ -14,39 +14,40 @@ spring:
         jwt:
           jwk-set-uri: http://localhost:9999/realms/cvhome/protocol/openid-connect/certs
   cloud:
-    local:
-      discovery:
-        services:
-          user:
-            - url: "http://localhost:8081"
-              metadata:
-                service-name: user
-                instance: user-1
-          certificate-manager:
-            - url: "http://localhost:8082"
-              metadata:
-                service-name: certificate-manager
-                instance: certificate-manager-1
-          auth:
-            - url: "http://localhost:9999"
-              metadata:
-                service-name: auth
-                instance: auth-1
-          ui:
-            - url: "http://localhost:4200"
-              metadata:
-                service-name: ui
-                instance: ui-1
-          profile:
-            - url: "http://localhost:4300"
-              metadata:
-                service-name: profile
-                instance: profile-1
-          gateway:
-            - url: "http://localhost:8080"
-              metadata:
-                service-name: gateway
-                instance: gateway-1
+    discovery:
+      client:
+        simple:
+          instances:
+            user:
+              - uri: "http://localhost:8081"
+                metadata:
+                  service-name: user
+                  instance: user-1
+            certificate-manager:
+              - uri: "http://localhost:8082"
+                metadata:
+                  service-name: certificate-manager
+                  instance: certificate-manager-1
+            auth:
+              - uri: "http://localhost:9999"
+                metadata:
+                  service-name: auth
+                  instance: auth-1
+            ui:
+              - uri: "http://localhost:4200"
+                metadata:
+                  service-name: ui
+                  instance: ui-1
+            profile:
+              - uri: "http://localhost:4300"
+                metadata:
+                  service-name: profile
+                  instance: profile-1
+            gateway:
+              - uri: "http://localhost:8080"
+                metadata:
+                  service-name: gateway
+                  instance: gateway-1
 server:
   forward-headers-strategy: FRAMEWORK
   port: 8081
