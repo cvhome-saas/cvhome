@@ -1,5 +1,4 @@
 import {Component, OnInit} from '@angular/core';
-import {UserService} from "./service/user.service";
 import {User} from "./domain/user";
 
 @Component({
@@ -11,13 +10,10 @@ export class AppComponent implements OnInit {
   title = 'ui';
   user: User | undefined;
 
-  constructor(private userService: UserService) {
+  constructor() {
   }
 
   ngOnInit(): void {
-    this.userService.getUser().subscribe(it => {
-      this.user = it
-    });
   }
 
 }
