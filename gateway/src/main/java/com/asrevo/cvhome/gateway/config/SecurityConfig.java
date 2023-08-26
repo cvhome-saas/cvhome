@@ -8,6 +8,7 @@ import org.springframework.security.config.annotation.web.reactive.EnableWebFlux
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.csrf.CookieServerCsrfTokenRepository;
+import org.springframework.security.web.server.csrf.ServerCsrfTokenRequestAttributeHandler;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.session.CookieWebSessionIdResolver;
@@ -42,7 +43,9 @@ public class SecurityConfig {
                 .oauth2Login(withDefaults())
                 .oauth2Client(withDefaults())
                 .csrf(it ->
-                        it.csrfTokenRepository(tokenRepository)
+                        it
+                                .csrfTokenRequestHandler(new ServerCsrfTokenRequestAttributeHandler())
+                                .csrfTokenRepository(tokenRepository)
                                 .requireCsrfProtectionMatcher(SecurityConfig::matches)
                 )
                 .build();

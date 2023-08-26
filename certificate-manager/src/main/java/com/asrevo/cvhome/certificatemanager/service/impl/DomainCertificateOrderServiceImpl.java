@@ -2,7 +2,6 @@ package com.asrevo.cvhome.certificatemanager.service.impl;
 
 import com.asrevo.cvhome.certificatemanager.domain.DomainCertificate;
 import com.asrevo.cvhome.certificatemanager.domain.DomainCertificateOrder;
-import com.asrevo.cvhome.certificatemanager.domain.DomainReference;
 import com.asrevo.cvhome.certificatemanager.repository.DomainCertificateRepository;
 import com.asrevo.cvhome.certificatemanager.service.*;
 import com.asrevo.cvhome.commons.domain.CertificateOrderStatus;
@@ -34,8 +33,6 @@ public class DomainCertificateOrderServiceImpl implements DomainCertificateOrder
     private final AcmeManagerService acmeManagerService;
 
     private final FileService fileService;
-
-    private final DomainReferenceService domainReferenceService;
 
 
     @Override
@@ -106,7 +103,6 @@ public class DomainCertificateOrderServiceImpl implements DomainCertificateOrder
             DomainCertificate domainCertificate = acmeManagerService.generate(one, fileService::upload);
             one.setCertificateOrderStatus(CertificateOrderStatus.GENERATED);
             iDomainCertificateOrderService.save(one);
-            domainReferenceService.saveOrUpdate(new DomainReference(null, one.getDomain(), one.getReference()));
             return domainCertificateRepository.put(domainCertificate);
         }
         return DomainCertificate.from(certificateOrder, status.name());

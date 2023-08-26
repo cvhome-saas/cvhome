@@ -7,10 +7,3 @@ CREATE TABLE IF NOT EXISTS public.domain_certificate_order
     certificate_order_status varchar(50),
     challenges               varchar(1500)
 );
-
-CREATE TABLE IF NOT EXISTS public.domain_reference
-(
-    id        SERIAL PRIMARY KEY,
-    domain    varchar(70),
-    reference varchar(50)
-);

@@ -31,6 +31,6 @@ public class ClientsConfig {
 
     @Bean
     public DomainReferenceService domainReferenceService(@Qualifier("defaultMicroServiceBuilder") WebClient.Builder builder) {
-        return build(builder, "lb://certificate-manager", DomainReferenceService.class);
+        return build(builder, "lb://user", DomainReferenceService.class);
     }
 }
