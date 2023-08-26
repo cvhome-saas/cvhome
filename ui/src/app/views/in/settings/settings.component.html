@@ -1,6 +1,43 @@
+<!--
 <div class="card">
   <div class="card-body">
-    <h5 class="card-title fw-semibold mb-4">Settings</h5>
-    <p class="mb-0">This is a sample page </p>
+
+    <h5 class="card-title fw-semibold mb-4">Sub Domain Settings</h5>
+    <app-sub-domain-settings [subDomainReferences]="subDomainReferences"></app-sub-domain-settings>
+
+    <h5 class="card-title fw-semibold mb-4">Custom Domain Settings</h5>
+    <app-custom-domain-settings [customDomainReferences]="customDomainReferences"></app-custom-domain-settings>
+
+
+  </div>
+</div>
+-->
+
+<div class="card">
+  <div class="card-body">
+    <ul class="nav nav-pills nav-fill mt-4" role="tablist">
+      <li class="nav-item" role="presentation">
+        <a class="nav-link active" data-bs-toggle="tab" href="#navpill-222" role="tab" aria-selected="false" tabindex="-1">
+          <span>Sub Domain Settings</span>
+        </a>
+      </li>
+      <li class="nav-item" role="presentation">
+        <a class="nav-link " data-bs-toggle="tab" href="#navpill-333" role="tab" aria-selected="true">
+          <span>Custom Domain Settings</span>
+        </a>
+      </li>
+    </ul>
+    <div class="tab-content border mt-2">
+      <div class="tab-pane p-3  active show" id="navpill-222" role="tabpanel">
+        <div class="row">
+          <app-sub-domain-settings [subDomainReferences]="subDomainReferences"></app-sub-domain-settings>
+        </div>
+      </div>
+      <div class="tab-pane p-3" id="navpill-333" role="tabpanel">
+        <div class="row">
+          <app-custom-domain-settings [customDomainReferences]="customDomainReferences"></app-custom-domain-settings>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
