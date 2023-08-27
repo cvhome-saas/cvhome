@@ -5,21 +5,27 @@
         <div class="col-md-6 justify-content-center">
           <div class="tab-content mt-6 ">
             <div class="tab-pane active">
+              <div [innerHTML]="errMessage" class="text-danger"></div>
               <div class="controls">
                 <label class="d-block mb-1">
                   Domain
                   <span class="text-danger">*</span>
                 </label>
                 <div class="input-group error validate">
-                  <input type="text" class="form-control" placeholder="alis" formControlName="domain">
+                  <input type="text" class="form-control" placeholder="full domain" formControlName="domain">
                 </div>
-                <div class="help-block" >
-                  <div *ngIf="domainReferenceForm.controls['domain'].invalid && (domainReferenceForm.controls['domain'].dirty || domainReferenceForm.controls['domain'].touched)" class="text-danger">
+                <div class="help-block">
+                  <div
+                    *ngIf="domainReferenceForm.controls['domain'].invalid && (domainReferenceForm.controls['domain'].dirty || domainReferenceForm.controls['domain'].touched)"
+                    class="text-danger">
                     <div *ngIf="domainReferenceForm.controls['domain'].errors?.['required']">
                       Domain is required.
                     </div>
                     <div *ngIf="domainReferenceForm.controls['domain'].errors?.['minlength']">
                       Domain is minLength.
+                    </div>
+                    <div *ngIf="domainReferenceForm.controls['domain'].errors?.['pattern']">
+                      Domain is pattern.
                     </div>
                   </div>
                 </div>

@@ -22,6 +22,9 @@
                     <div *ngIf="domainReferenceForm.controls['domain'].errors?.['minlength']">
                       Domain is minLength.
                     </div>
+                    <div *ngIf="domainReferenceForm.controls['domain'].errors?.['pattern']">
+                      Domain is pattern.
+                    </div>
                   </div>
                 </div>
               </div>

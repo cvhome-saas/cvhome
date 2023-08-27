@@ -6,13 +6,17 @@ import {HttpClient} from "@angular/common/http";
   providedIn: 'root'
 })
 export class DnsLookupService {
-  private DNS_URL = "https://dns.google/resolve";
+  private DNS_URL: string = "https://dns.google/resolve";
 
   constructor(private httpClient: HttpClient) {
   }
 
   lookup(domain: string): Observable<DnsLookupResponse> {
-    return this.httpClient.get<DnsLookupResponse>(this.DNS_URL + `?name=${domain}`)
+    return this.httpClient.get<DnsLookupResponse>(this.getRequestUrl(domain))
+  }
+
+  getRequestUrl(domain: string): string {
+    return this.DNS_URL + `?name=${domain}`;
   }
 }
 

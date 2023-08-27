@@ -21,7 +21,8 @@ export class SubDomainSettingsComponent {
     this.domainReferenceForm = new FormGroup({
       domain: new FormControl(null, [
         Validators.required,
-        Validators.minLength(4)
+        Validators.minLength(4),
+        Validators.pattern('^[a-zA-Z0-9]+$')
       ]),
     });
 
@@ -29,13 +30,15 @@ export class SubDomainSettingsComponent {
 
 
   onSubmit() {
-    let value: DomainReference = this.domainReferenceForm.value;
-    value.domainType = DomainType.SUB;
-    value.domain = value.domain + "." + this.baseDomain;
-    this.domainReferenceService.save(value).subscribe((it: DomainReference) => {
-      this.subDomainReferences.push(it);
-      this.domainReferenceForm.reset();
-    });
+    if (this.domainReferenceForm.valid) {
+      let value: DomainReference = this.domainReferenceForm.value;
+      value.domainType = DomainType.SUB;
+      value.domain = value.domain + "." + this.baseDomain;
+      this.domainReferenceService.save(value).subscribe((it: DomainReference) => {
+        this.subDomainReferences.push(it);
+        this.domainReferenceForm.reset();
+      });
+    }
   }
 
 }
