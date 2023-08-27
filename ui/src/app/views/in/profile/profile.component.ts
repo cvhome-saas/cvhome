@@ -1,4 +1,4 @@
-import {AfterViewInit, Component} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {AuthService} from "../../../service/auth.service";
 import {AuthUser} from "../../../model/auth-user";
 
@@ -7,13 +7,13 @@ import {AuthUser} from "../../../model/auth-user";
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.css']
 })
-export class ProfileComponent implements AfterViewInit {
+export class ProfileComponent implements OnInit {
   authUser: AuthUser | null = null;
 
   constructor(private authService: AuthService) {
   }
 
-  ngAfterViewInit(): void {
+  ngOnInit(): void {
     this.authService.getAuthUser().subscribe(it => {
       this.authUser = it
     })

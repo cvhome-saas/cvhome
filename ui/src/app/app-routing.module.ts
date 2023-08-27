@@ -6,7 +6,6 @@ import {HomeComponent} from "./views/in/home/home.component";
 import {ContentComponent} from "./views/in/content/content.component";
 import {authenticationGuard} from "./service/auth-guard.service";
 import {ProfileComponent} from "./views/in/profile/profile.component";
-import {SettingsComponent} from "./views/in/settings/settings.component";
 
 const routes: Routes = [
   {
@@ -14,7 +13,7 @@ const routes: Routes = [
       {path: '', component: HomeComponent},
       {path: 'content', component: ContentComponent},
       {path: 'profile', component: ProfileComponent},
-      {path: 'settings', component: SettingsComponent}
+      {path: 'settings', loadChildren: () => import('./views/in/settings/settings.module').then(m => m.SettingsModule)}
     ]
   },
   {path: 'welcome', component: WelcomeComponent},

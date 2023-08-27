@@ -1,13 +1,13 @@
 import {AfterViewInit, Component} from '@angular/core';
-import {DomainReferenceService} from "../../../service/domain-reference.service";
-import {DomainReference, DomainType} from "../../../model/domain-reference";
+import {DomainReference, DomainType} from "../../../../../model/domain-reference";
+import {DomainReferenceService} from "../../../../../service/domain-reference.service";
 
 @Component({
-  selector: 'app-settings',
-  templateUrl: './settings.component.html',
-  styleUrls: ['./settings.component.css']
+  selector: 'app-domain-settings',
+  templateUrl: './domain-settings.component.html',
+  styleUrls: ['./domain-settings.component.css']
 })
-export class SettingsComponent implements AfterViewInit {
+export class DomainSettingsComponent implements AfterViewInit {
   subDomainReferences: DomainReference[] = [];
   customDomainReferences: DomainReference[] = [];
 
@@ -24,5 +24,4 @@ export class SettingsComponent implements AfterViewInit {
       });
     });
   }
-
 }
