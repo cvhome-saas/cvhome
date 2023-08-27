@@ -1,5 +1,5 @@
 import {Component} from '@angular/core';
-import {environment} from "../../../../environment";
+import {environment} from "../../../../../environment";
 
 @Component({
   selector: 'app-welcome',

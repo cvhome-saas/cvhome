@@ -7,7 +7,6 @@ import {LeftSideBarNavComponent} from './componants/left-side-bar-nav/left-side-
 import {BaseComponent} from './views/in/base/base.component';
 import {HeaderNavComponent} from './componants/header-nav/header-nav.component';
 import {ContentComponent} from './views/in/content/content.component';
-import {WelcomeComponent} from './views/out/welcome/welcome.component';
 import {AppRoutingModule} from "./app-routing.module";
 import {HomeComponent} from './views/in/home/home.component';
 import {ErrorComponent} from './views/out/error/error.component';
@@ -21,7 +20,6 @@ import {MapErrorsPipe} from './pipe/map-errors.pipe';
     BaseComponent,
     HeaderNavComponent,
     ContentComponent,
-    WelcomeComponent,
     HomeComponent,
     ErrorComponent,
     MapErrorsPipe,
