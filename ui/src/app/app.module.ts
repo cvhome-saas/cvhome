@@ -10,7 +10,6 @@ import {ContentComponent} from './views/in/content/content.component';
 import {WelcomeComponent} from './views/out/welcome/welcome.component';
 import {AppRoutingModule} from "./app-routing.module";
 import {HomeComponent} from './views/in/home/home.component';
-import {ProfileComponent} from './views/in/profile/profile.component';
 import {ErrorComponent} from './views/out/error/error.component';
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {MapErrorsPipe} from './pipe/map-errors.pipe';
@@ -24,7 +23,6 @@ import {MapErrorsPipe} from './pipe/map-errors.pipe';
     ContentComponent,
     WelcomeComponent,
     HomeComponent,
-    ProfileComponent,
     ErrorComponent,
     MapErrorsPipe,
   ],
