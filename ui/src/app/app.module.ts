@@ -6,9 +6,7 @@ import {HttpClientModule} from "@angular/common/http";
 import {LeftSideBarNavComponent} from './componants/left-side-bar-nav/left-side-bar-nav.component';
 import {BaseComponent} from './views/in/base/base.component';
 import {HeaderNavComponent} from './componants/header-nav/header-nav.component';
-import {ContentComponent} from './views/in/content/content.component';
 import {AppRoutingModule} from "./app-routing.module";
-import {HomeComponent} from './views/in/home/home.component';
 import {ErrorComponent} from './views/out/error/error.component';
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {MapErrorsPipe} from './pipe/map-errors.pipe';
@@ -19,8 +17,6 @@ import {MapErrorsPipe} from './pipe/map-errors.pipe';
     LeftSideBarNavComponent,
     BaseComponent,
     HeaderNavComponent,
-    ContentComponent,
-    HomeComponent,
     ErrorComponent,
     MapErrorsPipe,
   ],
