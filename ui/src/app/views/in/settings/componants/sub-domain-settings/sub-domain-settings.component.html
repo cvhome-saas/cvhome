@@ -1,76 +1,63 @@
-<div class="card">
-  <div class="card-body p-9">
-    <form (ngSubmit)="onSubmit()" [formGroup]="domainReferenceForm">
-      <div class="row mt-4 justify-content-center">
-        <div class="col-md-6 justify-content-center">
-          <div class="tab-content mt-6 ">
-            <div class="tab-pane active">
-              <div class="controls">
-                <label class="d-block mb-1">
-                  Domain
-                  <span class="text-danger">*</span>
-                </label>
-                <div class="input-group error validate">
-                  <input type="text" class="form-control" placeholder="alis" formControlName="domain">
-                  <input type="text" class="form-control" placeholder="{{'.'+baseDomain}}" disabled="disabled">
+
+
+<form (ngSubmit)="onSubmit()" [formGroup]="domainReferenceForm">
+  <div class="row mt-4 justify-content-center">
+    <div class="col-md-6 justify-content-center">
+      <div class="tab-content mt-6 ">
+        <div class="tab-pane active">
+          <div class="controls">
+            <label class="d-block mb-1">
+              Domain
+              <span class="text-danger">*</span>
+            </label>
+            <div class="input-group error validate">
+              <input type="text" class="form-control" placeholder="alis" formControlName="domain">
+              <input type="text" class="form-control" placeholder="{{'.'+baseDomain}}" disabled="disabled">
+            </div>
+            <div class="help-block">
+              <div
+                *ngIf="domainReferenceForm.controls['domain'].invalid && (domainReferenceForm.controls['domain'].dirty || domainReferenceForm.controls['domain'].touched)"
+                class="text-danger">
+                <div *ngIf="domainReferenceForm.controls['domain'].errors?.['required']">
+                  Domain is required.
                 </div>
-                <div class="help-block">
-                  <div
-                    *ngIf="domainReferenceForm.controls['domain'].invalid && (domainReferenceForm.controls['domain'].dirty || domainReferenceForm.controls['domain'].touched)"
-                    class="text-danger">
-                    <div *ngIf="domainReferenceForm.controls['domain'].errors?.['required']">
-                      Domain is required.
-                    </div>
-                    <div *ngIf="domainReferenceForm.controls['domain'].errors?.['minlength']">
-                      Domain is minLength.
-                    </div>
-                    <div *ngIf="domainReferenceForm.controls['domain'].errors?.['pattern']">
-                      Domain is pattern.
-                    </div>
-                  </div>
+                <div *ngIf="domainReferenceForm.controls['domain'].errors?.['minlength']">
+                  Domain is minLength.
+                </div>
+                <div *ngIf="domainReferenceForm.controls['domain'].errors?.['pattern']">
+                  Domain is pattern.
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <div class="row mt-4 justify-content-center">
-        <div class="col-md-6 justify-content-center">
-          <div class="tab-content mt-6 ">
-            <div class="tab-pane active">
-              <button type="submit" class="btn btn-primary w-100">Submit</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </form>
-  </div>
-  <div class="card-body p-4">
-    <div class="table-responsive">
-      <table class="table text-nowrap mb-0 align-middle">
-        <thead class="text-dark fs-4">
-        <tr>
-          <th class="border-bottom-0">
-            <h6 class="fw-semibold mb-0">Domain</h6>
-          </th>
-          <th class="border-bottom-0">
-            <h6 class="fw-semibold mb-0">Link</h6>
-          </th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr *ngFor="let d of subDomainReferences">
-          <td class="border-bottom-0">
-            <h6 class="fw-semibold mb-1">{{d.domain}}</h6>
-            <span class="fw-normal">{{d.domainStatus}}</span>
-          </td>
-          <td class="border-bottom-0">
-            <a href="//{{d.domain}}" target="_blank" class="mb-0 fw-normal"><i class="ti ti-dots fs-4">...</i></a>
-          </td>
-        </tr>
-        </tbody>
-      </table>
     </div>
   </div>
-
-</div>
+  <div class="row mt-4 justify-content-center">
+    <div class="col-md-6 justify-content-center">
+      <div class="tab-content mt-6 ">
+        <div class="tab-pane active">
+          <button type="submit" class="btn btn-primary w-100">Submit</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+<table class="table text-nowrap mb-0 align-middle">
+  <thead class="text-dark fs-4">
+  <tr>
+    <th class="border-bottom-0">
+      <h6 class="fw-semibold mb-0">Domain</h6>
+    </th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let d of subDomainReferences">
+    <td class="border-bottom-0">
+      <h6 class="fw-semibold mb-1"><a href="//{{d.domainReference.domain}}" target="_blank" class="mb-0 fw-normal">{{d.domainReference.domain}}</a></h6>
+      <span class="fw-normal">{{d.domainReference.domainStatus}}</span>
+    </td>
+  </tr>
+  </tbody>
+</table>

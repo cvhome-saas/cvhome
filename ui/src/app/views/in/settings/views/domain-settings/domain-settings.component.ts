@@ -1,5 +1,5 @@
 import {AfterViewInit, Component} from '@angular/core';
-import {DomainReference, DomainType} from "../../../../../model/domain-reference";
+import {DomainReference, DomainReferenceOrder, DomainType} from "../../../../../model/domain-reference";
 import {DomainReferenceService} from "../../../../../service/domain-reference.service";
 
 @Component({
@@ -8,19 +8,19 @@ import {DomainReferenceService} from "../../../../../service/domain-reference.se
   styleUrls: ['./domain-settings.component.css']
 })
 export class DomainSettingsComponent implements AfterViewInit {
-  subDomainReferences: DomainReference[] = [];
-  customDomainReferences: DomainReference[] = [];
+  subDomainReferences: DomainReferenceOrder[] = [];
+  customDomainReferences: DomainReferenceOrder[] = [];
 
   constructor(private domainReferenceService: DomainReferenceService) {
   }
 
   ngAfterViewInit(): void {
-    this.domainReferenceService.getAllDomainReferences().subscribe((it: DomainReference[]) => {
-      this.subDomainReferences = it.filter((d: DomainReference): boolean => {
-        return d.domainType == DomainType.SUB;
+    this.domainReferenceService.getAllDomainReferencesOrders().subscribe((it: DomainReferenceOrder[]) => {
+      this.subDomainReferences = it.filter((d: DomainReferenceOrder): boolean => {
+        return d.domainReference.domainType == DomainType.SUB;
       });
-      this.customDomainReferences = it.filter((d: DomainReference): boolean => {
-        return d.domainType == DomainType.CUSTOM;
+      this.customDomainReferences = it.filter((d: DomainReferenceOrder): boolean => {
+        return d.domainReference.domainType == DomainType.CUSTOM;
       });
     });
   }
