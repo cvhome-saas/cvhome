@@ -8,11 +8,9 @@ import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 
 @Configuration
 @EnableR2dbcAuditing
-public class JdbcConfig {
+public class JdbcAuditingConfig {
     @Bean
     public ReactiveAuditorAware<String> auditorAware() {
-        return () -> {
-            return ReactiveSecurityContextHolder.getContext().map(it -> it.getAuthentication().getName());
-        };
+        return () -> ReactiveSecurityContextHolder.getContext().map(it -> it.getAuthentication().getName());
     }
 }

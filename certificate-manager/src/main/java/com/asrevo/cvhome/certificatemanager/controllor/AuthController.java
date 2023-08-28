@@ -1,4 +1,4 @@
-package com.asrevo.cvhome.user.controller;
+package com.asrevo.cvhome.certificatemanager.controllor;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

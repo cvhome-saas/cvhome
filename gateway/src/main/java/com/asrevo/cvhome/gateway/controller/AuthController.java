@@ -1,11 +1,11 @@
-package com.asrevo.cvhome.user.controller;
+package com.asrevo.cvhome.gateway.controller;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,9 +24,9 @@ public class AuthController {
     }
 
     @GetMapping("me")
-    public Mono<JwtAuthenticationToken> me() {
+    public Mono<OAuth2AuthenticationToken> me() {
         return ReactiveSecurityContextHolder.getContext()
                 .map(SecurityContext::getAuthentication)
-                .cast(JwtAuthenticationToken.class);
+                .cast(OAuth2AuthenticationToken.class);
     }
 }

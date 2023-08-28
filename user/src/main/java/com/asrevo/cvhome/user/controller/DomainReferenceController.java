@@ -7,8 +7,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.ReactiveSecurityContextHolder;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -25,7 +23,6 @@ public class DomainReferenceController {
 
     @PostMapping
     public Mono<DomainReference> save(@RequestBody DomainReference domainReference, @AuthenticationPrincipal Principal principal) {
-        Mono<SecurityContext> context = ReactiveSecurityContextHolder.getContext();
         log.info("saving domain {} reference for user {}", domainReference.domain(), principal.getName());
         return domainReferenceService.save(domainReference, principal.getName());
     }
