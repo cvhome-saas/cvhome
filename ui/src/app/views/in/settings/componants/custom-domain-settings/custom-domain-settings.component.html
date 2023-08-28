@@ -51,13 +51,7 @@
         <thead class="text-dark fs-4">
         <tr>
           <th class="border-bottom-0">
-            <h6 class="fw-semibold mb-0">Id</h6>
-          </th>
-          <th class="border-bottom-0">
             <h6 class="fw-semibold mb-0">Domain</h6>
-          </th>
-          <th class="border-bottom-0">
-            <h6 class="fw-semibold mb-0">Reference</h6>
           </th>
           <th class="border-bottom-0">
             <h6 class="fw-semibold mb-0">Link</h6>
@@ -67,17 +61,11 @@
         <tbody>
         <tr *ngFor="let d of customDomainReferences">
           <td class="border-bottom-0">
-            <h6 class="fw-semibold mb-0">{{d.id}}</h6>
-          </td>
-          <td class="border-bottom-0">
             <h6 class="fw-semibold mb-1">{{d.domain}}</h6>
-            <span class="fw-normal">{{d.domainType}}</span>
+            <span class="fw-normal">{{d.domainStatus}}</span>
           </td>
           <td class="border-bottom-0">
-            <p class="mb-0 fw-normal">{{d.reference}}</p>
-          </td>
-          <td class="border-bottom-0">
-            <a href="{{'https://'+d.domain}}" class="mb-0 fw-normal"><i class="ti ti-dots fs-4">...</i></a>
+            <a href="//{{d.domain}}" target="_blank" class="mb-0 fw-normal"><i class="ti ti-dots fs-4">...</i></a>
           </td>
         </tr>
         </tbody>
