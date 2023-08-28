@@ -10,11 +10,11 @@ spring:
       client:
         simple:
           instances:
-            user:
+            domain:
               - uri: "http://localhost:8081"
                 metadata:
-                  service-name: user
-                  instance: user-1
+                  service-name: domain
+                  instance: domain-1
             certificate-manager:
               - uri: "http://localhost:8082"
                 metadata:
@@ -50,10 +50,10 @@ spring:
         - PreserveHostHeader
         - AddResponseHeader=X-Frame-Options, SAMEORIGIN
       routes:
-        - id: user
-          uri: lb://user
+        - id: domain
+          uri: lb://domain
           predicates:
-            - Path=/user/**
+            - Path=/domain/**
           filters:
             - StripPrefix=1
         - id: certificate-manager

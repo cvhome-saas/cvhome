@@ -13,14 +13,14 @@ export class DomainReferenceService {
   }
 
   save(domainReference: DomainReference): Observable<DomainReference> {
-    return this.httpClient.post<DomainReference>("/user/api/v1/domain-reference", domainReference)
+    return this.httpClient.post<DomainReference>("/domain/api/v1/domain-reference", domainReference)
   }
 
   getAllDomainReferencesOrders(): Observable<DomainReferenceOrder[]> {
-    return this.httpClient.get<DomainReferenceOrder[]>("/user/api/v1/domain-reference/get-all-domain-references")
+    return this.httpClient.get<DomainReferenceOrder[]>("/domain/api/v1/domain-reference/get-all-domain-references")
   }
 
   orderHttps(id: number): Observable<DomainReference> {
-    return this.httpClient.post<DomainReference>(`/user/api/v1/domain-reference-acm/order?domainId=${id}`, null)
+    return this.httpClient.post<DomainReference>(`/domain/api/v1/domain-reference-acm/order?domainId=${id}`, null)
   }
 }
