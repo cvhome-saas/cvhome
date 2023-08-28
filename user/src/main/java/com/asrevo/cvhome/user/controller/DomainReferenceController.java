@@ -1,7 +1,9 @@
 package com.asrevo.cvhome.user.controller;
 
+import com.asrevo.cvhome.commons.domain.DomainReferenceOrder;
 import com.asrevo.cvhome.user.domain.DomainReference;
 import com.asrevo.cvhome.user.domain.DomainType;
+import com.asrevo.cvhome.user.service.DomainReferenceAcmService;
 import com.asrevo.cvhome.user.service.DomainReferenceService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +22,7 @@ import java.security.Principal;
 public class DomainReferenceController {
 
     private final DomainReferenceService domainReferenceService;
+    private final DomainReferenceAcmService domainReferenceAcmService;
 
     @PostMapping
     public Mono<DomainReference> save(@RequestBody DomainReference domainReference, @AuthenticationPrincipal Principal principal) {
@@ -35,8 +38,8 @@ public class DomainReferenceController {
     }
 
     @GetMapping(value = "get-all-domain-references")
-    public Flux<DomainReference> getAllDomainReferences(@AuthenticationPrincipal Principal principal, @RequestParam(value = "domainType", required = false) DomainType domainType) {
+    public Flux<DomainReferenceOrder> getAllDomainReferences(@AuthenticationPrincipal Principal principal, @RequestParam(value = "domainType", required = false) DomainType domainType) {
         log.info("getting all domain reference for user {}", principal.getName());
-        return domainReferenceService.getAllDomainReferences(principal.getName(), domainType);
+        return domainReferenceAcmService.getAllDomainReferences(principal.getName(), domainType);
     }
 }

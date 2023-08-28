@@ -11,6 +11,7 @@ public record DomainReference(@Id Long id,
                               String reference,
                               DomainType domainType,
                               DomainStatus domainStatus,
-                              @CreatedDate Instant createdDate
+                              @CreatedDate Instant createdDate,
+                              Long externalAcmOrderId
 ) {
 }

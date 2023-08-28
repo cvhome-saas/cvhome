@@ -8,6 +8,7 @@ import com.asrevo.cvhome.user.service.DomainReferenceService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -21,7 +22,7 @@ public class DomainReferenceServiceImpl implements DomainReferenceService {
 
     @Override
     public Mono<DomainReference> save(DomainReference d, String reference) {
-        return domainReferenceRepository.save(new DomainReference(null, d.domain(), reference, d.domainType(), DomainStatus.INITIATED, Instant.now()));
+        return domainReferenceRepository.save(new DomainReference(null, d.domain(), reference, d.domainType(), DomainStatus.INITIATED, Instant.now(), null));
     }
 
     @Override
@@ -32,5 +33,16 @@ public class DomainReferenceServiceImpl implements DomainReferenceService {
     @Override
     public Flux<DomainReference> getAllDomainReferences(String sub, DomainType domainType) {
         return domainReferenceRepository.getAllByReferenceAndDomainType(sub, domainType);
+    }
+
+    @Override
+    public Mono<DomainReference> findById(Long domainId) {
+        return domainReferenceRepository.findById(domainId);
+    }
+
+    @Transactional
+    public Mono<DomainReference> updateExternalAcmOrderId(Long domainId, Long externalAcmOrderId) {
+        return domainReferenceRepository.updateExternalAcmOrderId(domainId, externalAcmOrderId)
+                .flatMap(it -> domainReferenceRepository.findById(domainId));
     }
 }

@@ -13,6 +13,23 @@ spring:
     password: password
   security:
     oauth2:
+      client:
+        registration:
+          microservice:
+            provider: keycloak
+            client-id: microservice-app
+            client-secret: r1nuVn4HefusLGwHIeRxbdOzdTZLEMvQ
+            authorization-grant-type: password
+        provider:
+          keycloak:
+            #            comment issuer-uri to skip validation
+            #            issuer-uri: https://gateway.com:8443/realms/cvhome
+            jwk-set-uri: http://localhost:9999/realms/cvhome/protocol/openid-connect/certs
+            authorization-uri: http://localhost:9999/realms/cvhome/protocol/openid-connect/auth
+            token-uri: http://localhost:9999/realms/cvhome/protocol/openid-connect/token
+              #            need to trace why getting 401
+              #            user-info-uri: http://localhost:9999/realms/cvhome/protocol/openid-connect/userinfo
+              #            user-name-attribute: sub
       resourceserver:
         jwt:
           jwk-set-uri: http://localhost:9999/realms/cvhome/protocol/openid-connect/certs
