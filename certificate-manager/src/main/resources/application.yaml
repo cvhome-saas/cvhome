@@ -4,6 +4,9 @@ spring:
   docker:
     compose:
       file: ${spring.application.name}/compose.yml
+  sql:
+    init:
+      mode: always
   datasource:
     url: jdbc:postgresql://localhost:5432/certificatemanagerdb
     username: postgres

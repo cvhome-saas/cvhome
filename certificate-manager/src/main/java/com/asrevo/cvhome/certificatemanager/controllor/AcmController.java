@@ -4,6 +4,7 @@ import com.asrevo.cvhome.certificatemanager.domain.DomainCertificate;
 import com.asrevo.cvhome.certificatemanager.domain.DomainCertificateOrder;
 import com.asrevo.cvhome.certificatemanager.service.AcmeManagerService;
 import com.asrevo.cvhome.certificatemanager.service.DomainCertificateOrderService;
+import com.asrevo.cvhome.certificatemanager.service.IDomainCertificateOrderService;
 import com.asrevo.cvhome.commons.domain.CertificateFileType;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/acm")
@@ -25,6 +27,7 @@ public class AcmController {
 
     private final AcmeManagerService acmeManagerService;
     private final DomainCertificateOrderService domainCertificateOrderService;
+    private final IDomainCertificateOrderService iDomainCertificateOrderService;
 
     /*
      * .appcalc.net appcalc.net .uxplore.net uxplore.net www.uxplore.net uxb.uxplore.net
@@ -34,6 +37,10 @@ public class AcmController {
     public DomainCertificateOrder order(@RequestBody @Validated DomainCertificateOrder domainOrder) throws AcmeException, IOException {
         log.info("will order a certificate for domain {}", domainOrder.getDomain());
         return domainCertificateOrderService.order(domainOrder);
+    }
+    @PostMapping("orders")
+    public List<DomainCertificateOrder> order(@RequestBody List<Long> orderIds) {
+        return iDomainCertificateOrderService.findAllOrderByIdIn(orderIds);
     }
 
     @PostMapping("validate")

@@ -35,4 +35,9 @@ public class IDomainCertificateOrderServiceImpl implements IDomainCertificateOrd
     public List<DomainCertificateOrder> findAll() {
         return StreamSupport.stream(iDomainCertificateOrderRepository.findAll().spliterator(), false).toList();
     }
+
+    @Override
+    public List<DomainCertificateOrder> findAllOrderByIdIn(List<Long> orderIds) {
+        return StreamSupport.stream(iDomainCertificateOrderRepository.findAllById(orderIds).spliterator(), false).toList();
+    }
 }

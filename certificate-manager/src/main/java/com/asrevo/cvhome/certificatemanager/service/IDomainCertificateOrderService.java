@@ -13,4 +13,5 @@ public interface IDomainCertificateOrderService {
 
     List<DomainCertificateOrder> findAll();
 
+    List<DomainCertificateOrder> findAllOrderByIdIn(List<Long> orderIds);
 }
