@@ -1,5 +1,4 @@
 import {Component, OnInit} from '@angular/core';
-import {User} from "./domain/user";
 
 @Component({
   selector: 'app-root',
@@ -8,7 +7,6 @@ import {User} from "./domain/user";
 })
 export class AppComponent implements OnInit {
   title = 'ui';
-  user: User | undefined;
 
   constructor() {
   }
