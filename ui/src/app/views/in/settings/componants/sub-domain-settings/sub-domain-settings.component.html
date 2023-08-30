@@ -1,5 +1,3 @@
-
-
 <form (ngSubmit)="onSubmit()" [formGroup]="domainReferenceForm">
   <div class="row mt-4 justify-content-center">
     <div class="col-md-6 justify-content-center">
@@ -11,8 +9,8 @@
               <span class="text-danger">*</span>
             </label>
             <div class="input-group error validate">
-              <input type="text" class="form-control" placeholder="alis" formControlName="domain">
-              <input type="text" class="form-control" placeholder="{{'.'+baseDomain}}" disabled="disabled">
+              <input class="form-control" formControlName="domain" placeholder="alis" type="text">
+              <input class="form-control" disabled="disabled" placeholder="{{'.'+baseDomain}}" type="text">
             </div>
             <div class="help-block">
               <div
@@ -38,7 +36,7 @@
     <div class="col-md-6 justify-content-center">
       <div class="tab-content mt-6 ">
         <div class="tab-pane active">
-          <button type="submit" class="btn btn-primary w-100">Submit</button>
+          <button class="btn btn-primary w-100" type="submit">Submit</button>
         </div>
       </div>
     </div>
@@ -55,7 +53,8 @@
   <tbody>
   <tr *ngFor="let d of subDomainReferences">
     <td class="border-bottom-0">
-      <h6 class="fw-semibold mb-1"><a href="//{{d.domainReference.domain}}" target="_blank" class="mb-0 fw-normal">{{d.domainReference.domain}}</a></h6>
+      <h6 class="fw-semibold mb-1"><a class="mb-0 fw-normal" href="//{{d.domainReference.domain}}"
+                                      target="_blank">{{d.domainReference.domain}}</a></h6>
       <span class="fw-normal">{{d.domainReference.domainStatus}}</span>
     </td>
   </tr>

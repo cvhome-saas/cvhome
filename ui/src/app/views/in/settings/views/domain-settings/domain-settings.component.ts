@@ -1,5 +1,5 @@
 import {AfterViewInit, Component} from '@angular/core';
-import {DomainReference, DomainReferenceOrder, DomainType} from "../../../../../model/domain-reference";
+import {DomainReferenceOrder, DomainType} from "../../../../../model/domain-reference";
 import {DomainReferenceService} from "../../../../../service/domain-reference.service";
 
 @Component({

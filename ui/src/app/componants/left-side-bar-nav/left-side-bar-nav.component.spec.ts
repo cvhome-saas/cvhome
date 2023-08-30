@@ -1,6 +1,6 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { LeftSideBarNavComponent } from './left-side-bar-nav.component';
+import {LeftSideBarNavComponent} from './left-side-bar-nav.component';
 
 describe('LeftSideBarNavComponent', () => {
   let component: LeftSideBarNavComponent;
@@ -8,9 +8,9 @@ describe('LeftSideBarNavComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ LeftSideBarNavComponent ]
+      declarations: [LeftSideBarNavComponent]
     })
-    .compileComponents();
+      .compileComponents();
 
     fixture = TestBed.createComponent(LeftSideBarNavComponent);
     component = fixture.componentInstance;

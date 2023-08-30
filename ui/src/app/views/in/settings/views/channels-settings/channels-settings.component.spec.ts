@@ -1,6 +1,6 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { ChannelsSettingsComponent } from './channels-settings.component';
+import {ChannelsSettingsComponent} from './channels-settings.component';
 
 describe('ChannelsSettingsComponent', () => {
   let component: ChannelsSettingsComponent;
@@ -8,9 +8,9 @@ describe('ChannelsSettingsComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ChannelsSettingsComponent ]
+      declarations: [ChannelsSettingsComponent]
     })
-    .compileComponents();
+      .compileComponents();
 
     fixture = TestBed.createComponent(ChannelsSettingsComponent);
     component = fixture.componentInstance;

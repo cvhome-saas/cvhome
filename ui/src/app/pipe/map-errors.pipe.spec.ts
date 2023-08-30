@@ -1,4 +1,4 @@
-import { MapErrorsPipe } from './map-errors.pipe';
+import {MapErrorsPipe} from './map-errors.pipe';
 
 describe('MapErrorsPipe', () => {
   it('create an instance', () => {

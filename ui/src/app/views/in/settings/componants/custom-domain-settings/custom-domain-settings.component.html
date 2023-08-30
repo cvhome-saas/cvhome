@@ -10,7 +10,7 @@
               <span class="text-danger">*</span>
             </label>
             <div class="input-group error validate">
-              <input type="text" class="form-control" placeholder="full domain" formControlName="domain">
+              <input class="form-control" formControlName="domain" placeholder="full domain" type="text">
             </div>
             <div class="help-block">
               <div
@@ -36,7 +36,7 @@
     <div class="col-md-6 justify-content-center">
       <div class="tab-content mt-6 ">
         <div class="tab-pane active">
-          <button type="submit" class="btn btn-primary w-100">Submit</button>
+          <button class="btn btn-primary w-100" type="submit">Submit</button>
         </div>
       </div>
     </div>
@@ -53,11 +53,12 @@
   <tbody>
   <tr *ngFor="let d of customDomainReferences">
     <td class="border-bottom-0">
-      <h6 class="fw-semibold mb-1"><a href="//{{d.domainReference.domain}}" target="_blank" class="mb-0 fw-normal">{{d.domainReference.domain}}</a></h6>
+      <h6 class="fw-semibold mb-1"><a class="mb-0 fw-normal" href="//{{d.domainReference.domain}}"
+                                      target="_blank">{{d.domainReference.domain}}</a></h6>
       <span class="fw-normal">{{d.domainReference.domainStatus}}</span>
     </td>
     <td class="border-bottom-0">
-      <button type="button" class="btn mb-1 btn-secondary btn-circle btn-sm" (click)="orderHttps(d.domainReference)">
+      <button (click)="orderHttps(d.domainReference)" class="btn mb-1 btn-secondary btn-circle btn-sm" type="button">
         <i class="fs-5 ti ti-reload"></i>
       </button>
     </td>

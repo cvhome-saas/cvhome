@@ -1,6 +1,6 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { CustomDomainSettingsComponent } from './custom-domain-settings.component';
+import {CustomDomainSettingsComponent} from './custom-domain-settings.component';
 
 describe('CustomDomainSettingsComponent', () => {
   let component: CustomDomainSettingsComponent;
@@ -8,9 +8,9 @@ describe('CustomDomainSettingsComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ CustomDomainSettingsComponent ]
+      declarations: [CustomDomainSettingsComponent]
     })
-    .compileComponents();
+      .compileComponents();
 
     fixture = TestBed.createComponent(CustomDomainSettingsComponent);
     component = fixture.componentInstance;

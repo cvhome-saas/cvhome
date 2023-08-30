@@ -1,6 +1,6 @@
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { DnsLookupService } from './dns-lookup.service';
+import {DnsLookupService} from './dns-lookup.service';
 
 describe('DnsLookupService', () => {
   let service: DnsLookupService;

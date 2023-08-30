@@ -1,6 +1,6 @@
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { DomainReferenceService } from './domain-reference.service';
+import {DomainReferenceService} from './domain-reference.service';
 
 describe('DomainReferenceService', () => {
   let service: DomainReferenceService;

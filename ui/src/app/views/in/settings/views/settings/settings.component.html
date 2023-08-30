@@ -1,20 +1,20 @@
 <div class="d-flex">
   <div class="w-25 d-none d-lg-block border-end user-chat-box">
-    <div class="overflow-auto " style="height: calc(100vh - 262px)" data-simplebar="init">
+    <div class="overflow-auto " data-simplebar="init" style="height: calc(100vh - 262px)">
       <ul>
         <li>
-          <a routerLink="/in/settings" [routerLinkActive]="['bg-light']"
-             [routerLinkActiveOptions]="{ exact: true }"
-             class="p-3 border-bottom d-flex ">
+          <a [routerLinkActiveOptions]="{ exact: true }" [routerLinkActive]="['bg-light']"
+             class="p-3 border-bottom d-flex "
+             routerLink="/in/settings">
             <div class="ms-3 d-inline-block w-75">
               <h6 class="mb-0">Domain Settings</h6>
             </div>
           </a>
         </li>
         <li>
-          <a routerLink="/in/settings/channels" [routerLinkActive]="['bg-light']"
-             [routerLinkActiveOptions]="{ exact: true }"
-             class="p-3 border-bottom d-flex ">
+          <a [routerLinkActiveOptions]="{ exact: true }" [routerLinkActive]="['bg-light']"
+             class="p-3 border-bottom d-flex "
+             routerLink="/in/settings/channels">
             <div class="ms-3 d-inline-block w-75">
               <h6 class="mb-0">Channels Settings</h6>
             </div>

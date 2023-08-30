@@ -1,6 +1,6 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { SubDomainSettingsComponent } from './sub-domain-settings.component';
+import {SubDomainSettingsComponent} from './sub-domain-settings.component';
 
 describe('SubDomainSettingsComponent', () => {
   let component: SubDomainSettingsComponent;
@@ -8,9 +8,9 @@ describe('SubDomainSettingsComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ SubDomainSettingsComponent ]
+      declarations: [SubDomainSettingsComponent]
     })
-    .compileComponents();
+      .compileComponents();
 
     fixture = TestBed.createComponent(SubDomainSettingsComponent);
     component = fixture.componentInstance;
