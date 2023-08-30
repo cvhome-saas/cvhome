@@ -47,7 +47,7 @@ public class DomainCertificateOrderServiceImpl implements DomainCertificateOrder
         if (one != null) {
             return one;
         }
-        DomainCertificateOrder certificateOrder = new DomainCertificateOrder();
+        DomainCertificateOrder certificateOrder = DomainCertificateOrder.newOrder();
         certificateOrder.setDomain(order.getDomain());
         certificateOrder.setLocation(o.getLocation().toString());
         certificateOrder.setCertificateOrderStatus(CertificateOrderStatus.REQUESTED);

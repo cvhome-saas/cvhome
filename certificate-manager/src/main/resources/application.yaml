@@ -17,6 +17,13 @@ spring:
         jwt:
           jwk-set-uri: http://localhost:9999/realms/cvhome/protocol/openid-connect/certs
   cloud:
+    function:
+      definition: ";"
+    stream:
+      bindings:
+        logOrderEvents-out-0:
+          destination: "com.asrevo.cvhome.domain-certificate-order-events"
+          content-type: "application/json"
     discovery:
       client:
         simple:
