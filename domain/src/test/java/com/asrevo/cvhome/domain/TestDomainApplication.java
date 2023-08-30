@@ -12,7 +12,7 @@ import org.testcontainers.utility.DockerImageName;
 class TestDomainApplication {
     @Bean
     @ServiceConnection
-    PostgreSQLContainer<?> postgresContainer() {
+    static PostgreSQLContainer<?> postgresContainer() {
         return new PostgreSQLContainer<>(DockerImageName.parse("postgres:13"));
     }
 

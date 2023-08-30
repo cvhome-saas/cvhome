@@ -16,7 +16,6 @@ import org.springframework.data.relational.core.mapping.Table;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -34,6 +33,11 @@ public class DomainCertificateOrder extends AbstractAggregateRoot<DomainCertific
     private CertificateOrderStatus certificateOrderStatus;
     private Challenges challenges;
 
+    public static DomainCertificateOrder newOrder() {
+        DomainCertificateOrder domainCertificateOrder = new DomainCertificateOrder();
+        domainCertificateOrder.registerEvent(new SimpleEvent(Defines.OrderEvents.DOMAIN_CERTIFICATE_ORDER_CREATED, new HashMap<>()));
+        return domainCertificateOrder;
+    }
 
     @Override
     protected Collection<Object> domainEvents() {
@@ -44,12 +48,6 @@ public class DomainCertificateOrder extends AbstractAggregateRoot<DomainCertific
                 }
             }
         }).collect(Collectors.toList());
-    }
-
-    public static DomainCertificateOrder newOrder() {
-        DomainCertificateOrder domainCertificateOrder = new DomainCertificateOrder();
-        domainCertificateOrder.registerEvent(new SimpleEvent(Defines.OrderEvents.DOMAIN_CERTIFICATE_ORDER_CREATED, new HashMap<>()));
-        return domainCertificateOrder;
     }
 
     public void setCertificateOrderStatus(CertificateOrderStatus certificateOrderStatus) {

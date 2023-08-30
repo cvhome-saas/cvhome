@@ -38,6 +38,7 @@ public class AcmController {
         log.info("will order a certificate for domain {}", domainOrder.getDomain());
         return domainCertificateOrderService.order(domainOrder);
     }
+
     @PostMapping("orders")
     public List<DomainCertificateOrder> order(@RequestBody List<Long> orderIds) {
         return iDomainCertificateOrderService.findAllOrderByIdIn(orderIds);

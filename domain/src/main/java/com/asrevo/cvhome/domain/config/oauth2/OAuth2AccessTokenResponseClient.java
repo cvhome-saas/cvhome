@@ -15,10 +15,10 @@ import java.util.HashMap;
 
 @Setter
 public abstract class OAuth2AccessTokenResponseClient<T extends AbstractOAuth2AuthorizationGrantRequest> {
+    protected RestTemplate restTemplate;
     private DefaultMapOAuth2AccessTokenResponseConverter converter = new DefaultMapOAuth2AccessTokenResponseConverter();
     private ParameterizedTypeReference<HashMap<String, Object>> responseType = new ParameterizedTypeReference<>() {
     };
-    protected RestTemplate restTemplate;
 
     public OAuth2AccessTokenResponseClient() {
         this.restTemplate = new RestTemplate();

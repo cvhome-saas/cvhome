@@ -27,7 +27,7 @@ public class ServerCallBearerExchangeFilterFunction implements ExchangeFilterFun
     private OAuth2AccessTokenResponse accessToken;
     private ClientRegistration registration;
 
-    public  ServerCallBearerExchangeFilterFunction(WebClientReactivePasswordTokenResponseClient tokenClient,
+    public ServerCallBearerExchangeFilterFunction(WebClientReactivePasswordTokenResponseClient tokenClient,
                                                   WebClientReactiveRefreshTokenTokenResponseClient refreshTokenClient,
                                                   ReactiveClientRegistrationRepository registrationRepository, String registrationId, String username, String password) {
         this.tokenClient = tokenClient;
