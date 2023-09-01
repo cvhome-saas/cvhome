@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.domain.repository;
 
-import com.asrevo.cvhome.domain.domain.DomainReference;
-import com.asrevo.cvhome.domain.domain.DomainType;
+import com.asrevo.cvhome.commons.domain.DomainReference;
+import com.asrevo.cvhome.commons.domain.DomainType;
 import org.springframework.data.r2dbc.repository.Modifying;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;

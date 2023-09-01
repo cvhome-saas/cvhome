@@ -1,7 +1,5 @@
-package com.asrevo.cvhome.certificatemanager.domain;
+package com.asrevo.cvhome.commons.domain;
 
-import com.asrevo.cvhome.commons.domain.CertificateOrderStatus;
-import com.asrevo.cvhome.commons.domain.Challenges;
 import com.asrevo.cvhome.commons.event.Event;
 import com.asrevo.cvhome.commons.event.SimpleEvent;
 import com.asrevo.cvhome.commons.utils.Defines;

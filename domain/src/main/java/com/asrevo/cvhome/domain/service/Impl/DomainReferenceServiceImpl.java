@@ -1,8 +1,8 @@
 package com.asrevo.cvhome.domain.service.Impl;
 
-import com.asrevo.cvhome.domain.domain.DomainReference;
-import com.asrevo.cvhome.domain.domain.DomainStatus;
-import com.asrevo.cvhome.domain.domain.DomainType;
+import com.asrevo.cvhome.commons.domain.DomainReference;
+import com.asrevo.cvhome.commons.domain.DomainStatus;
+import com.asrevo.cvhome.commons.domain.DomainType;
 import com.asrevo.cvhome.domain.repository.DomainReferenceRepository;
 import com.asrevo.cvhome.domain.service.DomainReferenceService;
 import lombok.AllArgsConstructor;

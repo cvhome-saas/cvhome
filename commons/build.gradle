@@ -1,51 +1,13 @@
 plugins {
-    id 'java'
-    id 'org.springframework.boot' version '3.1.2'
-    id 'io.spring.dependency-management' version '1.1.2'
-//    id 'org.graalvm.buildtools.native' version '0.9.23'
-    id 'jacoco'
-}
-group = 'com.asrevo.cvhome'
-
-java {
-    sourceCompatibility = '17'
-}
-
-repositories {
-    mavenCentral()
-}
-
-tasks.named('test') {
-    useJUnitPlatform()
-}
-
-springBoot {
-    buildInfo()
-}
-
-bootBuildImage {
-    builder = "paketobuildpacks/builder:tiny"
-    imageName = "ghcr.io/ashraf-revo/${project.name}:${project.version.replaceAll("\'", "")}"
-    docker {
-        publishRegistry {
-            url = "https://ghcr.io"
-            username = "ashraf-revo"
-            password = System.getenv("GHCR_TOKEN")
-        }
-    }
+    id 'com.asrevo.java-library-conventions'
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter'
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-}
-
-
-test {
-    finalizedBy jacocoTestReport // report is always generated after tests run
-}
-jacocoTestReport {
-    dependsOn test // tests are required to run before generating the report
+    implementation 'org.shredzone.acme4j:acme4j-client:2.15'
+    implementation 'org.shredzone.acme4j:acme4j-utils:2.15'
+    compileOnly 'org.projectlombok:lombok:1.18.28'
+    compileOnly 'org.springframework.data:spring-data-commons:3.1.2'
+    compileOnly 'org.springframework.data:spring-data-relational:3.1.2'
+    compileOnly 'jakarta.validation:jakarta.validation-api:3.0.2'
+    annotationProcessor 'org.projectlombok:lombok:1.18.28'
 }

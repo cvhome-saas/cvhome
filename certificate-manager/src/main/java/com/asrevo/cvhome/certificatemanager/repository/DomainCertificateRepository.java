@@ -1,6 +1,6 @@
 package com.asrevo.cvhome.certificatemanager.repository;
 
-import com.asrevo.cvhome.certificatemanager.domain.DomainCertificate;
+import com.asrevo.cvhome.commons.domain.DomainCertificate;
 import org.springframework.stereotype.Service;
 /*
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;

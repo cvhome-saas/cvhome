@@ -1,6 +1,5 @@
-package com.asrevo.cvhome.certificatemanager.domain;
+package com.asrevo.cvhome.commons.domain;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
 import org.shredzone.acme4j.Certificate;
@@ -9,7 +8,6 @@ import java.util.Date;
 
 @Getter
 @Setter
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class DomainCertificate {
 
     private String domain;

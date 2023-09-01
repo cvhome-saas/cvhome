@@ -2,8 +2,8 @@ package com.asrevo.cvhome.domain.service.Impl;
 
 import com.asrevo.cvhome.commons.domain.DomainCertificateOrder;
 import com.asrevo.cvhome.commons.domain.DomainReferenceOrder;
-import com.asrevo.cvhome.domain.domain.DomainReference;
-import com.asrevo.cvhome.domain.domain.DomainType;
+import com.asrevo.cvhome.commons.domain.DomainReference;
+import com.asrevo.cvhome.commons.domain.DomainType;
 import com.asrevo.cvhome.domain.service.AcmService;
 import com.asrevo.cvhome.domain.service.DomainReferenceAcmService;
 import com.asrevo.cvhome.domain.service.DomainReferenceService;

@@ -1,4 +1,4 @@
-package com.asrevo.cvhome.domain.domain;
+package com.asrevo.cvhome.commons.domain;
 
 public enum DomainType {
     APPLICATION,
