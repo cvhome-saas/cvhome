@@ -17,4 +17,4 @@ plugins {
 }
 
 rootProject.name = 'cvhome'
-include('ui', 'profile', 'commons', 'auth', 'certificate-manager', 'domain', 'gateway')
+include('ui', 'commons', 'auth', 'certificate-manager', 'domain', 'gateway')

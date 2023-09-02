@@ -30,11 +30,6 @@ spring:
                 metadata:
                   service-name: ui
                   instance: ui-1
-            profile:
-              - uri: "http://localhost:4300"
-                metadata:
-                  service-name: profile
-                  instance: profile-1
             gateway:
               - uri: "http://localhost:8080"
                 metadata:
@@ -83,10 +78,6 @@ spring:
         - id: ui
           uri: lb://ui
           predicates:
-            - FHost=gateway.com,www.gateway.com
-        - id: profile
-          uri: lb://profile
-          predicates:
             - FHost={domain}.{x},{sub}.{domain}.{x}
   security:
     oauth2:
@@ -102,7 +93,7 @@ spring:
             client-authentication-method: client_secret_basic
             authorization-grant-type: authorization_code
             scope: openid, profile, email
-            redirect-uri: https://gateway.com:8443/login/oauth2/code/keycloak
+            redirect-uri: "{baseUrl}/login/oauth2/code/keycloak"
             provider: keycloak
             client-secret: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
         provider:

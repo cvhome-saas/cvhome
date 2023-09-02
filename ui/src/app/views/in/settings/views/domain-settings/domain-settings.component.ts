@@ -1,6 +1,9 @@
 import {AfterViewInit, Component} from '@angular/core';
-import {DomainReferenceOrder, DomainType} from "../../../../../model/domain-reference";
-import {DomainReferenceService} from "../../../../../service/domain-reference.service";
+import {
+  DomainReferenceOrder,
+  DomainReferenceService,
+  DomainType
+} from "../../../../../service/domain-reference.service";
 
 @Component({
     selector: 'app-domain-settings',

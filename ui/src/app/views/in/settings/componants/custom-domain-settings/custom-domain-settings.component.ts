@@ -1,7 +1,10 @@
 import {Component, Input} from '@angular/core';
-import {DomainReference, DomainReferenceOrder, DomainType} from "../../../../../model/domain-reference";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
-import {DomainReferenceService} from "../../../../../service/domain-reference.service";
+import {
+  DomainReference,
+  DomainReferenceOrder,
+  DomainReferenceService, DomainType
+} from "../../../../../service/domain-reference.service";
 import {environment} from "../../../../../../environment";
 import {DnsLookupService} from "../../../../../service/dns-lookup.service";
 import {map, mergeMap, Observable, of, throwError} from "rxjs";

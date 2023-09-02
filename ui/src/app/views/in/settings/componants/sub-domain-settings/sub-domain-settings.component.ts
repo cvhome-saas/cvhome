@@ -1,8 +1,11 @@
 import {Component, Input} from '@angular/core';
-import {DomainReference, DomainReferenceOrder, DomainType} from "../../../../../model/domain-reference";
 import {environment} from "../../../../../../environment";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
-import {DomainReferenceService} from "../../../../../service/domain-reference.service";
+import {
+  DomainReference,
+  DomainReferenceOrder,
+  DomainReferenceService, DomainType
+} from "../../../../../service/domain-reference.service";
 
 @Component({
     selector: 'app-sub-domain-settings',
