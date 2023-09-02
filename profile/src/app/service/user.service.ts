@@ -4,18 +4,18 @@ import {User} from "../domain/user";
 import {Observable} from "rxjs";
 
 @Injectable({
-  providedIn: 'root'
+    providedIn: 'root'
 })
 export class UserService {
 
-  constructor(private http: HttpClient) {
-  }
+    constructor(private http: HttpClient) {
+    }
 
-  getUser(): Observable<User> {
-    return this.http.get<User>("/user/api/v1/user", {
-      headers: {
-        "Map-Host-As-Request-Param": "true"
-      }
-    })
-  }
+    getUser(): Observable<User> {
+        return this.http.get<User>("/user/api/v1/user", {
+            headers: {
+                "Map-Host-As-Request-Param": "true"
+            }
+        })
+    }
 }

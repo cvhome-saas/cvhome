@@ -12,19 +12,19 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {MapErrorsPipe} from './pipe/map-errors.pipe';
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    LeftSideBarNavComponent,
-    BaseComponent,
-    HeaderNavComponent,
-    ErrorComponent,
-    MapErrorsPipe,
-  ],
-  imports: [
-    BrowserModule, HttpClientModule, AppRoutingModule, FormsModule, ReactiveFormsModule
-  ],
-  providers: [],
-  bootstrap: [AppComponent]
+    declarations: [
+        AppComponent,
+        LeftSideBarNavComponent,
+        BaseComponent,
+        HeaderNavComponent,
+        ErrorComponent,
+        MapErrorsPipe,
+    ],
+    imports: [
+        BrowserModule, HttpClientModule, AppRoutingModule, FormsModule, ReactiveFormsModule
+    ],
+    providers: [],
+    bootstrap: [AppComponent]
 })
 export class AppModule {
 }

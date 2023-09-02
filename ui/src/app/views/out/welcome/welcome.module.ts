@@ -5,10 +5,10 @@ import {WelcomeComponent} from "./views/welcome.component";
 import {WelcomeRoutingModule} from "./welcome.routing.module";
 
 @NgModule({
-  imports: [
-    CommonModule, HttpClientModule, WelcomeRoutingModule
-  ],
-  declarations: [WelcomeComponent]
+    imports: [
+        CommonModule, HttpClientModule, WelcomeRoutingModule
+    ],
+    declarations: [WelcomeComponent]
 })
 export class WelcomeModule {
 }

@@ -2,17 +2,17 @@ import {Pipe, PipeTransform} from '@angular/core';
 import {ValidationErrors} from "@angular/forms";
 
 @Pipe({
-  name: 'mapErrors'
+    name: 'mapErrors'
 })
 export class MapErrorsPipe implements PipeTransform {
 
-  transform(value: ValidationErrors | null, ...args: unknown[]): any[] {
-    if (value) {
-      return Object.keys(value);
+    transform(value: ValidationErrors | null, ...args: unknown[]): any[] {
+        if (value) {
+            return Object.keys(value);
 
-    } else {
-      return [];
+        } else {
+            return [];
+        }
     }
-  }
 
 }
