@@ -1,7 +1,7 @@
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes, UrlMatchResult, UrlSegment} from '@angular/router';
 import {environment} from "../environment";
-import {authenticationGuard} from "./service/auth-guard.service";
+import {inGuard, outGuard} from "./service/auth-guard.service";
 
 
 function matcher(pathIn: string[] = [], hostIn: string[] = [], pathNotIn: string[] = [], hostNotIn: string[] = []) {
@@ -33,11 +33,12 @@ const routes: Routes = [
   },
   {
     path: 'in',
-    canActivate: [authenticationGuard()],
+    canActivate: [inGuard()],
     loadChildren: () => import('./views/in/in.module').then(m => m.InModule)
   },
   {
     path: '',
+    canActivate: [outGuard()],
     loadChildren: () => import('./views/out/out.module').then(m => m.OutModule)
   },
 ];
