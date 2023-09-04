@@ -92,4 +92,14 @@ public class WebClientServicesConfig {
         refreshTokenClient.setWebClient(defaultBuilder.build());
         return refreshTokenClient;
     }
+
+/*   issue with this i cant disable https validation and the validation fail
+    @Bean
+    public DefaultReactiveOAuth2UserService defaultReactiveOAuth2UserService(WebClient.Builder defaultMicroServiceBuilder) {
+        DefaultReactiveOAuth2UserService defaultReactiveOAuth2UserService = new DefaultReactiveOAuth2UserService();
+        defaultReactiveOAuth2UserService.setWebClient(defaultMicroServiceBuilder.build());
+        return defaultReactiveOAuth2UserService;
+    }
+*/
+
 }
