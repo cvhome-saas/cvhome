@@ -18,12 +18,27 @@ spring:
           jwk-set-uri: http://localhost:9999/realms/cvhome/protocol/openid-connect/certs
   cloud:
     function:
-      definition: ";"
+#      definition: ";"
+      definition: "sysEvents"
     stream:
+      function:
+        bindings:
+          sysEvents: sysEvents
       bindings:
+        sysEvents-in-0:
+          destination: "com.asrevo.cvhome.sys-events"
+          group: ${spring.application.name}
         logOrderEvents-out-0:
           destination: "com.asrevo.cvhome.domain-certificate-order-events"
           content-type: "application/json"
+      rabbit:
+        bindings:
+          sysEvents:
+            consumer:
+              declare-exchange: false
+              exchangeType: topic
+              durableSubscription: true
+              acknowledgeMode: auto
     discovery:
       client:
         simple:

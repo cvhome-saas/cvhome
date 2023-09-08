@@ -35,17 +35,27 @@ spring:
           jwk-set-uri: http://localhost:9999/realms/cvhome/protocol/openid-connect/certs
   cloud:
     function:
-      definition: "logOrderEvents"
+      definition: "sysEvents;logOrderEvents"
     stream:
       function:
         bindings:
+          sysEvents: sysEvents
           logOrderEvents: logOrderEvents
       bindings:
+        sysEvents-in-0:
+          destination: "com.asrevo.cvhome.sys-events"
+          group: ${spring.application.name}
         logOrderEvents-in-0:
           destination: "com.asrevo.cvhome.domain-certificate-order-events"
           group: ${spring.application.name}
       rabbit:
         bindings:
+          sysEvents:
+            consumer:
+              declare-exchange: false
+              exchangeType: topic
+              durableSubscription: true
+              acknowledgeMode: auto
           logOrderEvents:
             consumer:
               exchangeType: topic

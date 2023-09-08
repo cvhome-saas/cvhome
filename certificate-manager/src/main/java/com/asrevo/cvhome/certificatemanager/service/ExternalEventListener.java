@@ -1,13 +1,11 @@
-package com.asrevo.cvhome.domain.service;
+package com.asrevo.cvhome.certificatemanager.service;
 
-import com.asrevo.cvhome.commons.event.SimpleEvent;
 import org.springframework.context.annotation.Bean;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
 import java.util.function.Consumer;
-
 
 @Component
 public class ExternalEventListener {
@@ -21,13 +19,6 @@ public class ExternalEventListener {
     public Consumer<Message<Map<String, Object>>> sysEvents() {
         return event -> {
             System.out.println("Received: sys event: " + event.getPayload());
-        };
-    }
-
-    @Bean
-    public Consumer<SimpleEvent> logOrderEvents() {
-        return event -> {
-            System.out.println("Received: order event: " + event.eventType());
         };
     }
 }
