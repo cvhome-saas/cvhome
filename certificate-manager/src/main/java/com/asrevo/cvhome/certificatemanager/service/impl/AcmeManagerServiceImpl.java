@@ -70,7 +70,7 @@ public class AcmeManagerServiceImpl implements AcmeManagerService {
         }
         writer.accept(
                 domainCrt,
-                Paths.get(getDomainCode(domainRequest.getDomain()), "domain.crt")
+                Paths.get(getDomainCode(domainRequest.getDomain()), CertificateFileType.CRT.getFile())
                         .toString());
     }
 
@@ -176,7 +176,7 @@ public class AcmeManagerServiceImpl implements AcmeManagerService {
         csrBuilder.write(csrFileWriter);
         writer.accept(
                 domainCsr,
-                Paths.get(getDomainCode(domainRequest.getDomain()), "domain.csr")
+                Paths.get(getDomainCode(domainRequest.getDomain()), CertificateFileType.CSR.getFile())
                         .toString());
         order.execute(csrBuilder.getEncoded());
         tryUntilTrue(10, () -> {
@@ -205,7 +205,7 @@ public class AcmeManagerServiceImpl implements AcmeManagerService {
 
     @Override
     public KeyPair generateOrGetDomainKeyPair(String domain) throws IOException {
-        Path domainKey = Paths.get(getDomainCode(domain), "domain.key");
+        Path domainKey = Paths.get(getDomainCode(domain), CertificateFileType.KEY.getFile());
         if (fileService.exist(domainKey.toString())) {
             InputStream stream = fileService.getFile(domainKey.toString());
             return KeyPairUtils.readKeyPair(new InputStreamReader(stream));
