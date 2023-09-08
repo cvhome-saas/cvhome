@@ -1,0 +1,1 @@
+rabbitmqctl export_definitions  file.json
