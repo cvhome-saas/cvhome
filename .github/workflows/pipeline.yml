@@ -22,7 +22,7 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-      - name: Use Node.js 20.x
+      - name: Use Node.js 18
         uses: actions/setup-node@v3
         with:
           node-version: 18
@@ -33,8 +33,7 @@ jobs:
       - name: Build Docker with Gradle
         uses: gradle/gradle-build-action@749f47bda3e44aa060e82d7b3ef7e40d953bd629
         with:
-          arguments: :ui:bootJar
-#          arguments: bootBuildImage -x test --publishImage
+          arguments: bootBuildImage -x test --publishImage
         env: # Or as an environment variable
           GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
       - uses: actions/upload-artifact@v3
