@@ -1,6 +1,6 @@
 package com.asrevo.cvhome.certificatemanager.repository;
 
-import com.asrevo.cvhome.certificatemanager.domain.DomainCertificateOrder;
+import com.asrevo.cvhome.commons.domain.DomainCertificateOrder;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;

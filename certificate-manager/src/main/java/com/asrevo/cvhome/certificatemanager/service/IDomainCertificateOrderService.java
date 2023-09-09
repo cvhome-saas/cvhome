@@ -1,6 +1,6 @@
 package com.asrevo.cvhome.certificatemanager.service;
 
-import com.asrevo.cvhome.certificatemanager.domain.DomainCertificateOrder;
+import com.asrevo.cvhome.commons.domain.DomainCertificateOrder;
 
 import java.util.List;
 

@@ -27,7 +27,7 @@ abstract class BootBuildImageTask extends DefaultTask {
 
     @TaskAction
     void bootBuildImage() {
-        String image = "ghcr.io/ashraf-revo/${project.name}:${project.version.replaceAll("\'", "")}"
+        String image = "ghcr.io/ashraf-revo/${project.name}:${project.version}"
         project.exec {
             workingDir '.'
             commandLine "docker", "build", "-t", image, "."

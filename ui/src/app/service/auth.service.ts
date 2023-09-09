@@ -1,6 +1,5 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {AuthUser} from "../model/auth-user";
 import {map, Observable, of} from "rxjs";
 import {environment} from '../../environment';
 
@@ -11,6 +10,13 @@ export class AuthService {
   private authUser: AuthUser | undefined;
 
   constructor(private httpClient: HttpClient) {
+    // this.authUser = {
+    //   email_verified: false,
+    //   family_name: "",
+    //   given_name: "",
+    //   preferred_username: "",
+    //   sub: ""
+    // }
   }
 
   getAuthUser(): Observable<AuthUser> {
@@ -24,4 +30,11 @@ export class AuthService {
         }))
     }
   }
+}
+export interface AuthUser {
+  sub: string
+  email_verified: boolean,
+  preferred_username: string
+  given_name: string
+  family_name: string
 }

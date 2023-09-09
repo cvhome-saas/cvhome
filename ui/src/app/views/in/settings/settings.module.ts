@@ -10,10 +10,10 @@ import {HttpClientModule} from "@angular/common/http";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 
 @NgModule({
-  imports: [
-    CommonModule, HttpClientModule, FormsModule, ReactiveFormsModule, SettingsRoutingModule
-  ],
-  declarations: [SettingsComponent, DomainSettingsComponent, ChannelsSettingsComponent, SubDomainSettingsComponent, CustomDomainSettingsComponent]
+    imports: [
+        CommonModule, HttpClientModule, FormsModule, ReactiveFormsModule, SettingsRoutingModule
+    ],
+    declarations: [SettingsComponent, DomainSettingsComponent, ChannelsSettingsComponent, SubDomainSettingsComponent, CustomDomainSettingsComponent]
 })
 export class SettingsModule {
 }

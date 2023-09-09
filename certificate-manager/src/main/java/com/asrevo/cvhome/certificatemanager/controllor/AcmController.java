@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.certificatemanager.controllor;
 
-import com.asrevo.cvhome.certificatemanager.domain.DomainCertificate;
-import com.asrevo.cvhome.certificatemanager.domain.DomainCertificateOrder;
+import com.asrevo.cvhome.commons.domain.DomainCertificate;
+import com.asrevo.cvhome.commons.domain.DomainCertificateOrder;
 import com.asrevo.cvhome.certificatemanager.service.AcmeManagerService;
 import com.asrevo.cvhome.certificatemanager.service.DomainCertificateOrderService;
 import com.asrevo.cvhome.certificatemanager.service.IDomainCertificateOrderService;

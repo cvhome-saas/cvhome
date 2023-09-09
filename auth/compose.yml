@@ -22,11 +22,18 @@ services:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
 
+      KK_TO_RMQ_URL: rabbitmq
+      KK_TO_RMQ_USERNAME: guest
+      KK_TO_RMQ_PASSWORD: guest
+      KK_TO_RMQ_VHOST: "/"
+      KK_TO_RMQ_EXCHANGE: "com.asrevo.cvhome.sys-events"
+
     command:  --verbose start --proxy=edge  --hostname-strict=false --import-realm
 #    command:  --verbose start --proxy=edge --hostname-strict=false --hostname-path=/auth --import-realm
 #    command:  --verbose start  --hostname-strict=false --import-realm
     volumes:
       - ./keycloak/imports:/opt/keycloak/data/import
+      - ./keycloak/providers:/opt/keycloak/providers
     ports:
       - "9999:8080"
     depends_on:

@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.domain.service;
 
 import com.asrevo.cvhome.commons.domain.DomainReferenceOrder;
-import com.asrevo.cvhome.domain.domain.DomainType;
+import com.asrevo.cvhome.commons.domain.DomainType;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 

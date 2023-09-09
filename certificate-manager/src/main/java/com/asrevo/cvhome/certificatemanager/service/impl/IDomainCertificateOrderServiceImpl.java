@@ -1,6 +1,6 @@
 package com.asrevo.cvhome.certificatemanager.service.impl;
 
-import com.asrevo.cvhome.certificatemanager.domain.DomainCertificateOrder;
+import com.asrevo.cvhome.commons.domain.DomainCertificateOrder;
 import com.asrevo.cvhome.certificatemanager.repository.IDomainCertificateOrderRepository;
 import com.asrevo.cvhome.certificatemanager.service.IDomainCertificateOrderService;
 import org.springframework.beans.factory.annotation.Autowired;

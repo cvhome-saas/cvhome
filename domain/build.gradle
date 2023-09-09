@@ -1,8 +1,8 @@
 plugins {
-    id 'java'
+    id 'com.asrevo.java-application-conventions'
     id 'org.springframework.boot' version '3.1.2'
     id 'io.spring.dependency-management' version '1.1.2'
-    id 'org.graalvm.buildtools.native' version '0.9.23'
+//    id 'org.graalvm.buildtools.native' version '0.9.23'
     id 'jacoco'
 }
 group = 'com.asrevo.cvhome'
@@ -26,7 +26,7 @@ springBoot {
 
 bootBuildImage {
     builder = "paketobuildpacks/builder:tiny"
-    imageName = "ghcr.io/ashraf-revo/${project.name}:${project.version.replaceAll("\'", "")}"
+    imageName = "ghcr.io/ashraf-revo/${project.name}:${project.version}"
     docker {
         publishRegistry {
             url = "https://ghcr.io"
@@ -56,6 +56,7 @@ dependencies {
     implementation 'org.shredzone.acme4j:acme4j-client:2.15'
     implementation 'org.shredzone.acme4j:acme4j-utils:2.15'
 
+    implementation project(':commons')
 //    developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
