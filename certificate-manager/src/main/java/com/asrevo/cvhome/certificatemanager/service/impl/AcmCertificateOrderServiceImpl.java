@@ -75,8 +75,10 @@ public class AcmCertificateOrderServiceImpl implements AcmCertificateOrderServic
                 boolean isValid = Utils.performPreValidation(it.getChallenges().challenges(), it.getChallengeValidationType().getChallenge());
                 if (isValid) {
                     CertificateOrderStatus certificateOrderStatus = doAcmValidation(it);
+                    log.error("acmValidation validation is {} for domain {}", certificateOrderStatus, orderId);
                     it.setCertificateOrderStatus(certificateOrderStatus);
                 } else {
+                    log.warn("performPreValidation validation is {} for domain {}", PRE_VALIDATED_INVALID, orderId);
                     it.setCertificateOrderStatus(PRE_VALIDATED_INVALID);
                 }
                 it.setValidatedDate(Instant.now());
@@ -101,7 +103,10 @@ public class AcmCertificateOrderServiceImpl implements AcmCertificateOrderServic
                 log.error("order {} not requested yet please wait we will notify you once its requested", order.getId());
                 throw new RuntimeException("order not requested yet please wait we will notify you once its requested");
             }
-        }).orElseThrow(() -> new RuntimeException("order not found"));
+        }).orElseThrow(() -> {
+            log.error("askValidate for order {} that not exist", order.getId());
+            return new RuntimeException("order not found");
+        });
     }
 
     @Override
@@ -112,19 +117,21 @@ public class AcmCertificateOrderServiceImpl implements AcmCertificateOrderServic
                 if (it.getChallengeValidationType().isAutomaticValidation()) {
                     if (TlsAlpn01Challenge.TYPE.equals(it.getChallengeValidationType().getChallenge())) {
                         try {
+                            log.info("will generateTemporalTlsAlpn01Certificate for order {}", orderId);
                             acmeManagerService.generateTemporalTlsAlpn01Certificate(it, fileService::upload);
                             it.setCertificateOrderStatus(VALIDATION_REQUESTED);
                             domainCertificateOrderService.save(it);
                         } catch (IOException e) {
-                            log.error("error when generateTemporalTlsAlpn01Certificate");
+                            log.error("error when generateTemporalTlsAlpn01Certificate for order {}", orderId);
                         }
                     } else if (Http01Challenge.TYPE.equals(it.getChallengeValidationType().getChallenge())) {
                         try {
+                            log.info("will generateTemporalHttpValidationFile for order {}", orderId);
                             acmeManagerService.generateTemporalHttpValidationFile(it, fileService::upload);
                             it.setCertificateOrderStatus(VALIDATION_REQUESTED);
                             domainCertificateOrderService.save(it);
                         } catch (Exception e) {
-                            log.error("error when generateTemporalHttpValidationFile");
+                            log.error("error when generateTemporalHttpValidationFile for order {}", orderId);
                         }
                     } else if (Dns01Challenge.TYPE.equals(it.getChallengeValidationType().getChallenge())) {
                         // @TODO check if we need to generate something before dns check
@@ -145,9 +152,12 @@ public class AcmCertificateOrderServiceImpl implements AcmCertificateOrderServic
         Set<CertificateOrderStatus> preGenerationNeededStatus = Set.of(VALIDATED_VALID);
         domainCertificateOrderService.findOneById(orderId).ifPresent(it -> {
             if (preGenerationNeededStatus.contains(it.getCertificateOrderStatus())) {
+                log.info("will generate acm certificate for order {}", orderId);
                 it.setCertificateOrderStatus(doAcmGeneration(it));
                 if (GENERATED.equals(it.getCertificateOrderStatus())) {
                     it.setGeneratedDate(Instant.now());
+                } else {
+                    log.error("generation failed for order {}", orderId);
                 }
                 domainCertificateOrderService.save(it);
             } else {
