@@ -9,6 +9,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -36,17 +37,13 @@ public class DomainCertificateOrderServiceImpl implements DomainCertificateOrder
     }
 
     @Override
-    public List<DomainCertificateOrder> findAllRequestedCertificates(int limit) {
-        return domainCertificateOrderRepository.findByCertificateOrderStatusOrderByIdAsc(CertificateOrderStatus.INITIATED, PageRequest.of(0, limit));
+    public List<DomainCertificateOrder> findAllSinceValidation(Set<CertificateOrderStatus> statuses, Instant from, int limit) {
+        return domainCertificateOrderRepository.findByCertificateOrderStatusInAndValidatedDateLessThanOrderByIdAsc(statuses, from, PageRequest.of(0, limit));
     }
 
     @Override
-    public DomainCertificateOrder findOneByIdOrLocation(Long id, String location) {
-        return domainCertificateOrderRepository.findOneByIdOrLocation(id, location);
+    public List<DomainCertificateOrder> findAllSinceCreation(Set<CertificateOrderStatus> statuses, Instant from, int limit) {
+        return domainCertificateOrderRepository.findByCertificateOrderStatusInAndCreatedDateLessThanOrderByIdAsc(statuses, from, PageRequest.of(0, limit));
     }
 
-    @Override
-    public Optional<DomainCertificateOrder> findOneByIdAndCertificateOrderStatusIn(Long orderId, Set<CertificateOrderStatus> statuses) {
-        return domainCertificateOrderRepository.findOneByIdAndCertificateOrderStatusIn(orderId, statuses);
-    }
 }

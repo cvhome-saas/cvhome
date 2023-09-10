@@ -3,6 +3,7 @@ package com.asrevo.cvhome.certificatemanager.service;
 import com.asrevo.cvhome.commons.domain.CertificateOrderStatus;
 import com.asrevo.cvhome.commons.domain.DomainCertificateOrder;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -15,9 +16,7 @@ public interface DomainCertificateOrderService {
 
     List<DomainCertificateOrder> findAllOrderByIdIn(List<Long> orderIds);
 
-    List<DomainCertificateOrder> findAllRequestedCertificates(int limit);
+    List<DomainCertificateOrder> findAllSinceValidation(Set<CertificateOrderStatus> statuses, Instant from, int limit);
 
-    DomainCertificateOrder findOneByIdOrLocation(Long id, String location);
-
-    Optional<DomainCertificateOrder> findOneByIdAndCertificateOrderStatusIn(Long orderId, Set<CertificateOrderStatus> statuses);
+    List<DomainCertificateOrder> findAllSinceCreation(Set<CertificateOrderStatus> statuses, Instant from, int limit);
 }

@@ -9,6 +9,5 @@ CREATE TABLE IF NOT EXISTS public.domain_certificate_order
     created_date              timestamp,
     requested_date            timestamp,
     validated_date            timestamp,
-    generated_date            timestamp,
-    CONSTRAINT location_unique unique (location)
+    generated_date timestamp
 );
