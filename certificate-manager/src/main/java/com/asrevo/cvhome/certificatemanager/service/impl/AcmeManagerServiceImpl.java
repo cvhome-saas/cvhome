@@ -1,10 +1,10 @@
 package com.asrevo.cvhome.certificatemanager.service.impl;
 
-import com.asrevo.cvhome.commons.domain.DomainCertificate;
-import com.asrevo.cvhome.commons.domain.DomainCertificateOrder;
 import com.asrevo.cvhome.certificatemanager.service.AcmeManagerService;
 import com.asrevo.cvhome.certificatemanager.service.FileService;
 import com.asrevo.cvhome.commons.domain.CertificateFileType;
+import com.asrevo.cvhome.commons.domain.DomainCertificate;
+import com.asrevo.cvhome.commons.domain.DomainCertificateOrder;
 import com.asrevo.cvhome.commons.domain.DomainRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.shredzone.acme4j.*;
@@ -22,7 +22,6 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -220,13 +219,6 @@ public class AcmeManagerServiceImpl implements AcmeManagerService {
     }
 
     @Override
-    public DomainCertificate info(DomainCertificateOrder certificateOrder) throws MalformedURLException {
-        Order order = this.login.bindOrder(new URL(certificateOrder.getLocation()));
-        return new DomainCertificate(
-                certificateOrder, order.getCertificate(), order.getStatus().name());
-    }
-
-    @Override
     public void generateTemporalTlsAlpn01Certificate(
             DomainCertificateOrder certificateOrder, BiConsumer<File, String> writer) throws IOException {
         URL location = new URL(certificateOrder.getLocation());
@@ -245,6 +237,11 @@ public class AcmeManagerServiceImpl implements AcmeManagerService {
         }
     }
 
+
+    @Override
+    public void generateTemporalHttpValidationFile(DomainCertificateOrder it, BiConsumer<File, String> writer) {
+        //@TODO generate http validation file
+    }
 
     @Override
     public InputStreamResource getDomainCertificateFile(String domain, CertificateFileType fileType) {

@@ -1,8 +1,12 @@
 package com.asrevo.cvhome.commons.domain;
 
 public enum CertificateOrderStatus {
+    INITIATED,
     REQUESTED,
+    VALIDATION_REQUESTED,
+    PRE_VALIDATED_INVALID,
     VALIDATED_VALID,
     VALIDATED_INVALID,
-    GENERATED
+    GENERATED,
+    FAIL_GENERATING
 }

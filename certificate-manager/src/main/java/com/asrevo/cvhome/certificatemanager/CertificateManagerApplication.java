@@ -1,12 +1,7 @@
 package com.asrevo.cvhome.certificatemanager;
 
-import com.asrevo.cvhome.commons.domain.DomainCertificateOrder;
-import com.asrevo.cvhome.certificatemanager.repository.IDomainCertificateOrderRepository;
-import com.asrevo.cvhome.certificatemanager.service.DomainCertificateOrderService;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
 public class CertificateManagerApplication {
@@ -16,16 +11,17 @@ public class CertificateManagerApplication {
         SpringApplication.run(CertificateManagerApplication.class, args);
     }
 
-    @Bean
-    public CommandLineRunner runner(DomainCertificateOrderService domainCertificateOrderService, IDomainCertificateOrderRepository iDomainCertificateOrderRepository) {
+/*    @Bean
+    public CommandLineRunner runner(DomainCertificateOrderRepository domainCertificateOrderRepository, AcmCertificateOrderService acmCertificateOrderService) {
         return new CommandLineRunner() {
             @Override
             public void run(String... args) throws Exception {
-                iDomainCertificateOrderRepository.deleteAll();
+                domainCertificateOrderRepository.deleteAll();
                 DomainCertificateOrder order = new DomainCertificateOrder();
-                order.setDomain("asa.asrevo.com");
-                domainCertificateOrderService.order(order);
+                order.setDomain("asas.asrevo.com");
+                order.setChallengeValidationType(ChallengeValidationType.TlsAlpn01);
+                acmCertificateOrderService.initiateOrder(order);
             }
         };
-    }
+    }*/
 }

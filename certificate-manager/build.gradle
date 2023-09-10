@@ -58,6 +58,9 @@ dependencies {
     implementation 'org.shredzone.acme4j:acme4j-utils:2.15'
     implementation 'commons-codec:commons-codec:1.15'
 
+    implementation 'org.jobrunr:jobrunr-spring-boot-starter:5.3.3'
+    implementation 'dnsjava:dnsjava:3.5.2'
+
     implementation project(':commons')
 //    developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
     compileOnly 'org.projectlombok:lombok'

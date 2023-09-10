@@ -1,35 +1,61 @@
+
+### get token for microservice-certificate-manager
+POST http://auth.gateway.com:9999/realms/cvhome/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+client_id = microservice-app &
+client_secret = r1nuVn4HefusLGwHIeRxbdOzdTZLEMvQ &
+grant_type = password &
+username = microservice-gateway
+    &
+password = microservice-gateway
+
+> {%
+    client.global.set("access_token", response.body.access_token)
+%}
+
+
 ### order a domain certificate
 POST http://localhost:8082/api/v1/acm/order
 Content-Type: application/json
+Authorization: Bearer {{access_token}}
 
 {
   "domain": "gateway.com",
-  "reference": "45"
+  "challengeValidationType": "Dns01"
 }
 
-### validate a domain challenge
-POST http://localhost:8082/api/v1/acm/validate
+### order a domain certificate xyz.asrevo.com
+POST http://localhost:8082/api/v1/acm/order
 Content-Type: application/json
+Authorization: Bearer {{access_token}}
 
 {
-  "location": "https://acme-v02.api.letsencrypt.org/acme/order/593265476/201332016326"
+  "domain": "xyz.asrevo.com",
+  "challengeValidationType": "Dns01"
 }
 
-### generate a domain challenge
-POST http://localhost:8082/api/v1/acm/generate
+
+### ask validate certificate xyz.asrevo.com
+POST http://localhost:8082/api/v1/acm/ask-validate
 Content-Type: application/json
+Authorization: Bearer {{access_token}}
 
 {
-  "location": "https://acme-v02.api.letsencrypt.org/acme/order/593265476/201332016326"
+  "id": 2
 }
+
 
 ### downoad a domain crt file
 POST http://localhost:8082/api/v1/acm/domain-certificate-file?domain=gateway.com&fileType=CRT
+Authorization: Bearer {{access_token}}
 
 
 ### downoad a domain key file
 POST http://localhost:8082/api/v1/acm/domain-certificate-file?domain=gateway.com&fileType=KEY
+Authorization: Bearer {{access_token}}
 
 
 ### downoad a domain csr file
 POST http://localhost:8082/api/v1/acm/domain-certificate-file?domain=gateway.com&fileType=CSR
+Authorization: Bearer {{access_token}}

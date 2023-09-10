@@ -3,14 +3,12 @@ package com.asrevo.cvhome.commons.domain;
 import com.asrevo.cvhome.commons.event.Event;
 import com.asrevo.cvhome.commons.event.SimpleEvent;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.domain.AbstractAggregateRoot;
 import org.springframework.data.relational.core.mapping.Table;
 
+import java.time.Instant;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,14 +22,21 @@ import static com.asrevo.cvhome.commons.utils.Defines.OrderEvents.*;
 @Table("domain_certificate_order")
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class DomainCertificateOrder extends AbstractAggregateRoot<DomainCertificateOrder> {
     private @Id Long id;
     private String location;
     @NotNull
     private String domain;
+    @NotNull
+    private ChallengeValidationType challengeValidationType;
 
-    private CertificateOrderStatus certificateOrderStatus;
+    private CertificateOrderStatus certificateOrderStatus = CertificateOrderStatus.INITIATED;
     private Challenges challenges;
+    private Instant createdDate;
+    private Instant requestedDate;
+    private Instant validatedDate;
+    private Instant generatedDate;
 
 
     @Override

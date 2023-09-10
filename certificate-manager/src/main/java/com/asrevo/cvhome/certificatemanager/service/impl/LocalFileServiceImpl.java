@@ -44,6 +44,9 @@ public class LocalFileServiceImpl implements FileService {
     @Override
     public void upload(File file, String fileName) {
         Path destination = root.resolve(fileName);
+        if (destination.toFile().exists()) {
+            destination.toFile().delete();
+        }
         createParentDirectory(destination);
         Files.copy(new FileInputStream(file), destination);
 /*

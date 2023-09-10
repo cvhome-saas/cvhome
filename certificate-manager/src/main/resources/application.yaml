@@ -19,15 +19,21 @@ spring:
   cloud:
     function:
 #      definition: ";"
-      definition: "sysEvents"
+      definition: "sysEvents;logOrderEvents"
     stream:
       function:
         bindings:
           sysEvents: sysEvents
+          logOrderEvents: logOrderEvents
       bindings:
         sysEvents-in-0:
           destination: "com.asrevo.cvhome.sys-events"
           group: ${spring.application.name}
+          content-type: "application/json"
+        logOrderEvents-in-0:
+          destination: "com.asrevo.cvhome.domain-certificate-order-events"
+          group: ${spring.application.name}
+          content-type: "application/json"
         logOrderEvents-out-0:
           destination: "com.asrevo.cvhome.domain-certificate-order-events"
           content-type: "application/json"
@@ -96,3 +102,7 @@ logging:
     org.springframework.web: debug
     org.springframework.security: debug
     reactor.netty.http: debug
+org:
+  jobrunr:
+    background-job-server:
+      enabled: true
