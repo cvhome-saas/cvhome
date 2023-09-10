@@ -10,4 +10,9 @@ public interface FileService {
     InputStream getFile(String fileName);
 
     boolean exist(String fileName);
+
+    void addToken(String token, String content);
+
+    InputStream getTokenValue(String token);
+
 }

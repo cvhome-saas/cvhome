@@ -127,7 +127,7 @@ public class AcmCertificateOrderServiceImpl implements AcmCertificateOrderServic
                     } else if (Http01Challenge.TYPE.equals(it.getChallengeValidationType().getChallenge())) {
                         try {
                             log.info("will generateTemporalHttpValidationFile for order {}", orderId);
-                            acmeManagerService.generateTemporalHttpValidationFile(it, fileService::upload);
+                            acmeManagerService.generateTemporalHttpValidationFile(it, fileService::addToken);
                             it.setCertificateOrderStatus(VALIDATION_REQUESTED);
                             domainCertificateOrderService.save(it);
                         } catch (Exception e) {

@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
-import static com.asrevo.cvhome.certificatemanager.utils.Utils.getDomainCode;
+import static com.asrevo.cvhome.certificatemanager.utils.Utils.encode64;
 import static org.apache.commons.codec.binary.Hex.encodeHexString;
 
 @Service
@@ -69,7 +69,7 @@ public class AcmeManagerServiceImpl implements AcmeManagerService {
         }
         writer.accept(
                 domainCrt,
-                Paths.get(getDomainCode(domainRequest.getDomain()), CertificateFileType.CRT.getFile())
+                Paths.get(encode64(domainRequest.getDomain()), CertificateFileType.CRT.getFile())
                         .toString());
     }
 
@@ -175,7 +175,7 @@ public class AcmeManagerServiceImpl implements AcmeManagerService {
         csrBuilder.write(csrFileWriter);
         writer.accept(
                 domainCsr,
-                Paths.get(getDomainCode(domainRequest.getDomain()), CertificateFileType.CSR.getFile())
+                Paths.get(encode64(domainRequest.getDomain()), CertificateFileType.CSR.getFile())
                         .toString());
         order.execute(csrBuilder.getEncoded());
         tryUntilTrue(10, () -> {
@@ -204,7 +204,7 @@ public class AcmeManagerServiceImpl implements AcmeManagerService {
 
     @Override
     public KeyPair generateOrGetDomainKeyPair(String domain) throws IOException {
-        Path domainKey = Paths.get(getDomainCode(domain), CertificateFileType.KEY.getFile());
+        Path domainKey = Paths.get(encode64(domain), CertificateFileType.KEY.getFile());
         if (fileService.exist(domainKey.toString())) {
             InputStream stream = fileService.getFile(domainKey.toString());
             return KeyPairUtils.readKeyPair(new InputStreamReader(stream));
@@ -239,13 +239,27 @@ public class AcmeManagerServiceImpl implements AcmeManagerService {
 
 
     @Override
-    public void generateTemporalHttpValidationFile(DomainCertificateOrder it, BiConsumer<File, String> writer) {
+    public void generateTemporalHttpValidationFile(DomainCertificateOrder it, BiConsumer<String, String> writer) {
         //@TODO generate http validation file
+        Map<String, String> httpChallenge = it.getChallenges().challenges().get(Http01Challenge.TYPE);
+        if (httpChallenge != null) {
+            String url = httpChallenge.get("key");
+            String value = httpChallenge.get("value");
+            String[] urlParts = url.split("/");
+            String token = urlParts[urlParts.length - 1];
+            writer.accept(encode64(token), value);
+        }
+    }
+
+    @Override
+    public InputStream getTemporalHttpValidationFile(String token) {
+        String encoded = encode64(token);
+        return fileService.getTokenValue(encoded);
     }
 
     @Override
     public InputStreamResource getDomainCertificateFile(String domain, CertificateFileType fileType) {
-        String fileName = Paths.get(getDomainCode(domain), fileType.getFile()).toString();
+        String fileName = Paths.get(encode64(domain), fileType.getFile()).toString();
         if (fileService.exist(fileName)) {
             return new InputStreamResource(fileService.getFile(fileName));
         } else {

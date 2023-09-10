@@ -10,6 +10,7 @@ import org.springframework.core.io.InputStreamResource;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.security.KeyPair;
 import java.util.function.BiConsumer;
@@ -28,7 +29,9 @@ public interface AcmeManagerService {
     void generateTemporalTlsAlpn01Certificate(DomainCertificateOrder certificateOrder, BiConsumer<File, String> writer)
             throws IOException;
 
-    void generateTemporalHttpValidationFile(DomainCertificateOrder it, BiConsumer<File, String> writer);
+    void generateTemporalHttpValidationFile(DomainCertificateOrder it, BiConsumer<String, String> writer);
+
+    InputStream getTemporalHttpValidationFile(String token);
 
     InputStreamResource getDomainCertificateFile(String domain, CertificateFileType fileType);
 

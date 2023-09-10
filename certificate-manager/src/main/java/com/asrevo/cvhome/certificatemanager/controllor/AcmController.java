@@ -48,7 +48,8 @@ public class AcmController {
         log.info("will download certificate {} for domain {}", fileType.getType(), domain);
         InputStreamResource body = acmeManagerService.getDomainCertificateFile(domain, fileType);
         if (body != null) {
-            return ResponseEntity.ok().headers(httpHeaders -> httpHeaders.add(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + fileType.getFile())).body(body);
+            return ResponseEntity.ok().headers(headers ->
+                    headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + fileType.getFile())).body(body);
         } else {
             return ResponseEntity.noContent().build();
         }

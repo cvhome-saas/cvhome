@@ -18,7 +18,9 @@ public class SecurityConfig {
         // @formatter:off
         return http
                 .authorizeExchange(it ->
-                        it.anyExchange().authenticated()
+                        it
+                                .pathMatchers(".well-known/acme-challenge/*").permitAll()
+                                .anyExchange().authenticated()
                 )
                 .oauth2ResourceServer(it ->
                         it.jwt(withDefaults())

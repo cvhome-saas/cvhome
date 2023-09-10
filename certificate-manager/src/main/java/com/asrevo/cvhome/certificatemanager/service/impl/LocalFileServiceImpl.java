@@ -4,21 +4,20 @@ import com.asrevo.cvhome.certificatemanager.service.FileService;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 @Service
 public class LocalFileServiceImpl implements FileService {
-    private Path root;
+    private Path acmRoot;
+    private Path tokenRoot;
 
     @SneakyThrows
     public LocalFileServiceImpl() {
-        root = createBaseDirectory();
+        acmRoot = createAcmBaseDirectory();
+        tokenRoot = createTokenBaseDirectory();
     }
 
     @SneakyThrows
@@ -34,16 +33,22 @@ public class LocalFileServiceImpl implements FileService {
     private S3Client s3Client;
 */
 
-    private Path createBaseDirectory() throws IOException {
-        this.root = Paths.get(System.getProperty("user.home"), "cvhome/certificate-manager/acm");
-        createParentDirectory(this.root);
-        return this.root;
+    private Path createAcmBaseDirectory() throws IOException {
+        this.acmRoot = Paths.get(System.getProperty("user.home"), "cvhome/certificate-manager/acm");
+        createParentDirectory(this.acmRoot);
+        return this.acmRoot;
+    }
+
+    private Path createTokenBaseDirectory() throws IOException {
+        this.tokenRoot = Paths.get(System.getProperty("user.home"), "cvhome/certificate-manager/token");
+        createParentDirectory(this.tokenRoot);
+        return this.tokenRoot;
     }
 
     @SneakyThrows
     @Override
     public void upload(File file, String fileName) {
-        Path destination = root.resolve(fileName);
+        Path destination = acmRoot.resolve(fileName);
         if (destination.toFile().exists()) {
             destination.toFile().delete();
         }
@@ -58,8 +63,32 @@ public class LocalFileServiceImpl implements FileService {
 
     @SneakyThrows
     @Override
+    public void addToken(String token, String content) {
+        Path destination = tokenRoot.resolve(token);
+        if (destination.toFile().exists()) {
+            destination.toFile().delete();
+        }
+        createParentDirectory(destination);
+        Files.copy(new ByteArrayInputStream(content.getBytes()), destination);
+/*
+        PutObjectRequest request =
+                PutObjectRequest.builder().bucket(bucketName).key(fileName).build();
+        s3Client.putObject(request, file.toPath());
+*/
+    }
+
+    @SneakyThrows
+    @Override
+    public InputStream getTokenValue(String token) {
+        Path destination = tokenRoot.resolve(token);
+        return new ByteArrayInputStream(Files.readAllBytes(destination));
+    }
+
+
+    @SneakyThrows
+    @Override
     public InputStream getFile(String fileName) {
-        File file = root.resolve(fileName).toFile();
+        File file = acmRoot.resolve(fileName).toFile();
         return new FileInputStream(file);
 /*
         GetObjectRequest request =
@@ -71,7 +100,7 @@ public class LocalFileServiceImpl implements FileService {
 
     @Override
     public boolean exist(String fileName) {
-        return root.resolve(fileName).toFile().exists();
+        return acmRoot.resolve(fileName).toFile().exists();
 /*
         try {
             HeadObjectRequest request =

@@ -16,8 +16,8 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 public class Utils {
-    public static String getDomainCode(String domain) {
-        byte[] encoded = Base64.getEncoder().encode(domain.getBytes());
+    public static String encode64(String value) {
+        byte[] encoded = Base64.getEncoder().encode(value.getBytes());
         return new String(encoded);
     }
 
