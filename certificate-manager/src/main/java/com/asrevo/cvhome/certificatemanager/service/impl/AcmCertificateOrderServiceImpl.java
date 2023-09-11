@@ -57,6 +57,7 @@ public class AcmCertificateOrderServiceImpl implements AcmCertificateOrderServic
                     it.setCertificateOrderStatus(CertificateOrderStatus.REQUESTED);
                     it.setRequestedDate(Instant.now());
                     it.setChallenges(new Challenges(AcmeManagerServiceImpl.getChallenges(it.getDomain(), o)));
+//                    @TODO check if challengeValidationType supported in order Challenges
                     domainCertificateOrderService.save(it);
                 } catch (Exception e) {
                     log.error("error when requesting order for order {}", orderId);
