@@ -11,8 +11,9 @@ plugins {
 
 
 repositories {
-    mavenCentral()
     mavenLocal()
+    mavenCentral()
+    maven { url 'https://repo.spring.io/milestone' }
 }
 
 dependencies {

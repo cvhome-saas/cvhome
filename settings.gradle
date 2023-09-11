@@ -9,6 +9,10 @@
 pluginManagement {
     // Include 'plugins build' to define convention plugins.
     includeBuild('build-logic')
+    repositories {
+        maven { url 'https://repo.spring.io/milestone' }
+        gradlePluginPortal()
+    }
 }
 
 plugins {
