@@ -1,38 +1,34 @@
 package com.asrevo.cvhome.certificatemanager.service;
 
-import com.asrevo.cvhome.commons.domain.CertificateFileType;
-import com.asrevo.cvhome.commons.domain.DomainCertificate;
-import com.asrevo.cvhome.commons.domain.DomainCertificateOrder;
+import com.asrevo.cvhome.commons.domain.*;
+import com.asrevo.cvhome.commons.domain.challenges.Http01Challenge;
+import com.asrevo.cvhome.commons.domain.challenges.TlsAlpn01Challenge;
+import org.apache.commons.codec.DecoderException;
 import org.shredzone.acme4j.Order;
 import org.shredzone.acme4j.Status;
 import org.shredzone.acme4j.exception.AcmeException;
 import org.springframework.core.io.InputStreamResource;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.security.KeyPair;
-import java.util.function.BiConsumer;
 
 public interface AcmeManagerService {
 
-    Order order(String domain) throws AcmeException, IOException;
+    Order order(OrderDomain domain) throws AcmeException, IOException;
 
     Status validate(URL location, String type) throws AcmeException;
 
-    DomainCertificate generate(DomainCertificateOrder certificateOrder, BiConsumer<File, String> writer)
+    DomainCertificate generate(DomainCertificateOrder certificateOrder)
             throws IOException, AcmeException;
 
-    KeyPair generateOrGetDomainKeyPair(String domain) throws IOException;
+    void generate(OrderDomain domain, TlsAlpn01Challenge challenge)
+            throws IOException, DecoderException;
 
-    void generateTemporalTlsAlpn01Certificate(DomainCertificateOrder certificateOrder, BiConsumer<File, String> writer)
-            throws IOException;
+    void generateValidationFile(Http01Challenge challenge) throws IOException;
 
-    void generateTemporalHttpValidationFile(DomainCertificateOrder it, BiConsumer<String, String> writer);
+    InputStream getHttpValidationFile(HttpValidationToken token);
 
-    InputStream getTemporalHttpValidationFile(String token);
-
-    InputStreamResource getDomainCertificateFile(String domain, CertificateFileType fileType);
+    InputStreamResource getCertificateFile(OrderDomain domain, CertificateFileType fileType);
 
 }

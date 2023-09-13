@@ -1,9 +1,6 @@
 package com.asrevo.cvhome.domain.service.Impl;
 
-import com.asrevo.cvhome.commons.domain.DomainCertificateOrder;
-import com.asrevo.cvhome.commons.domain.DomainReferenceOrder;
-import com.asrevo.cvhome.commons.domain.DomainReference;
-import com.asrevo.cvhome.commons.domain.DomainType;
+import com.asrevo.cvhome.commons.domain.*;
 import com.asrevo.cvhome.domain.service.AcmService;
 import com.asrevo.cvhome.domain.service.DomainReferenceAcmService;
 import com.asrevo.cvhome.domain.service.DomainReferenceService;
@@ -35,7 +32,7 @@ public class DomainReferenceAcmServiceImpl implements DomainReferenceAcmService 
                 .switchIfEmpty(Mono.defer(() -> Mono.error(new Exception("cant find this domainId : " + domainId))))
                 .flatMap(domainReference -> {
                             DomainCertificateOrder order = new DomainCertificateOrder();
-                            order.setDomain(domainReference.domain());
+                    order.setDomain(new OrderDomain(domainReference.domain()));
                             return acmService.order(order).map(response -> response);
                         }
                 )

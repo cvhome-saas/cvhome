@@ -7,7 +7,7 @@ import java.io.IOException;
 
 public interface AcmCertificateOrderService {
 
-    DomainCertificateOrder initiateOrder(DomainCertificateOrder order) throws AcmeException, IOException;
+    DomainCertificateOrder initiateOrder(DomainCertificateOrder order);
 
     void order(Long orderId) throws AcmeException, IOException;
 

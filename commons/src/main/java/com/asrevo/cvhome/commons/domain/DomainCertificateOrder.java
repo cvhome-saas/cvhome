@@ -1,20 +1,20 @@
 package com.asrevo.cvhome.commons.domain;
 
-import com.asrevo.cvhome.commons.event.Event;
-import com.asrevo.cvhome.commons.event.SimpleEvent;
+import com.asrevo.cvhome.commons.domain.challenges.Challenges;
+import com.asrevo.cvhome.commons.event.order.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.domain.AbstractAggregateRoot;
+import org.springframework.data.relational.core.mapping.Embedded;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.Instant;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.asrevo.cvhome.commons.utils.Defines.OrderEvents.*;
+import static com.asrevo.cvhome.commons.domain.CertificateOrderStatus.VALIDATION_REQUESTED;
+import static org.springframework.data.relational.core.mapping.Embedded.OnEmpty.USE_NULL;
 
 
 @Getter
@@ -25,9 +25,11 @@ import static com.asrevo.cvhome.commons.utils.Defines.OrderEvents.*;
 @ToString
 public class DomainCertificateOrder extends AbstractAggregateRoot<DomainCertificateOrder> {
     private @Id Long id;
-    private String location;
+    @Embedded(onEmpty = USE_NULL)
+    private OrderLocation location;
     @NotNull
-    private String domain;
+    @Embedded(onEmpty = USE_NULL)
+    private OrderDomain domain;
     @NotNull
     private ChallengeValidationType challengeValidationType;
 
@@ -39,28 +41,52 @@ public class DomainCertificateOrder extends AbstractAggregateRoot<DomainCertific
     private Instant generatedDate;
 
 
+    public static DomainCertificateOrder createOrder(OrderDomain domain, @NotNull ChallengeValidationType challengeValidationType) {
+        DomainCertificateOrder order = new DomainCertificateOrder();
+        order.setCertificateOrderStatus(CertificateOrderStatus.INITIATED);
+        order.setDomain(domain);
+        order.setChallengeValidationType(challengeValidationType);
+        order.setCreatedDate(Instant.now());
+        order.registerEvent(OrderCreatedEvent.from(order));
+        return order;
+    }
+
     @Override
     protected Collection<Object> domainEvents() {
         return super.domainEvents().stream().peek(it -> {
-            if (it instanceof Event event) {
+            if (it instanceof OrderEvent event) {
                 if (id != null) {
-                    event.data().put(DOMAIN_CERTIFICATE_ORDER_ID_KEY, id.toString());
+                    event.setId(id);
                 }
             }
         }).collect(Collectors.toList());
     }
 
-    public static DomainCertificateOrder newOrder() {
-        DomainCertificateOrder domainCertificateOrder = new DomainCertificateOrder();
-        domainCertificateOrder.registerEvent(new SimpleEvent(DOMAIN_CERTIFICATE_ORDER_CREATED, new HashMap<>()));
-        return domainCertificateOrder;
+    public void requestOrder(OrderLocation location, Challenges challenges) {
+        this.setLocation(location);
+        this.setCertificateOrderStatus(CertificateOrderStatus.REQUESTED);
+        this.setRequestedDate(Instant.now());
+        this.setChallenges(challenges);
+        // @TODO check if challengeValidationType supported in order Challenges
+        this.registerEvent(OrderRequestedEvent.from(this));
     }
 
-    public void setCertificateOrderStatus(CertificateOrderStatus status) {
-        this.certificateOrderStatus = status;
-        if (status != null) {
-            Map<String, String> data = Map.of(DOMAIN_CERTIFICATE_ORDER_STATUS_CHANGED_KEY, status.name());
-            this.registerEvent(new SimpleEvent(DOMAIN_CERTIFICATE_ORDER_STATUS_CHANGED_EVENT, new HashMap<>(data)));
+    public void generateOrderCertificate(CertificateOrderStatus status) {
+        this.setCertificateOrderStatus(status);
+        if (CertificateOrderStatus.GENERATED.equals(status)) {
+            this.setGeneratedDate(Instant.now());
         }
+        this.registerEvent(OrderCertificateGeneratedEvent.from(this));
+    }
+
+    public void requestValidate() {
+        this.certificateOrderStatus = VALIDATION_REQUESTED;
+        this.registerEvent(OrderValidationRequestedEvent.from(this));
+    }
+
+    public void validated(CertificateOrderStatus certificateOrderStatus) {
+        this.certificateOrderStatus = certificateOrderStatus;
+        this.setValidatedDate(Instant.now());
+        this.registerEvent(OrderValidatedEvent.from(this));
     }
 }

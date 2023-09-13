@@ -21,18 +21,50 @@ Content-Type: application/json
 Authorization: Bearer {{access_token}}
 
 {
-  "domain": "gateway.com",
+  "domain": {
+    "domain": "gateway.com"
+  },
   "challengeValidationType": "Dns01"
 }
 
-### order a domain certificate xyz.asrevo.com
+### order a domain certificate xyz.asrevo.com as dns
 POST http://localhost:8082/api/v1/acm/order
 Content-Type: application/json
 Authorization: Bearer {{access_token}}
 
 {
-  "domain": "xyz.asrevo.com",
+  "domain": {
+    "domain": "xyz.asrevo.com"
+  },
   "challengeValidationType": "Dns01"
+}
+
+
+
+### order a domain certificate xyz.asrevo.com as http
+POST http://localhost:8082/api/v1/acm/order
+Content-Type: application/json
+Authorization: Bearer {{access_token}}
+
+{
+  "domain": {
+    "domain": "xyz.asrevo.com"
+  },
+  "challengeValidationType": "Http01"
+}
+
+
+
+### order a domain certificate xyz.asrevo.com as TlsAlpn01
+POST http://localhost:8082/api/v1/acm/order
+Content-Type: application/json
+Authorization: Bearer {{access_token}}
+
+{
+  "domain": {
+    "domain": "xywz.asrevo.com"
+  },
+  "challengeValidationType": "TlsAlpn01"
 }
 
 

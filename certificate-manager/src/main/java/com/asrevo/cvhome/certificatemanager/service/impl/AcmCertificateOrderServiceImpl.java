@@ -3,22 +3,22 @@ package com.asrevo.cvhome.certificatemanager.service.impl;
 import com.asrevo.cvhome.certificatemanager.service.AcmCertificateOrderService;
 import com.asrevo.cvhome.certificatemanager.service.AcmeManagerService;
 import com.asrevo.cvhome.certificatemanager.service.DomainCertificateOrderService;
-import com.asrevo.cvhome.certificatemanager.service.FileService;
-import com.asrevo.cvhome.certificatemanager.utils.Utils;
+import com.asrevo.cvhome.commons.command.order.ValidateOrderCommand;
 import com.asrevo.cvhome.commons.domain.*;
+import com.asrevo.cvhome.commons.domain.challenges.Challenges;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.DecoderException;
 import org.shredzone.acme4j.Order;
 import org.shredzone.acme4j.Status;
 import org.shredzone.acme4j.challenge.Dns01Challenge;
 import org.shredzone.acme4j.challenge.Http01Challenge;
 import org.shredzone.acme4j.challenge.TlsAlpn01Challenge;
+import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.net.URL;
-import java.time.Instant;
 import java.util.Optional;
 import java.util.Set;
 
@@ -34,15 +34,11 @@ public class AcmCertificateOrderServiceImpl implements AcmCertificateOrderServic
 
     private final AcmeManagerService acmeManagerService;
 
-    private final FileService fileService;
+    private final StreamBridge streamBridge;
 
     @Override
     public DomainCertificateOrder initiateOrder(DomainCertificateOrder order) {
-        DomainCertificateOrder certificateOrder = DomainCertificateOrder.newOrder();
-        certificateOrder.setDomain(order.getDomain());
-        certificateOrder.setCertificateOrderStatus(CertificateOrderStatus.INITIATED);
-        certificateOrder.setChallengeValidationType(order.getChallengeValidationType());
-        certificateOrder.setCreatedDate(Instant.now());
+        DomainCertificateOrder certificateOrder = DomainCertificateOrder.createOrder(order.getDomain(), order.getChallengeValidationType());
         return domainCertificateOrderService.save(certificateOrder);
     }
 
@@ -53,11 +49,7 @@ public class AcmCertificateOrderServiceImpl implements AcmCertificateOrderServic
             if (preOrderNeededStatus.contains(it.getCertificateOrderStatus())) {
                 try {
                     Order o = acmeManagerService.order(it.getDomain());
-                    it.setLocation(o.getLocation().toString());
-                    it.setCertificateOrderStatus(CertificateOrderStatus.REQUESTED);
-                    it.setRequestedDate(Instant.now());
-                    it.setChallenges(new Challenges(AcmeManagerServiceImpl.getChallenges(it.getDomain(), o)));
-//                    @TODO check if challengeValidationType supported in order Challenges
+                    it.requestOrder(new OrderLocation(o.getLocation()), new Challenges(o));
                     domainCertificateOrderService.save(it);
                 } catch (Exception e) {
                     log.error("error when requesting order for order {}", orderId);
@@ -73,16 +65,15 @@ public class AcmCertificateOrderServiceImpl implements AcmCertificateOrderServic
         Set<CertificateOrderStatus> preValidationNeededStatus = Set.of(VALIDATION_REQUESTED);
         domainCertificateOrderService.findOneById(orderId).ifPresent(it -> {
             if (preValidationNeededStatus.contains(it.getCertificateOrderStatus())) {
-                boolean isValid = Utils.performPreValidation(it.getChallenges().challenges(), it.getChallengeValidationType().getChallenge());
+                boolean isValid = it.getChallenges().validate(it.getChallengeValidationType());
                 if (isValid) {
                     CertificateOrderStatus certificateOrderStatus = doAcmValidation(it);
-                    log.error("acmValidation validation is {} for domain {}", certificateOrderStatus, orderId);
-                    it.setCertificateOrderStatus(certificateOrderStatus);
+                    log.info("acmValidation validation is {} for domain {}", certificateOrderStatus, orderId);
+                    it.validated(certificateOrderStatus);
                 } else {
                     log.warn("performPreValidation validation is {} for domain {}", PRE_VALIDATED_INVALID, orderId);
-                    it.setCertificateOrderStatus(PRE_VALIDATED_INVALID);
+                    it.validated(PRE_VALIDATED_INVALID);
                 }
-                it.setValidatedDate(Instant.now());
                 domainCertificateOrderService.save(it);
             } else {
                 log.warn("request to do validation certificate for status {} and orderId {}", it.getCertificateOrderStatus(), orderId);
@@ -98,8 +89,12 @@ public class AcmCertificateOrderServiceImpl implements AcmCertificateOrderServic
         Set<CertificateOrderStatus> preAskValidateNeededStatus = Set.of(REQUESTED, PRE_VALIDATED_INVALID);
         domainCertificateOrderService.findOneById(order.getId()).map(it -> {
             if (preAskValidateNeededStatus.contains(it.getCertificateOrderStatus())) {
-                it.setCertificateOrderStatus(VALIDATION_REQUESTED);
-                return domainCertificateOrderService.save(it);
+                it.requestValidate();
+                ValidateOrderCommand command = new ValidateOrderCommand();
+                command.setId(it.getId());
+                DomainCertificateOrder saved = domainCertificateOrderService.save(it);
+                streamBridge.send("logOrderCommands-out-0", command);
+                return saved;
             } else {
                 log.error("order {} not requested yet please wait we will notify you once its requested", order.getId());
                 throw new RuntimeException("order not requested yet please wait we will notify you once its requested");
@@ -119,18 +114,24 @@ public class AcmCertificateOrderServiceImpl implements AcmCertificateOrderServic
                     if (TlsAlpn01Challenge.TYPE.equals(it.getChallengeValidationType().getChallenge())) {
                         try {
                             log.info("will generateTemporalTlsAlpn01Certificate for order {}", orderId);
-                            acmeManagerService.generateTemporalTlsAlpn01Certificate(it, fileService::upload);
-                            it.setCertificateOrderStatus(VALIDATION_REQUESTED);
+                            acmeManagerService.generate(it.getDomain(), it.getChallenges().getTlsAlpn01Challenge());
+                            it.requestValidate();
+                            ValidateOrderCommand command = new ValidateOrderCommand();
+                            command.setId(it.getId());
                             domainCertificateOrderService.save(it);
-                        } catch (IOException e) {
+                            streamBridge.send("logOrderCommands-out-0", command);
+                        } catch (IOException | DecoderException e) {
                             log.error("error when generateTemporalTlsAlpn01Certificate for order {}", orderId);
                         }
                     } else if (Http01Challenge.TYPE.equals(it.getChallengeValidationType().getChallenge())) {
                         try {
                             log.info("will generateTemporalHttpValidationFile for order {}", orderId);
-                            acmeManagerService.generateTemporalHttpValidationFile(it, fileService::addToken);
-                            it.setCertificateOrderStatus(VALIDATION_REQUESTED);
+                            acmeManagerService.generateValidationFile(it.getChallenges().getHttp01Challenge());
+                            it.requestValidate();
+                            ValidateOrderCommand command = new ValidateOrderCommand();
+                            command.setId(it.getId());
                             domainCertificateOrderService.save(it);
+                            streamBridge.send("logOrderCommands-out-0", command);
                         } catch (Exception e) {
                             log.error("error when generateTemporalHttpValidationFile for order {}", orderId);
                         }
@@ -154,10 +155,8 @@ public class AcmCertificateOrderServiceImpl implements AcmCertificateOrderServic
         domainCertificateOrderService.findOneById(orderId).ifPresent(it -> {
             if (preGenerationNeededStatus.contains(it.getCertificateOrderStatus())) {
                 log.info("will generate acm certificate for order {}", orderId);
-                it.setCertificateOrderStatus(doAcmGeneration(it));
-                if (GENERATED.equals(it.getCertificateOrderStatus())) {
-                    it.setGeneratedDate(Instant.now());
-                } else {
+                it.generateOrderCertificate(doAcmGeneration(it));
+                if (!GENERATED.equals(it.getCertificateOrderStatus())) {
                     log.error("generation failed for order {}", orderId);
                 }
                 domainCertificateOrderService.save(it);
@@ -171,7 +170,7 @@ public class AcmCertificateOrderServiceImpl implements AcmCertificateOrderServic
     private CertificateOrderStatus doAcmGeneration(DomainCertificateOrder it) {
         DomainCertificate certificate = null;
         try {
-            certificate = acmeManagerService.generate(it, fileService::upload);
+            certificate = acmeManagerService.generate(it);
         } catch (Exception e) {
             log.error("can not generate certificate for order {} ", it.getId());
         }
@@ -182,7 +181,7 @@ public class AcmCertificateOrderServiceImpl implements AcmCertificateOrderServic
 
     private CertificateOrderStatus doAcmValidation(DomainCertificateOrder order) {
         try {
-            Status status = acmeManagerService.validate(new URL(order.getLocation()), order.getChallengeValidationType().getChallenge());
+            Status status = acmeManagerService.validate(order.getLocation().url(), order.getChallengeValidationType().getChallenge());
             return status == Status.VALID
                     ? CertificateOrderStatus.VALIDATED_VALID
                     : CertificateOrderStatus.VALIDATED_INVALID;

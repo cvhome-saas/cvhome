@@ -10,12 +10,6 @@ import java.util.Date;
 @Setter
 public class DomainCertificate {
 
-    private String domain;
-
-    private String status;
-
-    private DomainCertificateOrder domainCertificateOrder;
-
     private Date notAfter;
 
     private Date notBefore;
@@ -28,14 +22,8 @@ public class DomainCertificate {
 
     private String sigAlgOID;
 
-    private DomainCertificate(DomainCertificateOrder domainCertificateOrder, String status) {
-        this.domain = domainCertificateOrder.getDomain();
-        this.status = status;
-        this.domainCertificateOrder = domainCertificateOrder;
-    }
 
-    public DomainCertificate(DomainCertificateOrder domainCertificateOrder, Certificate certificate, String status) {
-        this(domainCertificateOrder, status);
+    public DomainCertificate(Certificate certificate) {
 
         if (certificate != null && certificate.getCertificate() != null) {
             this.notAfter = certificate.getCertificate().getNotAfter();
@@ -47,7 +35,4 @@ public class DomainCertificate {
         }
     }
 
-    public static DomainCertificate from(DomainCertificateOrder domainCertificateOrder, String status) {
-        return new DomainCertificate(domainCertificateOrder, status);
-    }
 }

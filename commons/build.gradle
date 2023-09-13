@@ -5,6 +5,9 @@ plugins {
 dependencies {
     implementation 'org.shredzone.acme4j:acme4j-client:2.15'
     implementation 'org.shredzone.acme4j:acme4j-utils:2.15'
+    implementation 'commons-codec:commons-codec:1.15'
+    implementation 'dnsjava:dnsjava:3.5.2'
+    compileOnly('com.fasterxml.jackson.core:jackson-annotations:2.15.2')
     compileOnly 'org.projectlombok:lombok:1.18.28'
     compileOnly 'org.springframework.data:spring-data-commons:3.1.2'
     compileOnly 'org.springframework.data:spring-data-relational:3.1.2'

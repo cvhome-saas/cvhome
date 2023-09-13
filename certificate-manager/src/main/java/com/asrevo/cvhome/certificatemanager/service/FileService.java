@@ -11,8 +11,4 @@ public interface FileService {
 
     boolean exist(String fileName);
 
-    void addToken(String token, String content);
-
-    InputStream getTokenValue(String token);
-
 }

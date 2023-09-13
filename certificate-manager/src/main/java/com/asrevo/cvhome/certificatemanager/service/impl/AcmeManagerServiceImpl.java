@@ -1,41 +1,24 @@
 package com.asrevo.cvhome.certificatemanager.service.impl;
 
+import com.asrevo.cvhome.certificatemanager.service.AcmFileService;
 import com.asrevo.cvhome.certificatemanager.service.AcmeManagerService;
-import com.asrevo.cvhome.certificatemanager.service.FileService;
-import com.asrevo.cvhome.commons.domain.CertificateFileType;
-import com.asrevo.cvhome.commons.domain.DomainCertificate;
-import com.asrevo.cvhome.commons.domain.DomainCertificateOrder;
-import com.asrevo.cvhome.commons.domain.DomainRequest;
+import com.asrevo.cvhome.commons.domain.*;
+import com.asrevo.cvhome.commons.domain.challenges.Http01Challenge;
+import com.asrevo.cvhome.commons.domain.challenges.TlsAlpn01Challenge;
 import lombok.extern.slf4j.Slf4j;
 import org.shredzone.acme4j.*;
 import org.shredzone.acme4j.challenge.Challenge;
-import org.shredzone.acme4j.challenge.Dns01Challenge;
-import org.shredzone.acme4j.challenge.Http01Challenge;
-import org.shredzone.acme4j.challenge.TlsAlpn01Challenge;
 import org.shredzone.acme4j.exception.AcmeException;
-import org.shredzone.acme4j.toolbox.AcmeUtils;
 import org.shredzone.acme4j.util.CSRBuilder;
-import org.shredzone.acme4j.util.CertificateUtils;
-import org.shredzone.acme4j.util.KeyPairUtils;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.KeyPair;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.BiConsumer;
 import java.util.function.Supplier;
-
-import static com.asrevo.cvhome.certificatemanager.utils.Utils.encode64;
-import static org.apache.commons.codec.binary.Hex.encodeHexString;
 
 @Service
 @Lazy
@@ -46,78 +29,26 @@ public class AcmeManagerServiceImpl implements AcmeManagerService {
 
     private final Login login;
 
-    private final FileService fileService;
+    private final AcmFileService fileService;
 
-    public AcmeManagerServiceImpl(Account account, Login login, FileService fileService) {
+    public AcmeManagerServiceImpl(Account account, Login login, AcmFileService fileService) {
         this.account = account;
         this.login = login;
         this.fileService = fileService;
     }
 
-    private static void storeCertificate(
-            BiConsumer<File, String> writer, DomainRequest domainRequest, X509Certificate... certificates)
-            throws IOException {
-        File domainCrt = Files.createTempFile("domain", ".crt").toFile();
-        try (FileWriter crtFileWriter = new FileWriter(domainCrt)) {
-            try {
-                for (X509Certificate cert : certificates) {
-                    AcmeUtils.writeToPem(cert.getEncoded(), AcmeUtils.PemLabel.CERTIFICATE, crtFileWriter);
-                }
-            } catch (CertificateEncodingException ex) {
-                throw new IOException("Encoding error", ex);
-            }
-        }
-        writer.accept(
-                domainCrt,
-                Paths.get(encode64(domainRequest.getDomain()), CertificateFileType.CRT.getFile())
-                        .toString());
-    }
-
-    private static <T> void tryUntilTrue(int tries, Supplier<Boolean> tPredicate) {
+    private static void tryUntilTrue(int tries, Supplier<Boolean> tPredicate) {
         int localTries = tries;
         while (localTries > 1 && !tPredicate.get()) {
             localTries--;
         }
     }
 
-    public static Map<String, Map<String, String>> getChallenges(String domain, Order order) {
-        Authorization authorization =
-                order.getAuthorizations().stream().findFirst().orElseThrow();
-        Map<String, Map<String, String>> challenges = new HashMap<>();
-        Dns01Challenge dns01Challenge = authorization.findChallenge(Dns01Challenge.TYPE);
-        if (dns01Challenge != null) {
-            challenges.put(
-                    Dns01Challenge.TYPE,
-                    Map.of(
-                            "key",
-                            String.format(
-                                    "_acme-challenge.%s",
-                                    authorization.getIdentifier().getDomain()),
-                            "value",
-                            dns01Challenge.getDigest()));
-        }
-
-        Http01Challenge http01Challenge = authorization.findChallenge(Http01Challenge.TYPE);
-        if (http01Challenge != null) {
-            String key = String.format(
-                    "http://%s/.well-known/acme-challenge/%s",
-                    authorization.getIdentifier().getDomain(), http01Challenge.getToken());
-            challenges.put(Http01Challenge.TYPE, Map.of("key", key, "value", http01Challenge.getAuthorization()));
-        }
-
-        TlsAlpn01Challenge tlsAlpn01Challenge = authorization.findChallenge(TlsAlpn01Challenge.TYPE);
-        if (tlsAlpn01Challenge != null) {
-            challenges.put(
-                    TlsAlpn01Challenge.TYPE,
-                    Map.of("key", domain, "value", encodeHexString(tlsAlpn01Challenge.getAcmeValidation())));
-        }
-        return challenges;
-    }
 
     @Override
-    public Order order(String domain) throws AcmeException, IOException {
-        Order order = this.account.newOrder().domains(domain).create();
-        generateOrGetDomainKeyPair(domain);
+    public Order order(OrderDomain domain) throws AcmeException, IOException {
+        Order order = this.account.newOrder().domains(domain.domain()).create();
+        fileService.generateOrGetKeyPair(domain);
         return order;
     }
 
@@ -154,29 +85,20 @@ public class AcmeManagerServiceImpl implements AcmeManagerService {
         return Status.INVALID;
     }
 
-    private CSRBuilder generateCsr(KeyPair keyPair, DomainRequest domainRequest) throws IOException {
+    private CSRBuilder generateCsr(KeyPair keyPair, OrderDomain domain) throws IOException {
         CSRBuilder csrBuilder = new CSRBuilder();
-        csrBuilder.addDomains(domainRequest.getDomain());
+        csrBuilder.addDomains(domain.domain());
         csrBuilder.sign(keyPair);
+        fileService.storeCsr(domain, csrBuilder);
         return csrBuilder;
     }
 
     @Override
-    public DomainCertificate generate(DomainCertificateOrder certificateOrder, BiConsumer<File, String> writer)
+    public DomainCertificate generate(DomainCertificateOrder certificateOrder)
             throws IOException, AcmeException {
-        DomainRequest domainRequest = new DomainRequest();
-        domainRequest.setDomain(certificateOrder.getDomain());
-        domainRequest.setLocation(new URL(certificateOrder.getLocation()));
-        Order order = this.login.bindOrder(domainRequest.getLocation());
-        KeyPair domainKeyPair = generateOrGetDomainKeyPair(certificateOrder.getDomain());
-        CSRBuilder csrBuilder = generateCsr(domainKeyPair, domainRequest);
-        File domainCsr = Files.createTempFile("domain", ".csr").toFile();
-        FileWriter csrFileWriter = new FileWriter(domainCsr);
-        csrBuilder.write(csrFileWriter);
-        writer.accept(
-                domainCsr,
-                Paths.get(encode64(domainRequest.getDomain()), CertificateFileType.CSR.getFile())
-                        .toString());
+        Order order = this.login.bindOrder(certificateOrder.getLocation().url());
+        KeyPair domainKeyPair = fileService.generateOrGetKeyPair(certificateOrder.getDomain());
+        CSRBuilder csrBuilder = generateCsr(domainKeyPair, certificateOrder.getDomain());
         order.execute(csrBuilder.getEncoded());
         tryUntilTrue(10, () -> {
             try {
@@ -194,77 +116,31 @@ public class AcmeManagerServiceImpl implements AcmeManagerService {
         if (order.getStatus() == Status.VALID) {
             Certificate certificate = order.getCertificate();
             if (certificate != null) {
-                storeCertificate(writer, domainRequest, certificate.getCertificate());
-                return new DomainCertificate(
-                        certificateOrder, certificate, order.getStatus().name());
+                fileService.storeCertificate(certificateOrder.getDomain(), certificate.getCertificate());
+                return new DomainCertificate(certificate);
             }
         }
-        return DomainCertificate.from(certificateOrder, order.getStatus().name());
+        return null;
     }
 
-    @Override
-    public KeyPair generateOrGetDomainKeyPair(String domain) throws IOException {
-        Path domainKey = Paths.get(encode64(domain), CertificateFileType.KEY.getFile());
-        if (fileService.exist(domainKey.toString())) {
-            InputStream stream = fileService.getFile(domainKey.toString());
-            return KeyPairUtils.readKeyPair(new InputStreamReader(stream));
-        } else {
-            KeyPair domainKeyPair = KeyPairUtils.createKeyPair(2048);
-            Path domainPath = Files.createTempFile("domain", ".key");
-            FileWriter fileWriter = new FileWriter(domainPath.toFile());
-            KeyPairUtils.writeKeyPair(domainKeyPair, fileWriter);
-            fileService.upload(domainPath.toFile(), domainKey.toString());
-            return domainKeyPair;
-        }
-    }
-
-    @Override
-    public void generateTemporalTlsAlpn01Certificate(
-            DomainCertificateOrder certificateOrder, BiConsumer<File, String> writer) throws IOException {
-        URL location = new URL(certificateOrder.getLocation());
-        Order order = this.login.bindOrder(location);
-        Authorization authorization =
-                order.getAuthorizations().stream().findFirst().orElseThrow();
-        TlsAlpn01Challenge challenge = authorization.findChallenge(TlsAlpn01Challenge.class);
-        if (challenge != null) {
-            KeyPair keyPair = generateOrGetDomainKeyPair(certificateOrder.getDomain());
-            X509Certificate cert = CertificateUtils.createTlsAlpn01Certificate(
-                    keyPair, authorization.getIdentifier(), challenge.getAcmeValidation());
-            DomainRequest domainRequest = new DomainRequest();
-            domainRequest.setLocation(location);
-            domainRequest.setDomain(certificateOrder.getDomain());
-            storeCertificate(writer, domainRequest, cert);
-        }
+    public void generate(OrderDomain domain, TlsAlpn01Challenge challenge) throws IOException {
+        fileService.generateCertificate(domain, challenge);
     }
 
 
     @Override
-    public void generateTemporalHttpValidationFile(DomainCertificateOrder it, BiConsumer<String, String> writer) {
-        //@TODO generate http validation file
-        Map<String, String> httpChallenge = it.getChallenges().challenges().get(Http01Challenge.TYPE);
-        if (httpChallenge != null) {
-            String url = httpChallenge.get("key");
-            String value = httpChallenge.get("value");
-            String[] urlParts = url.split("/");
-            String token = urlParts[urlParts.length - 1];
-            writer.accept(encode64(token), value);
-        }
+    public void generateValidationFile(Http01Challenge challenge) throws IOException {
+        fileService.generateValidationFile(challenge);
     }
 
     @Override
-    public InputStream getTemporalHttpValidationFile(String token) {
-        String encoded = encode64(token);
-        return fileService.getTokenValue(encoded);
+    public InputStream getHttpValidationFile(HttpValidationToken token) {
+        return fileService.getHttpValidationFile(token);
     }
 
     @Override
-    public InputStreamResource getDomainCertificateFile(String domain, CertificateFileType fileType) {
-        String fileName = Paths.get(encode64(domain), fileType.getFile()).toString();
-        if (fileService.exist(fileName)) {
-            return new InputStreamResource(fileService.getFile(fileName));
-        } else {
-            return null;
-        }
+    public InputStreamResource getCertificateFile(OrderDomain domain, CertificateFileType fileType) {
+        return fileService.getCertificateFile(domain, fileType);
     }
 
 }

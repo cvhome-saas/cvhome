@@ -19,12 +19,13 @@ spring:
   cloud:
     function:
 #      definition: ";"
-      definition: "sysEvents;logOrderEvents"
+      definition: "sysEvents;logOrderEvents;logOrderCommands"
     stream:
       function:
         bindings:
           sysEvents: sysEvents
           logOrderEvents: logOrderEvents
+          logOrderCommands: logOrderCommands
       bindings:
         sysEvents-in-0:
           destination: "com.asrevo.cvhome.sys-events"
@@ -36,6 +37,13 @@ spring:
           content-type: "application/json"
         logOrderEvents-out-0:
           destination: "com.asrevo.cvhome.domain-certificate-order-events"
+          content-type: "application/json"
+        logOrderCommands-in-0:
+          destination: "com.asrevo.cvhome.domain-certificate-order-commands"
+          group: ${spring.application.name}
+          content-type: "application/json"
+        logOrderCommands-out-0:
+          destination: "com.asrevo.cvhome.domain-certificate-order-commands"
           content-type: "application/json"
       rabbit:
         bindings:
@@ -86,9 +94,6 @@ management:
       enabled: true
     os:
       enabled: true
-  metrics:
-    tags:
-      application: ${spring.application.name}
   endpoint:
     health:
       show-details: always
@@ -96,6 +101,9 @@ management:
     web:
       exposure:
         include: [ '*' ]
+  observations:
+    key-values:
+      application: ${spring.application.name}
 logging:
   level:
     org.springframework.boot: debug
@@ -105,4 +113,4 @@ logging:
 org:
   jobrunr:
     background-job-server:
-      enabled: true
+      enabled: false

@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.certificatemanager.controllor;
 
 import com.asrevo.cvhome.certificatemanager.service.AcmeManagerService;
+import com.asrevo.cvhome.commons.domain.HttpValidationToken;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,8 @@ public class AcmHttpVerificationController {
 
     @GetMapping("{token}")
     ResponseEntity<InputStreamReader> verify(@PathVariable("token") String token) {
-        InputStream stream = acmeManagerService.getTemporalHttpValidationFile(token);
+        HttpValidationToken validationToken = new HttpValidationToken(token);
+        InputStream stream = acmeManagerService.getHttpValidationFile(validationToken);
         InputStreamReader body = new InputStreamReader(stream);
         return ResponseEntity.ok().headers(headers ->
                 headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + token)).body(body);

@@ -14,17 +14,17 @@ import java.util.List;
 @Configuration
 public class JdbcConfig extends AbstractJdbcConfiguration {
 
-    private final ObjectMapper objectMapper;
+    private final ObjectMapper ployJson;
 
-    public JdbcConfig(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
+    public JdbcConfig() {
+        this.ployJson = JacksonConfig.getPloyJson();
     }
 
     @Override
     public JdbcCustomConversions jdbcCustomConversions() {
         List<Converter<?, ?>> converters = new ArrayList<>();
-        converters.add(new MapToJsonConverter(objectMapper));
-        converters.add(new JsonToMapConverter(objectMapper));
+        converters.add(new MapToJsonConverter(ployJson));
+        converters.add(new JsonToMapConverter(ployJson));
         return new JdbcCustomConversions(converters);
     }
 }
