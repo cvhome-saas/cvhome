@@ -1,0 +1,8 @@
+plugins {
+    id 'com.asrevo.java-library-conventions'
+}
+
+dependencies {
+    compileOnly 'org.projectlombok:lombok:1.18.28'
+    annotationProcessor 'org.projectlombok:lombok:1.18.28'
+}
