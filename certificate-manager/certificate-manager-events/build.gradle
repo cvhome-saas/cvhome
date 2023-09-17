@@ -3,8 +3,8 @@ plugins {
 }
 
 dependencies {
-    implementation project(':cvhome-events')
-    implementation project(':certificate-manager:certificate-manager-commons')
+    api project(':cvhome-events')
+    api project(':certificate-manager:certificate-manager-commons')
     compileOnly 'org.projectlombok:lombok:1.18.28'
     annotationProcessor 'org.projectlombok:lombok:1.18.28'
 }

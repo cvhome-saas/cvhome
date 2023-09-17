@@ -3,6 +3,8 @@ plugins {
 }
 
 dependencies {
+    api 'org.mongodb:bson:4.10.2'
+    compileOnly 'org.springframework.data:spring-data-commons:3.2.0-M2'
     compileOnly 'org.projectlombok:lombok:1.18.28'
     annotationProcessor 'org.projectlombok:lombok:1.18.28'
 }

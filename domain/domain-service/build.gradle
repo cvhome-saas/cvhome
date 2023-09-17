@@ -57,7 +57,6 @@ dependencies {
     implementation 'org.shredzone.acme4j:acme4j-client:2.15'
     implementation 'org.shredzone.acme4j:acme4j-utils:2.15'
 
-    implementation project(':cvhome-events')
     implementation project(':certificate-manager:certificate-manager-events')
 //    developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
     compileOnly 'org.projectlombok:lombok'

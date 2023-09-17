@@ -11,3 +11,52 @@ CREATE TABLE IF NOT EXISTS public.domain_certificate_order
     validated_date            timestamp,
     generated_date            timestamp
 );
+
+
+CREATE TABLE IF NOT EXISTS orders
+(
+    id         varchar(24) not null,
+    status     varchar(20) not null default 'INITIATED',
+    created_at timestamp   not null,
+    constraint orders_pk primary key (id)
+);
+
+CREATE TABLE IF NOT EXISTS certificate
+(
+    id         varchar(24)  not null,
+    location   varchar(300) not null,
+    created_at timestamp    not null,
+    valid_to   timestamp    not null,
+    orders_id  varchar(24)  not null,
+    constraint certificate_pk primary key (id),
+    constraint certificate_orders_id_fk foreign key (orders_id) references orders
+);
+
+CREATE TABLE IF NOT EXISTS domain
+(
+    id                    varchar(24) not null,
+    domain                varchar(50) not null,
+    status                varchar(20) not null default 'INITIATED',
+    auto_renew            bool        not null default false,
+    active_certificate_id varchar(24) null,
+    constraint domain_pk primary key (id),
+    constraint domain_active_certificate_id_fk foreign key (active_certificate_id) references certificate
+);
+
+CREATE TABLE IF NOT EXISTS domain_certificate_ref
+(
+    domain_id      varchar(24) not null,
+    certificate_id varchar(24) not null,
+    constraint domain_certificate_ref_domain_id_fk foreign key (domain_id) references domain,
+    constraint domain_certificate_ref_certificate_id_fk foreign key (certificate_id) references certificate
+);
+
+CREATE TABLE IF NOT EXISTS domain_orders_ref
+(
+    domain_id varchar(24) not null,
+    orders_id varchar(24) not null,
+    constraint domain_orders_ref_domain_id_fk foreign key (domain_id) references domain,
+    constraint domain_orders_ref_orders_id_fk foreign key (orders_id) references orders
+);
+
+

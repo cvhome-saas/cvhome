@@ -65,8 +65,6 @@ dependencies {
 
     implementation 'org.jobrunr:jobrunr-spring-boot-starter:5.3.3'
 
-    implementation project(':cvhome-events')
-    implementation project(':certificate-manager:certificate-manager-commons')
     implementation project(':certificate-manager:certificate-manager-events')
 
 //    developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
