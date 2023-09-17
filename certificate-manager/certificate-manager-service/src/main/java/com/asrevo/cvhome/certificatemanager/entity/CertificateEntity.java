@@ -11,10 +11,13 @@ import java.time.Instant;
 @Getter
 @Setter
 @Table("certificate")
-public class CertificateEntity extends BaseEntity<CertificateId> {
-    private String location;
-    private Instant createdAt;
-    private Instant validTo;
+public class CertificateEntity extends BaseEntity<CertificateEntity, CertificateId> {
+    private Instant notAfter;
+    private Instant notBefore;
+    private String serialNumber;
+    private Integer version;
+    private String sigAlgName;
+    private String sigAlgOID;
 
     @Override
     protected CertificateId generateId() {

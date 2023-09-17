@@ -174,7 +174,7 @@ public class AcmCertificateOrderServiceImpl implements AcmCertificateOrderServic
     private CertificateOrderStatus doAcmGeneration(DomainCertificateOrder it) {
         DomainCertificate certificate = null;
         try {
-            certificate = acmeManagerService.generate(it);
+            certificate = acmeManagerService.generate(it.getLocation(), it.getDomain());
         } catch (Exception e) {
             log.error("can not generate certificate for order {} ", it.getId());
         }

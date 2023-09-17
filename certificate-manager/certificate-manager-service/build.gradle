@@ -53,6 +53,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
     runtimeOnly 'org.postgresql:postgresql'
 
+    implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+
     implementation 'org.springdoc:springdoc-openapi-starter-webflux-ui:2.2.0'
 
     implementation 'org.shredzone.acme4j:acme4j-client:2.15'

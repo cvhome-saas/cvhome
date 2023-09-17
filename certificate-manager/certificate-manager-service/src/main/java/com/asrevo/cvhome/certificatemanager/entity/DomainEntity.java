@@ -15,7 +15,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Table("domain")
-public class DomainEntity extends BaseEntity<DomainId> {
+public class DomainEntity extends BaseEntity<DomainEntity, DomainId> {
     private String domain;
     private String status;
     private boolean autoRenew;

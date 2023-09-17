@@ -1,7 +1,6 @@
 package com.asrevo.cvhome.certificatemanager.service.impl;
 
 import com.asrevo.cvhome.certificatemanager.domain.DomainCertificate;
-import com.asrevo.cvhome.certificatemanager.domain.DomainCertificateOrder;
 import com.asrevo.cvhome.certificatemanager.domain.HttpValidationToken;
 import com.asrevo.cvhome.certificatemanager.domain.challenges.Http01Challenge;
 import com.asrevo.cvhome.certificatemanager.domain.challenges.TlsAlpn01Challenge;
@@ -9,6 +8,7 @@ import com.asrevo.cvhome.certificatemanager.service.AcmFileService;
 import com.asrevo.cvhome.certificatemanager.service.AcmeManagerService;
 import com.asrevo.cvhome.commons.domain.CertificateFileType;
 import com.asrevo.cvhome.commons.domain.OrderDomain;
+import com.asrevo.cvhome.commons.domain.OrderLocation;
 import lombok.extern.slf4j.Slf4j;
 import org.shredzone.acme4j.*;
 import org.shredzone.acme4j.challenge.Challenge;
@@ -98,11 +98,11 @@ public class AcmeManagerServiceImpl implements AcmeManagerService {
     }
 
     @Override
-    public DomainCertificate generate(DomainCertificateOrder certificateOrder)
+    public DomainCertificate generate(OrderLocation location, OrderDomain domain)
             throws IOException, AcmeException {
-        Order order = this.login.bindOrder(certificateOrder.getLocation().url());
-        KeyPair domainKeyPair = fileService.generateOrGetKeyPair(certificateOrder.getDomain());
-        CSRBuilder csrBuilder = generateCsr(domainKeyPair, certificateOrder.getDomain());
+        Order order = this.login.bindOrder(location.url());
+        KeyPair domainKeyPair = fileService.generateOrGetKeyPair(domain);
+        CSRBuilder csrBuilder = generateCsr(domainKeyPair, domain);
         order.execute(csrBuilder.getEncoded());
         tryUntilTrue(10, () -> {
             try {
@@ -120,7 +120,7 @@ public class AcmeManagerServiceImpl implements AcmeManagerService {
         if (order.getStatus() == Status.VALID) {
             Certificate certificate = order.getCertificate();
             if (certificate != null) {
-                fileService.storeCertificate(certificateOrder.getDomain(), certificate.getCertificate());
+                fileService.storeCertificate(domain, certificate.getCertificate());
                 return new DomainCertificate(certificate);
             }
         }

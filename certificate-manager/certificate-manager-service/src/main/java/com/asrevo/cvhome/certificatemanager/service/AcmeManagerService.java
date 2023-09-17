@@ -1,12 +1,12 @@
 package com.asrevo.cvhome.certificatemanager.service;
 
 import com.asrevo.cvhome.certificatemanager.domain.DomainCertificate;
-import com.asrevo.cvhome.certificatemanager.domain.DomainCertificateOrder;
 import com.asrevo.cvhome.certificatemanager.domain.HttpValidationToken;
 import com.asrevo.cvhome.certificatemanager.domain.challenges.Http01Challenge;
 import com.asrevo.cvhome.certificatemanager.domain.challenges.TlsAlpn01Challenge;
 import com.asrevo.cvhome.commons.domain.CertificateFileType;
 import com.asrevo.cvhome.commons.domain.OrderDomain;
+import com.asrevo.cvhome.commons.domain.OrderLocation;
 import org.apache.commons.codec.DecoderException;
 import org.shredzone.acme4j.Order;
 import org.shredzone.acme4j.Status;
@@ -23,7 +23,7 @@ public interface AcmeManagerService {
 
     Status validate(URL location, String type) throws AcmeException;
 
-    DomainCertificate generate(DomainCertificateOrder certificateOrder)
+    DomainCertificate generate(OrderLocation location, OrderDomain domain)
             throws IOException, AcmeException;
 
     void generate(OrderDomain domain, TlsAlpn01Challenge challenge)

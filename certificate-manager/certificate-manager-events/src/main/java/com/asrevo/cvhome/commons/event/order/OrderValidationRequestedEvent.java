@@ -1,6 +1,9 @@
 package com.asrevo.cvhome.commons.event.order;
 
 public class OrderValidationRequestedEvent extends OrderEvent {
+    public static OrderValidationRequestedEvent from() {
+        return new OrderValidationRequestedEvent();
+    }
     public static OrderValidationRequestedEvent from(Long orderId) {
         OrderValidationRequestedEvent event = new OrderValidationRequestedEvent();
         event.setId(orderId);

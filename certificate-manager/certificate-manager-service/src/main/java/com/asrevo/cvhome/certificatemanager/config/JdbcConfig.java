@@ -57,7 +57,7 @@ public class JdbcConfig extends AbstractJdbcConfiguration {
     }
 
     @Bean
-    public <R extends Identifier, T extends BaseEntity<R>> AfterSaveCallback<T> afterSaveCallback() {
+    public <R extends Identifier, T extends BaseEntity<?, R>> AfterSaveCallback<T> afterSaveCallback() {
         return aggregate -> {
             aggregate.setNew(false);
             return aggregate;
