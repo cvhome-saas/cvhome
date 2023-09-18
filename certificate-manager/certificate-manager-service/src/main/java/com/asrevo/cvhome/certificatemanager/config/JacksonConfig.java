@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.certificatemanager.config;
 
+import com.asrevo.cvhome.commons.jackson.config.ObjectIdDeserializer;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -13,7 +14,13 @@ import com.fasterxml.jackson.databind.util.StdDateFormat;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.Getter;
+import org.bson.types.ObjectId;
+import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
+@Configuration
 public class JacksonConfig {
     @Getter
     // @formatter:off
@@ -26,5 +33,13 @@ public class JacksonConfig {
             .activateDefaultTyping(new DefaultBaseTypeLimitingValidator(),
                     ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.WRAPPER_OBJECT).build();
     // @formatter:on
-
+    @Bean
+    public Jackson2ObjectMapperBuilderCustomizer customizer() {
+        return new Jackson2ObjectMapperBuilderCustomizer() {
+            @Override
+            public void customize(Jackson2ObjectMapperBuilder jacksonObjectMapperBuilder) {
+                jacksonObjectMapperBuilder.deserializers(new ObjectIdDeserializer(ObjectId.class));
+            }
+        };
+    }
 }

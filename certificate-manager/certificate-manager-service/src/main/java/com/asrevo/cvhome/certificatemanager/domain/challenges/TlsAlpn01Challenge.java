@@ -1,6 +1,6 @@
 package com.asrevo.cvhome.certificatemanager.domain.challenges;
 
-import com.asrevo.cvhome.certificatemanager.domain.ChallengeValidationType;
+import com.asrevo.cvhome.commons.domain.ChallengeValidationType;
 import org.apache.commons.codec.DecoderException;
 import org.shredzone.acme4j.Identifier;
 

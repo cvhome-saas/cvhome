@@ -69,12 +69,14 @@ Authorization: Bearer {{access_token}}
 
 
 ### ask validate certificate xyz.asrevo.com
-POST http://localhost:8082/api/v1/acm/ask-validate
+POST http://localhost:8082/api/v1/acm/validate
 Content-Type: application/json
 Authorization: Bearer {{access_token}}
 
 {
-  "id": 2
+  "id": {
+    "id": "650899db8931be1b9a517bb0"
+  }
 }
 
 

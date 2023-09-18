@@ -1,6 +1,6 @@
 package com.asrevo.cvhome.certificatemanager.domain.challenges;
 
-import com.asrevo.cvhome.certificatemanager.domain.ChallengeValidationType;
+import com.asrevo.cvhome.commons.domain.ChallengeValidationType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.shredzone.acme4j.Authorization;
 import org.shredzone.acme4j.Order;
@@ -12,7 +12,7 @@ import org.springframework.data.annotation.Transient;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.asrevo.cvhome.certificatemanager.domain.ChallengeValidationType.*;
+import static com.asrevo.cvhome.commons.domain.ChallengeValidationType.*;
 import static org.apache.commons.codec.binary.Hex.encodeHexString;
 
 public record Challenges(List<Challenge> challenges) {

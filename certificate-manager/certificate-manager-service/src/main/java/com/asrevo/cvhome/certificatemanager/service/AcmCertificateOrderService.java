@@ -1,22 +1,24 @@
 package com.asrevo.cvhome.certificatemanager.service;
 
-import com.asrevo.cvhome.certificatemanager.domain.DomainCertificateOrder;
+import com.asrevo.cvhome.commons.domain.OrdersId;
+import com.asrevo.cvhome.commons.dto.OrdersCreateRequestDto;
+import com.asrevo.cvhome.commons.dto.OrdersCreateResponseDto;
 import org.shredzone.acme4j.exception.AcmeException;
 
 import java.io.IOException;
 
 public interface AcmCertificateOrderService {
 
-    DomainCertificateOrder initiateOrder(DomainCertificateOrder order);
+    OrdersCreateResponseDto initiateOrder(OrdersCreateRequestDto createRequest);
 
-    void order(Long orderId) throws AcmeException, IOException;
+    void order(OrdersId orderId) throws AcmeException, IOException;
 
-    void doValidation(Long id);
+    void doValidation(OrdersId orderId);
 
-    void askValidate(DomainCertificateOrder certificateOrder, String type)
+    void askValidate(OrdersId orderId, String type)
             throws AcmeException, IOException;
 
-    void preValidation(Long orderId);
+    void preValidation(OrdersId orderId);
 
-    void doGeneration(Long orderId);
+    void doGeneration(OrdersId orderId);
 }

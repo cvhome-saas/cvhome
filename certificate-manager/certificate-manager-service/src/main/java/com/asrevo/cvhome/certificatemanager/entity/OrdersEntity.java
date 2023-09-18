@@ -1,6 +1,5 @@
 package com.asrevo.cvhome.certificatemanager.entity;
 
-import com.asrevo.cvhome.certificatemanager.domain.ChallengeValidationType;
 import com.asrevo.cvhome.certificatemanager.domain.challenges.Challenges;
 import com.asrevo.cvhome.commons.domain.*;
 import com.asrevo.cvhome.commons.event.order.*;
@@ -40,6 +39,7 @@ public class OrdersEntity extends BaseEntity<OrdersEntity, OrdersId> {
 
     public static OrdersEntity createOrder(OrderDomain domain, @NotNull ChallengeValidationType challengeValidationType) {
         OrdersEntity order = new OrdersEntity();
+        order.setNew();
         order.setCertificateOrderStatus(CertificateOrderStatus.INITIATED);
         order.setDomain(domain);
         order.setChallengeValidationType(challengeValidationType);

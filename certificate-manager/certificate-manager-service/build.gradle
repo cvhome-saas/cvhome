@@ -54,7 +54,7 @@ dependencies {
     runtimeOnly 'org.postgresql:postgresql'
 
     implementation 'org.mapstruct:mapstruct:1.5.5.Final'
-
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
     implementation 'org.springdoc:springdoc-openapi-starter-webflux-ui:2.2.0'
 
     implementation 'org.shredzone.acme4j:acme4j-client:2.15'
@@ -72,6 +72,7 @@ dependencies {
 //    developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.boot:spring-boot-testcontainers'
     testImplementation 'org.springframework.amqp:spring-rabbit-test'

@@ -1,11 +1,14 @@
 package com.asrevo.cvhome.certificatemanager.controllor;
 
-import com.asrevo.cvhome.certificatemanager.domain.DomainCertificateOrder;
 import com.asrevo.cvhome.certificatemanager.service.AcmCertificateOrderService;
 import com.asrevo.cvhome.certificatemanager.service.AcmeManagerService;
-import com.asrevo.cvhome.certificatemanager.service.DomainCertificateOrderService;
+import com.asrevo.cvhome.certificatemanager.service.OrdersService;
 import com.asrevo.cvhome.commons.domain.CertificateFileType;
 import com.asrevo.cvhome.commons.domain.OrderDomain;
+import com.asrevo.cvhome.commons.domain.OrdersId;
+import com.asrevo.cvhome.commons.dto.OrdersCreateRequestDto;
+import com.asrevo.cvhome.commons.dto.OrdersCreateResponseDto;
+import com.asrevo.cvhome.commons.dto.OrdersResponseDto;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.shredzone.acme4j.exception.AcmeException;
@@ -26,22 +29,22 @@ public class AcmController {
 
     private final AcmeManagerService acmeManagerService;
     private final AcmCertificateOrderService acmCertificateOrderService;
-    private final DomainCertificateOrderService domainCertificateOrderService;
+    private final OrdersService ordersService;
 
     /*
      * .appcalc.net appcalc.net .uxplore.net uxplore.net www.uxplore.net uxb.uxplore.net
      * backend.uxplore.net
      */
     @PostMapping("order")
-    public DomainCertificateOrder order(@RequestBody @Validated DomainCertificateOrder domainOrder) {
-        log.info("will order a certificate for domain {}", domainOrder.getDomain());
-        return acmCertificateOrderService.initiateOrder(domainOrder);
+    public OrdersCreateResponseDto order(@RequestBody @Validated OrdersCreateRequestDto createRequest) {
+        log.info("will order a certificate for domain {}", createRequest.getDomain());
+        return acmCertificateOrderService.initiateOrder(createRequest);
     }
 
     @PostMapping("validate")
-    public void validate(@RequestBody DomainCertificateOrder certificateOrder, @RequestParam(value = "type", defaultValue = "Dns01") String type) throws AcmeException, IOException {
-        log.info("will validate a domain challenge for {}", certificateOrder.getLocation());
-        acmCertificateOrderService.askValidate(certificateOrder, type);
+    public void validate(@RequestBody OrdersId orderId, @RequestParam(value = "type", defaultValue = "Dns01") String type) throws AcmeException, IOException {
+        log.info("will validate a domain challenge for {}", orderId);
+        acmCertificateOrderService.askValidate(orderId, type);
     }
 
     @PostMapping("domain-certificate-file")
@@ -55,9 +58,10 @@ public class AcmController {
             return ResponseEntity.noContent().build();
         }
     }
+    // @TODO check still need it
 
     @PostMapping("orders")
-    public List<DomainCertificateOrder> order(@RequestBody List<Long> orderIds) {
-        return domainCertificateOrderService.findAllOrderByIdIn(orderIds);
+    public List<OrdersResponseDto> order(@RequestBody List<OrdersId> ordersIds) {
+        return ordersService.findAllOrderByIdIn(ordersIds);
     }
 }

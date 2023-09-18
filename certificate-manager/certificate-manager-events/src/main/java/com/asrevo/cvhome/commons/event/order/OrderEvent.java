@@ -12,15 +12,7 @@ import java.util.Map;
 @Setter
 @ToString
 public abstract class OrderEvent implements Event {
-    private Long id;
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setId(OrdersId id) {
-
-    }
+    private OrdersId id;
 
     @Override
     public Map<String, String> data() {
