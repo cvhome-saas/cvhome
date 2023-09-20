@@ -8,7 +8,10 @@ plugins {
 group = 'com.asrevo.cvhome'
 
 java {
-    sourceCompatibility = '21'
+    sourceCompatibility = '17'
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
 }
 
 repositories {

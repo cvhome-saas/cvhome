@@ -20,7 +20,7 @@ jobs:
       - name: Set up JDK 21
         uses: actions/setup-java@v3
         with:
-          java-version: '21'
+          java-version: '17'
           distribution: 'corretto'
       - name: Use Node.js 18
         uses: actions/setup-node@v3
