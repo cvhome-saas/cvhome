@@ -10,11 +10,10 @@ import com.asrevo.cvhome.certificatemanager.service.AcmCertificateOrderService;
 import com.asrevo.cvhome.certificatemanager.service.AcmeManagerService;
 import com.asrevo.cvhome.certificatemanager.service.DomainService;
 import com.asrevo.cvhome.certificatemanager.service.OrdersService;
+import com.asrevo.cvhome.commons.command.order.AddCertificateToDomainCommand;
+import com.asrevo.cvhome.commons.command.order.CreateOrderCommand;
 import com.asrevo.cvhome.commons.command.order.ValidateOrderCommand;
-import com.asrevo.cvhome.commons.domain.CertificateOrderStatus;
-import com.asrevo.cvhome.commons.domain.ChallengeValidationType;
-import com.asrevo.cvhome.commons.domain.OrderLocation;
-import com.asrevo.cvhome.commons.domain.OrdersId;
+import com.asrevo.cvhome.commons.domain.*;
 import com.asrevo.cvhome.commons.dto.DomainCreateRequestDto;
 import com.asrevo.cvhome.commons.dto.DomainCreateResponseDto;
 import com.asrevo.cvhome.commons.dto.OrdersCreateRequestDto;
@@ -58,14 +57,28 @@ public class AcmCertificateOrderServiceImpl implements AcmCertificateOrderServic
 
     @Override
     public DomainCreateResponseDto register(DomainCreateRequestDto createRequest) {
-        DomainEntity domain = DomainEntity.createDomain(createRequest.getDomain(), createRequest.isAutoRenew());
+        DomainEntity domain = DomainEntity.createDomain(createRequest.getDomain(), createRequest.isAutoRenew(), createRequest.isAutoOrder());
         DomainEntity savedDomain = domainService.save(domain);
+        if (domain.isAutoOrder()) {
+            CreateOrderCommand createOrderCommand = new CreateOrderCommand();
+            createOrderCommand.setDomain(createOrderCommand.getDomain());
+            streamBridge.send("logOrderCommands-out-0", createOrderCommand);
+        }
         return domainMappers.toDomainCreateResponse(savedDomain);
     }
 
     @Override
     public OrdersCreateResponseDto initiateOrder(OrdersCreateRequestDto createRequest) {
-        OrdersEntity certificateOrder = OrdersEntity.createOrder(createRequest.getDomain(), createRequest.getChallengeValidationType());
+        return this.initiateOrder(createRequest.getDomain());
+    }
+
+    @Override
+    public OrdersCreateResponseDto initiateOrder(Domain domain) {
+        DomainEntity domainEntity = domainService.findOneByDomain(domain);
+        if (domainEntity == null) {
+            throw new RuntimeException("this domain not existed in domain-certificate-manager system");
+        }
+        OrdersEntity certificateOrder = OrdersEntity.createOrder(domainEntity.getDomain(), domainEntity.getDomain().getRecommendedChallengeValidationType());
         OrdersEntity savedOrder = ordersService.save(certificateOrder);
         return ordersEntityMappers.toOrdersCreateResponse(savedOrder);
     }
@@ -184,16 +197,44 @@ public class AcmCertificateOrderServiceImpl implements AcmCertificateOrderServic
             if (preGenerationNeededStatus.contains(it.getCertificateOrderStatus())) {
                 log.info("will generate acm certificate for order {}", orderId);
                 it.generateOrderCertificate(doAcmGeneration(it));
-                if (!GENERATED.equals(it.getCertificateOrderStatus())) {
+                ordersService.save(it);
+                if (GENERATED.equals(it.getCertificateOrderStatus())) {
+                    AddCertificateToDomainCommand command = new AddCertificateToDomainCommand();
+                    command.setDomain(it.getDomain());
+                    command.setCertificateId(it.getCertificate().getId());
+                    command.setOrdersId(orderId);
+                    streamBridge.send("logOrderCommands-out-0", command);
+                } else {
                     log.error("generation failed for order {}", orderId);
                 }
-                ordersService.save(it);
+
             } else {
                 log.warn("request to do generate certificate for status {} and orderId {}", it.getCertificateOrderStatus(), orderId);
             }
         });
     }
 
+    @Override
+    public void notifyDomainThatOrderRequested(Domain domain) {
+        DomainEntity domainEntity = domainService.findOneByDomain(domain);
+        if (domainEntity != null) {
+            DomainCertificateStatus newCertificateStatus = switch (domainEntity.getStatus()) {
+                case RENEWING_ORDER_PROCESS, EXPIRED_CERTIFICATE -> DomainCertificateStatus.RENEWING_ORDER_PROCESS;
+                default -> DomainCertificateStatus.FIRST_ORDERING;
+            };
+            domainEntity.setStatus(newCertificateStatus);
+            domainService.save(domainEntity);
+        }
+    }
+
+    @Override
+    public void addNewCertificateToDomain(Domain domain, OrdersId ordersId, CertificateId certificateId) {
+        DomainEntity domainEntity = domainService.findOneByDomain(domain);
+        if (domainEntity != null) {
+            domainEntity.addNewCertificate(ordersId, certificateId);
+            domainService.save(domainEntity);
+        }
+    }
 
     private CertificateOrderStatus doAcmGeneration(OrdersEntity it) {
         DomainCertificate certificate = null;
@@ -202,17 +243,14 @@ public class AcmCertificateOrderServiceImpl implements AcmCertificateOrderServic
         } catch (Exception e) {
             log.error("can not generate certificate for order {} ", it.getId());
         }
-        return Optional.ofNullable(certificate)
-                .map(d -> CertificateOrderStatus.GENERATED).orElse(CertificateOrderStatus.FAIL_GENERATING);
+        return Optional.ofNullable(certificate).map(d -> CertificateOrderStatus.GENERATED).orElse(CertificateOrderStatus.FAIL_GENERATING);
     }
 
 
     private CertificateOrderStatus doAcmValidation(OrdersEntity order) {
         try {
             Status status = acmeManagerService.validate(order.getLocation().url(), order.getChallengeValidationType().getChallenge());
-            return status == Status.VALID
-                    ? CertificateOrderStatus.VALIDATED_VALID
-                    : CertificateOrderStatus.VALIDATED_INVALID;
+            return status == Status.VALID ? CertificateOrderStatus.VALIDATED_VALID : CertificateOrderStatus.VALIDATED_INVALID;
         } catch (Exception e) {
             return CertificateOrderStatus.VALIDATED_INVALID;
         }

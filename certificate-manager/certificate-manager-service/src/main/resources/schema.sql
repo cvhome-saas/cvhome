@@ -1,18 +1,3 @@
-CREATE TABLE IF NOT EXISTS public.domain_certificate_order
-(
-    id                        SERIAL PRIMARY KEY,
-    location                  varchar(150),
-    domain                    varchar(70),
-    challenge_validation_type varchar(50) not null,
-    certificate_order_status  varchar(50) default 'INITIATED',
-    challenges                varchar(1500),
-    created_date              timestamp,
-    requested_date            timestamp,
-    validated_date            timestamp,
-    generated_date            timestamp
-);
-
-
 CREATE TABLE IF NOT EXISTS orders
 (
     id                        varchar(24) not null,
@@ -48,6 +33,7 @@ CREATE TABLE IF NOT EXISTS domain
     domain                varchar(50) not null,
     status                varchar(20) not null default 'INITIATED',
     auto_renew            bool        not null default false,
+    auto_order bool not null default false,
     active_certificate_id varchar(24) null,
     constraint domain_pk primary key (id),
     constraint domain_active_certificate_id_fk foreign key (active_certificate_id) references certificate

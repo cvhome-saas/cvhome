@@ -1,6 +1,8 @@
 package com.asrevo.cvhome.certificatemanager.service;
 
 import com.asrevo.cvhome.commons.command.Command;
+import com.asrevo.cvhome.commons.command.order.AddCertificateToDomainCommand;
+import com.asrevo.cvhome.commons.command.order.CreateOrderCommand;
 import com.asrevo.cvhome.commons.command.order.ValidateOrderCommand;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +18,12 @@ public class OrderCommandHandler {
 
         if (command instanceof ValidateOrderCommand order) {
             acmCertificateOrderService.doValidation(order.getId());
+        }
+        if (command instanceof CreateOrderCommand order) {
+            acmCertificateOrderService.initiateOrder(order.getDomain());
+        }
+        if (command instanceof AddCertificateToDomainCommand certificate) {
+            acmCertificateOrderService.addNewCertificateToDomain(certificate.getDomain(), certificate.getOrdersId(), certificate.getCertificateId());
         }
     }
 

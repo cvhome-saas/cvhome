@@ -26,6 +26,7 @@ public class OrderEventHandler {
         if (event instanceof OrderRequestedEvent order) {
 //            @TODO should notify order types creator that is not support dynamic
 //            @TODO should notify other microservices to do reset cached files
+            acmCertificateOrderService.notifyDomainThatOrderRequested(order.getDomain());
             acmCertificateOrderService.preValidation(order.getId());
         }
 

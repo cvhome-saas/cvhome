@@ -12,6 +12,14 @@ public record Domain(String domain) {
         return new String(encoded);
     }
 
+    public boolean isWildCard() {
+        return this.domain.startsWith("*.");
+    }
+
+    public ChallengeValidationType getRecommendedChallengeValidationType() {
+        return isWildCard() ? ChallengeValidationType.Dns01 : ChallengeValidationType.TlsAlpn01;
+    }
+
     public String encoded() {
         return encode64(domain);
     }

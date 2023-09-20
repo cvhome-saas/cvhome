@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.certificatemanager.entity;
 
+import com.asrevo.cvhome.certificatemanager.domain.challenges.Challenge;
 import com.asrevo.cvhome.certificatemanager.domain.challenges.Challenges;
 import com.asrevo.cvhome.commons.domain.*;
 import com.asrevo.cvhome.commons.event.order.*;
@@ -57,8 +58,17 @@ public class OrdersEntity extends BaseEntity<OrdersEntity, OrdersId> {
         this.setCertificateOrderStatus(CertificateOrderStatus.REQUESTED);
         this.setRequestedDate(Instant.now());
         this.setChallenges(challenges);
+        if (challenges.getChallenge(this.challengeValidationType) == null) {
+            ChallengeValidationType oldType = this.challengeValidationType;
+            this.challengeValidationType = challenges.challenges().stream().findFirst().map(Challenge::type).orElse(null);
+            if (challengeValidationType == null) {
+                throw new RuntimeException("challenges don't have any valid validation type");
+            }
+            this.registerEvent(OrderChallengeValidationTypeChangedEvent.from(domain, oldType, this.challengeValidationType));
+        }
+        this.registerEvent(OrderRequestedEvent.from(this.domain, this.location, this.requestedDate));
         // @TODO check if challengeValidationType supported in order Challenges
-        this.registerEvent(OrderRequestedEvent.from(this.location, this.requestedDate));
+
     }
 
     public void generateOrderCertificate(CertificateOrderStatus status) {
