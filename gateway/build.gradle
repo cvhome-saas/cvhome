@@ -8,7 +8,7 @@ plugins {
 group = 'com.asrevo.cvhome'
 
 java {
-    sourceCompatibility = '17'
+    sourceCompatibility = '21'
 }
 
 repositories {
