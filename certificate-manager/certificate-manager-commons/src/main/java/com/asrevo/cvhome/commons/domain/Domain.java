@@ -2,8 +2,8 @@ package com.asrevo.cvhome.commons.domain;
 
 import java.util.Base64;
 
-public record OrderDomain(String domain) {
-    public OrderDomain {
+public record Domain(String domain) {
+    public Domain {
         // @TODO should validate domain
     }
 

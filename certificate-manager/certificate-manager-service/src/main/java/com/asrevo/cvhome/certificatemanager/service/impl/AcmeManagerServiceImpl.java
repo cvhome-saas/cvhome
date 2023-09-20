@@ -7,7 +7,7 @@ import com.asrevo.cvhome.certificatemanager.domain.challenges.TlsAlpn01Challenge
 import com.asrevo.cvhome.certificatemanager.service.AcmFileService;
 import com.asrevo.cvhome.certificatemanager.service.AcmeManagerService;
 import com.asrevo.cvhome.commons.domain.CertificateFileType;
-import com.asrevo.cvhome.commons.domain.OrderDomain;
+import com.asrevo.cvhome.commons.domain.Domain;
 import com.asrevo.cvhome.commons.domain.OrderLocation;
 import lombok.extern.slf4j.Slf4j;
 import org.shredzone.acme4j.*;
@@ -50,7 +50,7 @@ public class AcmeManagerServiceImpl implements AcmeManagerService {
 
 
     @Override
-    public Order order(OrderDomain domain) throws AcmeException, IOException {
+    public Order order(Domain domain) throws AcmeException, IOException {
         Order order = this.account.newOrder().domains(domain.domain()).create();
         fileService.generateOrGetKeyPair(domain);
         return order;
@@ -89,7 +89,7 @@ public class AcmeManagerServiceImpl implements AcmeManagerService {
         return Status.INVALID;
     }
 
-    private CSRBuilder generateCsr(KeyPair keyPair, OrderDomain domain) throws IOException {
+    private CSRBuilder generateCsr(KeyPair keyPair, Domain domain) throws IOException {
         CSRBuilder csrBuilder = new CSRBuilder();
         csrBuilder.addDomains(domain.domain());
         csrBuilder.sign(keyPair);
@@ -98,7 +98,7 @@ public class AcmeManagerServiceImpl implements AcmeManagerService {
     }
 
     @Override
-    public DomainCertificate generate(OrderLocation location, OrderDomain domain)
+    public DomainCertificate generate(OrderLocation location, Domain domain)
             throws IOException, AcmeException {
         Order order = this.login.bindOrder(location.url());
         KeyPair domainKeyPair = fileService.generateOrGetKeyPair(domain);
@@ -127,7 +127,7 @@ public class AcmeManagerServiceImpl implements AcmeManagerService {
         return null;
     }
 
-    public void generate(OrderDomain domain, TlsAlpn01Challenge challenge) throws IOException {
+    public void generate(Domain domain, TlsAlpn01Challenge challenge) throws IOException {
         fileService.generateCertificate(domain, challenge);
     }
 
@@ -143,7 +143,7 @@ public class AcmeManagerServiceImpl implements AcmeManagerService {
     }
 
     @Override
-    public InputStreamResource getCertificateFile(OrderDomain domain, CertificateFileType fileType) {
+    public InputStreamResource getCertificateFile(Domain domain, CertificateFileType fileType) {
         return fileService.getCertificateFile(domain, fileType);
     }
 

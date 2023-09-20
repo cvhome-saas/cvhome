@@ -11,8 +11,6 @@ import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.Instant;
-import java.util.Collection;
-import java.util.stream.Collectors;
 
 import static com.asrevo.cvhome.commons.domain.CertificateOrderStatus.VALIDATION_REQUESTED;
 import static org.springframework.data.relational.core.mapping.Embedded.OnEmpty.USE_NULL;
@@ -25,7 +23,7 @@ public class OrdersEntity extends BaseEntity<OrdersEntity, OrdersId> {
     private OrderLocation location;
     @NotNull
     @Embedded(onEmpty = USE_NULL)
-    private OrderDomain domain;
+    private Domain domain;
     @NotNull
     private ChallengeValidationType challengeValidationType;
     private CertificateOrderStatus certificateOrderStatus = CertificateOrderStatus.INITIATED;
@@ -37,7 +35,7 @@ public class OrdersEntity extends BaseEntity<OrdersEntity, OrdersId> {
     @MappedCollection(idColumn = "orders_id")
     private CertificateEntity certificate;
 
-    public static OrdersEntity createOrder(OrderDomain domain, @NotNull ChallengeValidationType challengeValidationType) {
+    public static OrdersEntity createOrder(Domain domain, @NotNull ChallengeValidationType challengeValidationType) {
         OrdersEntity order = new OrdersEntity();
         order.setNew();
         order.setCertificateOrderStatus(CertificateOrderStatus.INITIATED);
@@ -53,16 +51,6 @@ public class OrdersEntity extends BaseEntity<OrdersEntity, OrdersId> {
         return OrdersId.newId();
     }
 
-    @Override
-    protected Collection<Object> domainEvents() {
-        return super.domainEvents().stream().peek(it -> {
-            if (it instanceof OrderEvent event) {
-                if (id != null) {
-                    event.setId(id);
-                }
-            }
-        }).collect(Collectors.toList());
-    }
 
     public void requestOrder(OrderLocation location, Challenges challenges) {
         this.setLocation(location);

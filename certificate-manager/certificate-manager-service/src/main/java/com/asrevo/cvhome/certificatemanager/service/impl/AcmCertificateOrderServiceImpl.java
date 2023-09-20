@@ -2,16 +2,21 @@ package com.asrevo.cvhome.certificatemanager.service.impl;
 
 import com.asrevo.cvhome.certificatemanager.domain.DomainCertificate;
 import com.asrevo.cvhome.certificatemanager.domain.challenges.Challenges;
+import com.asrevo.cvhome.certificatemanager.entity.DomainEntity;
 import com.asrevo.cvhome.certificatemanager.entity.OrdersEntity;
+import com.asrevo.cvhome.certificatemanager.mappers.DomainMappers;
 import com.asrevo.cvhome.certificatemanager.mappers.OrdersMappers;
 import com.asrevo.cvhome.certificatemanager.service.AcmCertificateOrderService;
 import com.asrevo.cvhome.certificatemanager.service.AcmeManagerService;
+import com.asrevo.cvhome.certificatemanager.service.DomainService;
 import com.asrevo.cvhome.certificatemanager.service.OrdersService;
 import com.asrevo.cvhome.commons.command.order.ValidateOrderCommand;
 import com.asrevo.cvhome.commons.domain.CertificateOrderStatus;
 import com.asrevo.cvhome.commons.domain.ChallengeValidationType;
 import com.asrevo.cvhome.commons.domain.OrderLocation;
 import com.asrevo.cvhome.commons.domain.OrdersId;
+import com.asrevo.cvhome.commons.dto.DomainCreateRequestDto;
+import com.asrevo.cvhome.commons.dto.DomainCreateResponseDto;
 import com.asrevo.cvhome.commons.dto.OrdersCreateRequestDto;
 import com.asrevo.cvhome.commons.dto.OrdersCreateResponseDto;
 import lombok.AllArgsConstructor;
@@ -45,6 +50,18 @@ public class AcmCertificateOrderServiceImpl implements AcmCertificateOrderServic
     private final StreamBridge streamBridge;
 
     private final OrdersMappers ordersEntityMappers;
+
+    private final DomainMappers domainMappers;
+
+    private final DomainService domainService;
+
+
+    @Override
+    public DomainCreateResponseDto register(DomainCreateRequestDto createRequest) {
+        DomainEntity domain = DomainEntity.createDomain(createRequest.getDomain(), createRequest.isAutoRenew());
+        DomainEntity savedDomain = domainService.save(domain);
+        return domainMappers.toDomainCreateResponse(savedDomain);
+    }
 
     @Override
     public OrdersCreateResponseDto initiateOrder(OrdersCreateRequestDto createRequest) {

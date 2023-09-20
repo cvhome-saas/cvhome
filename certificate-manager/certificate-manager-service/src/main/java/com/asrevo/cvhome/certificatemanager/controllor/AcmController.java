@@ -4,11 +4,9 @@ import com.asrevo.cvhome.certificatemanager.service.AcmCertificateOrderService;
 import com.asrevo.cvhome.certificatemanager.service.AcmeManagerService;
 import com.asrevo.cvhome.certificatemanager.service.OrdersService;
 import com.asrevo.cvhome.commons.domain.CertificateFileType;
-import com.asrevo.cvhome.commons.domain.OrderDomain;
+import com.asrevo.cvhome.commons.domain.Domain;
 import com.asrevo.cvhome.commons.domain.OrdersId;
-import com.asrevo.cvhome.commons.dto.OrdersCreateRequestDto;
-import com.asrevo.cvhome.commons.dto.OrdersCreateResponseDto;
-import com.asrevo.cvhome.commons.dto.OrdersResponseDto;
+import com.asrevo.cvhome.commons.dto.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.shredzone.acme4j.exception.AcmeException;
@@ -31,6 +29,12 @@ public class AcmController {
     private final AcmCertificateOrderService acmCertificateOrderService;
     private final OrdersService ordersService;
 
+    @PostMapping("register")
+    public DomainCreateResponseDto register(@RequestBody @Validated DomainCreateRequestDto createRequest) {
+        log.info("will order a certificate for domain {}", createRequest.getDomain());
+        return acmCertificateOrderService.register(createRequest);
+    }
+
     /*
      * .appcalc.net appcalc.net .uxplore.net uxplore.net www.uxplore.net uxb.uxplore.net
      * backend.uxplore.net
@@ -48,7 +52,7 @@ public class AcmController {
     }
 
     @PostMapping("domain-certificate-file")
-    public ResponseEntity<InputStreamResource> getCertificateFile(OrderDomain domain, @RequestParam(name = "fileType", defaultValue = "CRT") CertificateFileType fileType) {
+    public ResponseEntity<InputStreamResource> getCertificateFile(Domain domain, @RequestParam(name = "fileType", defaultValue = "CRT") CertificateFileType fileType) {
         log.info("will download certificate {} for domain {}", fileType.getType(), domain.domain());
         InputStreamResource body = acmeManagerService.getCertificateFile(domain, fileType);
         if (body != null) {

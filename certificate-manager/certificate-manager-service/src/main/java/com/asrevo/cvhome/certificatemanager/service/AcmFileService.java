@@ -4,7 +4,7 @@ import com.asrevo.cvhome.certificatemanager.domain.HttpValidationToken;
 import com.asrevo.cvhome.certificatemanager.domain.challenges.Http01Challenge;
 import com.asrevo.cvhome.certificatemanager.domain.challenges.TlsAlpn01Challenge;
 import com.asrevo.cvhome.commons.domain.CertificateFileType;
-import com.asrevo.cvhome.commons.domain.OrderDomain;
+import com.asrevo.cvhome.commons.domain.Domain;
 import org.shredzone.acme4j.util.CSRBuilder;
 import org.springframework.core.io.InputStreamResource;
 
@@ -14,17 +14,17 @@ import java.security.KeyPair;
 import java.security.cert.X509Certificate;
 
 public interface AcmFileService {
-    KeyPair generateOrGetKeyPair(OrderDomain domain) throws IOException;
+    KeyPair generateOrGetKeyPair(Domain domain) throws IOException;
 
-    void storeCsr(OrderDomain domain, CSRBuilder csrBuilder) throws IOException;
+    void storeCsr(Domain domain, CSRBuilder csrBuilder) throws IOException;
 
-    void storeCertificate(OrderDomain domain, X509Certificate... certificates) throws IOException;
+    void storeCertificate(Domain domain, X509Certificate... certificates) throws IOException;
 
-    void generateCertificate(OrderDomain domain, TlsAlpn01Challenge tlsAlpn01Challenge) throws IOException;
+    void generateCertificate(Domain domain, TlsAlpn01Challenge tlsAlpn01Challenge) throws IOException;
 
     void generateValidationFile(Http01Challenge http01Challenge) throws IOException;
 
     InputStream getHttpValidationFile(HttpValidationToken token);
 
-    InputStreamResource getCertificateFile(OrderDomain domain, CertificateFileType fileType);
+    InputStreamResource getCertificateFile(Domain domain, CertificateFileType fileType);
 }

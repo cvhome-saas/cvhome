@@ -11,7 +11,7 @@ import java.util.Map;
 @Getter
 @Setter
 @ToString
-public abstract class OrderEvent implements Event {
+public abstract class OrderEvent implements Event<OrdersId> {
     private OrdersId id;
 
     @Override

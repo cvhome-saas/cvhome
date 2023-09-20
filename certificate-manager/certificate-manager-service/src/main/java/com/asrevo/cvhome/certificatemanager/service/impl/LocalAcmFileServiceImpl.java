@@ -5,7 +5,7 @@ import com.asrevo.cvhome.certificatemanager.domain.challenges.Http01Challenge;
 import com.asrevo.cvhome.certificatemanager.domain.challenges.TlsAlpn01Challenge;
 import com.asrevo.cvhome.certificatemanager.service.AcmFileService;
 import com.asrevo.cvhome.commons.domain.CertificateFileType;
-import com.asrevo.cvhome.commons.domain.OrderDomain;
+import com.asrevo.cvhome.commons.domain.Domain;
 import lombok.SneakyThrows;
 import org.shredzone.acme4j.toolbox.AcmeUtils;
 import org.shredzone.acme4j.util.CSRBuilder;
@@ -54,7 +54,7 @@ public class LocalAcmFileServiceImpl implements AcmFileService {
     }
 
     @Override
-    public KeyPair generateOrGetKeyPair(OrderDomain domain) throws IOException {
+    public KeyPair generateOrGetKeyPair(Domain domain) throws IOException {
         Path domainKeyPath = acmRoot.resolve(Paths.get(domain.encoded(), CertificateFileType.KEY.getFile()));
         if (fileService.exist(domainKeyPath.toString())) {
             InputStream stream = fileService.getFile(domainKeyPath.toString());
@@ -70,7 +70,7 @@ public class LocalAcmFileServiceImpl implements AcmFileService {
     }
 
     @Override
-    public void storeCsr(OrderDomain domain, CSRBuilder csrBuilder) throws IOException {
+    public void storeCsr(Domain domain, CSRBuilder csrBuilder) throws IOException {
         File domainCsrTemp = Files.createTempFile("domain", ".csr").toFile();
         FileWriter csrFileWriter = new FileWriter(domainCsrTemp);
         csrBuilder.write(csrFileWriter);
@@ -80,12 +80,12 @@ public class LocalAcmFileServiceImpl implements AcmFileService {
     }
 
     @Override
-    public void storeCertificate(OrderDomain domain, X509Certificate... certificates) throws IOException {
+    public void storeCertificate(Domain domain, X509Certificate... certificates) throws IOException {
         this.storeCertificate(acmRoot, domain, certificates);
     }
 
     @Override
-    public void generateCertificate(OrderDomain domain, TlsAlpn01Challenge challenge) throws IOException {
+    public void generateCertificate(Domain domain, TlsAlpn01Challenge challenge) throws IOException {
         if (challenge != null) {
             KeyPair keyPair = this.generateOrGetKeyPair(domain);
             byte[] decode = challenge.decode();
@@ -118,7 +118,7 @@ public class LocalAcmFileServiceImpl implements AcmFileService {
     }
 
     @Override
-    public InputStreamResource getCertificateFile(OrderDomain domain, CertificateFileType fileType) {
+    public InputStreamResource getCertificateFile(Domain domain, CertificateFileType fileType) {
         String fileName = acmRoot.resolve(Paths.get(domain.encoded(), fileType.getFile())).toString();
         if (fileService.exist(fileName)) {
             return new InputStreamResource(fileService.getFile(fileName));
@@ -128,7 +128,7 @@ public class LocalAcmFileServiceImpl implements AcmFileService {
     }
 
 
-    private void storeCertificate(Path root, OrderDomain domain, X509Certificate... certificates) throws IOException {
+    private void storeCertificate(Path root, Domain domain, X509Certificate... certificates) throws IOException {
         File domainCrt = Files.createTempFile("domain", ".crt").toFile();
         try (FileWriter crtFileWriter = new FileWriter(domainCrt)) {
             try {
