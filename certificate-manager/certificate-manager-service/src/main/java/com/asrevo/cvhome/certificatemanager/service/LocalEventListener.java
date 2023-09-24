@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 public class LocalEventListener {
     private final StreamBridge streamBridge;
 
-    //@TransactionalEventListener not working fine
+    // @TODO replace with @TransactionalEventListener as its not working fine now
     @EventListener
     void onOrdersEvents(OrdersEvent event) {
         log.info(event.eventType());
