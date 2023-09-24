@@ -10,11 +10,11 @@ spring:
       client:
         simple:
           instances:
-            domain:
+            domain-ownership:
               - uri: "http://localhost:8081"
                 metadata:
-                  service-name: domain
-                  instance: domain-1
+                  service-name: domain-ownership
+                  instance: domain-ownership-1
             certificate-manager:
               - uri: "http://localhost:8082"
                 metadata:

@@ -1,4 +1,4 @@
-package com.asrevo.cvhome.certificatemanager.config;
+package com.asrevo.cvhome.domainownership.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,10 +18,7 @@ public class SecurityConfig {
         // @formatter:off
         return http
                 .authorizeExchange(it ->
-                        it
-                                .pathMatchers(".well-known/acme-challenge/*").permitAll()
-                                .pathMatchers("api/v1/test/sign").permitAll()
-                                .anyExchange().authenticated()
+                        it.anyExchange().authenticated()
                 )
                 .oauth2ResourceServer(it ->
                         it.jwt(withDefaults())

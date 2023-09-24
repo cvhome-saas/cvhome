@@ -28,6 +28,6 @@ include(
         'certificate-manager:certificate-manager-commons',
         'certificate-manager:certificate-manager-events',
         'certificate-manager:certificate-manager-service',
-        'domain:domain-service',
+        'domain-ownership:domain-ownership-service',
         'gateway'
 )

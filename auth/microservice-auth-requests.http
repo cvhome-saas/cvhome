@@ -5,12 +5,16 @@ Content-Type: application/x-www-form-urlencoded
 client_id=microservice-app&client_secret=r1nuVn4HefusLGwHIeRxbdOzdTZLEMvQ&grant_type=password&username=microservice-gateway
     &password=microservice-gateway
 
-### get token for microservice-user
+### get token for microservice-domain-ownership
 POST http://localhost:9999/realms/cvhome/protocol/openid-connect/token
 Content-Type: application/x-www-form-urlencoded
 
-client_id=microservice-app&client_secret=r1nuVn4HefusLGwHIeRxbdOzdTZLEMvQ&grant_type=password&username=microservice-user
-    &password=microservice-user
+client_id = microservice-app &
+client_secret = r1nuVn4HefusLGwHIeRxbdOzdTZLEMvQ &
+grant_type = password &
+username = microservice-domain-ownership
+    &
+password = microservice-domain-ownership
 
 
 ### get token for microservice-certificate-manager
