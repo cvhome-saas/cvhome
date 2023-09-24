@@ -31,7 +31,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.Optional;
 import java.util.Set;
 
 import static com.asrevo.cvhome.commons.domain.CertificateOrderStatus.*;
@@ -69,16 +68,16 @@ public class AcmCertificateOrderServiceImpl implements AcmCertificateOrderServic
 
     @Override
     public OrdersCreateResponseDto initiateOrder(OrdersCreateRequestDto createRequest) {
-        return this.initiateOrder(createRequest.getDomain());
+        return this.initiateOrder(createRequest.getDomain(), createRequest.getChallengeValidationType());
     }
 
     @Override
-    public OrdersCreateResponseDto initiateOrder(Domain domain) {
+    public OrdersCreateResponseDto initiateOrder(Domain domain, ChallengeValidationType challengeValidationType) {
         DomainEntity domainEntity = domainService.findOneByDomain(domain);
         if (domainEntity == null) {
             throw new RuntimeException("this domain not existed in domain-certificate-manager system");
         }
-        OrdersEntity certificateOrder = OrdersEntity.createOrder(domainEntity.getDomain(), domainEntity.getDomain().getRecommendedChallengeValidationType());
+        OrdersEntity certificateOrder = OrdersEntity.createOrder(domainEntity.getDomain(), challengeValidationType);
         OrdersEntity savedOrder = ordersService.save(certificateOrder);
         return ordersEntityMappers.toOrdersCreateResponse(savedOrder);
     }
@@ -236,14 +235,13 @@ public class AcmCertificateOrderServiceImpl implements AcmCertificateOrderServic
         }
     }
 
-    private CertificateOrderStatus doAcmGeneration(OrdersEntity it) {
-        DomainCertificate certificate = null;
+    private DomainCertificate doAcmGeneration(OrdersEntity it) {
         try {
-            certificate = acmeManagerService.generate(it.getLocation(), it.getDomain());
+            return acmeManagerService.generate(it.getLocation(), it.getDomain());
         } catch (Exception e) {
             log.error("can not generate certificate for order {} ", it.getId());
         }
-        return Optional.ofNullable(certificate).map(d -> CertificateOrderStatus.GENERATED).orElse(CertificateOrderStatus.FAIL_GENERATING);
+        return null;
     }
 
 

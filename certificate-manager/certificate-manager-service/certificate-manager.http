@@ -70,7 +70,7 @@ Authorization: Bearer {{access_token}}
   "domain": {
     "domain": "gateway.com"
   },
-  "autoOrder": true,
+  "autoOrder": false,
   "autoRenew": true
 }
 

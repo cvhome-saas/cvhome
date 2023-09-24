@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.certificatemanager.entity;
 
+import com.asrevo.cvhome.certificatemanager.domain.DomainCertificate;
 import com.asrevo.cvhome.certificatemanager.domain.challenges.Challenge;
 import com.asrevo.cvhome.certificatemanager.domain.challenges.Challenges;
 import com.asrevo.cvhome.commons.domain.*;
@@ -12,6 +13,7 @@ import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.Instant;
+import java.util.Optional;
 
 import static com.asrevo.cvhome.commons.domain.CertificateOrderStatus.VALIDATION_REQUESTED;
 import static org.springframework.data.relational.core.mapping.Embedded.OnEmpty.USE_NULL;
@@ -71,11 +73,15 @@ public class OrdersEntity extends BaseEntity<OrdersEntity, OrdersId> {
 
     }
 
-    public void generateOrderCertificate(CertificateOrderStatus status) {
-        this.setCertificateOrderStatus(status);
-        if (CertificateOrderStatus.GENERATED.equals(status)) {
+    public void generateOrderCertificate(DomainCertificate certificate) {
+
+        CertificateOrderStatus orderStatus = Optional.ofNullable(certificate).map(d -> CertificateOrderStatus.GENERATED).orElse(CertificateOrderStatus.FAIL_GENERATING);
+        this.setCertificateOrderStatus(orderStatus);
+        if (CertificateOrderStatus.GENERATED.equals(orderStatus)) {
             this.setGeneratedDate(Instant.now());
+            this.certificate = CertificateEntity.createNewCertificate(certificate.getNotAfter().toInstant(), certificate.getNotBefore().toInstant(), certificate.getSerialNumber(), certificate.getVersion(), certificate.getSigAlgName(), certificate.getSigAlgOID());
         }
+        this.andEvent(this.certificate);
         this.registerEvent(OrdersCertificateGeneratedEvent.from(this.certificateOrderStatus, this.generatedDate));
     }
 

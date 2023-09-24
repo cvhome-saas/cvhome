@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.certificatemanager.service;
 
 import com.asrevo.cvhome.commons.domain.CertificateId;
+import com.asrevo.cvhome.commons.domain.ChallengeValidationType;
 import com.asrevo.cvhome.commons.domain.Domain;
 import com.asrevo.cvhome.commons.domain.OrdersId;
 import com.asrevo.cvhome.commons.dto.DomainCreateRequestDto;
@@ -17,7 +18,7 @@ public interface AcmCertificateOrderService {
 
     OrdersCreateResponseDto initiateOrder(OrdersCreateRequestDto createRequest);
 
-    OrdersCreateResponseDto initiateOrder(Domain domain);
+    OrdersCreateResponseDto initiateOrder(Domain domain, ChallengeValidationType validationType);
 
     void order(OrdersId orderId) throws AcmeException, IOException;
 

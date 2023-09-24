@@ -31,9 +31,9 @@ CREATE TABLE IF NOT EXISTS domain
 (
     id                    varchar(24) not null,
     domain                varchar(50) not null,
-    status                varchar(20) not null default 'INITIATED',
+    status     varchar(30) not null default 'INITIATED',
     auto_renew            bool        not null default false,
-    auto_order bool not null default false,
+    auto_order bool        not null default false,
     active_certificate_id varchar(24) null,
     constraint domain_pk primary key (id),
     constraint domain_active_certificate_id_fk foreign key (active_certificate_id) references certificate

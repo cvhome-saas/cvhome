@@ -19,6 +19,19 @@ public class CertificateEntity extends BaseEntity<CertificateEntity, Certificate
     private String sigAlgName;
     private String sigAlgOID;
 
+
+    public static CertificateEntity createNewCertificate(Instant notAfter, Instant notBefore, String serialNumber, Integer version, String sigAlgName, String sigAlgOID) {
+        CertificateEntity certificate = new CertificateEntity();
+        certificate.setNew();
+        certificate.notAfter = notAfter;
+        certificate.notBefore = notBefore;
+        certificate.serialNumber = serialNumber;
+        certificate.version = version;
+        certificate.sigAlgName = sigAlgName;
+        certificate.sigAlgOID = sigAlgOID;
+        return certificate;
+    }
+
     @Override
     protected CertificateId generateId() {
         return CertificateId.newId();

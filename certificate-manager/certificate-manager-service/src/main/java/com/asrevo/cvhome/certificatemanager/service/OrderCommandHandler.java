@@ -20,7 +20,7 @@ public class OrderCommandHandler {
             acmCertificateOrderService.doValidation(order.getId());
         }
         if (command instanceof CreateOrderCommand order) {
-            acmCertificateOrderService.initiateOrder(order.getDomain());
+            acmCertificateOrderService.initiateOrder(order.getDomain(), order.getDomain().getRecommendedChallengeValidationType());
         }
         if (command instanceof AddCertificateToDomainCommand certificate) {
             acmCertificateOrderService.addNewCertificateToDomain(certificate.getDomain(), certificate.getOrdersId(), certificate.getCertificateId());

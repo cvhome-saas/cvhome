@@ -29,8 +29,7 @@ public abstract class BaseEntity<E extends AbstractAggregateRoot<E>, T extends I
     @Override
     protected Collection<Object> domainEvents() {
         return super.domainEvents().stream().peek(it -> {
-            if (it instanceof Event) {
-                Event<T> event = (Event<T>) it;
+            if (it instanceof Event event) {
                 if (id != null) {
                     event.setId(id);
                 }
