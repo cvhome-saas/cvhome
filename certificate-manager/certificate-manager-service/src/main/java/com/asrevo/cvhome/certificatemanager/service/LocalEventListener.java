@@ -5,8 +5,8 @@ import com.asrevo.cvhome.commons.event.order.OrdersEvent;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.stream.function.StreamBridge;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.event.TransactionalEventListener;
 
 
 @Component
@@ -15,14 +15,15 @@ import org.springframework.transaction.event.TransactionalEventListener;
 public class LocalEventListener {
     private final StreamBridge streamBridge;
 
-    @TransactionalEventListener
+    //@TransactionalEventListener not working fine
+    @EventListener
     void onOrdersEvents(OrdersEvent event) {
         log.info(event.eventType());
         streamBridge.send("logOrderEvents-out-0", event);
     }
 
-    @TransactionalEventListener
-    void onOrdersEvents(DomainEvent event) {
+    @EventListener
+    void onDomainEvents(DomainEvent event) {
         log.info(event.eventType());
     }
 }

@@ -29,8 +29,8 @@ public class OrdersServiceImpl implements OrdersService {
 
     @Transactional
     @Override
-    public OrdersEntity save(OrdersEntity domainCertificateOrder) {
-        return ordersRepository.save(domainCertificateOrder);
+    public OrdersEntity save(OrdersEntity orders) {
+        return ordersRepository.save(orders);
     }
 
     @Override
