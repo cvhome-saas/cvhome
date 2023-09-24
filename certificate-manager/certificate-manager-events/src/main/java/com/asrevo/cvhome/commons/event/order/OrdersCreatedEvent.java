@@ -7,11 +7,11 @@ import java.time.Instant;
 
 @Getter
 @Setter
-public class OrderCreatedEvent extends OrderEvent {
+public class OrdersCreatedEvent extends OrdersEvent {
     private Instant createdDate;
 
-    public static OrderCreatedEvent from(Instant createdDate) {
-        OrderCreatedEvent event = new OrderCreatedEvent();
+    public static OrdersCreatedEvent from(Instant createdDate) {
+        OrdersCreatedEvent event = new OrdersCreatedEvent();
         event.setCreatedDate(createdDate);
         return event;
     }

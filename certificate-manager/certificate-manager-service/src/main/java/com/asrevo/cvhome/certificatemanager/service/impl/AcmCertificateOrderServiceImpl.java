@@ -61,7 +61,7 @@ public class AcmCertificateOrderServiceImpl implements AcmCertificateOrderServic
         DomainEntity savedDomain = domainService.save(domain);
         if (domain.isAutoOrder()) {
             CreateOrderCommand createOrderCommand = new CreateOrderCommand();
-            createOrderCommand.setDomain(createOrderCommand.getDomain());
+            createOrderCommand.setDomain(savedDomain.getDomain());
             streamBridge.send("logOrderCommands-out-0", createOrderCommand);
         }
         return domainMappers.toDomainCreateResponse(savedDomain);

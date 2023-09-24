@@ -31,7 +31,7 @@ public class AcmController {
 
     @PostMapping("register")
     public DomainCreateResponseDto register(@RequestBody @Validated DomainCreateRequestDto createRequest) {
-        log.info("will order a certificate for domain {}", createRequest.getDomain());
+        log.info("will register a domain {}", createRequest.getDomain());
         return acmCertificateOrderService.register(createRequest);
     }
 

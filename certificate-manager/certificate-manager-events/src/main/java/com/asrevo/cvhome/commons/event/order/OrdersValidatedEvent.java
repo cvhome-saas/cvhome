@@ -8,12 +8,12 @@ import java.time.Instant;
 
 @Getter
 @Setter
-public class OrderValidatedEvent extends OrderEvent {
+public class OrdersValidatedEvent extends OrdersEvent {
     private CertificateOrderStatus certificateOrderStatus;
     private Instant validatedDate;
 
-    public static OrderValidatedEvent from(Instant validatedDate, CertificateOrderStatus orderStatus) {
-        OrderValidatedEvent event = new OrderValidatedEvent();
+    public static OrdersValidatedEvent from(Instant validatedDate, CertificateOrderStatus orderStatus) {
+        OrdersValidatedEvent event = new OrdersValidatedEvent();
         event.setValidatedDate(validatedDate);
         event.setCertificateOrderStatus(orderStatus);
         return event;

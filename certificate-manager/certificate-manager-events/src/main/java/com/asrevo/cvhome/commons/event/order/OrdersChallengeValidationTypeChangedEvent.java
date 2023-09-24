@@ -7,13 +7,13 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class OrderChallengeValidationTypeChangedEvent extends OrderEvent {
+public class OrdersChallengeValidationTypeChangedEvent extends OrdersEvent {
     private Domain domain;
     private ChallengeValidationType oldType;
     private ChallengeValidationType newType;
 
-    public static OrderChallengeValidationTypeChangedEvent from(Domain domain, ChallengeValidationType oldType, ChallengeValidationType newType) {
-        OrderChallengeValidationTypeChangedEvent event = new OrderChallengeValidationTypeChangedEvent();
+    public static OrdersChallengeValidationTypeChangedEvent from(Domain domain, ChallengeValidationType oldType, ChallengeValidationType newType) {
+        OrdersChallengeValidationTypeChangedEvent event = new OrdersChallengeValidationTypeChangedEvent();
         event.setDomain(domain);
         event.setOldType(oldType);
         event.setNewType(newType);

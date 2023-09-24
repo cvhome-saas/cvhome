@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.certificatemanager.service;
 
 import com.asrevo.cvhome.commons.command.order.OrderCommand;
-import com.asrevo.cvhome.commons.event.order.OrderEvent;
+import com.asrevo.cvhome.commons.event.order.OrdersEvent;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -34,7 +34,7 @@ public class ExternalEventListener {
     }
 
     @Bean
-    public Consumer<Message<OrderEvent>> logOrderEvents() {
+    public Consumer<Message<OrdersEvent>> logOrderEvents() {
         return event -> {
             System.out.println("Received: order event: " + event.getPayload().eventType() + "       " + event.getPayload().getId());
             try {

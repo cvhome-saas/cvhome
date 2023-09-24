@@ -9,12 +9,12 @@ import java.time.Instant;
 
 @Getter
 @Setter
-public class OrderCertificateGeneratedEvent extends OrderEvent {
+public class OrdersCertificateGeneratedEvent extends OrdersEvent {
     private Instant generatedDate;
     private CertificateOrderStatus certificateOrderStatus;
 
-    public static OrderCertificateGeneratedEvent from(CertificateOrderStatus orderStatus, Instant generatedDate) {
-        OrderCertificateGeneratedEvent event = new OrderCertificateGeneratedEvent();
+    public static OrdersCertificateGeneratedEvent from(CertificateOrderStatus orderStatus, Instant generatedDate) {
+        OrdersCertificateGeneratedEvent event = new OrdersCertificateGeneratedEvent();
         event.setCertificateOrderStatus(orderStatus);
         event.setGeneratedDate(generatedDate);
         return event;

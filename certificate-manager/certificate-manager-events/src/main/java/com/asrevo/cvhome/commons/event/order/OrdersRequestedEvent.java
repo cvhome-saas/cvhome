@@ -9,13 +9,13 @@ import java.time.Instant;
 
 @Getter
 @Setter
-public class OrderRequestedEvent extends OrderEvent {
+public class OrdersRequestedEvent extends OrdersEvent {
     private Domain domain;
     private OrderLocation location;
     private Instant requestedDate;
 
-    public static OrderRequestedEvent from(Domain domain, OrderLocation location, Instant requestedDate) {
-        OrderRequestedEvent event = new OrderRequestedEvent();
+    public static OrdersRequestedEvent from(Domain domain, OrderLocation location, Instant requestedDate) {
+        OrdersRequestedEvent event = new OrdersRequestedEvent();
         event.setDomain(domain);
         event.setLocation(location);
         event.setRequestedDate(requestedDate);

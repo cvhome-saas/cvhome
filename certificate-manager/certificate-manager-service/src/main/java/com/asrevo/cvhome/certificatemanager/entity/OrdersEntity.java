@@ -43,7 +43,7 @@ public class OrdersEntity extends BaseEntity<OrdersEntity, OrdersId> {
         order.setDomain(domain);
         order.setChallengeValidationType(challengeValidationType);
         order.setCreatedDate(Instant.now());
-        order.registerEvent(OrderCreatedEvent.from(order.createdDate));
+        order.registerEvent(OrdersCreatedEvent.from(order.createdDate));
         return order;
     }
 
@@ -64,9 +64,9 @@ public class OrdersEntity extends BaseEntity<OrdersEntity, OrdersId> {
             if (challengeValidationType == null) {
                 throw new RuntimeException("challenges don't have any valid validation type");
             }
-            this.registerEvent(OrderChallengeValidationTypeChangedEvent.from(domain, oldType, this.challengeValidationType));
+            this.registerEvent(OrdersChallengeValidationTypeChangedEvent.from(domain, oldType, this.challengeValidationType));
         }
-        this.registerEvent(OrderRequestedEvent.from(this.domain, this.location, this.requestedDate));
+        this.registerEvent(OrdersRequestedEvent.from(this.domain, this.location, this.requestedDate));
         // @TODO check if challengeValidationType supported in order Challenges
 
     }
@@ -76,17 +76,17 @@ public class OrdersEntity extends BaseEntity<OrdersEntity, OrdersId> {
         if (CertificateOrderStatus.GENERATED.equals(status)) {
             this.setGeneratedDate(Instant.now());
         }
-        this.registerEvent(OrderCertificateGeneratedEvent.from(this.certificateOrderStatus, this.generatedDate));
+        this.registerEvent(OrdersCertificateGeneratedEvent.from(this.certificateOrderStatus, this.generatedDate));
     }
 
     public void requestValidate() {
         this.certificateOrderStatus = VALIDATION_REQUESTED;
-        this.registerEvent(OrderValidationRequestedEvent.from());
+        this.registerEvent(OrdersValidationRequestedEvent.from());
     }
 
     public void validated(CertificateOrderStatus certificateOrderStatus) {
         this.certificateOrderStatus = certificateOrderStatus;
         this.setValidatedDate(Instant.now());
-        this.registerEvent(OrderValidatedEvent.from(this.validatedDate, this.certificateOrderStatus));
+        this.registerEvent(OrdersValidatedEvent.from(this.validatedDate, this.certificateOrderStatus));
     }
 }

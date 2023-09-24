@@ -36,7 +36,9 @@ public class DomainEntity extends BaseEntity<DomainEntity, DomainId> {
     public static DomainEntity createDomain(Domain domain, boolean autoRenew, boolean autoOrder) {
         DomainEntity entity = new DomainEntity();
         entity.setNew();
+        entity.setDomain(domain);
         entity.setAutoRenew(autoRenew);
+        entity.setAutoOrder(autoOrder);
         entity.setStatus(DomainCertificateStatus.INITIATED);
         entity.registerEvent(DomainRegisteredEvent.from(domain, autoRenew, autoOrder));
         return entity;
