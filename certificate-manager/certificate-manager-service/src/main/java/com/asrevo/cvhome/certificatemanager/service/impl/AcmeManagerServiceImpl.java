@@ -131,6 +131,15 @@ public class AcmeManagerServiceImpl implements AcmeManagerService {
         fileService.generateCertificate(domain, challenge);
     }
 
+    @Override
+    public void prepareValidation(Domain domain, com.asrevo.cvhome.certificatemanager.domain.challenges.Challenge challenge) throws IOException {
+        if (challenge instanceof TlsAlpn01Challenge tlsAlpn01Challenge) {
+            generate(domain, tlsAlpn01Challenge);
+        } else if (challenge instanceof Http01Challenge http01Challenge) {
+            generateValidationFile(http01Challenge);
+        }
+    }
+
 
     @Override
     public void generateValidationFile(Http01Challenge challenge) throws IOException {

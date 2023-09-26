@@ -1,5 +1,7 @@
 package com.asrevo.cvhome.certificatemanager.config;
 
+import com.asrevo.cvhome.commons.command.Command;
+import com.asrevo.cvhome.commons.event.Event;
 import com.asrevo.cvhome.commons.jackson.config.ObjectIdDeserializer;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -9,7 +11,7 @@ import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.databind.jsontype.DefaultBaseTypeLimitingValidator;
+import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
 import com.fasterxml.jackson.databind.util.StdDateFormat;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -22,6 +24,8 @@ import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
 @Configuration
 public class JacksonConfig {
+
+
     @Getter
     // @formatter:off
     private static final JsonMapper ployJson = JsonMapper.builder()
@@ -30,11 +34,17 @@ public class JacksonConfig {
             .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
             .configure(MapperFeature.DEFAULT_VIEW_INCLUSION, false)
             .addModules(new JavaTimeModule(), new Jdk8Module()).defaultDateFormat(new StdDateFormat())
-            .activateDefaultTyping(new DefaultBaseTypeLimitingValidator(),
+            .activateDefaultTyping(BasicPolymorphicTypeValidator
+                            .builder()
+                            .allowIfBaseType(Event.class)
+                            .allowIfBaseType(Command.class)
+                            .allowIfBaseType(Object.class)
+                            .build(),
                     ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.WRAPPER_OBJECT).build();
     // @formatter:on
     @Bean
     public Jackson2ObjectMapperBuilderCustomizer customizer() {
+
         return new Jackson2ObjectMapperBuilderCustomizer() {
             @Override
             public void customize(Jackson2ObjectMapperBuilder jacksonObjectMapperBuilder) {

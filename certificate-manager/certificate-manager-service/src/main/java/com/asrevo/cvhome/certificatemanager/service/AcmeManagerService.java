@@ -2,6 +2,7 @@ package com.asrevo.cvhome.certificatemanager.service;
 
 import com.asrevo.cvhome.certificatemanager.domain.DomainCertificate;
 import com.asrevo.cvhome.certificatemanager.domain.HttpValidationToken;
+import com.asrevo.cvhome.certificatemanager.domain.challenges.Challenge;
 import com.asrevo.cvhome.certificatemanager.domain.challenges.Http01Challenge;
 import com.asrevo.cvhome.certificatemanager.domain.challenges.TlsAlpn01Challenge;
 import com.asrevo.cvhome.commons.domain.CertificateFileType;
@@ -29,6 +30,7 @@ public interface AcmeManagerService {
     void generate(Domain domain, TlsAlpn01Challenge challenge)
             throws IOException, DecoderException;
 
+    void prepareValidation(Domain domain, Challenge challenge) throws IOException;
     void generateValidationFile(Http01Challenge challenge) throws IOException;
 
     InputStream getHttpValidationFile(HttpValidationToken token);

@@ -68,9 +68,9 @@ Authorization: Bearer {{access_token}}
 
 {
   "domain": {
-    "domain": "gateway.com"
+    "domain": "iad1.gateway.com"
   },
-  "autoOrder": false,
+  "autoOrder": true,
   "autoRenew": true
 }
 
@@ -135,7 +135,7 @@ Authorization: Bearer {{access_token}}
 
 {
   "id": {
-    "id": "650899db8931be1b9a517bb0"
+    "id": "6512c464929f5771f02d4646"
   }
 }
 

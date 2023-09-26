@@ -109,8 +109,8 @@ management:
     web:
       exposure:
         include: [ '*' ]
-  observations:
-    key-values:
+  metrics:
+    tags:
       application: ${spring.application.name}
 logging:
   level:

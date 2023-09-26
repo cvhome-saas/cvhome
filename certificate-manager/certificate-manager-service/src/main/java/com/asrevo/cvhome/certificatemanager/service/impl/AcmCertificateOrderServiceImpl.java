@@ -10,9 +10,8 @@ import com.asrevo.cvhome.certificatemanager.service.AcmCertificateOrderService;
 import com.asrevo.cvhome.certificatemanager.service.AcmeManagerService;
 import com.asrevo.cvhome.certificatemanager.service.DomainService;
 import com.asrevo.cvhome.certificatemanager.service.OrdersService;
-import com.asrevo.cvhome.commons.command.order.AddCertificateToDomainCommand;
-import com.asrevo.cvhome.commons.command.order.CreateOrderCommand;
-import com.asrevo.cvhome.commons.command.order.ValidateOrderCommand;
+import com.asrevo.cvhome.commons.command.CommandPublisher;
+import com.asrevo.cvhome.commons.command.order.*;
 import com.asrevo.cvhome.commons.domain.*;
 import com.asrevo.cvhome.commons.dto.DomainCreateRequestDto;
 import com.asrevo.cvhome.commons.dto.DomainCreateResponseDto;
@@ -20,15 +19,11 @@ import com.asrevo.cvhome.commons.dto.OrdersCreateRequestDto;
 import com.asrevo.cvhome.commons.dto.OrdersCreateResponseDto;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.codec.DecoderException;
 import org.shredzone.acme4j.Order;
 import org.shredzone.acme4j.Status;
-import org.shredzone.acme4j.challenge.Dns01Challenge;
-import org.shredzone.acme4j.challenge.Http01Challenge;
-import org.shredzone.acme4j.challenge.TlsAlpn01Challenge;
-import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.Set;
@@ -45,23 +40,22 @@ public class AcmCertificateOrderServiceImpl implements AcmCertificateOrderServic
 
     private final AcmeManagerService acmeManagerService;
 
-    private final StreamBridge streamBridge;
-
     private final OrdersMappers ordersEntityMappers;
 
     private final DomainMappers domainMappers;
 
     private final DomainService domainService;
 
+    private final CommandPublisher commandPublisher;
 
     @Override
     public DomainCreateResponseDto register(DomainCreateRequestDto createRequest) {
         DomainEntity domain = DomainEntity.createDomain(createRequest.getDomain(), createRequest.isAutoRenew(), createRequest.isAutoOrder());
         DomainEntity savedDomain = domainService.save(domain);
         if (domain.isAutoOrder()) {
-            CreateOrderCommand createOrderCommand = new CreateOrderCommand();
-            createOrderCommand.setDomain(savedDomain.getDomain());
-            streamBridge.send("logOrderCommands-out-0", createOrderCommand);
+            CreateOrderCommand command = new CreateOrderCommand();
+            command.setDomain(savedDomain.getDomain());
+            commandPublisher.publish(command);
         }
         return domainMappers.toDomainCreateResponse(savedDomain);
     }
@@ -79,9 +73,13 @@ public class AcmCertificateOrderServiceImpl implements AcmCertificateOrderServic
         }
         OrdersEntity certificateOrder = OrdersEntity.createOrder(domainEntity.getDomain(), challengeValidationType);
         OrdersEntity savedOrder = ordersService.save(certificateOrder);
+        RequestOrderCertificateCommand command = new RequestOrderCertificateCommand();
+        command.setId(savedOrder.getId());
+        commandPublisher.publish(command);
         return ordersEntityMappers.toOrdersCreateResponse(savedOrder);
     }
 
+    @Transactional
     @Override
     public void order(OrdersId orderId) {
         Set<CertificateOrderStatus> preOrderNeededStatus = Set.of(INITIATED);
@@ -91,6 +89,7 @@ public class AcmCertificateOrderServiceImpl implements AcmCertificateOrderServic
                     Order o = acmeManagerService.order(it.getDomain());
                     it.requestOrder(new OrderLocation(o.getLocation()), new Challenges(o));
                     ordersService.save(it);
+                    this.prepareOrderValidation(orderId);
                 } catch (Exception e) {
                     log.error("error when requesting order for order {}", orderId);
                 }
@@ -101,7 +100,7 @@ public class AcmCertificateOrderServiceImpl implements AcmCertificateOrderServic
     }
 
     @Override
-    public void doValidation(OrdersId orderId) {
+    public void validate(OrdersId orderId) {
         Set<CertificateOrderStatus> preValidationNeededStatus = Set.of(VALIDATION_REQUESTED);
         ordersService.findOneById(orderId).ifPresent(it -> {
             if (preValidationNeededStatus.contains(it.getCertificateOrderStatus())) {
@@ -110,6 +109,9 @@ public class AcmCertificateOrderServiceImpl implements AcmCertificateOrderServic
                     CertificateOrderStatus certificateOrderStatus = doAcmValidation(it);
                     log.info("acmValidation validation is {} for domain {}", certificateOrderStatus, orderId);
                     it.validated(certificateOrderStatus);
+                    GenerateCertificateCommand command = new GenerateCertificateCommand();
+                    command.setOrdersId(orderId);
+                    commandPublisher.publish(command);
                 } else {
                     log.warn("performPreValidation validation is {} for domain {}", PRE_VALIDATED_INVALID, orderId);
                     it.validated(PRE_VALIDATED_INVALID);
@@ -122,7 +124,7 @@ public class AcmCertificateOrderServiceImpl implements AcmCertificateOrderServic
     }
 
     @Override
-    public void askValidate(OrdersId orderId, String type) {
+    public void triggerValidate(OrdersId orderId, String type) {
         if (ChallengeValidationType.valueOf(type).isAutomaticValidation()) {
             throw new UnsupportedOperationException("automatic validation not support request validate operation");
         }
@@ -133,7 +135,7 @@ public class AcmCertificateOrderServiceImpl implements AcmCertificateOrderServic
                 ValidateOrderCommand command = new ValidateOrderCommand();
                 command.setId(it.getId());
                 OrdersEntity saved = ordersService.save(it);
-                streamBridge.send("logOrderCommands-out-0", command);
+                commandPublisher.publish(command);
                 return saved;
             } else {
                 log.error("order {} not requested yet please wait we will notify you once its requested", orderId);
@@ -146,41 +148,20 @@ public class AcmCertificateOrderServiceImpl implements AcmCertificateOrderServic
     }
 
     @Override
-    public void preValidation(OrdersId orderId) {
+    public void prepareOrderValidation(OrdersId orderId) {
         Set<CertificateOrderStatus> preValidationNeededStatus = Set.of(REQUESTED);
         ordersService.findOneById(orderId).ifPresent(it -> {
             if (preValidationNeededStatus.contains(it.getCertificateOrderStatus())) {
-                if (it.getChallengeValidationType().isAutomaticValidation()) {
-                    if (TlsAlpn01Challenge.TYPE.equals(it.getChallengeValidationType().getChallenge())) {
-                        try {
-                            log.info("will generateTemporalTlsAlpn01Certificate for order {}", orderId);
-                            acmeManagerService.generate(it.getDomain(), it.getChallenges().getTlsAlpn01Challenge());
-                            it.requestValidate();
-                            ValidateOrderCommand command = new ValidateOrderCommand();
-                            command.setId(it.getId());
-                            ordersService.save(it);
-                            streamBridge.send("logOrderCommands-out-0", command);
-                        } catch (IOException | DecoderException e) {
-                            log.error("error when generateTemporalTlsAlpn01Certificate for order {}", orderId);
-                        }
-                    } else if (Http01Challenge.TYPE.equals(it.getChallengeValidationType().getChallenge())) {
-                        try {
-                            log.info("will generateTemporalHttpValidationFile for order {}", orderId);
-                            acmeManagerService.generateValidationFile(it.getChallenges().getHttp01Challenge());
-                            it.requestValidate();
-                            ValidateOrderCommand command = new ValidateOrderCommand();
-                            command.setId(it.getId());
-                            ordersService.save(it);
-                            streamBridge.send("logOrderCommands-out-0", command);
-                        } catch (Exception e) {
-                            log.error("error when generateTemporalHttpValidationFile for order {}", orderId);
-                        }
-                    } else if (Dns01Challenge.TYPE.equals(it.getChallengeValidationType().getChallenge())) {
-                        // @TODO check if we need to generate something before dns check
-                        // send mail to creator to follow steps to prove ownership
-                    } else {
-                        log.error("unknown {} challenge type for order {}", it.getChallengeValidationType().getChallenge(), it.getId());
-                    }
+                try {
+                    log.info("will prepareOrderValidation for order {}", orderId);
+                    acmeManagerService.prepareValidation(it.getDomain(), it.getChallenges().getChallenge(it.getChallengeValidationType()));
+                    it.requestValidate();
+                    ValidateOrderCommand command = new ValidateOrderCommand();
+                    command.setId(it.getId());
+                    ordersService.save(it);
+                    commandPublisher.publish(command);
+                } catch (IOException e) {
+                    log.error("error when prepareOrderValidation for order {}", orderId);
                 }
             } else {
                 log.warn("request to do generate Validation Challenge certificate for status {} and orderId {}", it.getCertificateOrderStatus(), orderId);
@@ -202,7 +183,7 @@ public class AcmCertificateOrderServiceImpl implements AcmCertificateOrderServic
                     command.setDomain(it.getDomain());
                     command.setCertificateId(it.getCertificate().getId());
                     command.setOrdersId(orderId);
-                    streamBridge.send("logOrderCommands-out-0", command);
+                    commandPublisher.publish(command);
                 } else {
                     log.error("generation failed for order {}", orderId);
                 }
@@ -214,7 +195,7 @@ public class AcmCertificateOrderServiceImpl implements AcmCertificateOrderServic
     }
 
     @Override
-    public void notifyDomainThatOrderRequested(Domain domain) {
+    public void updateDomainStatus(Domain domain) {
         DomainEntity domainEntity = domainService.findOneByDomain(domain);
         if (domainEntity != null) {
             DomainCertificateStatus newCertificateStatus = switch (domainEntity.getStatus()) {

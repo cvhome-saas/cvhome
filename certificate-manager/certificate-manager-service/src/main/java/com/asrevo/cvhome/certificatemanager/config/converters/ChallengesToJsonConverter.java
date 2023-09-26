@@ -9,10 +9,10 @@ import org.springframework.data.convert.WritingConverter;
 
 @WritingConverter
 @Slf4j
-public class MapToJsonConverter implements Converter<Challenges, String> {
+public class ChallengesToJsonConverter implements Converter<Challenges, String> {
     private final ObjectMapper objectMapper;
 
-    public MapToJsonConverter(ObjectMapper objectMapper) {
+    public ChallengesToJsonConverter(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 

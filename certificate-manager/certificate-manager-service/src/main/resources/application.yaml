@@ -19,30 +19,30 @@ spring:
   cloud:
     function:
       #      definition: ";"
-      definition: "sysEvents;logOrderEvents;logOrderCommands"
+      definition: "inSysEvents;inOrderEvents;inOrderCommands"
     stream:
       function:
         bindings:
-          sysEvents: sysEvents
-          logOrderEvents: logOrderEvents
-          logOrderCommands: logOrderCommands
+          inSysEvents: inSysEvents
+          inOrderEvents: inOrderEvents
+          inOrderCommands: inOrderCommands
       bindings:
-        sysEvents-in-0:
+        inSysEvents-in-0:
           destination: "com.asrevo.cvhome.sys-events"
           group: ${spring.application.name}
           content-type: "application/json"
-        logOrderEvents-in-0:
+        inOrderEvents-in-0:
           destination: "com.asrevo.cvhome.domain-certificate-order-events"
           group: ${spring.application.name}
           content-type: "application/json"
-        logOrderEvents-out-0:
+        outOrderEvents-out-0:
           destination: "com.asrevo.cvhome.domain-certificate-order-events"
           content-type: "application/json"
-        logOrderCommands-in-0:
+        inOrderCommands-in-0:
           destination: "com.asrevo.cvhome.domain-certificate-order-commands"
           group: ${spring.application.name}
           content-type: "application/json"
-        logOrderCommands-out-0:
+        outOrderCommands-out-0:
           destination: "com.asrevo.cvhome.domain-certificate-order-commands"
           content-type: "application/json"
       rabbit:
@@ -101,8 +101,8 @@ management:
     web:
       exposure:
         include: [ '*' ]
-  observations:
-    key-values:
+  metrics:
+    tags:
       application: ${spring.application.name}
 logging:
   level:

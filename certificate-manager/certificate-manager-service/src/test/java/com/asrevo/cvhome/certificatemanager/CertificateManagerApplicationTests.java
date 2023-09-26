@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.certificatemanager;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
@@ -10,6 +11,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 @SpringBootTest
 @Testcontainers
+@Tag("integration-test")
 class CertificateManagerApplicationTests {
     @Container
     @ServiceConnection

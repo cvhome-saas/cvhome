@@ -20,7 +20,7 @@ class TestCertificateManagerApplication {
     @Bean
     @ServiceConnection
     static RabbitMQContainer rabbitContainer() {
-        return new RabbitMQContainer(DockerImageName.parse("rabbitmq:3.12"));
+        return new RabbitMQContainer(DockerImageName.parse("rabbitmq:3.12-management"));
     }
 
     public static void main(String[] args) {

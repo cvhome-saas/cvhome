@@ -8,9 +8,6 @@ import com.asrevo.cvhome.commons.dto.DomainCreateRequestDto;
 import com.asrevo.cvhome.commons.dto.DomainCreateResponseDto;
 import com.asrevo.cvhome.commons.dto.OrdersCreateRequestDto;
 import com.asrevo.cvhome.commons.dto.OrdersCreateResponseDto;
-import org.shredzone.acme4j.exception.AcmeException;
-
-import java.io.IOException;
 
 public interface AcmCertificateOrderService {
 
@@ -20,18 +17,17 @@ public interface AcmCertificateOrderService {
 
     OrdersCreateResponseDto initiateOrder(Domain domain, ChallengeValidationType validationType);
 
-    void order(OrdersId orderId) throws AcmeException, IOException;
+    void order(OrdersId orderId);
 
-    void doValidation(OrdersId orderId);
+    void validate(OrdersId orderId);
 
-    void askValidate(OrdersId orderId, String type)
-            throws AcmeException, IOException;
+    void triggerValidate(OrdersId orderId, String type);
 
-    void preValidation(OrdersId orderId);
+    void prepareOrderValidation(OrdersId orderId);
 
     void doGeneration(OrdersId orderId);
 
-    void notifyDomainThatOrderRequested(Domain domain);
+    void updateDomainStatus(Domain domain);
 
     void addNewCertificateToDomain(Domain domain, OrdersId ordersId, CertificateId certificateId);
 }

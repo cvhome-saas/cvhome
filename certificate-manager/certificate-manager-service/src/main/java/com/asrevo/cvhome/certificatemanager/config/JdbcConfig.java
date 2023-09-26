@@ -1,7 +1,9 @@
 package com.asrevo.cvhome.certificatemanager.config;
 
-import com.asrevo.cvhome.certificatemanager.config.converters.JsonToMapConverter;
-import com.asrevo.cvhome.certificatemanager.config.converters.MapToJsonConverter;
+import com.asrevo.cvhome.certificatemanager.config.converters.ChallengesToJsonConverter;
+import com.asrevo.cvhome.certificatemanager.config.converters.EventToJsonConverter;
+import com.asrevo.cvhome.certificatemanager.config.converters.JsonToChallengesConverter;
+import com.asrevo.cvhome.certificatemanager.config.converters.JsonToEventConverter;
 import com.asrevo.cvhome.commons.domain.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
@@ -26,8 +28,10 @@ public class JdbcConfig extends AbstractJdbcConfiguration {
     @Override
     public JdbcCustomConversions jdbcCustomConversions() {
         List<Converter<?, ?>> converters = new ArrayList<>();
-        converters.add(new MapToJsonConverter(ployJson));
-        converters.add(new JsonToMapConverter(ployJson));
+        converters.add(new ChallengesToJsonConverter(ployJson));
+        converters.add(new JsonToChallengesConverter(ployJson));
+        converters.add(new EventToJsonConverter(ployJson));
+        converters.add(new JsonToEventConverter(ployJson));
         converters.add(new Converter<Identifier, String>() {
             @Override
             public String convert(Identifier source) {

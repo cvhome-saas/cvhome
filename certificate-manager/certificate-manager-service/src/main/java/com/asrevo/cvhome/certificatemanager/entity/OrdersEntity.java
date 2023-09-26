@@ -4,6 +4,7 @@ import com.asrevo.cvhome.certificatemanager.domain.DomainCertificate;
 import com.asrevo.cvhome.certificatemanager.domain.challenges.Challenge;
 import com.asrevo.cvhome.certificatemanager.domain.challenges.Challenges;
 import com.asrevo.cvhome.commons.domain.*;
+import com.asrevo.cvhome.commons.event.Event;
 import com.asrevo.cvhome.commons.event.order.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -13,6 +14,8 @@ import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static com.asrevo.cvhome.commons.domain.CertificateOrderStatus.VALIDATION_REQUESTED;
@@ -37,6 +40,8 @@ public class OrdersEntity extends BaseEntity<OrdersEntity, OrdersId> {
     private Instant generatedDate;
     @MappedCollection(idColumn = "orders_id")
     private CertificateEntity certificate;
+    @MappedCollection(idColumn = "orders_id", keyColumn = "sequence")
+    private List<OrdersEventsEntity> events;
 
     public static OrdersEntity createOrder(Domain domain, @NotNull ChallengeValidationType challengeValidationType) {
         OrdersEntity order = new OrdersEntity();
@@ -45,8 +50,14 @@ public class OrdersEntity extends BaseEntity<OrdersEntity, OrdersId> {
         order.setDomain(domain);
         order.setChallengeValidationType(challengeValidationType);
         order.setCreatedDate(Instant.now());
-        order.registerEvent(OrdersCreatedEvent.from(order.createdDate));
+        order.registerEvent(OrdersCreatedEvent.from(order.getId(), order.createdDate));
         return order;
+    }
+
+    protected void registerEvent(Event<?> event) {
+        if (events == null) events = new ArrayList<>();
+        events.add(OrdersEventsEntity.from(event));
+        super.registerEvent(event);
     }
 
     @Override
@@ -66,9 +77,9 @@ public class OrdersEntity extends BaseEntity<OrdersEntity, OrdersId> {
             if (challengeValidationType == null) {
                 throw new RuntimeException("challenges don't have any valid validation type");
             }
-            this.registerEvent(OrdersChallengeValidationTypeChangedEvent.from(domain, oldType, this.challengeValidationType));
+            this.registerEvent(OrdersChallengeValidationTypeChangedEvent.from(this.id, domain, oldType, this.challengeValidationType));
         }
-        this.registerEvent(OrdersRequestedEvent.from(this.domain, this.location, this.requestedDate));
+        this.registerEvent(OrdersRequestedEvent.from(id, this.domain, this.location, this.requestedDate));
         // @TODO check if challengeValidationType supported in order Challenges
 
     }
@@ -82,17 +93,17 @@ public class OrdersEntity extends BaseEntity<OrdersEntity, OrdersId> {
             this.certificate = CertificateEntity.createNewCertificate(certificate.getNotAfter().toInstant(), certificate.getNotBefore().toInstant(), certificate.getSerialNumber(), certificate.getVersion(), certificate.getSigAlgName(), certificate.getSigAlgOID());
         }
         this.andEvent(this.certificate);
-        this.registerEvent(OrdersCertificateGeneratedEvent.from(this.certificateOrderStatus, this.generatedDate));
+        this.registerEvent(OrdersCertificateGeneratedEvent.from(this.id, this.certificateOrderStatus, this.generatedDate));
     }
 
     public void requestValidate() {
         this.certificateOrderStatus = VALIDATION_REQUESTED;
-        this.registerEvent(OrdersValidationRequestedEvent.from());
+        this.registerEvent(OrdersValidationRequestedEvent.from(this.id));
     }
 
     public void validated(CertificateOrderStatus certificateOrderStatus) {
         this.certificateOrderStatus = certificateOrderStatus;
         this.setValidatedDate(Instant.now());
-        this.registerEvent(OrdersValidatedEvent.from(this.validatedDate, this.certificateOrderStatus));
+        this.registerEvent(OrdersValidatedEvent.from(this.id, this.validatedDate, this.certificateOrderStatus));
     }
 }

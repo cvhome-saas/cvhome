@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.List;
 import java.util.Map;
 
 @Getter
@@ -19,4 +20,8 @@ public abstract class OrdersEvent implements Event<OrdersId> {
         return Map.of();
     }
 
+    @Override
+    public List<String> getDestinations() {
+        return List.of("outOrderEvents-out-0");
+    }
 }

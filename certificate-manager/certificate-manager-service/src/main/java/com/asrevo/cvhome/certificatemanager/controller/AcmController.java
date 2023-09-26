@@ -9,14 +9,12 @@ import com.asrevo.cvhome.commons.domain.OrdersId;
 import com.asrevo.cvhome.commons.dto.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.shredzone.acme4j.exception.AcmeException;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -46,9 +44,9 @@ public class AcmController {
     }
 
     @PostMapping("validate")
-    public void validate(@RequestBody OrdersId orderId, @RequestParam(value = "type", defaultValue = "Dns01") String type) throws AcmeException, IOException {
+    public void validate(@RequestBody OrdersId orderId, @RequestParam(value = "type", defaultValue = "Dns01") String type) {
         log.info("will validate a domain challenge for {}", orderId);
-        acmCertificateOrderService.askValidate(orderId, type);
+        acmCertificateOrderService.triggerValidate(orderId, type);
     }
 
     @PostMapping("domain-certificate-file")

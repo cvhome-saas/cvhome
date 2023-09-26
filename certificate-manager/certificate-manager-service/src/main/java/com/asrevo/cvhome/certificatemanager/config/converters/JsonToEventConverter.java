@@ -1,6 +1,6 @@
 package com.asrevo.cvhome.certificatemanager.config.converters;
 
-import com.asrevo.cvhome.certificatemanager.domain.challenges.Challenges;
+import com.asrevo.cvhome.commons.event.Event;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -11,16 +11,16 @@ import java.io.IOException;
 
 @Slf4j
 @ReadingConverter
-public class JsonToMapConverter implements Converter<String, Challenges> {
+public class JsonToEventConverter implements Converter<String, Event<?>> {
 
     private final ObjectMapper objectMapper;
 
-    public JsonToMapConverter(ObjectMapper objectMapper) {
+    public JsonToEventConverter(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 
     @Override
-    public Challenges convert(String json) {
+    public Event<?> convert(String json) {
         try {
             return objectMapper.readValue(json, new TypeReference<>() {
             });

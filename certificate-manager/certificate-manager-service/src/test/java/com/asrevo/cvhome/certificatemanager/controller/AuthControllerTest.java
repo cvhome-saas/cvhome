@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.certificatemanager.controller;
 
 import com.asrevo.cvhome.certificatemanager.config.SecurityConfig;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
@@ -13,6 +14,7 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 @WebFluxTest(AuthController.class)
 @Import(SecurityConfig.class)
 @Testcontainers
+@Tag("unit-test")
 class AuthControllerTest {
     @Autowired
     WebTestClient client;
