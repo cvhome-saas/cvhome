@@ -12,7 +12,7 @@ public class DefaultEventPublisher implements EventPublisher {
     }
 
     @Override
-    public <T extends Event<?>> void publish(T event) {
+    public <T extends Event> void publish(T event) {
         List<String> destinations = this.getEventDestinations(event);
         if (destinations != null && !destinations.isEmpty()) {
             destinations.forEach(it -> this.streamBridge.send(it, event));
@@ -20,7 +20,7 @@ public class DefaultEventPublisher implements EventPublisher {
     }
 
     @Override
-    public <T extends Event<?>> List<String> getEventDestinations(T event) {
+    public <T extends Event> List<String> getEventDestinations(T event) {
         return event.getDestinations();
     }
 }

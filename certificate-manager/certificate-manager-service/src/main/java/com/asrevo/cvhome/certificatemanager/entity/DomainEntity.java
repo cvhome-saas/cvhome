@@ -40,7 +40,7 @@ public class DomainEntity extends BaseEntity<DomainEntity, DomainId> {
         entity.setAutoRenew(autoRenew);
         entity.setAutoOrder(autoOrder);
         entity.setStatus(DomainCertificateStatus.INITIATED);
-        entity.registerEvent(DomainRegisteredEvent.from(domain, autoRenew, autoOrder));
+        entity.registerEvent(DomainRegisteredEvent.from(entity.getId(), domain, autoRenew, autoOrder));
         return entity;
     }
 

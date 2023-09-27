@@ -1,23 +1,24 @@
 package com.asrevo.cvhome.certificatemanager.config.converters;
 
-import com.asrevo.cvhome.commons.event.Event;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.WritingConverter;
 
+import java.util.Map;
+
 @WritingConverter
 @Slf4j
-public class EventToJsonConverter implements Converter<Event, String> {
+public class MapToJsonConverter implements Converter<Map<String, String>, String> {
     private final ObjectMapper objectMapper;
 
-    public EventToJsonConverter(ObjectMapper objectMapper) {
+    public MapToJsonConverter(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 
     @Override
-    public String convert(Event source) {
+    public String convert(Map<String, String> source) {
         try {
             return objectMapper.writeValueAsString(source);
         } catch (JsonProcessingException e) {

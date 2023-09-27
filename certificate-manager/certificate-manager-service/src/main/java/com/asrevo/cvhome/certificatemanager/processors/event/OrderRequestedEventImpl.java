@@ -15,7 +15,7 @@ public class OrderRequestedEventImpl implements EventImpl<OrdersRequestedEvent> 
 
     @Override
     public void process(OrdersRequestedEvent order) {
-        acmCertificateOrderService.updateDomainStatus(order.getDomain());
+        acmCertificateOrderService.updateDomainStatus(order.domain());
     }
 
     @Override

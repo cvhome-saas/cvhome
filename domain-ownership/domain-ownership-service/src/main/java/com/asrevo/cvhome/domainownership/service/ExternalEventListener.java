@@ -1,6 +1,6 @@
 package com.asrevo.cvhome.domainownership.service;
 
-import com.asrevo.cvhome.commons.event.SimpleEvent;
+import com.asrevo.cvhome.commons.event.Event;
 import org.springframework.context.annotation.Bean;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
@@ -25,7 +25,7 @@ public class ExternalEventListener {
     }
 
     @Bean
-    public Consumer<SimpleEvent> logOrderEvents() {
+    public Consumer<Event> logOrderEvents() {
         return event -> {
             System.out.println("Received: order event: " + event.eventType());
         };

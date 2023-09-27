@@ -5,19 +5,19 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class DefaultEventProcessor implements EventProcessor {
-    private final List<EventImpl<Event<?>>> eventsImpl;
+    private final List<EventImpl<Event>> eventsImpl;
 
-    public DefaultEventProcessor(List<EventImpl<Event<?>>> eventsImpl) {
+    public DefaultEventProcessor(List<EventImpl<Event>> eventsImpl) {
         this.eventsImpl = eventsImpl;
     }
 
     @Override
-    public void process(Event<?> event) {
+    public void process(Event event) {
         getProcessors(event.getClass()).forEach(it -> it.process(event));
     }
 
     @Override
-    public List<EventImpl<Event<?>>> getProcessors(Event<?> event) {
+    public List<EventImpl<Event>> getProcessors(Event event) {
         if (event == null) {
             return List.of();
         }
@@ -25,7 +25,7 @@ public class DefaultEventProcessor implements EventProcessor {
     }
 
     @Override
-    public List<EventImpl<Event<?>>> getProcessors(Class<? extends Event> tClass) {
+    public List<EventImpl<Event>> getProcessors(Class<? extends Event> tClass) {
         // @formatter:off
         return eventsImpl.stream()
                 .filter(it -> it.type().equals(tClass.getName()))
@@ -36,7 +36,7 @@ public class DefaultEventProcessor implements EventProcessor {
 
 
     @Override
-    public List<EventImpl<Event<?>>> getAllProcessors() {
+    public List<EventImpl<Event>> getAllProcessors() {
         return eventsImpl;
     }
 

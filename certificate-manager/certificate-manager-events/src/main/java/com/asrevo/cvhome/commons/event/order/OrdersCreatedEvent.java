@@ -1,21 +1,22 @@
 package com.asrevo.cvhome.commons.event.order;
 
 import com.asrevo.cvhome.commons.domain.OrdersId;
-import lombok.Getter;
-import lombok.Setter;
+import com.asrevo.cvhome.commons.event.EventId;
 
 import java.time.Instant;
+import java.util.Map;
 
-@Getter
-@Setter
-public class OrdersCreatedEvent extends OrdersEvent {
-    private Instant createdDate;
+public record OrdersCreatedEvent(EventId eventId, OrdersId ordersId, String eventType,
+                                 Map<String, String> data) implements OrdersEvent {
+    public final static String CREATED_DATE_KEY = "createdDate";
 
-    public static OrdersCreatedEvent from(OrdersId id, Instant createdDate) {
-        OrdersCreatedEvent event = new OrdersCreatedEvent();
-        event.setId(id);
-        event.setCreatedDate(createdDate);
-        return event;
+
+    public static OrdersCreatedEvent from(OrdersId ordersId, Instant createdDate) {
+        return new OrdersCreatedEvent(EventId.newId(), ordersId, "OrderCreatedEvent", Map.of(CREATED_DATE_KEY, createdDate.toString()));
+    }
+
+    Instant createdDate() {
+        return Instant.parse(this.data.get(CREATED_DATE_KEY));
     }
 
     @Override

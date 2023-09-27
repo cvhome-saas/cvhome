@@ -31,6 +31,7 @@ public interface AcmeManagerService {
             throws IOException, DecoderException;
 
     void prepareValidation(Domain domain, Challenge challenge) throws IOException;
+
     void generateValidationFile(Http01Challenge challenge) throws IOException;
 
     InputStream getHttpValidationFile(HttpValidationToken token);

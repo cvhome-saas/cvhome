@@ -4,7 +4,6 @@ import com.asrevo.cvhome.certificatemanager.domain.DomainCertificate;
 import com.asrevo.cvhome.certificatemanager.domain.challenges.Challenge;
 import com.asrevo.cvhome.certificatemanager.domain.challenges.Challenges;
 import com.asrevo.cvhome.commons.domain.*;
-import com.asrevo.cvhome.commons.event.Event;
 import com.asrevo.cvhome.commons.event.order.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -54,7 +53,7 @@ public class OrdersEntity extends BaseEntity<OrdersEntity, OrdersId> {
         return order;
     }
 
-    protected void registerEvent(Event<?> event) {
+    protected void registerEvent(OrdersEvent event) {
         if (events == null) events = new ArrayList<>();
         events.add(OrdersEventsEntity.from(event));
         super.registerEvent(event);

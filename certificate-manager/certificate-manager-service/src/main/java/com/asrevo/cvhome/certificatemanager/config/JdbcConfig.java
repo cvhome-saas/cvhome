@@ -1,11 +1,10 @@
 package com.asrevo.cvhome.certificatemanager.config;
 
-import com.asrevo.cvhome.certificatemanager.config.converters.ChallengesToJsonConverter;
-import com.asrevo.cvhome.certificatemanager.config.converters.EventToJsonConverter;
-import com.asrevo.cvhome.certificatemanager.config.converters.JsonToChallengesConverter;
-import com.asrevo.cvhome.certificatemanager.config.converters.JsonToEventConverter;
+import com.asrevo.cvhome.certificatemanager.config.converters.*;
 import com.asrevo.cvhome.commons.domain.*;
+import com.asrevo.cvhome.commons.event.EventId;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
@@ -20,6 +19,8 @@ import java.util.List;
 public class JdbcConfig extends AbstractJdbcConfiguration {
 
     private final ObjectMapper ployJson;
+    @Autowired
+    private ObjectMapper mapper;
 
     public JdbcConfig() {
         this.ployJson = JacksonConfig.getPloyJson();
@@ -30,6 +31,8 @@ public class JdbcConfig extends AbstractJdbcConfiguration {
         List<Converter<?, ?>> converters = new ArrayList<>();
         converters.add(new ChallengesToJsonConverter(ployJson));
         converters.add(new JsonToChallengesConverter(ployJson));
+        converters.add(new MapToJsonConverter(mapper));
+        converters.add(new JsonToMapConverter(mapper));
         converters.add(new EventToJsonConverter(ployJson));
         converters.add(new JsonToEventConverter(ployJson));
         converters.add(new Converter<Identifier, String>() {
@@ -54,6 +57,12 @@ public class JdbcConfig extends AbstractJdbcConfiguration {
             @Override
             public OrdersId convert(String source) {
                 return new OrdersId(source);
+            }
+        });
+        converters.add(new Converter<String, EventId>() {
+            @Override
+            public EventId convert(String source) {
+                return new EventId(source);
             }
         });
 

@@ -12,7 +12,7 @@ public class EventProcessorConfig {
 
     @Bean
     public EventProcessor eventProcessor(List<EventImpl<?>> eventsImpl) {
-        return new DefaultEventProcessor(eventsImpl.stream().map(it -> (EventImpl<Event<?>>) it).toList());
+        return new DefaultEventProcessor(eventsImpl.stream().map(it -> (EventImpl<Event>) it).toList());
     }
 
     @Bean

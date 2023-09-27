@@ -55,13 +55,13 @@ CREATE TABLE IF NOT EXISTS domain_orders_ref
     constraint domain_orders_ref_orders_id_fk foreign key (orders_id) references orders
 );
 
-CREATE TABLE IF NOT EXISTS orders_events
+CREATE TABLE IF NOT EXISTS orders_event
 (
-    id         varchar(24) not null,
+    event_id varchar(24) not null,
     event_type varchar(50) not null,
-    event      varchar(1500),
+    data     varchar(1500),
     orders_id  varchar(24) not null,
     sequence   varchar(5)  not null,
-    constraint orders_events_pk primary key (id),
-    constraint orders_events_orders_fk foreign key (orders_id) references orders
+    constraint orders_event_pk primary key (event_id),
+    constraint orders_event_orders_fk foreign key (orders_id) references orders
 );

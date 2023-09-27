@@ -38,7 +38,7 @@ public class ExternalEventListener {
     @Bean
     public Consumer<Message<OrdersEvent>> inOrderEvents() {
         return event -> {
-            System.out.println("Received: order event: " + event.getPayload().eventType() + "       " + event.getPayload().getId());
+            System.out.println("Received: order event: " + event.getPayload().eventType() + "       " + event.getPayload().ordersId());
             try {
                 eventProcessor.process(event.getPayload());
             } catch (Exception e) {
@@ -54,6 +54,7 @@ public class ExternalEventListener {
             try {
                 commandProcessor.process(event.getPayload());
             } catch (Exception e) {
+                e.printStackTrace();
                 log.error("error processing " + event.getPayload());
             }
         };

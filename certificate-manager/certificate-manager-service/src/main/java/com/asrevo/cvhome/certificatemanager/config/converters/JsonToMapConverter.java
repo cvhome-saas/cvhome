@@ -1,6 +1,5 @@
 package com.asrevo.cvhome.certificatemanager.config.converters;
 
-import com.asrevo.cvhome.commons.event.Event;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -8,19 +7,20 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.ReadingConverter;
 
 import java.io.IOException;
+import java.util.Map;
 
 @Slf4j
 @ReadingConverter
-public class JsonToEventConverter implements Converter<String, Event> {
+public class JsonToMapConverter implements Converter<String, Map<String, String>> {
 
     private final ObjectMapper objectMapper;
 
-    public JsonToEventConverter(ObjectMapper objectMapper) {
+    public JsonToMapConverter(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 
     @Override
-    public Event convert(String json) {
+    public Map<String, String> convert(String json) {
         try {
             return objectMapper.readValue(json, new TypeReference<>() {
             });

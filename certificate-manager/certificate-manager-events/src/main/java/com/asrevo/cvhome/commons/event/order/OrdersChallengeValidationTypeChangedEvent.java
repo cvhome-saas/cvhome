@@ -3,23 +3,32 @@ package com.asrevo.cvhome.commons.event.order;
 import com.asrevo.cvhome.commons.domain.ChallengeValidationType;
 import com.asrevo.cvhome.commons.domain.Domain;
 import com.asrevo.cvhome.commons.domain.OrdersId;
-import lombok.Getter;
-import lombok.Setter;
+import com.asrevo.cvhome.commons.event.EventId;
 
-@Getter
-@Setter
-public class OrdersChallengeValidationTypeChangedEvent extends OrdersEvent {
-    private Domain domain;
-    private ChallengeValidationType oldType;
-    private ChallengeValidationType newType;
+import java.util.Map;
 
-    public static OrdersChallengeValidationTypeChangedEvent from(OrdersId id, Domain domain, ChallengeValidationType oldType, ChallengeValidationType newType) {
-        OrdersChallengeValidationTypeChangedEvent event = new OrdersChallengeValidationTypeChangedEvent();
-        event.setId(id);
-        event.setDomain(domain);
-        event.setOldType(oldType);
-        event.setNewType(newType);
-        return event;
+public record OrdersChallengeValidationTypeChangedEvent(EventId eventId, OrdersId ordersId, String eventType,
+                                                        Map<String, String> data) implements OrdersEvent {
+    private final static String DOMAIN_KEY = "domain";
+    private final static String OLD_TYPE_KEY = "oldType";
+    private final static String NEW_TYPE_KEY = "newType";
+
+
+    public static OrdersChallengeValidationTypeChangedEvent from(OrdersId ordersId, Domain domain, ChallengeValidationType oldType, ChallengeValidationType newType) {
+        return new OrdersChallengeValidationTypeChangedEvent(EventId.newId(), ordersId, "OrderChallengeValidationTypeChangedEvent", Map.of(DOMAIN_KEY, domain.domain(), OLD_TYPE_KEY, oldType.name(), NEW_TYPE_KEY, newType.name()));
+    }
+
+    public Domain domain() {
+        return new Domain(this.data.get(DOMAIN_KEY));
+    }
+
+    public ChallengeValidationType oldType() {
+        return ChallengeValidationType.valueOf(this.data.get(OLD_TYPE_KEY));
+
+    }
+
+    public ChallengeValidationType newType() {
+        return ChallengeValidationType.valueOf(this.data.get(NEW_TYPE_KEY));
     }
 
     @Override
