@@ -1,6 +1,6 @@
 package com.asrevo.cvhome.certificatemanager.domain.challenges;
 
-import com.asrevo.cvhome.commons.domain.ChallengeValidationType;
+import com.asrevo.cvhome.certificatemanager.commons.domain.ChallengeValidationType;
 
 public interface Challenge {
     String key();

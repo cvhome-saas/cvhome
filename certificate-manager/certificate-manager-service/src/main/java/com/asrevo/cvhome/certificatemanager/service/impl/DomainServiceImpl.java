@@ -1,9 +1,9 @@
 package com.asrevo.cvhome.certificatemanager.service.impl;
 
+import com.asrevo.cvhome.certificatemanager.commons.domain.Domain;
 import com.asrevo.cvhome.certificatemanager.entity.DomainEntity;
 import com.asrevo.cvhome.certificatemanager.repository.DomainRepository;
 import com.asrevo.cvhome.certificatemanager.service.DomainService;
-import com.asrevo.cvhome.commons.domain.Domain;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 

@@ -19,13 +19,14 @@ spring:
   cloud:
     function:
       #      definition: ";"
-      definition: "inSysEvents;inOrderEvents;inOrderCommands"
+      definition: "inSysEvents;inOrderEvents;inOrderCommands;inDomainCommands"
     stream:
       function:
         bindings:
           inSysEvents: inSysEvents
           inOrderEvents: inOrderEvents
           inOrderCommands: inOrderCommands
+          inDomainCommands: inDomainCommands
       bindings:
         inSysEvents-in-0:
           destination: "com.asrevo.cvhome.sys-events"
@@ -42,12 +43,16 @@ spring:
           destination: "com.asrevo.cvhome.domain-certificate-order-commands"
           group: ${spring.application.name}
           content-type: "application/json"
+        inDomainCommands-in-0:
+          destination: "com.asrevo.cvhome.domain-certificate-domain-commands"
+          group: ${spring.application.name}
+          content-type: "application/json"
         outOrderCommands-out-0:
           destination: "com.asrevo.cvhome.domain-certificate-order-commands"
           content-type: "application/json"
       rabbit:
         bindings:
-          sysEvents:
+          inSysEvents:
             consumer:
               declare-exchange: false
               exchangeType: topic

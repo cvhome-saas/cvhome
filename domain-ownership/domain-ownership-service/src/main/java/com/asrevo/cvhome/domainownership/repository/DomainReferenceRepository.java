@@ -1,14 +1,6 @@
 package com.asrevo.cvhome.domainownership.repository;
 
-import com.asrevo.cvhome.domainownership.domain.DomainReference;
-import com.asrevo.cvhome.domainownership.domain.DomainType;
-import org.springframework.data.r2dbc.repository.Modifying;
-import org.springframework.data.r2dbc.repository.Query;
-import org.springframework.data.repository.reactive.ReactiveCrudRepository;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-
-public interface DomainReferenceRepository extends ReactiveCrudRepository<DomainReference, Long> {
+public interface DomainReferenceRepository /*extends ReactiveCrudRepository<DomainReference, Long> {
 
     Mono<DomainReference> findOneByDomain(String domain);
 
@@ -18,4 +10,6 @@ public interface DomainReferenceRepository extends ReactiveCrudRepository<Domain
     @Modifying
     @Query("update domain_reference set external_acm_order_id = :externalAcmOrderId where id= :domainId")
     Mono<Long> updateExternalAcmOrderId(Long domainId, Long externalAcmOrderId);
+}
+*/ {
 }

@@ -1,8 +1,8 @@
 package com.asrevo.cvhome.certificatemanager.processors.event;
 
+import com.asrevo.cvhome.certificatemanager.commons.event.order.OrdersRequestedEvent;
 import com.asrevo.cvhome.certificatemanager.service.AcmCertificateOrderService;
 import com.asrevo.cvhome.commons.event.EventImpl;
-import com.asrevo.cvhome.commons.event.order.OrdersRequestedEvent;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

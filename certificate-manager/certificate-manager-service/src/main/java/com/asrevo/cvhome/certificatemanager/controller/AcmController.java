@@ -1,12 +1,12 @@
 package com.asrevo.cvhome.certificatemanager.controller;
 
+import com.asrevo.cvhome.certificatemanager.commons.domain.CertificateFileType;
+import com.asrevo.cvhome.certificatemanager.commons.domain.Domain;
+import com.asrevo.cvhome.certificatemanager.commons.domain.OrdersId;
+import com.asrevo.cvhome.certificatemanager.commons.dto.*;
 import com.asrevo.cvhome.certificatemanager.service.AcmCertificateOrderService;
 import com.asrevo.cvhome.certificatemanager.service.AcmeManagerService;
 import com.asrevo.cvhome.certificatemanager.service.OrdersService;
-import com.asrevo.cvhome.commons.domain.CertificateFileType;
-import com.asrevo.cvhome.commons.domain.Domain;
-import com.asrevo.cvhome.commons.domain.OrdersId;
-import com.asrevo.cvhome.commons.dto.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.InputStreamResource;

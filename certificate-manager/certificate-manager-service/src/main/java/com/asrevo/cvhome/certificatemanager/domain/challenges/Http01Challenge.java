@@ -1,10 +1,10 @@
 package com.asrevo.cvhome.certificatemanager.domain.challenges;
 
-import com.asrevo.cvhome.commons.domain.ChallengeValidationType;
+import com.asrevo.cvhome.certificatemanager.commons.domain.ChallengeValidationType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.Transient;
 
-import static com.asrevo.cvhome.commons.utils.Utils.encode64;
+import static com.asrevo.cvhome.certificatemanager.commons.utils.Utils.encode64;
 
 public record Http01Challenge(String key, String value) implements Challenge {
 

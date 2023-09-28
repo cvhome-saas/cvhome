@@ -1,13 +1,13 @@
 package com.asrevo.cvhome.certificatemanager.service;
 
+import com.asrevo.cvhome.certificatemanager.commons.domain.CertificateFileType;
+import com.asrevo.cvhome.certificatemanager.commons.domain.Domain;
+import com.asrevo.cvhome.certificatemanager.commons.domain.OrderLocation;
 import com.asrevo.cvhome.certificatemanager.domain.DomainCertificate;
 import com.asrevo.cvhome.certificatemanager.domain.HttpValidationToken;
 import com.asrevo.cvhome.certificatemanager.domain.challenges.Challenge;
 import com.asrevo.cvhome.certificatemanager.domain.challenges.Http01Challenge;
 import com.asrevo.cvhome.certificatemanager.domain.challenges.TlsAlpn01Challenge;
-import com.asrevo.cvhome.commons.domain.CertificateFileType;
-import com.asrevo.cvhome.commons.domain.Domain;
-import com.asrevo.cvhome.commons.domain.OrderLocation;
 import org.apache.commons.codec.DecoderException;
 import org.shredzone.acme4j.Order;
 import org.shredzone.acme4j.Status;

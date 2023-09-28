@@ -48,13 +48,16 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
-    implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
+//    implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc'
     runtimeOnly 'org.postgresql:postgresql'
-    runtimeOnly 'org.postgresql:r2dbc-postgresql'
+//    runtimeOnly 'org.postgresql:r2dbc-postgresql'
 
     implementation 'org.shredzone.acme4j:acme4j-client:2.15'
     implementation 'org.shredzone.acme4j:acme4j-utils:2.15'
 
+    implementation project(':domain-ownership:domain-ownership-commons')
+    implementation project(':domain-ownership:domain-ownership-events')
     implementation project(':certificate-manager:certificate-manager-events')
 //    developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
     compileOnly 'org.projectlombok:lombok'
@@ -66,7 +69,7 @@ dependencies {
     testImplementation 'io.projectreactor:reactor-test'
     testImplementation 'org.testcontainers:junit-jupiter'
     testImplementation 'org.testcontainers:postgresql'
-    testImplementation 'org.testcontainers:r2dbc'
+//    testImplementation 'org.testcontainers:r2dbc'
     testImplementation 'org.testcontainers:rabbitmq'
 }
 

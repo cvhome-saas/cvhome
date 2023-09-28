@@ -1,10 +1,11 @@
 package com.asrevo.cvhome.certificatemanager.entity;
 
+import com.asrevo.cvhome.certificatemanager.commons.domain.*;
+import com.asrevo.cvhome.certificatemanager.commons.event.order.*;
 import com.asrevo.cvhome.certificatemanager.domain.DomainCertificate;
 import com.asrevo.cvhome.certificatemanager.domain.challenges.Challenge;
 import com.asrevo.cvhome.certificatemanager.domain.challenges.Challenges;
-import com.asrevo.cvhome.commons.domain.*;
-import com.asrevo.cvhome.commons.event.order.*;
+import com.asrevo.cvhome.commons.domain.BaseEntity;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static com.asrevo.cvhome.commons.domain.CertificateOrderStatus.VALIDATION_REQUESTED;
+import static com.asrevo.cvhome.certificatemanager.commons.domain.CertificateOrderStatus.VALIDATION_REQUESTED;
 import static org.springframework.data.relational.core.mapping.Embedded.OnEmpty.USE_NULL;
 
 @Getter

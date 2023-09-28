@@ -1,8 +1,8 @@
 package com.asrevo.cvhome.certificatemanager.jobs;
 
+import com.asrevo.cvhome.certificatemanager.commons.domain.CertificateOrderStatus;
 import com.asrevo.cvhome.certificatemanager.entity.OrdersEntity;
 import com.asrevo.cvhome.certificatemanager.service.OrdersService;
-import com.asrevo.cvhome.commons.domain.CertificateOrderStatus;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -12,8 +12,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Set;
 
-import static com.asrevo.cvhome.commons.domain.CertificateOrderStatus.INITIATED;
-import static com.asrevo.cvhome.commons.domain.CertificateOrderStatus.PRE_VALIDATED_INVALID;
+import static com.asrevo.cvhome.certificatemanager.commons.domain.CertificateOrderStatus.INITIATED;
+import static com.asrevo.cvhome.certificatemanager.commons.domain.CertificateOrderStatus.PRE_VALIDATED_INVALID;
 
 @Component
 @AllArgsConstructor

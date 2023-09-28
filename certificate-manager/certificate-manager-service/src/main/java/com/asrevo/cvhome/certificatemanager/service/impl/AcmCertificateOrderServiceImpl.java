@@ -1,5 +1,11 @@
 package com.asrevo.cvhome.certificatemanager.service.impl;
 
+import com.asrevo.cvhome.certificatemanager.commons.command.order.*;
+import com.asrevo.cvhome.certificatemanager.commons.domain.*;
+import com.asrevo.cvhome.certificatemanager.commons.dto.DomainCreateRequestDto;
+import com.asrevo.cvhome.certificatemanager.commons.dto.DomainCreateResponseDto;
+import com.asrevo.cvhome.certificatemanager.commons.dto.OrdersCreateRequestDto;
+import com.asrevo.cvhome.certificatemanager.commons.dto.OrdersCreateResponseDto;
 import com.asrevo.cvhome.certificatemanager.domain.DomainCertificate;
 import com.asrevo.cvhome.certificatemanager.domain.challenges.Challenges;
 import com.asrevo.cvhome.certificatemanager.entity.DomainEntity;
@@ -11,12 +17,6 @@ import com.asrevo.cvhome.certificatemanager.service.AcmeManagerService;
 import com.asrevo.cvhome.certificatemanager.service.DomainService;
 import com.asrevo.cvhome.certificatemanager.service.OrdersService;
 import com.asrevo.cvhome.commons.command.CommandPublisher;
-import com.asrevo.cvhome.commons.command.order.*;
-import com.asrevo.cvhome.commons.domain.*;
-import com.asrevo.cvhome.commons.dto.DomainCreateRequestDto;
-import com.asrevo.cvhome.commons.dto.DomainCreateResponseDto;
-import com.asrevo.cvhome.commons.dto.OrdersCreateRequestDto;
-import com.asrevo.cvhome.commons.dto.OrdersCreateResponseDto;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.shredzone.acme4j.Order;
@@ -27,8 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.Set;
-
-import static com.asrevo.cvhome.commons.domain.CertificateOrderStatus.*;
 
 @Service
 @Lazy
@@ -50,9 +48,14 @@ public class AcmCertificateOrderServiceImpl implements AcmCertificateOrderServic
 
     @Override
     public DomainCreateResponseDto register(DomainCreateRequestDto createRequest) {
-        DomainEntity domain = DomainEntity.createDomain(createRequest.getDomain(), createRequest.isAutoRenew(), createRequest.isAutoOrder());
-        DomainEntity savedDomain = domainService.save(domain);
-        if (domain.isAutoOrder()) {
+        return this.register(createRequest.getDomain(), createRequest.isAutoRenew(), createRequest.isAutoOrder());
+    }
+
+    @Override
+    public DomainCreateResponseDto register(Domain domain, boolean autoRenew, boolean autoOrder) {
+        DomainEntity entity = DomainEntity.createDomain(domain, autoRenew, autoOrder);
+        DomainEntity savedDomain = domainService.save(entity);
+        if (entity.isAutoOrder()) {
             CreateOrderCommand command = new CreateOrderCommand();
             command.setDomain(savedDomain.getDomain());
             commandPublisher.publish(command);
@@ -82,7 +85,7 @@ public class AcmCertificateOrderServiceImpl implements AcmCertificateOrderServic
     @Transactional
     @Override
     public void order(OrdersId orderId) {
-        Set<CertificateOrderStatus> preOrderNeededStatus = Set.of(INITIATED);
+        Set<CertificateOrderStatus> preOrderNeededStatus = Set.of(CertificateOrderStatus.INITIATED);
         ordersService.findOneById(orderId).ifPresent(it -> {
             if (preOrderNeededStatus.contains(it.getCertificateOrderStatus())) {
                 try {
@@ -101,7 +104,7 @@ public class AcmCertificateOrderServiceImpl implements AcmCertificateOrderServic
 
     @Override
     public void validate(OrdersId orderId) {
-        Set<CertificateOrderStatus> preValidationNeededStatus = Set.of(VALIDATION_REQUESTED);
+        Set<CertificateOrderStatus> preValidationNeededStatus = Set.of(CertificateOrderStatus.VALIDATION_REQUESTED);
         ordersService.findOneById(orderId).ifPresent(it -> {
             if (preValidationNeededStatus.contains(it.getCertificateOrderStatus())) {
                 boolean isValid = it.getChallenges().validate(it.getChallengeValidationType());
@@ -113,8 +116,8 @@ public class AcmCertificateOrderServiceImpl implements AcmCertificateOrderServic
                     command.setOrdersId(orderId);
                     commandPublisher.publish(command);
                 } else {
-                    log.warn("performPreValidation validation is {} for domain {}", PRE_VALIDATED_INVALID, orderId);
-                    it.validated(PRE_VALIDATED_INVALID);
+                    log.warn("performPreValidation validation is {} for domain {}", CertificateOrderStatus.PRE_VALIDATED_INVALID, orderId);
+                    it.validated(CertificateOrderStatus.PRE_VALIDATED_INVALID);
                 }
                 ordersService.save(it);
             } else {
@@ -128,7 +131,7 @@ public class AcmCertificateOrderServiceImpl implements AcmCertificateOrderServic
         if (ChallengeValidationType.valueOf(type).isAutomaticValidation()) {
             throw new UnsupportedOperationException("automatic validation not support request validate operation");
         }
-        Set<CertificateOrderStatus> preAskValidateNeededStatus = Set.of(REQUESTED, PRE_VALIDATED_INVALID);
+        Set<CertificateOrderStatus> preAskValidateNeededStatus = Set.of(CertificateOrderStatus.REQUESTED, CertificateOrderStatus.PRE_VALIDATED_INVALID);
         ordersService.findOneById(orderId).map(it -> {
             if (preAskValidateNeededStatus.contains(it.getCertificateOrderStatus())) {
                 it.requestValidate();
@@ -149,7 +152,7 @@ public class AcmCertificateOrderServiceImpl implements AcmCertificateOrderServic
 
     @Override
     public void prepareOrderValidation(OrdersId orderId) {
-        Set<CertificateOrderStatus> preValidationNeededStatus = Set.of(REQUESTED);
+        Set<CertificateOrderStatus> preValidationNeededStatus = Set.of(CertificateOrderStatus.REQUESTED);
         ordersService.findOneById(orderId).ifPresent(it -> {
             if (preValidationNeededStatus.contains(it.getCertificateOrderStatus())) {
                 try {
@@ -172,13 +175,13 @@ public class AcmCertificateOrderServiceImpl implements AcmCertificateOrderServic
 
     @Override
     public void doGeneration(OrdersId orderId) {
-        Set<CertificateOrderStatus> preGenerationNeededStatus = Set.of(VALIDATED_VALID);
+        Set<CertificateOrderStatus> preGenerationNeededStatus = Set.of(CertificateOrderStatus.VALIDATED_VALID);
         ordersService.findOneById(orderId).ifPresent(it -> {
             if (preGenerationNeededStatus.contains(it.getCertificateOrderStatus())) {
                 log.info("will generate acm certificate for order {}", orderId);
                 it.generateOrderCertificate(doAcmGeneration(it));
                 ordersService.save(it);
-                if (GENERATED.equals(it.getCertificateOrderStatus())) {
+                if (CertificateOrderStatus.GENERATED.equals(it.getCertificateOrderStatus())) {
                     AddCertificateToDomainCommand command = new AddCertificateToDomainCommand();
                     command.setDomain(it.getDomain());
                     command.setCertificateId(it.getCertificate().getId());

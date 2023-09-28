@@ -1,7 +1,11 @@
 package com.asrevo.cvhome.certificatemanager.config;
 
+import com.asrevo.cvhome.certificatemanager.commons.domain.CertificateId;
+import com.asrevo.cvhome.certificatemanager.commons.domain.DomainId;
+import com.asrevo.cvhome.certificatemanager.commons.domain.OrdersId;
 import com.asrevo.cvhome.certificatemanager.config.converters.*;
-import com.asrevo.cvhome.commons.domain.*;
+import com.asrevo.cvhome.commons.domain.BaseEntity;
+import com.asrevo.cvhome.commons.domain.Identifier;
 import com.asrevo.cvhome.commons.event.EventId;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;

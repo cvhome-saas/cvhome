@@ -1,8 +1,8 @@
 package com.asrevo.cvhome.certificatemanager.entity;
 
+import com.asrevo.cvhome.certificatemanager.commons.event.order.OrdersEvent;
 import com.asrevo.cvhome.commons.event.Event;
 import com.asrevo.cvhome.commons.event.EventId;
-import com.asrevo.cvhome.commons.event.order.OrdersEvent;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 

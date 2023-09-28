@@ -1,6 +1,6 @@
 package com.asrevo.cvhome.certificatemanager.entity;
 
-import com.asrevo.cvhome.commons.domain.OrdersId;
+import com.asrevo.cvhome.certificatemanager.commons.domain.OrdersId;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;

@@ -1,6 +1,6 @@
 package com.asrevo.cvhome.certificatemanager.domain.challenges;
 
-import com.asrevo.cvhome.commons.domain.ChallengeValidationType;
+import com.asrevo.cvhome.certificatemanager.commons.domain.ChallengeValidationType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.shredzone.acme4j.Authorization;
 import org.shredzone.acme4j.Order;
@@ -12,7 +12,6 @@ import org.springframework.data.annotation.Transient;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.asrevo.cvhome.commons.domain.ChallengeValidationType.*;
 import static org.apache.commons.codec.binary.Hex.encodeHexString;
 
 public record Challenges(List<Challenge> challenges) {
@@ -54,19 +53,19 @@ public record Challenges(List<Challenge> challenges) {
     @Transient
     @JsonIgnore
     public com.asrevo.cvhome.certificatemanager.domain.challenges.Dns01Challenge getDns01Challenge() {
-        return (com.asrevo.cvhome.certificatemanager.domain.challenges.Dns01Challenge) getChallenge(Dns01);
+        return (com.asrevo.cvhome.certificatemanager.domain.challenges.Dns01Challenge) getChallenge(ChallengeValidationType.Dns01);
     }
 
     @Transient
     @JsonIgnore
     public com.asrevo.cvhome.certificatemanager.domain.challenges.Http01Challenge getHttp01Challenge() {
-        return (com.asrevo.cvhome.certificatemanager.domain.challenges.Http01Challenge) getChallenge(Http01);
+        return (com.asrevo.cvhome.certificatemanager.domain.challenges.Http01Challenge) getChallenge(ChallengeValidationType.Http01);
     }
 
     @Transient
     @JsonIgnore
     public com.asrevo.cvhome.certificatemanager.domain.challenges.TlsAlpn01Challenge getTlsAlpn01Challenge() {
-        return (com.asrevo.cvhome.certificatemanager.domain.challenges.TlsAlpn01Challenge) getChallenge(TlsAlpn01);
+        return (com.asrevo.cvhome.certificatemanager.domain.challenges.TlsAlpn01Challenge) getChallenge(ChallengeValidationType.TlsAlpn01);
     }
 
     @Transient

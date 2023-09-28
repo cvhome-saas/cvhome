@@ -1,24 +1,15 @@
 package com.asrevo.cvhome.domainownership.service.Impl;
 
-import com.asrevo.cvhome.domainownership.domain.DomainReference;
-import com.asrevo.cvhome.domainownership.domain.DomainStatus;
-import com.asrevo.cvhome.domainownership.domain.DomainType;
-import com.asrevo.cvhome.domainownership.repository.DomainReferenceRepository;
 import com.asrevo.cvhome.domainownership.service.DomainReferenceService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-
-import java.time.Instant;
 
 @Service
 @Slf4j
 @AllArgsConstructor
 public class DomainReferenceServiceImpl implements DomainReferenceService {
-    private final DomainReferenceRepository domainReferenceRepository;
+/*    private final DomainReferenceRepository domainReferenceRepository;
 
     @Override
     public Mono<DomainReference> save(DomainReference d, String reference) {
@@ -45,4 +36,5 @@ public class DomainReferenceServiceImpl implements DomainReferenceService {
         return domainReferenceRepository.updateExternalAcmOrderId(domainId, externalAcmOrderId)
                 .flatMap(it -> domainReferenceRepository.findById(domainId));
     }
+*/
 }

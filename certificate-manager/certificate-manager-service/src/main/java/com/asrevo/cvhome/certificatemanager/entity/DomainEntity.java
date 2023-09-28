@@ -1,7 +1,8 @@
 package com.asrevo.cvhome.certificatemanager.entity;
 
-import com.asrevo.cvhome.commons.domain.*;
-import com.asrevo.cvhome.commons.event.domain.DomainRegisteredEvent;
+import com.asrevo.cvhome.certificatemanager.commons.domain.*;
+import com.asrevo.cvhome.certificatemanager.commons.event.domain.DomainRegisteredEvent;
+import com.asrevo.cvhome.commons.domain.BaseEntity;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;

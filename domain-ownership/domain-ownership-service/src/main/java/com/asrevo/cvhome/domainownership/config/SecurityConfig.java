@@ -17,8 +17,9 @@ public class SecurityConfig {
     SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
         // @formatter:off
         return http
-                .authorizeExchange(it ->
-                        it.anyExchange().authenticated()
+                .authorizeExchange(it -> it
+                        .pathMatchers("api/v1/test/sign").permitAll()
+                        .anyExchange().authenticated()
                 )
                 .oauth2ResourceServer(it ->
                         it.jwt(withDefaults())

@@ -1,14 +1,14 @@
 package com.asrevo.cvhome.certificatemanager.service.impl;
 
+import com.asrevo.cvhome.certificatemanager.commons.domain.CertificateFileType;
+import com.asrevo.cvhome.certificatemanager.commons.domain.Domain;
+import com.asrevo.cvhome.certificatemanager.commons.domain.OrderLocation;
 import com.asrevo.cvhome.certificatemanager.domain.DomainCertificate;
 import com.asrevo.cvhome.certificatemanager.domain.HttpValidationToken;
 import com.asrevo.cvhome.certificatemanager.domain.challenges.Http01Challenge;
 import com.asrevo.cvhome.certificatemanager.domain.challenges.TlsAlpn01Challenge;
 import com.asrevo.cvhome.certificatemanager.service.AcmFileService;
 import com.asrevo.cvhome.certificatemanager.service.AcmeManagerService;
-import com.asrevo.cvhome.commons.domain.CertificateFileType;
-import com.asrevo.cvhome.commons.domain.Domain;
-import com.asrevo.cvhome.commons.domain.OrderLocation;
 import lombok.extern.slf4j.Slf4j;
 import org.shredzone.acme4j.*;
 import org.shredzone.acme4j.challenge.Challenge;

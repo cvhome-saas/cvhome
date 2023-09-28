@@ -7,8 +7,8 @@ spring:
   sql:
     init:
       mode: always
-  r2dbc:
-    url: r2dbc:postgresql://localhost:5432/userdb
+  datasource:
+    url: jdbc:postgresql://localhost:5432/userdb
     username: postgres
     password: password
   security:
@@ -35,29 +35,33 @@ spring:
           jwk-set-uri: http://localhost:9999/realms/cvhome/protocol/openid-connect/certs
   cloud:
     function:
-      definition: "sysEvents;logOrderEvents"
+      #      definition: ";"
+      definition: "inSysEvents;inOrderEvents"
     stream:
       function:
         bindings:
-          sysEvents: sysEvents
-          logOrderEvents: logOrderEvents
+          inSysEvents: inSysEvents
+          inOrderEvents: inOrderEvents
       bindings:
-        sysEvents-in-0:
+        inSysEvents-in-0:
           destination: "com.asrevo.cvhome.sys-events"
           group: ${spring.application.name}
-        logOrderEvents-in-0:
+          content-type: "application/json"
+        inOrderEvents-in-0:
           destination: "com.asrevo.cvhome.domain-certificate-order-events"
           group: ${spring.application.name}
+          content-type: "application/json"
+        outOrderCommands-out-0:
+          destination: "com.asrevo.cvhome.domain-certificate-order-commands"
+          content-type: "application/json"
+        outDomainCommands-out-0:
+          destination: "com.asrevo.cvhome.domain-certificate-domain-commands"
+          content-type: "application/json"
       rabbit:
         bindings:
-          sysEvents:
+          inSysEvents:
             consumer:
               declare-exchange: false
-              exchangeType: topic
-              durableSubscription: true
-              acknowledgeMode: auto
-          logOrderEvents:
-            consumer:
               exchangeType: topic
               durableSubscription: true
               acknowledgeMode: auto
@@ -114,6 +118,8 @@ management:
       application: ${spring.application.name}
 logging:
   level:
+    org.springframework.jdbc.core.JdbcTemplate: debug
     org.springframework.boot: debug
     org.springframework.web: debug
     org.springframework.security: debug
+    reactor.netty.http: debug

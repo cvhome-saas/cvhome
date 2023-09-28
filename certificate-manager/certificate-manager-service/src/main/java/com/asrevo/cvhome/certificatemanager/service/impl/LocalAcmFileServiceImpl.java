@@ -1,11 +1,11 @@
 package com.asrevo.cvhome.certificatemanager.service.impl;
 
+import com.asrevo.cvhome.certificatemanager.commons.domain.CertificateFileType;
+import com.asrevo.cvhome.certificatemanager.commons.domain.Domain;
 import com.asrevo.cvhome.certificatemanager.domain.HttpValidationToken;
 import com.asrevo.cvhome.certificatemanager.domain.challenges.Http01Challenge;
 import com.asrevo.cvhome.certificatemanager.domain.challenges.TlsAlpn01Challenge;
 import com.asrevo.cvhome.certificatemanager.service.AcmFileService;
-import com.asrevo.cvhome.commons.domain.CertificateFileType;
-import com.asrevo.cvhome.commons.domain.Domain;
 import lombok.SneakyThrows;
 import org.shredzone.acme4j.toolbox.AcmeUtils;
 import org.shredzone.acme4j.util.CSRBuilder;

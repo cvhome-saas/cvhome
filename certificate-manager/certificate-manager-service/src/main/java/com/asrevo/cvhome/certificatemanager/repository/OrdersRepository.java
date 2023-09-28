@@ -1,8 +1,8 @@
 package com.asrevo.cvhome.certificatemanager.repository;
 
+import com.asrevo.cvhome.certificatemanager.commons.domain.CertificateOrderStatus;
+import com.asrevo.cvhome.certificatemanager.commons.domain.OrdersId;
 import com.asrevo.cvhome.certificatemanager.entity.OrdersEntity;
-import com.asrevo.cvhome.commons.domain.CertificateOrderStatus;
-import com.asrevo.cvhome.commons.domain.OrdersId;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.repository.ListCrudRepository;
 

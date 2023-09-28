@@ -29,5 +29,7 @@ include(
         'certificate-manager:certificate-manager-events',
         'certificate-manager:certificate-manager-service',
         'domain-ownership:domain-ownership-service',
+        'domain-ownership:domain-ownership-commons',
+        'domain-ownership:domain-ownership-events',
         'gateway:gateway-service'
 )

@@ -1,8 +1,7 @@
 package com.asrevo.cvhome.certificatemanager.service;
 
 import com.asrevo.cvhome.commons.event.DefaultEventPublisher;
-import com.asrevo.cvhome.commons.event.domain.DomainEvent;
-import com.asrevo.cvhome.commons.event.order.OrdersEvent;
+import com.asrevo.cvhome.commons.event.Event;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
@@ -17,14 +16,9 @@ public class LocalEventListener {
 
     // @TODO replace with @TransactionalEventListener as its not working fine now
     @EventListener
-    void onOrdersEvents(OrdersEvent event) {
+    void onOrdersEvents(Event event) {
         log.info(event.eventType());
         eventPublisher.publish(event);
-    }
-
-    @EventListener
-    void onDomainEvents(DomainEvent event) {
-        log.info(event.eventType());
     }
 }
 

@@ -1,9 +1,9 @@
 package com.asrevo.cvhome.certificatemanager.service;
 
+import com.asrevo.cvhome.commons.command.Command;
 import com.asrevo.cvhome.commons.command.CommandProcessor;
-import com.asrevo.cvhome.commons.command.order.OrderCommand;
+import com.asrevo.cvhome.commons.event.Event;
 import com.asrevo.cvhome.commons.event.EventProcessor;
-import com.asrevo.cvhome.commons.event.order.OrdersEvent;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -36,9 +36,9 @@ public class ExternalEventListener {
     }
 
     @Bean
-    public Consumer<Message<OrdersEvent>> inOrderEvents() {
+    public Consumer<Message<Event>> inOrderEvents() {
         return event -> {
-            System.out.println("Received: order event: " + event.getPayload().eventType() + "       " + event.getPayload().ordersId());
+            System.out.println("Received: order event: " + event.getPayload().eventType());
             try {
                 eventProcessor.process(event.getPayload());
             } catch (Exception e) {
@@ -48,13 +48,24 @@ public class ExternalEventListener {
     }
 
     @Bean
-    public Consumer<Message<OrderCommand>> inOrderCommands() {
+    public Consumer<Message<Command>> inOrderCommands() {
         return event -> {
             System.out.println("Received: order command: " + event.getPayload());
             try {
                 commandProcessor.process(event.getPayload());
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error("error processing " + event.getPayload());
+            }
+        };
+    }
+
+    @Bean
+    public Consumer<Message<Command>> inDomainCommands() {
+        return event -> {
+            System.out.println("Received: domain command: " + event.getPayload());
+            try {
+                commandProcessor.process(event.getPayload());
+            } catch (Exception e) {
                 log.error("error processing " + event.getPayload());
             }
         };

@@ -1,17 +1,19 @@
 package com.asrevo.cvhome.certificatemanager.service;
 
-import com.asrevo.cvhome.commons.domain.CertificateId;
-import com.asrevo.cvhome.commons.domain.ChallengeValidationType;
-import com.asrevo.cvhome.commons.domain.Domain;
-import com.asrevo.cvhome.commons.domain.OrdersId;
-import com.asrevo.cvhome.commons.dto.DomainCreateRequestDto;
-import com.asrevo.cvhome.commons.dto.DomainCreateResponseDto;
-import com.asrevo.cvhome.commons.dto.OrdersCreateRequestDto;
-import com.asrevo.cvhome.commons.dto.OrdersCreateResponseDto;
+import com.asrevo.cvhome.certificatemanager.commons.domain.CertificateId;
+import com.asrevo.cvhome.certificatemanager.commons.domain.ChallengeValidationType;
+import com.asrevo.cvhome.certificatemanager.commons.domain.Domain;
+import com.asrevo.cvhome.certificatemanager.commons.domain.OrdersId;
+import com.asrevo.cvhome.certificatemanager.commons.dto.DomainCreateRequestDto;
+import com.asrevo.cvhome.certificatemanager.commons.dto.DomainCreateResponseDto;
+import com.asrevo.cvhome.certificatemanager.commons.dto.OrdersCreateRequestDto;
+import com.asrevo.cvhome.certificatemanager.commons.dto.OrdersCreateResponseDto;
 
 public interface AcmCertificateOrderService {
 
     DomainCreateResponseDto register(DomainCreateRequestDto createRequest);
+
+    DomainCreateResponseDto register(Domain domain, boolean autoRenew, boolean autoOrder);
 
     OrdersCreateResponseDto initiateOrder(OrdersCreateRequestDto createRequest);
 
