@@ -73,7 +73,7 @@ public class DomainReferenceAcmServiceImpl implements DomainReferenceAcmService 
 
                 if (response.getStatusCode().isSameCodeAs(HttpStatus.OK) && response.getBody() != null) {
                     orders = response.getBody().stream()
-                            .collect(Collectors.toMap(DomainCertificateOrder::getId, Function.identity()));
+                            .collect(Collectors.toMap(DomainCertificateOrder::getId, Function.id()));
                 } else {
                     orders = Map.of();
                 }

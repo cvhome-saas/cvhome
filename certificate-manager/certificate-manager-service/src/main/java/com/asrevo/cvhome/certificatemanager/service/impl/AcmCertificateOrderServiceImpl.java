@@ -1,6 +1,5 @@
 package com.asrevo.cvhome.certificatemanager.service.impl;
 
-import com.asrevo.cvhome.certificatemanager.commons.command.order.AddCertificateToDomainCommand;
 import com.asrevo.cvhome.certificatemanager.commons.command.order.GenerateCertificateCommand;
 import com.asrevo.cvhome.certificatemanager.commons.command.order.RequestOrderCertificateCommand;
 import com.asrevo.cvhome.certificatemanager.commons.command.order.ValidateOrderCommand;
@@ -155,13 +154,7 @@ public class AcmCertificateOrderServiceImpl implements AcmCertificateOrderServic
                 log.info("will generate acm certificate for order {}", orderId);
                 it.generateOrderCertificate(doAcmGeneration(it));
                 ordersService.save(it);
-                if (CertificateOrderStatus.GENERATED.equals(it.getCertificateOrderStatus())) {
-                    AddCertificateToDomainCommand command = new AddCertificateToDomainCommand();
-                    command.setDomain(it.getDomain());
-                    command.setCertificateId(it.getCertificate().getId());
-                    command.setOrdersId(orderId);
-                    commandPublisher.publish(command);
-                } else {
+                if (!CertificateOrderStatus.GENERATED.equals(it.getCertificateOrderStatus())) {
                     log.error("generation failed for order {}", orderId);
                 }
 

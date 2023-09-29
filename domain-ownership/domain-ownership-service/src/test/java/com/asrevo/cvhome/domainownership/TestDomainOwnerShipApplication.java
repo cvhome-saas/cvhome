@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.domainownership;
 
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.context.annotation.Bean;
@@ -9,7 +10,8 @@ import org.testcontainers.containers.RabbitMQContainer;
 import org.testcontainers.utility.DockerImageName;
 
 @TestConfiguration(proxyBeanMethods = false)
-class TestDomainOwnerShipApplication {
+@SpringBootApplication
+public class TestDomainOwnerShipApplication {
     @Bean
     @ServiceConnection
     static PostgreSQLContainer<?> postgresContainer() {

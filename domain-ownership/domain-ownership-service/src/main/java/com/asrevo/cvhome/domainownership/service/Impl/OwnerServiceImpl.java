@@ -1,7 +1,8 @@
 package com.asrevo.cvhome.domainownership.service.Impl;
 
-import com.asrevo.cvhome.domainownership.commons.domain.Email;
-import com.asrevo.cvhome.domainownership.commons.domain.IdentityId;
+import com.asrevo.cvhome.certificatemanager.commons.domain.DomainId;
+import com.asrevo.cvhome.commons.domain.Email;
+import com.asrevo.cvhome.commons.domain.IdentityId;
 import com.asrevo.cvhome.domainownership.domain.OwnerEntity;
 import com.asrevo.cvhome.domainownership.repository.OwnerRepository;
 import com.asrevo.cvhome.domainownership.service.OwnerService;
@@ -20,9 +21,21 @@ import java.util.Optional;
 public class OwnerServiceImpl implements OwnerService {
     private final OwnerRepository ownerRepository;
 
+    @Transactional
     @Override
-    public OwnerEntity getSystemOwner() {
-        return ownerRepository.findByIdentity(IdentityId.ofSys()).orElseGet(this::createSysAccount);
+    public OwnerEntity getOwnerOrCreate(IdentityId identityId, Principal principal) {
+        return identityId.equals(IdentityId.ofSys()) ? getSystemOwner() : getOwner(principal);
+    }
+
+    @Transactional
+    @Override
+    public void addDomain(IdentityId identityId, DomainId domainId) {
+        OwnerEntity owner = ownerRepository.findById(identityId).orElseThrow(() -> new RuntimeException("owner not registered yet to own domains"));
+        ownerRepository.save(owner.addToDomains(domainId));
+    }
+
+    private OwnerEntity getSystemOwner() {
+        return ownerRepository.findById(IdentityId.ofSys()).orElseGet(this::createSysAccount);
     }
 
     private OwnerEntity createSysAccount() {
@@ -30,16 +43,8 @@ public class OwnerServiceImpl implements OwnerService {
         return ownerRepository.save(OwnerEntity.create(email, IdentityId.ofSys()));
     }
 
-    @Transactional
-    @Override
-    public OwnerEntity getOwner(Principal principal) {
-        return ownerRepository.findByIdentity(IdentityId.of(principal.getName())).orElseGet(() -> createOwnerAccount(principal));
-    }
-
-    @Transactional
-    @Override
-    public OwnerEntity save(OwnerEntity owner) {
-        return ownerRepository.save(owner);
+    private OwnerEntity getOwner(Principal principal) {
+        return ownerRepository.findById(IdentityId.of(principal.getName())).orElseGet(() -> createOwnerAccount(principal));
     }
 
     private OwnerEntity createOwnerAccount(Principal principal) {

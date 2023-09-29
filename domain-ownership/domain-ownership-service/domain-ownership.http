@@ -78,9 +78,9 @@ Authorization: Bearer {{access_token}}
 
 {
   "domain": {
-    "domain": "test1.asrevo.com",
-    "domainType": "SAS_SUB"
+    "domain": "test1.asrevo.com"
   },
+  "domainType": "SAS_SUB",
   "reference": {
     "reference": "12321311112550",
     "referenceType": "BLOG"

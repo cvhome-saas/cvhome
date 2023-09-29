@@ -61,20 +61,6 @@ password = microservice-gateway
 %}
 
 
-### register a domain
-POST http://localhost:8082/api/v1/acm/register
-Content-Type: application/json
-Authorization: Bearer {{access_token}}
-
-{
-  "domain": {
-    "domain": "uiaUiyyyaa32d1.gateway.com"
-  },
-  "autoOrder": true,
-  "autoRenew": true
-}
-
-
 ### order a domain certificate
 POST http://localhost:8082/api/v1/acm/order
 Content-Type: application/json

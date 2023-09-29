@@ -1,4 +1,4 @@
-package com.asrevo.cvhome.certificatemanager.commons.event.domain;
+package com.asrevo.cvhome.domainownership.commons.event.domain;
 
 import com.asrevo.cvhome.certificatemanager.commons.domain.Domain;
 import com.asrevo.cvhome.certificatemanager.commons.domain.DomainId;

@@ -1,13 +1,13 @@
 package com.asrevo.cvhome.domainownership.service;
 
+import com.asrevo.cvhome.certificatemanager.commons.domain.DomainId;
+import com.asrevo.cvhome.commons.domain.IdentityId;
 import com.asrevo.cvhome.domainownership.domain.OwnerEntity;
 
 import java.security.Principal;
 
 public interface OwnerService {
-    OwnerEntity getSystemOwner();
+    OwnerEntity getOwnerOrCreate(IdentityId identityId, Principal principal);
 
-    OwnerEntity getOwner(Principal principal);
-
-    OwnerEntity save(OwnerEntity owner);
+    void addDomain(IdentityId identityId, DomainId domainId);
 }

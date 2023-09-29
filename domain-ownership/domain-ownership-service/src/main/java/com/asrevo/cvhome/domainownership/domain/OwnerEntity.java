@@ -1,9 +1,12 @@
 package com.asrevo.cvhome.domainownership.domain;
 
+import com.asrevo.cvhome.certificatemanager.commons.domain.DomainId;
 import com.asrevo.cvhome.commons.domain.BaseEntity;
-import com.asrevo.cvhome.domainownership.commons.domain.*;
+import com.asrevo.cvhome.commons.domain.Email;
+import com.asrevo.cvhome.commons.domain.IdentityId;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.jdbc.core.mapping.AggregateReference;
 import org.springframework.data.relational.core.mapping.Embedded;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
@@ -16,31 +19,31 @@ import static org.springframework.data.relational.core.mapping.Embedded.OnEmpty.
 @Getter
 @Setter
 @Table("owner")
-public class OwnerEntity extends BaseEntity<OwnerEntity, OwnerId> {
-    private IdentityId identity;
+public class OwnerEntity extends BaseEntity<OwnerEntity, IdentityId> {
     @Embedded(onEmpty = USE_NULL)
     private Email email;
     @MappedCollection(idColumn = "owner_id")
-    private Set<DomainEntity> domains;
+    private Set<OwnerDomainRefEntity> domains;
 
-    public static OwnerEntity create(Email email, IdentityId identity) {
+    public static OwnerEntity create(Email email, IdentityId ownerId) {
         OwnerEntity entity = new OwnerEntity();
         entity.setNew();
+        entity.setId(ownerId);
         entity.setEmail(email);
-        entity.setIdentity(identity);
         entity.setDomains(new HashSet<>());
         return entity;
     }
 
     @Override
-    protected OwnerId generateId() {
-        return OwnerId.newId();
+    protected IdentityId generateId() {
+        return this.id;
     }
 
-    public DomainEntity addDomain(Domain domain, Reference reference) {
+    public OwnerEntity addToDomains(DomainId domainId) {
         if (this.domains == null || this.domains.isEmpty()) this.domains = new HashSet<>();
-        DomainEntity entity = DomainEntity.create(domain, reference);
-        this.domains.add(entity);
-        return entity;
+        OwnerDomainRefEntity ref = new OwnerDomainRefEntity();
+        ref.setDomain(AggregateReference.to(domainId));
+        this.domains.add(ref);
+        return this;
     }
 }
