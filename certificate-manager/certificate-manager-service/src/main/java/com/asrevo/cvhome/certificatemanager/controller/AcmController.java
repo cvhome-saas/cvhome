@@ -6,6 +6,7 @@ import com.asrevo.cvhome.certificatemanager.commons.domain.OrdersId;
 import com.asrevo.cvhome.certificatemanager.commons.dto.*;
 import com.asrevo.cvhome.certificatemanager.service.AcmCertificateOrderService;
 import com.asrevo.cvhome.certificatemanager.service.AcmeManagerService;
+import com.asrevo.cvhome.certificatemanager.service.DomainService;
 import com.asrevo.cvhome.certificatemanager.service.OrdersService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,11 +27,12 @@ public class AcmController {
     private final AcmeManagerService acmeManagerService;
     private final AcmCertificateOrderService acmCertificateOrderService;
     private final OrdersService ordersService;
+    private final DomainService domainService;
 
     @PostMapping("register")
     public DomainCreateResponseDto register(@RequestBody @Validated DomainCreateRequestDto createRequest) {
         log.info("will register a domain {}", createRequest.getDomain());
-        return acmCertificateOrderService.register(createRequest);
+        return domainService.register(createRequest);
     }
 
     /*

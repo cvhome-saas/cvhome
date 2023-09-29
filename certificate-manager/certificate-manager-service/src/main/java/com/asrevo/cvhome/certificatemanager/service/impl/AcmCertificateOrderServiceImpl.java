@@ -1,20 +1,18 @@
 package com.asrevo.cvhome.certificatemanager.service.impl;
 
-import com.asrevo.cvhome.certificatemanager.commons.command.order.*;
+import com.asrevo.cvhome.certificatemanager.commons.command.order.AddCertificateToDomainCommand;
+import com.asrevo.cvhome.certificatemanager.commons.command.order.GenerateCertificateCommand;
+import com.asrevo.cvhome.certificatemanager.commons.command.order.RequestOrderCertificateCommand;
+import com.asrevo.cvhome.certificatemanager.commons.command.order.ValidateOrderCommand;
 import com.asrevo.cvhome.certificatemanager.commons.domain.*;
-import com.asrevo.cvhome.certificatemanager.commons.dto.DomainCreateRequestDto;
-import com.asrevo.cvhome.certificatemanager.commons.dto.DomainCreateResponseDto;
 import com.asrevo.cvhome.certificatemanager.commons.dto.OrdersCreateRequestDto;
 import com.asrevo.cvhome.certificatemanager.commons.dto.OrdersCreateResponseDto;
 import com.asrevo.cvhome.certificatemanager.domain.DomainCertificate;
 import com.asrevo.cvhome.certificatemanager.domain.challenges.Challenges;
-import com.asrevo.cvhome.certificatemanager.entity.DomainEntity;
 import com.asrevo.cvhome.certificatemanager.entity.OrdersEntity;
-import com.asrevo.cvhome.certificatemanager.mappers.DomainMappers;
 import com.asrevo.cvhome.certificatemanager.mappers.OrdersMappers;
 import com.asrevo.cvhome.certificatemanager.service.AcmCertificateOrderService;
 import com.asrevo.cvhome.certificatemanager.service.AcmeManagerService;
-import com.asrevo.cvhome.certificatemanager.service.DomainService;
 import com.asrevo.cvhome.certificatemanager.service.OrdersService;
 import com.asrevo.cvhome.commons.command.CommandPublisher;
 import lombok.AllArgsConstructor;
@@ -40,28 +38,8 @@ public class AcmCertificateOrderServiceImpl implements AcmCertificateOrderServic
 
     private final OrdersMappers ordersEntityMappers;
 
-    private final DomainMappers domainMappers;
-
-    private final DomainService domainService;
-
     private final CommandPublisher commandPublisher;
 
-    @Override
-    public DomainCreateResponseDto register(DomainCreateRequestDto createRequest) {
-        return this.register(createRequest.getDomain(), createRequest.isAutoRenew(), createRequest.isAutoOrder());
-    }
-
-    @Override
-    public DomainCreateResponseDto register(Domain domain, boolean autoRenew, boolean autoOrder) {
-        DomainEntity entity = DomainEntity.createDomain(domain, autoRenew, autoOrder);
-        DomainEntity savedDomain = domainService.save(entity);
-        if (entity.isAutoOrder()) {
-            CreateOrderCommand command = new CreateOrderCommand();
-            command.setDomain(savedDomain.getDomain());
-            commandPublisher.publish(command);
-        }
-        return domainMappers.toDomainCreateResponse(savedDomain);
-    }
 
     @Override
     public OrdersCreateResponseDto initiateOrder(OrdersCreateRequestDto createRequest) {
@@ -70,11 +48,7 @@ public class AcmCertificateOrderServiceImpl implements AcmCertificateOrderServic
 
     @Override
     public OrdersCreateResponseDto initiateOrder(Domain domain, ChallengeValidationType challengeValidationType) {
-        DomainEntity domainEntity = domainService.findOneByDomain(domain);
-        if (domainEntity == null) {
-            throw new RuntimeException("this domain not existed in domain-certificate-manager system");
-        }
-        OrdersEntity certificateOrder = OrdersEntity.createOrder(domainEntity.getDomain(), challengeValidationType);
+        OrdersEntity certificateOrder = OrdersEntity.createOrder(domain, challengeValidationType);
         OrdersEntity savedOrder = ordersService.save(certificateOrder);
         RequestOrderCertificateCommand command = new RequestOrderCertificateCommand();
         command.setId(savedOrder.getId());
@@ -195,28 +169,6 @@ public class AcmCertificateOrderServiceImpl implements AcmCertificateOrderServic
                 log.warn("request to do generate certificate for status {} and orderId {}", it.getCertificateOrderStatus(), orderId);
             }
         });
-    }
-
-    @Override
-    public void updateDomainStatus(Domain domain) {
-        DomainEntity domainEntity = domainService.findOneByDomain(domain);
-        if (domainEntity != null) {
-            DomainCertificateStatus newCertificateStatus = switch (domainEntity.getStatus()) {
-                case RENEWING_ORDER_PROCESS, EXPIRED_CERTIFICATE -> DomainCertificateStatus.RENEWING_ORDER_PROCESS;
-                default -> DomainCertificateStatus.FIRST_ORDERING;
-            };
-            domainEntity.setStatus(newCertificateStatus);
-            domainService.save(domainEntity);
-        }
-    }
-
-    @Override
-    public void addNewCertificateToDomain(Domain domain, OrdersId ordersId, CertificateId certificateId) {
-        DomainEntity domainEntity = domainService.findOneByDomain(domain);
-        if (domainEntity != null) {
-            domainEntity.addNewCertificate(ordersId, certificateId);
-            domainService.save(domainEntity);
-        }
     }
 
     private DomainCertificate doAcmGeneration(OrdersEntity it) {

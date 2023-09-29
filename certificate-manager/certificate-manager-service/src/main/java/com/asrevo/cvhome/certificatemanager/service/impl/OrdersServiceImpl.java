@@ -1,20 +1,16 @@
 package com.asrevo.cvhome.certificatemanager.service.impl;
 
-import com.asrevo.cvhome.certificatemanager.commons.domain.CertificateOrderStatus;
 import com.asrevo.cvhome.certificatemanager.commons.domain.OrdersId;
 import com.asrevo.cvhome.certificatemanager.commons.dto.OrdersResponseDto;
 import com.asrevo.cvhome.certificatemanager.entity.OrdersEntity;
 import com.asrevo.cvhome.certificatemanager.repository.OrdersRepository;
 import com.asrevo.cvhome.certificatemanager.service.OrdersService;
 import lombok.AllArgsConstructor;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.StreamSupport;
 
 @Service
@@ -40,15 +36,4 @@ public class OrdersServiceImpl implements OrdersService {
                 .map(it -> new OrdersResponseDto())
                 .toList();
     }
-
-    @Override
-    public List<OrdersEntity> findAllSinceValidation(Set<CertificateOrderStatus> statuses, Instant from, int limit) {
-        return ordersRepository.findByCertificateOrderStatusInAndValidatedDateLessThanOrderByIdAsc(statuses, from, PageRequest.of(0, limit));
-    }
-
-    @Override
-    public List<OrdersEntity> findAllSinceCreation(Set<CertificateOrderStatus> statuses, Instant from, int limit) {
-        return ordersRepository.findByCertificateOrderStatusInAndCreatedDateLessThanOrderByIdAsc(statuses, from, PageRequest.of(0, limit));
-    }
-
 }

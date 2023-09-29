@@ -5,8 +5,6 @@ import lombok.AllArgsConstructor;
 import org.jobrunr.scheduling.JobScheduler;
 import org.springframework.stereotype.Component;
 
-import static org.jobrunr.scheduling.cron.Cron.every5minutes;
-
 @Component
 @AllArgsConstructor
 public class JobsLauncher {
@@ -19,7 +17,6 @@ public class JobsLauncher {
 
     @PostConstruct
     public void scheduleRecurrently() {
-        jobScheduler.scheduleRecurrently(every5minutes(), AcmJobs::enqueuePreValidationInvalid);
-        jobScheduler.scheduleRecurrently(every1minutes(), AcmJobs::enqueueFailedOrder);
+//        jobScheduler.scheduleRecurrently(every1minutes(), ****::****);
     }
 }
