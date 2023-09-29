@@ -537,7 +537,7 @@
   }, {
     "id" : "9f9c63a1-cab9-4396-9be2-e52441eecb8b",
     "createdTimestamp" : 1692367580050,
-    "username" : "microservice-user",
+    "username": "microservice-domain-ownership",
     "enabled" : true,
     "totp" : false,
     "emailVerified" : false,

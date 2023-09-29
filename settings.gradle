@@ -9,12 +9,27 @@
 pluginManagement {
     // Include 'plugins build' to define convention plugins.
     includeBuild('build-logic')
+    repositories {
+        maven { url 'https://repo.spring.io/milestone' }
+        gradlePluginPortal()
+    }
 }
 
 plugins {
     // Apply the foojay-resolver plugin to allow automatic download of JDKs
-    id 'org.gradle.toolchains.foojay-resolver-convention' version '0.4.0'
+    id 'org.gradle.toolchains.foojay-resolver-convention' version '0.7.0'
 }
 
 rootProject.name = 'cvhome'
-include('ui', 'commons', 'auth', 'certificate-manager', 'domain', 'gateway')
+include(
+        'ui',
+        'cvhome-commons',
+        'auth',
+        'certificate-manager:certificate-manager-commons',
+        'certificate-manager:certificate-manager-events',
+        'certificate-manager:certificate-manager-service',
+        'domain-ownership:domain-ownership-commons',
+        'domain-ownership:domain-ownership-events',
+        'domain-ownership:domain-ownership-service',
+        'gateway:gateway-service'
+)

@@ -17,11 +17,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - name: Set up JDK 17
+      - name: Set up JDK 21
         uses: actions/setup-java@v3
         with:
           java-version: '17'
-          distribution: 'temurin'
+          distribution: 'corretto'
       - name: Use Node.js 18
         uses: actions/setup-node@v3
         with:
@@ -33,9 +33,11 @@ jobs:
       - name: Build Docker with Gradle
         uses: gradle/gradle-build-action@749f47bda3e44aa060e82d7b3ef7e40d953bd629
         with:
-          arguments: bootBuildImage -x test --publishImage
+          arguments: bootBuildImage --publishImage
         env: # Or as an environment variable
           GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
+      - name: check docker images
+        run: docker images
       - uses: actions/upload-artifact@v3
         with:
           name: reports
