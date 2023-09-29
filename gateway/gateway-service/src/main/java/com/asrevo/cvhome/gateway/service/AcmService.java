@@ -1,6 +1,6 @@
 package com.asrevo.cvhome.gateway.service;
 
-import com.asrevo.cvhome.commons.domain.CertificateFileType;
+import com.asrevo.cvhome.certificatemanager.commons.domain.CertificateFileType;
 import com.asrevo.cvhome.gateway.config.ssl.AcmeTls1SslContextSpec;
 import io.netty.handler.ssl.SslContext;
 import lombok.SneakyThrows;
