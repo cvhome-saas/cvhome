@@ -43,7 +43,7 @@ public class SslNettyConfig {
             ParameterizedTypeReference<byte[]> responseType = new ParameterizedTypeReference<>() {
             };
             AcmService acmService = (d, fileType) -> {
-                String url = "http://localhost:8082/api/v1/acm/domain-certificate-file?domain=" + d + "&fileType=" + fileType.name();
+                String url = "http://certificate-manager:8082/api/v1/acm/domain-certificate-file?domain=" + d + "&fileType=" + fileType.name();
                 return template.exchange(url, POST, null, responseType);
             };
             SslContext sslContext = acmService.getSslContext(cf, domain);

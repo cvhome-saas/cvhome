@@ -27,11 +27,11 @@ public class SslExpirePolicy implements Expiry<String, SslProvider> {
 
     @Override
     public long expireAfterUpdate(String key, SslProvider value, long currentTime, @NonNegative long currentDuration) {
-        return Long.MAX_VALUE;
+        return defaultDuration.toNanos();
     }
 
     @Override
     public long expireAfterRead(String key, SslProvider value, long currentTime, @NonNegative long currentDuration) {
-        return Long.MAX_VALUE;
+        return currentDuration;
     }
 }

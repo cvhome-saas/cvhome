@@ -11,10 +11,8 @@ import java.time.temporal.ChronoUnit;
 @Slf4j
 public class SSlProviderCacheLoader implements SSlProviderLoader {
     private final LoadingCache<String, SslProvider> cache;
-    private final SSlProviderLoader loader;
 
     SSlProviderCacheLoader(SSlProviderLoader loader) {
-        this.loader = loader;
         this.cache = Caffeine.newBuilder().expireAfter(new SslExpirePolicy(Duration.of(1, ChronoUnit.DAYS)))
                 .build(loader::load);
     }
