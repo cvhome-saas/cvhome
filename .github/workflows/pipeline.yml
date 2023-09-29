@@ -36,6 +36,8 @@ jobs:
           arguments: bootBuildImage --publishImage --stacktrace
         env: # Or as an environment variable
           GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
+      - name: check docker images
+        run: docker images
       - uses: actions/upload-artifact@v3
         with:
           name: reports
