@@ -33,7 +33,7 @@ jobs:
       - name: Build Docker with Gradle
         uses: gradle/gradle-build-action@749f47bda3e44aa060e82d7b3ef7e40d953bd629
         with:
-          arguments: :domain-ownership:domain-ownership-events:bootBuildImage --publishImage --stacktrace
+          arguments: :domain-ownership:domain-ownership-service:bootBuildImage --publishImage --stacktrace
         env: # Or as an environment variable
           GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
       - uses: actions/upload-artifact@v3
