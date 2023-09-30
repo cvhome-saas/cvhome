@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.domainownership.service.Impl;
 
+import com.asrevo.cvhome.certificatemanager.commons.domain.CertificateOrderStatus;
 import com.asrevo.cvhome.certificatemanager.commons.domain.Domain;
 import com.asrevo.cvhome.certificatemanager.commons.domain.DomainCertificateStatus;
 import com.asrevo.cvhome.domainownership.commons.dto.AvailabilityResponse;
@@ -11,6 +12,8 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.Instant;
 
 @Service
 @AllArgsConstructor
@@ -43,16 +46,27 @@ public class DomainServiceImpl implements DomainService {
 
     @Transactional
     @Override
-    public void updateDomainStatus(Domain domain) {
+    public void updateDomainStatus(Domain domain, CertificateOrderStatus orderStatus, Instant date) {
         DomainEntity domainEntity = findOneByDomain(domain);
-        if (domainEntity != null) {
-            DomainCertificateStatus newCertificateStatus = switch (domainEntity.getStatus()) {
-                case RENEWING_ORDER_PROCESS, EXPIRED_CERTIFICATE -> DomainCertificateStatus.RENEWING_ORDER_PROCESS;
-                default -> DomainCertificateStatus.FIRST_ORDERING;
-            };
-            domainEntity.setStatus(newCertificateStatus);
-            save(domainEntity);
+        switch (orderStatus) {
+            case REQUESTED -> {
+                if (domainEntity != null) {
+                    DomainCertificateStatus newCertificateStatus = switch (domainEntity.getStatus()) {
+                        case RENEWING_ORDER_PROCESS, EXPIRED_CERTIFICATE, EXPIRING_CERTIFICATE_SOON ->
+                                DomainCertificateStatus.RENEWING_ORDER_PROCESS;
+                        default -> DomainCertificateStatus.FIRST_ORDERING;
+                    };
+                    domainEntity.setStatus(newCertificateStatus);
+                }
+            }
+            case GENERATED -> {
+                domainEntity.setStatus(DomainCertificateStatus.ACTIVE_CERTIFICATE_GENERATED);
+                domainEntity.setGeneratedDate(date);
+            }
+            case FAIL_GENERATING, PRE_VALIDATED_INVALID, VALIDATED_INVALID ->
+                    domainEntity.setStatus(DomainCertificateStatus.FAILED_CERTIFICATE_GENERATING);
         }
+        save(domainEntity);
     }
 
 }

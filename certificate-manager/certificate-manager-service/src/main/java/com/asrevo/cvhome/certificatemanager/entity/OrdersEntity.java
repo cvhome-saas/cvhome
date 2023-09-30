@@ -5,6 +5,7 @@ import com.asrevo.cvhome.certificatemanager.commons.event.order.*;
 import com.asrevo.cvhome.certificatemanager.domain.DomainCertificate;
 import com.asrevo.cvhome.certificatemanager.domain.challenges.Challenge;
 import com.asrevo.cvhome.certificatemanager.domain.challenges.Challenges;
+import com.asrevo.cvhome.certificatemanager.domain.challenges.Dns01Challenge;
 import com.asrevo.cvhome.commons.domain.BaseEntity;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -79,9 +80,13 @@ public class OrdersEntity extends BaseEntity<OrdersEntity, OrdersId> {
             }
             this.registerEvent(OrdersChallengeValidationTypeChangedEvent.from(this.id, domain, oldType, this.challengeValidationType));
         }
-        this.registerEvent(OrdersRequestedEvent.from(id, this.domain, this.location, this.requestedDate));
-        // @TODO check if challengeValidationType supported in order Challenges
+        Dns01Challenge dns01Challenge = this.challenges.getDns01Challenge();
+        if (ChallengeValidationType.Dns01.equals(this.challengeValidationType) && dns01Challenge != null) {
+            this.registerEvent(DnsOrdersRequestedEvent.from(id, this.domain, this.location, this.requestedDate, dns01Challenge.key(), dns01Challenge.value()));
+        } else {
+            this.registerEvent(OrdersRequestedEvent.from(id, this.domain, this.location, this.requestedDate));
 
+        }
     }
 
     public void generateOrderCertificate(DomainCertificate certificate) {
@@ -93,7 +98,7 @@ public class OrdersEntity extends BaseEntity<OrdersEntity, OrdersId> {
             this.certificate = CertificateEntity.createNewCertificate(certificate.getNotAfter().toInstant(), certificate.getNotBefore().toInstant(), certificate.getSerialNumber(), certificate.getVersion(), certificate.getSigAlgName(), certificate.getSigAlgOID());
         }
         this.andEvent(this.certificate);
-        this.registerEvent(OrdersCertificateGeneratedEvent.from(this.id, this.certificateOrderStatus, this.generatedDate));
+        this.registerEvent(OrdersCertificateGeneratedEvent.from(this.id, this.domain, this.certificateOrderStatus, this.generatedDate));
     }
 
     public void requestValidate() {
@@ -104,6 +109,6 @@ public class OrdersEntity extends BaseEntity<OrdersEntity, OrdersId> {
     public void validated(CertificateOrderStatus certificateOrderStatus) {
         this.certificateOrderStatus = certificateOrderStatus;
         this.setValidatedDate(Instant.now());
-        this.registerEvent(OrdersValidatedEvent.from(this.id, this.validatedDate, this.certificateOrderStatus));
+        this.registerEvent(OrdersValidatedEvent.from(this.id, this.domain, this.validatedDate, this.certificateOrderStatus));
     }
 }

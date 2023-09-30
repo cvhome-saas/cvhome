@@ -18,6 +18,6 @@ public class DomainRegisteredEventImpl implements EventImpl<DomainRegisteredEven
 
     @Override
     public String type() {
-        return DomainRegisteredEvent.class.getSimpleName();
+        return DomainRegisteredEvent.class.getName();
     }
 }

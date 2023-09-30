@@ -27,7 +27,7 @@ spring:
             jwk-set-uri: http://localhost:9999/realms/cvhome/protocol/openid-connect/certs
             authorization-uri: http://localhost:9999/realms/cvhome/protocol/openid-connect/auth
             token-uri: http://localhost:9999/realms/cvhome/protocol/openid-connect/token
-              #            need to trace why getting 401
+            #            need to trace why getting 401
             #            user-info-uri: http://localhost:9999/realms/cvhome/protocol/openid-connect/userinfo
             #            user-name-attribute: sub
       resourceserver:
@@ -36,12 +36,13 @@ spring:
   cloud:
     function:
       #      definition: ";"
-      definition: "inSysEvents;inOrderEvents"
+      definition: "inSysEvents;inOrderEvents;inDomainEvents"
     stream:
       function:
         bindings:
           inSysEvents: inSysEvents
           inOrderEvents: inOrderEvents
+          inDomainEvents: inDomainEvents
       bindings:
         inSysEvents-in-0:
           destination: "com.asrevo.cvhome.sys-events"
@@ -51,8 +52,15 @@ spring:
           destination: "com.asrevo.cvhome.domain-certificate-order-events"
           group: ${spring.application.name}
           content-type: "application/json"
+        inDomainEvents-in-0:
+          destination: "com.asrevo.cvhome.domain-certificate-domain-events"
+          group: ${spring.application.name}
+          content-type: "application/json"
         outOrderCommands-out-0:
           destination: "com.asrevo.cvhome.domain-certificate-order-commands"
+          content-type: "application/json"
+        outDomainEvents-out-0:
+          destination: "com.asrevo.cvhome.domain-certificate-domain-events"
           content-type: "application/json"
         outDomainCommands-out-0:
           destination: "com.asrevo.cvhome.domain-certificate-domain-commands"

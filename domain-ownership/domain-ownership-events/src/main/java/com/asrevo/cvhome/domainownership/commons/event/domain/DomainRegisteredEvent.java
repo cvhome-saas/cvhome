@@ -5,7 +5,6 @@ import com.asrevo.cvhome.certificatemanager.commons.domain.DomainId;
 import com.asrevo.cvhome.commons.domain.IdentityId;
 import com.asrevo.cvhome.commons.event.EventId;
 
-import java.util.List;
 import java.util.Map;
 
 public record DomainRegisteredEvent(EventId eventId, DomainId domainId, Domain domain,
@@ -33,10 +32,5 @@ public record DomainRegisteredEvent(EventId eventId, DomainId domainId, Domain d
     @Override
     public String eventType() {
         return "DomainRegisteredEvent";
-    }
-
-    @Override
-    public List<String> getDestinations() {
-        return List.of();
     }
 }

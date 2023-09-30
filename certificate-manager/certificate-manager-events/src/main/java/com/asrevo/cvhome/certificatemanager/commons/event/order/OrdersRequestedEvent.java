@@ -19,15 +19,15 @@ public record OrdersRequestedEvent(EventId eventId, OrdersId ordersId, String ev
     }
 
     public Domain domain() {
-        return new Domain(this.data.get("DOMAIN_KEY"));
+        return new Domain(this.data.get(DOMAIN_KEY));
     }
 
     public OrderLocation location() {
-        return new OrderLocation(this.data.get("ORDER_LOCATION_KEY"));
+        return new OrderLocation(this.data.get(ORDER_LOCATION_KEY));
     }
 
     public Instant requestedDate() {
-        return Instant.parse(this.data.get("REQUESTED_DATE_KEY"));
+        return Instant.parse(this.data.get(REQUESTED_DATE_KEY));
     }
 
     @Override

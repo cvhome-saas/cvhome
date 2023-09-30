@@ -13,6 +13,7 @@ import java.util.Map;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.WRAPPER_OBJECT)
 @JsonSubTypes({
+        @Type(value = DnsOrdersRequestedEvent.class),
         @Type(value = OrdersCertificateGeneratedEvent.class),
         @Type(value = OrdersChallengeValidationTypeChangedEvent.class),
         @Type(value = OrdersCreatedEvent.class),
@@ -20,7 +21,7 @@ import java.util.Map;
         @Type(value = OrdersValidatedEvent.class),
         @Type(value = OrdersValidationRequestedEvent.class),
 })
-public sealed interface OrdersEvent extends Event permits OrdersCertificateGeneratedEvent, OrdersChallengeValidationTypeChangedEvent, OrdersCreatedEvent, OrdersRequestedEvent, OrdersValidatedEvent, OrdersValidationRequestedEvent {
+public sealed interface OrdersEvent extends Event permits DnsOrdersRequestedEvent, OrdersCertificateGeneratedEvent, OrdersChallengeValidationTypeChangedEvent, OrdersCreatedEvent, OrdersRequestedEvent, OrdersValidatedEvent, OrdersValidationRequestedEvent {
     EventId eventId();
 
     OrdersId ordersId();

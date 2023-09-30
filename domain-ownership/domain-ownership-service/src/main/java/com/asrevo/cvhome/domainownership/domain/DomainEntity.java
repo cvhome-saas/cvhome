@@ -15,6 +15,8 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Embedded;
 import org.springframework.data.relational.core.mapping.Table;
 
+import java.time.Instant;
+
 import static org.springframework.data.relational.core.mapping.Embedded.OnEmpty.USE_NULL;
 
 @Getter
@@ -28,6 +30,8 @@ public class DomainEntity extends BaseEntity<DomainEntity, DomainId> {
     @Column("domain_type")
     private DomainType domainType;
     private DomainCertificateStatus status;
+    @Column("generated_date")
+    private Instant generatedDate;
     private boolean autoRenew;
     private boolean autoOrder;
     @Column("owner_id")
