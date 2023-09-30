@@ -82,3 +82,18 @@ Authorization: Bearer {{access_token}}
   },
   "domainType": "SAS_SUB"
 }
+
+### change reference
+POST http://localhost:8081/api/v1/domain-ownership/change-reference
+Content-Type: application/json
+Authorization: Bearer {{access_token}}
+
+{
+  "domain": {
+    "domain": "test1.asrevo.com"
+  },
+  "reference": {
+    "reference": "nnnnnnnnnnnn",
+    "referenceType": "BLOG"
+  }
+}

@@ -3,7 +3,10 @@ package com.asrevo.cvhome.domainownership.service.Impl;
 import com.asrevo.cvhome.certificatemanager.commons.domain.CertificateOrderStatus;
 import com.asrevo.cvhome.certificatemanager.commons.domain.Domain;
 import com.asrevo.cvhome.certificatemanager.commons.domain.DomainCertificateStatus;
+import com.asrevo.cvhome.commons.domain.IdentityId;
 import com.asrevo.cvhome.domainownership.commons.dto.AvailabilityResponse;
+import com.asrevo.cvhome.domainownership.commons.dto.DomainChangeReferenceRequest;
+import com.asrevo.cvhome.domainownership.commons.dto.DomainChangeReferenceResponse;
 import com.asrevo.cvhome.domainownership.commons.dto.DomainReferenceResponse;
 import com.asrevo.cvhome.domainownership.domain.DomainEntity;
 import com.asrevo.cvhome.domainownership.repository.DomainRepository;
@@ -67,6 +70,20 @@ public class DomainServiceImpl implements DomainService {
                     domainEntity.setStatus(DomainCertificateStatus.FAILED_CERTIFICATE_GENERATING);
         }
         save(domainEntity);
+    }
+
+    @Transactional
+    @Override
+    public DomainChangeReferenceResponse changeDomainReference(DomainChangeReferenceRequest changeReferenceRequest, IdentityId identityId) {
+        DomainEntity entity = domainRepository.findByDomain(changeReferenceRequest.domain()).orElseThrow(() -> new RuntimeException("this domain not registered yet"));
+        if (!identityId.equals(entity.getOwner().getId())) {
+            throw new RuntimeException("sorry you dont own this domain");
+        }
+
+        entity.changeDomainReference(changeReferenceRequest.reference());
+        DomainEntity savedDomain = domainRepository.save(entity);
+        return new DomainChangeReferenceResponse(savedDomain.getDomain(), savedDomain.getReference());
+
     }
 
 }

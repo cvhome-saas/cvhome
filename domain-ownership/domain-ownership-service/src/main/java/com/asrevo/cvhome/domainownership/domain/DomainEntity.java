@@ -7,6 +7,7 @@ import com.asrevo.cvhome.commons.domain.BaseEntity;
 import com.asrevo.cvhome.commons.domain.IdentityId;
 import com.asrevo.cvhome.domainownership.commons.domain.DomainType;
 import com.asrevo.cvhome.domainownership.commons.domain.Reference;
+import com.asrevo.cvhome.domainownership.commons.event.domain.DomainReferenceChangedEvent;
 import com.asrevo.cvhome.domainownership.commons.event.domain.DomainRegisteredEvent;
 import lombok.Getter;
 import lombok.Setter;
@@ -54,5 +55,11 @@ public class DomainEntity extends BaseEntity<DomainEntity, DomainId> {
     @Override
     protected DomainId generateId() {
         return DomainId.newId();
+    }
+
+    public void changeDomainReference(Reference reference) {
+        this.registerEvent(DomainReferenceChangedEvent.from(this.getId(), this.getDomain(), this.reference, reference));
+        this.setReference(reference);
+
     }
 }

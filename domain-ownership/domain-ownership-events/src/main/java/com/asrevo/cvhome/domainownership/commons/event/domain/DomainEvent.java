@@ -13,8 +13,9 @@ import java.util.List;
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.WRAPPER_OBJECT)
 @JsonSubTypes({
         @JsonSubTypes.Type(value = DomainRegisteredEvent.class),
+        @JsonSubTypes.Type(value = DomainReferenceChangedEvent.class),
 })
-public sealed interface DomainEvent extends Event permits DomainRegisteredEvent {
+public sealed interface DomainEvent extends Event permits DomainReferenceChangedEvent, DomainRegisteredEvent {
     EventId eventId();
 
     DomainId domainId();

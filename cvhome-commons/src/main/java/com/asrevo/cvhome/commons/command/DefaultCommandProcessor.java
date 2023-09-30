@@ -1,9 +1,12 @@
 package com.asrevo.cvhome.commons.command;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 public class DefaultCommandProcessor implements CommandProcessor {
     private final List<CommandImpl<Command>> commandsImpl;
 
@@ -13,7 +16,11 @@ public class DefaultCommandProcessor implements CommandProcessor {
 
     @Override
     public void process(Command command) {
-        getProcessors(command.getClass()).forEach(it -> it.process(command));
+        List<CommandImpl<Command>> processors = getProcessors(command.getClass());
+        processors.forEach(it -> it.process(command));
+        if (processors.isEmpty()) {
+            log.warn("could not find any command impl for {}", command.getClass());
+        }
     }
 
     @Override

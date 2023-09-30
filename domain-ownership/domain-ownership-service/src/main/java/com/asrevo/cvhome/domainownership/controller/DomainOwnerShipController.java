@@ -58,4 +58,9 @@ public class DomainOwnerShipController {
     public DomainReferenceResponse getReference(@RequestBody Domain domain) {
         return domainService.getReference(domain);
     }
+
+    @PostMapping("change-reference")
+    public DomainChangeReferenceResponse changeReference(@RequestBody DomainChangeReferenceRequest changeReferenceRequest, @AuthenticationPrincipal Principal principal) {
+        return domainService.changeDomainReference(changeReferenceRequest, new IdentityId(principal.getName()));
+    }
 }

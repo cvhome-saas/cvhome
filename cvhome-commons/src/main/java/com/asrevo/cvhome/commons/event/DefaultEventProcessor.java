@@ -1,9 +1,12 @@
 package com.asrevo.cvhome.commons.event;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 public class DefaultEventProcessor implements EventProcessor {
     private final List<EventImpl<Event>> eventsImpl;
 
@@ -13,7 +16,11 @@ public class DefaultEventProcessor implements EventProcessor {
 
     @Override
     public void process(Event event) {
-        getProcessors(event.getClass()).forEach(it -> it.process(event));
+        List<EventImpl<Event>> processors = getProcessors(event.getClass());
+        processors.forEach(it -> it.process(event));
+        if (processors.isEmpty()) {
+            log.warn("could not find any event impl for {}", event.eventType());
+        }
     }
 
     @Override
