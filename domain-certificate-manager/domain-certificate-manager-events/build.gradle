@@ -1,0 +1,12 @@
+plugins {
+    id 'com.asrevo.java-library-conventions'
+}
+
+dependencies {
+    api project(':domain-certificate-manager:domain-certificate-manager-commons')
+    compileOnly 'org.springframework.data:spring-data-commons:3.1.4'
+    compileOnly 'org.springframework.data:spring-data-relational:3.1.4'
+    compileOnly 'com.fasterxml.jackson.core:jackson-annotations:2.15.2'
+    compileOnly 'org.projectlombok:lombok:1.18.28'
+    annotationProcessor 'org.projectlombok:lombok:1.18.28'
+}
