@@ -9,6 +9,7 @@ import io.netty.handler.ssl.SupportedCipherSuiteFilter;
 import org.shredzone.acme4j.challenge.TlsAlpn01Challenge;
 import reactor.netty.tcp.AbstractProtocolSslContextSpec;
 
+import java.io.File;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.function.Consumer;
@@ -34,6 +35,10 @@ public final class AcmeTls1SslContextSpec extends AbstractProtocolSslContextSpec
 
     public static AcmeTls1SslContextSpec forServer(PrivateKey key, X509Certificate... keyCertChain) {
         return new AcmeTls1SslContextSpec(SslContextBuilder.forServer(key, keyCertChain));
+    }
+
+    public static AcmeTls1SslContextSpec forServer(File keyCertChainFile, File keyFile) {
+        return new AcmeTls1SslContextSpec(SslContextBuilder.forServer(keyCertChainFile, keyFile));
     }
 
     @Override
