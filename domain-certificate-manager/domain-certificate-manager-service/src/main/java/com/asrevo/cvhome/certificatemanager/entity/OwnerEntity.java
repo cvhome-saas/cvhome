@@ -1,4 +1,4 @@
-package com.asrevo.cvhome.certificatemanager.domain;
+package com.asrevo.cvhome.certificatemanager.entity;
 
 import com.asrevo.cvhome.certificatemanager.commons.domain.DomainId;
 import com.asrevo.cvhome.commons.domain.BaseEntity;

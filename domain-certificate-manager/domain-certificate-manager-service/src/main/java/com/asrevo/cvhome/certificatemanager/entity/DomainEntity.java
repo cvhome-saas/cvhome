@@ -1,4 +1,4 @@
-package com.asrevo.cvhome.certificatemanager.domain;
+package com.asrevo.cvhome.certificatemanager.entity;
 
 import com.asrevo.cvhome.certificatemanager.commons.domain.*;
 import com.asrevo.cvhome.certificatemanager.commons.event.domain.DomainReferenceChangedEvent;
@@ -32,7 +32,7 @@ public class DomainEntity extends BaseEntity<DomainEntity, DomainId> {
     private boolean autoRenew;
     private boolean autoOrder;
     @Column("owner_id")
-    private AggregateReference<OwnerEntity, IdentityId> owner;
+    private AggregateReference<com.asrevo.cvhome.certificatemanager.entity.OwnerEntity, IdentityId> owner;
 
     public static DomainEntity create(Domain domain, Reference reference, DomainType domainType, IdentityId identity) {
         DomainEntity entity = new DomainEntity();

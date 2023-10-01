@@ -1,4 +1,4 @@
-package com.asrevo.cvhome.certificatemanager.service.Impl;
+package com.asrevo.cvhome.certificatemanager.service.impl;
 
 import com.asrevo.cvhome.certificatemanager.service.DomainReferenceService;
 import lombok.AllArgsConstructor;

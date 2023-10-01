@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.certificatemanager.service;
 
 import com.asrevo.cvhome.certificatemanager.commons.domain.DomainId;
-import com.asrevo.cvhome.certificatemanager.domain.OwnerEntity;
+import com.asrevo.cvhome.certificatemanager.entity.OwnerEntity;
 import com.asrevo.cvhome.commons.domain.IdentityId;
 
 import java.security.Principal;

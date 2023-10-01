@@ -3,7 +3,7 @@ package com.asrevo.cvhome.certificatemanager.controller;
 import com.asrevo.cvhome.certificatemanager.commons.domain.Domain;
 import com.asrevo.cvhome.certificatemanager.commons.domain.DomainType;
 import com.asrevo.cvhome.certificatemanager.commons.dto.*;
-import com.asrevo.cvhome.certificatemanager.domain.OwnerEntity;
+import com.asrevo.cvhome.certificatemanager.entity.OwnerEntity;
 import com.asrevo.cvhome.certificatemanager.service.DomainOwnerShipService;
 import com.asrevo.cvhome.certificatemanager.service.DomainService;
 import com.asrevo.cvhome.certificatemanager.service.OwnerService;

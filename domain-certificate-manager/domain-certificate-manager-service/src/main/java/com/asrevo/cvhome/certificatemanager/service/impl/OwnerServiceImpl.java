@@ -1,7 +1,7 @@
-package com.asrevo.cvhome.certificatemanager.service.Impl;
+package com.asrevo.cvhome.certificatemanager.service.impl;
 
 import com.asrevo.cvhome.certificatemanager.commons.domain.DomainId;
-import com.asrevo.cvhome.certificatemanager.domain.OwnerEntity;
+import com.asrevo.cvhome.certificatemanager.entity.OwnerEntity;
 import com.asrevo.cvhome.certificatemanager.repository.OwnerRepository;
 import com.asrevo.cvhome.certificatemanager.service.OwnerService;
 import com.asrevo.cvhome.commons.domain.Email;
