@@ -26,20 +26,20 @@ public class DynamicSslLoaderNettyCustomizer implements NettyServerCustomizer {
         Function<String, String> keyResolver = getKeyResolver(sslProperties);
         this.sslContext = sslContext;
         SslProvider sslProvider = SslProvider.builder().sslContext(sslContext).build();
-        this.asyncMapping = (s, promise) -> getSslProviderPromise(slProviderLoader, sslProperties, s, promise, keyResolver, sslProvider);
+        this.asyncMapping = (domain, promise) -> getSslProvider(slProviderLoader, sslProperties, domain, promise, keyResolver, sslProvider);
     }
 
 
-    private static Promise<SslProvider> getSslProviderPromise(SSlProviderLoader slProviderLoader, SslProperties sslProperties, String s, Promise<SslProvider> promise, Function<String, String> keyResolver, SslProvider sslProvider) {
-        String domain = keyResolver.apply(s);
-        if (domain.equals(sslProperties.getDefaultDomain())) {
+    private static Promise<SslProvider> getSslProvider(SSlProviderLoader slProviderLoader, SslProperties sslProperties, String domain, Promise<SslProvider> promise, Function<String, String> keyResolver, SslProvider sslProvider) {
+        String resolvedDomain = keyResolver.apply(domain);
+        if (resolvedDomain.equals(sslProperties.getDefaultDomain())) {
             return promise.setSuccess(sslProvider);
         }
-        SslProvider load = slProviderLoader.load(s);
+        SslProvider load = slProviderLoader.load(domain);
         if (load != null) {
             return promise.setSuccess(load);
         } else {
-            return promise.setFailure(new Error("invalid host " + s));
+            return promise.setFailure(new Error("invalid host " + domain));
         }
     }
 
@@ -62,11 +62,11 @@ public class DynamicSslLoaderNettyCustomizer implements NettyServerCustomizer {
         boolean allowAccessLog = true;
         return httpServer
                 .accessLog(allowAccessLog, new SslNettyLogFormatter())
-                .secure(getSslContextSpecConsumer(), redirectHttpToHttps)
+                .secure(getSslContextSpec(), redirectHttpToHttps)
                 .protocol(supportedProtocol);
     }
 
-    private Consumer<SslProvider.SslContextSpec> getSslContextSpecConsumer() {
+    private Consumer<SslProvider.SslContextSpec> getSslContextSpec() {
         return sslContextSpec -> sslContextSpec.sslContext(this.sslContext).setSniAsyncMappings(this.asyncMapping);
     }
 }
