@@ -1,5 +1,5 @@
 ### get token from test application
-POST http://localhost:8081/api/v1/test/sign
+POST http://localhost:8082/api/v1/test/sign
 Content-Type: application/json
 
 {
@@ -62,23 +62,23 @@ password = microservice-gateway
 
 
 ### get proving
-POST http://localhost:8081/api/v1/domain-ownership/get-proving
+POST http://localhost:8082/api/v1/domain-ownership/get-proving
 Content-Type: application/json
 Authorization: Bearer {{access_token}}
 
 {
-  "domain": "test1.asrevo.com"
+  "domain": "aswwa.asrevo.com"
 }
 
 
 ### register a domain
-POST http://localhost:8081/api/v1/domain-ownership/register
+POST http://localhost:8082/api/v1/domain-ownership/register
 Content-Type: application/json
 Authorization: Bearer {{access_token}}
 
 {
   "domain": {
-    "domain": "test1.asrevo.com"
+    "domain": "aswwa.asrevo.com"
   },
   "domainType": "SAS_SUB"
 }

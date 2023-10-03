@@ -12,7 +12,6 @@ import reactor.netty.tcp.SslProvider;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 
 @Slf4j
@@ -23,9 +22,9 @@ public class DynamicSslLoaderNettyCustomizer implements NettyServerCustomizer {
     private final SslContext sslContext;
 
 
-    public DynamicSslLoaderNettyCustomizer(Supplier<SslContext> defaultSslContextSupplier, SSlProviderLoader slProviderLoader, SslProperties sslProperties) {
+    public DynamicSslLoaderNettyCustomizer(SslContext sslContext, SSlProviderLoader slProviderLoader, SslProperties sslProperties) {
         Function<String, String> keyResolver = getKeyResolver(sslProperties);
-        this.sslContext = defaultSslContextSupplier.get();
+        this.sslContext = sslContext;
         SslProvider sslProvider = SslProvider.builder().sslContext(sslContext).build();
         this.asyncMapping = (s, promise) -> getSslProviderPromise(slProviderLoader, sslProperties, s, promise, keyResolver, sslProvider);
     }
