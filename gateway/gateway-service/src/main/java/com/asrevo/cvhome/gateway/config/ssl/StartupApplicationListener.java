@@ -1,7 +1,6 @@
 package com.asrevo.cvhome.gateway.config.ssl;
 
 import com.asrevo.cvhome.gateway.service.AcmService;
-import io.netty.handler.ssl.SslContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -26,7 +25,7 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
-        SslContext sslContext = acmService.getSslContext(cf, sslProperties.getDefaultDomain());
+        DelegatedSslContext sslContext = acmService.getSslContext(cf, sslProperties.getDefaultDomain());
         if (sslContext != null) {
             delegatedSslContext.setNewSslContext(sslContext);
         } else {

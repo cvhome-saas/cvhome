@@ -11,9 +11,15 @@ import java.util.List;
 
 public class DelegatedSslContext extends SslContext {
     private SslContext cur;
+    private boolean isValidationCertificate = false;
 
     public DelegatedSslContext(SslContext cur) {
         this.cur = cur;
+    }
+
+    public DelegatedSslContext(SslContext cur, boolean isValidationCertificate) {
+        this.cur = cur;
+        this.isValidationCertificate = isValidationCertificate;
     }
 
     @Override
@@ -48,5 +54,19 @@ public class DelegatedSslContext extends SslContext {
 
     void setNewSslContext(SslContext sslContext) {
         this.cur = sslContext;
+    }
+
+    void setNewSslContext(DelegatedSslContext sslContext) {
+        this.cur = sslContext;
+        this.isValidationCertificate = sslContext.isValidationCertificate;
+    }
+
+    void setNewSslContext(SslContext sslContext, boolean isValidationCertificate) {
+        this.cur = sslContext;
+        this.isValidationCertificate = isValidationCertificate;
+    }
+
+    public boolean isValidationCertificate() {
+        return isValidationCertificate;
     }
 }

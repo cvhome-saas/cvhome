@@ -1,7 +1,6 @@
 package com.asrevo.cvhome.gateway.config.ssl;
 
 import com.google.common.net.InternetDomainName;
-import io.netty.handler.ssl.SslContext;
 import io.netty.util.AsyncMapping;
 import io.netty.util.concurrent.Promise;
 import lombok.extern.slf4j.Slf4j;
@@ -19,10 +18,10 @@ public class DynamicSslLoaderNettyCustomizer implements NettyServerCustomizer {
 
     private final AsyncMapping<String, SslProvider> asyncMapping;
     private final HttpProtocol[] supportedProtocol = {HttpProtocol.HTTP11, HttpProtocol.H2};
-    private final SslContext sslContext;
+    private final DelegatedSslContext sslContext;
 
 
-    public DynamicSslLoaderNettyCustomizer(SslContext sslContext, SSlProviderLoader slProviderLoader, SslProperties sslProperties) {
+    public DynamicSslLoaderNettyCustomizer(DelegatedSslContext sslContext, SSlProviderLoader slProviderLoader, SslProperties sslProperties) {
         Function<String, String> keyResolver = getKeyResolver(sslProperties);
         this.sslContext = sslContext;
         SslProvider sslProvider = SslProvider.builder().sslContext(sslContext).build();

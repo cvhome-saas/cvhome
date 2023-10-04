@@ -37,7 +37,7 @@ public class SslNettyConfig {
 
     @Bean
     public DelegatedSslContext delegatedSslContext(SslProperties sslProperties) {
-        return new DelegatedSslContext(getSslContextSupplier(sslProperties.getDefaultDomain()));
+        return new DelegatedSslContext(getSslContextSupplier(sslProperties.getDefaultDomain()), false);
     }
 
     @Bean
@@ -50,6 +50,7 @@ public class SslNettyConfig {
     public StartupApplicationListener applicationListener(AcmService acmService, DelegatedSslContext delegatedSslContext, CertificateFactory cf, SslProperties sslProperties) {
         return new StartupApplicationListener(acmService, delegatedSslContext, cf, sslProperties);
     }
+
     @SneakyThrows
     @Bean
     SSlProviderLoader slProviderLoader(AcmService acmService, CertificateFactory cf) {

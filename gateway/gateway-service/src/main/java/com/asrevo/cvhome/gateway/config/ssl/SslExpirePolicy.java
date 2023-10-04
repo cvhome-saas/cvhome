@@ -2,7 +2,6 @@ package com.asrevo.cvhome.gateway.config.ssl;
 
 import com.github.benmanes.caffeine.cache.Expiry;
 import org.checkerframework.checker.index.qual.NonNegative;
-import org.shredzone.acme4j.challenge.TlsAlpn01Challenge;
 import reactor.netty.tcp.SslProvider;
 
 import java.time.Duration;
@@ -18,7 +17,7 @@ public class SslExpirePolicy implements Expiry<String, SslProvider> {
 
     @Override
     public long expireAfterCreate(String key, SslProvider value, long currentTime) {
-        if (value.getSslContext().applicationProtocolNegotiator().protocols().contains(TlsAlpn01Challenge.ACME_TLS_1_PROTOCOL)) {
+        if (((DelegatedSslContext) value.getSslContext()).isValidationCertificate()) {
             return acmeTlsCacheTime;
         } else {
             return defaultDuration.toNanos();

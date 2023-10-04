@@ -2,7 +2,7 @@ package com.asrevo.cvhome.gateway.service;
 
 import com.asrevo.cvhome.certificatemanager.commons.domain.CertificateFileType;
 import com.asrevo.cvhome.gateway.config.ssl.AcmeTls1SslContextSpec;
-import io.netty.handler.ssl.SslContext;
+import com.asrevo.cvhome.gateway.config.ssl.DelegatedSslContext;
 import lombok.SneakyThrows;
 import org.shredzone.acme4j.util.KeyPairUtils;
 import org.springframework.http.HttpStatus;
@@ -43,16 +43,16 @@ public interface AcmService {
 
     @SneakyThrows
     default SslProvider getSslProvider(CertificateFactory certificateFactory, String domain) {
-        SslContext sslContext = getSslContext(certificateFactory, domain);
-        if (sslContext == null) {
+        DelegatedSslContext delegatedSslContext = getSslContext(certificateFactory, domain);
+        if (delegatedSslContext == null) {
             log.warn("couldn't get domain sslContext for domain {}", domain);
             return null;
         }
-        return SslProvider.builder().sslContext(sslContext).build();
+        return SslProvider.builder().sslContext(delegatedSslContext).build();
     }
 
     @SneakyThrows
-    default SslContext getSslContext(CertificateFactory certificateFactory, String domain) {
+    default DelegatedSslContext getSslContext(CertificateFactory certificateFactory, String domain) {
         log.info("will getSslContext for domain {} ", domain);
         InputStream keyS3Object = getFile(domain, CertificateFileType.KEY);
         if (keyS3Object == null) return null;
@@ -63,10 +63,10 @@ public interface AcmService {
         if (keyPair != null && cert != null) {
             if (cert.getIssuerX500Principal().getName().equals("CN=acme.invalid")) {
                 log.info("will generate AcmeTls1 for domain {}", domain);
-                return AcmeTls1SslContextSpec.forServer(keyPair.getPrivate(), cert).sslContext();
+                return new DelegatedSslContext(AcmeTls1SslContextSpec.forServer(keyPair.getPrivate(), cert).sslContext(), true);
             } else {
                 log.info("will generate Http2 for domain {}", domain);
-                return Http2SslContextSpec.forServer(keyPair.getPrivate(), cert).sslContext();
+                return new DelegatedSslContext(Http2SslContextSpec.forServer(keyPair.getPrivate(), cert).sslContext(), false);
             }
 
         }
