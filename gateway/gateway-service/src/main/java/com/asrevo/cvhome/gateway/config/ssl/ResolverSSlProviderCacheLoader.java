@@ -15,7 +15,7 @@ public class ResolverSSlProviderCacheLoader implements SSlProviderLoader {
     @Getter
     private final DelegatedSslContext defaultSslContext;
 
-    ResolverSSlProviderCacheLoader(SSlProviderCacheLoader sSlProviderCacheLoader, SslProperties sslProperties) {
+    public ResolverSSlProviderCacheLoader(SSlProviderCacheLoader sSlProviderCacheLoader, SslProperties sslProperties) {
         this.sSlProviderCacheLoader = sSlProviderCacheLoader;
         this.sslProperties = sslProperties;
         this.defaultSslContext = buildInitialiseContext();
@@ -46,11 +46,11 @@ public class ResolverSSlProviderCacheLoader implements SSlProviderLoader {
         return new DelegatedSslContext(sslContextSpec.sslContext(), false);
     }
 
-    public String defaultDomain() {
+    String defaultDomain() {
         return this.sslProperties.getDefaultDomain();
     }
 
-    public void requestNewSslContext() {
+    void requestNewSslContext() {
         SslProvider loaded = this.sSlProviderCacheLoader.load(this.defaultDomain());
         if (loaded != null && loaded.getSslContext() != null) {
             defaultSslContext.setNewSslContext(((DelegatedSslContext) loaded.getSslContext()));

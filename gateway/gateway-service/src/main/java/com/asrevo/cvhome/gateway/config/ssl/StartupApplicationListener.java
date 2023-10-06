@@ -7,15 +7,14 @@ import org.springframework.context.event.ContextRefreshedEvent;
 
 @Slf4j
 public class StartupApplicationListener implements ApplicationListener<ContextRefreshedEvent> {
-    private final ResolverSSlProviderCacheLoader resolverSSlProviderCacheLoader;
+    private final ResolverSSlProviderCacheLoader loader;
 
-    public StartupApplicationListener(ResolverSSlProviderCacheLoader resolverSSlProviderCacheLoader) {
-        this.resolverSSlProviderCacheLoader = resolverSSlProviderCacheLoader;
+    public StartupApplicationListener(ResolverSSlProviderCacheLoader loader) {
+        this.loader = loader;
     }
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
-        resolverSSlProviderCacheLoader.requestNewSslContext();
-
+        loader.requestNewSslContext();
     }
 }

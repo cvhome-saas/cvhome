@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.gateway.config.ssl;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.Expiry;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import lombok.extern.slf4j.Slf4j;
 import reactor.netty.tcp.SslProvider;
@@ -12,11 +13,15 @@ import java.time.temporal.ChronoUnit;
 public class SSlProviderCacheLoader implements SSlProviderLoader {
     private final LoadingCache<String, SslProvider> cache;
 
-    SSlProviderCacheLoader(SSlProviderLoader loader) {
-        this.cache = Caffeine.newBuilder().expireAfter(new SslExpirePolicy(Duration.of(1, ChronoUnit.DAYS)))
-                .build(loader::load);
+    public SSlProviderCacheLoader(SSlProviderLoader loader) {
+        this(loader, new SslExpirePolicy(Duration.of(1, ChronoUnit.DAYS)));
     }
 
+    public SSlProviderCacheLoader(SSlProviderLoader loader, Expiry<String, SslProvider> expiry) {
+        this.cache = Caffeine.newBuilder()
+                .expireAfter(expiry)
+                .build(loader::load);
+    }
 
     @Override
     public SslProvider load(String key) {

@@ -1,5 +1,6 @@
-package com.asrevo.cvhome.gateway.config.ssl;
+package com.asrevo.cvhome.gateway.config;
 
+import com.asrevo.cvhome.gateway.config.ssl.*;
 import com.asrevo.cvhome.gateway.service.AcmService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.embedded.netty.NettyServerCustomizer;

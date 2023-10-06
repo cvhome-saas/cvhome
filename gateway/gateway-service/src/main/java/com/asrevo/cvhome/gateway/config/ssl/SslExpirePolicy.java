@@ -11,7 +11,7 @@ public class SslExpirePolicy implements Expiry<String, SslProvider> {
     private final Duration defaultDuration;
     private final long acmeTlsCacheTime = Duration.of(15, ChronoUnit.SECONDS).toNanos();
 
-    public SslExpirePolicy(Duration defaultDuration) {
+    SslExpirePolicy(Duration defaultDuration) {
         this.defaultDuration = defaultDuration;
     }
 
