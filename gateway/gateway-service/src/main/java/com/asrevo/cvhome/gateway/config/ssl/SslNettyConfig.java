@@ -41,8 +41,7 @@ public class SslNettyConfig {
     }
 
     @Bean
-    public NettyServerCustomizer customizer(SSlProviderLoader slProviderLoader, DelegatedSslContext sslContext, SslProperties sslProperties) {
-        SSlProviderLoader loader = new SSlProviderCacheLoader(slProviderLoader);
+    public NettyServerCustomizer customizer(SSlProviderCacheLoader loader, DelegatedSslContext sslContext, SslProperties sslProperties) {
         return new DynamicSslLoaderNettyCustomizer(sslContext, loader, sslProperties);
     }
 
@@ -51,10 +50,8 @@ public class SslNettyConfig {
         return new StartupApplicationListener(acmService, delegatedSslContext, cf, sslProperties);
     }
 
-    @SneakyThrows
     @Bean
-    SSlProviderLoader slProviderLoader(AcmService acmService, CertificateFactory cf) {
-        return new AcmCertificateLoaderImpl(acmService, cf);
+    public SSlProviderCacheLoader sSlProviderCacheLoader(AcmService acmService, CertificateFactory cf) {
+        return new SSlProviderCacheLoader(key -> acmService.getSslProvider(cf, key));
     }
-
 }

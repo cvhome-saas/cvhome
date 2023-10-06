@@ -23,5 +23,4 @@ public class SSlProviderCacheLoader implements SSlProviderLoader {
         return this.cache.get(key);
     }
 
-
 }
