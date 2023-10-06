@@ -36,7 +36,7 @@ public class AcmController {
     @PostMapping("order")
     public OrdersCreateResponseDto order(@RequestBody @Validated OrdersCreateRequestDto createRequest) {
         log.info("will order a certificate for domain {}", createRequest.getDomain());
-        return acmCertificateOrderService.initiateOrder(createRequest);
+        return acmCertificateOrderService.initiate(createRequest);
     }
 
     @PostMapping("validate")
