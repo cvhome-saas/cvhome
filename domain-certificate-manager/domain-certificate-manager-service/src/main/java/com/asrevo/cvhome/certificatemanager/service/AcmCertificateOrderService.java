@@ -9,9 +9,9 @@ import com.asrevo.cvhome.certificatemanager.commons.dto.OrdersCreateResponseDto;
 public interface AcmCertificateOrderService {
 
 
-    OrdersCreateResponseDto initiateOrder(OrdersCreateRequestDto createRequest);
+    OrdersCreateResponseDto initiate(OrdersCreateRequestDto createRequest);
 
-    OrdersCreateResponseDto initiateOrder(Domain domain, ChallengeValidationType validationType);
+    OrdersCreateResponseDto initiate(Domain domain, ChallengeValidationType validationType);
 
     void order(OrdersId orderId);
 

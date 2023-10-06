@@ -15,7 +15,7 @@ public class CreateOrderCommandImpl implements CommandImpl<CreateOrderCommand> {
 
     @Override
     public void process(CreateOrderCommand order) {
-        acmCertificateOrderService.initiateOrder(order.getDomain(), order.getDomain().getRecommendedChallengeValidationType());
+        acmCertificateOrderService.initiate(order.getDomain(), order.getDomain().getRecommendedChallengeValidationType());
     }
 
     @Override
