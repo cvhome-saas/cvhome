@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
 public class SslNettyConfig {
     @Bean
     public ResolverSSlProviderCacheLoader resolverSSlProviderCacheLoader(AcmService acmService, SslProperties sslProperties) {
-        SSlProviderCacheLoader cacheLoader = new SSlProviderCacheLoader(acmService::getSslProvider);
+        SSlProviderCacheLoader cacheLoader = new SSlProviderCacheLoader(acmService);
         return new ResolverSSlProviderCacheLoader(cacheLoader, sslProperties);
     }
 

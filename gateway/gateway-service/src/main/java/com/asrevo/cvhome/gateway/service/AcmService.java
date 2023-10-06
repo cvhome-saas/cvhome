@@ -3,6 +3,7 @@ package com.asrevo.cvhome.gateway.service;
 import com.asrevo.cvhome.certificatemanager.commons.domain.CertificateFileType;
 import com.asrevo.cvhome.gateway.config.ssl.AcmeTls1SslContextSpec;
 import com.asrevo.cvhome.gateway.config.ssl.DelegatedSslContext;
+import com.asrevo.cvhome.gateway.config.ssl.SSlProviderLoader;
 import lombok.SneakyThrows;
 import org.shredzone.acme4j.util.KeyPairUtils;
 import org.springframework.http.HttpStatus;
@@ -17,7 +18,7 @@ import java.security.KeyPair;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 
-public interface AcmService {
+public interface AcmService extends SSlProviderLoader {
     org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AcmService.class);
 
     ResponseEntity<byte[]> getDomainCertificateFile(String domain, CertificateFileType fileType);
@@ -40,10 +41,8 @@ public interface AcmService {
         }
     }
 
-
-    @SneakyThrows
-    default SslProvider getSslProvider(String domain) {
-
+    @Override
+    default SslProvider load(String domain) {
         DelegatedSslContext delegatedSslContext = getSslContext(domain);
         if (delegatedSslContext == null) {
             log.warn("couldn't get domain sslContext for domain {}", domain);
