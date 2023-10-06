@@ -42,8 +42,9 @@ public interface AcmService {
 
 
     @SneakyThrows
-    default SslProvider getSslProvider(CertificateFactory certificateFactory, String domain) {
-        DelegatedSslContext delegatedSslContext = getSslContext(certificateFactory, domain);
+    default SslProvider getSslProvider(String domain) {
+
+        DelegatedSslContext delegatedSslContext = getSslContext(domain);
         if (delegatedSslContext == null) {
             log.warn("couldn't get domain sslContext for domain {}", domain);
             return null;
@@ -52,7 +53,8 @@ public interface AcmService {
     }
 
     @SneakyThrows
-    default DelegatedSslContext getSslContext(CertificateFactory certificateFactory, String domain) {
+    default DelegatedSslContext getSslContext(String domain) {
+        CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
         log.info("will getSslContext for domain {} ", domain);
         InputStream keyS3Object = getFile(domain, CertificateFileType.KEY);
         if (keyS3Object == null) return null;

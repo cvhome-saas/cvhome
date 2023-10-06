@@ -1,57 +1,28 @@
 package com.asrevo.cvhome.gateway.config.ssl;
 
 import com.asrevo.cvhome.gateway.service.AcmService;
-import io.netty.handler.ssl.SslContext;
-import io.netty.handler.ssl.util.SelfSignedCertificate;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.embedded.netty.NettyServerCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import reactor.netty.http.Http2SslContextSpec;
-
-import java.security.cert.CertificateFactory;
 
 
 @Configuration
 @Slf4j
 public class SslNettyConfig {
-    private static SslContext getSslContextSupplier(String domain) {
-        try {
-            log.info("will create initial self signed certificates for domain {} until we get a valid one", domain);
-            SelfSignedCertificate certificate = new SelfSignedCertificate(domain);
-            Http2SslContextSpec sslContextSpec = Http2SslContextSpec.forServer(certificate.certificate(), certificate.privateKey());
-            return sslContextSpec.sslContext();
-        } catch (Exception e) {
-            log.error("did not manged to create createSelfSsl for " + domain);
-            return null;
-        }
-    }
-
-
-    @SneakyThrows
     @Bean
-    public CertificateFactory cf() {
-        return CertificateFactory.getInstance("X.509");
+    public ResolverSSlProviderCacheLoader resolverSSlProviderCacheLoader(AcmService acmService, SslProperties sslProperties) {
+        SSlProviderCacheLoader cacheLoader = new SSlProviderCacheLoader(acmService::getSslProvider);
+        return new ResolverSSlProviderCacheLoader(cacheLoader, sslProperties);
     }
 
     @Bean
-    public DelegatedSslContext delegatedSslContext(SslProperties sslProperties) {
-        return new DelegatedSslContext(getSslContextSupplier(sslProperties.getDefaultDomain()), false);
+    public NettyServerCustomizer nettyServerCustomizer(ResolverSSlProviderCacheLoader sslLoader) {
+        return new DynamicSslLoaderNettyCustomizer(sslLoader);
     }
 
     @Bean
-    public NettyServerCustomizer customizer(SSlProviderCacheLoader loader, DelegatedSslContext sslContext, SslProperties sslProperties) {
-        return new DynamicSslLoaderNettyCustomizer(sslContext, loader, sslProperties);
-    }
-
-    @Bean
-    public StartupApplicationListener applicationListener(AcmService acmService, DelegatedSslContext delegatedSslContext, CertificateFactory cf, SslProperties sslProperties) {
-        return new StartupApplicationListener(acmService, delegatedSslContext, cf, sslProperties);
-    }
-
-    @Bean
-    public SSlProviderCacheLoader sSlProviderCacheLoader(AcmService acmService, CertificateFactory cf) {
-        return new SSlProviderCacheLoader(key -> acmService.getSslProvider(cf, key));
+    public StartupApplicationListener applicationListener(ResolverSSlProviderCacheLoader sslLoader) {
+        return new StartupApplicationListener(sslLoader);
     }
 }
