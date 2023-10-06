@@ -25,11 +25,8 @@ include(
         'ui',
         'cvhome-commons',
         'auth',
-        'certificate-manager:certificate-manager-commons',
-        'certificate-manager:certificate-manager-events',
-        'certificate-manager:certificate-manager-service',
-        'domain-ownership:domain-ownership-commons',
-        'domain-ownership:domain-ownership-events',
-        'domain-ownership:domain-ownership-service',
+        'domain-certificate-manager:domain-certificate-manager-commons',
+        'domain-certificate-manager:domain-certificate-manager-events',
+        'domain-certificate-manager:domain-certificate-manager-service',
         'gateway:gateway-service'
 )

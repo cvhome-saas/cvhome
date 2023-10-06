@@ -2,7 +2,8 @@ package com.asrevo.cvhome.gateway.service;
 
 import com.asrevo.cvhome.certificatemanager.commons.domain.CertificateFileType;
 import com.asrevo.cvhome.gateway.config.ssl.AcmeTls1SslContextSpec;
-import io.netty.handler.ssl.SslContext;
+import com.asrevo.cvhome.gateway.config.ssl.DelegatedSslContext;
+import com.asrevo.cvhome.gateway.config.ssl.SSlProviderLoader;
 import lombok.SneakyThrows;
 import org.shredzone.acme4j.util.KeyPairUtils;
 import org.springframework.http.HttpStatus;
@@ -17,7 +18,7 @@ import java.security.KeyPair;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 
-public interface AcmService {
+public interface AcmService extends SSlProviderLoader {
     org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AcmService.class);
 
     ResponseEntity<byte[]> getDomainCertificateFile(String domain, CertificateFileType fileType);
@@ -40,19 +41,19 @@ public interface AcmService {
         }
     }
 
-
-    @SneakyThrows
-    default SslProvider getSslProvider(CertificateFactory certificateFactory, String domain) {
-        SslContext sslContext = getSslContext(certificateFactory, domain);
-        if (sslContext == null) {
+    @Override
+    default SslProvider load(String domain) {
+        DelegatedSslContext delegatedSslContext = getSslContext(domain);
+        if (delegatedSslContext == null) {
             log.warn("couldn't get domain sslContext for domain {}", domain);
             return null;
         }
-        return SslProvider.builder().sslContext(sslContext).build();
+        return SslProvider.builder().sslContext(delegatedSslContext).build();
     }
 
     @SneakyThrows
-    default SslContext getSslContext(CertificateFactory certificateFactory, String domain) {
+    default DelegatedSslContext getSslContext(String domain) {
+        CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
         log.info("will getSslContext for domain {} ", domain);
         InputStream keyS3Object = getFile(domain, CertificateFileType.KEY);
         if (keyS3Object == null) return null;
@@ -63,10 +64,10 @@ public interface AcmService {
         if (keyPair != null && cert != null) {
             if (cert.getIssuerX500Principal().getName().equals("CN=acme.invalid")) {
                 log.info("will generate AcmeTls1 for domain {}", domain);
-                return AcmeTls1SslContextSpec.forServer(keyPair.getPrivate(), cert).sslContext();
+                return new DelegatedSslContext(AcmeTls1SslContextSpec.forServer(keyPair.getPrivate(), cert).sslContext(), true);
             } else {
                 log.info("will generate Http2 for domain {}", domain);
-                return Http2SslContextSpec.forServer(keyPair.getPrivate(), cert).sslContext();
+                return new DelegatedSslContext(Http2SslContextSpec.forServer(keyPair.getPrivate(), cert).sslContext(), false);
             }
 
         }
