@@ -32,6 +32,6 @@ public record OrdersValidatedEvent(EventId eventId, OrdersId ordersId, String ev
 
     @Override
     public String eventType() {
-        return "OrderValidatedEvent";
+        return "OrdersValidatedEvent";
     }
 }

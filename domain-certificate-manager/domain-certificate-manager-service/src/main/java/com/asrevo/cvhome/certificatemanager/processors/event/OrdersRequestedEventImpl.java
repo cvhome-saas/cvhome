@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class OrderRequestedEventImpl implements EventImpl<OrdersRequestedEvent> {
+public class OrdersRequestedEventImpl implements EventImpl<OrdersRequestedEvent> {
     private final DomainService domainService;
 
     @Override

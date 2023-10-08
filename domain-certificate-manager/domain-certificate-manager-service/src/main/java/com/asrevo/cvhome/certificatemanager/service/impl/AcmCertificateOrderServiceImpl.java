@@ -12,6 +12,7 @@ import com.asrevo.cvhome.certificatemanager.entity.OrdersEntity;
 import com.asrevo.cvhome.certificatemanager.mappers.OrdersMappers;
 import com.asrevo.cvhome.certificatemanager.service.AcmCertificateOrderService;
 import com.asrevo.cvhome.certificatemanager.service.AcmeManagerService;
+import com.asrevo.cvhome.certificatemanager.service.ChallengeInstallerManager;
 import com.asrevo.cvhome.certificatemanager.service.OrdersService;
 import com.asrevo.cvhome.commons.command.CommandPublisher;
 import lombok.AllArgsConstructor;
@@ -22,7 +23,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.util.Set;
 
 @Service
@@ -123,22 +123,20 @@ public class AcmCertificateOrderServiceImpl implements AcmCertificateOrderServic
         });
     }
 
+    private ChallengeInstallerManager installerManager;
+
     @Override
     public void prepareOrderValidation(OrdersId orderId) {
         Set<CertificateOrderStatus> preValidationNeededStatus = Set.of(CertificateOrderStatus.REQUESTED);
         ordersService.findOneById(orderId).ifPresent(it -> {
             if (preValidationNeededStatus.contains(it.getCertificateOrderStatus())) {
-                try {
-                    log.info("will prepareOrderValidation for order {}", orderId);
-                    acmeManagerService.doSetupBeforeValidation(it.getChallenges().getChallenge(it.getChallengeValidationType()));
-                    it.requestValidate();
-                    ValidateOrderCommand command = new ValidateOrderCommand();
-                    command.setId(it.getId());
-                    ordersService.save(it);
-                    commandPublisher.publish(command);
-                } catch (IOException e) {
-                    log.error("error when prepareOrderValidation for order {}", orderId);
-                }
+                log.info("will prepareOrderValidation for order {}", orderId);
+                installerManager.install(it.getChallenges().getChallenge(it.getChallengeValidationType()));
+                it.requestValidate();
+                ValidateOrderCommand command = new ValidateOrderCommand();
+                command.setId(it.getId());
+                ordersService.save(it);
+                commandPublisher.publish(command);
             } else {
                 log.warn("request to do generate Validation Challenge certificate for status {} and orderId {}", it.getCertificateOrderStatus(), orderId);
             }

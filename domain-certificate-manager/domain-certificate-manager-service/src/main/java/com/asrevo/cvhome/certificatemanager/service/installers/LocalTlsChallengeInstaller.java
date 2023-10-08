@@ -7,9 +7,12 @@ import com.asrevo.cvhome.certificatemanager.service.ChallengeInstaller;
 import com.asrevo.cvhome.certificatemanager.service.impl.LocalAcmFileServiceImpl;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.shredzone.acme4j.util.CertificateUtils;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.security.KeyPair;
+import java.security.cert.X509Certificate;
 
 @Service
 @AllArgsConstructor
@@ -18,9 +21,14 @@ public class LocalTlsChallengeInstaller implements ChallengeInstaller {
     private final LocalAcmFileServiceImpl localAcmFileService;
 
     @Override
-    public boolean setup(Challenge challenge) {
+    public boolean setup(Challenge c) {
         try {
-            localAcmFileService.generateCertificate(((TlsAlpnChallenge) challenge));
+            TlsAlpnChallenge challenge = (TlsAlpnChallenge) c;
+            KeyPair keyPair = localAcmFileService.generateOrGetKeyPair(challenge.domain());
+            byte[] decode = challenge.decode();
+            assert decode != null;
+            X509Certificate cert = CertificateUtils.createTlsAlpn01Certificate(keyPair, challenge.identifier(), decode);
+            localAcmFileService.storeCertificate(challenge.domain(), cert);
             return true;
         } catch (IOException e) {
             return false;

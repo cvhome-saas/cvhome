@@ -14,20 +14,34 @@ public class ChallengeInstallerManager {
     private final List<ChallengeInstaller> installers;
 
     public void install(Challenge challenge) {
-        List<ChallengeInstaller> installed = installers.stream().filter(it -> it.type().equals(challenge.type())).filter(it -> it.setup(challenge)).toList();
-        if (!installed.isEmpty()) {
-            List<String> setupOnProviders = installed.stream().map(ChallengeInstaller::provider).toList();
-            log.info(setupOnProviders.toString());
+        List<ChallengeInstaller> installed = installers.stream().filter(it -> it.type().equals(challenge.type())).toList();
+        ChallengeInstaller appliedInstaller = null;
+        for (ChallengeInstaller installer : installed) {
+            boolean isSetup = installer.setup(challenge);
+            if (isSetup) {
+                appliedInstaller = installer;
+                break;
+            }
+        }
+        if (appliedInstaller != null) {
+            log.info(appliedInstaller.provider());
         } else {
             log.info("");
         }
     }
 
     public void clean(Challenge challenge) {
-        List<ChallengeInstaller> installed = installers.stream().filter(it -> it.type().equals(challenge.type())).filter(it -> it.clean(challenge)).toList();
-        if (!installed.isEmpty()) {
-            List<String> cleanOnProviders = installed.stream().map(ChallengeInstaller::provider).toList();
-            log.info(cleanOnProviders.toString());
+        List<ChallengeInstaller> installed = installers.stream().filter(it -> it.type().equals(challenge.type())).toList();
+        ChallengeInstaller appliedInstaller = null;
+        for (ChallengeInstaller installer : installed) {
+            boolean isCleaned = installer.clean(challenge);
+            if (isCleaned) {
+                appliedInstaller = installer;
+                break;
+            }
+        }
+        if (appliedInstaller != null) {
+            log.info(appliedInstaller.provider());
         } else {
             log.info("");
         }

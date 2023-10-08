@@ -5,8 +5,6 @@ import com.asrevo.cvhome.certificatemanager.commons.domain.Domain;
 import com.asrevo.cvhome.certificatemanager.commons.domain.OrderLocation;
 import com.asrevo.cvhome.certificatemanager.domain.DomainCertificate;
 import com.asrevo.cvhome.certificatemanager.domain.HttpValidationToken;
-import com.asrevo.cvhome.certificatemanager.domain.challenges.HttpChallenge;
-import com.asrevo.cvhome.certificatemanager.domain.challenges.TlsAlpnChallenge;
 import com.asrevo.cvhome.certificatemanager.service.AcmFileService;
 import com.asrevo.cvhome.certificatemanager.service.AcmeManagerService;
 import lombok.AllArgsConstructor;
@@ -124,28 +122,9 @@ public class AcmeManagerServiceImpl implements AcmeManagerService {
         return null;
     }
 
-    public void generate(TlsAlpnChallenge challenge) throws IOException {
-        fileService.generateCertificate(challenge);
-    }
-
-    @Override
-    public void doSetupBeforeValidation(com.asrevo.cvhome.certificatemanager.domain.challenges.Challenge challenge) throws IOException {
-        if (challenge instanceof TlsAlpnChallenge tlsAlpnChallenge) {
-            generate(tlsAlpnChallenge);
-        } else if (challenge instanceof HttpChallenge httpChallenge) {
-            setupHttpVerificationFile(httpChallenge);
-        }
-    }
-
-
-    @Override
-    public void setupHttpVerificationFile(HttpChallenge challenge) throws IOException {
-        fileService.generateValidationFile(challenge);
-    }
-
     @Override
     public InputStream getHttpValidationFile(HttpValidationToken token) {
-        return fileService.getHttpValidationFile(token);
+        return null;
     }
 
     @Override

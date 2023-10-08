@@ -2,14 +2,10 @@ package com.asrevo.cvhome.certificatemanager.service.impl;
 
 import com.asrevo.cvhome.certificatemanager.commons.domain.CertificateFileType;
 import com.asrevo.cvhome.certificatemanager.commons.domain.Domain;
-import com.asrevo.cvhome.certificatemanager.domain.HttpValidationToken;
-import com.asrevo.cvhome.certificatemanager.domain.challenges.HttpChallenge;
-import com.asrevo.cvhome.certificatemanager.domain.challenges.TlsAlpnChallenge;
 import com.asrevo.cvhome.certificatemanager.service.AcmFileService;
 import lombok.SneakyThrows;
 import org.shredzone.acme4j.toolbox.AcmeUtils;
 import org.shredzone.acme4j.util.CSRBuilder;
-import org.shredzone.acme4j.util.CertificateUtils;
 import org.shredzone.acme4j.util.KeyPairUtils;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.stereotype.Service;
@@ -26,12 +22,10 @@ import java.security.cert.X509Certificate;
 public class LocalAcmFileServiceImpl implements AcmFileService {
     private final LocalFileServiceImpl fileService;
     private Path acmRoot;
-    private Path tokenRoot;
 
     public LocalAcmFileServiceImpl(LocalFileServiceImpl fileService) {
         this.fileService = fileService;
         acmRoot = createAcmBaseDirectory();
-        tokenRoot = createTokenBaseDirectory();
     }
 
     @SneakyThrows
@@ -47,11 +41,6 @@ public class LocalAcmFileServiceImpl implements AcmFileService {
         return this.acmRoot;
     }
 
-    private Path createTokenBaseDirectory() {
-        this.tokenRoot = Paths.get(System.getProperty("user.home"), "cvhome/certificate-manager/token");
-        createParentDirectory(this.tokenRoot);
-        return this.tokenRoot;
-    }
 
     @Override
     public KeyPair generateOrGetKeyPair(Domain domain) throws IOException {
@@ -81,40 +70,18 @@ public class LocalAcmFileServiceImpl implements AcmFileService {
 
     @Override
     public void storeCertificate(Domain domain, X509Certificate... certificates) throws IOException {
-        this.storeCertificate(acmRoot, domain, certificates);
-    }
-
-    @Override
-    public void generateCertificate(TlsAlpnChallenge challenge) throws IOException {
-        if (challenge != null) {
-            KeyPair keyPair = this.generateOrGetKeyPair(challenge.domain());
-            byte[] decode = challenge.decode();
-            assert decode != null;
-            X509Certificate cert = CertificateUtils.createTlsAlpn01Certificate(keyPair, challenge.identifier(), decode);
-            storeCertificate(acmRoot, challenge.domain(), cert);
+        File domainCrt = Files.createTempFile("domain", ".crt").toFile();
+        try (FileWriter crtFileWriter = new FileWriter(domainCrt)) {
+            try {
+                for (X509Certificate cert : certificates) {
+                    AcmeUtils.writeToPem(cert.getEncoded(), AcmeUtils.PemLabel.CERTIFICATE, crtFileWriter);
+                }
+            } catch (CertificateEncodingException ex) {
+                throw new IOException("Encoding error", ex);
+            }
         }
-
-    }
-
-
-    @Override
-    public void generateValidationFile(HttpChallenge challenge) throws IOException {
-        if (challenge != null) {
-
-            File http01Temp = Files.createTempFile("domain", ".http01").toFile();
-            FileWriter http01FileWriter = new FileWriter(http01Temp);
-            http01FileWriter.append(challenge.authorization());
-            http01FileWriter.flush();
-            http01FileWriter.close();
-
-            Path tokenPath = tokenRoot.resolve(challenge.token());
-            fileService.upload(http01Temp, tokenPath.toString());
-        }
-    }
-
-    @Override
-    public InputStream getHttpValidationFile(HttpValidationToken token) {
-        return fileService.getFile(tokenRoot.resolve(token.encoded()).toString());
+        Path certificatePath = acmRoot.resolve(Paths.get(domain.encoded(), CertificateFileType.CRT.getFile()));
+        fileService.upload(domainCrt, certificatePath.toString());
     }
 
     @Override
@@ -126,22 +93,4 @@ public class LocalAcmFileServiceImpl implements AcmFileService {
             return null;
         }
     }
-
-
-    private void storeCertificate(Path root, Domain domain, X509Certificate... certificates) throws IOException {
-        File domainCrt = Files.createTempFile("domain", ".crt").toFile();
-        try (FileWriter crtFileWriter = new FileWriter(domainCrt)) {
-            try {
-                for (X509Certificate cert : certificates) {
-                    AcmeUtils.writeToPem(cert.getEncoded(), AcmeUtils.PemLabel.CERTIFICATE, crtFileWriter);
-                }
-            } catch (CertificateEncodingException ex) {
-                throw new IOException("Encoding error", ex);
-            }
-        }
-
-        Path certificatePath = root.resolve(Paths.get(domain.encoded(), CertificateFileType.CRT.getFile()));
-        fileService.upload(domainCrt, certificatePath.toString());
-    }
-
 }
