@@ -27,10 +27,10 @@ public interface AcmeManagerService {
     DomainCertificate generate(OrderLocation location, Domain domain)
             throws IOException, AcmeException;
 
-    void generate(Domain domain, TlsAlpnChallenge challenge)
+    void generate(TlsAlpnChallenge challenge)
             throws IOException, DecoderException;
 
-    void doSetupBeforeValidation(Domain domain, Challenge challenge) throws IOException;
+    void doSetupBeforeValidation(Challenge challenge) throws IOException;
 
     void setupHttpVerificationFile(HttpChallenge challenge) throws IOException;
 

@@ -124,14 +124,14 @@ public class AcmeManagerServiceImpl implements AcmeManagerService {
         return null;
     }
 
-    public void generate(Domain domain, TlsAlpnChallenge challenge) throws IOException {
-        fileService.generateCertificate(domain, challenge);
+    public void generate(TlsAlpnChallenge challenge) throws IOException {
+        fileService.generateCertificate(challenge);
     }
 
     @Override
-    public void doSetupBeforeValidation(Domain domain, com.asrevo.cvhome.certificatemanager.domain.challenges.Challenge challenge) throws IOException {
+    public void doSetupBeforeValidation(com.asrevo.cvhome.certificatemanager.domain.challenges.Challenge challenge) throws IOException {
         if (challenge instanceof TlsAlpnChallenge tlsAlpnChallenge) {
-            generate(domain, tlsAlpnChallenge);
+            generate(tlsAlpnChallenge);
         } else if (challenge instanceof HttpChallenge httpChallenge) {
             setupHttpVerificationFile(httpChallenge);
         }

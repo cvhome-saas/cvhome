@@ -85,13 +85,13 @@ public class LocalAcmFileServiceImpl implements AcmFileService {
     }
 
     @Override
-    public void generateCertificate(Domain domain, TlsAlpnChallenge challenge) throws IOException {
+    public void generateCertificate(TlsAlpnChallenge challenge) throws IOException {
         if (challenge != null) {
-            KeyPair keyPair = this.generateOrGetKeyPair(domain);
+            KeyPair keyPair = this.generateOrGetKeyPair(challenge.domain());
             byte[] decode = challenge.decode();
             assert decode != null;
             X509Certificate cert = CertificateUtils.createTlsAlpn01Certificate(keyPair, challenge.identifier(), decode);
-            storeCertificate(acmRoot, domain, cert);
+            storeCertificate(acmRoot, challenge.domain(), cert);
         }
 
     }

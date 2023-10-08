@@ -20,7 +20,7 @@ public interface AcmFileService {
 
     void storeCertificate(Domain domain, X509Certificate... certificates) throws IOException;
 
-    void generateCertificate(Domain domain, TlsAlpnChallenge tlsAlpnChallenge) throws IOException;
+    void generateCertificate(TlsAlpnChallenge tlsAlpnChallenge) throws IOException;
 
     void generateValidationFile(HttpChallenge httpChallenge) throws IOException;
 

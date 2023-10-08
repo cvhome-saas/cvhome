@@ -130,7 +130,7 @@ public class AcmCertificateOrderServiceImpl implements AcmCertificateOrderServic
             if (preValidationNeededStatus.contains(it.getCertificateOrderStatus())) {
                 try {
                     log.info("will prepareOrderValidation for order {}", orderId);
-                    acmeManagerService.doSetupBeforeValidation(it.getDomain(), it.getChallenges().getChallenge(it.getChallengeValidationType()));
+                    acmeManagerService.doSetupBeforeValidation(it.getChallenges().getChallenge(it.getChallengeValidationType()));
                     it.requestValidate();
                     ValidateOrderCommand command = new ValidateOrderCommand();
                     command.setId(it.getId());

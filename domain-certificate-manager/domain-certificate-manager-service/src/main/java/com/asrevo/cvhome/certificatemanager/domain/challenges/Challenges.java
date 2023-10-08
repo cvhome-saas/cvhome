@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.certificatemanager.domain.challenges;
 
 import com.asrevo.cvhome.certificatemanager.commons.domain.ChallengeValidationType;
+import com.asrevo.cvhome.certificatemanager.commons.domain.Domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.shredzone.acme4j.Authorization;
 import org.shredzone.acme4j.Order;
@@ -31,17 +32,17 @@ public record Challenges(List<Challenge> challenges) {
 
         Dns01Challenge dns01Challenge = authorization.findChallenge(Dns01Challenge.TYPE);
         if (dns01Challenge != null) {
-            challenges.add(new DnsChallenge(authorization.getIdentifier().getDomain(), isWildcard, dns01Challenge.getDigest()));
+            challenges.add(new DnsChallenge(new Domain(domain), isWildcard, dns01Challenge.getDigest()));
         }
 
         Http01Challenge http01Challenge = authorization.findChallenge(Http01Challenge.TYPE);
         if (http01Challenge != null) {
-            challenges.add(new HttpChallenge(authorization.getIdentifier().getDomain(), isWildcard, http01Challenge.getToken(), http01Challenge.getAuthorization()));
+            challenges.add(new HttpChallenge(new Domain(domain), isWildcard, http01Challenge.getToken(), http01Challenge.getAuthorization()));
         }
 
         TlsAlpn01Challenge tlsAlpn01Challenge = authorization.findChallenge(TlsAlpn01Challenge.TYPE);
         if (tlsAlpn01Challenge != null) {
-            challenges.add(new TlsAlpnChallenge(domain, isWildcard, encodeHexString(tlsAlpn01Challenge.getAcmeValidation())));
+            challenges.add(new TlsAlpnChallenge(new Domain(domain), isWildcard, encodeHexString(tlsAlpn01Challenge.getAcmeValidation())));
         }
         return challenges;
     }

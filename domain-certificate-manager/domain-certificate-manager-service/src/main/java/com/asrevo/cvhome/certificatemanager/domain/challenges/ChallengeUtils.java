@@ -61,7 +61,7 @@ public class ChallengeUtils {
     };
 
     static boolean validate(TlsAlpnChallenge challenge) {
-        return validateAcmeTls1(challenge.domain(), 8443) || validateAcmeTls1(challenge.domain(), 443);
+        return validateAcmeTls1(challenge.domain().domain(), 8443) || validateAcmeTls1(challenge.domain().domain(), 443);
     }
 
     private static SSLSocketFactory createSSlFactory() {

@@ -2,7 +2,6 @@ package com.asrevo.cvhome.certificatemanager.commons.domain;
 
 import com.asrevo.cvhome.commons.domain.IdentityId;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.annotation.Transient;
 import org.xbill.DNS.Record;
 import org.xbill.DNS.*;
@@ -37,7 +36,7 @@ public record Domain(String domain) {
     }
 
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @JsonIgnore
     @Transient
     public String getProvingDomain() {
         return "dos-prove." + this.domain;
