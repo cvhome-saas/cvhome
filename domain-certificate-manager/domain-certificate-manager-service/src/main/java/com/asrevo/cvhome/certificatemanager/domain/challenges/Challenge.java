@@ -5,6 +5,7 @@ import com.asrevo.cvhome.certificatemanager.commons.domain.Domain;
 
 public interface Challenge {
     Domain domain();
+
     ChallengeValidationType type();
 
     boolean validate();

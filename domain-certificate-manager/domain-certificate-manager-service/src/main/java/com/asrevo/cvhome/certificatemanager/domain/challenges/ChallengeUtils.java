@@ -95,8 +95,6 @@ public class ChallengeUtils {
         boolean b = validateAcmeTls1("aswwa.asrevo.com", 443);
     }
 
-    private static final SSLSocketFactory socketFactory = createSSlFactory();
-
     private static boolean validateAcmeTls1(String host, Integer port) {
         if (isPortOpen(host, port)) {
             try (SSLSocket sslSocket = (SSLSocket) socketFactory.createSocket(InetAddress.getByName(host), port)) {
@@ -114,6 +112,8 @@ public class ChallengeUtils {
         }
         return false;
     }
+
+    private static final SSLSocketFactory socketFactory = createSSlFactory();
 
     private static boolean isPortOpen(String hostName, int portNumber) {
         boolean result;
@@ -164,4 +164,6 @@ public class ChallengeUtils {
         }
         return false;
     }
+
+
 }
