@@ -17,7 +17,6 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
-import java.util.stream.Stream;
 
 import static org.shredzone.acme4j.challenge.TlsAlpn01Challenge.ACME_TLS_1_PROTOCOL;
 
@@ -113,8 +112,6 @@ public class ChallengeUtils {
         return false;
     }
 
-    private static final SSLSocketFactory socketFactory = createSSlFactory();
-
     private static boolean isPortOpen(String hostName, int portNumber) {
         boolean result;
         try {
@@ -137,20 +134,18 @@ public class ChallengeUtils {
             lookup.setCache(null);
             final Record[] records = lookup.run();
             if (lookup.getResult() == Lookup.SUCCESSFUL && records != null && records.length > 0) {
-                return Arrays.stream(records).flatMap(it -> {
-                            if (it.getType() == 16) {
-                                TXTRecord txtRecord = (TXTRecord) it;
-                                return txtRecord.getStrings().stream();
-                            } else {
-                                return Stream.of();
-                            }
-                        })
+                return Arrays.stream(records)
+                        .filter(it -> it.getType() == 16)
+                        .map(it -> (TXTRecord) it)
+                        .flatMap(it -> it.getStrings().stream())
                         .anyMatch(it -> it.equals(challenge.digest()));
             }
         } catch (Exception ignored) {
         }
         return false;
-    }
+    }    private static final SSLSocketFactory socketFactory = createSSlFactory();
+
+
 
     static boolean validate(HttpChallenge challenge) {
         try {

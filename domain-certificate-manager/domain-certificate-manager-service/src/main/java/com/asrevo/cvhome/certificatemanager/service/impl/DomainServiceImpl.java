@@ -13,10 +13,12 @@ import com.asrevo.cvhome.certificatemanager.service.DomainService;
 import com.asrevo.cvhome.commons.domain.IdentityId;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.jdbc.core.mapping.AggregateReference;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -84,6 +86,11 @@ public class DomainServiceImpl implements DomainService {
         DomainEntity savedDomain = domainRepository.save(entity);
         return new DomainChangeReferenceResponse(savedDomain.getDomain(), savedDomain.getReference());
 
+    }
+
+    @Override
+    public List<DomainEntity> findAllSystemDomainNotRequested() {
+        return domainRepository.findByOwnerAndStatusIs(AggregateReference.to(IdentityId.ofSys()), DomainCertificateStatus.INITIATED);
     }
 
 }

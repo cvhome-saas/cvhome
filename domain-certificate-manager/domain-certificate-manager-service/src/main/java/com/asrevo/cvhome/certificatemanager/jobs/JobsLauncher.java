@@ -17,6 +17,6 @@ public class JobsLauncher {
 
     @PostConstruct
     public void scheduleRecurrently() {
-//        jobScheduler.scheduleRecurrently(every1minutes(), ****::****);
+        jobScheduler.scheduleRecurrently(every1minutes(), AcmJobs::orderSystemDomains);
     }
 }

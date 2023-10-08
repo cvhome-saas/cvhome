@@ -78,4 +78,10 @@ logging:
 org:
   jobrunr:
     background-job-server:
-      enabled: false
+      enabled: true
+com:
+  asrevo:
+    auto-order-domains:
+      domains:
+        - domain: "gateway.com"
+        - domain: "*.gateway.com"

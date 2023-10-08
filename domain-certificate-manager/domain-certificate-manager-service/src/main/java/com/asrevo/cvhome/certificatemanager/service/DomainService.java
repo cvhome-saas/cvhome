@@ -10,6 +10,7 @@ import com.asrevo.cvhome.certificatemanager.entity.DomainEntity;
 import com.asrevo.cvhome.commons.domain.IdentityId;
 
 import java.time.Instant;
+import java.util.List;
 
 public interface DomainService {
     DomainEntity findOneByDomain(Domain domain);
@@ -23,4 +24,6 @@ public interface DomainService {
     void updateDomainStatus(Domain domain, CertificateOrderStatus certificateOrderStatus, Instant date);
 
     DomainChangeReferenceResponse changeDomainReference(DomainChangeReferenceRequest changeReferenceRequest, IdentityId identityId);
+
+    List<DomainEntity> findAllSystemDomainNotRequested();
 }

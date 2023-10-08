@@ -26,11 +26,6 @@ public record Domain(String domain) {
     }
 
     @JsonIgnore
-    public ChallengeValidationType getRecommendedChallengeValidationType() {
-        return isWildCard() ? ChallengeValidationType.Dns01 : ChallengeValidationType.TlsAlpn01;
-    }
-
-    @JsonIgnore
     public String encoded() {
         return encode64(domain);
     }

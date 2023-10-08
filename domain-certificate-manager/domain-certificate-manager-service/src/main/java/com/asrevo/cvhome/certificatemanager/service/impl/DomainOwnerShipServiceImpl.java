@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.certificatemanager.service.impl;
 
 import com.asrevo.cvhome.certificatemanager.commons.command.order.CreateOrderCommand;
+import com.asrevo.cvhome.certificatemanager.commons.domain.ChallengeValidationType;
 import com.asrevo.cvhome.certificatemanager.commons.domain.Domain;
 import com.asrevo.cvhome.certificatemanager.commons.domain.DomainType;
 import com.asrevo.cvhome.certificatemanager.commons.domain.Reference;
@@ -15,6 +16,8 @@ import com.asrevo.cvhome.commons.domain.IdentityId;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Slf4j
 @AllArgsConstructor
@@ -33,6 +36,7 @@ public class DomainOwnerShipServiceImpl implements DomainOwnerShipService {
 
             CreateOrderCommand command = new CreateOrderCommand();
             command.setDomain(request.domain());
+            command.setValidationType(Optional.ofNullable(request.recommendedChallengeValidationType()).orElse(ChallengeValidationType.TlsAlpn01));
             commandPublisher.publish(command);
             return new RegisterDomainResponse(entity.getDomain(), entity.getReference());
         }
