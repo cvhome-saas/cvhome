@@ -7,6 +7,7 @@ import com.asrevo.cvhome.certificatemanager.commons.domain.*;
 import com.asrevo.cvhome.certificatemanager.commons.dto.OrdersCreateRequestDto;
 import com.asrevo.cvhome.certificatemanager.commons.dto.OrdersCreateResponseDto;
 import com.asrevo.cvhome.certificatemanager.domain.DomainCertificate;
+import com.asrevo.cvhome.certificatemanager.domain.HttpValidationToken;
 import com.asrevo.cvhome.certificatemanager.domain.challenges.Challenges;
 import com.asrevo.cvhome.certificatemanager.entity.OrdersEntity;
 import com.asrevo.cvhome.certificatemanager.mappers.OrdersMappers;
@@ -23,6 +24,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.InputStream;
 import java.util.Set;
 
 @Service
@@ -160,6 +162,11 @@ public class AcmCertificateOrderServiceImpl implements AcmCertificateOrderServic
                 log.warn("request to do generate certificate for status {} and orderId {}", it.getCertificateOrderStatus(), orderId);
             }
         });
+    }
+
+    @Override
+    public InputStream getHttpValidationToken(HttpValidationToken validationToken) {
+        return installerManager.getHttpValidationToken(validationToken);
     }
 
     private DomainCertificate doAcmGeneration(OrdersEntity it) {

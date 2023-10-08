@@ -5,6 +5,9 @@ import com.asrevo.cvhome.certificatemanager.commons.domain.Domain;
 import com.asrevo.cvhome.certificatemanager.commons.domain.OrdersId;
 import com.asrevo.cvhome.certificatemanager.commons.dto.OrdersCreateRequestDto;
 import com.asrevo.cvhome.certificatemanager.commons.dto.OrdersCreateResponseDto;
+import com.asrevo.cvhome.certificatemanager.domain.HttpValidationToken;
+
+import java.io.InputStream;
 
 public interface AcmCertificateOrderService {
 
@@ -22,4 +25,6 @@ public interface AcmCertificateOrderService {
     void prepareOrderValidation(OrdersId orderId);
 
     void doGeneration(OrdersId orderId);
+
+    InputStream getHttpValidationToken(HttpValidationToken validationToken);
 }

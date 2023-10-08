@@ -1,21 +1,22 @@
 package com.asrevo.cvhome.certificatemanager.service.installers;
 
 import com.asrevo.cvhome.certificatemanager.commons.domain.ChallengeValidationType;
+import com.asrevo.cvhome.certificatemanager.domain.HttpValidationToken;
 import com.asrevo.cvhome.certificatemanager.domain.challenges.Challenge;
 import com.asrevo.cvhome.certificatemanager.domain.challenges.HttpChallenge;
-import com.asrevo.cvhome.certificatemanager.service.ChallengeInstaller;
 import com.asrevo.cvhome.certificatemanager.service.impl.LocalFileServiceImpl;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 @Service
-public class LocalHttpChallengeInstaller implements ChallengeInstaller {
+public class LocalHttpChallengeInstaller implements HttpInstaller {
     private final Path tokenRoot;
     private final LocalFileServiceImpl localFileService;
 
@@ -68,5 +69,10 @@ public class LocalHttpChallengeInstaller implements ChallengeInstaller {
     @Override
     public ChallengeValidationType type() {
         return ChallengeValidationType.Http01;
+    }
+
+    @Override
+    public InputStream getHttpValidationFile(HttpValidationToken token) {
+        return localFileService.getFile(tokenRoot.resolve(token.encoded()).toString());
     }
 }

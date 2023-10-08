@@ -1,10 +1,14 @@
 package com.asrevo.cvhome.certificatemanager.service;
 
+import com.asrevo.cvhome.certificatemanager.commons.domain.ChallengeValidationType;
+import com.asrevo.cvhome.certificatemanager.domain.HttpValidationToken;
 import com.asrevo.cvhome.certificatemanager.domain.challenges.Challenge;
+import com.asrevo.cvhome.certificatemanager.service.installers.HttpInstaller;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.io.InputStream;
 import java.util.List;
 
 @Service
@@ -45,5 +49,17 @@ public class ChallengeInstallerManager {
         } else {
             log.info("");
         }
+    }
+
+    public InputStream getHttpValidationToken(HttpValidationToken validationToken) {
+        List<HttpInstaller> httpInstallers = installers.stream().filter(it -> it.type().equals(ChallengeValidationType.Http01)).map(it -> ((HttpInstaller) it)).toList();
+        InputStream stream = null;
+        for (HttpInstaller httpInstaller : httpInstallers) {
+            stream = httpInstaller.getHttpValidationFile(validationToken);
+            if (stream != null) {
+                break;
+            }
+        }
+        return stream;
     }
 }

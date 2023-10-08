@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.certificatemanager.controller;
 
 import com.asrevo.cvhome.certificatemanager.domain.HttpValidationToken;
-import com.asrevo.cvhome.certificatemanager.service.AcmeManagerService;
+import com.asrevo.cvhome.certificatemanager.service.AcmCertificateOrderService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -17,12 +17,12 @@ import java.io.InputStreamReader;
 @RequestMapping(".well-known/acme-challenge")
 @AllArgsConstructor
 public class AcmHttpVerificationController {
-    private AcmeManagerService acmeManagerService;
+    private AcmCertificateOrderService acmCertificateOrderService;
 
     @GetMapping("{token}")
     ResponseEntity<InputStreamReader> verify(@PathVariable("token") String token) {
         HttpValidationToken validationToken = new HttpValidationToken(token);
-        InputStream stream = acmeManagerService.getHttpValidationFile(validationToken);
+        InputStream stream = acmCertificateOrderService.getHttpValidationToken(validationToken);
         InputStreamReader body = new InputStreamReader(stream);
         return ResponseEntity.ok().headers(headers ->
                 headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + token)).body(body);

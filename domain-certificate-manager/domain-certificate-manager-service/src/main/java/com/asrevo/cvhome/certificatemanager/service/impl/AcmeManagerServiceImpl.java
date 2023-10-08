@@ -4,7 +4,6 @@ import com.asrevo.cvhome.certificatemanager.commons.domain.CertificateFileType;
 import com.asrevo.cvhome.certificatemanager.commons.domain.Domain;
 import com.asrevo.cvhome.certificatemanager.commons.domain.OrderLocation;
 import com.asrevo.cvhome.certificatemanager.domain.DomainCertificate;
-import com.asrevo.cvhome.certificatemanager.domain.HttpValidationToken;
 import com.asrevo.cvhome.certificatemanager.service.AcmFileService;
 import com.asrevo.cvhome.certificatemanager.service.AcmeManagerService;
 import lombok.AllArgsConstructor;
@@ -18,7 +17,6 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.security.KeyPair;
 import java.util.function.Supplier;
@@ -119,11 +117,6 @@ public class AcmeManagerServiceImpl implements AcmeManagerService {
                 return new DomainCertificate(certificate);
             }
         }
-        return null;
-    }
-
-    @Override
-    public InputStream getHttpValidationFile(HttpValidationToken token) {
         return null;
     }
 
