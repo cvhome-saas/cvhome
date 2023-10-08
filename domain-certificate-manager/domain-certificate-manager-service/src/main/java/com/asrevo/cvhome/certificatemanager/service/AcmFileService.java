@@ -3,8 +3,8 @@ package com.asrevo.cvhome.certificatemanager.service;
 import com.asrevo.cvhome.certificatemanager.commons.domain.CertificateFileType;
 import com.asrevo.cvhome.certificatemanager.commons.domain.Domain;
 import com.asrevo.cvhome.certificatemanager.domain.HttpValidationToken;
-import com.asrevo.cvhome.certificatemanager.domain.challenges.Http01Challenge;
-import com.asrevo.cvhome.certificatemanager.domain.challenges.TlsAlpn01Challenge;
+import com.asrevo.cvhome.certificatemanager.domain.challenges.HttpChallenge;
+import com.asrevo.cvhome.certificatemanager.domain.challenges.TlsAlpnChallenge;
 import org.shredzone.acme4j.util.CSRBuilder;
 import org.springframework.core.io.InputStreamResource;
 
@@ -20,9 +20,9 @@ public interface AcmFileService {
 
     void storeCertificate(Domain domain, X509Certificate... certificates) throws IOException;
 
-    void generateCertificate(Domain domain, TlsAlpn01Challenge tlsAlpn01Challenge) throws IOException;
+    void generateCertificate(Domain domain, TlsAlpnChallenge tlsAlpnChallenge) throws IOException;
 
-    void generateValidationFile(Http01Challenge http01Challenge) throws IOException;
+    void generateValidationFile(HttpChallenge httpChallenge) throws IOException;
 
     InputStream getHttpValidationFile(HttpValidationToken token);
 

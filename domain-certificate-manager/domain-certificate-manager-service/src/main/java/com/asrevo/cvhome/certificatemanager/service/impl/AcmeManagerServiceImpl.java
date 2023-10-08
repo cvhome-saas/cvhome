@@ -5,10 +5,11 @@ import com.asrevo.cvhome.certificatemanager.commons.domain.Domain;
 import com.asrevo.cvhome.certificatemanager.commons.domain.OrderLocation;
 import com.asrevo.cvhome.certificatemanager.domain.DomainCertificate;
 import com.asrevo.cvhome.certificatemanager.domain.HttpValidationToken;
-import com.asrevo.cvhome.certificatemanager.domain.challenges.Http01Challenge;
-import com.asrevo.cvhome.certificatemanager.domain.challenges.TlsAlpn01Challenge;
+import com.asrevo.cvhome.certificatemanager.domain.challenges.HttpChallenge;
+import com.asrevo.cvhome.certificatemanager.domain.challenges.TlsAlpnChallenge;
 import com.asrevo.cvhome.certificatemanager.service.AcmFileService;
 import com.asrevo.cvhome.certificatemanager.service.AcmeManagerService;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.shredzone.acme4j.*;
 import org.shredzone.acme4j.challenge.Challenge;
@@ -27,6 +28,7 @@ import java.util.function.Supplier;
 @Service
 @Lazy
 @Slf4j
+@AllArgsConstructor
 public class AcmeManagerServiceImpl implements AcmeManagerService {
 
     private final Account account;
@@ -35,11 +37,6 @@ public class AcmeManagerServiceImpl implements AcmeManagerService {
 
     private final AcmFileService fileService;
 
-    public AcmeManagerServiceImpl(Account account, Login login, AcmFileService fileService) {
-        this.account = account;
-        this.login = login;
-        this.fileService = fileService;
-    }
 
     private static void tryUntilTrue(int tries, Supplier<Boolean> tPredicate) {
         int localTries = tries;
@@ -127,22 +124,22 @@ public class AcmeManagerServiceImpl implements AcmeManagerService {
         return null;
     }
 
-    public void generate(Domain domain, TlsAlpn01Challenge challenge) throws IOException {
+    public void generate(Domain domain, TlsAlpnChallenge challenge) throws IOException {
         fileService.generateCertificate(domain, challenge);
     }
 
     @Override
-    public void prepareValidation(Domain domain, com.asrevo.cvhome.certificatemanager.domain.challenges.Challenge challenge) throws IOException {
-        if (challenge instanceof TlsAlpn01Challenge tlsAlpn01Challenge) {
-            generate(domain, tlsAlpn01Challenge);
-        } else if (challenge instanceof Http01Challenge http01Challenge) {
-            generateValidationFile(http01Challenge);
+    public void doSetupBeforeValidation(Domain domain, com.asrevo.cvhome.certificatemanager.domain.challenges.Challenge challenge) throws IOException {
+        if (challenge instanceof TlsAlpnChallenge tlsAlpnChallenge) {
+            generate(domain, tlsAlpnChallenge);
+        } else if (challenge instanceof HttpChallenge httpChallenge) {
+            setupHttpVerificationFile(httpChallenge);
         }
     }
 
 
     @Override
-    public void generateValidationFile(Http01Challenge challenge) throws IOException {
+    public void setupHttpVerificationFile(HttpChallenge challenge) throws IOException {
         fileService.generateValidationFile(challenge);
     }
 

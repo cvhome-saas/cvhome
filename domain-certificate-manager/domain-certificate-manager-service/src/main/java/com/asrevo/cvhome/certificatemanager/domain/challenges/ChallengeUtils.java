@@ -7,6 +7,7 @@ import org.xbill.DNS.*;
 import javax.net.ssl.*;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -17,6 +18,8 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.stream.Stream;
+
+import static org.shredzone.acme4j.challenge.TlsAlpn01Challenge.ACME_TLS_1_PROTOCOL;
 
 @Slf4j
 public class ChallengeUtils {
@@ -57,8 +60,8 @@ public class ChallengeUtils {
         }
     };
 
-    static boolean validate(TlsAlpn01Challenge challenge) {
-        return validateAcmeTls1(challenge.key(), 8443) || validateAcmeTls1(challenge.key(), 443);
+    static boolean validate(TlsAlpnChallenge challenge) {
+        return validateAcmeTls1(challenge.domain(), 8443) || validateAcmeTls1(challenge.domain(), 443);
     }
 
     private static SSLSocketFactory createSSlFactory() {
@@ -95,25 +98,41 @@ public class ChallengeUtils {
     private static final SSLSocketFactory socketFactory = createSSlFactory();
 
     private static boolean validateAcmeTls1(String host, Integer port) {
-        try (SSLSocket sslSocket = (SSLSocket) socketFactory.createSocket(InetAddress.getByName(host), port)) {
-            SSLParameters sslParameters = sslSocket.getSSLParameters();
-            sslParameters.setApplicationProtocols(new String[]{org.shredzone.acme4j.challenge.TlsAlpn01Challenge.ACME_TLS_1_PROTOCOL});
-            sslSocket.setSSLParameters(sslParameters);
-            sslSocket.startHandshake();
-            if (org.shredzone.acme4j.challenge.TlsAlpn01Challenge.ACME_TLS_1_PROTOCOL.equals(sslSocket.getApplicationProtocol())) {
-                System.out.println(org.shredzone.acme4j.challenge.TlsAlpn01Challenge.ACME_TLS_1_PROTOCOL + " is supported");
-                Certificate[] peerCertificates = sslSocket.getSession().getPeerCertificates();
-                return true;
+        if (isPortOpen(host, port)) {
+            try (SSLSocket sslSocket = (SSLSocket) socketFactory.createSocket(InetAddress.getByName(host), port)) {
+                SSLParameters sslParameters = sslSocket.getSSLParameters();
+                sslParameters.setApplicationProtocols(new String[]{ACME_TLS_1_PROTOCOL});
+                sslSocket.setSSLParameters(sslParameters);
+                sslSocket.startHandshake();
+                if (ACME_TLS_1_PROTOCOL.equals(sslSocket.getApplicationProtocol())) {
+                    System.out.println(ACME_TLS_1_PROTOCOL + " is supported");
+                    Certificate[] peerCertificates = sslSocket.getSession().getPeerCertificates();
+                    return true;
+                }
+            } catch (IOException ignored) {
             }
-        } catch (IOException ignored) {
         }
         return false;
     }
 
-
-    static boolean validate(Dns01Challenge challenge) {
+    private static boolean isPortOpen(String hostName, int portNumber) {
+        boolean result;
         try {
-            final Lookup lookup = new Lookup(challenge.key(), Type.TXT);
+            Socket s = new Socket();
+            InetSocketAddress endpoint = new InetSocketAddress(hostName, portNumber);
+            s.connect(endpoint, 1000);
+            s.close();
+            result = true;
+        } catch (Exception e) {
+            result = false;
+        }
+
+        return result;
+    }
+
+    static boolean validate(DnsChallenge challenge) {
+        try {
+            final Lookup lookup = new Lookup(challenge.record(), Type.TXT);
             lookup.setResolver(new SimpleResolver());
             lookup.setCache(null);
             final Record[] records = lookup.run();
@@ -126,21 +145,21 @@ public class ChallengeUtils {
                                 return Stream.of();
                             }
                         })
-                        .anyMatch(it -> it.equals(challenge.value()));
+                        .anyMatch(it -> it.equals(challenge.digest()));
             }
         } catch (Exception ignored) {
         }
         return false;
     }
 
-    static boolean validate(Http01Challenge challenge) {
+    static boolean validate(HttpChallenge challenge) {
         try {
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(new URI(challenge.key()))
+                    .uri(new URI(challenge.validationUrl()))
                     .GET()
                     .build();
             HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
-            return response.body().contains(challenge.value());
+            return response.body().contains(challenge.authorization());
         } catch (Exception ignored) {
         }
         return false;

@@ -5,7 +5,7 @@ import com.asrevo.cvhome.certificatemanager.commons.event.order.*;
 import com.asrevo.cvhome.certificatemanager.domain.DomainCertificate;
 import com.asrevo.cvhome.certificatemanager.domain.challenges.Challenge;
 import com.asrevo.cvhome.certificatemanager.domain.challenges.Challenges;
-import com.asrevo.cvhome.certificatemanager.domain.challenges.Dns01Challenge;
+import com.asrevo.cvhome.certificatemanager.domain.challenges.DnsChallenge;
 import com.asrevo.cvhome.commons.domain.BaseEntity;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -80,9 +80,9 @@ public class OrdersEntity extends BaseEntity<OrdersEntity, OrdersId> {
             }
             this.registerEvent(OrdersChallengeValidationTypeChangedEvent.from(this.id, domain, oldType, this.challengeValidationType));
         }
-        Dns01Challenge dns01Challenge = this.challenges.getDns01Challenge();
-        if (ChallengeValidationType.Dns01.equals(this.challengeValidationType) && dns01Challenge != null) {
-            this.registerEvent(DnsOrdersRequestedEvent.from(id, this.domain, this.location, this.requestedDate, dns01Challenge.key(), dns01Challenge.value()));
+        DnsChallenge dnsChallenge = this.challenges.getDns01Challenge();
+        if (ChallengeValidationType.Dns01.equals(this.challengeValidationType) && dnsChallenge != null) {
+            this.registerEvent(DnsOrdersRequestedEvent.from(id, this.domain, this.location, this.requestedDate, dnsChallenge.record(), dnsChallenge.digest()));
         } else {
             this.registerEvent(OrdersRequestedEvent.from(id, this.domain, this.location, this.requestedDate));
 

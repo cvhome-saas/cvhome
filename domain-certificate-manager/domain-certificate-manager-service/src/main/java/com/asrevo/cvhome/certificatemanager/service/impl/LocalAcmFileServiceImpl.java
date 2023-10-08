@@ -3,8 +3,8 @@ package com.asrevo.cvhome.certificatemanager.service.impl;
 import com.asrevo.cvhome.certificatemanager.commons.domain.CertificateFileType;
 import com.asrevo.cvhome.certificatemanager.commons.domain.Domain;
 import com.asrevo.cvhome.certificatemanager.domain.HttpValidationToken;
-import com.asrevo.cvhome.certificatemanager.domain.challenges.Http01Challenge;
-import com.asrevo.cvhome.certificatemanager.domain.challenges.TlsAlpn01Challenge;
+import com.asrevo.cvhome.certificatemanager.domain.challenges.HttpChallenge;
+import com.asrevo.cvhome.certificatemanager.domain.challenges.TlsAlpnChallenge;
 import com.asrevo.cvhome.certificatemanager.service.AcmFileService;
 import lombok.SneakyThrows;
 import org.shredzone.acme4j.toolbox.AcmeUtils;
@@ -85,7 +85,7 @@ public class LocalAcmFileServiceImpl implements AcmFileService {
     }
 
     @Override
-    public void generateCertificate(Domain domain, TlsAlpn01Challenge challenge) throws IOException {
+    public void generateCertificate(Domain domain, TlsAlpnChallenge challenge) throws IOException {
         if (challenge != null) {
             KeyPair keyPair = this.generateOrGetKeyPair(domain);
             byte[] decode = challenge.decode();
@@ -98,16 +98,16 @@ public class LocalAcmFileServiceImpl implements AcmFileService {
 
 
     @Override
-    public void generateValidationFile(Http01Challenge challenge) throws IOException {
+    public void generateValidationFile(HttpChallenge challenge) throws IOException {
         if (challenge != null) {
 
             File http01Temp = Files.createTempFile("domain", ".http01").toFile();
             FileWriter http01FileWriter = new FileWriter(http01Temp);
-            http01FileWriter.append(challenge.value());
+            http01FileWriter.append(challenge.authorization());
             http01FileWriter.flush();
             http01FileWriter.close();
 
-            Path tokenPath = tokenRoot.resolve(challenge.tokenEncoded());
+            Path tokenPath = tokenRoot.resolve(challenge.token());
             fileService.upload(http01Temp, tokenPath.toString());
         }
     }

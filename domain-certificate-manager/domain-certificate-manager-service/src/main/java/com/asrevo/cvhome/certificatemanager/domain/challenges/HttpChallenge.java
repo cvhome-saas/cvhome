@@ -4,9 +4,14 @@ import com.asrevo.cvhome.certificatemanager.commons.domain.ChallengeValidationTy
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.Transient;
 
-import static com.asrevo.cvhome.certificatemanager.commons.utils.Utils.encode64;
+public record HttpChallenge(String domain, boolean isWildCard, String token,
+                            String authorization) implements Challenge {
 
-public record Http01Challenge(String key, String value) implements Challenge {
+    @Transient
+    @JsonIgnore
+    public String validationUrl() {
+        return String.format("http://%s/.well-known/acme-challenge/%s", domain, token);
+    }
 
     @Override
     public ChallengeValidationType type() {
@@ -17,14 +22,4 @@ public record Http01Challenge(String key, String value) implements Challenge {
     public boolean validate() {
         return ChallengeUtils.validate(this);
     }
-
-    @Transient
-    @JsonIgnore
-    public String tokenEncoded() {
-        String url = this.key();
-        String[] urlParts = url.split("/");
-        String token = urlParts[urlParts.length - 1];
-        return encode64(token);
-    }
-
 }

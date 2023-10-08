@@ -6,8 +6,8 @@ import com.asrevo.cvhome.certificatemanager.commons.domain.OrderLocation;
 import com.asrevo.cvhome.certificatemanager.domain.DomainCertificate;
 import com.asrevo.cvhome.certificatemanager.domain.HttpValidationToken;
 import com.asrevo.cvhome.certificatemanager.domain.challenges.Challenge;
-import com.asrevo.cvhome.certificatemanager.domain.challenges.Http01Challenge;
-import com.asrevo.cvhome.certificatemanager.domain.challenges.TlsAlpn01Challenge;
+import com.asrevo.cvhome.certificatemanager.domain.challenges.HttpChallenge;
+import com.asrevo.cvhome.certificatemanager.domain.challenges.TlsAlpnChallenge;
 import org.apache.commons.codec.DecoderException;
 import org.shredzone.acme4j.Order;
 import org.shredzone.acme4j.Status;
@@ -27,12 +27,12 @@ public interface AcmeManagerService {
     DomainCertificate generate(OrderLocation location, Domain domain)
             throws IOException, AcmeException;
 
-    void generate(Domain domain, TlsAlpn01Challenge challenge)
+    void generate(Domain domain, TlsAlpnChallenge challenge)
             throws IOException, DecoderException;
 
-    void prepareValidation(Domain domain, Challenge challenge) throws IOException;
+    void doSetupBeforeValidation(Domain domain, Challenge challenge) throws IOException;
 
-    void generateValidationFile(Http01Challenge challenge) throws IOException;
+    void setupHttpVerificationFile(HttpChallenge challenge) throws IOException;
 
     InputStream getHttpValidationFile(HttpValidationToken token);
 

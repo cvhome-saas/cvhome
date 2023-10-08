@@ -80,7 +80,7 @@ Authorization: Bearer {{access_token}}
 
 {
   "domain": {
-    "domain": "xyz.asrevo.com"
+    "domain": "xaayz.asrevo.com"
   },
   "challengeValidationType": "Dns01"
 }
