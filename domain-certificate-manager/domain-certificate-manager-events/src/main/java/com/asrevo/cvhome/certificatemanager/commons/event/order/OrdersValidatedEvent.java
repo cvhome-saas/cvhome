@@ -15,7 +15,7 @@ public record OrdersValidatedEvent(EventId eventId, OrdersId ordersId, String ev
     private final static String CERTIFICATE_ORDER_STATUS_KEY = "certificateOrderStatus";
 
     public static OrdersValidatedEvent from(OrdersId ordersId, Domain domain, Instant validatedDate, CertificateOrderStatus orderStatus) {
-        return new OrdersValidatedEvent(EventId.newId(), ordersId, "OrderValidatedEvent", Map.of(DOMAIN_KEY, domain.domain(), VALIDATE_DATE_KEY, validatedDate.toString(), CERTIFICATE_ORDER_STATUS_KEY, orderStatus.name()));
+        return new OrdersValidatedEvent(EventId.newId(), ordersId, "OrdersValidatedEvent", Map.of(DOMAIN_KEY, domain.domain(), VALIDATE_DATE_KEY, validatedDate.toString(), CERTIFICATE_ORDER_STATUS_KEY, orderStatus.name()));
     }
 
     public Domain domain() {

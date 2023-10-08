@@ -9,11 +9,11 @@ public record OrdersValidationRequestedEvent(EventId eventId, OrdersId ordersId,
                                              Map<String, String> data) implements OrdersEvent {
 
     public static OrdersValidationRequestedEvent from(OrdersId orderId) {
-        return new OrdersValidationRequestedEvent(EventId.newId(), orderId, "OrderValidationRequestedEvent", Map.of());
+        return new OrdersValidationRequestedEvent(EventId.newId(), orderId, "OrdersValidationRequestedEvent", Map.of());
     }
 
     @Override
     public String eventType() {
-        return "OrderValidationRequestedEvent";
+        return "OrdersValidationRequestedEvent";
     }
 }

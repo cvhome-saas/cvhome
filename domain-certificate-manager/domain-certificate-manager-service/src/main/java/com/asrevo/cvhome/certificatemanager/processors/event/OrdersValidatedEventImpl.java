@@ -20,6 +20,6 @@ public class OrdersValidatedEventImpl implements EventImpl<OrdersValidatedEvent>
 
     @Override
     public String type() {
-        return OrdersValidatedEvent.class.getSimpleName();
+        return OrdersValidatedEvent.class.getName();
     }
 }

@@ -12,7 +12,7 @@ public record OrdersCreatedEvent(EventId eventId, OrdersId ordersId, String even
 
 
     public static OrdersCreatedEvent from(OrdersId ordersId, Instant createdDate) {
-        return new OrdersCreatedEvent(EventId.newId(), ordersId, "OrderCreatedEvent", Map.of(CREATED_DATE_KEY, createdDate.toString()));
+        return new OrdersCreatedEvent(EventId.newId(), ordersId, "OrdersCreatedEvent", Map.of(CREATED_DATE_KEY, createdDate.toString()));
     }
 
     Instant createdDate() {
@@ -21,7 +21,7 @@ public record OrdersCreatedEvent(EventId eventId, OrdersId ordersId, String even
 
     @Override
     public String eventType() {
-        return "OrderCreatedEvent";
+        return "OrdersCreatedEvent";
     }
 
 }

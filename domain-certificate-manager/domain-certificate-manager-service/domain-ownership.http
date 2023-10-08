@@ -25,6 +25,7 @@ Content-Type: application/json
   "aud": "account",
   "realm_access": {
     "roles": [
+      "ADMIN",
       "ROLE_MICROSERVICE",
       "offline_access",
       "uma_authorization",
@@ -78,7 +79,7 @@ Authorization: Bearer {{access_token}}
 
 {
   "domain": {
-    "domain": "aswwa.asrevo.com"
+    "domain": "*.asrevo.com"
   },
   "domainType": "SAS_SUB"
 }

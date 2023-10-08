@@ -20,6 +20,6 @@ public class OrdersCertificateGeneratedEventImpl implements EventImpl<OrdersCert
 
     @Override
     public String type() {
-        return OrdersCertificateGeneratedEvent.class.getSimpleName();
+        return OrdersCertificateGeneratedEvent.class.getName();
     }
 }

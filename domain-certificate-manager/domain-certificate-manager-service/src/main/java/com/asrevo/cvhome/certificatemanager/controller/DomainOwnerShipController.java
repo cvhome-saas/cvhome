@@ -46,6 +46,13 @@ public class DomainOwnerShipController {
                 throw new RuntimeException("you don't have authorities to create " + request.domainType().name() + " domain");
             }
         }
+
+        if (request.domain().isWildCard()) {
+            if (principal.getAuthorities().stream().noneMatch(it -> "ROLE_ADMIN".equals(it.getAuthority()))) {
+                throw new RuntimeException("you don't have authorities to create wildcard domain " + request.domain().domain());
+            }
+        }
+
         IdentityId identityId = switch (request.domainType()) {
             case APPLICATION_RESERVED -> IdentityId.ofSys();
             default -> IdentityId.of(principal.getName());

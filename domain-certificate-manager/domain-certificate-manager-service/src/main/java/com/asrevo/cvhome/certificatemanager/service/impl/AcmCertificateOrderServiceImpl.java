@@ -41,6 +41,8 @@ public class AcmCertificateOrderServiceImpl implements AcmCertificateOrderServic
 
     private final CommandPublisher commandPublisher;
 
+    private final ChallengeInstallerManager installerManager;
+
 
     @Override
     public OrdersCreateResponseDto initiate(OrdersCreateRequestDto createRequest) {
@@ -87,14 +89,15 @@ public class AcmCertificateOrderServiceImpl implements AcmCertificateOrderServic
                     CertificateOrderStatus certificateOrderStatus = doAcmValidation(it);
                     log.info("acmValidation validation is {} for domain {}", certificateOrderStatus, orderId);
                     it.validated(certificateOrderStatus);
+                    ordersService.save(it);
                     GenerateCertificateCommand command = new GenerateCertificateCommand();
-                    command.setOrdersId(orderId);
+                    command.setId(orderId);
                     commandPublisher.publish(command);
                 } else {
                     log.warn("performPreValidation validation is {} for domain {}", CertificateOrderStatus.PRE_VALIDATED_INVALID, orderId);
                     it.validated(CertificateOrderStatus.PRE_VALIDATED_INVALID);
+                    ordersService.save(it);
                 }
-                ordersService.save(it);
             } else {
                 log.warn("request to do validation certificate for status {} and orderId {}", it.getCertificateOrderStatus(), orderId);
             }
@@ -124,8 +127,6 @@ public class AcmCertificateOrderServiceImpl implements AcmCertificateOrderServic
             return new RuntimeException("order not found");
         });
     }
-
-    private ChallengeInstallerManager installerManager;
 
     @Override
     public void prepareOrderValidation(OrdersId orderId) {
