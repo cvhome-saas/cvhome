@@ -29,7 +29,7 @@ public class ResolverSSlProviderCacheLoader implements SSlProviderLoader {
 
     private String resolveDomain(String domain) {
         String ourDomain = "." + sslProperties.getDefaultDomain();
-        if (!Utils.isValidInet4Address(domain) || !InternetDomainName.isValid(domain)) {
+        if (Utils.isValidInet4Address(domain) || !InternetDomainName.isValid(domain)) {
             return sslProperties.getDefaultDomain();
         } else if (domain.endsWith(ourDomain)) {
             return sslProperties.getSubDomainFallback();
