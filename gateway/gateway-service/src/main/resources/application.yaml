@@ -1,3 +1,9 @@
+com:
+  asrevo:
+    cvhome:
+      ssl:
+        default-domain: "gateway.com"
+        sub-domain-fallback: "*.gateway.com"
 spring:
   application:
     name: gateway
@@ -25,11 +31,21 @@ spring:
                 metadata:
                   service-name: auth
                   instance: auth-1
-            ui:
+            admin-ui:
               - uri: "http://localhost:4200"
                 metadata:
-                  service-name: ui
-                  instance: ui-1
+                  service-name: admin-ui
+                  instance: admin-ui-1
+            store-ui:
+              - uri: "http://localhost:4300"
+                metadata:
+                  service-name: store-ui
+                  instance: store-ui-1
+            welcome-ui:
+              - uri: "http://localhost:4400"
+                metadata:
+                  service-name: welcome-ui
+                  instance: welcome-ui-1
             gateway:
               - uri: "http://localhost:8080"
                 metadata:
@@ -75,8 +91,16 @@ spring:
           uri: lb://auth
           predicates:
             - Path=/js/**
-        - id: ui
-          uri: lb://ui
+        - id: welcome-ui
+          uri: lb://welcome-ui
+          predicates:
+            - FHost=asrevo.com
+        - id: admin-ui
+          uri: lb://admin-ui
+          predicates:
+            - FHost=admin.asrevo.com
+        - id: admin-ui
+          uri: lb://store-ui
           predicates:
             - FHost={domain}.{x},{sub}.{domain}.{x}
   security:
@@ -127,12 +151,6 @@ management:
     web:
       exposure:
         include: [ '*' ]
-com:
-  asrevo:
-    cvhome:
-      ssl:
-        default-domain: "gateway.com"
-        sub-domain-fallback: "*.gateway.com"
 logging:
   level:
     org.springframework.boot: debug

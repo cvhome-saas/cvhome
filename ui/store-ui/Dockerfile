@@ -1,6 +1,4 @@
-FROM nginx:1.25
-
-# Copy the build output to replace the default nginx contents.
-ADD  /dist/store-ui/ /usr/share/nginx/html
-COPY nginx.conf  /etc/nginx/conf.d/default.conf
-EXPOSE 80
+FROM node:18-slim
+ADD  /dist/store-ui/ /dist/store-ui/
+EXPOSE 4300
+CMD ["node", "dist/store-ui/server/main.js"]

@@ -1,6 +1,4 @@
-FROM nginx:1.25
-
-# Copy the build output to replace the default nginx contents.
-ADD  /dist/welcome-ui/ /usr/share/nginx/html
-COPY nginx.conf  /etc/nginx/conf.d/default.conf
-EXPOSE 80
+FROM node:18-slim
+ADD  /dist/welcome-ui/ /dist/welcome-ui/
+EXPOSE 4400
+CMD ["node", "dist/welcome-ui/server/main.js"]

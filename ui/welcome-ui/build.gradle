@@ -12,7 +12,7 @@ task "bootJar" {
     }
     exec {
       workingDir '.'
-      commandLine "npm", "run", "ng", "build"
+      commandLine "npm", "run", "build:ssr"
     }
   }
 }
