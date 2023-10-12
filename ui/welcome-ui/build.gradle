@@ -1,0 +1,55 @@
+task "clean" {
+  doLast {
+    delete files('dist/')
+  }
+}
+
+task "bootJar" {
+  doLast {
+    exec {
+      workingDir '.'
+      commandLine "npm", "i"
+    }
+    exec {
+      workingDir '.'
+      commandLine "npm", "run", "ng", "build"
+    }
+  }
+}
+
+tasks.register('bootBuildImage', BootBuildImageTask) {
+  dependsOn('bootJar')
+}
+
+
+abstract class BootBuildImageTask extends DefaultTask {
+  private Boolean publishImage = false
+
+
+  @Option(option = "publishImage", description = "Configures PublishImage.")
+  void setPublishImage(Boolean publishImage) {
+    this.publishImage = publishImage;
+  }
+
+  BootBuildImageTask() {
+  }
+
+  @TaskAction
+  void bootBuildImage() {
+    String image = "ghcr.io/ashraf-revo/${project.name}:${project.version}"
+    project.exec {
+      workingDir '.'
+      commandLine "docker", "build", "-t", image, "."
+    }
+    if (publishImage) {
+      project.exec {
+        workingDir '.'
+        commandLine "docker", "login","https://ghcr.io", "--username", "ashraf-revo", "--password", System.getenv("GHCR_TOKEN")
+      }
+      project.exec {
+        workingDir '.'
+        commandLine "docker", "push", image
+      }
+    }
+  }
+}

@@ -1,0 +1,67 @@
+<form (ngSubmit)="onSubmit()" [formGroup]="domainReferenceForm">
+  <div class="row mt-4 justify-content-center">
+    <div class="col-md-6 justify-content-center">
+      <div class="tab-content mt-6 ">
+        <div class="tab-pane active">
+          <div [innerHTML]="errMessage" class="text-danger"></div>
+          <div class="controls">
+            <label class="d-block mb-1">
+              Domain
+              <span class="text-danger">*</span>
+            </label>
+            <div class="input-group error validate">
+              <input class="form-control" formControlName="domain" placeholder="full domain" type="text">
+            </div>
+            <div class="help-block">
+              <div
+                *ngIf="domainReferenceForm.controls['domain'].invalid && (domainReferenceForm.controls['domain'].dirty || domainReferenceForm.controls['domain'].touched)"
+                class="text-danger">
+                <div *ngIf="domainReferenceForm.controls['domain'].errors?.['required']">
+                  Domain is required.
+                </div>
+                <div *ngIf="domainReferenceForm.controls['domain'].errors?.['minlength']">
+                  Domain is minLength.
+                </div>
+                <div *ngIf="domainReferenceForm.controls['domain'].errors?.['pattern']">
+                  Domain is pattern.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row mt-4 justify-content-center">
+    <div class="col-md-6 justify-content-center">
+      <div class="tab-content mt-6 ">
+        <div class="tab-pane active">
+          <button class="btn btn-primary w-100" type="submit">Submit</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+<table class="table text-nowrap mb-0 align-middle">
+  <thead class="text-dark fs-4">
+  <tr>
+    <th class="border-bottom-0">
+      <h6 class="fw-semibold mb-0">Domain</h6>
+    </th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let d of customDomainReferences">
+    <td class="border-bottom-0">
+      <h6 class="fw-semibold mb-1"><a class="mb-0 fw-normal" href="//{{d.domainReference.domain}}"
+                                      target="_blank">{{d.domainReference.domain}}</a></h6>
+      <span class="fw-normal">{{d.domainReference.domainStatus}}</span>
+    </td>
+    <td class="border-bottom-0">
+      <button (click)="orderHttps(d.domainReference)" class="btn mb-1 btn-secondary btn-circle btn-sm" type="button">
+        <i class="fs-5 ti ti-reload"></i>
+      </button>
+    </td>
+  </tr>
+  </tbody>
+</table>
