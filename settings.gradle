@@ -22,7 +22,9 @@ plugins {
 
 rootProject.name = 'cvhome'
 include(
-        'ui',
+        'ui:admin-ui',
+        'ui:store-ui',
+        'ui:welcome-ui',
         'cvhome-commons',
         'auth',
         'domain-certificate-manager:domain-certificate-manager-commons',
