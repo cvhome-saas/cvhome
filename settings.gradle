@@ -22,13 +22,13 @@ plugins {
 
 rootProject.name = 'cvhome'
 include(
-        'ui:admin-ui',
-        'ui:store-ui',
-        'ui:welcome-ui',
         'cvhome-commons',
         'auth',
         'domain-certificate-manager:domain-certificate-manager-commons',
         'domain-certificate-manager:domain-certificate-manager-events',
         'domain-certificate-manager:domain-certificate-manager-service',
-        'gateway:gateway-service'
+        'gateway:gateway-service',
+        'ui:admin-ui',
+        'ui:store-ui',
+        'ui:welcome-ui',
 )
