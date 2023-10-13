@@ -53,9 +53,9 @@
   <tbody>
   <tr *ngFor="let d of subDomainReferences">
     <td class="border-bottom-0">
-      <h6 class="fw-semibold mb-1"><a class="mb-0 fw-normal" href="//{{d.domainReference.domain}}"
-                                      target="_blank">{{d.domainReference.domain}}</a></h6>
-      <span class="fw-normal">{{d.domainReference.domainStatus}}</span>
+      <h6 class="fw-semibold mb-1">
+        <a class="mb-0 fw-normal" href="//{{d.domain.domain}}" target="_blank">{{d.domain.domain}}</a>
+      </h6>
     </td>
   </tr>
   </tbody>

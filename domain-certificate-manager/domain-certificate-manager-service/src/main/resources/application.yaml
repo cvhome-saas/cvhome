@@ -85,3 +85,4 @@ com:
       domains:
         - domain: "gateway.com"
         - domain: "*.gateway.com"
+      default-domain: "gateway.com"

@@ -2,47 +2,56 @@ import {Component, Input} from '@angular/core';
 import {environment} from "../../../../../../environment";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {
-  DomainReference,
-  DomainReferenceOrder,
-  DomainReferenceService, DomainType
-} from "../../../../../service/domain-reference.service";
+  DomainCertificateStatus,
+  DomainOwnershipService,
+  DomainType,
+  RegisterDomainResponse,
+  RegisteredDomain
+} from "../../../../../service/domain-ownership.service";
 
 @Component({
-    selector: 'app-sub-domain-settings',
-    templateUrl: './sub-domain-settings.component.html',
-    styleUrls: ['./sub-domain-settings.component.css']
+  selector: 'app-sub-domain-settings',
+  templateUrl: './sub-domain-settings.component.html',
+  styleUrls: ['./sub-domain-settings.component.css']
 })
 export class SubDomainSettingsComponent {
-    @Input()
-    subDomainReferences: DomainReferenceOrder[] = [];
-    baseDomain: string;
-    domainReferenceForm: FormGroup;
+  @Input()
+  subDomainReferences: RegisteredDomain[] = [];
+  baseDomain: string;
+  domainReferenceForm: FormGroup;
 
 
-    constructor(private domainReferenceService: DomainReferenceService) {
-        this.baseDomain = environment.BASE_DOMAIN;
-        this.domainReferenceForm = new FormGroup({
-            domain: new FormControl(null, [
-                Validators.required,
-                Validators.minLength(4),
-                Validators.pattern('^[a-zA-Z0-9]+$')
-            ]),
+  constructor(private domainOwnershipService: DomainOwnershipService) {
+    this.baseDomain = environment.BASE_DOMAIN;
+    this.domainReferenceForm = new FormGroup({
+      domain: new FormControl(null, [
+        Validators.required,
+        Validators.minLength(4),
+        Validators.pattern('^[a-zA-Z0-9]+$')
+      ]),
+    });
+
+  }
+
+
+  onSubmit() {
+    if (this.domainReferenceForm.valid) {
+      let value: any = this.domainReferenceForm.value;
+      this.domainOwnershipService.register({
+        domain: {
+          domain: value.domain + "." + this.baseDomain
+        },
+        domainType: DomainType.SAS_SUB
+      }).subscribe((it: RegisterDomainResponse) => {
+        this.subDomainReferences.push({
+          domain: it.domain,
+          domainType: DomainType.SAS_SUB,
+          reference: it.reference,
+          certificateStatus: DomainCertificateStatus.ACTIVE_CERTIFICATE_GENERATED,
         });
-
+        this.domainReferenceForm.reset();
+      });
     }
-
-
-    onSubmit() {
-        if (this.domainReferenceForm.valid) {
-            let value: DomainReference = this.domainReferenceForm.value;
-            this.domainReferenceService.save({
-                domain: value.domain + "." + this.baseDomain,
-                domainType: DomainType.SUB
-            }).subscribe((it: DomainReference) => {
-                this.subDomainReferences.push({domainReference: it});
-                this.domainReferenceForm.reset();
-            });
-        }
-    }
+  }
 
 }

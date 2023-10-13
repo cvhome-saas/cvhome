@@ -8,6 +8,7 @@ import com.asrevo.cvhome.domaincertificatemanager.commons.domain.Reference;
 import com.asrevo.cvhome.domaincertificatemanager.commons.dto.AvailabilityResponse;
 import com.asrevo.cvhome.domaincertificatemanager.commons.dto.RegisterDomainRequest;
 import com.asrevo.cvhome.domaincertificatemanager.commons.dto.RegisterDomainResponse;
+import com.asrevo.cvhome.domaincertificatemanager.config.AutoOrderDomainsProperties;
 import com.asrevo.cvhome.domaincertificatemanager.entity.DomainEntity;
 import com.asrevo.cvhome.domaincertificatemanager.service.DomainOwnerShipService;
 import com.asrevo.cvhome.domaincertificatemanager.service.DomainService;
@@ -25,9 +26,11 @@ import java.util.Optional;
 public class DomainOwnerShipServiceImpl implements DomainOwnerShipService {
     private final DomainService domainService;
     private final CommandPublisher commandPublisher;
+    private final AutoOrderDomainsProperties autoOrderDomainsProperties;
 
 
     @Override
+
     public RegisterDomainResponse register(RegisterDomainRequest request, IdentityId owner) {
         AvailabilityResponse availability = domainService.checkAvailability(request.domain());
         if (availability.available()) {
@@ -58,8 +61,12 @@ public class DomainOwnerShipServiceImpl implements DomainOwnerShipService {
 
     private DomainEntity doRegister(Domain domain, Reference reference, DomainType domainType, IdentityId identity) {
         if (domainType.equals(DomainType.SAS_CUSTOM)) {
-            boolean provedTo = domain.isProvedTo(identity);
-            if (!provedTo) {
+            boolean txtProvedTo = domain.isTXTProvedTo(identity);
+            if (!txtProvedTo) {
+                throw new RuntimeException("please prove domain ownership on domain " + domain.domain() + " by adding txt record " + domain.getProvingDomain() + " with value " + identity.id());
+            }
+            boolean cnameProvedTo = domain.isCNAMEProvedTo(autoOrderDomainsProperties.getDefaultDomain());
+            if (!cnameProvedTo) {
                 throw new RuntimeException("please prove domain ownership on domain " + domain.domain() + " by adding txt record " + domain.getProvingDomain() + " with value " + identity.id());
             }
         }

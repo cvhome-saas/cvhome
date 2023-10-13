@@ -12,4 +12,5 @@ import java.util.List;
 @Setter
 public class AutoOrderDomainsProperties {
     private List<Domain> domains;
+    private Domain defaultDomain;
 }

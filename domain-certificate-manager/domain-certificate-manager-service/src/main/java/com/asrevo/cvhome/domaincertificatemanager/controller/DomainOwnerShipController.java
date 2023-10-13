@@ -28,7 +28,7 @@ public class DomainOwnerShipController {
     private final OwnerService ownerService;
 
     @PostMapping("get-proving")
-    public ProvingResponse getReference(@RequestBody Domain domain, @AuthenticationPrincipal Principal principal) {
+    public ProvingResponse getProving(@RequestBody Domain domain, @AuthenticationPrincipal Principal principal) {
         return new ProvingResponse(domain.getProvingDomain(), principal.getName());
     }
 
@@ -73,7 +73,7 @@ public class DomainOwnerShipController {
     }
 
     @GetMapping(value = "get-registered-domains")
-    public List<RegisteredDomainResponse> registeredDomains(
+    public List<RegisteredDomainResponse> getRegisteredDomains(
             @RequestParam(name = "domainType", required = false) DomainType domainType,
             @AuthenticationPrincipal Principal principal) {
         return domainService.findAllRegisteredDomains(IdentityId.of(principal.getName()), domainType);
