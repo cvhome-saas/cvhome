@@ -1,6 +1,6 @@
 spring:
   application:
-    name: domain-certificate-manager
+    name: store
   docker:
     compose:
       file: ${spring.application.name}/compose.yml
@@ -8,7 +8,7 @@ spring:
     init:
       mode: always
   datasource:
-    url: jdbc:postgresql://localhost:5432/certificatemanagerdb
+    url: jdbc:postgresql://localhost:5432/storedb
     username: postgres
     password: password
   security:
@@ -53,7 +53,7 @@ spring:
                   instance: gateway-1
 server:
   forward-headers-strategy: FRAMEWORK
-  port: 8082
+  port: 8083
 info:
   app:
     name: ${spring.application.name}
@@ -80,14 +80,3 @@ logging:
     org.springframework.web: debug
     org.springframework.security: debug
     reactor.netty.http: debug
-org:
-  jobrunr:
-    background-job-server:
-      enabled: true
-com:
-  asrevo:
-    auto-order-domains:
-      domains:
-        - domain: "gateway.com"
-        - domain: "*.gateway.com"
-      default-domain: "gateway.com"

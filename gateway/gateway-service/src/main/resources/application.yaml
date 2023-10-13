@@ -26,6 +26,11 @@ spring:
                 metadata:
                   service-name: domain-certificate-manager
                   instance: domain-certificate-manager-1
+            store:
+              - uri: "http://localhost:8083"
+                metadata:
+                  service-name: store
+                  instance: store-1
             auth:
               - uri: "http://localhost:9999"
                 metadata:
