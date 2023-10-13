@@ -59,6 +59,7 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
+            "disableHostCheck": true,
             "port": 4200
           },
           "configurations": {

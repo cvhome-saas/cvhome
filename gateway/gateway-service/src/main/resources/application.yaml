@@ -56,7 +56,6 @@ spring:
         locator:
           enabled: true
       default-filters:
-        - MapHostAsRequestParam=userId
         - TokenRelay
         - PreserveHostHeader
         - AddResponseHeader=X-Frame-Options, SAMEORIGIN
@@ -94,15 +93,17 @@ spring:
         - id: welcome-ui
           uri: lb://welcome-ui
           predicates:
-            - FHost=asrevo.com
+            - FHost=gateway.com
         - id: admin-ui
           uri: lb://admin-ui
           predicates:
-            - FHost=admin.asrevo.com
-        - id: admin-ui
+            - FHost=admin.gateway.com
+        - id: store-ui
           uri: lb://store-ui
           predicates:
             - FHost={domain}.{x},{sub}.{domain}.{x}
+          filters:
+            - MapHostAsRequestParam=userId
   security:
     oauth2:
       client:

@@ -14,17 +14,29 @@ public class ResolverSSlProviderCacheLoader implements SSlProviderLoader {
     private final SslProperties sslProperties;
     @Getter
     private final DelegatedSslContext defaultSslContext;
+    @Getter
+    private final SslProvider defaultSslProvider;
 
     public ResolverSSlProviderCacheLoader(SSlProviderCacheLoader sSlProviderCacheLoader, SslProperties sslProperties) {
         this.sSlProviderCacheLoader = sSlProviderCacheLoader;
         this.sslProperties = sslProperties;
         this.defaultSslContext = buildInitialiseContext();
+        this.defaultSslProvider = SslProvider.builder().sslContext(this.defaultSslContext).build();
     }
 
     @Override
     public SslProvider load(String domain) {
         String resolvedDomain = resolveDomain(domain);
-        return sSlProviderCacheLoader.load(resolvedDomain);
+        SslProvider loaded = sSlProviderCacheLoader.load(resolvedDomain);
+        if (loaded != null) {
+            return loaded;
+        } else if (sslProperties.getDefaultDomain().equals(resolvedDomain)) {
+            return this.defaultSslProvider;
+        } else if (sslProperties.getSubDomainFallback().equals(resolvedDomain)) {
+            return this.defaultSslProvider;
+        } else {
+            return null;
+        }
     }
 
     private String resolveDomain(String domain) {
