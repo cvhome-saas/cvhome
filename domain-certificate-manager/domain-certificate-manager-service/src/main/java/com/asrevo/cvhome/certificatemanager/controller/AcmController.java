@@ -3,8 +3,6 @@ package com.asrevo.cvhome.certificatemanager.controller;
 import com.asrevo.cvhome.certificatemanager.commons.domain.CertificateFileType;
 import com.asrevo.cvhome.certificatemanager.commons.domain.Domain;
 import com.asrevo.cvhome.certificatemanager.commons.domain.OrdersId;
-import com.asrevo.cvhome.certificatemanager.commons.dto.OrdersCreateRequestDto;
-import com.asrevo.cvhome.certificatemanager.commons.dto.OrdersCreateResponseDto;
 import com.asrevo.cvhome.certificatemanager.commons.dto.OrdersResponseDto;
 import com.asrevo.cvhome.certificatemanager.service.AcmCertificateOrderService;
 import com.asrevo.cvhome.certificatemanager.service.AcmeManagerService;
@@ -14,7 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,16 +25,6 @@ public class AcmController {
     private final AcmeManagerService acmeManagerService;
     private final AcmCertificateOrderService acmCertificateOrderService;
     private final OrdersService ordersService;
-
-    /*
-     * .appcalc.net appcalc.net .uxplore.net uxplore.net www.uxplore.net uxb.uxplore.net
-     * backend.uxplore.net
-     */
-    @PostMapping("order")
-    public OrdersCreateResponseDto order(@RequestBody @Validated OrdersCreateRequestDto createRequest) {
-        log.info("will order a certificate for domain {}", createRequest.getDomain());
-        return acmCertificateOrderService.initiate(createRequest);
-    }
 
     @PostMapping("validate")
     public void validate(@RequestBody OrdersId orderId, @RequestParam(value = "type", defaultValue = "Dns01") String type) {

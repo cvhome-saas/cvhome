@@ -11,9 +11,6 @@ import java.io.InputStream;
 
 public interface AcmCertificateOrderService {
 
-
-    OrdersCreateResponseDto initiate(OrdersCreateRequestDto createRequest);
-
     OrdersCreateResponseDto initiate(Domain domain, ChallengeValidationType validationType);
 
     void order(OrdersId orderId);

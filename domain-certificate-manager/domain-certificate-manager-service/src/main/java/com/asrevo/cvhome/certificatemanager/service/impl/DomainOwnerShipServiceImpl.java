@@ -31,9 +31,23 @@ public class DomainOwnerShipServiceImpl implements DomainOwnerShipService {
     public RegisterDomainResponse register(RegisterDomainRequest request, IdentityId owner) {
         AvailabilityResponse availability = domainService.checkAvailability(request.domain());
         if (availability.available()) {
-
             DomainEntity entity = doRegister(request.domain(), request.reference(), request.domainType(), owner);
+            if (entity.getDomainType().equals(DomainType.SAS_CUSTOM)) {
+                CreateOrderCommand command = new CreateOrderCommand();
+                command.setDomain(request.domain());
+                command.setValidationType(Optional.ofNullable(request.recommendedChallengeValidationType()).orElse(ChallengeValidationType.TlsAlpn01));
+                commandPublisher.publish(command);
+            }
+            return new RegisterDomainResponse(entity.getDomain(), entity.getReference());
+        }
+        throw new RuntimeException("domain already registered");
+    }
 
+    @Override
+    public RegisterDomainResponse registerReservedDomainToSys(RegisterDomainRequest request) {
+        AvailabilityResponse availability = domainService.checkAvailability(request.domain());
+        if (availability.available()) {
+            DomainEntity entity = doRegister(request.domain(), request.reference(), DomainType.APPLICATION_RESERVED, IdentityId.ofSys());
             CreateOrderCommand command = new CreateOrderCommand();
             command.setDomain(request.domain());
             command.setValidationType(Optional.ofNullable(request.recommendedChallengeValidationType()).orElse(ChallengeValidationType.TlsAlpn01));

@@ -43,12 +43,6 @@ public class AcmCertificateOrderServiceImpl implements AcmCertificateOrderServic
 
     private final ChallengeInstallerManager installerManager;
 
-
-    @Override
-    public OrdersCreateResponseDto initiate(OrdersCreateRequestDto createRequest) {
-        return this.initiate(createRequest.getDomain(), createRequest.getChallengeValidationType());
-    }
-
     @Override
     public OrdersCreateResponseDto initiate(Domain domain, ChallengeValidationType challengeValidationType) {
         OrdersEntity certificateOrder = OrdersEntity.createOrder(domain, challengeValidationType);

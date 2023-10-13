@@ -6,4 +6,6 @@ import com.asrevo.cvhome.commons.domain.IdentityId;
 
 public interface DomainOwnerShipService {
     RegisterDomainResponse register(RegisterDomainRequest request, IdentityId identityId);
+
+    RegisterDomainResponse registerReservedDomainToSys(RegisterDomainRequest request);
 }
