@@ -1,7 +1,5 @@
 import {Component, Input} from '@angular/core';
 import {FormControl, FormGroup, Validators} from "@angular/forms";
-import {environment} from "../../../../../../environment";
-import {DnsLookupService} from "../../../../../service/dns-lookup.service";
 import {
   DomainCertificateStatus,
   DomainOwnershipService,
@@ -9,6 +7,7 @@ import {
   RegisterDomainResponse,
   RegisteredDomain
 } from "../../../../../service/domain-ownership.service";
+import {Store, StoreService} from "../../../../../service/store.service";
 
 @Component({
   selector: 'app-custom-domain-settings',
@@ -20,9 +19,10 @@ export class CustomDomainSettingsComponent {
   customDomainReferences: RegisteredDomain[] = [];
   customDomainForm: FormGroup;
   errMessage: string = '';
+  stores: Store[];
 
 
-  constructor(private domainOwnershipService: DomainOwnershipService, private dnsLookupService: DnsLookupService) {
+  constructor(private domainOwnershipService: DomainOwnershipService, private storeService: StoreService) {
     this.customDomainForm = new FormGroup({
       domain: new FormControl(null, [
         Validators.required,
@@ -30,6 +30,7 @@ export class CustomDomainSettingsComponent {
         Validators.pattern('^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]$')
       ]),
     });
+    this.storeService.findAllStores().subscribe(it => this.stores = it)
   }
 
 

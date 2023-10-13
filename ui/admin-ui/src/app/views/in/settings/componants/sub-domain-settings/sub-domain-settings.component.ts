@@ -8,6 +8,7 @@ import {
   RegisterDomainResponse,
   RegisteredDomain
 } from "../../../../../service/domain-ownership.service";
+import {Store, StoreService} from "../../../../../service/store.service";
 
 @Component({
   selector: 'app-sub-domain-settings',
@@ -18,25 +19,25 @@ export class SubDomainSettingsComponent {
   @Input()
   subDomainReferences: RegisteredDomain[] = [];
   baseDomain: string;
-  subDomainFormm: FormGroup;
+  subDomainForm: FormGroup;
+  stores: Store[];
 
-
-  constructor(private domainOwnershipService: DomainOwnershipService) {
+  constructor(private domainOwnershipService: DomainOwnershipService, private storeService: StoreService) {
     this.baseDomain = environment.BASE_DOMAIN;
-    this.subDomainFormm = new FormGroup({
+    this.subDomainForm = new FormGroup({
       domain: new FormControl(null, [
         Validators.required,
         Validators.minLength(4),
         Validators.pattern('^[a-zA-Z0-9]+$')
       ]),
     });
-
+    this.storeService.findAllStores().subscribe(it => this.stores = it)
   }
 
 
   onSubmit() {
-    if (this.subDomainFormm.valid) {
-      let value: any = this.subDomainFormm.value;
+    if (this.subDomainForm.valid) {
+      let value: any = this.subDomainForm.value;
       this.domainOwnershipService.register({
         domain: {
           domain: value.domain + "." + this.baseDomain
@@ -49,7 +50,7 @@ export class SubDomainSettingsComponent {
           reference: it.reference,
           certificateStatus: DomainCertificateStatus.ACTIVE_CERTIFICATE_GENERATED,
         });
-        this.subDomainFormm.reset();
+        this.subDomainForm.reset();
       });
     }
   }
