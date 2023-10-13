@@ -20,7 +20,7 @@ export class SubDomainSettingsComponent {
   subDomainReferences: RegisteredDomain[] = [];
   baseDomain: string;
   subDomainForm: FormGroup;
-  stores: Store[];
+  stores: Store[] = [];
 
   constructor(private domainOwnershipService: DomainOwnershipService, private storeService: StoreService) {
     this.baseDomain = environment.BASE_DOMAIN;

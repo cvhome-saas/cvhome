@@ -19,7 +19,7 @@ export class CustomDomainSettingsComponent {
   customDomainReferences: RegisteredDomain[] = [];
   customDomainForm: FormGroup;
   errMessage: string = '';
-  stores: Store[];
+  stores: Store[] = [];
 
 
   constructor(private domainOwnershipService: DomainOwnershipService, private storeService: StoreService) {
