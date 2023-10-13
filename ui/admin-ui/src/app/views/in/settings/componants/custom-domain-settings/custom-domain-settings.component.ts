@@ -2,7 +2,6 @@ import {Component, Input} from '@angular/core';
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {environment} from "../../../../../../environment";
 import {DnsLookupService} from "../../../../../service/dns-lookup.service";
-import {map, mergeMap, Observable} from "rxjs";
 import {
   DomainCertificateStatus,
   DomainOwnershipService,
@@ -38,34 +37,24 @@ export class CustomDomainSettingsComponent {
   onSubmit() {
     if (this.domainReferenceForm.valid) {
       let value: any = this.domainReferenceForm.value;
-      this.checkCNAMEHost(value.domain)
-        .pipe(mergeMap(it => this.domainOwnershipService.register({
-          domain: {
-            domain: value.domain
-          },
-          domainType: DomainType.SAS_CUSTOM
-        })))
-        .subscribe({
-          next: (it: RegisterDomainResponse) => {
-            this.errMessage = '';
-            this.customDomainReferences.push({
-              domain: it.domain,
-              domainType: DomainType.SAS_CUSTOM,
-              reference: it.reference,
-              certificateStatus: DomainCertificateStatus.INITIATED
-            });
-          },
-          error: (e: Error) => this.errMessage = e.message,
-          complete: () => this.domainReferenceForm.reset()
-        });
+      this.domainOwnershipService.register({
+        domain: {
+          domain: value.domain
+        },
+        domainType: DomainType.SAS_CUSTOM
+      }).subscribe({
+        next: (it: RegisterDomainResponse) => {
+          this.errMessage = '';
+          this.customDomainReferences.push({
+            domain: it.domain,
+            domainType: DomainType.SAS_CUSTOM,
+            reference: it.reference,
+            certificateStatus: DomainCertificateStatus.INITIATED
+          });
+        },
+        error: (e: Error) => this.errMessage = e.message,
+        complete: () => this.domainReferenceForm.reset()
+      });
     }
-  }
-
-  checkCNAMEHost(domain: string): Observable<boolean> {
-    return this.dnsLookupService.lookup(domain)
-      .pipe(
-        map(it => it.Answer),
-        map(it => (it != null && it.filter(answer => answer.type == 5 && answer.data.includes(this.baseDomain)).length > 0)),
-      )
   }
 }

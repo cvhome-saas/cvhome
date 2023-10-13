@@ -17,9 +17,6 @@ public interface AcmCertificateOrderService {
     void validate(OrdersId orderId);
 
     void triggerValidate(OrdersId orderId, String type);
-
-    void prepareOrderValidation(OrdersId orderId);
-
     void doGeneration(OrdersId orderId);
 
     InputStream getHttpValidationToken(HttpValidationToken validationToken);

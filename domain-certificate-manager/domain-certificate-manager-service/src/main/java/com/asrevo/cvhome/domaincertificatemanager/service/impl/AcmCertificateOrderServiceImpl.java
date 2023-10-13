@@ -72,7 +72,26 @@ public class AcmCertificateOrderServiceImpl implements AcmCertificateOrderServic
         });
     }
 
-    @Override
+    private void prepareOrderValidation(OrdersId orderId) {
+        Set<CertificateOrderStatus> preValidationNeededStatus = Set.of(CertificateOrderStatus.REQUESTED);
+        ordersService.findOneById(orderId).ifPresent(it -> {
+            if (preValidationNeededStatus.contains(it.getCertificateOrderStatus())) {
+                log.info("will prepareOrderValidation for order {}", orderId);
+                installerManager.install(it.getChallenges().getChallenge(it.getChallengeValidationType()));
+                it.requestValidate();
+                ordersService.save(it);
+                ValidateOrderCommand command = new ValidateOrderCommand();
+                command.setId(it.getId());
+                commandPublisher.publish(command);
+            } else {
+                log.warn("request to do generate Validation Challenge certificate for status {} and orderId {}", it.getCertificateOrderStatus(), orderId);
+            }
+        });
+
+    }
+
+   @Transactional
+   @Override
     public void validate(OrdersId orderId) {
         Set<CertificateOrderStatus> preValidationNeededStatus = Set.of(CertificateOrderStatus.VALIDATION_REQUESTED);
         ordersService.findOneById(orderId).ifPresent(it -> {
@@ -120,26 +139,6 @@ public class AcmCertificateOrderServiceImpl implements AcmCertificateOrderServic
             return new RuntimeException("order not found");
         });
     }
-
-    @Override
-    public void prepareOrderValidation(OrdersId orderId) {
-        Set<CertificateOrderStatus> preValidationNeededStatus = Set.of(CertificateOrderStatus.REQUESTED);
-        ordersService.findOneById(orderId).ifPresent(it -> {
-            if (preValidationNeededStatus.contains(it.getCertificateOrderStatus())) {
-                log.info("will prepareOrderValidation for order {}", orderId);
-                installerManager.install(it.getChallenges().getChallenge(it.getChallengeValidationType()));
-                it.requestValidate();
-                ValidateOrderCommand command = new ValidateOrderCommand();
-                command.setId(it.getId());
-                ordersService.save(it);
-                commandPublisher.publish(command);
-            } else {
-                log.warn("request to do generate Validation Challenge certificate for status {} and orderId {}", it.getCertificateOrderStatus(), orderId);
-            }
-        });
-
-    }
-
     @Override
     public void doGeneration(OrdersId orderId) {
         Set<CertificateOrderStatus> preGenerationNeededStatus = Set.of(CertificateOrderStatus.VALIDATED_VALID);
