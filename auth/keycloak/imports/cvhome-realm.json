@@ -493,7 +493,7 @@
   }, {
     "id" : "4003ef66-915e-47f5-9e01-6eb8dbbee38c",
     "createdTimestamp" : 1692367604799,
-    "username" : "microservice-certificate-manager",
+    "username" : "microservice-domain-certificate-manager",
     "enabled" : true,
     "totp" : false,
     "emailVerified" : false,

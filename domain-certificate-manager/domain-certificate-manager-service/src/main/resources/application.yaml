@@ -1,6 +1,6 @@
 spring:
   application:
-    name: certificate-manager
+    name: domain-certificate-manager
   docker:
     compose:
       file: ${spring.application.name}/compose.yml
@@ -26,11 +26,11 @@ spring:
                 metadata:
                   service-name: domain-ownership
                   instance: domain-ownership-1
-            certificate-manager:
+            domain-certificate-manager:
               - uri: "http://localhost:8082"
                 metadata:
-                  service-name: certificate-manager
-                  instance: certificate-manager-1
+                  service-name: domain-certificate-manager
+                  instance: domain-certificate-manager-1
             auth:
               - uri: "http://localhost:9999"
                 metadata:

@@ -23,7 +23,7 @@ public class ClientsConfig {
         };
         return (domain, fileType) -> {
             // @TODO need to get any instance using discoveryClient
-            ServiceInstance instance = discoveryClient.getInstances("certificate-manager").get(0);
+            ServiceInstance instance = discoveryClient.getInstances("domain-certificate-manager").get(0);
             String url = instance.getUri() + "/api/v1/acm/domain-certificate-file?domain=" + domain + "&fileType=" + fileType.name();
             return template.exchange(url, POST, null, responseType);
         };

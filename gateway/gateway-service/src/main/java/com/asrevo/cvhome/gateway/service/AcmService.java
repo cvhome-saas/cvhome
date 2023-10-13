@@ -1,6 +1,6 @@
 package com.asrevo.cvhome.gateway.service;
 
-import com.asrevo.cvhome.certificatemanager.commons.domain.CertificateFileType;
+import com.asrevo.cvhome.domaincertificatemanager.commons.domain.CertificateFileType;
 import com.asrevo.cvhome.gateway.config.ssl.AcmeTls1SslContextSpec;
 import com.asrevo.cvhome.gateway.config.ssl.DelegatedSslContext;
 import com.asrevo.cvhome.gateway.config.ssl.SSlProviderLoader;

@@ -21,11 +21,11 @@ spring:
                 metadata:
                   service-name: domain-ownership
                   instance: domain-ownership-1
-            certificate-manager:
+            domain-certificate-manager:
               - uri: "http://localhost:8082"
                 metadata:
-                  service-name: certificate-manager
-                  instance: certificate-manager-1
+                  service-name: domain-certificate-manager
+                  instance: domain-certificate-manager-1
             auth:
               - uri: "http://localhost:9999"
                 metadata:
@@ -66,10 +66,10 @@ spring:
             - Path=/domain/**
           filters:
             - StripPrefix=1
-        - id: certificate-manager
-          uri: lb://certificate-manager
+        - id: domain-certificate-manager
+          uri: lb://domain-certificate-manager
           predicates:
-            - Path=/certificate-manager/**
+            - Path=/domain-certificate-manager/**
           filters:
             - StripPrefix=1
         - id: auth
