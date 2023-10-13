@@ -15,11 +15,3 @@ export function inGuard(): CanActivateFn {
   };
 }
 
-export function outGuard(): CanActivateFn {
-  return (route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree => {
-    const oauthService: AuthService = inject(AuthService);
-    const router: Router = inject(Router);
-    return oauthService.getAuthUser().pipe(map(it => router.parseUrl('/')), catchError(it => of(true)));
-  };
-}
-
