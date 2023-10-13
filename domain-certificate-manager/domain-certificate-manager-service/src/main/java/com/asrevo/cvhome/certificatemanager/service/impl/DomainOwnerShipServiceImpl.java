@@ -44,15 +44,14 @@ public class DomainOwnerShipServiceImpl implements DomainOwnerShipService {
     }
 
     @Override
-    public RegisterDomainResponse registerReservedDomainToSys(RegisterDomainRequest request) {
+    public void registerReservedDomainToSys(RegisterDomainRequest request) {
         AvailabilityResponse availability = domainService.checkAvailability(request.domain());
         if (availability.available()) {
-            DomainEntity entity = doRegister(request.domain(), request.reference(), DomainType.APPLICATION_RESERVED, IdentityId.ofSys());
+            doRegister(request.domain(), request.reference(), DomainType.APPLICATION_RESERVED, IdentityId.ofSys());
             CreateOrderCommand command = new CreateOrderCommand();
             command.setDomain(request.domain());
             command.setValidationType(Optional.ofNullable(request.recommendedChallengeValidationType()).orElse(ChallengeValidationType.TlsAlpn01));
             commandPublisher.publish(command);
-            return new RegisterDomainResponse(entity.getDomain(), entity.getReference());
         }
         throw new RuntimeException("domain already registered");
     }
