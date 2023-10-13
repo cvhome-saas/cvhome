@@ -2,7 +2,7 @@ import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {SettingsComponent} from "./views/settings/settings.component";
 import {DomainSettingsComponent} from "./views/domain-settings/domain-settings.component";
-import {ChannelsSettingsComponent} from "./views/channels-settings/channels-settings.component";
+import {StoresSettingsComponent} from "./views/stores-settings/stores-settings.component";
 import {SettingsRoutingModule} from "./settings.routing.module";
 import {SubDomainSettingsComponent} from "./componants/sub-domain-settings/sub-domain-settings.component";
 import {CustomDomainSettingsComponent} from "./componants/custom-domain-settings/custom-domain-settings.component";
@@ -13,7 +13,7 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
     imports: [
         CommonModule, HttpClientModule, FormsModule, ReactiveFormsModule, SettingsRoutingModule
     ],
-    declarations: [SettingsComponent, DomainSettingsComponent, ChannelsSettingsComponent, SubDomainSettingsComponent, CustomDomainSettingsComponent]
+    declarations: [SettingsComponent, DomainSettingsComponent, StoresSettingsComponent, SubDomainSettingsComponent, CustomDomainSettingsComponent]
 })
 export class SettingsModule {
 }

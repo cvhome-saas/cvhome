@@ -1,18 +1,18 @@
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 
-import {ChannelsSettingsComponent} from './channels-settings.component';
+import {StoresSettingsComponent} from './stores-settings.component';
 
-describe('ChannelsSettingsComponent', () => {
-    let component: ChannelsSettingsComponent;
-    let fixture: ComponentFixture<ChannelsSettingsComponent>;
+describe('StoresSettingsComponent', () => {
+    let component: StoresSettingsComponent;
+    let fixture: ComponentFixture<StoresSettingsComponent>;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [ChannelsSettingsComponent]
+            declarations: [StoresSettingsComponent]
         })
             .compileComponents();
 
-        fixture = TestBed.createComponent(ChannelsSettingsComponent);
+        fixture = TestBed.createComponent(StoresSettingsComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });
