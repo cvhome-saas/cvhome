@@ -18,12 +18,12 @@ export class SubDomainSettingsComponent {
   @Input()
   subDomainReferences: RegisteredDomain[] = [];
   baseDomain: string;
-  domainReferenceForm: FormGroup;
+  subDomainFormm: FormGroup;
 
 
   constructor(private domainOwnershipService: DomainOwnershipService) {
     this.baseDomain = environment.BASE_DOMAIN;
-    this.domainReferenceForm = new FormGroup({
+    this.subDomainFormm = new FormGroup({
       domain: new FormControl(null, [
         Validators.required,
         Validators.minLength(4),
@@ -35,8 +35,8 @@ export class SubDomainSettingsComponent {
 
 
   onSubmit() {
-    if (this.domainReferenceForm.valid) {
-      let value: any = this.domainReferenceForm.value;
+    if (this.subDomainFormm.valid) {
+      let value: any = this.subDomainFormm.value;
       this.domainOwnershipService.register({
         domain: {
           domain: value.domain + "." + this.baseDomain
@@ -49,7 +49,7 @@ export class SubDomainSettingsComponent {
           reference: it.reference,
           certificateStatus: DomainCertificateStatus.ACTIVE_CERTIFICATE_GENERATED,
         });
-        this.domainReferenceForm.reset();
+        this.subDomainFormm.reset();
       });
     }
   }

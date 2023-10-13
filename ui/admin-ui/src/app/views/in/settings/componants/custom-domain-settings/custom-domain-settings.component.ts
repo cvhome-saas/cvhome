@@ -18,13 +18,12 @@ import {
 export class CustomDomainSettingsComponent {
   @Input()
   customDomainReferences: RegisteredDomain[] = [];
-  baseDomain: string = environment.BASE_DOMAIN;
-  domainReferenceForm: FormGroup;
+  customDomainForm: FormGroup;
   errMessage: string = '';
 
 
   constructor(private domainOwnershipService: DomainOwnershipService, private dnsLookupService: DnsLookupService) {
-    this.domainReferenceForm = new FormGroup({
+    this.customDomainForm = new FormGroup({
       domain: new FormControl(null, [
         Validators.required,
         Validators.minLength(4),
@@ -35,8 +34,8 @@ export class CustomDomainSettingsComponent {
 
 
   onSubmit() {
-    if (this.domainReferenceForm.valid) {
-      let value: any = this.domainReferenceForm.value;
+    if (this.customDomainForm.valid) {
+      let value: any = this.customDomainForm.value;
       this.domainOwnershipService.register({
         domain: {
           domain: value.domain
@@ -53,7 +52,7 @@ export class CustomDomainSettingsComponent {
           });
         },
         error: (e: Error) => this.errMessage = e.message,
-        complete: () => this.domainReferenceForm.reset()
+        complete: () => this.customDomainForm.reset()
       });
     }
   }

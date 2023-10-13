@@ -1,4 +1,4 @@
-<form (ngSubmit)="onSubmit()" [formGroup]="domainReferenceForm">
+<form (ngSubmit)="onSubmit()" [formGroup]="customDomainForm">
   <div class="row mt-4 justify-content-center">
     <div class="col-md-6 justify-content-center">
       <div class="tab-content mt-6 ">
@@ -14,15 +14,15 @@
             </div>
             <div class="help-block">
               <div
-                *ngIf="domainReferenceForm.controls['domain'].invalid && (domainReferenceForm.controls['domain'].dirty || domainReferenceForm.controls['domain'].touched)"
+                *ngIf="customDomainForm.controls['domain'].invalid && (customDomainForm.controls['domain'].dirty || customDomainForm.controls['domain'].touched)"
                 class="text-danger">
-                <div *ngIf="domainReferenceForm.controls['domain'].errors?.['required']">
+                <div *ngIf="customDomainForm.controls['domain'].errors?.['required']">
                   Domain is required.
                 </div>
-                <div *ngIf="domainReferenceForm.controls['domain'].errors?.['minlength']">
+                <div *ngIf="customDomainForm.controls['domain'].errors?.['minlength']">
                   Domain is minLength.
                 </div>
-                <div *ngIf="domainReferenceForm.controls['domain'].errors?.['pattern']">
+                <div *ngIf="customDomainForm.controls['domain'].errors?.['pattern']">
                   Domain is pattern.
                 </div>
               </div>
