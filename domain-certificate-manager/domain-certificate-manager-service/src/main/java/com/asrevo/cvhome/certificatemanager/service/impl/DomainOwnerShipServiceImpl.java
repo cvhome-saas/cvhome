@@ -57,7 +57,7 @@ public class DomainOwnerShipServiceImpl implements DomainOwnerShipService {
     }
 
     private DomainEntity doRegister(Domain domain, Reference reference, DomainType domainType, IdentityId identity) {
-        if (!identity.equals(IdentityId.ofSys())) {
+        if (domainType.equals(DomainType.SAS_CUSTOM)) {
             boolean provedTo = domain.isProvedTo(identity);
             if (!provedTo) {
                 throw new RuntimeException("please prove domain ownership on domain " + domain.domain() + " by adding txt record " + domain.getProvingDomain() + " with value " + identity.id());
