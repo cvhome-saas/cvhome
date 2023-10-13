@@ -1,9 +1,10 @@
 import {Component, Input} from '@angular/core';
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {
+  Domain,
   DomainCertificateStatus,
   DomainOwnershipService,
-  DomainType,
+  DomainType, ReferenceType,
   RegisterDomainResponse,
   RegisteredDomain
 } from "../../../../../service/domain-ownership.service";
@@ -33,7 +34,6 @@ export class CustomDomainSettingsComponent {
     this.storeService.findAllStores().subscribe(it => this.stores = it)
   }
 
-
   onSubmit() {
     if (this.customDomainForm.valid) {
       let value: any = this.customDomainForm.value;
@@ -57,4 +57,18 @@ export class CustomDomainSettingsComponent {
       });
     }
   }
+
+  onReferenceChange(domain: Domain, value: any) {
+    let refId = value.target.value;
+    this.domainOwnershipService.changeReference({
+      domain:domain,
+      reference:{
+        reference:refId,
+        referenceType:ReferenceType.STORE
+      }
+    }).subscribe(it=>{
+      this.customDomainReferences.filter(it => it.domain.domain == domain.domain).forEach(d => d.reference = it.reference);
+    })
+  }
+
 }

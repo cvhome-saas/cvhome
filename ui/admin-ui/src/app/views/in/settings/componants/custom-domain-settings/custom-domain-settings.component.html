@@ -48,6 +48,9 @@
     <th class="border-bottom-0">
       <h6 class="fw-semibold mb-0">Domain</h6>
     </th>
+    <th class="border-bottom-0">
+      <h6 class="fw-semibold mb-0">Reference</h6>
+    </th>
   </tr>
   </thead>
   <tbody>
@@ -56,6 +59,14 @@
       <h6 class="fw-semibold mb-1"><a class="mb-0 fw-normal" href="//{{d.domain.domain}}"
                                       target="_blank">{{d.domain.domain}}</a></h6>
     </td>
+    <td>
+      <select class="form-select" aria-label="Default select example" (change)="onReferenceChange(d.domain,$event)">
+        <option value="null">Select reference</option>
+        <option *ngFor="let o of stores" [value]="o.id.id"
+                [selected]="d.reference&&o.id.id==d.reference.reference">{{o.name}}</option>
+      </select>
+    </td>
+
   </tr>
   </tbody>
 </table>

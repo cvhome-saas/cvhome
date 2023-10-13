@@ -2,9 +2,11 @@ import {Component, Input} from '@angular/core';
 import {environment} from "../../../../../../environment";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {
+  Domain,
   DomainCertificateStatus,
   DomainOwnershipService,
   DomainType,
+  ReferenceType,
   RegisterDomainResponse,
   RegisteredDomain
 } from "../../../../../service/domain-ownership.service";
@@ -55,4 +57,16 @@ export class SubDomainSettingsComponent {
     }
   }
 
+  onReferenceChange(domain: Domain, value: any) {
+    let refId = value.target.value;
+    this.domainOwnershipService.changeReference({
+      domain:domain,
+      reference:{
+        reference:refId,
+        referenceType:ReferenceType.STORE
+      }
+    }).subscribe(it=>{
+      this.subDomainReferences.filter(it => it.domain.domain == domain.domain).forEach(d => d.reference = it.reference);
+    })
+  }
 }
