@@ -17,5 +17,5 @@ public interface DomainRepository extends ListCrudRepository<DomainEntity, Domai
     Optional<DomainEntity> findByDomain(Domain domain);
 
     List<DomainEntity> findByOwnerAndStatusIs(AggregateReference<OwnerEntity, IdentityId> owner, DomainCertificateStatus domainCertificateStatus);
-    List<DomainEntity> findByOwnerAndDomainType(AggregateReference<OwnerEntity, IdentityId> owner, DomainType domainType);
+    List<DomainEntity> findByOwnerAndDomainTypeIn(AggregateReference<OwnerEntity, IdentityId> owner, List<DomainType> domainTypes);
 }

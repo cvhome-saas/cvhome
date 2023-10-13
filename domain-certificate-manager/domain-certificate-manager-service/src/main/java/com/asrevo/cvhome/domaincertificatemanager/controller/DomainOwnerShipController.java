@@ -1,13 +1,13 @@
 package com.asrevo.cvhome.domaincertificatemanager.controller;
 
+import com.asrevo.cvhome.commons.domain.IdentityId;
 import com.asrevo.cvhome.domaincertificatemanager.commons.domain.Domain;
 import com.asrevo.cvhome.domaincertificatemanager.commons.domain.DomainType;
+import com.asrevo.cvhome.domaincertificatemanager.commons.dto.*;
 import com.asrevo.cvhome.domaincertificatemanager.entity.OwnerEntity;
 import com.asrevo.cvhome.domaincertificatemanager.service.DomainOwnerShipService;
 import com.asrevo.cvhome.domaincertificatemanager.service.DomainService;
 import com.asrevo.cvhome.domaincertificatemanager.service.OwnerService;
-import com.asrevo.cvhome.commons.domain.IdentityId;
-import com.asrevo.cvhome.domaincertificatemanager.commons.dto.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -38,7 +38,8 @@ public class DomainOwnerShipController {
     }
 
     @PostMapping("register")
-    public RegisterDomainResponse register(@RequestBody RegisterDomainRequest request, @AuthenticationPrincipal JwtAuthenticationToken principal) {
+    public RegisterDomainResponse register(@RequestBody RegisterDomainRequest request,
+                                           @AuthenticationPrincipal JwtAuthenticationToken principal) {
         if (request.domainType() == DomainType.APPLICATION_RESERVED) {
             if (principal.getAuthorities().stream().noneMatch(it -> "ROLE_ADMIN".equals(it.getAuthority()))) {
                 throw new RuntimeException("you don't have authorities to create " + request.domainType().name() + " domain");
@@ -65,12 +66,16 @@ public class DomainOwnerShipController {
     }
 
     @PostMapping("change-reference")
-    public DomainChangeReferenceResponse changeReference(@RequestBody DomainChangeReferenceRequest changeReferenceRequest, @AuthenticationPrincipal Principal principal) {
+    public DomainChangeReferenceResponse changeReference(
+            @RequestBody DomainChangeReferenceRequest changeReferenceRequest,
+            @AuthenticationPrincipal Principal principal) {
         return domainService.changeDomainReference(changeReferenceRequest, new IdentityId(principal.getName()));
     }
 
-    @GetMapping(value = "get-registered-domains", params = {"domainType"})
-    public List<RegisteredDomainResponse> registeredDomains(@RequestParam(name = "domainType", defaultValue = "SAS_CUSTOM") DomainType domainType, @AuthenticationPrincipal Principal principal) {
+    @GetMapping(value = "get-registered-domains")
+    public List<RegisteredDomainResponse> registeredDomains(
+            @RequestParam(name = "domainType", required = false) DomainType domainType,
+            @AuthenticationPrincipal Principal principal) {
         return domainService.findAllRegisteredDomains(IdentityId.of(principal.getName()), domainType);
     }
 }

@@ -1,15 +1,16 @@
 package com.asrevo.cvhome.domaincertificatemanager.service.impl;
 
+import com.asrevo.cvhome.commons.domain.IdentityId;
 import com.asrevo.cvhome.domaincertificatemanager.commons.domain.CertificateOrderStatus;
 import com.asrevo.cvhome.domaincertificatemanager.commons.domain.Domain;
 import com.asrevo.cvhome.domaincertificatemanager.commons.domain.DomainCertificateStatus;
 import com.asrevo.cvhome.domaincertificatemanager.commons.domain.DomainType;
+import com.asrevo.cvhome.domaincertificatemanager.commons.dto.*;
 import com.asrevo.cvhome.domaincertificatemanager.entity.DomainEntity;
+import com.asrevo.cvhome.domaincertificatemanager.entity.OwnerEntity;
 import com.asrevo.cvhome.domaincertificatemanager.mappers.DomainMappers;
 import com.asrevo.cvhome.domaincertificatemanager.repository.DomainRepository;
 import com.asrevo.cvhome.domaincertificatemanager.service.DomainService;
-import com.asrevo.cvhome.commons.domain.IdentityId;
-import com.asrevo.cvhome.domaincertificatemanager.commons.dto.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -95,7 +97,11 @@ public class DomainServiceImpl implements DomainService {
 
     @Override
     public List<RegisteredDomainResponse> findAllRegisteredDomains(IdentityId identityId, DomainType domainType) {
-        List<DomainEntity> domains = domainRepository.findByOwnerAndDomainType(AggregateReference.to(identityId), domainType);
+        List<DomainType> domainTypes = Optional.ofNullable(domainType).map(List::of)
+                .orElseGet(() ->
+                        List.of(DomainType.SAS_CUSTOM, DomainType.SAS_SUB));
+        AggregateReference<OwnerEntity, IdentityId> owner = AggregateReference.to(identityId);
+        List<DomainEntity> domains = domainRepository.findByOwnerAndDomainTypeIn(owner, domainTypes);
         return domainMappers.toRegisteredDomainResponse(domains);
     }
 
