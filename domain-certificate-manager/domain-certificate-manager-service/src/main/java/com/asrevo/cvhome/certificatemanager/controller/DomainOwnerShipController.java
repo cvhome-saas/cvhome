@@ -12,12 +12,10 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.List;
 
 
 @RestController
@@ -69,5 +67,10 @@ public class DomainOwnerShipController {
     @PostMapping("change-reference")
     public DomainChangeReferenceResponse changeReference(@RequestBody DomainChangeReferenceRequest changeReferenceRequest, @AuthenticationPrincipal Principal principal) {
         return domainService.changeDomainReference(changeReferenceRequest, new IdentityId(principal.getName()));
+    }
+
+    @GetMapping(value = "get-registered-domains", params = {"domainType"})
+    public List<RegisteredDomainResponse> registeredDomains(@RequestParam(name = "domainType", defaultValue = "SAS_CUSTOM") DomainType domainType, @AuthenticationPrincipal Principal principal) {
+        return domainService.findAllRegisteredDomains(IdentityId.of(principal.getName()), domainType);
     }
 }

@@ -2,10 +2,8 @@ package com.asrevo.cvhome.certificatemanager.service;
 
 import com.asrevo.cvhome.certificatemanager.commons.domain.CertificateOrderStatus;
 import com.asrevo.cvhome.certificatemanager.commons.domain.Domain;
-import com.asrevo.cvhome.certificatemanager.commons.dto.AvailabilityResponse;
-import com.asrevo.cvhome.certificatemanager.commons.dto.DomainChangeReferenceRequest;
-import com.asrevo.cvhome.certificatemanager.commons.dto.DomainChangeReferenceResponse;
-import com.asrevo.cvhome.certificatemanager.commons.dto.DomainReferenceResponse;
+import com.asrevo.cvhome.certificatemanager.commons.domain.DomainType;
+import com.asrevo.cvhome.certificatemanager.commons.dto.*;
 import com.asrevo.cvhome.certificatemanager.entity.DomainEntity;
 import com.asrevo.cvhome.commons.domain.IdentityId;
 
@@ -26,4 +24,6 @@ public interface DomainService {
     DomainChangeReferenceResponse changeDomainReference(DomainChangeReferenceRequest changeReferenceRequest, IdentityId identityId);
 
     List<DomainEntity> findAllSystemDomainNotRequested();
+
+    List<RegisteredDomainResponse> findAllRegisteredDomains(IdentityId identityId, DomainType domainType);
 }

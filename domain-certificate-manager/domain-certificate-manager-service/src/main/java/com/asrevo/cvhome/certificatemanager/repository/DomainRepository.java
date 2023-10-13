@@ -3,6 +3,7 @@ package com.asrevo.cvhome.certificatemanager.repository;
 import com.asrevo.cvhome.certificatemanager.commons.domain.Domain;
 import com.asrevo.cvhome.certificatemanager.commons.domain.DomainCertificateStatus;
 import com.asrevo.cvhome.certificatemanager.commons.domain.DomainId;
+import com.asrevo.cvhome.certificatemanager.commons.domain.DomainType;
 import com.asrevo.cvhome.certificatemanager.entity.DomainEntity;
 import com.asrevo.cvhome.certificatemanager.entity.OwnerEntity;
 import com.asrevo.cvhome.commons.domain.IdentityId;
@@ -15,5 +16,6 @@ import java.util.Optional;
 public interface DomainRepository extends ListCrudRepository<DomainEntity, DomainId> {
     Optional<DomainEntity> findByDomain(Domain domain);
 
-    List<DomainEntity> findByOwnerAndStatusIs(AggregateReference<OwnerEntity, IdentityId> reference, DomainCertificateStatus domainCertificateStatus);
+    List<DomainEntity> findByOwnerAndStatusIs(AggregateReference<OwnerEntity, IdentityId> owner, DomainCertificateStatus domainCertificateStatus);
+    List<DomainEntity> findByOwnerAndDomainType(AggregateReference<OwnerEntity, IdentityId> owner, DomainType domainType);
 }
