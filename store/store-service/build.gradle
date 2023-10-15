@@ -25,7 +25,8 @@ springBoot {
 
 bootBuildImage {
     builder = "paketobuildpacks/builder:tiny"
-    imageName = "ghcr.io/ashraf-revo/store:${project.version}"
+    imageName = "ghcr.io/ashraf-revo/store"
+    tags:["${project.version}","latest"]
     docker {
         publishRegistry {
             url = "https://ghcr.io"
