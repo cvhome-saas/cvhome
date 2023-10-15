@@ -42,11 +42,14 @@ jobs:
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
+        with:
+          mask-password: 'false'
       - name: Build Docker with Gradle
         uses: gradle/gradle-build-action@749f47bda3e44aa060e82d7b3ef7e40d953bd629
         with:
           arguments: bootBuildImage --publishImage
         env: # Or as an environment variable
+          ECR_TOKEN: ${{ steps.login-ecr.outputs.password }}
           GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
       - name: check docker images
         run: docker images
