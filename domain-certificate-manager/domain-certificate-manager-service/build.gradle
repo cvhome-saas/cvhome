@@ -26,7 +26,7 @@ springBoot {
 bootBuildImage {
     builder = "paketobuildpacks/builder:tiny"
     imageName = "ghcr.io/ashraf-revo/domain-certificate-manager"
-    tags = ["${project.version}", "latest"]
+    tags = ["ghcr.io/ashraf-revo/domain-certificate-manager:${project.version}", "ghcr.io/ashraf-revo/domain-certificate-manager:latest"]
     docker {
         publishRegistry {
             url = "https://ghcr.io"
