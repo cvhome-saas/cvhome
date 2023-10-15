@@ -37,10 +37,11 @@ bootBuildImage {
 }*/
 bootBuildImage {
     builder = "paketobuildpacks/builder:tiny"
-    imageName = "117535662239.dkr.ecr.eu-central-1.amazonaws.com/gateway"
+    imageName = "${System.getenv("REGISTRY")}/gateway"
     tags = ["${imageName}:${project.version}", "${imageName}:latest"]
     docker {
         publishRegistry {
+            url = System.getenv("REGISTRY")
             username = "AWS"
             password = System.getenv("ECR_TOKEN")
         }
