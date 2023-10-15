@@ -49,7 +49,7 @@ jobs:
         with:
           arguments: bootBuildImage --publishImage
         env: # Or as an environment variable
-          ECR_TOKEN: ${{ steps.login-ecr.outputs.password }}
+          ECR_TOKEN: ${{ steps.login-ecr.outputs.docker_password_117535662239_dkr_ecr_eu_central_1_amazonaws_com }}
           GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
       - name: check docker images
         run: docker images
