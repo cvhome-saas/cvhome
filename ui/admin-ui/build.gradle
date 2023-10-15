@@ -34,7 +34,7 @@ abstract class BootBuildImageTask extends DefaultTask {
   BootBuildImageTask() {
   }
 
-  @TaskAction
+/*  @TaskAction
   void bootBuildImage() {
     String image = "ghcr.io/ashraf-revo/${project.name}"
     project.exec {
@@ -52,4 +52,20 @@ abstract class BootBuildImageTask extends DefaultTask {
       }
     }
   }
+*/
+  @TaskAction
+  void bootBuildImage() {
+    String image = "117535662239.dkr.ecr.eu-central-1.amazonaws.com/${project.name}"
+    project.exec {
+      workingDir '.'
+      commandLine "docker", "build", "-t", "${image}:${project.version}", "-t", "${image}:latest", "."
+    }
+    if (publishImage) {
+      project.exec {
+        workingDir '.'
+        commandLine "docker", "push", image, "--all-tags"
+      }
+    }
+  }
+
 }

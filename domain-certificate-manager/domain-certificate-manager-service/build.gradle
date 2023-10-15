@@ -23,7 +23,7 @@ springBoot {
     buildInfo()
 }
 
-bootBuildImage {
+/*bootBuildImage {
     builder = "paketobuildpacks/builder:tiny"
     imageName = "ghcr.io/ashraf-revo/domain-certificate-manager"
     tags = ["ghcr.io/ashraf-revo/domain-certificate-manager:${project.version}", "ghcr.io/ashraf-revo/domain-certificate-manager:latest"]
@@ -35,6 +35,14 @@ bootBuildImage {
         }
     }
 }
+*/
+
+bootBuildImage {
+    builder = "paketobuildpacks/builder:tiny"
+    imageName = "117535662239.dkr.ecr.eu-central-1.amazonaws.com/domain-certificate-manager"
+    tags = ["117535662239.dkr.ecr.eu-central-1.amazonaws.com/domain-certificate-manager:${project.version}", "117535662239.dkr.ecr.eu-central-1.amazonaws.com/domain-certificate-manager:latest"]
+}
+
 
 ext {
     set('springCloudVersion', "2022.0.4")

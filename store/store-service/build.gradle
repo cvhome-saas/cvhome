@@ -23,7 +23,7 @@ springBoot {
     buildInfo()
 }
 
-bootBuildImage {
+/*bootBuildImage {
     builder = "paketobuildpacks/builder:tiny"
     imageName = "ghcr.io/ashraf-revo/store"
     tags = ["ghcr.io/ashraf-revo/store:${project.version}", "ghcr.io/ashraf-revo/store:latest"]
@@ -34,6 +34,11 @@ bootBuildImage {
             password = System.getenv("GHCR_TOKEN")
         }
     }
+}*/
+bootBuildImage {
+    builder = "paketobuildpacks/builder:tiny"
+    imageName = "117535662239.dkr.ecr.eu-central-1.amazonaws.com/store"
+    tags = ["117535662239.dkr.ecr.eu-central-1.amazonaws.com/store:${project.version}", "117535662239.dkr.ecr.eu-central-1.amazonaws.com/store:latest"]
 }
 
 ext {

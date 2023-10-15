@@ -22,7 +22,7 @@ repositories {
 springBoot {
     buildInfo()
 }
-
+/*
 bootBuildImage {
     builder = "paketobuildpacks/builder:tiny"
     imageName = "ghcr.io/ashraf-revo/gateway"
@@ -34,6 +34,11 @@ bootBuildImage {
             password = System.getenv("GHCR_TOKEN")
         }
     }
+}*/
+bootBuildImage {
+    builder = "paketobuildpacks/builder:tiny"
+    imageName = "117535662239.dkr.ecr.eu-central-1.amazonaws.com/gateway"
+    tags = ["117535662239.dkr.ecr.eu-central-1.amazonaws.com/gateway:${project.version}", "117535662239.dkr.ecr.eu-central-1.amazonaws.com/gateway:latest"]
 }
 
 ext {
