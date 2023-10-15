@@ -37,11 +37,11 @@ springBoot {
 }*/
 bootBuildImage {
     builder = "paketobuildpacks/builder:tiny"
-    imageName = "117535662239.dkr.ecr.eu-central-1.amazonaws.com/store"
-    tags = ["117535662239.dkr.ecr.eu-central-1.amazonaws.com/store:${project.version}", "117535662239.dkr.ecr.eu-central-1.amazonaws.com/store:latest"]
+    imageName = "${System.getenv("REGISTRY")}/store"
+    tags = ["${System.getenv("REGISTRY")}/store:${project.version}", "${System.getenv("REGISTRY")}/store:latest"]
     docker {
         publishRegistry {
-            url = "117535662239.dkr.ecr.eu-central-1.amazonaws.com"
+            url = System.getenv("REGISTRY")
             username = "AWS"
             password = System.getenv("ECR_TOKEN")
         }
