@@ -1,0 +1,60 @@
+com:
+  asrevo:
+    cvhome:
+      fargate:
+        namespace: "cvhome.lcl"
+spring:
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+      default-filters:
+        - TokenRelay
+        - PreserveHostHeader
+        - AddResponseHeader=X-Frame-Options, SAMEORIGIN
+      routes:
+        - id: domain-certificate-manager
+          uri: http://domain-certificate-manager.${com.asrevo.cvhome.fargate.namespace}:8082
+          predicates:
+            - Path=/domain-certificate-manager/**
+          filters:
+            - StripPrefix=1
+        - id: store
+          uri: http://store.${com.asrevo.cvhome.fargate.namespace}:8083
+          predicates:
+            - Path=/store/**
+          filters:
+            - StripPrefix=1
+        - id: auth
+          uri: http://auth.${com.asrevo.cvhome.fargate.namespace}:9999
+          predicates:
+            - FHost=auth.${com.asrevo.cvhome.ssl.default-domain}
+        - id: realms
+          uri: http://auth.${com.asrevo.cvhome.fargate.namespace}:9999
+          predicates:
+            - Path=/realms/**
+          filters:
+            - SetRequestHostHeader=auth.${com.asrevo.cvhome.ssl.default-domain}:${server.port}
+        - id: resources
+          uri: http://auth.${com.asrevo.cvhome.fargate.namespace}:9999
+          predicates:
+            - Path=/resources/**
+        - id: js
+          uri: http://auth.${com.asrevo.cvhome.fargate.namespace}:9999
+          predicates:
+            - Path=/js/**
+        - id: admin-ui
+          uri: http://admin-ui.${com.asrevo.cvhome.fargate.namespace}:4200
+          predicates:
+            - FHost=admin.${com.asrevo.cvhome.ssl.default-domain}
+        - id: store-ui
+          uri: http://store-ui.${com.asrevo.cvhome.fargate.namespace}:4300
+          predicates:
+            - FHost={domain}.{x},{sub}.{domain}.{x}
+          filters:
+            - MapHostAsRequestParam=userId
+        - id: welcome-ui
+          uri: http://welcome-ui.${com.asrevo.cvhome.fargate.namespace}:4400
+          predicates:
+            - FHost=${com.asrevo.cvhome.ssl.default-domain}

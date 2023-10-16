@@ -9,5 +9,4 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties("com.asrevo.cvhome.ssl")
 public class SslProperties {
     private String defaultDomain;
-    private String subDomainFallback;
 }

@@ -32,7 +32,7 @@ public class ResolverSSlProviderCacheLoader implements SSlProviderLoader {
             return loaded;
         } else if (sslProperties.getDefaultDomain().equals(resolvedDomain)) {
             return this.defaultSslProvider;
-        } else if (sslProperties.getSubDomainFallback().equals(resolvedDomain)) {
+        } else if (("*." + sslProperties.getDefaultDomain()).equals(resolvedDomain)) {
             return this.defaultSslProvider;
         } else {
             return null;
@@ -44,7 +44,7 @@ public class ResolverSSlProviderCacheLoader implements SSlProviderLoader {
         if (Utils.isValidInet4Address(domain) || !InternetDomainName.isValid(domain)) {
             return sslProperties.getDefaultDomain();
         } else if (domain.endsWith(ourDomain)) {
-            return sslProperties.getSubDomainFallback();
+            return "*." + sslProperties.getDefaultDomain();
         } else {
             return domain;
         }

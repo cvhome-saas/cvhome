@@ -3,112 +3,9 @@ com:
     cvhome:
       ssl:
         default-domain: "gateway.com"
-        sub-domain-fallback: "*.gateway.com"
 spring:
   application:
     name: gateway
-  r2dbc:
-    url: r2dbc:postgresql://localhost:5432/gatewaydb
-    username: postgres
-    password: password
-  cloud:
-    discovery:
-      client:
-        simple:
-          instances:
-            domain-ownership:
-              - uri: "http://localhost:8081"
-                metadata:
-                  service-name: domain-ownership
-                  instance: domain-ownership-1
-            domain-certificate-manager:
-              - uri: "http://localhost:8082"
-                metadata:
-                  service-name: domain-certificate-manager
-                  instance: domain-certificate-manager-1
-            store:
-              - uri: "http://localhost:8083"
-                metadata:
-                  service-name: store
-                  instance: store-1
-            auth:
-              - uri: "http://localhost:9999"
-                metadata:
-                  service-name: auth
-                  instance: auth-1
-            admin-ui:
-              - uri: "http://localhost:4200"
-                metadata:
-                  service-name: admin-ui
-                  instance: admin-ui-1
-            store-ui:
-              - uri: "http://localhost:4300"
-                metadata:
-                  service-name: store-ui
-                  instance: store-ui-1
-            welcome-ui:
-              - uri: "http://localhost:4400"
-                metadata:
-                  service-name: welcome-ui
-                  instance: welcome-ui-1
-            gateway:
-              - uri: "http://localhost:8080"
-                metadata:
-                  service-name: gateway
-                  instance: gateway-1
-    gateway:
-      discovery:
-        locator:
-          enabled: true
-      default-filters:
-        - TokenRelay
-        - PreserveHostHeader
-        - AddResponseHeader=X-Frame-Options, SAMEORIGIN
-      routes:
-        - id: domain
-          uri: lb://domain
-          predicates:
-            - Path=/domain/**
-          filters:
-            - StripPrefix=1
-        - id: domain-certificate-manager
-          uri: lb://domain-certificate-manager
-          predicates:
-            - Path=/domain-certificate-manager/**
-          filters:
-            - StripPrefix=1
-        - id: auth
-          uri: lb://auth
-          predicates:
-            - FHost=auth.gateway.com
-        - id: realms
-          uri: lb://auth
-          predicates:
-            - Path=/realms/**
-          filters:
-            - SetRequestHostHeader=auth.gateway.com:8443
-        - id: resources
-          uri: lb://auth
-          predicates:
-            - Path=/resources/**
-        - id: js
-          uri: lb://auth
-          predicates:
-            - Path=/js/**
-        - id: welcome-ui
-          uri: lb://welcome-ui
-          predicates:
-            - FHost=gateway.com
-        - id: admin-ui
-          uri: lb://admin-ui
-          predicates:
-            - FHost=admin.gateway.com
-        - id: store-ui
-          uri: lb://store-ui
-          predicates:
-            - FHost={domain}.{x},{sub}.{domain}.{x}
-          filters:
-            - MapHostAsRequestParam=userId
   security:
     oauth2:
       client:
@@ -131,7 +28,7 @@ spring:
             #            comment issuer-uri to skip validation
             #            issuer-uri: https://gateway.com:8443/realms/cvhome
             jwk-set-uri: http://localhost:9999/realms/cvhome/protocol/openid-connect/certs
-            authorization-uri: https://auth.gateway.com:8443/realms/cvhome/protocol/openid-connect/auth
+            authorization-uri: https://auth.${com.asrevo.cvhome.ssl.default-domain}:${server.port}/realms/cvhome/protocol/openid-connect/auth
             token-uri: http://localhost:9999/realms/cvhome/protocol/openid-connect/token
 #            need to trace why getting 401 error=invalid_token, auth_method=validate_access_token is by issuer?
 #            user-info-uri: https://auth.gateway.com:8443/realms/cvhome/protocol/openid-connect/userinfo
