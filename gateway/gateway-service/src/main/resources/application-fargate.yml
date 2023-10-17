@@ -44,14 +44,14 @@ spring:
           uri: http://auth.${com.asrevo.cvhome.fargate.namespace}:9999
           predicates:
             - Path=/js/**
+        - id: welcome-ui
+          uri: http://welcome-ui.${com.asrevo.cvhome.fargate.namespace}:4400
+          predicates:
+            - FHost=www.${com.asrevo.cvhome.ssl.default-domain},${com.asrevo.cvhome.ssl.default-domain}
         - id: admin-ui
           uri: http://admin-ui.${com.asrevo.cvhome.fargate.namespace}:4200
           predicates:
             - FHost=admin.${com.asrevo.cvhome.ssl.default-domain}
-        - id: welcome-ui
-          uri: http://welcome-ui.${com.asrevo.cvhome.fargate.namespace}:4400
-          predicates:
-            - FHost=${com.asrevo.cvhome.ssl.default-domain}
         - id: store-ui
           uri: http://store-ui.${com.asrevo.cvhome.fargate.namespace}:4300
           predicates:

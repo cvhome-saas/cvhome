@@ -82,7 +82,7 @@ spring:
         - id: welcome-ui
           uri: lb://welcome-ui
           predicates:
-            - FHost=${com.asrevo.cvhome.ssl.default-domain}
+            - FHost=www.${com.asrevo.cvhome.ssl.default-domain},${com.asrevo.cvhome.ssl.default-domain}
         - id: admin-ui
           uri: lb://admin-ui
           predicates:
