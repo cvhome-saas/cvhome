@@ -7,5 +7,5 @@ import com.asrevo.cvhome.domaincertificatemanager.commons.domain.DomainType;
 import com.asrevo.cvhome.domaincertificatemanager.commons.domain.Reference;
 
 public record RegisterDomainRequest(Domain domain, DomainType domainType, Reference reference,
-                                    ChallengeValidationType recommendedChallengeValidationType) {
+                                    ChallengeValidationType recommendedType, boolean includeSubDomains) {
 }

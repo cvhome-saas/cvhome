@@ -1,9 +1,9 @@
 package com.asrevo.cvhome.domaincertificatemanager.commons.event.domain;
 
-import com.asrevo.cvhome.domaincertificatemanager.commons.domain.Domain;
-import com.asrevo.cvhome.domaincertificatemanager.commons.domain.DomainId;
 import com.asrevo.cvhome.commons.domain.IdentityId;
 import com.asrevo.cvhome.commons.event.EventId;
+import com.asrevo.cvhome.domaincertificatemanager.commons.domain.Domain;
+import com.asrevo.cvhome.domaincertificatemanager.commons.domain.DomainId;
 
 import java.util.Map;
 

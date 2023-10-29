@@ -26,7 +26,12 @@ public class AcmJobs {
         domains.forEach(it -> {
             DomainEntity entity = domainService.findOneByDomain(it);
             if (entity == null) {
-                domainOwnerShipService.registerReservedDomainToSys(new RegisterDomainRequest(it, null, null, ChallengeValidationType.Dns01));
+                RegisterDomainRequest request = new RegisterDomainRequest(it,
+                        null,
+                        null,
+                        ChallengeValidationType.TlsAlpn01,
+                        false);
+                domainOwnerShipService.registerReservedDomainToSys(request);
             }
         });
     }

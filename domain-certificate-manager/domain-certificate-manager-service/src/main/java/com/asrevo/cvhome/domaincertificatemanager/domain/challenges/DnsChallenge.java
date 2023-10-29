@@ -10,6 +10,11 @@ public record DnsChallenge(Domain domain, boolean isWildCard, String digest) imp
     @Transient
     @JsonIgnore
     public String record() {
+        return record(this.domain);
+    }
+    @Transient
+    @JsonIgnore
+    public static String record(Domain domain) {
         return String.format("_acme-challenge.%s", domain.domain());
     }
 

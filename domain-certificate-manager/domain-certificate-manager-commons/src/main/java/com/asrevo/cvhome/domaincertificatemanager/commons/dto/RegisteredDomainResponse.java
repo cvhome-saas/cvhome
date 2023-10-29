@@ -5,6 +5,7 @@ import com.asrevo.cvhome.domaincertificatemanager.commons.domain.DomainCertifica
 import com.asrevo.cvhome.domaincertificatemanager.commons.domain.DomainType;
 import com.asrevo.cvhome.domaincertificatemanager.commons.domain.Reference;
 
-public record RegisteredDomainResponse(Domain domain, DomainType domainType, Reference reference, DomainCertificateStatus certificateStatus) {
+public record RegisteredDomainResponse(Domain domain, DomainType domainType, Reference reference,
+                                       DomainCertificateStatus certificateStatus) {
 
 }

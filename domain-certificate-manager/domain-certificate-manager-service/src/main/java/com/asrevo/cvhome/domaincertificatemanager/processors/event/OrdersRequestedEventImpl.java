@@ -1,9 +1,9 @@
 package com.asrevo.cvhome.domaincertificatemanager.processors.event;
 
+import com.asrevo.cvhome.commons.event.EventImpl;
 import com.asrevo.cvhome.domaincertificatemanager.commons.domain.CertificateOrderStatus;
 import com.asrevo.cvhome.domaincertificatemanager.commons.event.order.OrdersRequestedEvent;
 import com.asrevo.cvhome.domaincertificatemanager.service.DomainService;
-import com.asrevo.cvhome.commons.event.EventImpl;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

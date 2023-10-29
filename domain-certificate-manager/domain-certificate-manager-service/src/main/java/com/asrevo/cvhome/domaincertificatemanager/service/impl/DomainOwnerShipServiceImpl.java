@@ -1,5 +1,7 @@
 package com.asrevo.cvhome.domaincertificatemanager.service.impl;
 
+import com.asrevo.cvhome.commons.command.CommandPublisher;
+import com.asrevo.cvhome.commons.domain.IdentityId;
 import com.asrevo.cvhome.domaincertificatemanager.commons.command.order.CreateOrderCommand;
 import com.asrevo.cvhome.domaincertificatemanager.commons.domain.ChallengeValidationType;
 import com.asrevo.cvhome.domaincertificatemanager.commons.domain.Domain;
@@ -12,8 +14,6 @@ import com.asrevo.cvhome.domaincertificatemanager.config.AutoOrderDomainsPropert
 import com.asrevo.cvhome.domaincertificatemanager.entity.DomainEntity;
 import com.asrevo.cvhome.domaincertificatemanager.service.DomainOwnerShipService;
 import com.asrevo.cvhome.domaincertificatemanager.service.DomainService;
-import com.asrevo.cvhome.commons.command.CommandPublisher;
-import com.asrevo.cvhome.commons.domain.IdentityId;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -30,15 +30,15 @@ public class DomainOwnerShipServiceImpl implements DomainOwnerShipService {
 
 
     @Override
-
     public RegisterDomainResponse register(RegisterDomainRequest request, IdentityId owner) {
         AvailabilityResponse availability = domainService.checkAvailability(request.domain());
         if (availability.available()) {
-            DomainEntity entity = doRegister(request.domain(), request.reference(), request.domainType(), owner);
+            DomainEntity entity = doRegister(request.domain(), request.reference(), request.domainType(), request.includeSubDomains(), owner);
             if (entity.getDomainType().equals(DomainType.SAS_CUSTOM)) {
                 CreateOrderCommand command = new CreateOrderCommand();
                 command.setDomain(request.domain());
-                command.setValidationType(Optional.ofNullable(request.recommendedChallengeValidationType()).orElse(ChallengeValidationType.TlsAlpn01));
+                command.setIncludeSubDomains(request.includeSubDomains());
+                command.setValidationType(Optional.ofNullable(request.recommendedType()).orElse(ChallengeValidationType.TlsAlpn01));
                 commandPublisher.publish(command);
             }
             return new RegisterDomainResponse(entity.getDomain(), entity.getReference());
@@ -48,18 +48,24 @@ public class DomainOwnerShipServiceImpl implements DomainOwnerShipService {
 
     @Override
     public void registerReservedDomainToSys(RegisterDomainRequest request) {
+        if (request.includeSubDomains() && !ChallengeValidationType.Dns01.equals(request.recommendedType())) {
+            throw new RuntimeException("can't request order with all sub domains when validation is not dns");
+        }
+
         AvailabilityResponse availability = domainService.checkAvailability(request.domain());
         if (availability.available()) {
-            doRegister(request.domain(), request.reference(), DomainType.APPLICATION_RESERVED, IdentityId.ofSys());
+            doRegister(request.domain(), request.reference(), DomainType.APPLICATION_RESERVED, request.includeSubDomains(), IdentityId.ofSys());
             CreateOrderCommand command = new CreateOrderCommand();
+            command.setIncludeSubDomains(request.includeSubDomains());
             command.setDomain(request.domain());
-            command.setValidationType(Optional.ofNullable(request.recommendedChallengeValidationType()).orElse(ChallengeValidationType.TlsAlpn01));
+            command.setValidationType(Optional.ofNullable(request.recommendedType()).orElse(ChallengeValidationType.TlsAlpn01));
             commandPublisher.publish(command);
+        } else {
+            throw new RuntimeException("domain already registered");
         }
-        throw new RuntimeException("domain already registered");
     }
 
-    private DomainEntity doRegister(Domain domain, Reference reference, DomainType domainType, IdentityId identity) {
+    private DomainEntity doRegister(Domain domain, Reference reference, DomainType domainType, boolean includeSubDomains, IdentityId identity) {
         if (domainType.equals(DomainType.SAS_CUSTOM)) {
             boolean txtProvedTo = domain.isTXTProvedTo(identity);
             if (!txtProvedTo) {
@@ -70,7 +76,7 @@ public class DomainOwnerShipServiceImpl implements DomainOwnerShipService {
                 throw new RuntimeException("please prove domain ownership on domain " + domain.domain() + " by adding txt record " + domain.getProvingDomain() + " with value " + identity.id());
             }
         }
-        return domainService.save(DomainEntity.create(domain, reference, domainType, identity));
+        return domainService.save(DomainEntity.create(domain, reference, domainType, includeSubDomains, identity));
     }
 
 

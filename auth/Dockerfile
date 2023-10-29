@@ -1,4 +1,5 @@
 FROM quay.io/keycloak/keycloak:21.0
 
-
-EXPOSE 8080
+COPY keycloak/imports /opt/keycloak/data/import
+COPY keycloak/providers /opt/keycloak/providers
+EXPOSE 9999

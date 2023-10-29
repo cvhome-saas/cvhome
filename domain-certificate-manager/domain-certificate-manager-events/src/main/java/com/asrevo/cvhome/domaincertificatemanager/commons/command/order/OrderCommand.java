@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.domaincertificatemanager.commons.command.order;
 
-import com.asrevo.cvhome.domaincertificatemanager.commons.domain.OrdersId;
 import com.asrevo.cvhome.commons.command.Command;
+import com.asrevo.cvhome.domaincertificatemanager.commons.domain.OrdersId;
 import lombok.Getter;
 import lombok.Setter;
 

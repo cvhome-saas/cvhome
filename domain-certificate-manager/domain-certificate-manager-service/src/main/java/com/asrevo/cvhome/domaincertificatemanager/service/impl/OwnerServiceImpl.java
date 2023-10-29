@@ -1,11 +1,11 @@
 package com.asrevo.cvhome.domaincertificatemanager.service.impl;
 
+import com.asrevo.cvhome.commons.domain.Email;
+import com.asrevo.cvhome.commons.domain.IdentityId;
 import com.asrevo.cvhome.domaincertificatemanager.commons.domain.DomainId;
 import com.asrevo.cvhome.domaincertificatemanager.entity.OwnerEntity;
 import com.asrevo.cvhome.domaincertificatemanager.repository.OwnerRepository;
 import com.asrevo.cvhome.domaincertificatemanager.service.OwnerService;
-import com.asrevo.cvhome.commons.domain.Email;
-import com.asrevo.cvhome.commons.domain.IdentityId;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;

@@ -14,11 +14,11 @@ import java.net.URL;
 
 public interface AcmeManagerService {
 
-    Order order(Domain domain) throws AcmeException, IOException;
+    Order order(Domain domain, boolean includeSubDomains) throws AcmeException, IOException;
 
     Status validate(URL location, String type) throws AcmeException;
 
-    DomainCertificate generate(OrderLocation location, Domain domain)
+    DomainCertificate generate(OrderLocation location, Domain domain, boolean includeSubDomains)
             throws IOException, AcmeException;
 
     InputStreamResource getCertificateFile(Domain domain, CertificateFileType fileType);

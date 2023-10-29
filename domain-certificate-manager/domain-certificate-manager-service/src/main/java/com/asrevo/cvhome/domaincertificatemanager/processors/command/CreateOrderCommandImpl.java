@@ -1,8 +1,8 @@
 package com.asrevo.cvhome.domaincertificatemanager.processors.command;
 
+import com.asrevo.cvhome.commons.command.CommandImpl;
 import com.asrevo.cvhome.domaincertificatemanager.commons.command.order.CreateOrderCommand;
 import com.asrevo.cvhome.domaincertificatemanager.service.AcmCertificateOrderService;
-import com.asrevo.cvhome.commons.command.CommandImpl;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,7 +15,7 @@ public class CreateOrderCommandImpl implements CommandImpl<CreateOrderCommand> {
 
     @Override
     public void process(CreateOrderCommand order) {
-        acmCertificateOrderService.initiate(order.getDomain(), order.getValidationType());
+        acmCertificateOrderService.initiate(order.getDomain(), order.getValidationType(), order.isIncludeSubDomains());
     }
 
     @Override

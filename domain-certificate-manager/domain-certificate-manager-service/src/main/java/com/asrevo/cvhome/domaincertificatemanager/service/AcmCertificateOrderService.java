@@ -10,13 +10,14 @@ import java.io.InputStream;
 
 public interface AcmCertificateOrderService {
 
-    OrdersCreateResponseDto initiate(Domain domain, ChallengeValidationType validationType);
+    OrdersCreateResponseDto initiate(Domain domain, ChallengeValidationType validationType, boolean includeSubDomains);
 
     void order(OrdersId orderId);
 
     void validate(OrdersId orderId);
 
     void triggerValidate(OrdersId orderId, String type);
+
     void doGeneration(OrdersId orderId);
 
     InputStream getHttpValidationToken(HttpValidationToken validationToken);

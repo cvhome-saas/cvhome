@@ -2,14 +2,15 @@ package com.asrevo.cvhome.domaincertificatemanager.service;
 
 
 import com.asrevo.cvhome.domaincertificatemanager.commons.domain.ChallengeValidationType;
-import com.asrevo.cvhome.domaincertificatemanager.domain.challenges.Challenge;
+import com.asrevo.cvhome.domaincertificatemanager.config.InstallersConfigProperties.InstallerProvider;
+import com.asrevo.cvhome.domaincertificatemanager.domain.challenges.ChallengeInstall;
 
 public interface ChallengeInstaller {
-    boolean setup(Challenge challenge);
+    boolean setup(ChallengeInstall challenge);
 
-    boolean clean(Challenge challenge);
+    boolean clean(ChallengeInstall challenge);
 
-    String provider();
+    InstallerProvider provider();
 
     ChallengeValidationType type();
 }

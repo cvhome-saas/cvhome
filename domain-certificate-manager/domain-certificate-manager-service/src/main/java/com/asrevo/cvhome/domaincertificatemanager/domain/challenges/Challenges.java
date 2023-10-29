@@ -12,6 +12,7 @@ import org.springframework.data.annotation.Transient;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.apache.commons.codec.binary.Hex.encodeHexString;
 
@@ -22,10 +23,11 @@ public record Challenges(List<Challenge> challenges) {
     }
 
     public static List<Challenge> getChallenges(Order order) {
-        List<Challenge> challenges = new ArrayList<>();
+        return order.getAuthorizations().stream().flatMap(it -> getChallenges(it).stream()).collect(Collectors.toList());
+    }
 
-        Authorization authorization =
-                order.getAuthorizations().stream().findFirst().orElseThrow();
+    private static List<Challenge> getChallenges(Authorization authorization) {
+        List<Challenge> challenges = new ArrayList<>();
         String domain = authorization.getIdentifier().getDomain();
         boolean isWildcard = authorization.isWildcard();
 
@@ -49,31 +51,13 @@ public record Challenges(List<Challenge> challenges) {
 
     @Transient
     @JsonIgnore
-    public DnsChallenge getDns01Challenge() {
-        return (DnsChallenge) getChallenge(ChallengeValidationType.Dns01);
+    public ChallengeInstall getInstallChallenge(ChallengeValidationType challengeValidationType) {
+        return new ChallengeInstall(challenges.stream().filter(it -> challengeValidationType.equals(it.type())).toList());
     }
 
     @Transient
     @JsonIgnore
-    public HttpChallenge getHttp01Challenge() {
-        return (HttpChallenge) getChallenge(ChallengeValidationType.Http01);
-    }
-
-    @Transient
-    @JsonIgnore
-    public TlsAlpnChallenge getTlsAlpn01Challenge() {
-        return (TlsAlpnChallenge) getChallenge(ChallengeValidationType.TlsAlpn01);
-    }
-
-    @Transient
-    @JsonIgnore
-    public Challenge getChallenge(ChallengeValidationType challengeValidationType) {
-        return challenges.stream().filter(it -> challengeValidationType.equals(it.type())).findFirst().orElse(null);
-    }
-
-    @Transient
-    @JsonIgnore
-    public boolean validate(ChallengeValidationType challengeValidationType) {
-        return challenges.stream().filter(it -> it.type().equals(challengeValidationType)).allMatch(Challenge::validate);
+    public boolean validate(ChallengeValidationType validationType) {
+        return challenges.stream().filter(it -> it.type().equals(validationType)).allMatch(Challenge::validate);
     }
 }

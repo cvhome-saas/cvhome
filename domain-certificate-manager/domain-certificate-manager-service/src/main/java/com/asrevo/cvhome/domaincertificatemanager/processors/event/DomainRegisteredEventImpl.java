@@ -1,8 +1,8 @@
 package com.asrevo.cvhome.domaincertificatemanager.processors.event;
 
+import com.asrevo.cvhome.commons.event.EventImpl;
 import com.asrevo.cvhome.domaincertificatemanager.commons.event.domain.DomainRegisteredEvent;
 import com.asrevo.cvhome.domaincertificatemanager.service.OwnerService;
-import com.asrevo.cvhome.commons.event.EventImpl;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 

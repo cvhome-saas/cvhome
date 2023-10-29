@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.domaincertificatemanager.entity;
 
-import com.asrevo.cvhome.domaincertificatemanager.commons.domain.CertificateId;
 import com.asrevo.cvhome.commons.domain.BaseEntity;
+import com.asrevo.cvhome.domaincertificatemanager.commons.domain.CertificateId;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.relational.core.mapping.Table;

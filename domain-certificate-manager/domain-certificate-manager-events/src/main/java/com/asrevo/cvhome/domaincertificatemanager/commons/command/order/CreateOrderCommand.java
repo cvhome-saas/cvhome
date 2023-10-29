@@ -10,4 +10,5 @@ import lombok.Setter;
 public class CreateOrderCommand extends OrderCommand {
     private Domain domain;
     private ChallengeValidationType validationType;
+    private boolean includeSubDomains;
 }

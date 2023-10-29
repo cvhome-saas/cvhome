@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.domaincertificatemanager.service.impl;
 
+import com.asrevo.cvhome.commons.command.CommandPublisher;
 import com.asrevo.cvhome.domaincertificatemanager.commons.command.order.GenerateCertificateCommand;
 import com.asrevo.cvhome.domaincertificatemanager.commons.command.order.RequestOrderCertificateCommand;
 import com.asrevo.cvhome.domaincertificatemanager.commons.command.order.ValidateOrderCommand;
@@ -7,6 +8,7 @@ import com.asrevo.cvhome.domaincertificatemanager.commons.domain.*;
 import com.asrevo.cvhome.domaincertificatemanager.commons.dto.OrdersCreateResponseDto;
 import com.asrevo.cvhome.domaincertificatemanager.domain.DomainCertificate;
 import com.asrevo.cvhome.domaincertificatemanager.domain.HttpValidationToken;
+import com.asrevo.cvhome.domaincertificatemanager.domain.challenges.ChallengeInstall;
 import com.asrevo.cvhome.domaincertificatemanager.domain.challenges.Challenges;
 import com.asrevo.cvhome.domaincertificatemanager.entity.OrdersEntity;
 import com.asrevo.cvhome.domaincertificatemanager.mappers.OrdersMappers;
@@ -14,7 +16,6 @@ import com.asrevo.cvhome.domaincertificatemanager.service.AcmCertificateOrderSer
 import com.asrevo.cvhome.domaincertificatemanager.service.AcmeManagerService;
 import com.asrevo.cvhome.domaincertificatemanager.service.ChallengeInstallerManager;
 import com.asrevo.cvhome.domaincertificatemanager.service.OrdersService;
-import com.asrevo.cvhome.commons.command.CommandPublisher;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.shredzone.acme4j.Order;
@@ -43,8 +44,8 @@ public class AcmCertificateOrderServiceImpl implements AcmCertificateOrderServic
     private final ChallengeInstallerManager installerManager;
 
     @Override
-    public OrdersCreateResponseDto initiate(Domain domain, ChallengeValidationType challengeValidationType) {
-        OrdersEntity certificateOrder = OrdersEntity.createOrder(domain, challengeValidationType);
+    public OrdersCreateResponseDto initiate(Domain domain, ChallengeValidationType challengeValidationType, boolean includeSubDomains) {
+        OrdersEntity certificateOrder = OrdersEntity.createOrder(domain, challengeValidationType, includeSubDomains);
         OrdersEntity savedOrder = ordersService.save(certificateOrder);
         RequestOrderCertificateCommand command = new RequestOrderCertificateCommand();
         command.setId(savedOrder.getId());
@@ -59,7 +60,7 @@ public class AcmCertificateOrderServiceImpl implements AcmCertificateOrderServic
         ordersService.findOneById(orderId).ifPresent(it -> {
             if (preOrderNeededStatus.contains(it.getCertificateOrderStatus())) {
                 try {
-                    Order o = acmeManagerService.order(it.getDomain());
+                    Order o = acmeManagerService.order(it.getDomain(), it.isIncludeSubDomains());
                     it.requestOrder(new OrderLocation(o.getLocation()), new Challenges(o));
                     ordersService.save(it);
                     this.prepareOrderValidation(orderId);
@@ -77,7 +78,8 @@ public class AcmCertificateOrderServiceImpl implements AcmCertificateOrderServic
         ordersService.findOneById(orderId).ifPresent(it -> {
             if (preValidationNeededStatus.contains(it.getCertificateOrderStatus())) {
                 log.info("will prepareOrderValidation for order {}", orderId);
-                installerManager.install(it.getChallenges().getChallenge(it.getChallengeValidationType()));
+                ChallengeInstall installChallenge = it.getChallenges().getInstallChallenge(it.getChallengeValidationType());
+                installerManager.install(installChallenge);
                 it.requestValidate();
                 ordersService.save(it);
                 ValidateOrderCommand command = new ValidateOrderCommand();
@@ -90,8 +92,8 @@ public class AcmCertificateOrderServiceImpl implements AcmCertificateOrderServic
 
     }
 
-   @Transactional
-   @Override
+    @Transactional
+    @Override
     public void validate(OrdersId orderId) {
         Set<CertificateOrderStatus> preValidationNeededStatus = Set.of(CertificateOrderStatus.VALIDATION_REQUESTED);
         ordersService.findOneById(orderId).ifPresent(it -> {
@@ -139,6 +141,7 @@ public class AcmCertificateOrderServiceImpl implements AcmCertificateOrderServic
             return new RuntimeException("order not found");
         });
     }
+
     @Override
     public void doGeneration(OrdersId orderId) {
         Set<CertificateOrderStatus> preGenerationNeededStatus = Set.of(CertificateOrderStatus.VALIDATED_VALID);
@@ -164,7 +167,7 @@ public class AcmCertificateOrderServiceImpl implements AcmCertificateOrderServic
 
     private DomainCertificate doAcmGeneration(OrdersEntity it) {
         try {
-            return acmeManagerService.generate(it.getLocation(), it.getDomain());
+            return acmeManagerService.generate(it.getLocation(), it.getDomain(), it.isIncludeSubDomains());
         } catch (Exception e) {
             log.error("can not generate certificate for order {} ", it.getId());
         }

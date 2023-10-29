@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.domaincertificatemanager.domain.challenges;
 
+import com.asrevo.cvhome.domaincertificatemanager.commons.domain.Domain;
 import lombok.extern.slf4j.Slf4j;
 import org.xbill.DNS.Record;
 import org.xbill.DNS.*;
@@ -22,7 +23,6 @@ import static org.shredzone.acme4j.challenge.TlsAlpn01Challenge.ACME_TLS_1_PROTO
 
 @Slf4j
 public class ChallengeUtils {
-
     private static final TrustManager MOCK_TRUST_MANAGER = new X509ExtendedTrustManager() {
         @Override
         public void checkClientTrusted(X509Certificate[] x509Certificates, String s, Socket socket) throws CertificateException {
@@ -57,11 +57,7 @@ public class ChallengeUtils {
         @Override
         public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
         }
-    };
-
-    static boolean validate(TlsAlpnChallenge challenge) {
-        return validateAcmeTls1(challenge.domain().domain(), 8443) || validateAcmeTls1(challenge.domain().domain(), 443);
-    }
+    };    private static final SSLSocketFactory socketFactory = createSSlFactory();
 
     private static SSLSocketFactory createSSlFactory() {
         if (socketFactory != null) return socketFactory;
@@ -72,6 +68,10 @@ public class ChallengeUtils {
         } catch (Exception e) {
             return ((SSLSocketFactory) SSLSocketFactory.getDefault());
         }
+    }
+
+    static boolean validate(TlsAlpnChallenge challenge) {
+        return validateAcmeTls1(challenge.domain().domain(), 8443) || validateAcmeTls1(challenge.domain().domain(), 443);
     }
 
     /*
@@ -90,8 +90,8 @@ public class ChallengeUtils {
 //        TLSClientHelloExtractor tlsClientHelloExtractor = new TLSClientHelloExtractor(wrap);
 //        System.out.println(tlsClientHelloExtractor);
     * */
-    public static void main(String[] args) throws IOException {
-        boolean b = validateAcmeTls1("aswwa.asrevo.com", 443);
+    public static void main(String[] args) {
+        boolean validate = validate(new DnsChallenge(new Domain("cvhome.click"), false, "LNDh2P8MUaHOjpGC_7-kdvNdfZgVlmThgi_ogVwT7eA"));
     }
 
     private static boolean validateAcmeTls1(String host, Integer port) {
@@ -130,7 +130,7 @@ public class ChallengeUtils {
     static boolean validate(DnsChallenge challenge) {
         try {
             final Lookup lookup = new Lookup(challenge.record(), Type.TXT);
-            lookup.setResolver(new SimpleResolver());
+            lookup.setResolver(new SimpleResolver("8.8.8.8"));
             lookup.setCache(null);
             final Record[] records = lookup.run();
             if (lookup.getResult() == Lookup.SUCCESSFUL && records != null && records.length > 0) {
@@ -143,9 +143,7 @@ public class ChallengeUtils {
         } catch (Exception ignored) {
         }
         return false;
-    }    private static final SSLSocketFactory socketFactory = createSSlFactory();
-
-
+    }
 
     static boolean validate(HttpChallenge challenge) {
         try {

@@ -1,12 +1,10 @@
 package com.asrevo.cvhome.domaincertificatemanager.entity;
 
-import com.asrevo.cvhome.domaincertificatemanager.domain.DomainCertificate;
-import com.asrevo.cvhome.domaincertificatemanager.domain.challenges.Challenge;
-import com.asrevo.cvhome.domaincertificatemanager.domain.challenges.Challenges;
-import com.asrevo.cvhome.domaincertificatemanager.domain.challenges.DnsChallenge;
 import com.asrevo.cvhome.commons.domain.BaseEntity;
 import com.asrevo.cvhome.domaincertificatemanager.commons.domain.*;
 import com.asrevo.cvhome.domaincertificatemanager.commons.event.order.*;
+import com.asrevo.cvhome.domaincertificatemanager.domain.DomainCertificate;
+import com.asrevo.cvhome.domaincertificatemanager.domain.challenges.Challenges;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
@@ -31,6 +29,7 @@ public class OrdersEntity extends BaseEntity<OrdersEntity, OrdersId> {
     @NotNull
     @Embedded(onEmpty = USE_NULL)
     private Domain domain;
+    private boolean includeSubDomains;
     @NotNull
     private ChallengeValidationType challengeValidationType;
     private CertificateOrderStatus certificateOrderStatus = CertificateOrderStatus.INITIATED;
@@ -44,12 +43,13 @@ public class OrdersEntity extends BaseEntity<OrdersEntity, OrdersId> {
     @MappedCollection(idColumn = "orders_id", keyColumn = "sequence")
     private List<OrdersEventsEntity> events;
 
-    public static OrdersEntity createOrder(Domain domain, @NotNull ChallengeValidationType challengeValidationType) {
+    public static OrdersEntity createOrder(Domain domain, @NotNull ChallengeValidationType challengeValidationType, boolean includeSubDomains) {
         OrdersEntity order = new OrdersEntity();
         order.setNew();
         order.setCertificateOrderStatus(CertificateOrderStatus.INITIATED);
         order.setDomain(domain);
         order.setChallengeValidationType(challengeValidationType);
+        order.setIncludeSubDomains(includeSubDomains);
         order.setCreatedDate(Instant.now());
         order.registerEvent(OrdersCreatedEvent.from(order.getId(), order.createdDate));
         return order;
@@ -72,21 +72,25 @@ public class OrdersEntity extends BaseEntity<OrdersEntity, OrdersId> {
         this.setCertificateOrderStatus(CertificateOrderStatus.REQUESTED);
         this.setRequestedDate(Instant.now());
         this.setChallenges(challenges);
-        if (challenges.getChallenge(this.challengeValidationType) == null) {
-            ChallengeValidationType oldType = this.challengeValidationType;
-            this.challengeValidationType = challenges.challenges().stream().findFirst().map(Challenge::type).orElse(null);
-            if (challengeValidationType == null) {
-                throw new RuntimeException("challenges don't have any valid validation type");
-            }
-            this.registerEvent(OrdersChallengeValidationTypeChangedEvent.from(this.id, domain, oldType, this.challengeValidationType));
-        }
-        DnsChallenge dnsChallenge = this.challenges.getDns01Challenge();
-        if (ChallengeValidationType.Dns01.equals(this.challengeValidationType) && dnsChallenge != null) {
-            this.registerEvent(DnsOrdersRequestedEvent.from(id, this.domain, this.location, this.requestedDate, dnsChallenge.record(), dnsChallenge.digest()));
-        } else {
-            this.registerEvent(OrdersRequestedEvent.from(id, this.domain, this.location, this.requestedDate));
+//       @TODO check later if we can support change on validation Type
+//        if (challenges.getChallenge(this.challengeValidationType) == null) {
+//            ChallengeValidationType oldType = this.challengeValidationType;
+//            this.challengeValidationType = challenges.challenges().stream().findFirst().map(Challenge::type).orElse(null);
+//            if (challengeValidationType == null) {
+//                throw new RuntimeException("challenges don't have any valid validation type");
+//            }
+//            this.registerEvent(OrdersChallengeValidationTypeChangedEvent.from(this.id, domain, oldType, this.challengeValidationType));
+//        }
+//        DnsChallenge dnsChallenge = this.challenges.getDns01Challenge();
+//        if (ChallengeValidationType.Dns01.equals(this.challengeValidationType) && dnsChallenge != null) {
+//            this.registerEvent(DnsOrdersRequestedEvent.from(id, this.domain, this.location, this.requestedDate, dnsChallenge.record(), dnsChallenge.digest()));
+//        } else {
+//            this.registerEvent(OrdersRequestedEvent.from(id, this.domain, this.location, this.requestedDate));
+//
+//        }
+        this.registerEvent(OrdersRequestedEvent.from(id, this.domain, this.location, this.requestedDate));
 
-        }
+
     }
 
     public void generateOrderCertificate(DomainCertificate certificate) {

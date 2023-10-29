@@ -1,10 +1,10 @@
 package com.asrevo.cvhome.domaincertificatemanager.entity;
 
+import com.asrevo.cvhome.commons.domain.BaseEntity;
+import com.asrevo.cvhome.commons.domain.IdentityId;
 import com.asrevo.cvhome.domaincertificatemanager.commons.domain.*;
 import com.asrevo.cvhome.domaincertificatemanager.commons.event.domain.DomainReferenceChangedEvent;
 import com.asrevo.cvhome.domaincertificatemanager.commons.event.domain.DomainRegisteredEvent;
-import com.asrevo.cvhome.commons.domain.BaseEntity;
-import com.asrevo.cvhome.commons.domain.IdentityId;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;
@@ -31,10 +31,11 @@ public class DomainEntity extends BaseEntity<DomainEntity, DomainId> {
     private Instant generatedDate;
     private boolean autoRenew;
     private boolean autoOrder;
+    private boolean includeSubDomains;
     @Column("owner_id")
     private AggregateReference<com.asrevo.cvhome.domaincertificatemanager.entity.OwnerEntity, IdentityId> owner;
 
-    public static DomainEntity create(Domain domain, Reference reference, DomainType domainType, IdentityId identity) {
+    public static DomainEntity create(Domain domain, Reference reference, DomainType domainType, boolean includeSubDomains, IdentityId identity) {
         DomainEntity entity = new DomainEntity();
         entity.setNew();
         entity.setDomain(domain);
@@ -43,6 +44,7 @@ public class DomainEntity extends BaseEntity<DomainEntity, DomainId> {
         entity.setStatus(DomainCertificateStatus.INITIATED);
         entity.setAutoOrder(true);
         entity.setAutoRenew(true);
+        entity.setIncludeSubDomains(includeSubDomains);
         entity.setOwner(AggregateReference.to(identity));
         entity.registerEvent(DomainRegisteredEvent.from(entity.getId(), identity, domain, entity.autoRenew, entity.autoOrder));
         return entity;

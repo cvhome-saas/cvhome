@@ -11,7 +11,7 @@ public record HttpChallenge(Domain domain, boolean isWildCard, String token,
     @Transient
     @JsonIgnore
     public String validationUrl() {
-        return String.format("http://%s/.well-known/acme-challenge/%s", domain.domain(), token);
+        return String.format("http://%s:80/.well-known/acme-challenge/%s", domain.domain(), token);
     }
 
     @Override

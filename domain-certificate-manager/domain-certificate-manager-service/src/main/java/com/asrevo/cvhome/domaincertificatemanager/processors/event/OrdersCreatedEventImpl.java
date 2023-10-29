@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.domaincertificatemanager.processors.event;
 
-import com.asrevo.cvhome.domaincertificatemanager.commons.event.order.OrdersCreatedEvent;
 import com.asrevo.cvhome.commons.event.EventImpl;
+import com.asrevo.cvhome.domaincertificatemanager.commons.event.order.OrdersCreatedEvent;
 import org.springframework.stereotype.Service;
 
 @Service

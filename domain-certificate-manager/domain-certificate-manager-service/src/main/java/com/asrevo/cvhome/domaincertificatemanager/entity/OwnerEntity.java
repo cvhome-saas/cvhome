@@ -1,9 +1,9 @@
 package com.asrevo.cvhome.domaincertificatemanager.entity;
 
-import com.asrevo.cvhome.domaincertificatemanager.commons.domain.DomainId;
 import com.asrevo.cvhome.commons.domain.BaseEntity;
 import com.asrevo.cvhome.commons.domain.Email;
 import com.asrevo.cvhome.commons.domain.IdentityId;
+import com.asrevo.cvhome.domaincertificatemanager.commons.domain.DomainId;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;

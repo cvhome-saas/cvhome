@@ -2,7 +2,6 @@ package com.asrevo.cvhome.domaincertificatemanager.service.impl;
 
 import com.asrevo.cvhome.domaincertificatemanager.service.FileService;
 import lombok.SneakyThrows;
-import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -11,7 +10,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-@Service
 public class LocalFileServiceImpl implements FileService {
 
     @SneakyThrows
