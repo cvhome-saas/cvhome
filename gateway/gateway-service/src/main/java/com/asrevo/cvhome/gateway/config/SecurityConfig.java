@@ -26,10 +26,11 @@ public class SecurityConfig {
         ServerHttpRequest request = exchange.getRequest();
         // @formatter:off
         return (
-                request.getMethod() != HttpMethod.GET
-                && !request.getPath().toString().startsWith("/auth")
-                && !request.getPath().toString().startsWith("/realms")
-                && !request.getPath().toString().startsWith("/resources")
+                request.getMethod() != HttpMethod.GET &&
+                        !request.getPath().toString().startsWith("/auth") &&
+                        !request.getPath().toString().startsWith("/realms") &&
+                        !request.getPath().toString().startsWith("/resources") &&
+                        !request.getURI().getHost().startsWith("auth.")
         ) ? match() : notMatch();
         // @formatter:on
     }
