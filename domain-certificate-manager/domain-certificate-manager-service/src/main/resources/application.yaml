@@ -88,15 +88,20 @@ com:
   asrevo:
     auto-order-domains:
       domains:
-        - domain: "cvhome.click"
+        - domain: "ars.cvhome.click"
       default-domain: "gateway.com"
-    installers:
-      providers:
-        - s3
-        - route53
-    file-config:
-      providers:
-        - s3
-      s3-config:
-        cert-bucket: cvhome-cert-storage
-        token-bucket: cvhome-cert-storage
+    dcm:
+      challenge-config:
+        dns-config:
+          providers:
+            - route53
+          route53-config:
+            zone-id: "s"
+        http-config:
+          provider: s3
+          s3-config:
+            bucket: "cvhome-cert-storage"
+        tls-alpn01-config:
+          provider: s3
+          s3-config:
+            bucket: "cvhome-cert-storage"

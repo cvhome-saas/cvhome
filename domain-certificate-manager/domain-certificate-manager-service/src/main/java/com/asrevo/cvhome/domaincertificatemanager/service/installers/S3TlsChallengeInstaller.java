@@ -1,8 +1,9 @@
 package com.asrevo.cvhome.domaincertificatemanager.service.installers;
 
-import com.asrevo.cvhome.domaincertificatemanager.config.InstallersConfigProperties.InstallerProvider;
+import com.asrevo.cvhome.domaincertificatemanager.config.DcmChallengesConfigProperties.FileProvider;
 import com.asrevo.cvhome.domaincertificatemanager.service.impl.AcmFileServiceProvider;
 import org.springframework.stereotype.Service;
+
 
 @Service
 public class S3TlsChallengeInstaller extends TlsChallengeInstaller {
@@ -11,7 +12,7 @@ public class S3TlsChallengeInstaller extends TlsChallengeInstaller {
     }
 
     @Override
-    public InstallerProvider provider() {
-        return InstallerProvider.S3;
+    public String provider() {
+        return FileProvider.S3.name();
     }
 }

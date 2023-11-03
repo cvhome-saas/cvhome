@@ -22,17 +22,17 @@ public class LocalHttpChallengeVerifyServiceImpl implements HttpChallengeVerifyS
         this.tokenRoot = createTokenBaseDirectory();
     }
 
-    private Path createTokenBaseDirectory() {
-        Path root = Paths.get(System.getProperty("user.home"), "cvhome/domain-certificate-manager/token");
-        createParentDirectory(root);
-        return root;
-    }
-
     @SneakyThrows
     private static void createParentDirectory(Path destination) {
         if (!destination.getParent().toFile().exists()) {
             Files.createDirectories(destination.getParent());
         }
+    }
+
+    private Path createTokenBaseDirectory() {
+        Path root = Paths.get(System.getProperty("user.home"), "cvhome/domain-certificate-manager/token");
+        createParentDirectory(root);
+        return root;
     }
 
     @Override

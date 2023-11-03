@@ -29,8 +29,8 @@ public class AcmJobs {
                 RegisterDomainRequest request = new RegisterDomainRequest(it,
                         null,
                         null,
-                        ChallengeValidationType.TlsAlpn01,
-                        false);
+                        ChallengeValidationType.Dns01,
+                        true);
                 domainOwnerShipService.registerReservedDomainToSys(request);
             }
         });

@@ -23,6 +23,8 @@ import static org.shredzone.acme4j.challenge.TlsAlpn01Challenge.ACME_TLS_1_PROTO
 
 @Slf4j
 public class ChallengeUtils {
+    private static final SSLSocketFactory socketFactory = createSSlFactory();
+
     private static final TrustManager MOCK_TRUST_MANAGER = new X509ExtendedTrustManager() {
         @Override
         public void checkClientTrusted(X509Certificate[] x509Certificates, String s, Socket socket) throws CertificateException {
@@ -57,7 +59,7 @@ public class ChallengeUtils {
         @Override
         public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
         }
-    };    private static final SSLSocketFactory socketFactory = createSSlFactory();
+    };
 
     private static SSLSocketFactory createSSlFactory() {
         if (socketFactory != null) return socketFactory;
@@ -69,6 +71,7 @@ public class ChallengeUtils {
             return ((SSLSocketFactory) SSLSocketFactory.getDefault());
         }
     }
+
 
     static boolean validate(TlsAlpnChallenge challenge) {
         return validateAcmeTls1(challenge.domain().domain(), 8443) || validateAcmeTls1(challenge.domain().domain(), 443);
@@ -134,11 +137,7 @@ public class ChallengeUtils {
             lookup.setCache(null);
             final Record[] records = lookup.run();
             if (lookup.getResult() == Lookup.SUCCESSFUL && records != null && records.length > 0) {
-                return Arrays.stream(records)
-                        .filter(it -> it.getType() == 16)
-                        .map(it -> (TXTRecord) it)
-                        .flatMap(it -> it.getStrings().stream())
-                        .anyMatch(it -> it.equals(challenge.digest()));
+                return Arrays.stream(records).filter(it -> it.getType() == 16).map(it -> (TXTRecord) it).flatMap(it -> it.getStrings().stream()).anyMatch(it -> it.equals(challenge.digest()));
             }
         } catch (Exception ignored) {
         }
@@ -147,10 +146,7 @@ public class ChallengeUtils {
 
     static boolean validate(HttpChallenge challenge) {
         try {
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(new URI(challenge.validationUrl()))
-                    .GET()
-                    .build();
+            HttpRequest request = HttpRequest.newBuilder().uri(new URI(challenge.validationUrl())).GET().build();
             HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
             return response.body().contains(challenge.authorization());
         } catch (Exception ignored) {

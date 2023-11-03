@@ -1,6 +1,6 @@
 package com.asrevo.cvhome.domaincertificatemanager.service;
 
-import com.asrevo.cvhome.domaincertificatemanager.config.InstallersConfigProperties;
+import com.asrevo.cvhome.domaincertificatemanager.config.DcmChallengesConfigProperties;
 import com.asrevo.cvhome.domaincertificatemanager.domain.HttpValidationToken;
 import com.asrevo.cvhome.domaincertificatemanager.domain.challenges.ChallengeInstall;
 import com.asrevo.cvhome.domaincertificatemanager.service.impl.HttpChallengeVerifyServiceProvider;
@@ -16,16 +16,19 @@ import java.util.List;
 @Slf4j
 public class ChallengeInstallerManager {
     private final List<ChallengeInstaller> installers;
-    private final InstallersConfigProperties configProperties;
-    private final HttpChallengeVerifyServiceProvider httpProvider;
+    private final HttpChallengeVerifyServiceProvider httpVerifyProvider;
+    private final DcmChallengesConfigProperties properties;
 
 
     public boolean install(ChallengeInstall challenge) {
+
         List<ChallengeInstaller> installed = installers.stream()
                 .filter(it -> it.type().equals(challenge.challengeType()))
-                .filter(it -> configProperties.getProviders().contains(it.provider()))
+                .filter(it -> properties.providers(it.type()).contains(it.provider()))
                 .toList();
+
         ChallengeInstaller appliedInstaller = null;
+
         for (ChallengeInstaller installer : installed) {
             boolean isSetup = installer.setup(challenge);
             if (isSetup) {
@@ -33,11 +36,12 @@ public class ChallengeInstallerManager {
                 break;
             }
         }
+
         if (appliedInstaller != null) {
-            log.info("successfully applied installer {} {}", appliedInstaller.provider().name(), challenge.domains());
+            log.info("successfully applied installer {} {}", appliedInstaller.provider(), challenge.domain());
             return true;
         } else {
-            log.warn("did not find any installer for {} , {}", challenge.challengeType(), challenge.domains());
+            log.warn("did not find any installer for {} , {}", challenge.challengeType(), challenge.domain());
             return false;
         }
     }
@@ -54,13 +58,13 @@ public class ChallengeInstallerManager {
             }
         }
         if (appliedInstaller != null) {
-            log.info(appliedInstaller.provider().name());
+            log.info(appliedInstaller.provider());
         } else {
             log.info("");
         }
     }
 
     public InputStream getHttpValidationToken(HttpValidationToken validationToken) {
-        return httpProvider.getInstance().getValidationFile(validationToken);
+        return httpVerifyProvider.getInstance().getValidationFile(validationToken);
     }
 }

@@ -1,23 +1,19 @@
 package com.asrevo.cvhome.domaincertificatemanager.service.impl;
 
-import com.asrevo.cvhome.domaincertificatemanager.config.FileServiceConfigProperties;
-import com.asrevo.cvhome.domaincertificatemanager.config.FileServiceConfigProperties.FileProvider;
+import com.asrevo.cvhome.domaincertificatemanager.config.DcmChallengesConfigProperties;
+import com.asrevo.cvhome.domaincertificatemanager.config.DcmChallengesConfigProperties.LocalFileProviderConfig;
+import com.asrevo.cvhome.domaincertificatemanager.config.DcmChallengesConfigProperties.S3FileProviderConfig;
 import com.asrevo.cvhome.domaincertificatemanager.service.AcmFileService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.Set;
-
-import static com.asrevo.cvhome.domaincertificatemanager.config.FileServiceConfigProperties.FileProvider.LOCAL;
-import static com.asrevo.cvhome.domaincertificatemanager.config.FileServiceConfigProperties.FileProvider.S3;
-
 @Service
 @Slf4j
 public class AcmFileServiceProvider {
-    private final FileServiceConfigProperties configProperties;
+    private final DcmChallengesConfigProperties configProperties;
     private AcmFileService instance;
 
-    public AcmFileServiceProvider(FileServiceConfigProperties configProperties) {
+    public AcmFileServiceProvider(DcmChallengesConfigProperties configProperties) {
         this.configProperties = configProperties;
     }
 
@@ -28,23 +24,23 @@ public class AcmFileServiceProvider {
         return this.instance;
     }
 
+
     private AcmFileService build() {
-        return build(configProperties.getProviders());
-    }
+        DcmChallengesConfigProperties.HttpChallengeConfig httpConfig = this.configProperties.getHttpConfig();
+        DcmChallengesConfigProperties.FileProvider provider = httpConfig.getProvider();
 
-    private AcmFileService build(Set<FileProvider> providers) {
-        if (providers.contains(S3)) {
-            log.info("will use s3 as file service for cert");
-            return new S3AcmFileServiceImpl(configProperties.getS3Config().getCertBucket());
-        } else if (providers.contains(LOCAL)) {
-            log.info("will use local as file service for cert");
-            return new LocalAcmFileServiceImpl();
-        } else {
-            throw new RuntimeException("providers not implemented");
+        switch (provider) {
+            case S3 -> {
+                S3FileProviderConfig s3Config = httpConfig.getS3Config();
+                log.info("will use local as file service for cert");
+                return new S3AcmFileServiceImpl(s3Config.getBucket());
+            }
+            case LOCAL -> {
+                LocalFileProviderConfig localConfig = httpConfig.getLocalConfig();
+                log.info("will use local as file service for cert");
+                return new LocalAcmFileServiceImpl();
+            }
+            default -> throw new RuntimeException("providers not implemented");
         }
-    }
-
-    public AcmFileService create(FileProvider provider) {
-        return build(Set.of(provider));
     }
 }

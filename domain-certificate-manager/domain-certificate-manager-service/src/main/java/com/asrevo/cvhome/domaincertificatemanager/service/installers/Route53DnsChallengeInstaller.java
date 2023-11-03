@@ -2,7 +2,7 @@ package com.asrevo.cvhome.domaincertificatemanager.service.installers;
 
 import com.asrevo.cvhome.domaincertificatemanager.commons.domain.ChallengeValidationType;
 import com.asrevo.cvhome.domaincertificatemanager.commons.domain.Domain;
-import com.asrevo.cvhome.domaincertificatemanager.config.InstallersConfigProperties.InstallerProvider;
+import com.asrevo.cvhome.domaincertificatemanager.config.DcmChallengesConfigProperties.DnsProvider;
 import com.asrevo.cvhome.domaincertificatemanager.domain.challenges.Challenge;
 import com.asrevo.cvhome.domaincertificatemanager.domain.challenges.ChallengeInstall;
 import com.asrevo.cvhome.domaincertificatemanager.domain.challenges.DnsChallenge;
@@ -41,7 +41,7 @@ public class Route53DnsChallengeInstaller implements ChallengeInstaller {
     private boolean installDnsChallenge(Domain domain, List<Challenge> challenges) {
         return getClient().listHostedZones().hostedZones()
                 .stream()
-                .filter(it -> it.name().endsWith(domain.domain() + "."))
+                .filter(it -> (domain.domain()+".").endsWith(it.name()))
                 .findFirst()
                 .map(zone -> {
 
@@ -88,8 +88,8 @@ public class Route53DnsChallengeInstaller implements ChallengeInstaller {
     }
 
     @Override
-    public InstallerProvider provider() {
-        return InstallerProvider.ROUTE53;
+    public String provider() {
+        return DnsProvider.ROUTE53.name();
     }
 
     @Override

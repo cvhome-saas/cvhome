@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.domaincertificatemanager.service.installers;
 
 import com.asrevo.cvhome.domaincertificatemanager.commons.domain.ChallengeValidationType;
-import com.asrevo.cvhome.domaincertificatemanager.config.InstallersConfigProperties.InstallerProvider;
+import com.asrevo.cvhome.domaincertificatemanager.config.DcmChallengesConfigProperties.FileProvider;
 import com.asrevo.cvhome.domaincertificatemanager.domain.challenges.ChallengeInstall;
 import com.asrevo.cvhome.domaincertificatemanager.domain.challenges.TlsAlpnChallenge;
 import com.asrevo.cvhome.domaincertificatemanager.service.ChallengeInstaller;
@@ -9,7 +9,6 @@ import com.asrevo.cvhome.domaincertificatemanager.service.impl.AcmFileServicePro
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.shredzone.acme4j.util.CertificateUtils;
-import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.security.KeyPair;
@@ -47,8 +46,8 @@ public abstract class TlsChallengeInstaller implements ChallengeInstaller {
     }
 
     @Override
-    public InstallerProvider provider() {
-        return InstallerProvider.LOCAL;
+    public String provider() {
+        return FileProvider.LOCAL.name();
     }
 
     @Override

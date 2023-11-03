@@ -2,7 +2,6 @@ package com.asrevo.cvhome.domaincertificatemanager.service;
 
 
 import com.asrevo.cvhome.domaincertificatemanager.commons.domain.ChallengeValidationType;
-import com.asrevo.cvhome.domaincertificatemanager.config.InstallersConfigProperties.InstallerProvider;
 import com.asrevo.cvhome.domaincertificatemanager.domain.challenges.ChallengeInstall;
 
 public interface ChallengeInstaller {
@@ -10,7 +9,7 @@ public interface ChallengeInstaller {
 
     boolean clean(ChallengeInstall challenge);
 
-    InstallerProvider provider();
+    String provider();
 
     ChallengeValidationType type();
 }
