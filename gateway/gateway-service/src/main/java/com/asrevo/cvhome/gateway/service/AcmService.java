@@ -29,7 +29,7 @@ public interface AcmService extends SSlProviderLoader {
 
             ResponseEntity<byte[]> response = getDomainCertificateFile(domainRequest, fileType);
 
-            if (HttpStatus.OK.equals(response.getStatusCode()) && response.getBody() != null) {
+            if (HttpStatus.OK.equals(response.getStatusCode()) && response.getBody() != null && response.getBody().length > 0) {
                 return new ByteArrayInputStream(response.getBody());
             } else {
                 log.warn("couldn't fetch domain {} file {}", domainRequest, fileType.getType());
