@@ -1,0 +1,10 @@
+spring:
+  datasource:
+    url: jdbc:${spring.datasource.engine}://${spring.datasource.host}:${spring.datasource.port}/${spring.datasource.database}
+    username: postgres
+    password: password
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://auth:9999/realms/cvhome/protocol/openid-connect/certs
