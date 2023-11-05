@@ -1,8 +1,9 @@
 spring:
   datasource:
-    url: jdbc:${spring.datasource.engine}://${spring.datasource.host}:${spring.datasource.port}/${spring.datasource.database}
+    url: jdbc:postgresql://${spring.datasource.host}:${spring.datasource.port}/${spring.datasource.database}
     username: postgres
     password: password
+    driver-class-name: org.postgresql.Driver
   security:
     oauth2:
       resourceserver:
