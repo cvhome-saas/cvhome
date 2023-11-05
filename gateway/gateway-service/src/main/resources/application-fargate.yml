@@ -4,6 +4,28 @@ com:
       fargate:
         namespace: "cvhome.lcl"
 spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          microservice:
+            provider: keycloak
+            client-id: microservice-app
+            client-secret: r1nuVn4HefusLGwHIeRxbdOzdTZLEMvQ
+            authorization-grant-type: password
+          keycloak:
+            client-id: web-app
+            client-authentication-method: client_secret_basic
+            authorization-grant-type: authorization_code
+            scope: openid, profile, email
+            redirect-uri: "{baseUrl}/login/oauth2/code/keycloak"
+            provider: keycloak
+            client-secret: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
+        provider:
+          keycloak:
+            jwk-set-uri: https://auth.${com.asrevo.cvhome.ssl.default-domain}:${server.port}/realms/cvhome/protocol/openid-connect/certs
+            authorization-uri: https://auth.${com.asrevo.cvhome.ssl.default-domain}:${server.port}/realms/cvhome/protocol/openid-connect/auth
+            token-uri: https://auth.${com.asrevo.cvhome.ssl.default-domain}:${server.port}/realms/cvhome/protocol/openid-connect/token
   cloud:
     gateway:
       default-filters:
