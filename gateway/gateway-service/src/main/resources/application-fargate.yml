@@ -6,9 +6,6 @@ com:
 spring:
   cloud:
     gateway:
-      discovery:
-        locator:
-          enabled: true
       default-filters:
         - TokenRelay
         - PreserveHostHeader
