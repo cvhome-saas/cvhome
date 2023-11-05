@@ -16,11 +16,11 @@ import static org.springframework.http.HttpMethod.POST;
 public class ClientsConfig {
 
     @Bean
-    public AcmService acmService(RestTemplate template) {
+    public AcmService acmService(RestTemplate template, FargateProperties properties) {
         ParameterizedTypeReference<byte[]> responseType = new ParameterizedTypeReference<>() {
         };
         return (domain, fileType) -> {
-            String url = "http://domain-certificate-manager:8082/api/v1/acm/domain-certificate-file?domain=" + domain + "&fileType=" + fileType.name();
+            String url = "http://domain-certificate-manager." + properties.getNamespace() + ":8082/api/v1/acm/domain-certificate-file?domain=" + domain + "&fileType=" + fileType.name();
             return template.exchange(url, POST, null, responseType);
         };
     }
