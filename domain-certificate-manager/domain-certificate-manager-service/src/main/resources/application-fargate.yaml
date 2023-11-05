@@ -1,3 +1,8 @@
+com:
+  asrevo:
+    cvhome:
+      fargate:
+        namespace: "cvhome.lcl"
 spring:
   datasource:
     url: jdbc:postgresql://${spring.datasource.host}:${spring.datasource.port}/${spring.datasource.database}
