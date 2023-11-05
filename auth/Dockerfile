@@ -11,4 +11,4 @@ ENV KEYCLOAK_ADMIN_PASSWORD=admin
 COPY keycloak/imports /opt/keycloak/data/import
 COPY keycloak/providers /opt/keycloak/providers
 EXPOSE 9999
-ENTRYPOINT ["/opt/keycloak/bin/kc.sh","--verbose","start","--proxy=edge","--hostname-strict=false","--import-realm"]
+ENTRYPOINT ["/opt/keycloak/bin/kc.sh","--verbose","start","--proxy=edge","--hostname-strict=false","--import-realm","--log-level=\"INFO,org.hibernate:debug\""]
