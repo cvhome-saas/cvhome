@@ -32,7 +32,7 @@ public class AcmFileServiceProvider {
         switch (provider) {
             case S3 -> {
                 S3FileProviderConfig s3Config = httpConfig.getS3Config();
-                log.info("will use local as file service for cert");
+                log.info("will use s3 as file service for cert");
                 return new S3AcmFileServiceImpl(s3Config.getBucket());
             }
             case LOCAL -> {
