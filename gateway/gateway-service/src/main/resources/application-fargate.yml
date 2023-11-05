@@ -23,9 +23,9 @@ spring:
             client-secret: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
         provider:
           keycloak:
-            jwk-set-uri: https://auth.${com.asrevo.cvhome.ssl.default-domain}:${server.port}/realms/cvhome/protocol/openid-connect/certs
+            jwk-set-uri: http://auth.${com.asrevo.cvhome.fargate.namespace}:9999/realms/cvhome/protocol/openid-connect/certs
             authorization-uri: https://auth.${com.asrevo.cvhome.ssl.default-domain}:${server.port}/realms/cvhome/protocol/openid-connect/auth
-            token-uri: https://auth.${com.asrevo.cvhome.ssl.default-domain}:${server.port}/realms/cvhome/protocol/openid-connect/token
+            token-uri: http://auth.${com.asrevo.cvhome.fargate.namespace}:9999/realms/cvhome/protocol/openid-connect/token
   cloud:
     gateway:
       default-filters:

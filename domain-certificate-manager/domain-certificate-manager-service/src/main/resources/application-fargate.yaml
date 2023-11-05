@@ -8,4 +8,4 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          jwk-set-uri: http://auth:9999/realms/cvhome/protocol/openid-connect/certs
+          jwk-set-uri: http://auth.${com.asrevo.cvhome.fargate.namespace}:9999/realms/cvhome/protocol/openid-connect/certs
