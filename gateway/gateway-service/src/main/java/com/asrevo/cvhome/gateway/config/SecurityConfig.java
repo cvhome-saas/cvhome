@@ -44,10 +44,10 @@ public class SecurityConfig {
                 .oauth2Login(withDefaults())
                 .oauth2Client(withDefaults())
                 .csrf(it ->
-                        it
-                                .csrfTokenRequestHandler(new ServerCsrfTokenRequestAttributeHandler())
-                                .csrfTokenRepository(tokenRepository)
-                                .requireCsrfProtectionMatcher(SecurityConfig::matches)
+                        it.disable()
+//                                .csrfTokenRequestHandler(new ServerCsrfTokenRequestAttributeHandler())
+//                                .csrfTokenRepository(tokenRepository)
+//                                .requireCsrfProtectionMatcher(SecurityConfig::matches)
                 )
                 .build();
         // @formatter:on
