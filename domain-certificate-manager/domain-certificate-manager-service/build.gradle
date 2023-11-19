@@ -84,6 +84,7 @@ dependencies {
 
     implementation project(':domain-certificate-manager:domain-certificate-manager-events')
 
+    implementation project(':fargate-task-info')
 //    developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
