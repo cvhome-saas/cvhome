@@ -1,0 +1,186 @@
+{
+  "status": "UP",
+  "components": {
+    "JobRunr": {
+      "status": "UP",
+      "details": {
+        "backgroundJobServer": "enabled",
+        "backgroundJobServerStatus": "running"
+      }
+    },
+    "db": {
+      "status": "UP",
+      "details": {
+        "database": "PostgreSQL",
+        "validationQuery": "isValid()"
+      }
+    },
+    "discoveryComposite": {
+      "description": "Discovery Client not initialized",
+      "status": "UNKNOWN",
+      "components": {
+        "discoveryClient": {
+          "description": "Discovery Client not initialized",
+          "status": "UNKNOWN"
+        }
+      }
+    },
+    "diskSpace": {
+      "status": "UP",
+      "details": {
+        "total": 31526391808,
+        "free": 19452092416,
+        "threshold": 10485760,
+        "path": "/workspace/.",
+        "exists": true
+      }
+    },
+    "ecsTask": {
+      "status": "UP",
+      "details": {
+        "Cluster": "arn:aws:ecs:eu-central-1:117535662239:cluster/cvhome",
+        "TaskARN": "arn:aws:ecs:eu-central-1:117535662239:task/cvhome/d063044c39af4258aeae43c711b83a34",
+        "Family": "domain-certificate-manager",
+        "Revision": "8",
+        "DesiredStatus": "RUNNING",
+        "KnownStatus": "RUNNING",
+        "Limits": {
+          "CPU": 0.5,
+          "Memory": 1024
+        },
+        "PullStartedAt": "2023-11-19T12:38:04.276055314Z",
+        "PullStoppedAt": "2023-11-19T12:38:11.285558591Z",
+        "AvailabilityZone": "eu-central-1c",
+        "LaunchType": "FARGATE",
+        "Containers": [
+          {
+            "DockerId": "d063044c39af4258aeae43c711b83a34-4216152328",
+            "Name": "domain-certificate-managerTask",
+            "DockerName": "domain-certificate-managerTask",
+            "Image": "117535662239.dkr.ecr.eu-central-1.amazonaws.com/domain-certificate-manager:0.0.1-SNAPSHOT",
+            "ImageID": "sha256:001c4f25c6fa1ed16ffa59ae9d8f86a3e13c95de2d2a15475e3e246e0a6884d8",
+            "Labels": {
+              "com.amazonaws.ecs.cluster": "arn:aws:ecs:eu-central-1:117535662239:cluster/cvhome",
+              "com.amazonaws.ecs.container-name": "domain-certificate-managerTask",
+              "com.amazonaws.ecs.task-arn": "arn:aws:ecs:eu-central-1:117535662239:task/cvhome/d063044c39af4258aeae43c711b83a34",
+              "com.amazonaws.ecs.task-definition-family": "domain-certificate-manager",
+              "com.amazonaws.ecs.task-definition-version": "8"
+            },
+            "DesiredStatus": "RUNNING",
+            "KnownStatus": "RUNNING",
+            "Limits": {
+              "CPU": 2.0,
+              "Memory": 0
+            },
+            "CreatedAt": "2023-11-19T12:38:43.88019243Z",
+            "StartedAt": "2023-11-19T12:38:43.88019243Z",
+            "Type": "NORMAL",
+            "LogDriver": "awslogs",
+            "LogOptions": {
+              "awslogs-group": "/aws/ecs/cvhome/domain-certificate-manager",
+              "awslogs-region": "eu-central-1",
+              "awslogs-stream": "domain-certificate-manager/domain-certificate-managerTask/d063044c39af4258aeae43c711b83a34"
+            },
+            "ContainerARN": "arn:aws:ecs:eu-central-1:117535662239:container/cvhome/d063044c39af4258aeae43c711b83a34/9fb8d06a-71f7-49c3-a2e9-e1336ab9815a",
+            "Networks": [
+              {
+                "NetworkMode": "awsvpc",
+                "IPv4Addresses": [
+                  "10.0.2.226"
+                ],
+                "AttachmentIndex": 0,
+                "MACAddress": "0a:2d:fa:a4:63:19",
+                "IPv4SubnetCIDRBlock": "10.0.2.0/24",
+                "DomainNameServers": [
+                  "10.0.0.2"
+                ],
+                "DomainNameSearchList": [
+                  "eu-central-1.compute.internal"
+                ],
+                "PrivateDNSName": "ip-10-0-2-226.eu-central-1.compute.internal",
+                "SubnetGatewayIpv4Address": "10.0.2.1/24"
+              }
+            ],
+            "Snapshotter": "overlayfs",
+            "Health": null
+          },
+          {
+            "DockerId": "d063044c39af4258aeae43c711b83a34-488776908",
+            "Name": "ecs-service-connect-7KTFptR",
+            "DockerName": "ecs-service-connect-7KTFptR",
+            "Image": "840364872350.dkr.ecr.us-west-2.amazonaws.com/aws-appmesh-envoy:latest",
+            "ImageID": "",
+            "Labels": {
+              "com.amazonaws.ecs.cluster": "arn:aws:ecs:eu-central-1:117535662239:cluster/cvhome",
+              "com.amazonaws.ecs.container-name": "ecs-service-connect-7KTFptR",
+              "com.amazonaws.ecs.task-arn": "arn:aws:ecs:eu-central-1:117535662239:task/cvhome/d063044c39af4258aeae43c711b83a34",
+              "com.amazonaws.ecs.task-definition-family": "domain-certificate-manager",
+              "com.amazonaws.ecs.task-definition-version": "8"
+            },
+            "DesiredStatus": "RUNNING",
+            "KnownStatus": "RUNNING",
+            "Limits": {
+              "CPU": 0.0,
+              "Memory": 0
+            },
+            "CreatedAt": "2023-11-19T12:38:12.128714981Z",
+            "StartedAt": "2023-11-19T12:38:12.128714981Z",
+            "Type": "NORMAL",
+            "LogDriver": null,
+            "LogOptions": null,
+            "ContainerARN": "arn:aws:ecs:eu-central-1:117535662239:container/cvhome/d063044c39af4258aeae43c711b83a34/c145a1b4-e56d-4ffc-9ff2-076b6d685906",
+            "Networks": [
+              {
+                "NetworkMode": "awsvpc",
+                "IPv4Addresses": [
+                  "10.0.2.226"
+                ],
+                "AttachmentIndex": 0,
+                "MACAddress": "0a:2d:fa:a4:63:19",
+                "IPv4SubnetCIDRBlock": "10.0.2.0/24",
+                "DomainNameServers": [
+                  "10.0.0.2"
+                ],
+                "DomainNameSearchList": [
+                  "eu-central-1.compute.internal"
+                ],
+                "PrivateDNSName": "ip-10-0-2-226.eu-central-1.compute.internal",
+                "SubnetGatewayIpv4Address": "10.0.2.1/24"
+              }
+            ],
+            "Snapshotter": "overlayfs",
+            "Health": {
+              "status": "HEALTHY",
+              "statusSince": "2023-11-19T12:38:43.189715781Z"
+            }
+          }
+        ],
+        "ClockDrift": {
+          "ClockErrorBound": 0.5351060000000001,
+          "ReferenceTimestamp": "2023-11-19T12:38:47.000+00:00",
+          "ClockSynchronizationStatus": "SYNCHRONIZED"
+        },
+        "EphemeralStorageMetrics": {
+          "Utilized": 392,
+          "Reserved": 20496
+        }
+      }
+    },
+    "ping": {
+      "status": "UP"
+    },
+    "reactiveDiscoveryClients": {
+      "description": "Discovery Client not initialized",
+      "status": "UNKNOWN",
+      "components": {
+        "Simple Reactive Discovery Client": {
+          "description": "Discovery Client not initialized",
+          "status": "UNKNOWN"
+        }
+      }
+    },
+    "refreshScope": {
+      "status": "UP"
+    }
+  }
+}

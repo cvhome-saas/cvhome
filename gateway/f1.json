@@ -1,0 +1,621 @@
+{
+  "activeProfiles": [
+    "fargate"
+  ],
+  "propertySources": [
+    {
+      "name": "server.ports",
+      "properties": {
+        "local.server.port": {
+          "value": "******"
+        }
+      }
+    },
+    {
+      "name": "gateway-properties",
+      "properties": {
+        "spring.webflux.hiddenmethod.filter.enabled": {
+          "value": "******"
+        }
+      }
+    },
+    {
+      "name": "systemProperties",
+      "properties": {
+        "java.specification.version": {
+          "value": "******"
+        },
+        "sun.jnu.encoding": {
+          "value": "******"
+        },
+        "java.class.path": {
+          "value": "******"
+        },
+        "java.vm.vendor": {
+          "value": "******"
+        },
+        "sun.arch.data.model": {
+          "value": "******"
+        },
+        "java.vendor.url": {
+          "value": "******"
+        },
+        "user.timezone": {
+          "value": "******"
+        },
+        "org.jboss.logging.provider": {
+          "value": "******"
+        },
+        "java.vm.specification.version": {
+          "value": "******"
+        },
+        "os.name": {
+          "value": "******"
+        },
+        "sun.java.launcher": {
+          "value": "******"
+        },
+        "user.country": {
+          "value": "******"
+        },
+        "sun.boot.library.path": {
+          "value": "******"
+        },
+        "sun.java.command": {
+          "value": "******"
+        },
+        "jdk.debug": {
+          "value": "******"
+        },
+        "sun.cpu.endian": {
+          "value": "******"
+        },
+        "org.springframework.cloud.bindings.boot.enable": {
+          "value": "******"
+        },
+        "user.home": {
+          "value": "******"
+        },
+        "user.language": {
+          "value": "******"
+        },
+        "java.specification.vendor": {
+          "value": "******"
+        },
+        "java.security.properties": {
+          "value": "******"
+        },
+        "java.version.date": {
+          "value": "******"
+        },
+        "java.home": {
+          "value": "******"
+        },
+        "file.separator": {
+          "value": "******"
+        },
+        "java.vm.compressedOopsMode": {
+          "value": "******"
+        },
+        "line.separator": {
+          "value": "******"
+        },
+        "java.vm.specification.vendor": {
+          "value": "******"
+        },
+        "java.specification.name": {
+          "value": "******"
+        },
+        "FILE_LOG_CHARSET": {
+          "value": "******"
+        },
+        "java.awt.headless": {
+          "value": "******"
+        },
+        "sun.management.compiler": {
+          "value": "******"
+        },
+        "java.runtime.version": {
+          "value": "******"
+        },
+        "user.name": {
+          "value": "******"
+        },
+        "path.separator": {
+          "value": "******"
+        },
+        "os.version": {
+          "value": "******"
+        },
+        "java.runtime.name": {
+          "value": "******"
+        },
+        "file.encoding": {
+          "value": "******"
+        },
+        "java.vm.name": {
+          "value": "******"
+        },
+        "java.vendor.url.bug": {
+          "value": "******"
+        },
+        "java.io.tmpdir": {
+          "value": "******"
+        },
+        "java.version": {
+          "value": "******"
+        },
+        "user.dir": {
+          "value": "******"
+        },
+        "os.arch": {
+          "value": "******"
+        },
+        "java.vm.specification.name": {
+          "value": "******"
+        },
+        "PID": {
+          "value": "******"
+        },
+        "CONSOLE_LOG_CHARSET": {
+          "value": "******"
+        },
+        "native.encoding": {
+          "value": "******"
+        },
+        "java.library.path": {
+          "value": "******"
+        },
+        "java.vm.info": {
+          "value": "******"
+        },
+        "java.vendor": {
+          "value": "******"
+        },
+        "java.vm.version": {
+          "value": "******"
+        },
+        "sun.io.unicode.encoding": {
+          "value": "******"
+        },
+        "java.class.version": {
+          "value": "******"
+        }
+      }
+    },
+    {
+      "name": "systemEnvironment",
+      "properties": {
+        "PATH": {
+          "value": "******",
+          "origin": "System Environment Property \"PATH\""
+        },
+        "AWS_CONTAINER_CREDENTIALS_RELATIVE_URI": {
+          "value": "******",
+          "origin": "System Environment Property \"AWS_CONTAINER_CREDENTIALS_RELATIVE_URI\""
+        },
+        "BPL_JVM_THREAD_COUNT": {
+          "value": "******",
+          "origin": "System Environment Property \"BPL_JVM_THREAD_COUNT\""
+        },
+        "SPRING_PROFILES_ACTIVE": {
+          "value": "******",
+          "origin": "System Environment Property \"SPRING_PROFILES_ACTIVE\""
+        },
+        "JAVA_HOME": {
+          "value": "******",
+          "origin": "System Environment Property \"JAVA_HOME\""
+        },
+        "AWS_EXECUTION_ENV": {
+          "value": "******",
+          "origin": "System Environment Property \"AWS_EXECUTION_ENV\""
+        },
+        "AWS_DEFAULT_REGION": {
+          "value": "******",
+          "origin": "System Environment Property \"AWS_DEFAULT_REGION\""
+        },
+        "ECS_CONTAINER_METADATA_URI": {
+          "value": "******",
+          "origin": "System Environment Property \"ECS_CONTAINER_METADATA_URI\""
+        },
+        "ECS_CONTAINER_METADATA_URI_V4": {
+          "value": "******",
+          "origin": "System Environment Property \"ECS_CONTAINER_METADATA_URI_V4\""
+        },
+        "COM_ASREVO_CVHOME_FARGATE_NAMESPACE": {
+          "value": "******",
+          "origin": "System Environment Property \"COM_ASREVO_CVHOME_FARGATE_NAMESPACE\""
+        },
+        "ECS_AGENT_URI": {
+          "value": "******",
+          "origin": "System Environment Property \"ECS_AGENT_URI\""
+        },
+        "JAVA_TOOL_OPTIONS": {
+          "value": "******",
+          "origin": "System Environment Property \"JAVA_TOOL_OPTIONS\""
+        },
+        "LD_LIBRARY_PATH": {
+          "value": "******",
+          "origin": "System Environment Property \"LD_LIBRARY_PATH\""
+        },
+        "JAVA_SECURITY_PROPERTIES": {
+          "value": "******",
+          "origin": "System Environment Property \"JAVA_SECURITY_PROPERTIES\""
+        },
+        "BPI_APPLICATION_PATH": {
+          "value": "******",
+          "origin": "System Environment Property \"BPI_APPLICATION_PATH\""
+        },
+        "BPI_JVM_CACERTS": {
+          "value": "******",
+          "origin": "System Environment Property \"BPI_JVM_CACERTS\""
+        },
+        "SERVER_PORT": {
+          "value": "******",
+          "origin": "System Environment Property \"SERVER_PORT\""
+        },
+        "AWS_REGION": {
+          "value": "******",
+          "origin": "System Environment Property \"AWS_REGION\""
+        },
+        "COM_ASREVO_CVHOME_SSL_DEFAULT-DOMAIN": {
+          "value": "******",
+          "origin": "System Environment Property \"COM_ASREVO_CVHOME_SSL_DEFAULT-DOMAIN\""
+        },
+        "CLASSPATH": {
+          "value": "******",
+          "origin": "System Environment Property \"CLASSPATH\""
+        },
+        "NMT_LEVEL_1": {
+          "value": "******",
+          "origin": "System Environment Property \"NMT_LEVEL_1\""
+        },
+        "BPI_JVM_SECURITY_PROVIDERS": {
+          "value": "******",
+          "origin": "System Environment Property \"BPI_JVM_SECURITY_PROVIDERS\""
+        },
+        "HOSTNAME": {
+          "value": "******",
+          "origin": "System Environment Property \"HOSTNAME\""
+        },
+        "BPI_JVM_CLASS_COUNT": {
+          "value": "******",
+          "origin": "System Environment Property \"BPI_JVM_CLASS_COUNT\""
+        },
+        "HOME": {
+          "value": "******",
+          "origin": "System Environment Property \"HOME\""
+        },
+        "MALLOC_ARENA_MAX": {
+          "value": "******",
+          "origin": "System Environment Property \"MALLOC_ARENA_MAX\""
+        }
+      }
+    },
+    {
+      "name": "springCloudClientHostInfo",
+      "properties": {
+        "spring.cloud.client.hostname": {
+          "value": "******"
+        },
+        "spring.cloud.client.ip-address": {
+          "value": "******"
+        }
+      }
+    },
+    {
+      "name": "Config resource 'class path resource [application-fargate.yml]' via location 'optional:classpath:/'",
+      "properties": {
+        "com.asrevo.cvhome.fargate.namespace": {
+          "value": "******",
+          "origin": "class path resource [application-fargate.yml] - 5:20"
+        },
+        "spring.security.oauth2.client.registration.microservice.provider": {
+          "value": "******",
+          "origin": "class path resource [application-fargate.yml] - 12:23"
+        },
+        "spring.security.oauth2.client.registration.microservice.client-id": {
+          "value": "******",
+          "origin": "class path resource [application-fargate.yml] - 13:24"
+        },
+        "spring.security.oauth2.client.registration.microservice.client-secret": {
+          "value": "******",
+          "origin": "class path resource [application-fargate.yml] - 14:28"
+        },
+        "spring.security.oauth2.client.registration.microservice.authorization-grant-type": {
+          "value": "******",
+          "origin": "class path resource [application-fargate.yml] - 15:39"
+        },
+        "spring.security.oauth2.client.registration.keycloak.client-id": {
+          "value": "******",
+          "origin": "class path resource [application-fargate.yml] - 17:24"
+        },
+        "spring.security.oauth2.client.registration.keycloak.client-authentication-method": {
+          "value": "******",
+          "origin": "class path resource [application-fargate.yml] - 18:43"
+        },
+        "spring.security.oauth2.client.registration.keycloak.authorization-grant-type": {
+          "value": "******",
+          "origin": "class path resource [application-fargate.yml] - 19:39"
+        },
+        "spring.security.oauth2.client.registration.keycloak.scope": {
+          "value": "******",
+          "origin": "class path resource [application-fargate.yml] - 20:20"
+        },
+        "spring.security.oauth2.client.registration.keycloak.redirect-uri": {
+          "value": "******",
+          "origin": "class path resource [application-fargate.yml] - 21:27"
+        },
+        "spring.security.oauth2.client.registration.keycloak.provider": {
+          "value": "******",
+          "origin": "class path resource [application-fargate.yml] - 22:23"
+        },
+        "spring.security.oauth2.client.registration.keycloak.client-secret": {
+          "value": "******",
+          "origin": "class path resource [application-fargate.yml] - 23:28"
+        },
+        "spring.security.oauth2.client.provider.keycloak.jwk-set-uri": {
+          "value": "******",
+          "origin": "class path resource [application-fargate.yml] - 26:26"
+        },
+        "spring.security.oauth2.client.provider.keycloak.authorization-uri": {
+          "value": "******",
+          "origin": "class path resource [application-fargate.yml] - 27:32"
+        },
+        "spring.security.oauth2.client.provider.keycloak.token-uri": {
+          "value": "******",
+          "origin": "class path resource [application-fargate.yml] - 28:24"
+        },
+        "spring.cloud.gateway.default-filters[0]": {
+          "value": "******",
+          "origin": "class path resource [application-fargate.yml] - 32:11"
+        },
+        "spring.cloud.gateway.default-filters[1]": {
+          "value": "******",
+          "origin": "class path resource [application-fargate.yml] - 33:11"
+        },
+        "spring.cloud.gateway.default-filters[2]": {
+          "value": "******",
+          "origin": "class path resource [application-fargate.yml] - 34:11"
+        },
+        "spring.cloud.gateway.routes[0].id": {
+          "value": "******",
+          "origin": "class path resource [application-fargate.yml] - 36:15"
+        },
+        "spring.cloud.gateway.routes[0].uri": {
+          "value": "******",
+          "origin": "class path resource [application-fargate.yml] - 37:16"
+        },
+        "spring.cloud.gateway.routes[0].predicates[0]": {
+          "value": "******",
+          "origin": "class path resource [application-fargate.yml] - 39:15"
+        },
+        "spring.cloud.gateway.routes[0].filters[0]": {
+          "value": "******",
+          "origin": "class path resource [application-fargate.yml] - 41:15"
+        },
+        "spring.cloud.gateway.routes[1].id": {
+          "value": "******",
+          "origin": "class path resource [application-fargate.yml] - 42:15"
+        },
+        "spring.cloud.gateway.routes[1].uri": {
+          "value": "******",
+          "origin": "class path resource [application-fargate.yml] - 43:16"
+        },
+        "spring.cloud.gateway.routes[1].predicates[0]": {
+          "value": "******",
+          "origin": "class path resource [application-fargate.yml] - 45:15"
+        },
+        "spring.cloud.gateway.routes[1].filters[0]": {
+          "value": "******",
+          "origin": "class path resource [application-fargate.yml] - 47:15"
+        },
+        "spring.cloud.gateway.routes[2].id": {
+          "value": "******",
+          "origin": "class path resource [application-fargate.yml] - 48:15"
+        },
+        "spring.cloud.gateway.routes[2].uri": {
+          "value": "******",
+          "origin": "class path resource [application-fargate.yml] - 49:16"
+        },
+        "spring.cloud.gateway.routes[2].predicates[0]": {
+          "value": "******",
+          "origin": "class path resource [application-fargate.yml] - 51:15"
+        },
+        "spring.cloud.gateway.routes[3].id": {
+          "value": "******",
+          "origin": "class path resource [application-fargate.yml] - 52:15"
+        },
+        "spring.cloud.gateway.routes[3].uri": {
+          "value": "******",
+          "origin": "class path resource [application-fargate.yml] - 53:16"
+        },
+        "spring.cloud.gateway.routes[3].predicates[0]": {
+          "value": "******",
+          "origin": "class path resource [application-fargate.yml] - 55:15"
+        },
+        "spring.cloud.gateway.routes[3].filters[0]": {
+          "value": "******",
+          "origin": "class path resource [application-fargate.yml] - 57:15"
+        },
+        "spring.cloud.gateway.routes[4].id": {
+          "value": "******",
+          "origin": "class path resource [application-fargate.yml] - 58:15"
+        },
+        "spring.cloud.gateway.routes[4].uri": {
+          "value": "******",
+          "origin": "class path resource [application-fargate.yml] - 59:16"
+        },
+        "spring.cloud.gateway.routes[4].predicates[0]": {
+          "value": "******",
+          "origin": "class path resource [application-fargate.yml] - 61:15"
+        },
+        "spring.cloud.gateway.routes[5].id": {
+          "value": "******",
+          "origin": "class path resource [application-fargate.yml] - 62:15"
+        },
+        "spring.cloud.gateway.routes[5].uri": {
+          "value": "******",
+          "origin": "class path resource [application-fargate.yml] - 63:16"
+        },
+        "spring.cloud.gateway.routes[5].predicates[0]": {
+          "value": "******",
+          "origin": "class path resource [application-fargate.yml] - 65:15"
+        },
+        "spring.cloud.gateway.routes[6].id": {
+          "value": "******",
+          "origin": "class path resource [application-fargate.yml] - 66:15"
+        },
+        "spring.cloud.gateway.routes[6].uri": {
+          "value": "******",
+          "origin": "class path resource [application-fargate.yml] - 67:16"
+        },
+        "spring.cloud.gateway.routes[6].predicates[0]": {
+          "value": "******",
+          "origin": "class path resource [application-fargate.yml] - 69:15"
+        },
+        "spring.cloud.gateway.routes[7].id": {
+          "value": "******",
+          "origin": "class path resource [application-fargate.yml] - 70:15"
+        },
+        "spring.cloud.gateway.routes[7].uri": {
+          "value": "******",
+          "origin": "class path resource [application-fargate.yml] - 71:16"
+        },
+        "spring.cloud.gateway.routes[7].predicates[0]": {
+          "value": "******",
+          "origin": "class path resource [application-fargate.yml] - 73:15"
+        },
+        "spring.cloud.gateway.routes[8].id": {
+          "value": "******",
+          "origin": "class path resource [application-fargate.yml] - 74:15"
+        },
+        "spring.cloud.gateway.routes[8].uri": {
+          "value": "******",
+          "origin": "class path resource [application-fargate.yml] - 75:16"
+        },
+        "spring.cloud.gateway.routes[8].predicates[0]": {
+          "value": "******",
+          "origin": "class path resource [application-fargate.yml] - 77:15"
+        },
+        "spring.cloud.gateway.routes[8].filters[0]": {
+          "value": "******",
+          "origin": "class path resource [application-fargate.yml] - 79:15"
+        }
+      }
+    },
+    {
+      "name": "Config resource 'class path resource [application.yaml]' via location 'optional:classpath:/'",
+      "properties": {
+        "com.asrevo.cvhome.ssl.default-domain": {
+          "value": "******",
+          "origin": "class path resource [application.yaml] - 5:25"
+        },
+        "spring.application.name": {
+          "value": "******",
+          "origin": "class path resource [application.yaml] - 8:11"
+        },
+        "spring.security.oauth2.client.registration.microservice.provider": {
+          "value": "******",
+          "origin": "class path resource [application.yaml] - 14:23"
+        },
+        "spring.security.oauth2.client.registration.microservice.client-id": {
+          "value": "******",
+          "origin": "class path resource [application.yaml] - 15:24"
+        },
+        "spring.security.oauth2.client.registration.microservice.client-secret": {
+          "value": "******",
+          "origin": "class path resource [application.yaml] - 16:28"
+        },
+        "spring.security.oauth2.client.registration.microservice.authorization-grant-type": {
+          "value": "******",
+          "origin": "class path resource [application.yaml] - 17:39"
+        },
+        "spring.security.oauth2.client.registration.keycloak.client-id": {
+          "value": "******",
+          "origin": "class path resource [application.yaml] - 19:24"
+        },
+        "spring.security.oauth2.client.registration.keycloak.client-authentication-method": {
+          "value": "******",
+          "origin": "class path resource [application.yaml] - 20:43"
+        },
+        "spring.security.oauth2.client.registration.keycloak.authorization-grant-type": {
+          "value": "******",
+          "origin": "class path resource [application.yaml] - 21:39"
+        },
+        "spring.security.oauth2.client.registration.keycloak.scope": {
+          "value": "******",
+          "origin": "class path resource [application.yaml] - 22:20"
+        },
+        "spring.security.oauth2.client.registration.keycloak.redirect-uri": {
+          "value": "******",
+          "origin": "class path resource [application.yaml] - 23:27"
+        },
+        "spring.security.oauth2.client.registration.keycloak.provider": {
+          "value": "******",
+          "origin": "class path resource [application.yaml] - 24:23"
+        },
+        "spring.security.oauth2.client.registration.keycloak.client-secret": {
+          "value": "******",
+          "origin": "class path resource [application.yaml] - 25:28"
+        },
+        "spring.security.oauth2.client.provider.keycloak.jwk-set-uri": {
+          "value": "******",
+          "origin": "class path resource [application.yaml] - 30:26"
+        },
+        "spring.security.oauth2.client.provider.keycloak.authorization-uri": {
+          "value": "******",
+          "origin": "class path resource [application.yaml] - 31:32"
+        },
+        "spring.security.oauth2.client.provider.keycloak.token-uri": {
+          "value": "******",
+          "origin": "class path resource [application.yaml] - 32:24"
+        },
+        "server.port": {
+          "value": "******",
+          "origin": "class path resource [application.yaml] - 37:9"
+        },
+        "info.app.name": {
+          "value": "******",
+          "origin": "class path resource [application.yaml] - 40:11"
+        },
+        "management.info.env.enabled": {
+          "value": "******",
+          "origin": "class path resource [application.yaml] - 44:16"
+        },
+        "management.info.os.enabled": {
+          "value": "******",
+          "origin": "class path resource [application.yaml] - 46:16"
+        },
+        "management.metrics.tags.application": {
+          "value": "******",
+          "origin": "class path resource [application.yaml] - 49:20"
+        },
+        "management.endpoint.health.show-details": {
+          "value": "******",
+          "origin": "class path resource [application.yaml] - 52:21"
+        },
+        "management.endpoints.web.exposure.include[0]": {
+          "value": "******",
+          "origin": "class path resource [application.yaml] - 56:20"
+        },
+        "logging.level.org.springframework.boot": {
+          "value": "******",
+          "origin": "class path resource [application.yaml] - 59:31"
+        },
+        "logging.level.org.springframework.web": {
+          "value": "******",
+          "origin": "class path resource [application.yaml] - 60:30"
+        },
+        "logging.level.org.springframework.security": {
+          "value": "******",
+          "origin": "class path resource [application.yaml] - 61:35"
+        },
+        "logging.level.reactor.netty.http": {
+          "value": "******",
+          "origin": "class path resource [application.yaml] - 62:25"
+        }
+      }
+    }
+  ]
+}
