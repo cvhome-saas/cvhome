@@ -39,6 +39,7 @@ spring:
     ecs:
       discovery:
         namespace: "cvhome.lcl"
+        namespace-id: "ns-je7qri6wn7fbsrpn"
     gateway:
       discovery:
         locator:

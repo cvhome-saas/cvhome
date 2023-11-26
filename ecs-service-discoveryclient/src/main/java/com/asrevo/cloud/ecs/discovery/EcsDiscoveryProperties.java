@@ -10,5 +10,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class EcsDiscoveryProperties {
     public static final String PREFIX = "spring.cloud.ecs.discovery";
     private String namespace;
+    private String namespaceId;
     private boolean enabled = true;
 }
