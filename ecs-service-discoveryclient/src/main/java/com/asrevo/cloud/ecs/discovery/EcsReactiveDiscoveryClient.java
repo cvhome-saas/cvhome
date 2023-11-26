@@ -35,19 +35,18 @@ public class EcsReactiveDiscoveryClient implements ReactiveDiscoveryClient {
     public static Flux<ServiceInstance> getDefaultServiceInstances(ServiceDiscoveryAsyncClient discoveryAsync,
                                                                    EcsDiscoveryProperties properties,
                                                                    String serviceId) {
-        DiscoverInstancesRequest request = DiscoverInstancesRequest.builder()
+        log.info("getting services for {}", serviceId);
+        DiscoverInstancesRequest request = DiscoverInstancesRequest
+                .builder()
                 .namespaceName(properties.getNamespace())
-                .serviceName(serviceId)
-                .build();
+                .serviceName(serviceId).build();
         return Mono.fromFuture(discoveryAsync.discoverInstances(request))
                 .map(DiscoverInstancesResponse::instances)
                 .doOnEach(it -> {
-                    if (it.hasValue()) {
-                        log.info("getting " + it.get().size() + " services for " + serviceId);
+                    if (it.hasValue() && it.get() != null) {
+                        log.info("getting {} services for {}", it.get().size(), serviceId);
                     }
-                })
-                .flatMapMany(Flux::fromIterable)
-                .map(CloudMapServiceInstance::new);
+                }).flatMapMany(Flux::fromIterable).map(CloudMapServiceInstance::new);
     }
 
     @Override
@@ -55,7 +54,8 @@ public class EcsReactiveDiscoveryClient implements ReactiveDiscoveryClient {
         return getEcsServices(this.discoveryAsync, this.properties);
     }
 
-    public static Flux<String> getEcsServices(ServiceDiscoveryAsyncClient discoveryAsync, EcsDiscoveryProperties properties) {
+    public static Flux<String> getEcsServices(ServiceDiscoveryAsyncClient discoveryAsync,
+                                              EcsDiscoveryProperties properties) {
         log.info("getting all services");
         List<ServiceFilter> filters = new ArrayList<>();
         if (properties.getNamespaceId() != null) {
