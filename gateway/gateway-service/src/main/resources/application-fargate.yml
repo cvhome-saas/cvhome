@@ -23,56 +23,71 @@ spring:
             client-secret: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
         provider:
           keycloak:
-            jwk-set-uri: http://auth.${com.asrevo.cvhome.fargate.namespace}:9999/realms/cvhome/protocol/openid-connect/certs
+            jwk-set-uri: lb://auth:9999/realms/cvhome/protocol/openid-connect/certs
             authorization-uri: https://auth.${com.asrevo.cvhome.ssl.default-domain}:${server.port}/realms/cvhome/protocol/openid-connect/auth
-            token-uri: http://auth.${com.asrevo.cvhome.fargate.namespace}:9999/realms/cvhome/protocol/openid-connect/token
+            token-uri: lb://auth:9999/realms/cvhome/protocol/openid-connect/token
   cloud:
+    loadbalancer:
+      eager-load:
+        clients:
+          - "gateway"
+          - "domain-certificate-manager"
+          - "auth"
+          - "welcome-ui"
+          - "admin-ui"
+          - "store-ui"
+    ecs:
+      discovery:
+        namespace: "cvhome.lcl"
     gateway:
+      discovery:
+        locator:
+          enabled: true
       default-filters:
         - TokenRelay
         - PreserveHostHeader
         - AddResponseHeader=X-Frame-Options, SAMEORIGIN
       routes:
         - id: domain-certificate-manager
-          uri: http://domain-certificate-manager.${com.asrevo.cvhome.fargate.namespace}:8082
+          uri: lb://domain-certificate-manager:8082
           predicates:
             - Path=/domain-certificate-manager/**
           filters:
             - StripPrefix=1
         - id: store
-          uri: http://store.${com.asrevo.cvhome.fargate.namespace}:8083
+          uri: lb://store:8083
           predicates:
             - Path=/store/**
           filters:
             - StripPrefix=1
         - id: auth
-          uri: http://auth.${com.asrevo.cvhome.fargate.namespace}:9999
+          uri: lb://auth:9999
           predicates:
             - FHost=auth.${com.asrevo.cvhome.ssl.default-domain}
         - id: realms
-          uri: http://auth.${com.asrevo.cvhome.fargate.namespace}:9999
+          uri: lb://auth:9999
           predicates:
             - Path=/realms/**
           filters:
             - SetRequestHostHeader=auth.${com.asrevo.cvhome.ssl.default-domain}:${server.port}
         - id: resources
-          uri: http://auth.${com.asrevo.cvhome.fargate.namespace}:9999
+          uri: lb://auth:9999
           predicates:
             - Path=/resources/**
         - id: js
-          uri: http://auth.${com.asrevo.cvhome.fargate.namespace}:9999
+          uri: lb://auth:9999
           predicates:
             - Path=/js/**
         - id: welcome-ui
-          uri: http://welcome-ui.${com.asrevo.cvhome.fargate.namespace}:4400
+          uri: lb://welcome-ui:4400
           predicates:
             - FHost=www.${com.asrevo.cvhome.ssl.default-domain},${com.asrevo.cvhome.ssl.default-domain}
         - id: admin-ui
-          uri: http://admin-ui.${com.asrevo.cvhome.fargate.namespace}:4200
+          uri: lb://admin-ui:4200
           predicates:
             - FHost=admin.${com.asrevo.cvhome.ssl.default-domain}
         - id: store-ui
-          uri: http://store-ui.${com.asrevo.cvhome.fargate.namespace}:4300
+          uri: lb://store-ui:4300
           predicates:
             - FHost={domain}.{x},{sub}.{domain}.{x}
           filters:
