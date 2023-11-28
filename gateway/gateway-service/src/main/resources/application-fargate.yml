@@ -23,9 +23,9 @@ spring:
             client-secret: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
         provider:
           keycloak:
-            jwk-set-uri: lb://auth:9999/realms/cvhome/protocol/openid-connect/certs
+            jwk-set-uri: http://auth.cvhome.lcl:9999/realms/cvhome/protocol/openid-connect/certs
             authorization-uri: https://auth.${com.asrevo.cvhome.ssl.default-domain}:${server.port}/realms/cvhome/protocol/openid-connect/auth
-            token-uri: lb://auth:9999/realms/cvhome/protocol/openid-connect/token
+            token-uri: http://auth.cvhome.lcl:9999/realms/cvhome/protocol/openid-connect/token
   cloud:
     loadbalancer:
       eager-load:
