@@ -104,11 +104,12 @@ public class WebClientServicesConfig {
     }
 */
 
-    @Bean
-    public WebClientReactiveAuthorizationCodeTokenResponseClient webClientReactiveAuthorizationCodeTokenResponseClient(WebClient.Builder defaultMicroServiceBuilder) {
+/*   @Bean
+    public WebClientReactiveAuthorizationCodeTokenResponseClient webClientReactiveAuthorizationCodeTokenResponseClient(WebClient.Builder defaultBalancedBuilder) {
         WebClientReactiveAuthorizationCodeTokenResponseClient webClientReactiveAuthorizationCodeTokenResponseClient = new WebClientReactiveAuthorizationCodeTokenResponseClient();
-        webClientReactiveAuthorizationCodeTokenResponseClient.setWebClient(defaultMicroServiceBuilder.build());
+        webClientReactiveAuthorizationCodeTokenResponseClient.setWebClient(defaultBalancedBuilder.build());
         return webClientReactiveAuthorizationCodeTokenResponseClient;
     }
+*/
 
 }
