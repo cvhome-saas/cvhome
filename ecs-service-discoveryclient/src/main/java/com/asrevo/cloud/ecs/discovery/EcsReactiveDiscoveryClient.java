@@ -46,7 +46,9 @@ public class EcsReactiveDiscoveryClient implements ReactiveDiscoveryClient {
                     if (it.hasValue() && it.get() != null) {
                         log.info("getting {} services for {}", it.get().size(), serviceId);
                     }
-                }).flatMapMany(Flux::fromIterable).map(CloudMapServiceInstance::new);
+                })
+                .flatMapMany(Flux::fromIterable)
+                .map(instance -> new CloudMapServiceInstance(instance,properties.getServicePorts().get(serviceId)));
     }
 
     @Override
