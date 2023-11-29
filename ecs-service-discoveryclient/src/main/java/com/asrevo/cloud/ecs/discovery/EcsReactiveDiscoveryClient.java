@@ -48,7 +48,10 @@ public class EcsReactiveDiscoveryClient implements ReactiveDiscoveryClient {
                     }
                 })
                 .flatMapMany(Flux::fromIterable)
-                .map(instance -> new CloudMapServiceInstance(instance,properties.getServicePorts().get(serviceId)));
+                .map(instance -> {
+                    Integer defaultPort = properties.getServicePorts().getOrDefault(serviceId, properties.getDefaultPort());
+                    return new CloudMapServiceInstance(instance, defaultPort);
+                });
     }
 
     @Override
