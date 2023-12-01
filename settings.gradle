@@ -23,7 +23,6 @@ plugins {
 rootProject.name = 'cvhome'
 include(
         'fargate-task-info',
-        'ecs-service-discoveryclient',
         'cvhome-commons',
         'auth',
         'domain-certificate-manager:domain-certificate-manager-commons',
