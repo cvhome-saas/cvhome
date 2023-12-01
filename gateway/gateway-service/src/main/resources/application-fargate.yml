@@ -58,45 +58,45 @@ spring:
         - AddResponseHeader=X-Frame-Options, SAMEORIGIN
       routes:
         - id: domain-certificate-manager
-          uri: http://domain-certificate-manager.${spring.cloud.ecs.discovery.namespace}:8082
+          uri: lb://domain-certificate-manager
           predicates:
             - Path=/domain-certificate-manager/**
           filters:
             - StripPrefix=1
         - id: store
-          uri: http://store.${spring.cloud.ecs.discovery.namespace}:8083
+          uri: lb://store
           predicates:
             - Path=/store/**
           filters:
             - StripPrefix=1
         - id: auth
-          uri: http://auth.${spring.cloud.ecs.discovery.namespace}:9999
+          uri: lb://auth
           predicates:
             - FHost=auth.${com.asrevo.cvhome.ssl.default-domain}
         - id: realms
-          uri: http://auth.${spring.cloud.ecs.discovery.namespace}:9999
+          uri: lb://auth
           predicates:
             - Path=/realms/**
           filters:
             - SetRequestHostHeader=auth.${com.asrevo.cvhome.ssl.default-domain}:${server.port}
         - id: resources
-          uri: http://auth.${spring.cloud.ecs.discovery.namespace}:9999
+          uri: lb://auth
           predicates:
             - Path=/resources/**
         - id: js
-          uri: http://auth.${spring.cloud.ecs.discovery.namespace}:9999
+          uri: lb://auth
           predicates:
             - Path=/js/**
         - id: welcome-ui
-          uri: http://welcome-ui.${spring.cloud.ecs.discovery.namespace}:4400
+          uri: lb://welcome-ui
           predicates:
             - FHost=www.${com.asrevo.cvhome.ssl.default-domain},${com.asrevo.cvhome.ssl.default-domain}
         - id: admin-ui
-          uri: http://admin-ui.${spring.cloud.ecs.discovery.namespace}:4200
+          uri: lb://admin-ui
           predicates:
             - FHost=admin.${com.asrevo.cvhome.ssl.default-domain}
         - id: store-ui
-          uri: http://store-ui.${spring.cloud.ecs.discovery.namespace}:4300
+          uri: lb://store-ui
           predicates:
             - FHost={domain}.{x},{sub}.{domain}.{x}
           filters:
