@@ -19,7 +19,7 @@ public class SecurityConfig {
         return http
                 .authorizeExchange(it ->
                         it
-                                .pathMatchers(".well-known/acme-challenge/*").permitAll()
+                                .pathMatchers("/actuator", "/actuator/*/**").permitAll()
                                 .pathMatchers("api/v1/test/sign").permitAll()
                                 .anyExchange().authenticated()
                 )
