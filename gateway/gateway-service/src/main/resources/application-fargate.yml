@@ -32,6 +32,7 @@ spring:
         clients:
           - "gateway"
           - "domain-certificate-manager"
+          - "store"
           - "auth"
           - "welcome-ui"
           - "admin-ui"
@@ -44,6 +45,7 @@ spring:
         default-port: 8080
         service-ports:
           "domain-certificate-manager": 8082
+          "store": 8082
           "auth": 9999
           "welcome-ui": 4400
           "store-ui": 4300
