@@ -26,6 +26,7 @@ include(
         'ecs-service-discoveryclient',
         'cvhome-commons',
         'auth',
+        'https-redirect',
         'domain-certificate-manager:domain-certificate-manager-commons',
         'domain-certificate-manager:domain-certificate-manager-events',
         'domain-certificate-manager:domain-certificate-manager-service',
