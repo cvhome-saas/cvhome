@@ -19,7 +19,7 @@ import {Store, StoreService} from "../../../../../service/store.service";
 export class SubDomainSettingsComponent implements OnInit {
   @Input()
   subDomainReferences: RegisteredDomain[] = [];
-  baseDomain: string;
+  baseDomain: string = '';
   subDomainForm: FormGroup;
   stores: Store[] = [];
 
