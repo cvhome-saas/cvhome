@@ -4,6 +4,7 @@ import com.asrevo.cvhome.commons.domain.IdentityId;
 import com.asrevo.cvhome.domaincertificatemanager.commons.domain.Domain;
 import com.asrevo.cvhome.domaincertificatemanager.commons.domain.DomainType;
 import com.asrevo.cvhome.domaincertificatemanager.commons.dto.*;
+import com.asrevo.cvhome.domaincertificatemanager.config.AutoOrderDomainsProperties;
 import com.asrevo.cvhome.domaincertificatemanager.entity.OwnerEntity;
 import com.asrevo.cvhome.domaincertificatemanager.service.DomainOwnerShipService;
 import com.asrevo.cvhome.domaincertificatemanager.service.DomainService;
@@ -26,6 +27,7 @@ public class DomainOwnerShipController {
     private final DomainService domainService;
     private final DomainOwnerShipService domainOwnerShipService;
     private final OwnerService ownerService;
+    private final AutoOrderDomainsProperties autoOrderDomainsProperties;
 
     @PostMapping("get-proving")
     public ProvingResponse getProving(@RequestBody Domain domain, @AuthenticationPrincipal Principal principal) {
@@ -35,6 +37,11 @@ public class DomainOwnerShipController {
     @PostMapping("check-availability")
     public AvailabilityResponse checkAvailability(@RequestBody Domain domain) {
         return domainService.checkAvailability(domain);
+    }
+
+    @GetMapping("default-domain")
+    public Domain defaultDomain() {
+        return autoOrderDomainsProperties.getDefaultDomain();
     }
 
     @PostMapping("register")

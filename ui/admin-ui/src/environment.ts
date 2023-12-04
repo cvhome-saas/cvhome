@@ -5,7 +5,4 @@ export const environment = {
   LOGIN_URL: '/oauth2/authorization/keycloak',
   REGISTER_URL: '/oauth2/authorization/keycloak?SSS',
   CLIENT_APP: 'web-app',
-  BASE_DOMAIN: 'gateway.com',
-  WWW_BASE_DOMAIN: 'www.gateway.com',
-  ALL_BASE_DOMAINS: ['gateway.com', 'www.gateway.com']
 };
