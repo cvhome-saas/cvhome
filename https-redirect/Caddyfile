@@ -1,0 +1,2 @@
+:80
+redir https://{host}{uri}

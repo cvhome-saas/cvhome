@@ -44,8 +44,8 @@ management:
       enabled: true
     os:
       enabled: true
-  metrics:
-    tags:
+  observations:
+    key-values:
       application: ${spring.application.name}
   endpoint:
     health:

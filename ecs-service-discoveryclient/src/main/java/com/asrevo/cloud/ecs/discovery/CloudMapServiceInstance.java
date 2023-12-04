@@ -9,9 +9,11 @@ import java.util.Map;
 
 public class CloudMapServiceInstance implements ServiceInstance {
     private final HttpInstanceSummary instance;
+    private final Integer port;
 
-    public CloudMapServiceInstance(HttpInstanceSummary instance) {
+    public CloudMapServiceInstance(HttpInstanceSummary instance, Integer port) {
         this.instance = instance;
+        this.port = port;
     }
 
 
@@ -31,7 +33,7 @@ public class CloudMapServiceInstance implements ServiceInstance {
 
     @Override
     public int getPort() {
-        return Integer.parseInt(instance.attributes().getOrDefault("AWS_INSTANCE_PORT", "8080"));
+        return Integer.parseInt(instance.attributes().getOrDefault("AWS_INSTANCE_PORT", port.toString()));
     }
 
     @Override

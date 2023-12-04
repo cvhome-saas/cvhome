@@ -1,5 +1,4 @@
-import {Component, Input} from '@angular/core';
-import {environment} from "../../../../../../environment";
+import {Component, Input, OnInit} from '@angular/core';
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {
   Domain,
@@ -17,7 +16,7 @@ import {Store, StoreService} from "../../../../../service/store.service";
   templateUrl: './sub-domain-settings.component.html',
   styleUrls: ['./sub-domain-settings.component.css']
 })
-export class SubDomainSettingsComponent {
+export class SubDomainSettingsComponent implements OnInit {
   @Input()
   subDomainReferences: RegisteredDomain[] = [];
   baseDomain: string;
@@ -25,7 +24,6 @@ export class SubDomainSettingsComponent {
   stores: Store[] = [];
 
   constructor(private domainOwnershipService: DomainOwnershipService, private storeService: StoreService) {
-    this.baseDomain = environment.BASE_DOMAIN;
     this.subDomainForm = new FormGroup({
       domain: new FormControl(null, [
         Validators.required,
@@ -33,7 +31,11 @@ export class SubDomainSettingsComponent {
         Validators.pattern('^[a-zA-Z0-9]+$')
       ]),
     });
+  }
+
+  ngOnInit(): void {
     this.storeService.findAllStores().subscribe(it => this.stores = it)
+    this.domainOwnershipService.defaultDomain().subscribe(it => this.baseDomain = it.domain)
   }
 
 
@@ -60,12 +62,12 @@ export class SubDomainSettingsComponent {
   onReferenceChange(domain: Domain, value: any) {
     let refId = value.target.value;
     this.domainOwnershipService.changeReference({
-      domain:domain,
-      reference:{
-        reference:refId,
-        referenceType:ReferenceType.STORE
+      domain: domain,
+      reference: {
+        reference: refId,
+        referenceType: ReferenceType.STORE
       }
-    }).subscribe(it=>{
+    }).subscribe(it => {
       this.subDomainReferences.filter(it => it.domain.domain == domain.domain).forEach(d => d.reference = it.reference);
     })
   }

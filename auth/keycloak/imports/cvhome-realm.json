@@ -1446,7 +1446,7 @@
   "adminTheme" : "keycloak.v2",
   "emailTheme" : "keycloak",
   "eventsEnabled" : false,
-  "eventsListeners" : [ "jboss-logging", "keycloak-to-rabbitmq"],
+  "eventsListeners" : [ "jboss-logging"],
   "enabledEventTypes" : [ ],
   "adminEventsEnabled" : false,
   "adminEventsDetailsEnabled" : false,

@@ -19,6 +19,10 @@ export class DomainOwnershipService {
     return this.httpClient.post<AvailabilityResponse>(`${this.DOMAIN_OWNERSHIP_BASE_URL}/check-availability`, request)
   }
 
+  defaultDomain(): Observable<Domain> {
+    return this.httpClient.get<Domain>(`${this.DOMAIN_OWNERSHIP_BASE_URL}/default-domain`)
+  }
+
   register(request: RegisterDomainRequest): Observable<RegisterDomainResponse> {
     return this.httpClient.post<RegisterDomainResponse>(`${this.DOMAIN_OWNERSHIP_BASE_URL}/register`, request)
   }
