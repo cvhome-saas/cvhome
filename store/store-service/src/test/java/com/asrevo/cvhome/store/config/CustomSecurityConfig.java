@@ -19,7 +19,6 @@ public class CustomSecurityConfig {
         return new RSAKeyGenerator(2048)
                 .keyUse(KeyUse.SIGNATURE) // indicate the intended use of the key (optional)
                 .keyID(UUID.randomUUID().toString()) // give the key a unique ID (optional)
-                .issueTime(new Date()) // issued-at timestamp (optional)
                 .generate();
     }
 

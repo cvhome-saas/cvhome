@@ -64,8 +64,8 @@ dependencies {
     implementation 'org.bouncycastle:bcpkix-jdk15on:1.70'
 
     implementation project(':domain-certificate-manager:domain-certificate-manager-commons')
-    implementation project(':fargate-task-info')
-    implementation project(':ecs-service-discoveryclient')
+    implementation project(':ecs:fargate-task-info')
+    implementation project(':ecs:ecs-service-discoveryclient')
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'

@@ -14,3 +14,27 @@ spring:
       resourceserver:
         jwt:
           jwk-set-uri: http://auth.${com.asrevo.cvhome.fargate.namespace}:9999/realms/cvhome/protocol/openid-connect/certs
+  cloud:
+    loadbalancer:
+      eager-load:
+        clients:
+          - "gateway"
+          - "domain-certificate-manager"
+          - "store"
+          - "auth"
+          - "welcome-ui"
+          - "admin-ui"
+          - "store-ui"
+    ecs:
+      discovery:
+        namespace: "cvhome.lcl"
+        namespace-id: "ns-je7qri6wn7fbsrpn"
+        enabled: true
+        default-port: 8080
+        service-ports:
+          "domain-certificate-manager": 8082
+          "store": 8083
+          "auth": 9999
+          "welcome-ui": 4400
+          "store-ui": 4300
+          "admin-ui": 4200

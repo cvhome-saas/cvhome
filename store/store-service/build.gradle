@@ -62,6 +62,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
     runtimeOnly 'org.postgresql:postgresql'
 
+    implementation project(':ecs:fargate-task-info')
+    implementation project(':ecs:ecs-service-discoveryclient')
+
     implementation 'org.mapstruct:mapstruct:1.5.5.Final'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
     implementation 'org.springdoc:springdoc-openapi-starter-webflux-ui:2.2.0'
