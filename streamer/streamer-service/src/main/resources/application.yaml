@@ -1,0 +1,38 @@
+spring:
+  application:
+    name: streamer
+  docker:
+    compose:
+      file: ${spring.application.name}/compose.yml
+  sql:
+    init:
+      mode: always
+server:
+  forward-headers-strategy: FRAMEWORK
+  port: 8084
+info:
+  app:
+    name: ${spring.application.name}
+management:
+  info:
+    env:
+      enabled: true
+    os:
+      enabled: true
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: [ '*' ]
+  observations:
+    key-values:
+      application: ${spring.application.name}
+logging:
+  level:
+    org.springframework.jdbc.core.JdbcTemplate: debug
+    org.springframework.boot: debug
+    org.springframework.web: debug
+    org.springframework.security: debug
+    reactor.netty.http: debug
