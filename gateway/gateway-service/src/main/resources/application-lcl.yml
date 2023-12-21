@@ -36,6 +36,11 @@ spring:
                 metadata:
                   service-name: store
                   instance: store-1
+            streamer:
+              - uri: "http://localhost:8083"
+                metadata:
+                  service-name: streamer
+                  instance: streamer-1
             auth:
               - uri: "http://localhost:9999"
                 metadata:

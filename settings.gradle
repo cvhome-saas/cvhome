@@ -33,6 +33,7 @@ include(
         'store:store-commons',
         'store:store-events',
         'store:store-service',
+        'streamer:streamer-service',
         'gateway:gateway-service',
         'ui:admin-ui',
         'ui:store-ui',

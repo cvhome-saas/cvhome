@@ -33,6 +33,7 @@ spring:
           - "gateway"
           - "domain-certificate-manager"
           - "store"
+          - "streamer"
           - "auth"
           - "welcome-ui"
           - "admin-ui"
@@ -46,6 +47,7 @@ spring:
         service-ports:
           "domain-certificate-manager": 8082
           "store": 8083
+          "streamer": 8084
           "auth": 9999
           "welcome-ui": 4400
           "store-ui": 4300
@@ -69,6 +71,12 @@ spring:
           uri: lb://store
           predicates:
             - Path=/store/**
+          filters:
+            - StripPrefix=1
+        - id: streamer
+          uri: lb://streamer
+          predicates:
+            - Path=/streamer/**
           filters:
             - StripPrefix=1
         - id: auth

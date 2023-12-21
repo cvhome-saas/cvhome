@@ -21,6 +21,7 @@ spring:
           - "gateway"
           - "domain-certificate-manager"
           - "store"
+          - "streamer"
           - "auth"
           - "welcome-ui"
           - "admin-ui"
