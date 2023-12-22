@@ -20,6 +20,8 @@ public class SecurityConfig {
                 .authorizeExchange(it ->
                         it
                                 .pathMatchers("/actuator", "/actuator/*/**").permitAll()
+                                .pathMatchers("index.html").permitAll()
+                                .pathMatchers("streaming/*/**").permitAll()
                                 .pathMatchers("api/v1/test/sign").permitAll()
                                 .anyExchange().authenticated()
                 )

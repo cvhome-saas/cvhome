@@ -47,7 +47,7 @@ public class RtspHandler implements Function<DefaultFullHttpRequest, Mono<Defaul
         } else if (this.state == RtspMethods.SETUP && request.method() == RtspMethods.RECORD) {
             this.state = RtspMethods.RECORD;
             SdpElementParser parse = SdpElementParser.parse(this.session.getSessionDescription());
-            HlsStreamContainerSplitter splitter = new HlsStreamContainerSplitter(parse, 10, this.session.getStreamId());
+            HlsStreamContainerSplitter splitter = new HlsStreamContainerSplitter(parse, 2, this.session.getStreamId());
             splitter.start();
             this.rtpH264AacHandler = new RtpH264AacHandler(splitter, this.session);
             return Mono.just(new RecordAction(request, this.session).call());
