@@ -112,6 +112,7 @@ public class ChallengeUtils {
             } catch (IOException ignored) {
             }
         }
+        log.warn("validation not valid ");
         return false;
     }
 
@@ -141,6 +142,7 @@ public class ChallengeUtils {
             }
         } catch (Exception ignored) {
         }
+        log.warn("validation not valid ");
         return false;
     }
 
@@ -151,6 +153,7 @@ public class ChallengeUtils {
             return response.body().contains(challenge.authorization());
         } catch (Exception ignored) {
         }
+        log.warn("validation not valid ");
         return false;
     }
 

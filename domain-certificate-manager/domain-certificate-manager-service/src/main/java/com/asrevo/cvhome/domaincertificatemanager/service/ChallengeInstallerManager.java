@@ -1,9 +1,8 @@
 package com.asrevo.cvhome.domaincertificatemanager.service;
 
-import com.asrevo.cvhome.domaincertificatemanager.config.DcmChallengesConfigProperties;
 import com.asrevo.cvhome.domaincertificatemanager.domain.HttpValidationToken;
 import com.asrevo.cvhome.domaincertificatemanager.domain.challenges.ChallengeInstall;
-import com.asrevo.cvhome.domaincertificatemanager.service.impl.HttpChallengeVerifyServiceProvider;
+import com.asrevo.cvhome.domaincertificatemanager.service.verify.http.HttpChallengeVerifyServiceProvider;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -17,19 +16,16 @@ import java.util.List;
 public class ChallengeInstallerManager {
     private final List<ChallengeInstaller> installers;
     private final HttpChallengeVerifyServiceProvider httpVerifyProvider;
-    private final DcmChallengesConfigProperties properties;
 
 
     public boolean install(ChallengeInstall challenge) {
-
-        List<ChallengeInstaller> installed = installers.stream()
+        List<ChallengeInstaller> suggestedInstallers = installers.stream()
                 .filter(it -> it.type().equals(challenge.challengeType()))
-                .filter(it -> properties.providers(it.type()).contains(it.provider()))
                 .toList();
 
         ChallengeInstaller appliedInstaller = null;
 
-        for (ChallengeInstaller installer : installed) {
+        for (ChallengeInstaller installer : suggestedInstallers) {
             boolean isSetup = installer.setup(challenge);
             if (isSetup) {
                 appliedInstaller = installer;
@@ -38,10 +34,10 @@ public class ChallengeInstallerManager {
         }
 
         if (appliedInstaller != null) {
-            log.info("successfully applied installer {} {}", appliedInstaller.provider(), challenge.domain());
+            log.info("install successfully applied installer {} {}", appliedInstaller.getClass().getSimpleName(), challenge.domain());
             return true;
         } else {
-            log.warn("did not find any installer for {} , {}", challenge.challengeType(), challenge.domain());
+            log.warn("install did not find any installer for {} , {}", challenge.challengeType(), challenge.domain());
             return false;
         }
     }
@@ -58,13 +54,13 @@ public class ChallengeInstallerManager {
             }
         }
         if (appliedInstaller != null) {
-            log.info(appliedInstaller.provider());
+            log.info("clean successfully applied installer {} {}", appliedInstaller.getClass().getSimpleName(), challenge.domain());
         } else {
-            log.info("");
+            log.warn("clean did not find any installer for {} , {}", challenge.challengeType(), challenge.domain());
         }
     }
 
     public InputStream getHttpValidationToken(HttpValidationToken validationToken) {
-        return httpVerifyProvider.getInstance().getValidationFile(validationToken);
+        return httpVerifyProvider.getInstance(null).readVerifyFile(validationToken);
     }
 }

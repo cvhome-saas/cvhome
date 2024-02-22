@@ -1,9 +1,9 @@
-package com.asrevo.cvhome.domaincertificatemanager.service.impl;
+package com.asrevo.cvhome.domaincertificatemanager.service.verify.http;
 
 import com.asrevo.cvhome.domaincertificatemanager.domain.HttpValidationToken;
 import com.asrevo.cvhome.domaincertificatemanager.domain.challenges.HttpChallenge;
-import com.asrevo.cvhome.domaincertificatemanager.service.FileService;
-import com.asrevo.cvhome.domaincertificatemanager.service.HttpChallengeVerifyService;
+import com.asrevo.cvhome.domaincertificatemanager.service.storage.FileService;
+import com.asrevo.cvhome.domaincertificatemanager.service.storage.impl.S3FileServiceImpl;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -30,7 +30,7 @@ public class S3HttpChallengeVerifyServiceImpl implements HttpChallengeVerifyServ
     }
 
     @Override
-    public boolean create(HttpChallenge challenge) {
+    public boolean createHttpVerifyFile(HttpChallenge challenge) {
         try {
             File http01Temp = Files.createTempFile("domain", ".http01").toFile();
             FileWriter http01FileWriter = new FileWriter(http01Temp);
@@ -47,8 +47,13 @@ public class S3HttpChallengeVerifyServiceImpl implements HttpChallengeVerifyServ
     }
 
     @Override
-    public InputStream getValidationFile(HttpValidationToken token) {
+    public InputStream readVerifyFile(HttpValidationToken token) {
         String fileName = resolveS3Uri(token.encoded(), this.tokenRoot);
         return fileService.getFile(fileName);
+    }
+
+    @Override
+    public boolean clean(HttpChallenge challenge) {
+        return false;
     }
 }

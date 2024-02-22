@@ -1,6 +1,6 @@
-package com.asrevo.cvhome.domaincertificatemanager.service.impl;
+package com.asrevo.cvhome.domaincertificatemanager.service.storage.impl;
 
-import com.asrevo.cvhome.domaincertificatemanager.service.FileService;
+import com.asrevo.cvhome.domaincertificatemanager.service.storage.FileService;
 import lombok.SneakyThrows;
 
 import java.io.File;

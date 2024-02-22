@@ -48,16 +48,17 @@ com:
       default-domain: "cvhome.click"
     dcm:
       challenge-config:
-        dns-config:
+        acm-file-provider: table
+        acm-table-config:
+          directory: "nothing"
+        dns-installer-config:
           providers:
             - route53
-          route53-config:
-            zone-id: "s"
-        http-config:
-          provider: s3
-          s3-config:
-            bucket: "cvhome-cert-storage"
-        tls-alpn01-config:
-          provider: s3
-          s3-config:
-            bucket: "cvhome-cert-storage"
+        http-installer-config:
+          installer-file-provider: table
+          installer-table-config:
+            directory: "nothing"
+        tls-alpn01-installer-config:
+          installer-file-provider: table
+          installer-table-config:
+            directory: "nothing"

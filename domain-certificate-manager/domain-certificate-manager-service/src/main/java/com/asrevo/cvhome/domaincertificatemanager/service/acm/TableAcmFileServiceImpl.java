@@ -1,9 +1,9 @@
-package com.asrevo.cvhome.domaincertificatemanager.service.impl;
+package com.asrevo.cvhome.domaincertificatemanager.service.acm;
 
 import com.asrevo.cvhome.domaincertificatemanager.commons.domain.CertificateFileType;
 import com.asrevo.cvhome.domaincertificatemanager.commons.domain.Domain;
-import com.asrevo.cvhome.domaincertificatemanager.service.AcmFileService;
-import lombok.SneakyThrows;
+import com.asrevo.cvhome.domaincertificatemanager.repository.FilesRepository;
+import com.asrevo.cvhome.domaincertificatemanager.service.storage.impl.TableFileServiceImpl;
 import org.shredzone.acme4j.toolbox.AcmeUtils;
 import org.shredzone.acme4j.util.CSRBuilder;
 import org.shredzone.acme4j.util.KeyPairUtils;
@@ -12,46 +12,33 @@ import org.springframework.core.io.InputStreamResource;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.KeyPair;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
-public class LocalAcmFileServiceImpl implements AcmFileService {
-    private final LocalFileServiceImpl fileService;
-    private Path acmRoot;
+import static com.asrevo.cvhome.domaincertificatemanager.entity.FileEntity.resolveFileUri;
 
-    public LocalAcmFileServiceImpl() {
-        this.fileService = new LocalFileServiceImpl();
-        acmRoot = createAcmBaseDirectory();
-    }
+public class TableAcmFileServiceImpl implements AcmFileService {
+    private final TableFileServiceImpl fileService;
+    private final String acmRoot = "acm";
 
-    @SneakyThrows
-    private static void createParentDirectory(Path destination) {
-        if (!destination.getParent().toFile().exists()) {
-            Files.createDirectories(destination.getParent());
-        }
-    }
-
-    private Path createAcmBaseDirectory() {
-        this.acmRoot = Paths.get(System.getProperty("user.home"), "cvhome/domain-certificate-manager/acm");
-        createParentDirectory(this.acmRoot);
-        return this.acmRoot;
+    public TableAcmFileServiceImpl(FilesRepository filesRepository) {
+        this.fileService = new TableFileServiceImpl(filesRepository);
     }
 
 
     @Override
     public KeyPair generateOrGetKeyPair(Domain domain) throws IOException {
-        Path domainKeyPath = acmRoot.resolve(Paths.get(domain.encoded(), CertificateFileType.KEY.getFile()));
-        if (fileService.exist(domainKeyPath.toString())) {
-            InputStream stream = fileService.getFile(domainKeyPath.toString());
+        String fileName = resolveFileUri(this.acmRoot, domain.encoded(), CertificateFileType.KEY.getFile());
+        if (fileService.exist(fileName)) {
+            InputStream stream = fileService.getFile(fileName);
             return KeyPairUtils.readKeyPair(new InputStreamReader(stream));
         } else {
             KeyPair domainKeyPair = KeyPairUtils.createKeyPair(2048);
             Path domainPath = Files.createTempFile("domain", ".key");
             FileWriter fileWriter = new FileWriter(domainPath.toFile());
             KeyPairUtils.writeKeyPair(domainKeyPair, fileWriter);
-            fileService.upload(domainPath.toFile(), domainKeyPath.toString());
+            fileService.upload(domainPath.toFile(), fileName);
             return domainKeyPair;
         }
     }
@@ -61,8 +48,8 @@ public class LocalAcmFileServiceImpl implements AcmFileService {
         File domainCsrTemp = Files.createTempFile("domain", ".csr").toFile();
         FileWriter csrFileWriter = new FileWriter(domainCsrTemp);
         csrBuilder.write(csrFileWriter);
-        Path csrPath = acmRoot.resolve(Paths.get(domain.encoded(), CertificateFileType.CSR.getFile()));
-        fileService.upload(domainCsrTemp, csrPath.toString());
+        String fileName = resolveFileUri(this.acmRoot, domain.encoded(), CertificateFileType.CSR.getFile());
+        fileService.upload(domainCsrTemp, fileName);
     }
 
     @Override
@@ -77,13 +64,14 @@ public class LocalAcmFileServiceImpl implements AcmFileService {
                 throw new IOException("Encoding error", ex);
             }
         }
-        Path certificatePath = acmRoot.resolve(Paths.get(domain.encoded(), CertificateFileType.CRT.getFile()));
-        fileService.upload(domainCrt, certificatePath.toString());
+        String fileName = resolveFileUri(this.acmRoot, domain.encoded(), CertificateFileType.CRT.getFile());
+        fileService.upload(domainCrt, fileName);
+
     }
 
     @Override
     public InputStreamResource getCertificateFile(Domain domain, CertificateFileType fileType) {
-        String fileName = acmRoot.resolve(Paths.get(domain.encoded(), fileType.getFile())).toString();
+        String fileName = resolveFileUri(this.acmRoot, domain.encoded(), fileType.getFile());
         if (fileService.exist(fileName)) {
             return new InputStreamResource(fileService.getFile(fileName));
         } else {

@@ -4,8 +4,9 @@ import com.asrevo.cvhome.domaincertificatemanager.commons.domain.CertificateFile
 import com.asrevo.cvhome.domaincertificatemanager.commons.domain.Domain;
 import com.asrevo.cvhome.domaincertificatemanager.commons.domain.OrderLocation;
 import com.asrevo.cvhome.domaincertificatemanager.domain.DomainCertificate;
-import com.asrevo.cvhome.domaincertificatemanager.service.AcmFileService;
 import com.asrevo.cvhome.domaincertificatemanager.service.AcmeManagerService;
+import com.asrevo.cvhome.domaincertificatemanager.service.acm.AcmFileService;
+import com.asrevo.cvhome.domaincertificatemanager.service.acm.AcmFileServiceProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.shredzone.acme4j.*;
 import org.shredzone.acme4j.challenge.Challenge;

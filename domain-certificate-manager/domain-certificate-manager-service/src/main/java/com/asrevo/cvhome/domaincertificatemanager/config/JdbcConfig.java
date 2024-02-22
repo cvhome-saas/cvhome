@@ -8,6 +8,7 @@ import com.asrevo.cvhome.domaincertificatemanager.commons.domain.CertificateId;
 import com.asrevo.cvhome.domaincertificatemanager.commons.domain.DomainId;
 import com.asrevo.cvhome.domaincertificatemanager.commons.domain.OrdersId;
 import com.asrevo.cvhome.domaincertificatemanager.config.converters.*;
+import com.asrevo.cvhome.domaincertificatemanager.entity.FileId;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -74,6 +75,12 @@ public class JdbcConfig extends AbstractJdbcConfiguration {
             @Override
             public IdentityId convert(String source) {
                 return new IdentityId(source);
+            }
+        });
+        converters.add(new Converter<String, FileId>() {
+            @Override
+            public FileId convert(String source) {
+                return new FileId(source);
             }
         });
 

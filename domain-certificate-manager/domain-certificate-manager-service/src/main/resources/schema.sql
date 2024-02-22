@@ -72,3 +72,11 @@ CREATE TABLE IF NOT EXISTS owner_domain_ref
     constraint owner_domain_ref_owner_id_fk foreign key (owner_id) references owner,
     constraint owner_domain_ref_domain_id_fk foreign key (domain_id) references domain
 );
+
+CREATE TABLE IF NOT EXISTS files
+(
+    id      varchar(24)   not null,
+    path    varchar(128),
+    content varchar(2048) not null
+);
+

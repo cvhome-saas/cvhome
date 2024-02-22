@@ -1,4 +1,4 @@
-package com.asrevo.cvhome.domaincertificatemanager.service;
+package com.asrevo.cvhome.domaincertificatemanager.service.storage;
 
 import java.io.File;
 import java.io.InputStream;

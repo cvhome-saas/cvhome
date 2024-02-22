@@ -1,7 +1,7 @@
-package com.asrevo.cvhome.domaincertificatemanager.service.impl;
+package com.asrevo.cvhome.domaincertificatemanager.service.storage.impl;
 
 import com.asrevo.cvhome.domaincertificatemanager.domain.S3KeyPath;
-import com.asrevo.cvhome.domaincertificatemanager.service.FileService;
+import com.asrevo.cvhome.domaincertificatemanager.service.storage.FileService;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.HeadObjectRequest;

@@ -9,7 +9,5 @@ public interface ChallengeInstaller {
 
     boolean clean(ChallengeInstall challenge);
 
-    String provider();
-
     ChallengeValidationType type();
 }

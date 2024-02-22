@@ -1,4 +1,4 @@
-package com.asrevo.cvhome.domaincertificatemanager.service;
+package com.asrevo.cvhome.domaincertificatemanager.service.verify.http;
 
 import com.asrevo.cvhome.domaincertificatemanager.domain.HttpValidationToken;
 import com.asrevo.cvhome.domaincertificatemanager.domain.challenges.HttpChallenge;
@@ -6,7 +6,9 @@ import com.asrevo.cvhome.domaincertificatemanager.domain.challenges.HttpChalleng
 import java.io.InputStream;
 
 public interface HttpChallengeVerifyService {
-    boolean create(HttpChallenge challenge);
+    boolean createHttpVerifyFile(HttpChallenge challenge);
 
-    InputStream getValidationFile(HttpValidationToken token);
+    InputStream readVerifyFile(HttpValidationToken token);
+
+    boolean clean(HttpChallenge challenge);
 }

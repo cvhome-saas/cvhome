@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.domaincertificatemanager;
 
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -16,6 +17,15 @@ public class TestDomainCertificateManagerApplication {
     @ServiceConnection
     static PostgreSQLContainer<?> postgresContainer() {
         return new PostgreSQLContainer<>(DockerImageName.parse("postgres:13"));
+    }
+
+    @Bean
+    CommandLineRunner runner(PostgreSQLContainer<?> postgresContainer) {
+        return args -> {
+            System.out.println(postgresContainer.getJdbcUrl());
+            System.out.println(postgresContainer.getUsername());
+            System.out.println(postgresContainer.getPassword());
+        };
     }
 
     public static void main(String[] args) {

@@ -1,4 +1,4 @@
-package com.asrevo.cvhome.domaincertificatemanager.service;
+package com.asrevo.cvhome.domaincertificatemanager.service.acm;
 
 import com.asrevo.cvhome.domaincertificatemanager.commons.domain.CertificateFileType;
 import com.asrevo.cvhome.domaincertificatemanager.commons.domain.Domain;

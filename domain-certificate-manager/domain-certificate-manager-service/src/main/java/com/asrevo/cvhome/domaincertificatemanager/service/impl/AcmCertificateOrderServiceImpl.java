@@ -65,7 +65,7 @@ public class AcmCertificateOrderServiceImpl implements AcmCertificateOrderServic
                     ordersService.save(it);
                     this.prepareOrderValidation(orderId);
                 } catch (Exception e) {
-                    log.error("error when requesting order for order {} , {}", orderId,e.getMessage());
+                    log.error("error when requesting order for order {} , {}", orderId, e.getMessage());
                 }
             } else {
                 log.warn("request to do order certificate for status {} and orderId {}", it.getCertificateOrderStatus(), orderId);

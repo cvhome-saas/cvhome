@@ -1,9 +1,9 @@
-package com.asrevo.cvhome.domaincertificatemanager.service.impl;
+package com.asrevo.cvhome.domaincertificatemanager.service.verify.http;
 
 import com.asrevo.cvhome.domaincertificatemanager.domain.HttpValidationToken;
 import com.asrevo.cvhome.domaincertificatemanager.domain.challenges.HttpChallenge;
-import com.asrevo.cvhome.domaincertificatemanager.service.FileService;
-import com.asrevo.cvhome.domaincertificatemanager.service.HttpChallengeVerifyService;
+import com.asrevo.cvhome.domaincertificatemanager.service.storage.FileService;
+import com.asrevo.cvhome.domaincertificatemanager.service.storage.impl.LocalFileServiceImpl;
 import lombok.SneakyThrows;
 
 import java.io.File;
@@ -36,7 +36,7 @@ public class LocalHttpChallengeVerifyServiceImpl implements HttpChallengeVerifyS
     }
 
     @Override
-    public boolean create(HttpChallenge challenge) {
+    public boolean createHttpVerifyFile(HttpChallenge challenge) {
         try {
             File http01Temp = Files.createTempFile("domain", ".http01").toFile();
             FileWriter http01FileWriter = new FileWriter(http01Temp);
@@ -53,7 +53,12 @@ public class LocalHttpChallengeVerifyServiceImpl implements HttpChallengeVerifyS
     }
 
     @Override
-    public InputStream getValidationFile(HttpValidationToken token) {
+    public InputStream readVerifyFile(HttpValidationToken token) {
         return fileService.getFile(tokenRoot.resolve(token.encoded()).toString());
+    }
+
+    @Override
+    public boolean clean(HttpChallenge challenge) {
+        return false;
     }
 }
