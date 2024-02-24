@@ -61,7 +61,7 @@ public class SecurityConfig {
     @Bean
     public WebSessionIdResolver webSessionIdResolver() {
         CookieWebSessionIdResolver resolver = new CookieWebSessionIdResolver();
-        resolver.setCookieName("GATEWAY-JSESSIONID");
+        resolver.setCookieName("CORE-GATEWAY-JSESSIONID");
         resolver.addCookieInitializer((builder) -> builder.path("/"));
         return resolver;
     }
