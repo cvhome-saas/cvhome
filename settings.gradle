@@ -22,20 +22,24 @@ plugins {
 
 rootProject.name = 'cvhome'
 include(
-        'ecs:fargate-task-info',
-        'ecs:ecs-service-discoveryclient',
-        'cvhome-commons',
-        'auth',
-        'https-redirect',
-        'domain-certificate-manager:domain-certificate-manager-commons',
-        'domain-certificate-manager:domain-certificate-manager-events',
-        'domain-certificate-manager:domain-certificate-manager-service',
-        'store:store-commons',
-        'store:store-events',
-        'store:store-service',
-        'streamer:streamer-service',
-        'gateway:gateway-service',
-        'ui:admin-ui',
-        'ui:store-ui',
-        'ui:welcome-ui',
+        'commons:ecs-commons:fargate-task-info',
+        'commons:ecs-commons:ecs-service-discoveryclient',
+        'commons:cvhome-commons',
+
+        'core:gateway:gateway-service',
+        'core:admin-ui',
+        'core:welcome-ui',
+        'core:auth',
+        'core:domain-certificate-manager:domain-certificate-manager-commons',
+        'core:domain-certificate-manager:domain-certificate-manager-events',
+        'core:domain-certificate-manager:domain-certificate-manager-service',
+
+        'store:gateway:gateway-service',
+        'store:store-ui',
+        'store:store:store-commons',
+        'store:store:store-events',
+        'store:store:store-service',
+
+        'saas:gateway:gateway-service',
+
 )
