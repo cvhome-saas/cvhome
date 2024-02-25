@@ -36,10 +36,15 @@ spring:
                 metadata:
                   service-name: store-ui
                   instance: store-ui-1
+            domain-certificate-manager:
+              - uri: "http://localhost:8082"
+                metadata:
+                  service-name: domain-certificate-manager
+                  instance: domain-certificate-manager-1
     gateway:
       discovery:
         locator:
-          enabled: true
+          enabled: false
       default-filters:
         - TokenRelay
         - PreserveHostHeader
@@ -49,11 +54,11 @@ spring:
           uri: lb://store
           predicates:
             - Path=/store/**
-            - FHost={sub}.{domain}.{x}
-            - Header=Map-Host-As-Request-Param, true
+            - FHost={domain}.{x},{sub}.{domain}.{x}
+            - Header=Map-Host-As-Request-Param,true
           filters:
             - StripPrefix=1
-            - MapHostAsRequestParam=userId
+            - MapHostAsRequestParam=storeId
         - id: store
           uri: lb://store
           predicates:
@@ -63,4 +68,4 @@ spring:
         - id: store-ui
           uri: lb://store-ui
           predicates:
-            - FHost={sub}.{domain}.{x} , {domain}.{x}
+            - FHost={domain}.{x},{sub}.{domain}.{x}

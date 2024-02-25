@@ -49,7 +49,7 @@ spring:
     gateway:
       discovery:
         locator:
-          enabled: true
+          enabled: false
       default-filters:
         - TokenRelay
         - PreserveHostHeader

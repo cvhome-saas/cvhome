@@ -58,5 +58,6 @@ logging:
   level:
     org.springframework.boot: debug
     org.springframework.web: debug
+    org.springframework.cloud.gateway: debug
     org.springframework.security: debug
     reactor.netty.http: debug

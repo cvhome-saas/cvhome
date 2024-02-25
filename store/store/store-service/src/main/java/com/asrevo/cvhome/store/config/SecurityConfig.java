@@ -13,14 +13,15 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @Configuration
 @EnableWebFluxSecurity
 public class SecurityConfig {
-    @Bean
-    SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
-        // @formatter:off
+  @Bean
+  SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
+    // @formatter:off
         return http
                 .authorizeExchange(it ->
                         it
                                 .pathMatchers("/actuator", "/actuator/*/**").permitAll()
                                 .pathMatchers("api/v1/test/sign").permitAll()
+                                .pathMatchers("api/v1/public/**").permitAll()
                                 .anyExchange().authenticated()
                 )
                 .oauth2ResourceServer(it ->
@@ -29,13 +30,13 @@ public class SecurityConfig {
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .build();
         // @formatter:on
-    }
+  }
 
-    @Bean
-    public ReactiveJwtAuthenticationConverter converter() {
-        ReactiveJwtAuthenticationConverter converter = new ReactiveJwtAuthenticationConverter();
-        KeyClockJwtGrantedAuthoritiesConverter keyClockJwtGrantedAuthoritiesConverter = new KeyClockJwtGrantedAuthoritiesConverter();
-        converter.setJwtGrantedAuthoritiesConverter(source -> Flux.fromIterable(keyClockJwtGrantedAuthoritiesConverter.convert(source)));
-        return converter;
-    }
+  @Bean
+  public ReactiveJwtAuthenticationConverter converter() {
+    ReactiveJwtAuthenticationConverter converter = new ReactiveJwtAuthenticationConverter();
+    KeyClockJwtGrantedAuthoritiesConverter keyClockJwtGrantedAuthoritiesConverter = new KeyClockJwtGrantedAuthoritiesConverter();
+    converter.setJwtGrantedAuthoritiesConverter(source -> Flux.fromIterable(keyClockJwtGrantedAuthoritiesConverter.convert(source)));
+    return converter;
+  }
 }

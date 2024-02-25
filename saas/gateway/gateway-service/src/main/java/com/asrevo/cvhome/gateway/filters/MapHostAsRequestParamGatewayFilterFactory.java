@@ -74,7 +74,7 @@ public class MapHostAsRequestParamGatewayFilterFactory extends AbstractGatewayFi
                             .flatMap(itx -> {
                                 if (itx.getStatusCode().isSameCodeAs(HttpStatus.OK)) {
                                     if (itx.getBody() != null && itx.getBody().domain() != null) {
-                                        ServerHttpRequest request = createHttpRequestWithNewParams(config, exchange, uri, itx.getBody().domain());
+                                        ServerHttpRequest request = createHttpRequestWithNewParams(config, exchange, uri, itx.getBody().reference());
                                         return chain.filter(exchange.mutate().request(request).build());
                                     }
                                 }

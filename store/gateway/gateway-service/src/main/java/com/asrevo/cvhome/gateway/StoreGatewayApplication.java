@@ -7,9 +7,9 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 
 @SpringBootApplication
 @EnableConfigurationProperties(value = {FargateProperties.class})
-public class GatewayApplication {
+public class StoreGatewayApplication {
   @lombok.Generated
   public static void main(String[] args) {
-    SpringApplication.run(GatewayApplication.class, args);
+    SpringApplication.run(StoreGatewayApplication.class, args);
   }
 }

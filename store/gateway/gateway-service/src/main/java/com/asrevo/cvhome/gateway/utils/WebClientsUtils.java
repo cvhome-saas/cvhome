@@ -8,8 +8,8 @@ public class WebClientsUtils {
     public static <T> T build(WebClient.Builder builder, String url, Class<T> tClass) {
         WebClient client = builder.baseUrl(url).build();
 
-        WebClientAdapter clientAdapter = WebClientAdapter.forClient(client);
-        HttpServiceProxyFactory proxy = HttpServiceProxyFactory.builder(clientAdapter)
+        WebClientAdapter clientAdapter = WebClientAdapter.create(client);
+        HttpServiceProxyFactory proxy = HttpServiceProxyFactory.builderFor(clientAdapter)
 
                 .build();
         return proxy.createClient(tClass);

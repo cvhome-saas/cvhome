@@ -6,9 +6,9 @@ import org.springframework.boot.test.context.TestConfiguration;
 
 @TestConfiguration(proxyBeanMethods = false)
 @SpringBootApplication
-public class TestGatewayApplication {
+public class TestSaasGatewayApplication {
     public static void main(String[] args) {
-        SpringApplication.from(GatewayApplication::main).with(TestGatewayApplication.class).run(args);
+        SpringApplication.from(SaasGatewayApplication::main).with(TestSaasGatewayApplication.class).run(args);
     }
 
 }
