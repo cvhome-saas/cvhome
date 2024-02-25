@@ -1,16 +1,32 @@
 package com.asrevo.cvhome.domaincertificatemanager.config;
 
+import com.asrevo.cvhome.commons.domain.IdentityId;
+import com.asrevo.cvhome.commons.event.EventId;
+import com.asrevo.cvhome.domaincertificatemanager.commons.domain.CertificateId;
+import com.asrevo.cvhome.domaincertificatemanager.commons.domain.DomainId;
+import com.asrevo.cvhome.domaincertificatemanager.commons.domain.OrdersId;
+import com.asrevo.cvhome.domaincertificatemanager.entity.FileId;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
+import org.springdoc.core.utils.SpringDocUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class SwaggerConfig {
+  static {
+    SpringDocUtils.getConfig().replaceWithClass(CertificateId.class, String.class);
+    SpringDocUtils.getConfig().replaceWithClass(DomainId.class, String.class);
+    SpringDocUtils.getConfig().replaceWithClass(OrdersId.class, String.class);
+    SpringDocUtils.getConfig().replaceWithClass(EventId.class, String.class);
+    SpringDocUtils.getConfig().replaceWithClass(IdentityId.class, String.class);
+    SpringDocUtils.getConfig().replaceWithClass(FileId.class, String.class);
+  }
+
   @Bean
   public OpenAPI customOpenAPI() {
     String name = "bearer-key";
