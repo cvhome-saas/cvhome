@@ -20,6 +20,7 @@ public class SecurityConfig {
                 .authorizeExchange(it ->
                         it
                                 .pathMatchers("/actuator", "/actuator/*/**").permitAll()
+                                .pathMatchers("swagger-ui.html","webjars/swagger-ui/**","api-docs","api-docs/**").permitAll()
                                 .pathMatchers(".well-known/acme-challenge/*").permitAll()
                                 .pathMatchers("api/v1/test/sign").permitAll()
                                 .pathMatchers("api/v1/public/**").permitAll()
