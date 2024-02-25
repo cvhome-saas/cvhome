@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.gateway.filters;
 
+import com.asrevo.cvhome.domaincertificatemanager.commons.domain.Domain;
 import com.asrevo.cvhome.gateway.models.DomainReference;
 import com.asrevo.cvhome.gateway.service.DomainReferenceService;
 import lombok.Getter;
@@ -68,7 +69,7 @@ public class MapHostAsRequestParamGatewayFilterFactory extends AbstractGatewayFi
             URI uri = exchange.getRequest().getURI();
             String hostName = exchange.getRequest().getHeaders().getHost().getHostName();
             if (checkingIfHostMappingNeeded(exchange, config)) {
-                Mono<ResponseEntity<DomainReference>> domainReferenceResponse = this.domainReferenceService.getDomainReference(hostName);
+                Mono<ResponseEntity<DomainReference>> domainReferenceResponse = this.domainReferenceService.getReference(new Domain(hostName));
                 try {
                     return domainReferenceResponse
                             .flatMap(itx -> {

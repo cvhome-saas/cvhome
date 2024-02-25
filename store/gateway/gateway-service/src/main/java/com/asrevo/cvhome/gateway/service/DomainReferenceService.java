@@ -1,14 +1,15 @@
 package com.asrevo.cvhome.gateway.service;
 
+import com.asrevo.cvhome.domaincertificatemanager.commons.domain.Domain;
 import com.asrevo.cvhome.gateway.models.DomainReference;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.service.annotation.GetExchange;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.service.annotation.HttpExchange;
+import org.springframework.web.service.annotation.PostExchange;
 import reactor.core.publisher.Mono;
 
-@HttpExchange("api/v1/domain-reference")
+@HttpExchange("api/v1/domain-ownership")
 public interface DomainReferenceService {
-    @GetExchange("/get-domain-reference")
-    Mono<ResponseEntity<DomainReference>> getDomainReference(@RequestParam(name = "domain") String domain);
+  @PostExchange("/get-reference")
+  Mono<ResponseEntity<DomainReference>> getReference(@RequestBody Domain domain);
 }

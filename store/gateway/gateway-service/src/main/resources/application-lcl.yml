@@ -19,48 +19,23 @@ spring:
         provider:
           keycloak:
             jwk-set-uri: http://localhost:9999/realms/cvhome/protocol/openid-connect/certs
-            authorization-uri: https://auth.${com.asrevo.cvhome.ssl.default-domain}:${server.port}/realms/cvhome/protocol/openid-connect/auth
+            authorization-uri: http://auth.${com.asrevo.cvhome.ssl.default-domain}:${server.port}/realms/cvhome/protocol/openid-connect/auth
             token-uri: http://localhost:9999/realms/cvhome/protocol/openid-connect/token
   cloud:
     discovery:
       client:
         simple:
           instances:
-            domain-certificate-manager:
-              - uri: "http://localhost:8082"
-                metadata:
-                  service-name: domain-certificate-manager
-                  instance: domain-certificate-manager-1
             store:
               - uri: "http://localhost:8083"
                 metadata:
                   service-name: store
                   instance: store-1
-            streamer:
-              - uri: "http://localhost:8083"
-                metadata:
-                  service-name: streamer
-                  instance: streamer-1
-            auth:
-              - uri: "http://localhost:9999"
-                metadata:
-                  service-name: auth
-                  instance: auth-1
-            admin-ui:
-              - uri: "http://localhost:4200"
-                metadata:
-                  service-name: admin-ui
-                  instance: admin-ui-1
             store-ui:
               - uri: "http://localhost:4300"
                 metadata:
                   service-name: store-ui
                   instance: store-ui-1
-            welcome-ui:
-              - uri: "http://localhost:4400"
-                metadata:
-                  service-name: welcome-ui
-                  instance: welcome-ui-1
     gateway:
       discovery:
         locator:
@@ -70,53 +45,22 @@ spring:
         - PreserveHostHeader
         - AddResponseHeader=X-Frame-Options, SAMEORIGIN
       routes:
-        - id: domain
-          uri: lb://domain
+        - id: mapped-store
+          uri: lb://store
           predicates:
-            - Path=/domain/**
+            - Path=/store/**
+            - FHost={sub}.{domain}.{x}
+            - Header=Map-Host-As-Request-Param, true
           filters:
             - StripPrefix=1
-        - id: domain-certificate-manager
-          uri: lb://domain-certificate-manager
-          predicates:
-            - Path=/domain-certificate-manager/**
-          filters:
-            - StripPrefix=1
+            - MapHostAsRequestParam=userId
         - id: store
           uri: lb://store
           predicates:
             - Path=/store/**
           filters:
             - StripPrefix=1
-        - id: auth
-          uri: lb://auth
-          predicates:
-            - FHost=auth.${com.asrevo.cvhome.ssl.default-domain}
-        - id: realms
-          uri: lb://auth
-          predicates:
-            - Path=/realms/**
-          filters:
-            - SetRequestHostHeader=auth.${com.asrevo.cvhome.ssl.default-domain}:8443
-        - id: resources
-          uri: lb://auth
-          predicates:
-            - Path=/resources/**
-        - id: js
-          uri: lb://auth
-          predicates:
-            - Path=/js/**
-        - id: welcome-ui
-          uri: lb://welcome-ui
-          predicates:
-            - FHost=www.${com.asrevo.cvhome.ssl.default-domain},${com.asrevo.cvhome.ssl.default-domain}
-        - id: admin-ui
-          uri: lb://admin-ui
-          predicates:
-            - FHost=admin.${com.asrevo.cvhome.ssl.default-domain}
         - id: store-ui
           uri: lb://store-ui
           predicates:
-            - FHost={domain}.{x},{sub}.{domain}.{x}
-          filters:
-            - MapHostAsRequestParam=userId
+            - FHost={sub}.{domain}.{x} , {domain}.{x}
