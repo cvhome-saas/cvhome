@@ -22,35 +22,36 @@ spring:
             authorization-uri: http://auth.${com.asrevo.cvhome.ssl.default-domain}:${server.port}/realms/cvhome/protocol/openid-connect/auth
             token-uri: http://localhost:9999/realms/cvhome/protocol/openid-connect/token
   cloud:
-    discovery:
-      client:
-        simple:
-          instances:
-            store:
-              - uri: "http://localhost:8083"
-                metadata:
-                  service-name: store
-                  instance: store-1
-            store-ui:
-              - uri: "http://localhost:4300"
-                metadata:
-                  service-name: store-ui
-                  instance: store-ui-1
-            domain-certificate-manager:
-              - uri: "http://localhost:8082"
-                metadata:
-                  service-name: domain-certificate-manager
-                  instance: domain-certificate-manager-1
+    local:
+      discovery:
+        enabled: true
+        services:
+          store:
+            - url: "http://localhost:8083"
+              metadata:
+                service-name: store
+                instance: store-1
+          store-ui:
+            - url: "http://localhost:4300"
+              metadata:
+                service-name: store-ui
+                instance: store-ui-1
+          domain-certificate-manager:
+            - url: "http://localhost:8082"
+              metadata:
+                service-name: domain-certificate-manager
+                instance: domain-certificate-manager-1
     gateway:
       discovery:
         locator:
-          enabled: false
+          enabled: true
       default-filters:
         - TokenRelay
         - PreserveHostHeader
         - AddResponseHeader=X-Frame-Options, SAMEORIGIN
       routes:
         - id: mapped-store
+          order: -1
           uri: lb://store
           predicates:
             - Path=/store/**
@@ -60,12 +61,14 @@ spring:
             - StripPrefix=1
             - MapHostAsRequestParam=storeId
         - id: store
+          order: -1
           uri: lb://store
           predicates:
             - Path=/store/**
           filters:
             - StripPrefix=1
         - id: store-ui
+          order: -1
           uri: lb://store-ui
           predicates:
             - FHost={domain}.{x},{sub}.{domain}.{x}
