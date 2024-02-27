@@ -1,8 +1,9 @@
-package com.asrevo.cvhome.gateway;
+package com.asrevo.cvhome.gateway.mocks;
 
 import org.mockserver.client.MockServerClient;
 import org.mockserver.model.JsonBody;
 import org.mockserver.model.MediaType;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -30,9 +31,9 @@ public class MockDomainCertificateManagerServerConfig {
   }
 
   @Bean
-  public CommandLineRunner domainCertificateManagerRunner(MockServerContainer mockServer) {
+  public CommandLineRunner domainCertificateManagerRunner(@Qualifier("domainCertificateManagerMockServer") MockServerContainer domainCertificateManagerMockServer) {
     return args -> {
-      MockServerClient mockServerClient = new MockServerClient(mockServer.getHost(), mockServer.getServerPort());
+      MockServerClient mockServerClient = new MockServerClient(domainCertificateManagerMockServer.getHost(), domainCertificateManagerMockServer.getServerPort());
       mockServerClient
         .when(
           request()
