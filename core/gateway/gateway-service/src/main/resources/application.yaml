@@ -28,7 +28,7 @@ com:
           namespace: core.cvhome.lcl
 spring:
   application:
-    name: gateway
+    name: coreGateway
   security:
     oauth2:
       client:

@@ -5,7 +5,7 @@ com:
         default-domain: "gateway.com"
 spring:
   application:
-    name: gateway
+    name: saasGateway
   security:
     oauth2:
       client:
