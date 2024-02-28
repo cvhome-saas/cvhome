@@ -1,8 +1,3 @@
-com:
-  asrevo:
-    cvhome:
-      fargate:
-        namespace: "cvhome.lcl"
 spring:
   security:
     oauth2:
@@ -24,7 +19,7 @@ spring:
         provider:
           keycloak:
             jwk-set-uri: ${com.asrevo.cvhome.services.auth.schema}://auth.${com.asrevo.cvhome.services.auth.namespace}:${com.asrevo.cvhome.services.auth.port}/realms/cvhome/protocol/openid-connect/certs
-            authorization-uri: ${com.asrevo.cvhome.services.coreGateway.schema}://${com.asrevo.cvhome.services.auth.domain}:${com.asrevo.cvhome.services.coreGateway.port}/realms/cvhome/protocol/openid-connect/auth
+            authorization-uri: ${com.asrevo.cvhome.services.core-gateway.schema}://${com.asrevo.cvhome.services.auth.domain}:${com.asrevo.cvhome.services.core-gateway.port}/realms/cvhome/protocol/openid-connect/auth
             token-uri: ${com.asrevo.cvhome.services.auth.schema}://auth.${com.asrevo.cvhome.services.auth.namespace}:${com.asrevo.cvhome.services.auth.port}/realms/cvhome/protocol/openid-connect/token
   cloud:
     loadbalancer:
@@ -70,7 +65,7 @@ spring:
           predicates:
             - Path=/realms/**
           filters:
-            - SetRequestHostHeader=${com.asrevo.cvhome.services.auth.domain}:${com.asrevo.cvhome.services.coreGateway.port}
+            - SetRequestHostHeader=${com.asrevo.cvhome.services.auth.domain}:${com.asrevo.cvhome.services.core-gateway.port}
         - id: resources
           uri: lb://auth
           predicates:
@@ -82,8 +77,8 @@ spring:
         - id: welcome-ui
           uri: lb://welcome-ui
           predicates:
-            - FHost=www.${com.asrevo.cvhome.services.coreGateway.domain},${com.asrevo.cvhome.services.coreGateway.domain}
+            - FHost=www.${com.asrevo.cvhome.services.core-gateway.domain},${com.asrevo.cvhome.services.core-gateway.domain}
         - id: admin-ui
           uri: lb://admin-ui
           predicates:
-            - FHost=admin.${com.asrevo.cvhome.services.coreGateway.domain}
+            - FHost=admin.${com.asrevo.cvhome.services.core-gateway.domain}

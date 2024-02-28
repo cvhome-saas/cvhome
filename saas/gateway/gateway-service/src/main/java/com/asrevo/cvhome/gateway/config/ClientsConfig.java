@@ -6,12 +6,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.core.env.Environment;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
-
-import java.util.Arrays;
-import java.util.HashSet;
 
 import static com.asrevo.cvhome.gateway.utils.WebClientsUtils.build;
 import static org.springframework.http.HttpMethod.POST;
@@ -20,19 +16,21 @@ import static org.springframework.http.HttpMethod.POST;
 public class ClientsConfig {
 
     @Bean
-    public AcmService acmService(RestTemplate template, Environment environment, FargateProperties properties) {
+    public AcmService acmService(RestTemplate template, ServiceDomainProperties serviceDomainProperties) {
         ParameterizedTypeReference<byte[]> responseType = new ParameterizedTypeReference<>() {
         };
-        boolean isFargateEnv = new HashSet<>(Arrays.asList(environment.getActiveProfiles())).contains("fargate");
-        String suffix = isFargateEnv ? "." + properties.getNamespace() : "";
+        ServiceDomain gatewayService = serviceDomainProperties.services().get("core-gateway");
+        String domainCertificateManagerUrl = gatewayService.getServiceHost("domain-certificate-manager");
         return (domain, fileType) -> {
-            String url = "http://domain-certificate-manager" + suffix + ":8082/api/v1/acm/domain-certificate-file?domain=" + domain + "&fileType=" + fileType.name();
+            String url = domainCertificateManagerUrl + "/api/v1/acm/domain-certificate-file?domain=" + domain + "&fileType=" + fileType.name();
             return template.exchange(url, POST, null, responseType);
         };
     }
 
     @Bean
-    public DomainReferenceService domainReferenceService(@Qualifier("defaultMicroServiceBuilder") WebClient.Builder builder) {
-        return build(builder, "lb://domain-ownership", DomainReferenceService.class);
+    public DomainReferenceService domainReferenceService(@Qualifier("defaultBuilder") WebClient.Builder builder, ServiceDomainProperties serviceDomainProperties) {
+        ServiceDomain gatewayService = serviceDomainProperties.services().get("core-gateway");
+        String domainCertificateManagerUrl = gatewayService.getServiceHost("domain-certificate-manager");
+        return build(builder, domainCertificateManagerUrl, DomainReferenceService.class);
     }
 }

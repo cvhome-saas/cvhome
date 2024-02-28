@@ -1,3 +1,31 @@
+com:
+  asrevo:
+    cvhome:
+      services:
+        core-gateway:
+          name: core-gateway
+          domain: "gateway.com"
+          port: 8080
+          schema: http
+          namespace: core.cvhome.lcl
+        saas-gateway:
+          name: saas-gateway
+          domain: "gateway.click"
+          port: 8443
+          schema: https
+          namespace: saas.cvhome.lcl
+        store-gateway:
+          name: store-gateway
+          domain: "gateway.me"
+          port: 8085
+          schema: http
+          namespace: store.cvhome.lcl
+        auth:
+          name: auth
+          domain: "auth.gateway.com"
+          port: 9999
+          schema: http
+          namespace: core.cvhome.lcl
 spring:
   security:
     oauth2:
@@ -18,9 +46,9 @@ spring:
             client-secret: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
         provider:
           keycloak:
-            jwk-set-uri: ${com.asrevo.cvhome.services.auth.schema}://${com.asrevo.cvhome.services.auth.domain}:${com.asrevo.cvhome.services.auth.port}/realms/cvhome/protocol/openid-connect/certs
-            authorization-uri: ${com.asrevo.cvhome.services.coreGateway.schema}://${com.asrevo.cvhome.services.auth.domain}:${com.asrevo.cvhome.services.coreGateway.port}/realms/cvhome/protocol/openid-connect/auth
-            token-uri: ${com.asrevo.cvhome.services.auth.schema}://${com.asrevo.cvhome.services.auth.domain}:${com.asrevo.cvhome.services.auth.port}/realms/cvhome/protocol/openid-connect/token
+            jwk-set-uri: ${com.asrevo.cvhome.services.core-gateway.schema}://${com.asrevo.cvhome.services.auth.domain}:${com.asrevo.cvhome.services.core-gateway.port}/realms/cvhome/protocol/openid-connect/certs
+            authorization-uri: ${com.asrevo.cvhome.services.core-gateway.schema}://${com.asrevo.cvhome.services.auth.domain}:${com.asrevo.cvhome.services.core-gateway.port}/realms/cvhome/protocol/openid-connect/auth
+            token-uri: ${com.asrevo.cvhome.services.core-gateway.schema}://${com.asrevo.cvhome.services.auth.domain}:${com.asrevo.cvhome.services.core-gateway.port}/realms/cvhome/protocol/openid-connect/token
   cloud:
     local:
       discovery:

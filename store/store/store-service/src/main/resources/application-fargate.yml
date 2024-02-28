@@ -1,8 +1,3 @@
-com:
-  asrevo:
-    cvhome:
-      fargate:
-        namespace: "cvhome.lcl"
 spring:
   datasource:
     url: jdbc:postgresql://${spring.datasource.host}:${spring.datasource.port}/${spring.datasource.database}
@@ -13,7 +8,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          jwk-set-uri: http://auth.${com.asrevo.cvhome.fargate.namespace}:9999/realms/cvhome/protocol/openid-connect/certs
+          jwk-set-uri: ${com.asrevo.cvhome.services.core-gateway.schema}://${com.asrevo.cvhome.services.auth.domain}:${com.asrevo.cvhome.services.core-gateway.port}/realms/cvhome/protocol/openid-connect/certs
   cloud:
     loadbalancer:
       eager-load:

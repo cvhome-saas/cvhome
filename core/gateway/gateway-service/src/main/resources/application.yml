@@ -1,11 +1,34 @@
 com:
   asrevo:
     cvhome:
-      ssl:
-        default-domain: "gateway.com"
+      services:
+        core-gateway:
+          name: core-gateway
+          domain: "gateway.com"
+          port: 8080
+          schema: http
+          namespace: core.cvhome.lcl
+        saas-gateway:
+          name: saas-gateway
+          domain: "gateway.click"
+          port: 8443
+          schema: https
+          namespace: saas.cvhome.lcl
+        store-gateway:
+          name: store-gateway
+          domain: "gateway.me"
+          port: 8085
+          schema: http
+          namespace: store.cvhome.lcl
+        auth:
+          name: auth
+          domain: "auth.gateway.com"
+          port: 9999
+          schema: http
+          namespace: core.cvhome.lcl
 spring:
   application:
-    name: saasGateway
+    name: core-gateway
   security:
     oauth2:
       client:
@@ -27,14 +50,15 @@ spring:
           keycloak:
             #            comment issuer-uri to skip validation
             #            issuer-uri: https://gateway.com:8443/realms/cvhome
-            jwk-set-uri: http://localhost:9999/realms/cvhome/protocol/openid-connect/certs
-            authorization-uri: https://auth.${com.asrevo.cvhome.ssl.default-domain}:${server.port}/realms/cvhome/protocol/openid-connect/auth
-            token-uri: http://localhost:9999/realms/cvhome/protocol/openid-connect/token
+            jwk-set-uri: ${com.asrevo.cvhome.services.auth.schema}://${com.asrevo.cvhome.services.auth.domain}:${com.asrevo.cvhome.services.auth.port}/realms/cvhome/protocol/openid-connect/certs
+            authorization-uri: ${com.asrevo.cvhome.services.core-gateway.schema}://${com.asrevo.cvhome.services.auth.domain}:${com.asrevo.cvhome.services.core-gateway.port}/realms/cvhome/protocol/openid-connect/auth
+            token-uri: ${com.asrevo.cvhome.services.auth.schema}://${com.asrevo.cvhome.services.auth.domain}:${com.asrevo.cvhome.services.auth.port}/realms/cvhome/protocol/openid-connect/token
+
 #            need to trace why getting 401 error=invalid_token, auth_method=validate_access_token is by issuer?
 #            user-info-uri: https://auth.gateway.com:8443/realms/cvhome/protocol/openid-connect/userinfo
 #            user-name-attribute: sub
 server:
-  port: 8443
+  port: ${com.asrevo.cvhome.services.core-gateway.port}
 info:
   app:
     name: ${spring.application.name}
