@@ -38,7 +38,7 @@ bootBuildImage {
 bootBuildImage {
     builder = "paketobuildpacks/builder:tiny"
     imageName = "${System.getenv("REGISTRY")}/saas/saas-gateway"
-    tags = ["${System.getenv("REGISTRY")}/saas/gateway:${project.version}", "${System.getenv("REGISTRY")}/saas/gateway:latest"]
+    tags = ["${System.getenv("REGISTRY")}/saas/saas-gateway:${project.version}", "${System.getenv("REGISTRY")}/saas/saas-gateway:latest"]
     docker {
         publishRegistry {
             url = System.getenv("REGISTRY")
