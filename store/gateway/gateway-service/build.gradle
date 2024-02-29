@@ -37,7 +37,7 @@ bootBuildImage {
 }*/
 bootBuildImage {
   builder = "paketobuildpacks/builder:tiny"
-  imageName = "${System.getenv("REGISTRY")}/store/gateway"
+  imageName = "${System.getenv("REGISTRY")}/store/store-gateway"
   tags = ["${System.getenv("REGISTRY")}/store/gateway:${project.version}", "${System.getenv("REGISTRY")}/store/gateway:latest"]
   docker {
     publishRegistry {
