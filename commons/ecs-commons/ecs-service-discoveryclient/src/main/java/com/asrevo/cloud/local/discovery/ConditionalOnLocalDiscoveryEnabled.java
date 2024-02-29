@@ -12,6 +12,6 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Inherited
-@ConditionalOnProperty(value = "spring.cloud.local.discovery.enabled", matchIfMissing = true)
+@ConditionalOnProperty(value = "spring.cloud.local.discovery.enabled")
 public @interface ConditionalOnLocalDiscoveryEnabled {
 }

@@ -8,6 +8,6 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Inherited
-@ConditionalOnProperty(value = "spring.cloud.ecs.discovery.enabled", matchIfMissing = true)
+@ConditionalOnProperty(value = "spring.cloud.ecs.discovery.enabled")
 public @interface ConditionalOnEcsDiscoveryEnabled {
 }
