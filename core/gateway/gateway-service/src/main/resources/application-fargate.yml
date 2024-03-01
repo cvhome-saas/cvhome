@@ -57,21 +57,21 @@ spring:
           filters:
             - StripPrefix=1
         - id: auth
-          uri: lb://auth
+          uri: ${com.asrevo.cvhome.services.auth.schema}://${com.asrevo.cvhome.services.auth.domain}:${com.asrevo.cvhome.services.auth.port}
           predicates:
             - FHost=${com.asrevo.cvhome.services.auth.domain}
         - id: realms
-          uri: lb://auth
+          uri: ${com.asrevo.cvhome.services.auth.schema}://${com.asrevo.cvhome.services.auth.domain}:${com.asrevo.cvhome.services.auth.port}
           predicates:
             - Path=/realms/**
           filters:
             - SetRequestHostHeader=${com.asrevo.cvhome.services.auth.domain}:${com.asrevo.cvhome.services.core-gateway.port}
         - id: resources
-          uri: lb://auth
+          uri: ${com.asrevo.cvhome.services.auth.schema}://${com.asrevo.cvhome.services.auth.domain}:${com.asrevo.cvhome.services.auth.port}
           predicates:
             - Path=/resources/**
         - id: js
-          uri: lb://auth
+          uri: ${com.asrevo.cvhome.services.auth.schema}://${com.asrevo.cvhome.services.auth.domain}:${com.asrevo.cvhome.services.auth.port}
           predicates:
             - Path=/js/**
         - id: welcome-ui
