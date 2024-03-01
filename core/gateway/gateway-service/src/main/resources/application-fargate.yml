@@ -61,7 +61,7 @@ spring:
           predicates:
             - Path=/realms/**
           filters:
-            - SetRequestHostHeader=${com.asrevo.cvhome.services.auth.domain}:${com.asrevo.cvhome.services.auth.port}
+            - SetRequestHostHeader=${com.asrevo.cvhome.services.auth.domain}
         - id: welcome-ui
           uri: lb://welcome-ui
           predicates:
