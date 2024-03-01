@@ -56,6 +56,12 @@ spring:
             - Path=/domain-certificate-manager/**
           filters:
             - StripPrefix=1
+        - id: realms
+          uri: ${com.asrevo.cvhome.services.auth.schema}://${com.asrevo.cvhome.services.auth.domain}:${com.asrevo.cvhome.services.auth.port}
+          predicates:
+            - Path=/realms/**
+          filters:
+            - SetRequestHostHeader=${com.asrevo.cvhome.services.auth.domain}:${com.asrevo.cvhome.services.auth.port}
         - id: welcome-ui
           uri: lb://welcome-ui
           predicates:
