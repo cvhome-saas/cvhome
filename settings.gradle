@@ -26,21 +26,6 @@ include(
         'commons:ecs-commons:ecs-service-discoveryclient',
         'commons:cvhome-commons',
 
-
-//        'store-pod:gateway:gateway-service',
-//        'store-pod:landing:landing-commons',
-//        'store-pod:landing:landing-events',
-//        'store-pod:landing:landing-service',
-
-        'store-core:gateway:gateway-service',
-//        'store-core:store:store-commons',
-//        'store-core:store:store-events',
-//        'store-core:store:store-service',
-//        'store-core:wallet:wallet-commons',
-//        'store-core:wallet:wallet-events',
-//        'store-core:wallet:wallet-service',
-//        'store-core:store-ui',
-
 //        'core:gateway:gateway-service',
 //        'core:admin-ui',
 //        'core:welcome-ui',
@@ -49,7 +34,20 @@ include(
         'core:domain-certificate-manager:domain-certificate-manager-events',
 //        'core:domain-certificate-manager:domain-certificate-manager-service',
 
+        'store-pod:gateway:gateway-service',
+        'store-pod:landing:landing-commons',
+        'store-pod:landing:landing-events',
+        'store-pod:landing:landing-service',
 
-//        'saas-pod:gateway:gateway-service',
+        'store-core:gateway:gateway-service',
+        'store-core:store:store-commons',
+        'store-core:store:store-events',
+        'store-core:store:store-service',
+        'store-core:wallet:wallet-commons',
+        'store-core:wallet:wallet-events',
+        'store-core:wallet:wallet-service',
+//        'store-core:store-ui',
+
+        'saas-pod:gateway:gateway-service',
 
 )
