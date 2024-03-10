@@ -39,17 +39,17 @@ include(
         'store-core:wallet:wallet-commons',
         'store-core:wallet:wallet-events',
         'store-core:wallet:wallet-service',
-        'store-core:store-ui',
+//        'store-core:store-ui',
 
-        'core:gateway:gateway-service',
-        'core:admin-ui',
-        'core:welcome-ui',
-        'core:auth',
+//        'core:gateway:gateway-service',
+//        'core:admin-ui',
+//        'core:welcome-ui',
+//        'core:auth',
         'core:domain-certificate-manager:domain-certificate-manager-commons',
         'core:domain-certificate-manager:domain-certificate-manager-events',
-        'core:domain-certificate-manager:domain-certificate-manager-service',
+//        'core:domain-certificate-manager:domain-certificate-manager-service',
 
 
-        'saas-pod:gateway:gateway-service',
+//        'saas-pod:gateway:gateway-service',
 
 )
