@@ -1,0 +1,50 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/certificatemanagerdb
+    username: postgres
+    password: password
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${com.asrevo.cvhome.services.auth.schema}://${com.asrevo.cvhome.services.auth.domain}:${com.asrevo.cvhome.services.auth.port}/realms/cvhome/protocol/openid-connect/certs
+  cloud:
+    local:
+      discovery:
+        enabled: true
+        services:
+          domain-ownership:
+            - url: "http://localhost:8081"
+              metadata:
+                service-name: domain-ownership
+                instance: domain-ownership-1
+          domain-certificate-manager:
+            - url: "http://localhost:8082"
+              metadata:
+                service-name: domain-certificate-manager
+                instance: domain-certificate-manager-1
+          store:
+            - url: "http://localhost:8083"
+              metadata:
+                service-name: store
+                instance: store-1
+          streamer:
+            - url: "http://localhost:8084"
+              metadata:
+                service-name: streamer
+                instance: streamer-1
+          auth:
+            - url: "http://localhost:9999"
+              metadata:
+                service-name: auth
+                instance: auth-1
+          ui:
+            - url: "http://localhost:4200"
+              metadata:
+                service-name: ui
+                instance: ui-1
+          gateway:
+            - url: "http://localhost:8080"
+              metadata:
+                service-name: gateway
+                instance: gateway-1

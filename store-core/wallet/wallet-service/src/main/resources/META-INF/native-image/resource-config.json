@@ -1,0 +1,12 @@
+{
+  "resources": {
+    "includes": [
+      {
+        "pattern": "\\Qaccount.key\\E"
+      },
+      {
+        "pattern": "org/shredzone/acme4j/version.properties"
+      }
+    ]
+  }
+}
