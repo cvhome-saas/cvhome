@@ -37,8 +37,8 @@ springBoot {
 }*/
 bootBuildImage {
   builder = "paketobuildpacks/builder:tiny"
-  imageName = "${System.getenv("REGISTRY")}/store-pod/landing"
-  tags = ["${System.getenv("REGISTRY")}/store-pod/landing:${project.version}", "${System.getenv("REGISTRY")}/store-pod/landing:latest"]
+  imageName = "${System.getenv("REGISTRY")}/store-pod/landing-ui"
+  tags = ["${System.getenv("REGISTRY")}/store-pod/landing-ui:${project.version}", "${System.getenv("REGISTRY")}/store-pod/landing-ui:latest"]
   docker {
     publishRegistry {
       url = System.getenv("REGISTRY")
