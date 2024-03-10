@@ -47,7 +47,7 @@ jobs:
       - name: Build Docker with Gradle
         uses: gradle/gradle-build-action@749f47bda3e44aa060e82d7b3ef7e40d953bd629
         with:
-          arguments: bootBuildImage --publishImage
+          arguments: bootBuildImage --publishImage --debug
         env: # Or as an environment variable
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_TOKEN: ${{ steps.login-ecr.outputs.docker_password_117535662239_dkr_ecr_eu_central_1_amazonaws_com }}
