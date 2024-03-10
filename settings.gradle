@@ -35,9 +35,9 @@ include(
 //        'core:domain-certificate-manager:domain-certificate-manager-service',
 
         'store-pod:gateway:gateway-service',
-        'store-pod:landing:landing-commons',
-        'store-pod:landing:landing-events',
-        'store-pod:landing:landing-service',
+        'store-pod:landing-ui:landing-ui-commons',
+        'store-pod:landing-ui:landing-ui-events',
+        'store-pod:landing-ui:landing-ui-service',
 
         'store-core:gateway:gateway-service',
         'store-core:store:store-commons',
