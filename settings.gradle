@@ -26,13 +26,6 @@ include(
         'commons:ecs-commons:ecs-service-discoveryclient',
         'commons:cvhome-commons',
 
-        'core:gateway:gateway-service',
-        'core:admin-ui',
-        'core:welcome-ui',
-        'core:auth',
-        'core:domain-certificate-manager:domain-certificate-manager-commons',
-        'core:domain-certificate-manager:domain-certificate-manager-events',
-        'core:domain-certificate-manager:domain-certificate-manager-service',
 
         'store-pod:gateway:gateway-service',
         'store-pod:landing:landing-commons',
@@ -47,6 +40,15 @@ include(
         'store-core:wallet:wallet-events',
         'store-core:wallet:wallet-service',
         'store-core:store-ui',
+
+        'core:gateway:gateway-service',
+        'core:admin-ui',
+        'core:welcome-ui',
+        'core:auth',
+        'core:domain-certificate-manager:domain-certificate-manager-commons',
+        'core:domain-certificate-manager:domain-certificate-manager-events',
+        'core:domain-certificate-manager:domain-certificate-manager-service',
+
 
         'saas-pod:gateway:gateway-service',
 
