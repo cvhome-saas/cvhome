@@ -26,26 +26,6 @@ com:
           port: 9999
           schema: http
           namespace: core.cvhome.lcl
-    auto-order-domains:
-      domains:
-        - domain: "cvhome.click"
-      default-domain: "cvhome.click"
-    dcm:
-      challenge-config:
-        acm-file-provider: table
-        acm-table-config:
-          directory: "nothing"
-        dns-installer-config:
-          providers:
-            - route53
-        http-installer-config:
-          installer-file-provider: table
-          installer-table-config:
-            directory: "nothing"
-        tls-alpn01-installer-config:
-          installer-file-provider: table
-          installer-table-config:
-            directory: "nothing"
 spring:
   application:
     name: wallet
@@ -66,7 +46,7 @@ springdoc:
     path: /api-docs
 server:
   forward-headers-strategy: FRAMEWORK
-  port: 8082
+  port: 8085
 info:
   app:
     name: ${spring.application.name}
