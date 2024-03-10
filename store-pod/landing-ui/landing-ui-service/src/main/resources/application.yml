@@ -28,7 +28,7 @@ com:
           namespace: core.cvhome.lcl
 spring:
   application:
-    name: landing
+    name: landing-ui
   docker:
     compose:
       file: ${spring.application.name}/compose.yml
