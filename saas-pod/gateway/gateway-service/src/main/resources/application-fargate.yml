@@ -35,7 +35,7 @@ spring:
           - "store-ui"
     ecs:
       discovery:
-        namespace: "cvhome.lcl"
+        namespace: "saas-pod.cvhome.lcl"
         namespace-id: "ns-je7qri6wn7fbsrpn"
         enabled: true
         default-port: 8080
