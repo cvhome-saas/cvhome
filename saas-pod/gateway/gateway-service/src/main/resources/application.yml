@@ -10,18 +10,24 @@ com:
           port: 8080
           schema: http
           namespace: core.cvhome.lcl
-        saas-gateway:
-          name: saas-gateway
+        store-core-gateway:
+          name: store-core-gateway
+          domain: "store.gateway.com"
+          port: 8088
+          schema: http
+          namespace: store-core.cvhome.lcl
+        saas-pod-gateway:
+          name: saas-pod-gateway
           domain: "gateway.click"
           port: 8443
           schema: https
-          namespace: saas.cvhome.lcl
-        store-gateway:
-          name: store-gateway
+          namespace: saas-pod.cvhome.lcl
+        store-pod-gateway:
+          name: store-pod-gateway
           domain: "gateway.me"
           port: 8085
           schema: http
-          namespace: store.cvhome.lcl
+          namespace: store-pod.cvhome.lcl
         auth:
           name: auth
           domain: "auth.gateway.com"
@@ -59,7 +65,7 @@ spring:
 #            user-info-uri: https://auth.gateway.com:8443/realms/cvhome/protocol/openid-connect/userinfo
 #            user-name-attribute: sub
 server:
-  port: ${com.asrevo.cvhome.services.saas-gateway.port}
+  port: ${com.asrevo.cvhome.services.saas-pod-gateway.port}
 info:
   app:
     name: ${spring.application.name}

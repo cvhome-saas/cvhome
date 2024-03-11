@@ -25,22 +25,21 @@ spring:
     loadbalancer:
       eager-load:
         clients:
-          - "gateway"
-          - "domain-certificate-manager"
-          - "auth"
-          - "welcome-ui"
-          - "admin-ui"
+          - "store-core-gateway"
+          - "store"
+          - "store-ui"
+          - "wallet"
     ecs:
       discovery:
-        namespace: "cvhome.lcl"
-        namespace-id: "ns-je7qri6wn7fbsrpn"
+        namespace: "store-core.cvhome.lcl"
+        namespace-id: "ns-aacm3spcnftheq3b"
         enabled: true
         default-port: 8080
         service-ports:
-          "domain-certificate-manager": 8082
-          "auth": 9999
-          "welcome-ui": 4400
-          "admin-ui": 4200
+          "store-core-gateway": 8088
+          "store": 8086
+          "store-ui": 4300
+          "wallet": 8087
     gateway:
       discovery:
         locator:
@@ -50,21 +49,7 @@ spring:
         - PreserveHostHeader
         - AddResponseHeader=X-Frame-Options, SAMEORIGIN
       routes:
-        - id: domain-certificate-manager
-          uri: lb://domain-certificate-manager
+        - id: store-ui
+          uri: lb://store-ui
           predicates:
-            - Path=/domain-certificate-manager/**
-          filters:
-            - StripPrefix=1
-        - id: realms
-          uri: ${com.asrevo.cvhome.services.auth.schema}://${com.asrevo.cvhome.services.auth.domain}:${com.asrevo.cvhome.services.auth.port}
-          predicates:
-            - Path=/realms/**
-        - id: welcome-ui
-          uri: lb://welcome-ui
-          predicates:
-            - FHost=www.${com.asrevo.cvhome.services.core-gateway.domain},${com.asrevo.cvhome.services.core-gateway.domain}
-        - id: admin-ui
-          uri: lb://admin-ui
-          predicates:
-            - FHost=admin.${com.asrevo.cvhome.services.core-gateway.domain}
+            - FHost=store-ui.${com.asrevo.cvhome.services.core-gateway.domain}

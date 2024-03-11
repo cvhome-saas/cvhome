@@ -13,25 +13,18 @@ spring:
     loadbalancer:
       eager-load:
         clients:
-          - "gateway"
-          - "domain-certificate-manager"
+          - "store-core-gateway"
           - "store"
-          - "streamer"
-          - "auth"
-          - "welcome-ui"
-          - "admin-ui"
           - "store-ui"
+          - "wallet"
     ecs:
       discovery:
-        namespace: "cvhome.lcl"
-        namespace-id: "ns-je7qri6wn7fbsrpn"
+        namespace: "store-core.cvhome.lcl"
+        namespace-id: "ns-aacm3spcnftheq3b"
         enabled: true
         default-port: 8080
         service-ports:
-          "domain-certificate-manager": 8082
-          "store": 8083
-          "streamer": 8084
-          "auth": 9999
-          "welcome-ui": 4400
+          "store-core-gateway": 8088
+          "store": 8086
           "store-ui": 4300
-          "admin-ui": 4200
+          "wallet": 8087

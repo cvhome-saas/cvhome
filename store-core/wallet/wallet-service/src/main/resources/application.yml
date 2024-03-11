@@ -8,18 +8,24 @@ com:
           port: 8080
           schema: http
           namespace: core.cvhome.lcl
-        saas-gateway:
-          name: saas-gateway
+        store-core-gateway:
+          name: store-core-gateway
+          domain: "store.gateway.com"
+          port: 8088
+          schema: http
+          namespace: store-core.cvhome.lcl
+        saas-pod-gateway:
+          name: saas-pod-gateway
           domain: "gateway.click"
           port: 8443
           schema: https
-          namespace: saas.cvhome.lcl
-        store-gateway:
-          name: store-gateway
+          namespace: saas-pod.cvhome.lcl
+        store-pod-gateway:
+          name: store-pod-gateway
           domain: "gateway.me"
           port: 8085
           schema: http
-          namespace: store.cvhome.lcl
+          namespace: store-pod.cvhome.lcl
         auth:
           name: auth
           domain: "auth.gateway.com"
@@ -46,7 +52,7 @@ springdoc:
     path: /api-docs
 server:
   forward-headers-strategy: FRAMEWORK
-  port: 8085
+  port: 8087
 info:
   app:
     name: ${spring.application.name}

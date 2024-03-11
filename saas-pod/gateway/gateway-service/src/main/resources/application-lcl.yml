@@ -31,11 +31,11 @@ spring:
                 metadata:
                   service-name: domain-certificate-manager
                   instance: domain-certificate-manager-1
-            store-gateway:
+            store-pod-gateway:
               - url: "http://localhost:8085"
                 metadata:
-                  service-name: store-gateway
-                  instance: store-gateway-1
+                  service-name: store-pod-gateway
+                  instance: store-pod-gateway-1
     gateway:
       discovery:
         locator:
@@ -52,9 +52,9 @@ spring:
             - Path=/domain-certificate-manager/**
           filters:
             - StripPrefix=1
-        - id: store-gateway
+        - id: store-pod-gateway
           order: -1
-          uri: lb://store-gateway
+          uri: lb://store-pod-gateway
           predicates:
             - FHost={domain}.{x},{sub}.{domain}.{x}
           filters:
