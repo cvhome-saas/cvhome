@@ -41,6 +41,7 @@ spring:
           "auth": 9999
           "welcome-ui": 4400
           "admin-ui": 4200
+          "store-core-gateway.store-core.cvhome.lcl": 8088
         include-services:
           - ${com.asrevo.cvhome.services.store-core-gateway.name}.${com.asrevo.cvhome.services.store-core-gateway.namespace}
     gateway:
