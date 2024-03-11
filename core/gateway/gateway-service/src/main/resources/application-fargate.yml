@@ -25,14 +25,14 @@ spring:
     loadbalancer:
       eager-load:
         clients:
-          - "gateway"
+          - "core-gateway"
           - "domain-certificate-manager"
           - "auth"
           - "welcome-ui"
           - "admin-ui"
     ecs:
       discovery:
-        namespace: "cvhome.lcl"
+        namespace: "core.cvhome.lcl"
         namespace-id: "ns-je7qri6wn7fbsrpn"
         enabled: true
         default-port: 8080
@@ -50,16 +50,6 @@ spring:
         - PreserveHostHeader
         - AddResponseHeader=X-Frame-Options, SAMEORIGIN
       routes:
-        - id: domain-certificate-manager
-          uri: lb://domain-certificate-manager
-          predicates:
-            - Path=/domain-certificate-manager/**
-          filters:
-            - StripPrefix=1
-        - id: realms
-          uri: ${com.asrevo.cvhome.services.auth.schema}://${com.asrevo.cvhome.services.auth.domain}:${com.asrevo.cvhome.services.auth.port}
-          predicates:
-            - Path=/realms/**
         - id: welcome-ui
           uri: lb://welcome-ui
           predicates:

@@ -55,13 +55,6 @@ spring:
         - PreserveHostHeader
         - AddResponseHeader=X-Frame-Options, SAMEORIGIN
       routes:
-        - id: domain-certificate-manager
-          order: -1
-          uri: lb://domain-certificate-manager
-          predicates:
-            - Path=/domain-certificate-manager/**
-          filters:
-            - StripPrefix=1
         - id: auth
           order: -1
           uri: lb://auth
