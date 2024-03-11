@@ -46,6 +46,11 @@ spring:
               metadata:
                 service-name: welcome-ui
                 instance: welcome-ui-1
+          store-ui:
+            - url: "http://localhost:8088"
+              metadata:
+                service-name: store-ui
+                instance: store-ui-1
     gateway:
       discovery:
         locator:
@@ -87,3 +92,8 @@ spring:
           uri: lb://admin-ui
           predicates:
             - FHost=admin.${com.asrevo.cvhome.services.core-gateway.domain}
+        - id: store-ui
+          order: -1
+          uri: lb://store-ui
+          predicates:
+            - FHost=store-ui.${com.asrevo.cvhome.services.core-gateway.domain}

@@ -41,6 +41,8 @@ spring:
           "auth": 9999
           "welcome-ui": 4400
           "admin-ui": 4200
+        include-services:
+          - ${com.asrevo.cvhome.services.store-core-gateway.name}.${com.asrevo.cvhome.services.store-core-gateway.namespace}
     gateway:
       discovery:
         locator:
@@ -58,3 +60,7 @@ spring:
           uri: lb://admin-ui
           predicates:
             - FHost=admin.${com.asrevo.cvhome.services.core-gateway.domain}
+        - id: store-ui
+          uri: lb://${com.asrevo.cvhome.services.store-core-gateway.name}.${com.asrevo.cvhome.services.store-core-gateway.namespace}
+          predicates:
+            - FHost=store-ui.${com.asrevo.cvhome.services.core-gateway.domain}

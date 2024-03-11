@@ -67,7 +67,7 @@ public class EcsReactiveDiscoveryClient implements ReactiveDiscoveryClient {
     private static Optional<String> extractServiceName(String serviceId) {
         int firstSplitter = serviceId.indexOf(".");
         if (firstSplitter > 0) {
-            return Optional.of(serviceId.substring(0, firstSplitter ));
+            return Optional.of(serviceId.substring(0, firstSplitter));
         } else {
             return Optional.empty();
         }
@@ -91,7 +91,8 @@ public class EcsReactiveDiscoveryClient implements ReactiveDiscoveryClient {
         return Mono.fromFuture(future)
                 .map(ListServicesResponse::services)
                 .flatMapMany(Flux::fromIterable)
-                .map(ServiceSummary::name);
+                .map(ServiceSummary::name)
+                .mergeWith(Flux.fromIterable(properties.getIncludeServices()));
     }
 }
 
