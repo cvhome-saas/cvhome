@@ -52,7 +52,7 @@ springdoc:
     path: /api-docs
 server:
   forward-headers-strategy: FRAMEWORK
-  port: 8083
+  port: 8084
 info:
   app:
     name: ${spring.application.name}

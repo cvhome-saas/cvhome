@@ -25,18 +25,16 @@ spring:
     loadbalancer:
       eager-load:
         clients:
-          - "gateway"
-          - "store"
-          - "store-ui"
+          - "store-pod-gateway"
+          - "landing-ui"
     ecs:
       discovery:
-        namespace: "cvhome.lcl"
+        namespace: "store-pod.cvhome.lcl"
         namespace-id: "ns-je7qri6wn7fbsrpn"
         enabled: true
         default-port: 8080
         service-ports:
-          "store": 8083
-          "store-ui": 4300
+          "landing-ui": 8084
     gateway:
       discovery:
         locator:
@@ -45,27 +43,3 @@ spring:
         - TokenRelay
         - PreserveHostHeader
         - AddResponseHeader=X-Frame-Options, SAMEORIGIN
-      routes:
-        - id: mapped-store
-          uri: lb://store
-          predicates:
-            - Path=/store/**
-            - FHost={domain}.{x},{sub}.{domain}.{x}
-            - Header=Map-Host-As-Request-Param,true
-          filters:
-            - StripPrefix=1
-            - MapHostAsRequestParam=storeId
-        - id: store
-          uri: lb://store
-          predicates:
-            - Path=/store/**
-          filters:
-            - StripPrefix=1
-        - id: store-ui
-          uri: lb://store-ui
-          predicates:
-            - FHost={domain}.{x},{sub}.{domain}.{x}
-        - id: realms
-          uri: ${com.asrevo.cvhome.services.auth.schema}://${com.asrevo.cvhome.services.auth.domain}:${com.asrevo.cvhome.services.auth.port}
-          predicates:
-            - Path=/realms/**

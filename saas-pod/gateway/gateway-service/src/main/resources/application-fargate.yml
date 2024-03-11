@@ -42,7 +42,6 @@ spring:
         service-ports:
           "domain-certificate-manager": 8082
           "store": 8083
-          "streamer": 8084
           "auth": 9999
           "welcome-ui": 4400
           "store-ui": 4300

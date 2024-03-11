@@ -60,21 +60,11 @@ spring:
       discovery:
         enabled: true
         services:
-          store:
-            - url: "http://localhost:8083"
+          landing-ui:
+            - url: "http://localhost:8084"
               metadata:
-                service-name: store
-                instance: store-1
-          store-ui:
-            - url: "http://localhost:4300"
-              metadata:
-                service-name: store-ui
-                instance: store-ui-1
-          domain-certificate-manager:
-            - url: "http://localhost:8082"
-              metadata:
-                service-name: domain-certificate-manager
-                instance: domain-certificate-manager-1
+                service-name: landing-ui
+                instance: landing-ui-1
     gateway:
       discovery:
         locator:
@@ -83,26 +73,3 @@ spring:
         - TokenRelay
         - PreserveHostHeader
         - AddResponseHeader=X-Frame-Options, SAMEORIGIN
-      routes:
-        - id: mapped-store
-          order: -1
-          uri: lb://store
-          predicates:
-            - Path=/store/**
-            - FHost={domain}.{x},{sub}.{domain}.{x}
-            - Header=Map-Host-As-Request-Param,true
-          filters:
-            - StripPrefix=1
-            - MapHostAsRequestParam=storeId
-        - id: store
-          order: -1
-          uri: lb://store
-          predicates:
-            - Path=/store/**
-          filters:
-            - StripPrefix=1
-        - id: store-ui
-          order: -1
-          uri: lb://store-ui
-          predicates:
-            - FHost={domain}.{x},{sub}.{domain}.{x}
