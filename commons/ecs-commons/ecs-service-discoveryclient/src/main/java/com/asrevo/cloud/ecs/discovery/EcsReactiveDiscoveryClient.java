@@ -10,6 +10,7 @@ import software.amazon.awssdk.services.servicediscovery.model.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 @Slf4j
@@ -38,8 +39,8 @@ public class EcsReactiveDiscoveryClient implements ReactiveDiscoveryClient {
         log.info("getting services for {}", serviceId);
         DiscoverInstancesRequest request = DiscoverInstancesRequest
                 .builder()
-                .namespaceName(properties.getNamespace())
-                .serviceName(serviceId).build();
+                .namespaceName(extractNamespace(serviceId).orElse(properties.getNamespace()))
+                .serviceName(extractServiceName(serviceId).orElse(serviceId)).build();
         return Mono.fromFuture(discoveryAsync.discoverInstances(request))
                 .map(DiscoverInstancesResponse::instances)
                 .doOnEach(it -> {
@@ -52,6 +53,24 @@ public class EcsReactiveDiscoveryClient implements ReactiveDiscoveryClient {
                     Integer defaultPort = properties.getServicePorts().getOrDefault(serviceId, properties.getDefaultPort());
                     return new CloudMapServiceInstance(instance, defaultPort);
                 });
+    }
+
+    private static Optional<String> extractNamespace(String serviceId) {
+        int firstSplitter = serviceId.indexOf(".");
+        if (firstSplitter > 0 && serviceId.length() > firstSplitter + 1) {
+            return Optional.of(serviceId.substring(firstSplitter + 1));
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    private static Optional<String> extractServiceName(String serviceId) {
+        int firstSplitter = serviceId.indexOf(".");
+        if (firstSplitter > 0) {
+            return Optional.of(serviceId.substring(0, firstSplitter ));
+        } else {
+            return Optional.empty();
+        }
     }
 
     @Override
