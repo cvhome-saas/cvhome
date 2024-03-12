@@ -1,3 +1,15 @@
+CREATE TABLE IF NOT EXISTS pod
+(
+    id        varchar(24) not null,
+    region    varchar(30),
+    sub_region varchar(30),
+    pod_type      varchar(30),
+    namespace varchar(70),
+    location  varchar(150),
+    location_alis  varchar(150),
+    constraint pod_pk primary key (id)
+);
+
 CREATE TABLE IF NOT EXISTS orders
 (
     id                        varchar(24) not null,
@@ -59,10 +71,12 @@ CREATE TABLE IF NOT EXISTS domain
     auto_order          bool        not null default false,
     include_sub_domains bool                 default false,
     owner_id            varchar(50) not null,
+    pod_id              varchar(50) not null,
     generated_date      timestamp,
     constraint domain_pk primary key (id),
     constraint unique_domain unique (domain),
-    constraint domain_owner_id_fk foreign key (owner_id) references owner (id)
+    constraint domain_owner_id_fk foreign key (owner_id) references owner (id),
+    constraint domain_pod_id_fk foreign key (pod_id) references pod (id)
 );
 
 CREATE TABLE IF NOT EXISTS owner_domain_ref

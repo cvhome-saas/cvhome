@@ -61,7 +61,7 @@ public class DomainOwnerShipController {
 
         if (request.includeSubDomains()) {
             if (principal.getAuthorities().stream().noneMatch(it -> "ROLE_ADMIN".equals(it.getAuthority()))) {
-                throw new RuntimeException("you don't have authorities to include sup domains " + request.domain().domain());
+                throw new RuntimeException("you don't have authorities to include sub domains " + request.domain().domain());
             }
         }
 

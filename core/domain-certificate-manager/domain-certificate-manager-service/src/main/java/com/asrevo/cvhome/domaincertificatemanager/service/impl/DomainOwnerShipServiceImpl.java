@@ -3,10 +3,7 @@ package com.asrevo.cvhome.domaincertificatemanager.service.impl;
 import com.asrevo.cvhome.commons.command.CommandPublisher;
 import com.asrevo.cvhome.commons.domain.IdentityId;
 import com.asrevo.cvhome.domaincertificatemanager.commons.command.order.CreateOrderCommand;
-import com.asrevo.cvhome.domaincertificatemanager.commons.domain.ChallengeValidationType;
-import com.asrevo.cvhome.domaincertificatemanager.commons.domain.Domain;
-import com.asrevo.cvhome.domaincertificatemanager.commons.domain.DomainType;
-import com.asrevo.cvhome.domaincertificatemanager.commons.domain.Reference;
+import com.asrevo.cvhome.domaincertificatemanager.commons.domain.*;
 import com.asrevo.cvhome.domaincertificatemanager.commons.dto.AvailabilityResponse;
 import com.asrevo.cvhome.domaincertificatemanager.commons.dto.RegisterDomainRequest;
 import com.asrevo.cvhome.domaincertificatemanager.commons.dto.RegisterDomainResponse;
@@ -14,6 +11,7 @@ import com.asrevo.cvhome.domaincertificatemanager.config.AutoOrderDomainsPropert
 import com.asrevo.cvhome.domaincertificatemanager.entity.DomainEntity;
 import com.asrevo.cvhome.domaincertificatemanager.service.DomainOwnerShipService;
 import com.asrevo.cvhome.domaincertificatemanager.service.DomainService;
+import com.asrevo.cvhome.domaincertificatemanager.service.PodService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -27,6 +25,7 @@ public class DomainOwnerShipServiceImpl implements DomainOwnerShipService {
     private final DomainService domainService;
     private final CommandPublisher commandPublisher;
     private final AutoOrderDomainsProperties autoOrderDomainsProperties;
+    private final PodService podService;
 
 
     @Override
@@ -76,7 +75,9 @@ public class DomainOwnerShipServiceImpl implements DomainOwnerShipService {
                 throw new RuntimeException("please prove domain ownership on domain " + domain.domain() + " by adding txt record " + domain.getProvingDomain() + " with value " + identity.id());
             }
         }
-        return domainService.save(DomainEntity.create(domain, reference, domainType, includeSubDomains, identity));
+        PodId podId = podService.selectPod(domain, reference, domainType, identity);
+        log.info("select pod {} to domain {} ", podId, domain);
+        return domainService.save(DomainEntity.create(domain, reference, domainType, includeSubDomains, identity, podId));
     }
 
 

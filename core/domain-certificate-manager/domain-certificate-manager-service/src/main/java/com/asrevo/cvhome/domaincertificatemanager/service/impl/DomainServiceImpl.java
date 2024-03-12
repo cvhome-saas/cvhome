@@ -1,16 +1,14 @@
 package com.asrevo.cvhome.domaincertificatemanager.service.impl;
 
 import com.asrevo.cvhome.commons.domain.IdentityId;
-import com.asrevo.cvhome.domaincertificatemanager.commons.domain.CertificateOrderStatus;
-import com.asrevo.cvhome.domaincertificatemanager.commons.domain.Domain;
-import com.asrevo.cvhome.domaincertificatemanager.commons.domain.DomainCertificateStatus;
-import com.asrevo.cvhome.domaincertificatemanager.commons.domain.DomainType;
+import com.asrevo.cvhome.domaincertificatemanager.commons.domain.*;
 import com.asrevo.cvhome.domaincertificatemanager.commons.dto.*;
 import com.asrevo.cvhome.domaincertificatemanager.entity.DomainEntity;
 import com.asrevo.cvhome.domaincertificatemanager.entity.OwnerEntity;
 import com.asrevo.cvhome.domaincertificatemanager.mappers.DomainMappers;
 import com.asrevo.cvhome.domaincertificatemanager.repository.DomainRepository;
 import com.asrevo.cvhome.domaincertificatemanager.service.DomainService;
+import com.asrevo.cvhome.domaincertificatemanager.service.PodService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;
@@ -26,6 +24,7 @@ import java.util.Optional;
 @Slf4j
 public class DomainServiceImpl implements DomainService {
     private final DomainRepository domainRepository;
+    private final PodService podService;
     private final DomainMappers domainMappers;
 
 
@@ -43,7 +42,13 @@ public class DomainServiceImpl implements DomainService {
 
     @Override
     public DomainReferenceResponse getReference(Domain domain) {
-        return domainRepository.findByDomain(domain).map(it -> new DomainReferenceResponse(it.getReference())).orElseThrow(() -> new RuntimeException("couldn't find this domain"));
+        return domainRepository.findByDomain(domain)
+          .map(it -> {
+            PodDto pod = podService.getPod(it.getPod().getId());
+            Reference reference = it.getReference();
+            return new DomainReferenceResponse(DomainStatus.PUBLISHED, reference, pod);
+          })
+          .orElseThrow(() -> new RuntimeException("couldn't find this domain"));
     }
 
     @Override

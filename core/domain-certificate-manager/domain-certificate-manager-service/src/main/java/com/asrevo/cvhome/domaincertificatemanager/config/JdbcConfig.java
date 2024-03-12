@@ -7,6 +7,7 @@ import com.asrevo.cvhome.commons.event.EventId;
 import com.asrevo.cvhome.domaincertificatemanager.commons.domain.CertificateId;
 import com.asrevo.cvhome.domaincertificatemanager.commons.domain.DomainId;
 import com.asrevo.cvhome.domaincertificatemanager.commons.domain.OrdersId;
+import com.asrevo.cvhome.domaincertificatemanager.commons.domain.PodId;
 import com.asrevo.cvhome.domaincertificatemanager.config.converters.*;
 import com.asrevo.cvhome.domaincertificatemanager.entity.FileId;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -81,6 +82,13 @@ public class JdbcConfig extends AbstractJdbcConfiguration {
             @Override
             public FileId convert(String source) {
                 return new FileId(source);
+            }
+        });
+
+        converters.add(new Converter<String, PodId>() {
+            @Override
+            public PodId convert(String source) {
+                return new PodId(source);
             }
         });
 

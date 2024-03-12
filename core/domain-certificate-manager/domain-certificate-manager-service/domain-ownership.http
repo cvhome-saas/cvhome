@@ -95,6 +95,32 @@ Authorization: Bearer {{access_token}}
   },
   "reference": {
     "reference": "nnnnnnnnnnnn",
-    "referenceType": "BLOG"
+    "referenceType": "STORE"
   }
+}
+
+
+### register a domain
+POST http://localhost:8082/api/v1/domain-ownership/register
+Content-Type: application/json
+Authorization: Bearer {{access_token}}
+
+{
+  "domain": {
+    "domain": "test.asrevo.com"
+  },
+  "domainType": "SAS_SUB",
+  "reference": {
+    "reference": "nnnnnnnnnnnn",
+    "referenceType": "STORE"
+  }
+}
+
+### get reference
+POST http://localhost:8082/api/v1/domain-ownership/get-reference
+Content-Type: application/json
+Authorization: Bearer {{access_token}}
+
+{
+  "domain": "test.asrevo.com"
 }
