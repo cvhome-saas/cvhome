@@ -1,12 +1,13 @@
 package com.asrevo.cvhome.landing.views;
 
 import com.asrevo.cvhome.landing.service.ProductService;
-import com.asrevo.cvhome.landing.service.product.Product;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.reactive.result.view.Rendering;
-import org.thymeleaf.context.LazyContextVariable;
+import org.thymeleaf.spring6.context.webflux.ReactiveDataDriverContextVariable;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Controller
 public class LandingView {
@@ -18,22 +19,13 @@ public class LandingView {
   public Rendering index() {
     Rendering.Builder<?> builder = Rendering.view("store-15/index.html");
 
+    builder.modelAttribute("landingProducts", new ReactiveDataDriverContextVariable(
+      Flux.defer(() -> Flux.fromIterable(productService.findAllProducts(10)))));
 
-    builder.modelAttribute("landingProducts", new LazyContextVariable<>() {
-      @Override
-      protected Object loadValue() {
-        System.out.println("get landingProducts");
-        return productService.findAllProducts(10);
-      }
-    });
 
-    builder.modelAttribute("product", new LazyContextVariable<Product>() {
-      @Override
-      protected Product loadValue() {
-        System.out.println("get product");
-        return productService.getProductById("10");
-      }
-    });
+    builder.modelAttribute("product", new ReactiveDataDriverContextVariable(
+      Mono.defer(() -> Mono.just(productService.getProductById("10")))));
+
 
     return builder.build();
   }
