@@ -13,33 +13,13 @@ spring:
       discovery:
         enabled: true
         services:
-          domain-ownership:
-            - url: "http://localhost:8081"
+          landing-ui:
+            - url: "http://localhost:8084"
               metadata:
-                service-name: domain-ownership
-                instance: domain-ownership-1
-          domain-certificate-manager:
-            - url: "http://localhost:8082"
+                service-name: landing-ui
+                instance: landing-ui-1
+          product:
+            - url: "http://localhost:8089"
               metadata:
-                service-name: domain-certificate-manager
-                instance: domain-certificate-manager-1
-          store:
-            - url: "http://localhost:8083"
-              metadata:
-                service-name: store
-                instance: store-1
-          auth:
-            - url: "http://localhost:9999"
-              metadata:
-                service-name: auth
-                instance: auth-1
-          ui:
-            - url: "http://localhost:4200"
-              metadata:
-                service-name: ui
-                instance: ui-1
-          gateway:
-            - url: "http://localhost:8080"
-              metadata:
-                service-name: gateway
-                instance: gateway-1
+                service-name: product
+                instance: product-1

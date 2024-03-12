@@ -1,4 +1,4 @@
-package com.asrevo.cvhome.store.controller;
+package com.asrevo.cvhome.product.controller;
 
 import com.asrevo.cvhome.commons.domain.Identifier;
 import com.asrevo.cvhome.store.commons.domain.StoreId;

@@ -1,4 +1,4 @@
-package com.asrevo.cvhome.store.config;
+package com.asrevo.cvhome.product.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,6 +22,7 @@ public class SecurityConfig {
                                 .pathMatchers("/actuator", "/actuator/*/**").permitAll()
                                 .pathMatchers("swagger-ui.html","webjars/swagger-ui/**","api-docs","api-docs/**").permitAll()
                                 .pathMatchers("api/v1/test/sign").permitAll()
+                                .pathMatchers("api/v1/public/**").permitAll()
                                 .anyExchange().authenticated()
                 )
                 .oauth2ResourceServer(it ->
