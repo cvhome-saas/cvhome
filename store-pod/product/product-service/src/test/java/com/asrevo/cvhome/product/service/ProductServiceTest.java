@@ -94,12 +94,8 @@ class ProductServiceTest {
         StoreId storeId = StoreId.newId();
         CreateProductDto createProductDto = new CreateProductDto("p1", "d1", new ProductPrice(50D, Currency.getInstance("USD")), Boolean.TRUE, new ImageLink("google.com"));
         CreateProductResponseDto createProductResponseDto = productService.createProduct(storeId, createProductDto);
-
-
         UpdateProductDto updateProductDto = new UpdateProductDto("pnew", null, null, Boolean.FALSE);
         UpdateProductResponseDto updateProductResponseDto = productService.updateProduct(storeId, createProductResponseDto.id(), updateProductDto);
-
-
         assertThat(updateProductDto.published(), is(updateProductResponseDto.published()));
         assertThat(updateProductDto.name(), is(updateProductDto.name()));
         assertThat(createProductDto.price(), is(updateProductResponseDto.price()));
@@ -122,7 +118,6 @@ class ProductServiceTest {
         StoreId storeId = StoreId.newId();
         CreateProductDto createProductDto = new CreateProductDto("p1", "d1", new ProductPrice(50D, Currency.getInstance("USD")), Boolean.TRUE, new ImageLink("google.com"));
         CreateProductResponseDto createProductResponseDto = productService.createProduct(storeId, createProductDto);
-
         AddProductVariantDto addProductVariantDto = new AddProductVariantDto(new ProductPrice(66D, Currency.getInstance("USD")), new ProductAmount(20), Map.of("COLOR", "RED"));
         AddProductVariantResponseDto addProductVariantResponseDto = productService.addVariant(storeId, createProductResponseDto.id(), addProductVariantDto);
         assertThat(addProductVariantResponseDto.id(), notNullValue());
@@ -137,10 +132,8 @@ class ProductServiceTest {
         StoreId storeId = StoreId.newId();
         CreateProductDto createProductDto = new CreateProductDto("p1", "d1", new ProductPrice(50D, Currency.getInstance("USD")), Boolean.TRUE, new ImageLink("google.com"));
         CreateProductResponseDto createProductResponseDto = productService.createProduct(storeId, createProductDto);
-
         AddProductVariantDto addProductVariantDto = new AddProductVariantDto(new ProductPrice(66D, Currency.getInstance("USD")), new ProductAmount(20), Map.of("COLOR", "RED"));
         AddProductVariantResponseDto addProductVariantResponseDto = productService.addVariant(storeId, createProductResponseDto.id(), addProductVariantDto);
-
         ProductVariantDto productVariant = productService.getProductVariant(storeId, createProductResponseDto.id(), addProductVariantResponseDto.id());
         assertThat(productVariant, notNullValue());
     }
