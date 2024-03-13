@@ -3,10 +3,12 @@ package com.asrevo.cvhome.domaincertificatemanager.jobs;
 import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import org.jobrunr.scheduling.JobScheduler;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 @Component
 @AllArgsConstructor
+@ConditionalOnProperty(prefix = "org.jobrunr.job-scheduler",name = "enabled")
 public class JobsLauncher {
 
     private final JobScheduler jobScheduler;
