@@ -2,6 +2,7 @@ package com.asrevo.cvhome.product.entity;
 
 
 import com.asrevo.cvhome.commons.domain.BaseEntity;
+import com.asrevo.cvhome.product.commons.domain.ImageLink;
 import com.asrevo.cvhome.product.commons.domain.ProductId;
 import com.asrevo.cvhome.product.commons.domain.ProductPrice;
 import com.asrevo.cvhome.product.commons.dto.CreateProductDto;
@@ -41,6 +42,7 @@ public class ProductEntity extends BaseEntity<ProductEntity, ProductId> {
         product.setDescription(createProductDto.description());
         product.setPrice(createProductDto.price());
         product.setPublished(createProductDto.published());
+        product.setDeleted(Boolean.FALSE);
         return product;
     }
 
@@ -49,7 +51,7 @@ public class ProductEntity extends BaseEntity<ProductEntity, ProductId> {
         return ProductId.newId();
     }
 
-    public ProductEntity addImage(String link) {
+    public ProductEntity addImage(ImageLink link) {
         this.productImages.add(ProductImageEntity.create(this.id, link));
         return this;
     }

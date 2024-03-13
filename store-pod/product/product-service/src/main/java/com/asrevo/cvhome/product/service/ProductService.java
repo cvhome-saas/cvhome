@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.product.service;
 
+import com.asrevo.cvhome.product.commons.domain.ImageLink;
 import com.asrevo.cvhome.product.commons.domain.ProductId;
 import com.asrevo.cvhome.product.commons.domain.ProductVariantId;
 import com.asrevo.cvhome.product.commons.dto.*;
@@ -12,10 +13,12 @@ public interface ProductService {
     List<ProductDto> findAll(StoreId storeId, Pageable pageable);
 
     CreateProductResponseDto createProduct(StoreId storeId, CreateProductDto createProductDto);
+    DeleteProductResponseDto deleteProduct(StoreId storeId, ProductId productId);
+    ProductDto getProduct(StoreId storeId, ProductId productId);
 
     UpdateProductResponseDto updateProduct(StoreId storeId, ProductId productId, UpdateProductDto updateProductDto);
 
-    ProductDto addImage(StoreId storeId, ProductId productId, String link);
+    ProductDto addImage(StoreId storeId, ProductId productId, ImageLink imageLink);
 
     AddProductVariantResponseDto addVariant(StoreId storeId, ProductId productId, AddProductVariantDto addProductVariantDto);
 

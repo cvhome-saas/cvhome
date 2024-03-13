@@ -35,12 +35,15 @@ tasks.register('unitTest', Test) {
 test {
     finalizedBy jacocoTestReport // report is always generated after tests run
 }
+/*
+@TODO i think we have issue here it trigger all tests
 integrationTest {
     finalizedBy jacocoTestReport // report is always generated after tests run
 }
 unitTest {
     finalizedBy jacocoTestReport // report is always generated after tests run
 }
+*/
 jacocoTestReport {
     dependsOn test // tests are required to run before generating the report
 }

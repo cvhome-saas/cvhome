@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.product.service.impl;
 
+import com.asrevo.cvhome.product.commons.domain.ImageLink;
 import com.asrevo.cvhome.product.commons.domain.ProductId;
 import com.asrevo.cvhome.product.commons.domain.ProductVariantId;
 import com.asrevo.cvhome.product.commons.dto.*;
@@ -38,8 +39,28 @@ public class ProductServiceImpl implements ProductService {
 
     @Transactional
     @Override
+    public DeleteProductResponseDto deleteProduct(StoreId storeId, ProductId productId) {
+        return productRepository.findOneByStoreIdAndIdAndDeletedIsFalse(storeId, productId)
+                .map(it -> {
+                    it.setDeleted(Boolean.TRUE);
+                    return it;
+                })
+                .map(productRepository::save)
+                .map(it -> new DeleteProductResponseDto(it.getId(), Boolean.TRUE))
+                .orElse(null);
+    }
+
+    @Override
+    public ProductDto getProduct(StoreId storeId, ProductId productId) {
+        return productRepository.findOneByStoreIdAndIdAndDeletedIsFalse(storeId, productId)
+                .map(productMapper::toDto)
+                .orElse(null);
+    }
+
+    @Transactional
+    @Override
     public UpdateProductResponseDto updateProduct(StoreId storeId, ProductId productId, UpdateProductDto updateProductDto) {
-        return productRepository.findOneByStoreIdAndId(storeId, productId)
+        return productRepository.findOneByStoreIdAndIdAndDeletedIsFalse(storeId, productId)
                 .map(it -> {
                     productMapper.map(updateProductDto, it);
                     return it;
@@ -48,9 +69,10 @@ public class ProductServiceImpl implements ProductService {
                 .orElse(null);
     }
 
+    @Transactional
     @Override
-    public ProductDto addImage(StoreId storeId, ProductId productId, String link) {
-        return productRepository.findOneByStoreIdAndId(storeId, productId)
+    public ProductDto addImage(StoreId storeId, ProductId productId, ImageLink link) {
+        return productRepository.findOneByStoreIdAndIdAndDeletedIsFalse(storeId, productId)
                 .map(it -> it.addImage(link))
                 .map(productRepository::save)
                 .map(productMapper::toDto)
@@ -60,7 +82,7 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     @Override
     public AddProductVariantResponseDto addVariant(StoreId storeId, ProductId productId, AddProductVariantDto addProductVariantDto) {
-        return productRepository.findOneByStoreIdAndId(storeId, productId)
+        return productRepository.findOneByStoreIdAndIdAndDeletedIsFalse(storeId, productId)
                 .map(it -> ProductVariantEntity.createProductVariant(it.getId(), addProductVariantDto))
                 .map(productVariantRepository::save)
                 .map(productMapper::toAddProductVariantResponseDto)
@@ -70,7 +92,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductVariantDto getProductVariant(StoreId storeId, ProductId productId, ProductVariantId variantId) {
-        return productRepository.findOneByStoreIdAndId(storeId, productId)
+        return productRepository.findOneByStoreIdAndIdAndDeletedIsFalse(storeId, productId)
                 .flatMap(it -> {
                     return productVariantRepository.findById(variantId);
                 })

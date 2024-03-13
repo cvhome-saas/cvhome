@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.product.service;
 
+import com.asrevo.cvhome.product.commons.domain.ImageLink;
 import com.asrevo.cvhome.product.commons.domain.ProductAmount;
 import com.asrevo.cvhome.product.commons.domain.ProductPrice;
 import com.asrevo.cvhome.product.commons.dto.*;
@@ -22,6 +23,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import java.util.Currency;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.IntStream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -41,8 +43,14 @@ class ProductServiceTest {
 
     @Test
     void findAll() {
-        List<ProductDto> all = productService.findAll(StoreId.newId(), PageRequest.of(0, 10));
-        System.out.println(all);
+        StoreId storeId = StoreId.newId();
+        IntStream.range(0, 20).forEach(it -> {
+            CreateProductDto createProductDto = new CreateProductDto("p" + it, "d1" + it, new ProductPrice(50D * it, Currency.getInstance("USD")), Boolean.TRUE);
+            productService.createProduct(storeId, createProductDto);
+        });
+        PageRequest pageRequest = PageRequest.of(0, 10);
+        List<ProductDto> all = productService.findAll(storeId, pageRequest);
+        assertThat(all.size(), is(pageRequest.getPageSize()));
     }
 
     @Test
@@ -52,6 +60,19 @@ class ProductServiceTest {
         CreateProductResponseDto createProductResponseDto = productService.createProduct(storeId, createProductDto);
         assertThat(createProductResponseDto.published(), is(createProductDto.published()));
         assertThat(createProductResponseDto.id(), notNullValue());
+        assertThat(createProductResponseDto.price(), is(createProductDto.price()));
+    }
+
+    @Test
+    void getProduct() {
+        StoreId storeId = StoreId.newId();
+        CreateProductDto createProductDto = new CreateProductDto("p1", "d1", new ProductPrice(50D, Currency.getInstance("USD")), Boolean.TRUE);
+        CreateProductResponseDto createProductResponseDto = productService.createProduct(storeId, createProductDto);
+        ProductDto productDto = productService.getProduct(storeId, createProductResponseDto.id());
+
+        assertThat(createProductResponseDto.id(), is(productDto.id()));
+        assertThat(createProductResponseDto.name(), is(createProductDto.name()));
+        assertThat(createProductResponseDto.description(), is(createProductDto.description()));
         assertThat(createProductResponseDto.price(), is(createProductDto.price()));
     }
 
@@ -77,9 +98,18 @@ class ProductServiceTest {
         StoreId storeId = StoreId.newId();
         CreateProductDto createProductDto = new CreateProductDto("p1", "d1", new ProductPrice(50D, Currency.getInstance("USD")), Boolean.TRUE);
         CreateProductResponseDto createProductResponseDto = productService.createProduct(storeId, createProductDto);
-        String newLink = "new link";
-        ProductDto product = productService.addImage(storeId, createProductResponseDto.id(), newLink);
-        assertThat(product.images(), hasItem(newLink));
+        ImageLink imageLink = new ImageLink("new link");
+        ProductDto product = productService.addImage(storeId, createProductResponseDto.id(), imageLink);
+        assertThat(product.images(), hasItem(imageLink));
+
+
+        ProductDto productDto = productService.getProduct(storeId, createProductResponseDto.id());
+
+        assertThat(createProductResponseDto.id(), is(productDto.id()));
+        assertThat(createProductResponseDto.name(), is(createProductDto.name()));
+        assertThat(createProductResponseDto.description(), is(createProductDto.description()));
+        assertThat(createProductResponseDto.price(), is(createProductDto.price()));
+        assertThat(productDto.images(), hasItem(imageLink));
 
     }
 
@@ -109,7 +139,5 @@ class ProductServiceTest {
 
         ProductVariantDto productVariant = productService.getProductVariant(storeId, createProductResponseDto.id(), addProductVariantResponseDto.id());
         assertThat(productVariant, notNullValue());
-        System.out.println("aaaaaaaaaa");
-
     }
 }

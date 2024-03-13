@@ -2,6 +2,7 @@ package com.asrevo.cvhome.product.config;
 
 import com.asrevo.cvhome.commons.domain.BaseEntity;
 import com.asrevo.cvhome.commons.domain.Identifier;
+import com.asrevo.cvhome.product.commons.domain.ImageLink;
 import com.asrevo.cvhome.product.commons.domain.ProductId;
 import com.asrevo.cvhome.product.commons.domain.ProductVariantId;
 import com.asrevo.cvhome.store.commons.domain.StoreId;
@@ -66,6 +67,13 @@ public class JdbcConfig extends AbstractJdbcConfiguration {
             @Override
             public Currency convert(String source) {
                 return Currency.getInstance(source);
+            }
+        });
+
+        converters.add(new Converter<String, ImageLink>() {
+            @Override
+            public ImageLink convert(String source) {
+                return new ImageLink(source);
             }
         });
 

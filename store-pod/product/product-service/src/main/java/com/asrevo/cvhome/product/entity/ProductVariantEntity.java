@@ -9,6 +9,7 @@ import com.asrevo.cvhome.product.commons.dto.AddProductVariantDto;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;
+import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Embedded;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
@@ -22,8 +23,8 @@ import static org.springframework.data.relational.core.mapping.Embedded.OnEmpty.
 @Setter
 @Table("product_variant")
 public class ProductVariantEntity extends BaseEntity<ProductVariantEntity, ProductVariantId> {
-    @MappedCollection(idColumn = "product_variant_id")
-    private ProductVariantRefEntity product;
+    @Column("product_id")
+    private AggregateReference<ProductEntity, ProductId> product;
     @Embedded(onEmpty = USE_NULL)
     private ProductPrice price;
     @Embedded(onEmpty = USE_NULL)
@@ -33,8 +34,8 @@ public class ProductVariantEntity extends BaseEntity<ProductVariantEntity, Produ
 
     public static ProductVariantEntity createProductVariant(ProductId id, AddProductVariantDto addProductVariantDto) {
         ProductVariantEntity productVariant = new ProductVariantEntity();
-        ProductVariantId generatedId = productVariant.setNew();
-        productVariant.setProduct(new ProductVariantRefEntity(AggregateReference.to(id), AggregateReference.to(generatedId)));
+        productVariant.setNew();
+        productVariant.setProduct(AggregateReference.to(id));
         productVariant.setPrice(addProductVariantDto.price());
         productVariant.setAmount(addProductVariantDto.amount());
         List<ProductVariantFeatureEntity> features = addProductVariantDto.features().entrySet().stream().map(it -> ProductVariantFeatureEntity.createProductFeature(it.getKey(), it.getValue())).toList();

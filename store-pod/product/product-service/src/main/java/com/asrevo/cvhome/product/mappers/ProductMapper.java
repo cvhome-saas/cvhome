@@ -1,12 +1,17 @@
 package com.asrevo.cvhome.product.mappers;
 
+import com.asrevo.cvhome.product.commons.domain.ImageLink;
 import com.asrevo.cvhome.product.commons.domain.ProductId;
 import com.asrevo.cvhome.product.commons.dto.*;
-import com.asrevo.cvhome.product.entity.*;
+import com.asrevo.cvhome.product.entity.ProductEntity;
+import com.asrevo.cvhome.product.entity.ProductImageEntity;
+import com.asrevo.cvhome.product.entity.ProductVariantEntity;
+import com.asrevo.cvhome.product.entity.ProductVariantFeatureEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
+import org.springframework.data.jdbc.core.mapping.AggregateReference;
 
 import java.util.HashMap;
 import java.util.List;
@@ -17,7 +22,7 @@ public interface ProductMapper {
     @Mapping(source = "productImages", target = "images")
     ProductDto toDto(ProductEntity entity);
 
-    default List<String> toImages(List<ProductImageEntity> images) {
+    default List<ImageLink> toImages(List<ProductImageEntity> images) {
         return images.stream().map(ProductImageEntity::getLink).toList();
     }
 
@@ -41,9 +46,10 @@ public interface ProductMapper {
         return map;
     }
 
+    @Mapping(source = "product", target = "productId")
     ProductVariantDto toDto(ProductVariantEntity entity);
 
-    default ProductId toProductId(ProductVariantRefEntity entity) {
-        return entity.getProduct().getId();
+    default ProductId toProductId(AggregateReference<ProductEntity, ProductId> product) {
+        return product.getId();
     }
 }
