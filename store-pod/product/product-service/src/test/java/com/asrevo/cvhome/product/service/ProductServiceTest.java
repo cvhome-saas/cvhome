@@ -22,8 +22,7 @@ import java.util.Currency;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 
 
 @DataJdbcTest
@@ -69,14 +68,16 @@ class ProductServiceTest {
         assertThat(updateProductDto.name(), is(updateProductDto.name()));
         assertThat(createProductDto.price(), is(updateProductResponseDto.price()));
 
-
     }
+
     @Test
     void addImage() {
         StoreId storeId = StoreId.newId();
         CreateProductDto createProductDto = new CreateProductDto("p1", "d1", new ProductPrice(50D, Currency.getInstance("USD")), Boolean.TRUE);
         CreateProductResponseDto createProductResponseDto = productService.createProduct(storeId, createProductDto);
-        ProductDto newLink = productService.addImage(storeId, createProductResponseDto.id(), "new link");
-        System.out.println(newLink);
+        String newLink = "new link";
+        ProductDto product = productService.addImage(storeId, createProductResponseDto.id(), newLink);
+        assertThat(product.images(),hasItem(newLink));
+
     }
 }
