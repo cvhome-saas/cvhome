@@ -12,6 +12,9 @@ import org.springframework.data.relational.core.mapping.Embedded;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static org.springframework.data.relational.core.mapping.Embedded.OnEmpty.USE_NULL;
@@ -25,9 +28,10 @@ public class ProductEntity extends BaseEntity<ProductEntity, ProductId> {
     private String description;
     @Embedded(onEmpty = USE_NULL)
     private ProductPrice price;
-    @MappedCollection(idColumn = "product_id")
-    private Set<ProductVariantRefEntity> productVariants;
     private Boolean published;
+    private Boolean deleted;
+    @MappedCollection(idColumn = "product_id",keyColumn = "sequence")
+    private List<ProductImageEntity> productImages = new ArrayList<>();
 
     public static ProductEntity createProduct(StoreId storeId, CreateProductDto createProductDto) {
         ProductEntity product = new ProductEntity();
@@ -45,4 +49,12 @@ public class ProductEntity extends BaseEntity<ProductEntity, ProductId> {
         return ProductId.newId();
     }
 
+    public ProductEntity addImage(String link) {
+        this.productImages.add(ProductImageEntity.create(this.id, link));
+        return this;
+    }
+    public ProductEntity delete() {
+        this.deleted = Boolean.TRUE;
+        return this;
+    }
 }

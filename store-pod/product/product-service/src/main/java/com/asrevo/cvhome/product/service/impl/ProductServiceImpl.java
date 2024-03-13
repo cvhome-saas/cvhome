@@ -43,4 +43,12 @@ public class ProductServiceImpl implements ProductService {
                 .map(it -> productMapper.toUpdateProductResponseDto(productRepository.save(it)))
                 .orElse(null);
     }
+
+    @Override
+    public ProductDto addImage(StoreId storeId, ProductId productId, String link) {
+        return productRepository.findOneByStoreIdAndId(storeId, productId)
+                .map(it -> it.addImage(link))
+                .map(it -> productMapper.toDto(productRepository.save(it)))
+                .orElse(null);
+    }
 }

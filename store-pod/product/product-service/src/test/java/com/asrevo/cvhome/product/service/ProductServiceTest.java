@@ -71,4 +71,12 @@ class ProductServiceTest {
 
 
     }
+    @Test
+    void addImage() {
+        StoreId storeId = StoreId.newId();
+        CreateProductDto createProductDto = new CreateProductDto("p1", "d1", new ProductPrice(50D, Currency.getInstance("USD")), Boolean.TRUE);
+        CreateProductResponseDto createProductResponseDto = productService.createProduct(storeId, createProductDto);
+        ProductDto newLink = productService.addImage(storeId, createProductResponseDto.id(), "new link");
+        System.out.println(newLink);
+    }
 }

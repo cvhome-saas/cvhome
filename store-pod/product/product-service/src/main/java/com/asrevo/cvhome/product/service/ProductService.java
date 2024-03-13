@@ -13,4 +13,6 @@ public interface ProductService {
     CreateProductResponseDto createProduct(StoreId storeId, CreateProductDto createProductDto);
 
     UpdateProductResponseDto updateProduct(StoreId storeId, ProductId productId, UpdateProductDto updateProductDto);
+
+    ProductDto addImage(StoreId storeId, ProductId productId, String link);
 }
