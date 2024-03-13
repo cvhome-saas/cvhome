@@ -77,6 +77,7 @@ class ProductServiceTest {
         assertThat(createProductResponseDto.price(), is(createProductDto.price()));
         assertThat(createProductResponseDto.imageLink(), is(createProductDto.imageLink()));
     }
+
     @Test
     void deleteProduct() {
         StoreId storeId = StoreId.newId();
