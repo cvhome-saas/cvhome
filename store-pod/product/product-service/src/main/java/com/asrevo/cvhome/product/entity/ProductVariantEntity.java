@@ -5,6 +5,7 @@ import com.asrevo.cvhome.product.commons.domain.ProductAmount;
 import com.asrevo.cvhome.product.commons.domain.ProductId;
 import com.asrevo.cvhome.product.commons.domain.ProductPrice;
 import com.asrevo.cvhome.product.commons.domain.ProductVariantId;
+import com.asrevo.cvhome.product.commons.dto.AddProductVariantDto;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;
@@ -30,12 +31,13 @@ public class ProductVariantEntity extends BaseEntity<ProductVariantEntity, Produ
     @MappedCollection(idColumn = "product_variant_id", keyColumn = "id")
     private List<ProductVariantFeatureEntity> features = new ArrayList<>();
 
-    public static ProductVariantEntity createProductVariant(ProductId id, ProductPrice price, ProductAmount amount, List<ProductVariantFeatureEntity> features) {
+    public static ProductVariantEntity createProductVariant(ProductId id, AddProductVariantDto addProductVariantDto) {
         ProductVariantEntity productVariant = new ProductVariantEntity();
         ProductVariantId generatedId = productVariant.setNew();
         productVariant.setProduct(new ProductVariantRefEntity(AggregateReference.to(id), AggregateReference.to(generatedId)));
-        productVariant.setPrice(price);
-        productVariant.setAmount(amount);
+        productVariant.setPrice(addProductVariantDto.price());
+        productVariant.setAmount(addProductVariantDto.amount());
+        List<ProductVariantFeatureEntity> features = addProductVariantDto.features().entrySet().stream().map(it -> ProductVariantFeatureEntity.createProductFeature(it.getKey(), it.getValue())).toList();
         productVariant.setFeatures(features);
         return productVariant;
     }

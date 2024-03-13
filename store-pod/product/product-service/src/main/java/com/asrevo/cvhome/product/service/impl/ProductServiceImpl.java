@@ -1,10 +1,13 @@
 package com.asrevo.cvhome.product.service.impl;
 
 import com.asrevo.cvhome.product.commons.domain.ProductId;
+import com.asrevo.cvhome.product.commons.domain.ProductVariantId;
 import com.asrevo.cvhome.product.commons.dto.*;
 import com.asrevo.cvhome.product.entity.ProductEntity;
+import com.asrevo.cvhome.product.entity.ProductVariantEntity;
 import com.asrevo.cvhome.product.mappers.ProductMapper;
 import com.asrevo.cvhome.product.repository.ProductRepository;
+import com.asrevo.cvhome.product.repository.ProductVariantRepository;
 import com.asrevo.cvhome.product.service.ProductService;
 import com.asrevo.cvhome.store.commons.domain.StoreId;
 import lombok.AllArgsConstructor;
@@ -18,6 +21,7 @@ import java.util.List;
 @AllArgsConstructor
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
+    private final ProductVariantRepository productVariantRepository;
     private final ProductMapper productMapper;
 
     @Override
@@ -48,7 +52,29 @@ public class ProductServiceImpl implements ProductService {
     public ProductDto addImage(StoreId storeId, ProductId productId, String link) {
         return productRepository.findOneByStoreIdAndId(storeId, productId)
                 .map(it -> it.addImage(link))
-                .map(it -> productMapper.toDto(productRepository.save(it)))
+                .map(productRepository::save)
+                .map(productMapper::toDto)
+                .orElse(null);
+    }
+
+    @Transactional
+    @Override
+    public AddProductVariantResponseDto addVariant(StoreId storeId, ProductId productId, AddProductVariantDto addProductVariantDto) {
+        return productRepository.findOneByStoreIdAndId(storeId, productId)
+                .map(it -> ProductVariantEntity.createProductVariant(it.getId(), addProductVariantDto))
+                .map(productVariantRepository::save)
+                .map(productMapper::toAddProductVariantResponseDto)
+                .orElse(null);
+
+    }
+
+    @Override
+    public ProductVariantDto getProductVariant(StoreId storeId, ProductId productId, ProductVariantId variantId) {
+        return productRepository.findOneByStoreIdAndId(storeId, productId)
+                .flatMap(it -> {
+                    return productVariantRepository.findById(variantId);
+                })
+                .map(productMapper::toDto)
                 .orElse(null);
     }
 }

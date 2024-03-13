@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.product.service;
 
 import com.asrevo.cvhome.product.commons.domain.ProductId;
+import com.asrevo.cvhome.product.commons.domain.ProductVariantId;
 import com.asrevo.cvhome.product.commons.dto.*;
 import com.asrevo.cvhome.store.commons.domain.StoreId;
 import org.springframework.data.domain.Pageable;
@@ -15,4 +16,8 @@ public interface ProductService {
     UpdateProductResponseDto updateProduct(StoreId storeId, ProductId productId, UpdateProductDto updateProductDto);
 
     ProductDto addImage(StoreId storeId, ProductId productId, String link);
+
+    AddProductVariantResponseDto addVariant(StoreId storeId, ProductId productId, AddProductVariantDto addProductVariantDto);
+
+    ProductVariantDto getProductVariant(StoreId storeId, ProductId productId, ProductVariantId variantId);
 }

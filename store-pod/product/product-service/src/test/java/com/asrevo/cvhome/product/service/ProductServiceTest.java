@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.product.service;
 
+import com.asrevo.cvhome.product.commons.domain.ProductAmount;
 import com.asrevo.cvhome.product.commons.domain.ProductPrice;
 import com.asrevo.cvhome.product.commons.dto.*;
 import com.asrevo.cvhome.product.mappers.ProductMapperImpl;
@@ -20,6 +21,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.Currency;
 import java.util.List;
+import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -77,7 +79,37 @@ class ProductServiceTest {
         CreateProductResponseDto createProductResponseDto = productService.createProduct(storeId, createProductDto);
         String newLink = "new link";
         ProductDto product = productService.addImage(storeId, createProductResponseDto.id(), newLink);
-        assertThat(product.images(),hasItem(newLink));
+        assertThat(product.images(), hasItem(newLink));
+
+    }
+
+    @Test
+    void addVariant() {
+        StoreId storeId = StoreId.newId();
+        CreateProductDto createProductDto = new CreateProductDto("p1", "d1", new ProductPrice(50D, Currency.getInstance("USD")), Boolean.TRUE);
+        CreateProductResponseDto createProductResponseDto = productService.createProduct(storeId, createProductDto);
+
+        AddProductVariantDto addProductVariantDto = new AddProductVariantDto(new ProductPrice(66D, Currency.getInstance("USD")), new ProductAmount(20), Map.of("COLOR", "RED"));
+        AddProductVariantResponseDto addProductVariantResponseDto = productService.addVariant(storeId, createProductResponseDto.id(), addProductVariantDto);
+        assertThat(addProductVariantResponseDto.id(), notNullValue());
+        assertThat(addProductVariantResponseDto.amount(), is(addProductVariantDto.amount()));
+        assertThat(addProductVariantResponseDto.price(), is(addProductVariantDto.price()));
+        assertThat(addProductVariantResponseDto.features(), is(addProductVariantDto.features()));
+
+    }
+
+    @Test
+    void getVariant() {
+        StoreId storeId = StoreId.newId();
+        CreateProductDto createProductDto = new CreateProductDto("p1", "d1", new ProductPrice(50D, Currency.getInstance("USD")), Boolean.TRUE);
+        CreateProductResponseDto createProductResponseDto = productService.createProduct(storeId, createProductDto);
+
+        AddProductVariantDto addProductVariantDto = new AddProductVariantDto(new ProductPrice(66D, Currency.getInstance("USD")), new ProductAmount(20), Map.of("COLOR", "RED"));
+        AddProductVariantResponseDto addProductVariantResponseDto = productService.addVariant(storeId, createProductResponseDto.id(), addProductVariantDto);
+
+        ProductVariantDto productVariant = productService.getProductVariant(storeId, createProductResponseDto.id(), addProductVariantResponseDto.id());
+        assertThat(productVariant, notNullValue());
+        System.out.println("aaaaaaaaaa");
 
     }
 }

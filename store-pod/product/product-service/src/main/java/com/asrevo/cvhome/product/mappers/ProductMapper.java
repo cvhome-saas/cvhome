@@ -1,17 +1,18 @@
 package com.asrevo.cvhome.product.mappers;
 
-import com.asrevo.cvhome.product.commons.dto.CreateProductResponseDto;
-import com.asrevo.cvhome.product.commons.dto.ProductDto;
-import com.asrevo.cvhome.product.commons.dto.UpdateProductDto;
-import com.asrevo.cvhome.product.commons.dto.UpdateProductResponseDto;
+import com.asrevo.cvhome.product.commons.dto.*;
 import com.asrevo.cvhome.product.entity.ProductEntity;
 import com.asrevo.cvhome.product.entity.ProductImageEntity;
+import com.asrevo.cvhome.product.entity.ProductVariantEntity;
+import com.asrevo.cvhome.product.entity.ProductVariantFeatureEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface ProductMapper {
@@ -32,4 +33,14 @@ public interface ProductMapper {
     void map(UpdateProductDto updateProductDto, @MappingTarget ProductEntity entity);
 
     UpdateProductResponseDto toUpdateProductResponseDto(ProductEntity entity);
+
+    AddProductVariantResponseDto toAddProductVariantResponseDto(ProductVariantEntity entity);
+
+    default Map<String, String> toMap(List<ProductVariantFeatureEntity> features) {
+        HashMap<String, String> map = new HashMap<>();
+        features.forEach(it-> map.put(it.getKey(), it.getValue()));
+        return map;
+    };
+
+    ProductVariantDto toDto(ProductVariantEntity entity);
 }
