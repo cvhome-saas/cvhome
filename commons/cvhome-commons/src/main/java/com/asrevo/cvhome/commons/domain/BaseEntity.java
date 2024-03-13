@@ -17,8 +17,9 @@ public abstract class BaseEntity<E extends AbstractAggregateRoot<E>, T extends I
 
     protected abstract T generateId();
 
-    protected void setNew() {
+    protected T setNew() {
         this.id = generateId();
         this.isNew = true;
+        return this.id;
     }
 }

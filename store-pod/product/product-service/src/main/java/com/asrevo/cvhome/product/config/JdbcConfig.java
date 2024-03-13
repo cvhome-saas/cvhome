@@ -2,6 +2,9 @@ package com.asrevo.cvhome.product.config;
 
 import com.asrevo.cvhome.commons.domain.BaseEntity;
 import com.asrevo.cvhome.commons.domain.Identifier;
+import com.asrevo.cvhome.product.commons.domain.ProductId;
+import com.asrevo.cvhome.product.commons.domain.ProductPrice;
+import com.asrevo.cvhome.product.commons.domain.ProductVariantId;
 import com.asrevo.cvhome.store.commons.domain.StoreId;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +16,7 @@ import org.springframework.data.jdbc.repository.config.AbstractJdbcConfiguration
 import org.springframework.data.relational.core.mapping.event.AfterSaveCallback;
 
 import java.util.ArrayList;
+import java.util.Currency;
 import java.util.List;
 
 @Configuration
@@ -35,12 +39,37 @@ public class JdbcConfig extends AbstractJdbcConfiguration {
                 return source.getId().toString();
             }
         });
+        converters.add(new Converter<Currency, String>() {
+            @Override
+            public String convert(Currency source) {
+                return source.toString();
+            }
+        });
         converters.add(new Converter<String, StoreId>() {
             @Override
             public StoreId convert(String source) {
                 return new StoreId(source);
             }
         });
+        converters.add(new Converter<String, ProductId>() {
+            @Override
+            public ProductId convert(String source) {
+                return new ProductId(source);
+            }
+        });
+        converters.add(new Converter<String, ProductVariantId>() {
+            @Override
+            public ProductVariantId convert(String source) {
+                return new ProductVariantId(source);
+            }
+        });
+        converters.add(new Converter<String, Currency>() {
+            @Override
+            public Currency convert(String source) {
+                return Currency.getInstance(source);
+            }
+        });
+
 
         return new JdbcCustomConversions(converters);
     }
