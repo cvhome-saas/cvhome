@@ -29,8 +29,8 @@ public class AdminProductsController {
     }
 
     @GetMapping("find-all")
-    public List<ProductDto> findAll(@RequestParam StoreId storeId, Pageable request) {
-        return productService.findAll(storeId, request);
+    public List<ProductDto> findAll(@RequestParam StoreId storeId, Pageable pageable) {
+        return productService.findAll(storeId, pageable);
     }
 }
 

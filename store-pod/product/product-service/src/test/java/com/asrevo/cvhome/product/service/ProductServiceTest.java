@@ -45,7 +45,7 @@ class ProductServiceTest {
     void findAll() {
         StoreId storeId = StoreId.newId();
         IntStream.range(0, 20).forEach(it -> {
-            CreateProductDto createProductDto = new CreateProductDto("p" + it, "d1" + it, new ProductPrice(50D * it, Currency.getInstance("USD")), Boolean.TRUE);
+            CreateProductDto createProductDto = new CreateProductDto("p" + it, "d1" + it, new ProductPrice(50D * it, Currency.getInstance("USD")), Boolean.TRUE, new ImageLink("google.com"));
             productService.createProduct(storeId, createProductDto);
         });
         PageRequest pageRequest = PageRequest.of(0, 10);
@@ -56,17 +56,18 @@ class ProductServiceTest {
     @Test
     void createProduct() {
         StoreId storeId = StoreId.newId();
-        CreateProductDto createProductDto = new CreateProductDto("p1", "d1", new ProductPrice(50D, Currency.getInstance("USD")), Boolean.TRUE);
+        CreateProductDto createProductDto = new CreateProductDto("p1", "d1", new ProductPrice(50D, Currency.getInstance("USD")), Boolean.TRUE, new ImageLink("google.com"));
         CreateProductResponseDto createProductResponseDto = productService.createProduct(storeId, createProductDto);
         assertThat(createProductResponseDto.published(), is(createProductDto.published()));
         assertThat(createProductResponseDto.id(), notNullValue());
         assertThat(createProductResponseDto.price(), is(createProductDto.price()));
+        assertThat(createProductResponseDto.imageLink(), is(createProductDto.imageLink()));
     }
 
     @Test
     void getProduct() {
         StoreId storeId = StoreId.newId();
-        CreateProductDto createProductDto = new CreateProductDto("p1", "d1", new ProductPrice(50D, Currency.getInstance("USD")), Boolean.TRUE);
+        CreateProductDto createProductDto = new CreateProductDto("p1", "d1", new ProductPrice(50D, Currency.getInstance("USD")), Boolean.TRUE, new ImageLink("google.com"));
         CreateProductResponseDto createProductResponseDto = productService.createProduct(storeId, createProductDto);
         ProductDto productDto = productService.getProduct(storeId, createProductResponseDto.id());
 
@@ -74,12 +75,13 @@ class ProductServiceTest {
         assertThat(createProductResponseDto.name(), is(createProductDto.name()));
         assertThat(createProductResponseDto.description(), is(createProductDto.description()));
         assertThat(createProductResponseDto.price(), is(createProductDto.price()));
+        assertThat(createProductResponseDto.imageLink(), is(createProductDto.imageLink()));
     }
 
     @Test
     void updateProduct() {
         StoreId storeId = StoreId.newId();
-        CreateProductDto createProductDto = new CreateProductDto("p1", "d1", new ProductPrice(50D, Currency.getInstance("USD")), Boolean.TRUE);
+        CreateProductDto createProductDto = new CreateProductDto("p1", "d1", new ProductPrice(50D, Currency.getInstance("USD")), Boolean.TRUE, new ImageLink("google.com"));
         CreateProductResponseDto createProductResponseDto = productService.createProduct(storeId, createProductDto);
 
 
@@ -90,33 +92,24 @@ class ProductServiceTest {
         assertThat(updateProductDto.published(), is(updateProductResponseDto.published()));
         assertThat(updateProductDto.name(), is(updateProductDto.name()));
         assertThat(createProductDto.price(), is(updateProductResponseDto.price()));
+        assertThat(createProductDto.imageLink(), is(updateProductResponseDto.imageLink()));
 
     }
 
     @Test
     void addImage() {
         StoreId storeId = StoreId.newId();
-        CreateProductDto createProductDto = new CreateProductDto("p1", "d1", new ProductPrice(50D, Currency.getInstance("USD")), Boolean.TRUE);
+        CreateProductDto createProductDto = new CreateProductDto("p1", "d1", new ProductPrice(50D, Currency.getInstance("USD")), Boolean.TRUE, new ImageLink("google.com"));
         CreateProductResponseDto createProductResponseDto = productService.createProduct(storeId, createProductDto);
-        ImageLink imageLink = new ImageLink("new link");
-        ProductDto product = productService.addImage(storeId, createProductResponseDto.id(), imageLink);
-        assertThat(product.images(), hasItem(imageLink));
-
-
-        ProductDto productDto = productService.getProduct(storeId, createProductResponseDto.id());
-
-        assertThat(createProductResponseDto.id(), is(productDto.id()));
-        assertThat(createProductResponseDto.name(), is(createProductDto.name()));
-        assertThat(createProductResponseDto.description(), is(createProductDto.description()));
-        assertThat(createProductResponseDto.price(), is(createProductDto.price()));
-        assertThat(productDto.images(), hasItem(imageLink));
-
+        ImageLink imageLink = new ImageLink("new imageLink");
+        AddProductImageResponseDto addProductImageResponseDto = productService.addImage(storeId, createProductResponseDto.id(), imageLink);
+        assertThat(addProductImageResponseDto.imageLink(), equalTo(imageLink));
     }
 
     @Test
     void addVariant() {
         StoreId storeId = StoreId.newId();
-        CreateProductDto createProductDto = new CreateProductDto("p1", "d1", new ProductPrice(50D, Currency.getInstance("USD")), Boolean.TRUE);
+        CreateProductDto createProductDto = new CreateProductDto("p1", "d1", new ProductPrice(50D, Currency.getInstance("USD")), Boolean.TRUE, new ImageLink("google.com"));
         CreateProductResponseDto createProductResponseDto = productService.createProduct(storeId, createProductDto);
 
         AddProductVariantDto addProductVariantDto = new AddProductVariantDto(new ProductPrice(66D, Currency.getInstance("USD")), new ProductAmount(20), Map.of("COLOR", "RED"));
@@ -131,7 +124,7 @@ class ProductServiceTest {
     @Test
     void getVariant() {
         StoreId storeId = StoreId.newId();
-        CreateProductDto createProductDto = new CreateProductDto("p1", "d1", new ProductPrice(50D, Currency.getInstance("USD")), Boolean.TRUE);
+        CreateProductDto createProductDto = new CreateProductDto("p1", "d1", new ProductPrice(50D, Currency.getInstance("USD")), Boolean.TRUE, new ImageLink("google.com"));
         CreateProductResponseDto createProductResponseDto = productService.createProduct(storeId, createProductDto);
 
         AddProductVariantDto addProductVariantDto = new AddProductVariantDto(new ProductPrice(66D, Currency.getInstance("USD")), new ProductAmount(20), Map.of("COLOR", "RED"));

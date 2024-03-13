@@ -19,7 +19,7 @@ import static org.springframework.data.relational.core.mapping.Embedded.OnEmpty.
 public class ProductImageEntity extends BaseEntity<ProductImageEntity, ProductImageId> {
     @Column("link")
     @Embedded(onEmpty = USE_NULL)
-    private ImageLink link;
+    private ImageLink imageLink;
     @Column("product_id")
     private AggregateReference<ProductEntity, ProductId> product;
 
@@ -27,7 +27,7 @@ public class ProductImageEntity extends BaseEntity<ProductImageEntity, ProductIm
         ProductImageEntity productImage = new ProductImageEntity();
         productImage.setNew();
         productImage.setProduct(AggregateReference.to(productId));
-        productImage.setLink(link);
+        productImage.setImageLink(link);
         return productImage;
     }
 

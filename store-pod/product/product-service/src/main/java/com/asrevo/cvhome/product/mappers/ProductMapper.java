@@ -19,12 +19,9 @@ import java.util.Map;
 
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface ProductMapper {
-    @Mapping(source = "productImages", target = "images")
     ProductDto toDto(ProductEntity entity);
-
-    default List<ImageLink> toImages(List<ProductImageEntity> images) {
-        return images.stream().map(ProductImageEntity::getLink).toList();
-    }
+    @Mapping(source = "product", target = "productId")
+    AddProductImageResponseDto toDto(ProductImageEntity entity);
 
     CreateProductResponseDto toCreateProductResponseDto(ProductEntity entity);
 
@@ -33,7 +30,6 @@ public interface ProductMapper {
     @Mapping(target = "storeId", ignore = true)
     @Mapping(target = "deleted", ignore = true)
     @Mapping(target = "isNew", ignore = true)
-    @Mapping(target = "productImages", ignore = true)
     void map(UpdateProductDto updateProductDto, @MappingTarget ProductEntity entity);
 
     UpdateProductResponseDto toUpdateProductResponseDto(ProductEntity entity);

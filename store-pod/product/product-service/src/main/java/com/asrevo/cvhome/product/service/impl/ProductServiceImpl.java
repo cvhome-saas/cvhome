@@ -5,8 +5,10 @@ import com.asrevo.cvhome.product.commons.domain.ProductId;
 import com.asrevo.cvhome.product.commons.domain.ProductVariantId;
 import com.asrevo.cvhome.product.commons.dto.*;
 import com.asrevo.cvhome.product.entity.ProductEntity;
+import com.asrevo.cvhome.product.entity.ProductImageEntity;
 import com.asrevo.cvhome.product.entity.ProductVariantEntity;
 import com.asrevo.cvhome.product.mappers.ProductMapper;
+import com.asrevo.cvhome.product.repository.ProductImageRepository;
 import com.asrevo.cvhome.product.repository.ProductRepository;
 import com.asrevo.cvhome.product.repository.ProductVariantRepository;
 import com.asrevo.cvhome.product.service.ProductService;
@@ -23,6 +25,7 @@ import java.util.List;
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final ProductVariantRepository productVariantRepository;
+    private final ProductImageRepository productImageRepository;
     private final ProductMapper productMapper;
 
     @Override
@@ -71,11 +74,20 @@ public class ProductServiceImpl implements ProductService {
 
     @Transactional
     @Override
-    public ProductDto addImage(StoreId storeId, ProductId productId, ImageLink link) {
+    public AddProductImageResponseDto addImage(StoreId storeId, ProductId productId, ImageLink imageLink) {
         return productRepository.findOneByStoreIdAndIdAndDeletedIsFalse(storeId, productId)
-                .map(it -> it.addImage(link))
-                .map(productRepository::save)
-                .map(productMapper::toDto)
+                .map(it -> {
+                    ProductImageEntity productImage = ProductImageEntity.create(it.getId(), imageLink);
+                    return productImage;
+                })
+                .map(entity -> {
+                    ProductImageEntity save = productImageRepository.save(entity);
+                    return save;
+                })
+                .map(entity1 -> {
+                    AddProductImageResponseDto dto = productMapper.toDto(entity1);
+                    return dto;
+                })
                 .orElse(null);
     }
 

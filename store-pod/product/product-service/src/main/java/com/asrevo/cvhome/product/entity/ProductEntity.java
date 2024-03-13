@@ -9,6 +9,7 @@ import com.asrevo.cvhome.product.commons.dto.CreateProductDto;
 import com.asrevo.cvhome.store.commons.domain.StoreId;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Embedded;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
@@ -31,8 +32,9 @@ public class ProductEntity extends BaseEntity<ProductEntity, ProductId> {
     private ProductPrice price;
     private Boolean published;
     private Boolean deleted;
-    @MappedCollection(idColumn = "product_id",keyColumn = "sequence")
-    private List<ProductImageEntity> productImages = new ArrayList<>();
+    @Column("image_link")
+    @Embedded(onEmpty = USE_NULL)
+    private ImageLink imageLink;
 
     public static ProductEntity createProduct(StoreId storeId, CreateProductDto createProductDto) {
         ProductEntity product = new ProductEntity();
@@ -43,6 +45,7 @@ public class ProductEntity extends BaseEntity<ProductEntity, ProductId> {
         product.setPrice(createProductDto.price());
         product.setPublished(createProductDto.published());
         product.setDeleted(Boolean.FALSE);
+        product.setImageLink(createProductDto.imageLink());
         return product;
     }
 
@@ -51,10 +54,6 @@ public class ProductEntity extends BaseEntity<ProductEntity, ProductId> {
         return ProductId.newId();
     }
 
-    public ProductEntity addImage(ImageLink link) {
-        this.productImages.add(ProductImageEntity.create(this.id, link));
-        return this;
-    }
     public ProductEntity delete() {
         this.deleted = Boolean.TRUE;
         return this;

@@ -18,7 +18,7 @@ public interface ProductService {
 
     UpdateProductResponseDto updateProduct(StoreId storeId, ProductId productId, UpdateProductDto updateProductDto);
 
-    ProductDto addImage(StoreId storeId, ProductId productId, ImageLink imageLink);
+    AddProductImageResponseDto addImage(StoreId storeId, ProductId productId, ImageLink imageLink);
 
     AddProductVariantResponseDto addVariant(StoreId storeId, ProductId productId, AddProductVariantDto addProductVariantDto);
 
