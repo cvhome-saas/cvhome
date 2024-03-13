@@ -77,6 +77,17 @@ class ProductServiceTest {
         assertThat(createProductResponseDto.price(), is(createProductDto.price()));
         assertThat(createProductResponseDto.imageLink(), is(createProductDto.imageLink()));
     }
+    @Test
+    void deleteProduct() {
+        StoreId storeId = StoreId.newId();
+        CreateProductDto createProductDto = new CreateProductDto("p1", "d1", new ProductPrice(50D, Currency.getInstance("USD")), Boolean.TRUE, new ImageLink("google.com"));
+        CreateProductResponseDto createProductResponseDto = productService.createProduct(storeId, createProductDto);
+        DeleteProductResponseDto deleteProductResponseDto = productService.deleteProduct(storeId, createProductResponseDto.id());
+        ProductDto productDto = productService.getProduct(storeId, createProductResponseDto.id());
+        assertThat(deleteProductResponseDto.id(), is(createProductResponseDto.id()));
+        assertThat(deleteProductResponseDto.deleted(), is(Boolean.TRUE));
+        assertThat(productDto, nullValue());
+    }
 
     @Test
     void updateProduct() {
