@@ -10,8 +10,8 @@ import static com.asrevo.cvhome.gateway.utils.WebClientsUtils.build;
 
 @Configuration
 public class ClientsConfig {
-  @Bean
-  public DomainReferenceService domainReferenceService(@Qualifier("defaultMicroServiceBuilder") WebClient.Builder builder) {
-    return build(builder, "lb://domain-certificate-manager", DomainReferenceService.class);
-  }
+    @Bean
+    public DomainReferenceService domainReferenceService(@Qualifier("defaultMicroServiceBuilder") WebClient.Builder builder) {
+        return build(builder, "lb://domain-certificate-manager", DomainReferenceService.class);
+    }
 }

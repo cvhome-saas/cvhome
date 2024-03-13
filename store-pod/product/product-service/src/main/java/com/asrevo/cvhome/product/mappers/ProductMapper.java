@@ -12,16 +12,16 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface ProductMapper {
-  ProductDto toDto(ProductEntity entity);
+    ProductDto toDto(ProductEntity entity);
 
-  CreateProductResponseDto toCreateProductResponseDto(ProductEntity entity);
+    CreateProductResponseDto toCreateProductResponseDto(ProductEntity entity);
 
-  @Mapping(target = "new", ignore = true)
-  @Mapping(target = "id", ignore = true)
-  @Mapping(target = "storeId", ignore = true)
-  @Mapping(target = "productVariants", ignore = true)
-  @Mapping(target = "isNew", ignore = true)
-  void map(UpdateProductDto updateProductDto, @MappingTarget ProductEntity entity);
+    @Mapping(target = "new", ignore = true)
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "storeId", ignore = true)
+    @Mapping(target = "productVariants", ignore = true)
+    @Mapping(target = "isNew", ignore = true)
+    void map(UpdateProductDto updateProductDto, @MappingTarget ProductEntity entity);
 
-  UpdateProductResponseDto toUpdateProductResponseDto(ProductEntity entity);
+    UpdateProductResponseDto toUpdateProductResponseDto(ProductEntity entity);
 }

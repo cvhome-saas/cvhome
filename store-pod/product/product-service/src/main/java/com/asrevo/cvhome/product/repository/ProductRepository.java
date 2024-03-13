@@ -10,7 +10,7 @@ import org.springframework.data.repository.ListCrudRepository;
 import java.util.Optional;
 
 public interface ProductRepository extends ListCrudRepository<ProductEntity, ProductId> {
-  Page<ProductEntity> findAllByStoreId(StoreId storeId, Pageable pageable);
+    Page<ProductEntity> findAllByStoreId(StoreId storeId, Pageable pageable);
 
     Optional<ProductEntity> findOneByStoreIdAndId(StoreId storeId, ProductId productId);
 }

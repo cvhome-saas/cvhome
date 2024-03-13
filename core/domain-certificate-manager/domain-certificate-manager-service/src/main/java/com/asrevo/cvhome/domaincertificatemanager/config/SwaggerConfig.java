@@ -19,38 +19,38 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class SwaggerConfig {
-  static {
-    SpringDocUtils.getConfig().replaceWithClass(CertificateId.class, String.class);
-    SpringDocUtils.getConfig().replaceWithClass(DomainId.class, String.class);
-    SpringDocUtils.getConfig().replaceWithClass(OrdersId.class, String.class);
-    SpringDocUtils.getConfig().replaceWithClass(EventId.class, String.class);
-    SpringDocUtils.getConfig().replaceWithClass(IdentityId.class, String.class);
-    SpringDocUtils.getConfig().replaceWithClass(FileId.class, String.class);
-    SpringDocUtils.getConfig().replaceWithClass(PodId.class, String.class);
-  }
+    static {
+        SpringDocUtils.getConfig().replaceWithClass(CertificateId.class, String.class);
+        SpringDocUtils.getConfig().replaceWithClass(DomainId.class, String.class);
+        SpringDocUtils.getConfig().replaceWithClass(OrdersId.class, String.class);
+        SpringDocUtils.getConfig().replaceWithClass(EventId.class, String.class);
+        SpringDocUtils.getConfig().replaceWithClass(IdentityId.class, String.class);
+        SpringDocUtils.getConfig().replaceWithClass(FileId.class, String.class);
+        SpringDocUtils.getConfig().replaceWithClass(PodId.class, String.class);
+    }
 
-  @Bean
-  public OpenAPI customOpenAPI() {
-    String name = "bearer-key";
-    String basePath = "/";
+    @Bean
+    public OpenAPI customOpenAPI() {
+        String name = "bearer-key";
+        String basePath = "/";
 //    if (Set.of(environment.getActiveProfiles()).contains("cloud")) {
 //      basePath = "/uxplore";
 //    }
-    Server server = new Server()
-      .url(basePath);
-    SecurityScheme securitySchemesItem = new SecurityScheme()
-      .type(SecurityScheme.Type.HTTP)
-      .scheme("Bearer")
-      .bearerFormat("JWT");
-    Components components = new Components().addSecuritySchemes(name, securitySchemesItem);
-    SecurityRequirement securityRequirement = new SecurityRequirement().addList(name);
-    Info info = new Info()
-      .title("title")
-      .version("1.0");
-    return new OpenAPI()
-      .addServersItem(server)
-      .components(components)
-      .addSecurityItem(securityRequirement)
-      .info(info);
-  }
+        Server server = new Server()
+                .url(basePath);
+        SecurityScheme securitySchemesItem = new SecurityScheme()
+                .type(SecurityScheme.Type.HTTP)
+                .scheme("Bearer")
+                .bearerFormat("JWT");
+        Components components = new Components().addSecuritySchemes(name, securitySchemesItem);
+        SecurityRequirement securityRequirement = new SecurityRequirement().addList(name);
+        Info info = new Info()
+                .title("title")
+                .version("1.0");
+        return new OpenAPI()
+                .addServersItem(server)
+                .components(components)
+                .addSecurityItem(securityRequirement)
+                .info(info);
+    }
 }

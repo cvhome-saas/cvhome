@@ -23,8 +23,6 @@ import static org.shredzone.acme4j.challenge.TlsAlpn01Challenge.ACME_TLS_1_PROTO
 
 @Slf4j
 public class ChallengeUtils {
-    private static final SSLSocketFactory socketFactory = createSSlFactory();
-
     private static final TrustManager MOCK_TRUST_MANAGER = new X509ExtendedTrustManager() {
         @Override
         public void checkClientTrusted(X509Certificate[] x509Certificates, String s, Socket socket) throws CertificateException {
@@ -72,10 +70,9 @@ public class ChallengeUtils {
         }
     }
 
-
     static boolean validate(TlsAlpnChallenge challenge) {
         return validateAcmeTls1(challenge.domain().domain(), 8443) || validateAcmeTls1(challenge.domain().domain(), 443);
-    }
+    }    private static final SSLSocketFactory socketFactory = createSSlFactory();
 
     /*
     *
@@ -156,6 +153,8 @@ public class ChallengeUtils {
         log.warn("validation not valid ");
         return false;
     }
+
+
 
 
 }

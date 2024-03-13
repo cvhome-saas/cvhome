@@ -8,9 +8,9 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface ProductService {
-  List<ProductDto> findAll(StoreId storeId, Pageable pageable);
+    List<ProductDto> findAll(StoreId storeId, Pageable pageable);
 
-  CreateProductResponseDto createProduct(StoreId storeId, CreateProductDto createProductDto);
+    CreateProductResponseDto createProduct(StoreId storeId, CreateProductDto createProductDto);
 
-  UpdateProductResponseDto updateProduct(StoreId storeId, ProductId productId, UpdateProductDto updateProductDto);
+    UpdateProductResponseDto updateProduct(StoreId storeId, ProductId productId, UpdateProductDto updateProductDto);
 }

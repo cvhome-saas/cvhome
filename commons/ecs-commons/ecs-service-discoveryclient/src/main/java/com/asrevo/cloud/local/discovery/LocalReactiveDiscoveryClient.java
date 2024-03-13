@@ -20,6 +20,19 @@ public class LocalReactiveDiscoveryClient implements ReactiveDiscoveryClient {
         this.properties = properties;
     }
 
+    /**
+     * @param properties for getting defined services
+     * @param serviceId  The serviceId to query.
+     * @return available services
+     */
+    public static Flux<ServiceInstance> getDefaultServiceInstances(
+            LocalDiscoveryProperties properties,
+            String serviceId) {
+
+        return Flux.fromIterable(properties.getServices().get(serviceId))
+                .map(it -> new LocalServiceInstance(serviceId, it));
+    }
+
     @Override
     public String description() {
         return "local reactive discovery client";
@@ -32,20 +45,6 @@ public class LocalReactiveDiscoveryClient implements ReactiveDiscoveryClient {
     @Override
     public Flux<ServiceInstance> getInstances(String serviceId) {
         return getDefaultServiceInstances(this.properties, serviceId);
-    }
-
-    /**
-     *
-      * @param properties for getting defined services
-     * @param serviceId  The serviceId to query.
-     * @return available services
-     */
-    public static Flux<ServiceInstance> getDefaultServiceInstances(
-            LocalDiscoveryProperties properties,
-            String serviceId) {
-
-        return Flux.fromIterable(properties.getServices().get(serviceId))
-                .map(it -> new LocalServiceInstance(serviceId, it));
     }
 
     @Override

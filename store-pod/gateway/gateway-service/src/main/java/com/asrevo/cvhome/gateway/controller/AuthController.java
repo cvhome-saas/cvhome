@@ -21,13 +21,13 @@ import java.util.Optional;
 @Slf4j
 @AllArgsConstructor
 public class AuthController {
-  @GetMapping("current")
-  public ResponseEntity<Principal> current(@AuthenticationPrincipal Principal principal) {
-    return Optional.ofNullable(principal)
-      .map(ResponseEntity::ok)
-      .orElseGet(() ->
-        new ResponseEntity<>(HttpStatus.UNAUTHORIZED));
-  }
+    @GetMapping("current")
+    public ResponseEntity<Principal> current(@AuthenticationPrincipal Principal principal) {
+        return Optional.ofNullable(principal)
+                .map(ResponseEntity::ok)
+                .orElseGet(() ->
+                        new ResponseEntity<>(HttpStatus.UNAUTHORIZED));
+    }
 
     @GetMapping("me")
     public Mono<OAuth2AuthenticationToken> me() {

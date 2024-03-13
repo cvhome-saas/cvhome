@@ -9,9 +9,9 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 @EnableConfigurationProperties({ServiceDomainProperties.class})
 public class LandingApplication {
 
-  @lombok.Generated
-  public static void main(String[] args) {
-    SpringApplication.run(LandingApplication.class, args);
-  }
+    @lombok.Generated
+    public static void main(String[] args) {
+        SpringApplication.run(LandingApplication.class, args);
+    }
 
 }

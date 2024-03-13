@@ -16,6 +16,13 @@ public class DnsChallengeVerifyServiceProvider implements ChallengeServiceProvid
 
     private final Map<DnsProvider, DnsInstaller> instances = new HashMap<>();
 
+    private static DnsInstaller getDnsInstaller(DnsProvider it) {
+        return switch (it) {
+            case ROUTE53 -> new Route53DnsInstallerImpl();
+            case UNKNOWN -> new UnknownDnsInstallerImpl();
+        };
+    }
+
     @Override
     public DnsInstaller getInstance(ListDnsChallenge challenge) {
         return getRecommendedProvider(challenge)
@@ -23,13 +30,6 @@ public class DnsChallengeVerifyServiceProvider implements ChallengeServiceProvid
                         instances.computeIfAbsent(it, (provider) ->
                                 getDnsInstaller(it)))
                 .orElse(null);
-    }
-
-    private static DnsInstaller getDnsInstaller(DnsProvider it) {
-        return switch (it) {
-            case ROUTE53 -> new Route53DnsInstallerImpl();
-            case UNKNOWN -> new UnknownDnsInstallerImpl();
-        };
     }
 
     //@TODO later we could provide mechanism to determine real dns provider that host this domain

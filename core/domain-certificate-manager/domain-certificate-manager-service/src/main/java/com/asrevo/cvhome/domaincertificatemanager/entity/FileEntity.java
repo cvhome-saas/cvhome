@@ -22,12 +22,12 @@ public class FileEntity extends BaseEntity<FileEntity, FileId> {
         return fileEntity;
     }
 
+    public static String resolveFileUri(String basePath, String fileName, String ext) {
+        return "file://" + basePath + "/" + fileName + ext;
+    }
+
     @Override
     protected FileId generateId() {
         return FileId.newId();
-    }
-
-    public static String resolveFileUri(String basePath, String fileName, String ext) {
-        return "file://" + basePath + "/" + fileName + ext;
     }
 }

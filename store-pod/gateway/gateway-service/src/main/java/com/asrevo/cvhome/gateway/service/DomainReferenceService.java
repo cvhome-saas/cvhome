@@ -10,6 +10,6 @@ import reactor.core.publisher.Mono;
 
 @HttpExchange("api/v1/domain-ownership")
 public interface DomainReferenceService {
-  @PostExchange("/get-reference")
-  Mono<ResponseEntity<DomainReference>> getReference(@RequestBody Domain domain);
+    @PostExchange("/get-reference")
+    Mono<ResponseEntity<DomainReference>> getReference(@RequestBody Domain domain);
 }

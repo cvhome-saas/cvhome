@@ -5,7 +5,6 @@ import com.asrevo.cvhome.product.service.ProductService;
 import com.asrevo.cvhome.store.commons.domain.StoreId;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,11 +18,11 @@ import java.util.List;
 @AllArgsConstructor
 @Slf4j
 public class ProductsController {
-  private final ProductService productService;
+    private final ProductService productService;
 
-  @GetMapping("find-all")
-  public List<ProductDto> findAll(@RequestParam StoreId storeId, Pageable request) {
-    return productService.findAll(storeId, request);
-  }
+    @GetMapping("find-all")
+    public List<ProductDto> findAll(@RequestParam StoreId storeId, Pageable request) {
+        return productService.findAll(storeId, request);
+    }
 }
 

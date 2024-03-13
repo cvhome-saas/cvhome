@@ -3,7 +3,6 @@ package com.asrevo.cvhome.store.service;
 import com.asrevo.cvhome.commons.domain.IdentityId;
 import com.asrevo.cvhome.store.commons.dto.CreateStoreRequest;
 import com.asrevo.cvhome.store.commons.dto.StoreDto;
-import org.mapstruct.Mapping;
 
 import java.util.List;
 

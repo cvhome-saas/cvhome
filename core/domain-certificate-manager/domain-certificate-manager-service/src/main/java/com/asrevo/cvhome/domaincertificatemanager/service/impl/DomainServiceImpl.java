@@ -43,12 +43,12 @@ public class DomainServiceImpl implements DomainService {
     @Override
     public DomainReferenceResponse getReference(Domain domain) {
         return domainRepository.findByDomain(domain)
-          .map(it -> {
-            PodDto pod = podService.getPod(it.getPod().getId());
-            Reference reference = it.getReference();
-            return new DomainReferenceResponse(DomainStatus.PUBLISHED, reference, pod);
-          })
-          .orElseThrow(() -> new RuntimeException("couldn't find this domain"));
+                .map(it -> {
+                    PodDto pod = podService.getPod(it.getPod().getId());
+                    Reference reference = it.getReference();
+                    return new DomainReferenceResponse(DomainStatus.PUBLISHED, reference, pod);
+                })
+                .orElseThrow(() -> new RuntimeException("couldn't find this domain"));
     }
 
     @Override

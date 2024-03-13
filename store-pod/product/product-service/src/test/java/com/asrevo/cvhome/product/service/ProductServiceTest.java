@@ -32,43 +32,43 @@ import static org.hamcrest.Matchers.notNullValue;
 @Testcontainers
 @Tag("integration-test")
 class ProductServiceTest {
-  @Container
-  @ServiceConnection
-  static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:13");
-  @Autowired
-  private ProductService productService;
+    @Container
+    @ServiceConnection
+    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:13");
+    @Autowired
+    private ProductService productService;
 
-  @Test
-  void findAll() {
-    List<ProductDto> all = productService.findAll(StoreId.newId(), PageRequest.of(0, 10));
-    System.out.println(all);
-  }
+    @Test
+    void findAll() {
+        List<ProductDto> all = productService.findAll(StoreId.newId(), PageRequest.of(0, 10));
+        System.out.println(all);
+    }
 
-  @Test
-  void createProduct() {
-    StoreId storeId = StoreId.newId();
-    CreateProductDto createProductDto = new CreateProductDto("p1", "d1", new ProductPrice(50D, Currency.getInstance("USD")), Boolean.TRUE);
-    CreateProductResponseDto createProductResponseDto = productService.createProduct(storeId, createProductDto);
-    assertThat(createProductResponseDto.published(), is(createProductDto.published()));
-    assertThat(createProductResponseDto.id(), notNullValue());
-    assertThat(createProductResponseDto.price(),is(createProductDto.price()));
-  }
+    @Test
+    void createProduct() {
+        StoreId storeId = StoreId.newId();
+        CreateProductDto createProductDto = new CreateProductDto("p1", "d1", new ProductPrice(50D, Currency.getInstance("USD")), Boolean.TRUE);
+        CreateProductResponseDto createProductResponseDto = productService.createProduct(storeId, createProductDto);
+        assertThat(createProductResponseDto.published(), is(createProductDto.published()));
+        assertThat(createProductResponseDto.id(), notNullValue());
+        assertThat(createProductResponseDto.price(), is(createProductDto.price()));
+    }
 
-  @Test
-  void updateProduct() {
-    StoreId storeId = StoreId.newId();
-    CreateProductDto createProductDto = new CreateProductDto("p1", "d1", new ProductPrice(50D, Currency.getInstance("USD")), Boolean.TRUE);
-    CreateProductResponseDto createProductResponseDto = productService.createProduct(storeId, createProductDto);
-
-
-    UpdateProductDto updateProductDto = new UpdateProductDto("pnew", null, null, Boolean.FALSE);
-    UpdateProductResponseDto updateProductResponseDto = productService.updateProduct(storeId,createProductResponseDto.id(), updateProductDto);
+    @Test
+    void updateProduct() {
+        StoreId storeId = StoreId.newId();
+        CreateProductDto createProductDto = new CreateProductDto("p1", "d1", new ProductPrice(50D, Currency.getInstance("USD")), Boolean.TRUE);
+        CreateProductResponseDto createProductResponseDto = productService.createProduct(storeId, createProductDto);
 
 
-    assertThat(updateProductDto.published(), is(updateProductResponseDto.published()));
-    assertThat(updateProductDto.name(), is(updateProductDto.name()));
-    assertThat(createProductDto.price(),is(updateProductResponseDto.price()));
+        UpdateProductDto updateProductDto = new UpdateProductDto("pnew", null, null, Boolean.FALSE);
+        UpdateProductResponseDto updateProductResponseDto = productService.updateProduct(storeId, createProductResponseDto.id(), updateProductDto);
 
 
-  }
+        assertThat(updateProductDto.published(), is(updateProductResponseDto.published()));
+        assertThat(updateProductDto.name(), is(updateProductDto.name()));
+        assertThat(createProductDto.price(), is(updateProductResponseDto.price()));
+
+
+    }
 }

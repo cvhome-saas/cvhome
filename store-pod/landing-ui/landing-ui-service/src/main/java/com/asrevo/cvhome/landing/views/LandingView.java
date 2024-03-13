@@ -12,29 +12,29 @@ import reactor.core.publisher.Mono;
 @Controller
 public class LandingView {
 
-  @Autowired
-  private ProductService productService;
+    @Autowired
+    private ProductService productService;
 
-  @GetMapping(value = {"", "/"})
-  public Rendering index() {
-    Rendering.Builder<?> builder = Rendering.view("store-15/index.html");
+    @GetMapping(value = {"", "/"})
+    public Rendering index() {
+        Rendering.Builder<?> builder = Rendering.view("store-15/index.html");
 
-    builder.modelAttribute("landingProducts", new ReactiveDataDriverContextVariable(
-      Flux.defer(() -> Flux.fromIterable(productService.findAllProducts(10)))));
-
-
-    builder.modelAttribute("product", new ReactiveDataDriverContextVariable(
-      Mono.defer(() -> Mono.just(productService.getProductById("10")))));
+        builder.modelAttribute("landingProducts", new ReactiveDataDriverContextVariable(
+                Flux.defer(() -> Flux.fromIterable(productService.findAllProducts(10)))));
 
 
-    return builder.build();
-  }
+        builder.modelAttribute("product", new ReactiveDataDriverContextVariable(
+                Mono.defer(() -> Mono.just(productService.getProductById("10")))));
 
 
-  @GetMapping(value = {"/index.html"})
-  public String redirectToIndex() {
-    return "redirect:/";
-  }
+        return builder.build();
+    }
+
+
+    @GetMapping(value = {"/index.html"})
+    public String redirectToIndex() {
+        return "redirect:/";
+    }
 
 /*
     public String index(WebRequest request) {

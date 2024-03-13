@@ -37,7 +37,7 @@ public class DomainEntity extends BaseEntity<DomainEntity, DomainId> {
     @Column("pod_id")
     private AggregateReference<PodEntity, PodId> pod;
 
-    public static DomainEntity create(Domain domain, Reference reference, DomainType domainType, boolean includeSubDomains, IdentityId identity,PodId podId) {
+    public static DomainEntity create(Domain domain, Reference reference, DomainType domainType, boolean includeSubDomains, IdentityId identity, PodId podId) {
         DomainEntity entity = new DomainEntity();
         entity.setNew();
         entity.setDomain(domain);

@@ -10,19 +10,19 @@ import org.springframework.data.relational.core.mapping.Table;
 @Setter
 @Table("product_variant_feature")
 public class ProductVariantFeatureEntity extends BaseEntity<ProductVariantFeatureEntity, ProductFeatureId> {
-  private String key;
-  private String value;
+    private String key;
+    private String value;
 
-  public static ProductVariantFeatureEntity createProductFeature(String key, String value) {
-    ProductVariantFeatureEntity feature = new ProductVariantFeatureEntity();
-    feature.setNew();
-    feature.setKey(key);
-    feature.setValue(value);
-    return feature;
-  }
+    public static ProductVariantFeatureEntity createProductFeature(String key, String value) {
+        ProductVariantFeatureEntity feature = new ProductVariantFeatureEntity();
+        feature.setNew();
+        feature.setKey(key);
+        feature.setValue(value);
+        return feature;
+    }
 
-  @Override
-  protected ProductFeatureId generateId() {
-    return ProductFeatureId.newId();
-  }
+    @Override
+    protected ProductFeatureId generateId() {
+        return ProductFeatureId.newId();
+    }
 }

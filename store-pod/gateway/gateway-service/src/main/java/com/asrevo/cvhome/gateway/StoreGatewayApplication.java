@@ -8,8 +8,8 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 @SpringBootApplication
 @EnableConfigurationProperties(value = {ServiceDomainProperties.class})
 public class StoreGatewayApplication {
-  @lombok.Generated
-  public static void main(String[] args) {
-    SpringApplication.run(StoreGatewayApplication.class, args);
-  }
+    @lombok.Generated
+    public static void main(String[] args) {
+        SpringApplication.run(StoreGatewayApplication.class, args);
+    }
 }

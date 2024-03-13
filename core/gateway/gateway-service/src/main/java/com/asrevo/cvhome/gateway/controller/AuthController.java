@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
@@ -17,7 +16,6 @@ import reactor.core.publisher.Mono;
 
 import java.security.Principal;
 import java.util.Optional;
-import java.util.function.Function;
 
 @RestController
 @RequestMapping("api/v1/auth")
@@ -25,13 +23,13 @@ import java.util.function.Function;
 @AllArgsConstructor
 @PreAuthorize("isAuthenticated()")
 public class AuthController {
-  @GetMapping("current")
-  public ResponseEntity<Principal> current(@AuthenticationPrincipal Principal principal) {
-    return Optional.ofNullable(principal)
-      .map(ResponseEntity::ok)
-      .orElseGet(() ->
-        new ResponseEntity<>(HttpStatus.UNAUTHORIZED));
-  }
+    @GetMapping("current")
+    public ResponseEntity<Principal> current(@AuthenticationPrincipal Principal principal) {
+        return Optional.ofNullable(principal)
+                .map(ResponseEntity::ok)
+                .orElseGet(() ->
+                        new ResponseEntity<>(HttpStatus.UNAUTHORIZED));
+    }
 
     @GetMapping("me")
     public Mono<OAuth2AuthenticationToken> me() {

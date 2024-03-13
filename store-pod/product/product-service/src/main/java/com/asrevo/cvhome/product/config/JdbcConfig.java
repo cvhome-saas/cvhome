@@ -3,7 +3,6 @@ package com.asrevo.cvhome.product.config;
 import com.asrevo.cvhome.commons.domain.BaseEntity;
 import com.asrevo.cvhome.commons.domain.Identifier;
 import com.asrevo.cvhome.product.commons.domain.ProductId;
-import com.asrevo.cvhome.product.commons.domain.ProductPrice;
 import com.asrevo.cvhome.product.commons.domain.ProductVariantId;
 import com.asrevo.cvhome.store.commons.domain.StoreId;
 import com.fasterxml.jackson.databind.ObjectMapper;

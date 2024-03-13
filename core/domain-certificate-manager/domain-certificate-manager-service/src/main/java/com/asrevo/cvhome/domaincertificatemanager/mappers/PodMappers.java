@@ -6,6 +6,6 @@ import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface PodMappers {
-  PodDto toPodDto(PodEntity entity);
+    PodDto toPodDto(PodEntity entity);
 
 }

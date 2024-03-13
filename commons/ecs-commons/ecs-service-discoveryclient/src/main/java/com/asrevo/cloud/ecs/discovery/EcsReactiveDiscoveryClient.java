@@ -23,16 +23,6 @@ public class EcsReactiveDiscoveryClient implements ReactiveDiscoveryClient {
         this.discoveryAsync = discoveryAsync;
     }
 
-    @Override
-    public String description() {
-        return "ecs reactive discovery client";
-    }
-
-    @Override
-    public Flux<ServiceInstance> getInstances(String serviceId) {
-        return getDefaultServiceInstances(this.discoveryAsync, this.properties, serviceId);
-    }
-
     public static Flux<ServiceInstance> getDefaultServiceInstances(ServiceDiscoveryAsyncClient discoveryAsync,
                                                                    EcsDiscoveryProperties properties,
                                                                    String serviceId) {
@@ -73,11 +63,6 @@ public class EcsReactiveDiscoveryClient implements ReactiveDiscoveryClient {
         }
     }
 
-    @Override
-    public Flux<String> getServices() {
-        return getEcsServices(this.discoveryAsync, this.properties);
-    }
-
     public static Flux<String> getEcsServices(ServiceDiscoveryAsyncClient discoveryAsync,
                                               EcsDiscoveryProperties properties) {
         log.info("getting all services");
@@ -93,6 +78,21 @@ public class EcsReactiveDiscoveryClient implements ReactiveDiscoveryClient {
                 .flatMapMany(Flux::fromIterable)
                 .map(ServiceSummary::name)
                 .mergeWith(Flux.fromIterable(properties.getIncludeServices()));
+    }
+
+    @Override
+    public String description() {
+        return "ecs reactive discovery client";
+    }
+
+    @Override
+    public Flux<ServiceInstance> getInstances(String serviceId) {
+        return getDefaultServiceInstances(this.discoveryAsync, this.properties, serviceId);
+    }
+
+    @Override
+    public Flux<String> getServices() {
+        return getEcsServices(this.discoveryAsync, this.properties);
     }
 }
 

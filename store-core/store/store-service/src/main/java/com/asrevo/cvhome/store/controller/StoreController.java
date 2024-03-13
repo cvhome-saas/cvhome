@@ -4,7 +4,6 @@ import com.asrevo.cvhome.commons.domain.IdentityId;
 import com.asrevo.cvhome.store.commons.dto.CreateStoreRequest;
 import com.asrevo.cvhome.store.commons.dto.StoreDto;
 import com.asrevo.cvhome.store.entity.OwnerEntity;
-import com.asrevo.cvhome.store.entity.StoreEntity;
 import com.asrevo.cvhome.store.service.OwnerService;
 import com.asrevo.cvhome.store.service.StoreService;
 import lombok.AllArgsConstructor;
@@ -26,7 +25,7 @@ public class StoreController {
     @PostMapping
     public StoreDto create(@RequestBody CreateStoreRequest request, @AuthenticationPrincipal Principal principal) {
         OwnerEntity owner = ownerService.getOwnerOrCreate(IdentityId.of(principal.getName()), principal);
-       return storeService.createStore(request, owner.getId());
+        return storeService.createStore(request, owner.getId());
     }
 
     @GetMapping("me")

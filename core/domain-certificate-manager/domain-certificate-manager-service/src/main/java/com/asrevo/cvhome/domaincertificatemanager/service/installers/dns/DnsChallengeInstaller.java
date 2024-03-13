@@ -22,6 +22,14 @@ public class DnsChallengeInstaller implements ChallengeInstaller {
         this.provider = provider;
     }
 
+    private static List<ListDnsChallenge> toListDnsChallenge(ChallengeInstall challenge) {
+        return challenge.challenges().stream()
+                .map(it -> ((DnsChallenge) it))
+                .collect(Collectors.collectingAndThen(Collectors.groupingBy(Challenge::domain), domainListMap ->
+                        domainListMap.entrySet().stream()
+                                .map(it -> new ListDnsChallenge(it.getKey(), it.getValue())).toList()));
+    }
+
     @Override
     public synchronized boolean setup(ChallengeInstall challenge) {
         List<ListDnsChallenge> dnsChallenges = toListDnsChallenge(challenge);
@@ -29,7 +37,6 @@ public class DnsChallengeInstaller implements ChallengeInstaller {
                 .stream()
                 .allMatch(it -> provider.getInstance(it).install(it));
     }
-
 
     @Override
     public boolean clean(ChallengeInstall challenge) {
@@ -42,13 +49,5 @@ public class DnsChallengeInstaller implements ChallengeInstaller {
     @Override
     public ChallengeValidationType type() {
         return ChallengeValidationType.Dns01;
-    }
-
-    private static List<ListDnsChallenge> toListDnsChallenge(ChallengeInstall challenge) {
-        return challenge.challenges().stream()
-                .map(it -> ((DnsChallenge) it))
-                .collect(Collectors.collectingAndThen(Collectors.groupingBy(Challenge::domain), domainListMap ->
-                        domainListMap.entrySet().stream()
-                                .map(it -> new ListDnsChallenge(it.getKey(), it.getValue())).toList()));
     }
 }

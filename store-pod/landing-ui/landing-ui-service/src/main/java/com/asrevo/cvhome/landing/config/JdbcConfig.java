@@ -17,33 +17,33 @@ import java.util.List;
 @Configuration
 public class JdbcConfig extends AbstractJdbcConfiguration {
 
-  private final ObjectMapper ployJson;
-  @Autowired
-  private ObjectMapper mapper;
+    private final ObjectMapper ployJson;
+    @Autowired
+    private ObjectMapper mapper;
 
-  public JdbcConfig() {
-    this.ployJson = JacksonConfig.getPloyJson();
-  }
+    public JdbcConfig() {
+        this.ployJson = JacksonConfig.getPloyJson();
+    }
 
-  @Override
-  public JdbcCustomConversions jdbcCustomConversions() {
-    List<Converter<?, ?>> converters = new ArrayList<>();
-    converters.add(new Converter<Identifier, String>() {
-      @Override
-      public String convert(Identifier source) {
-        return source.getId().toString();
-      }
-    });
+    @Override
+    public JdbcCustomConversions jdbcCustomConversions() {
+        List<Converter<?, ?>> converters = new ArrayList<>();
+        converters.add(new Converter<Identifier, String>() {
+            @Override
+            public String convert(Identifier source) {
+                return source.getId().toString();
+            }
+        });
 
-    return new JdbcCustomConversions(converters);
-  }
+        return new JdbcCustomConversions(converters);
+    }
 
-  @Bean
-  public <R extends Identifier, T extends BaseEntity<?, R>> AfterSaveCallback<T> afterSaveCallback() {
-    return aggregate -> {
-      aggregate.setNew(false);
-      return aggregate;
-    };
-  }
+    @Bean
+    public <R extends Identifier, T extends BaseEntity<?, R>> AfterSaveCallback<T> afterSaveCallback() {
+        return aggregate -> {
+            aggregate.setNew(false);
+            return aggregate;
+        };
+    }
 
 }

@@ -9,7 +9,7 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface StoreMappers {
-    @Mapping(source = "owner.id",target = "owner")
+    @Mapping(source = "owner.id", target = "owner")
     StoreDto toStoreDto(StoreEntity entity);
 
     List<StoreDto> toStoreDto(List<StoreEntity> entities);

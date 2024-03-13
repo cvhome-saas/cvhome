@@ -17,6 +17,10 @@ public class TestWalletApplication {
         return new PostgreSQLContainer<>(DockerImageName.parse("postgres:13"));
     }
 
+    public static void main(String[] args) {
+        SpringApplication.from(WalletApplication::main).with(TestWalletApplication.class).run(args);
+    }
+
     @Bean
     CommandLineRunner runner(PostgreSQLContainer<?> postgresContainer) {
         return args -> {
@@ -24,10 +28,6 @@ public class TestWalletApplication {
             System.out.println(postgresContainer.getUsername());
             System.out.println(postgresContainer.getPassword());
         };
-    }
-
-    public static void main(String[] args) {
-        SpringApplication.from(WalletApplication::main).with(TestWalletApplication.class).run(args);
     }
 
 }

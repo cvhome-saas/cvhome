@@ -13,16 +13,16 @@ import org.springframework.data.relational.core.mapping.Table;
 @Setter
 @Table("pod")
 public class PodEntity extends BaseEntity<PodEntity, PodId> {
-  private PodRegion region;
-  private PodSubRegion subRegion;
-  private PodType podType;
-  private String namespace;
-  private String location;
-  private String locationAlis;
+    private PodRegion region;
+    private PodSubRegion subRegion;
+    private PodType podType;
+    private String namespace;
+    private String location;
+    private String locationAlis;
 
-  @Override
-  protected PodId generateId() {
-    return PodId.newId();
-  }
+    @Override
+    protected PodId generateId() {
+        return PodId.newId();
+    }
 }
 

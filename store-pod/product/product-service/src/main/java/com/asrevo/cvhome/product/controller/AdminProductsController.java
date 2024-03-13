@@ -16,21 +16,21 @@ import java.util.List;
 @AllArgsConstructor
 @Slf4j
 public class AdminProductsController {
-  private final ProductService productService;
+    private final ProductService productService;
 
-  @PostMapping
-  public CreateProductResponseDto createProduct(@RequestParam StoreId storeId, @RequestBody CreateProductDto createProductDto) {
-    return productService.createProduct(storeId, createProductDto);
-  }
+    @PostMapping
+    public CreateProductResponseDto createProduct(@RequestParam StoreId storeId, @RequestBody CreateProductDto createProductDto) {
+        return productService.createProduct(storeId, createProductDto);
+    }
 
-  @PutMapping
-  public UpdateProductResponseDto updateProduct(@RequestParam StoreId storeId, @RequestParam ProductId productId, @RequestBody UpdateProductDto updateProductDto) {
-    return productService.updateProduct(storeId, productId, updateProductDto);
-  }
+    @PutMapping
+    public UpdateProductResponseDto updateProduct(@RequestParam StoreId storeId, @RequestParam ProductId productId, @RequestBody UpdateProductDto updateProductDto) {
+        return productService.updateProduct(storeId, productId, updateProductDto);
+    }
 
-  @GetMapping("find-all")
-  public List<ProductDto> findAll(@RequestParam StoreId storeId, Pageable request) {
-    return productService.findAll(storeId, request);
-  }
+    @GetMapping("find-all")
+    public List<ProductDto> findAll(@RequestParam StoreId storeId, Pageable request) {
+        return productService.findAll(storeId, request);
+    }
 }
 

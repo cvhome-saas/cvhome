@@ -16,8 +16,8 @@ public class LocalServiceInstance implements ServiceInstance {
     private final String serviceId;
 
     /**
-     * @param serviceId  serviceId.
-     * @param instance instance
+     * @param serviceId serviceId.
+     * @param instance  instance
      */
     public LocalServiceInstance(String serviceId, LocalInstance instance) {
         this.instance = instance;

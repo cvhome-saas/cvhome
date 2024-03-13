@@ -11,7 +11,6 @@ import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2Clien
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.oauth2.client.endpoint.WebClientReactiveAuthorizationCodeTokenResponseClient;
 import org.springframework.security.oauth2.client.endpoint.WebClientReactivePasswordTokenResponseClient;
 import org.springframework.security.oauth2.client.endpoint.WebClientReactiveRefreshTokenTokenResponseClient;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;

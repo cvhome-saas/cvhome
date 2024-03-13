@@ -8,7 +8,7 @@ import com.asrevo.cvhome.domaincertificatemanager.commons.domain.Reference;
 import com.asrevo.cvhome.domaincertificatemanager.commons.dto.PodDto;
 
 public interface PodService {
-  PodId selectPod(Domain domain, Reference reference, DomainType domainType, IdentityId identity);
+    PodId selectPod(Domain domain, Reference reference, DomainType domainType, IdentityId identity);
 
-  PodDto getPod(PodId podId);
+    PodDto getPod(PodId podId);
 }

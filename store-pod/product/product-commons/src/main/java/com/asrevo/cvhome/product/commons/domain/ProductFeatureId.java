@@ -6,17 +6,17 @@ import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import org.bson.types.ObjectId;
 
 public record ProductFeatureId(@JsonSerialize(using = ToStringSerializer.class) ObjectId id) implements Identifier {
-  public ProductFeatureId(String id) {
-    this(new ObjectId(id));
-  }
+    public ProductFeatureId(String id) {
+        this(new ObjectId(id));
+    }
 
-  public static ProductFeatureId newId() {
-    return new ProductFeatureId(new ObjectId());
-  }
+    public static ProductFeatureId newId() {
+        return new ProductFeatureId(new ObjectId());
+    }
 
-  @JsonSerialize(using = ToStringSerializer.class)
-  @Override
-  public ObjectId getId() {
-    return this.id;
-  }
+    @JsonSerialize(using = ToStringSerializer.class)
+    @Override
+    public ObjectId getId() {
+        return this.id;
+    }
 }

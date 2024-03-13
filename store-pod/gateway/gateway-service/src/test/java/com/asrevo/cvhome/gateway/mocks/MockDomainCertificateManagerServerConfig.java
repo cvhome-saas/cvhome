@@ -20,42 +20,42 @@ import static org.mockserver.model.HttpResponse.response;
 @ConditionalOnProperty(prefix = "mock", name = "domain-certificate-manager.enabled", matchIfMissing = true)
 public class MockDomainCertificateManagerServerConfig {
 
-  @Bean
-  public MockServerContainer domainCertificateManagerMockServer() {
-    DockerImageName MOCKSERVER_IMAGE = DockerImageName
-      .parse("mockserver/mockserver")
-      .withTag("mockserver-" + MockServerClient.class.getPackage().getImplementationVersion());
-    MockServerContainer container = new MockServerContainer(MOCKSERVER_IMAGE);
-    container.setPortBindings(List.of("8082:1080"));
-    return container;
-  }
+    @Bean
+    public MockServerContainer domainCertificateManagerMockServer() {
+        DockerImageName MOCKSERVER_IMAGE = DockerImageName
+                .parse("mockserver/mockserver")
+                .withTag("mockserver-" + MockServerClient.class.getPackage().getImplementationVersion());
+        MockServerContainer container = new MockServerContainer(MOCKSERVER_IMAGE);
+        container.setPortBindings(List.of("8082:1080"));
+        return container;
+    }
 
-  @Bean
-  public CommandLineRunner domainCertificateManagerRunner(@Qualifier("domainCertificateManagerMockServer") MockServerContainer domainCertificateManagerMockServer) {
-    return args -> {
-      MockServerClient mockServerClient = new MockServerClient(domainCertificateManagerMockServer.getHost(), domainCertificateManagerMockServer.getServerPort());
-      mockServerClient
-        .when(
-          request()
-            .withMethod("POST")
-            .withPath("/api/v1/domain-ownership/get-reference")
-            .withBody(new JsonBody("""
-                 {
-                    "domain":"ashraf.gateway.me",
-                 }
-              """))
-        )
-        .respond(
-          response()
-            .withContentType(MediaType.APPLICATION_JSON)
-            .withBody("""
-                 {
-                    "id": 1,
-                    "domain":"ashraf.gateway.me",
-                    "reference":"65db438ee842462c224e2fb2"
-                 }
-              """
-            ));
-    };
-  }
+    @Bean
+    public CommandLineRunner domainCertificateManagerRunner(@Qualifier("domainCertificateManagerMockServer") MockServerContainer domainCertificateManagerMockServer) {
+        return args -> {
+            MockServerClient mockServerClient = new MockServerClient(domainCertificateManagerMockServer.getHost(), domainCertificateManagerMockServer.getServerPort());
+            mockServerClient
+                    .when(
+                            request()
+                                    .withMethod("POST")
+                                    .withPath("/api/v1/domain-ownership/get-reference")
+                                    .withBody(new JsonBody("""
+                                               {
+                                                  "domain":"ashraf.gateway.me",
+                                               }
+                                            """))
+                    )
+                    .respond(
+                            response()
+                                    .withContentType(MediaType.APPLICATION_JSON)
+                                    .withBody("""
+                                               {
+                                                  "id": 1,
+                                                  "domain":"ashraf.gateway.me",
+                                                  "reference":"65db438ee842462c224e2fb2"
+                                               }
+                                            """
+                                    ));
+        };
+    }
 }

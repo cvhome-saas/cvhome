@@ -16,9 +16,9 @@ import org.springframework.data.relational.core.mapping.Table;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProductVariantRefEntity {
-  @Column("product_id")
-  private AggregateReference<ProductEntity, ProductId> product;
-  @Column("product_variant_id")
-  private AggregateReference<ProductVariantEntity, ProductVariantId> productVariant;
+    @Column("product_id")
+    private AggregateReference<ProductEntity, ProductId> product;
+    @Column("product_variant_id")
+    private AggregateReference<ProductVariantEntity, ProductVariantId> productVariant;
 
 }
