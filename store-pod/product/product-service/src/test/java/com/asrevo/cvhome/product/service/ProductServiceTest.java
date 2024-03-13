@@ -70,7 +70,6 @@ class ProductServiceTest {
         CreateProductDto createProductDto = new CreateProductDto("p1", "d1", new ProductPrice(50D, Currency.getInstance("USD")), Boolean.TRUE, new ImageLink("google.com"));
         CreateProductResponseDto createProductResponseDto = productService.createProduct(storeId, createProductDto);
         ProductDto productDto = productService.getProduct(storeId, createProductResponseDto.id());
-
         assertThat(createProductResponseDto.id(), is(productDto.id()));
         assertThat(createProductResponseDto.name(), is(createProductDto.name()));
         assertThat(createProductResponseDto.description(), is(createProductDto.description()));
@@ -101,7 +100,6 @@ class ProductServiceTest {
         assertThat(updateProductDto.name(), is(updateProductDto.name()));
         assertThat(createProductDto.price(), is(updateProductResponseDto.price()));
         assertThat(createProductDto.imageLink(), is(updateProductResponseDto.imageLink()));
-
     }
 
     @Test
@@ -125,7 +123,6 @@ class ProductServiceTest {
         assertThat(addProductVariantResponseDto.amount(), is(addProductVariantDto.amount()));
         assertThat(addProductVariantResponseDto.price(), is(addProductVariantDto.price()));
         assertThat(addProductVariantResponseDto.features(), is(addProductVariantDto.features()));
-
     }
 
     @Test
