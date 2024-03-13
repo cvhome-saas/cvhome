@@ -2,10 +2,6 @@ package com.asrevo.cvhome.wallet.config;
 
 import com.asrevo.cvhome.commons.domain.BaseEntity;
 import com.asrevo.cvhome.commons.domain.Identifier;
-import com.asrevo.cvhome.wallet.config.converters.EventToJsonConverter;
-import com.asrevo.cvhome.wallet.config.converters.JsonToEventConverter;
-import com.asrevo.cvhome.wallet.config.converters.JsonToMapConverter;
-import com.asrevo.cvhome.wallet.config.converters.MapToJsonConverter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -32,17 +28,12 @@ public class JdbcConfig extends AbstractJdbcConfiguration {
     @Override
     public JdbcCustomConversions jdbcCustomConversions() {
         List<Converter<?, ?>> converters = new ArrayList<>();
-        converters.add(new MapToJsonConverter(mapper));
-        converters.add(new JsonToMapConverter(mapper));
-        converters.add(new EventToJsonConverter(ployJson));
-        converters.add(new JsonToEventConverter(ployJson));
         converters.add(new Converter<Identifier, String>() {
             @Override
             public String convert(Identifier source) {
                 return source.getId().toString();
             }
         });
-
 
         return new JdbcCustomConversions(converters);
     }

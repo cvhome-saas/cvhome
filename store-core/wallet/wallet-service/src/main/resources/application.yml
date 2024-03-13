@@ -79,7 +79,3 @@ logging:
     org.springframework.web: debug
     org.springframework.security: debug
     reactor.netty.http: debug
-org:
-  jobrunr:
-    background-job-server:
-      enabled: true
