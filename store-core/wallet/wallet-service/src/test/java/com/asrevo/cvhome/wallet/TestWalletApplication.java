@@ -1,9 +1,7 @@
 package com.asrevo.cvhome.wallet;
 
-import com.asrevo.cvhome.wallet.WalletApplication;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.context.annotation.Bean;
@@ -11,7 +9,6 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
 
 @TestConfiguration(proxyBeanMethods = false)
-@SpringBootApplication
 public class TestWalletApplication {
 
     @Bean
