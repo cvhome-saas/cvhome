@@ -1,11 +1,9 @@
 package com.asrevo.cvhome.product.mappers;
 
+import com.asrevo.cvhome.product.commons.domain.CategoryId;
 import com.asrevo.cvhome.product.commons.domain.ProductId;
 import com.asrevo.cvhome.product.commons.dto.*;
-import com.asrevo.cvhome.product.entity.ProductEntity;
-import com.asrevo.cvhome.product.entity.ProductImageEntity;
-import com.asrevo.cvhome.product.entity.ProductVariantEntity;
-import com.asrevo.cvhome.product.entity.ProductVariantFeatureEntity;
+import com.asrevo.cvhome.product.entity.*;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -15,6 +13,7 @@ import org.springframework.data.jdbc.core.mapping.AggregateReference;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface ProductMapper {
@@ -29,6 +28,7 @@ public interface ProductMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "storeId", ignore = true)
     @Mapping(target = "deleted", ignore = true)
+    @Mapping(target = "published", ignore = true)
     @Mapping(target = "isNew", ignore = true)
     void map(UpdateProductDto updateProductDto, @MappingTarget ProductEntity entity);
 
@@ -46,6 +46,14 @@ public interface ProductMapper {
     ProductVariantDto toDto(ProductVariantEntity entity);
 
     default ProductId toProductId(AggregateReference<ProductEntity, ProductId> product) {
-        return product.getId();
+        return Optional.ofNullable(product).map(AggregateReference::getId).orElse(null);
+    }
+
+    default CategoryId toCategoryId(AggregateReference<CategoryEntity, CategoryId> category) {
+        return Optional.ofNullable(category).map(AggregateReference::getId).orElse(null);
+    }
+
+    default AggregateReference<CategoryEntity, CategoryId> toAggregateReference(CategoryId categoryId) {
+        return AggregateReference.to(categoryId);
     }
 }

@@ -6,5 +6,5 @@ import com.asrevo.cvhome.product.commons.domain.ProductPrice;
 
 import java.util.List;
 
-public record ProductDto(ProductId id, String name, String description, ProductPrice price, List<ImageLink> images) {
+public record ProductDto(ProductId id, String name, String description, ProductPrice price) {
 }

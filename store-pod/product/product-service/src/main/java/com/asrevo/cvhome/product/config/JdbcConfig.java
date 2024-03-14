@@ -2,6 +2,7 @@ package com.asrevo.cvhome.product.config;
 
 import com.asrevo.cvhome.commons.domain.BaseEntity;
 import com.asrevo.cvhome.commons.domain.Identifier;
+import com.asrevo.cvhome.product.commons.domain.CategoryId;
 import com.asrevo.cvhome.product.commons.domain.ImageLink;
 import com.asrevo.cvhome.product.commons.domain.ProductId;
 import com.asrevo.cvhome.product.commons.domain.ProductVariantId;
@@ -74,6 +75,12 @@ public class JdbcConfig extends AbstractJdbcConfiguration {
             @Override
             public ImageLink convert(String source) {
                 return new ImageLink(source);
+            }
+        });
+        converters.add(new Converter<String, CategoryId>() {
+            @Override
+            public CategoryId convert(String source) {
+                return new CategoryId(source);
             }
         });
 

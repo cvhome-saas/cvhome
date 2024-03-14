@@ -2,6 +2,7 @@ package com.asrevo.cvhome.product.entity;
 
 
 import com.asrevo.cvhome.commons.domain.BaseEntity;
+import com.asrevo.cvhome.product.commons.domain.CategoryId;
 import com.asrevo.cvhome.product.commons.domain.ImageLink;
 import com.asrevo.cvhome.product.commons.domain.ProductId;
 import com.asrevo.cvhome.product.commons.domain.ProductPrice;
@@ -9,6 +10,7 @@ import com.asrevo.cvhome.product.commons.dto.CreateProductDto;
 import com.asrevo.cvhome.store.commons.domain.StoreId;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.jdbc.core.mapping.AggregateReference;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Embedded;
 import org.springframework.data.relational.core.mapping.Table;
@@ -20,6 +22,8 @@ import static org.springframework.data.relational.core.mapping.Embedded.OnEmpty.
 @Table("product")
 public class ProductEntity extends BaseEntity<ProductEntity, ProductId> {
     private StoreId storeId;
+    @Column("category_id")
+    private AggregateReference<CategoryEntity, CategoryId> category;
     private String name;
     private String description;
     @Embedded(onEmpty = USE_NULL)
@@ -34,6 +38,7 @@ public class ProductEntity extends BaseEntity<ProductEntity, ProductId> {
         ProductEntity product = new ProductEntity();
         product.setNew();
         product.setStoreId(storeId);
+        product.setCategory(AggregateReference.to(createProductDto.categoryId()));
         product.setName(createProductDto.name());
         product.setDescription(createProductDto.description());
         product.setPrice(createProductDto.price());

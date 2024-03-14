@@ -5,5 +5,5 @@ import com.asrevo.cvhome.product.commons.domain.ProductId;
 import com.asrevo.cvhome.product.commons.domain.ProductPrice;
 
 public record UpdateProductResponseDto(ProductId id, String name, String description, ProductPrice price,
-                                       Boolean published, ImageLink imageLink) {
+                                       ImageLink imageLink) {
 }
