@@ -18,6 +18,8 @@ public interface ProductService {
 
     PublishProductResponseDto publishProduct(StoreId storeId, ProductId productId);
 
+    PublishProductResponseDto unPublishProduct(StoreId storeId, ProductId productId);
+
     ProductDto getProduct(StoreId storeId, ProductId productId);
 
     DetailedProductDto getDetailedProduct(StoreId storeId, ProductId productId);

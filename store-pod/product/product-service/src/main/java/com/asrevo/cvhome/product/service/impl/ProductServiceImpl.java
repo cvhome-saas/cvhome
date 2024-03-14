@@ -60,6 +60,16 @@ public class ProductServiceImpl implements ProductService {
                 .orElse(null);
     }
 
+    @Transactional
+    @Override
+    public PublishProductResponseDto unPublishProduct(StoreId storeId, ProductId productId) {
+        return productRepository.findOneByStoreIdAndIdAndDeletedIsFalse(storeId, productId)
+                .map(ProductEntity::unPublish)
+                .map(productRepository::save)
+                .map(it -> new PublishProductResponseDto(it.getId(), Boolean.FALSE))
+                .orElse(null);
+    }
+
     @Override
     public ProductDto getProduct(StoreId storeId, ProductId productId) {
         return productRepository.findOneByStoreIdAndIdAndDeletedIsFalse(storeId, productId)

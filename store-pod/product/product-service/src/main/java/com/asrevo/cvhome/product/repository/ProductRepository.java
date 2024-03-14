@@ -12,7 +12,7 @@ import java.util.Optional;
 public interface ProductRepository extends ListCrudRepository<ProductEntity, ProductId> {
     Page<ProductEntity> findAllByStoreId(StoreId storeId, Pageable pageable);
 
-    Optional<ProductEntity> findOneByStoreIdAndId(StoreId storeId, ProductId productId);
     Optional<ProductEntity> findOneByStoreIdAndIdAndDeletedIsFalse(StoreId storeId, ProductId productId);
+
     Optional<ProductEntity> findOneByStoreIdAndIdAndDeletedIsFalseAndPublishedIsTrue(StoreId storeId, ProductId productId);
 }

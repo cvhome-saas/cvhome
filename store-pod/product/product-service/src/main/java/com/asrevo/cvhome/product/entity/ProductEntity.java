@@ -52,8 +52,14 @@ public class ProductEntity extends BaseEntity<ProductEntity, ProductId> {
         this.deleted = Boolean.TRUE;
         return this;
     }
+
     public ProductEntity publish() {
         this.published = Boolean.TRUE;
+        return this;
+    }
+
+    public ProductEntity unPublish() {
+        this.published = Boolean.FALSE;
         return this;
     }
 }

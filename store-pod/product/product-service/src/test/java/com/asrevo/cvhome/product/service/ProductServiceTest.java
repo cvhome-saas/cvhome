@@ -103,6 +103,19 @@ class ProductServiceTest {
     }
 
     @Test
+    void unPublishProduct() {
+        StoreId storeId = StoreId.newId();
+        CreateProductDto createProductDto = new CreateProductDto("p1", "d1", new ProductPrice(50D, Currency.getInstance("USD")), new ImageLink("google.com"));
+        CreateProductResponseDto createProductResponseDto = productService.createProduct(storeId, createProductDto);
+        DetailedProductDto detailedProduct = productService.getDetailedProduct(storeId, createProductResponseDto.id());
+        assertThat(detailedProduct, nullValue());
+        PublishProductResponseDto publishProductResponseDto = productService.unPublishProduct(storeId, createProductResponseDto.id());
+        DetailedProductDto publishedDetailedProduct = productService.getDetailedProduct(storeId, createProductResponseDto.id());
+        assertThat(publishProductResponseDto.published(), is(Boolean.FALSE));
+        assertThat(publishedDetailedProduct, nullValue());
+    }
+
+    @Test
     void updateProduct() {
         StoreId storeId = StoreId.newId();
         CreateProductDto createProductDto = new CreateProductDto("p1", "d1", new ProductPrice(50D, Currency.getInstance("USD")), new ImageLink("google.com"));
