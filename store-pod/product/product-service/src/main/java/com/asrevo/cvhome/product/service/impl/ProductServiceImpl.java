@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.product.service.impl;
 
+import com.asrevo.cvhome.product.commons.domain.CategoryId;
 import com.asrevo.cvhome.product.commons.domain.ImageLink;
 import com.asrevo.cvhome.product.commons.domain.ProductId;
 import com.asrevo.cvhome.product.commons.domain.ProductVariantId;
@@ -16,6 +17,7 @@ import com.asrevo.cvhome.product.service.ProductService;
 import com.asrevo.cvhome.store.commons.domain.StoreId;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jdbc.core.mapping.AggregateReference;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,12 +39,10 @@ public class ProductServiceImpl implements ProductService {
 
     @Transactional
     @Override
-    public CreateProductResponseDto createProduct(StoreId storeId, CreateProductDto createProductDto) {
-        return categoryService.findCategory(createProductDto.categoryId(), storeId)
-                .map(it -> ProductEntity.createProduct(storeId, createProductDto))
-                .map(productRepository::save)
-                .map(productMapper::toCreateProductResponseDto)
-                .orElse(null);
+    public CreateProductResponseDto createProduct(StoreId storeId, CategoryId categoryId, CreateProductDto createProductDto) {
+        CategoryDto category = categoryService.findCategory(categoryId, storeId);
+        ProductEntity savedProduct = productRepository.save(ProductEntity.createProduct(storeId, category.id(), createProductDto));
+        return productMapper.toCreateProductResponseDto(savedProduct);
     }
 
     @Transactional
@@ -98,15 +98,13 @@ public class ProductServiceImpl implements ProductService {
 
     @Transactional
     @Override
-    public UpdateProductResponseDto updateProduct(StoreId storeId, ProductId productId, UpdateProductDto updateProductDto) {
-        return categoryService.findCategory(updateProductDto.category(), storeId)
-                .flatMap(it -> productRepository.findOneByStoreIdAndIdAndDeletedIsFalse(storeId, productId))
-                .map(it -> {
-                    productMapper.map(updateProductDto, it);
-                    return it;
-                })
-                .map(it -> productMapper.toUpdateProductResponseDto(productRepository.save(it)))
-                .orElse(null);
+    public UpdateProductResponseDto updateProduct(StoreId storeId, ProductId productId, CategoryId categoryId, UpdateProductDto updateProductDto) {
+        CategoryDto category = categoryService.findCategory(categoryId, storeId);
+        ProductEntity currentProduct = productRepository.findOneByStoreIdAndIdAndDeletedIsFalse(storeId, productId).orElseThrow(() -> new RuntimeException("product not exist"));
+        productMapper.map(updateProductDto, currentProduct);
+        currentProduct.setCategory(AggregateReference.to(category.id()));
+        ProductEntity save = productRepository.save(currentProduct);
+        return productMapper.toUpdateProductResponseDto(save);
     }
 
     @Transactional

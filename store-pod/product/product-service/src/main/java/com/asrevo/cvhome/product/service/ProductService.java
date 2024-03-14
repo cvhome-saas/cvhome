@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.product.service;
 
+import com.asrevo.cvhome.product.commons.domain.CategoryId;
 import com.asrevo.cvhome.product.commons.domain.ImageLink;
 import com.asrevo.cvhome.product.commons.domain.ProductId;
 import com.asrevo.cvhome.product.commons.domain.ProductVariantId;
@@ -12,7 +13,7 @@ import java.util.List;
 public interface ProductService {
     List<ProductDto> findAll(StoreId storeId, Pageable pageable);
 
-    CreateProductResponseDto createProduct(StoreId storeId, CreateProductDto createProductDto);
+    CreateProductResponseDto createProduct(StoreId storeId, CategoryId categoryId, CreateProductDto createProductDto);
 
     DeleteProductResponseDto deleteProduct(StoreId storeId, ProductId productId);
 
@@ -26,7 +27,7 @@ public interface ProductService {
 
     DetailedProductDto getDetailedProduct(StoreId storeId, ProductId productId, ProductVariantId variantId);
 
-    UpdateProductResponseDto updateProduct(StoreId storeId, ProductId productId, UpdateProductDto updateProductDto);
+    UpdateProductResponseDto updateProduct(StoreId storeId, ProductId productId, CategoryId categoryId, UpdateProductDto updateProductDto);
 
     AddProductImageResponseDto addImage(StoreId storeId, ProductId productId, ImageLink imageLink);
 

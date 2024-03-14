@@ -18,7 +18,7 @@ import java.util.List;
 public class AdminProductsController {
     private final ProductService productService;
 
-    @PostMapping
+/*    @PostMapping
     public CreateProductResponseDto createProduct(@RequestParam StoreId storeId, @RequestBody CreateProductDto createProductDto) {
         return productService.createProduct(storeId, createProductDto);
     }
@@ -31,6 +31,6 @@ public class AdminProductsController {
     @GetMapping("find-all")
     public List<ProductDto> findAll(@RequestParam StoreId storeId, Pageable pageable) {
         return productService.findAll(storeId, pageable);
-    }
+    }*/
 }
 

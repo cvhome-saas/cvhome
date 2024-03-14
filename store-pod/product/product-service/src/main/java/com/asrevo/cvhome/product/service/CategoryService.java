@@ -17,5 +17,5 @@ public interface CategoryService {
 
     List<CategoriesView> getStoreCategoriesView(StoreId storeId);
 
-    Optional<CategoryDto> findCategory(CategoryId categoryId, StoreId storeId);
+    CategoryDto findCategory(CategoryId categoryId, StoreId storeId);
 }

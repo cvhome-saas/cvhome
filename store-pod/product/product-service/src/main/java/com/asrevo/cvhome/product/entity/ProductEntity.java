@@ -34,11 +34,11 @@ public class ProductEntity extends BaseEntity<ProductEntity, ProductId> {
     @Embedded(onEmpty = USE_NULL)
     private ImageLink imageLink;
 
-    public static ProductEntity createProduct(StoreId storeId, CreateProductDto createProductDto) {
+    public static ProductEntity createProduct(StoreId storeId,CategoryId categoryId, CreateProductDto createProductDto) {
         ProductEntity product = new ProductEntity();
         product.setNew();
         product.setStoreId(storeId);
-        product.setCategory(AggregateReference.to(createProductDto.categoryId()));
+        product.setCategory(AggregateReference.to(categoryId));
         product.setName(createProductDto.name());
         product.setDescription(createProductDto.description());
         product.setPrice(createProductDto.price());

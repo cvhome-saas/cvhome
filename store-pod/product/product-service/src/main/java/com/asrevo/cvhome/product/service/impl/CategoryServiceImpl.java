@@ -33,10 +33,10 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     @Override
     public CreateCategoryResponseDto createCategory(StoreId storeId, CategoryId parent, CreateCategoryDto createCategoryDto) {
-        return categoryRepository.findById(parent)
-                .map(it -> categoryRepository.save(CategoryEntity.createCategory(storeId, it, createCategoryDto)))
-                .map(categoryMapper::toCreateCategoryResponse)
-                .orElse(null);
+        CategoryEntity parentCategory = categoryRepository.findByIdAndStoreId(parent, storeId)
+                .orElseThrow(() -> new RuntimeException("parent category not exist"));
+        CategoryEntity savedCategory = categoryRepository.save(CategoryEntity.createCategory(storeId, parentCategory, createCategoryDto));
+        return categoryMapper.toCreateCategoryResponse(savedCategory);
     }
 
     /*
@@ -85,8 +85,9 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public Optional<CategoryDto> findCategory(CategoryId categoryId, StoreId storeId) {
-        return categoryRepository.findByIdAndStoreId(categoryId, storeId)
-                .map(categoryMapper::toDto);
+    public CategoryDto findCategory(CategoryId categoryId, StoreId storeId) {
+        CategoryEntity categoryEntity = categoryRepository.findByIdAndStoreId(categoryId, storeId)
+                .orElseThrow(() -> new RuntimeException("parent category not exist"));
+        return categoryMapper.toDto(categoryEntity);
     }
 }

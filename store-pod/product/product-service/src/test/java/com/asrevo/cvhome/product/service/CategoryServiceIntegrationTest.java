@@ -19,8 +19,6 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import java.util.Optional;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
@@ -68,23 +66,17 @@ class CategoryServiceIntegrationTest {
         CreateCategoryResponseDto parentCategory = categoryService.createCategory(storeId, createCategoryDto);
         CreateCategoryResponseDto subCategory = categoryService.createCategory(storeId, parentCategory.id(), createCategoryDto);
 
-        Optional<CategoryDto> findParent = categoryService.findCategory(parentCategory.id(), storeId);
-        Optional<CategoryDto> findSub = categoryService.findCategory(subCategory.id(), storeId);
 
-        assertThat(findParent.isPresent(), is(Boolean.TRUE));
-        findParent.ifPresent(it -> {
-            assertThat(it, notNullValue());
-            assertThat(it.parent(), nullValue());
-            assertThat(it.name(), notNullValue());
-            assertThat(it.imageLink(), notNullValue());
-        });
+        CategoryDto findParent = categoryService.findCategory(parentCategory.id(), storeId);
+        assertThat(findParent, notNullValue());
+        assertThat(findParent.parent(), nullValue());
+        assertThat(findParent.name(), notNullValue());
+        assertThat(findParent.imageLink(), notNullValue());
 
-        assertThat(findSub.isPresent(), is(Boolean.TRUE));
-        findSub.ifPresent(it -> {
-            assertThat(it, notNullValue());
-            assertThat(it.parent(), notNullValue());
-            assertThat(it.name(), notNullValue());
-            assertThat(it.imageLink(), notNullValue());
-        });
+        CategoryDto findSub = categoryService.findCategory(subCategory.id(), storeId);
+        assertThat(findSub, notNullValue());
+        assertThat(findSub.parent(), notNullValue());
+        assertThat(findSub.name(), notNullValue());
+        assertThat(findSub.imageLink(), notNullValue());
     }
 }
