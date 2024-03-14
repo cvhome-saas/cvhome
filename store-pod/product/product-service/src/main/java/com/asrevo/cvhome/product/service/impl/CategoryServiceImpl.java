@@ -2,6 +2,7 @@ package com.asrevo.cvhome.product.service.impl;
 
 import com.asrevo.cvhome.product.commons.domain.CategoryId;
 import com.asrevo.cvhome.product.commons.dto.CategoriesView;
+import com.asrevo.cvhome.product.commons.dto.CategoryDto;
 import com.asrevo.cvhome.product.commons.dto.CreateCategoryDto;
 import com.asrevo.cvhome.product.commons.dto.CreateCategoryResponseDto;
 import com.asrevo.cvhome.product.entity.CategoryEntity;
@@ -26,7 +27,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CreateCategoryResponseDto createCategory(StoreId storeId, CreateCategoryDto createCategoryDto) {
         CategoryEntity saved = categoryRepository.save(CategoryEntity.createCategory(storeId, createCategoryDto));
-        return categoryMapper.toDto(saved);
+        return categoryMapper.toCreateCategoryResponse(saved);
     }
 
     @Transactional
@@ -34,7 +35,7 @@ public class CategoryServiceImpl implements CategoryService {
     public CreateCategoryResponseDto createCategory(StoreId storeId, CategoryId parent, CreateCategoryDto createCategoryDto) {
         return categoryRepository.findById(parent)
                 .map(it -> categoryRepository.save(CategoryEntity.createCategory(storeId, it, createCategoryDto)))
-                .map(categoryMapper::toDto)
+                .map(categoryMapper::toCreateCategoryResponse)
                 .orElse(null);
     }
 
@@ -74,12 +75,18 @@ public class CategoryServiceImpl implements CategoryService {
         for (CategoriesView parent : parents) {
             List<CategoriesView> subCategories = subCategoriesMap.get(parent.id())
                     .stream()
-                    .map(it -> new CategoriesView(it.getId(), it.getName(), it.getImageLink(),it.getSequence(), new ArrayList<>()))
+                    .map(it -> new CategoriesView(it.getId(), it.getName(), it.getImageLink(), it.getSequence(), new ArrayList<>()))
                     .sorted(Comparator.comparing(CategoriesView::sequence))
                     .toList();
             parent.subCategories().addAll(subCategories);
         }
 
         return parents;
+    }
+
+    @Override
+    public Optional<CategoryDto> findCategory(CategoryId categoryId, StoreId storeId) {
+        return categoryRepository.findByIdAndStoreId(categoryId, storeId)
+                .map(categoryMapper::toDto);
     }
 }

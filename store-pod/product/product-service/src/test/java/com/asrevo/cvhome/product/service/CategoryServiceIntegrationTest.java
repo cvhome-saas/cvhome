@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.product.service;
 
 import com.asrevo.cvhome.product.commons.domain.ImageLink;
+import com.asrevo.cvhome.product.commons.dto.CategoryDto;
 import com.asrevo.cvhome.product.commons.dto.CreateCategoryDto;
 import com.asrevo.cvhome.product.commons.dto.CreateCategoryResponseDto;
 import com.asrevo.cvhome.product.mappers.CategoryMapperImpl;
@@ -18,9 +19,10 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.util.Optional;
+
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 
 @DataJdbcTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -37,7 +39,7 @@ class CategoryServiceIntegrationTest {
     @Test
     void createCategory() {
         StoreId storeId = StoreId.newId();
-        CreateCategoryDto createCategoryDto = new CreateCategoryDto("ssa",new ImageLink("swa"),0);
+        CreateCategoryDto createCategoryDto = new CreateCategoryDto("ssa", new ImageLink("swa"), 0);
         CreateCategoryResponseDto category = categoryService.createCategory(storeId, createCategoryDto);
         assertThat(category, notNullValue());
         assertThat(category.id(), notNullValue());
@@ -48,7 +50,7 @@ class CategoryServiceIntegrationTest {
     @Test
     void createCategoryUnderCategory() {
         StoreId storeId = StoreId.newId();
-        CreateCategoryDto createCategoryDto = new CreateCategoryDto("ssa",new ImageLink("swa"),0);
+        CreateCategoryDto createCategoryDto = new CreateCategoryDto("ssa", new ImageLink("swa"), 0);
         CreateCategoryResponseDto parentCategory = categoryService.createCategory(storeId, createCategoryDto);
         CreateCategoryResponseDto subCategory = categoryService.createCategory(storeId, parentCategory.id(), createCategoryDto);
 
@@ -57,5 +59,32 @@ class CategoryServiceIntegrationTest {
         assertThat(subCategory.name(), is(createCategoryDto.name()));
         assertThat(subCategory.imageLink(), is(createCategoryDto.imageLink()));
         assertThat(subCategory.parent(), is(parentCategory.id()));
+    }
+
+    @Test
+    void findCategoryInStore() {
+        StoreId storeId = StoreId.newId();
+        CreateCategoryDto createCategoryDto = new CreateCategoryDto("ssa", new ImageLink("swa"), 0);
+        CreateCategoryResponseDto parentCategory = categoryService.createCategory(storeId, createCategoryDto);
+        CreateCategoryResponseDto subCategory = categoryService.createCategory(storeId, parentCategory.id(), createCategoryDto);
+
+        Optional<CategoryDto> findParent = categoryService.findCategory(parentCategory.id(), storeId);
+        Optional<CategoryDto> findSub = categoryService.findCategory(subCategory.id(), storeId);
+
+        assertThat(findParent.isPresent(), is(Boolean.TRUE));
+        findParent.ifPresent(it -> {
+            assertThat(it, notNullValue());
+            assertThat(it.parent(), nullValue());
+            assertThat(it.name(), notNullValue());
+            assertThat(it.imageLink(), notNullValue());
+        });
+
+        assertThat(findSub.isPresent(), is(Boolean.TRUE));
+        findSub.ifPresent(it -> {
+            assertThat(it, notNullValue());
+            assertThat(it.parent(), notNullValue());
+            assertThat(it.name(), notNullValue());
+            assertThat(it.imageLink(), notNullValue());
+        });
     }
 }

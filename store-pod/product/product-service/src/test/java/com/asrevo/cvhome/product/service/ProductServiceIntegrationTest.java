@@ -132,7 +132,7 @@ class ProductServiceIntegrationTest {
         CategoryId categoryId = categoryService.createCategory(storeId, new CreateCategoryDto("ssa", new ImageLink("swa"), 0)).id();
         CreateProductDto createProductDto = new CreateProductDto("p1", "d1", new ProductPrice(50D, Currency.getInstance("USD")), new ImageLink("google.com"), categoryId);
         CreateProductResponseDto createProductResponseDto = productService.createProduct(storeId, createProductDto);
-        UpdateProductDto updateProductDto = new UpdateProductDto("pnew", null, null, null, null);
+        UpdateProductDto updateProductDto = new UpdateProductDto("pnew", null, null, categoryId, null);
         UpdateProductResponseDto updateProductResponseDto = productService.updateProduct(storeId, createProductResponseDto.id(), updateProductDto);
         assertThat(updateProductDto.name(), is(updateProductDto.name()));
         assertThat(createProductDto.price(), is(updateProductResponseDto.price()));

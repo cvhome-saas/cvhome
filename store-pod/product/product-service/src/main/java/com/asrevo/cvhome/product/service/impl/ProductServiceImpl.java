@@ -11,6 +11,7 @@ import com.asrevo.cvhome.product.mappers.ProductMapper;
 import com.asrevo.cvhome.product.repository.ProductImageRepository;
 import com.asrevo.cvhome.product.repository.ProductRepository;
 import com.asrevo.cvhome.product.repository.ProductVariantRepository;
+import com.asrevo.cvhome.product.service.CategoryService;
 import com.asrevo.cvhome.product.service.ProductService;
 import com.asrevo.cvhome.store.commons.domain.StoreId;
 import lombok.AllArgsConstructor;
@@ -26,6 +27,7 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final ProductVariantRepository productVariantRepository;
     private final ProductImageRepository productImageRepository;
+    private final CategoryService categoryService;
     private final ProductMapper productMapper;
 
     @Override
@@ -36,8 +38,11 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     @Override
     public CreateProductResponseDto createProduct(StoreId storeId, CreateProductDto createProductDto) {
-        ProductEntity entity = productRepository.save(ProductEntity.createProduct(storeId, createProductDto));
-        return productMapper.toCreateProductResponseDto(entity);
+        return categoryService.findCategory(createProductDto.categoryId(), storeId)
+                .map(it -> ProductEntity.createProduct(storeId, createProductDto))
+                .map(productRepository::save)
+                .map(productMapper::toCreateProductResponseDto)
+                .orElse(null);
     }
 
     @Transactional
@@ -94,7 +99,8 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     @Override
     public UpdateProductResponseDto updateProduct(StoreId storeId, ProductId productId, UpdateProductDto updateProductDto) {
-        return productRepository.findOneByStoreIdAndIdAndDeletedIsFalse(storeId, productId)
+        return categoryService.findCategory(updateProductDto.category(), storeId)
+                .flatMap(it -> productRepository.findOneByStoreIdAndIdAndDeletedIsFalse(storeId, productId))
                 .map(it -> {
                     productMapper.map(updateProductDto, it);
                     return it;
