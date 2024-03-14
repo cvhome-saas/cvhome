@@ -12,13 +12,10 @@ import lombok.Setter;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Embedded;
-import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
 
-import static com.asrevo.cvhome.product.entity.ProductVariantFeatureEntity.createProductFeature;
 import static org.springframework.data.relational.core.mapping.Embedded.OnEmpty.USE_NULL;
 
 @Getter
@@ -32,8 +29,7 @@ public class ProductVariantEntity extends BaseEntity<ProductVariantEntity, Produ
     private ProductPrice price;
     @Embedded(onEmpty = USE_NULL)
     private ProductAmount amount;
-    @MappedCollection(idColumn = "product_variant_id", keyColumn = "id")
-    private List<ProductVariantFeatureEntity> features = new ArrayList<>();
+    private Map<String, String> features;
 
     public static ProductVariantEntity createProductVariant(ProductId productId, StoreId storeId, AddProductVariantDto addProductVariantDto) {
         ProductVariantEntity productVariant = new ProductVariantEntity();
@@ -42,9 +38,7 @@ public class ProductVariantEntity extends BaseEntity<ProductVariantEntity, Produ
         productVariant.setStoreId(storeId);
         productVariant.setPrice(addProductVariantDto.price());
         productVariant.setAmount(addProductVariantDto.amount());
-        List<ProductVariantFeatureEntity> features = addProductVariantDto.features().entrySet().stream()
-                .map(it -> createProductFeature(productId, storeId, it.getKey(), it.getValue())).toList();
-        productVariant.setFeatures(features);
+        productVariant.setFeatures(addProductVariantDto.features());
         return productVariant;
     }
 

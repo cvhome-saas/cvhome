@@ -44,18 +44,7 @@ CREATE TABLE IF NOT EXISTS product_variant
     price      int,
     currency   varchar(4),
     amount     int,
+    features   varchar(1500),
     constraint product_variant_pk primary key (id),
     constraint product_variant_product_id_fk foreign key (product_id) references product
-);
-
-CREATE TABLE IF NOT EXISTS product_variant_feature
-(
-    id                 varchar(24) not null,
-    product_id         varchar(24) not null,
-    store_id           varchar(24),
-    key                varchar(50),
-    value              varchar(50),
-    product_variant_id varchar(24),
-    constraint product_variant_feature_pk primary key (id),
-    constraint product_variant_feature_product_id_fk foreign key (product_id) references product
 );
