@@ -1,6 +1,5 @@
 package com.asrevo.cvhome.product.mappers;
 
-import com.asrevo.cvhome.product.commons.domain.ImageLink;
 import com.asrevo.cvhome.product.commons.domain.ProductId;
 import com.asrevo.cvhome.product.commons.dto.*;
 import com.asrevo.cvhome.product.entity.ProductEntity;
@@ -20,6 +19,7 @@ import java.util.Map;
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface ProductMapper {
     ProductDto toDto(ProductEntity entity);
+
     @Mapping(source = "product", target = "productId")
     AddProductImageResponseDto toDto(ProductImageEntity entity);
 

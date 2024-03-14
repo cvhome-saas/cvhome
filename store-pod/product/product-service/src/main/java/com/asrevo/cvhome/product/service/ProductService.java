@@ -13,8 +13,16 @@ public interface ProductService {
     List<ProductDto> findAll(StoreId storeId, Pageable pageable);
 
     CreateProductResponseDto createProduct(StoreId storeId, CreateProductDto createProductDto);
+
     DeleteProductResponseDto deleteProduct(StoreId storeId, ProductId productId);
+
+    PublishProductResponseDto publishProduct(StoreId storeId, ProductId productId);
+
     ProductDto getProduct(StoreId storeId, ProductId productId);
+
+    DetailedProductDto getDetailedProduct(StoreId storeId, ProductId productId);
+
+    DetailedProductDto getDetailedProduct(StoreId storeId, ProductId productId, ProductVariantId variantId);
 
     UpdateProductResponseDto updateProduct(StoreId storeId, ProductId productId, UpdateProductDto updateProductDto);
 

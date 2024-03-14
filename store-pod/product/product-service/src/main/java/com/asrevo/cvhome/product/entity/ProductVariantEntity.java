@@ -6,6 +6,7 @@ import com.asrevo.cvhome.product.commons.domain.ProductId;
 import com.asrevo.cvhome.product.commons.domain.ProductPrice;
 import com.asrevo.cvhome.product.commons.domain.ProductVariantId;
 import com.asrevo.cvhome.product.commons.dto.AddProductVariantDto;
+import com.asrevo.cvhome.store.commons.domain.StoreId;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;
@@ -17,6 +18,7 @@ import org.springframework.data.relational.core.mapping.Table;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.asrevo.cvhome.product.entity.ProductVariantFeatureEntity.createProductFeature;
 import static org.springframework.data.relational.core.mapping.Embedded.OnEmpty.USE_NULL;
 
 @Getter
@@ -25,6 +27,7 @@ import static org.springframework.data.relational.core.mapping.Embedded.OnEmpty.
 public class ProductVariantEntity extends BaseEntity<ProductVariantEntity, ProductVariantId> {
     @Column("product_id")
     private AggregateReference<ProductEntity, ProductId> product;
+    private StoreId storeId;
     @Embedded(onEmpty = USE_NULL)
     private ProductPrice price;
     @Embedded(onEmpty = USE_NULL)
@@ -32,13 +35,15 @@ public class ProductVariantEntity extends BaseEntity<ProductVariantEntity, Produ
     @MappedCollection(idColumn = "product_variant_id", keyColumn = "id")
     private List<ProductVariantFeatureEntity> features = new ArrayList<>();
 
-    public static ProductVariantEntity createProductVariant(ProductId id, AddProductVariantDto addProductVariantDto) {
+    public static ProductVariantEntity createProductVariant(ProductId productId, StoreId storeId, AddProductVariantDto addProductVariantDto) {
         ProductVariantEntity productVariant = new ProductVariantEntity();
         productVariant.setNew();
-        productVariant.setProduct(AggregateReference.to(id));
+        productVariant.setProduct(AggregateReference.to(productId));
+        productVariant.setStoreId(storeId);
         productVariant.setPrice(addProductVariantDto.price());
         productVariant.setAmount(addProductVariantDto.amount());
-        List<ProductVariantFeatureEntity> features = addProductVariantDto.features().entrySet().stream().map(it -> ProductVariantFeatureEntity.createProductFeature(it.getKey(), it.getValue())).toList();
+        List<ProductVariantFeatureEntity> features = addProductVariantDto.features().entrySet().stream()
+                .map(it -> createProductFeature(productId, storeId, it.getKey(), it.getValue())).toList();
         productVariant.setFeatures(features);
         return productVariant;
     }

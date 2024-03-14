@@ -44,12 +44,19 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public DeleteProductResponseDto deleteProduct(StoreId storeId, ProductId productId) {
         return productRepository.findOneByStoreIdAndIdAndDeletedIsFalse(storeId, productId)
-                .map(it -> {
-                    it.setDeleted(Boolean.TRUE);
-                    return it;
-                })
+                .map(ProductEntity::delete)
                 .map(productRepository::save)
                 .map(it -> new DeleteProductResponseDto(it.getId(), Boolean.TRUE))
+                .orElse(null);
+    }
+
+    @Transactional
+    @Override
+    public PublishProductResponseDto publishProduct(StoreId storeId, ProductId productId) {
+        return productRepository.findOneByStoreIdAndIdAndDeletedIsFalse(storeId, productId)
+                .map(ProductEntity::publish)
+                .map(productRepository::save)
+                .map(it -> new PublishProductResponseDto(it.getId(), Boolean.TRUE))
                 .orElse(null);
     }
 
@@ -57,6 +64,20 @@ public class ProductServiceImpl implements ProductService {
     public ProductDto getProduct(StoreId storeId, ProductId productId) {
         return productRepository.findOneByStoreIdAndIdAndDeletedIsFalse(storeId, productId)
                 .map(productMapper::toDto)
+                .orElse(null);
+    }
+
+    @Override
+    public DetailedProductDto getDetailedProduct(StoreId storeId, ProductId productId) {
+        return productRepository.findOneByStoreIdAndIdAndDeletedIsFalseAndPublishedIsTrue(storeId, productId)
+                .map(it -> new DetailedProductDto())
+                .orElse(null);
+    }
+
+    @Override
+    public DetailedProductDto getDetailedProduct(StoreId storeId, ProductId productId, ProductVariantId variantId) {
+        return productRepository.findOneByStoreIdAndIdAndDeletedIsFalseAndPublishedIsTrue(storeId, productId)
+                .map(it -> new DetailedProductDto())
                 .orElse(null);
     }
 
@@ -76,18 +97,9 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public AddProductImageResponseDto addImage(StoreId storeId, ProductId productId, ImageLink imageLink) {
         return productRepository.findOneByStoreIdAndIdAndDeletedIsFalse(storeId, productId)
-                .map(it -> {
-                    ProductImageEntity productImage = ProductImageEntity.create(it.getId(), imageLink);
-                    return productImage;
-                })
-                .map(entity -> {
-                    ProductImageEntity save = productImageRepository.save(entity);
-                    return save;
-                })
-                .map(entity1 -> {
-                    AddProductImageResponseDto dto = productMapper.toDto(entity1);
-                    return dto;
-                })
+                .map(it -> ProductImageEntity.create(it.getId(), storeId, imageLink))
+                .map(productImageRepository::save)
+                .map(productMapper::toDto)
                 .orElse(null);
     }
 
@@ -95,7 +107,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public AddProductVariantResponseDto addVariant(StoreId storeId, ProductId productId, AddProductVariantDto addProductVariantDto) {
         return productRepository.findOneByStoreIdAndIdAndDeletedIsFalse(storeId, productId)
-                .map(it -> ProductVariantEntity.createProductVariant(it.getId(), addProductVariantDto))
+                .map(it -> ProductVariantEntity.createProductVariant(it.getId(), storeId, addProductVariantDto))
                 .map(productVariantRepository::save)
                 .map(productMapper::toAddProductVariantResponseDto)
                 .orElse(null);
@@ -105,9 +117,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductVariantDto getProductVariant(StoreId storeId, ProductId productId, ProductVariantId variantId) {
         return productRepository.findOneByStoreIdAndIdAndDeletedIsFalse(storeId, productId)
-                .flatMap(it -> {
-                    return productVariantRepository.findById(variantId);
-                })
+                .flatMap(it -> productVariantRepository.findById(variantId))
                 .map(productMapper::toDto)
                 .orElse(null);
     }

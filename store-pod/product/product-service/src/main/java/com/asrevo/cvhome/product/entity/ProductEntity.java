@@ -11,13 +11,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Embedded;
-import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 import static org.springframework.data.relational.core.mapping.Embedded.OnEmpty.USE_NULL;
 
@@ -43,7 +37,7 @@ public class ProductEntity extends BaseEntity<ProductEntity, ProductId> {
         product.setName(createProductDto.name());
         product.setDescription(createProductDto.description());
         product.setPrice(createProductDto.price());
-        product.setPublished(createProductDto.published());
+        product.setPublished(Boolean.FALSE);
         product.setDeleted(Boolean.FALSE);
         product.setImageLink(createProductDto.imageLink());
         return product;
@@ -56,6 +50,10 @@ public class ProductEntity extends BaseEntity<ProductEntity, ProductId> {
 
     public ProductEntity delete() {
         this.deleted = Boolean.TRUE;
+        return this;
+    }
+    public ProductEntity publish() {
+        this.published = Boolean.TRUE;
         return this;
     }
 }
