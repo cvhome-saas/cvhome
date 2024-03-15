@@ -5,7 +5,7 @@ import com.asrevo.cvhome.product.commons.domain.ImageLink;
 import com.asrevo.cvhome.product.commons.dto.CategoriesView;
 import com.asrevo.cvhome.product.entity.CategoryEntity;
 import com.asrevo.cvhome.product.repository.CategoryRepository;
-import com.asrevo.cvhome.product.service.impl.CategoryServiceImpl;
+import com.asrevo.cvhome.product.service.impl.AdminCategoryServiceImpl;
 import com.asrevo.cvhome.store.commons.domain.StoreId;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -23,12 +23,12 @@ import static org.hamcrest.Matchers.hasSize;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit-test")
-class CategoryServiceUnitTest {
+class AdminCategoryServiceUnitTest {
     @Mock
     CategoryRepository categoryRepository;
 
     @InjectMocks
-    private CategoryServiceImpl categoryService;
+    private AdminCategoryServiceImpl categoryService;
 
     @Test
     void getStoreCategoriesView() {

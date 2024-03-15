@@ -7,8 +7,8 @@ import com.asrevo.cvhome.product.entity.ProductEntity;
 import com.asrevo.cvhome.product.mappers.ProductMapper;
 import com.asrevo.cvhome.product.repository.ProductDetailsRepository;
 import com.asrevo.cvhome.product.repository.ProductRepository;
-import com.asrevo.cvhome.product.service.CategoryService;
-import com.asrevo.cvhome.product.service.ProductService;
+import com.asrevo.cvhome.product.service.AdminCategoryService;
+import com.asrevo.cvhome.product.service.AdminProductService;
 import com.asrevo.cvhome.store.commons.domain.StoreId;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -21,9 +21,9 @@ import java.util.List;
 
 @Service
 @AllArgsConstructor
-public class ProductServiceImpl implements ProductService {
+public class AdminProductServiceImpl implements AdminProductService {
     private final ProductRepository productRepository;
-    private final CategoryService categoryService;
+    private final AdminCategoryService categoryService;
     private final ProductDetailsRepository productDetailsRepository;
     private final ProductMapper productMapper;
 
@@ -119,13 +119,6 @@ public class ProductServiceImpl implements ProductService {
         return productRepository.findOneByStoreIdAndIdAndDeletedIsFalse(storeId, productId)
                 .map(productMapper::toDto)
                 .orElse(null);
-    }
-
-    @Override
-    public DetailedProductDto getDetailedProduct(StoreId storeId, ProductId productId) {
-        ProductEntity productEntity = productRepository.findOneByStoreIdAndIdAndDeletedIsFalseAndPublishedIsTrue(storeId, productId)
-                .orElseThrow(() -> new RuntimeException("product not exist or not published"));
-        return new DetailedProductDto();
     }
 
     @Transactional

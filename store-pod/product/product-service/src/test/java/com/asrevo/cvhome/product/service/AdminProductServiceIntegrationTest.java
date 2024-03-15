@@ -4,8 +4,8 @@ import com.asrevo.cvhome.product.commons.domain.*;
 import com.asrevo.cvhome.product.commons.dto.*;
 import com.asrevo.cvhome.product.mappers.CategoryMapperImpl;
 import com.asrevo.cvhome.product.mappers.ProductMapperImpl;
-import com.asrevo.cvhome.product.service.impl.CategoryServiceImpl;
-import com.asrevo.cvhome.product.service.impl.ProductServiceImpl;
+import com.asrevo.cvhome.product.service.impl.AdminCategoryServiceImpl;
+import com.asrevo.cvhome.product.service.impl.AdminProductServiceImpl;
 import com.asrevo.cvhome.store.commons.domain.StoreId;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -32,17 +32,17 @@ import static org.junit.Assert.assertThrows;
 
 @DataJdbcTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Import({JacksonAutoConfiguration.class, ProductServiceImpl.class, ProductMapperImpl.class, CategoryServiceImpl.class, CategoryMapperImpl.class})
+@Import({JacksonAutoConfiguration.class, AdminProductServiceImpl.class, ProductMapperImpl.class, AdminCategoryServiceImpl.class, CategoryMapperImpl.class})
 @Testcontainers
 @Tag("integration-test")
-class ProductServiceIntegrationTest {
+class AdminProductServiceIntegrationTest {
     @Container
     @ServiceConnection
     static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:13");
     @Autowired
-    private ProductService productService;
+    private AdminProductService productService;
     @Autowired
-    private CategoryService categoryService;
+    private AdminCategoryService categoryService;
 
 
     private static CreateProductDto getCreateProductDto(ProductType productType, SubProducts subProducts) {

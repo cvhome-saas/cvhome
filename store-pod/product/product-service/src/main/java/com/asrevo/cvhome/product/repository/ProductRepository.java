@@ -14,5 +14,4 @@ public interface ProductRepository extends ListCrudRepository<ProductEntity, Pro
 
     Optional<ProductEntity> findOneByStoreIdAndIdAndDeletedIsFalse(StoreId storeId, ProductId productId);
 
-    Optional<ProductEntity> findOneByStoreIdAndIdAndDeletedIsFalseAndPublishedIsTrue(StoreId storeId, ProductId productId);
 }

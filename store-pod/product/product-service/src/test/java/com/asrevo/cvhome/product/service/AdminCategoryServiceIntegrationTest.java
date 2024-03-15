@@ -6,9 +6,8 @@ import com.asrevo.cvhome.product.commons.dto.CategoryDto;
 import com.asrevo.cvhome.product.commons.dto.CreateCategoryDto;
 import com.asrevo.cvhome.product.commons.dto.CreateCategoryResponseDto;
 import com.asrevo.cvhome.product.mappers.CategoryMapperImpl;
-import com.asrevo.cvhome.product.service.impl.CategoryServiceImpl;
+import com.asrevo.cvhome.product.service.impl.AdminCategoryServiceImpl;
 import com.asrevo.cvhome.store.commons.domain.StoreId;
-import org.junit.Assert;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,15 +26,15 @@ import static org.junit.Assert.assertThrows;
 
 @DataJdbcTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Import({JacksonAutoConfiguration.class, CategoryServiceImpl.class, CategoryMapperImpl.class})
+@Import({JacksonAutoConfiguration.class, AdminCategoryServiceImpl.class, CategoryMapperImpl.class})
 @Testcontainers
 @Tag("integration-test")
-class CategoryServiceIntegrationTest {
+class AdminCategoryServiceIntegrationTest {
     @Container
     @ServiceConnection
     static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:13");
     @Autowired
-    private CategoryService categoryService;
+    private AdminCategoryService categoryService;
 
     @Test
     void createCategory() {

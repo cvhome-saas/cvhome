@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.product.controller;
 
 import com.asrevo.cvhome.product.commons.dto.ProductDto;
-import com.asrevo.cvhome.product.service.ProductService;
+import com.asrevo.cvhome.product.service.AdminProductService;
 import com.asrevo.cvhome.store.commons.domain.StoreId;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +18,7 @@ import java.util.List;
 @AllArgsConstructor
 @Slf4j
 public class ProductsController {
-    private final ProductService productService;
+    private final AdminProductService productService;
 
     @GetMapping("find-all")
     public List<ProductDto> findAll(@RequestParam StoreId storeId, Pageable request) {

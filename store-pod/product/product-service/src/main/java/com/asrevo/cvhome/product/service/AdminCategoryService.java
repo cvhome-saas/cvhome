@@ -8,9 +8,8 @@ import com.asrevo.cvhome.product.commons.dto.CreateCategoryResponseDto;
 import com.asrevo.cvhome.store.commons.domain.StoreId;
 
 import java.util.List;
-import java.util.Optional;
 
-public interface CategoryService {
+public interface AdminCategoryService {
     CreateCategoryResponseDto createCategory(StoreId storeId, CreateCategoryDto createCategoryDto);
 
     CreateCategoryResponseDto createCategory(StoreId storeId, CategoryId categoryId, CreateCategoryDto createCategoryDto);

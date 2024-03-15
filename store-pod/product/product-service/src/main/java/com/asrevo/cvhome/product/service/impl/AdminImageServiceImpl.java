@@ -4,7 +4,7 @@ import com.asrevo.cvhome.product.commons.dto.ImageDto;
 import com.asrevo.cvhome.product.entity.ImageEntity;
 import com.asrevo.cvhome.product.mappers.ImageMapper;
 import com.asrevo.cvhome.product.repository.ImageRepository;
-import com.asrevo.cvhome.product.service.ImageService;
+import com.asrevo.cvhome.product.service.AdminImageService;
 import com.asrevo.cvhome.store.commons.domain.StoreId;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -15,7 +15,7 @@ import java.util.List;
 
 @Service
 @AllArgsConstructor
-public class ImageServiceImpl implements ImageService {
+public class AdminImageServiceImpl implements AdminImageService {
     private final ImageRepository imageRepository;
     private final ImageMapper imageMapper;
 

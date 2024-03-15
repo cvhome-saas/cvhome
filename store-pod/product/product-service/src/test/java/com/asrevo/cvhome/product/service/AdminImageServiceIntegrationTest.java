@@ -3,7 +3,7 @@ package com.asrevo.cvhome.product.service;
 import com.asrevo.cvhome.product.commons.domain.ImageLink;
 import com.asrevo.cvhome.product.commons.dto.ImageDto;
 import com.asrevo.cvhome.product.mappers.ImageMapperImpl;
-import com.asrevo.cvhome.product.service.impl.ImageServiceImpl;
+import com.asrevo.cvhome.product.service.impl.AdminImageServiceImpl;
 import com.asrevo.cvhome.store.commons.domain.StoreId;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -26,15 +26,15 @@ import static rocks.cleancode.hamcrest.record.HasFieldMatcher.field;
 
 @DataJdbcTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Import({JacksonAutoConfiguration.class, ImageServiceImpl.class, ImageMapperImpl.class})
+@Import({JacksonAutoConfiguration.class, AdminImageServiceImpl.class, ImageMapperImpl.class})
 @Testcontainers
 @Tag("integration-test")
-class ImageServiceIntegrationTest {
+class AdminImageServiceIntegrationTest {
     @Container
     @ServiceConnection
     static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:13");
     @Autowired
-    private ImageServiceImpl imageService;
+    private AdminImageServiceImpl imageService;
 
     @Test
     void create() {

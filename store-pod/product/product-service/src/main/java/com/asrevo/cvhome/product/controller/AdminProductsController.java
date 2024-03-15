@@ -1,22 +1,16 @@
 package com.asrevo.cvhome.product.controller;
 
-import com.asrevo.cvhome.product.commons.domain.ProductId;
-import com.asrevo.cvhome.product.commons.dto.*;
-import com.asrevo.cvhome.product.service.ProductService;
-import com.asrevo.cvhome.store.commons.domain.StoreId;
+import com.asrevo.cvhome.product.service.AdminProductService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/products")
 @AllArgsConstructor
 @Slf4j
 public class AdminProductsController {
-    private final ProductService productService;
+    private final AdminProductService productService;
 
 /*    @PostMapping
     public CreateProductResponseDto createProduct(@RequestParam StoreId storeId, @RequestBody CreateProductDto createProductDto) {
