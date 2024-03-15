@@ -7,6 +7,7 @@ import com.asrevo.cvhome.product.mappers.ProductMapperImpl;
 import com.asrevo.cvhome.product.service.impl.CategoryServiceImpl;
 import com.asrevo.cvhome.product.service.impl.ProductServiceImpl;
 import com.asrevo.cvhome.store.commons.domain.StoreId;
+import org.junit.Assert;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -101,10 +102,10 @@ class ProductServiceIntegrationTest {
         CategoryId categoryId = categoryService.createCategory(storeId, new CreateCategoryDto("ssa", new ImageLink("https://google.com/image.jpg"), 0)).id();
         CreateProductDto createProductDto = new CreateProductDto("p1", "d1", new ProductPrice(50D, Currency.getInstance("USD")), new ImageLink("https://google.com/product.png"));
         CreateProductResponseDto createProductResponseDto = productService.createProduct(storeId, categoryId, createProductDto);
-        ProductDetails productDetails = productService.addProductDetails(storeId, createProductResponseDto.id(), new ProductDetails(Map.of(DetailsLanguage.EN, new ProductDetail("sa", "wa", List.of(), Map.of(), Boolean.FALSE)), List.of(new ImageLink("https://google.com/421.png"))));
+        ProductDetails details = new ProductDetails(Map.of(DetailsLanguage.EN, new ProductDetail("sa", "wa", List.of(), Map.of(), Boolean.FALSE)), new ImagesLink(List.of(new ImageLink("https://google.com/421.png"))));
+        ProductDetails productDetails = productService.addProductDetails(storeId, createProductResponseDto.id(), details);
         assertThat(productDetails, notNullValue());
-        DetailedProductDto detailedProduct = productService.getDetailedProduct(storeId, createProductResponseDto.id());
-        assertThat(detailedProduct, nullValue());
+        Assert.assertThrows(RuntimeException.class, () -> productService.getDetailedProduct(storeId, createProductResponseDto.id()));
         PublishProductResponseDto publishProductResponseDto = productService.publishProduct(storeId, createProductResponseDto.id());
         DetailedProductDto publishedDetailedProduct = productService.getDetailedProduct(storeId, createProductResponseDto.id());
         assertThat(publishProductResponseDto.published(), is(Boolean.TRUE));
@@ -117,7 +118,7 @@ class ProductServiceIntegrationTest {
         CategoryId categoryId = categoryService.createCategory(storeId, new CreateCategoryDto("ssa", new ImageLink("https://google.com/image.jpg"), 0)).id();
         CreateProductDto createProductDto = new CreateProductDto("p1", "d1", new ProductPrice(50D, Currency.getInstance("USD")), new ImageLink("https://google.com/product.png"));
         CreateProductResponseDto createProductResponseDto = productService.createProduct(storeId, categoryId, createProductDto);
-        ProductDetails productDetails = new ProductDetails(Map.of(), List.of());
+        ProductDetails productDetails = new ProductDetails(Map.of(), new ImagesLink(List.of()));
         ProductDetails productDetailsResponse = productService.addProductDetails(storeId, createProductResponseDto.id(), productDetails);
         assertThat(productDetails, is(productDetailsResponse));
     }
@@ -128,12 +129,14 @@ class ProductServiceIntegrationTest {
         CategoryId categoryId = categoryService.createCategory(storeId, new CreateCategoryDto("ssa", new ImageLink("https://google.com/image.jpg"), 0)).id();
         CreateProductDto createProductDto = new CreateProductDto("p1", "d1", new ProductPrice(50D, Currency.getInstance("USD")), new ImageLink("https://google.com/product.png"));
         CreateProductResponseDto createProductResponseDto = productService.createProduct(storeId, categoryId, createProductDto);
+        ProductDetails details = new ProductDetails(Map.of(DetailsLanguage.EN, new ProductDetail("sa", "wa", List.of(), Map.of(), Boolean.FALSE)), new ImagesLink(List.of(new ImageLink("https://google.com/421.png"))));
+         productService.addProductDetails(storeId, createProductResponseDto.id(), details);
+        productService.publishProduct(storeId, createProductResponseDto.id());
         DetailedProductDto detailedProduct = productService.getDetailedProduct(storeId, createProductResponseDto.id());
-        assertThat(detailedProduct, nullValue());
+        assertThat(detailedProduct, notNullValue());
         PublishProductResponseDto publishProductResponseDto = productService.unPublishProduct(storeId, createProductResponseDto.id());
-        DetailedProductDto publishedDetailedProduct = productService.getDetailedProduct(storeId, createProductResponseDto.id());
         assertThat(publishProductResponseDto.published(), is(Boolean.FALSE));
-        assertThat(publishedDetailedProduct, nullValue());
+        Assert.assertThrows(RuntimeException.class, () -> productService.getDetailedProduct(storeId, createProductResponseDto.id()));
     }
 
     @Test

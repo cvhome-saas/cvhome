@@ -13,7 +13,6 @@ import org.springframework.data.relational.core.mapping.Embedded;
 import org.springframework.data.relational.core.mapping.Table;
 import org.springframework.util.StringUtils;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -37,7 +36,7 @@ public class ProductEntity extends BaseEntity<ProductEntity, ProductId> {
     @Embedded(onEmpty = USE_NULL)
     private ImageLink imageLink;
 
-    public static ProductEntity createProduct(StoreId storeId,CategoryId categoryId, CreateProductDto createProductDto) {
+    public static ProductEntity createProduct(StoreId storeId, CategoryId categoryId, CreateProductDto createProductDto) {
         ProductEntity product = new ProductEntity();
         product.setNew();
         product.setStoreId(storeId);
@@ -83,7 +82,7 @@ public class ProductEntity extends BaseEntity<ProductEntity, ProductId> {
                 });
             }
         });
-        List<ImageLink> imageLinks = Optional.ofNullable(productDetails.extraImages()).orElseThrow(() -> new RuntimeException("imageLinks shouldn't be null"));
+        ImagesLink imageLinks = Optional.ofNullable(productDetails.extraImages()).orElseThrow(() -> new RuntimeException("imageLinks shouldn't be null"));
         if (imageLinks.isEmpty()) throw new RuntimeException("imageLinks should have at least image");
         this.published = Boolean.TRUE;
         return this;

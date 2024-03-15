@@ -37,7 +37,7 @@ class CategoryServiceIntegrationTest {
     @Test
     void createCategory() {
         StoreId storeId = StoreId.newId();
-        CreateCategoryDto createCategoryDto = new CreateCategoryDto("ssa", new ImageLink("swa"), 0);
+        CreateCategoryDto createCategoryDto = new CreateCategoryDto("ssa",  new ImageLink("https://google.com/product.png"), 0);
         CreateCategoryResponseDto category = categoryService.createCategory(storeId, createCategoryDto);
         assertThat(category, notNullValue());
         assertThat(category.id(), notNullValue());
@@ -48,7 +48,7 @@ class CategoryServiceIntegrationTest {
     @Test
     void createCategoryUnderCategory() {
         StoreId storeId = StoreId.newId();
-        CreateCategoryDto createCategoryDto = new CreateCategoryDto("ssa", new ImageLink("swa"), 0);
+        CreateCategoryDto createCategoryDto = new CreateCategoryDto("ssa",  new ImageLink("https://google.com/product.png"), 0);
         CreateCategoryResponseDto parentCategory = categoryService.createCategory(storeId, createCategoryDto);
         CreateCategoryResponseDto subCategory = categoryService.createCategory(storeId, parentCategory.id(), createCategoryDto);
 
@@ -62,7 +62,7 @@ class CategoryServiceIntegrationTest {
     @Test
     void findCategoryInStore() {
         StoreId storeId = StoreId.newId();
-        CreateCategoryDto createCategoryDto = new CreateCategoryDto("ssa", new ImageLink("swa"), 0);
+        CreateCategoryDto createCategoryDto = new CreateCategoryDto("ssa",  new ImageLink("https://google.com/product.png"), 0);
         CreateCategoryResponseDto parentCategory = categoryService.createCategory(storeId, createCategoryDto);
         CreateCategoryResponseDto subCategory = categoryService.createCategory(storeId, parentCategory.id(), createCategoryDto);
 
