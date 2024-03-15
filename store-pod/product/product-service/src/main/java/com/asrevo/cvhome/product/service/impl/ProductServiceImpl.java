@@ -90,16 +90,16 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public DetailedProductDto getDetailedProduct(StoreId storeId, ProductId productId) {
-        return productRepository.findOneByStoreIdAndIdAndDeletedIsFalseAndPublishedIsTrue(storeId, productId)
-                .map(it -> new DetailedProductDto())
-                .orElse(null);
+        ProductEntity productEntity = productRepository.findOneByStoreIdAndIdAndDeletedIsFalseAndPublishedIsTrue(storeId, productId)
+                .orElseThrow(() -> new RuntimeException("product not exist or not published"));
+        return new DetailedProductDto();
     }
 
     @Override
     public DetailedProductDto getDetailedProduct(StoreId storeId, ProductId productId, ProductVariantId variantId) {
-        return productRepository.findOneByStoreIdAndIdAndDeletedIsFalseAndPublishedIsTrue(storeId, productId)
-                .map(it -> new DetailedProductDto())
-                .orElse(null);
+        ProductEntity productEntity = productRepository.findOneByStoreIdAndIdAndDeletedIsFalseAndPublishedIsTrue(storeId, productId)
+                .orElseThrow(() -> new RuntimeException("product not exist or not published"));
+        return new DetailedProductDto();
     }
 
     @Transactional
