@@ -46,11 +46,11 @@ class ProductServiceIntegrationTest {
 
 
     private static CreateProductDto getCreateProductDto(ProductType productType, SubProducts subProducts) {
-        return new CreateProductDto("p1", "d1", new ProductPrice(50D, Currency.getInstance("USD")), new ImageLink("https://google.com/product.png"), new ProductAmount(10), productType, subProducts);
+        return new CreateProductDto("p1", "d1", new ProductPrice(50D, Currency.getInstance("USD")), new ImageLink("https://google.com/product.png"), new ProductAmount(10), productType, subProducts, ImagesLink.empty());
     }
 
     private static CreateProductDto getCreateProductDto() {
-        return new CreateProductDto("p1", "d1", new ProductPrice(50D, Currency.getInstance("USD")), new ImageLink("https://google.com/product.png"), new ProductAmount(10), ProductType.SINGLE, SubProducts.empty());
+        return new CreateProductDto("p1", "d1", new ProductPrice(50D, Currency.getInstance("USD")), new ImageLink("https://google.com/product.png"), new ProductAmount(10), ProductType.SINGLE, SubProducts.empty(), ImagesLink.empty());
     }
 
     @Test
@@ -58,7 +58,7 @@ class ProductServiceIntegrationTest {
         StoreId storeId = StoreId.newId();
         CategoryId categoryId = categoryService.createCategory(storeId, new CreateCategoryDto("ssa", new ImageLink("https://google.com/image.jpg"), 0)).id();
         IntStream.range(0, 20).forEach(it -> {
-            CreateProductDto createProductDto = new CreateProductDto("p" + it, "d1" + it, new ProductPrice(50D * it, Currency.getInstance("USD")), new ImageLink("https://google.com/product.png"), new ProductAmount(10), ProductType.SINGLE, SubProducts.empty());
+            CreateProductDto createProductDto = new CreateProductDto("p" + it, "d1" + it, new ProductPrice(50D * it, Currency.getInstance("USD")), new ImageLink("https://google.com/product.png"), new ProductAmount(10), ProductType.SINGLE, SubProducts.empty(), ImagesLink.empty());
             productService.createProduct(storeId, categoryId, createProductDto);
         });
         PageRequest pageRequest = PageRequest.of(0, 10);

@@ -27,6 +27,7 @@ CREATE TABLE IF NOT EXISTS product
     amount       int,
     product_type varchar(10),
     sub_products varchar(1000),
+    image_links varchar(1024),
 --     features   varchar(1500),
     constraint product_pk primary key (id),
     constraint product_category_id_fk foreign key (category_id) references category

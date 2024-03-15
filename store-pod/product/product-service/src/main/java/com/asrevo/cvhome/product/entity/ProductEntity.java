@@ -42,6 +42,8 @@ public class ProductEntity extends BaseEntity<ProductEntity, ProductId> {
     private ProductType productType;
     @Column("sub_products")
     private SubProducts subProducts;
+    @Column("image_links")
+    private ImagesLink imageLinks;
 
     public static ProductEntity createProduct(StoreId storeId, CategoryId categoryId, CreateProductDto createProductDto) {
         ProductEntity product = new ProductEntity();
@@ -57,6 +59,7 @@ public class ProductEntity extends BaseEntity<ProductEntity, ProductId> {
         product.setAmount(createProductDto.amount());
         product.setProductType(createProductDto.productType());
         product.setSubProducts(createProductDto.subProducts());
+        product.setImageLinks(createProductDto.imageLinks());
         return product;
     }
 
