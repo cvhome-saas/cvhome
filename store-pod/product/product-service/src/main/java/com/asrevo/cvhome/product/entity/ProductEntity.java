@@ -2,10 +2,7 @@ package com.asrevo.cvhome.product.entity;
 
 
 import com.asrevo.cvhome.commons.domain.BaseEntity;
-import com.asrevo.cvhome.product.commons.domain.CategoryId;
-import com.asrevo.cvhome.product.commons.domain.ImageLink;
-import com.asrevo.cvhome.product.commons.domain.ProductId;
-import com.asrevo.cvhome.product.commons.domain.ProductPrice;
+import com.asrevo.cvhome.product.commons.domain.*;
 import com.asrevo.cvhome.product.commons.dto.CreateProductDto;
 import com.asrevo.cvhome.store.commons.domain.StoreId;
 import lombok.Getter;
@@ -14,6 +11,12 @@ import org.springframework.data.jdbc.core.mapping.AggregateReference;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Embedded;
 import org.springframework.data.relational.core.mapping.Table;
+import org.springframework.util.StringUtils;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 import static org.springframework.data.relational.core.mapping.Embedded.OnEmpty.USE_NULL;
 
@@ -58,7 +61,30 @@ public class ProductEntity extends BaseEntity<ProductEntity, ProductId> {
         return this;
     }
 
-    public ProductEntity publish() {
+    public ProductEntity publish(ProductDetails pd) {
+        ProductDetails productDetails = Optional.ofNullable(pd).orElseThrow(() -> new RuntimeException("product details shouldn't be null"));
+        Map<DetailsLanguage, ProductDetail> details = Optional.ofNullable(productDetails.details()).orElseThrow(() -> new RuntimeException("details shouldn't be null"));
+        if (details.isEmpty()) throw new RuntimeException("details should have at least one language");
+        details.forEach((detailsLanguage, productDetail) -> {
+            if (Objects.isNull(productDetail.ltr())) {
+                throw new RuntimeException("ltr should be true or false");
+            }
+            if (!StringUtils.hasText(productDetail.name())) {
+                throw new RuntimeException("name should be not empty");
+            }
+            if (!StringUtils.hasText(productDetail.shortDescription())) {
+                throw new RuntimeException("short description should be not empty");
+            }
+            if (productDetail.descriptions() != null && !productDetail.descriptions().isEmpty()) {
+                productDetail.descriptions().forEach(description -> {
+                    if (!StringUtils.hasText(description)) {
+                        throw new RuntimeException("description entries value should be not empty");
+                    }
+                });
+            }
+        });
+        List<ImageLink> imageLinks = Optional.ofNullable(productDetails.extraImages()).orElseThrow(() -> new RuntimeException("imageLinks shouldn't be null"));
+        if (imageLinks.isEmpty()) throw new RuntimeException("imageLinks should have at least image");
         this.published = Boolean.TRUE;
         return this;
     }

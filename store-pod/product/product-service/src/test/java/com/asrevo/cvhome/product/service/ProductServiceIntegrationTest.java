@@ -1,9 +1,6 @@
 package com.asrevo.cvhome.product.service;
 
-import com.asrevo.cvhome.product.commons.domain.CategoryId;
-import com.asrevo.cvhome.product.commons.domain.ImageLink;
-import com.asrevo.cvhome.product.commons.domain.ProductAmount;
-import com.asrevo.cvhome.product.commons.domain.ProductPrice;
+import com.asrevo.cvhome.product.commons.domain.*;
 import com.asrevo.cvhome.product.commons.dto.*;
 import com.asrevo.cvhome.product.mappers.CategoryMapperImpl;
 import com.asrevo.cvhome.product.mappers.ProductMapperImpl;
@@ -49,9 +46,9 @@ class ProductServiceIntegrationTest {
     @Test
     void findAll() {
         StoreId storeId = StoreId.newId();
-        CategoryId categoryId = categoryService.createCategory(storeId, new CreateCategoryDto("ssa", new ImageLink("swa"), 0)).id();
+        CategoryId categoryId = categoryService.createCategory(storeId, new CreateCategoryDto("ssa", new ImageLink("https://google.com/image.jpg"), 0)).id();
         IntStream.range(0, 20).forEach(it -> {
-            CreateProductDto createProductDto = new CreateProductDto("p" + it, "d1" + it, new ProductPrice(50D * it, Currency.getInstance("USD")), new ImageLink("google.com"));
+            CreateProductDto createProductDto = new CreateProductDto("p" + it, "d1" + it, new ProductPrice(50D * it, Currency.getInstance("USD")), new ImageLink("https://google.com/product.png"));
             productService.createProduct(storeId, categoryId, createProductDto);
         });
         PageRequest pageRequest = PageRequest.of(0, 10);
@@ -62,8 +59,8 @@ class ProductServiceIntegrationTest {
     @Test
     void createProduct() {
         StoreId storeId = StoreId.newId();
-        CategoryId categoryId = categoryService.createCategory(storeId, new CreateCategoryDto("ssa", new ImageLink("swa"), 0)).id();
-        CreateProductDto createProductDto = new CreateProductDto("p1", "d1", new ProductPrice(50D, Currency.getInstance("USD")), new ImageLink("google.com"));
+        CategoryId categoryId = categoryService.createCategory(storeId, new CreateCategoryDto("ssa", new ImageLink("https://google.com/image.jpg"), 0)).id();
+        CreateProductDto createProductDto = new CreateProductDto("p1", "d1", new ProductPrice(50D, Currency.getInstance("USD")), new ImageLink("https://google.com/product.png"));
         CreateProductResponseDto createProductResponseDto = productService.createProduct(storeId, categoryId, createProductDto);
         assertThat(createProductResponseDto.published(), is(Boolean.FALSE));
         assertThat(createProductResponseDto.id(), notNullValue());
@@ -74,8 +71,8 @@ class ProductServiceIntegrationTest {
     @Test
     void getProduct() {
         StoreId storeId = StoreId.newId();
-        CategoryId categoryId = categoryService.createCategory(storeId, new CreateCategoryDto("ssa", new ImageLink("swa"), 0)).id();
-        CreateProductDto createProductDto = new CreateProductDto("p1", "d1", new ProductPrice(50D, Currency.getInstance("USD")), new ImageLink("google.com"));
+        CategoryId categoryId = categoryService.createCategory(storeId, new CreateCategoryDto("ssa", new ImageLink("https://google.com/image.jpg"), 0)).id();
+        CreateProductDto createProductDto = new CreateProductDto("p1", "d1", new ProductPrice(50D, Currency.getInstance("USD")), new ImageLink("https://google.com/product.png"));
         CreateProductResponseDto createProductResponseDto = productService.createProduct(storeId, categoryId, createProductDto);
         ProductDto productDto = productService.getProduct(storeId, createProductResponseDto.id());
         assertThat(createProductResponseDto.id(), is(productDto.id()));
@@ -88,8 +85,8 @@ class ProductServiceIntegrationTest {
     @Test
     void deleteProduct() {
         StoreId storeId = StoreId.newId();
-        CategoryId categoryId = categoryService.createCategory(storeId, new CreateCategoryDto("ssa", new ImageLink("swa"), 0)).id();
-        CreateProductDto createProductDto = new CreateProductDto("p1", "d1", new ProductPrice(50D, Currency.getInstance("USD")), new ImageLink("google.com"));
+        CategoryId categoryId = categoryService.createCategory(storeId, new CreateCategoryDto("ssa", new ImageLink("https://google.com/image.jpg"), 0)).id();
+        CreateProductDto createProductDto = new CreateProductDto("p1", "d1", new ProductPrice(50D, Currency.getInstance("USD")), new ImageLink("https://google.com/product.png"));
         CreateProductResponseDto createProductResponseDto = productService.createProduct(storeId, categoryId, createProductDto);
         DeleteProductResponseDto deleteProductResponseDto = productService.deleteProduct(storeId, createProductResponseDto.id());
         ProductDto productDto = productService.getProduct(storeId, createProductResponseDto.id());
@@ -101,9 +98,11 @@ class ProductServiceIntegrationTest {
     @Test
     void publishProduct() {
         StoreId storeId = StoreId.newId();
-        CategoryId categoryId = categoryService.createCategory(storeId, new CreateCategoryDto("ssa", new ImageLink("swa"), 0)).id();
-        CreateProductDto createProductDto = new CreateProductDto("p1", "d1", new ProductPrice(50D, Currency.getInstance("USD")), new ImageLink("google.com"));
+        CategoryId categoryId = categoryService.createCategory(storeId, new CreateCategoryDto("ssa", new ImageLink("https://google.com/image.jpg"), 0)).id();
+        CreateProductDto createProductDto = new CreateProductDto("p1", "d1", new ProductPrice(50D, Currency.getInstance("USD")), new ImageLink("https://google.com/product.png"));
         CreateProductResponseDto createProductResponseDto = productService.createProduct(storeId, categoryId, createProductDto);
+        ProductDetails productDetails = productService.addProductDetails(storeId, createProductResponseDto.id(), new ProductDetails(Map.of(DetailsLanguage.EN, new ProductDetail("sa", "wa", List.of(), Map.of(), Boolean.FALSE)), List.of(new ImageLink("https://google.com/421.png"))));
+        assertThat(productDetails, notNullValue());
         DetailedProductDto detailedProduct = productService.getDetailedProduct(storeId, createProductResponseDto.id());
         assertThat(detailedProduct, nullValue());
         PublishProductResponseDto publishProductResponseDto = productService.publishProduct(storeId, createProductResponseDto.id());
@@ -113,10 +112,21 @@ class ProductServiceIntegrationTest {
     }
 
     @Test
+    void addProductDetails() {
+        StoreId storeId = StoreId.newId();
+        CategoryId categoryId = categoryService.createCategory(storeId, new CreateCategoryDto("ssa", new ImageLink("https://google.com/image.jpg"), 0)).id();
+        CreateProductDto createProductDto = new CreateProductDto("p1", "d1", new ProductPrice(50D, Currency.getInstance("USD")), new ImageLink("https://google.com/product.png"));
+        CreateProductResponseDto createProductResponseDto = productService.createProduct(storeId, categoryId, createProductDto);
+        ProductDetails productDetails = new ProductDetails(Map.of(), List.of());
+        ProductDetails productDetailsResponse = productService.addProductDetails(storeId, createProductResponseDto.id(), productDetails);
+        assertThat(productDetails, is(productDetailsResponse));
+    }
+
+    @Test
     void unPublishProduct() {
         StoreId storeId = StoreId.newId();
-        CategoryId categoryId = categoryService.createCategory(storeId, new CreateCategoryDto("ssa", new ImageLink("swa"), 0)).id();
-        CreateProductDto createProductDto = new CreateProductDto("p1", "d1", new ProductPrice(50D, Currency.getInstance("USD")), new ImageLink("google.com"));
+        CategoryId categoryId = categoryService.createCategory(storeId, new CreateCategoryDto("ssa", new ImageLink("https://google.com/image.jpg"), 0)).id();
+        CreateProductDto createProductDto = new CreateProductDto("p1", "d1", new ProductPrice(50D, Currency.getInstance("USD")), new ImageLink("https://google.com/product.png"));
         CreateProductResponseDto createProductResponseDto = productService.createProduct(storeId, categoryId, createProductDto);
         DetailedProductDto detailedProduct = productService.getDetailedProduct(storeId, createProductResponseDto.id());
         assertThat(detailedProduct, nullValue());
@@ -129,8 +139,8 @@ class ProductServiceIntegrationTest {
     @Test
     void updateProduct() {
         StoreId storeId = StoreId.newId();
-        CategoryId categoryId = categoryService.createCategory(storeId, new CreateCategoryDto("ssa", new ImageLink("swa"), 0)).id();
-        CreateProductDto createProductDto = new CreateProductDto("p1", "d1", new ProductPrice(50D, Currency.getInstance("USD")), new ImageLink("google.com"));
+        CategoryId categoryId = categoryService.createCategory(storeId, new CreateCategoryDto("ssa", new ImageLink("https://google.com/image.jpg"), 0)).id();
+        CreateProductDto createProductDto = new CreateProductDto("p1", "d1", new ProductPrice(50D, Currency.getInstance("USD")), new ImageLink("https://google.com/product.png"));
         CreateProductResponseDto createProductResponseDto = productService.createProduct(storeId, categoryId, createProductDto);
         UpdateProductDto updateProductDto = new UpdateProductDto("pnew", null, null, null);
         UpdateProductResponseDto updateProductResponseDto = productService.updateProduct(storeId, createProductResponseDto.id(), categoryId, updateProductDto);
@@ -142,10 +152,10 @@ class ProductServiceIntegrationTest {
     @Test
     void addImage() {
         StoreId storeId = StoreId.newId();
-        CategoryId categoryId = categoryService.createCategory(storeId, new CreateCategoryDto("ssa", new ImageLink("swa"), 0)).id();
-        CreateProductDto createProductDto = new CreateProductDto("p1", "d1", new ProductPrice(50D, Currency.getInstance("USD")), new ImageLink("google.com"));
+        CategoryId categoryId = categoryService.createCategory(storeId, new CreateCategoryDto("ssa", new ImageLink("https://google.com/image.jpg"), 0)).id();
+        CreateProductDto createProductDto = new CreateProductDto("p1", "d1", new ProductPrice(50D, Currency.getInstance("USD")), new ImageLink("https://google.com/product.png"));
         CreateProductResponseDto createProductResponseDto = productService.createProduct(storeId, categoryId, createProductDto);
-        ImageLink imageLink = new ImageLink("new imageLink");
+        ImageLink imageLink = new ImageLink("https://google.com/image.png");
         AddProductImageResponseDto addProductImageResponseDto = productService.addImage(storeId, createProductResponseDto.id(), imageLink);
         assertThat(addProductImageResponseDto.imageLink(), equalTo(imageLink));
     }
@@ -153,8 +163,8 @@ class ProductServiceIntegrationTest {
     @Test
     void addVariant() {
         StoreId storeId = StoreId.newId();
-        CategoryId categoryId = categoryService.createCategory(storeId, new CreateCategoryDto("ssa", new ImageLink("swa"), 0)).id();
-        CreateProductDto createProductDto = new CreateProductDto("p1", "d1", new ProductPrice(50D, Currency.getInstance("USD")), new ImageLink("google.com"));
+        CategoryId categoryId = categoryService.createCategory(storeId, new CreateCategoryDto("ssa", new ImageLink("https://google.com/image.jpg"), 0)).id();
+        CreateProductDto createProductDto = new CreateProductDto("p1", "d1", new ProductPrice(50D, Currency.getInstance("USD")), new ImageLink("https://google.com/product.png"));
         CreateProductResponseDto createProductResponseDto = productService.createProduct(storeId, categoryId, createProductDto);
         AddProductVariantDto addProductVariantDto = new AddProductVariantDto(new ProductPrice(66D, Currency.getInstance("USD")), new ProductAmount(20), Map.of("COLOR", "RED"));
         AddProductVariantResponseDto addProductVariantResponseDto = productService.addVariant(storeId, createProductResponseDto.id(), addProductVariantDto);
@@ -167,8 +177,8 @@ class ProductServiceIntegrationTest {
     @Test
     void getVariant() {
         StoreId storeId = StoreId.newId();
-        CategoryId categoryId = categoryService.createCategory(storeId, new CreateCategoryDto("ssa", new ImageLink("swa"), 0)).id();
-        CreateProductDto createProductDto = new CreateProductDto("p1", "d1", new ProductPrice(50D, Currency.getInstance("USD")), new ImageLink("google.com"));
+        CategoryId categoryId = categoryService.createCategory(storeId, new CreateCategoryDto("ssa", new ImageLink("https://google.com/image.jpg"), 0)).id();
+        CreateProductDto createProductDto = new CreateProductDto("p1", "d1", new ProductPrice(50D, Currency.getInstance("USD")), new ImageLink("https://google.com/product.png"));
         CreateProductResponseDto createProductResponseDto = productService.createProduct(storeId, categoryId, createProductDto);
         AddProductVariantDto addProductVariantDto = new AddProductVariantDto(new ProductPrice(66D, Currency.getInstance("USD")), new ProductAmount(20), Map.of("COLOR", "RED"));
         AddProductVariantResponseDto addProductVariantResponseDto = productService.addVariant(storeId, createProductResponseDto.id(), addProductVariantDto);

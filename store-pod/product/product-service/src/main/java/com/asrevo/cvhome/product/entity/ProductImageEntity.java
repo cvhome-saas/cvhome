@@ -25,7 +25,7 @@ public class ProductImageEntity extends BaseEntity<ProductImageEntity, ProductIm
     @Column("product_id")
     private AggregateReference<ProductEntity, ProductId> product;
 
-    public static ProductImageEntity create(ProductId productId, StoreId storeId, ImageLink link) {
+    public static ProductImageEntity create(StoreId storeId, ProductId productId, ImageLink link) {
         ProductImageEntity productImage = new ProductImageEntity();
         productImage.setNew();
         productImage.setProduct(AggregateReference.to(productId));

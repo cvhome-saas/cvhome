@@ -1,14 +1,13 @@
 package com.asrevo.cvhome.product.service.impl;
 
-import com.asrevo.cvhome.product.commons.domain.CategoryId;
-import com.asrevo.cvhome.product.commons.domain.ImageLink;
-import com.asrevo.cvhome.product.commons.domain.ProductId;
-import com.asrevo.cvhome.product.commons.domain.ProductVariantId;
+import com.asrevo.cvhome.product.commons.domain.*;
 import com.asrevo.cvhome.product.commons.dto.*;
+import com.asrevo.cvhome.product.entity.ProductDetailsEntity;
 import com.asrevo.cvhome.product.entity.ProductEntity;
 import com.asrevo.cvhome.product.entity.ProductImageEntity;
 import com.asrevo.cvhome.product.entity.ProductVariantEntity;
 import com.asrevo.cvhome.product.mappers.ProductMapper;
+import com.asrevo.cvhome.product.repository.ProductDetailsRepository;
 import com.asrevo.cvhome.product.repository.ProductImageRepository;
 import com.asrevo.cvhome.product.repository.ProductRepository;
 import com.asrevo.cvhome.product.repository.ProductVariantRepository;
@@ -30,6 +29,7 @@ public class ProductServiceImpl implements ProductService {
     private final ProductVariantRepository productVariantRepository;
     private final ProductImageRepository productImageRepository;
     private final CategoryService categoryService;
+    private final ProductDetailsRepository productDetailsRepository;
     private final ProductMapper productMapper;
 
     @Override
@@ -57,12 +57,18 @@ public class ProductServiceImpl implements ProductService {
 
     @Transactional
     @Override
+    public ProductDetails addProductDetails(StoreId storeId, ProductId productId, ProductDetails productDetails) {
+        return productDetailsRepository.save(ProductDetailsEntity.create(storeId, productId, productDetails)).getProductDetails();
+    }
+
+    @Transactional
+    @Override
     public PublishProductResponseDto publishProduct(StoreId storeId, ProductId productId) {
-        return productRepository.findOneByStoreIdAndIdAndDeletedIsFalse(storeId, productId)
-                .map(ProductEntity::publish)
-                .map(productRepository::save)
-                .map(it -> new PublishProductResponseDto(it.getId(), Boolean.TRUE))
-                .orElse(null);
+        ProductEntity productEntity = productRepository.findOneByStoreIdAndIdAndDeletedIsFalse(storeId, productId).orElseThrow(() -> new RuntimeException("product not exist"));
+        ProductDetailsEntity productDetailsEntity = productDetailsRepository.findByStoreIdAndAndProduct(storeId, productId).orElseThrow(() -> new RuntimeException("product details not created yet"));
+        productEntity.publish(productDetailsEntity.getProductDetails());
+        productRepository.save(productEntity);
+        return new PublishProductResponseDto(productId, Boolean.TRUE);
     }
 
     @Transactional
@@ -111,7 +117,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public AddProductImageResponseDto addImage(StoreId storeId, ProductId productId, ImageLink imageLink) {
         return productRepository.findOneByStoreIdAndIdAndDeletedIsFalse(storeId, productId)
-                .map(it -> ProductImageEntity.create(it.getId(), storeId, imageLink))
+                .map(it -> ProductImageEntity.create(storeId, it.getId(), imageLink))
                 .map(productImageRepository::save)
                 .map(productMapper::toDto)
                 .orElse(null);

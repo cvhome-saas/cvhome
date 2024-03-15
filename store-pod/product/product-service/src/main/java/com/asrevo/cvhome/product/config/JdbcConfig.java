@@ -7,7 +7,9 @@ import com.asrevo.cvhome.product.commons.domain.ImageLink;
 import com.asrevo.cvhome.product.commons.domain.ProductId;
 import com.asrevo.cvhome.product.commons.domain.ProductVariantId;
 import com.asrevo.cvhome.product.config.converters.JsonToMapConverter;
+import com.asrevo.cvhome.product.config.converters.JsonToProductDetailsConverter;
 import com.asrevo.cvhome.product.config.converters.MapToJsonConverter;
+import com.asrevo.cvhome.product.config.converters.ProductDetailsToJsonConverter;
 import com.asrevo.cvhome.store.commons.domain.StoreId;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +40,8 @@ public class JdbcConfig extends AbstractJdbcConfiguration {
         List<Converter<?, ?>> converters = new ArrayList<>();
         converters.add(new MapToJsonConverter(mapper));
         converters.add(new JsonToMapConverter(mapper));
+        converters.add(new ProductDetailsToJsonConverter(mapper));
+        converters.add(new JsonToProductDetailsConverter(mapper));
         converters.add(new Converter<Identifier, String>() {
             @Override
             public String convert(Identifier source) {

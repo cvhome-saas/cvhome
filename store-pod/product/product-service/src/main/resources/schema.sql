@@ -34,8 +34,20 @@ CREATE TABLE IF NOT EXISTS product_image
     product_id varchar(24),
     store_id   varchar(24),
     sequence   varchar(5),
-    constraint product_image_pk primary key (id)
+    constraint product_image_pk primary key (id),
+    constraint product_image_product_id_fk foreign key (product_id) references product
 );
+
+CREATE TABLE IF NOT EXISTS product_details
+(
+    id              varchar(24) not null,
+    product_id      varchar(24),
+    store_id        varchar(24),
+    product_details varchar(2048),
+    constraint product_details_pk primary key (id),
+    constraint product_details_product_id_fk foreign key (product_id) references product
+);
+
 CREATE TABLE IF NOT EXISTS product_variant
 (
     id         varchar(24) not null,
