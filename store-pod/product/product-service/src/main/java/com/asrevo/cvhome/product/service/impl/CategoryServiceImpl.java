@@ -87,7 +87,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryDto findCategory(CategoryId categoryId, StoreId storeId) {
         CategoryEntity categoryEntity = categoryRepository.findByIdAndStoreId(categoryId, storeId)
-                .orElseThrow(() -> new RuntimeException("parent category not exist"));
+                .orElseThrow(() -> new RuntimeException("category not exist"));
         return categoryMapper.toDto(categoryEntity);
     }
 }

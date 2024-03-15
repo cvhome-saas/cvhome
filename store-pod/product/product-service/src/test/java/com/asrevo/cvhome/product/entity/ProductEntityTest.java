@@ -17,6 +17,6 @@ class ProductEntityTest {
     void publish() {
         ProductEntity entity = new ProductEntity();
         ProductDetails pd = new ProductDetails(Map.of(DetailsLanguage.EN, new ProductDetail("sa", "wa", List.of(), Map.of(), Boolean.FALSE)), new ImagesLink(List.of(new ImageLink("https://google.com/421.png"))));
-        entity.publish(pd);
+        entity.publish(pd, List.of(pd));
     }
 }

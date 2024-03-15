@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.product.service;
 
+import com.asrevo.cvhome.product.commons.domain.CategoryId;
 import com.asrevo.cvhome.product.commons.domain.ImageLink;
 import com.asrevo.cvhome.product.commons.dto.CategoryDto;
 import com.asrevo.cvhome.product.commons.dto.CreateCategoryDto;
@@ -7,6 +8,7 @@ import com.asrevo.cvhome.product.commons.dto.CreateCategoryResponseDto;
 import com.asrevo.cvhome.product.mappers.CategoryMapperImpl;
 import com.asrevo.cvhome.product.service.impl.CategoryServiceImpl;
 import com.asrevo.cvhome.store.commons.domain.StoreId;
+import org.junit.Assert;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertThrows;
 
 @DataJdbcTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -57,6 +60,12 @@ class CategoryServiceIntegrationTest {
         assertThat(subCategory.name(), is(createCategoryDto.name()));
         assertThat(subCategory.imageLink(), is(createCategoryDto.imageLink()));
         assertThat(subCategory.parent(), is(parentCategory.id()));
+    }
+    @Test
+    void createCategoryUnderCategoryNotExist() {
+        StoreId storeId = StoreId.newId();
+        CreateCategoryDto createCategoryDto = new CreateCategoryDto("ssa",  new ImageLink("https://google.com/product.png"), 0);
+        assertThrows("parent category not exist", RuntimeException.class, () -> categoryService.createCategory(storeId, CategoryId.newId(), createCategoryDto));
     }
 
     @Test

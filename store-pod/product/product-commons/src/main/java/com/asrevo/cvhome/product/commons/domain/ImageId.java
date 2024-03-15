@@ -5,13 +5,13 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import org.bson.types.ObjectId;
 
-public record ProductVariantId(@JsonSerialize(using = ToStringSerializer.class) ObjectId id) implements Identifier {
-    public ProductVariantId(String id) {
+public record ImageId(@JsonSerialize(using = ToStringSerializer.class) ObjectId id) implements Identifier {
+    public ImageId(String id) {
         this(new ObjectId(id));
     }
 
-    public static ProductVariantId newId() {
-        return new ProductVariantId(new ObjectId());
+    public static ImageId newId() {
+        return new ImageId(new ObjectId());
     }
 
     @JsonSerialize(using = ToStringSerializer.class)

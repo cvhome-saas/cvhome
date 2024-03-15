@@ -2,25 +2,26 @@ package com.asrevo.cvhome.product.mappers;
 
 import com.asrevo.cvhome.product.commons.domain.CategoryId;
 import com.asrevo.cvhome.product.commons.domain.ProductId;
-import com.asrevo.cvhome.product.commons.dto.*;
+import com.asrevo.cvhome.product.commons.dto.CreateProductResponseDto;
+import com.asrevo.cvhome.product.commons.dto.ProductDto;
+import com.asrevo.cvhome.product.commons.dto.UpdateProductDto;
+import com.asrevo.cvhome.product.commons.dto.UpdateProductResponseDto;
 import com.asrevo.cvhome.product.entity.CategoryEntity;
 import com.asrevo.cvhome.product.entity.ProductEntity;
-import com.asrevo.cvhome.product.entity.ProductImageEntity;
-import com.asrevo.cvhome.product.entity.ProductVariantEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;
 
+import javax.annotation.processing.Generated;
 import java.util.Optional;
 
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+@lombok.Generated
+@Generated("aas")
 public interface ProductMapper {
     ProductDto toDto(ProductEntity entity);
-
-    @Mapping(source = "product", target = "productId")
-    AddProductImageResponseDto toDto(ProductImageEntity entity);
 
     CreateProductResponseDto toCreateProductResponseDto(ProductEntity entity);
 
@@ -29,15 +30,12 @@ public interface ProductMapper {
     @Mapping(target = "storeId", ignore = true)
     @Mapping(target = "deleted", ignore = true)
     @Mapping(target = "published", ignore = true)
+    @Mapping(target = "category", ignore = true)
     @Mapping(target = "isNew", ignore = true)
     void map(UpdateProductDto updateProductDto, @MappingTarget ProductEntity entity);
 
     UpdateProductResponseDto toUpdateProductResponseDto(ProductEntity entity);
 
-    AddProductVariantResponseDto toAddProductVariantResponseDto(ProductVariantEntity entity);
-
-    @Mapping(source = "product", target = "productId")
-    ProductVariantDto toDto(ProductVariantEntity entity);
 
     default ProductId toProductId(AggregateReference<ProductEntity, ProductId> product) {
         return Optional.ofNullable(product).map(AggregateReference::getId).orElse(null);

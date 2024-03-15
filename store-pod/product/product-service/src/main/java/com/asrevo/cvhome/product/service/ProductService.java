@@ -24,13 +24,6 @@ public interface ProductService {
 
     DetailedProductDto getDetailedProduct(StoreId storeId, ProductId productId);
 
-    DetailedProductDto getDetailedProduct(StoreId storeId, ProductId productId, ProductVariantId variantId);
-
     UpdateProductResponseDto updateProduct(StoreId storeId, ProductId productId, CategoryId categoryId, UpdateProductDto updateProductDto);
 
-    AddProductImageResponseDto addImage(StoreId storeId, ProductId productId, ImageLink imageLink);
-
-    AddProductVariantResponseDto addVariant(StoreId storeId, ProductId productId, AddProductVariantDto addProductVariantDto);
-
-    ProductVariantDto getProductVariant(StoreId storeId, ProductId productId, ProductVariantId variantId);
 }
