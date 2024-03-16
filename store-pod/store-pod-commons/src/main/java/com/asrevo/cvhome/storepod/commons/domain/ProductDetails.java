@@ -1,4 +1,5 @@
-package com.asrevo.cvhome.product.commons.domain;
+package com.asrevo.cvhome.storepod.commons.domain;
+
 
 public record ProductDetails(ProductDetail detail, ImagesLink extraImages) {
 }

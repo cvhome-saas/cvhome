@@ -1,8 +1,6 @@
 package com.asrevo.cvhome.product.config.converters;
 
-import com.asrevo.cvhome.product.commons.domain.ProductDetails;
 import com.asrevo.cvhome.product.commons.domain.SubProducts;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.converter.Converter;

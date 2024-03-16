@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.product.commons.domain;
 
+import com.asrevo.cvhome.storepod.commons.domain.ProductId;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.Iterator;

@@ -34,6 +34,7 @@ include(
         'core:domain-certificate-manager:domain-certificate-manager-events',
         'core:domain-certificate-manager:domain-certificate-manager-service',
 
+        'store-pod:store-pod-commons',
         'store-pod:gateway:gateway-service',
         'store-pod:product:product-commons',
         'store-pod:product:product-events',

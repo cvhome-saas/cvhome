@@ -1,9 +1,9 @@
 package com.asrevo.cvhome.product.service.impl;
 
 import com.asrevo.cvhome.commons.utils.OperationExecution;
-import com.asrevo.cvhome.product.commons.domain.ProductDetails;
-import com.asrevo.cvhome.product.commons.domain.ProductId;
-import com.asrevo.cvhome.product.commons.domain.ProductType;
+import com.asrevo.cvhome.storepod.commons.domain.ProductDetails;
+import com.asrevo.cvhome.storepod.commons.domain.ProductId;
+import com.asrevo.cvhome.storepod.commons.domain.ProductType;
 import com.asrevo.cvhome.product.commons.domain.SubProducts;
 import com.asrevo.cvhome.product.commons.dto.*;
 import com.asrevo.cvhome.product.entity.ProductDetailsEntity;
@@ -15,6 +15,9 @@ import com.asrevo.cvhome.product.service.AdminCategoryService;
 import com.asrevo.cvhome.product.service.AdminProductService;
 import com.asrevo.cvhome.product.utils.ErrorCodes;
 import com.asrevo.cvhome.store.commons.domain.StoreId;
+import com.asrevo.cvhome.storepod.commons.dto.DetailedProductDto;
+import com.asrevo.cvhome.storepod.commons.dto.FindAllProductDto;
+import com.asrevo.cvhome.storepod.commons.dto.ProductDto;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;

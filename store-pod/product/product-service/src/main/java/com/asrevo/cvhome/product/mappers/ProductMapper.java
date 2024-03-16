@@ -1,10 +1,12 @@
 package com.asrevo.cvhome.product.mappers;
 
-import com.asrevo.cvhome.product.commons.domain.CategoryId;
-import com.asrevo.cvhome.product.commons.domain.ProductId;
+import com.asrevo.cvhome.storepod.commons.domain.CategoryId;
+import com.asrevo.cvhome.storepod.commons.domain.ProductId;
 import com.asrevo.cvhome.product.commons.dto.*;
 import com.asrevo.cvhome.product.entity.CategoryEntity;
 import com.asrevo.cvhome.product.entity.ProductEntity;
+import com.asrevo.cvhome.storepod.commons.dto.FindAllProductDto;
+import com.asrevo.cvhome.storepod.commons.dto.ProductDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;

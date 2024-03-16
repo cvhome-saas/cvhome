@@ -1,9 +1,12 @@
 package com.asrevo.cvhome.product.controller.admin;
 
-import com.asrevo.cvhome.product.commons.domain.ProductId;
+import com.asrevo.cvhome.storepod.commons.domain.ProductId;
 import com.asrevo.cvhome.product.commons.dto.*;
 import com.asrevo.cvhome.product.service.AdminProductService;
 import com.asrevo.cvhome.store.commons.domain.StoreId;
+import com.asrevo.cvhome.storepod.commons.dto.DetailedProductDto;
+import com.asrevo.cvhome.storepod.commons.dto.FindAllProductDto;
+import com.asrevo.cvhome.storepod.commons.dto.ProductDto;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;

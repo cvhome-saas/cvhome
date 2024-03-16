@@ -1,4 +1,4 @@
-package com.asrevo.cvhome.product.commons.domain;
+package com.asrevo.cvhome.storepod.commons.domain;
 
 import com.asrevo.cvhome.commons.utils.ErrorCodes;
 import com.asrevo.cvhome.commons.utils.OperationExecution;

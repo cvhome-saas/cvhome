@@ -1,4 +1,4 @@
-package com.asrevo.cvhome.product.commons.domain;
+package com.asrevo.cvhome.storepod.commons.domain;
 
 import java.util.List;
 import java.util.Map;

@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.product.service;
 
-import com.asrevo.cvhome.product.commons.domain.CategoryId;
-import com.asrevo.cvhome.product.commons.domain.ImageLink;
+import com.asrevo.cvhome.storepod.commons.domain.CategoryId;
+import com.asrevo.cvhome.storepod.commons.domain.ImageLink;
 import com.asrevo.cvhome.product.commons.dto.CategoryDto;
 import com.asrevo.cvhome.product.commons.dto.CreateCategoryDto;
 import com.asrevo.cvhome.product.commons.dto.CreateCategoryResponseDto;

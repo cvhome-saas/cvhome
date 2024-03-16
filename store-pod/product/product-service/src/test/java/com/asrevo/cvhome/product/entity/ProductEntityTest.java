@@ -1,6 +1,9 @@
 package com.asrevo.cvhome.product.entity;
 
-import com.asrevo.cvhome.product.commons.domain.*;
+import com.asrevo.cvhome.storepod.commons.domain.ImageLink;
+import com.asrevo.cvhome.storepod.commons.domain.ImagesLink;
+import com.asrevo.cvhome.storepod.commons.domain.ProductDetail;
+import com.asrevo.cvhome.storepod.commons.domain.ProductDetails;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

@@ -1,7 +1,7 @@
-package com.asrevo.cvhome.product.commons.dto;
+package com.asrevo.cvhome.storepod.commons.dto;
 
-import com.asrevo.cvhome.product.commons.domain.ProductDetails;
-import com.asrevo.cvhome.product.commons.domain.ProductId;
+import com.asrevo.cvhome.storepod.commons.domain.ProductDetails;
+import com.asrevo.cvhome.storepod.commons.domain.ProductId;
 
 import java.util.List;
 

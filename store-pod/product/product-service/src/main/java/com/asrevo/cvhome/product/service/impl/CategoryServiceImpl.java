@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.product.service.impl;
 
-import com.asrevo.cvhome.product.commons.domain.CategoryId;
-import com.asrevo.cvhome.product.commons.dto.CategoriesView;
+import com.asrevo.cvhome.storepod.commons.domain.CategoryId;
+import com.asrevo.cvhome.storepod.commons.dto.CategoriesView;
 import com.asrevo.cvhome.product.entity.CategoryEntity;
 import com.asrevo.cvhome.product.repository.CategoryRepository;
 import com.asrevo.cvhome.product.service.CategoryService;

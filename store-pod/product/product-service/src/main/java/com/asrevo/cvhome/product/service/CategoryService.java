@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.product.service;
 
-import com.asrevo.cvhome.product.commons.dto.CategoriesView;
 import com.asrevo.cvhome.store.commons.domain.StoreId;
+import com.asrevo.cvhome.storepod.commons.dto.CategoriesView;
 
 import java.util.List;
 

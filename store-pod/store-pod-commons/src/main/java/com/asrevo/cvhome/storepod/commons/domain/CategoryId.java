@@ -1,4 +1,4 @@
-package com.asrevo.cvhome.product.commons.domain;
+package com.asrevo.cvhome.storepod.commons.domain;
 
 import com.asrevo.cvhome.commons.domain.Identifier;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;

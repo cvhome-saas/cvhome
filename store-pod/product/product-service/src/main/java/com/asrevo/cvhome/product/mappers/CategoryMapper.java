@@ -1,6 +1,6 @@
 package com.asrevo.cvhome.product.mappers;
 
-import com.asrevo.cvhome.product.commons.domain.CategoryId;
+import com.asrevo.cvhome.storepod.commons.domain.CategoryId;
 import com.asrevo.cvhome.product.commons.dto.CategoryDto;
 import com.asrevo.cvhome.product.commons.dto.CreateCategoryResponseDto;
 import com.asrevo.cvhome.product.entity.CategoryEntity;

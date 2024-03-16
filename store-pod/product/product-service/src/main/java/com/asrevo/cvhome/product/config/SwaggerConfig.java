@@ -4,6 +4,8 @@ import com.asrevo.cvhome.commons.domain.IdentityId;
 import com.asrevo.cvhome.commons.event.EventId;
 import com.asrevo.cvhome.product.commons.domain.*;
 import com.asrevo.cvhome.store.commons.domain.StoreId;
+import com.asrevo.cvhome.storepod.commons.domain.CategoryId;
+import com.asrevo.cvhome.storepod.commons.domain.ProductId;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;

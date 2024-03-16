@@ -1,8 +1,8 @@
 package com.asrevo.cvhome.product.repository;
 
-import com.asrevo.cvhome.product.commons.domain.CategoryId;
 import com.asrevo.cvhome.product.entity.CategoryEntity;
 import com.asrevo.cvhome.store.commons.domain.StoreId;
+import com.asrevo.cvhome.storepod.commons.domain.CategoryId;
 import org.springframework.data.repository.ListCrudRepository;
 
 import java.util.List;

@@ -1,6 +1,6 @@
 package com.asrevo.cvhome.product.controller.admin;
 
-import com.asrevo.cvhome.product.commons.domain.CategoryId;
+import com.asrevo.cvhome.storepod.commons.domain.CategoryId;
 import com.asrevo.cvhome.product.commons.dto.CreateCategoryDto;
 import com.asrevo.cvhome.product.commons.dto.CreateCategoryResponseDto;
 import com.asrevo.cvhome.product.service.AdminCategoryService;

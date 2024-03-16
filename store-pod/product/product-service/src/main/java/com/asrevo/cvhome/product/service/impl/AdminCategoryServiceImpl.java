@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.product.service.impl;
 
-import com.asrevo.cvhome.product.commons.domain.CategoryId;
-import com.asrevo.cvhome.product.commons.dto.CategoriesView;
+import com.asrevo.cvhome.storepod.commons.domain.CategoryId;
+import com.asrevo.cvhome.storepod.commons.dto.CategoriesView;
 import com.asrevo.cvhome.product.commons.dto.CategoryDto;
 import com.asrevo.cvhome.product.commons.dto.CreateCategoryDto;
 import com.asrevo.cvhome.product.commons.dto.CreateCategoryResponseDto;
@@ -15,9 +15,6 @@ import com.asrevo.cvhome.store.commons.domain.StoreId;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor

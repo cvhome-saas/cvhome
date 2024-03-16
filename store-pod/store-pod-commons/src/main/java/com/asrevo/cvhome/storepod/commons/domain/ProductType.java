@@ -1,4 +1,4 @@
-package com.asrevo.cvhome.product.commons.domain;
+package com.asrevo.cvhome.storepod.commons.domain;
 
 public enum ProductType {
     SINGLE,           // single product  or could be added in a VARIANT as ELEMENTS  or in a GROUP AS ELEMENTS

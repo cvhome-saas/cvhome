@@ -19,12 +19,14 @@ public class LandingView {
     public Rendering index() {
         Rendering.Builder<?> builder = Rendering.view("store-15/index.html");
 
+/*
         builder.modelAttribute("landingProducts", new ReactiveDataDriverContextVariable(
                 Flux.defer(() -> Flux.fromIterable(productService.findAllProducts(10)))));
 
 
         builder.modelAttribute("product", new ReactiveDataDriverContextVariable(
                 Mono.defer(() -> Mono.just(productService.getProductById("10")))));
+*/
 
 
         return builder.build();

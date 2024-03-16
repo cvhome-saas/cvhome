@@ -1,7 +1,6 @@
 package com.asrevo.cvhome.product.config.converters;
 
-import com.asrevo.cvhome.product.commons.domain.ImagesLink;
-import com.asrevo.cvhome.product.commons.domain.ProductDetails;
+import com.asrevo.cvhome.storepod.commons.domain.ImagesLink;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;

@@ -1,8 +1,8 @@
-package com.asrevo.cvhome.product.controller;
+package com.asrevo.cvhome.product.controller.store;
 
-import com.asrevo.cvhome.product.commons.dto.CategoriesView;
 import com.asrevo.cvhome.product.service.CategoryService;
 import com.asrevo.cvhome.store.commons.domain.StoreId;
+import com.asrevo.cvhome.storepod.commons.dto.CategoriesView;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;

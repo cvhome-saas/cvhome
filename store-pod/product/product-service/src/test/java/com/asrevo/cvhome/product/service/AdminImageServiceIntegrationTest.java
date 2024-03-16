@@ -1,6 +1,6 @@
 package com.asrevo.cvhome.product.service;
 
-import com.asrevo.cvhome.product.commons.domain.ImageLink;
+import com.asrevo.cvhome.storepod.commons.domain.ImageLink;
 import com.asrevo.cvhome.product.commons.dto.ImageDto;
 import com.asrevo.cvhome.product.mappers.ImageMapperImpl;
 import com.asrevo.cvhome.product.service.impl.AdminImageServiceImpl;
