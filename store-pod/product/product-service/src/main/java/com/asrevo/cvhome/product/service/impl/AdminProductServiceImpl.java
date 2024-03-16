@@ -1,6 +1,10 @@
 package com.asrevo.cvhome.product.service.impl;
 
-import com.asrevo.cvhome.product.commons.domain.*;
+import com.asrevo.cvhome.commons.utils.OperationExecution;
+import com.asrevo.cvhome.product.commons.domain.ProductDetails;
+import com.asrevo.cvhome.product.commons.domain.ProductId;
+import com.asrevo.cvhome.product.commons.domain.ProductType;
+import com.asrevo.cvhome.product.commons.domain.SubProducts;
 import com.asrevo.cvhome.product.commons.dto.*;
 import com.asrevo.cvhome.product.entity.ProductDetailsEntity;
 import com.asrevo.cvhome.product.entity.ProductEntity;
@@ -9,15 +13,19 @@ import com.asrevo.cvhome.product.repository.ProductDetailsRepository;
 import com.asrevo.cvhome.product.repository.ProductRepository;
 import com.asrevo.cvhome.product.service.AdminCategoryService;
 import com.asrevo.cvhome.product.service.AdminProductService;
+import com.asrevo.cvhome.product.utils.ErrorCodes;
 import com.asrevo.cvhome.store.commons.domain.StoreId;
 import lombok.AllArgsConstructor;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jdbc.core.mapping.AggregateReference;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+import static org.springframework.data.domain.ExampleMatcher.GenericPropertyMatchers.ignoreCase;
 
 @Service
 @AllArgsConstructor
@@ -27,33 +35,61 @@ public class AdminProductServiceImpl implements AdminProductService {
     private final ProductDetailsRepository productDetailsRepository;
     private final ProductMapper productMapper;
 
+
     @Override
-    public List<ProductDto> findAll(StoreId storeId, Pageable pageable) {
-        return productRepository.findAllByStoreId(storeId, pageable).stream().map(productMapper::toDto).toList();
+    public Page<ProductDto> findAll(StoreId storeId, FindAllProductDto dto, Pageable pageable) {
+        ProductEntity product = productMapper.toEntity(dto);
+        product.setStoreId(storeId);
+        product.setDeleted(Boolean.FALSE);
+        ExampleMatcher matcher = ExampleMatcher.matching();
+        if (Objects.nonNull(dto.name())) {
+            matcher = matcher.withMatcher("name", ignoreCase().contains());
+        }
+        Page<ProductEntity> all = productRepository.findAll(Example.of(product, matcher), pageable);
+        return new PageImpl<>(all.stream().map(productMapper::toDto).toList(), all.getPageable(), all.getTotalElements());
+    }
+
+    private CreateProductResponseDto createProduct(StoreId storeId, CreateProductDto createProductDto) {
+        CategoryDto category = categoryService.findCategory(createProductDto.category(), storeId);
+        ProductEntity savedProduct = productRepository.save(ProductEntity.createProduct(storeId, category.id(), createProductDto));
+        return productMapper.toCreateProductResponseDto(savedProduct);
+    }
+
+    private void addSubProduct(StoreId storeId, ProductId productId, List<DetailedProductDto> detailedProductDto) {
+        SubProducts subProducts = detailedProductDto.stream().map(DetailedProductDto::id)
+                .collect(Collectors.collectingAndThen(Collectors.toList(), SubProducts::new));
+
+        ProductEntity productEntity = getProductEntity(storeId, productId);
+
+        validateSubProducts(storeId, productEntity.getProductType(), subProducts);
+
+        productEntity.setSubProducts(subProducts);
+        productRepository.save(productEntity);
     }
 
     @Transactional
     @Override
-    public CreateProductResponseDto createProduct(StoreId storeId, CategoryId categoryId, CreateProductDto createProductDto) {
-        validateSubProducts(storeId, createProductDto.productType(), createProductDto.subProducts());
-        CategoryDto category = categoryService.findCategory(categoryId, storeId);
-        ProductEntity savedProduct = productRepository.save(ProductEntity.createProduct(storeId, category.id(), createProductDto));
-        return productMapper.toCreateProductResponseDto(savedProduct);
+    public DetailedProductDto createProduct(StoreId storeId, CreateDetailedProductDto detailedProductDto) {
+        CreateProductResponseDto product = createProduct(storeId, detailedProductDto.dto());
+        if (detailedProductDto.subProducts() != null && !detailedProductDto.subProducts().isEmpty()) {
+            addSubProduct(storeId, product.id(), detailedProductDto.subProducts());
+        }
+        if (detailedProductDto.productDetails() != null) {
+            addProductDetails(storeId, product.id(), detailedProductDto.productDetails());
+        }
+        return getDetailedProduct(storeId, product.id());
     }
 
     private void validateSubProducts(StoreId storeId, ProductType productType, SubProducts productIds) {
         if (ProductType.SINGLE.equals(productType)) {
             if (!CollectionUtils.isEmpty(productIds.productIds())) {
-                throw new RuntimeException("single product should not have sub product");
+                throw new OperationExecution(ErrorCodes.single_product_should_not_have_sub_product);
             }
         } else {
             if (!CollectionUtils.isEmpty(productIds.productIds())) {
                 List<ProductEntity> subProducts = productRepository.findAllById(productIds.productIds());
                 if (!subProducts.stream().allMatch(it -> it.getStoreId().equals(storeId))) {
-                    throw new RuntimeException("one or more sub product not from this store");
-                }
-                if (!subProducts.stream().allMatch(it -> ProductType.SINGLE.equals(it.getProductType()))) {
-                    throw new RuntimeException("all sub products should be single type not GROUP OR VARIANT");
+                    throw new OperationExecution(ErrorCodes.one_or_more_sub_product_not_from_this_store);
                 }
             }
         }
@@ -62,26 +98,23 @@ public class AdminProductServiceImpl implements AdminProductService {
     @Transactional
     @Override
     public DeleteProductResponseDto deleteProduct(StoreId storeId, ProductId productId) {
-        return productRepository.findOneByStoreIdAndIdAndDeletedIsFalse(storeId, productId)
-                .map(ProductEntity::delete)
-                .map(productRepository::save)
-                .map(it -> new DeleteProductResponseDto(it.getId(), Boolean.TRUE))
-                .orElse(null);
+        ProductEntity productEntity = getProductEntity(storeId, productId);
+
+        productEntity.delete();
+        productRepository.save(productEntity);
+        return new DeleteProductResponseDto(productEntity.getId(), Boolean.TRUE);
     }
 
-    @Transactional
-    @Override
-    public ProductDetails addProductDetails(StoreId storeId, ProductId productId, ProductDetails productDetails) {
-        return productDetailsRepository.save(ProductDetailsEntity.create(storeId, productId, productDetails)).getProductDetails();
+    private void addProductDetails(StoreId storeId, ProductId productId, ProductDetails productDetails) {
+        productDetailsRepository.save(ProductDetailsEntity.create(storeId, productId, productDetails));
     }
 
     @Transactional
     @Override
     public PublishProductResponseDto publishProduct(StoreId storeId, ProductId productId) {
-        ProductEntity productEntity = productRepository.findOneByStoreIdAndIdAndDeletedIsFalse(storeId, productId)
-                .orElseThrow(() -> new RuntimeException("product not exist"));
+        ProductEntity productEntity = getProductEntity(storeId, productId);
         ProductDetailsEntity productDetailsEntity = productDetailsRepository.findByStoreIdAndAndProduct(storeId, productId)
-                .orElseThrow(() -> new RuntimeException("product details not created yet"));
+                .orElseThrow(() -> new OperationExecution(ErrorCodes.product_details_not_created_yet));
         List<ProductDetails> productDetails = getSubProductDetails(storeId, productEntity);
         productEntity.publish(productDetailsEntity.getProductDetails(), productDetails);
         productRepository.save(productEntity);
@@ -96,7 +129,7 @@ public class AdminProductServiceImpl implements AdminProductService {
                     .map(ProductDetailsEntity::getProductDetails)
                     .toList();
             if (productDetails.size() != productEntity.getSubProducts().size()) {
-                throw new RuntimeException("one of your sub products not have product details yet");
+                throw new OperationExecution(ErrorCodes.one_of_your_sub_products_not_have_product_details_yet);
             }
         } else {
             productDetails = List.of();
@@ -107,35 +140,36 @@ public class AdminProductServiceImpl implements AdminProductService {
     @Transactional
     @Override
     public PublishProductResponseDto unPublishProduct(StoreId storeId, ProductId productId) {
+        ProductEntity productEntity = getProductEntity(storeId, productId);
+        productEntity.unPublish();
+        productRepository.save(productEntity);
+        return new PublishProductResponseDto(productEntity.getId(), Boolean.FALSE);
+    }
+
+    private ProductEntity getProductEntity(StoreId storeId, ProductId productId) {
         return productRepository.findOneByStoreIdAndIdAndDeletedIsFalse(storeId, productId)
-                .map(ProductEntity::unPublish)
-                .map(productRepository::save)
-                .map(it -> new PublishProductResponseDto(it.getId(), Boolean.FALSE))
-                .orElse(null);
+                .orElseThrow(() -> new OperationExecution(ErrorCodes.product_not_exist));
     }
 
     @Override
     public ProductDto getProduct(StoreId storeId, ProductId productId) {
-        return productRepository.findOneByStoreIdAndIdAndDeletedIsFalse(storeId, productId)
-                .map(productMapper::toDto)
-                .orElse(null);
+        ProductEntity productEntity = getProductEntity(storeId, productId);
+        return productMapper.toDto(productEntity);
     }
 
-    @Transactional
     @Override
-    public UpdateProductResponseDto updateProduct(StoreId storeId, ProductId productId, CategoryId categoryId, UpdateProductDto updateProductDto) {
-        validateSubProducts(storeId, updateProductDto.productType(), updateProductDto.subProducts());
-        CategoryDto category = categoryService.findCategory(categoryId, storeId);
-        ProductEntity productEntity = productRepository.findOneByStoreIdAndIdAndDeletedIsFalse(storeId, productId).orElseThrow(() -> new RuntimeException("product not exist"));
-        if (Boolean.TRUE.equals(productEntity.getPublished())) {
-            ProductDetailsEntity productDetailsEntity = productDetailsRepository.findByStoreIdAndAndProduct(storeId, productId)
-                    .orElseThrow(() -> new RuntimeException("update published product that have details not created yet"));
-            List<ProductDetails> productDetails = getSubProductDetails(storeId, productEntity);
-            productEntity.verify(productDetailsEntity.getProductDetails(), productDetails);
-        }
-        productMapper.map(updateProductDto, productEntity);
-        productEntity.setCategory(AggregateReference.to(category.id()));
-        ProductEntity save = productRepository.save(productEntity);
-        return productMapper.toUpdateProductResponseDto(save);
+    public DetailedProductDto getDetailedProduct(StoreId storeId, ProductId productId) {
+        ProductEntity productEntity = getProductEntity(storeId, productId);
+        ProductDto dto = productMapper.toDto(productEntity);
+        ProductDetails productDetails = productDetailsRepository.findByStoreIdAndAndProduct(storeId, productId).map(ProductDetailsEntity::getProductDetails).orElse(null);
+        List<DetailedProductDto> list = productRepository.findOneByStoreIdAndIdInAndDeletedIsFalse(storeId, productEntity.getSubProducts().productIds())
+                .stream().map(productMapper::toDto)
+                .map(it -> {
+                    ProductDetails d = productDetailsRepository.findByStoreIdAndAndProduct(storeId, it.id()).map(ProductDetailsEntity::getProductDetails).orElse(null);
+                    return new DetailedProductDto(it.id(), it, d, List.of());
+                })
+                .toList();
+        return new DetailedProductDto(productId, dto, productDetails, list);
     }
+
 }

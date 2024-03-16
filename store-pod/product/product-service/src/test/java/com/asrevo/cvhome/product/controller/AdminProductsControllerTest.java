@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.product.controller;
 
 import com.asrevo.cvhome.product.config.SecurityConfig;
+import com.asrevo.cvhome.product.controller.admin.AdminProductsController;
 import com.asrevo.cvhome.product.service.AdminProductService;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;

@@ -6,6 +6,7 @@ import com.asrevo.cvhome.product.mappers.CategoryMapperImpl;
 import com.asrevo.cvhome.product.mappers.ProductMapperImpl;
 import com.asrevo.cvhome.product.service.impl.AdminCategoryServiceImpl;
 import com.asrevo.cvhome.product.service.impl.AdminProductServiceImpl;
+import com.asrevo.cvhome.product.utils.ErrorCodes;
 import com.asrevo.cvhome.store.commons.domain.StoreId;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,7 @@ import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -45,12 +47,12 @@ class AdminProductServiceIntegrationTest {
     private AdminCategoryService categoryService;
 
 
-    private static CreateProductDto getCreateProductDto(ProductType productType, SubProducts subProducts) {
-        return new CreateProductDto("p1", "d1", new ProductPrice(50D, Currency.getInstance("USD")), new ImageLink("https://google.com/product.png"), new ProductAmount(10), productType, subProducts, ImagesLink.empty());
+    private static CreateProductDto getCreateProductDto(CategoryId categoryId, ProductType productType) {
+        return new CreateProductDto("p1", "d1", new ProductPrice(50D, Currency.getInstance("USD")), new ImageLink("https://google.com/product.png"), new ProductAmount(10), productType, ImagesLink.empty(), categoryId);
     }
 
-    private static CreateProductDto getCreateProductDto() {
-        return new CreateProductDto("p1", "d1", new ProductPrice(50D, Currency.getInstance("USD")), new ImageLink("https://google.com/product.png"), new ProductAmount(10), ProductType.SINGLE, SubProducts.empty(), ImagesLink.empty());
+    private static CreateProductDto getCreateProductDto(CategoryId categoryId) {
+        return new CreateProductDto("p1", "d1", new ProductPrice(50D, Currency.getInstance("USD")), new ImageLink("https://google.com/product.png"), new ProductAmount(10), ProductType.SINGLE, ImagesLink.empty(), categoryId);
     }
 
     @Test
@@ -58,45 +60,132 @@ class AdminProductServiceIntegrationTest {
         StoreId storeId = StoreId.newId();
         CategoryId categoryId = categoryService.createCategory(storeId, new CreateCategoryDto("ssa", new ImageLink("https://google.com/image.jpg"), 0)).id();
         IntStream.range(0, 20).forEach(it -> {
-            CreateProductDto createProductDto = new CreateProductDto("p" + it, "d1" + it, new ProductPrice(50D * it, Currency.getInstance("USD")), new ImageLink("https://google.com/product.png"), new ProductAmount(10), ProductType.SINGLE, SubProducts.empty(), ImagesLink.empty());
-            productService.createProduct(storeId, categoryId, createProductDto);
+            CreateProductDto createProductDto = new CreateProductDto("p" + it, "d1" + it, new ProductPrice(50D * it, Currency.getInstance("USD")), new ImageLink("https://google.com/product.png"), new ProductAmount(10), ProductType.SINGLE, ImagesLink.empty(), categoryId);
+            productService.createProduct(storeId, new CreateDetailedProductDto(createProductDto));
         });
         PageRequest pageRequest = PageRequest.of(0, 10);
-        List<ProductDto> all = productService.findAll(storeId, pageRequest);
-        assertThat(all.size(), is(pageRequest.getPageSize()));
+        Page<ProductDto> page = productService.findAll(storeId, new FindAllProductDto(CategoryId.newId(), Boolean.TRUE, "new product", ProductType.GROUP), pageRequest);
+        assertThat(page.getSize(), is(pageRequest.getPageSize()));
     }
 
     @Test
     void createProduct() {
         StoreId storeId = StoreId.newId();
         CategoryId categoryId = categoryService.createCategory(storeId, new CreateCategoryDto("ssa", new ImageLink("https://google.com/image.jpg"), 0)).id();
-        CreateProductDto createProductDto = getCreateProductDto();
-        CreateProductResponseDto createProductResponseDto = productService.createProduct(storeId, categoryId, createProductDto);
-        assertThat(createProductResponseDto.published(), is(Boolean.FALSE));
-        assertThat(createProductResponseDto.id(), notNullValue());
-        assertThat(createProductResponseDto.price(), is(createProductDto.price()));
-        assertThat(createProductResponseDto.imageLink(), is(createProductDto.imageLink()));
+        CreateProductDto createProductDto = getCreateProductDto(categoryId);
+        DetailedProductDto detailedProductDto = productService.createProduct(storeId, new CreateDetailedProductDto(createProductDto));
+        ProductDto dto = detailedProductDto.dto();
+        assertThat(dto.published(), is(Boolean.FALSE));
+        assertThat(dto.id(), notNullValue());
+        assertThat(dto.price(), is(createProductDto.price()));
+        assertThat(dto.imageLink(), is(createProductDto.imageLink()));
     }
 
     @Test
     void createProductWithoutCategory() {
-        assertThrows("category not exist", RuntimeException.class, () -> productService.createProduct(StoreId.newId(), CategoryId.newId(), getCreateProductDto()));
+        assertThrows(ErrorCodes.category_not_exist.message(), RuntimeException.class, () -> productService.createProduct(StoreId.newId(), new CreateDetailedProductDto(getCreateProductDto(CategoryId.newId()))));
+    }
+
+
+    @Test
+    void getProduct() {
+        StoreId storeId = StoreId.newId();
+        CategoryId categoryId = categoryService.createCategory(storeId, new CreateCategoryDto("ssa", new ImageLink("https://google.com/image.jpg"), 0)).id();
+        CreateProductDto createProductDto = getCreateProductDto(categoryId);
+        DetailedProductDto detailedProductDto = productService.createProduct(storeId, new CreateDetailedProductDto(createProductDto));
+        ProductDto dto = detailedProductDto.dto();
+        ProductDto productDto = productService.getProduct(storeId, dto.id());
+        assertThat(dto.id(), is(productDto.id()));
+        assertThat(dto.name(), is(createProductDto.name()));
+        assertThat(dto.description(), is(createProductDto.description()));
+        assertThat(dto.price(), is(createProductDto.price()));
+        assertThat(dto.imageLink(), is(createProductDto.imageLink()));
     }
 
     @Test
-    void createGroupProduct() {
+    void deleteProduct() {
         StoreId storeId = StoreId.newId();
         CategoryId categoryId = categoryService.createCategory(storeId, new CreateCategoryDto("ssa", new ImageLink("https://google.com/image.jpg"), 0)).id();
-        CreateProductResponseDto subProduct1 = productService.createProduct(storeId, categoryId, getCreateProductDto());
-        CreateProductResponseDto subProduct2 = productService.createProduct(storeId, categoryId, getCreateProductDto());
-        CreateProductResponseDto subProduct3 = productService.createProduct(storeId, categoryId, getCreateProductDto());
+        CreateProductDto createProductDto = getCreateProductDto(categoryId);
+        DetailedProductDto detailedProductDto = productService.createProduct(storeId, new CreateDetailedProductDto(createProductDto));
+        DeleteProductResponseDto deleteProductResponseDto = productService.deleteProduct(storeId, detailedProductDto.id());
 
-        SubProducts subProducts = new SubProducts(subProduct1.id(), subProduct2.id(), subProduct3.id());
+        assertThat(deleteProductResponseDto.deleted(), is(Boolean.TRUE));
+        assertThat(deleteProductResponseDto.id(), is(detailedProductDto.id()));
+        assertThrows(ErrorCodes.product_not_exist.message(), RuntimeException.class, () -> productService.getProduct(storeId, detailedProductDto.id()));
+    }
 
-        CreateProductResponseDto parentProduct = productService.createProduct(storeId, categoryId, getCreateProductDto(ProductType.GROUP, subProducts));
-        assertThat(parentProduct.productType(), is(ProductType.GROUP));
-        assertThat(parentProduct.subProducts().size(), is(equalTo(subProducts.size())));
+    @Test
+    void publishProduct() {
+        StoreId storeId = StoreId.newId();
+        CategoryId categoryId = categoryService.createCategory(storeId, new CreateCategoryDto("ssa", new ImageLink("https://google.com/image.jpg"), 0)).id();
+        CreateProductDto createProductDto = getCreateProductDto(categoryId);
+        ProductDetails details = new ProductDetails(new ProductDetail("sa", "wa", List.of(), Map.of(), Boolean.FALSE), new ImagesLink(List.of(new ImageLink("https://google.com/421.png"))));
+        DetailedProductDto detailedProductDto = productService.createProduct(storeId, new CreateDetailedProductDto(createProductDto, details, null));
+        assertThat(detailedProductDto, notNullValue());
+        assertThat(detailedProductDto.productDetails(), notNullValue());
+        PublishProductResponseDto publishProductResponseDto = productService.publishProduct(storeId, detailedProductDto.id());
+        assertThat(publishProductResponseDto.published(), is(Boolean.TRUE));
+    }
 
+
+    @Test
+    void publishMultiProductWithSubProductsAllHaveDetails() {
+        StoreId storeId = StoreId.newId();
+        CategoryId categoryId = categoryService.createCategory(storeId, new CreateCategoryDto("ssa", new ImageLink("https://google.com/image.jpg"), 0)).id();
+
+        ProductDetails details = new ProductDetails(new ProductDetail("sa", "wa", List.of(), Map.of(), Boolean.FALSE), new ImagesLink(List.of(new ImageLink("https://google.com/421.png"))));
+
+        DetailedProductDto subProduct1 = productService.createProduct(storeId, new CreateDetailedProductDto(getCreateProductDto(categoryId), details, null));
+        DetailedProductDto subProduct2 = productService.createProduct(storeId, new CreateDetailedProductDto(getCreateProductDto(categoryId), details, null));
+        DetailedProductDto subProduct3 = productService.createProduct(storeId, new CreateDetailedProductDto(getCreateProductDto(categoryId), details, null));
+
+
+        List<DetailedProductDto> subProducts = new SubProducts(subProduct1.id(), subProduct2.id(), subProduct3.id()).productIds()
+                .stream()
+                .map(it -> new DetailedProductDto(it, null, null, null))
+                .toList();
+
+        DetailedProductDto parentProduct = productService.createProduct(storeId, new CreateDetailedProductDto(getCreateProductDto(categoryId, ProductType.GROUP), details, subProducts));
+
+        productService.publishProduct(storeId, parentProduct.id());
+    }
+
+    @Test
+    void publishNotExistProduct() {
+        assertThrows(ErrorCodes.product_not_exist.message(), RuntimeException.class, () -> productService.publishProduct(StoreId.newId(), ProductId.newId()));
+    }
+
+    @Test
+    void publishProductWithNoDetails() {
+        StoreId storeId = StoreId.newId();
+        CategoryId categoryId = categoryService.createCategory(storeId, new CreateCategoryDto("ssa", new ImageLink("https://google.com/image.jpg"), 0)).id();
+        CreateProductDto createProductDto = getCreateProductDto(categoryId);
+        DetailedProductDto detailedProductDto = productService.createProduct(storeId, new CreateDetailedProductDto(createProductDto));
+        assertThrows(ErrorCodes.product_details_not_created_yet.message(), RuntimeException.class, () -> productService.publishProduct(storeId, detailedProductDto.id()));
+    }
+
+ /*   @Test
+    void addProductDetails() {
+        StoreId storeId = StoreId.newId();
+        CategoryId categoryId = categoryService.createCategory(storeId, new CreateCategoryDto("ssa", new ImageLink("https://google.com/image.jpg"), 0)).id();
+        CreateProductDto createProductDto = getCreateProductDto(categoryId);
+        CreateProductResponseDto createProductResponseDto = productService.createProduct(storeId, createProductDto);
+        ProductDetails productDetails = new ProductDetails(new ProductDetail("sa", "wa", List.of(), Map.of(), Boolean.FALSE), new ImagesLink(List.of(new ImageLink("https://google.com/421.png"))));
+        ProductDetails productDetailsResponse = productService.addProductDetails(storeId, createProductResponseDto.id(), productDetails);
+        assertThat(productDetails, is(productDetailsResponse));
+    }*/
+
+    @Test
+    void unPublishProduct() {
+        StoreId storeId = StoreId.newId();
+        CategoryId categoryId = categoryService.createCategory(storeId, new CreateCategoryDto("ssa", new ImageLink("https://google.com/image.jpg"), 0)).id();
+        CreateProductDto createProductDto = getCreateProductDto(categoryId);
+        ProductDetails details = new ProductDetails(new ProductDetail("sa", "wa", List.of(), Map.of(), Boolean.FALSE), new ImagesLink(List.of(new ImageLink("https://google.com/421.png"))));
+        DetailedProductDto detailedProductDto = productService.createProduct(storeId, new CreateDetailedProductDto(createProductDto, details, null));
+        productService.publishProduct(storeId, detailedProductDto.id());
+        PublishProductResponseDto publishProductResponseDto = productService.unPublishProduct(storeId, detailedProductDto.id());
+        assertThat(publishProductResponseDto.published(), is(Boolean.FALSE));
     }
 
     @Test
@@ -105,78 +194,57 @@ class AdminProductServiceIntegrationTest {
         CategoryId categoryId = categoryService.createCategory(storeId, new CreateCategoryDto("ssa", new ImageLink("https://google.com/image.jpg"), 0)).id();
         StoreId anotherstoreId = StoreId.newId();
         CategoryId anothercategoryId = categoryService.createCategory(anotherstoreId, new CreateCategoryDto("ssa", new ImageLink("https://google.com/image.jpg"), 0)).id();
-        CreateProductResponseDto subProduct1 = productService.createProduct(storeId, categoryId, getCreateProductDto());
-        CreateProductResponseDto subProduct2 = productService.createProduct(storeId, categoryId, getCreateProductDto());
-        CreateProductResponseDto subProduct3 = productService.createProduct(anotherstoreId, anothercategoryId, getCreateProductDto());
-        SubProducts subProducts = new SubProducts(subProduct1.id(), subProduct2.id(), subProduct3.id());
-        assertThrows("one or more sub product not from this store", RuntimeException.class, () -> productService.createProduct(storeId, categoryId, getCreateProductDto(ProductType.GROUP, subProducts)));
-    }
+        DetailedProductDto subProduct1 = productService.createProduct(storeId, new CreateDetailedProductDto(getCreateProductDto(categoryId)));
+        DetailedProductDto subProduct2 = productService.createProduct(storeId, new CreateDetailedProductDto(getCreateProductDto(categoryId)));
+        DetailedProductDto subProduct3 = productService.createProduct(anotherstoreId, new CreateDetailedProductDto(getCreateProductDto(anothercategoryId)));
 
-    @Test
-    void createGroupProductWithGroupOrVariantSubProducts() {
-        StoreId storeId = StoreId.newId();
-        CategoryId categoryId = categoryService.createCategory(storeId, new CreateCategoryDto("ssa", new ImageLink("https://google.com/image.jpg"), 0)).id();
-        CreateProductResponseDto subProduct1 = productService.createProduct(storeId, categoryId, getCreateProductDto());
-        CreateProductResponseDto subProduct2 = productService.createProduct(storeId, categoryId, getCreateProductDto());
-        CreateProductResponseDto subProduct3 = productService.createProduct(storeId, categoryId, getCreateProductDto(ProductType.GROUP, new SubProducts(subProduct2.id())));
-        SubProducts subProducts = new SubProducts(subProduct1.id(), subProduct2.id(), subProduct3.id());
-        assertThrows("all sub products should be single type not GROUP OR VARIANT", RuntimeException.class, () -> productService.createProduct(storeId, categoryId, getCreateProductDto(ProductType.GROUP, subProducts)));
+        List<DetailedProductDto> subProducts = new SubProducts(subProduct1.id(), subProduct2.id(), subProduct3.id()).productIds()
+                .stream()
+                .map(it -> new DetailedProductDto(it, null, null, null))
+                .toList();
+
+        assertThrows(ErrorCodes.one_or_more_sub_product_not_from_this_store.message(), RuntimeException.class, () -> {
+            productService.createProduct(storeId, new CreateDetailedProductDto(getCreateProductDto(categoryId, ProductType.GROUP), null, subProducts)/*getCreateProductDto(categoryId, ProductType.GROUP, subProducts)*/);
+        });
     }
 
     @Test
     void createSingleWithMultipleProduct() {
         StoreId storeId = StoreId.newId();
         CategoryId categoryId = categoryService.createCategory(storeId, new CreateCategoryDto("ssa", new ImageLink("https://google.com/image.jpg"), 0)).id();
-        CreateProductResponseDto subProduct1 = productService.createProduct(storeId, categoryId, getCreateProductDto());
-        CreateProductResponseDto subProduct2 = productService.createProduct(storeId, categoryId, getCreateProductDto());
-        CreateProductResponseDto subProduct3 = productService.createProduct(storeId, categoryId, getCreateProductDto());
-        SubProducts subProducts = new SubProducts(subProduct1.id(), subProduct2.id(), subProduct3.id());
-        assertThrows("single product should not have sub product", RuntimeException.class, () ->
-                productService.createProduct(storeId, categoryId, getCreateProductDto(ProductType.SINGLE, subProducts)));
+        DetailedProductDto subProduct1 = productService.createProduct(storeId, new CreateDetailedProductDto(getCreateProductDto(categoryId)));
+        DetailedProductDto subProduct2 = productService.createProduct(storeId, new CreateDetailedProductDto(getCreateProductDto(categoryId)));
+        DetailedProductDto subProduct3 = productService.createProduct(storeId, new CreateDetailedProductDto(getCreateProductDto(categoryId)));
+
+        List<DetailedProductDto> subProducts = new SubProducts(subProduct1.id(), subProduct2.id(), subProduct3.id()).productIds()
+                .stream()
+                .map(it -> new DetailedProductDto(it, null, null, null))
+                .toList();
+
+        assertThrows(ErrorCodes.single_product_should_not_have_sub_product.message(), RuntimeException.class, () -> {
+            productService.createProduct(storeId, new CreateDetailedProductDto(getCreateProductDto(categoryId, ProductType.SINGLE), null, subProducts)/*getCreateProductDto(categoryId, ProductType.GROUP, subProducts)*/);
+        });
 
     }
 
     @Test
-    void getProduct() {
+    void createGroupProduct() {
         StoreId storeId = StoreId.newId();
         CategoryId categoryId = categoryService.createCategory(storeId, new CreateCategoryDto("ssa", new ImageLink("https://google.com/image.jpg"), 0)).id();
-        CreateProductDto createProductDto = getCreateProductDto();
-        CreateProductResponseDto createProductResponseDto = productService.createProduct(storeId, categoryId, createProductDto);
-        ProductDto productDto = productService.getProduct(storeId, createProductResponseDto.id());
-        assertThat(createProductResponseDto.id(), is(productDto.id()));
-        assertThat(createProductResponseDto.name(), is(createProductDto.name()));
-        assertThat(createProductResponseDto.description(), is(createProductDto.description()));
-        assertThat(createProductResponseDto.price(), is(createProductDto.price()));
-        assertThat(createProductResponseDto.imageLink(), is(createProductDto.imageLink()));
-    }
+        DetailedProductDto subProduct1 = productService.createProduct(storeId, new CreateDetailedProductDto(getCreateProductDto(categoryId)));
+        DetailedProductDto subProduct2 = productService.createProduct(storeId, new CreateDetailedProductDto(getCreateProductDto(categoryId)));
+        DetailedProductDto subProduct3 = productService.createProduct(storeId, new CreateDetailedProductDto(getCreateProductDto(categoryId)));
 
-    @Test
-    void deleteProduct() {
-        StoreId storeId = StoreId.newId();
-        CategoryId categoryId = categoryService.createCategory(storeId, new CreateCategoryDto("ssa", new ImageLink("https://google.com/image.jpg"), 0)).id();
-        CreateProductDto createProductDto = getCreateProductDto();
-        CreateProductResponseDto createProductResponseDto = productService.createProduct(storeId, categoryId, createProductDto);
-        DeleteProductResponseDto deleteProductResponseDto = productService.deleteProduct(storeId, createProductResponseDto.id());
-        ProductDto productDto = productService.getProduct(storeId, createProductResponseDto.id());
-        assertThat(deleteProductResponseDto.id(), is(createProductResponseDto.id()));
-        assertThat(deleteProductResponseDto.deleted(), is(Boolean.TRUE));
-        assertThat(productDto, nullValue());
-    }
 
-    @Test
-    void publishProduct() {
-        StoreId storeId = StoreId.newId();
-        CategoryId categoryId = categoryService.createCategory(storeId, new CreateCategoryDto("ssa", new ImageLink("https://google.com/image.jpg"), 0)).id();
-        CreateProductDto createProductDto = getCreateProductDto();
-        CreateProductResponseDto createProductResponseDto = productService.createProduct(storeId, categoryId, createProductDto);
-        ProductDetails details = new ProductDetails(Map.of(DetailsLanguage.EN, new ProductDetail("sa", "wa", List.of(), Map.of(), Boolean.FALSE)), new ImagesLink(List.of(new ImageLink("https://google.com/421.png"))));
-        ProductDetails productDetails = productService.addProductDetails(storeId, createProductResponseDto.id(), details);
-        assertThat(productDetails, notNullValue());
-        assertThrows(RuntimeException.class, () -> productService.getDetailedProduct(storeId, createProductResponseDto.id()));
-        PublishProductResponseDto publishProductResponseDto = productService.publishProduct(storeId, createProductResponseDto.id());
-        DetailedProductDto publishedDetailedProduct = productService.getDetailedProduct(storeId, createProductResponseDto.id());
-        assertThat(publishProductResponseDto.published(), is(Boolean.TRUE));
-        assertThat(publishedDetailedProduct, notNullValue());
+        List<DetailedProductDto> subProducts = new SubProducts(subProduct1.id(), subProduct2.id(), subProduct3.id()).productIds()
+                .stream()
+                .map(it -> new DetailedProductDto(it, null, null, null))
+                .toList();
+
+        DetailedProductDto pProduct = productService.createProduct(storeId, new CreateDetailedProductDto(getCreateProductDto(categoryId, ProductType.GROUP), null, subProducts)/*getCreateProductDto(categoryId, ProductType.GROUP, subProducts)*/);
+        assertThat(pProduct.dto().productType(), is(ProductType.GROUP));
+        assertThat(pProduct.subProducts().size(), is(equalTo(subProducts.size())));
+
     }
 
     @Test
@@ -184,135 +252,18 @@ class AdminProductServiceIntegrationTest {
         StoreId storeId = StoreId.newId();
         CategoryId categoryId = categoryService.createCategory(storeId, new CreateCategoryDto("ssa", new ImageLink("https://google.com/image.jpg"), 0)).id();
 
-        CreateProductResponseDto subProduct1 = productService.createProduct(storeId, categoryId, getCreateProductDto());
-        CreateProductResponseDto subProduct2 = productService.createProduct(storeId, categoryId, getCreateProductDto());
-        CreateProductResponseDto subProduct3 = productService.createProduct(storeId, categoryId, getCreateProductDto());
+        DetailedProductDto subProduct1 = productService.createProduct(storeId, new CreateDetailedProductDto(getCreateProductDto(categoryId)));
+        DetailedProductDto subProduct2 = productService.createProduct(storeId, new CreateDetailedProductDto(getCreateProductDto(categoryId)));
+        DetailedProductDto subProduct3 = productService.createProduct(storeId, new CreateDetailedProductDto(getCreateProductDto(categoryId)));
 
-        SubProducts subProducts = new SubProducts(subProduct1.id(), subProduct2.id(), subProduct3.id());
+        List<DetailedProductDto> subProducts = new SubProducts(subProduct1.id(), subProduct2.id(), subProduct3.id()).productIds()
+                .stream()
+                .map(it -> new DetailedProductDto(it, null, null, null))
+                .toList();
+        ProductDetails details = new ProductDetails(new ProductDetail("sa", "wa", List.of(), Map.of(), Boolean.FALSE), new ImagesLink(List.of(new ImageLink("https://google.com/421.png"))));
 
-        CreateProductResponseDto parentProduct = productService.createProduct(storeId, categoryId, getCreateProductDto(ProductType.GROUP, subProducts));
-        ProductDetails details = new ProductDetails(Map.of(DetailsLanguage.EN, new ProductDetail("sa", "wa", List.of(), Map.of(), Boolean.FALSE)), new ImagesLink(List.of(new ImageLink("https://google.com/421.png"))));
-        productService.addProductDetails(storeId, parentProduct.id(), details);
-        assertThrows("one of your sub products not have product details yet", RuntimeException.class, () -> productService.publishProduct(storeId, parentProduct.id()));
+        DetailedProductDto parentProduct = productService.createProduct(storeId, new CreateDetailedProductDto(getCreateProductDto(categoryId, ProductType.GROUP), details, subProducts));
+        assertThrows(ErrorCodes.one_of_your_sub_products_not_have_product_details_yet.message(), RuntimeException.class, () -> productService.publishProduct(storeId, parentProduct.id()));
     }
 
-    @Test
-    void publishGroupProductWithSubProductsAllHaveDetails() {
-        StoreId storeId = StoreId.newId();
-        CategoryId categoryId = categoryService.createCategory(storeId, new CreateCategoryDto("ssa", new ImageLink("https://google.com/image.jpg"), 0)).id();
-
-        CreateProductResponseDto subProduct1 = productService.createProduct(storeId, categoryId, getCreateProductDto());
-        CreateProductResponseDto subProduct2 = productService.createProduct(storeId, categoryId, getCreateProductDto());
-        CreateProductResponseDto subProduct3 = productService.createProduct(storeId, categoryId, getCreateProductDto());
-
-        SubProducts subProducts = new SubProducts(subProduct1.id(), subProduct2.id(), subProduct3.id());
-
-        CreateProductResponseDto parentProduct = productService.createProduct(storeId, categoryId, getCreateProductDto(ProductType.GROUP, subProducts));
-        ProductDetails details = new ProductDetails(Map.of(DetailsLanguage.EN, new ProductDetail("sa", "wa", List.of(), Map.of(), Boolean.FALSE)), new ImagesLink(List.of(new ImageLink("https://google.com/421.png"))));
-
-        productService.addProductDetails(storeId, subProduct1.id(), details);
-        productService.addProductDetails(storeId, subProduct2.id(), details);
-        productService.addProductDetails(storeId, subProduct3.id(), details);
-        productService.addProductDetails(storeId, parentProduct.id(), details);
-        productService.publishProduct(storeId, parentProduct.id());
-    }
-
-    @Test
-    void publishVariantProductWithSubProductsAllHaveDetails() {
-        StoreId storeId = StoreId.newId();
-        CategoryId categoryId = categoryService.createCategory(storeId, new CreateCategoryDto("ssa", new ImageLink("https://google.com/image.jpg"), 0)).id();
-
-        CreateProductResponseDto subProduct1 = productService.createProduct(storeId, categoryId, getCreateProductDto());
-        CreateProductResponseDto subProduct2 = productService.createProduct(storeId, categoryId, getCreateProductDto());
-        CreateProductResponseDto subProduct3 = productService.createProduct(storeId, categoryId, getCreateProductDto());
-
-        SubProducts subProducts = new SubProducts(subProduct1.id(), subProduct2.id(), subProduct3.id());
-
-        CreateProductResponseDto parentProduct = productService.createProduct(storeId, categoryId, getCreateProductDto(ProductType.GROUP, subProducts));
-        ProductDetails details = new ProductDetails(Map.of(DetailsLanguage.EN, new ProductDetail("sa", "wa", List.of(), Map.of(), Boolean.FALSE)), new ImagesLink(List.of(new ImageLink("https://google.com/421.png"))));
-
-        productService.addProductDetails(storeId, subProduct1.id(), details);
-        productService.addProductDetails(storeId, subProduct2.id(), details);
-        productService.addProductDetails(storeId, subProduct3.id(), details);
-        productService.addProductDetails(storeId, parentProduct.id(), details);
-        productService.publishProduct(storeId, parentProduct.id());
-    }
-
-    @Test
-    void publishNotExistProduct() {
-        assertThrows("product not exist", RuntimeException.class, () -> productService.publishProduct(StoreId.newId(), ProductId.newId()));
-    }
-
-    @Test
-    void publishProductWithNoDetails() {
-        StoreId storeId = StoreId.newId();
-        CategoryId categoryId = categoryService.createCategory(storeId, new CreateCategoryDto("ssa", new ImageLink("https://google.com/image.jpg"), 0)).id();
-        CreateProductDto createProductDto = getCreateProductDto();
-        CreateProductResponseDto createProductResponseDto = productService.createProduct(storeId, categoryId, createProductDto);
-        assertThrows("product details not created yet", RuntimeException.class, () -> productService.publishProduct(storeId, createProductResponseDto.id()));
-    }
-
-    @Test
-    void addProductDetails() {
-        StoreId storeId = StoreId.newId();
-        CategoryId categoryId = categoryService.createCategory(storeId, new CreateCategoryDto("ssa", new ImageLink("https://google.com/image.jpg"), 0)).id();
-        CreateProductDto createProductDto = getCreateProductDto();
-        CreateProductResponseDto createProductResponseDto = productService.createProduct(storeId, categoryId, createProductDto);
-        ProductDetails productDetails = new ProductDetails(Map.of(), new ImagesLink(List.of()));
-        ProductDetails productDetailsResponse = productService.addProductDetails(storeId, createProductResponseDto.id(), productDetails);
-        assertThat(productDetails, is(productDetailsResponse));
-    }
-
-    @Test
-    void unPublishProduct() {
-        StoreId storeId = StoreId.newId();
-        CategoryId categoryId = categoryService.createCategory(storeId, new CreateCategoryDto("ssa", new ImageLink("https://google.com/image.jpg"), 0)).id();
-        CreateProductDto createProductDto = getCreateProductDto();
-        CreateProductResponseDto createProductResponseDto = productService.createProduct(storeId, categoryId, createProductDto);
-        ProductDetails details = new ProductDetails(Map.of(DetailsLanguage.EN, new ProductDetail("sa", "wa", List.of(), Map.of(), Boolean.FALSE)), new ImagesLink(List.of(new ImageLink("https://google.com/421.png"))));
-        productService.addProductDetails(storeId, createProductResponseDto.id(), details);
-        productService.publishProduct(storeId, createProductResponseDto.id());
-        DetailedProductDto detailedProduct = productService.getDetailedProduct(storeId, createProductResponseDto.id());
-        assertThat(detailedProduct, notNullValue());
-        PublishProductResponseDto publishProductResponseDto = productService.unPublishProduct(storeId, createProductResponseDto.id());
-        assertThat(publishProductResponseDto.published(), is(Boolean.FALSE));
-        assertThrows(RuntimeException.class, () -> productService.getDetailedProduct(storeId, createProductResponseDto.id()));
-    }
-
-    @Test
-    void updateProduct() {
-        StoreId storeId = StoreId.newId();
-        CategoryId categoryId = categoryService.createCategory(storeId, new CreateCategoryDto("ssa", new ImageLink("https://google.com/image.jpg"), 0)).id();
-        CreateProductDto createProductDto = getCreateProductDto();
-        CreateProductResponseDto createProductResponseDto = productService.createProduct(storeId, categoryId, createProductDto);
-        UpdateProductDto updateProductDto = new UpdateProductDto("pnew", null, null, null, new ProductAmount(10), ProductType.SINGLE, SubProducts.empty());
-        UpdateProductResponseDto updateProductResponseDto = productService.updateProduct(storeId, createProductResponseDto.id(), categoryId, updateProductDto);
-        assertThat(updateProductDto.name(), is(updateProductDto.name()));
-        assertThat(createProductDto.price(), is(updateProductResponseDto.price()));
-        assertThat(createProductDto.imageLink(), is(updateProductResponseDto.imageLink()));
-    }
-
-    @Test
-    void updatePublishedProduct() {
-        StoreId storeId = StoreId.newId();
-        CategoryId categoryId = categoryService.createCategory(storeId, new CreateCategoryDto("ssa", new ImageLink("https://google.com/image.jpg"), 0)).id();
-        CreateProductDto createProductDto = getCreateProductDto();
-        CreateProductResponseDto createProductResponseDto = productService.createProduct(storeId, categoryId, createProductDto);
-        ProductDetails details = new ProductDetails(Map.of(DetailsLanguage.EN, new ProductDetail("sa", "wa", List.of(), Map.of(), Boolean.FALSE)), new ImagesLink(List.of(new ImageLink("https://google.com/421.png"))));
-        productService.addProductDetails(storeId, createProductResponseDto.id(), details);
-        productService.publishProduct(storeId, createProductResponseDto.id());
-        UpdateProductDto updateProductDto = new UpdateProductDto("pnew", null, null, null, new ProductAmount(10), ProductType.SINGLE, SubProducts.empty());
-        UpdateProductResponseDto updateProductResponseDto = productService.updateProduct(storeId, createProductResponseDto.id(), categoryId, updateProductDto);
-        assertThat(updateProductDto.name(), is(updateProductDto.name()));
-        assertThat(createProductDto.price(), is(updateProductResponseDto.price()));
-
-    }
-
-    @Test
-    void updateNonExistProduct() {
-        StoreId storeId = StoreId.newId();
-        CategoryId categoryId = categoryService.createCategory(storeId, new CreateCategoryDto("ssa", new ImageLink("https://google.com/image.jpg"), 0)).id();
-        UpdateProductDto updateProductDto = new UpdateProductDto("pnew", null, null, null, new ProductAmount(10), ProductType.SINGLE, SubProducts.empty());
-        assertThrows("update published product that have details not created yet", RuntimeException.class, () -> productService.updateProduct(storeId, ProductId.newId(), categoryId, updateProductDto));
-    }
 }

@@ -1,5 +1,7 @@
 package com.asrevo.cvhome.product.commons.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.Iterator;
 import java.util.List;
 
@@ -17,10 +19,12 @@ public record SubProducts(List<ProductId> productIds) implements Iterable<Produc
         return productIds.iterator();
     }
 
+    @JsonIgnore
     public Boolean isEmpty() {
         return this.productIds.isEmpty();
     }
 
+    @JsonIgnore
     public Integer size() {
         return this.productIds.size();
     }

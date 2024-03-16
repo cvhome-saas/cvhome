@@ -4,6 +4,8 @@ package com.asrevo.cvhome.product.entity;
 import com.asrevo.cvhome.commons.domain.BaseEntity;
 import com.asrevo.cvhome.product.commons.domain.*;
 import com.asrevo.cvhome.product.commons.dto.CreateProductDto;
+import com.asrevo.cvhome.product.utils.ErrorCodes;
+import com.asrevo.cvhome.commons.utils.OperationExecution;
 import com.asrevo.cvhome.store.commons.domain.StoreId;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,7 +16,6 @@ import org.springframework.data.relational.core.mapping.Table;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -58,7 +59,7 @@ public class ProductEntity extends BaseEntity<ProductEntity, ProductId> {
         product.setImageLink(createProductDto.imageLink());
         product.setAmount(createProductDto.amount());
         product.setProductType(createProductDto.productType());
-        product.setSubProducts(createProductDto.subProducts());
+        product.setSubProducts(new SubProducts(List.of()));
         product.setImageLinks(createProductDto.imageLinks());
         return product;
     }
@@ -80,38 +81,36 @@ public class ProductEntity extends BaseEntity<ProductEntity, ProductId> {
     }
 
     public void verify(ProductDetails pd, List<ProductDetails> subProducts) {
-        verify(pd, "master");
+        verify(pd);
         if (subProducts != null && !subProducts.isEmpty()) {
             for (ProductDetails subProduct : subProducts) {
-                verify(subProduct, "sub");
+                verify(subProduct);
             }
         }
     }
 
-    private void verify(ProductDetails pd, String product) {
-        ProductDetails productDetails = Optional.ofNullable(pd).orElseThrow(() -> new RuntimeException(product + " product details shouldn't be null"));
-        Map<DetailsLanguage, ProductDetail> details = Optional.ofNullable(productDetails.details()).orElseThrow(() -> new RuntimeException(product + " details shouldn't be null"));
-        if (details.isEmpty()) throw new RuntimeException(product + " details should have at least one language");
-        details.forEach((detailsLanguage, productDetail) -> {
+    private void verify(ProductDetails pd) {
+        ProductDetails productDetails = Optional.ofNullable(pd).orElseThrow(() -> new OperationExecution(ErrorCodes.product_details_should_not_be_null));
+
+        ProductDetail productDetail = Optional.ofNullable(productDetails.detail()).orElseThrow(() -> new OperationExecution(ErrorCodes.details_should_not_be_null));
             if (Objects.isNull(productDetail.ltr())) {
-                throw new RuntimeException(product + " ltr should be true or false");
+                throw new OperationExecution(ErrorCodes.ltr_should_be_true_or_false);
             }
             if (!StringUtils.hasText(productDetail.name())) {
-                throw new RuntimeException(product + " name should be not empty");
+                throw new OperationExecution(ErrorCodes.name_should_be_not_empty);
             }
             if (!StringUtils.hasText(productDetail.shortDescription())) {
-                throw new RuntimeException(product + " short description should be not empty");
+                throw new OperationExecution(ErrorCodes.short_description_should_be_not_empty);
             }
             if (productDetail.descriptions() != null && !productDetail.descriptions().isEmpty()) {
                 productDetail.descriptions().forEach(description -> {
                     if (!StringUtils.hasText(description)) {
-                        throw new RuntimeException(product + " description entries value should be not empty");
+                        throw new OperationExecution(ErrorCodes.description_entries_value_should_be_not_empty);
                     }
                 });
             }
-        });
-        ImagesLink imageLinks = Optional.ofNullable(productDetails.extraImages()).orElseThrow(() -> new RuntimeException("imageLinks shouldn't be null"));
-        if (imageLinks.isEmpty()) throw new RuntimeException("imageLinks should have at least image");
+        ImagesLink imageLinks = Optional.ofNullable(productDetails.extraImages()).orElseThrow(() -> new OperationExecution(ErrorCodes.imageLinks_should_not_be_null));
+        if (imageLinks.isEmpty()) throw new OperationExecution(ErrorCodes.imageLinks_should_have_at_least_image);
 
     }
 

@@ -32,14 +32,14 @@ public class JdbcConfig extends AbstractJdbcConfiguration {
     @Override
     public JdbcCustomConversions jdbcCustomConversions() {
         List<Converter<?, ?>> converters = new ArrayList<>();
-        converters.add(new MapToJsonConverter(mapper));
-        converters.add(new JsonToMapConverter(mapper));
-        converters.add(new ProductDetailsToJsonConverter(mapper));
-        converters.add(new JsonToProductDetailsConverter(mapper));
-        converters.add(new ImagesLinkToJsonConverter(mapper));
-        converters.add(new JsonToImagesLinkConverter(mapper));
-        converters.add(new SubProductsToJsonConverter(mapper));
-        converters.add(new JsonToSubProductsConverter(mapper));
+        converters.add(new MapToJsonConverter(ployJson));
+        converters.add(new JsonToMapConverter(ployJson));
+        converters.add(new ProductDetailsToJsonConverter(ployJson));
+        converters.add(new JsonToProductDetailsConverter(ployJson));
+        converters.add(new ImagesLinkToJsonConverter(ployJson));
+        converters.add(new JsonToImagesLinkConverter(ployJson));
+        converters.add(new SubProductsToJsonConverter(ployJson));
+        converters.add(new JsonToSubProductsConverter(ployJson));
         converters.add(new Converter<Identifier, String>() {
             @Override
             public String convert(Identifier source) {

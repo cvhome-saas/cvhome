@@ -23,8 +23,7 @@ public class JsonToSubProductsConverter implements Converter<String, SubProducts
     @Override
     public SubProducts convert(String json) {
         try {
-            return objectMapper.readValue(json, new TypeReference<>() {
-            });
+            return objectMapper.readValue(json, SubProducts.class);
         } catch (IOException e) {
             log.error("Problem while parsing JSON: {}", json, e);
         }

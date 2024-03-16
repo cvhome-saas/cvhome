@@ -2,10 +2,7 @@ package com.asrevo.cvhome.product.mappers;
 
 import com.asrevo.cvhome.product.commons.domain.CategoryId;
 import com.asrevo.cvhome.product.commons.domain.ProductId;
-import com.asrevo.cvhome.product.commons.dto.CreateProductResponseDto;
-import com.asrevo.cvhome.product.commons.dto.ProductDto;
-import com.asrevo.cvhome.product.commons.dto.UpdateProductDto;
-import com.asrevo.cvhome.product.commons.dto.UpdateProductResponseDto;
+import com.asrevo.cvhome.product.commons.dto.*;
 import com.asrevo.cvhome.product.entity.CategoryEntity;
 import com.asrevo.cvhome.product.entity.ProductEntity;
 import org.mapstruct.Mapper;
@@ -46,6 +43,11 @@ public interface ProductMapper {
     }
 
     default AggregateReference<CategoryEntity, CategoryId> toAggregateReference(CategoryId categoryId) {
-        return AggregateReference.to(categoryId);
+        return Optional.ofNullable(categoryId).map(it-> {
+            AggregateReference<CategoryEntity, CategoryId> e = AggregateReference.to(categoryId);
+            return e;
+        }).orElse(null);
     }
+
+    ProductEntity toEntity(FindAllProductDto dto);
 }

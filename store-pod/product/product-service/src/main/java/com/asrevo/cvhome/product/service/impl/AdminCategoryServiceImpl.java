@@ -9,6 +9,8 @@ import com.asrevo.cvhome.product.entity.CategoryEntity;
 import com.asrevo.cvhome.product.mappers.CategoryMapper;
 import com.asrevo.cvhome.product.repository.CategoryRepository;
 import com.asrevo.cvhome.product.service.AdminCategoryService;
+import com.asrevo.cvhome.product.utils.ErrorCodes;
+import com.asrevo.cvhome.commons.utils.OperationExecution;
 import com.asrevo.cvhome.store.commons.domain.StoreId;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -34,7 +36,7 @@ public class AdminCategoryServiceImpl implements AdminCategoryService {
     @Override
     public CreateCategoryResponseDto createCategory(StoreId storeId, CategoryId parent, CreateCategoryDto createCategoryDto) {
         CategoryEntity parentCategory = categoryRepository.findByIdAndStoreId(parent, storeId)
-                .orElseThrow(() -> new RuntimeException("parent category not exist"));
+                .orElseThrow(() -> new OperationExecution(ErrorCodes.parent_category_not_exist));
         CategoryEntity savedCategory = categoryRepository.save(CategoryEntity.createCategory(storeId, parentCategory, createCategoryDto));
         return categoryMapper.toCreateCategoryResponse(savedCategory);
     }
@@ -56,38 +58,11 @@ public class AdminCategoryServiceImpl implements AdminCategoryService {
      *
      * */
 
-    @Override
-    public List<CategoriesView> getStoreCategoriesView(StoreId storeId) {
-        List<CategoryEntity> allCategories = categoryRepository.findALlByStoreId(storeId);
-
-        List<CategoriesView> parents = allCategories
-                .stream()
-                .filter(it -> Objects.isNull(it.getParent()))
-                .map(it -> new CategoriesView(it.getId(), it.getName(), it.getImageLink(), it.getSequence(), new ArrayList<>()))
-                .sorted(Comparator.comparing(CategoriesView::sequence))
-                .toList();
-
-        Map<CategoryId, List<CategoryEntity>> subCategoriesMap = allCategories
-                .stream()
-                .filter(it -> Objects.nonNull(it.getParent()) && Objects.nonNull(it.getParent().getId()))
-                .collect(Collectors.groupingBy(it -> it.getParent().getId()));
-
-        for (CategoriesView parent : parents) {
-            List<CategoriesView> subCategories = subCategoriesMap.get(parent.id())
-                    .stream()
-                    .map(it -> new CategoriesView(it.getId(), it.getName(), it.getImageLink(), it.getSequence(), new ArrayList<>()))
-                    .sorted(Comparator.comparing(CategoriesView::sequence))
-                    .toList();
-            parent.subCategories().addAll(subCategories);
-        }
-
-        return parents;
-    }
 
     @Override
     public CategoryDto findCategory(CategoryId categoryId, StoreId storeId) {
         CategoryEntity categoryEntity = categoryRepository.findByIdAndStoreId(categoryId, storeId)
-                .orElseThrow(() -> new RuntimeException("category not exist"));
+                .orElseThrow(() -> new OperationExecution(ErrorCodes.category_not_exist));
         return categoryMapper.toDto(categoryEntity);
     }
 }

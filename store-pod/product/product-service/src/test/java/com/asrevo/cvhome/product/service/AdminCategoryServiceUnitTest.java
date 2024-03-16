@@ -6,6 +6,7 @@ import com.asrevo.cvhome.product.commons.dto.CategoriesView;
 import com.asrevo.cvhome.product.entity.CategoryEntity;
 import com.asrevo.cvhome.product.repository.CategoryRepository;
 import com.asrevo.cvhome.product.service.impl.AdminCategoryServiceImpl;
+import com.asrevo.cvhome.product.service.impl.CategoryServiceImpl;
 import com.asrevo.cvhome.store.commons.domain.StoreId;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -28,7 +29,7 @@ class AdminCategoryServiceUnitTest {
     CategoryRepository categoryRepository;
 
     @InjectMocks
-    private AdminCategoryServiceImpl categoryService;
+    private CategoryServiceImpl categoryService;
 
     @Test
     void getStoreCategoriesView() {

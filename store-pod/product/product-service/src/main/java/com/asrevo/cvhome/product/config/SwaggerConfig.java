@@ -2,6 +2,7 @@ package com.asrevo.cvhome.product.config;
 
 import com.asrevo.cvhome.commons.domain.IdentityId;
 import com.asrevo.cvhome.commons.event.EventId;
+import com.asrevo.cvhome.product.commons.domain.*;
 import com.asrevo.cvhome.store.commons.domain.StoreId;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -13,10 +14,17 @@ import org.springdoc.core.utils.SpringDocUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.Currency;
+
 @Configuration
 public class SwaggerConfig {
     static {
         SpringDocUtils.getConfig().replaceWithClass(StoreId.class, String.class);
+        SpringDocUtils.getConfig().replaceWithClass(CategoryId.class, String.class);
+        SpringDocUtils.getConfig().replaceWithClass(ImageId.class, String.class);
+        SpringDocUtils.getConfig().replaceWithClass(ProductId.class, String.class);
+        SpringDocUtils.getConfig().replaceWithClass(ProductDetailsId.class, String.class);
+        SpringDocUtils.getConfig().replaceWithClass(Currency.class, String.class);
         SpringDocUtils.getConfig().replaceWithClass(EventId.class, String.class);
         SpringDocUtils.getConfig().replaceWithClass(IdentityId.class, String.class);
     }

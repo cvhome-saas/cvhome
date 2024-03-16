@@ -14,7 +14,6 @@ public interface AdminCategoryService {
 
     CreateCategoryResponseDto createCategory(StoreId storeId, CategoryId categoryId, CreateCategoryDto createCategoryDto);
 
-    List<CategoriesView> getStoreCategoriesView(StoreId storeId);
 
     CategoryDto findCategory(CategoryId categoryId, StoreId storeId);
 }
