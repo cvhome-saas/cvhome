@@ -9,7 +9,7 @@ spring:
       eager-load:
         clients:
           - "core-gateway"
-          - "domain-certificate-manager"
+          - "dcm"
           - "router"
           - "auth"
           - "welcome-ui"
@@ -20,7 +20,7 @@ spring:
         enabled: true
         default-port: 8080
         service-ports:
-          "domain-certificate-manager": 8001
+          "dcm": 8001
           "router": 8002
           "auth": 9999
           "welcome-ui": 4400

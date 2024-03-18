@@ -27,14 +27,14 @@ include(
         'commons:cvhome-commons',
 
         'core:gateway:gateway-service',
-        'core:welcome-ui',
         'core:auth',
+        'core:dcm:dcm-commons',
+        'core:dcm:dcm-events',
+        'core:dcm:dcm-service',
         'core:router:router-commons',
         'core:router:router-events',
         'core:router:router-service',
-        'core:domain-certificate-manager:domain-certificate-manager-commons',
-        'core:domain-certificate-manager:domain-certificate-manager-events',
-        'core:domain-certificate-manager:domain-certificate-manager-service',
+        'core:welcome-ui',
 
         'store-pod:commons',
         'store-pod:gateway:gateway-service',

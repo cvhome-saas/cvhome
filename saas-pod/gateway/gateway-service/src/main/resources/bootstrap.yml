@@ -8,8 +8,8 @@ com:
           port: 8000
           schema: http
           namespace: core.cvhome.lcl
-        domain-certificate-manager:
-          name: domain-certificate-manager
+        dcm:
+          name: dcm
           port: 8001
           schema: http
           namespace: core.cvhome.lcl

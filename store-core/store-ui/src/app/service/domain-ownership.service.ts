@@ -6,7 +6,7 @@ import {Observable} from "rxjs";
   providedIn: 'root'
 })
 export class DomainOwnershipService {
-  private readonly DOMAIN_OWNERSHIP_BASE_URL: string = '/domain-certificate-manager/api/v1/domain-ownership';
+  private readonly DOMAIN_OWNERSHIP_BASE_URL: string = '/dcm/api/v1/domain-ownership';
 
   constructor(private httpClient: HttpClient) {
   }

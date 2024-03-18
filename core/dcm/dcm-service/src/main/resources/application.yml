@@ -1,0 +1,40 @@
+com:
+  asrevo:
+    auto-order-domains:
+      domains:
+        - domain: "cvhome.click"
+      default-domain: "cvhome.click"
+    dcm:
+      challenge-config:
+        acm-file-provider: table
+        acm-table-config:
+          directory: "nothing"
+        dns-installer-config:
+          providers:
+            - route53
+        http-installer-config:
+          installer-file-provider: table
+          installer-table-config:
+            directory: "nothing"
+        tls-alpn01-installer-config:
+          installer-file-provider: table
+          installer-table-config:
+            directory: "nothing"
+spring:
+  application:
+    name: dcm
+server:
+  forward-headers-strategy: FRAMEWORK
+  port: ${com.asrevo.cvhome.services.dcm.port}
+info:
+  app:
+    name: ${spring.application.name}
+  observations:
+    key-values:
+      application: ${spring.application.name}
+org:
+  jobrunr:
+    background-job-server:
+      enabled: false
+    job-scheduler:
+      enabled: false

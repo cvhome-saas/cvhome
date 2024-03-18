@@ -26,7 +26,7 @@ spring:
       eager-load:
         clients:
           - "gateway"
-          - "domain-certificate-manager"
+          - "dcm"
           - "store"
           - "streamer"
           - "auth"
@@ -40,7 +40,7 @@ spring:
         enabled: true
         default-port: 8080
         service-ports:
-          "domain-certificate-manager": 8082
+          "dcm": 8082
           "store": 8083
           "auth": 9999
           "welcome-ui": 4400
@@ -55,10 +55,10 @@ spring:
         - PreserveHostHeader
         - AddResponseHeader=X-Frame-Options, SAMEORIGIN
       routes:
-        - id: domain-certificate-manager
-          uri: lb://domain-certificate-manager
+        - id: dcm
+          uri: lb://dcm
           predicates:
-            - Path=/domain-certificate-manager/**
+            - Path=/dcm/**
           filters:
             - StripPrefix=1
         - id: store

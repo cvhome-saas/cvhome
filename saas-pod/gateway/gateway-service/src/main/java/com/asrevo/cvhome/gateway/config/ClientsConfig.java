@@ -20,7 +20,7 @@ public class ClientsConfig {
         ParameterizedTypeReference<byte[]> responseType = new ParameterizedTypeReference<>() {
         };
         ServiceDomain gatewayService = serviceDomainProperties.services().get("core-gateway");
-        String domainCertificateManagerUrl = gatewayService.getServiceHost("domain-certificate-manager");
+        String domainCertificateManagerUrl = gatewayService.getServiceHost("dcm");
         return (domain, fileType) -> {
             String url = domainCertificateManagerUrl + "/api/v1/acm/domain-certificate-file?domain=" + domain + "&fileType=" + fileType.name();
             return template.exchange(url, POST, null, responseType);
@@ -30,7 +30,7 @@ public class ClientsConfig {
     @Bean
     public DomainReferenceService domainReferenceService(@Qualifier("defaultBuilder") WebClient.Builder builder, ServiceDomainProperties serviceDomainProperties) {
         ServiceDomain gatewayService = serviceDomainProperties.services().get("core-gateway");
-        String domainCertificateManagerUrl = gatewayService.getServiceHost("domain-certificate-manager");
+        String domainCertificateManagerUrl = gatewayService.getServiceHost("dcm");
         return build(builder, domainCertificateManagerUrl, DomainReferenceService.class);
     }
 }

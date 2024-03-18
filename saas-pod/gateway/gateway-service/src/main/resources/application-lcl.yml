@@ -26,11 +26,11 @@ spring:
       discovery:
         enabled: true
         services:
-            domain-certificate-manager:
+            dcm:
               - url: "http://localhost:8082"
                 metadata:
-                  service-name: domain-certificate-manager
-                  instance: domain-certificate-manager-1
+                  service-name: dcm
+                  instance: dcm-1
             store-pod-gateway:
               - url: "http://localhost:8085"
                 metadata:
@@ -45,11 +45,11 @@ spring:
         - PreserveHostHeader
         - AddResponseHeader=X-Frame-Options, SAMEORIGIN
       routes:
-        - id: domain-certificate-manager
+        - id: dcm
           order: -1
-          uri: lb://domain-certificate-manager
+          uri: lb://dcm
           predicates:
-            - Path=/domain-certificate-manager/**
+            - Path=/dcm/**
           filters:
             - StripPrefix=1
         - id: store-pod-gateway

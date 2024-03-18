@@ -8,11 +8,11 @@ spring:
       discovery:
         enabled: true
         services:
-          domain-certificate-manager:
+          dcm:
             - url: "http://localhost:8001"
               metadata:
-                service-name: domain-certificate-manager
-                instance: domain-certificate-manager-1
+                service-name: dcm
+                instance: dcm-1
           router:
             - url: "http://localhost:8002"
               metadata:

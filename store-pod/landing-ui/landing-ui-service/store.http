@@ -46,7 +46,7 @@ Content-Type: application/json
 
 
 
-### get token for microservice-domain-certificate-manager
+### get token for microservice-dcm
 POST http://auth.gateway.com:9999/realms/cvhome/protocol/openid-connect/token
 Content-Type: application/x-www-form-urlencoded
 

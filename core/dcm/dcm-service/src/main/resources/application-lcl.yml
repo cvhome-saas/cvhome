@@ -1,0 +1,30 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/certificatemanagerdb
+    username: postgres
+    password: password
+  cloud:
+    local:
+      discovery:
+        enabled: true
+        services:
+          dcm:
+            - url: "http://localhost:8001"
+              metadata:
+                service-name: dcm
+                instance: dcm-1
+          router:
+            - url: "http://localhost:8002"
+              metadata:
+                service-name: router
+                instance: router-1
+          auth:
+            - url: "http://localhost:9999"
+              metadata:
+                service-name: auth
+                instance: auth-1
+          welcome-ui:
+            - url: "http://localhost:4400"
+              metadata:
+                service-name: welcome-ui
+                instance: welcome-ui-1

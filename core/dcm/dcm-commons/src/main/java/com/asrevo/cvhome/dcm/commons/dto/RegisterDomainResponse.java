@@ -1,0 +1,7 @@
+package com.asrevo.cvhome.dcm.commons.dto;
+
+import com.asrevo.cvhome.commons.domain.Domain;
+import com.asrevo.cvhome.commons.domain.Reference;
+
+public record RegisterDomainResponse(Domain domain, Reference reference) {
+}

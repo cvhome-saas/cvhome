@@ -63,7 +63,7 @@ dependencies {
     implementation 'org.bouncycastle:bcprov-jdk15on:1.70'
     implementation 'org.bouncycastle:bcpkix-jdk15on:1.70'
 
-    implementation project(':core:domain-certificate-manager:domain-certificate-manager-commons')
+    implementation project(':core:dcm:dcm-commons')
     implementation project(':commons:ecs-commons:fargate-task-info')
     implementation project(':commons:ecs-commons:ecs-service-discoveryclient')
     compileOnly 'org.projectlombok:lombok'

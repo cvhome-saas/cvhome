@@ -27,8 +27,8 @@ services:
 #    environment:
 #      SERVER_PORT: 8081
 #    network_mode: host
-#  domain-certificate-manager:
-#    image: ghcr.io/ashraf-revo/domain-certificate-manager:5.0.0
+#  dcm:
+#    image: ghcr.io/ashraf-revo/dcm:5.0.0
 #    restart: always
 #    ports:
 #      - "8082:8082"
