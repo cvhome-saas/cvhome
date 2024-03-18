@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/store-ui/browser",
+            "outputPath": "dist/store-ui",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": [
@@ -57,11 +57,11 @@
           "defaultConfiguration": "production"
         },
         "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
             "disableHostCheck": true,
-            "port": 4300
+            "port": 4200
           },
-          "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
               "browserTarget": "store-ui:build:production"
@@ -95,65 +95,11 @@
             ],
             "scripts": []
           }
-        },
-        "server": {
-          "builder": "@angular-devkit/build-angular:server",
-          "options": {
-            "outputPath": "dist/store-ui/server",
-            "main": "server.ts",
-            "tsConfig": "tsconfig.server.json"
-          },
-          "configurations": {
-            "production": {
-              "outputHashing": "media"
-            },
-            "development": {
-              "buildOptimizer": false,
-              "optimization": false,
-              "sourceMap": true,
-              "extractLicenses": false,
-              "vendorChunk": true
-            }
-          },
-          "defaultConfiguration": "production"
-        },
-        "serve-ssr": {
-          "builder": "@nguniversal/builders:ssr-dev-server",
-          "configurations": {
-            "development": {
-              "browserTarget": "store-ui:build:development",
-              "serverTarget": "store-ui:server:development"
-            },
-            "production": {
-              "browserTarget": "store-ui:build:production",
-              "serverTarget": "store-ui:server:production"
-            }
-          },
-          "defaultConfiguration": "development"
-        },
-        "prerender": {
-          "builder": "@nguniversal/builders:prerender",
-          "options": {
-            "routes": [
-              "/"
-            ]
-          },
-          "configurations": {
-            "production": {
-              "browserTarget": "store-ui:build:production",
-              "serverTarget": "store-ui:server:production"
-            },
-            "development": {
-              "browserTarget": "store-ui:build:development",
-              "serverTarget": "store-ui:server:development"
-            }
-          },
-          "defaultConfiguration": "production"
         }
       }
     }
   },
   "cli": {
-    "analytics": "a208c76c-cfca-4da0-a436-2fe99010bf76"
+    "analytics": "9992dfa9-0b06-4c5f-9980-8767f6bbb27f"
   }
 }

@@ -1,8 +1,8 @@
 package com.asrevo.cvhome.domaincertificatemanager.controller;
 
 import com.asrevo.cvhome.commons.domain.IdentityId;
-import com.asrevo.cvhome.domaincertificatemanager.commons.domain.Domain;
-import com.asrevo.cvhome.domaincertificatemanager.commons.domain.DomainType;
+import com.asrevo.cvhome.commons.domain.Domain;
+import com.asrevo.cvhome.commons.domain.DomainType;
 import com.asrevo.cvhome.domaincertificatemanager.commons.dto.*;
 import com.asrevo.cvhome.domaincertificatemanager.config.AutoOrderDomainsProperties;
 import com.asrevo.cvhome.domaincertificatemanager.entity.OwnerEntity;

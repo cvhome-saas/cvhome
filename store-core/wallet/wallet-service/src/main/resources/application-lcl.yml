@@ -3,26 +3,21 @@ spring:
     url: jdbc:postgresql://localhost:5432/walletdb
     username: postgres
     password: password
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          jwk-set-uri: ${com.asrevo.cvhome.services.auth.schema}://${com.asrevo.cvhome.services.auth.domain}:${com.asrevo.cvhome.services.auth.port}/realms/cvhome/protocol/openid-connect/certs
   cloud:
     local:
       discovery:
         enabled: true
         services:
+          manager:
+            - url: "http://localhost:7001"
+              metadata:
+                service-name: manager
+                instance: manager-1
           wallet:
-            - url: "http://localhost:8087"
+            - url: "http://localhost:7002"
               metadata:
                 service-name: wallet
                 instance: wallet-1
-          store:
-            - url: "http://localhost:8086"
-              metadata:
-                service-name: store
-                instance: store-1
           store-ui:
             - url: "http://localhost:4300"
               metadata:

@@ -1,0 +1,74 @@
+com:
+  asrevo:
+    cvhome:
+      services:
+        core-gateway:
+          name: core-gateway
+          domain: "gateway.com"
+          port: 8000
+          schema: http
+          namespace: core.cvhome.lcl
+        domain-certificate-manager:
+          name: domain-certificate-manager
+          port: 8001
+          schema: http
+          namespace: core.cvhome.lcl
+        router:
+          name: router
+          port: 8002
+          schema: http
+          namespace: core.cvhome.lcl
+        welcome-ui:
+          name: welcome-ui
+          port: 4400
+          schema: http
+          namespace: core.cvhome.lcl
+        auth:
+          name: auth
+          domain: "auth.gateway.com"
+          port: 9999
+          schema: http
+          namespace: core.cvhome.lcl
+        store-core-gateway:
+          name: store-core-gateway
+          domain: "store.gateway.com"
+          port: 7000
+          schema: http
+          namespace: store-core.cvhome.lcl
+        manager:
+          name: manager
+          port: 7001
+          schema: http
+          namespace: store-core.cvhome.lcl
+        wallet:
+          name: wallet
+          port: 7002
+          schema: http
+          namespace: store-core.cvhome.lcl
+        store-ui:
+          name: store-ui
+          port: 4300
+          schema: http
+          namespace: store-core.cvhome.lcl
+        saas-pod-gateway:
+          name: saas-pod-gateway
+          domain: "gateway.click"
+          port: 8443
+          schema: https
+          namespace: saas-pod.cvhome.lcl
+        store-pod-gateway:
+          name: store-pod-gateway
+          domain: "gateway.me"
+          port: 6000
+          schema: http
+          namespace: store-pod.cvhome.lcl
+        store:
+          name: store
+          port: 6001
+          schema: http
+          namespace: store-pod.cvhome.lcl
+        landing-ui:
+          name: landing-ui
+          port: 6002
+          schema: http
+          namespace: store-pod.cvhome.lcl

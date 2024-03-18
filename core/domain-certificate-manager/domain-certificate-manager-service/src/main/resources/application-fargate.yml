@@ -4,20 +4,15 @@ spring:
     username: postgres
     password: password
     driver-class-name: org.postgresql.Driver
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          jwk-set-uri: ${com.asrevo.cvhome.services.auth.schema}://${com.asrevo.cvhome.services.auth.domain}:${com.asrevo.cvhome.services.auth.port}/realms/cvhome/protocol/openid-connect/certs
   cloud:
     loadbalancer:
       eager-load:
         clients:
           - "core-gateway"
           - "domain-certificate-manager"
+          - "router"
           - "auth"
           - "welcome-ui"
-          - "admin-ui"
     ecs:
       discovery:
         namespace: "core.cvhome.lcl"
@@ -25,7 +20,7 @@ spring:
         enabled: true
         default-port: 8080
         service-ports:
-          "domain-certificate-manager": 8082
+          "domain-certificate-manager": 8001
+          "router": 8002
           "auth": 9999
           "welcome-ui": 4400
-          "admin-ui": 4200

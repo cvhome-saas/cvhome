@@ -1,6 +1,6 @@
 package com.asrevo.cvhome.domaincertificatemanager.domain.challenges;
 
-import com.asrevo.cvhome.domaincertificatemanager.commons.domain.Domain;
+import com.asrevo.cvhome.commons.domain.Domain;
 import lombok.extern.slf4j.Slf4j;
 import org.xbill.DNS.Record;
 import org.xbill.DNS.*;

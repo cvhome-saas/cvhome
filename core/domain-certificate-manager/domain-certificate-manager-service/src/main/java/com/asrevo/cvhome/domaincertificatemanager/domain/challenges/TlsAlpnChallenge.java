@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.domaincertificatemanager.domain.challenges;
 
 import com.asrevo.cvhome.domaincertificatemanager.commons.domain.ChallengeValidationType;
-import com.asrevo.cvhome.domaincertificatemanager.commons.domain.Domain;
+import com.asrevo.cvhome.commons.domain.Domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.codec.DecoderException;
 import org.shredzone.acme4j.Identifier;

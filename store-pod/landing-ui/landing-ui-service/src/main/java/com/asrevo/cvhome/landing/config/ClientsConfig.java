@@ -15,11 +15,11 @@ public class ClientsConfig {
 
     @Bean
     public ProductService productService(@Qualifier("defaultBalancedBuilder") WebClient.Builder builder) {
-        return build(builder, "lb://product", ProductService.class);
+        return build(builder, "lb://store", ProductService.class);
     }
 
     @Bean
     public CategoryService categoryService(@Qualifier("defaultBalancedBuilder") WebClient.Builder builder) {
-        return build(builder, "lb://product", CategoryService.class);
+        return build(builder, "lb://store", CategoryService.class);
     }
 }

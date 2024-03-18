@@ -1,25 +1,20 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/storedb
+    url: jdbc:postgresql://localhost:5432/landingdb
     username: postgres
     password: password
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          jwk-set-uri: ${com.asrevo.cvhome.services.core-gateway.schema}://${com.asrevo.cvhome.services.auth.domain}:${com.asrevo.cvhome.services.core-gateway.port}/realms/cvhome/protocol/openid-connect/certs
   cloud:
     local:
       discovery:
         enabled: true
         services:
+          store:
+            - url: "http://localhost:6001"
+              metadata:
+                service-name: store
+                instance: store-1
           landing-ui:
-            - url: "http://localhost:8084"
+            - url: "http://localhost:6002"
               metadata:
                 service-name: landing-ui
                 instance: landing-ui-1
-          product:
-            - url: "http://localhost:8089"
-              metadata:
-                service-name: product
-                instance: product-1

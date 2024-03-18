@@ -1,4 +1,4 @@
-FROM node:18-alpine
-ADD  /dist/store-ui/ /dist/store-ui/
-EXPOSE 4300
-CMD ["node", "dist/store-ui/server/main.js"]
+FROM nginx:1.25-alpine-slim
+ADD  /dist/store-ui/ /usr/share/nginx/html
+COPY nginx.conf  /etc/nginx/conf.d/default.conf
+EXPOSE 4200

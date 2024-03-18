@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.domaincertificatemanager.service.impl;
 
 import com.asrevo.cvhome.commons.command.CommandPublisher;
+import com.asrevo.cvhome.commons.domain.Domain;
 import com.asrevo.cvhome.domaincertificatemanager.commons.command.order.GenerateCertificateCommand;
 import com.asrevo.cvhome.domaincertificatemanager.commons.command.order.RequestOrderCertificateCommand;
 import com.asrevo.cvhome.domaincertificatemanager.commons.command.order.ValidateOrderCommand;

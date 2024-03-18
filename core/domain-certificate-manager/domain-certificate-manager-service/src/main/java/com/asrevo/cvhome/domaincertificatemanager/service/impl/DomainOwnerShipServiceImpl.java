@@ -1,9 +1,12 @@
 package com.asrevo.cvhome.domaincertificatemanager.service.impl;
 
 import com.asrevo.cvhome.commons.command.CommandPublisher;
+import com.asrevo.cvhome.commons.domain.DomainType;
 import com.asrevo.cvhome.commons.domain.IdentityId;
+import com.asrevo.cvhome.commons.domain.Reference;
 import com.asrevo.cvhome.domaincertificatemanager.commons.command.order.CreateOrderCommand;
-import com.asrevo.cvhome.domaincertificatemanager.commons.domain.*;
+import com.asrevo.cvhome.domaincertificatemanager.commons.domain.ChallengeValidationType;
+import com.asrevo.cvhome.commons.domain.Domain;
 import com.asrevo.cvhome.domaincertificatemanager.commons.dto.AvailabilityResponse;
 import com.asrevo.cvhome.domaincertificatemanager.commons.dto.RegisterDomainRequest;
 import com.asrevo.cvhome.domaincertificatemanager.commons.dto.RegisterDomainResponse;
@@ -11,12 +14,15 @@ import com.asrevo.cvhome.domaincertificatemanager.config.AutoOrderDomainsPropert
 import com.asrevo.cvhome.domaincertificatemanager.entity.DomainEntity;
 import com.asrevo.cvhome.domaincertificatemanager.service.DomainOwnerShipService;
 import com.asrevo.cvhome.domaincertificatemanager.service.DomainService;
-import com.asrevo.cvhome.domaincertificatemanager.service.PodService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.xbill.DNS.Record;
+import org.xbill.DNS.*;
 
+import java.util.Arrays;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @Slf4j
 @AllArgsConstructor
@@ -25,7 +31,6 @@ public class DomainOwnerShipServiceImpl implements DomainOwnerShipService {
     private final DomainService domainService;
     private final CommandPublisher commandPublisher;
     private final AutoOrderDomainsProperties autoOrderDomainsProperties;
-    private final PodService podService;
 
 
     @Override
@@ -66,19 +71,57 @@ public class DomainOwnerShipServiceImpl implements DomainOwnerShipService {
 
     private DomainEntity doRegister(Domain domain, Reference reference, DomainType domainType, boolean includeSubDomains, IdentityId identity) {
         if (domainType.equals(DomainType.SAS_CUSTOM)) {
-            boolean txtProvedTo = domain.isTXTProvedTo(identity);
+            boolean txtProvedTo = isTXTProvedTo(identity, domain.getProvingDomain());
             if (!txtProvedTo) {
                 throw new RuntimeException("please prove domain ownership on domain " + domain.domain() + " by adding txt record " + domain.getProvingDomain() + " with value " + identity.id());
             }
-            boolean cnameProvedTo = domain.isCNAMEProvedTo(autoOrderDomainsProperties.getDefaultDomain());
+            boolean cnameProvedTo = isCNAMEProvedTo(domain.domain(), autoOrderDomainsProperties.getDefaultDomain());
             if (!cnameProvedTo) {
                 throw new RuntimeException("please prove domain ownership on domain " + domain.domain() + " by adding txt record " + domain.getProvingDomain() + " with value " + identity.id());
             }
         }
-        PodId podId = podService.selectPod(domain, reference, domainType, identity);
-        log.info("select pod {} to domain {} ", podId, domain);
-        return domainService.save(DomainEntity.create(domain, reference, domainType, includeSubDomains, identity, podId));
+        return domainService.save(DomainEntity.create(domain, reference, domainType, includeSubDomains, identity));
     }
 
+    private boolean isTXTProvedTo(IdentityId identityId, String provingDomain) {
+        try {
+            final Lookup lookup = new Lookup(provingDomain, Type.TXT);
+            lookup.setResolver(new SimpleResolver());
+            lookup.setCache(null);
+            Record[] records = lookup.run();
+            if (lookup.getResult() == Lookup.SUCCESSFUL && records != null && records.length > 0) {
+                return Arrays.stream(records).flatMap(it -> {
+                            if (it.getType() == 16) {
+                                TXTRecord txtRecord = (TXTRecord) it;
+                                return txtRecord.getStrings().stream();
+                            } else {
+                                return Stream.of();
+                            }
+                        })
+                        .anyMatch(it -> it.equals(identityId.id()));
+            }
+        } catch (Exception ignored) {
+        }
+        return false;
+    }
+
+    private boolean isCNAMEProvedTo(String lookupDomain, Domain domain) {
+        try {
+            final Lookup lookup = new Lookup(lookupDomain, Type.CNAME);
+            lookup.setResolver(new SimpleResolver());
+            lookup.setCache(null);
+            Record[] records = lookup.run();
+            if (lookup.getResult() == Lookup.SUCCESSFUL && records != null && records.length > 0) {
+                return Arrays.stream(records)
+                        .filter(it -> it.getType() == Type.CNAME)
+                        .map(it -> ((CNAMERecord) it))
+                        .map(it -> it.getTarget().toString())
+                        .filter(it -> it != null && !it.isEmpty())
+                        .anyMatch(it -> it.substring(0, it.length() - 1).equals(domain.domain()));
+            }
+        } catch (Exception ignored) {
+        }
+        return false;
+    }
 
 }

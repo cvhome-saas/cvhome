@@ -1,0 +1,25 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/managerdb
+    username: postgres
+    password: password
+  cloud:
+    local:
+      discovery:
+        enabled: true
+        services:
+          manager:
+            - url: "http://localhost:7001"
+              metadata:
+                service-name: manager
+                instance: manager-1
+          wallet:
+            - url: "http://localhost:7002"
+              metadata:
+                service-name: wallet
+                instance: wallet-1
+          store-ui:
+            - url: "http://localhost:4300"
+              metadata:
+                service-name: store-ui
+                instance: store-ui-1

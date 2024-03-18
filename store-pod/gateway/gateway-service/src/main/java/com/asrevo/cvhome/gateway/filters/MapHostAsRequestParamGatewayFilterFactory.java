@@ -1,6 +1,6 @@
 package com.asrevo.cvhome.gateway.filters;
 
-import com.asrevo.cvhome.domaincertificatemanager.commons.domain.Domain;
+import com.asrevo.cvhome.commons.domain.Domain;
 import com.asrevo.cvhome.gateway.models.DomainReference;
 import com.asrevo.cvhome.gateway.service.DomainReferenceService;
 import lombok.Getter;

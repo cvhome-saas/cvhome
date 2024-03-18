@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.domaincertificatemanager.jobs;
 
 import com.asrevo.cvhome.domaincertificatemanager.commons.domain.ChallengeValidationType;
-import com.asrevo.cvhome.domaincertificatemanager.commons.domain.Domain;
+import com.asrevo.cvhome.commons.domain.Domain;
 import com.asrevo.cvhome.domaincertificatemanager.commons.dto.RegisterDomainRequest;
 import com.asrevo.cvhome.domaincertificatemanager.config.AutoOrderDomainsProperties;
 import com.asrevo.cvhome.domaincertificatemanager.entity.DomainEntity;

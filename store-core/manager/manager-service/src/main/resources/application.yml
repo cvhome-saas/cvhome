@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: manager
+server:
+  forward-headers-strategy: FRAMEWORK
+  port: ${com.asrevo.cvhome.services.manager.port}
+info:
+  app:
+    name: ${spring.application.name}
+management:
+  observations:
+    key-values:
+      application: ${spring.application.name}

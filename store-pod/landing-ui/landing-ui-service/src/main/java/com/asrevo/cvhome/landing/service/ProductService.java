@@ -2,7 +2,7 @@ package com.asrevo.cvhome.landing.service;
 
 
 import com.asrevo.cvhome.commons.utils.CustomPageImpl;
-import com.asrevo.cvhome.store.commons.domain.StoreId;
+import com.asrevo.cvhome.manager.commons.domain.StoreId;
 import com.asrevo.cvhome.storepod.commons.domain.ProductId;
 import com.asrevo.cvhome.storepod.commons.dto.DetailedProductDto;
 import com.asrevo.cvhome.storepod.commons.dto.ProductDto;

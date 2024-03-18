@@ -1,0 +1,20 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/storedb
+    username: postgres
+    password: password
+  cloud:
+    local:
+      discovery:
+        enabled: true
+        services:
+          store:
+            - url: "http://localhost:6001"
+              metadata:
+                service-name: store
+                instance: store-1
+          landing-ui:
+            - url: "http://localhost:6002"
+              metadata:
+                service-name: landing-ui
+                instance: landing-ui-1

@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.domaincertificatemanager.service.acm;
 
 import com.asrevo.cvhome.domaincertificatemanager.commons.domain.CertificateFileType;
-import com.asrevo.cvhome.domaincertificatemanager.commons.domain.Domain;
+import com.asrevo.cvhome.commons.domain.Domain;
 import com.asrevo.cvhome.domaincertificatemanager.repository.FilesRepository;
 import com.asrevo.cvhome.domaincertificatemanager.service.storage.impl.TableFileServiceImpl;
 import org.shredzone.acme4j.toolbox.AcmeUtils;

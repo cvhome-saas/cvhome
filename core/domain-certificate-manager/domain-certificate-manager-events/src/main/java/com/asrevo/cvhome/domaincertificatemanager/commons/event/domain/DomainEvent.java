@@ -2,8 +2,8 @@ package com.asrevo.cvhome.domaincertificatemanager.commons.event.domain;
 
 import com.asrevo.cvhome.commons.event.Event;
 import com.asrevo.cvhome.commons.event.EventId;
-import com.asrevo.cvhome.domaincertificatemanager.commons.domain.Domain;
-import com.asrevo.cvhome.domaincertificatemanager.commons.domain.DomainId;
+import com.asrevo.cvhome.commons.domain.Domain;
+import com.asrevo.cvhome.commons.domain.DomainId;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 

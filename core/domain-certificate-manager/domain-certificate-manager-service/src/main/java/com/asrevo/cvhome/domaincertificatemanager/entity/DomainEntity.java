@@ -1,7 +1,6 @@
 package com.asrevo.cvhome.domaincertificatemanager.entity;
 
-import com.asrevo.cvhome.commons.domain.BaseEntity;
-import com.asrevo.cvhome.commons.domain.IdentityId;
+import com.asrevo.cvhome.commons.domain.*;
 import com.asrevo.cvhome.domaincertificatemanager.commons.domain.*;
 import com.asrevo.cvhome.domaincertificatemanager.commons.event.domain.DomainReferenceChangedEvent;
 import com.asrevo.cvhome.domaincertificatemanager.commons.event.domain.DomainRegisteredEvent;
@@ -34,10 +33,8 @@ public class DomainEntity extends BaseEntity<DomainEntity, DomainId> {
     private boolean includeSubDomains;
     @Column("owner_id")
     private AggregateReference<OwnerEntity, IdentityId> owner;
-    @Column("pod_id")
-    private AggregateReference<PodEntity, PodId> pod;
 
-    public static DomainEntity create(Domain domain, Reference reference, DomainType domainType, boolean includeSubDomains, IdentityId identity, PodId podId) {
+    public static DomainEntity create(Domain domain, Reference reference, DomainType domainType, boolean includeSubDomains, IdentityId identity) {
         DomainEntity entity = new DomainEntity();
         entity.setNew();
         entity.setDomain(domain);
@@ -48,7 +45,6 @@ public class DomainEntity extends BaseEntity<DomainEntity, DomainId> {
         entity.setAutoRenew(!DomainType.SAS_SUB.equals(domainType));
         entity.setIncludeSubDomains(includeSubDomains);
         entity.setOwner(AggregateReference.to(identity));
-        entity.setPod(AggregateReference.to(podId));
         entity.registerEvent(DomainRegisteredEvent.from(entity.getId(), identity, domain, entity.autoRenew, entity.autoOrder));
         return entity;
     }

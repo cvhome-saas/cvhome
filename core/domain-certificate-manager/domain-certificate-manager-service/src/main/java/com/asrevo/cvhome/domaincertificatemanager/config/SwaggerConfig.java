@@ -3,9 +3,8 @@ package com.asrevo.cvhome.domaincertificatemanager.config;
 import com.asrevo.cvhome.commons.domain.IdentityId;
 import com.asrevo.cvhome.commons.event.EventId;
 import com.asrevo.cvhome.domaincertificatemanager.commons.domain.CertificateId;
-import com.asrevo.cvhome.domaincertificatemanager.commons.domain.DomainId;
+import com.asrevo.cvhome.commons.domain.DomainId;
 import com.asrevo.cvhome.domaincertificatemanager.commons.domain.OrdersId;
-import com.asrevo.cvhome.domaincertificatemanager.commons.domain.PodId;
 import com.asrevo.cvhome.domaincertificatemanager.entity.FileId;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -26,7 +25,6 @@ public class SwaggerConfig {
         SpringDocUtils.getConfig().replaceWithClass(EventId.class, String.class);
         SpringDocUtils.getConfig().replaceWithClass(IdentityId.class, String.class);
         SpringDocUtils.getConfig().replaceWithClass(FileId.class, String.class);
-        SpringDocUtils.getConfig().replaceWithClass(PodId.class, String.class);
     }
 
     @Bean

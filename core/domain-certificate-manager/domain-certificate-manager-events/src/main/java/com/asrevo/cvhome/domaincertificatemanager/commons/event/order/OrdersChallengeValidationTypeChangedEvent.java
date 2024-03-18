@@ -2,7 +2,7 @@ package com.asrevo.cvhome.domaincertificatemanager.commons.event.order;
 
 import com.asrevo.cvhome.commons.event.EventId;
 import com.asrevo.cvhome.domaincertificatemanager.commons.domain.ChallengeValidationType;
-import com.asrevo.cvhome.domaincertificatemanager.commons.domain.Domain;
+import com.asrevo.cvhome.commons.domain.Domain;
 import com.asrevo.cvhome.domaincertificatemanager.commons.domain.OrdersId;
 
 import java.util.Map;

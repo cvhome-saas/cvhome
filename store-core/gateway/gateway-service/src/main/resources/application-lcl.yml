@@ -1,41 +1,19 @@
 spring:
-  security:
-    oauth2:
-      client:
-        registration:
-          microservice:
-            provider: keycloak
-            client-id: microservice-app
-            client-secret: r1nuVn4HefusLGwHIeRxbdOzdTZLEMvQ
-            authorization-grant-type: password
-          keycloak:
-            client-id: web-app
-            client-authentication-method: client_secret_basic
-            authorization-grant-type: authorization_code
-            scope: openid, profile, email
-            redirect-uri: "{baseUrl}/login/oauth2/code/keycloak"
-            provider: keycloak
-            client-secret: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
-        provider:
-          keycloak:
-            jwk-set-uri: ${com.asrevo.cvhome.services.auth.schema}://${com.asrevo.cvhome.services.auth.domain}:${com.asrevo.cvhome.services.auth.port}/realms/cvhome/protocol/openid-connect/certs
-            authorization-uri: ${com.asrevo.cvhome.services.core-gateway.schema}://${com.asrevo.cvhome.services.auth.domain}:${com.asrevo.cvhome.services.core-gateway.port}/realms/cvhome/protocol/openid-connect/auth
-            token-uri: ${com.asrevo.cvhome.services.auth.schema}://${com.asrevo.cvhome.services.auth.domain}:${com.asrevo.cvhome.services.auth.port}/realms/cvhome/protocol/openid-connect/token
   cloud:
     local:
       discovery:
         enabled: true
         services:
+          manager:
+            - url: "http://localhost:7001"
+              metadata:
+                service-name: manager
+                instance: manager-1
           wallet:
-            - url: "http://localhost:8087"
+            - url: "http://localhost:7002"
               metadata:
                 service-name: wallet
                 instance: wallet-1
-          store:
-            - url: "http://localhost:8086"
-              metadata:
-                service-name: store
-                instance: store-1
           store-ui:
             - url: "http://localhost:4300"
               metadata:

@@ -1,56 +1,29 @@
 spring:
-  security:
-    oauth2:
-      client:
-        registration:
-          microservice:
-            provider: keycloak
-            client-id: microservice-app
-            client-secret: r1nuVn4HefusLGwHIeRxbdOzdTZLEMvQ
-            authorization-grant-type: password
-          keycloak:
-            client-id: web-app
-            client-authentication-method: client_secret_basic
-            authorization-grant-type: authorization_code
-            scope: openid, profile, email
-            redirect-uri: "{baseUrl}/login/oauth2/code/keycloak"
-            provider: keycloak
-            client-secret: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
-        provider:
-          keycloak:
-            jwk-set-uri: ${com.asrevo.cvhome.services.auth.schema}://${com.asrevo.cvhome.services.auth.domain}:${com.asrevo.cvhome.services.auth.port}/realms/cvhome/protocol/openid-connect/certs
-            authorization-uri: ${com.asrevo.cvhome.services.core-gateway.schema}://${com.asrevo.cvhome.services.auth.domain}:${com.asrevo.cvhome.services.core-gateway.port}/realms/cvhome/protocol/openid-connect/auth
-            token-uri: ${com.asrevo.cvhome.services.auth.schema}://${com.asrevo.cvhome.services.auth.domain}:${com.asrevo.cvhome.services.auth.port}/realms/cvhome/protocol/openid-connect/token
   cloud:
     local:
       discovery:
         enabled: true
         services:
           domain-certificate-manager:
-            - url: "http://localhost:8082"
+            - url: "http://localhost:8001"
               metadata:
                 service-name: domain-certificate-manager
                 instance: domain-certificate-manager-1
+          router:
+            - url: "http://localhost:8002"
+              metadata:
+                service-name: router
+                instance: router-1
           auth:
             - url: "http://localhost:9999"
               metadata:
                 service-name: auth
                 instance: auth-1
-          admin-ui:
-            - url: "http://localhost:4200"
-              metadata:
-                service-name: admin-ui
-                instance: admin-ui-1
           welcome-ui:
             - url: "http://localhost:4400"
               metadata:
                 service-name: welcome-ui
                 instance: welcome-ui-1
-          store-ui:
-            - url: "http://localhost:8088"
-              metadata:
-                service-name: store-ui
-                instance: store-ui-1
     gateway:
       discovery:
         locator:
@@ -60,40 +33,8 @@ spring:
         - PreserveHostHeader
         - AddResponseHeader=X-Frame-Options, SAMEORIGIN
       routes:
-        - id: auth
-          order: -1
-          uri: lb://auth
-          predicates:
-            - FHost=${com.asrevo.cvhome.services.auth.domain}
-        - id: realms
-          order: -1
-          uri: lb://auth
-          predicates:
-            - Path=/realms/**
-          filters:
-            - SetRequestHostHeader=${com.asrevo.cvhome.services.auth.domain}:${server.port}
-        - id: resources
-          order: -1
-          uri: lb://auth
-          predicates:
-            - Path=/resources/**
-        - id: js
-          order: -1
-          uri: lb://auth
-          predicates:
-            - Path=/js/**
         - id: welcome-ui
           order: -1
           uri: lb://welcome-ui
           predicates:
             - FHost=www.${com.asrevo.cvhome.services.core-gateway.domain},${com.asrevo.cvhome.services.core-gateway.domain}
-        - id: admin-ui
-          order: -1
-          uri: lb://admin-ui
-          predicates:
-            - FHost=admin.${com.asrevo.cvhome.services.core-gateway.domain}
-        - id: store-ui
-          order: -1
-          uri: lb://store-ui
-          predicates:
-            - FHost=store-ui.${com.asrevo.cvhome.services.core-gateway.domain}

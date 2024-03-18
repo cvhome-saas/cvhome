@@ -1,31 +1,10 @@
 spring:
-  security:
-    oauth2:
-      client:
-        registration:
-          microservice:
-            provider: keycloak
-            client-id: microservice-app
-            client-secret: r1nuVn4HefusLGwHIeRxbdOzdTZLEMvQ
-            authorization-grant-type: password
-          keycloak:
-            client-id: web-app
-            client-authentication-method: client_secret_basic
-            authorization-grant-type: authorization_code
-            scope: openid, profile, email
-            redirect-uri: "{baseUrl}/login/oauth2/code/keycloak"
-            provider: keycloak
-            client-secret: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
-        provider:
-          keycloak:
-            jwk-set-uri: ${com.asrevo.cvhome.services.auth.schema}://${com.asrevo.cvhome.services.auth.domain}:${com.asrevo.cvhome.services.auth.port}/realms/cvhome/protocol/openid-connect/certs
-            authorization-uri: ${com.asrevo.cvhome.services.auth.schema}://${com.asrevo.cvhome.services.auth.domain}:${com.asrevo.cvhome.services.auth.port}/realms/cvhome/protocol/openid-connect/auth
-            token-uri: ${com.asrevo.cvhome.services.auth.schema}://${com.asrevo.cvhome.services.auth.domain}:${com.asrevo.cvhome.services.auth.port}/realms/cvhome/protocol/openid-connect/token
   cloud:
     loadbalancer:
       eager-load:
         clients:
           - "store-pod-gateway"
+          - "store"
           - "landing-ui"
     ecs:
       discovery:
@@ -34,8 +13,8 @@ spring:
         enabled: true
         default-port: 8080
         service-ports:
-          "landing-ui": 8084
-          "product": 8089
+          "store": 6001
+          "landing-ui": 6002
     gateway:
       discovery:
         locator:

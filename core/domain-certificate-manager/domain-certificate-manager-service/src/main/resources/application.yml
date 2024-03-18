@@ -1,37 +1,5 @@
 com:
   asrevo:
-    cvhome:
-      services:
-        core-gateway:
-          name: core-gateway
-          domain: "gateway.com"
-          port: 8080
-          schema: http
-          namespace: core.cvhome.lcl
-        store-core-gateway:
-          name: store-core-gateway
-          domain: "store.gateway.com"
-          port: 8088
-          schema: http
-          namespace: store-core.cvhome.lcl
-        saas-pod-gateway:
-          name: saas-pod-gateway
-          domain: "gateway.click"
-          port: 8443
-          schema: https
-          namespace: saas-pod.cvhome.lcl
-        store-pod-gateway:
-          name: store-pod-gateway
-          domain: "gateway.me"
-          port: 8085
-          schema: http
-          namespace: store-pod.cvhome.lcl
-        auth:
-          name: auth
-          domain: "auth.gateway.com"
-          port: 9999
-          schema: http
-          namespace: core.cvhome.lcl
     auto-order-domains:
       domains:
         - domain: "cvhome.click"
@@ -55,50 +23,15 @@ com:
 spring:
   application:
     name: domain-certificate-manager
-  docker:
-    compose:
-      file: ${spring.application.name}/compose.yml
-  sql:
-    init:
-      mode: always
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          jwk-set-uri: ${com.asrevo.cvhome.services.auth.schema}://${com.asrevo.cvhome.services.auth.domain}:${com.asrevo.cvhome.services.auth.port}/realms/cvhome/protocol/openid-connect/certs
-springdoc:
-  show-actuator: true
-  api-docs:
-    path: /api-docs
 server:
   forward-headers-strategy: FRAMEWORK
-  port: 8082
+  port: ${com.asrevo.cvhome.services.domain-certificate-manager.port}
 info:
   app:
     name: ${spring.application.name}
-management:
-  info:
-    env:
-      enabled: true
-    os:
-      enabled: true
-  endpoint:
-    health:
-      show-details: always
-  endpoints:
-    web:
-      exposure:
-        include: [ '*' ]
   observations:
     key-values:
       application: ${spring.application.name}
-logging:
-  level:
-    org.springframework.jdbc.core.JdbcTemplate: debug
-    org.springframework.boot: debug
-    org.springframework.web: debug
-    org.springframework.security: debug
-    reactor.netty.http: debug
 org:
   jobrunr:
     background-job-server:

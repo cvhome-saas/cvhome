@@ -12,7 +12,7 @@ task "bootJar" {
     }
     exec {
       workingDir '.'
-      commandLine "npm", "run", "build:ssr"
+      commandLine "npm", "run", "ng", "build"
     }
   }
 }
@@ -33,8 +33,8 @@ abstract class BootBuildImageTask extends DefaultTask {
 
   BootBuildImageTask() {
   }
-/*
-  @TaskAction
+
+/*  @TaskAction
   void bootBuildImage() {
     String image = "ghcr.io/ashraf-revo/${project.name}"
     project.exec {
@@ -52,10 +52,10 @@ abstract class BootBuildImageTask extends DefaultTask {
       }
     }
   }
-  */
+*/
   @TaskAction
   void bootBuildImage() {
-    String image = "${System.getenv('REGISTRY')}/store-core/${project.name}"
+    String image = "${System.getenv('REGISTRY')}/core/${project.name}"
     project.exec {
       workingDir '.'
       commandLine "docker", "build", "-t", "${image}:${project.version}", "-t", "${image}:latest", "."
@@ -67,4 +67,5 @@ abstract class BootBuildImageTask extends DefaultTask {
       }
     }
   }
+
 }

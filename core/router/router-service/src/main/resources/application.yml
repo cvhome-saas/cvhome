@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: router
+server:
+  forward-headers-strategy: FRAMEWORK
+  port: ${com.asrevo.cvhome.services.router.port}
+info:
+  app:
+    name: ${spring.application.name}
+  observations:
+    key-values:
+      application: ${spring.application.name}

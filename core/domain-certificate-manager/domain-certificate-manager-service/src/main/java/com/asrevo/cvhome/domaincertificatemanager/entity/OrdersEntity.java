@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.domaincertificatemanager.entity;
 
 import com.asrevo.cvhome.commons.domain.BaseEntity;
+import com.asrevo.cvhome.commons.domain.Domain;
 import com.asrevo.cvhome.domaincertificatemanager.commons.domain.*;
 import com.asrevo.cvhome.domaincertificatemanager.commons.event.order.*;
 import com.asrevo.cvhome.domaincertificatemanager.domain.DomainCertificate;
