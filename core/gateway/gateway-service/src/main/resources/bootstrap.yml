@@ -47,7 +47,7 @@ com:
           namespace: store-core.cvhome.lcl
         store-ui:
           name: store-ui
-          port: 4300
+          port: 4200
           schema: http
           namespace: store-core.cvhome.lcl
         saas-pod-gateway:

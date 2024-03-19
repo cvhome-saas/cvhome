@@ -24,4 +24,4 @@ spring:
           "store-core-gateway": 7000
           "manager": 7001
           "wallet": 7002
-          "store-ui": 4300
+          "store-ui": 4200

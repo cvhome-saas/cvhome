@@ -44,7 +44,7 @@ spring:
           "store": 8083
           "auth": 9999
           "welcome-ui": 4400
-          "store-ui": 4300
+          "store-ui": 4200
           "admin-ui": 4200
     gateway:
       discovery:

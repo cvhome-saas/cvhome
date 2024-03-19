@@ -15,7 +15,7 @@ spring:
                 service-name: wallet
                 instance: wallet-1
           store-ui:
-            - url: "http://localhost:4300"
+            - url: "http://localhost:4200"
               metadata:
                 service-name: store-ui
                 instance: store-ui-1
