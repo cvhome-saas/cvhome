@@ -1,5 +1,5 @@
-
-CREATE TABLE IF NOT EXISTS orders
+create schema if not exists dcm;
+CREATE TABLE IF NOT EXISTS dcm.orders
 (
     id                        varchar(24) not null,
     location                  varchar(150),
@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS orders
     constraint orders_pk primary key (id)
 );
 
-CREATE TABLE IF NOT EXISTS certificate
+CREATE TABLE IF NOT EXISTS dcm.certificate
 (
     id            varchar(24)  not null,
     not_after     timestamp    not null,
@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS certificate
     constraint certificate_orders_id_fk foreign key (orders_id) references orders
 );
 
-CREATE TABLE IF NOT EXISTS orders_event
+CREATE TABLE IF NOT EXISTS dcm.orders_event
 (
     event_id   varchar(24) not null,
     event_type varchar(50) not null,
@@ -41,14 +41,14 @@ CREATE TABLE IF NOT EXISTS orders_event
 );
 
 
-CREATE TABLE IF NOT EXISTS owner
+CREATE TABLE IF NOT EXISTS dcm.owner
 (
     id    varchar(50) not null,
     email varchar(50) not null,
     constraint owner_pk primary key (id)
 );
 
-CREATE TABLE IF NOT EXISTS domain
+CREATE TABLE IF NOT EXISTS dcm.domain
 (
     id                  varchar(24) not null,
     domain              varchar(50) not null,
@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS domain
     constraint domain_owner_id_fk foreign key (owner_id) references owner (id)
 );
 
-CREATE TABLE IF NOT EXISTS owner_domain_ref
+CREATE TABLE IF NOT EXISTS dcm.owner_domain_ref
 (
     owner_id  varchar(50) not null,
     domain_id varchar(24) not null,
@@ -74,7 +74,7 @@ CREATE TABLE IF NOT EXISTS owner_domain_ref
     constraint owner_domain_ref_domain_id_fk foreign key (domain_id) references domain
 );
 
-CREATE TABLE IF NOT EXISTS files
+CREATE TABLE IF NOT EXISTS dcm.files
 (
     id      varchar(24)   not null,
     path    varchar(128),

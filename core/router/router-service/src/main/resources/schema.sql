@@ -1,4 +1,5 @@
-CREATE TABLE IF NOT EXISTS pod
+create schema if not exists router;
+CREATE TABLE IF NOT EXISTS router.pod
 (
     id        varchar(24) not null,
     region    varchar(30),

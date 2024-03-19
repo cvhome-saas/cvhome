@@ -1,11 +1,12 @@
-CREATE TABLE IF NOT EXISTS owner
+create schema if not exists manager;
+CREATE TABLE IF NOT EXISTS manager.owner
 (
     id    varchar(50) not null,
     email varchar(50) not null,
     constraint owner_pk primary key (id)
 );
 
-CREATE TABLE IF NOT EXISTS store
+CREATE TABLE IF NOT EXISTS manager.store
 (
     id       varchar(24) not null,
     name     varchar(50) not null,
@@ -14,7 +15,7 @@ CREATE TABLE IF NOT EXISTS store
     constraint store_owner_id_fk foreign key (owner_id) references owner (id)
 );
 
-CREATE TABLE IF NOT EXISTS owner_store_ref
+CREATE TABLE IF NOT EXISTS manager.owner_store_ref
 (
     owner_id  varchar(50) not null,
     store_id varchar(24) not null,

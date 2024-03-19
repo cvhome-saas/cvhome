@@ -1,4 +1,5 @@
-CREATE TABLE IF NOT EXISTS category
+create schema if not exists store;
+CREATE TABLE IF NOT EXISTS store.category
 (
     id         varchar(24)  not null,
     store_id   varchar(24),
@@ -12,7 +13,7 @@ CREATE TABLE IF NOT EXISTS category
 
 );
 
-CREATE TABLE IF NOT EXISTS product
+CREATE TABLE IF NOT EXISTS store.product
 (
     id           varchar(24)  not null,
     store_id     varchar(24),
@@ -33,7 +34,7 @@ CREATE TABLE IF NOT EXISTS product
     constraint product_category_id_fk foreign key (category_id) references category
 );
 
-CREATE TABLE IF NOT EXISTS image
+CREATE TABLE IF NOT EXISTS store.image
 (
     id         varchar(24)  not null,
     image_link varchar(200) not null,
@@ -42,7 +43,7 @@ CREATE TABLE IF NOT EXISTS image
     constraint image_pk primary key (id)
 );
 
-CREATE TABLE IF NOT EXISTS product_details
+CREATE TABLE IF NOT EXISTS store.product_details
 (
     id              varchar(24) not null,
     product_id      varchar(24),
