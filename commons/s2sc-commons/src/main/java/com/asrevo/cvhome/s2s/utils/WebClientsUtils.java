@@ -12,6 +12,7 @@ public class WebClientsUtils {
         HttpServiceProxyFactory proxy = HttpServiceProxyFactory.builderFor(clientAdapter)
                 .customArgumentResolver(new IdentifierSerializeParamArgumentResolver())
                 .customArgumentResolver(new PageableSerializeParamArgumentResolver())
+                .customArgumentResolver(new DomainSerializeParamArgumentResolver())
                 .build();
         return proxy.createClient(tClass);
     }
