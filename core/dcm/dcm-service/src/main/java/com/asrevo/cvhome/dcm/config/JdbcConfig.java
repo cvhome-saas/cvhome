@@ -9,6 +9,7 @@ import com.asrevo.cvhome.commons.domain.DomainId;
 import com.asrevo.cvhome.dcm.commons.domain.OrdersId;
 import com.asrevo.cvhome.dcm.config.converters.*;
 import com.asrevo.cvhome.dcm.entity.FileId;
+import com.asrevo.cvhome.s2s.config.internal.JacksonConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;

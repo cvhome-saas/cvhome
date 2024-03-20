@@ -3,6 +3,7 @@ package com.asrevo.cvhome.manager.config;
 import com.asrevo.cvhome.commons.domain.BaseEntity;
 import com.asrevo.cvhome.commons.domain.Identifier;
 import com.asrevo.cvhome.manager.commons.domain.StoreId;
+import com.asrevo.cvhome.s2s.config.internal.JacksonConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;

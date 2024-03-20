@@ -3,6 +3,7 @@ package com.asrevo.cvhome.store.config;
 import com.asrevo.cvhome.commons.domain.BaseEntity;
 import com.asrevo.cvhome.commons.domain.Identifier;
 import com.asrevo.cvhome.manager.commons.domain.StoreId;
+import com.asrevo.cvhome.s2s.config.internal.JacksonConfig;
 import com.asrevo.cvhome.store.commons.domain.ImageId;
 import com.asrevo.cvhome.store.config.converters.*;
 import com.asrevo.cvhome.storepod.commons.domain.CategoryId;

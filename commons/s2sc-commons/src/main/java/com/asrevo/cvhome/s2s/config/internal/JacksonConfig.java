@@ -1,4 +1,4 @@
-package com.asrevo.cvhome.router.config;
+package com.asrevo.cvhome.s2s.config.internal;
 
 import com.asrevo.cvhome.commons.command.Command;
 import com.asrevo.cvhome.commons.event.Event;

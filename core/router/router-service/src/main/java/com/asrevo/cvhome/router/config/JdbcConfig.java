@@ -5,6 +5,7 @@ import com.asrevo.cvhome.commons.domain.Identifier;
 import com.asrevo.cvhome.router.commons.domain.PodId;
 import com.asrevo.cvhome.router.commons.domain.ReferenceAlisId;
 import com.asrevo.cvhome.router.commons.domain.ReferenceId;
+import com.asrevo.cvhome.s2s.config.internal.JacksonConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
