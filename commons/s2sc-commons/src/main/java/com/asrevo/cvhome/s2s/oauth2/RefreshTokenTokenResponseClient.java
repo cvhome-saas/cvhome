@@ -1,4 +1,4 @@
-package com.asrevo.cvhome.gateway.config.oauth2;
+package com.asrevo.cvhome.s2s.oauth2;
 
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;

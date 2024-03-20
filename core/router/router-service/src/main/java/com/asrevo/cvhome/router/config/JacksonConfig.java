@@ -2,7 +2,7 @@ package com.asrevo.cvhome.router.config;
 
 import com.asrevo.cvhome.commons.command.Command;
 import com.asrevo.cvhome.commons.event.Event;
-import com.asrevo.cvhome.commons.jackson.config.ObjectIdDeserializer;
+import com.asrevo.cvhome.s2s.oauth2.config.ObjectIdDeserializer;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;

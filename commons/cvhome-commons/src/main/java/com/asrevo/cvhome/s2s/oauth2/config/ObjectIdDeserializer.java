@@ -1,4 +1,4 @@
-package com.asrevo.cvhome.commons.jackson.config;
+package com.asrevo.cvhome.s2s.oauth2.config;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.TreeNode;

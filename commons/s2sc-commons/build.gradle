@@ -1,0 +1,12 @@
+plugins {
+    id 'com.asrevo.java-library-conventions'
+}
+
+dependencies {
+    compileOnly project(":commons:cvhome-commons")
+    compileOnly 'org.springframework:spring-webflux:6.1.4'
+    compileOnly 'org.springframework.data:spring-data-commons:3.2.3'
+    compileOnly 'org.springframework.boot:spring-boot-starter-oauth2-client:3.2.3'
+    compileOnly 'org.projectlombok:lombok:1.18.28'
+    annotationProcessor 'org.projectlombok:lombok:1.18.28'
+}

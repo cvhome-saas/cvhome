@@ -1,18 +1,17 @@
-package com.asrevo.cvhome.landing.utils;
+package com.asrevo.cvhome.s2s.utils;
 
-import com.asrevo.cvhome.commons.domain.Identifier;
 import org.springframework.core.MethodParameter;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.service.invoker.HttpRequestValues;
 import org.springframework.web.service.invoker.HttpServiceArgumentResolver;
 
-public class IdentifierSerializeParamArgumentResolver implements HttpServiceArgumentResolver {
+public class PageableSerializeParamArgumentResolver implements HttpServiceArgumentResolver {
     @Override
     public boolean resolve(Object argument, MethodParameter parameter, HttpRequestValues.Builder requestValues) {
         try {
-            if (argument instanceof Identifier identifier) {
-                String name = parameter.getParameterName();
-                String value = identifier.getId().toString();
-                requestValues.addRequestParameter(name, value);
+            if (argument instanceof Pageable pageable) {
+                requestValues.addRequestParameter("page", String.valueOf(pageable.getPageNumber()));
+                requestValues.addRequestParameter("size", String.valueOf(pageable.getPageSize()));
                 return true;
             }
         } catch (Exception ignored) {

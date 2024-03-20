@@ -1,4 +1,4 @@
-package com.asrevo.cvhome.landing.utils;
+package com.asrevo.cvhome.s2s.utils;
 
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.support.WebClientAdapter;

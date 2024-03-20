@@ -1,9 +1,9 @@
 package com.asrevo.cvhome.gateway.config;
 
-import com.asrevo.cvhome.gateway.config.oauth2.PasswordTokenResponseClient;
-import com.asrevo.cvhome.gateway.config.oauth2.RefreshTokenTokenResponseClient;
-import com.asrevo.cvhome.gateway.config.oauth2.ServerCallBearerExchangeFilterFunction;
-import com.asrevo.cvhome.gateway.config.oauth2.ServerCallBearerExchangeInterceptor;
+import com.asrevo.cvhome.s2s.oauth2.PasswordTokenResponseClient;
+import com.asrevo.cvhome.s2s.oauth2.RefreshTokenTokenResponseClient;
+import com.asrevo.cvhome.s2s.oauth2.ServerCallBearerExchangeFilterFunction;
+import com.asrevo.cvhome.s2s.oauth2.ServerCallBearerExchangeInterceptor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
