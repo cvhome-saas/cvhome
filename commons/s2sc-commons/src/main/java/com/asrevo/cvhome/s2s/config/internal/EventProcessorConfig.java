@@ -1,4 +1,4 @@
-package com.asrevo.cvhome.store.config;
+package com.asrevo.cvhome.s2s.config.internal;
 
 import com.asrevo.cvhome.commons.event.*;
 import org.springframework.context.ApplicationEventPublisher;

@@ -1,6 +1,6 @@
 package com.asrevo.cvhome.router;
 
-import com.asrevo.cvhome.s2s.config.CustomSecurityConfig;
+import com.asrevo.cvhome.s2s.config.TestCustomSecurityConfig;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -11,7 +11,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
 
 @TestConfiguration(proxyBeanMethods = false)
-@Import(CustomSecurityConfig.class)
+@Import(TestCustomSecurityConfig.class)
 public class TestRouterApplication {
 
     @Bean

@@ -1,4 +1,4 @@
-package com.asrevo.cvhome.dcm.config;
+package com.asrevo.cvhome.s2s.model;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -8,6 +8,3 @@ import java.util.Map;
 public record ServiceDomainProperties(Map<String, ServiceDomain> services) {
 }
 
-record ServiceDomain(String name, String domain, String port, String schema, String namespace) {
-
-}

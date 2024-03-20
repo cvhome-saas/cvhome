@@ -1,12 +1,12 @@
 package com.asrevo.cvhome.wallet;
 
-import com.asrevo.cvhome.wallet.config.ServiceDomainProperties;
+import com.asrevo.cvhome.s2s.config.CvhomeSharedConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Import;
 
 @SpringBootApplication
-@EnableConfigurationProperties({ServiceDomainProperties.class})
+@Import(CvhomeSharedConfig.class)
 public class WalletApplication {
 
     @lombok.Generated

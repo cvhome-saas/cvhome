@@ -2,6 +2,8 @@ package com.asrevo.cvhome.gateway.config;
 
 import com.asrevo.cvhome.gateway.service.AcmService;
 import com.asrevo.cvhome.gateway.service.DomainReferenceService;
+import com.asrevo.cvhome.s2s.model.ServiceDomain;
+import com.asrevo.cvhome.s2s.model.ServiceDomainProperties;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

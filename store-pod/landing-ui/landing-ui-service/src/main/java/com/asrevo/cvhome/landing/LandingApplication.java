@@ -1,12 +1,12 @@
 package com.asrevo.cvhome.landing;
 
-import com.asrevo.cvhome.landing.config.ServiceDomainProperties;
+import com.asrevo.cvhome.s2s.config.CvhomeSharedConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Import;
 
 @SpringBootApplication
-@EnableConfigurationProperties({ServiceDomainProperties.class})
+@Import(CvhomeSharedConfig.class)
 public class LandingApplication {
 
     @lombok.Generated
