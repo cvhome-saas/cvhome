@@ -1,7 +1,15 @@
 package com.asrevo.cvhome.router.controller;
 
+import com.asrevo.cvhome.commons.domain.Domain;
+import com.asrevo.cvhome.commons.domain.Reference;
+import com.asrevo.cvhome.router.commons.dto.AddAlisDto;
+import com.asrevo.cvhome.router.commons.dto.CreateNewReferenceDto;
+import com.asrevo.cvhome.router.commons.dto.CreateReferenceResponse;
+import com.asrevo.cvhome.router.commons.dto.PodDto;
+import com.asrevo.cvhome.router.service.PodService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -9,4 +17,33 @@ import org.springframework.web.bind.annotation.*;
 @AllArgsConstructor
 @Slf4j
 public class RouterController {
+    private final PodService podService;
+
+    @PostMapping("create")
+    public CreateReferenceResponse createReference(CreateNewReferenceDto dto) {
+        return podService.createReference(dto);
+    }
+
+    @PostMapping("add-alis")
+    public CreateReferenceResponse addAlis(AddAlisDto dto) {
+        return podService.addAlis(dto);
+    }
+
+    @GetMapping("allocation")
+    public PodDto getAllocation(@RequestParam Domain domain) {
+        return podService.getAllocation(domain);
+    }
+
+    @PostMapping("enable-reference")
+    public ResponseEntity<Void> enableReference(@RequestBody Reference reference) {
+        podService.enableReference(reference);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("disable-reference")
+    public ResponseEntity<Void> disableReference(@RequestBody Reference reference) {
+        podService.disableReference(reference);
+        return ResponseEntity.ok().build();
+    }
+
 }

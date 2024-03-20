@@ -8,4 +8,5 @@ import org.mapstruct.Mapper;
 public interface PodMappers {
     PodDto toDto(PodEntity entity);
 
+    PodEntity toEntity(PodDto dto);
 }

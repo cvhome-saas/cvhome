@@ -4,10 +4,7 @@ import com.asrevo.cvhome.commons.domain.Domain;
 import com.asrevo.cvhome.commons.domain.Reference;
 import com.asrevo.cvhome.commons.utils.OperationExecution;
 import com.asrevo.cvhome.router.commons.domain.Country;
-import com.asrevo.cvhome.router.commons.dto.AddAlisDto;
-import com.asrevo.cvhome.router.commons.dto.CreateNewReferenceDto;
-import com.asrevo.cvhome.router.commons.dto.CreateReferenceResponse;
-import com.asrevo.cvhome.router.commons.dto.PodDto;
+import com.asrevo.cvhome.router.commons.dto.*;
 import com.asrevo.cvhome.router.entity.PodEntity;
 import com.asrevo.cvhome.router.entity.ReferenceAlisEntity;
 import com.asrevo.cvhome.router.entity.ReferenceEntity;
@@ -18,6 +15,9 @@ import com.asrevo.cvhome.router.repository.ReferenceRepository;
 import com.asrevo.cvhome.router.service.PodService;
 import com.asrevo.cvhome.router.utils.ErrorCodes;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +28,19 @@ public class PodServiceImpl implements PodService {
     private final PodRepository podRepository;
     private final PodMappers podMappers;
     private final ReferenceMappers referenceMappers;
+
+    @Transactional
+    @Override
+    public PodDto create(CreatePodDto dto) {
+        PodEntity entity = PodEntity.create(dto);
+        return podMappers.toDto(podRepository.save(entity));
+    }
+
+    @Override
+    public Page<PodEntity> findAll(PodDto podDto, Pageable pageable) {
+        PodEntity entity = podMappers.toEntity(podDto);
+        return podRepository.findAll(Example.of(entity), pageable);
+    }
 
     @Override
     public PodDto selectPod(Domain domain, Country country) {

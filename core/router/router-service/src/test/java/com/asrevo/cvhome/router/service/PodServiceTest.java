@@ -6,10 +6,11 @@ import com.asrevo.cvhome.commons.domain.Reference;
 import com.asrevo.cvhome.commons.domain.ReferenceType;
 import com.asrevo.cvhome.commons.utils.OperationExecution;
 import com.asrevo.cvhome.router.commons.domain.Country;
-import com.asrevo.cvhome.router.commons.dto.AddAlisDto;
-import com.asrevo.cvhome.router.commons.dto.CreateNewReferenceDto;
-import com.asrevo.cvhome.router.commons.dto.CreateReferenceResponse;
-import com.asrevo.cvhome.router.commons.dto.PodDto;
+import com.asrevo.cvhome.router.commons.domain.PodRegion;
+import com.asrevo.cvhome.router.commons.domain.PodSubRegion;
+import com.asrevo.cvhome.router.commons.domain.PodType;
+import com.asrevo.cvhome.router.commons.dto.*;
+import com.asrevo.cvhome.router.entity.PodEntity;
 import com.asrevo.cvhome.router.mappers.PodMappersImpl;
 import com.asrevo.cvhome.router.mappers.ReferenceMappersImpl;
 import com.asrevo.cvhome.router.service.impl.PodServiceImpl;
@@ -22,13 +23,14 @@ import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 
 @DataJdbcTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -44,6 +46,20 @@ class PodServiceTest {
     private final Reference reference = new Reference("1231231324456", ReferenceType.STORE);
     private final CreateNewReferenceDto createReferenceDto = new CreateNewReferenceDto(reference, new Domain("ass.com"), Country.EG);
 
+    @Test
+    void shouldCreatePod() {
+        PodDto podDto = podService.create(new CreatePodDto(PodRegion.EU_CENTRAL_1, PodSubRegion.R1, PodType.EXTERNAL, "namespace", "location", "locationAlis"));
+        assertThat(podDto, notNullValue());
+        assertThat(podDto.id(), notNullValue());
+    }
+
+    @Test
+    void findAll() {
+        podService.create(new CreatePodDto(PodRegion.EU_CENTRAL_2, PodSubRegion.R1, PodType.EXTERNAL, "namespace", "location", "locationAlis"));
+        Page<PodEntity> all = podService.findAll(new PodDto(null, PodRegion.EU_CENTRAL_2, PodSubRegion.R1, null, null, null, null), PageRequest.of(0, 5));
+        assertThat(all, notNullValue());
+        assertThat(all.getSize(), greaterThan(1));
+    }
 
     @Test
     void selectPodShouldNotReturnNull() {
