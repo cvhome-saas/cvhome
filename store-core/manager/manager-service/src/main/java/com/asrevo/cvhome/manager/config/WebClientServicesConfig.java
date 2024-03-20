@@ -26,6 +26,14 @@ public class WebClientServicesConfig {
         return WebClient.builder();
     }
 
+
+    @Bean("defaultWebMicroServiceBuilder")
+    public WebClient.Builder defaultWebMicroServiceBuilder(WebClientReactivePasswordTokenResponseClient tokenClient, WebClientReactiveRefreshTokenTokenResponseClient refreshTokenClient, ReactiveClientRegistrationRepository repository) {
+        ServerCallBearerExchangeFilterFunction filter = new ServerCallBearerExchangeFilterFunction(tokenClient, refreshTokenClient, repository, "microservice", "microservice-gateway", "microservice-gateway");
+        return WebClient.builder().filter(filter);
+    }
+
+
     @Bean("defaultMicroServiceBuilder")
     @LoadBalanced
     public WebClient.Builder defaultMicroServiceBuilder(WebClientReactivePasswordTokenResponseClient tokenClient, WebClientReactiveRefreshTokenTokenResponseClient refreshTokenClient, ReactiveClientRegistrationRepository repository) {

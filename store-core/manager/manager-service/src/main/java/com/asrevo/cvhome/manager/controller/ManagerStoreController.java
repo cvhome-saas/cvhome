@@ -2,7 +2,7 @@ package com.asrevo.cvhome.manager.controller;
 
 import com.asrevo.cvhome.commons.domain.IdentityId;
 import com.asrevo.cvhome.manager.commons.dto.CreateManagerStoreRequest;
-import com.asrevo.cvhome.manager.commons.dto.CreateStoreResponse;
+import com.asrevo.cvhome.manager.commons.dto.CreateManagerStoreResponse;
 import com.asrevo.cvhome.manager.commons.dto.ManagerStoreDto;
 import com.asrevo.cvhome.manager.service.InternalStoreService;
 import com.asrevo.cvhome.manager.service.StoreManagerService;
@@ -24,7 +24,7 @@ public class ManagerStoreController {
     private final InternalStoreService storeService;
 
     @PostMapping
-    public CreateStoreResponse create(@RequestBody CreateManagerStoreRequest request, @AuthenticationPrincipal Principal principal) {
+    public CreateManagerStoreResponse create(@RequestBody CreateManagerStoreRequest request, @AuthenticationPrincipal Principal principal) {
         return managerService.createStore(request, IdentityId.of(principal.getName()));
     }
 

@@ -13,7 +13,7 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Embedded;
 import org.springframework.data.relational.core.mapping.Table;
 
-import java.time.ZonedDateTime;
+import java.time.Instant;
 
 @Getter
 @Setter
@@ -24,7 +24,7 @@ public class ManagerStoreEntity extends BaseEntity<ManagerStoreEntity, ManagerSt
     @Column("owner_id")
     private IdentityId owner;
     @Column("created_date")
-    private ZonedDateTime createdDate;
+    private Instant createdDate;
     private Country country;
     @Embedded(onEmpty = Embedded.OnEmpty.USE_NULL)
     private Email email;
@@ -35,8 +35,9 @@ public class ManagerStoreEntity extends BaseEntity<ManagerStoreEntity, ManagerSt
         ManagerStoreEntity entity = new ManagerStoreEntity();
         entity.setNew();
         entity.setName(request.name());
-        entity.setCreatedDate(ZonedDateTime.now());
+        entity.setCreatedDate(Instant.now());
         entity.setOwner(identityId);
+        entity.setEmail(request.email());
         entity.setCountry(request.country());
         entity.setSyncedInRouter(Boolean.FALSE);
         entity.setSyncedInRouter(Boolean.FALSE);
@@ -54,6 +55,7 @@ public class ManagerStoreEntity extends BaseEntity<ManagerStoreEntity, ManagerSt
         this.setSyncedInRouter(Boolean.TRUE);
         return this;
     }
+
     public ManagerStoreEntity syncInStore() {
         this.setSyncedInStore(Boolean.TRUE);
         return this;
