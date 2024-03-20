@@ -2,9 +2,8 @@ package com.asrevo.cvhome.router.service.impl;
 
 import com.asrevo.cvhome.commons.domain.Domain;
 import com.asrevo.cvhome.commons.domain.DomainReference;
-import com.asrevo.cvhome.commons.domain.Reference;
 import com.asrevo.cvhome.commons.utils.OperationExecution;
-import com.asrevo.cvhome.router.commons.domain.Country;
+import com.asrevo.cvhome.commons.domain.Country;
 import com.asrevo.cvhome.router.commons.dto.*;
 import com.asrevo.cvhome.router.entity.PodEntity;
 import com.asrevo.cvhome.router.entity.ReferenceAlisEntity;

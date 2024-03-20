@@ -3,10 +3,8 @@ package com.asrevo.cvhome.router.service;
 
 import com.asrevo.cvhome.commons.domain.Domain;
 import com.asrevo.cvhome.commons.domain.DomainReference;
-import com.asrevo.cvhome.commons.domain.Reference;
-import com.asrevo.cvhome.commons.domain.ReferenceType;
 import com.asrevo.cvhome.commons.utils.OperationExecution;
-import com.asrevo.cvhome.router.commons.domain.Country;
+import com.asrevo.cvhome.commons.domain.Country;
 import com.asrevo.cvhome.router.commons.domain.PodRegion;
 import com.asrevo.cvhome.router.commons.domain.PodSubRegion;
 import com.asrevo.cvhome.router.commons.domain.PodType;
