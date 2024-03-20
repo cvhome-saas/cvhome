@@ -1,4 +1,4 @@
-package com.asrevo.cvhome.store.controller;
+package com.asrevo.cvhome.router.controller;
 
 import com.asrevo.cvhome.commons.utils.OperationExecution;
 import org.springframework.http.HttpStatus;

@@ -4,5 +4,8 @@ import com.asrevo.cvhome.router.commons.domain.PodId;
 import com.asrevo.cvhome.router.entity.PodEntity;
 import org.springframework.data.repository.ListCrudRepository;
 
+import java.util.Optional;
+
 public interface PodRepository extends ListCrudRepository<PodEntity, PodId> {
+
 }

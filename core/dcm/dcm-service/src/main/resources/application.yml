@@ -23,6 +23,10 @@ com:
 spring:
   application:
     name: dcm
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      schema: dcm
 server:
   forward-headers-strategy: FRAMEWORK
   port: ${com.asrevo.cvhome.services.dcm.port}
