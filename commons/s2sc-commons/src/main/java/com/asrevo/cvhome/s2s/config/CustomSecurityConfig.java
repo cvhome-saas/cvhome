@@ -1,4 +1,4 @@
-package com.asrevo.cvhome.landing.config;
+package com.asrevo.cvhome.s2s.config;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JOSEObjectType;
