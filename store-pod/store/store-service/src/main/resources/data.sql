@@ -1,8 +1,10 @@
 INSERT INTO store.category (id, store_id, name, image_link, parent_id, sequence, level)
-VALUES ('65f5b471c919a450ab3f8649', '507f1f77bcf86cd799439011', 'string', 'https://google.com', null, 0, 0) on conflict do nothing;
+VALUES ('65f5b471c919a450ab3f8649', '507f1f77bcf86cd799439011', 'string', 'https://google.com', null, 0,
+        0) on conflict do nothing;
 
 INSERT INTO store.category (id, store_id, name, image_link, parent_id, sequence, level)
-VALUES ('65f5b471c919a450ab3f8641', '507f1f77bcf86cd799439011', 'string', 'https://google.com', null, 0, 0) on conflict do nothing;
+VALUES ('65f5b471c919a450ab3f8641', '507f1f77bcf86cd799439011', 'string', 'https://google.com', null, 0,
+        0) on conflict do nothing;
 
 INSERT INTO store.category (id, store_id, name, image_link, parent_id, sequence, level)
 VALUES ('65f5b471c919a450ab3f8642', '507f1f77bcf86cd799439011', 'string', 'https://google.com',
@@ -33,7 +35,7 @@ INSERT INTO store.product (id, store_id, category_id, name, description, price, 
 VALUES ('65f5b484c919a450ab3f864a', '507f1f77bcf86cd799439011', '65f5b471c919a450ab3f8649', 'string', 'string', 20,
         'USD', false, false, 'https://google.com', 15, 'SINGLE',
         '{"productIds":{"java.util.ImmutableCollections$ListN":[]}}',
-        '{"imagesLinks":{"java.util.ArrayList":[{"imageLink":"https://google.com"}]}}')  on conflict do nothing;
+        '{"imagesLinks":{"java.util.ArrayList":[{"imageLink":"https://google.com"}]}}') on conflict do nothing;
 
 INSERT INTO store.product (id, store_id, category_id, name, description, price, currency, published, deleted,
                            image_link, amount, product_type, sub_products, image_links)
