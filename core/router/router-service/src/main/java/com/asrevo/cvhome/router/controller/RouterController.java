@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.router.controller;
 
 import com.asrevo.cvhome.commons.domain.Domain;
+import com.asrevo.cvhome.commons.domain.DomainReference;
 import com.asrevo.cvhome.commons.domain.Reference;
 import com.asrevo.cvhome.router.commons.dto.AddAlisDto;
 import com.asrevo.cvhome.router.commons.dto.CreateNewReferenceDto;
@@ -35,13 +36,13 @@ public class RouterController {
     }
 
     @PostMapping("enable-reference")
-    public ResponseEntity<Void> enableReference(@RequestBody Reference reference) {
+    public ResponseEntity<Void> enableReference(@RequestBody DomainReference reference) {
         podService.enableReference(reference);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("disable-reference")
-    public ResponseEntity<Void> disableReference(@RequestBody Reference reference) {
+    public ResponseEntity<Void> disableReference(@RequestBody DomainReference reference) {
         podService.disableReference(reference);
         return ResponseEntity.ok().build();
     }

@@ -2,6 +2,7 @@ package com.asrevo.cvhome.router.service;
 
 
 import com.asrevo.cvhome.commons.domain.Domain;
+import com.asrevo.cvhome.commons.domain.DomainReference;
 import com.asrevo.cvhome.commons.domain.Reference;
 import com.asrevo.cvhome.commons.domain.ReferenceType;
 import com.asrevo.cvhome.commons.utils.OperationExecution;
@@ -43,7 +44,7 @@ class PodServiceTest {
     static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:13");
     @Autowired
     private PodService podService;
-    private final Reference reference = new Reference("1231231324456", ReferenceType.STORE);
+    private final DomainReference reference = new DomainReference("1231231324456");
     private final CreateNewReferenceDto createReferenceDto = new CreateNewReferenceDto(reference, new Domain("ass.com"), Country.EG);
 
     @Test

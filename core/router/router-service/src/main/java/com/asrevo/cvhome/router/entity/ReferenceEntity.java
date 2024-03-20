@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.router.entity;
 
 import com.asrevo.cvhome.commons.domain.BaseEntity;
+import com.asrevo.cvhome.commons.domain.DomainReference;
 import com.asrevo.cvhome.commons.domain.Reference;
 import com.asrevo.cvhome.router.commons.domain.PodId;
 import com.asrevo.cvhome.router.commons.domain.ReferenceId;
@@ -21,7 +22,7 @@ import java.util.Set;
 public class ReferenceEntity extends BaseEntity<ReferenceEntity, ReferenceId> {
     @Column("reference")
     @Embedded(onEmpty = Embedded.OnEmpty.USE_NULL)
-    private Reference reference;
+    private DomainReference reference;
     @Column("enabled")
     private Boolean enabled;
     @Column("pod_id")
@@ -29,7 +30,7 @@ public class ReferenceEntity extends BaseEntity<ReferenceEntity, ReferenceId> {
     @MappedCollection(idColumn = "reference_id")
     private Set<ReferenceAlisEntity> alis = new HashSet<>();
 
-    public static ReferenceEntity create(Reference reference, PodId podId) {
+    public static ReferenceEntity create(DomainReference reference, PodId podId) {
         ReferenceEntity entity = new ReferenceEntity();
         entity.setNew();
         entity.setReference(reference);

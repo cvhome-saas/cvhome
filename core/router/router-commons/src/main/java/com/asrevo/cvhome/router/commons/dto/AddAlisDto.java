@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.router.commons.dto;
 
 import com.asrevo.cvhome.commons.domain.Domain;
-import com.asrevo.cvhome.commons.domain.Reference;
+import com.asrevo.cvhome.commons.domain.DomainReference;
 
-public record AddAlisDto(Reference reference, Domain domain) {
+public record AddAlisDto(DomainReference reference, Domain domain) {
 }

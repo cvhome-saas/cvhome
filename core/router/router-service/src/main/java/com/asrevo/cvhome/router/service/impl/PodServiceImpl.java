@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.router.service.impl;
 
 import com.asrevo.cvhome.commons.domain.Domain;
+import com.asrevo.cvhome.commons.domain.DomainReference;
 import com.asrevo.cvhome.commons.domain.Reference;
 import com.asrevo.cvhome.commons.utils.OperationExecution;
 import com.asrevo.cvhome.router.commons.domain.Country;
@@ -81,7 +82,7 @@ public class PodServiceImpl implements PodService {
 
     @Transactional
     @Override
-    public Boolean enableReference(Reference reference) {
+    public Boolean enableReference(DomainReference reference) {
         ReferenceEntity entity = getReferenceEntity(reference);
         referenceRepository.save(entity.enableReference());
         return Boolean.TRUE;
@@ -89,13 +90,13 @@ public class PodServiceImpl implements PodService {
 
     @Transactional
     @Override
-    public Boolean disableReference(Reference reference) {
+    public Boolean disableReference(DomainReference reference) {
         ReferenceEntity entity = getReferenceEntity(reference);
         referenceRepository.save(entity.disableReference());
         return Boolean.TRUE;
     }
 
-    private ReferenceEntity getReferenceEntity(Reference reference) {
+    private ReferenceEntity getReferenceEntity(DomainReference reference) {
         return referenceRepository.findByReference(reference)
                 .orElseThrow(() -> new OperationExecution(ErrorCodes.reference_not_exist));
     }

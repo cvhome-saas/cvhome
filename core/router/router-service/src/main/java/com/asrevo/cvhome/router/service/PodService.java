@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.router.service;
 
 import com.asrevo.cvhome.commons.domain.Domain;
+import com.asrevo.cvhome.commons.domain.DomainReference;
 import com.asrevo.cvhome.commons.domain.Reference;
 import com.asrevo.cvhome.router.commons.domain.Country;
 import com.asrevo.cvhome.router.commons.dto.*;
@@ -21,7 +22,7 @@ public interface PodService {
 
     PodDto getAllocation(Domain domain);
 
-    Boolean enableReference(Reference reference);
+    Boolean enableReference(DomainReference reference);
 
-    Boolean disableReference(Reference reference);
+    Boolean disableReference(DomainReference reference);
 }

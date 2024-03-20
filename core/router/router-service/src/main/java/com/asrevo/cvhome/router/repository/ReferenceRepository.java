@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.router.repository;
 
+import com.asrevo.cvhome.commons.domain.DomainReference;
 import com.asrevo.cvhome.commons.domain.Reference;
 import com.asrevo.cvhome.router.commons.domain.ReferenceId;
 import com.asrevo.cvhome.router.entity.PodEntity;
@@ -11,7 +12,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.Optional;
 
 public interface ReferenceRepository extends ListCrudRepository<ReferenceEntity, ReferenceId> {
-    Optional<ReferenceEntity> findByReference(Reference reference);
+    Optional<ReferenceEntity> findByReference(DomainReference reference);
 
     @Query("""
             SELECT p.*
