@@ -3,6 +3,7 @@ package com.asrevo.cvhome.router.config;
 import com.asrevo.cvhome.commons.domain.BaseEntity;
 import com.asrevo.cvhome.commons.domain.Identifier;
 import com.asrevo.cvhome.router.commons.domain.PodId;
+import com.asrevo.cvhome.router.commons.domain.ReferenceAlisId;
 import com.asrevo.cvhome.router.commons.domain.ReferenceId;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +47,12 @@ public class JdbcConfig extends AbstractJdbcConfiguration {
             @Override
             public ReferenceId convert(String source) {
                 return new ReferenceId(source);
+            }
+        });
+        converters.add(new Converter<String, ReferenceAlisId>() {
+            @Override
+            public ReferenceAlisId convert(String source) {
+                return new ReferenceAlisId(source);
             }
         });
 

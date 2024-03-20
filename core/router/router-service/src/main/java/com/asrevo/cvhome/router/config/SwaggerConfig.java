@@ -3,6 +3,8 @@ package com.asrevo.cvhome.router.config;
 import com.asrevo.cvhome.commons.domain.IdentityId;
 import com.asrevo.cvhome.commons.event.EventId;
 import com.asrevo.cvhome.router.commons.domain.PodId;
+import com.asrevo.cvhome.router.commons.domain.ReferenceAlisId;
+import com.asrevo.cvhome.router.commons.domain.ReferenceId;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
@@ -17,6 +19,8 @@ import org.springframework.context.annotation.Configuration;
 public class SwaggerConfig {
     static {
         SpringDocUtils.getConfig().replaceWithClass(PodId.class, String.class);
+        SpringDocUtils.getConfig().replaceWithClass(ReferenceId.class, String.class);
+        SpringDocUtils.getConfig().replaceWithClass(ReferenceAlisId.class, String.class);
         SpringDocUtils.getConfig().replaceWithClass(EventId.class, String.class);
         SpringDocUtils.getConfig().replaceWithClass(IdentityId.class, String.class);
     }
