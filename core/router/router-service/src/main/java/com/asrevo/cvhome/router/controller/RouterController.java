@@ -21,12 +21,12 @@ public class RouterController {
     private final PodService podService;
 
     @PostMapping("create")
-    public CreateReferenceResponse createReference(CreateNewReferenceDto dto) {
+    public CreateReferenceResponse createReference(@RequestBody CreateNewReferenceDto dto) {
         return podService.createReference(dto);
     }
 
     @PostMapping("add-alis")
-    public CreateReferenceResponse addAlis(AddAlisDto dto) {
+    public CreateReferenceResponse addAlis(@RequestBody AddAlisDto dto) {
         return podService.addAlis(dto);
     }
 

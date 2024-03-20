@@ -1,7 +1,5 @@
 package com.asrevo.cvhome.landing.utils;
 
-import org.springframework.core.convert.ConversionService;
-import org.springframework.util.StringValueResolver;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.support.WebClientAdapter;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
