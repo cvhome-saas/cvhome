@@ -2,19 +2,12 @@ package com.asrevo.cvhome.store.config;
 
 import com.asrevo.cvhome.commons.domain.IdentityId;
 import com.asrevo.cvhome.commons.event.EventId;
-import com.asrevo.cvhome.manager.commons.domain.StoreId;
+import com.asrevo.cvhome.storepod.commons.domain.StoreId;
 import com.asrevo.cvhome.store.commons.domain.ImageId;
 import com.asrevo.cvhome.store.commons.domain.ProductDetailsId;
 import com.asrevo.cvhome.storepod.commons.domain.CategoryId;
 import com.asrevo.cvhome.storepod.commons.domain.ProductId;
-import io.swagger.v3.oas.models.Components;
-import io.swagger.v3.oas.models.OpenAPI;
-import io.swagger.v3.oas.models.info.Info;
-import io.swagger.v3.oas.models.security.SecurityRequirement;
-import io.swagger.v3.oas.models.security.SecurityScheme;
-import io.swagger.v3.oas.models.servers.Server;
 import org.springdoc.core.utils.SpringDocUtils;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.Currency;

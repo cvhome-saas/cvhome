@@ -2,7 +2,7 @@ package com.asrevo.cvhome.store.repository;
 
 import com.asrevo.cvhome.storepod.commons.domain.ProductId;
 import com.asrevo.cvhome.store.entity.ProductEntity;
-import com.asrevo.cvhome.manager.commons.domain.StoreId;
+import com.asrevo.cvhome.storepod.commons.domain.StoreId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.ListCrudRepository;

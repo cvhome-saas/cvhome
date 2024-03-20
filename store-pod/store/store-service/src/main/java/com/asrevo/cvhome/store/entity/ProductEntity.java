@@ -2,11 +2,11 @@ package com.asrevo.cvhome.store.entity;
 
 
 import com.asrevo.cvhome.commons.domain.BaseEntity;
+import com.asrevo.cvhome.storepod.commons.domain.StoreId;
 import com.asrevo.cvhome.store.commons.domain.*;
 import com.asrevo.cvhome.store.commons.dto.CreateProductDto;
 import com.asrevo.cvhome.store.utils.ErrorCodes;
 import com.asrevo.cvhome.commons.utils.OperationExecution;
-import com.asrevo.cvhome.manager.commons.domain.StoreId;
 import com.asrevo.cvhome.storepod.commons.domain.*;
 import lombok.Getter;
 import lombok.Setter;

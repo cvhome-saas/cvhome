@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.store.service.impl;
 
+import com.asrevo.cvhome.storepod.commons.domain.StoreId;
 import com.asrevo.cvhome.storepod.commons.domain.CategoryId;
-import com.asrevo.cvhome.storepod.commons.dto.CategoriesView;
 import com.asrevo.cvhome.store.commons.dto.CategoryDto;
 import com.asrevo.cvhome.store.commons.dto.CreateCategoryDto;
 import com.asrevo.cvhome.store.commons.dto.CreateCategoryResponseDto;
@@ -11,7 +11,6 @@ import com.asrevo.cvhome.store.repository.CategoryRepository;
 import com.asrevo.cvhome.store.service.AdminCategoryService;
 import com.asrevo.cvhome.store.utils.ErrorCodes;
 import com.asrevo.cvhome.commons.utils.OperationExecution;
-import com.asrevo.cvhome.manager.commons.domain.StoreId;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

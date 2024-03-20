@@ -1,11 +1,11 @@
 package com.asrevo.cvhome.store.service.impl;
 
 import com.asrevo.cvhome.commons.utils.OperationExecution;
+import com.asrevo.cvhome.storepod.commons.domain.StoreId;
 import com.asrevo.cvhome.storepod.commons.domain.ProductDetails;
 import com.asrevo.cvhome.storepod.commons.domain.ProductId;
 import com.asrevo.cvhome.storepod.commons.domain.ProductType;
 import com.asrevo.cvhome.storepod.commons.dto.DetailedProductDto;
-import com.asrevo.cvhome.storepod.commons.dto.FindAllProductDto;
 import com.asrevo.cvhome.storepod.commons.dto.ProductDto;
 import com.asrevo.cvhome.store.entity.ProductDetailsEntity;
 import com.asrevo.cvhome.store.entity.ProductEntity;
@@ -14,15 +14,11 @@ import com.asrevo.cvhome.store.repository.ProductDetailsRepository;
 import com.asrevo.cvhome.store.repository.ProductRepository;
 import com.asrevo.cvhome.store.service.ProductService;
 import com.asrevo.cvhome.store.utils.ErrorCodes;
-import com.asrevo.cvhome.manager.commons.domain.StoreId;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
-
-import static org.springframework.data.domain.ExampleMatcher.GenericPropertyMatchers.ignoreCase;
 
 @Service
 @AllArgsConstructor
@@ -33,7 +29,7 @@ public class ProductServiceImpl implements ProductService {
 
 
     @Override
-    public Page<ProductDto> findAll(StoreId storeId,  Pageable pageable) {
+    public Page<ProductDto> findAll(StoreId storeId, Pageable pageable) {
         ProductEntity product = new ProductEntity();
         product.setStoreId(storeId);
         product.setDeleted(Boolean.FALSE);

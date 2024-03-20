@@ -3,6 +3,7 @@ plugins {
 }
 
 dependencies {
+    api project(':core:router:router-commons')
     api project(':commons:cvhome-commons')
     compileOnly 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
     compileOnly 'com.fasterxml.jackson.core:jackson-annotations:2.15.2'

@@ -1,10 +1,10 @@
 package com.asrevo.cvhome.store.entity;
 
 import com.asrevo.cvhome.commons.domain.BaseEntity;
-import com.asrevo.cvhome.manager.commons.domain.StoreId;
 import com.asrevo.cvhome.store.commons.dto.CreateCategoryDto;
 import com.asrevo.cvhome.storepod.commons.domain.CategoryId;
 import com.asrevo.cvhome.storepod.commons.domain.ImageLink;
+import com.asrevo.cvhome.storepod.commons.domain.StoreId;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;

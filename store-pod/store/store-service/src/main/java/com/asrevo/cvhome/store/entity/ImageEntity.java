@@ -2,7 +2,7 @@ package com.asrevo.cvhome.store.entity;
 
 import com.asrevo.cvhome.commons.domain.BaseEntity;
 import com.asrevo.cvhome.store.commons.domain.ImageId;
-import com.asrevo.cvhome.manager.commons.domain.StoreId;
+import com.asrevo.cvhome.storepod.commons.domain.StoreId;
 import com.asrevo.cvhome.storepod.commons.domain.ImageLink;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,7 +22,7 @@ public class ImageEntity extends BaseEntity<ImageEntity, ImageId> {
     private ImageLink imageLink;
     private StoreId storeId;
 
-    public static ImageEntity create(StoreId storeId,String name, ImageLink link) {
+    public static ImageEntity create(StoreId storeId, String name, ImageLink link) {
         ImageEntity image = new ImageEntity();
         image.setNew();
         image.setStoreId(storeId);

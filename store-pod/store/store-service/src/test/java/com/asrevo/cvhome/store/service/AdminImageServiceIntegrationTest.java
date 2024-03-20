@@ -1,10 +1,10 @@
 package com.asrevo.cvhome.store.service;
 
+import com.asrevo.cvhome.storepod.commons.domain.StoreId;
 import com.asrevo.cvhome.storepod.commons.domain.ImageLink;
 import com.asrevo.cvhome.store.commons.dto.ImageDto;
 import com.asrevo.cvhome.store.mappers.ImageMapperImpl;
 import com.asrevo.cvhome.store.service.impl.AdminImageServiceImpl;
-import com.asrevo.cvhome.manager.commons.domain.StoreId;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

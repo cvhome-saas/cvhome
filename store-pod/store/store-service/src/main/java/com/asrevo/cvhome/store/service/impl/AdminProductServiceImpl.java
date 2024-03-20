@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.store.service.impl;
 
 import com.asrevo.cvhome.commons.utils.OperationExecution;
+import com.asrevo.cvhome.storepod.commons.domain.StoreId;
 import com.asrevo.cvhome.storepod.commons.domain.ProductDetails;
 import com.asrevo.cvhome.storepod.commons.domain.ProductId;
 import com.asrevo.cvhome.storepod.commons.domain.ProductType;
@@ -14,7 +15,6 @@ import com.asrevo.cvhome.store.repository.ProductRepository;
 import com.asrevo.cvhome.store.service.AdminCategoryService;
 import com.asrevo.cvhome.store.service.AdminProductService;
 import com.asrevo.cvhome.store.utils.ErrorCodes;
-import com.asrevo.cvhome.manager.commons.domain.StoreId;
 import com.asrevo.cvhome.storepod.commons.dto.DetailedProductDto;
 import com.asrevo.cvhome.storepod.commons.dto.FindAllProductDto;
 import com.asrevo.cvhome.storepod.commons.dto.ProductDto;

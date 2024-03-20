@@ -1,9 +1,9 @@
 package com.asrevo.cvhome.store.entity;
 
 import com.asrevo.cvhome.commons.domain.BaseEntity;
+import com.asrevo.cvhome.storepod.commons.domain.StoreId;
 import com.asrevo.cvhome.storepod.commons.domain.ProductDetails;
 import com.asrevo.cvhome.store.commons.domain.ProductDetailsId;
-import com.asrevo.cvhome.manager.commons.domain.StoreId;
 import com.asrevo.cvhome.storepod.commons.domain.ProductId;
 import lombok.Getter;
 import lombok.Setter;

@@ -58,6 +58,7 @@ dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
   implementation 'org.springframework.boot:spring-boot-starter-security'
+  implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
   implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
   implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
   runtimeOnly 'org.postgresql:postgresql'
@@ -69,7 +70,6 @@ dependencies {
   annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
   implementation 'org.springdoc:springdoc-openapi-starter-webflux-ui:2.3.0'
 
-  implementation project(':core:router:router-commons')
   implementation project(':store-core:manager:manager-events')
   implementation project(':commons:s2sc-commons')
 
