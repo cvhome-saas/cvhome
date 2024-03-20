@@ -1,4 +1,4 @@
-package com.asrevo.cvhome.router.config;
+package com.asrevo.cvhome.s2s.config.internal;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.web.ReactivePageableHandlerMethodArgumentResolver;
