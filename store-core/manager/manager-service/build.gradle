@@ -71,6 +71,7 @@ dependencies {
 
   implementation project(':core:router:router-commons')
   implementation project(':store-core:manager:manager-events')
+  implementation project(':commons:s2sc-commons')
 
 //    developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
   compileOnly 'org.projectlombok:lombok'

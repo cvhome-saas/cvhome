@@ -1,4 +1,4 @@
-package com.asrevo.cvhome.store.config;
+package com.asrevo.cvhome.s2s.jwt;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.converter.Converter;

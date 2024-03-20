@@ -83,6 +83,7 @@ dependencies {
   implementation 'org.jobrunr:jobrunr-spring-boot-starter:5.3.3'
 
   implementation project(':core:dcm:dcm-events')
+  implementation project(':commons:s2sc-commons')
 
   implementation project(':commons:ecs-commons:fargate-task-info')
   implementation project(':commons:ecs-commons:ecs-service-discoveryclient')
