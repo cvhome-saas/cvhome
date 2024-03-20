@@ -1,4 +1,4 @@
-package com.asrevo.cvhome.landing.config;
+package com.asrevo.cvhome.s2s.config.internal;
 
 import com.asrevo.cvhome.fargate.task.EcsTask;
 import com.fasterxml.jackson.core.type.TypeReference;

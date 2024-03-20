@@ -1,4 +1,4 @@
-package com.asrevo.cvhome.manager.config;
+package com.asrevo.cvhome.s2s.config.internal;
 
 import com.asrevo.cvhome.fargate.task.EcsTask;
 import com.asrevo.cvhome.fargate.task.EcsTaskFetcher;
