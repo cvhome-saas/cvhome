@@ -152,9 +152,9 @@ public class ChallengeUtils {
         }
         log.warn("validation not valid ");
         return false;
-    }    private static final SSLSocketFactory socketFactory = createSSlFactory();
+    }
 
-
+    private static final SSLSocketFactory socketFactory = createSSlFactory();
 
 
 }
