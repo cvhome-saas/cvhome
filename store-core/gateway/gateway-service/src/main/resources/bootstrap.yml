@@ -10,16 +10,19 @@ com:
           namespace: core.cvhome.lcl
         dcm:
           name: dcm
+          domain: "gateway.com"
           port: 8001
           schema: http
           namespace: core.cvhome.lcl
         router:
           name: router
+          domain: "gateway.com"
           port: 8002
           schema: http
           namespace: core.cvhome.lcl
         welcome-ui:
           name: welcome-ui
+          domain: "gateway.com"
           port: 4400
           schema: http
           namespace: core.cvhome.lcl
@@ -31,22 +34,25 @@ com:
           namespace: core.cvhome.lcl
         store-core-gateway:
           name: store-core-gateway
-          domain: "store.gateway.com"
+          domain: "store-ui.gateway.com"
           port: 7000
           schema: http
           namespace: store-core.cvhome.lcl
         manager:
           name: manager
+          domain: "store-ui.gateway.com"
           port: 7001
           schema: http
           namespace: store-core.cvhome.lcl
         wallet:
           name: wallet
+          domain: "store-ui.gateway.com"
           port: 7002
           schema: http
           namespace: store-core.cvhome.lcl
         store-ui:
           name: store-ui
+          domain: "store-ui.gateway.com"
           port: 4200
           schema: http
           namespace: store-core.cvhome.lcl
