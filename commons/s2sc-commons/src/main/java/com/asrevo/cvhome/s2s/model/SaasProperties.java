@@ -7,6 +7,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Getter
 @Setter
 @ConfigurationProperties("com.asrevo.cvhome.saas")
-public class SaaslProperties {
+public class SaasProperties {
     private String defaultDomain;
 }

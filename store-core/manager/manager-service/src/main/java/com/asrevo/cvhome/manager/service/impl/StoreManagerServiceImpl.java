@@ -12,6 +12,7 @@ import com.asrevo.cvhome.manager.service.StoreManagerService;
 import com.asrevo.cvhome.manager.service.StorePodClient;
 import com.asrevo.cvhome.router.commons.dto.CreateNewReferenceDto;
 import com.asrevo.cvhome.router.commons.dto.CreateReferenceResponse;
+import com.asrevo.cvhome.s2s.model.SaasProperties;
 import com.asrevo.cvhome.storepod.commons.dto.CreateStoreResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,7 +20,7 @@ import org.springframework.stereotype.Service;
 @Service
 @AllArgsConstructor
 public class StoreManagerServiceImpl implements StoreManagerService {
-    private final static String baseDomain = ".cvhome.click";
+    private final SaasProperties saasProperties;
     private final RouterService routerService;
     private final InternalStoreService internalStoreService;
     private final StorePodClientFactory storePodClientFactory;
@@ -41,7 +42,7 @@ public class StoreManagerServiceImpl implements StoreManagerService {
 
     private CreateReferenceResponse createReference(CreateManagerStoreRequest storeRequest, ManagerStoreDto store) {
         DomainReference reference = new DomainReference(store.id().getId().toString());
-        Domain suggestedSubDomain = new Domain(storeRequest.name() + baseDomain);
+        Domain suggestedSubDomain = new Domain(storeRequest.name() + "." + saasProperties.getDefaultDomain());
         CreateNewReferenceDto createNewReferenceDto = new CreateNewReferenceDto(reference, suggestedSubDomain, storeRequest.country());
         return routerService.create(createNewReferenceDto);
     }

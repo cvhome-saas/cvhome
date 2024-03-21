@@ -2,7 +2,7 @@ package com.asrevo.cvhome.gateway.config;
 
 import com.asrevo.cvhome.gateway.config.ssl.*;
 import com.asrevo.cvhome.gateway.service.AcmService;
-import com.asrevo.cvhome.s2s.model.SaaslProperties;
+import com.asrevo.cvhome.s2s.model.SaasProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.embedded.netty.NettyServerCustomizer;
 import org.springframework.context.annotation.Bean;
@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
 @Slf4j
 public class SslNettyConfig {
     @Bean
-    public ResolverSSlProviderCacheLoader resolverSSlProviderCacheLoader(AcmService acmService, SaaslProperties sslProperties) {
+    public ResolverSSlProviderCacheLoader resolverSSlProviderCacheLoader(AcmService acmService, SaasProperties sslProperties) {
         SSlProviderCacheLoader cacheLoader = new SSlProviderCacheLoader(acmService);
         return new ResolverSSlProviderCacheLoader(cacheLoader, sslProperties);
     }

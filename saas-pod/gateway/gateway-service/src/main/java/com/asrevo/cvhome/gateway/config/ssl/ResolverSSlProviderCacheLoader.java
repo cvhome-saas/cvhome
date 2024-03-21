@@ -1,6 +1,6 @@
 package com.asrevo.cvhome.gateway.config.ssl;
 
-import com.asrevo.cvhome.s2s.model.SaaslProperties;
+import com.asrevo.cvhome.s2s.model.SaasProperties;
 import com.google.common.net.InternetDomainName;
 import io.netty.handler.ssl.util.SelfSignedCertificate;
 import lombok.Getter;
@@ -12,13 +12,13 @@ import reactor.netty.tcp.SslProvider;
 @Slf4j
 public class ResolverSSlProviderCacheLoader implements SSlProviderLoader {
     private final SSlProviderCacheLoader sSlProviderCacheLoader;
-    private final SaaslProperties sslProperties;
+    private final SaasProperties sslProperties;
     @Getter
     private final DelegatedSslContext defaultSslContext;
     @Getter
     private final SslProvider defaultSslProvider;
 
-    public ResolverSSlProviderCacheLoader(SSlProviderCacheLoader sSlProviderCacheLoader, SaaslProperties sslProperties) {
+    public ResolverSSlProviderCacheLoader(SSlProviderCacheLoader sSlProviderCacheLoader, SaasProperties sslProperties) {
         this.sSlProviderCacheLoader = sSlProviderCacheLoader;
         this.sslProperties = sslProperties;
         this.defaultSslContext = buildInitialiseContext();
