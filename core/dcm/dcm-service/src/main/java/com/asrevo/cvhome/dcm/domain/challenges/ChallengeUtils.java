@@ -128,8 +128,6 @@ public class ChallengeUtils {
         return result;
     }
 
-    private static final SSLSocketFactory socketFactory = createSSlFactory();
-
     static boolean validate(DnsChallenge challenge) {
         try {
             final Lookup lookup = new Lookup(challenge.record(), Type.TXT);
@@ -143,7 +141,7 @@ public class ChallengeUtils {
         }
         log.warn("validation not valid ");
         return false;
-    }
+    }    private static final SSLSocketFactory socketFactory = createSSlFactory();
 
     static boolean validate(HttpChallenge challenge) {
         try {
