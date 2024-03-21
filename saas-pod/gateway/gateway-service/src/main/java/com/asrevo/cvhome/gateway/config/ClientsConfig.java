@@ -11,7 +11,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import static com.asrevo.cvhome.gateway.utils.WebClientsUtils.build;
+import static com.asrevo.cvhome.s2s.utils.WebClientsUtils.build;
 import static org.springframework.http.HttpMethod.POST;
 
 @Configuration
