@@ -26,16 +26,16 @@ spring:
       discovery:
         enabled: true
         services:
-            dcm:
-              - url: "http://localhost:8082"
-                metadata:
-                  service-name: dcm
-                  instance: dcm-1
-            store-pod-gateway:
-              - url: "http://localhost:8085"
-                metadata:
-                  service-name: store-pod-gateway
-                  instance: store-pod-gateway-1
+          dcm:
+            - url: "http://localhost:8082"
+              metadata:
+                service-name: dcm
+                instance: dcm-1
+          store-pod-gateway:
+            - url: "http://localhost:8085"
+              metadata:
+                service-name: store-pod-gateway
+                instance: store-pod-gateway-1
     gateway:
       discovery:
         locator:

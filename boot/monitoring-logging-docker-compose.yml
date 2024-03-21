@@ -4,7 +4,7 @@ services:
     image: otel/opentelemetry-collector-contrib:0.80.0
     volumes:
       - ./logging-otel-collector-config.yaml:/otel-config.yaml
-    command: ["--config=/otel-config.yaml"]
+    command: [ "--config=/otel-config.yaml" ]
     ports:
       - "4317:4317"
       - "4318:4318"

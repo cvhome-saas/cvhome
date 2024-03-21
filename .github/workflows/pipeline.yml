@@ -9,7 +9,7 @@
 
 name: Java pipeline
 
-on: [push]
+on: [ push ]
 
 jobs:
   build:
