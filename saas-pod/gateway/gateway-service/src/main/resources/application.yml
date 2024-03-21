@@ -24,7 +24,7 @@ com:
           namespace: saas-pod.cvhome.lcl
         store-pod-gateway:
           name: store-pod-gateway
-          domain: "gateway.me"
+          domain: "store-pod-1.gateway.com"
           port: 8085
           schema: http
           namespace: store-pod.cvhome.lcl
