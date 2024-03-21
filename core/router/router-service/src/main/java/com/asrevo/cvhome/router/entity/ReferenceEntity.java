@@ -2,8 +2,7 @@ package com.asrevo.cvhome.router.entity;
 
 import com.asrevo.cvhome.commons.domain.BaseEntity;
 import com.asrevo.cvhome.commons.domain.DomainReference;
-import com.asrevo.cvhome.commons.domain.Reference;
-import com.asrevo.cvhome.router.commons.domain.PodId;
+import com.asrevo.cvhome.commons.domain.PodId;
 import com.asrevo.cvhome.router.commons.domain.ReferenceId;
 import lombok.Getter;
 import lombok.Setter;

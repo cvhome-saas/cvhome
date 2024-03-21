@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.router.controller;
 
 import com.asrevo.cvhome.router.commons.dto.CreatePodDto;
-import com.asrevo.cvhome.router.commons.dto.PodDto;
+import com.asrevo.cvhome.commons.dto.PodDto;
 import com.asrevo.cvhome.router.entity.PodEntity;
 import com.asrevo.cvhome.router.service.PodService;
 import lombok.AllArgsConstructor;

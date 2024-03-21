@@ -1,6 +1,6 @@
 package com.asrevo.cvhome.router.mappers;
 
-import com.asrevo.cvhome.router.commons.dto.PodDto;
+import com.asrevo.cvhome.commons.dto.PodDto;
 import com.asrevo.cvhome.router.entity.PodEntity;
 import org.mapstruct.Mapper;
 

@@ -1,4 +1,6 @@
 package com.asrevo.cvhome.router.commons.dto;
 
-public record CreateReferenceResponse(PodDto podDto,ReferenceDto referenceDto) {
+import com.asrevo.cvhome.commons.dto.PodDto;
+
+public record CreateReferenceResponse(PodDto podDto, ReferenceDto referenceDto) {
 }

@@ -2,7 +2,7 @@ package com.asrevo.cvhome.router.config;
 
 import com.asrevo.cvhome.commons.domain.BaseEntity;
 import com.asrevo.cvhome.commons.domain.Identifier;
-import com.asrevo.cvhome.router.commons.domain.PodId;
+import com.asrevo.cvhome.commons.domain.PodId;
 import com.asrevo.cvhome.router.commons.domain.ReferenceAlisId;
 import com.asrevo.cvhome.router.commons.domain.ReferenceId;
 import com.asrevo.cvhome.s2s.config.internal.JacksonConfig;

@@ -12,11 +12,12 @@ import com.asrevo.cvhome.manager.service.InternalStoreService;
 import com.asrevo.cvhome.manager.utils.ErrorCodes;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.awt.print.Pageable;
-import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -29,12 +30,15 @@ public class InternalStoreServiceImpl implements InternalStoreService {
     @Override
     public ManagerStoreDto createStore(CreateManagerStoreRequest storeRequest, IdentityId identityId) {
         ManagerStoreEntity entity = storeRepository.save(ManagerStoreEntity.createStore(storeRequest, identityId));
-        return storeMappers.toStoreDto(entity);
+        return storeMappers.toDto(entity);
     }
 
     @Override
-    public List<ManagerStoreDto> findAll(IdentityId identityId, Pageable pageable) {
-        return storeMappers.toStoreDto(storeRepository.findAllByOwner(identityId));
+    public Page<ManagerStoreDto> findAll(ManagerStoreDto managerStoreDto, IdentityId identityId, Pageable pageable) {
+        ManagerStoreEntity entity = storeMappers.toEntity(managerStoreDto);
+        entity.setOwner(identityId);
+        Page<ManagerStoreEntity> all = storeRepository.findAll(Example.of(entity), pageable);
+        return new PageImpl<>(all.stream().map(storeMappers::toDto).toList(), all.getPageable(), all.getTotalElements());
     }
 
     @Transactional

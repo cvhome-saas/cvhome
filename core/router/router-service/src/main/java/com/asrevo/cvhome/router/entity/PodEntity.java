@@ -1,10 +1,10 @@
 package com.asrevo.cvhome.router.entity;
 
 import com.asrevo.cvhome.commons.domain.BaseEntity;
-import com.asrevo.cvhome.router.commons.domain.PodId;
-import com.asrevo.cvhome.router.commons.domain.PodRegion;
-import com.asrevo.cvhome.router.commons.domain.PodSubRegion;
-import com.asrevo.cvhome.router.commons.domain.PodType;
+import com.asrevo.cvhome.commons.domain.PodId;
+import com.asrevo.cvhome.commons.domain.PodRegion;
+import com.asrevo.cvhome.commons.domain.PodSubRegion;
+import com.asrevo.cvhome.commons.domain.PodType;
 import com.asrevo.cvhome.router.commons.dto.CreatePodDto;
 import lombok.Getter;
 import lombok.Setter;

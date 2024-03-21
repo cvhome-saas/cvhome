@@ -2,7 +2,7 @@ package com.asrevo.cvhome.router.config;
 
 import com.asrevo.cvhome.commons.domain.IdentityId;
 import com.asrevo.cvhome.commons.event.EventId;
-import com.asrevo.cvhome.router.commons.domain.PodId;
+import com.asrevo.cvhome.commons.domain.PodId;
 import com.asrevo.cvhome.router.commons.domain.ReferenceAlisId;
 import com.asrevo.cvhome.router.commons.domain.ReferenceId;
 import org.springdoc.core.utils.SpringDocUtils;

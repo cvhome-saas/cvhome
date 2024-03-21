@@ -8,7 +8,9 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface ManagerStoreMappers {
-    ManagerStoreDto toStoreDto(ManagerStoreEntity entity);
+    ManagerStoreDto toDto(ManagerStoreEntity entity);
 
-    List<ManagerStoreDto> toStoreDto(List<ManagerStoreEntity> entities);
+    List<ManagerStoreDto> toDto(List<ManagerStoreEntity> entities);
+
+    ManagerStoreEntity toEntity(ManagerStoreDto managerStoreDto);
 }

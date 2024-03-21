@@ -1,6 +1,5 @@
-package com.asrevo.cvhome.router.commons.domain;
+package com.asrevo.cvhome.commons.domain;
 
-import com.asrevo.cvhome.commons.domain.Identifier;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import org.bson.types.ObjectId;

@@ -8,12 +8,15 @@ import com.asrevo.cvhome.manager.service.InternalStoreService;
 import com.asrevo.cvhome.manager.service.StoreManagerService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.awt.print.Pageable;
 import java.security.Principal;
-import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/manager-store")
@@ -28,8 +31,8 @@ public class ManagerStoreController {
         return managerService.createStore(request, IdentityId.of(principal.getName()));
     }
 
-    @GetMapping("find-all")
-    public List<ManagerStoreDto> findAllStores(@AuthenticationPrincipal Principal principal, Pageable pageable) {
-        return storeService.findAll(IdentityId.of(principal.getName()), pageable);
+    @PostMapping("find-all")
+    public Page<ManagerStoreDto> findAllStores(@AuthenticationPrincipal Principal principal, @RequestBody ManagerStoreDto managerStoreDto, Pageable pageable) {
+        return storeService.findAll(managerStoreDto, IdentityId.of(principal.getName()), pageable);
     }
 }

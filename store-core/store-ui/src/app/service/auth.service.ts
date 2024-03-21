@@ -23,9 +23,9 @@ export class AuthService {
     if (this.authUser) {
       return of(this.authUser)
     } else {
-      return this.httpClient.get<AuthUser>(environment.USER_INFO_URL)
-        .pipe(map((it: AuthUser) => {
-          this.authUser = it;
+      return this.httpClient.get<any>(environment.USER_INFO_URL)
+        .pipe(map((it: any) => {
+          this.authUser = it.principal.claims;
           return it;
         }))
     }

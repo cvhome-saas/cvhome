@@ -13,6 +13,10 @@ const routes: Routes = [
         loadChildren: () => import('./profile/profile.module').then(m => m.ProfileModule)
       },
       {
+        path: 'store-manager',
+        loadChildren: () => import('./store-manager/store-manager.module').then(m => m.StoreManagerModule)
+      },
+      {
         path: 'settings',
         loadChildren: () => import('./settings/settings.module').then(m => m.SettingsModule)
       }
