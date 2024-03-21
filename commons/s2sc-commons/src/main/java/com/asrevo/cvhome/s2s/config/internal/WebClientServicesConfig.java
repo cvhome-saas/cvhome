@@ -1,4 +1,4 @@
-package com.asrevo.cvhome.gateway.config;
+package com.asrevo.cvhome.s2s.config.internal;
 
 import com.asrevo.cvhome.s2s.oauth2.PasswordTokenResponseClient;
 import com.asrevo.cvhome.s2s.oauth2.RefreshTokenTokenResponseClient;
@@ -30,6 +30,23 @@ import java.util.List;
 public class WebClientServicesConfig {
 // @TODO CHECK   DefaultClientCredentialsTokenResponseClient
 
+    /**
+     * used for inside and outside cluster call for secured c-2-s calls without client load balancing
+     *
+     * @return
+     */
+    @Bean("webBuilder")
+    @LoadBalanced
+    public WebClient.Builder webBuilder(ReactiveClientRegistrationRepository clientRegistrationRepository, ServerOAuth2AuthorizedClientRepository serverOAuth2AuthorizedClientRepository) {
+        ServerOAuth2AuthorizedClientExchangeFilterFunction oauth = new ServerOAuth2AuthorizedClientExchangeFilterFunction(clientRegistrationRepository, serverOAuth2AuthorizedClientRepository/*new UnAuthenticatedServerOAuth2AuthorizedClientRepository()*/);
+        oauth.setDefaultClientRegistrationId("keycloak");
+        return WebClient.builder().filter(oauth);
+    }
+    /**
+     * used for inside cluster call for secured c-2-s calls with client load balancing
+     *
+     * @return
+     */
     @Bean("defaultWebBuilder")
     @LoadBalanced
     public WebClient.Builder defaultWebBuilder(ReactiveClientRegistrationRepository clientRegistrationRepository, ServerOAuth2AuthorizedClientRepository serverOAuth2AuthorizedClientRepository) {
@@ -38,6 +55,22 @@ public class WebClientServicesConfig {
         return WebClient.builder().filter(oauth);
     }
 
+    /**
+     * used for inside and outside cluster call for secured s-2-s calls without client load balancing
+     *
+     * @return
+     */
+    @Bean("defaultWebMicroServiceBuilder")
+    public WebClient.Builder defaultWebMicroServiceBuilder(WebClientReactivePasswordTokenResponseClient tokenClient, WebClientReactiveRefreshTokenTokenResponseClient refreshTokenClient, ReactiveClientRegistrationRepository repository) {
+        ServerCallBearerExchangeFilterFunction filter = new ServerCallBearerExchangeFilterFunction(tokenClient, refreshTokenClient, repository, "microservice", "microservice-gateway", "microservice-gateway");
+        return WebClient.builder().filter(filter);
+    }
+
+    /**
+     * used for inside cluster call for secured s-2-s calls with client load balancing
+     *
+     * @return
+     */
     @Bean("defaultMicroServiceBuilder")
     @LoadBalanced
     public WebClient.Builder defaultMicroServiceBuilder(WebClientReactivePasswordTokenResponseClient tokenClient, WebClientReactiveRefreshTokenTokenResponseClient refreshTokenClient, ReactiveClientRegistrationRepository repository) {
@@ -45,11 +78,21 @@ public class WebClientServicesConfig {
         return WebClient.builder().filter(filter);
     }
 
+    /**
+     * used for inside and outside cluster call for non-secured calls without client load balancing
+     *
+     * @return
+     */
     @Bean("defaultBuilder")
     public WebClient.Builder defaultBuilder() {
         return WebClient.builder();
     }
 
+    /**
+     * used for inside cluster call for non-secured calls with client load balancing
+     *
+     * @return
+     */
     @Bean("defaultBalancedBuilder")
     @LoadBalanced
     public WebClient.Builder defaultBalancedBuilder() {
