@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.gateway.config;
 
 import com.asrevo.cvhome.gateway.service.AcmService;
-import com.asrevo.cvhome.gateway.service.DomainReferenceService;
+import com.asrevo.cvhome.s2s.clients.RouterAllocationService;
 import com.asrevo.cvhome.s2s.model.ServiceDomain;
 import com.asrevo.cvhome.s2s.model.ServiceDomainProperties;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -30,9 +30,7 @@ public class ClientsConfig {
     }
 
     @Bean
-    public DomainReferenceService domainReferenceService(@Qualifier("defaultBuilder") WebClient.Builder builder, ServiceDomainProperties serviceDomainProperties) {
-        ServiceDomain gatewayService = serviceDomainProperties.services().get("core-gateway");
-        String domainCertificateManagerUrl = gatewayService.getServiceHost("dcm");
-        return build(builder, domainCertificateManagerUrl, DomainReferenceService.class);
+    public RouterAllocationService routerAllocationService(@Qualifier("defaultMicroServiceBuilder") WebClient.Builder builder) {
+        return build(builder, "lb://router", RouterAllocationService.class);
     }
 }

@@ -1,51 +1,15 @@
 spring:
-  security:
-    oauth2:
-      client:
-        registration:
-          microservice:
-            provider: keycloak
-            client-id: microservice-app
-            client-secret: r1nuVn4HefusLGwHIeRxbdOzdTZLEMvQ
-            authorization-grant-type: password
-          keycloak:
-            client-id: web-app
-            client-authentication-method: client_secret_basic
-            authorization-grant-type: authorization_code
-            scope: openid, profile, email
-            redirect-uri: "{baseUrl}/login/oauth2/code/keycloak"
-            provider: keycloak
-            client-secret: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
-        provider:
-          keycloak:
-            jwk-set-uri: ${com.asrevo.cvhome.services.auth.schema}://${com.asrevo.cvhome.services.auth.domain}:${com.asrevo.cvhome.services.auth.port}/realms/cvhome/protocol/openid-connect/certs
-            authorization-uri: ${com.asrevo.cvhome.services.auth.schema}://${com.asrevo.cvhome.services.auth.domain}:${com.asrevo.cvhome.services.auth.port}/realms/cvhome/protocol/openid-connect/auth
-            token-uri: ${com.asrevo.cvhome.services.auth.schema}://${com.asrevo.cvhome.services.auth.domain}:${com.asrevo.cvhome.services.auth.port}/realms/cvhome/protocol/openid-connect/token
   cloud:
     loadbalancer:
       eager-load:
         clients:
-          - "gateway"
-          - "dcm"
-          - "store"
-          - "streamer"
-          - "auth"
-          - "welcome-ui"
-          - "admin-ui"
-          - "store-ui"
+          - "saas-pod-gateway"
     ecs:
       discovery:
         namespace: "saas-pod.cvhome.lcl"
         namespace-id: "ns-je7qri6wn7fbsrpn"
         enabled: true
         default-port: 8080
-        service-ports:
-          "dcm": 8082
-          "store": 8083
-          "auth": 9999
-          "welcome-ui": 4400
-          "store-ui": 4200
-          "admin-ui": 4200
     gateway:
       discovery:
         locator:
@@ -55,53 +19,8 @@ spring:
         - PreserveHostHeader
         - AddResponseHeader=X-Frame-Options, SAMEORIGIN
       routes:
-        - id: dcm
-          uri: lb://dcm
-          predicates:
-            - Path=/dcm/**
-          filters:
-            - StripPrefix=1
-        - id: store
-          uri: lb://store
-          predicates:
-            - Path=/store/**
-          filters:
-            - StripPrefix=1
-        - id: streamer
-          uri: lb://streamer
-          predicates:
-            - Path=/streamer/**
-          filters:
-            - StripPrefix=1
-        - id: auth
-          uri: lb://auth
-          predicates:
-            - FHost=auth.${com.asrevo.cvhome.ssl.default-domain}
-        - id: realms
-          uri: lb://auth
-          predicates:
-            - Path=/realms/**
-          filters:
-            - SetRequestHostHeader=auth.${com.asrevo.cvhome.ssl.default-domain}:${server.port}
-        - id: resources
-          uri: lb://auth
-          predicates:
-            - Path=/resources/**
-        - id: js
-          uri: lb://auth
-          predicates:
-            - Path=/js/**
-        - id: welcome-ui
-          uri: lb://welcome-ui
-          predicates:
-            - FHost=www.${com.asrevo.cvhome.ssl.default-domain},${com.asrevo.cvhome.ssl.default-domain}
-        - id: admin-ui
-          uri: lb://admin-ui
-          predicates:
-            - FHost=admin.${com.asrevo.cvhome.ssl.default-domain}
-        - id: store-ui
-          uri: lb://store-ui
+        - id: landing-ui
+          order: -1
+          uri: ${com.asrevo.cvhome.services.landing-ui.schema}://${com.asrevo.cvhome.services.landing-ui.domain}:${com.asrevo.cvhome.services.landing-ui.port}
           predicates:
             - FHost={domain}.{x},{sub}.{domain}.{x}
-          filters:
-            - MapHostAsRequestParam=userId
