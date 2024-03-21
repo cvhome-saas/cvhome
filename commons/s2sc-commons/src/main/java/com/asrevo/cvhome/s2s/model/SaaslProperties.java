@@ -1,4 +1,4 @@
-package com.asrevo.cvhome.gateway.config.ssl;
+package com.asrevo.cvhome.s2s.model;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -6,7 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @Getter
 @Setter
-@ConfigurationProperties("com.asrevo.cvhome.ssl")
-public class SslProperties {
+@ConfigurationProperties("com.asrevo.cvhome.saas")
+public class SaaslProperties {
     private String defaultDomain;
 }

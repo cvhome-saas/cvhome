@@ -1,8 +1,3 @@
-com:
-  asrevo:
-    cvhome:
-      ssl:
-        default-domain: "gateway.click"
 spring:
   application:
     name: saas-pod-gateway

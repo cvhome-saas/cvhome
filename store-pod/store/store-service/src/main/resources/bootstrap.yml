@@ -1,6 +1,8 @@
 com:
   asrevo:
     cvhome:
+      saas:
+        default-domain: "gateway.click"
       services:
         core-gateway:
           name: core-gateway
