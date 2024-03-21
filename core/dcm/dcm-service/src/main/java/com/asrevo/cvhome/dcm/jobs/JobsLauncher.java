@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @AllArgsConstructor
-@ConditionalOnProperty(prefix = "org.jobrunr.job-scheduler",name = "enabled")
+@ConditionalOnProperty(prefix = "org.jobrunr.job-scheduler", name = "enabled")
 public class JobsLauncher {
 
     private final JobScheduler jobScheduler;

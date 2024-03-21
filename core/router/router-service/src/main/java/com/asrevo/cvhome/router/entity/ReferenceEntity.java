@@ -53,6 +53,7 @@ public class ReferenceEntity extends BaseEntity<ReferenceEntity, ReferenceId> {
         this.setEnabled(Boolean.TRUE);
         return this;
     }
+
     public ReferenceEntity disableReference() {
         this.setEnabled(Boolean.FALSE);
         return this;

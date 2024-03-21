@@ -1,10 +1,12 @@
 package com.asrevo.cvhome.store.mappers;
 
-import com.asrevo.cvhome.storepod.commons.domain.CategoryId;
-import com.asrevo.cvhome.storepod.commons.domain.ProductId;
-import com.asrevo.cvhome.store.commons.dto.*;
+import com.asrevo.cvhome.store.commons.dto.CreateProductResponseDto;
+import com.asrevo.cvhome.store.commons.dto.UpdateProductDto;
+import com.asrevo.cvhome.store.commons.dto.UpdateProductResponseDto;
 import com.asrevo.cvhome.store.entity.CategoryEntity;
 import com.asrevo.cvhome.store.entity.ProductEntity;
+import com.asrevo.cvhome.storepod.commons.domain.CategoryId;
+import com.asrevo.cvhome.storepod.commons.domain.ProductId;
 import com.asrevo.cvhome.storepod.commons.dto.FindAllProductDto;
 import com.asrevo.cvhome.storepod.commons.dto.ProductDto;
 import org.mapstruct.Mapper;
@@ -45,7 +47,7 @@ public interface ProductMapper {
     }
 
     default AggregateReference<CategoryEntity, CategoryId> toAggregateReference(CategoryId categoryId) {
-        return Optional.ofNullable(categoryId).map(it-> {
+        return Optional.ofNullable(categoryId).map(it -> {
             AggregateReference<CategoryEntity, CategoryId> e = AggregateReference.to(categoryId);
             return e;
         }).orElse(null);

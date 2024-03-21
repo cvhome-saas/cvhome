@@ -11,5 +11,5 @@ import java.util.List;
 @HttpExchange("api/v1/public/category")
 public interface CategoryService {
     @GetExchange("store-categories-view")
-    List<CategoriesView> getStoreCategoriesView( ManagerStoreId storeId);
+    List<CategoriesView> getStoreCategoriesView(ManagerStoreId storeId);
 }

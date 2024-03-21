@@ -2,7 +2,6 @@ package com.asrevo.cvhome.s2s.utils;
 
 import com.asrevo.cvhome.commons.domain.Domain;
 import org.springframework.core.MethodParameter;
-import org.springframework.data.domain.Pageable;
 import org.springframework.web.service.invoker.HttpRequestValues;
 import org.springframework.web.service.invoker.HttpServiceArgumentResolver;
 

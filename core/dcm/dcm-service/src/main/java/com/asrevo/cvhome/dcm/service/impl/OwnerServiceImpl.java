@@ -1,8 +1,8 @@
 package com.asrevo.cvhome.dcm.service.impl;
 
+import com.asrevo.cvhome.commons.domain.DomainId;
 import com.asrevo.cvhome.commons.domain.Email;
 import com.asrevo.cvhome.commons.domain.IdentityId;
-import com.asrevo.cvhome.commons.domain.DomainId;
 import com.asrevo.cvhome.dcm.entity.OwnerEntity;
 import com.asrevo.cvhome.dcm.repository.OwnerRepository;
 import com.asrevo.cvhome.dcm.service.OwnerService;

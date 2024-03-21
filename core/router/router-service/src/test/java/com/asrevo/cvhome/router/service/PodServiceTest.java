@@ -40,10 +40,10 @@ class PodServiceTest {
     @Container
     @ServiceConnection
     static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:13");
-    @Autowired
-    private PodService podService;
     private final DomainReference reference = new DomainReference("1231231324456");
     private final CreateNewReferenceDto createReferenceDto = new CreateNewReferenceDto(reference, new Domain("ass.com"), Country.EG);
+    @Autowired
+    private PodService podService;
 
     @Test
     void shouldCreatePod() {
@@ -90,6 +90,7 @@ class PodServiceTest {
         assertThat(allocation.subRegion(), notNullValue());
         assertThat(allocation.reference(), notNullValue());
     }
+
     @Test
     void getAllocationByReference() {
         CreateReferenceResponse response = podService.createReference(createReferenceDto);

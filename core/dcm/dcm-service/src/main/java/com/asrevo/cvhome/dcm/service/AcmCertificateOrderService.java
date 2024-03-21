@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.dcm.service;
 
-import com.asrevo.cvhome.dcm.commons.domain.ChallengeValidationType;
 import com.asrevo.cvhome.commons.domain.Domain;
+import com.asrevo.cvhome.dcm.commons.domain.ChallengeValidationType;
 import com.asrevo.cvhome.dcm.commons.domain.OrdersId;
 import com.asrevo.cvhome.dcm.commons.dto.OrdersCreateResponseDto;
 import com.asrevo.cvhome.dcm.domain.HttpValidationToken;

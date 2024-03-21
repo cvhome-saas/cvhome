@@ -12,8 +12,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import static org.mockito.ArgumentMatchers.any;
-
 @WebFluxTest(AdminProductsController.class)
 @Import(SecurityConfig.class)
 @Testcontainers

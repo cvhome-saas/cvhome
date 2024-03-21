@@ -16,8 +16,8 @@ public record ImagesLink(List<ImageLink> imagesLinks) implements Iterable<ImageL
         return imagesLinks.iterator();
     }
 
-   @JsonIgnore
-   public int size() {
+    @JsonIgnore
+    public int size() {
         return imagesLinks.size();
     }
 

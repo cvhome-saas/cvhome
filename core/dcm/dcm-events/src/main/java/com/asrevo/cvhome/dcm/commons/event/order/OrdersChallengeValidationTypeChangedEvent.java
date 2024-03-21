@@ -1,9 +1,9 @@
 package com.asrevo.cvhome.dcm.commons.event.order;
 
+import com.asrevo.cvhome.commons.domain.Domain;
 import com.asrevo.cvhome.commons.event.EventId;
 import com.asrevo.cvhome.dcm.commons.domain.ChallengeValidationType;
 import com.asrevo.cvhome.dcm.commons.domain.OrdersId;
-import com.asrevo.cvhome.commons.domain.Domain;
 
 import java.util.Map;
 

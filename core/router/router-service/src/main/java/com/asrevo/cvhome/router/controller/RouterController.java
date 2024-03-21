@@ -2,7 +2,6 @@ package com.asrevo.cvhome.router.controller;
 
 import com.asrevo.cvhome.commons.domain.Domain;
 import com.asrevo.cvhome.commons.domain.DomainReference;
-import com.asrevo.cvhome.commons.domain.Reference;
 import com.asrevo.cvhome.commons.dto.PodReferenceDto;
 import com.asrevo.cvhome.router.commons.dto.AddAlisDto;
 import com.asrevo.cvhome.router.commons.dto.CreateNewReferenceDto;
@@ -34,6 +33,7 @@ public class RouterController {
     public PodReferenceDto getAllocationByDomain(@RequestParam Domain domain) {
         return podService.getAllocation(domain);
     }
+
     @GetMapping("allocation-by-reference")
     public PodReferenceDto getAllocationByReference(@RequestParam DomainReference reference) {
         return podService.getAllocation(reference);

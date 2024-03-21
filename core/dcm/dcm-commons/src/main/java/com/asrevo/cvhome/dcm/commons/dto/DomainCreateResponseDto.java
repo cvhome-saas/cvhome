@@ -1,8 +1,8 @@
 package com.asrevo.cvhome.dcm.commons.dto;
 
 import com.asrevo.cvhome.commons.domain.Domain;
-import com.asrevo.cvhome.dcm.commons.domain.DomainCertificateStatus;
 import com.asrevo.cvhome.commons.domain.DomainId;
+import com.asrevo.cvhome.dcm.commons.domain.DomainCertificateStatus;
 import lombok.Getter;
 import lombok.Setter;
 

@@ -6,9 +6,9 @@ import com.asrevo.cvhome.commons.domain.IdentityId;
 import com.asrevo.cvhome.manager.commons.dto.CreateManagerStoreRequest;
 import com.asrevo.cvhome.manager.commons.dto.CreateManagerStoreResponse;
 import com.asrevo.cvhome.manager.commons.dto.ManagerStoreDto;
-import com.asrevo.cvhome.manager.service.StoreManagerService;
-import com.asrevo.cvhome.manager.service.RouterService;
 import com.asrevo.cvhome.manager.service.InternalStoreService;
+import com.asrevo.cvhome.manager.service.RouterService;
+import com.asrevo.cvhome.manager.service.StoreManagerService;
 import com.asrevo.cvhome.manager.service.StorePodClient;
 import com.asrevo.cvhome.router.commons.dto.CreateNewReferenceDto;
 import com.asrevo.cvhome.router.commons.dto.CreateReferenceResponse;
@@ -19,11 +19,10 @@ import org.springframework.stereotype.Service;
 @Service
 @AllArgsConstructor
 public class StoreManagerServiceImpl implements StoreManagerService {
+    private final static String baseDomain = ".cvhome.click";
     private final RouterService routerService;
     private final InternalStoreService internalStoreService;
     private final StorePodClientFactory storePodClientFactory;
-    private final static String baseDomain = ".cvhome.click";
-
 
     @Override
     public CreateManagerStoreResponse createStore(CreateManagerStoreRequest storeRequest, IdentityId identityId) {

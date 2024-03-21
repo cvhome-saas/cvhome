@@ -1,12 +1,12 @@
 package com.asrevo.cvhome.dcm.service.impl;
 
 import com.asrevo.cvhome.commons.command.CommandPublisher;
+import com.asrevo.cvhome.commons.domain.Domain;
 import com.asrevo.cvhome.commons.domain.DomainType;
 import com.asrevo.cvhome.commons.domain.IdentityId;
 import com.asrevo.cvhome.commons.domain.Reference;
 import com.asrevo.cvhome.dcm.commons.command.order.CreateOrderCommand;
 import com.asrevo.cvhome.dcm.commons.domain.ChallengeValidationType;
-import com.asrevo.cvhome.commons.domain.Domain;
 import com.asrevo.cvhome.dcm.commons.dto.AvailabilityResponse;
 import com.asrevo.cvhome.dcm.commons.dto.RegisterDomainRequest;
 import com.asrevo.cvhome.dcm.commons.dto.RegisterDomainResponse;

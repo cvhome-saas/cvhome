@@ -1,13 +1,13 @@
 package com.asrevo.cvhome.store.service;
 
-import com.asrevo.cvhome.storepod.commons.domain.StoreId;
 import com.asrevo.cvhome.store.commons.dto.CategoryDto;
 import com.asrevo.cvhome.store.commons.dto.CreateCategoryDto;
 import com.asrevo.cvhome.store.commons.dto.CreateCategoryResponseDto;
 import com.asrevo.cvhome.store.mappers.CategoryMapperImpl;
+import com.asrevo.cvhome.store.service.impl.AdminCategoryServiceImpl;
 import com.asrevo.cvhome.storepod.commons.domain.CategoryId;
 import com.asrevo.cvhome.storepod.commons.domain.ImageLink;
-import com.asrevo.cvhome.store.service.impl.AdminCategoryServiceImpl;
+import com.asrevo.cvhome.storepod.commons.domain.StoreId;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +39,7 @@ class AdminCategoryServiceIntegrationTest {
     @Test
     void createCategory() {
         StoreId storeId = StoreId.newId();
-        CreateCategoryDto createCategoryDto = new CreateCategoryDto("ssa",  new ImageLink("https://google.com/product.png"), 0);
+        CreateCategoryDto createCategoryDto = new CreateCategoryDto("ssa", new ImageLink("https://google.com/product.png"), 0);
         CreateCategoryResponseDto category = categoryService.createCategory(storeId, createCategoryDto);
         assertThat(category, notNullValue());
         assertThat(category.id(), notNullValue());
@@ -50,7 +50,7 @@ class AdminCategoryServiceIntegrationTest {
     @Test
     void createCategoryUnderCategory() {
         StoreId storeId = StoreId.newId();
-        CreateCategoryDto createCategoryDto = new CreateCategoryDto("ssa",  new ImageLink("https://google.com/product.png"), 0);
+        CreateCategoryDto createCategoryDto = new CreateCategoryDto("ssa", new ImageLink("https://google.com/product.png"), 0);
         CreateCategoryResponseDto parentCategory = categoryService.createCategory(storeId, createCategoryDto);
         CreateCategoryResponseDto subCategory = categoryService.createCategory(storeId, parentCategory.id(), createCategoryDto);
 
@@ -60,17 +60,18 @@ class AdminCategoryServiceIntegrationTest {
         assertThat(subCategory.imageLink(), is(createCategoryDto.imageLink()));
         assertThat(subCategory.parent(), is(parentCategory.id()));
     }
+
     @Test
     void createCategoryUnderCategoryNotExist() {
         StoreId storeId = StoreId.newId();
-        CreateCategoryDto createCategoryDto = new CreateCategoryDto("ssa",  new ImageLink("https://google.com/product.png"), 0);
+        CreateCategoryDto createCategoryDto = new CreateCategoryDto("ssa", new ImageLink("https://google.com/product.png"), 0);
         assertThrows("parent category not exist", RuntimeException.class, () -> categoryService.createCategory(storeId, CategoryId.newId(), createCategoryDto));
     }
 
     @Test
     void findCategoryInStore() {
         StoreId storeId = StoreId.newId();
-        CreateCategoryDto createCategoryDto = new CreateCategoryDto("ssa",  new ImageLink("https://google.com/product.png"), 0);
+        CreateCategoryDto createCategoryDto = new CreateCategoryDto("ssa", new ImageLink("https://google.com/product.png"), 0);
         CreateCategoryResponseDto parentCategory = categoryService.createCategory(storeId, createCategoryDto);
         CreateCategoryResponseDto subCategory = categoryService.createCategory(storeId, parentCategory.id(), createCategoryDto);
 

@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.dcm.commons.event.order;
 
-import com.asrevo.cvhome.commons.event.EventId;
 import com.asrevo.cvhome.commons.domain.Domain;
+import com.asrevo.cvhome.commons.event.EventId;
 import com.asrevo.cvhome.dcm.commons.domain.OrderLocation;
 import com.asrevo.cvhome.dcm.commons.domain.OrdersId;
 

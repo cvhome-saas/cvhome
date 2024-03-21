@@ -1,10 +1,10 @@
 package com.asrevo.cvhome.dcm.commons.event.domain;
 
-import com.asrevo.cvhome.commons.event.EventId;
 import com.asrevo.cvhome.commons.domain.Domain;
 import com.asrevo.cvhome.commons.domain.DomainId;
 import com.asrevo.cvhome.commons.domain.Reference;
 import com.asrevo.cvhome.commons.domain.ReferenceType;
+import com.asrevo.cvhome.commons.event.EventId;
 
 import java.util.Map;
 

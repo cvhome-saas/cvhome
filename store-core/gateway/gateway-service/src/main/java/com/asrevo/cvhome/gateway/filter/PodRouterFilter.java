@@ -26,6 +26,11 @@ public class PodRouterFilter implements GlobalFilter, Ordered {
         this.router = router;
     }
 
+    @SneakyThrows
+    private static URI buildUri(UriComponents uriComponents, PodReferenceDto dto) {
+        return new URI(dto.location() + uriComponents.getPath() + "?" + uriComponents.getQuery());
+    }
+
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         URI uri = exchange.getRequest().getURI();
@@ -44,17 +49,11 @@ public class PodRouterFilter implements GlobalFilter, Ordered {
         return chain.filter(exchange);
     }
 
-
     @SneakyThrows
     private Mono<ServerHttpRequest> getServerHttpRequest(ServerWebExchange exchange, UriComponents uriComponents, DomainReference reference) {
         return this.router.getAllocation(reference)
                 .map(dto -> buildUri(uriComponents, dto))
                 .map(newUri -> exchange.getRequest().mutate().uri(newUri).build());
-    }
-
-    @SneakyThrows
-    private static URI buildUri(UriComponents uriComponents, PodReferenceDto dto) {
-        return new URI(dto.location() + uriComponents.getPath() + "?" + uriComponents.getQuery());
     }
 
     @Override

@@ -1,9 +1,9 @@
 package com.asrevo.cvhome.store.mappers;
 
-import com.asrevo.cvhome.storepod.commons.domain.CategoryId;
 import com.asrevo.cvhome.store.commons.dto.CategoryDto;
 import com.asrevo.cvhome.store.commons.dto.CreateCategoryResponseDto;
 import com.asrevo.cvhome.store.entity.CategoryEntity;
+import com.asrevo.cvhome.storepod.commons.domain.CategoryId;
 import org.mapstruct.Mapper;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;
@@ -16,6 +16,7 @@ import java.util.Optional;
 @Generated("aas")
 public interface CategoryMapper {
     CategoryDto toDto(CategoryEntity entity);
+
     CreateCategoryResponseDto toCreateCategoryResponse(CategoryEntity entity);
 
 

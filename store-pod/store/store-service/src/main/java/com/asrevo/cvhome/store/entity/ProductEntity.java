@@ -2,11 +2,10 @@ package com.asrevo.cvhome.store.entity;
 
 
 import com.asrevo.cvhome.commons.domain.BaseEntity;
-import com.asrevo.cvhome.storepod.commons.domain.StoreId;
-import com.asrevo.cvhome.store.commons.domain.*;
+import com.asrevo.cvhome.commons.utils.OperationExecution;
+import com.asrevo.cvhome.store.commons.domain.SubProducts;
 import com.asrevo.cvhome.store.commons.dto.CreateProductDto;
 import com.asrevo.cvhome.store.utils.ErrorCodes;
-import com.asrevo.cvhome.commons.utils.OperationExecution;
 import com.asrevo.cvhome.storepod.commons.domain.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -94,22 +93,22 @@ public class ProductEntity extends BaseEntity<ProductEntity, ProductId> {
         ProductDetails productDetails = Optional.ofNullable(pd).orElseThrow(() -> new OperationExecution(ErrorCodes.product_details_should_not_be_null));
 
         ProductDetail productDetail = Optional.ofNullable(productDetails.detail()).orElseThrow(() -> new OperationExecution(ErrorCodes.details_should_not_be_null));
-            if (Objects.isNull(productDetail.ltr())) {
-                throw new OperationExecution(ErrorCodes.ltr_should_be_true_or_false);
-            }
-            if (!StringUtils.hasText(productDetail.name())) {
-                throw new OperationExecution(ErrorCodes.name_should_be_not_empty);
-            }
-            if (!StringUtils.hasText(productDetail.shortDescription())) {
-                throw new OperationExecution(ErrorCodes.short_description_should_be_not_empty);
-            }
-            if (productDetail.descriptions() != null && !productDetail.descriptions().isEmpty()) {
-                productDetail.descriptions().forEach(description -> {
-                    if (!StringUtils.hasText(description)) {
-                        throw new OperationExecution(ErrorCodes.description_entries_value_should_be_not_empty);
-                    }
-                });
-            }
+        if (Objects.isNull(productDetail.ltr())) {
+            throw new OperationExecution(ErrorCodes.ltr_should_be_true_or_false);
+        }
+        if (!StringUtils.hasText(productDetail.name())) {
+            throw new OperationExecution(ErrorCodes.name_should_be_not_empty);
+        }
+        if (!StringUtils.hasText(productDetail.shortDescription())) {
+            throw new OperationExecution(ErrorCodes.short_description_should_be_not_empty);
+        }
+        if (productDetail.descriptions() != null && !productDetail.descriptions().isEmpty()) {
+            productDetail.descriptions().forEach(description -> {
+                if (!StringUtils.hasText(description)) {
+                    throw new OperationExecution(ErrorCodes.description_entries_value_should_be_not_empty);
+                }
+            });
+        }
         ImagesLink imageLinks = Optional.ofNullable(productDetails.extraImages()).orElseThrow(() -> new OperationExecution(ErrorCodes.imageLinks_should_not_be_null));
         if (imageLinks.isEmpty()) throw new OperationExecution(ErrorCodes.imageLinks_should_have_at_least_image);
 

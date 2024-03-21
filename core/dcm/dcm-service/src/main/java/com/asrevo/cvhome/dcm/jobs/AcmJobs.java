@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.dcm.jobs;
 
-import com.asrevo.cvhome.dcm.commons.domain.ChallengeValidationType;
 import com.asrevo.cvhome.commons.domain.Domain;
+import com.asrevo.cvhome.dcm.commons.domain.ChallengeValidationType;
 import com.asrevo.cvhome.dcm.commons.dto.RegisterDomainRequest;
 import com.asrevo.cvhome.dcm.config.AutoOrderDomainsProperties;
 import com.asrevo.cvhome.dcm.entity.DomainEntity;

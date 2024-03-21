@@ -1,11 +1,11 @@
 package com.asrevo.cvhome.dcm.config;
 
 import com.asrevo.cvhome.commons.domain.BaseEntity;
+import com.asrevo.cvhome.commons.domain.DomainId;
 import com.asrevo.cvhome.commons.domain.Identifier;
 import com.asrevo.cvhome.commons.domain.IdentityId;
 import com.asrevo.cvhome.commons.event.EventId;
 import com.asrevo.cvhome.dcm.commons.domain.CertificateId;
-import com.asrevo.cvhome.commons.domain.DomainId;
 import com.asrevo.cvhome.dcm.commons.domain.OrdersId;
 import com.asrevo.cvhome.dcm.config.converters.*;
 import com.asrevo.cvhome.dcm.entity.FileId;
@@ -84,7 +84,6 @@ public class JdbcConfig extends AbstractJdbcConfiguration {
                 return new FileId(source);
             }
         });
-
 
 
         return new JdbcCustomConversions(converters);

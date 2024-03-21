@@ -1,9 +1,9 @@
 package com.asrevo.cvhome.dcm.service;
 
-import com.asrevo.cvhome.commons.domain.IdentityId;
-import com.asrevo.cvhome.dcm.commons.domain.CertificateOrderStatus;
 import com.asrevo.cvhome.commons.domain.Domain;
 import com.asrevo.cvhome.commons.domain.DomainType;
+import com.asrevo.cvhome.commons.domain.IdentityId;
+import com.asrevo.cvhome.dcm.commons.domain.CertificateOrderStatus;
 import com.asrevo.cvhome.dcm.commons.dto.*;
 import com.asrevo.cvhome.dcm.entity.DomainEntity;
 

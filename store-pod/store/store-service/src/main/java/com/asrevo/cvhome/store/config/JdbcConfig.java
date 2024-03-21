@@ -2,13 +2,13 @@ package com.asrevo.cvhome.store.config;
 
 import com.asrevo.cvhome.commons.domain.BaseEntity;
 import com.asrevo.cvhome.commons.domain.Identifier;
-import com.asrevo.cvhome.storepod.commons.domain.StoreId;
 import com.asrevo.cvhome.s2s.config.internal.JacksonConfig;
 import com.asrevo.cvhome.store.commons.domain.ImageId;
 import com.asrevo.cvhome.store.config.converters.*;
 import com.asrevo.cvhome.storepod.commons.domain.CategoryId;
 import com.asrevo.cvhome.storepod.commons.domain.ImageLink;
 import com.asrevo.cvhome.storepod.commons.domain.ProductId;
+import com.asrevo.cvhome.storepod.commons.domain.StoreId;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;

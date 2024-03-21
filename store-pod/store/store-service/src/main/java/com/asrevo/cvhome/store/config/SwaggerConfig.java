@@ -2,11 +2,11 @@ package com.asrevo.cvhome.store.config;
 
 import com.asrevo.cvhome.commons.domain.IdentityId;
 import com.asrevo.cvhome.commons.event.EventId;
-import com.asrevo.cvhome.storepod.commons.domain.StoreId;
 import com.asrevo.cvhome.store.commons.domain.ImageId;
 import com.asrevo.cvhome.store.commons.domain.ProductDetailsId;
 import com.asrevo.cvhome.storepod.commons.domain.CategoryId;
 import com.asrevo.cvhome.storepod.commons.domain.ProductId;
+import com.asrevo.cvhome.storepod.commons.domain.StoreId;
 import org.springdoc.core.utils.SpringDocUtils;
 import org.springframework.context.annotation.Configuration;
 

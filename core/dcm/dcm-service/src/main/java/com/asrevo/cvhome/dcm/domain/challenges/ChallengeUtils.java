@@ -72,7 +72,7 @@ public class ChallengeUtils {
 
     static boolean validate(TlsAlpnChallenge challenge) {
         return validateAcmeTls1(challenge.domain().domain(), 8443) || validateAcmeTls1(challenge.domain().domain(), 443);
-    }    private static final SSLSocketFactory socketFactory = createSSlFactory();
+    }
 
     /*
     *
@@ -92,7 +92,7 @@ public class ChallengeUtils {
     * */
     public static void main(String[] args) {
         boolean validate = validate(new DnsChallenge(new Domain("cvhome.click"), false, "LNDh2P8MUaHOjpGC_7-kdvNdfZgVlmThgi_ogVwT7eA"));
-    }
+    }    private static final SSLSocketFactory socketFactory = createSSlFactory();
 
     private static boolean validateAcmeTls1(String host, Integer port) {
         if (isPortOpen(host, port)) {

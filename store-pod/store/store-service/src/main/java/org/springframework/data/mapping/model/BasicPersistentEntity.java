@@ -15,20 +15,6 @@
  */
 package org.springframework.data.mapping.model;
 
-import java.io.Serializable;
-import java.lang.annotation.Annotation;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.stream.Collectors;
-
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.data.annotation.Immutable;
 import org.springframework.data.annotation.TypeAlias;
@@ -43,12 +29,13 @@ import org.springframework.data.util.Lazy;
 import org.springframework.data.util.TypeInformation;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.lang.Nullable;
-import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.ConcurrentReferenceHashMap;
+import org.springframework.util.*;
 import org.springframework.util.ConcurrentReferenceHashMap.ReferenceType;
-import org.springframework.util.MultiValueMap;
-import org.springframework.util.StringUtils;
+
+import java.io.Serializable;
+import java.lang.annotation.Annotation;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Simple value object to capture information of {@link PersistentEntity}s.
@@ -75,16 +62,14 @@ public class BasicPersistentEntity<T, P extends PersistentProperty<P>> implement
     private final Map<String, P> propertyCache;
     private final Map<Class<? extends Annotation>, Optional<Annotation>> annotationCache;
     private final MultiValueMap<Class<? extends Annotation>, P> propertyAnnotationCache;
-
-    private @Nullable P idProperty;
-    private @Nullable P versionProperty;
-    private PersistentPropertyAccessorFactory propertyAccessorFactory;
-    private EvaluationContextProvider evaluationContextProvider = EvaluationContextProvider.DEFAULT;
-
     private final Lazy<Alias> typeAlias;
     private final Lazy<IsNewStrategy> isNewStrategy;
     private final Lazy<Boolean> isImmutable;
     private final Lazy<Boolean> requiresPropertyPopulation;
+    private @Nullable P idProperty;
+    private @Nullable P versionProperty;
+    private PersistentPropertyAccessorFactory propertyAccessorFactory;
+    private EvaluationContextProvider evaluationContextProvider = EvaluationContextProvider.DEFAULT;
 
     /**
      * Creates a new {@link BasicPersistentEntity} from the given {@link TypeInformation}.
@@ -101,7 +86,7 @@ public class BasicPersistentEntity<T, P extends PersistentProperty<P>> implement
      * entity.
      *
      * @param information must not be {@literal null}.
-     * @param comparator can be {@literal null}.
+     * @param comparator  can be {@literal null}.
      */
     public BasicPersistentEntity(TypeInformation<T> information, @Nullable Comparator<P> comparator) {
 
@@ -127,6 +112,23 @@ public class BasicPersistentEntity<T, P extends PersistentProperty<P>> implement
         this.isImmutable = Lazy.of(() -> isAnnotationPresent(Immutable.class));
         this.requiresPropertyPopulation = Lazy.of(() -> !isImmutable() && properties.stream() //
                 .anyMatch(it -> !(isCreatorArgument(it) || it.isTransient())));
+    }
+
+    /**
+     * Calculates the {@link Alias} to be used for the given type.
+     *
+     * @param type must not be {@literal null}.
+     * @return
+     */
+    private static Alias getAliasFromAnnotation(Class<?> type) {
+
+        TypeAlias typeAlias = AnnotatedElementUtils.findMergedAnnotation(type, TypeAlias.class);
+
+        if (typeAlias != null && StringUtils.hasText(typeAlias.value())) {
+            return Alias.of(typeAlias.value());
+        }
+
+        return Alias.empty();
     }
 
     @Nullable
@@ -435,7 +437,7 @@ public class BasicPersistentEntity<T, P extends PersistentProperty<P>> implement
     /**
      * Obtain a {@link EvaluationContext} for a {@code rootObject} given {@link ExpressionDependencies}.
      *
-     * @param rootObject must not be {@literal null}.
+     * @param rootObject   must not be {@literal null}.
      * @param dependencies must not be {@literal null}.
      * @return the evaluation context with extensions loaded that satisfy {@link ExpressionDependencies}.
      * @since 2.5
@@ -466,23 +468,6 @@ public class BasicPersistentEntity<T, P extends PersistentProperty<P>> implement
         Assert.notNull(bean, "Target bean must not be null");
         Assert.isInstanceOf(getType(), bean,
                 () -> String.format(TYPE_MISMATCH, bean.getClass().getName(), getType().getName()));
-    }
-
-    /**
-     * Calculates the {@link Alias} to be used for the given type.
-     *
-     * @param type must not be {@literal null}.
-     * @return
-     */
-    private static Alias getAliasFromAnnotation(Class<?> type) {
-
-        TypeAlias typeAlias = AnnotatedElementUtils.findMergedAnnotation(type, TypeAlias.class);
-
-        if (typeAlias != null && StringUtils.hasText(typeAlias.value())) {
-            return Alias.of(typeAlias.value());
-        }
-
-        return Alias.empty();
     }
 
     /**

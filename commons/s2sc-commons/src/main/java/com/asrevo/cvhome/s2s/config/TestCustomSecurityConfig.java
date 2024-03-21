@@ -45,6 +45,7 @@ public class TestCustomSecurityConfig {
             return new NimbusReactiveJwtDecoder(rsaKey.toRSAPublicKey());
         }
     }
+
     @Component
     @Profile("signer")
     public static class JwtSigner {
@@ -75,6 +76,7 @@ public class TestCustomSecurityConfig {
 
 
     }
+
     @RestController
     @Profile("signer")
     public static class SignerController {

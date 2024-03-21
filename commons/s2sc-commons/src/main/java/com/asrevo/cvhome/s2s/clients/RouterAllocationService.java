@@ -18,5 +18,4 @@ public interface RouterAllocationService {
     Mono<PodReferenceDto> getAllocation(DomainReference reference);
 
 
-
 }

@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.dcm.service.impl;
 
-import com.asrevo.cvhome.dcm.commons.domain.CertificateFileType;
 import com.asrevo.cvhome.commons.domain.Domain;
+import com.asrevo.cvhome.dcm.commons.domain.CertificateFileType;
 import com.asrevo.cvhome.dcm.commons.domain.OrderLocation;
 import com.asrevo.cvhome.dcm.domain.DomainCertificate;
 import com.asrevo.cvhome.dcm.service.AcmeManagerService;
