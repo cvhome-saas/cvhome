@@ -82,9 +82,18 @@ class PodServiceTest {
     }
 
     @Test
-    void getAllocation() {
+    void getAllocationByDomain() {
         podService.createReference(createReferenceDto);
         PodReferenceDto allocation = podService.getAllocation(createReferenceDto.domain());
+        assertThat(allocation, notNullValue());
+        assertThat(allocation.region(), notNullValue());
+        assertThat(allocation.subRegion(), notNullValue());
+        assertThat(allocation.reference(), notNullValue());
+    }
+    @Test
+    void getAllocationByReference() {
+        CreateReferenceResponse response = podService.createReference(createReferenceDto);
+        PodReferenceDto allocation = podService.getAllocation(response.referenceDto().reference());
         assertThat(allocation, notNullValue());
         assertThat(allocation.region(), notNullValue());
         assertThat(allocation.subRegion(), notNullValue());

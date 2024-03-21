@@ -3,6 +3,7 @@ package com.asrevo.cvhome.router.service.impl;
 import com.asrevo.cvhome.commons.domain.Country;
 import com.asrevo.cvhome.commons.domain.Domain;
 import com.asrevo.cvhome.commons.domain.DomainReference;
+import com.asrevo.cvhome.commons.domain.Reference;
 import com.asrevo.cvhome.commons.dto.PodDto;
 import com.asrevo.cvhome.commons.dto.PodReferenceDto;
 import com.asrevo.cvhome.commons.utils.OperationExecution;
@@ -79,7 +80,13 @@ public class PodServiceImpl implements PodService {
 
     @Override
     public PodReferenceDto getAllocation(Domain domain) {
-        return referenceRepository.getReferenceAllocation(domain.domain())
+        return referenceRepository.getReferenceAllocationByDomain(domain.domain())
+                .orElseThrow(() -> new OperationExecution(ErrorCodes.alis_not_exist));
+    }
+
+    @Override
+    public PodReferenceDto getAllocation(DomainReference reference) {
+        return referenceRepository.getReferenceAllocationByReference(reference.reference())
                 .orElseThrow(() -> new OperationExecution(ErrorCodes.alis_not_exist));
     }
 

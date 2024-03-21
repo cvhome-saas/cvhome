@@ -3,7 +3,6 @@ package com.asrevo.cvhome.router.repository;
 import com.asrevo.cvhome.commons.domain.DomainReference;
 import com.asrevo.cvhome.commons.dto.PodReferenceDto;
 import com.asrevo.cvhome.router.commons.domain.ReferenceId;
-import com.asrevo.cvhome.router.entity.PodEntity;
 import com.asrevo.cvhome.router.entity.ReferenceEntity;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.ListCrudRepository;
@@ -25,6 +24,16 @@ public interface ReferenceRepository extends ListCrudRepository<ReferenceEntity,
                    AND ra.domain = :domain
             LIMIT  1
             """)
-    Optional<PodReferenceDto> getReferenceAllocation(@Param("domain") String domain);
+    Optional<PodReferenceDto> getReferenceAllocationByDomain(@Param("domain") String domain);
 
+    @Query("""
+            SELECT p.*,r.enabled,r.reference
+            FROM   reference r
+                   LEFT JOIN pod p
+                          ON p.id = r.pod_id
+            WHERE  r.enabled = true
+                   AND r.reference = :reference
+            LIMIT  1
+            """)
+    Optional<PodReferenceDto> getReferenceAllocationByReference(@Param("reference") String reference);
 }

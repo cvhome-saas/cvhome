@@ -9,11 +9,15 @@ public class WebClientsUtils {
         WebClient client = builder.baseUrl(url).build();
 
         WebClientAdapter clientAdapter = WebClientAdapter.create(client);
-        HttpServiceProxyFactory proxy = HttpServiceProxyFactory.builderFor(clientAdapter)
-                .customArgumentResolver(new IdentifierSerializeParamArgumentResolver())
-                .customArgumentResolver(new PageableSerializeParamArgumentResolver())
+        HttpServiceProxyFactory.Builder proxyBuilder = HttpServiceProxyFactory.builderFor(clientAdapter);
+        proxyBuilder.customArgumentResolver(new IdentifierSerializeParamArgumentResolver())
                 .customArgumentResolver(new DomainSerializeParamArgumentResolver())
-                .build();
-        return proxy.createClient(tClass);
+                .customArgumentResolver(new DomainReferenceSerializeParamArgumentResolver());
+        try {
+            Class.forName("org.springframework.data.domain.Pageable");
+            proxyBuilder.customArgumentResolver(new PageableSerializeParamArgumentResolver());
+        } catch (Exception ignored) {
+        }
+        return proxyBuilder.build().createClient(tClass);
     }
 }

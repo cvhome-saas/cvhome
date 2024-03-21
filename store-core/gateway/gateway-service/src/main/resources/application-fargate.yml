@@ -27,7 +27,13 @@ spring:
         - PreserveHostHeader
         - AddResponseHeader=X-Frame-Options, SAMEORIGIN
       routes:
+        - id: store
+          order: -2
+          uri: ${com.asrevo.cvhome.services.store-pod-gateway.schema}://${com.asrevo.cvhome.services.store-pod-gateway.domain}:${com.asrevo.cvhome.services.store-pod-gateway.port}
+          predicates:
+            - Path=/store/**
         - id: store-ui
+          order: -1
           uri: lb://store-ui
           predicates:
             - FHost=store-ui.${com.asrevo.cvhome.services.core-gateway.domain}

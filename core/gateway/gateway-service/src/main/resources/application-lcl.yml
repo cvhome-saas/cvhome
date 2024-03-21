@@ -24,6 +24,31 @@ spring:
               metadata:
                 service-name: welcome-ui
                 instance: welcome-ui-1
+          manager:
+            - url: "http://localhost:7001"
+              metadata:
+                service-name: manager
+                instance: manager-1
+          wallet:
+            - url: "http://localhost:7002"
+              metadata:
+                service-name: wallet
+                instance: wallet-1
+          store-ui:
+            - url: "http://localhost:4200"
+              metadata:
+                service-name: store-ui
+                instance: store-ui-1
+          store:
+            - url: "http://localhost:6001"
+              metadata:
+                service-name: store
+                instance: store-1
+          landing-ui:
+            - url: "http://localhost:6002"
+              metadata:
+                service-name: landing-ui
+                instance: landing-ui-1
     gateway:
       discovery:
         locator:

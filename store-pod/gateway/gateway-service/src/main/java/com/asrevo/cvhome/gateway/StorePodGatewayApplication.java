@@ -7,9 +7,9 @@ import org.springframework.context.annotation.Import;
 
 @SpringBootApplication
 @Import(CvhomeSharedConfig.class)
-public class StoreGatewayApplication {
+public class StorePodGatewayApplication {
     @lombok.Generated
     public static void main(String[] args) {
-        SpringApplication.run(StoreGatewayApplication.class, args);
+        SpringApplication.run(StorePodGatewayApplication.class, args);
     }
 }
