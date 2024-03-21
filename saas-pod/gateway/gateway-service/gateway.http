@@ -12,5 +12,7 @@ Accept: application/json
 POST  https://gateway.com:8443/api/v1/test/call
 Content-Type: application/json
 
-{"url":"https://www.google.com/"}
+{
+  "url": "https://www.google.com/"
+}
 

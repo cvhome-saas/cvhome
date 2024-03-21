@@ -1,72 +1,74 @@
 <form (ngSubmit)="onSubmit()" [formGroup]="customDomainForm">
-  <div class="row mt-4 justify-content-center">
-    <div class="col-md-6 justify-content-center">
-      <div class="tab-content mt-6 ">
-        <div class="tab-pane active">
-          <div [innerHTML]="errMessage" class="text-danger"></div>
-          <div class="controls">
-            <label class="d-block mb-1">
-              Domain
-              <span class="text-danger">*</span>
-            </label>
-            <div class="input-group error validate">
-              <input class="form-control" formControlName="domain" placeholder="full domain" type="text">
+    <div class="row mt-4 justify-content-center">
+        <div class="col-md-6 justify-content-center">
+            <div class="tab-content mt-6 ">
+                <div class="tab-pane active">
+                    <div [innerHTML]="errMessage" class="text-danger"></div>
+                    <div class="controls">
+                        <label class="d-block mb-1">
+                            Domain
+                            <span class="text-danger">*</span>
+                        </label>
+                        <div class="input-group error validate">
+                            <input class="form-control" formControlName="domain" placeholder="full domain" type="text">
+                        </div>
+                        <div class="help-block">
+                            <div
+                                    *ngIf="customDomainForm.controls['domain'].invalid && (customDomainForm.controls['domain'].dirty || customDomainForm.controls['domain'].touched)"
+                                    class="text-danger">
+                                <div *ngIf="customDomainForm.controls['domain'].errors?.['required']">
+                                    Domain is required.
+                                </div>
+                                <div *ngIf="customDomainForm.controls['domain'].errors?.['minlength']">
+                                    Domain is minLength.
+                                </div>
+                                <div *ngIf="customDomainForm.controls['domain'].errors?.['pattern']">
+                                    Domain is pattern.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="help-block">
-              <div
-                *ngIf="customDomainForm.controls['domain'].invalid && (customDomainForm.controls['domain'].dirty || customDomainForm.controls['domain'].touched)"
-                class="text-danger">
-                <div *ngIf="customDomainForm.controls['domain'].errors?.['required']">
-                  Domain is required.
+        </div>
+    </div>
+    <div class="row mt-4 justify-content-center">
+        <div class="col-md-6 justify-content-center">
+            <div class="tab-content mt-6 ">
+                <div class="tab-pane active">
+                    <button class="btn btn-primary w-100" type="submit">Submit</button>
                 </div>
-                <div *ngIf="customDomainForm.controls['domain'].errors?.['minlength']">
-                  Domain is minLength.
-                </div>
-                <div *ngIf="customDomainForm.controls['domain'].errors?.['pattern']">
-                  Domain is pattern.
-                </div>
-              </div>
             </div>
-          </div>
         </div>
-      </div>
     </div>
-  </div>
-  <div class="row mt-4 justify-content-center">
-    <div class="col-md-6 justify-content-center">
-      <div class="tab-content mt-6 ">
-        <div class="tab-pane active">
-          <button class="btn btn-primary w-100" type="submit">Submit</button>
-        </div>
-      </div>
-    </div>
-  </div>
 </form>
 <table class="table text-nowrap mb-0 align-middle">
-  <thead class="text-dark fs-4">
-  <tr>
-    <th class="border-bottom-0">
-      <h6 class="fw-semibold mb-0">Domain</h6>
-    </th>
-    <th class="border-bottom-0">
-      <h6 class="fw-semibold mb-0">Reference</h6>
-    </th>
-  </tr>
-  </thead>
-  <tbody>
-  <tr *ngFor="let d of customDomainReferences">
-    <td class="border-bottom-0">
-      <h6 class="fw-semibold mb-1"><a class="mb-0 fw-normal" href="//{{d.domain.domain}}"
-                                      target="_blank">{{d.domain.domain}}</a></h6>
-    </td>
-    <td>
-      <select class="form-select" aria-label="Default select example" (change)="onReferenceChange(d.domain,$event)">
-        <option value="null">Select reference</option>
-        <option *ngFor="let o of stores" [value]="o.id.id"
-                [selected]="d.reference&&o.id.id==d.reference.reference">{{o.name}}</option>
-      </select>
-    </td>
+    <thead class="text-dark fs-4">
+    <tr>
+        <th class="border-bottom-0">
+            <h6 class="fw-semibold mb-0">Domain</h6>
+        </th>
+        <th class="border-bottom-0">
+            <h6 class="fw-semibold mb-0">Reference</h6>
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let d of customDomainReferences">
+        <td class="border-bottom-0">
+            <h6 class="fw-semibold mb-1"><a class="mb-0 fw-normal" href="//{{d.domain.domain}}"
+                                            target="_blank">{{ d.domain.domain }}</a></h6>
+        </td>
+        <td>
+            <select (change)="onReferenceChange(d.domain,$event)" aria-label="Default select example"
+                    class="form-select">
+                <option value="null">Select reference</option>
+                <option *ngFor="let o of stores" [selected]="d.reference&&o.id.id==d.reference.reference"
+                        [value]="o.id.id">{{ o.name }}
+                </option>
+            </select>
+        </td>
 
-  </tr>
-  </tbody>
+    </tr>
+    </tbody>
 </table>

@@ -5,19 +5,19 @@ import {CommonModule} from "@angular/common";
 import {RouterLink} from "@angular/router";
 
 @NgModule({
-  declarations: [
-    LeftSideBarNavComponent,
-    HeaderNavComponent,
-  ],
+    declarations: [
+        LeftSideBarNavComponent,
+        HeaderNavComponent,
+    ],
     imports: [
         CommonModule,
         RouterLink
     ],
-  exports: [
-    CommonModule,
-    LeftSideBarNavComponent,
-    HeaderNavComponent
-  ]
+    exports: [
+        CommonModule,
+        LeftSideBarNavComponent,
+        HeaderNavComponent
+    ]
 })
 export class ComponentsSharedModule {
 }

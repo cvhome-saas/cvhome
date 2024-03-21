@@ -1,33 +1,33 @@
 <div class="card">
-  <div class="card-body">
-    <h5 class="card-title fw-semibold mb-4">Profile</h5>
-    <div class="card mb-0">
-      <div class="card-body">
-        <form>
-          <fieldset disabled>
-            <div class="mb-3">
-              <label class="form-label">Sub</label>
-              <input [value]="authUser?.sub" class="form-control" type="text">
+    <div class="card-body">
+        <h5 class="card-title fw-semibold mb-4">Profile</h5>
+        <div class="card mb-0">
+            <div class="card-body">
+                <form>
+                    <fieldset disabled>
+                        <div class="mb-3">
+                            <label class="form-label">Sub</label>
+                            <input [value]="authUser?.sub" class="form-control" type="text">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Preferred Username</label>
+                            <input [value]="authUser?.preferred_username" class="form-control" type="text">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Given Name</label>
+                            <input [value]="authUser?.given_name" class="form-control" type="text">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Family Name</label>
+                            <input [value]="authUser?.family_name" class="form-control" type="text">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email Verified</label>
+                            <input [value]="authUser?.email_verified" class="form-control" type="text">
+                        </div>
+                    </fieldset>
+                </form>
             </div>
-            <div class="mb-3">
-              <label class="form-label">Preferred Username</label>
-              <input [value]="authUser?.preferred_username" class="form-control" type="text">
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Given Name</label>
-              <input [value]="authUser?.given_name" class="form-control" type="text">
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Family Name</label>
-              <input [value]="authUser?.family_name" class="form-control" type="text">
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Email Verified</label>
-              <input [value]="authUser?.email_verified" class="form-control" type="text">
-            </div>
-          </fieldset>
-        </form>
-      </div>
+        </div>
     </div>
-  </div>
 </div>

@@ -94,7 +94,8 @@ Authorization: Bearer {{access_token}}
 
 
 ### get product details
-GET http://localhost:8089/api/v1/admin/products/detailed-product?storeId=65f023632bc46470c104b76f&productId=65f5a789e37ac17bfb45926f
+GET http://localhost:8089/api/v1/admin/products/detailed-product?storeId=65f023632bc46470c104b76f&
+    productId=65f5a789e37ac17bfb45926f
 Accept: application/json
 Authorization: Bearer {{access_token}}
 
@@ -106,7 +107,6 @@ Content-Type: application/json
 Authorization: Bearer {{access_token}}
 
 {
-
 }
 
 ### find all in  category

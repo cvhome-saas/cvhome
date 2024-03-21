@@ -1,5 +1,4 @@
 import {Component, OnInit} from '@angular/core';
-import {AuthService, AuthUser} from "../../../../../service/auth.service";
 
 @Component({
     selector: 'app-store-manager',

@@ -44,6 +44,7 @@ abstract class BootBuildImageTask extends DefaultTask {
         }
     }
     */
+
     @TaskAction
     void bootBuildImage() {
         String image = "${System.getenv('REGISTRY')}/core/${project.name}"

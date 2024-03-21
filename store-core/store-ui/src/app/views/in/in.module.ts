@@ -6,13 +6,13 @@ import {ComponentsSharedModule} from "../../shared/components/components-shared.
 import {PipesSharedModule} from "../../shared/utils/pipes-shared.module";
 
 @NgModule({
-  imports: [
-    CommonModule, InRoutingModule, ComponentsSharedModule, PipesSharedModule
-  ],
-  declarations: [
-    BaseComponent,
+    imports: [
+        CommonModule, InRoutingModule, ComponentsSharedModule, PipesSharedModule
+    ],
+    declarations: [
+        BaseComponent,
 
-  ]
+    ]
 })
 export class InModule {
 }
