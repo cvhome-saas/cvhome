@@ -111,7 +111,7 @@ public class ChallengeUtils {
         }
         log.warn("validation not valid ");
         return false;
-    }    private static final SSLSocketFactory socketFactory = createSSlFactory();
+    }
 
     private static boolean isPortOpen(String hostName, int portNumber) {
         boolean result;
@@ -127,6 +127,8 @@ public class ChallengeUtils {
 
         return result;
     }
+
+    private static final SSLSocketFactory socketFactory = createSSlFactory();
 
     static boolean validate(DnsChallenge challenge) {
         try {
