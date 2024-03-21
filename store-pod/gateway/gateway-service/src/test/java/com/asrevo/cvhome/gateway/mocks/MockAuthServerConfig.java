@@ -16,7 +16,7 @@ import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 
 @Configuration
-@ConditionalOnProperty(prefix = "mock", name = "auth.enabled", matchIfMissing = true)
+@ConditionalOnProperty(prefix = "mock", name = "auth.enabled", matchIfMissing = false)
 public class MockAuthServerConfig {
 
     @Bean

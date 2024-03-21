@@ -7,9 +7,9 @@ import org.springframework.context.annotation.Import;
 
 @TestConfiguration(proxyBeanMethods = false)
 @Import(TestCustomSecurityConfig.class)
-public class TestSaasGatewayApplication {
+public class TestSaasPodGatewayApplication {
     public static void main(String[] args) {
-        SpringApplication.from(SaasGatewayApplication::main).with(TestSaasGatewayApplication.class).run(args);
+        SpringApplication.from(SaasPodGatewayApplication::main).with(TestSaasPodGatewayApplication.class).run(args);
     }
 
 }

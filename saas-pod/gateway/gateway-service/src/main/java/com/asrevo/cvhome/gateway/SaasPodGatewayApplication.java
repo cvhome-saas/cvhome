@@ -10,9 +10,9 @@ import org.springframework.context.annotation.Import;
 @SpringBootApplication
 @EnableConfigurationProperties(value = {SslProperties.class})
 @Import(CvhomeSharedConfig.class)
-public class SaasGatewayApplication {
+public class SaasPodGatewayApplication {
     @lombok.Generated
     public static void main(String[] args) {
-        SpringApplication.run(SaasGatewayApplication.class, args);
+        SpringApplication.run(SaasPodGatewayApplication.class, args);
     }
 }

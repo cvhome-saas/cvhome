@@ -17,7 +17,7 @@ import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 
 @Configuration
-@ConditionalOnProperty(prefix = "mock", name = "dcm.enabled", matchIfMissing = true)
+@ConditionalOnProperty(prefix = "mock", name = "dcm.enabled", matchIfMissing = false)
 public class MockDomainCertificateManagerServerConfig {
 
     @Bean
