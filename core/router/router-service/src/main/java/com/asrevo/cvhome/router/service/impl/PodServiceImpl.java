@@ -1,11 +1,15 @@
 package com.asrevo.cvhome.router.service.impl;
 
+import com.asrevo.cvhome.commons.domain.Country;
 import com.asrevo.cvhome.commons.domain.Domain;
 import com.asrevo.cvhome.commons.domain.DomainReference;
 import com.asrevo.cvhome.commons.dto.PodDto;
+import com.asrevo.cvhome.commons.dto.PodReferenceDto;
 import com.asrevo.cvhome.commons.utils.OperationExecution;
-import com.asrevo.cvhome.commons.domain.Country;
-import com.asrevo.cvhome.router.commons.dto.*;
+import com.asrevo.cvhome.router.commons.dto.AddAlisDto;
+import com.asrevo.cvhome.router.commons.dto.CreateNewReferenceDto;
+import com.asrevo.cvhome.router.commons.dto.CreatePodDto;
+import com.asrevo.cvhome.router.commons.dto.CreateReferenceResponse;
 import com.asrevo.cvhome.router.entity.PodEntity;
 import com.asrevo.cvhome.router.entity.ReferenceAlisEntity;
 import com.asrevo.cvhome.router.entity.ReferenceEntity;
@@ -74,10 +78,9 @@ public class PodServiceImpl implements PodService {
 
 
     @Override
-    public PodDto getAllocation(Domain domain) {
-        PodEntity podEntity = referenceRepository.getAllocation(domain.domain())
+    public PodReferenceDto getAllocation(Domain domain) {
+        return referenceRepository.getReferenceAllocation(domain.domain())
                 .orElseThrow(() -> new OperationExecution(ErrorCodes.alis_not_exist));
-        return podMappers.toDto(podEntity);
     }
 
     @Transactional

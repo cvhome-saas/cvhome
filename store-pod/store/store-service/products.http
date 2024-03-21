@@ -45,7 +45,7 @@ Content-Type: application/json
 %}
 
 ### create category
-POST http://localhost:8089/api/v1/admin/category/create?storeId=507f1f77bcf86cd799439011
+POST http://localhost:8089/api/v1/admin/category/create?storeId=65f023632bc46470c104b76f
 Content-Type: application/json
 Authorization: Bearer {{access_token}}
 
@@ -58,7 +58,7 @@ Authorization: Bearer {{access_token}}
 }
 
 ### create single product
-POST http://localhost:8089/api/v1/admin/products/create?storeId=507f1f77bcf86cd799439011
+POST http://localhost:8089/api/v1/admin/products/create?storeId=65f023632bc46470c104b76f
 Content-Type: application/json
 Authorization: Bearer {{access_token}}
 
@@ -94,14 +94,14 @@ Authorization: Bearer {{access_token}}
 
 
 ### get product details
-GET http://localhost:8089/api/v1/admin/products/detailed-product?storeId=507f1f77bcf86cd799439011&productId=65f5a789e37ac17bfb45926f
+GET http://localhost:8089/api/v1/admin/products/detailed-product?storeId=65f023632bc46470c104b76f&productId=65f5a789e37ac17bfb45926f
 Accept: application/json
 Authorization: Bearer {{access_token}}
 
 
 
 ### find all
-POST http://localhost:8089/api/v1/admin/products/find-all?storeId=507f1f77bcf86cd799439011
+POST http://localhost:8089/api/v1/admin/products/find-all?storeId=65f023632bc46470c104b76f
 Content-Type: application/json
 Authorization: Bearer {{access_token}}
 
@@ -110,7 +110,7 @@ Authorization: Bearer {{access_token}}
 }
 
 ### find all in  category
-POST http://localhost:8089/api/v1/admin/products/find-all?storeId=507f1f77bcf86cd799439011
+POST http://localhost:8089/api/v1/admin/products/find-all?storeId=65f023632bc46470c104b76f
 Content-Type: application/json
 Authorization: Bearer {{access_token}}
 
@@ -127,7 +127,7 @@ Authorization: Bearer {{access_token}}
 
 
 ### create group product
-POST http://localhost:8089/api/v1/admin/products/create?storeId=507f1f77bcf86cd799439011
+POST http://localhost:8089/api/v1/admin/products/create?storeId=65f023632bc46470c104b76f
 Content-Type: application/json
 Authorization: Bearer {{access_token}}
 

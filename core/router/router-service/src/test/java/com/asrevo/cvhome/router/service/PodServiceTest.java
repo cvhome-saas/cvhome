@@ -1,15 +1,14 @@
 package com.asrevo.cvhome.router.service;
 
 
-import com.asrevo.cvhome.commons.domain.Domain;
-import com.asrevo.cvhome.commons.domain.DomainReference;
+import com.asrevo.cvhome.commons.domain.*;
 import com.asrevo.cvhome.commons.dto.PodDto;
+import com.asrevo.cvhome.commons.dto.PodReferenceDto;
 import com.asrevo.cvhome.commons.utils.OperationExecution;
-import com.asrevo.cvhome.commons.domain.Country;
-import com.asrevo.cvhome.commons.domain.PodRegion;
-import com.asrevo.cvhome.commons.domain.PodSubRegion;
-import com.asrevo.cvhome.commons.domain.PodType;
-import com.asrevo.cvhome.router.commons.dto.*;
+import com.asrevo.cvhome.router.commons.dto.AddAlisDto;
+import com.asrevo.cvhome.router.commons.dto.CreateNewReferenceDto;
+import com.asrevo.cvhome.router.commons.dto.CreatePodDto;
+import com.asrevo.cvhome.router.commons.dto.CreateReferenceResponse;
 import com.asrevo.cvhome.router.entity.PodEntity;
 import com.asrevo.cvhome.router.mappers.PodMappersImpl;
 import com.asrevo.cvhome.router.mappers.ReferenceMappersImpl;
@@ -85,20 +84,22 @@ class PodServiceTest {
     @Test
     void getAllocation() {
         podService.createReference(createReferenceDto);
-        PodDto allocation = podService.getAllocation(createReferenceDto.domain());
+        PodReferenceDto allocation = podService.getAllocation(createReferenceDto.domain());
         assertThat(allocation, notNullValue());
         assertThat(allocation.region(), notNullValue());
         assertThat(allocation.subRegion(), notNullValue());
+        assertThat(allocation.reference(), notNullValue());
     }
 
     @Test
     void enableReference() {
         podService.createReference(createReferenceDto);
         podService.enableReference(createReferenceDto.reference());
-        PodDto allocation = podService.getAllocation(createReferenceDto.domain());
+        PodReferenceDto allocation = podService.getAllocation(createReferenceDto.domain());
         assertThat(allocation, notNullValue());
         assertThat(allocation.region(), notNullValue());
         assertThat(allocation.subRegion(), notNullValue());
+        assertThat(allocation.reference(), notNullValue());
     }
 
     @Test

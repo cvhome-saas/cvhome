@@ -2,10 +2,10 @@ package com.asrevo.cvhome.router.controller;
 
 import com.asrevo.cvhome.commons.domain.Domain;
 import com.asrevo.cvhome.commons.domain.DomainReference;
+import com.asrevo.cvhome.commons.dto.PodReferenceDto;
 import com.asrevo.cvhome.router.commons.dto.AddAlisDto;
 import com.asrevo.cvhome.router.commons.dto.CreateNewReferenceDto;
 import com.asrevo.cvhome.router.commons.dto.CreateReferenceResponse;
-import com.asrevo.cvhome.commons.dto.PodDto;
 import com.asrevo.cvhome.router.service.PodService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +30,7 @@ public class RouterController {
     }
 
     @GetMapping("allocation")
-    public PodDto getAllocation(@RequestParam Domain domain) {
+    public PodReferenceDto getAllocation(@RequestParam Domain domain) {
         return podService.getAllocation(domain);
     }
 

@@ -4,6 +4,7 @@ import com.asrevo.cvhome.commons.domain.Domain;
 import com.asrevo.cvhome.commons.domain.DomainReference;
 import com.asrevo.cvhome.commons.domain.Country;
 import com.asrevo.cvhome.commons.dto.PodDto;
+import com.asrevo.cvhome.commons.dto.PodReferenceDto;
 import com.asrevo.cvhome.router.commons.dto.*;
 import com.asrevo.cvhome.router.entity.PodEntity;
 import org.springframework.data.domain.Page;
@@ -20,7 +21,7 @@ public interface PodService {
 
     CreateReferenceResponse addAlis(AddAlisDto addAlisDto);
 
-    PodDto getAllocation(Domain domain);
+    PodReferenceDto getAllocation(Domain domain);
 
     Boolean enableReference(DomainReference reference);
 
