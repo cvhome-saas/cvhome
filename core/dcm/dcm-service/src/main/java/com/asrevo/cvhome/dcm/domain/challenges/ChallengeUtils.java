@@ -141,7 +141,7 @@ public class ChallengeUtils {
         }
         log.warn("validation not valid ");
         return false;
-    }    private static final SSLSocketFactory socketFactory = createSSlFactory();
+    }
 
     static boolean validate(HttpChallenge challenge) {
         try {
@@ -152,7 +152,7 @@ public class ChallengeUtils {
         }
         log.warn("validation not valid ");
         return false;
-    }
+    }    private static final SSLSocketFactory socketFactory = createSSlFactory();
 
 
 
