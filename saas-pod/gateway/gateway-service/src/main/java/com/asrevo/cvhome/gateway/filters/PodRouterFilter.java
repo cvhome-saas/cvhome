@@ -54,7 +54,11 @@ public class PodRouterFilter implements GlobalFilter, Ordered {
     private Mono<ServerHttpRequest> getServerHttpRequest(ServerWebExchange exchange, UriComponents uriComponents, Domain domain) {
         return this.router.getAllocation(domain)
                 .map(dto -> buildUri(uriComponents, dto))
-                .map(newUri -> exchange.getRequest().mutate().uri(newUri).build());
+                .map(newUri -> exchange.getRequest()
+                        .mutate()
+                        .uri(newUri)
+                        .header("host", newUri.getHost())
+                        .build());
     }
 
     @Override
