@@ -20,7 +20,7 @@ spring:
         - AddResponseHeader=X-Frame-Options, SAMEORIGIN
       routes:
         - id: landing-ui
-          order: -1
+          order: 10
           uri: ${com.asrevo.cvhome.services.landing-ui.schema}://${com.asrevo.cvhome.services.landing-ui.domain}:${com.asrevo.cvhome.services.landing-ui.port}
           predicates:
             - FHost={domain}.{x},{sub}.{domain}.{x}

@@ -23,3 +23,9 @@ spring:
         - TokenRelay
         - PreserveHostHeader
         - AddResponseHeader=X-Frame-Options, SAMEORIGIN
+      routes:
+        - id: landing-ui
+          order: 10
+          uri: lb://landing-ui
+          predicates:
+            - FHost={domain}.{x},{sub}.{domain}.{x}
