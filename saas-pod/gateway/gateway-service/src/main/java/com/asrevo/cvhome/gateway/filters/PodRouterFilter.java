@@ -4,6 +4,7 @@ import com.asrevo.cvhome.commons.domain.Domain;
 import com.asrevo.cvhome.commons.dto.PodReferenceDto;
 import com.asrevo.cvhome.s2s.clients.RouterAllocationService;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
@@ -21,6 +22,7 @@ import java.util.Optional;
 import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.GATEWAY_REQUEST_URL_ATTR;
 
 @Component
+@Slf4j
 public class PodRouterFilter implements GlobalFilter, Ordered {
     private final RouterAllocationService router;
 
@@ -30,6 +32,7 @@ public class PodRouterFilter implements GlobalFilter, Ordered {
 
     @SneakyThrows
     private static URI buildUri(UriComponents uriComponents, PodReferenceDto dto) {
+        log.info("will build uri for {} , {}",dto.reference(),dto.location());
         return new URI(dto.location() + uriComponents.getPath() + "?" + uriComponents.getQuery());
     }
 
@@ -41,6 +44,7 @@ public class PodRouterFilter implements GlobalFilter, Ordered {
             UriComponents uriComponents = UriComponentsBuilder.fromUri(uri).build();
             Mono<ServerHttpRequest> httpRequest = getServerHttpRequest(exchange, uriComponents, new Domain(hostName));
             return httpRequest.flatMap(it -> {
+                log.info("will route {} to {}", uri, it.getURI());
                 exchange.getAttributes().put(GATEWAY_REQUEST_URL_ATTR, it.getURI());
                 return chain.filter(exchange.mutate().request(it).build());
             });
