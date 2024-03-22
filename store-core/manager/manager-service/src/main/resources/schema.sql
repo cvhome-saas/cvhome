@@ -9,5 +9,5 @@ CREATE TABLE IF NOT EXISTS manager.manager_store
     owner_id         varchar(50) not null,
     synced_in_router boolean default false,
     synced_in_store  boolean default false,
-    constraint store_pk primary key (id)
+    constraint manager_store_pk primary key (id)
 );
