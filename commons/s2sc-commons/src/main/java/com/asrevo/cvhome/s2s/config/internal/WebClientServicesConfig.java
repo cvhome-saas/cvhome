@@ -134,6 +134,12 @@ public class WebClientServicesConfig {
         return RestClient.builder().requestInterceptor(e1);
     }
 
+    @Bean("restBClientBuilder")
+    @LoadBalanced
+    public RestClient.Builder restBClientBuilder() {
+        return RestClient.builder();
+    }
+
     @Bean("microClientBuilder")
     @LoadBalanced
     public RestClient.Builder microClientBuilder(PasswordTokenResponseClient responseClient, RefreshTokenTokenResponseClient refreshTokenTokenResponseClient, OAuth2ClientProperties properties) {
@@ -179,6 +185,12 @@ public class WebClientServicesConfig {
                                              @Qualifier("defaultWebMicroServiceBuilder") WebClient.Builder defaultWebMicroServiceBuilder,
                                              ServiceDomainProperties serviceDomainProperties) {
         return new WebClientBuilder(environment, defaultMicroServiceBuilder, defaultWebMicroServiceBuilder, serviceDomainProperties);
+    }
+    @Bean
+    public RestClientBuilder restClientBuilder(Environment environment,
+                                             @Qualifier("restBClientBuilder") RestClient.Builder restBClientBuilder,
+                                             ServiceDomainProperties serviceDomainProperties) {
+        return new RestClientBuilder(environment, restBClientBuilder, restBClientBuilder, serviceDomainProperties);
     }
 
 }

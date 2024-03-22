@@ -3,11 +3,12 @@
     <title>landing-ui</title>
 </head>
 <body>
-product <p th:text="${product.name}"/>
-landing
 <div th:each="product: ${landingProducts}">
-    <p th:text="${product.id}"/>
+    <p th:text="${product.id.id}"/>
     <p th:text="${product.name}"/>
+    <p th:text="${product.description}"/>
+    <p th:text="${product.productType}"/>
+    <p th:text="${product.imageLink.imageLink}"/>
 </div>
 </body>
 </html>
