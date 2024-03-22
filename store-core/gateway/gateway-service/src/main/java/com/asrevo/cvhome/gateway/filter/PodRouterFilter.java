@@ -42,8 +42,8 @@ public class PodRouterFilter implements GlobalFilter, Ordered {
                 return httpRequest.flatMap(it -> {
                             exchange.getAttributes().put(GATEWAY_REQUEST_URL_ATTR, it.getURI());
                             return chain.filter(exchange.mutate().request(it).build());
-                        })
-                        .onErrorResume(throwable -> chain.filter(exchange));
+                        });
+//                        .onErrorResume(throwable -> chain.filter(exchange));
             }
         }
         return chain.filter(exchange);
