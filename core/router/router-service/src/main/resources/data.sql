@@ -15,3 +15,7 @@ on conflict do nothing;
 insert into router.reference_alis(id, domain, reference_id)
 values ('65f023632bc46470c204b25f', 'ali.com', '65f023632bc46470c204b76f')
 on conflict do nothing;
+
+insert into router.reference_alis(id, domain, reference_id)
+values ('65f023632bc16470c204b25f', 'ashraf.onecvhome.click', '65f023632bc46470c204b76f')
+on conflict do nothing;
