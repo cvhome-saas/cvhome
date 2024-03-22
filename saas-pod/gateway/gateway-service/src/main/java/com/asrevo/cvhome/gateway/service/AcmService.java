@@ -8,6 +8,9 @@ import lombok.SneakyThrows;
 import org.shredzone.acme4j.util.KeyPairUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.service.annotation.HttpExchange;
+import org.springframework.web.service.annotation.PostExchange;
 import reactor.netty.http.Http2SslContextSpec;
 import reactor.netty.tcp.SslProvider;
 
@@ -18,10 +21,12 @@ import java.security.KeyPair;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 
+@HttpExchange("/api/v1/acm")
 public interface AcmService extends SSlProviderLoader {
     org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AcmService.class);
 
-    ResponseEntity<byte[]> getDomainCertificateFile(String domain, CertificateFileType fileType);
+    @PostExchange("domain-certificate-file")
+    ResponseEntity<byte[]> getDomainCertificateFile(@RequestParam("domain") String domain, @RequestParam("fileType") CertificateFileType fileType);
 
     default ByteArrayInputStream getFile(String domainRequest, CertificateFileType fileType) {
         try {
@@ -72,7 +77,6 @@ public interface AcmService extends SSlProviderLoader {
 
         }
         return null;
-
     }
 
 

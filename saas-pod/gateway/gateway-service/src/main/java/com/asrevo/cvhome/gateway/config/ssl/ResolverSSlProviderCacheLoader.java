@@ -63,7 +63,7 @@ public class ResolverSSlProviderCacheLoader implements SSlProviderLoader {
         return this.sslProperties.getDefaultDomain();
     }
 
-    void requestNewSslContext() {
+    synchronized void requestNewSslContext() {
         SslProvider loaded = this.sSlProviderCacheLoader.load(this.defaultDomain());
         if (loaded != null && loaded.getSslContext() != null) {
             defaultSslContext.setNewSslContext(((DelegatedSslContext) loaded.getSslContext()));

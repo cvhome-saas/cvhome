@@ -10,78 +10,91 @@ com:
           port: 8000
           schema: http
           namespace: core.cvhome.lcl
+          gateway-service-name: core-gateway
         dcm:
           name: dcm
           domain: "gateway.com"
           port: 8001
           schema: http
           namespace: core.cvhome.lcl
+          gateway-service-name: core-gateway
         router:
           name: router
           domain: "gateway.com"
           port: 8002
           schema: http
           namespace: core.cvhome.lcl
+          gateway-service-name: core-gateway
         welcome-ui:
           name: welcome-ui
           domain: "gateway.com"
           port: 4400
           schema: http
           namespace: core.cvhome.lcl
+          gateway-service-name: core-gateway
         auth:
           name: auth
           domain: "auth.gateway.com"
           port: 9999
           schema: http
           namespace: core.cvhome.lcl
+          gateway-service-name: core-gateway
         store-core-gateway:
           name: store-core-gateway
           domain: "store-ui.gateway.com"
           port: 7000
           schema: http
           namespace: store-core.cvhome.lcl
+          gateway-service-name: store-core-gateway
         manager:
           name: manager
           domain: "store-ui.gateway.com"
           port: 7001
           schema: http
           namespace: store-core.cvhome.lcl
+          gateway-service-name: store-core-gateway
         wallet:
           name: wallet
           domain: "store-ui.gateway.com"
           port: 7002
           schema: http
           namespace: store-core.cvhome.lcl
+          gateway-service-name: store-core-gateway
         store-ui:
           name: store-ui
           domain: "store-ui.gateway.com"
           port: 4200
           schema: http
           namespace: store-core.cvhome.lcl
+          gateway-service-name: store-core-gateway
         saas-pod-gateway:
           name: saas-pod-gateway
           domain: "gateway.click"
           port: 8443
           schema: https
           namespace: saas-pod.cvhome.lcl
+          gateway-service-name: saas-pod-gateway
         store-pod-gateway:
           name: store-pod-gateway
           domain: "store-pod-1.gateway.com"
           port: 6000
           schema: http
           namespace: store-pod.cvhome.lcl
+          gateway-service-name: saas-pod-gateway
         store:
           name: store
           domain: "store-pod-1.gateway.com"
           port: 6001
           schema: http
           namespace: store-pod.cvhome.lcl
+          gateway-service-name: saas-pod-gateway
         landing-ui:
           name: landing-ui
           domain: "store-pod-1.gateway.com"
           port: 6002
           schema: http
           namespace: store-pod.cvhome.lcl
+          gateway-service-name: saas-pod-gateway
 spring:
   security:
     oauth2:
