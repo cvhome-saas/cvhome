@@ -80,21 +80,21 @@ com:
           port: 6000
           schema: http
           namespace: store-pod.cvhome.lcl
-          gateway-service-name: saas-pod-gateway
+          gateway-service-name: store-pod-gateway
         store:
           name: store
           domain: "store-pod-1.gateway.com"
           port: 6001
           schema: http
           namespace: store-pod.cvhome.lcl
-          gateway-service-name: saas-pod-gateway
+          gateway-service-name: store-pod-gateway
         landing-ui:
           name: landing-ui
           domain: "store-pod-1.gateway.com"
           port: 6002
           schema: http
           namespace: store-pod.cvhome.lcl
-          gateway-service-name: saas-pod-gateway
+          gateway-service-name: store-pod-gateway
 spring:
   security:
     oauth2:

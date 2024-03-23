@@ -31,7 +31,7 @@ public class WebClientBuilder {
             ServiceDomain requestedService = serviceDomainProperties.services().get(serviceName);
             ServiceDomain currentService = serviceDomainProperties.services().get(environment.getProperty("spring.application.name"));
 
-            if (requestedService.gatewayServiceName().equals(currentService.name())) {
+            if (requestedService.gatewayServiceName().equals(currentService.gatewayServiceName())) {
                 return buildInternalClient(serviceName, tClass);
             } else {
                 ServiceDomain gatewayService = serviceDomainProperties.services().get(requestedService.gatewayServiceName());
