@@ -1,0 +1,31 @@
+spring:
+  cloud:
+    loadbalancer:
+      eager-load:
+        clients:
+          - "store-pod-gateway"
+          - "store"
+          - "landing-ui"
+    ecs:
+      discovery:
+        namespace: "store-pod.cvhome.lcl"
+        namespace-id: "ns-je7qri6wn7fbsrpn"
+        enabled: true
+        default-port: 8080
+        service-ports:
+          "store": 6001
+          "landing-ui": 6002
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+      default-filters:
+        - TokenRelay
+        - PreserveHostHeader
+        - AddResponseHeader=X-Frame-Options, SAMEORIGIN
+      routes:
+        - id: landing-ui
+          order: 10
+          uri: lb://landing-ui
+          predicates:
+            - FHost={domain}.{x},{sub}.{domain}.{x}

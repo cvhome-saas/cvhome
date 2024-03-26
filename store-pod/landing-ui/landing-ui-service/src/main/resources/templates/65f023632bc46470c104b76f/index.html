@@ -1,0 +1,14 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>landing-ui</title>
+</head>
+<body>
+<div th:each="product: ${landingProducts}">
+    <p th:text="${product.id.id}"/>
+    <p th:text="${product.name}"/>
+    <p th:text="${product.description}"/>
+    <p th:text="${product.productType}"/>
+    <p th:text="${product.imageLink.imageLink}"/>
+</div>
+</body>
+</html>

@@ -1,0 +1,18 @@
+### get actuator info
+GET https://gateway.com:8443/actuator/info
+
+
+### get get user
+GET https://gateway.com:8443/user/api/v1/user
+Map-Host-As-Request-Param: true
+Accept: application/json
+
+
+### post sss
+POST  https://gateway.com:8443/api/v1/test/call
+Content-Type: application/json
+
+{
+  "url": "https://www.google.com/"
+}
+

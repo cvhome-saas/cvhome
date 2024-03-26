@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: store-pod-gateway
+server:
+  port: ${com.asrevo.cvhome.services.store-pod-gateway.port}
+info:
+  app:
+    name: ${spring.application.name}
+management:
+  observations:
+    key-values:
+      application: ${spring.application.name}

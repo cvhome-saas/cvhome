@@ -1,0 +1,31 @@
+package com.asrevo.cvhome.dcm.domain.challenges;
+
+import com.asrevo.cvhome.commons.domain.Domain;
+import com.asrevo.cvhome.dcm.commons.domain.ChallengeValidationType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.data.annotation.Transient;
+
+public record DnsChallenge(Domain domain, boolean isWildCard, String digest) implements Challenge {
+
+    @Transient
+    @JsonIgnore
+    public static String record(Domain domain) {
+        return String.format("_acme-challenge.%s", domain.domain());
+    }
+
+    @Transient
+    @JsonIgnore
+    public String record() {
+        return record(this.domain);
+    }
+
+    @Override
+    public ChallengeValidationType type() {
+        return ChallengeValidationType.Dns01;
+    }
+
+    @Override
+    public boolean validate() {
+        return ChallengeUtils.validate(this);
+    }
+}

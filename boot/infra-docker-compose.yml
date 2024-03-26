@@ -44,10 +44,10 @@ services:
       KK_TO_RMQ_VHOST: "/"
       KK_TO_RMQ_EXCHANGE: "com.asrevo.cvhome.sys-events"
 
-    command:  --verbose start --proxy=edge  --hostname-strict=false --import-realm
-#        command:  --verbose start --proxy=edge  --hostname-strict=false --import-realm --log-level=DEBUG
-#        command:  --verbose start --proxy=edge --hostname-strict=false --hostname-path=/auth --import-realm
-#        command:  --verbose start  --hostname-strict=false --import-realm
+    command: --verbose start --proxy=edge  --hostname-strict=false --import-realm
+    #        command:  --verbose start --proxy=edge  --hostname-strict=false --import-realm --log-level=DEBUG
+    #        command:  --verbose start --proxy=edge --hostname-strict=false --hostname-path=/auth --import-realm
+    #        command:  --verbose start  --hostname-strict=false --import-realm
     volumes:
       - ../auth/keycloak/imports:/opt/keycloak/data/import
       - ../auth/keycloak/providers:/opt/keycloak/providers

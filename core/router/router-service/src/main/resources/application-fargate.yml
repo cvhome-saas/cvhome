@@ -1,0 +1,23 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://${spring.datasource.host}:${spring.datasource.port}/${spring.datasource.database}
+  cloud:
+    loadbalancer:
+      eager-load:
+        clients:
+          - "core-gateway"
+          - "dcm"
+          - "router"
+          - "auth"
+          - "welcome-ui"
+    ecs:
+      discovery:
+        namespace: "core.cvhome.lcl"
+        namespace-id: "ns-je7qri6wn7fbsrpn"
+        enabled: true
+        default-port: 8080
+        service-ports:
+          "dcm": 8001
+          "router": 8002
+          "auth": 9999
+          "welcome-ui": 4400

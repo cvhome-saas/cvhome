@@ -1,6 +1,7 @@
 # Getting Started
 
 ### Reference Documentation
+
 For further reference, please consider the following sections:
 
 * [Official Gradle documentation](https://docs.gradle.org)
@@ -10,6 +11,7 @@ For further reference, please consider the following sections:
 * [Config Client Quick Start](https://docs.spring.io/spring-cloud-config/docs/current/reference/html/#_client_side_usage)
 
 ### Additional Links
+
 These additional references should also help you:
 
 * [Gradle Build Scans – insights for your project's build](https://scans.gradle.com#gradle)
@@ -21,6 +23,7 @@ This project has been configured to let you generate either a lightweight contai
 It is also possible to run your tests in a native image.
 
 ### Lightweight Container with Cloud Native Buildpacks
+
 If you're already familiar with Spring Boot container images support, this is the easiest way to get started.
 Docker should be installed and configured on your machine prior to creating the image.
 
@@ -37,6 +40,7 @@ $ docker run --rm cvhome:0.0.1-SNAPSHOT
 ```
 
 ### Executable with Native Build Tools
+
 Use this option if you want to explore more options such as running your tests in a native image.
 The GraalVM `native-image` compiler should be installed and configured on your machine.
 
@@ -49,6 +53,7 @@ $ ./gradlew nativeCompile
 ```
 
 Then, you can run the app as follows:
+
 ```
 $ build/native/nativeCompile/cvhome
 ```
