@@ -1,4 +1,4 @@
-export interface StoreId {
+export interface ManagerStoreId {
     id: string;
 }
 
@@ -13,7 +13,7 @@ export interface CreateStoreRequest {
 }
 
 export interface Store {
-    id: StoreId;
+    id: ManagerStoreId;
     name: string;
     owner: IdentityId;
 }
@@ -30,4 +30,21 @@ export enum Country {
 
 export interface Email {
     email: string;
+}
+
+export interface User {
+    id: string;
+    username: string;
+    email: string;
+    firstname: string;
+    enabled: boolean,
+    groups: Group[]
+}
+
+export enum Group {
+    ORG_ADMIN = 'ORG_ADMIN', STORE_ADMIN = 'STORE_ADMIN', STORE_MODERATOR = 'STORE_MODERATOR', CUSTOMER = 'CUSTOMER'
+}
+
+export interface ResetPassword {
+    password: string
 }

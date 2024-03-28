@@ -67,7 +67,7 @@ public class KeycloakUserAccountServiceImpl implements UserAccountService {
     }
 
     @Override
-    public void createUser(IdentityId identityId, ManagerStoreId managerStoreId, CreateUserRequestDto createUserRequestDto) {
+    public KeyCloakUserDto createUser(IdentityId identityId, ManagerStoreId managerStoreId, CreateUserRequestDto createUserRequestDto) {
         try {
             UserRepresentation user = new UserRepresentation();
             user.setEnabled(true);
@@ -82,7 +82,7 @@ public class KeycloakUserAccountServiceImpl implements UserAccountService {
             Response response = usersResource.create(user);
             String userId = CreatedResponseUtil.getCreatedId(response);
             doResetPassword(new RestPasswordRequestDto(createUserRequestDto.password()), userId);
-
+            return userRepresentationMapper.toDto(usersResource.get(userId).toRepresentation());
         } catch (Exception e) {
             throw new OperationExecution(ErrorCodes.create_user_fail);
         }

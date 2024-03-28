@@ -1,9 +1,9 @@
 package com.asrevo.cvhome.manager.controller;
 
 import com.asrevo.cvhome.commons.annotation.OrgStorePrincipalInfo;
+import com.asrevo.cvhome.commons.domain.Groups;
 import com.asrevo.cvhome.commons.domain.UserOrgStoreInfo;
 import com.asrevo.cvhome.commons.utils.OperationExecution;
-import com.asrevo.cvhome.commons.domain.Groups;
 import com.asrevo.cvhome.manager.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.manager.commons.dto.CreateUserRequestDto;
 import com.asrevo.cvhome.manager.commons.dto.KeyCloakUserDto;
@@ -34,7 +34,7 @@ public class UserAccountController {
 
     @PostMapping("create")
     @PreAuthorize("hasPermission(#storeId,'ManagerStoreId','STORE.USERS.CREATE')")
-    public void create(@OrgStorePrincipalInfo UserOrgStoreInfo info, @RequestParam ManagerStoreId storeId, @RequestBody CreateUserRequestDto create) {
+    public Mono<KeyCloakUserDto> create(@OrgStorePrincipalInfo UserOrgStoreInfo info, @RequestParam ManagerStoreId storeId, @RequestBody CreateUserRequestDto create) {
         if (create.groups() == null || create.groups().isEmpty()) {
             throw new OperationExecution(ErrorCodes.groups_should_not_be_empty);
         }
@@ -47,7 +47,7 @@ public class UserAccountController {
         if (userAccountService.usernameExist(create.username())) {
             throw new OperationExecution(ErrorCodes.username_already_taken);
         }
-        userAccountService.createUser(info.org(), storeId, create);
+        return Mono.just(userAccountService.createUser(info.org(), storeId, create));
     }
 
     @PostMapping("reset")

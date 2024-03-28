@@ -14,7 +14,7 @@ public interface UserAccountService {
 
     List<KeyCloakUserDto> list(ListUsersQuery listUsers);
 
-    void createUser(IdentityId identityId, ManagerStoreId managerStoreId, CreateUserRequestDto createUserRequestDto);
+    KeyCloakUserDto createUser(IdentityId identityId, ManagerStoreId managerStoreId, CreateUserRequestDto createUserRequestDto);
 
     void resetPassword(UserOrgStoreInfo userOrgStoreInfo, ManagerStoreId storeId, RestPasswordRequestDto passwordRequestDto, String userId);
 
