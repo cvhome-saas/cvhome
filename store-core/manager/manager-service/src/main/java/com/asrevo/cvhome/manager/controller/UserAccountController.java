@@ -9,7 +9,6 @@ import com.asrevo.cvhome.manager.commons.dto.CreateUserRequestDto;
 import com.asrevo.cvhome.manager.commons.dto.KeyCloakUserDto;
 import com.asrevo.cvhome.manager.commons.dto.ListUsersQuery;
 import com.asrevo.cvhome.manager.commons.dto.RestPasswordRequestDto;
-import com.asrevo.cvhome.manager.service.SecurityService;
 import com.asrevo.cvhome.manager.service.UserAccountService;
 import com.asrevo.cvhome.manager.utils.ErrorCodes;
 import lombok.AllArgsConstructor;
@@ -26,7 +25,6 @@ import java.util.List;
 @Slf4j
 public class UserAccountController {
     private final UserAccountService userAccountService;
-    private final SecurityService securityService;
 
     @GetMapping("list")
     @PreAuthorize("hasPermission(#storeId,'ManagerStoreId','STORE.USERS.LIST')")
