@@ -1,6 +1,4 @@
-import {AfterViewInit, Component} from '@angular/core';
-import {Store, StoreService} from "../../../../../service/store.service";
-import {FormControl, FormGroup, Validators} from "@angular/forms";
+import {Component} from '@angular/core';
 
 @Component({
     selector: 'app-stores-settings',

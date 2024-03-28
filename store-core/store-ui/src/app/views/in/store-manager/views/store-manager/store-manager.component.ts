@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
-import {Country, Page, Store, StoreService} from "../../../../../service/store.service";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
+import {Country, Page, Store} from "../../../../../domain/commons";
+import {StoreService} from "../../../../../service/store.service";
 
 @Component({
     selector: 'app-store-manager',
@@ -35,7 +36,7 @@ export class StoreManagerComponent implements OnInit {
     }
 
     ngAfterViewInit(): void {
-        this.storeService.findAllStores().subscribe(it => this.stores = it);
+        this.storeService.list().subscribe(it => this.stores = it);
     }
 
     onSubmit() {

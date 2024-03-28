@@ -1,15 +1,5 @@
-import {Component, Input} from '@angular/core';
-import {FormControl, FormGroup, Validators} from "@angular/forms";
-import {
-    Domain,
-    DomainCertificateStatus,
-    DomainOwnershipService,
-    DomainType,
-    ReferenceType,
-    RegisterDomainResponse,
-    RegisteredDomain
-} from "../../../../../service/domain-ownership.service";
-import {Store, StoreService} from "../../../../../service/store.service";
+import {Component} from '@angular/core';
+
 
 @Component({
     selector: 'app-custom-domain-settings',
