@@ -4,6 +4,7 @@ import com.asrevo.cvhome.commons.domain.IdentityId;
 import com.asrevo.cvhome.commons.utils.OperationExecution;
 import com.asrevo.cvhome.manager.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.manager.commons.dto.CreateManagerStoreRequest;
+import com.asrevo.cvhome.manager.commons.dto.ListManagerStoreQuery;
 import com.asrevo.cvhome.manager.commons.dto.ManagerStoreDto;
 import com.asrevo.cvhome.manager.entity.ManagerStoreEntity;
 import com.asrevo.cvhome.manager.mappers.ManagerStoreMappers;
@@ -34,9 +35,11 @@ public class InternalStoreServiceImpl implements InternalStoreService {
     }
 
     @Override
-    public Page<ManagerStoreDto> findAll(ManagerStoreDto managerStoreDto, IdentityId identityId, Pageable pageable) {
-        ManagerStoreEntity entity = storeMappers.toEntity(managerStoreDto);
+    public Page<ManagerStoreDto> findAll(ListManagerStoreQuery listManagerStoreQuery, IdentityId identityId, Pageable pageable) {
+        ManagerStoreEntity entity = storeMappers.toEntity(listManagerStoreQuery);
         entity.setOwner(identityId);
+        entity.setSyncedInRouter(Boolean.TRUE);
+        entity.setSyncedInStore(Boolean.TRUE);
         Page<ManagerStoreEntity> all = storeRepository.findAll(Example.of(entity), pageable);
         return new PageImpl<>(all.stream().map(storeMappers::toDto).toList(), all.getPageable(), all.getTotalElements());
     }
