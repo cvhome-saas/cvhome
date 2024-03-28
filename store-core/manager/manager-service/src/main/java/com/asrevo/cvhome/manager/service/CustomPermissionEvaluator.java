@@ -1,0 +1,39 @@
+package com.asrevo.cvhome.manager.service;
+
+import com.asrevo.cvhome.manager.commons.domain.ManagerStoreId;
+import lombok.AllArgsConstructor;
+import org.springframework.security.access.PermissionEvaluator;
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Component;
+
+import java.io.Serializable;
+
+@Component
+@AllArgsConstructor
+public class CustomPermissionEvaluator implements PermissionEvaluator {
+    private final AccessEvaluator rolesEvaluator;
+
+    @Override
+    public boolean hasPermission(Authentication authentication, Object targetDomainObject, Object permission) {
+        return false;
+    }
+
+    @Override
+    public boolean hasPermission(Authentication authentication, Serializable targetId, String targetType, Object permission) {
+        String action = (String) permission;
+        return switch (action) {
+            case "STORE.USERS.LIST" ->
+                    rolesEvaluator.hasAccessOnStoreUsersList(authentication, ((ManagerStoreId) targetId));
+            case "STORE.USERS.CREATE" ->
+                    rolesEvaluator.hasAccessOnStoreUsersCreate(authentication, ((ManagerStoreId) targetId));
+            case "STORE.USERS.DELETE" ->
+                    rolesEvaluator.hasAccessOnStoreUsersDelete(authentication, ((ManagerStoreId) targetId));
+            case "STORE.USERS.ENABLE" ->
+                    rolesEvaluator.hasAccessOnStoreUsersEnable(authentication, ((ManagerStoreId) targetId));
+            case "STORE.USERS.DISABLE" ->
+                    rolesEvaluator.hasAccessOnStoreUsersDisable(authentication, ((ManagerStoreId) targetId));
+            default -> false;
+        };
+    }
+
+}

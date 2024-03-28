@@ -1,7 +1,9 @@
 package com.asrevo.cvhome.commons.domain;
 
 
-public interface Identifier {
+import java.io.Serializable;
+
+public interface Identifier extends Serializable {
     Object getId();
 }
 

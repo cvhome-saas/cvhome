@@ -52,7 +52,7 @@ public class MockDomainCertificateManagerServerConfig {
                                                {
                                                   "id": 1,
                                                   "domain":"ashraf.gateway.me",
-                                                  "reference":"65db438ee842462c224e2fb2"
+                                                  "reference":"65f023632bc46470c104b76f"
                                                }
                                             """
                                     ));

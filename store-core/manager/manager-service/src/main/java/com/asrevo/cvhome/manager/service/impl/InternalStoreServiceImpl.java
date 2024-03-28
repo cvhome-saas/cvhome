@@ -44,8 +44,7 @@ public class InternalStoreServiceImpl implements InternalStoreService {
     @Transactional
     @Override
     public void syncInRouter(ManagerStoreId storeId) {
-        ManagerStoreEntity storeEntity = storeRepository.findById(storeId)
-                .orElseThrow(() -> new OperationExecution(ErrorCodes.store_not_found));
+        ManagerStoreEntity storeEntity = getManagerStoreEntity(storeId);
         storeEntity.syncInRouter();
         storeRepository.save(storeEntity);
     }
@@ -53,9 +52,18 @@ public class InternalStoreServiceImpl implements InternalStoreService {
     @Transactional
     @Override
     public void syncInStore(ManagerStoreId storeId) {
-        ManagerStoreEntity storeEntity = storeRepository.findById(storeId)
-                .orElseThrow(() -> new OperationExecution(ErrorCodes.store_not_found));
+        ManagerStoreEntity storeEntity = getManagerStoreEntity(storeId);
         storeEntity.syncInStore();
         storeRepository.save(storeEntity);
+    }
+
+    private ManagerStoreEntity getManagerStoreEntity(ManagerStoreId storeId) {
+        return storeRepository.findById(storeId)
+                .orElseThrow(() -> new OperationExecution(ErrorCodes.store_not_found));
+    }
+
+    @Override
+    public IdentityId getStoreOwner(ManagerStoreId storeId) {
+        return getManagerStoreEntity(storeId).getOwner();
     }
 }

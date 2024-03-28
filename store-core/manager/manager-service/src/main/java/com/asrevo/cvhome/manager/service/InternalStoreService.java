@@ -15,4 +15,7 @@ public interface InternalStoreService {
     void syncInRouter(ManagerStoreId storeId);
 
     void syncInStore(ManagerStoreId storeId);
+
+    IdentityId getStoreOwner(ManagerStoreId storeId);
+
 }

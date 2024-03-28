@@ -1,5 +1,5 @@
 ### test find products in a store through gateway
-GET http://localhost:8080/store/api/v1/public/products/find-all?storeId=65db438ee842462c224e2fb2
+GET http://localhost:8080/store/api/v1/public/products/find-all?storeId=65f023632bc46470c104b76f
 Accept: application/json
 
 ### test find products in a store through gateway with mapping
