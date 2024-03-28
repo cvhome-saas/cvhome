@@ -1,6 +1,6 @@
 package com.asrevo.cvhome.manager.commons.dto;
 
-import com.asrevo.cvhome.manager.commons.domain.Groups;
+import com.asrevo.cvhome.commons.domain.Groups;
 
 import java.util.List;
 

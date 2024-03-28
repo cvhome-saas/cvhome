@@ -1,4 +1,4 @@
-package com.asrevo.cvhome.manager.commons.domain;
+package com.asrevo.cvhome.commons.domain;
 
 public enum Groups {
     ORG_ADMIN, STORE_ADMIN, STORE_MODERATOR, CUSTOMER;

@@ -3,7 +3,7 @@ package com.asrevo.cvhome.manager.controller;
 import com.asrevo.cvhome.commons.annotation.OrgStorePrincipalInfo;
 import com.asrevo.cvhome.commons.domain.UserOrgStoreInfo;
 import com.asrevo.cvhome.commons.utils.OperationExecution;
-import com.asrevo.cvhome.manager.commons.domain.Groups;
+import com.asrevo.cvhome.commons.domain.Groups;
 import com.asrevo.cvhome.manager.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.manager.commons.dto.CreateUserRequestDto;
 import com.asrevo.cvhome.manager.commons.dto.KeyCloakUserDto;

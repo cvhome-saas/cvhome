@@ -1,4 +1,6 @@
 package com.asrevo.cvhome.commons.domain;
 
-public record UserOrgStoreInfo(IdentityId org, String store) {
+import java.util.List;
+
+public record UserOrgStoreInfo(IdentityId org, String store, List<Roles> roles) {
 }
