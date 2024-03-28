@@ -9,10 +9,11 @@ import {ManageStoreCatalogComponent} from "./views/manage-store-catalog/manage-s
 import {ManageStoreUsersComponent} from "./views/manage-store-users/manage-store-users.component";
 import {ManageStoreLandingComponent} from "./views/manage-store-landing/manage-store-landing.component";
 import {ManageStoreOrdersComponent} from "./views/manage-store-orders/manage-store-orders.component";
+import {RouterLink} from "@angular/router";
 
 @NgModule({
     imports: [
-        CommonModule, HttpClientModule, StoreManagerRoutingModule, FormsModule, ReactiveFormsModule
+        CommonModule, HttpClientModule, StoreManagerRoutingModule, FormsModule, ReactiveFormsModule, RouterLink
     ],
     declarations: [StoreManagerComponent,
         ManageStoreComponent,

@@ -16,8 +16,8 @@ import {Store, StoreService} from "../../../../../service/store.service";
     templateUrl: './sub-domain-settings.component.html',
     styleUrls: ['./sub-domain-settings.component.css']
 })
-export class SubDomainSettingsComponent implements OnInit {
-    @Input()
+export class SubDomainSettingsComponent /*implements OnInit */{
+/*    @Input()
     subDomainReferences: RegisteredDomain[] = [];
     baseDomain: string = '';
     subDomainForm: FormGroup;
@@ -71,4 +71,4 @@ export class SubDomainSettingsComponent implements OnInit {
             this.subDomainReferences.filter(it => it.domain.domain == domain.domain).forEach(d => d.reference = it.reference);
         })
     }
-}
+*/}

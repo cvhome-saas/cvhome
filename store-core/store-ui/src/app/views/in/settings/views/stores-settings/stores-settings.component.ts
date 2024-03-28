@@ -7,8 +7,8 @@ import {FormControl, FormGroup, Validators} from "@angular/forms";
     templateUrl: './stores-settings.component.html',
     styleUrls: ['./stores-settings.component.css']
 })
-export class StoresSettingsComponent implements AfterViewInit {
-    stores: Store[] = [];
+export class StoresSettingsComponent /*implements AfterViewInit*/ {
+/*    stores: Store[] = [];
     storeForm: FormGroup;
 
 
@@ -37,5 +37,5 @@ export class StoresSettingsComponent implements AfterViewInit {
                 this.storeForm.reset();
             });
         }
-    }
+    }*/
 }

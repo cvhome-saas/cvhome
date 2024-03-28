@@ -17,7 +17,7 @@ import {Store, StoreService} from "../../../../../service/store.service";
     styleUrls: ['./custom-domain-settings.component.css']
 })
 export class CustomDomainSettingsComponent {
-    @Input()
+  /*  @Input()
     customDomainReferences: RegisteredDomain[] = [];
     customDomainForm: FormGroup;
     errMessage: string = '';
@@ -71,5 +71,5 @@ export class CustomDomainSettingsComponent {
             this.customDomainReferences.filter(it => it.domain.domain == domain.domain).forEach(d => d.reference = it.reference);
         })
     }
-
+*/
 }

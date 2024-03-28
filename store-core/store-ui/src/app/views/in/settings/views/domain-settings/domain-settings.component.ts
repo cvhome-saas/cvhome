@@ -7,7 +7,8 @@ import {DomainOwnershipService, DomainType, RegisteredDomain} from "../../../../
     templateUrl: './domain-settings.component.html',
     styleUrls: ['./domain-settings.component.css']
 })
-export class DomainSettingsComponent implements AfterViewInit {
+export class DomainSettingsComponent /*implements AfterViewInit*/ {
+/*
     subDomainReferences: RegisteredDomain[] = [];
     customDomainReferences: RegisteredDomain[] = [];
 
@@ -24,4 +25,5 @@ export class DomainSettingsComponent implements AfterViewInit {
             });
         });
     }
+*/
 }

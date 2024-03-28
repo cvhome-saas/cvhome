@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {Store, StoreService} from "../../../../../service/store.service";
+import {Country, Page, Store, StoreService} from "../../../../../service/store.service";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 
 @Component({
@@ -8,8 +8,9 @@ import {FormControl, FormGroup, Validators} from "@angular/forms";
     styleUrls: ['./store-manager.component.css']
 })
 export class StoreManagerComponent implements OnInit {
-    stores: Store[] = [];
+    stores: Page<Store> = {};
     storeForm: FormGroup;
+    countries: Country[] = Object.values(Country);
 
 
     constructor(private storeService: StoreService) {
@@ -19,6 +20,13 @@ export class StoreManagerComponent implements OnInit {
                 Validators.minLength(4),
                 Validators.pattern('^[a-zA-Z0-9]+$')
             ]),
+            email: new FormControl(null, [
+                Validators.required,
+                Validators.email
+            ]),
+            country: new FormControl(this.countries[0], [
+                Validators.required
+            ])
         });
 
     }
@@ -34,10 +42,15 @@ export class StoreManagerComponent implements OnInit {
         if (this.storeForm.valid) {
             let value: any = this.storeForm.value;
             this.storeService.create({
-                name: value.name
+                name: value.name,
+                email: {
+                    email: value.email
+                },
+                country: value.country
             }).subscribe((it: Store) => {
-                this.stores.push(it);
-                this.storeForm.reset();
+                if (!this.stores.content) this.stores.content = []
+                this.stores.content.push(it);
+                this.storeForm.reset({"country": this.countries[0]});
             });
         }
     }

@@ -34,6 +34,49 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="controls">
+                                    <label class="d-block mb-1">
+                                        Email
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group error validate">
+                                        <input class="form-control" formControlName="email" placeholder="email"
+                                               type="text">
+                                    </div>
+                                    <div class="help-block">
+                                        <div
+                                                *ngIf="storeForm.controls['email'].invalid && (storeForm.controls['email'].dirty || storeForm.controls['email'].touched)"
+                                                class="text-danger">
+                                            <div *ngIf="storeForm.controls['email'].errors?.['required']">
+                                                Email is required.
+                                            </div>
+                                            <div *ngIf="storeForm.controls['email'].errors?.['email']">
+                                                Email not valid.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="controls">
+                                    <label class="d-block mb-1">
+                                        Country
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group error validate">
+
+                                        <select class="form-control" formControlName="country" placeholder="country">
+                                            <option [value]="c" *ngFor="let c of countries">{{ c }}</option>
+                                        </select>
+                                    </div>
+                                    <div class="help-block">
+                                        <div
+                                                *ngIf="storeForm.controls['country'].invalid && (storeForm.controls['country'].dirty || storeForm.controls['country'].touched)"
+                                                class="text-danger">
+                                            <div *ngIf="storeForm.controls['country'].errors?.['required']">
+                                                Country is required.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -58,18 +101,17 @@
                         </th>
                     </tr>
                     </thead>
-                    <tbody>
-                    <tr *ngFor="let d of stores">
+                    <tbody *ngIf="stores.content">
+                    <tr *ngFor="let d of stores.content">
                         <td class="border-bottom-0">
                             <h6 class="fw-semibold mb-1">
-                                {{ d.name }}
+                                <a [routerLink]="d.id.id">{{ d.name }}</a>
                             </h6>
                         </td>
                     </tr>
                     </tbody>
                 </table>
             </div>
-
 
         </div>
     </div>

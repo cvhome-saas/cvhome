@@ -59,10 +59,17 @@ spring:
         - AddResponseHeader=X-Frame-Options, SAMEORIGIN
       routes:
         - id: store
-          order: -2
+          order: -3
           uri: ${com.asrevo.cvhome.services.store-pod-gateway.schema}://${com.asrevo.cvhome.services.store-pod-gateway.domain}:${com.asrevo.cvhome.services.store-pod-gateway.port}
           predicates:
             - Path=/store/**
+        - id: manager
+          order: -2
+          uri: lb://manager
+          predicates:
+            - Path=/manager/**
+          filters:
+            - StripPrefix=1
         - id: store-ui
           order: -1
           uri: lb://store-ui

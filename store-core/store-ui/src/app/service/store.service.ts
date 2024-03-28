@@ -6,17 +6,17 @@ import {Observable} from "rxjs";
     providedIn: 'root'
 })
 export class StoreService {
-    private readonly STORE_BASE_URL: string = '/store/api/v1/store';
+    private readonly STORE_BASE_URL: string = '/manager/api/v1/store-manager';
 
     constructor(private httpClient: HttpClient) {
     }
 
     create(request: CreateStoreRequest): Observable<Store> {
-        return this.httpClient.post<Store>(`${this.STORE_BASE_URL}`, request)
+        return this.httpClient.post<Store>(`${this.STORE_BASE_URL}/create`, request)
     }
 
-    findAllStores(): Observable<Store[]> {
-        return this.httpClient.get<Store[]>(`${this.STORE_BASE_URL}/me`)
+    findAllStores(): Observable<Page<Store>> {
+        return this.httpClient.post<Page<Store>>(`${this.STORE_BASE_URL}/list`, {})
     }
 
 }
@@ -30,11 +30,27 @@ export interface IdentityId {
 }
 
 export interface CreateStoreRequest {
-    name: string;
+    name?: string;
+    country?: Country;
+    email?: Email;
 }
 
 export interface Store {
     id: StoreId;
     name: string;
     owner: IdentityId;
+}
+
+export interface Page<T> {
+    content?: T[];
+}
+
+export enum Country {
+    EG = 'EG',
+    KSA = 'KSA',
+    UAE = 'UAE'
+}
+
+export interface Email {
+    email: string;
 }
