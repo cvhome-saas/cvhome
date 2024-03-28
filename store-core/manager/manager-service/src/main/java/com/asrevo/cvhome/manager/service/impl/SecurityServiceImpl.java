@@ -40,12 +40,28 @@ public class SecurityServiceImpl implements SecurityService {
         return internalStoreService.getStoreOwner(requestedStoreId).equals(info.org());
     }
 
+    @Override
+    public boolean isStoreModerator(Authentication authentication, ManagerStoreId requestedStoreId) {
+        if (!hasStoreModeratorRole(authentication)) {
+            return false;
+        }
+        UserOrgStoreInfo info = getOrgStoreInfo(authentication);
+        if (!requestedStoreId.getId().toString().equals(info.store())) {
+            return false;
+        }
+        return internalStoreService.getStoreOwner(requestedStoreId).equals(info.org());
+    }
+
     private static boolean hasOrgAdminRole(Authentication authentication) {
         return hasRole(authentication, Roles.ROLE_ORG_ADMIN);
     }
 
     private static boolean hasStoreAdminRole(Authentication authentication) {
         return hasRole(authentication, Roles.ROLE_STORE_ADMIN);
+    }
+
+    private static boolean hasStoreModeratorRole(Authentication authentication) {
+        return hasRole(authentication, Roles.ROLE_STORE_MODERATOR);
     }
 
     private static boolean hasRole(Authentication authentication, Roles role) {

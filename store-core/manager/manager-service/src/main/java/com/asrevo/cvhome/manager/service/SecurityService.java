@@ -7,4 +7,6 @@ public interface SecurityService {
     boolean isOrgAdmin(Authentication authentication, ManagerStoreId requestedStoreId);
 
     boolean isStoreAdmin(Authentication authentication, ManagerStoreId requestedStoreId);
+
+    boolean isStoreModerator(Authentication authentication, ManagerStoreId requestedStoreId);
 }
