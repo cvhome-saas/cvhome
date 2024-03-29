@@ -13,4 +13,6 @@ public interface AccessEvaluator {
     boolean hasAccessOnStoreUsersEnable(Authentication authentication, ManagerStoreId requestedStoreId);
 
     boolean hasAccessOnStoreUsersDisable(Authentication authentication, ManagerStoreId requestedStoreId);
+
+    boolean hasAccessOnStoreFindOne(Authentication authentication, ManagerStoreId requestedStoreId);
 }

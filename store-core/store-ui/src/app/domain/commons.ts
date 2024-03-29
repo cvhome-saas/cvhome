@@ -13,9 +13,9 @@ export interface CreateStoreRequest {
 }
 
 export interface Store {
-    id: ManagerStoreId;
-    name: string;
-    owner: IdentityId;
+    id?: ManagerStoreId;
+    name?: string;
+    owner?: IdentityId;
 }
 
 export interface Page<T> {
@@ -32,6 +32,12 @@ export interface Email {
     email: string;
 }
 
+export interface CreateUserRequest {
+    username: string;
+    password: string;
+    groups: Group[];
+}
+
 export interface User {
     id: string;
     username: string;
@@ -42,9 +48,14 @@ export interface User {
 }
 
 export enum Group {
-    ORG_ADMIN = 'ORG_ADMIN', STORE_ADMIN = 'STORE_ADMIN', STORE_MODERATOR = 'STORE_MODERATOR', CUSTOMER = 'CUSTOMER'
+    STORE_ADMIN = 'STORE_ADMIN', STORE_MODERATOR = 'STORE_MODERATOR',
+// ORG_ADMIN = 'ORG_ADMIN', CUSTOMER = 'CUSTOMER'
 }
 
 export interface ResetPassword {
     password: string
+}
+
+export interface ChangeGroupRequest {
+    groups: Group[]
 }

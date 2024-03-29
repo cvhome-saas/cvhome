@@ -3,7 +3,6 @@ package com.asrevo.cvhome.manager.service.impl;
 import com.asrevo.cvhome.commons.domain.IdentityId;
 import com.asrevo.cvhome.commons.domain.UserOrgStoreInfo;
 import com.asrevo.cvhome.commons.utils.OperationExecution;
-import com.asrevo.cvhome.commons.domain.Groups;
 import com.asrevo.cvhome.manager.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.manager.commons.dto.CreateUserRequestDto;
 import com.asrevo.cvhome.manager.commons.dto.KeyCloakUserDto;
@@ -21,7 +20,6 @@ import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.idm.CredentialRepresentation;
-import org.keycloak.representations.idm.GroupRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties;
 import org.springframework.stereotype.Service;
@@ -29,7 +27,6 @@ import org.springframework.stereotype.Service;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 
 import static com.asrevo.cvhome.s2s.utils.Constants.ORG_ATTR_KEY;
@@ -55,16 +52,11 @@ public class KeycloakUserAccountServiceImpl implements UserAccountService {
     @Override
     public List<KeyCloakUserDto> list(ListUsersQuery listUsers) {
         List<UserRepresentation> list = usersResource.searchByAttributes(listUsers.query());
-        return userRepresentationMapper.toDto(list)
-                .stream().map(it -> {
-                    List<Groups> groups = usersResource.get(it.id()).groups().stream().map(GroupRepresentation::getName)
-                            .map(Groups::parse)
-                            .filter(Objects::nonNull)
-                            .toList();
-                    return new KeyCloakUserDto(it.id(), it.username(), it.email(), it.firstName(), it.lastName(), it.enabled(), groups);
-                }).toList()
-                ;
+        return list.stream().
+                map(it -> userRepresentationMapper.toDto(it, usersResource.get(it.getId()).groups()))
+                .toList();
     }
+
 
     @Override
     public KeyCloakUserDto createUser(IdentityId identityId, ManagerStoreId managerStoreId, CreateUserRequestDto createUserRequestDto) {
@@ -81,8 +73,9 @@ public class KeycloakUserAccountServiceImpl implements UserAccountService {
 
             Response response = usersResource.create(user);
             String userId = CreatedResponseUtil.getCreatedId(response);
+            UserRepresentation representation = usersResource.get(userId).toRepresentation();
             doResetPassword(new RestPasswordRequestDto(createUserRequestDto.password()), userId);
-            return userRepresentationMapper.toDto(usersResource.get(userId).toRepresentation());
+            return userRepresentationMapper.toDto(representation, usersResource.get(userId).groups());
         } catch (Exception e) {
             throw new OperationExecution(ErrorCodes.create_user_fail);
         }

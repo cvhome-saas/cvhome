@@ -2,6 +2,7 @@ package com.asrevo.cvhome.manager.controller;
 
 import com.asrevo.cvhome.commons.annotation.OrgStorePrincipalInfo;
 import com.asrevo.cvhome.commons.domain.UserOrgStoreInfo;
+import com.asrevo.cvhome.manager.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.manager.commons.dto.CreateManagerStoreRequest;
 import com.asrevo.cvhome.manager.commons.dto.CreateManagerStoreResponse;
 import com.asrevo.cvhome.manager.commons.dto.ListManagerStoreQuery;
@@ -13,10 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -36,5 +34,11 @@ public class StoreManagerController {
     @PreAuthorize("hasAnyRole('ROLE_ORG_ADMIN')")
     public Mono<CreateManagerStoreResponse> create(@RequestBody CreateManagerStoreRequest request, @OrgStorePrincipalInfo UserOrgStoreInfo info) {
         return Mono.just(managerService.createStore(request, info.org()));
+    }
+
+    @GetMapping("store-info")
+    @PreAuthorize("hasPermission(#storeId,'ManagerStoreId','STORE.FIND-ONE')")
+    public Mono<ManagerStoreDto> storeInfo(@OrgStorePrincipalInfo UserOrgStoreInfo info, @RequestParam ManagerStoreId storeId) {
+        return Mono.just(storeService.findStore(storeId));
     }
 }

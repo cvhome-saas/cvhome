@@ -22,6 +22,10 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
     public boolean hasPermission(Authentication authentication, Serializable targetId, String targetType, Object permission) {
         String action = (String) permission;
         return switch (action) {
+            // store
+            case "STORE.FIND-ONE" ->
+                    rolesEvaluator.hasAccessOnStoreFindOne(authentication, ((ManagerStoreId) targetId));
+            // users
             case "STORE.USERS.LIST" ->
                     rolesEvaluator.hasAccessOnStoreUsersList(authentication, ((ManagerStoreId) targetId));
             case "STORE.USERS.CREATE" ->

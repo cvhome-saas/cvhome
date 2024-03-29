@@ -69,4 +69,9 @@ public class InternalStoreServiceImpl implements InternalStoreService {
     public IdentityId getStoreOwner(ManagerStoreId storeId) {
         return getManagerStoreEntity(storeId).getOwner();
     }
+
+    @Override
+    public ManagerStoreDto findStore(ManagerStoreId storeId) {
+        return storeMappers.toDto(getManagerStoreEntity(storeId));
+    }
 }

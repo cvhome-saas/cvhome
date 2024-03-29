@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {Observable} from "rxjs";
-import {CreateStoreRequest, Page, Store} from "../domain/commons";
+import {CreateStoreRequest, ManagerStoreId, Page, Store} from "../domain/commons";
 
 @Injectable({
     providedIn: 'root'
@@ -20,4 +20,7 @@ export class StoreService {
         return this.httpClient.post<Page<Store>>(`${this.STORE_MANAGER_BASE_URL}/list`, {})
     }
 
+    getStoreInfo(param: ManagerStoreId): Observable<Store> {
+        return this.httpClient.get<Store>(`${this.STORE_MANAGER_BASE_URL}/store-info?storeId=${param.id}`, {})
+    }
 }

@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {Observable} from "rxjs";
-import {CreateStoreRequest, ManagerStoreId, ResetPassword, User} from "../domain/commons";
+import {ChangeGroupRequest, CreateUserRequest, ManagerStoreId, ResetPassword, User} from "../domain/commons";
 
 @Injectable({
     providedIn: 'root'
@@ -12,12 +12,13 @@ export class UserService {
     constructor(private httpClient: HttpClient) {
     }
 
-    create(request: CreateStoreRequest): Observable<User> {
-        return this.httpClient.post<User>(`${this.USER_ACCOUNT_BASE_URL}/create`, request)
-    }
 
     list(storeId: ManagerStoreId): Observable<User[]> {
         return this.httpClient.get<User[]>(`${this.USER_ACCOUNT_BASE_URL}/list?storeId=${storeId.id}`)
+    }
+
+    create(request: CreateUserRequest, storeId: ManagerStoreId): Observable<User> {
+        return this.httpClient.post<User>(`${this.USER_ACCOUNT_BASE_URL}/create?storeId=${storeId.id}`, request)
     }
 
     reset(storeId: ManagerStoreId, userId: string, password: ResetPassword): Observable<any> {
@@ -34,6 +35,10 @@ export class UserService {
 
     disable(storeId: ManagerStoreId, userId: string): Observable<any> {
         return this.httpClient.post(`${this.USER_ACCOUNT_BASE_URL}/disable?storeId=${storeId.id}&userId=${userId}`, {})
+    }
+
+    updateGroups(storeId: ManagerStoreId, userId: string, request: ChangeGroupRequest): Observable<any> {
+        return this.httpClient.post(`${this.USER_ACCOUNT_BASE_URL}/update-groups?storeId=${storeId.id}&userId=${userId}`, request)
     }
 
 }

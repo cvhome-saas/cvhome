@@ -1,1 +1,162 @@
-users
+<div class="card">
+    <div class="card-body">
+        <div class="mb-4">
+            <h5 class="card-title fw-semibold">User Manager</h5>
+        </div>
+        <div>
+            <form (ngSubmit)="onSubmit()" [formGroup]="userForm">
+                <div class="row mt-4 justify-content-center">
+                    <div class="col-md-6 justify-content-center">
+                        <div class="tab-content mt-6 ">
+                            <div class="tab-pane active">
+                                <div class="controls">
+                                    <label class="d-block mb-1">
+                                        Username
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group error validate">
+                                        <input class="form-control" formControlName="username" placeholder="username"
+                                               type="text">
+                                    </div>
+                                    <div class="help-block">
+                                        <div
+                                                *ngIf="userForm.controls['username'].invalid && (userForm.controls['username'].dirty || userForm.controls['username'].touched)"
+                                                class="text-danger">
+                                            <div *ngIf="userForm.controls['username'].errors?.['required']">
+                                                Username is required.
+                                            </div>
+                                            <div *ngIf="userForm.controls['username'].errors?.['minlength']">
+                                                Username is minLength.
+                                            </div>
+                                            <div *ngIf="userForm.controls['username'].errors?.['pattern']">
+                                                Username is pattern.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="controls">
+                                    <label class="d-block mb-1">
+                                        Password
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group error validate">
+                                        <input class="form-control" formControlName="password" placeholder="password"
+                                               type="text">
+                                    </div>
+                                    <div class="help-block">
+                                        <div
+                                                *ngIf="userForm.controls['password'].invalid && (userForm.controls['password'].dirty || userForm.controls['password'].touched)"
+                                                class="text-danger">
+                                            <div *ngIf="userForm.controls['password'].errors?.['required']">
+                                                Password is required.
+                                            </div>
+                                            <div *ngIf="userForm.controls['password'].errors?.['minlength']">
+                                                Password is minLength.
+                                            </div>
+                                            <div *ngIf="userForm.controls['password'].errors?.['pattern']">
+                                                Password is pattern.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="controls">
+                                    <label class="d-block mb-1">
+                                        Groups
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group error validate">
+
+                                        <select multiple class="form-control" formControlName="groups"
+                                                placeholder="groups">
+                                            <option [value]="c" *ngFor="let c of groups">{{ c }}</option>
+                                        </select>
+                                    </div>
+                                    <div class="help-block">
+                                        <div
+                                                *ngIf="userForm.controls['groups'].invalid && (userForm.controls['groups'].dirty || userForm.controls['groups'].touched)"
+                                                class="text-danger">
+                                            <div *ngIf="userForm.controls['groups'].errors?.['required']">
+                                                Groups is required.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-4 justify-content-center">
+                    <div class="col-md-6 justify-content-center">
+                        <div class="tab-content mt-6 ">
+                            <div class="tab-pane active">
+                                <button class="btn btn-primary w-100" type="submit">Submit</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+            <div>
+                <table class="table text-nowrap mb-0 align-middle">
+                    <thead class="text-dark fs-4">
+                    <tr>
+                        <th class="border-bottom-0">
+                            <h6 class="fw-semibold mb-0">Username</h6>
+                        </th>
+                        <th class="border-bottom-0">
+                            <h6 class="fw-semibold mb-0">Enabled</h6>
+                        </th>
+                        <th class="border-bottom-0">
+                            <h6 class="fw-semibold mb-0">Groups</h6>
+                        </th>
+                        <th class="border-bottom-0">
+                            <h6 class="fw-semibold mb-0">Actions</h6>
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody *ngIf="users">
+                    <tr *ngFor="let u of users">
+                        <td class="ps-0">
+                            <div class="d-flex align-items-center">
+                                <div>
+                                    <h6 class="fw-semibold mb-1">{{ u.username }}</h6>
+                                    <p class="fs-2 mb-0 text-muted">
+                                        {{ u.email }}
+                                    </p>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <p class="mb-0 fs-3">
+                                <input type="checkbox" [checked]="u.enabled" [value]="u.enabled"
+                                       (change)="statusChange(u.id,$event)">
+                            </p>
+                        </td>
+                        <td>
+                            <p>
+                                Select Groups
+                            </p>
+                            <select multiple style="height:125px;" name="cities" (change)="groupsChanged(u.id,$event)">
+                                <option *ngFor="let g of u.selectedGroups" [value]="g.group"
+                                        [selected]="g.selected">{{ g.group }}
+                                </option>
+                            </select>
+                        </td>
+                        <td>
+                            <div class="btn-group me-2 mb-2" role="group" aria-label="First group">
+                                <button type="button" class="btn btn-secondary" (click)="deleteUser(u.id)">
+                                    <i class="ti ti-trash fs-4"></i>
+                                </button>
+                                <button type="button" class="btn btn-secondary">
+                                    <i class="ti ti-settings fs-4"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>

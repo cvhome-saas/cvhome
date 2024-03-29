@@ -19,4 +19,5 @@ public interface InternalStoreService {
 
     IdentityId getStoreOwner(ManagerStoreId storeId);
 
+    ManagerStoreDto findStore(ManagerStoreId storeId);
 }

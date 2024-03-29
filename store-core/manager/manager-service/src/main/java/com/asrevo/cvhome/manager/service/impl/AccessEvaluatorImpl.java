@@ -14,7 +14,7 @@ public class AccessEvaluatorImpl implements AccessEvaluator {
 
     @Override
     public boolean hasAccessOnStoreUsersList(Authentication authentication, ManagerStoreId requestedStoreId) {
-        return hasReadAccessOnUsers(authentication, requestedStoreId);
+        return hasReadAccessOnStore(authentication, requestedStoreId);
     }
 
     @Override
@@ -38,7 +38,12 @@ public class AccessEvaluatorImpl implements AccessEvaluator {
         return hasMaintainAccessOnUsers(authentication, requestedStoreId);
     }
 
-    private boolean hasReadAccessOnUsers(Authentication authentication, ManagerStoreId requestedStoreId) {
+    @Override
+    public boolean hasAccessOnStoreFindOne(Authentication authentication, ManagerStoreId requestedStoreId) {
+        return hasReadAccessOnStore(authentication, requestedStoreId);
+    }
+
+    private boolean hasReadAccessOnStore(Authentication authentication, ManagerStoreId requestedStoreId) {
         if (securityRoleCheckService.isOrgAdmin(authentication, requestedStoreId)) {
             return true;
         } else if (securityRoleCheckService.isStoreAdmin(authentication, requestedStoreId)) {
