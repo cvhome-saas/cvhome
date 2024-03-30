@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.store.controller.v2.product;
 
+import com.asrevo.cvhome.commons.annotation.SecuredResource;
 import com.asrevo.cvhome.store.controller.exception.UnauthorizedException;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
@@ -61,7 +62,7 @@ public class ProductVariantApi {
     public @ResponseBody Entity create(
             @Valid @RequestBody PersistableProductVariant variant,
             @PathVariable Long productId,
-            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language) {
 
         String authenticatedUser = userFacade.authenticatedUser();
@@ -82,7 +83,7 @@ public class ProductVariantApi {
     @PutMapping(value = {"/private/product/{id}/variant/{variantId}"})
     @Operation(method = "PUT", description = "Update product variant", summary = "", responses = @ApiResponse(content = @Content(mediaType = "application/json", schema = @Schema(implementation = Void.class))))
     public @ResponseBody void update(@PathVariable Long id, @PathVariable Long variantId,
-                                     @Valid @RequestBody PersistableProductVariant variant, @Parameter(hidden = true) MerchantStore merchantStore,
+                                     @Valid @RequestBody PersistableProductVariant variant, @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
                                      @Parameter(hidden = true) Language language) {
 
         String authenticatedUser = userFacade.authenticatedUser();
@@ -106,7 +107,7 @@ public class ProductVariantApi {
     public @ResponseBody ResponseEntity<EntityExists> exists(
             @PathVariable Long id,
             @PathVariable String sku,
-            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language) {
 
         String authenticatedUser = userFacade.authenticatedUser();
@@ -133,7 +134,7 @@ public class ProductVariantApi {
             @PathVariable final Long id,
             @PathVariable Long variantId,
             @RequestParam(value = "lang", required = false) String lang,
-            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language) throws Exception {
 
         return productVariantFacade.get(variantId, id, merchantStore, language);
@@ -147,7 +148,7 @@ public class ProductVariantApi {
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public @ResponseBody ReadableEntityList<ReadableProductVariant> list(@PathVariable final Long id,
-                                                                         @Parameter(hidden = true) MerchantStore merchantStore, @Parameter(hidden = true) Language language,
+                                                                         @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore, @Parameter(hidden = true) Language language,
                                                                          @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
                                                                          @RequestParam(value = "count", required = false, defaultValue = "10") Integer count) {
 
@@ -164,7 +165,7 @@ public class ProductVariantApi {
     public void delete(
             @PathVariable Long id,
             @PathVariable Long variantId,
-            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language) {
 
         productVariantFacade.delete(variantId, id, merchantStore);

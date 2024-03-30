@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.store.controller.v1.product;
 
+import com.asrevo.cvhome.commons.annotation.SecuredResource;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.entity.catalog.product.Product;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
@@ -53,7 +54,7 @@ public class ProductGroupApi {
     })
     public @ResponseBody ProductGroup creteGroup(
             @RequestBody ProductGroup group,
-            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language,
             HttpServletResponse response)
             throws Exception {
@@ -73,7 +74,7 @@ public class ProductGroupApi {
     public void updateGroup(
             @RequestBody ProductGroup group,
             @PathVariable String code,
-            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language,
             HttpServletResponse response)
             throws Exception {
@@ -89,7 +90,7 @@ public class ProductGroupApi {
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public @ResponseBody java.util.List<ProductGroup> list(
-            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language,
             HttpServletResponse response)
             throws Exception {
@@ -153,7 +154,7 @@ public class ProductGroupApi {
     public @ResponseBody ReadableProductList addProductToGroup(
             @PathVariable Long productId,
             @PathVariable String code,
-            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language,
             HttpServletResponse response) {
 
@@ -197,7 +198,7 @@ public class ProductGroupApi {
     public @ResponseBody ReadableProductList removeProductFromGroup(
             @PathVariable Long productId,
             @PathVariable String code,
-            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language,
             HttpServletRequest request,
             HttpServletResponse response) {

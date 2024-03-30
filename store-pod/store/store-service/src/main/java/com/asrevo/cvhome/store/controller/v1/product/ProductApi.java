@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.store.controller.v1.product;
 
+import com.asrevo.cvhome.commons.annotation.SecuredResource;
 import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
 import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
 import com.asrevo.cvhome.store.controller.exception.UnauthorizedException;
@@ -92,7 +93,7 @@ public class ProductApi {
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public @ResponseBody Entity create(@Valid @RequestBody PersistableProduct product,
-                                       @Parameter(hidden = true) MerchantStore merchantStore, @Parameter(hidden = true) Language language) {
+                                       @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore, @Parameter(hidden = true) Language language) {
 
         Long id = productCommonFacade.saveProduct(merchantStore, product, language);
         Entity returnEntity = new Entity();
@@ -111,7 +112,7 @@ public class ProductApi {
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = PersistableProduct.class)))
     )
     public void update(@PathVariable Long id,
-                       @Valid @RequestBody PersistableProduct product, @Parameter(hidden = true) MerchantStore merchantStore,
+                       @Valid @RequestBody PersistableProduct product, @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
                        HttpServletRequest request, HttpServletResponse response) {
 
         try {
@@ -148,7 +149,7 @@ public class ProductApi {
             @PathVariable Long id,
             @Valid @RequestBody
             LightPersistableProduct product,
-            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language) {
         productCommonFacade.update(id, product, merchantStore, language);
         return;
@@ -161,7 +162,7 @@ public class ProductApi {
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
-    public void delete(@PathVariable Long id, @Parameter(hidden = true) MerchantStore merchantStore, @Parameter(hidden = true) Language language) {
+    public void delete(@PathVariable Long id, @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore, @Parameter(hidden = true) Language language) {
 
         productCommonFacade.deleteProduct(id, merchantStore);
     }
@@ -394,7 +395,7 @@ public class ProductApi {
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = EntityExists.class)))
     )
     public ResponseEntity<EntityExists> exists(@RequestParam(value = "code") String code,
-                                               @Parameter(hidden = true) MerchantStore merchantStore, @Parameter(hidden = true) Language language) {
+                                               @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore, @Parameter(hidden = true) Language language) {
 
         boolean exists = productCommonFacade.exists(code, merchantStore);
         return new ResponseEntity<EntityExists>(new EntityExists(exists), HttpStatus.OK);
@@ -408,7 +409,7 @@ public class ProductApi {
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public void addProductToCategory(@PathVariable Long productId,
-                                     @PathVariable Long categoryId, @Parameter(hidden = true) MerchantStore merchantStore, @Parameter(hidden = true) Language language,
+                                     @PathVariable Long categoryId, @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore, @Parameter(hidden = true) Language language,
                                      HttpServletResponse response) throws Exception {
 
         try {
@@ -449,7 +450,7 @@ public class ProductApi {
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public void removeProductFromCategory(@PathVariable Long productId,
-                                          @PathVariable Long categoryId, @Parameter(hidden = true) MerchantStore merchantStore, @Parameter(hidden = true) Language language) {
+                                          @PathVariable Long categoryId, @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore, @Parameter(hidden = true) Language language) {
 
         try {
             Product product = productService.getById(productId);
@@ -500,7 +501,7 @@ public class ProductApi {
     @Operation(method = "POST", description = "Patch product sort order", summary = "Change product sortOrder")
     public void changeProductOrder(@PathVariable Long id,
                                    @RequestParam(value = "order", required = false, defaultValue = "0") Integer position,
-                                   @Parameter(hidden = true) MerchantStore merchantStore, @Parameter(hidden = true) Language language) throws IOException {
+                                   @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore, @Parameter(hidden = true) Language language) throws IOException {
 
         try {
 

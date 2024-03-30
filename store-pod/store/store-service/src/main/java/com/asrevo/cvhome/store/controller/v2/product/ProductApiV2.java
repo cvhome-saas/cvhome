@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.store.controller.v2.product;
 
+import com.asrevo.cvhome.commons.annotation.SecuredResource;
 import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
 import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
 import com.asrevo.cvhome.store.core.constants.Constants;
@@ -80,7 +81,7 @@ public class ProductApiV2 {
     })
     public @ResponseBody Entity create(
             @Valid @RequestBody PersistableProduct product,
-            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language) {
 
         Long id = productCommonFacade.saveProduct(merchantStore, product, language);
@@ -104,7 +105,7 @@ public class ProductApiV2 {
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public @ResponseBody Entity createV2(@Valid @RequestBody PersistableProductDefinition product,
-                                         @Parameter(hidden = true) MerchantStore merchantStore, @Parameter(hidden = true) Language language) {
+                                         @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore, @Parameter(hidden = true) Language language) {
 
         // make sure product id is null
         product.setId(null);
@@ -123,7 +124,7 @@ public class ProductApiV2 {
     })
     public void updateV2(@PathVariable Long id,
                          @Valid @RequestBody PersistableProductDefinition product,
-                         @Parameter(hidden = true) MerchantStore merchantStore, @Parameter(hidden = true) Language language) {
+                         @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore, @Parameter(hidden = true) Language language) {
 
         productDefinitionFacade.update(id, product, merchantStore, language);
 
@@ -137,7 +138,7 @@ public class ProductApiV2 {
     })
     public @ResponseBody ReadableProductDefinition getV2(
             @PathVariable Long id,
-            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language) {
 
         ReadableProductDefinition def = productDefinitionFacade.getProduct(merchantStore, id, language);
@@ -151,7 +152,7 @@ public class ProductApiV2 {
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
-    public void deleteV2(@PathVariable Long id, @Parameter(hidden = true) MerchantStore merchantStore, @Parameter(hidden = true) Language language) {
+    public void deleteV2(@PathVariable Long id, @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore, @Parameter(hidden = true) Language language) {
 
         productCommonFacade.deleteProduct(id, merchantStore);
     }
@@ -312,7 +313,7 @@ public class ProductApiV2 {
             @PathVariable String sku,
             @Valid @RequestBody
             LightPersistableProduct product,
-            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language) {
         productCommonFacade.update(sku, product, merchantStore, language);
         return;

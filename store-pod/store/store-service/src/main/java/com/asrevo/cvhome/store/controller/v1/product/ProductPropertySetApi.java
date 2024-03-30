@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.store.controller.v1.product;
 
+import com.asrevo.cvhome.commons.annotation.SecuredResource;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
@@ -41,7 +42,7 @@ public class ProductPropertySetApi {
     })
     public void create(
             @Valid @RequestBody PersistableProductOptionSet optionSet,
-            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language) {
 
         productOptionSetFacade.create(optionSet, merchantStore, language);
@@ -58,7 +59,7 @@ public class ProductPropertySetApi {
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = EntityExists.class))))
     public ResponseEntity<EntityExists> exists(
             @RequestParam(value = "code") String code,
-            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language) {
 
         boolean isOptionExist = productOptionSetFacade.exists(code, merchantStore);
@@ -75,7 +76,7 @@ public class ProductPropertySetApi {
     @ResponseBody
     public ReadableProductOptionSet get(
             @PathVariable Long id,
-            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language) {
 
         return productOptionSetFacade.get(id, merchantStore, language);
@@ -92,7 +93,7 @@ public class ProductPropertySetApi {
     public void update(
             @Valid @RequestBody PersistableProductOptionSet option,
             @PathVariable Long id,
-            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language) {
 
         option.setId(id);
@@ -109,7 +110,7 @@ public class ProductPropertySetApi {
     })
     public void delete(
             @PathVariable Long id,
-            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language) {
 
         productOptionSetFacade.delete(id, merchantStore);
@@ -131,7 +132,7 @@ public class ProductPropertySetApi {
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public @ResponseBody List<ReadableProductOptionSet> list(
-            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language,
             @RequestParam(value = "productType", required = false) String type) {
 

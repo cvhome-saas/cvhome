@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.store.controller.v1.category;
 
+import com.asrevo.cvhome.commons.annotation.SecuredResource;
 import com.asrevo.cvhome.store.controller.exception.UnauthorizedException;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
@@ -56,7 +57,7 @@ public class CategoryApi {
     })
     public ReadableCategory get(
             @PathVariable(name = "id") Long categoryId,
-            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language) {
         ReadableCategory category = categoryFacade.getById(merchantStore, categoryId, language);
         return category;
@@ -86,7 +87,7 @@ public class CategoryApi {
     })
     @Operation(method = "GET", description = "Check if category code already exists", summary = "", responses = @ApiResponse(content = @Content(schema = @Schema(implementation = EntityExists.class))))
     public ResponseEntity<EntityExists> exists(@RequestParam(value = "code") String code,
-                                               @Parameter(hidden = true) MerchantStore merchantStore, @Parameter(hidden = true) Language language) {
+                                               @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore, @Parameter(hidden = true) Language language) {
         boolean isCategoryExist = categoryFacade.existByCode(merchantStore, code);
         return new ResponseEntity<EntityExists>(new EntityExists(isCategoryExist), HttpStatus.OK);
     }
@@ -143,7 +144,7 @@ public class CategoryApi {
     })
     public PersistableCategory create(
             @Valid @RequestBody PersistableCategory category,
-            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language) {
 
         // superadmin, admin and admin_catalogue
@@ -162,7 +163,7 @@ public class CategoryApi {
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE))
     })
     public PersistableCategory update(@PathVariable Long id, @Valid @RequestBody PersistableCategory category,
-                                      @Parameter(hidden = true) MerchantStore merchantStore) {
+                                      @Parameter(hidden = true) @SecuredResource  MerchantStore merchantStore) {
 
         // superadmin, admin and admin_catalogue
         String authenticatedUser = userFacade.authenticatedUser();
@@ -182,7 +183,7 @@ public class CategoryApi {
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE))
     })
     public void updateVisible(@PathVariable Long id, @Valid @RequestBody PersistableCategory category,
-                              @Parameter(hidden = true) MerchantStore merchantStore
+                              @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore
     ) {
 
         // superadmin, admin and admin_catalogue
@@ -205,7 +206,7 @@ public class CategoryApi {
     public void move(
             @PathVariable Long id,
             @PathVariable Long parent,
-            @Parameter(hidden = true) MerchantStore merchantStore) {
+            @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore) {
         // superadmin, admin and admin_catalogue
         String authenticatedUser = userFacade.authenticatedUser();
         if (authenticatedUser == null) {
@@ -221,7 +222,7 @@ public class CategoryApi {
 
     @DeleteMapping(value = "/private/category/{id}", produces = {APPLICATION_JSON_VALUE})
     @ResponseStatus(OK)
-    public void delete(@PathVariable("id") Long categoryId, @Parameter(hidden = true) MerchantStore merchantStore) {
+    public void delete(@PathVariable("id") Long categoryId, @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore) {
 
         // superadmin, admin and admin_catalogue
         String authenticatedUser = userFacade.authenticatedUser();

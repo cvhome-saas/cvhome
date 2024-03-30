@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.store.controller.v2.product;
 
+import com.asrevo.cvhome.commons.annotation.SecuredResource;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.entity.catalog.product.Product;
 import com.asrevo.cvhome.store.core.entity.catalog.product.attribute.ProductAttribute;
@@ -180,7 +181,7 @@ public class ProductVariationApi {
     })
     public @ResponseBody Entity create(
             @Valid @RequestBody PersistableProductVariation variation,
-            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language) {
 
         Long variantId = productVariationFacade.create(variation, merchantStore, language);
@@ -197,7 +198,7 @@ public class ProductVariationApi {
     @Operation(method = "GET", description = "Check if option set code already exists", summary = "", responses = {@ApiResponse(content = @Content(schema = @Schema(implementation = EntityExists.class)))})
     public ResponseEntity<EntityExists> exists(
             @RequestParam(value = "code") String code,
-            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language) {
 
         boolean isOptionExist = productVariationFacade.exists(code, merchantStore);
@@ -214,7 +215,7 @@ public class ProductVariationApi {
     @ResponseBody
     public ReadableProductVariation get(
             @PathVariable Long variationId,
-            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language) {
 
         return productVariationFacade.get(variationId, merchantStore, language);
@@ -231,7 +232,7 @@ public class ProductVariationApi {
     public void update(
             @Valid @RequestBody PersistableProductVariation variation,
             @PathVariable Long variationId,
-            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language) {
 
         variation.setId(variationId);
@@ -248,7 +249,7 @@ public class ProductVariationApi {
     })
     public void delete(
             @PathVariable Long variationId,
-            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language) {
 
         productVariationFacade.delete(variationId, merchantStore);
@@ -263,7 +264,7 @@ public class ProductVariationApi {
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public @ResponseBody ReadableEntityList<ReadableProductVariation> list(
-            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language,
             @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
             @RequestParam(value = "count", required = false, defaultValue = "10") Integer count) {

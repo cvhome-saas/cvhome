@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.store.controller.v1.product;
 
+import com.asrevo.cvhome.commons.annotation.SecuredResource;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
@@ -49,7 +50,7 @@ public class ProductPriceApi {
             @PathVariable String sku,
             @PathVariable Long inventoryId,
             @Valid @RequestBody PersistableProductPrice price,
-            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language) {
 
         price.setSku(sku);
@@ -71,7 +72,7 @@ public class ProductPriceApi {
     public @ResponseBody Entity save(
             @PathVariable String sku,
             @Valid @RequestBody PersistableProductPrice price,
-            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language) {
 
         price.setSku(sku);
@@ -94,7 +95,7 @@ public class ProductPriceApi {
             @PathVariable Long inventoryId,
             @PathVariable Long priceId,
             @Valid @RequestBody PersistableProductPrice price,
-            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language) {
 
 
@@ -117,7 +118,7 @@ public class ProductPriceApi {
             @PathVariable String sku,
             @PathVariable Long priceId,
             @Valid @RequestBody PersistableProductPrice price,
-            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language) {
 
 
@@ -137,7 +138,7 @@ public class ProductPriceApi {
     public List<ReadableProductPrice> list(
             @PathVariable String sku,
             @PathVariable Long inventoryId,
-            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language) {
 
 
@@ -155,7 +156,7 @@ public class ProductPriceApi {
     })
     public List<ReadableProductPrice> list(
             @PathVariable String sku,
-            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language) {
 
 
@@ -174,7 +175,7 @@ public class ProductPriceApi {
     public void delete(
             @PathVariable String sku,
             @PathVariable Long priceId,
-            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language) {
 
 

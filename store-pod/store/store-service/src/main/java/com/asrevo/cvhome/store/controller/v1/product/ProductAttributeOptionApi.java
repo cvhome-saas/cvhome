@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.store.controller.v1.product;
 
+import com.asrevo.cvhome.commons.annotation.SecuredResource;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
@@ -45,7 +46,7 @@ public class ProductAttributeOptionApi {
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public @ResponseBody ReadableProductOptionEntity createOption(
-            @Valid @RequestBody PersistableProductOptionEntity option, @Parameter(hidden = true) MerchantStore merchantStore,
+            @Valid @RequestBody PersistableProductOptionEntity option, @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language, HttpServletRequest request, HttpServletResponse response) {
 
         ReadableProductOptionEntity entity = productOptionFacade.saveOption(option, merchantStore, language);
@@ -63,7 +64,7 @@ public class ProductAttributeOptionApi {
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = EntityExists.class)))
     )
     public ResponseEntity<EntityExists> optionExists(@RequestParam(value = "code") String code,
-                                                     @Parameter(hidden = true) MerchantStore merchantStore, @Parameter(hidden = true) Language language) {
+                                                     @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore, @Parameter(hidden = true) Language language) {
 
         boolean isOptionExist = productOptionFacade.optionExists(code, merchantStore);
         return new ResponseEntity<EntityExists>(new EntityExists(isOptionExist), HttpStatus.OK);
@@ -79,7 +80,7 @@ public class ProductAttributeOptionApi {
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = EntityExists.class)))
     )
     public ResponseEntity<EntityExists> optionValueExists(@RequestParam(value = "code") String code,
-                                                          @Parameter(hidden = true) MerchantStore merchantStore, @Parameter(hidden = true) Language language) {
+                                                          @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore, @Parameter(hidden = true) Language language) {
         boolean isOptionExist = productOptionFacade.optionValueExists(code, merchantStore);
         return new ResponseEntity<EntityExists>(new EntityExists(isOptionExist), HttpStatus.OK);
     }
@@ -93,7 +94,7 @@ public class ProductAttributeOptionApi {
     public @ResponseBody ReadableProductOptionValue createOptionValue(
             @Valid @RequestBody PersistableProductOptionValue optionValue,
             //@RequestParam(name = "file", required = false) MultipartFile file,
-            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language,
             HttpServletRequest request,
             HttpServletResponse response) {
@@ -113,7 +114,7 @@ public class ProductAttributeOptionApi {
     public void addOptionValueImage(
             @PathVariable Long id,
             @RequestParam(name = "file", required = true) MultipartFile file,
-            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language,
             HttpServletRequest request,
             HttpServletResponse response) {
@@ -131,7 +132,7 @@ public class ProductAttributeOptionApi {
     })
     public void removeOptionValueImage(
             @PathVariable Long id,
-            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language,
             HttpServletRequest request, HttpServletResponse response) {
 
@@ -146,7 +147,7 @@ public class ProductAttributeOptionApi {
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     @ResponseBody
-    public ReadableProductOptionEntity getOption(@PathVariable Long id, @Parameter(hidden = true) MerchantStore merchantStore,
+    public ReadableProductOptionEntity getOption(@PathVariable Long id, @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
                                                  @Parameter(hidden = true) Language language, HttpServletRequest request, HttpServletResponse response) {
 
         return productOptionFacade.getOption(id, merchantStore, language);
@@ -160,7 +161,7 @@ public class ProductAttributeOptionApi {
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     @ResponseBody
-    public ReadableProductOptionValue getOptionValue(@PathVariable Long id, @Parameter(hidden = true) MerchantStore merchantStore,
+    public ReadableProductOptionValue getOptionValue(@PathVariable Long id, @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
                                                      @Parameter(hidden = true) Language language, HttpServletRequest request, HttpServletResponse response) {
 
         return productOptionFacade.getOptionValue(id, merchantStore, language);
@@ -174,7 +175,7 @@ public class ProductAttributeOptionApi {
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public void updateOption(@Valid @RequestBody PersistableProductOptionEntity option, @PathVariable Long optionId,
-                             @Parameter(hidden = true) MerchantStore merchantStore, @Parameter(hidden = true) Language language, HttpServletRequest request,
+                             @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore, @Parameter(hidden = true) Language language, HttpServletRequest request,
                              HttpServletResponse response) {
         option.setId(optionId);
         productOptionFacade.saveOption(option, merchantStore, language);
@@ -188,7 +189,7 @@ public class ProductAttributeOptionApi {
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
-    public void deleteOption(@PathVariable Long optionId, @Parameter(hidden = true) MerchantStore merchantStore,
+    public void deleteOption(@PathVariable Long optionId, @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
                              @Parameter(hidden = true) Language language, HttpServletRequest request, HttpServletResponse response) {
 
         productOptionFacade.deleteOption(optionId, merchantStore);
@@ -205,7 +206,7 @@ public class ProductAttributeOptionApi {
     public void updateOptionValue(
             @PathVariable Long id,
             @Valid @RequestBody PersistableProductOptionValue optionValue,
-            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language, HttpServletRequest request,
             HttpServletResponse response) {
 
@@ -223,7 +224,7 @@ public class ProductAttributeOptionApi {
     })
     public void deleteOptionValue(
             @PathVariable Long id,
-            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language, HttpServletRequest request,
             HttpServletResponse response) {
 
@@ -239,7 +240,7 @@ public class ProductAttributeOptionApi {
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public @ResponseBody ReadableProductOptionList options(
-            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language,
             @RequestParam(value = "name", required = false) String name,
             @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
@@ -256,7 +257,7 @@ public class ProductAttributeOptionApi {
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public @ResponseBody ReadableProductOptionValueList optionsValues(
-            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language,
             @RequestParam(value = "name", required = false) String name,
             @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
@@ -286,7 +287,7 @@ public class ProductAttributeOptionApi {
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ReadableProductAttributeList.class))))
     public @ResponseBody ReadableProductAttributeList attributes(
             @PathVariable Long id,
-            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language,
             @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
             @RequestParam(value = "count", required = false, defaultValue = "10") Integer count) {
@@ -306,7 +307,7 @@ public class ProductAttributeOptionApi {
     public @ResponseBody ReadableProductAttributeEntity getAttribute(
             @PathVariable Long id,
             @PathVariable Long attributeId,
-            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language, HttpServletRequest request, HttpServletResponse response) {
 
         ReadableProductAttributeEntity entity = productOptionFacade.getAttribute(id, attributeId, merchantStore, language);
@@ -323,7 +324,7 @@ public class ProductAttributeOptionApi {
     public @ResponseBody Entity createAttribute(
             @PathVariable Long id,
             @Valid @RequestBody PersistableProductAttribute attribute,
-            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language,
             HttpServletRequest request,
             HttpServletResponse response) {
@@ -358,7 +359,7 @@ public class ProductAttributeOptionApi {
     public List<CodeEntity> createAttributes(
             @PathVariable Long id,
             @Valid @RequestBody List<PersistableProductAttribute> attributes,
-            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language) {
 
 
@@ -373,7 +374,7 @@ public class ProductAttributeOptionApi {
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public void updateAttribute(@PathVariable Long id, @Valid @RequestBody PersistableProductAttribute attribute, @PathVariable Long attributeId,
-                                @Parameter(hidden = true) MerchantStore merchantStore, @Parameter(hidden = true) Language language, HttpServletRequest request,
+                                @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore, @Parameter(hidden = true) Language language, HttpServletRequest request,
                                 HttpServletResponse response) {
 
         attribute.setId(attributeId);
@@ -389,7 +390,7 @@ public class ProductAttributeOptionApi {
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
-    public void deleteAttribute(@PathVariable Long id, @PathVariable Long attributeId, @Parameter(hidden = true) MerchantStore merchantStore,
+    public void deleteAttribute(@PathVariable Long id, @PathVariable Long attributeId, @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
                                 @Parameter(hidden = true) Language language, HttpServletRequest request, HttpServletResponse response) {
 
         productOptionFacade.deleteAttribute(id, attributeId, merchantStore);

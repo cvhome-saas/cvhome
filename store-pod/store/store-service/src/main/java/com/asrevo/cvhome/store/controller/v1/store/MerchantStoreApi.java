@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.store.controller.v1.store;
 
+import com.asrevo.cvhome.commons.annotation.SecuredResource;
 import com.asrevo.cvhome.store.controller.exception.RestApiException;
 import com.asrevo.cvhome.store.controller.exception.UnauthorizedException;
 import com.asrevo.cvhome.store.core.constants.Constants;
@@ -116,7 +117,7 @@ public class MerchantStoreApi {
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public ReadableMerchantStoreList get(
-            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language,
             @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
             @RequestParam(value = "count", required = false, defaultValue = "10") Integer count,
@@ -158,7 +159,7 @@ public class MerchantStoreApi {
     @Operation(method = "GET", description = "Get list of store names. Returns all retailers and stores", summary = "",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ReadableMerchantStore.class))))
     public List<ReadableMerchantStore> list(
-            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language,
             @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
             @RequestParam(value = "count", required = false, defaultValue = "10") Integer count,

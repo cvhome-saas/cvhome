@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.store.controller.v1.product;
 
+import com.asrevo.cvhome.commons.annotation.SecuredResource;
 import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
 import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
 import com.asrevo.cvhome.store.controller.exception.UnauthorizedException;
@@ -72,7 +73,7 @@ public class ProductImageApi {
             @RequestParam(value = "file", required = true) MultipartFile[] files,
             @RequestParam(value = "order", required = false, defaultValue = "0") Integer position,
             @RequestParam(value = "defaultImage", required = false, defaultValue = "false") boolean defaultImage,
-            @Parameter(hidden = true) MerchantStore merchantStore, @Parameter(hidden = true) Language language) throws IOException {
+            @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore, @Parameter(hidden = true) Language language) throws IOException {
 
         try {
 
@@ -156,7 +157,7 @@ public class ProductImageApi {
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(value = {"/private/product/{id}/image/{imageId}"}, method = RequestMethod.DELETE)
     public void deleteImage(@PathVariable Long id, @PathVariable Long imageId, @Valid NameEntity imageName,
-                            @Parameter(hidden = true) MerchantStore merchantStore, @Parameter(hidden = true) Language language) {
+                            @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore, @Parameter(hidden = true) Language language) {
 
 
         Optional<ProductImage> productImage = productImageService.getProductImage(imageId, id, merchantStore);
@@ -257,7 +258,7 @@ public class ProductImageApi {
     })
     public void imageDetails(@PathVariable Long id, @PathVariable Long imageId,
                              @RequestParam(value = "order", required = false, defaultValue = "0") Integer position,
-                             @Parameter(hidden = true) MerchantStore merchantStore, @Parameter(hidden = true) Language language) throws IOException {
+                             @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore, @Parameter(hidden = true) Language language) throws IOException {
 
         try {
 

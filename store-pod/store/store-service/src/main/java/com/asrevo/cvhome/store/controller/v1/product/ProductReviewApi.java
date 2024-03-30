@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.store.controller.v1.product;
 
+import com.asrevo.cvhome.commons.annotation.SecuredResource;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.entity.catalog.product.Product;
 import com.asrevo.cvhome.store.core.entity.catalog.product.review.ProductReview;
@@ -54,7 +55,7 @@ public class ProductReviewApi {
     public PersistableProductReview create(
             @PathVariable final Long id,
             @Valid @RequestBody PersistableProductReview review,
-            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language,
             HttpServletRequest request,
             HttpServletResponse response) {
@@ -146,7 +147,7 @@ public class ProductReviewApi {
             @PathVariable final Long id,
             @PathVariable final Long reviewId,
             @Valid @RequestBody PersistableProductReview review,
-            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language,
             HttpServletRequest request,
             HttpServletResponse response) {
@@ -201,7 +202,7 @@ public class ProductReviewApi {
     public void delete(
             @PathVariable final Long id,
             @PathVariable final Long reviewId,
-            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language,
             HttpServletResponse response) {
 

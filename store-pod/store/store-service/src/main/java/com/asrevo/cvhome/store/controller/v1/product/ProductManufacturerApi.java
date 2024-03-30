@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.store.controller.v1.product;
 
+import com.asrevo.cvhome.commons.annotation.SecuredResource;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.entity.catalog.product.manufacturer.Manufacturer;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
@@ -67,7 +68,7 @@ public class ProductManufacturerApi {
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public PersistableManufacturer create(@Valid @RequestBody PersistableManufacturer manufacturer,
-                                          @Parameter(hidden = true) MerchantStore merchantStore, @Parameter(hidden = true) Language language, HttpServletResponse response) {
+                                          @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore, @Parameter(hidden = true) Language language, HttpServletResponse response) {
 
         try {
             manufacturerFacade.saveOrUpdateManufacturer(manufacturer, merchantStore, language);
@@ -127,7 +128,7 @@ public class ProductManufacturerApi {
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ReadableManufacturerList.class)))
     )
     public ReadableManufacturerList listByStore(
-            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language,
             @RequestParam(value = "name", required = false) String name,
             @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
@@ -168,7 +169,7 @@ public class ProductManufacturerApi {
     @Operation(method = "GET", description = "Check if manufacturer code already exists", summary = "",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = EntityExists.class))))
     public ResponseEntity<EntityExists> exists(@RequestParam(value = "code") String code,
-                                               @Parameter(hidden = true) MerchantStore merchantStore, @Parameter(hidden = true) Language language) {
+                                               @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore, @Parameter(hidden = true) Language language) {
 
         boolean exists = manufacturerFacade.manufacturerExist(merchantStore, code);
         return new ResponseEntity<EntityExists>(new EntityExists(exists), HttpStatus.OK);
@@ -183,7 +184,7 @@ public class ProductManufacturerApi {
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public void update(@PathVariable Long id,
-                       @Valid @RequestBody PersistableManufacturer manufacturer, @Parameter(hidden = true) MerchantStore merchantStore,
+                       @Valid @RequestBody PersistableManufacturer manufacturer, @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
                        @Parameter(hidden = true) Language language, HttpServletRequest request, HttpServletResponse response) {
 
         try {
@@ -205,7 +206,7 @@ public class ProductManufacturerApi {
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
-    public void delete(@PathVariable Long id, @Parameter(hidden = true) MerchantStore merchantStore, @Parameter(hidden = true) Language language,
+    public void delete(@PathVariable Long id, @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore, @Parameter(hidden = true) Language language,
                        HttpServletResponse response) {
 
         try {

@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.store.controller.v1.product;
 
+import com.asrevo.cvhome.commons.annotation.SecuredResource;
 import com.asrevo.cvhome.store.controller.exception.RestApiException;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
@@ -36,7 +37,7 @@ public class ProductInventoryApi {
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public @ResponseBody ReadableInventory create(@PathVariable Long productId,
-                                                  @Valid @RequestBody PersistableInventory inventory, @Parameter(hidden = true) MerchantStore merchantStore,
+                                                  @Valid @RequestBody PersistableInventory inventory, @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
                                                   @Parameter(hidden = true) Language language) {
         inventory.setProductId(productId);
         return productInventoryFacade.add(inventory, merchantStore, language);
@@ -51,7 +52,7 @@ public class ProductInventoryApi {
     public void update(
             @PathVariable Long productId,
             @PathVariable Long id,
-            @Valid @RequestBody PersistableInventory inventory, @Parameter(hidden = true) MerchantStore merchantStore,
+            @Valid @RequestBody PersistableInventory inventory, @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language) {
         inventory.setId(id);
         inventory.setProductId(inventory.getProductId());
@@ -70,7 +71,7 @@ public class ProductInventoryApi {
     public void delete(
             @PathVariable Long productId,
             @PathVariable Long id,
-            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language) {
 
         productInventoryFacade.delete(productId, id, merchantStore);
@@ -85,7 +86,7 @@ public class ProductInventoryApi {
     })
     public @ResponseBody ReadableEntityList<ReadableInventory> getBySku(
             @PathVariable String sku,
-            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language,
             @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
             @RequestParam(value = "count", required = false, defaultValue = "10") Integer count) {
@@ -102,7 +103,7 @@ public class ProductInventoryApi {
     })
     public @ResponseBody ReadableEntityList<ReadableInventory> getByProductId(
             @RequestParam Long productId,
-            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language,
             @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
             @RequestParam(value = "count", required = false, defaultValue = "10") Integer count) {

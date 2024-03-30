@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.store.controller.v2.product;
 
+import com.asrevo.cvhome.commons.annotation.SecuredResource;
 import com.asrevo.cvhome.store.controller.exception.UnauthorizedException;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
@@ -48,7 +49,7 @@ public class ProductVariantGroupApi {
     })
     public @ResponseBody Entity create(
             @Valid @RequestBody PersistableProductVariantGroup instanceGroup,
-            @Parameter(hidden = true) MerchantStore merchantStore, @Parameter(hidden = true) Language language) {
+            @Parameter(hidden = true)  @SecuredResource MerchantStore merchantStore, @Parameter(hidden = true) Language language) {
 
         String authenticatedUser = userFacade.authenticatedUser();
         if (authenticatedUser == null) {
@@ -69,7 +70,7 @@ public class ProductVariantGroupApi {
     @Operation(method = "PUT", description = "Update product instance group", summary = "", responses = @ApiResponse(content = @Content(mediaType = "application/json", schema = @Schema(implementation = Void.class))))
     public @ResponseBody void update(@PathVariable Long id,
                                      @Valid @RequestBody PersistableProductVariantGroup instance,
-                                     @Parameter(hidden = true) MerchantStore merchantStore,
+                                     @Parameter(hidden = true)  @SecuredResource MerchantStore merchantStore,
                                      @Parameter(hidden = true) Language language) {
 
         String authenticatedUser = userFacade.authenticatedUser();
@@ -87,7 +88,7 @@ public class ProductVariantGroupApi {
     @GetMapping(value = {"/private/product/productVariantGroup/{id}"})
     @Operation(method = "GET", description = "Get product instance group", summary = "", responses = @ApiResponse(content = @Content(mediaType = "application/json", schema = @Schema(implementation = Void.class))))
     public @ResponseBody ReadableProductVariantGroup get(
-            @PathVariable Long id, @Parameter(hidden = true) MerchantStore merchantStore,
+            @PathVariable Long id, @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language) {
 
         String authenticatedUser = userFacade.authenticatedUser();
@@ -106,7 +107,7 @@ public class ProductVariantGroupApi {
     @ResponseStatus(HttpStatus.OK)
     @DeleteMapping(value = {"/private/product/productVariantGroup/{id}"})
     @Operation(method = "DELETE", description = "Delete product instance group", summary = "", responses = @ApiResponse(content = @Content(mediaType = "application/json", schema = @Schema(implementation = Void.class))))
-    public @ResponseBody void delete(@PathVariable Long id, @Parameter(hidden = true) MerchantStore merchantStore,
+    public @ResponseBody void delete(@PathVariable Long id, @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
                                      @Parameter(hidden = true) Language language) {
 
         String authenticatedUser = userFacade.authenticatedUser();
@@ -126,7 +127,7 @@ public class ProductVariantGroupApi {
     @Operation(method = "GET", description = "Delete product instance group", summary = "", responses = @ApiResponse(content = @Content(mediaType = "application/json", schema = @Schema(implementation = Void.class))))
     public @ResponseBody ReadableEntityList<ReadableProductVariantGroup> list(
             @PathVariable final Long id,
-            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language,
             @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
             @RequestParam(value = "count", required = false, defaultValue = "10") Integer count) {
@@ -154,7 +155,7 @@ public class ProductVariantGroupApi {
             @PathVariable Long id,
             @RequestParam(value = "file", required = true) MultipartFile file,
             @RequestParam(value = "order", required = false, defaultValue = "0") Integer position,
-            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language) {
 
         String authenticatedUser = userFacade.authenticatedUser();
@@ -173,7 +174,7 @@ public class ProductVariantGroupApi {
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(value = {
             "/private/product/productVariantGroup/{id}/image/{imageId}"}, method = RequestMethod.DELETE)
-    public void removeImage(@PathVariable Long id, @PathVariable Long imageId, @Parameter(hidden = true) MerchantStore merchantStore,
+    public void removeImage(@PathVariable Long id, @PathVariable Long imageId, @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
                             @Parameter(hidden = true) Language language) {
 
         String authenticatedUser = userFacade.authenticatedUser();

@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.store.controller.v1.product;
 
+import com.asrevo.cvhome.commons.annotation.SecuredResource;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
@@ -47,7 +48,7 @@ public class ProductTypeApi {
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public ReadableProductTypeList list(@RequestParam(name = "count", defaultValue = "10") int count,
-                                        @RequestParam(name = "page", defaultValue = "0") int page, @Parameter(hidden = true) MerchantStore merchantStore,
+                                        @RequestParam(name = "page", defaultValue = "0") int page, @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
                                         @Parameter(hidden = true) Language language) {
 
         return productTypeFacade.getByMerchant(merchantStore, language, count, page);
@@ -61,7 +62,7 @@ public class ProductTypeApi {
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
-    public ReadableProductType get(@PathVariable Long id, @Parameter(hidden = true) MerchantStore merchantStore,
+    public ReadableProductType get(@PathVariable Long id, @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
                                    @Parameter(hidden = true) Language language) {
 
         return productTypeFacade.get(merchantStore, id, language);
@@ -75,7 +76,7 @@ public class ProductTypeApi {
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
-    public ResponseEntity<EntityExists> exists(@RequestParam String code, @Parameter(hidden = true) MerchantStore merchantStore,
+    public ResponseEntity<EntityExists> exists(@RequestParam String code, @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
                                                @Parameter(hidden = true) Language language) {
 
         boolean exists = productTypeFacade.exists(code, merchantStore, language);
@@ -89,7 +90,7 @@ public class ProductTypeApi {
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
-    public Entity create(@RequestBody PersistableProductType type, @Parameter(hidden = true) MerchantStore merchantStore,
+    public Entity create(@RequestBody PersistableProductType type, @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
                          @Parameter(hidden = true) Language language) {
 
         Long id = productTypeFacade.save(type, merchantStore, language);
@@ -107,7 +108,7 @@ public class ProductTypeApi {
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public void update(@RequestBody PersistableProductType type, @PathVariable Long id,
-                       @Parameter(hidden = true) MerchantStore merchantStore, @Parameter(hidden = true) Language language) {
+                       @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore, @Parameter(hidden = true) Language language) {
 
         productTypeFacade.update(type, id, merchantStore, language);
 
@@ -119,7 +120,7 @@ public class ProductTypeApi {
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
-    public void delete(@PathVariable Long id, @Parameter(hidden = true) MerchantStore merchantStore, @Parameter(hidden = true) Language language) {
+    public void delete(@PathVariable Long id, @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore, @Parameter(hidden = true) Language language) {
 
         productTypeFacade.delete(id, merchantStore, language);
 
