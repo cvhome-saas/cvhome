@@ -1,7 +1,7 @@
-package com.asrevo.cvhome.manager.config;
+package com.asrevo.cvhome.s2s.config.internal;
 
 import com.asrevo.cvhome.commons.annotation.OrgStorePrincipalInfo;
-import com.asrevo.cvhome.manager.service.impl.SecurityServiceImpl;
+import com.asrevo.cvhome.s2s.utils.SecurityUtils;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.security.core.Authentication;
@@ -14,7 +14,7 @@ import reactor.core.publisher.Mono;
 
 import java.lang.annotation.Annotation;
 
-public class OrgStorePrincipalInfoArgumentResolver implements HandlerMethodArgumentResolver {
+public class ReactiveOrgStorePrincipalInfoArgumentResolver implements HandlerMethodArgumentResolver {
 
 
     @Override
@@ -31,7 +31,7 @@ public class OrgStorePrincipalInfoArgumentResolver implements HandlerMethodArgum
     }
 
     private Object resolvePrincipal(MethodParameter parameter, Authentication authentication) {
-        return SecurityServiceImpl.getOrgStoreInfo(authentication);
+        return SecurityUtils.getOrgStoreInfo(authentication);
 
     }
 
