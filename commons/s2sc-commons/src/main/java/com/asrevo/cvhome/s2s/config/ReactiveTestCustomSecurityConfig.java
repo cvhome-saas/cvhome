@@ -28,7 +28,7 @@ import java.util.UUID;
 
 @Configuration
 @Profile("signer")
-public class TestCustomSecurityConfig {
+public class ReactiveTestCustomSecurityConfig {
     @Configuration
     @Profile("signer")
     public static class SignerConfig {

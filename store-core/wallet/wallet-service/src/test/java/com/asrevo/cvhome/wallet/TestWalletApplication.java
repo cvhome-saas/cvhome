@@ -1,6 +1,6 @@
 package com.asrevo.cvhome.wallet;
 
-import com.asrevo.cvhome.s2s.config.TestCustomSecurityConfig;
+import com.asrevo.cvhome.s2s.config.ReactiveTestCustomSecurityConfig;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -11,7 +11,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
 
 @TestConfiguration(proxyBeanMethods = false)
-@Import(TestCustomSecurityConfig.class)
+@Import(ReactiveTestCustomSecurityConfig.class)
 public class TestWalletApplication {
 
     @Bean
