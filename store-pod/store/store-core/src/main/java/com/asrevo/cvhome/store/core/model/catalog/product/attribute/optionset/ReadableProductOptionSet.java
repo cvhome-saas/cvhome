@@ -1,0 +1,24 @@
+package com.asrevo.cvhome.store.core.model.catalog.product.attribute.optionset;
+
+import com.asrevo.cvhome.store.core.model.catalog.product.attribute.ReadableProductOption;
+import com.asrevo.cvhome.store.core.model.catalog.product.attribute.ReadableProductOptionValue;
+import com.asrevo.cvhome.store.core.model.catalog.product.type.ReadableProductType;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.List;
+
+@Setter
+@Getter
+public class ReadableProductOptionSet extends ProductOptionSetEntity {
+
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
+
+    private ReadableProductOption option;
+    private List<ReadableProductOptionValue> values;
+    private List<ReadableProductType> productTypes;
+
+}

@@ -74,6 +74,7 @@ dependencies {
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.4.0'
 
+    implementation project(':store-pod:store:store-core')
     implementation project(':store-pod:store:store-events')
     implementation project(':commons:s2sc-commons')
 

@@ -1,0 +1,51 @@
+package com.asrevo.cvhome.store.core.entity.reference.zone;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
+import com.asrevo.cvhome.store.core.entity.reference.country.Country;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Entity
+@Table(name = "ZONE")
+@Getter
+@Setter
+public class Zone extends SalesManagerEntity<Long, Zone> {
+    private static final long serialVersionUID = 1L;
+
+    @Id
+    @Column(name = "ZONE_ID")
+    @TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME",
+            valueColumnName = "SEQ_COUNT", pkColumnValue = "ZONE_SEQ_NEXT_VAL")
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
+    private Long id;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "zone", cascade = CascadeType.ALL)
+    private List<ZoneDescription> descriptions = new ArrayList<ZoneDescription>();
+
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "COUNTRY_ID", nullable = false)
+    private Country country;
+
+    @Transient
+    private String name;
+
+
+    @Column(name = "ZONE_CODE", unique = true, nullable = false)
+    private String code;
+
+    public Zone() {
+    }
+
+    public Zone(Country country, String name, String code) {
+        this.setCode(code);
+        this.setCountry(country);
+        this.setCode(name);
+    }
+}

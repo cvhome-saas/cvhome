@@ -1,0 +1,20 @@
+package com.asrevo.cvhome.store.core.model.catalog.product;
+
+import com.asrevo.cvhome.store.core.model.customer.ReadableCustomer;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.io.Serializable;
+
+
+@Setter
+@Getter
+public class ReadableProductReview extends ProductReviewEntity implements Serializable {
+
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
+    private ReadableCustomer customer;
+
+}

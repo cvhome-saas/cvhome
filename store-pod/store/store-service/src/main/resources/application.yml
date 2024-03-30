@@ -5,6 +5,9 @@ spring:
     driver-class-name: org.postgresql.Driver
     hikari:
       schema: store
+  jpa:
+    hibernate:
+      ddl-auto: update
 server:
   forward-headers-strategy: FRAMEWORK
   port: ${com.asrevo.cvhome.services.store.port}

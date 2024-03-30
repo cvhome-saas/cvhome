@@ -1,0 +1,39 @@
+package com.asrevo.cvhome.store.core.constants;
+
+import java.util.Currency;
+import java.util.Locale;
+
+public class Constants {
+
+    public static final String ALL_REGIONS = "*";
+    public final static String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
+    public final static String DEFAULT_DATE_FORMAT_YEAR = "yyyy";
+    public final static String DEFAULT_LANGUAGE = "en";
+    public final static String DEFAULT_COUNTRY = "CA";
+
+    public final static String UNDERSCORE = "_";
+    public final static String TRUE = "true";
+
+    public final static String DEFAULT_STORE = "DEFAULT";
+
+    public final static Locale DEFAULT_LOCALE = Locale.US;
+    public final static Currency DEFAULT_CURRENCY = Currency.getInstance(Locale.US);
+
+    public final static String SLASH = "/";
+    public final static String LANGUAGE = "LANGUAGE";
+    public final static String LANG = "lang";
+
+    public final static String MERCHANT_STORE = "MERCHANT_STORE";
+    public final static String GROUP_ADMIN = "ADMIN";
+
+    public final static String GROUP_SUPERADMIN = "SUPERADMIN";
+    public final static String GROUP_ADMIN_CATALOGUE = "ADMIN_CATALOGUE";
+    public final static String GROUP_ADMIN_RETAIL = "ADMIN_RETAIL";
+
+    public final static String STATIC_URI = "/static";
+    public final static String FILES_URI = "/files";
+    public final static String PRODUCTS_URI = "/products";
+    public final static String SMALL_IMAGE = "SMALL";
+    public final static int MAX_REVIEW_RATING_SCORE = 5;
+
+}

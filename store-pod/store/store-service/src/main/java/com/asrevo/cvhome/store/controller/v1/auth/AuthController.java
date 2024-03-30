@@ -1,4 +1,4 @@
-package com.asrevo.cvhome.store.controller;
+package com.asrevo.cvhome.store.controller.v1.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
