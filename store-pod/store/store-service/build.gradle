@@ -63,6 +63,10 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     runtimeOnly 'org.postgresql:postgresql'
 
+
+    implementation 'commons-validator:commons-validator:1.8.0'
+    implementation 'com.googlecode.json-simple:json-simple:1.1.1'
+
     implementation project(':commons:ecs-commons:fargate-task-info')
     implementation project(':commons:ecs-commons:ecs-service-discoveryclient')
 
