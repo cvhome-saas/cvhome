@@ -6,6 +6,7 @@ dependencies {
     compileOnly project(":commons:cvhome-commons")
     compileOnly project(":commons:ecs-commons:fargate-task-info")
     compileOnly 'org.springframework:spring-webflux:6.1.4'
+    compileOnly 'org.springframework:spring-webmvc:6.1.4'
     compileOnly 'org.springframework.data:spring-data-commons:3.2.3'
     compileOnly 'org.springframework.boot:spring-boot-starter-oauth2-client:3.2.3'
     compileOnly 'org.springframework.cloud:spring-cloud-gateway-server:4.1.0'
