@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.store.config;
 
-import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.controller.exception.UnauthorizedException;
+import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.service.facade.store.StoreFacade;
 import com.asrevo.cvhome.store.service.facade.user.UserFacade;
 import jakarta.servlet.http.HttpServletRequest;
@@ -39,10 +39,12 @@ public class MerchantStoreArgumentResolver implements HandlerMethodArgumentResol
 
     @Override
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
-                                  NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
+                                  NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
         String storeValue = Optional.ofNullable(webRequest.getParameter(REQUEST_PARAMATER_STORE))
                 .filter(StringUtils::isNotBlank).orElse(DEFAULT_STORE);
         // todo get from cache
+//        UserOrgStoreInfo storeInfo = SecurityUtils.getOrgStoreInfo(SecurityContextHolder.getContext().getAuthentication());
+
         MerchantStore storeModel = storeFacade.get(storeValue);
 
         HttpServletRequest httpServletRequest = webRequest.getNativeRequest(HttpServletRequest.class);
