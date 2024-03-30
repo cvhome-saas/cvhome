@@ -209,27 +209,6 @@ public class Product extends SalesManagerEntity<Long, Product> implements Audita
 
 
 
-    @Override
-    public Long getId() {
-        return this.id;
-    }
-
-    @Override
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    @Override
-    public AuditSection getAuditSection() {
-        return auditSection;
-    }
-
-    @Override
-    public void setAuditSection(AuditSection auditSection) {
-        this.auditSection = auditSection;
-    }
-
-
 
     public ProductDescription getProductDescription() {
         if (this.getDescriptions() != null && this.getDescriptions().size() > 0) {

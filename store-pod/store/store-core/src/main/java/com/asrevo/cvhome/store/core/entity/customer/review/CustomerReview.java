@@ -35,7 +35,7 @@ public class CustomerReview extends SalesManagerEntity<Long, CustomerReview> imp
     private Long id;
 
     @Embedded
-    private AuditSection audit = new AuditSection();
+    private AuditSection auditSection = new AuditSection();
 
     @Column(name = "REVIEWS_RATING")
     private Double reviewRating;
@@ -60,26 +60,6 @@ public class CustomerReview extends SalesManagerEntity<Long, CustomerReview> imp
     private Customer reviewedCustomer;
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "customerReview")
     private Set<CustomerReviewDescription> descriptions = new HashSet<CustomerReviewDescription>();
-
-    @Override
-    public Long getId() {
-        return id;
-    }
-
-    @Override
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    @Override
-    public AuditSection getAuditSection() {
-        return audit;
-    }
-
-    @Override
-    public void setAuditSection(AuditSection audit) {
-        this.audit = audit;
-    }
 
 
 }

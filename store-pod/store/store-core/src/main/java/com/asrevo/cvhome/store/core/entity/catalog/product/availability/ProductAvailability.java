@@ -150,24 +150,5 @@ public class ProductAvailability extends SalesManagerEntity<Long, ProductAvailab
         this.productDateAvailable = CloneUtils.clone(productDateAvailable);
     }
 
-    @Override
-    public Long getId() {
-        return id;
-    }
-
-    @Override
-    public void setId(Long id) {
-        this.id = id;
-    }
-    @Override
-    public AuditSection getAuditSection() {
-        return auditSection;
-    }
-
-    @Override
-    public void setAuditSection(AuditSection audit) {
-        this.auditSection = audit;
-
-    }
 
 }

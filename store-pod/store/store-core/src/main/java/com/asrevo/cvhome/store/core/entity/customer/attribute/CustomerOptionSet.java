@@ -43,15 +43,4 @@ public class CustomerOptionSet extends SalesManagerEntity<Long, CustomerOptionSe
     @Column(name = "SORT_ORDER")
     private Integer sortOrder = 0;
 
-    @Override
-    public Long getId() {
-        return id;
-    }
-
-    @Override
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-
 }

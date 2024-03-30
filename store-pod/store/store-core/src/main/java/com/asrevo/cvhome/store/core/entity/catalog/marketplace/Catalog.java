@@ -37,25 +37,5 @@ public class Catalog extends SalesManagerEntity<Long, Catalog> implements Audita
     @Embedded
     private AuditSection auditSection = new AuditSection();
 
-    @Override
-    public AuditSection getAuditSection() {
-        return auditSection;
-    }
-
-    @Override
-    public void setAuditSection(AuditSection audit) {
-        this.auditSection = audit;
-    }
-
-
-    @Override
-    public Long getId() {
-        return id;
-    }
-
-    @Override
-    public void setId(Long id) {
-        this.id = id;
-    }
 
 }

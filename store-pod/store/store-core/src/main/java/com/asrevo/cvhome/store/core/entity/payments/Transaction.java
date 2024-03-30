@@ -70,16 +70,6 @@ public class Transaction extends SalesManagerEntity<Long, Transaction> implement
     private Map<String, String> transactionDetails = new HashMap<String, String>();
 
     @Override
-    public AuditSection getAuditSection() {
-        return this.auditSection;
-    }
-
-    @Override
-    public void setAuditSection(AuditSection audit) {
-        this.auditSection = audit;
-
-    }
-    @Override
     public String toJSONString() {
 
         if (this.getTransactionDetails() != null && this.getTransactionDetails().size() > 0) {

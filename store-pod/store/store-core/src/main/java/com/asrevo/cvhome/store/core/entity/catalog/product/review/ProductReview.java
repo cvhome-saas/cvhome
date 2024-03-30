@@ -37,7 +37,7 @@ public class ProductReview extends SalesManagerEntity<Long, ProductReview> imple
     private Long id;
 
     @Embedded
-    private AuditSection audit = new AuditSection();
+    private AuditSection auditSection = new AuditSection();
 
     @Column(name = "REVIEWS_RATING")
     private Double reviewRating;
@@ -65,17 +65,6 @@ public class ProductReview extends SalesManagerEntity<Long, ProductReview> imple
     private Set<ProductReviewDescription> descriptions = new HashSet<ProductReviewDescription>();
 
     public ProductReview() {
-    }
-
-
-    @Override
-    public AuditSection getAuditSection() {
-        return audit;
-    }
-
-    @Override
-    public void setAuditSection(AuditSection audit) {
-        this.audit = audit;
     }
 
 

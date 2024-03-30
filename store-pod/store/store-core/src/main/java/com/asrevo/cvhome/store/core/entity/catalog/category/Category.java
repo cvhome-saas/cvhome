@@ -86,26 +86,6 @@ public class Category extends SalesManagerEntity<Long, Category> implements Audi
         this.id = 0L;
     }
 
-    @Override
-    public Long getId() {
-        return this.id;
-    }
-
-    @Override
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    @Override
-    public AuditSection getAuditSection() {
-        return auditSection;
-    }
-
-    @Override
-    public void setAuditSection(AuditSection auditSection) {
-        this.auditSection = auditSection;
-    }
-
     public CategoryDescription getDescription() {
         if (descriptions != null && descriptions.size() > 0) {
             return descriptions.iterator().next();

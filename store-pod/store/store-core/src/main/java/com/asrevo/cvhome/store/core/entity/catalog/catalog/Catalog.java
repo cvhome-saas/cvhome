@@ -86,25 +86,6 @@ public class Catalog extends SalesManagerEntity<Long, Catalog> implements Audita
         this.id = 0L;
     }
 
-    @Override
-    public Long getId() {
-        return this.id;
-    }
-
-    @Override
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    @Override
-    public AuditSection getAuditSection() {
-        return auditSection;
-    }
-
-    @Override
-    public void setAuditSection(AuditSection auditSection) {
-        this.auditSection = auditSection;
-    }
 
 
 }

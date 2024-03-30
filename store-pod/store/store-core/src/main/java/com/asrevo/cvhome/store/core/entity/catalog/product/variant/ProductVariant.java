@@ -85,26 +85,4 @@ public class ProductVariant extends SalesManagerEntity<Long, ProductVariant> imp
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "productVariant")
     private Set<ProductAvailability> availabilities = new HashSet<ProductAvailability>();
 
-
-    @Override
-    public AuditSection getAuditSection() {
-        return auditSection;
-    }
-
-    @Override
-    public void setAuditSection(AuditSection audit) {
-        this.auditSection = audit;
-
-    }
-
-    @Override
-    public Long getId() {
-        return this.id;
-    }
-
-    @Override
-    public void setId(Long id) {
-        this.id = id;
-    }
-
 }

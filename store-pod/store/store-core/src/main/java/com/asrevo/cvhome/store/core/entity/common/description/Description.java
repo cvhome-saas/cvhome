@@ -50,15 +50,4 @@ public class Description implements Auditable, Serializable {
         this.setLanguage(language);
         this.setName(name);
     }
-
-    @Override
-    public AuditSection getAuditSection() {
-        return auditSection;
-    }
-
-    @Override
-    public void setAuditSection(AuditSection auditSection) {
-        this.auditSection = auditSection;
-    }
-
 }

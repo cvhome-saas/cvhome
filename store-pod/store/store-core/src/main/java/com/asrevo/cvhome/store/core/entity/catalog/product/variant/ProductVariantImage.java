@@ -43,16 +43,4 @@ public class ProductVariantImage extends SalesManagerEntity<Long, ProductVariant
     public ProductVariantImage() {
     }
 
-
-
-    @Override
-    public Long getId() {
-        return id;
-    }
-
-    @Override
-    public void setId(Long id) {
-        this.id = id;
-    }
-
    }

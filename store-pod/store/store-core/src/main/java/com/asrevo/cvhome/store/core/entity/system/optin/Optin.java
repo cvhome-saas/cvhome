@@ -58,15 +58,4 @@ public class Optin extends SalesManagerEntity<Long, Optin> implements Serializab
     @Column(name = "DESCRIPTION")
     private String description;
 
-
-    @Override
-    public Long getId() {
-        return id;
-    }
-
-    @Override
-    public void setId(Long id) {
-        this.id = id;
-    }
-
 }

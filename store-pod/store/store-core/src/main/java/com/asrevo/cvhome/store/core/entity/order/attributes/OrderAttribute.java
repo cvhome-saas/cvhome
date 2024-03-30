@@ -38,15 +38,4 @@ public class OrderAttribute extends SalesManagerEntity<Long, OrderAttribute> {
     @JoinColumn(name = "ORDER_ID", nullable = false)
     private Order order;
 
-    @Override
-    public Long getId() {
-        return id;
-    }
-
-    @Override
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-
 }

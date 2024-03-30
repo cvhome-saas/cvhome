@@ -49,20 +49,4 @@ public class CatalogCategoryEntry extends SalesManagerEntity<Long, CatalogCatego
     @Column(name = "VISIBLE")
     private boolean visible;
 
-    @Override
-    public void setId(Long id) {
-        this.id = id;
-
-    }
-
-    @Override
-    public AuditSection getAuditSection() {
-        return auditSection;
-    }
-
-    @Override
-    public void setAuditSection(AuditSection audit) {
-        auditSection = audit;
-
-    }
 }

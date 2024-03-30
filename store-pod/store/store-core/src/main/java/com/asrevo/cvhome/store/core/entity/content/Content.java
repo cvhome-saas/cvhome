@@ -71,18 +71,6 @@ public class Content extends SalesManagerEntity<Long, Content> implements Serial
     @Column(name = "PRODUCT_GROUP", nullable = true)
     private String productGroup;
 
-
-    @Override
-    public Long getId() {
-        return this.id;
-    }
-
-    @Override
-    public void setId(Long id) {
-        this.id = id;
-
-    }
-
     public ContentDescription getDescription() {
 
         if (this.getDescriptions() != null && this.getDescriptions().size() > 0) {

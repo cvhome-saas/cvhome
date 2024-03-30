@@ -49,25 +49,4 @@ public class ProductType extends SalesManagerEntity<Long, ProductType> implement
     public ProductType() {
     }
 
-    @Override
-    public Long getId() {
-        return id;
-    }
-
-    @Override
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    @Override
-    public AuditSection getAuditSection() {
-        return auditSection;
-    }
-
-    @Override
-    public void setAuditSection(AuditSection auditSection) {
-        this.auditSection = auditSection;
-    }
-
-
 }

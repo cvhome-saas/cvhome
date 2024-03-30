@@ -39,15 +39,5 @@ public class DigitalProduct extends SalesManagerEntity<Long, DigitalProduct> {
     private String productFileName;
 
 
-    @Override
-    public Long getId() {
-        return id;
-    }
-
-    @Override
-    public void setId(Long id) {
-        this.id = id;
-    }
-
 
 }

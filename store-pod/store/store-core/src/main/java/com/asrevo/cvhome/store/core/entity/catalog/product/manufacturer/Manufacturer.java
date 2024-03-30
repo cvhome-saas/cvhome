@@ -50,26 +50,6 @@ public class Manufacturer extends SalesManagerEntity<Long, Manufacturer> impleme
     public Manufacturer() {
     }
 
-    @Override
-    public Long getId() {
-        return id;
-    }
-
-    @Override
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    @Override
-    public AuditSection getAuditSection() {
-        return auditSection;
-    }
-
-    @Override
-    public void setAuditSection(AuditSection auditSection) {
-        this.auditSection = auditSection;
-    }
-
 
 
 }

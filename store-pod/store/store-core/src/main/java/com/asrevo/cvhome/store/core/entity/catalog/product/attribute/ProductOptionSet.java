@@ -69,16 +69,4 @@ public class ProductOptionSet extends SalesManagerEntity<Long, ProductOptionSet>
     private boolean optionDisplayOnly = false;
 
 
-
-    @Override
-    public Long getId() {
-        return this.id;
-    }
-
-    @Override
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-
 }

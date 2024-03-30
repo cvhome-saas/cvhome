@@ -68,17 +68,6 @@ public class ProductPrice extends SalesManagerEntity<Long, ProductPrice> {
     public ProductPrice() {
     }
 
-    @Override
-    public Long getId() {
-        return this.id;
-    }
-
-    @Override
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-
 
     public Date getProductPriceSpecialStartDate() {
         return CloneUtils.clone(productPriceSpecialStartDate);

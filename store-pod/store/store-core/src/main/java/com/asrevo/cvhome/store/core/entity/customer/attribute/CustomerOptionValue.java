@@ -57,18 +57,6 @@ public class CustomerOptionValue extends SalesManagerEntity<Long, CustomerOption
     public CustomerOptionValue() {
     }
 
-    @Override
-    public Long getId() {
-        return id;
-    }
-
-    @Override
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-
-
     public List<CustomerOptionValueDescription> getDescriptionsSettoList() {
         if (descriptionsList == null || descriptionsList.size() == 0) {
             descriptionsList = new ArrayList<CustomerOptionValueDescription>(this.getDescriptions());

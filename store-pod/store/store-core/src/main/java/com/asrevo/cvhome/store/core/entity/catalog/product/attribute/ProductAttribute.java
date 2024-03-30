@@ -108,18 +108,4 @@ public class ProductAttribute extends SalesManagerEntity<Long, ProductAttribute>
     public ProductAttribute() {
     }
 
-
-
-    @Override
-    public Long getId() {
-        return id;
-    }
-
-    @Override
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-
-
 }

@@ -60,17 +60,6 @@ public class ProductOption extends SalesManagerEntity<Long, ProductOption> {
     }
 
 
-    @Override
-    public Long getId() {
-        return id;
-    }
-
-    @Override
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-
 
     public List<ProductOptionDescription> getDescriptionsSettoList() {
         if (descriptionsList == null || descriptionsList.size() == 0) {

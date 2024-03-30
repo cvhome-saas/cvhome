@@ -47,16 +47,5 @@ public class ProductVariantGroup extends SalesManagerEntity<Long, ProductVariant
     @JoinColumn(name = "MERCHANT_ID", nullable = false)
     private MerchantStore merchantStore;
 
-    @Override
-    public Long getId() {
-        return this.id;
-    }
-
-    @Override
-    public void setId(Long id) {
-        this.id = id;
-
-    }
-
 
 }

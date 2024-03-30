@@ -70,28 +70,4 @@ public class ProductVariation extends SalesManagerEntity<Long, ProductVariation>
     @Column(name = "VARIANT_DEFAULT")
     private boolean variantDefault = false;
 
-
-    @Override
-    public AuditSection getAuditSection() {
-        return auditSection;
-    }
-
-    @Override
-    public void setAuditSection(AuditSection audit) {
-        this.auditSection = audit;
-
-    }
-
-    @Override
-    public Long getId() {
-        return id;
-    }
-
-    @Override
-    public void setId(Long id) {
-        this.id = id;
-
-    }
-
-
 }
