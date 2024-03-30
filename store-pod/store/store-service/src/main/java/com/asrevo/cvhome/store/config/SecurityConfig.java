@@ -35,10 +35,12 @@ public class SecurityConfig {
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(keyClockJwtGrantedAuthoritiesConverter);
         return jwtAuthenticationConverter;
     }
+
     @Bean
     @Lazy
     public AccessEvaluator accessEvaluator(StoreFacade storeFacade) {
-        return new AccessEvaluatorImpl(new StoreSecurityServiceImpl((it)-> IdentityId.of(storeFacade.get(it.getId().toString()).getOrg())));
+        return new AccessEvaluatorImpl(new StoreSecurityServiceImpl((it) ->
+                IdentityId.of(storeFacade.get(it.getId().toString()).getOrg())));
     }
 
 }

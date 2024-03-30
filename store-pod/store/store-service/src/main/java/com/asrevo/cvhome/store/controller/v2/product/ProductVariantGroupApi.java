@@ -49,7 +49,7 @@ public class ProductVariantGroupApi {
     })
     public @ResponseBody Entity create(
             @Valid @RequestBody PersistableProductVariantGroup instanceGroup,
-            @Parameter(hidden = true)  @SecuredResource MerchantStore merchantStore, @Parameter(hidden = true) Language language) {
+            @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore, @Parameter(hidden = true) Language language) {
 
         String authenticatedUser = userFacade.authenticatedUser();
         if (authenticatedUser == null) {
@@ -70,7 +70,7 @@ public class ProductVariantGroupApi {
     @Operation(method = "PUT", description = "Update product instance group", summary = "", responses = @ApiResponse(content = @Content(mediaType = "application/json", schema = @Schema(implementation = Void.class))))
     public @ResponseBody void update(@PathVariable Long id,
                                      @Valid @RequestBody PersistableProductVariantGroup instance,
-                                     @Parameter(hidden = true)  @SecuredResource MerchantStore merchantStore,
+                                     @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
                                      @Parameter(hidden = true) Language language) {
 
         String authenticatedUser = userFacade.authenticatedUser();

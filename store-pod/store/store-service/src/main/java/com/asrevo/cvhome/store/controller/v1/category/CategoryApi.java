@@ -163,7 +163,7 @@ public class CategoryApi {
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE))
     })
     public PersistableCategory update(@PathVariable Long id, @Valid @RequestBody PersistableCategory category,
-                                      @Parameter(hidden = true) @SecuredResource  MerchantStore merchantStore) {
+                                      @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore) {
 
         // superadmin, admin and admin_catalogue
         String authenticatedUser = userFacade.authenticatedUser();

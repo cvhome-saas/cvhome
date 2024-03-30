@@ -1,7 +1,5 @@
 package com.asrevo.cvhome.store.service.facade.user;
 
-import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
-
 import java.util.List;
 
 /**

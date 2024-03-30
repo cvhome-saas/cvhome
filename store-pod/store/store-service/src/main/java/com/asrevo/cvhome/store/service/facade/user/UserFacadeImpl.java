@@ -1,6 +1,5 @@
 package com.asrevo.cvhome.store.service.facade.user;
 
-import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
