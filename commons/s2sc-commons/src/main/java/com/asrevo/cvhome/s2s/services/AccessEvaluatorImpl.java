@@ -1,16 +1,12 @@
-package com.asrevo.cvhome.manager.service.impl;
+package com.asrevo.cvhome.s2s.services;
 
-import com.asrevo.cvhome.manager.commons.domain.ManagerStoreId;
-import com.asrevo.cvhome.manager.service.AccessEvaluator;
-import com.asrevo.cvhome.manager.service.SecurityService;
+import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Service;
 
-@Service
 @AllArgsConstructor
 public class AccessEvaluatorImpl implements AccessEvaluator {
-    private final SecurityService securityRoleCheckService;
+    private final StoreSecurityService securityRoleCheckService;
 
     @Override
     public boolean hasAccessOnStoreUsersList(Authentication authentication, ManagerStoreId requestedStoreId) {

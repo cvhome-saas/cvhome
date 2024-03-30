@@ -2,7 +2,7 @@ package com.asrevo.cvhome.manager.controller;
 
 import com.asrevo.cvhome.commons.annotation.OrgStorePrincipalInfo;
 import com.asrevo.cvhome.commons.domain.UserOrgStoreInfo;
-import com.asrevo.cvhome.manager.commons.domain.ManagerStoreId;
+import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.manager.commons.dto.CreateManagerStoreRequest;
 import com.asrevo.cvhome.manager.commons.dto.CreateManagerStoreResponse;
 import com.asrevo.cvhome.manager.commons.dto.ListManagerStoreQuery;

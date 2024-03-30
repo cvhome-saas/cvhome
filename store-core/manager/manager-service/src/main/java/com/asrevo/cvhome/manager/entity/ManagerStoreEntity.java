@@ -4,7 +4,7 @@ import com.asrevo.cvhome.commons.domain.BaseEntity;
 import com.asrevo.cvhome.commons.domain.Country;
 import com.asrevo.cvhome.commons.domain.Email;
 import com.asrevo.cvhome.commons.domain.IdentityId;
-import com.asrevo.cvhome.manager.commons.domain.ManagerStoreId;
+import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.manager.commons.dto.CreateManagerStoreRequest;
 import com.asrevo.cvhome.manager.commons.event.store.StoreCreatedEvent;
 import lombok.Getter;

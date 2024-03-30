@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.manager.service;
 
-import com.asrevo.cvhome.manager.commons.domain.ManagerStoreId;
+import com.asrevo.cvhome.commons.domain.ManagerStoreId;
+import com.asrevo.cvhome.s2s.services.AccessEvaluator;
 import lombok.AllArgsConstructor;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.core.Authentication;

@@ -1,20 +1,19 @@
-package com.asrevo.cvhome.manager.service.impl;
+package com.asrevo.cvhome.s2s.services;
 
+import com.asrevo.cvhome.commons.domain.IdentityId;
+import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.commons.domain.Roles;
 import com.asrevo.cvhome.commons.domain.UserOrgStoreInfo;
-import com.asrevo.cvhome.manager.commons.domain.ManagerStoreId;
-import com.asrevo.cvhome.manager.service.InternalStoreService;
-import com.asrevo.cvhome.manager.service.SecurityService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Service;
+
+import java.util.function.Function;
 
 import static com.asrevo.cvhome.s2s.utils.SecurityUtils.getOrgStoreInfo;
 
-@Service
 @AllArgsConstructor
-public class SecurityServiceImpl implements SecurityService {
-    private final InternalStoreService internalStoreService;
+public class StoreSecurityServiceImpl implements StoreSecurityService {
+    private final Function<ManagerStoreId, IdentityId> getOwnerForStore;
 
     private static boolean hasSuperAdminRole(Authentication authentication) {
         return hasRole(authentication, Roles.ROLE_SUPER_ADMIN);
@@ -47,7 +46,7 @@ public class SecurityServiceImpl implements SecurityService {
             return false;
         }
         String orgName = authentication.getName();
-        return internalStoreService.getStoreOwner(requestedStoreId).getId().toString().equals(orgName);
+        return getOwnerForStore.apply((requestedStoreId)).getId().toString().equals(orgName);
     }
 
     @Override
@@ -59,7 +58,7 @@ public class SecurityServiceImpl implements SecurityService {
         if (!requestedStoreId.getId().toString().equals(info.store())) {
             return false;
         }
-        return internalStoreService.getStoreOwner(requestedStoreId).equals(info.org());
+        return getOwnerForStore.apply((requestedStoreId)).equals(info.org());
     }
 
     @Override
@@ -71,7 +70,7 @@ public class SecurityServiceImpl implements SecurityService {
         if (!requestedStoreId.getId().toString().equals(info.store())) {
             return false;
         }
-        return internalStoreService.getStoreOwner(requestedStoreId).equals(info.org());
+        return getOwnerForStore.apply((requestedStoreId)).equals(info.org());
     }
 
 

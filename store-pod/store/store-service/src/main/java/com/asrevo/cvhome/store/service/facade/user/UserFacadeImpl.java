@@ -15,11 +15,6 @@ public class UserFacadeImpl implements UserFacade {
     }
 
     @Override
-    public boolean authorizeStore(MerchantStore store, String path) {
-        return true;
-    }
-
-    @Override
     public void authorizedGroup(String userName, List<String> groupNames) {
         System.out.println("authorizedGroup");
     }

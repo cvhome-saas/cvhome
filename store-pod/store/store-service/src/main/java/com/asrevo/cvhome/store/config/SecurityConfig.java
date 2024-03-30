@@ -1,9 +1,15 @@
 package com.asrevo.cvhome.store.config;
 
 
+import com.asrevo.cvhome.commons.domain.IdentityId;
 import com.asrevo.cvhome.s2s.jwt.KeyClockJwtGrantedAuthoritiesConverter;
+import com.asrevo.cvhome.s2s.services.AccessEvaluator;
+import com.asrevo.cvhome.s2s.services.AccessEvaluatorImpl;
+import com.asrevo.cvhome.s2s.services.StoreSecurityServiceImpl;
+import com.asrevo.cvhome.store.service.facade.store.StoreFacade;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -29,4 +35,10 @@ public class SecurityConfig {
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(keyClockJwtGrantedAuthoritiesConverter);
         return jwtAuthenticationConverter;
     }
+    @Bean
+    @Lazy
+    public AccessEvaluator accessEvaluator(StoreFacade storeFacade) {
+        return new AccessEvaluatorImpl(new StoreSecurityServiceImpl((it)-> IdentityId.of(storeFacade.get(it.getId().toString()).getOrg())));
+    }
+
 }
