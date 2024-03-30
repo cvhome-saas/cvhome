@@ -73,16 +73,16 @@ Content-Type: application/json
 Authorization: Bearer {{access_token}}
 
 {
-  "code" : "s3imbeats1",
-  "order" : 2,
-  "descriptions" : [
+  "code": "s3imbeats1",
+  "order": 2,
+  "descriptions": [
     {
-      "language" : "en",
-      "name" : "SimBeats1"
+      "language": "en",
+      "name": "SimBeats1"
     },
     {
-      "language" : "fr",
-      "name" : "SimBeats1"
+      "language": "fr",
+      "name": "SimBeats1"
     }
   ]
 }
@@ -95,21 +95,22 @@ Content-Type: application/json
 Authorization: Bearer {{access_token}}
 
 {
-  "code" : "headsets",
-  "sortOrder" : 0,
-  "visible" : true,
-  "parent" : null,
-  "descriptions" : [ {
-    "language" : "en",
-    "name" : "Headsets",
-    "friendlyUrl" : "headsets",
-    "title" : "Headsets"
-  },
+  "code": "headsets",
+  "sortOrder": 0,
+  "visible": true,
+  "parent": null,
+  "descriptions": [
     {
-      "language" : "fr",
-      "name" : "Écouteurs",
-      "friendlyUrl" : "ecouteurs",
-      "title" : "Écouteurs"
+      "language": "en",
+      "name": "Headsets",
+      "friendlyUrl": "headsets",
+      "title": "Headsets"
+    },
+    {
+      "language": "fr",
+      "name": "Écouteurs",
+      "friendlyUrl": "ecouteurs",
+      "title": "Écouteurs"
     }
   ]
 }
@@ -151,8 +152,10 @@ Authorization: Bearer {{access_token}}
     "manufacturer": "s3imbeats1",
     "width": 12
   },
-  "categories" : [
-    { "code":"headsets"}
+  "categories": [
+    {
+      "code": "headsets"
+    }
   ],
   "shipeable": true,
   "sortOrder": 1,

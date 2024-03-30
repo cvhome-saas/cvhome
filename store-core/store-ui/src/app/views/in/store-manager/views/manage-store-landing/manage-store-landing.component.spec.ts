@@ -1,21 +1,21 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { ManageStoreLandingComponent } from './manage-store-landing.component';
+import {ManageStoreLandingComponent} from './manage-store-landing.component';
 
 describe('ManageStoreLandingComponent', () => {
-  let component: ManageStoreLandingComponent;
-  let fixture: ComponentFixture<ManageStoreLandingComponent>;
+    let component: ManageStoreLandingComponent;
+    let fixture: ComponentFixture<ManageStoreLandingComponent>;
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      declarations: [ManageStoreLandingComponent]
+    beforeEach(() => {
+        TestBed.configureTestingModule({
+            declarations: [ManageStoreLandingComponent]
+        });
+        fixture = TestBed.createComponent(ManageStoreLandingComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
     });
-    fixture = TestBed.createComponent(ManageStoreLandingComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+    it('should create', () => {
+        expect(component).toBeTruthy();
+    });
 });

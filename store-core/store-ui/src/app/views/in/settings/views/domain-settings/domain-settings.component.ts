@@ -1,6 +1,4 @@
-import {AfterViewInit, Component} from '@angular/core';
-
-import {DomainOwnershipService, DomainType, RegisteredDomain} from "../../../../../service/domain-ownership.service";
+import {Component} from '@angular/core';
 
 @Component({
     selector: 'app-domain-settings',
@@ -8,22 +6,22 @@ import {DomainOwnershipService, DomainType, RegisteredDomain} from "../../../../
     styleUrls: ['./domain-settings.component.css']
 })
 export class DomainSettingsComponent /*implements AfterViewInit*/ {
-/*
-    subDomainReferences: RegisteredDomain[] = [];
-    customDomainReferences: RegisteredDomain[] = [];
+    /*
+        subDomainReferences: RegisteredDomain[] = [];
+        customDomainReferences: RegisteredDomain[] = [];
 
-    constructor(private domainOwnershipService: DomainOwnershipService) {
-    }
+        constructor(private domainOwnershipService: DomainOwnershipService) {
+        }
 
-    ngAfterViewInit(): void {
-        this.domainOwnershipService.getRegisteredDomains().subscribe((it: RegisteredDomain[]) => {
-            this.subDomainReferences = it.filter((d: RegisteredDomain): boolean => {
-                return d.domainType == DomainType.SAS_SUB;
+        ngAfterViewInit(): void {
+            this.domainOwnershipService.getRegisteredDomains().subscribe((it: RegisteredDomain[]) => {
+                this.subDomainReferences = it.filter((d: RegisteredDomain): boolean => {
+                    return d.domainType == DomainType.SAS_SUB;
+                });
+                this.customDomainReferences = it.filter((d: RegisteredDomain): boolean => {
+                    return d.domainType == DomainType.SAS_CUSTOM;
+                });
             });
-            this.customDomainReferences = it.filter((d: RegisteredDomain): boolean => {
-                return d.domainType == DomainType.SAS_CUSTOM;
-            });
-        });
-    }
-*/
+        }
+    */
 }

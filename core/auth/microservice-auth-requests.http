@@ -20,7 +20,8 @@ client_id = admin-cli &
 grant_type = password &
 username = admin
     &
-password = admin & scope=roles
+password = admin &
+scope = roles
 
 ### get token for microservice-domain-ownership
 POST http://localhost:9999/realms/cvhome/protocol/openid-connect/token

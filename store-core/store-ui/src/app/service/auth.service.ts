@@ -10,15 +10,15 @@ export class AuthService {
     private authUser: AuthUser | undefined;
 
     constructor(private httpClient: HttpClient) {
-/*
-        this.authUser = {
-          email_verified: false,
-          family_name: "",
-          given_name: "",
-          preferred_username: "",
-          sub: "temp"
-        }
-*/
+        /*
+                this.authUser = {
+                  email_verified: false,
+                  family_name: "",
+                  given_name: "",
+                  preferred_username: "",
+                  sub: "temp"
+                }
+        */
     }
 
     getAuthUser(): Observable<AuthUser> {

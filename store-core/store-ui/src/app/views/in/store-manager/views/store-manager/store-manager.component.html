@@ -64,7 +64,7 @@
                                     <div class="input-group error validate">
 
                                         <select class="form-control" formControlName="country" placeholder="country">
-                                            <option [value]="c" *ngFor="let c of countries">{{ c }}</option>
+                                            <option *ngFor="let c of countries" [value]="c">{{ c }}</option>
                                         </select>
                                     </div>
                                     <div class="help-block">
