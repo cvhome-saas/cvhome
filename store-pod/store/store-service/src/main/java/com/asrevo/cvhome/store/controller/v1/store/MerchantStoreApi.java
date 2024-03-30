@@ -213,7 +213,7 @@ public class MerchantStoreApi {
 
         userFacade.authorizedGroup(authenticatedUser, Stream.of("SUPERADMIN", "ADMIN_RETAILER").collect(Collectors.toList()));
 
-
+        store.setOrg("d1952c95-312e-4bb9-9a2d-b703d031276f");
         storeFacade.create(store);
     }
 

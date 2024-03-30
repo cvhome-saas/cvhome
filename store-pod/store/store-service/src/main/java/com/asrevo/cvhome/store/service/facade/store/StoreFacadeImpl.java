@@ -224,6 +224,7 @@ public class StoreFacadeImpl implements StoreFacade {
         MerchantStore mStore = getMerchantStoreByCode(code);
 
         store.setId(mStore.getId());
+        store.setOrg(mStore.getOrg());
 
         try {
             mStore = persistableMerchantStorePopulator.populate(store, mStore, language);
@@ -508,6 +509,7 @@ public class StoreFacadeImpl implements StoreFacade {
         convert.setId(store.getId());
         convert.setCode(store.getCode());
         convert.setName(store.getStorename());
+        convert.setOrg(store.getOrg());
         return convert;
     }
 

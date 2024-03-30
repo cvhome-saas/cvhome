@@ -248,6 +248,7 @@ public class InitializationDatabaseImpl implements InitializationDatabase {
         store.setInBusinessSince(date);
         store.setZone(qc);
         store.setStorename("Shopizer");
+        store.setOrg("d1952c95-312e-4bb9-9a2d-b703d031276f");
         store.setStorephone("888-888-8888");
         store.setCode(Constants.DEFAULT_STORE);
         store.setStorecity("My city");

@@ -49,6 +49,9 @@ public class MerchantStore extends SalesManagerEntity<Integer, MerchantStore> im
     @Pattern(regexp = "^[a-zA-Z0-9_]*$")
     @Column(name = "STORE_CODE", nullable = false, unique = true, length = 100)
     private String code;
+    @NotEmpty
+    @Column(name = "ORG", nullable = false, updatable = false)
+    private String org;
     @Column(name = "LINEAGE")
     private String lineage;
     @NotEmpty

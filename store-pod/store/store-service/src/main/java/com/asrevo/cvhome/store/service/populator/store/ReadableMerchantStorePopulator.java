@@ -136,6 +136,7 @@ public class ReadableMerchantStorePopulator extends
         target.setCurrencyFormatNational(source.isCurrencyFormatNational());
         target.setEmail(source.getStoreEmailAddress());
         target.setName(source.getStorename());
+        target.setOrg(source.getOrg());
         target.setId(source.getId());
         target.setInBusinessSince(DateUtil.formatDate(source.getInBusinessSince()));
         target.setUseCache(source.isUseCache());

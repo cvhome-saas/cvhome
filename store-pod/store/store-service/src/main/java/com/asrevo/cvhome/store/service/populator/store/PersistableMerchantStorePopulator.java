@@ -77,6 +77,9 @@ public class PersistableMerchantStorePopulator extends AbstractDataPopulator<Per
         }
         target.setCurrencyFormatNational(source.isCurrencyFormatNational());
         target.setStorename(source.getName());
+        if (source.getOrg() != null) {
+            target.setOrg(source.getOrg());
+        }
         target.setStorephone(source.getPhone());
         target.setStoreEmailAddress(source.getEmail());
         target.setUseCache(source.isUseCache());

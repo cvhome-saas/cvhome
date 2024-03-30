@@ -22,6 +22,7 @@ public class MerchantStoreEntity implements Serializable {
     private String code;
     @NotNull
     private String name;
+    private String org;
 
     private String defaultLanguage;//code
     private String currency;//code
