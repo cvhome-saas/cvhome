@@ -188,7 +188,7 @@ public class WebClientServicesConfig {
 
     @Configuration
     @ConditionalOnWebApplication(type = SERVLET)
-   static class ServletWebClientServicesConfig {
+    static class ServletWebClientServicesConfig {
         @Bean
         public RestClientBuilder restClientBuilder(Environment environment,
                                                    @Qualifier("restBClientBuilder") RestClient.Builder restBClientBuilder,

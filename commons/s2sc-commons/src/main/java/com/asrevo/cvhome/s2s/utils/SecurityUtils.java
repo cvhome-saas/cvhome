@@ -15,9 +15,11 @@ public class SecurityUtils {
     private static boolean hasOrgAdminRole(Authentication authentication) {
         return hasRole(authentication, Roles.ROLE_ORG_ADMIN);
     }
+
     private static boolean hasRole(Authentication authentication, Roles role) {
         return authentication.getAuthorities().stream().anyMatch(it -> it.getAuthority().contains(role.name()));
     }
+
     public static UserOrgStoreInfo getOrgStoreInfo(Authentication authentication) {
         List<Roles> roles = authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).map(Roles::parse).filter(Objects::nonNull).toList();
         if (hasOrgAdminRole(authentication)) {

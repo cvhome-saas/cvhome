@@ -16,6 +16,26 @@ import static com.asrevo.cvhome.s2s.utils.SecurityUtils.getOrgStoreInfo;
 public class SecurityServiceImpl implements SecurityService {
     private final InternalStoreService internalStoreService;
 
+    private static boolean hasSuperAdminRole(Authentication authentication) {
+        return hasRole(authentication, Roles.ROLE_SUPER_ADMIN);
+    }
+
+    private static boolean hasOrgAdminRole(Authentication authentication) {
+        return hasRole(authentication, Roles.ROLE_ORG_ADMIN);
+    }
+
+    private static boolean hasStoreAdminRole(Authentication authentication) {
+        return hasRole(authentication, Roles.ROLE_STORE_ADMIN);
+    }
+
+    private static boolean hasStoreModeratorRole(Authentication authentication) {
+        return hasRole(authentication, Roles.ROLE_STORE_MODERATOR);
+    }
+
+    private static boolean hasRole(Authentication authentication, Roles role) {
+        return authentication.getAuthorities().stream().anyMatch(it -> it.getAuthority().contains(role.name()));
+    }
+
     @Override
     public boolean isSuperAdmin(Authentication authentication, ManagerStoreId requestedStoreId) {
         return hasSuperAdminRole(authentication);
@@ -29,7 +49,6 @@ public class SecurityServiceImpl implements SecurityService {
         String orgName = authentication.getName();
         return internalStoreService.getStoreOwner(requestedStoreId).getId().toString().equals(orgName);
     }
-
 
     @Override
     public boolean isStoreAdmin(Authentication authentication, ManagerStoreId requestedStoreId) {
@@ -53,26 +72,6 @@ public class SecurityServiceImpl implements SecurityService {
             return false;
         }
         return internalStoreService.getStoreOwner(requestedStoreId).equals(info.org());
-    }
-
-    private static boolean hasSuperAdminRole(Authentication authentication) {
-        return hasRole(authentication, Roles.ROLE_SUPER_ADMIN);
-    }
-
-    private static boolean hasOrgAdminRole(Authentication authentication) {
-        return hasRole(authentication, Roles.ROLE_ORG_ADMIN);
-    }
-
-    private static boolean hasStoreAdminRole(Authentication authentication) {
-        return hasRole(authentication, Roles.ROLE_STORE_ADMIN);
-    }
-
-    private static boolean hasStoreModeratorRole(Authentication authentication) {
-        return hasRole(authentication, Roles.ROLE_STORE_MODERATOR);
-    }
-
-    private static boolean hasRole(Authentication authentication, Roles role) {
-        return authentication.getAuthorities().stream().anyMatch(it -> it.getAuthority().contains(role.name()));
     }
 
 

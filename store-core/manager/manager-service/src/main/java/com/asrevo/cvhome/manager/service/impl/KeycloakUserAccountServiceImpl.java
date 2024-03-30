@@ -37,8 +37,17 @@ import static com.asrevo.cvhome.s2s.utils.Constants.STORE_ATTR_KEY;
 public class KeycloakUserAccountServiceImpl implements UserAccountService {
     private final Keycloak keycloak;
     private final OAuth2ResourceServerProperties properties;
-    private UsersResource usersResource;
     private final UserRepresentationMapper userRepresentationMapper;
+    private UsersResource usersResource;
+
+    private static Optional<String> extractKey(Map<String, List<String>> attributes, String key) {
+        List<String> strings = attributes.get(key);
+        if (strings.size() == 1) {
+            return Optional.ofNullable(strings.get(0));
+        } else {
+            return Optional.empty();
+        }
+    }
 
     @SneakyThrows
     @PostConstruct
@@ -56,7 +65,6 @@ public class KeycloakUserAccountServiceImpl implements UserAccountService {
                 map(it -> userRepresentationMapper.toDto(it, usersResource.get(it.getId()).groups()))
                 .toList();
     }
-
 
     @Override
     public KeyCloakUserDto createUser(IdentityId identityId, ManagerStoreId managerStoreId, CreateUserRequestDto createUserRequestDto) {
@@ -160,15 +168,6 @@ public class KeycloakUserAccountServiceImpl implements UserAccountService {
             return storeId.getId().toString().equals(userOrgStoreInfo.store());
         } else {
             return storeAttr.equals(storeId.getId().toString());
-        }
-    }
-
-    private static Optional<String> extractKey(Map<String, List<String>> attributes, String key) {
-        List<String> strings = attributes.get(key);
-        if (strings.size() == 1) {
-            return Optional.ofNullable(strings.get(0));
-        } else {
-            return Optional.empty();
         }
     }
 

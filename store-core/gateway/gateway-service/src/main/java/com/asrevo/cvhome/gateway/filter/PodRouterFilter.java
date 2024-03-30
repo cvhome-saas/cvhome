@@ -40,9 +40,9 @@ public class PodRouterFilter implements GlobalFilter, Ordered {
             if (storeId != null) {
                 Mono<ServerHttpRequest> httpRequest = getServerHttpRequest(exchange, uriComponents, new DomainReference(storeId));
                 return httpRequest.flatMap(it -> {
-                            exchange.getAttributes().put(GATEWAY_REQUEST_URL_ATTR, it.getURI());
-                            return chain.filter(exchange.mutate().request(it).build());
-                        });
+                    exchange.getAttributes().put(GATEWAY_REQUEST_URL_ATTR, it.getURI());
+                    return chain.filter(exchange.mutate().request(it).build());
+                });
 //                        .onErrorResume(throwable -> chain.filter(exchange));
             }
         }
