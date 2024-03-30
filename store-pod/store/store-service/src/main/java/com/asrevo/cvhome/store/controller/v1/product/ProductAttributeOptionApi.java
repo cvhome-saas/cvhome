@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.store.controller.v1.product;
 
+import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import com.asrevo.cvhome.store.core.model.catalog.product.attribute.PersistableProductAttribute;
@@ -40,8 +41,8 @@ public class ProductAttributeOptionApi {
     @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(value = {"/private/product/option"}, method = RequestMethod.POST)
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public @ResponseBody ReadableProductOptionEntity createOption(
             @Valid @RequestBody PersistableProductOptionEntity option, @Parameter(hidden = true) MerchantStore merchantStore,
@@ -55,8 +56,8 @@ public class ProductAttributeOptionApi {
     @ResponseStatus(HttpStatus.OK)
     @GetMapping(value = {"/private/product/option/unique"}, produces = MediaType.APPLICATION_JSON_VALUE)
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     @Operation(method = "GET", description = "Check if option code already exists", summary = "",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = EntityExists.class)))
@@ -71,8 +72,8 @@ public class ProductAttributeOptionApi {
     @ResponseStatus(HttpStatus.OK)
     @GetMapping(value = {"/private/product/option/value/unique"}, produces = MediaType.APPLICATION_JSON_VALUE)
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     @Operation(method = "GET", description = "Check if option value code already exists", summary = "",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = EntityExists.class)))
@@ -86,8 +87,8 @@ public class ProductAttributeOptionApi {
     @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(value = {"/private/product/option/value"}, method = RequestMethod.POST)
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public @ResponseBody ReadableProductOptionValue createOptionValue(
             @Valid @RequestBody PersistableProductOptionValue optionValue,
@@ -106,8 +107,8 @@ public class ProductAttributeOptionApi {
     @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(value = {"/private/product/option/value/{id}/image"}, method = RequestMethod.POST)
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public void addOptionValueImage(
             @PathVariable Long id,
@@ -125,8 +126,8 @@ public class ProductAttributeOptionApi {
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(value = {"/private/product/option/value/{id}/image"}, method = RequestMethod.DELETE)
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public void removeOptionValueImage(
             @PathVariable Long id,
@@ -141,8 +142,8 @@ public class ProductAttributeOptionApi {
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(value = {"/private/product/option/{id}"}, method = RequestMethod.GET)
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     @ResponseBody
     public ReadableProductOptionEntity getOption(@PathVariable Long id, @Parameter(hidden = true) MerchantStore merchantStore,
@@ -155,8 +156,8 @@ public class ProductAttributeOptionApi {
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(value = {"/private/product/option/value/{id}"}, method = RequestMethod.GET)
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     @ResponseBody
     public ReadableProductOptionValue getOptionValue(@PathVariable Long id, @Parameter(hidden = true) MerchantStore merchantStore,
@@ -169,8 +170,8 @@ public class ProductAttributeOptionApi {
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(value = {"/private/product/option/{optionId}"}, method = RequestMethod.PUT)
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public void updateOption(@Valid @RequestBody PersistableProductOptionEntity option, @PathVariable Long optionId,
                              @Parameter(hidden = true) MerchantStore merchantStore, @Parameter(hidden = true) Language language, HttpServletRequest request,
@@ -184,8 +185,8 @@ public class ProductAttributeOptionApi {
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(value = {"/private/product/option/{optionId}"}, method = RequestMethod.DELETE)
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public void deleteOption(@PathVariable Long optionId, @Parameter(hidden = true) MerchantStore merchantStore,
                              @Parameter(hidden = true) Language language, HttpServletRequest request, HttpServletResponse response) {
@@ -198,8 +199,8 @@ public class ProductAttributeOptionApi {
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(value = {"/private/product/option/value/{id}"}, method = RequestMethod.PUT)
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public void updateOptionValue(
             @PathVariable Long id,
@@ -217,8 +218,8 @@ public class ProductAttributeOptionApi {
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(value = {"/private/product/option/value/{id}"}, method = RequestMethod.DELETE)
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public void deleteOptionValue(
             @PathVariable Long id,
@@ -234,8 +235,8 @@ public class ProductAttributeOptionApi {
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(value = {"/private/product/options"}, method = RequestMethod.GET)
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public @ResponseBody ReadableProductOptionList options(
             @Parameter(hidden = true) MerchantStore merchantStore,
@@ -251,8 +252,8 @@ public class ProductAttributeOptionApi {
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(value = {"/private/product/options/values"}, method = RequestMethod.GET)
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public @ResponseBody ReadableProductOptionValueList optionsValues(
             @Parameter(hidden = true) MerchantStore merchantStore,
@@ -278,8 +279,8 @@ public class ProductAttributeOptionApi {
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(value = {"/private/product/{id}/attributes"}, method = RequestMethod.GET)
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     @Operation(method = "GET", description = "Get product attributes", summary = "",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ReadableProductAttributeList.class))))
@@ -297,8 +298,8 @@ public class ProductAttributeOptionApi {
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(value = {"/private/product/{id}/attribute/{attributeId}"}, method = RequestMethod.GET)
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     @Operation(method = "GET", description = "Get product attributes", summary = "",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = EntityExists.class))))
@@ -316,8 +317,8 @@ public class ProductAttributeOptionApi {
     @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(value = {"/private/product/{id}/attribute"}, method = RequestMethod.POST)
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public @ResponseBody Entity createAttribute(
             @PathVariable Long id,
@@ -349,8 +350,8 @@ public class ProductAttributeOptionApi {
     @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(value = {"/private/product/{id}/attributes"}, method = RequestMethod.POST)
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     @Operation(method = "POST", description = "Saves multiple attributes", summary = "application/json",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = CodeEntity.class))))
@@ -368,8 +369,8 @@ public class ProductAttributeOptionApi {
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(value = {"/private/product/{id}/attribute/{attributeId}"}, method = RequestMethod.PUT)
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public void updateAttribute(@PathVariable Long id, @Valid @RequestBody PersistableProductAttribute attribute, @PathVariable Long attributeId,
                                 @Parameter(hidden = true) MerchantStore merchantStore, @Parameter(hidden = true) Language language, HttpServletRequest request,
@@ -385,8 +386,8 @@ public class ProductAttributeOptionApi {
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(value = {"/private/product/{id}/attribute/{attributeId}"}, method = RequestMethod.DELETE)
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public void deleteAttribute(@PathVariable Long id, @PathVariable Long attributeId, @Parameter(hidden = true) MerchantStore merchantStore,
                                 @Parameter(hidden = true) Language language, HttpServletRequest request, HttpServletResponse response) {

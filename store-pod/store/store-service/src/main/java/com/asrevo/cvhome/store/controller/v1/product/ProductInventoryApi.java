@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.store.controller.v1.product;
 
+import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import com.asrevo.cvhome.store.core.model.catalog.product.inventory.PersistableInventory;
@@ -31,8 +32,8 @@ public class ProductInventoryApi {
     @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(value = {"/private/product/{productId}/inventory"}, method = RequestMethod.POST)
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public @ResponseBody ReadableInventory create(@PathVariable Long productId,
                                                   @Valid @RequestBody PersistableInventory inventory, @Parameter(hidden = true) MerchantStore merchantStore,
@@ -44,8 +45,8 @@ public class ProductInventoryApi {
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(value = {"/private/product/{productId}/inventory/{id}"}, method = RequestMethod.PUT)
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public void update(
             @PathVariable Long productId,
@@ -63,8 +64,8 @@ public class ProductInventoryApi {
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(value = {"/private/product/{productId}/inventory/{id}"}, method = RequestMethod.DELETE)
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public void delete(
             @PathVariable Long productId,
@@ -79,8 +80,8 @@ public class ProductInventoryApi {
     @ResponseStatus(HttpStatus.OK)
     @GetMapping(value = {"/private/product/{sku}/inventory"})
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public @ResponseBody ReadableEntityList<ReadableInventory> getBySku(
             @PathVariable String sku,
@@ -96,8 +97,8 @@ public class ProductInventoryApi {
     @ResponseStatus(HttpStatus.OK)
     @GetMapping(value = {"/private/product/inventory"})
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public @ResponseBody ReadableEntityList<ReadableInventory> getByProductId(
             @RequestParam Long productId,

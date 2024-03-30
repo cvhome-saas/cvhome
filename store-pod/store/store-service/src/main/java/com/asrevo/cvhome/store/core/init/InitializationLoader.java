@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.store.core.init;
 
+import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.services.merchant.MerchantStoreService;
 import com.asrevo.cvhome.store.core.services.reference.init.InitializationDatabase;
 import com.asrevo.cvhome.store.core.services.system.MerchantConfigurationService;
@@ -48,7 +49,7 @@ public class InitializationLoader {
 
                 initializationDatabase.populate("sm-shop");
 
-                MerchantStore store = merchantService.getByCode(MerchantStore.DEFAULT_STORE);
+                MerchantStore store = merchantService.getByCode(Constants.DEFAULT_STORE);
 
                 MerchantConfig config = new MerchantConfig();
                 config.setAllowPurchaseItems(true);

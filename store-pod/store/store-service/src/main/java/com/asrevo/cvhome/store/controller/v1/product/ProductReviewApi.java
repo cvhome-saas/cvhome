@@ -48,8 +48,8 @@ public class ProductReviewApi {
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public PersistableProductReview create(
             @PathVariable final Long id,
@@ -96,8 +96,8 @@ public class ProductReviewApi {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public List<ReadableProductReview> getAll(
             @PathVariable final Long id,
@@ -139,8 +139,8 @@ public class ProductReviewApi {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public PersistableProductReview update(
             @PathVariable final Long id,
@@ -195,8 +195,8 @@ public class ProductReviewApi {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public void delete(
             @PathVariable final Long id,

@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.store.controller.v1.product;
 
+import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import com.asrevo.cvhome.store.core.model.catalog.product.PersistableProductPrice;
@@ -41,8 +42,8 @@ public class ProductPriceApi {
     @RequestMapping(value = {"/private/product/{sku}/inventory/{inventoryId}/price"},
             method = RequestMethod.POST)
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public @ResponseBody Entity save(
             @PathVariable String sku,
@@ -64,8 +65,8 @@ public class ProductPriceApi {
     @RequestMapping(value = {"/private/product/{sku}/price"},
             method = RequestMethod.POST)
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public @ResponseBody Entity save(
             @PathVariable String sku,
@@ -85,8 +86,8 @@ public class ProductPriceApi {
     @RequestMapping(value = {"/private/product/{sku}/inventory/{inventoryId}/price/{priceId}"},
             method = RequestMethod.PUT)
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public void edit(
             @PathVariable String sku,
@@ -109,8 +110,8 @@ public class ProductPriceApi {
     @RequestMapping(value = {"/private/product/{sku}/price/{priceId}"},
             method = RequestMethod.GET)
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public ReadableProductPrice get(
             @PathVariable String sku,
@@ -130,8 +131,8 @@ public class ProductPriceApi {
     @RequestMapping(value = {"/private/product/{sku}/inventory/{inventoryId}/price"},
             method = RequestMethod.GET)
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public List<ReadableProductPrice> list(
             @PathVariable String sku,
@@ -149,8 +150,8 @@ public class ProductPriceApi {
     @RequestMapping(value = {"/private/product/{sku}/prices"},
             method = RequestMethod.GET)
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public List<ReadableProductPrice> list(
             @PathVariable String sku,
@@ -167,8 +168,8 @@ public class ProductPriceApi {
     @RequestMapping(value = {"/private/product/{sku}/price/{priceId}"},
             method = RequestMethod.DELETE)
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public void delete(
             @PathVariable String sku,

@@ -25,7 +25,6 @@ import java.util.*;
 @Setter
 public class MerchantStore extends SalesManagerEntity<Integer, MerchantStore> implements Auditable {
 
-    public final static String DEFAULT_STORE = "DEFAULT";
     private static final long serialVersionUID = 1L;
     @Id
     @Column(name = "MERCHANT_ID", unique = true, nullable = false)

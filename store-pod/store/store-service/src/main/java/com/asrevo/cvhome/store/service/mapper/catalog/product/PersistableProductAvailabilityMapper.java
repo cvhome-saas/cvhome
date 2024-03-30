@@ -59,7 +59,7 @@ public class PersistableProductAvailabilityMapper implements Mapper<PersistableP
                     ProductPriceDescription ppd = new ProductPriceDescription();
                     ppd.setProductPrice(price);
                     ppd.setLanguage(lang);
-                    ppd.setName(ProductPriceDescription.DEFAULT_PRICE_DESCRIPTION);
+                    ppd.setName(Constants.DEFAULT_PRICE_DESCRIPTION);
 
                     // price appender
                     Optional<com.asrevo.cvhome.store.core.model.catalog.product.ProductPriceDescription> description = source

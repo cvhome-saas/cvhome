@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.store.controller.v1.product;
 
+import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.services.catalog.product.ProductService;
 import com.asrevo.cvhome.store.core.services.catalog.product.review.ProductReviewService;
 import com.asrevo.cvhome.store.core.entity.catalog.product.Product;
@@ -94,8 +95,8 @@ public class ProductRelationshipApi {
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = List.class))))
     @ResponseBody
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public List<ReadableProduct> getAll(
             @PathVariable final Long id,

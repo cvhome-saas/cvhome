@@ -14,7 +14,11 @@ public class Constants {
     public final static String UNDERSCORE = "_";
     public final static String TRUE = "true";
 
-    public final static String DEFAULT_STORE = "DEFAULT";
+    public final static String DEFAULT_STORE = "65f023632bc46470c104b76f";
+    public static final String DEFAULT_MANUFACTURER = "DEFAULT";
+    public final static String DEFAULT_TAX_CLASS = "DEFAULT";
+    public final static String DEFAULT_PRICE_DESCRIPTION = "DEFAULT";
+
 
     public final static Locale DEFAULT_LOCALE = Locale.US;
     public final static Currency DEFAULT_CURRENCY = Currency.getInstance(Locale.US);

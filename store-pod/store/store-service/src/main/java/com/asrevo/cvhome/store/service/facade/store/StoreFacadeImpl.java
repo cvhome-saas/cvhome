@@ -267,7 +267,7 @@ public class StoreFacadeImpl implements StoreFacade {
     @Override
     public void delete(String code) {
 
-        if (MerchantStore.DEFAULT_STORE.equals(code.toUpperCase())) {
+        if (Constants.DEFAULT_STORE.equals(code.toUpperCase())) {
             throw new ServiceRuntimeException("Cannot remove default store");
         }
 

@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.store.controller.v2.product;
 
+import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.entity.catalog.product.ProductCriteria;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
@@ -74,8 +75,8 @@ public class ProductApiV2 {
     @RequestMapping(value = {"/private/product/inventory"},
             method = RequestMethod.POST)
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public @ResponseBody Entity create(
             @Valid @RequestBody PersistableProduct product,
@@ -99,8 +100,8 @@ public class ProductApiV2 {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(value = {"/private/product"})
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public @ResponseBody Entity createV2(@Valid @RequestBody PersistableProductDefinition product,
                                          @Parameter(hidden = true) MerchantStore merchantStore, @Parameter(hidden = true) Language language) {
@@ -117,8 +118,8 @@ public class ProductApiV2 {
     @ResponseStatus(HttpStatus.OK)
     @PutMapping(value = {"/private/product/{id}"})
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public void updateV2(@PathVariable Long id,
                          @Valid @RequestBody PersistableProductDefinition product,
@@ -131,8 +132,8 @@ public class ProductApiV2 {
     @ResponseStatus(HttpStatus.OK)
     @GetMapping(value = {"/private/product/{id}"})
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public @ResponseBody ReadableProductDefinition getV2(
             @PathVariable Long id,
@@ -147,8 +148,8 @@ public class ProductApiV2 {
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(value = {"/private/product/{id}"}, method = RequestMethod.DELETE)
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public void deleteV2(@PathVariable Long id, @Parameter(hidden = true) MerchantStore merchantStore, @Parameter(hidden = true) Language language) {
 
@@ -172,8 +173,8 @@ public class ProductApiV2 {
     @ApiResponse(responseCode = "200", description = "Single product found", content = @Content(schema = @Schema(implementation = ReadableProduct.class)))
     @ResponseBody
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public ReadableProduct getByfriendlyUrl(
             @PathVariable final String friendlyUrl,
@@ -203,8 +204,8 @@ public class ProductApiV2 {
     @RequestMapping(value = "/products/category/{friendlyUrl}", method = RequestMethod.GET)
     @ResponseBody
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public ReadableProductList list(
             @RequestParam(value = "lang", required = false) String lang,
@@ -257,8 +258,8 @@ public class ProductApiV2 {
     @RequestMapping(value = "/products", method = RequestMethod.GET)
     @ResponseBody
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public ReadableProductList list(
             @RequestParam(value = "lang", required = false) String lang,
@@ -304,8 +305,8 @@ public class ProductApiV2 {
     @PatchMapping(value = "/private/product/{sku}", produces = {APPLICATION_JSON_VALUE})
     @Operation(method = "PATCH", description = "Update product inventory", summary = "Updates product inventory", responses = @ApiResponse(content = @Content(mediaType = "application/json", schema = @Schema(implementation = Void.class))))
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public void update(
             @PathVariable String sku,
@@ -334,8 +335,8 @@ public class ProductApiV2 {
     @ApiResponse(responseCode = "200", description = "Single product found", content = @Content(schema = @Schema(implementation = ReadableProduct.class)))
     @ResponseBody
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public ReadableProduct get(@PathVariable final String sku,
                                @RequestParam(value = "lang", required = false) String lang,

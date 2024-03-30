@@ -22,7 +22,6 @@ import lombok.Setter;
 @Setter
 public class ProductPriceDescription extends Description {
 
-    public final static String DEFAULT_PRICE_DESCRIPTION = "DEFAULT";
     /**
      *
      */

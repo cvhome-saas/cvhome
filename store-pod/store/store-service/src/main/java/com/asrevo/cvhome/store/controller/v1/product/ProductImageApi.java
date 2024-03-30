@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.store.controller.v1.product;
 
+import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.services.catalog.product.ProductService;
 import com.asrevo.cvhome.store.core.services.catalog.product.image.ProductImageService;
@@ -63,8 +64,8 @@ public class ProductImageApi {
     @RequestMapping(value = {"/private/product/{id}/image", "/auth/product/{id}/image"}, consumes = {
             MediaType.MULTIPART_FORM_DATA_VALUE}, method = RequestMethod.POST)
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public void uploadImage(
             @PathVariable Long id,
@@ -193,8 +194,8 @@ public class ProductImageApi {
             @ApiResponse(responseCode = "200", description = "List of ProductImage found")})
     @ResponseBody
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public List<ReadableImage> images(
             @PathVariable Long productId,
@@ -251,8 +252,8 @@ public class ProductImageApi {
     @RequestMapping(value = {"/private/product/{id}/image/{imageId}",
             "/auth/product/{id}/image"}, method = RequestMethod.PATCH)
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public void imageDetails(@PathVariable Long id, @PathVariable Long imageId,
                              @RequestParam(value = "order", required = false, defaultValue = "0") Integer position,

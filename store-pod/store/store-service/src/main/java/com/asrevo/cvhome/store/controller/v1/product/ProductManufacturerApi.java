@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.store.controller.v1.product;
 
+import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.services.catalog.product.manufacturer.ManufacturerService;
 import com.asrevo.cvhome.store.core.entity.catalog.product.manufacturer.Manufacturer;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
@@ -62,8 +63,8 @@ public class ProductManufacturerApi {
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public PersistableManufacturer create(@Valid @RequestBody PersistableManufacturer manufacturer,
                                           @Parameter(hidden = true) MerchantStore merchantStore, @Parameter(hidden = true) Language language, HttpServletResponse response) {
@@ -88,8 +89,8 @@ public class ProductManufacturerApi {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public ReadableManufacturer get(@PathVariable Long id, @Parameter(hidden = true) MerchantStore merchantStore,
                                     @Parameter(hidden = true) Language language, HttpServletResponse response) {
@@ -119,8 +120,8 @@ public class ProductManufacturerApi {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     @Operation(method = "GET", description = "List manufacturers by store", summary = "This request supports paging or not. Paging supports page number and request count",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ReadableManufacturerList.class)))
@@ -142,8 +143,8 @@ public class ProductManufacturerApi {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     @Operation(method = "GET", description = "List manufacturers by store", summary = "This request supports paging or not. Paging supports page number and request count",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ReadableManufacturerList.class)))
@@ -161,8 +162,8 @@ public class ProductManufacturerApi {
     @ResponseStatus(HttpStatus.OK)
     @GetMapping(value = {"/private/manufacturer/unique"}, produces = MediaType.APPLICATION_JSON_VALUE)
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     @Operation(method = "GET", description = "Check if manufacturer code already exists", summary = "",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = EntityExists.class))))
@@ -178,8 +179,8 @@ public class ProductManufacturerApi {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public void update(@PathVariable Long id,
                        @Valid @RequestBody PersistableManufacturer manufacturer, @Parameter(hidden = true) MerchantStore merchantStore,
@@ -201,8 +202,8 @@ public class ProductManufacturerApi {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public void delete(@PathVariable Long id, @Parameter(hidden = true) MerchantStore merchantStore, @Parameter(hidden = true) Language language,
                        HttpServletResponse response) {
@@ -231,8 +232,8 @@ public class ProductManufacturerApi {
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = List.class))))
     @ResponseBody
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public List<ReadableManufacturer> list(@PathVariable final Long id, // category
                                            // id

@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.store.controller.v2.product;
 
+import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.services.catalog.pricing.PricingService;
 import com.asrevo.cvhome.store.core.services.catalog.product.ProductService;
 import com.asrevo.cvhome.store.core.entity.catalog.product.Product;
@@ -94,8 +95,8 @@ public class ProductVariationApi {
             responses = @ApiResponse(content = @Content(mediaType = "application/json", schema = @Schema(implementation = ReadableProductPrice.class))))
     @ResponseBody
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public ReadableProductPrice calculateVariant(
             @PathVariable final Long id,
@@ -152,8 +153,8 @@ public class ProductVariationApi {
             responses = @ApiResponse(content = @Content(mediaType = "application/json", schema = @Schema(implementation = List.class))))
     @ResponseBody
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public List<ReadableProductVariant> categoryVariantList(
             @PathVariable final Long id, //category id
@@ -174,8 +175,8 @@ public class ProductVariationApi {
             summary = "",
             responses = @ApiResponse(content = @Content(mediaType = "application/json", schema = @Schema(implementation = Void.class))))
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public @ResponseBody Entity create(
             @Valid @RequestBody PersistableProductVariation variation,
@@ -190,8 +191,8 @@ public class ProductVariationApi {
     @ResponseStatus(HttpStatus.OK)
     @GetMapping(value = {"/private/product/variation/unique"}, produces = MediaType.APPLICATION_JSON_VALUE)
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     @Operation(method = "GET", description = "Check if option set code already exists", summary = "", responses = {@ApiResponse(content = @Content(schema = @Schema(implementation = EntityExists.class)))})
     public ResponseEntity<EntityExists> exists(
@@ -207,8 +208,8 @@ public class ProductVariationApi {
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(value = {"/private/product/variation/{variationId}"}, method = RequestMethod.GET)
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     @ResponseBody
     public ReadableProductVariation get(
@@ -224,8 +225,8 @@ public class ProductVariationApi {
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(value = {"/private/product/variation/{variationId}"}, method = RequestMethod.PUT)
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public void update(
             @Valid @RequestBody PersistableProductVariation variation,
@@ -242,8 +243,8 @@ public class ProductVariationApi {
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(value = {"/private/product/variation/{variationId}"}, method = RequestMethod.DELETE)
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public void delete(
             @PathVariable Long variationId,
@@ -258,8 +259,8 @@ public class ProductVariationApi {
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(value = {"/private/product/variations"}, method = RequestMethod.GET)
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public @ResponseBody ReadableEntityList<ReadableProductVariation> list(
             @Parameter(hidden = true) MerchantStore merchantStore,

@@ -22,7 +22,6 @@ import java.util.List;
 
 
 public class TaxClass extends SalesManagerEntity<Long, TaxClass> {
-    public final static String DEFAULT_TAX_CLASS = "DEFAULT";
     private static final long serialVersionUID = 1L;
     @Id
     @Column(name = "TAX_CLASS_ID", unique = true, nullable = false)

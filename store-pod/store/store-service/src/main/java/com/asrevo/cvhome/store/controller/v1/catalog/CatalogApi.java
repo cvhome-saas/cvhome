@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.store.controller.v1.catalog;
 
+import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
@@ -45,8 +46,8 @@ public class CatalogApi {
     @Operation(method = "GET", description = "Get catalogs by merchant", summary = "",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ReadableEntityList.class))))
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public ReadableEntityList<ReadableCatalog> getCatalogs(
             @Parameter(hidden = true) MerchantStore merchantStore, @Parameter(hidden = true) Language language,
@@ -62,8 +63,8 @@ public class CatalogApi {
     @ResponseStatus(HttpStatus.OK)
     @GetMapping(value = {"/private/catalog/unique"}, produces = MediaType.APPLICATION_JSON_VALUE)
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     @Operation(method = "GET", description = "Check if catalog code already exists", summary = "",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = Void.class))))
@@ -81,8 +82,8 @@ public class CatalogApi {
     @Operation(method = "POST", description = "Create catalog", summary = "",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = Void.class))))
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public ReadableCatalog createCatalog(
             @RequestBody @Valid PersistableCatalog catalog,
@@ -97,8 +98,8 @@ public class CatalogApi {
     @Operation(method = "PATCH", description = "Update catalog", summary = "",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = Void.class))))
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public void updateCatalog(
             @PathVariable Long id,
@@ -115,8 +116,8 @@ public class CatalogApi {
     @Operation(method = "GET", description = "Get catalog", summary = "",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = Void.class))))
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public ReadableCatalog getCatalog(
             @PathVariable Long id,
@@ -132,8 +133,8 @@ public class CatalogApi {
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = Void.class))))
 
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public void deleteCatalog(
             @PathVariable Long id,
@@ -148,8 +149,8 @@ public class CatalogApi {
     @Operation(method = "POST", description = "Add catalog entry to catalog", summary = "",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ReadableCatalogCategoryEntry.class))))
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public ReadableCatalogCategoryEntry addCatalogEntry(
             @PathVariable Long id,
@@ -175,8 +176,8 @@ public class CatalogApi {
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = Void.class))))
 
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public void removeCatalogEntry(
             @PathVariable Long id,
@@ -193,8 +194,8 @@ public class CatalogApi {
     @ResponseStatus(HttpStatus.OK)
     @Operation(method = "GET", description = "Get catalog entry by catalog", summary = "", responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ReadableEntityList.class))))
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public ReadableEntityList<ReadableCatalogCategoryEntry> getCatalogEntry(
             @PathVariable(value = "id") Long id,

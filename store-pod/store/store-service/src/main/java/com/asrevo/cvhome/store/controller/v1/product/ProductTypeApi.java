@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.store.controller.v1.product;
 
+import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import com.asrevo.cvhome.store.core.model.catalog.product.type.PersistableProductType;
@@ -42,8 +43,8 @@ public class ProductTypeApi {
     @GetMapping(value = "/private/product/types", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(method = "GET", description = "Get product types list", summary = "", responses = @ApiResponse(content = @Content(schema = @Schema(implementation = List.class))))
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public ReadableProductTypeList list(@RequestParam(name = "count", defaultValue = "10") int count,
                                         @RequestParam(name = "page", defaultValue = "0") int page, @Parameter(hidden = true) MerchantStore merchantStore,
@@ -57,8 +58,8 @@ public class ProductTypeApi {
     @Operation(method = "GET", description = "Get product type", summary = "",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ReadableProductType.class))))
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public ReadableProductType get(@PathVariable Long id, @Parameter(hidden = true) MerchantStore merchantStore,
                                    @Parameter(hidden = true) Language language) {
@@ -71,8 +72,8 @@ public class ProductTypeApi {
     @Operation(method = "GET", description = "Verify if product type is unique", summary = "",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = EntityExists.class))))
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public ResponseEntity<EntityExists> exists(@RequestParam String code, @Parameter(hidden = true) MerchantStore merchantStore,
                                                @Parameter(hidden = true) Language language) {
@@ -85,8 +86,8 @@ public class ProductTypeApi {
     @PostMapping(value = "/private/product/type", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(method = "POST", description = "Create product type", summary = "", responses = @ApiResponse(content = @Content(schema = @Schema(implementation = Entity.class))))
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public Entity create(@RequestBody PersistableProductType type, @Parameter(hidden = true) MerchantStore merchantStore,
                          @Parameter(hidden = true) Language language) {
@@ -102,8 +103,8 @@ public class ProductTypeApi {
     @Operation(method = "PUT", description = "Update product type", summary = "",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = Void.class))))
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public void update(@RequestBody PersistableProductType type, @PathVariable Long id,
                        @Parameter(hidden = true) MerchantStore merchantStore, @Parameter(hidden = true) Language language) {
@@ -115,8 +116,8 @@ public class ProductTypeApi {
     @DeleteMapping(value = "/private/product/type/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(method = "DELETE", description = "Delete product type", summary = "", responses = @ApiResponse(content = @Content(schema = @Schema(implementation = EntityExists.class))))
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public void delete(@PathVariable Long id, @Parameter(hidden = true) MerchantStore merchantStore, @Parameter(hidden = true) Language language) {
 

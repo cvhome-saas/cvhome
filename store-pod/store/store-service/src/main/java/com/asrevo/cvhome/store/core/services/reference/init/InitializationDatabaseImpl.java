@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.store.core.services.reference.init;
 
+import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.services.catalog.product.manufacturer.ManufacturerService;
 import com.asrevo.cvhome.store.core.services.catalog.product.type.ProductTypeService;
@@ -248,7 +249,7 @@ public class InitializationDatabaseImpl implements InitializationDatabase {
         store.setZone(qc);
         store.setStorename("Shopizer");
         store.setStorephone("888-888-8888");
-        store.setCode(MerchantStore.DEFAULT_STORE);
+        store.setCode(Constants.DEFAULT_STORE);
         store.setStorecity("My city");
         store.setStoreaddress("1234 Street address");
         store.setStorepostalcode("H2H-2H2");
@@ -270,14 +271,14 @@ public class InitializationDatabaseImpl implements InitializationDatabase {
 
         //create default manufacturer
         Manufacturer defaultManufacturer = new Manufacturer();
-        defaultManufacturer.setCode("DEFAULT");
+        defaultManufacturer.setCode(Constants.DEFAULT_MANUFACTURER);
         defaultManufacturer.setMerchantStore(store);
 
         ManufacturerDescription manufacturerDescription = new ManufacturerDescription();
         manufacturerDescription.setLanguage(en);
-        manufacturerDescription.setName("DEFAULT");
+        manufacturerDescription.setName(Constants.DEFAULT_MANUFACTURER);
         manufacturerDescription.setManufacturer(defaultManufacturer);
-        manufacturerDescription.setDescription("DEFAULT");
+        manufacturerDescription.setDescription(Constants.DEFAULT_MANUFACTURER);
         defaultManufacturer.getDescriptions().add(manufacturerDescription);
 
         manufacturerService.create(defaultManufacturer);

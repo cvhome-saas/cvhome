@@ -55,8 +55,8 @@ public class ProductVariantApi {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(value = {"/private/product/{productId}/variant"})
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public @ResponseBody Entity create(
             @Valid @RequestBody PersistableProductVariant variant,
@@ -99,8 +99,8 @@ public class ProductVariantApi {
     @ResponseStatus(HttpStatus.OK)
     @GetMapping(value = {"/private/product/{id}/variant/{sku}/unique"}, produces = "application/json")
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     @Operation(method = "GET", description = "Check if option set code already exists", summary = "", responses = {@ApiResponse(content = @Content(schema = @Schema(implementation = EntityExists.class)))})
     public @ResponseBody ResponseEntity<EntityExists> exists(
@@ -126,8 +126,8 @@ public class ProductVariantApi {
     @Operation(method = "GET", description = "Get a productVariant by id", summary = "For administration and shop purpose. Specifying ?merchant is required otherwise it falls back to DEFAULT")
     @ApiResponse(responseCode = "200", description = "Single product found", content = @Content(schema = @Schema(implementation = ReadableProductVariant.class)))
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public @ResponseBody ReadableProductVariant get(
             @PathVariable final Long id,
@@ -143,8 +143,8 @@ public class ProductVariantApi {
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(value = {"/private/product/{id}/variants"}, method = RequestMethod.GET)
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public @ResponseBody ReadableEntityList<ReadableProductVariant> list(@PathVariable final Long id,
                                                                          @Parameter(hidden = true) MerchantStore merchantStore, @Parameter(hidden = true) Language language,
@@ -158,8 +158,8 @@ public class ProductVariantApi {
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(value = {"/private/product/{id}/variant/{variantId}"}, method = RequestMethod.DELETE)
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public void delete(
             @PathVariable Long id,
@@ -178,8 +178,8 @@ public class ProductVariantApi {
      @ResponseStatus(HttpStatus.CREATED)
      @RequestMapping(value = { "/private/product/{id}/{variantId}/image" }, method = RequestMethod.POST)
      @Parameters({
-     @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = "DEFAULT")),
-     @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+     @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+     @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
      })
      public void addvariantImage(
      @PathVariable Long id,

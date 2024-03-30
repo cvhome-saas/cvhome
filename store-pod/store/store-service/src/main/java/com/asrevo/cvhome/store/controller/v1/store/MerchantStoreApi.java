@@ -70,7 +70,7 @@ public class MerchantStoreApi {
     @Operation(method = "GET", description = "Get merchant store full details", summary = "",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ReadableMerchantStore.class))))
     @Parameters({
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public ReadableMerchantStore storeFull(
             @PathVariable String code,
@@ -89,7 +89,7 @@ public class MerchantStoreApi {
     @Operation(method = "GET", description = "Get retailer child stores", summary = "Merchant (retailer) can have multiple stores",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ReadableMerchantStore.class))))
     @Parameters({
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public ReadableMerchantStoreList list(@PathVariable String code, @Parameter(hidden = true) Language language,
                                           @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
@@ -113,7 +113,7 @@ public class MerchantStoreApi {
     @Operation(method = "GET", description = "Get list of stores. Returns all retailers and stores. If superadmin everything is returned, else only retailer and child stores.",
             summary = "", responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ReadableMerchantStore.class))))
     @Parameters({
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public ReadableMerchantStoreList get(
             @Parameter(hidden = true) MerchantStore merchantStore,
@@ -265,7 +265,7 @@ public class MerchantStoreApi {
     @Operation(method = "GET", description = "Get child stores", summary = "",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ReadableMerchantStore.class))))
     @Parameters({
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = "en"))
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public ReadableMerchantStoreList children(@PathVariable String code, @Parameter(hidden = true) Language language,
                                               @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,

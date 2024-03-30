@@ -20,7 +20,6 @@ import java.util.Set;
 @Getter
 @Setter
 public class Manufacturer extends SalesManagerEntity<Long, Manufacturer> implements Auditable {
-    public static final String DEFAULT_MANUFACTURER = "DEFAULT";
     private static final long serialVersionUID = 1L;
     @Id
     @Column(name = "MANUFACTURER_ID", unique = true, nullable = false)

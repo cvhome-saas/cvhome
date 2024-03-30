@@ -205,7 +205,7 @@ public class PersistableProductDefinitionMapper implements Mapper<PersistablePro
                     ProductPriceDescription ppd = new ProductPriceDescription();
                     ppd.setProductPrice(defaultPrice);
                     ppd.setLanguage(lang);
-                    ppd.setName(ProductPriceDescription.DEFAULT_PRICE_DESCRIPTION);
+                    ppd.setName(Constants.DEFAULT_PRICE_DESCRIPTION);
                     defaultPrice.getDescriptions().add(ppd);
                 }
             }

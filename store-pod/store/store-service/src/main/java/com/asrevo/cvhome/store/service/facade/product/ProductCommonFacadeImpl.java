@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.store.service.facade.product;
 
+import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.model.catalog.product.*;
 import com.asrevo.cvhome.store.controller.exception.ConversionException;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
@@ -76,7 +77,7 @@ public class ProductCommonFacadeImpl implements ProductCommonFacade {
     @Override
     public Long saveProduct(MerchantStore store, PersistableProduct product, Language language) {
 
-        String manufacturer = Manufacturer.DEFAULT_MANUFACTURER;
+        String manufacturer = Constants.DEFAULT_MANUFACTURER;
         if (product.getProductSpecifications() != null) {
             manufacturer = product.getProductSpecifications().getManufacturer();
         } else {
