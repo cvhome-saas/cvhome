@@ -28,11 +28,13 @@ public class Constants {
     public final static String LANG = "lang";
 
     public final static String MERCHANT_STORE = "MERCHANT_STORE";
-    public final static String GROUP_ADMIN = "ADMIN";
 
-    public final static String GROUP_SUPERADMIN = "SUPERADMIN";
-    public final static String GROUP_ADMIN_CATALOGUE = "ADMIN_CATALOGUE";
-    public final static String GROUP_ADMIN_RETAIL = "ADMIN_RETAIL";
+    public final static String GROUP_SUPER_ADMIN = "SUPER_ADMIN"; // super admin for all orgs and stores    // new*
+    public final static String GROUP_ORG_ADMIN = "ORG_ADMIN"; // store admin
+    public final static String GROUP_ADMIN = "ADMIN"; // store admin
+
+    public final static String GROUP_ADMIN_CATALOGUE = "ADMIN_CATALOGUE"; /// moderator
+    public final static String GROUP_ADMIN_RETAIL = "ADMIN_RETAIL";  //not have // new*
 
     public final static String STATIC_URI = "/static";
     public final static String FILES_URI = "/files";

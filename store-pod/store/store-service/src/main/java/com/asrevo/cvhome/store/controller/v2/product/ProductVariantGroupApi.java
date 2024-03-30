@@ -55,7 +55,7 @@ public class ProductVariantGroupApi {
             throw new UnauthorizedException();
         }
 
-        userFacade.authorizedGroup(authenticatedUser, Stream.of(Constants.GROUP_SUPERADMIN, Constants.GROUP_ADMIN,
+        userFacade.authorizedGroup(authenticatedUser, Stream.of(Constants.GROUP_SUPER_ADMIN, Constants.GROUP_ADMIN,
                 Constants.GROUP_ADMIN_CATALOGUE, Constants.GROUP_ADMIN_RETAIL).collect(Collectors.toList()));
 
         Long id = productVariantGroupFacade.create(instanceGroup, merchantStore, language);
@@ -77,7 +77,7 @@ public class ProductVariantGroupApi {
             throw new UnauthorizedException();
         }
 
-        userFacade.authorizedGroup(authenticatedUser, Stream.of(Constants.GROUP_SUPERADMIN, Constants.GROUP_ADMIN,
+        userFacade.authorizedGroup(authenticatedUser, Stream.of(Constants.GROUP_SUPER_ADMIN, Constants.GROUP_ADMIN,
                 Constants.GROUP_ADMIN_CATALOGUE, Constants.GROUP_ADMIN_RETAIL).collect(Collectors.toList()));
 
         productVariantGroupFacade.update(id, instance, merchantStore, language);
@@ -95,7 +95,7 @@ public class ProductVariantGroupApi {
             throw new UnauthorizedException();
         }
 
-        userFacade.authorizedGroup(authenticatedUser, Stream.of(Constants.GROUP_SUPERADMIN, Constants.GROUP_ADMIN,
+        userFacade.authorizedGroup(authenticatedUser, Stream.of(Constants.GROUP_SUPER_ADMIN, Constants.GROUP_ADMIN,
                 Constants.GROUP_ADMIN_CATALOGUE, Constants.GROUP_ADMIN_RETAIL).collect(Collectors.toList()));
 
         return productVariantGroupFacade.get(id, merchantStore, language);
@@ -114,7 +114,7 @@ public class ProductVariantGroupApi {
             throw new UnauthorizedException();
         }
 
-        userFacade.authorizedGroup(authenticatedUser, Stream.of(Constants.GROUP_SUPERADMIN, Constants.GROUP_ADMIN,
+        userFacade.authorizedGroup(authenticatedUser, Stream.of(Constants.GROUP_SUPER_ADMIN, Constants.GROUP_ADMIN,
                 Constants.GROUP_ADMIN_CATALOGUE, Constants.GROUP_ADMIN_RETAIL).collect(Collectors.toList()));
 
         productVariantGroupFacade.delete(id, id, merchantStore);
@@ -136,7 +136,7 @@ public class ProductVariantGroupApi {
             throw new UnauthorizedException();
         }
 
-        userFacade.authorizedGroup(authenticatedUser, Stream.of(Constants.GROUP_SUPERADMIN, Constants.GROUP_ADMIN,
+        userFacade.authorizedGroup(authenticatedUser, Stream.of(Constants.GROUP_SUPER_ADMIN, Constants.GROUP_ADMIN,
                 Constants.GROUP_ADMIN_CATALOGUE, Constants.GROUP_ADMIN_RETAIL).collect(Collectors.toList()));
 
         return productVariantGroupFacade.list(id, merchantStore, language, page, count);
@@ -162,7 +162,7 @@ public class ProductVariantGroupApi {
             throw new UnauthorizedException();
         }
 
-        userFacade.authorizedGroup(authenticatedUser, Stream.of(Constants.GROUP_SUPERADMIN, Constants.GROUP_ADMIN,
+        userFacade.authorizedGroup(authenticatedUser, Stream.of(Constants.GROUP_SUPER_ADMIN, Constants.GROUP_ADMIN,
                 Constants.GROUP_ADMIN_CATALOGUE, Constants.GROUP_ADMIN_RETAIL).collect(Collectors.toList()));
 
         productVariantGroupFacade.addImage(file, id, merchantStore, language);
@@ -181,7 +181,7 @@ public class ProductVariantGroupApi {
             throw new UnauthorizedException();
         }
 
-        userFacade.authorizedGroup(authenticatedUser, Stream.of(Constants.GROUP_SUPERADMIN, Constants.GROUP_ADMIN,
+        userFacade.authorizedGroup(authenticatedUser, Stream.of(Constants.GROUP_SUPER_ADMIN, Constants.GROUP_ADMIN,
                 Constants.GROUP_ADMIN_CATALOGUE, Constants.GROUP_ADMIN_RETAIL).collect(Collectors.toList()));
 
         productVariantGroupFacade.removeImage(imageId, id, merchantStore);

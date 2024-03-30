@@ -69,7 +69,7 @@ public class ProductVariantApi {
             throw new UnauthorizedException();
         }
 
-        userFacade.authorizedGroup(authenticatedUser, Stream.of(Constants.GROUP_SUPERADMIN, Constants.GROUP_ADMIN,
+        userFacade.authorizedGroup(authenticatedUser, Stream.of(Constants.GROUP_SUPER_ADMIN, Constants.GROUP_ADMIN,
                 Constants.GROUP_ADMIN_CATALOGUE, Constants.GROUP_ADMIN_RETAIL).collect(Collectors.toList()));
 
         Long id = productVariantFacade.create(variant, productId, merchantStore, language);
@@ -90,7 +90,7 @@ public class ProductVariantApi {
             throw new UnauthorizedException();
         }
 
-        userFacade.authorizedGroup(authenticatedUser, Stream.of(Constants.GROUP_SUPERADMIN, Constants.GROUP_ADMIN,
+        userFacade.authorizedGroup(authenticatedUser, Stream.of(Constants.GROUP_SUPER_ADMIN, Constants.GROUP_ADMIN,
                 Constants.GROUP_ADMIN_CATALOGUE, Constants.GROUP_ADMIN_RETAIL).collect(Collectors.toList()));
 
         productVariantFacade.update(variantId, variant, id, merchantStore, language);
@@ -114,7 +114,7 @@ public class ProductVariantApi {
             throw new UnauthorizedException();
         }
 
-        userFacade.authorizedGroup(authenticatedUser, Stream.of(Constants.GROUP_SUPERADMIN, Constants.GROUP_ADMIN,
+        userFacade.authorizedGroup(authenticatedUser, Stream.of(Constants.GROUP_SUPER_ADMIN, Constants.GROUP_ADMIN,
                 Constants.GROUP_ADMIN_CATALOGUE, Constants.GROUP_ADMIN_RETAIL).collect(Collectors.toList()));
 
         boolean exist = productVariantFacade.exists(sku, merchantStore, id, language);

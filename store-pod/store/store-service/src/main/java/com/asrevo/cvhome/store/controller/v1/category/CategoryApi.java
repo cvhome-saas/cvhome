@@ -152,7 +152,7 @@ public class CategoryApi {
             throw new UnauthorizedException();
         }
 
-        userFacade.authorizedGroup(authenticatedUser, Stream.of(Constants.GROUP_SUPERADMIN, Constants.GROUP_ADMIN, Constants.GROUP_ADMIN_CATALOGUE, Constants.GROUP_ADMIN_RETAIL).collect(Collectors.toList()));
+        userFacade.authorizedGroup(authenticatedUser, Stream.of(Constants.GROUP_SUPER_ADMIN, Constants.GROUP_ADMIN, Constants.GROUP_ADMIN_CATALOGUE, Constants.GROUP_ADMIN_RETAIL).collect(Collectors.toList()));
 
         return categoryFacade.saveCategory(merchantStore, category);
     }
@@ -170,7 +170,7 @@ public class CategoryApi {
             throw new UnauthorizedException();
         }
 
-        userFacade.authorizedGroup(authenticatedUser, Stream.of(Constants.GROUP_SUPERADMIN, Constants.GROUP_ADMIN, Constants.GROUP_ADMIN_CATALOGUE, Constants.GROUP_ADMIN_RETAIL).collect(Collectors.toList()));
+        userFacade.authorizedGroup(authenticatedUser, Stream.of(Constants.GROUP_SUPER_ADMIN, Constants.GROUP_ADMIN, Constants.GROUP_ADMIN_CATALOGUE, Constants.GROUP_ADMIN_RETAIL).collect(Collectors.toList()));
 
 
         category.setId(id);
@@ -191,7 +191,7 @@ public class CategoryApi {
             throw new UnauthorizedException();
         }
 
-        userFacade.authorizedGroup(authenticatedUser, Stream.of(Constants.GROUP_SUPERADMIN, Constants.GROUP_ADMIN, Constants.GROUP_ADMIN_CATALOGUE, Constants.GROUP_ADMIN_RETAIL).collect(Collectors.toList()));
+        userFacade.authorizedGroup(authenticatedUser, Stream.of(Constants.GROUP_SUPER_ADMIN, Constants.GROUP_ADMIN, Constants.GROUP_ADMIN_CATALOGUE, Constants.GROUP_ADMIN_RETAIL).collect(Collectors.toList()));
 
         category.setId(id);
         categoryFacade.setVisible(category, merchantStore);
@@ -212,7 +212,7 @@ public class CategoryApi {
             throw new UnauthorizedException();
         }
 
-        userFacade.authorizedGroup(authenticatedUser, Stream.of(Constants.GROUP_SUPERADMIN, Constants.GROUP_ADMIN, Constants.GROUP_ADMIN_CATALOGUE, Constants.GROUP_ADMIN_RETAIL).collect(Collectors.toList()));
+        userFacade.authorizedGroup(authenticatedUser, Stream.of(Constants.GROUP_SUPER_ADMIN, Constants.GROUP_ADMIN, Constants.GROUP_ADMIN_CATALOGUE, Constants.GROUP_ADMIN_RETAIL).collect(Collectors.toList()));
 
 
         categoryFacade.move(id, parent, merchantStore);
@@ -229,7 +229,7 @@ public class CategoryApi {
             throw new UnauthorizedException();
         }
 
-        userFacade.authorizedGroup(authenticatedUser, Stream.of(Constants.GROUP_SUPERADMIN, Constants.GROUP_ADMIN, Constants.GROUP_ADMIN_CATALOGUE, Constants.GROUP_ADMIN_RETAIL).collect(Collectors.toList()));
+        userFacade.authorizedGroup(authenticatedUser, Stream.of(Constants.GROUP_SUPER_ADMIN, Constants.GROUP_ADMIN, Constants.GROUP_ADMIN_CATALOGUE, Constants.GROUP_ADMIN_RETAIL).collect(Collectors.toList()));
 
 
         categoryFacade.deleteCategory(categoryId, merchantStore);
