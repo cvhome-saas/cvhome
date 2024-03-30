@@ -115,15 +115,6 @@
         "attributes": {}
       },
       {
-        "id": "30236b4d-0a81-4ead-99bb-c995eea2fd7c",
-        "name": "ROLE_MICROSERVICE",
-        "description": "",
-        "composite": false,
-        "clientRole": false,
-        "containerId": "c4e1ca23-4168-4488-88b3-dc009dea7b85",
-        "attributes": {}
-      },
-      {
         "id": "56ced1fb-c426-4054-8bb1-95acec11045a",
         "name": "uma_authorization",
         "description": "${role_uma_authorization}",
@@ -163,8 +154,8 @@
         "attributes": {}
       },
       {
-        "id": "bf10d7a3-60e5-450b-93b8-e6c60ed041bf",
-        "name": "ROLE_MICROSERVICE_GATEWAY",
+        "id": "b86bc209-cec9-40fc-92fe-73866cb7a398",
+        "name": "ROLE_ORG_ADMIN",
         "description": "",
         "composite": false,
         "clientRole": false,
@@ -172,8 +163,8 @@
         "attributes": {}
       },
       {
-        "id": "0c6c2622-4f22-4208-8de2-e2429353fecd",
-        "name": "ROLE_USER",
+        "id": "bf10d7a3-60e5-450b-93b8-e6c60ed041bf",
+        "name": "ROLE_MICROSERVICE_GATEWAY",
         "description": "",
         "composite": false,
         "clientRole": false,
@@ -190,8 +181,8 @@
         "attributes": {}
       },
       {
-        "id": "b86bc209-cec9-40fc-92fe-73866cb7a398",
-        "name": "ROLE_ORG_ADMIN",
+        "id": "68c2f5ab-33b5-4ef2-9ab0-66261a5902c1",
+        "name": "ROLE_STORE_ADMIN",
         "description": "",
         "composite": false,
         "clientRole": false,
@@ -199,8 +190,8 @@
         "attributes": {}
       },
       {
-        "id": "68c2f5ab-33b5-4ef2-9ab0-66261a5902c1",
-        "name": "ROLE_STORE_ADMIN",
+        "id": "bc646660-56dd-4807-9024-87218865e800",
+        "name": "ROLE_SUPER_ADMIN",
         "description": "",
         "composite": false,
         "clientRole": false,
@@ -217,8 +208,35 @@
         "attributes": {}
       },
       {
+        "id": "30236b4d-0a81-4ead-99bb-c995eea2fd7c",
+        "name": "ROLE_MICROSERVICE",
+        "description": "",
+        "composite": false,
+        "clientRole": false,
+        "containerId": "c4e1ca23-4168-4488-88b3-dc009dea7b85",
+        "attributes": {}
+      },
+      {
+        "id": "4e6839b9-2fc3-491c-812d-681cff53f3f4",
+        "name": "ROLE_STORE_RETAIL",
+        "description": "",
+        "composite": false,
+        "clientRole": false,
+        "containerId": "c4e1ca23-4168-4488-88b3-dc009dea7b85",
+        "attributes": {}
+      },
+      {
         "id": "720ead53-5e82-4ed4-b7c1-a0713b0f10c4",
         "name": "ROLE_CUSTOMER",
+        "description": "",
+        "composite": false,
+        "clientRole": false,
+        "containerId": "c4e1ca23-4168-4488-88b3-dc009dea7b85",
+        "attributes": {}
+      },
+      {
+        "id": "0c6c2622-4f22-4208-8de2-e2429353fecd",
+        "name": "ROLE_USER",
         "description": "",
         "composite": false,
         "clientRole": false,
@@ -596,6 +614,28 @@
       "attributes": {},
       "realmRoles": [
         "ROLE_STORE_MODERATOR"
+      ],
+      "clientRoles": {}
+    },
+    {
+      "id": "9c101c55-bafe-4108-85f1-f256042dd1e5",
+      "name": "STORE_RETAIL",
+      "path": "/STORE_RETAIL",
+      "subGroups": [],
+      "attributes": {},
+      "realmRoles": [
+        "ROLE_STORE_RETAIL"
+      ],
+      "clientRoles": {}
+    },
+    {
+      "id": "e30b4b24-7faa-459b-bb35-b41b38ec6013",
+      "name": "SUPER_ADMIN",
+      "path": "/SUPER_ADMIN",
+      "subGroups": [],
+      "attributes": {},
+      "realmRoles": [
+        "ROLE_SUPER_ADMIN"
       ],
       "clientRoles": {}
     },
@@ -1337,9 +1377,9 @@
         "oidc.ciba.grant.enabled": "false",
         "backchannel.logout.session.required": "true",
         "client_credentials.use_refresh_token": "false",
+        "acr.loa.map": "{}",
         "require.pushed.authorization.requests": "false",
         "tls.client.certificate.bound.access.tokens": "false",
-        "acr.loa.map": "{}",
         "display.on.consent.screen": "false",
         "token.response.type.bearer.lower-case": "false"
       },
@@ -2032,13 +2072,13 @@
         "config": {
           "allowed-protocol-mapper-types": [
             "saml-user-property-mapper",
-            "oidc-usermodel-attribute-mapper",
             "saml-user-attribute-mapper",
-            "oidc-sha256-pairwise-sub-mapper",
+            "oidc-usermodel-attribute-mapper",
+            "oidc-full-name-mapper",
             "oidc-address-mapper",
             "oidc-usermodel-property-mapper",
-            "saml-role-list-mapper",
-            "oidc-full-name-mapper"
+            "oidc-sha256-pairwise-sub-mapper",
+            "saml-role-list-mapper"
           ]
         }
       },
@@ -2101,14 +2141,14 @@
         "subComponents": {},
         "config": {
           "allowed-protocol-mapper-types": [
-            "oidc-usermodel-property-mapper",
-            "oidc-address-mapper",
-            "saml-user-attribute-mapper",
-            "saml-role-list-mapper",
-            "saml-user-property-mapper",
             "oidc-sha256-pairwise-sub-mapper",
             "oidc-full-name-mapper",
-            "oidc-usermodel-attribute-mapper"
+            "saml-user-property-mapper",
+            "oidc-usermodel-property-mapper",
+            "oidc-usermodel-attribute-mapper",
+            "saml-role-list-mapper",
+            "saml-user-attribute-mapper",
+            "oidc-address-mapper"
           ]
         }
       }
