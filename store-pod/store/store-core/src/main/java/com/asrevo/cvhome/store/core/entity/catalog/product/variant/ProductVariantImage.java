@@ -43,4 +43,4 @@ public class ProductVariantImage extends SalesManagerEntity<Long, ProductVariant
     public ProductVariantImage() {
     }
 
-   }
+}

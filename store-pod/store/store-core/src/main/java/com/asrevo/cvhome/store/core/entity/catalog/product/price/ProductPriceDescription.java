@@ -1,8 +1,8 @@
 package com.asrevo.cvhome.store.core.entity.catalog.product.price;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
 import com.asrevo.cvhome.store.core.entity.common.description.Description;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -37,8 +37,6 @@ public class ProductPriceDescription extends Description {
 
     public ProductPriceDescription() {
     }
-
-
 
 
 }

@@ -1,8 +1,8 @@
 package com.asrevo.cvhome.store.core.entity.customer.attribute;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
@@ -63,8 +63,6 @@ public class CustomerOptionValue extends SalesManagerEntity<Long, CustomerOption
         }
         return descriptionsList;
     }
-
-
 
 
 }

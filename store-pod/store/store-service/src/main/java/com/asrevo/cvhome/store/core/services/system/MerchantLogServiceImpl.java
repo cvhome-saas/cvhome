@@ -1,8 +1,8 @@
 package com.asrevo.cvhome.store.core.services.system;
 
+import com.asrevo.cvhome.store.core.entity.system.MerchantLog;
 import com.asrevo.cvhome.store.core.repositories.system.MerchantLogRepository;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
-import com.asrevo.cvhome.store.core.entity.system.MerchantLog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

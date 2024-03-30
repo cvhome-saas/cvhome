@@ -1,8 +1,6 @@
 package com.asrevo.cvhome.store.controller.v2.product;
 
 import com.asrevo.cvhome.store.core.constants.Constants;
-import com.asrevo.cvhome.store.core.services.catalog.pricing.PricingService;
-import com.asrevo.cvhome.store.core.services.catalog.product.ProductService;
 import com.asrevo.cvhome.store.core.entity.catalog.product.Product;
 import com.asrevo.cvhome.store.core.entity.catalog.product.attribute.ProductAttribute;
 import com.asrevo.cvhome.store.core.entity.catalog.product.price.FinalPrice;
@@ -17,9 +15,11 @@ import com.asrevo.cvhome.store.core.model.catalog.product.variation.ReadableProd
 import com.asrevo.cvhome.store.core.model.entity.Entity;
 import com.asrevo.cvhome.store.core.model.entity.EntityExists;
 import com.asrevo.cvhome.store.core.model.entity.ReadableEntityList;
-import com.asrevo.cvhome.store.service.populator.catalog.ReadableFinalPricePopulator;
+import com.asrevo.cvhome.store.core.services.catalog.pricing.PricingService;
+import com.asrevo.cvhome.store.core.services.catalog.product.ProductService;
 import com.asrevo.cvhome.store.service.facade.category.CategoryFacade;
 import com.asrevo.cvhome.store.service.facade.product.ProductVariationFacade;
+import com.asrevo.cvhome.store.service.populator.catalog.ReadableFinalPricePopulator;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

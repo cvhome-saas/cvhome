@@ -1,7 +1,6 @@
 package com.asrevo.cvhome.store.service.populator.catalog;
 
 import com.asrevo.cvhome.store.controller.exception.ConversionException;
-import com.asrevo.cvhome.store.utils.AbstractDataPopulator;
 import com.asrevo.cvhome.store.core.entity.catalog.product.review.ProductReview;
 import com.asrevo.cvhome.store.core.entity.catalog.product.review.ProductReviewDescription;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
@@ -9,6 +8,7 @@ import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import com.asrevo.cvhome.store.core.model.catalog.product.ReadableProductReview;
 import com.asrevo.cvhome.store.core.model.customer.ReadableCustomer;
 import com.asrevo.cvhome.store.service.populator.customer.ReadableCustomerPopulator;
+import com.asrevo.cvhome.store.utils.AbstractDataPopulator;
 import com.asrevo.cvhome.store.utils.DateUtil;
 
 import java.util.Set;

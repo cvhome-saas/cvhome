@@ -1,17 +1,6 @@
 package com.asrevo.cvhome.store.core.services.reference.init;
 
 import com.asrevo.cvhome.store.core.constants.Constants;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
-import com.asrevo.cvhome.store.core.services.catalog.product.manufacturer.ManufacturerService;
-import com.asrevo.cvhome.store.core.services.catalog.product.type.ProductTypeService;
-import com.asrevo.cvhome.store.core.services.merchant.MerchantStoreService;
-import com.asrevo.cvhome.store.core.services.reference.country.CountryService;
-import com.asrevo.cvhome.store.core.services.reference.currency.CurrencyService;
-import com.asrevo.cvhome.store.core.services.reference.language.LanguageService;
-import com.asrevo.cvhome.store.core.services.reference.loader.IntegrationModulesLoader;
-import com.asrevo.cvhome.store.core.services.reference.loader.ZonesLoader;
-import com.asrevo.cvhome.store.core.services.reference.zone.ZoneService;
-import com.asrevo.cvhome.store.core.services.system.optin.OptinService;
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
 import com.asrevo.cvhome.store.core.entity.catalog.product.manufacturer.Manufacturer;
 import com.asrevo.cvhome.store.core.entity.catalog.product.manufacturer.ManufacturerDescription;
@@ -25,6 +14,17 @@ import com.asrevo.cvhome.store.core.entity.reference.zone.Zone;
 import com.asrevo.cvhome.store.core.entity.reference.zone.ZoneDescription;
 import com.asrevo.cvhome.store.core.entity.system.optin.Optin;
 import com.asrevo.cvhome.store.core.entity.system.optin.OptinType;
+import com.asrevo.cvhome.store.core.exception.ServiceException;
+import com.asrevo.cvhome.store.core.services.catalog.product.manufacturer.ManufacturerService;
+import com.asrevo.cvhome.store.core.services.catalog.product.type.ProductTypeService;
+import com.asrevo.cvhome.store.core.services.merchant.MerchantStoreService;
+import com.asrevo.cvhome.store.core.services.reference.country.CountryService;
+import com.asrevo.cvhome.store.core.services.reference.currency.CurrencyService;
+import com.asrevo.cvhome.store.core.services.reference.language.LanguageService;
+import com.asrevo.cvhome.store.core.services.reference.loader.IntegrationModulesLoader;
+import com.asrevo.cvhome.store.core.services.reference.loader.ZonesLoader;
+import com.asrevo.cvhome.store.core.services.reference.zone.ZoneService;
+import com.asrevo.cvhome.store.core.services.system.optin.OptinService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,10 +51,10 @@ public class InitializationDatabaseImpl implements InitializationDatabase {
     @Autowired
     private CurrencyService currencyService;
 
-/*
-    @Autowired
-    private TaxClassService taxClassService;
-*/
+    /*
+        @Autowired
+        private TaxClassService taxClassService;
+    */
     @Autowired
     private ZonesLoader zonesLoader;
 

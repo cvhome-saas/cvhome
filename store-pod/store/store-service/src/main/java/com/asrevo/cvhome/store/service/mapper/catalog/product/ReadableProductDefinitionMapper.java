@@ -7,11 +7,6 @@ import com.asrevo.cvhome.store.core.entity.catalog.product.description.ProductDe
 import com.asrevo.cvhome.store.core.entity.catalog.product.image.ProductImage;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
-import com.asrevo.cvhome.store.service.mapper.Mapper;
-import com.asrevo.cvhome.store.service.mapper.catalog.ReadableCategoryMapper;
-import com.asrevo.cvhome.store.service.mapper.catalog.ReadableManufacturerMapper;
-import com.asrevo.cvhome.store.service.mapper.catalog.ReadableProductTypeMapper;
-import com.asrevo.cvhome.store.service.mapper.inventory.ReadableInventoryMapper;
 import com.asrevo.cvhome.store.core.model.catalog.category.ReadableCategory;
 import com.asrevo.cvhome.store.core.model.catalog.manufacturer.ReadableManufacturer;
 import com.asrevo.cvhome.store.core.model.catalog.product.ReadableImage;
@@ -22,14 +17,19 @@ import com.asrevo.cvhome.store.core.model.catalog.product.product.definition.Rea
 import com.asrevo.cvhome.store.core.model.catalog.product.type.ReadableProductType;
 import com.asrevo.cvhome.store.core.model.references.DimensionUnitOfMeasure;
 import com.asrevo.cvhome.store.core.model.references.WeightUnitOfMeasure;
+import com.asrevo.cvhome.store.service.mapper.Mapper;
+import com.asrevo.cvhome.store.service.mapper.catalog.ReadableCategoryMapper;
+import com.asrevo.cvhome.store.service.mapper.catalog.ReadableManufacturerMapper;
+import com.asrevo.cvhome.store.service.mapper.catalog.ReadableProductTypeMapper;
+import com.asrevo.cvhome.store.service.mapper.inventory.ReadableInventoryMapper;
 import com.asrevo.cvhome.store.utils.DateUtil;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
-import org.apache.commons.collections.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;

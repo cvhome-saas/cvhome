@@ -24,7 +24,7 @@ public class ProductEntity extends Product implements Serializable {
 
     /**
      * -- GETTER --
-     *  End RENTAL fields
+     * End RENTAL fields
      *
      * @return
      */

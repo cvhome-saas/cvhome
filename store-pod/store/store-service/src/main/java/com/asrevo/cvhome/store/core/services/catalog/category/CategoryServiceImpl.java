@@ -1,17 +1,17 @@
 package com.asrevo.cvhome.store.core.services.catalog.category;
 
 import com.asrevo.cvhome.store.core.constants.Constants;
+import com.asrevo.cvhome.store.core.entity.catalog.category.Category;
+import com.asrevo.cvhome.store.core.entity.catalog.category.CategoryDescription;
+import com.asrevo.cvhome.store.core.entity.catalog.product.Product;
+import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
+import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.repositories.catalog.category.CategoryDescriptionRepository;
 import com.asrevo.cvhome.store.core.repositories.catalog.category.CategoryRepository;
 import com.asrevo.cvhome.store.core.repositories.catalog.category.PageableCategoryRepository;
 import com.asrevo.cvhome.store.core.services.catalog.product.ProductService;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
-import com.asrevo.cvhome.store.core.entity.catalog.category.Category;
-import com.asrevo.cvhome.store.core.entity.catalog.category.CategoryDescription;
-import com.asrevo.cvhome.store.core.entity.catalog.product.Product;
-import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
-import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

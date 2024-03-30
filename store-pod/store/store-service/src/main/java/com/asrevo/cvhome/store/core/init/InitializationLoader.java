@@ -1,11 +1,11 @@
 package com.asrevo.cvhome.store.core.init;
 
 import com.asrevo.cvhome.store.core.constants.Constants;
+import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
+import com.asrevo.cvhome.store.core.entity.system.MerchantConfig;
 import com.asrevo.cvhome.store.core.services.merchant.MerchantStoreService;
 import com.asrevo.cvhome.store.core.services.reference.init.InitializationDatabase;
 import com.asrevo.cvhome.store.core.services.system.MerchantConfigurationService;
-import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
-import com.asrevo.cvhome.store.core.entity.system.MerchantConfig;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

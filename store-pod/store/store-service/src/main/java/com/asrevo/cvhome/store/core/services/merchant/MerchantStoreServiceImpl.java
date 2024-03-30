@@ -1,13 +1,13 @@
 package com.asrevo.cvhome.store.core.services.merchant;
 
+import com.asrevo.cvhome.store.core.entity.common.GenericEntityList;
+import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
+import com.asrevo.cvhome.store.core.entity.merchant.MerchantStoreCriteria;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.repositories.merchant.MerchantRepository;
 import com.asrevo.cvhome.store.core.repositories.merchant.PageableMerchantRepository;
 import com.asrevo.cvhome.store.core.services.catalog.product.type.ProductTypeService;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
-import com.asrevo.cvhome.store.core.entity.common.GenericEntityList;
-import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
-import com.asrevo.cvhome.store.core.entity.merchant.MerchantStoreCriteria;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

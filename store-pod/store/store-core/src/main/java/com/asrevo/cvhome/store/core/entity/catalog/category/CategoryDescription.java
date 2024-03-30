@@ -1,10 +1,10 @@
 package com.asrevo.cvhome.store.core.entity.catalog.category;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
 import com.asrevo.cvhome.store.core.entity.common.description.Description;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

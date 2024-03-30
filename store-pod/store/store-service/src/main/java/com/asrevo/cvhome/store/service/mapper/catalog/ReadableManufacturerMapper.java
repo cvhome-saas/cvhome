@@ -4,8 +4,8 @@ import com.asrevo.cvhome.store.core.entity.catalog.product.manufacturer.Manufact
 import com.asrevo.cvhome.store.core.entity.catalog.product.manufacturer.ManufacturerDescription;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
-import com.asrevo.cvhome.store.service.mapper.Mapper;
 import com.asrevo.cvhome.store.core.model.catalog.manufacturer.ReadableManufacturer;
+import com.asrevo.cvhome.store.service.mapper.Mapper;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;

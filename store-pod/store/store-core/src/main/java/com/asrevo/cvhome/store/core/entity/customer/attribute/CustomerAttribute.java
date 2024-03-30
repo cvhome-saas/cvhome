@@ -1,8 +1,8 @@
 package com.asrevo.cvhome.store.core.entity.customer.attribute;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.asrevo.cvhome.store.core.entity.customer.Customer;
 import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -47,7 +47,6 @@ public class CustomerAttribute extends SalesManagerEntity<Long, CustomerAttribut
 
     public CustomerAttribute() {
     }
-
 
 
 }

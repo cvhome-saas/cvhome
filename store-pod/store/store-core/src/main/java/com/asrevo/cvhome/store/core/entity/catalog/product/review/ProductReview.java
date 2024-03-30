@@ -1,12 +1,12 @@
 package com.asrevo.cvhome.store.core.entity.catalog.product.review;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.asrevo.cvhome.store.core.entity.catalog.product.Product;
 import com.asrevo.cvhome.store.core.entity.common.audit.AuditListener;
 import com.asrevo.cvhome.store.core.entity.common.audit.AuditSection;
 import com.asrevo.cvhome.store.core.entity.common.audit.Auditable;
 import com.asrevo.cvhome.store.core.entity.customer.Customer;
 import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

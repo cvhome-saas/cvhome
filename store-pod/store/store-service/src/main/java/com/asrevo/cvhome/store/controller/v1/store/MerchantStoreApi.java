@@ -2,12 +2,12 @@ package com.asrevo.cvhome.store.controller.v1.store;
 
 import com.asrevo.cvhome.store.controller.exception.RestApiException;
 import com.asrevo.cvhome.store.controller.exception.UnauthorizedException;
+import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.entity.content.FileContentType;
 import com.asrevo.cvhome.store.core.entity.content.InputContentFile;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStoreCriteria;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
-import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.model.entity.EntityExists;
 import com.asrevo.cvhome.store.core.model.store.*;
 import com.asrevo.cvhome.store.service.facade.store.StoreFacade;
@@ -48,7 +48,7 @@ public class MerchantStoreApi {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MerchantStoreApi.class);
 
-    private static final Map<String, String> MAPPING_FIELDS = Map.of("name", "name","readableAudit.user", "auditSection.modifiedBy");
+    private static final Map<String, String> MAPPING_FIELDS = Map.of("name", "name", "readableAudit.user", "auditSection.modifiedBy");
 
     @Autowired
     private StoreFacade storeFacade;

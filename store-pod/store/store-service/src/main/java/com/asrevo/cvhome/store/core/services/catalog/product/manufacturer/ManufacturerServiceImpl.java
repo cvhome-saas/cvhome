@@ -1,15 +1,15 @@
 package com.asrevo.cvhome.store.core.services.catalog.product.manufacturer;
 
 
-import com.asrevo.cvhome.store.core.exception.ServiceException;
-import com.asrevo.cvhome.store.core.repositories.catalog.product.manufacturer.ManufacturerRepository;
-import com.asrevo.cvhome.store.core.repositories.catalog.product.manufacturer.PageableManufacturerRepository;
-import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
 import com.asrevo.cvhome.store.core.entity.catalog.category.Category;
 import com.asrevo.cvhome.store.core.entity.catalog.product.manufacturer.Manufacturer;
 import com.asrevo.cvhome.store.core.entity.catalog.product.manufacturer.ManufacturerDescription;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
+import com.asrevo.cvhome.store.core.exception.ServiceException;
+import com.asrevo.cvhome.store.core.repositories.catalog.product.manufacturer.ManufacturerRepository;
+import com.asrevo.cvhome.store.core.repositories.catalog.product.manufacturer.PageableManufacturerRepository;
+import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

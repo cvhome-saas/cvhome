@@ -1,8 +1,8 @@
 package com.asrevo.cvhome.store.core.entity.order.orderstatus;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.asrevo.cvhome.store.core.entity.order.Order;
 import com.asrevo.cvhome.store.core.utils.CloneUtils;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.io.Serializable;

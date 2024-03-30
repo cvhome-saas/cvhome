@@ -1,6 +1,5 @@
 package com.asrevo.cvhome.store.core.services.catalog.pricing;
 
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.entity.catalog.product.Product;
 import com.asrevo.cvhome.store.core.entity.catalog.product.attribute.ProductAttribute;
 import com.asrevo.cvhome.store.core.entity.catalog.product.availability.ProductAvailability;
@@ -9,6 +8,7 @@ import com.asrevo.cvhome.store.core.entity.catalog.product.variant.ProductVarian
 import com.asrevo.cvhome.store.core.entity.customer.Customer;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.currency.Currency;
+import com.asrevo.cvhome.store.core.exception.ServiceException;
 
 import java.math.BigDecimal;
 import java.util.List;

@@ -1,8 +1,9 @@
 package com.asrevo.cvhome.store.core.model.store;
 
+import com.asrevo.cvhome.store.core.model.content.ReadableImage;
 import lombok.Getter;
 import lombok.Setter;
-import com.asrevo.cvhome.store.core.model.content.ReadableImage;
+
 @Setter
 @Getter
 public class ReadableBrand extends MerchantStoreBrand {

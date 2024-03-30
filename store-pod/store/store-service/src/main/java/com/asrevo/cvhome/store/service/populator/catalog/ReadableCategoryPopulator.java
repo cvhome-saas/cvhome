@@ -1,12 +1,12 @@
 package com.asrevo.cvhome.store.service.populator.catalog;
 
 import com.asrevo.cvhome.store.controller.exception.ConversionException;
-import com.asrevo.cvhome.store.utils.AbstractDataPopulator;
 import com.asrevo.cvhome.store.core.entity.catalog.category.Category;
 import com.asrevo.cvhome.store.core.entity.catalog.category.CategoryDescription;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import com.asrevo.cvhome.store.core.model.catalog.category.ReadableCategory;
+import com.asrevo.cvhome.store.utils.AbstractDataPopulator;
 import org.springframework.util.Assert;
 
 public class ReadableCategoryPopulator extends

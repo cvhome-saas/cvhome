@@ -1,10 +1,10 @@
 package com.asrevo.cvhome.store.core.entity.common.description;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.asrevo.cvhome.store.core.entity.common.audit.AuditListener;
 import com.asrevo.cvhome.store.core.entity.common.audit.AuditSection;
 import com.asrevo.cvhome.store.core.entity.common.audit.Auditable;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;

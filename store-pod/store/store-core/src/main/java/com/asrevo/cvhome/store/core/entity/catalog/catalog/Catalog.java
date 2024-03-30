@@ -87,5 +87,4 @@ public class Catalog extends SalesManagerEntity<Long, Catalog> implements Audita
     }
 
 
-
 }

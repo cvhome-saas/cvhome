@@ -1,14 +1,14 @@
 package com.asrevo.cvhome.store.service.populator.catalog;
 
 import com.asrevo.cvhome.store.controller.exception.ConversionException;
-import com.asrevo.cvhome.store.core.services.catalog.category.CategoryService;
-import com.asrevo.cvhome.store.core.services.reference.language.LanguageService;
-import com.asrevo.cvhome.store.utils.AbstractDataPopulator;
 import com.asrevo.cvhome.store.core.entity.catalog.category.Category;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import com.asrevo.cvhome.store.core.model.catalog.category.CategoryDescription;
 import com.asrevo.cvhome.store.core.model.catalog.category.PersistableCategory;
+import com.asrevo.cvhome.store.core.services.catalog.category.CategoryService;
+import com.asrevo.cvhome.store.core.services.reference.language.LanguageService;
+import com.asrevo.cvhome.store.utils.AbstractDataPopulator;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;

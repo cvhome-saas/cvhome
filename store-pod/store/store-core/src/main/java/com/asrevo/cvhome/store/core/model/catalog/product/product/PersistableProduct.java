@@ -1,10 +1,10 @@
 package com.asrevo.cvhome.store.core.model.catalog.product.product;
 
-import com.asrevo.cvhome.store.core.model.catalog.product.attribute.PersistableProductAttribute;
-import com.asrevo.cvhome.store.core.model.catalog.product.product.variant.PersistableProductVariant;
 import com.asrevo.cvhome.store.core.model.catalog.category.Category;
 import com.asrevo.cvhome.store.core.model.catalog.product.PersistableImage;
 import com.asrevo.cvhome.store.core.model.catalog.product.ProductDescription;
+import com.asrevo.cvhome.store.core.model.catalog.product.attribute.PersistableProductAttribute;
+import com.asrevo.cvhome.store.core.model.catalog.product.product.variant.PersistableProductVariant;
 import lombok.Getter;
 import lombok.Setter;
 

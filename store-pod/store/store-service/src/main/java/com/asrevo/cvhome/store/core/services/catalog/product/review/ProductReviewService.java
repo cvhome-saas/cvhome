@@ -1,10 +1,10 @@
 package com.asrevo.cvhome.store.core.services.catalog.product.review;
 
-import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
 import com.asrevo.cvhome.store.core.entity.catalog.product.Product;
 import com.asrevo.cvhome.store.core.entity.catalog.product.review.ProductReview;
 import com.asrevo.cvhome.store.core.entity.customer.Customer;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
+import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
 
 import java.util.List;
 

@@ -1,8 +1,6 @@
 package com.asrevo.cvhome.store.service.populator.customer;
 
-import com.asrevo.cvhome.store.core.model.customer.attribute.*;
 import com.asrevo.cvhome.store.controller.exception.ConversionException;
-import com.asrevo.cvhome.store.utils.AbstractDataPopulator;
 import com.asrevo.cvhome.store.core.entity.customer.Customer;
 import com.asrevo.cvhome.store.core.entity.customer.attribute.CustomerAttribute;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
@@ -10,7 +8,9 @@ import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import com.asrevo.cvhome.store.core.entity.user.Group;
 import com.asrevo.cvhome.store.core.model.customer.ReadableCustomer;
 import com.asrevo.cvhome.store.core.model.customer.address.Address;
+import com.asrevo.cvhome.store.core.model.customer.attribute.*;
 import com.asrevo.cvhome.store.core.model.security.ReadableGroup;
+import com.asrevo.cvhome.store.utils.AbstractDataPopulator;
 import org.apache.commons.lang3.StringUtils;
 
 public class ReadableCustomerPopulator extends

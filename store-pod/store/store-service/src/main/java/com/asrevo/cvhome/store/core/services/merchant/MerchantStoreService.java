@@ -1,10 +1,10 @@
 package com.asrevo.cvhome.store.core.services.merchant;
 
-import com.asrevo.cvhome.store.core.exception.ServiceException;
-import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
 import com.asrevo.cvhome.store.core.entity.common.GenericEntityList;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStoreCriteria;
+import com.asrevo.cvhome.store.core.exception.ServiceException;
+import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
 import org.springframework.data.domain.Page;
 
 import java.util.List;

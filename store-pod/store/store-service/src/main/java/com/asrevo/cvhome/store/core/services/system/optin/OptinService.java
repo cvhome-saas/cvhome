@@ -1,10 +1,10 @@
 package com.asrevo.cvhome.store.core.services.system.optin;
 
-import com.asrevo.cvhome.store.core.exception.ServiceException;
-import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.system.optin.Optin;
 import com.asrevo.cvhome.store.core.entity.system.optin.OptinType;
+import com.asrevo.cvhome.store.core.exception.ServiceException;
+import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
 
 /**
  * Registers Optin events

@@ -1,13 +1,13 @@
 package com.asrevo.cvhome.store.core.services.customer;
 
 
-import com.asrevo.cvhome.store.core.exception.ServiceException;
-import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
 import com.asrevo.cvhome.store.core.entity.common.Address;
 import com.asrevo.cvhome.store.core.entity.customer.Customer;
 import com.asrevo.cvhome.store.core.entity.customer.CustomerCriteria;
 import com.asrevo.cvhome.store.core.entity.customer.CustomerList;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
+import com.asrevo.cvhome.store.core.exception.ServiceException;
+import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
 
 import java.util.List;
 

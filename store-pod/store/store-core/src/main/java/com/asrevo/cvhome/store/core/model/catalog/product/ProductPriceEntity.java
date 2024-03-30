@@ -28,6 +28,7 @@ public class ProductPriceEntity extends ProductPrice implements Serializable {
     private boolean defaultPrice = true;
     private BigDecimal price;
     private BigDecimal discountedPrice;
+
     public String getCode() {
         if (StringUtils.isBlank(this.code)) {
             code = DEFAULT_PRICE_CODE;

@@ -1,8 +1,8 @@
 package com.asrevo.cvhome.store.core.entity.order.orderproduct;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
 import com.asrevo.cvhome.store.core.entity.order.Order;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -52,9 +52,6 @@ public class OrderProduct extends SalesManagerEntity<Long, OrderProduct> {
 
     public OrderProduct() {
     }
-
-
-
 
 
 }

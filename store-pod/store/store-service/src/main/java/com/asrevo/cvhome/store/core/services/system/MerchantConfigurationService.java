@@ -1,11 +1,11 @@
 package com.asrevo.cvhome.store.core.services.system;
 
-import com.asrevo.cvhome.store.core.exception.ServiceException;
-import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.system.MerchantConfig;
 import com.asrevo.cvhome.store.core.entity.system.MerchantConfiguration;
 import com.asrevo.cvhome.store.core.entity.system.MerchantConfigurationType;
+import com.asrevo.cvhome.store.core.exception.ServiceException;
+import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
 
 import java.util.List;
 

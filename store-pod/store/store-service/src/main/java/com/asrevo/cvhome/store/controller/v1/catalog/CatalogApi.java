@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.store.controller.v1.catalog;
 
-import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
+import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import com.asrevo.cvhome.store.core.model.catalog.catalog.PersistableCatalog;

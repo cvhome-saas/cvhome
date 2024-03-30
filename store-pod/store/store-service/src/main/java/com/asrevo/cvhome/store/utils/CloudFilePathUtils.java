@@ -1,8 +1,8 @@
 package com.asrevo.cvhome.store.utils;
 
+import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.entity.content.FileContentType;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
-import com.asrevo.cvhome.store.core.constants.Constants;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 

@@ -1,8 +1,8 @@
 package com.asrevo.cvhome.store.core.services.customer.review;
 
-import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
 import com.asrevo.cvhome.store.core.entity.customer.Customer;
 import com.asrevo.cvhome.store.core.entity.customer.review.CustomerReview;
+import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
 
 import java.util.List;
 

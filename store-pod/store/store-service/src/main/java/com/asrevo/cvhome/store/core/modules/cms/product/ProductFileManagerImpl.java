@@ -1,16 +1,16 @@
 package com.asrevo.cvhome.store.core.modules.cms.product;
 
 import com.asrevo.cvhome.store.core.constants.Constants;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
-import com.asrevo.cvhome.store.utils.CoreConfiguration;
-import com.asrevo.cvhome.store.utils.ProductImageCropUtils;
-import com.asrevo.cvhome.store.utils.ProductImageSizeUtils;
 import com.asrevo.cvhome.store.core.entity.catalog.product.Product;
 import com.asrevo.cvhome.store.core.entity.catalog.product.file.ProductImageSize;
 import com.asrevo.cvhome.store.core.entity.catalog.product.image.ProductImage;
 import com.asrevo.cvhome.store.core.entity.content.FileContentType;
 import com.asrevo.cvhome.store.core.entity.content.ImageContentFile;
 import com.asrevo.cvhome.store.core.entity.content.OutputContentFile;
+import com.asrevo.cvhome.store.core.exception.ServiceException;
+import com.asrevo.cvhome.store.utils.CoreConfiguration;
+import com.asrevo.cvhome.store.utils.ProductImageCropUtils;
+import com.asrevo.cvhome.store.utils.ProductImageSizeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

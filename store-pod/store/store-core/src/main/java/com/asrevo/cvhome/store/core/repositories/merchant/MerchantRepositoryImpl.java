@@ -1,10 +1,10 @@
 package com.asrevo.cvhome.store.core.repositories.merchant;
 
-import com.asrevo.cvhome.store.core.exception.ServiceException;
-import com.asrevo.cvhome.store.core.utils.RepositoryHelper;
 import com.asrevo.cvhome.store.core.entity.common.GenericEntityList;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStoreCriteria;
+import com.asrevo.cvhome.store.core.exception.ServiceException;
+import com.asrevo.cvhome.store.core.utils.RepositoryHelper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;

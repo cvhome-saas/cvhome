@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.store.core.model.catalog.product.product.variant;
 
-import com.asrevo.cvhome.store.core.model.catalog.product.inventory.ReadableInventory;
 import com.asrevo.cvhome.store.core.model.catalog.product.ReadableImage;
+import com.asrevo.cvhome.store.core.model.catalog.product.inventory.ReadableInventory;
 import com.asrevo.cvhome.store.core.model.catalog.product.variation.ReadableProductVariation;
 import lombok.Getter;
 import lombok.Setter;

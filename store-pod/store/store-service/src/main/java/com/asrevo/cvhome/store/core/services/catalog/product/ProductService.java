@@ -1,7 +1,5 @@
 package com.asrevo.cvhome.store.core.services.catalog.product;
 
-import com.asrevo.cvhome.store.core.exception.ServiceException;
-import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
 import com.asrevo.cvhome.store.core.entity.catalog.category.Category;
 import com.asrevo.cvhome.store.core.entity.catalog.product.Product;
 import com.asrevo.cvhome.store.core.entity.catalog.product.ProductCriteria;
@@ -10,6 +8,8 @@ import com.asrevo.cvhome.store.core.entity.catalog.product.description.ProductDe
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import com.asrevo.cvhome.store.core.entity.tax.taxclass.TaxClass;
+import com.asrevo.cvhome.store.core.exception.ServiceException;
+import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
 import org.springframework.data.domain.Page;
 
 import java.util.List;

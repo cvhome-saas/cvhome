@@ -1,13 +1,13 @@
 package com.asrevo.cvhome.store.core.services.catalog.product.relationship;
 
-import com.asrevo.cvhome.store.core.exception.ServiceException;
-import com.asrevo.cvhome.store.core.repositories.catalog.product.relationship.ProductRelationshipRepository;
-import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
 import com.asrevo.cvhome.store.core.entity.catalog.product.Product;
 import com.asrevo.cvhome.store.core.entity.catalog.product.relationship.ProductRelationship;
 import com.asrevo.cvhome.store.core.entity.catalog.product.relationship.ProductRelationshipType;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
+import com.asrevo.cvhome.store.core.exception.ServiceException;
+import com.asrevo.cvhome.store.core.repositories.catalog.product.relationship.ProductRelationshipRepository;
+import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

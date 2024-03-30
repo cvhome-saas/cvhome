@@ -1,8 +1,8 @@
 package com.asrevo.cvhome.store.core.entity.reference.geozone;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
 import com.asrevo.cvhome.store.core.entity.reference.country.Country;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -40,7 +40,6 @@ public class GeoZone extends SalesManagerEntity<Long, GeoZone> {
 
     public GeoZone() {
     }
-
 
 
 }

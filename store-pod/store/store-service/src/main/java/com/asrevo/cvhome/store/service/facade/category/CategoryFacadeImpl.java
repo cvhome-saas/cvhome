@@ -1,11 +1,6 @@
 package com.asrevo.cvhome.store.service.facade.category;
 
-import com.asrevo.cvhome.store.core.model.catalog.product.attribute.ProductOptionValue;
-import com.asrevo.cvhome.store.controller.exception.ConversionException;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
-import com.asrevo.cvhome.store.core.services.catalog.category.CategoryService;
-import com.asrevo.cvhome.store.core.services.catalog.product.attribute.ProductAttributeService;
-import com.asrevo.cvhome.store.core.services.merchant.MerchantStoreService;
+import com.asrevo.cvhome.store.controller.exception.*;
 import com.asrevo.cvhome.store.core.entity.catalog.category.Category;
 import com.asrevo.cvhome.store.core.entity.catalog.product.attribute.ProductAttribute;
 import com.asrevo.cvhome.store.core.entity.catalog.product.attribute.ProductOption;
@@ -13,23 +8,24 @@ import com.asrevo.cvhome.store.core.entity.catalog.product.attribute.ProductOpti
 import com.asrevo.cvhome.store.core.entity.catalog.product.attribute.ProductOptionValueDescription;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
-import com.asrevo.cvhome.store.service.mapper.catalog.ReadableCategoryMapper;
+import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.catalog.category.PersistableCategory;
 import com.asrevo.cvhome.store.core.model.catalog.category.ReadableCategory;
 import com.asrevo.cvhome.store.core.model.catalog.category.ReadableCategoryList;
+import com.asrevo.cvhome.store.core.model.catalog.product.attribute.ProductOptionValue;
 import com.asrevo.cvhome.store.core.model.catalog.product.attribute.ReadableProductVariant;
 import com.asrevo.cvhome.store.core.model.catalog.product.attribute.ReadableProductVariantValue;
 import com.asrevo.cvhome.store.core.model.entity.ListCriteria;
+import com.asrevo.cvhome.store.core.services.catalog.category.CategoryService;
+import com.asrevo.cvhome.store.core.services.catalog.product.attribute.ProductAttributeService;
+import com.asrevo.cvhome.store.core.services.merchant.MerchantStoreService;
+import com.asrevo.cvhome.store.service.mapper.catalog.ReadableCategoryMapper;
 import com.asrevo.cvhome.store.service.populator.catalog.PersistableCategoryPopulator;
 import com.asrevo.cvhome.store.service.populator.catalog.ReadableCategoryPopulator;
-import com.asrevo.cvhome.store.controller.exception.OperationNotAllowedException;
-import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
-import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
-import com.asrevo.cvhome.store.controller.exception.UnauthorizedException;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-import org.apache.commons.collections.CollectionUtils;
 
 import java.util.*;
 import java.util.Map.Entry;

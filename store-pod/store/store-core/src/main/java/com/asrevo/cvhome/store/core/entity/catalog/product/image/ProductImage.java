@@ -66,5 +66,4 @@ public class ProductImage extends SalesManagerEntity<Long, ProductImage> {
     }
 
 
-
 }

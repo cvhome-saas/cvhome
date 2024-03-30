@@ -1,7 +1,6 @@
 package com.asrevo.cvhome.store.utils;
 
 import com.asrevo.cvhome.store.core.constants.Constants;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.entity.catalog.product.Product;
 import com.asrevo.cvhome.store.core.entity.catalog.product.attribute.ProductAttribute;
 import com.asrevo.cvhome.store.core.entity.catalog.product.availability.ProductAvailability;
@@ -10,6 +9,8 @@ import com.asrevo.cvhome.store.core.entity.catalog.product.price.ProductPrice;
 import com.asrevo.cvhome.store.core.entity.catalog.product.variant.ProductVariant;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.order.orderproduct.OrderProduct;
+import com.asrevo.cvhome.store.core.exception.ServiceException;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.BigDecimalValidator;
 import org.apache.commons.validator.routines.CurrencyValidator;
@@ -17,7 +18,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
-import org.apache.commons.collections.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.text.NumberFormat;

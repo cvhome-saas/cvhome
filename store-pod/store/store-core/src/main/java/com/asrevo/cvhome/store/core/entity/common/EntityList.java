@@ -27,5 +27,5 @@ public class EntityList implements Serializable {
     public int getTotalPages() {
         return totalPages == 0 ? totalPages + 1 : totalPages;
     }
-    
+
 }

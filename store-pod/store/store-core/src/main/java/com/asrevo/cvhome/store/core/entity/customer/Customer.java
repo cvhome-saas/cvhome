@@ -1,6 +1,5 @@
 package com.asrevo.cvhome.store.core.entity.customer;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.asrevo.cvhome.store.core.entity.catalog.product.review.ProductReview;
 import com.asrevo.cvhome.store.core.entity.common.Billing;
 import com.asrevo.cvhome.store.core.entity.common.CredentialsReset;
@@ -13,6 +12,7 @@ import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import com.asrevo.cvhome.store.core.entity.user.Group;
 import com.asrevo.cvhome.store.core.utils.CloneUtils;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;

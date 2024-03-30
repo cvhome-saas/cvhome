@@ -1,10 +1,6 @@
 package com.asrevo.cvhome.store.core.modules.cms.product.local;
 
 import com.asrevo.cvhome.store.core.constants.Constants;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
-import com.asrevo.cvhome.store.core.modules.cms.impl.CMSManager;
-import com.asrevo.cvhome.store.core.modules.cms.impl.LocalCacheManagerImpl;
-import com.asrevo.cvhome.store.core.modules.cms.product.ProductAssetsManager;
 import com.asrevo.cvhome.store.core.entity.catalog.product.Product;
 import com.asrevo.cvhome.store.core.entity.catalog.product.file.ProductImageSize;
 import com.asrevo.cvhome.store.core.entity.catalog.product.image.ProductImage;
@@ -12,6 +8,10 @@ import com.asrevo.cvhome.store.core.entity.content.FileContentType;
 import com.asrevo.cvhome.store.core.entity.content.ImageContentFile;
 import com.asrevo.cvhome.store.core.entity.content.OutputContentFile;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
+import com.asrevo.cvhome.store.core.exception.ServiceException;
+import com.asrevo.cvhome.store.core.modules.cms.impl.CMSManager;
+import com.asrevo.cvhome.store.core.modules.cms.impl.LocalCacheManagerImpl;
+import com.asrevo.cvhome.store.core.modules.cms.product.ProductAssetsManager;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

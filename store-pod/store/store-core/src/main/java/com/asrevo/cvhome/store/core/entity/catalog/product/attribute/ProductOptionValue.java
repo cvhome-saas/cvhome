@@ -64,5 +64,4 @@ public class ProductOptionValue extends SalesManagerEntity<Long, ProductOptionVa
     }
 
 
-
 }

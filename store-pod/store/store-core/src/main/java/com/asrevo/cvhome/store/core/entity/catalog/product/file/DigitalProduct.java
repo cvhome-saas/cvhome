@@ -39,5 +39,4 @@ public class DigitalProduct extends SalesManagerEntity<Long, DigitalProduct> {
     private String productFileName;
 
 
-
 }

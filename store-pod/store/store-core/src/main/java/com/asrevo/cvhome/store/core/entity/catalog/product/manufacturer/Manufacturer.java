@@ -51,5 +51,4 @@ public class Manufacturer extends SalesManagerEntity<Long, Manufacturer> impleme
     }
 
 
-
 }

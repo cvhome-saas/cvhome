@@ -1,15 +1,15 @@
 package com.asrevo.cvhome.store.core.services.customer;
 
-import com.asrevo.cvhome.store.core.exception.ServiceException;
-import com.asrevo.cvhome.store.core.repositories.customer.CustomerRepository;
-import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
-import com.asrevo.cvhome.store.core.services.customer.attribute.CustomerAttributeService;
 import com.asrevo.cvhome.store.core.entity.common.Address;
 import com.asrevo.cvhome.store.core.entity.customer.Customer;
 import com.asrevo.cvhome.store.core.entity.customer.CustomerCriteria;
 import com.asrevo.cvhome.store.core.entity.customer.CustomerList;
 import com.asrevo.cvhome.store.core.entity.customer.attribute.CustomerAttribute;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
+import com.asrevo.cvhome.store.core.exception.ServiceException;
+import com.asrevo.cvhome.store.core.repositories.customer.CustomerRepository;
+import com.asrevo.cvhome.store.core.services.customer.attribute.CustomerAttributeService;
+import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
 import com.asrevo.cvhome.store.core.services.geo.GeoLocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

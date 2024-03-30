@@ -1,11 +1,11 @@
 package com.asrevo.cvhome.store.core.services.catalog.product.availability;
 
+import com.asrevo.cvhome.store.core.entity.catalog.product.availability.ProductAvailability;
+import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.repositories.catalog.product.availability.PageableProductAvailabilityRepository;
 import com.asrevo.cvhome.store.core.repositories.catalog.product.availability.ProductAvailabilityRepository;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
-import com.asrevo.cvhome.store.core.entity.catalog.product.availability.ProductAvailability;
-import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

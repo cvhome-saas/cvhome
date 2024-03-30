@@ -37,7 +37,6 @@ public class Currency extends SalesManagerEntity<Long, Currency> implements Seri
     }
 
 
-
     public java.util.Currency getCurrency() {
         return currency;
     }

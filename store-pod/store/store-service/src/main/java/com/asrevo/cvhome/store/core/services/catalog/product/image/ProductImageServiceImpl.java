@@ -1,11 +1,5 @@
 package com.asrevo.cvhome.store.core.services.catalog.product.image;
 
-import com.asrevo.cvhome.store.events.products.DeleteProductImageEvent;
-import com.asrevo.cvhome.store.events.products.SaveProductImageEvent;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
-import com.asrevo.cvhome.store.core.modules.cms.product.ProductFileManager;
-import com.asrevo.cvhome.store.core.repositories.catalog.product.image.ProductImageRepository;
-import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
 import com.asrevo.cvhome.store.core.entity.catalog.product.Product;
 import com.asrevo.cvhome.store.core.entity.catalog.product.file.ProductImageSize;
 import com.asrevo.cvhome.store.core.entity.catalog.product.image.ProductImage;
@@ -14,6 +8,12 @@ import com.asrevo.cvhome.store.core.entity.content.FileContentType;
 import com.asrevo.cvhome.store.core.entity.content.ImageContentFile;
 import com.asrevo.cvhome.store.core.entity.content.OutputContentFile;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
+import com.asrevo.cvhome.store.core.exception.ServiceException;
+import com.asrevo.cvhome.store.core.modules.cms.product.ProductFileManager;
+import com.asrevo.cvhome.store.core.repositories.catalog.product.image.ProductImageRepository;
+import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
+import com.asrevo.cvhome.store.events.products.DeleteProductImageEvent;
+import com.asrevo.cvhome.store.events.products.SaveProductImageEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;

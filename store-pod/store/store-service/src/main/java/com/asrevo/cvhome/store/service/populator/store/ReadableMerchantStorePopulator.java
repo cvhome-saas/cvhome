@@ -2,15 +2,11 @@ package com.asrevo.cvhome.store.service.populator.store;
 
 
 import com.asrevo.cvhome.store.controller.exception.ConversionException;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
-import com.asrevo.cvhome.store.core.services.reference.country.CountryService;
-import com.asrevo.cvhome.store.core.services.reference.language.LanguageService;
-import com.asrevo.cvhome.store.core.services.reference.zone.ZoneService;
-import com.asrevo.cvhome.store.utils.AbstractDataPopulator;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.country.Country;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import com.asrevo.cvhome.store.core.entity.reference.zone.Zone;
+import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.content.ReadableImage;
 import com.asrevo.cvhome.store.core.model.entity.ReadableAudit;
 import com.asrevo.cvhome.store.core.model.references.MeasureUnit;
@@ -18,8 +14,13 @@ import com.asrevo.cvhome.store.core.model.references.ReadableAddress;
 import com.asrevo.cvhome.store.core.model.references.ReadableLanguage;
 import com.asrevo.cvhome.store.core.model.references.WeightUnit;
 import com.asrevo.cvhome.store.core.model.store.ReadableMerchantStore;
+import com.asrevo.cvhome.store.core.services.reference.country.CountryService;
+import com.asrevo.cvhome.store.core.services.reference.language.LanguageService;
+import com.asrevo.cvhome.store.core.services.reference.zone.ZoneService;
+import com.asrevo.cvhome.store.utils.AbstractDataPopulator;
 import com.asrevo.cvhome.store.utils.DateUtil;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -27,7 +28,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
-import org.apache.commons.collections.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;

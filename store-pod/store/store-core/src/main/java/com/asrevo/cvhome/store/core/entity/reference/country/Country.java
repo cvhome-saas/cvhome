@@ -1,9 +1,9 @@
 package com.asrevo.cvhome.store.core.entity.reference.country;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
 import com.asrevo.cvhome.store.core.entity.reference.geozone.GeoZone;
 import com.asrevo.cvhome.store.core.entity.reference.zone.Zone;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

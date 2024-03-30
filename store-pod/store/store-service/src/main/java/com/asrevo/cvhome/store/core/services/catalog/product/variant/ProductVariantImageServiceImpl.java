@@ -1,9 +1,9 @@
 package com.asrevo.cvhome.store.core.services.catalog.product.variant;
 
-import com.asrevo.cvhome.store.core.repositories.catalog.product.variant.ProductVariantImageRepository;
-import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
 import com.asrevo.cvhome.store.core.entity.catalog.product.variant.ProductVariantImage;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
+import com.asrevo.cvhome.store.core.repositories.catalog.product.variant.ProductVariantImageRepository;
+import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;

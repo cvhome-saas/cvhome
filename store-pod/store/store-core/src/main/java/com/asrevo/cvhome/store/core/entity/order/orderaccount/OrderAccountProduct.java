@@ -64,7 +64,6 @@ public class OrderAccountProduct implements Serializable {
     }
 
 
-
     public Date getOrderAccountProductStartDate() {
         return CloneUtils.clone(orderAccountProductStartDate);
     }

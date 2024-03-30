@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.store.core.services.generic;
 
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
+import com.asrevo.cvhome.store.core.exception.ServiceException;
 
 import java.io.Serializable;
 import java.util.List;

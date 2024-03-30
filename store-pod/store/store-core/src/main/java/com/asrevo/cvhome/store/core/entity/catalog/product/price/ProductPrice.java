@@ -1,9 +1,9 @@
 package com.asrevo.cvhome.store.core.entity.catalog.product.price;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.asrevo.cvhome.store.core.entity.catalog.product.availability.ProductAvailability;
 import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
 import com.asrevo.cvhome.store.core.utils.CloneUtils;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
@@ -84,7 +84,6 @@ public class ProductPrice extends SalesManagerEntity<Long, ProductPrice> {
     public void setProductPriceSpecialEndDate(Date productPriceSpecialEndDate) {
         this.productPriceSpecialEndDate = CloneUtils.clone(productPriceSpecialEndDate);
     }
-
 
 
 }

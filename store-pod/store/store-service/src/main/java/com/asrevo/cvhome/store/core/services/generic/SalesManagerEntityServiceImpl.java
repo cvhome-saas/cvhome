@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.store.core.services.generic;
 
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
+import com.asrevo.cvhome.store.core.exception.ServiceException;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.io.Serializable;

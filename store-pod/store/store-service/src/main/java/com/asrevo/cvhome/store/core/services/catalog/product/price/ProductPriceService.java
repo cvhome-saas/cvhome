@@ -1,10 +1,10 @@
 package com.asrevo.cvhome.store.core.services.catalog.product.price;
 
-import com.asrevo.cvhome.store.core.exception.ServiceException;
-import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
 import com.asrevo.cvhome.store.core.entity.catalog.product.price.ProductPrice;
 import com.asrevo.cvhome.store.core.entity.catalog.product.price.ProductPriceDescription;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
+import com.asrevo.cvhome.store.core.exception.ServiceException;
+import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
 
 import java.util.List;
 

@@ -208,8 +208,6 @@ public class Product extends SalesManagerEntity<Long, Product> implements Audita
     }
 
 
-
-
     public ProductDescription getProductDescription() {
         if (this.getDescriptions() != null && this.getDescriptions().size() > 0) {
             return this.getDescriptions().iterator().next();

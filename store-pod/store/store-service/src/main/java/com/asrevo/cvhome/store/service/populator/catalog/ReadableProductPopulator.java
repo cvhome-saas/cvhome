@@ -1,11 +1,6 @@
 package com.asrevo.cvhome.store.service.populator.catalog;
 
-import com.asrevo.cvhome.store.core.model.catalog.product.*;
-import com.asrevo.cvhome.store.core.model.catalog.product.attribute.*;
-import com.asrevo.cvhome.store.core.model.customer.address.Address;
 import com.asrevo.cvhome.store.controller.exception.ConversionException;
-import com.asrevo.cvhome.store.core.services.catalog.pricing.PricingService;
-import com.asrevo.cvhome.store.utils.AbstractDataPopulator;
 import com.asrevo.cvhome.store.core.entity.catalog.category.Category;
 import com.asrevo.cvhome.store.core.entity.catalog.product.Product;
 import com.asrevo.cvhome.store.core.entity.catalog.product.attribute.ProductAttribute;
@@ -24,15 +19,20 @@ import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import com.asrevo.cvhome.store.core.model.catalog.category.ReadableCategory;
 import com.asrevo.cvhome.store.core.model.catalog.manufacturer.ReadableManufacturer;
+import com.asrevo.cvhome.store.core.model.catalog.product.*;
+import com.asrevo.cvhome.store.core.model.catalog.product.attribute.*;
 import com.asrevo.cvhome.store.core.model.catalog.product.attribute.api.ReadableProductOptionValue;
 import com.asrevo.cvhome.store.core.model.catalog.product.product.ProductSpecification;
 import com.asrevo.cvhome.store.core.model.catalog.product.type.ProductTypeDescription;
 import com.asrevo.cvhome.store.core.model.catalog.product.type.ReadableProductType;
+import com.asrevo.cvhome.store.core.model.customer.address.Address;
+import com.asrevo.cvhome.store.core.services.catalog.pricing.PricingService;
+import com.asrevo.cvhome.store.utils.AbstractDataPopulator;
 import com.asrevo.cvhome.store.utils.DateUtil;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.Assert;
-import org.apache.commons.collections.CollectionUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;

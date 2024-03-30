@@ -1,7 +1,5 @@
 package com.asrevo.cvhome.store.core.services.catalog.pricing;
 
-import com.asrevo.cvhome.store.core.exception.ServiceException;
-import com.asrevo.cvhome.store.utils.ProductPriceUtils;
 import com.asrevo.cvhome.store.core.entity.catalog.product.Product;
 import com.asrevo.cvhome.store.core.entity.catalog.product.attribute.ProductAttribute;
 import com.asrevo.cvhome.store.core.entity.catalog.product.availability.ProductAvailability;
@@ -10,6 +8,8 @@ import com.asrevo.cvhome.store.core.entity.catalog.product.variant.ProductVarian
 import com.asrevo.cvhome.store.core.entity.customer.Customer;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.currency.Currency;
+import com.asrevo.cvhome.store.core.exception.ServiceException;
+import com.asrevo.cvhome.store.utils.ProductPriceUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

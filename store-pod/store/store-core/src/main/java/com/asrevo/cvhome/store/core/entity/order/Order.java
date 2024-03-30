@@ -1,6 +1,5 @@
 package com.asrevo.cvhome.store.core.entity.order;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.asrevo.cvhome.store.core.converter.LocaleConverter;
 import com.asrevo.cvhome.store.core.entity.common.Billing;
 import com.asrevo.cvhome.store.core.entity.common.Delivery;
@@ -13,6 +12,7 @@ import com.asrevo.cvhome.store.core.entity.order.orderstatus.OrderStatusHistory;
 import com.asrevo.cvhome.store.core.entity.order.payment.CreditCard;
 import com.asrevo.cvhome.store.core.entity.payments.PaymentType;
 import com.asrevo.cvhome.store.core.entity.reference.currency.Currency;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import lombok.Getter;

@@ -1,7 +1,6 @@
 package com.asrevo.cvhome.store.core.repositories.catalog.product;
 
 import com.asrevo.cvhome.store.core.constants.Constants;
-import com.asrevo.cvhome.store.core.utils.RepositoryHelper;
 import com.asrevo.cvhome.store.core.entity.catalog.product.Product;
 import com.asrevo.cvhome.store.core.entity.catalog.product.ProductCriteria;
 import com.asrevo.cvhome.store.core.entity.catalog.product.ProductList;
@@ -10,6 +9,7 @@ import com.asrevo.cvhome.store.core.entity.common.GenericEntityList;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import com.asrevo.cvhome.store.core.entity.tax.taxclass.TaxClass;
+import com.asrevo.cvhome.store.core.utils.RepositoryHelper;
 import jakarta.persistence.*;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;

@@ -3,8 +3,8 @@ package com.asrevo.cvhome.store.service.mapper.catalog;
 import com.asrevo.cvhome.store.core.entity.catalog.catalog.Catalog;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
-import com.asrevo.cvhome.store.service.mapper.Mapper;
 import com.asrevo.cvhome.store.core.model.catalog.catalog.PersistableCatalog;
+import com.asrevo.cvhome.store.service.mapper.Mapper;
 import org.springframework.stereotype.Component;
 
 @Component

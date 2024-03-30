@@ -1,10 +1,10 @@
 package com.asrevo.cvhome.store.core.modules.cms.content;
 
 import com.asrevo.cvhome.store.core.constants.Constants;
-import com.asrevo.cvhome.store.core.modules.cms.common.AssetsManager;
-import com.asrevo.cvhome.store.core.modules.cms.impl.CMSManager;
 import com.asrevo.cvhome.store.core.entity.content.FileContentType;
 import com.asrevo.cvhome.store.core.entity.content.OutputContentFile;
+import com.asrevo.cvhome.store.core.modules.cms.common.AssetsManager;
+import com.asrevo.cvhome.store.core.modules.cms.impl.CMSManager;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.ByteArrayOutputStream;

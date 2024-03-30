@@ -1,9 +1,9 @@
 package com.asrevo.cvhome.store.core.services.reference.loader;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.entity.system.IntegrationModule;
 import com.asrevo.cvhome.store.core.entity.system.ModuleConfig;
+import com.asrevo.cvhome.store.core.exception.ServiceException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
