@@ -21,6 +21,11 @@ public class SecurityServiceImpl implements SecurityService {
     private final InternalStoreService internalStoreService;
 
     @Override
+    public boolean isSuperAdmin(Authentication authentication, ManagerStoreId requestedStoreId) {
+        return hasSuperAdminRole(authentication);
+    }
+
+    @Override
     public boolean isOrgAdmin(Authentication authentication, ManagerStoreId requestedStoreId) {
         if (!hasOrgAdminRole(authentication)) {
             return false;
@@ -52,6 +57,10 @@ public class SecurityServiceImpl implements SecurityService {
             return false;
         }
         return internalStoreService.getStoreOwner(requestedStoreId).equals(info.org());
+    }
+
+    private static boolean hasSuperAdminRole(Authentication authentication) {
+        return hasRole(authentication, Roles.ROLE_SUPER_ADMIN);
     }
 
     private static boolean hasOrgAdminRole(Authentication authentication) {

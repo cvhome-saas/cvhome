@@ -6,6 +6,7 @@ public class ErrorCodes {
     public static final ErrorCode store_not_found = new ErrorCode("0", "store not found");
     public static final ErrorCode create_user_fail = new ErrorCode("0", "create_user_fail");
     public static final ErrorCode create_org_admin_not_allowed = new ErrorCode("0", "create org admin not allowed");
+    public static final ErrorCode create_super_admin_not_allowed = new ErrorCode("0", "create super admin not allowed");
     public static final ErrorCode create_customer_not_allowed = new ErrorCode("0", "create customer not allowed");
     public static final ErrorCode groups_should_not_be_empty = new ErrorCode("0", "groups should not be empty");
     public static final ErrorCode username_already_taken = new ErrorCode("0", "username already taken");

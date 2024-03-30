@@ -4,6 +4,8 @@ import com.asrevo.cvhome.manager.commons.domain.ManagerStoreId;
 import org.springframework.security.core.Authentication;
 
 public interface SecurityService {
+    boolean isSuperAdmin(Authentication authentication, ManagerStoreId requestedStoreId);
+
     boolean isOrgAdmin(Authentication authentication, ManagerStoreId requestedStoreId);
 
     boolean isStoreAdmin(Authentication authentication, ManagerStoreId requestedStoreId);

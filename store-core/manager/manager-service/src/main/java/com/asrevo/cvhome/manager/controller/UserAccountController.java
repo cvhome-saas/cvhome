@@ -44,6 +44,9 @@ public class UserAccountController {
         if (create.groups().contains(Groups.ORG_ADMIN)) {
             throw new OperationExecution(ErrorCodes.create_org_admin_not_allowed);
         }
+        if (create.groups().contains(Groups.SUPER_ADMIN)) {
+            throw new OperationExecution(ErrorCodes.create_super_admin_not_allowed);
+        }
         if (userAccountService.usernameExist(create.username())) {
             throw new OperationExecution(ErrorCodes.username_already_taken);
         }

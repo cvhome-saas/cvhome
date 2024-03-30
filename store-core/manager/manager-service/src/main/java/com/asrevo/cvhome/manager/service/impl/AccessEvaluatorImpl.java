@@ -44,7 +44,9 @@ public class AccessEvaluatorImpl implements AccessEvaluator {
     }
 
     private boolean hasReadAccessOnStore(Authentication authentication, ManagerStoreId requestedStoreId) {
-        if (securityRoleCheckService.isOrgAdmin(authentication, requestedStoreId)) {
+        if (securityRoleCheckService.isSuperAdmin(authentication, requestedStoreId)) {
+            return true;
+        } else if (securityRoleCheckService.isOrgAdmin(authentication, requestedStoreId)) {
             return true;
         } else if (securityRoleCheckService.isStoreAdmin(authentication, requestedStoreId)) {
             return true;
@@ -56,7 +58,9 @@ public class AccessEvaluatorImpl implements AccessEvaluator {
     }
 
     private boolean hasMaintainAccessOnUsers(Authentication authentication, ManagerStoreId requestedStoreId) {
-        if (securityRoleCheckService.isOrgAdmin(authentication, requestedStoreId)) {
+        if (securityRoleCheckService.isSuperAdmin(authentication, requestedStoreId)) {
+            return true;
+        } else if (securityRoleCheckService.isOrgAdmin(authentication, requestedStoreId)) {
             return true;
         } else if (securityRoleCheckService.isStoreAdmin(authentication, requestedStoreId)) {
             return true;
