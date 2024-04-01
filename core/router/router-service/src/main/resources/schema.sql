@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS router.reference
 CREATE TABLE IF NOT EXISTS router.reference_alis
 (
     id           varchar(24) not null,
-    domain       varchar(40),
+    domain       varchar(40) unique,
     reference_id varchar(24),
     constraint reference_alis_pk primary key (id),
     constraint reference_alis_reference_id_fk foreign key (reference_id) references router.reference
