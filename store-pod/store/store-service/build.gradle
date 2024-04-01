@@ -65,6 +65,7 @@ dependencies {
 
 
     implementation 'commons-validator:commons-validator:1.8.0'
+    implementation 'commons-io:commons-io:2.15.1'
     implementation 'com.googlecode.json-simple:json-simple:1.1.1'
 
     implementation project(':commons:ecs-commons:fargate-task-info')

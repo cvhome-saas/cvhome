@@ -5,7 +5,7 @@ package com.asrevo.cvhome.store.core.services.generic;
  * <p>
  * Cela permet de simplifier la configuration Spring de la partie transactionnelle car
  * il suffit alors de déclarer le pointcut de l'aspect sur
- * this(com.salesmanager.core.business.services.common.generic.ITransactionalAspectAwareService)
+ * this(com.asrevo.cvhome.store.core.services.common.generic.ITransactionalAspectAwareService)
  */
 public interface TransactionalAspectAwareService {
 

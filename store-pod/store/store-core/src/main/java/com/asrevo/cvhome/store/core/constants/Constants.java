@@ -19,6 +19,7 @@ public class Constants {
     public final static String DEFAULT_TAX_CLASS = "DEFAULT";
     public final static String DEFAULT_PRICE_DESCRIPTION = "DEFAULT";
 
+    public final static String OT_DISCOUNT_TITLE = "order.total.discount";
 
     public final static Locale DEFAULT_LOCALE = Locale.US;
     public final static Currency DEFAULT_CURRENCY = Currency.getInstance(Locale.US);

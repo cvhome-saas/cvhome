@@ -13,6 +13,7 @@ import lombok.Setter;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -94,5 +95,15 @@ public class ShoppingCartItem extends SalesManagerEntity<Long, ShoppingCartItem>
         this.setSku(product.getSku());
         this.quantity = 1;
         this.productVirtual = product.isProductVirtual();
+    }
+
+    public ShoppingCartItem() {
+    }
+
+    public void addAttributes(ShoppingCartAttributeItem shoppingCartAttributeItem) {
+        this.attributes.add(shoppingCartAttributeItem);
+    }
+    public void removeAllAttributes(){
+        this.attributes.removeAll(Collections.EMPTY_SET);
     }
 }

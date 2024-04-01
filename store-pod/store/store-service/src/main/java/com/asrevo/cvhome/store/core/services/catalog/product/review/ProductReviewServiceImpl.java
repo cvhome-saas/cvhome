@@ -103,7 +103,7 @@ public class ProductReviewServiceImpl extends
     }
 
     /* (non-Javadoc)
-     * @see com.salesmanager.core.business.services.catalog.product.review.ProductReviewService#getByProductNoObjects(com.salesmanager.core.model.catalog.product.Product)
+     * @see com.asrevo.cvhome.store.core.services.catalog.product.review.ProductReviewService#getByProductNoObjects(com.salesmanager.core.model.catalog.product.Product)
      */
     @Override
     public List<ProductReview> getByProductNoCustomers(Product product) {

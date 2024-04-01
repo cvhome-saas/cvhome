@@ -20,7 +20,7 @@ public class InitializationLoader {
     private static final Logger LOGGER = LoggerFactory.getLogger(InitializationLoader.class);
     @Autowired
     protected MerchantStoreService merchantService;
-    @Value("${db.init.data:true}")
+    @Value("${db.init.data:false}")
     private boolean initDefaultData;
     @Autowired
     private MerchantConfigurationService merchantConfigurationService;
