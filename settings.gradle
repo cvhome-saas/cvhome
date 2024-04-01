@@ -58,5 +58,6 @@ include(
         'store-core:store-ui',
 
         'saas-pod:gateway:gateway-service',
+        'saas-pod:gateway:gateway-service-v2',
 
 )
