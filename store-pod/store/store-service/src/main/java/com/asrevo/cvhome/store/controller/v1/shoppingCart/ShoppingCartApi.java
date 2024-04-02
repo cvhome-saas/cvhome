@@ -34,20 +34,20 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class ShoppingCartApi {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ShoppingCartApi.class);
-/*
+    /*
 
-	@Autowired
-	private com.salesmanager.shop.store.controller.shoppingCart.facade.v1.ShoppingCartFacade shoppingCartFacadev1;
+        @Autowired
+        private com.salesmanager.shop.store.controller.shoppingCart.facade.v1.ShoppingCartFacade shoppingCartFacadev1;
 
-	@Autowired
-	private CustomerService customerService;
+        @Autowired
+        private CustomerService customerService;
 
-	@Autowired
-	private CustomerFacade customerFacadev1;
-	
-	@Autowired
-	private com.salesmanager.shop.store.controller.customer.facade.CustomerFacade customerFacade;
-*/
+        @Autowired
+        private CustomerFacade customerFacadev1;
+
+        @Autowired
+        private com.salesmanager.shop.store.controller.customer.facade.CustomerFacade customerFacade;
+    */
     @Autowired
     private ShoppingCartFacade shoppingCartFacade;
 
