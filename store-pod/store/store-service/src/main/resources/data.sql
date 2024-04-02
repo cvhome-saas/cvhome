@@ -2044,14 +2044,14 @@ INSERT INTO store.CATEGORY_DESCRIPTION (DESCRIPTION_ID, DATE_CREATED, DATE_MODIF
                                         LANGUAGE_ID, CATEGORY_ID)
 VALUES (1, '2024-03-31 15:24:30', '2024-03-31 15:24:30', NULL, 'phones', 'phones', NULL, '', '', NULL, 'phones',
         'phones', 1, 1),
-       (2, '2024-03-31 15:24:48', '2024-03-31 15:24:48', NULL, '', 'cars', NULL, '', '', NULL, 'cars', 'cars', 1, 2);
+       (2, '2024-03-31 15:24:48', '2024-03-31 15:24:48', NULL, '', 'cars', NULL, '', '', NULL, 'cars', '2', 1, 2);
 
 
 INSERT INTO store.CONTENT (CONTENT_ID, DATE_CREATED, DATE_MODIFIED, UPDT_ID, CODE, CONTENT_POSITION, CONTENT_TYPE,
                            LINK_TO_MENU, PRODUCT_GROUP, SORT_ORDER, VISIBLE, MERCHANT_ID)
 VALUES (1, NULL, NULL, NULL, 'aboutus', NULL, 'PAGE', false, NULL, 0, true, 1),
        (2, NULL, NULL, NULL, 'callus', NULL, 'PAGE', false, NULL, 0, true, 1),
-       (3, NULL, NULL, NULL, 'usno', NULL, 'BOX', false, NULL, 0, true, 1);
+       (3, NULL, NULL, NULL, 'agreement', NULL, 'BOX', false, NULL, 0, true, 1);
 
 
 INSERT INTO store.CONTENT_DESCRIPTION (DESCRIPTION_ID, DATE_CREATED, DATE_MODIFIED, UPDT_ID, DESCRIPTION, NAME, TITLE,
@@ -2060,7 +2060,7 @@ VALUES (1, '2024-03-31 15:28:01', '2024-03-31 15:28:01', NULL, 'welcome to us', 
         NULL, 'about us', 'about-us', 1, 1),
        (2, '2024-03-31 15:28:20', '2024-03-31 15:28:20', NULL, 'callus', 'callus', 'callus', 'callus', NULL, 'callus',
         'callus', 1, 2),
-       (3, '2024-03-31 15:28:40', '2024-03-31 15:28:40', NULL, 'usno&nbsp;usnovusno&nbsp;usno&nbsp;usno', 'usno', '',
+       (3, '2024-03-31 15:28:40', '2024-03-31 15:28:40', NULL, 'agreement&nbsp;agreementvagreement&nbsp;agreement&nbsp;agreement', 'agreement', '',
         NULL, NULL, '', NULL, 1, 3);
 INSERT INTO store.PRODUCT (PRODUCT_ID, DATE_CREATED, DATE_MODIFIED, UPDT_ID, AVAILABLE, COND, DATE_AVAILABLE, PREORDER,
                            PRODUCT_HEIGHT, PRODUCT_FREE, PRODUCT_LENGTH, QUANTITY_ORDERED, REVIEW_AVG, REVIEW_COUNT,

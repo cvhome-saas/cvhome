@@ -5,6 +5,7 @@ import com.asrevo.cvhome.store.core.entity.common.Delivery;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
+
 /**
  * Contains shipping fees according to user selections
  * @author casams1

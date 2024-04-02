@@ -364,12 +364,12 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
     public Product getBySku(String productCode, MerchantStore merchant, Language language) throws ServiceException {
 
         try {
-            List<Object> products = productRepository.findBySku(productCode, merchant.getId());
+            List<Long> products = productRepository.findBySku(productCode, merchant.getId());
             if (products.isEmpty()) {
                 throw new ServiceException("Cannot get product with sku [" + productCode + "]");
             }
-            BigInteger id = (BigInteger) products.get(0);
-            return productRepository.getById(id.longValue(), merchant, language);
+            Long id = products.get(0);
+            return productRepository.getById(id, merchant, language);
         } catch (Exception e) {
             throw new ServiceException("Cannot get product with sku [" + productCode + "]", e);
         }
@@ -380,12 +380,11 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
     public Product getBySku(String productCode, MerchantStore merchant) throws ServiceException {
 
         try {
-            List<Object> products = productRepository.findBySku(productCode, merchant.getId());
+            List<Long> products = productRepository.findBySku(productCode, merchant.getId());
             if (products.isEmpty()) {
                 throw new ServiceException("Cannot get product with sku [" + productCode + "]");
             }
-            BigInteger id = (BigInteger) products.get(0);
-            return this.findOne(id.longValue(), merchant);
+            return this.findOne(products.get(0), merchant);
         } catch (Exception e) {
             throw new ServiceException("Cannot get product with sku [" + productCode + "]", e);
         }

@@ -43,4 +43,10 @@ public class Constants {
     public final static String SMALL_IMAGE = "SMALL";
     public final static int MAX_REVIEW_RATING_SCORE = 5;
 
+    public final static String OT_ITEM_PRICE_MODULE_CODE = "itemprice";
+    public final static String OT_SUBTOTAL_MODULE_CODE = "subtotal";
+    public final static String OT_SHIPPING_MODULE_CODE = "shipping";
+    public final static String OT_TOTAL_MODULE_CODE = "total";
+    public final static String SHIPPING_CONFIGURATION = "SHIPPING_CONFIG";
+
 }
