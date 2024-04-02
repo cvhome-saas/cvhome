@@ -1,25 +1,22 @@
 package com.asrevo.cvhome.store.core.model.content;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * A simple piece of content
- * @author carlsamson
  *
+ * @author carlsamson
  */
+@Setter
+@Getter
 @Deprecated
 public class ReadableContent extends Content {
-  
-  /**
-   * 
-   */
-  private static final long serialVersionUID = 1L;
-  private String content;
 
-  public String getContent() {
-    return content;
-  }
-
-  public void setContent(String content) {
-    this.content = content;
-  }
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
+    private String content;
 
 }

@@ -7,28 +7,29 @@ import com.asrevo.cvhome.store.service.facade.shipping.ShippingFacade;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 // @TODO ASHRAF
 @RestController
 @RequestMapping("/api/v1")
-@Tag(name = "Shipping - Expedition management resource (Shipping Management Api) - ship to country" )
+@Tag(name = "Shipping - Expedition management resource (Shipping Management Api) - ship to country")
 public class ShippingExpeditionApi {
-	
 
 
-	@Autowired
-	private ShippingFacade shippingFacade;
+    @Autowired
+    private ShippingFacade shippingFacade;
 
 
-	 @GetMapping("/shipping/country")
-	  public List<ReadableCountry> getCountry(
-				@Parameter(hidden = true) MerchantStore merchantStore,
-				@Parameter(hidden = true) Language language) {
-	    return shippingFacade.shipToCountry(merchantStore, language);
-	  }
-	
+    @GetMapping("/shipping/country")
+    public List<ReadableCountry> getCountry(
+            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) Language language) {
+        return shippingFacade.shipToCountry(merchantStore, language);
+    }
+
 
 }

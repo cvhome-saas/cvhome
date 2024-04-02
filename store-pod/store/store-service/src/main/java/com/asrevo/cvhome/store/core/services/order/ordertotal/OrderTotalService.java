@@ -10,11 +10,11 @@ import com.asrevo.cvhome.store.core.model.order.OrderTotalVariation;
 /**
  * Additional dynamic order total calculation
  * from the rules engine and other modules
- * @author carlsamson
  *
+ * @author carlsamson
  */
 public interface OrderTotalService {
-	
-	OrderTotalVariation findOrderTotalVariation(final OrderSummary summary, final Customer customer, final MerchantStore store, final Language language) throws Exception;
+
+    OrderTotalVariation findOrderTotalVariation(final OrderSummary summary, final Customer customer, final MerchantStore store, final Language language) throws Exception;
 
 }

@@ -30,6 +30,7 @@ public class ShippingServiceImpl implements ShippingService {
     private CountryService countryService;
     @Autowired
     private MerchantConfigurationService merchantConfigurationService;
+
     @Override
     public List<Country> getShipToCountryList(MerchantStore store, Language language) throws ServiceException {
 
@@ -37,16 +38,16 @@ public class ShippingServiceImpl implements ShippingService {
         ShippingConfiguration shippingConfiguration = getShippingConfiguration(store);
         ShippingType shippingType = ShippingType.INTERNATIONAL;
         List<String> supportedCountries = new ArrayList<String>();
-        if(shippingConfiguration==null) {
+        if (shippingConfiguration == null) {
             shippingConfiguration = new ShippingConfiguration();
         }
 
-        if(shippingConfiguration.getShippingType()!=null) {
+        if (shippingConfiguration.getShippingType() != null) {
             shippingType = shippingConfiguration.getShippingType();
         }
 
 
-        if(shippingType.name().equals(ShippingType.NATIONAL.name())){
+        if (shippingType.name().equals(ShippingType.NATIONAL.name())) {
 
             supportedCountries.add(store.getCountry().getIsoCode());
 
@@ -54,13 +55,13 @@ public class ShippingServiceImpl implements ShippingService {
 
             MerchantConfiguration configuration = merchantConfigurationService.getMerchantConfiguration(SUPPORTED_COUNTRIES, store);
 
-            if(configuration!=null) {
+            if (configuration != null) {
 
                 String countries = configuration.getValue();
-                if(!StringUtils.isBlank(countries)) {
+                if (!StringUtils.isBlank(countries)) {
 
-                    Object objRegions= JSONValue.parse(countries);
-                    JSONArray arrayRegions=(JSONArray)objRegions;
+                    Object objRegions = JSONValue.parse(countries);
+                    JSONArray arrayRegions = (JSONArray) objRegions;
                     for (Object arrayRegion : arrayRegions) {
                         supportedCountries.add((String) arrayRegion);
                     }
@@ -81,13 +82,13 @@ public class ShippingServiceImpl implements ShippingService {
 
         ShippingConfiguration shippingConfiguration = null;
 
-        if(configuration!=null) {
+        if (configuration != null) {
             String value = configuration.getValue();
 
             ObjectMapper mapper = new ObjectMapper();
             try {
                 shippingConfiguration = mapper.readValue(value, ShippingConfiguration.class);
-            } catch(Exception e) {
+            } catch (Exception e) {
                 throw new ServiceException("Cannot parse json string " + value);
             }
         }

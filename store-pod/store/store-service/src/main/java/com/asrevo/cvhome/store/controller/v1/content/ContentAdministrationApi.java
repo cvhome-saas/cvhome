@@ -32,8 +32,26 @@ import com.asrevo.cvhome.store.core.model.content.Content;
 */
 /**
  * Administration tool dedicated api
- * @author carlsamson
  *
+ * @author carlsamson
+ * <p>
+ * <p>
+ * Works with ng-file-man client
+ * @param path
+ * @param merchantStore
+ * @param language
+ * @return
+ * @throws Exception
+ * @param path
+ * @param merchantStore
+ * @param language
+ * @return
+ * @throws Exception
+ * <p>
+ * works with file manager (javascript client)
+ * @param files
+ * @param merchantStore
+ * @param language
  *//*
 
 @RestController
@@ -59,14 +77,14 @@ public class ContentAdministrationApi {
 	
 	*/
 /**
-	 * Works with ng-file-man client
-	 * 
-	 * @param path
-	 * @param merchantStore
-	 * @param language
-	 * @return
-	 * @throws Exception
-	 *//*
+ * Works with ng-file-man client
+ *
+ * @param path
+ * @param merchantStore
+ * @param language
+ * @return
+ * @throws Exception
+ *//*
 
 	@GetMapping(value = "/private/content/list", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiImplicitParams({ @ApiImplicitParam(name = "store", dataType = "String", defaultValue = "DEFAULT"),
@@ -85,12 +103,12 @@ public class ContentAdministrationApi {
 	
 	*/
 /**
-	 * @param path
-	 * @param merchantStore
-	 * @param language
-	 * @return
-	 * @throws Exception
-	 *//*
+ * @param path
+ * @param merchantStore
+ * @param language
+ * @return
+ * @throws Exception
+ *//*
 
 	@GetMapping(value = "/private/content/folder", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiImplicitParams({ @ApiImplicitParam(name = "store", dataType = "String", defaultValue = "DEFAULT"),
@@ -106,11 +124,11 @@ public class ContentAdministrationApi {
 	
 	*/
 /**
-	 * works with file manager (javascript client)
-	 * @param files
-	 * @param merchantStore
-	 * @param language
-	 *//*
+ * works with file manager (javascript client)
+ * @param files
+ * @param merchantStore
+ * @param language
+ *//*
 
 	@PostMapping(value = "/private/content/images/add", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
 	@ResponseStatus(HttpStatus.CREATED)
@@ -263,8 +281,8 @@ public class ContentAdministrationApi {
 
 		*/
 /**
-		 * 
-		 *//*
+ *
+ *//*
 
 		private static final long serialVersionUID = 1L;
 		private boolean success = true;
@@ -344,8 +362,8 @@ public class ContentAdministrationApi {
 
 		*/
 /**
-		 * 
-		 *//*
+ *
+ *//*
 
 		private static final long serialVersionUID = 1L;
 		private String url;

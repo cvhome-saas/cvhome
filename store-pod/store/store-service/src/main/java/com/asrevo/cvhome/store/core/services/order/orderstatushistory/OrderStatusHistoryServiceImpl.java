@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class OrderStatusHistoryServiceImpl implements OrderStatusHistoryService{
+public class OrderStatusHistoryServiceImpl implements OrderStatusHistoryService {
     @Autowired
     private OrderStatusHistoryRepository orderStatusHistoryRepository;
 

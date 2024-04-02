@@ -24,9 +24,9 @@ import com.asrevo.cvhome.store.utils.AbstractDataPopulator;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
 import org.apache.commons.beanutils.ConversionException;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.Assert;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -76,13 +76,18 @@ public class ShoppingCartDataPopulator extends AbstractDataPopulator<ShoppingCar
         return pricingService;
     }
 
+    public void setPricingService(final PricingService pricingService) {
+        this.pricingService = pricingService;
+    }
+
+    ;
 
     @Override
     public ShoppingCartData populate(final ShoppingCart shoppingCart,
                                      final ShoppingCartData cart, final MerchantStore store, final Language language) {
 
-        Validate.notNull(shoppingCart, "Requires ShoppingCart");
-        Validate.notNull(language, "Requires Language not null");
+        Assert.notNull(shoppingCart, "Requires ShoppingCart");
+        Assert.notNull(language, "Requires Language not null");
         int cartQuantity = 0;
         cart.setCode(shoppingCart.getShoppingCartCode());
         Set<com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem> items = shoppingCart.getLineItems();
@@ -201,14 +206,6 @@ public class ShoppingCartDataPopulator extends AbstractDataPopulator<ShoppingCar
 
 
     }
-
-    ;
-
-
-    public void setPricingService(final PricingService pricingService) {
-        this.pricingService = pricingService;
-    }
-
 
     public void setShoppingCartCalculationService(final ShoppingCartCalculationService shoppingCartCalculationService) {
         this.shoppingCartCalculationService = shoppingCartCalculationService;

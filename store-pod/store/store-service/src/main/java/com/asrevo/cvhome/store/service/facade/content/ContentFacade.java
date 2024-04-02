@@ -5,6 +5,7 @@ import com.asrevo.cvhome.store.core.entity.content.FileContentType;
 import com.asrevo.cvhome.store.core.entity.content.OutputContentFile;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
+import com.asrevo.cvhome.store.core.model.content.ContentFile;
 import com.asrevo.cvhome.store.core.model.content.ContentFolder;
 import com.asrevo.cvhome.store.core.model.content.ReadableContentEntity;
 import com.asrevo.cvhome.store.core.model.content.ReadableContentFull;
@@ -13,17 +14,15 @@ import com.asrevo.cvhome.store.core.model.content.box.ReadableContentBox;
 import com.asrevo.cvhome.store.core.model.content.page.PersistableContentPage;
 import com.asrevo.cvhome.store.core.model.content.page.ReadableContentPage;
 import com.asrevo.cvhome.store.core.model.entity.ReadableEntityList;
-import com.asrevo.cvhome.store.core.model.content.ContentFile;
 
 import java.util.List;
 import java.util.Optional;
 
 
-
 /**
  * Images and files management
- * @author carlsamson
  *
+ * @author carlsamson
  */
 public interface ContentFacade {
 
@@ -32,6 +31,7 @@ public interface ContentFacade {
 
     /**
      * File pth
+     *
      * @param store
      * @param file
      * @return
@@ -40,6 +40,7 @@ public interface ContentFacade {
 
     /**
      * Deletes a file from CMS
+     *
      * @param store
      * @param fileName
      */
@@ -47,15 +48,16 @@ public interface ContentFacade {
 
     /**
      * Delete content page
+     *
      * @param store
      * @param id
      */
     void delete(MerchantStore store, Long id);
 
 
-
     /**
      * Returns page names and urls configured for a given MerchantStore
+     *
      * @param store
      * @param language
      * @return
@@ -66,6 +68,7 @@ public interface ContentFacade {
 
     /**
      * Returns page name by code
+     *
      * @param code
      * @param store
      * @param language
@@ -76,6 +79,7 @@ public interface ContentFacade {
 
     /**
      * Returns page by name
+     *
      * @param name
      * @param store
      * @param language
@@ -87,6 +91,7 @@ public interface ContentFacade {
 
     /**
      * Returns a content box for a given code and merchant store
+     *
      * @param code
      * @param store
      * @param language
@@ -108,6 +113,7 @@ public interface ContentFacade {
     /**
      * Returns content boxes created with code prefix
      * for example return boxes with code starting with <code>_
+     *
      * @param store
      * @param language
      * @return
@@ -121,6 +127,7 @@ public interface ContentFacade {
 
     /**
      * Add multiple files
+     *
      * @param file
      * @param merchantStoreCode
      */
@@ -128,6 +135,7 @@ public interface ContentFacade {
 
     /**
      * Creates content page
+     *
      * @param page
      * @param merchantStore
      * @param language
@@ -140,6 +148,7 @@ public interface ContentFacade {
 
     /**
      * Creates content box
+     *
      * @param box
      * @param merchantStore
      * @param language
@@ -154,6 +163,7 @@ public interface ContentFacade {
 
     /**
      * Get all content types
+     *
      * @param type
      * @param store
      * @param language
@@ -163,6 +173,7 @@ public interface ContentFacade {
 
     /**
      * Rename file
+     *
      * @param store
      * @param fileType
      * @param originalName
@@ -172,6 +183,7 @@ public interface ContentFacade {
 
     /**
      * Download file
+     *
      * @param store
      * @param fileType
      * @param fileName

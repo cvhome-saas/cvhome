@@ -51,26 +51,27 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
     public OrderTotalSummary calculateShoppingCartTotal(
             final ShoppingCart shoppingCart, final Customer customer, final MerchantStore store,
             final Language language) throws ServiceException {
-        Validate.notNull(shoppingCart,"Order summary cannot be null");
-        Validate.notNull(customer,"Customery cannot be null");
-        Validate.notNull(store,"MerchantStore cannot be null.");
+        Validate.notNull(shoppingCart, "Order summary cannot be null");
+        Validate.notNull(customer, "Customery cannot be null");
+        Validate.notNull(store, "MerchantStore cannot be null.");
         try {
             return caculateShoppingCart(shoppingCart, customer, store, language);
         } catch (Exception e) {
-            LOGGER.error( "Error while calculating shopping cart total" +e );
+            LOGGER.error("Error while calculating shopping cart total" + e);
             throw new ServiceException(e);
         }
 
     }
-    private OrderTotalSummary caculateShoppingCart( ShoppingCart shoppingCart, final Customer customer, final MerchantStore store, final Language language) throws Exception {
+
+    private OrderTotalSummary caculateShoppingCart(ShoppingCart shoppingCart, final Customer customer, final MerchantStore store, final Language language) throws Exception {
 
 
         OrderSummary orderSummary = new OrderSummary();
         orderSummary.setOrderSummaryType(OrderSummaryType.SHOPPINGCART);
 
-        if(!StringUtils.isBlank(shoppingCart.getPromoCode())) {
+        if (!StringUtils.isBlank(shoppingCart.getPromoCode())) {
             Date promoDateAdded = shoppingCart.getPromoAdded();//promo valid 1 day
-            if(promoDateAdded == null) {
+            if (promoDateAdded == null) {
                 promoDateAdded = new Date();
             }
             Instant instant = promoDateAdded.toInstant();
@@ -78,7 +79,7 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
             LocalDate date = zdt.toLocalDate();
             //date added < date + 1 day
             LocalDate tomorrow = LocalDate.now().plusDays(1);
-            if(date.isBefore(tomorrow)) {
+            if (date.isBefore(tomorrow)) {
                 orderSummary.setPromoCode(shoppingCart.getPromoCode());
             } else {
                 //clear promo
@@ -98,31 +99,28 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
     }
 
 
-
-
-
     /**
      * <p>Method will be used to calculate Shopping cart total as well will update price for each
      * line items.
      * </p>
+     *
      * @param shoppingCart
      * @param store
      * @param language
      * @return {@link OrderTotalSummary}
      * @throws ServiceException
-     *
      */
     @Override
     public OrderTotalSummary calculateShoppingCartTotal(
             final ShoppingCart shoppingCart, final MerchantStore store, final Language language)
             throws ServiceException {
-        Validate.notNull(shoppingCart,"Order summary cannot be null");
-        Validate.notNull(store,"MerchantStore cannot be null");
+        Validate.notNull(shoppingCart, "Order summary cannot be null");
+        Validate.notNull(store, "MerchantStore cannot be null");
 
         try {
             return caculateShoppingCart(shoppingCart, null, store, language);
         } catch (Exception e) {
-            LOGGER.error( "Error while calculating shopping cart total" +e );
+            LOGGER.error("Error while calculating shopping cart total" + e);
             throw new ServiceException(e);
         }
     }
@@ -131,7 +129,7 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
 
         OrderTotalSummary totalSummary = new OrderTotalSummary();
         List<OrderTotal> orderTotals = new ArrayList<OrderTotal>();
-        Map<String,OrderTotal> otherPricesTotals = new HashMap<String,OrderTotal>();
+        Map<String, OrderTotal> otherPricesTotals = new HashMap<String, OrderTotal>();
 
 //  @TODO ASHRAF
 //        ShippingConfiguration shippingConfiguration = null;
@@ -146,21 +144,21 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
          */
         BigDecimal subTotal = new BigDecimal(0);
         subTotal.setScale(2, RoundingMode.HALF_UP);
-        for(ShoppingCartItem item : summary.getProducts()) {
+        for (ShoppingCartItem item : summary.getProducts()) {
 
             BigDecimal st = item.getItemPrice().multiply(new BigDecimal(item.getQuantity()));
             item.setSubTotal(st);
             subTotal = subTotal.add(st);
             //Other prices
             FinalPrice finalPrice = item.getFinalPrice();
-            if(finalPrice!=null) {
+            if (finalPrice != null) {
                 List<FinalPrice> otherPrices = finalPrice.getAdditionalPrices();
-                if(otherPrices!=null) {
-                    for(FinalPrice price : otherPrices) {
-                        if(!price.isDefaultPrice()) {
+                if (otherPrices != null) {
+                    for (FinalPrice price : otherPrices) {
+                        if (!price.isDefaultPrice()) {
                             OrderTotal itemSubTotal = otherPricesTotals.get(price.getProductPrice().getCode());
 
-                            if(itemSubTotal==null) {
+                            if (itemSubTotal == null) {
                                 itemSubTotal = new OrderTotal();
                                 itemSubTotal.setModule(Constants.OT_ITEM_PRICE_MODULE_CODE);
                                 itemSubTotal.setTitle(Constants.OT_ITEM_PRICE_MODULE_CODE);
@@ -171,14 +169,14 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
                             }
 
                             BigDecimal orderTotalValue = itemSubTotal.getValue();
-                            if(orderTotalValue==null) {
+                            if (orderTotalValue == null) {
                                 orderTotalValue = new BigDecimal(0);
                                 orderTotalValue.setScale(2, RoundingMode.HALF_UP);
                             }
 
                             orderTotalValue = orderTotalValue.add(price.getFinalPrice());
                             itemSubTotal.setValue(orderTotalValue);
-                            if(price.getProductPrice().getProductPriceType().name().equals(OrderValueType.ONE_TIME)) {
+                            if (price.getProductPrice().getProductPriceType().name().equals(OrderValueType.ONE_TIME)) {
                                 subTotal = subTotal.add(price.getFinalPrice());
                             }
                         }
@@ -213,7 +211,7 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
 
 
         totalSummary.setSubTotal(subTotal);
-        grandTotal=grandTotal.add(subTotal);
+        grandTotal = grandTotal.add(subTotal);
 
         OrderTotal orderTotalSubTotal = new OrderTotal();
         orderTotalSubTotal.setModule(Constants.OT_SUBTOTAL_MODULE_CODE);
@@ -227,7 +225,7 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
 
 
         //shipping
-        if(summary.getShippingSummary()!=null) {
+        if (summary.getShippingSummary() != null) {
 
 
             OrderTotal shippingSubTotal = new OrderTotal();
@@ -239,12 +237,12 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
 
             orderTotals.add(shippingSubTotal);
 
-            if(!summary.getShippingSummary().isFreeShipping()) {
+            if (!summary.getShippingSummary().isFreeShipping()) {
                 shippingSubTotal.setValue(summary.getShippingSummary().getShipping());
-                grandTotal=grandTotal.add(summary.getShippingSummary().getShipping());
+                grandTotal = grandTotal.add(summary.getShippingSummary().getShipping());
             } else {
                 shippingSubTotal.setValue(new BigDecimal(0));
-                grandTotal=grandTotal.add(new BigDecimal(0));
+                grandTotal = grandTotal.add(new BigDecimal(0));
             }
 
 //  @TODO ASHRAF

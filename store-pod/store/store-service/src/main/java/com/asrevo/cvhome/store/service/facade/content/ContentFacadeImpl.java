@@ -8,8 +8,8 @@ import com.asrevo.cvhome.store.core.entity.content.*;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
-import com.asrevo.cvhome.store.core.model.content.*;
 import com.asrevo.cvhome.store.core.model.content.ContentFile;
+import com.asrevo.cvhome.store.core.model.content.*;
 import com.asrevo.cvhome.store.core.model.content.box.PersistableContentBox;
 import com.asrevo.cvhome.store.core.model.content.box.ReadableContentBox;
 import com.asrevo.cvhome.store.core.model.content.box.ReadableContentBoxFull;
@@ -44,10 +44,8 @@ import java.util.stream.Collectors;
 @Component("contentFacade")
 public class ContentFacadeImpl implements ContentFacade {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ContentFacade.class);
-
     public static final String FILE_CONTENT_DELIMETER = "/";
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(ContentFacade.class);
     @Autowired
     private ContentService contentService;
 

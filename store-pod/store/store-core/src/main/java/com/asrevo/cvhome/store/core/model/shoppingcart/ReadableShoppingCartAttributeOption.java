@@ -5,9 +5,9 @@ import com.asrevo.cvhome.store.core.model.catalog.product.attribute.ReadableProd
 
 public class ReadableShoppingCartAttributeOption extends ReadableProductOption {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
 
 }

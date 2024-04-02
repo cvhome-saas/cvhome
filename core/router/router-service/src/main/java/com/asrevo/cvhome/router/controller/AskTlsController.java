@@ -13,8 +13,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("api/v1/router")
 @AllArgsConstructor
 @Slf4j
-public class AskTlsController{
+public class AskTlsController {
     public final ReferenceAlisRepository referenceAlisRepository;
+
     @GetMapping("public/ask-for-tls")
     public ResponseEntity<Object> ask(Domain domain) {
         return referenceAlisRepository.findByAlis(domain)

@@ -2,27 +2,19 @@ package com.asrevo.cvhome.store.core.model.shoppingcart;
 
 
 import com.asrevo.cvhome.store.core.model.entity.ShopEntity;
+import lombok.Getter;
+import lombok.Setter;
 
+@Setter
+@Getter
 public class ReadableShoppingCartAttribute extends ShopEntity {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	
-	private ReadableShoppingCartAttributeOption option;
-	private ReadableShoppingCartAttributeOptionValue optionValue;
-	
-	public ReadableShoppingCartAttributeOption getOption() {
-		return option;
-	}
-	public void setOption(ReadableShoppingCartAttributeOption option) {
-		this.option = option;
-	}
-	public ReadableShoppingCartAttributeOptionValue getOptionValue() {
-		return optionValue;
-	}
-	public void setOptionValue(ReadableShoppingCartAttributeOptionValue optionValue) {
-		this.optionValue = optionValue;
-	}
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
+
+    private ReadableShoppingCartAttributeOption option;
+    private ReadableShoppingCartAttributeOptionValue optionValue;
+
 }

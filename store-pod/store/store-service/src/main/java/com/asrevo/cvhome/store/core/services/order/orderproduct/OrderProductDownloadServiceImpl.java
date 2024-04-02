@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service("orderProductDownloadService")
-public class OrderProductDownloadServiceImpl  extends SalesManagerEntityServiceImpl<Long, OrderProductDownload> implements OrderProductDownloadService {
+public class OrderProductDownloadServiceImpl extends SalesManagerEntityServiceImpl<Long, OrderProductDownload> implements OrderProductDownloadService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderProductDownloadServiceImpl.class);
 
@@ -24,10 +24,10 @@ public class OrderProductDownloadServiceImpl  extends SalesManagerEntityServiceI
         super(orderProductDownloadRepository);
         this.orderProductDownloadRepository = orderProductDownloadRepository;
     }
-    
+
     @Override
     public List<OrderProductDownload> getByOrderId(Long orderId) {
-    	return orderProductDownloadRepository.findByOrderId(orderId);
+        return orderProductDownloadRepository.findByOrderId(orderId);
     }
 
 

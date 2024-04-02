@@ -1,11 +1,15 @@
 package com.asrevo.cvhome.store.core.model.order.total;
 
 import com.asrevo.cvhome.store.core.model.entity.Entity;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 
 
+@Setter
+@Getter
 public class OrderTotal extends Entity implements Serializable {
 
     /**
@@ -18,55 +22,6 @@ public class OrderTotal extends Entity implements Serializable {
     private int order;
     private String module;
     private BigDecimal value;
-
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
-    }
-
-    public int getOrder() {
-        return order;
-    }
-
-    public void setOrder(int order) {
-        this.order = order;
-    }
-
-    public String getModule() {
-        return module;
-    }
-
-    public void setModule(String module) {
-        this.module = module;
-    }
-
-    public BigDecimal getValue() {
-        return value;
-    }
-
-    public void setValue(BigDecimal value) {
-        this.value = value;
-    }
-
-    public String getText() {
-        return text;
-    }
-
-    public void setText(String text) {
-        this.text = text;
-    }
 
 
 }

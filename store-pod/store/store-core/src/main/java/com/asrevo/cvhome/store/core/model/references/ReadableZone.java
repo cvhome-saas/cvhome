@@ -1,17 +1,16 @@
 package com.asrevo.cvhome.store.core.model.references;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Setter
+@Getter
 public class ReadableZone extends ZoneEntity {
-	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	private String name;
-	public String getName() {
-		return name;
-	}
-	public void setName(String name) {
-		this.name = name;
-	}
+
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
+    private String name;
 
 }

@@ -103,7 +103,8 @@ public class ShoppingCartItem extends SalesManagerEntity<Long, ShoppingCartItem>
     public void addAttributes(ShoppingCartAttributeItem shoppingCartAttributeItem) {
         this.attributes.add(shoppingCartAttributeItem);
     }
-    public void removeAllAttributes(){
+
+    public void removeAllAttributes() {
         this.attributes.removeAll(Collections.EMPTY_SET);
     }
 }

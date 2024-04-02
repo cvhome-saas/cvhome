@@ -8,12 +8,9 @@ import com.asrevo.cvhome.store.core.model.references.ReadableCountry;
 import java.util.List;
 
 public interface ShippingFacade {
-	
 
-	List<ReadableCountry> shipToCountry(MerchantStore store, Language lanuage);
 
-	
-	
+    List<ReadableCountry> shipToCountry(MerchantStore store, Language lanuage);
 
 
 }
