@@ -2,11 +2,11 @@ package com.asrevo.cvhome.store.core.services.shoppingcart;
 
 
 import com.asrevo.cvhome.store.core.entity.catalog.product.Product;
+import com.asrevo.cvhome.store.core.entity.customer.Customer;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCart;
 import com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
-import com.asrevo.cvhome.store.core.model.customer.Customer;
 import com.asrevo.cvhome.store.core.model.shipping.ShippingProduct;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
 

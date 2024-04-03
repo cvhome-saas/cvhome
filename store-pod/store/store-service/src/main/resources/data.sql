@@ -2051,7 +2051,8 @@ INSERT INTO store.CONTENT (CONTENT_ID, DATE_CREATED, DATE_MODIFIED, UPDT_ID, COD
                            LINK_TO_MENU, PRODUCT_GROUP, SORT_ORDER, VISIBLE, MERCHANT_ID)
 VALUES (1, NULL, NULL, NULL, 'aboutus', NULL, 'PAGE', false, NULL, 0, true, 1),
        (2, NULL, NULL, NULL, 'callus', NULL, 'PAGE', false, NULL, 0, true, 1),
-       (3, NULL, NULL, NULL, 'agreement', NULL, 'BOX', false, NULL, 0, true, 1);
+       (3, NULL, NULL, NULL, 'agreement', NULL, 'BOX', false, NULL, 0, true, 1),
+       (4, NULL, NULL, NULL, 'headerMessage', NULL, 'BOX', false, NULL, 0, true, 1);
 
 
 INSERT INTO store.CONTENT_DESCRIPTION (DESCRIPTION_ID, DATE_CREATED, DATE_MODIFIED, UPDT_ID, DESCRIPTION, NAME, TITLE,
@@ -2061,7 +2062,9 @@ VALUES (1, '2024-03-31 15:28:01', '2024-03-31 15:28:01', NULL, 'welcome to us', 
        (2, '2024-03-31 15:28:20', '2024-03-31 15:28:20', NULL, 'callus', 'callus', 'callus', 'callus', NULL, 'callus',
         'callus', 1, 2),
        (3, '2024-03-31 15:28:40', '2024-03-31 15:28:40', NULL, 'agreement&nbsp;agreementvagreement&nbsp;agreement&nbsp;agreement', 'agreement', '',
-        NULL, NULL, '', NULL, 1, 3);
+        NULL, NULL, '', NULL, 1, 3),
+       (4, '2024-03-31 15:28:40', '2024-03-31 15:28:40', NULL, 'headerMessage&nbsp;headerMessagevheaderMessage&nbsp;headerMessage&nbsp;headerMessage', 'headerMessage', '',
+        NULL, NULL, '', NULL, 1, 4);
 INSERT INTO store.PRODUCT (PRODUCT_ID, DATE_CREATED, DATE_MODIFIED, UPDT_ID, AVAILABLE, COND, DATE_AVAILABLE, PREORDER,
                            PRODUCT_HEIGHT, PRODUCT_FREE, PRODUCT_LENGTH, QUANTITY_ORDERED, REVIEW_AVG, REVIEW_COUNT,
                            PRODUCT_SHIP, PRODUCT_VIRTUAL, PRODUCT_WEIGHT, PRODUCT_WIDTH, REF_SKU, RENTAL_DURATION,
@@ -2252,8 +2255,8 @@ VALUES (1, 1),
 INSERT INTO store.SM_SEQUENCER (SEQ_NAME, SEQ_COUNT)
 VALUES ('category_description_seq', 3),
        ('CATEGORY_SEQ_NEXT_VAL', 1),
-       ('content_description_seq', 4),
-       ('CONTENT_SEQ_NEXT_VAL', 1),
+       ('content_description_seq', 5),
+       ('CONTENT_SEQ_NEXT_VAL', 5),
        ('country_description_seq', 712),
        ('COUNTRY_SEQ_NEXT_VAL', 5),
        ('CURRENCY_SEQ_NEXT_VAL', 4),

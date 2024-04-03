@@ -13,6 +13,7 @@ import com.asrevo.cvhome.store.core.model.security.ReadableGroup;
 import com.asrevo.cvhome.store.utils.AbstractDataPopulator;
 import org.apache.commons.lang3.StringUtils;
 
+
 public class ReadableCustomerPopulator extends
         AbstractDataPopulator<Customer, ReadableCustomer> {
 
@@ -78,7 +79,7 @@ public class ReadableCustomerPopulator extends
             }
 
             if (source.getCustomerReviewCount() != null) {
-                target.setRatingCount(source.getCustomerReviewCount().intValue());
+                target.setRatingCount(source.getCustomerReviewCount());
             }
 
             if (source.getDelivery() != null) {

@@ -3,10 +3,10 @@
  */
 package com.asrevo.cvhome.store.service.facade.shoppingCart;
 
+import com.asrevo.cvhome.store.core.entity.customer.Customer;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCart;
-import com.asrevo.cvhome.store.core.model.customer.Customer;
 import com.asrevo.cvhome.store.core.model.shoppingcart.PersistableShoppingCartItem;
 import com.asrevo.cvhome.store.core.model.shoppingcart.ReadableShoppingCart;
 import com.asrevo.cvhome.store.core.model.shoppingcart.ShoppingCartData;

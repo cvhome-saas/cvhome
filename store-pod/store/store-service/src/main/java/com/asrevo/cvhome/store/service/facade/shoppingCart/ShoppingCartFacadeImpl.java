@@ -11,12 +11,12 @@ import com.asrevo.cvhome.store.core.entity.catalog.product.attribute.ProductAttr
 import com.asrevo.cvhome.store.core.entity.catalog.product.availability.ProductAvailability;
 import com.asrevo.cvhome.store.core.entity.catalog.product.price.FinalPrice;
 import com.asrevo.cvhome.store.core.entity.catalog.product.variant.ProductVariant;
+import com.asrevo.cvhome.store.core.entity.customer.Customer;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCart;
 import com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartAttributeItem;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
-import com.asrevo.cvhome.store.core.model.customer.Customer;
 import com.asrevo.cvhome.store.core.model.shoppingcart.*;
 import com.asrevo.cvhome.store.core.services.catalog.pricing.PricingService;
 import com.asrevo.cvhome.store.core.services.catalog.product.ProductService;
