@@ -30,36 +30,36 @@ jobs:
         run: chmod +x ./gradlew
       - name: Validate Gradle wrapper
         uses: gradle/wrapper-validation-action@ccb4328a959376b642e027874838f60f8e596de3
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4 # More information on this action can be found below in the 'AWS Credentials' section
-        with:
-          aws-region: eu-central-1
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      - name: get caller identity
-        run: |
-          aws sts get-caller-identity
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
-        with:
-          mask-password: 'false'
-      #      - name: Build
-      #        uses: gradle/gradle-build-action@749f47bda3e44aa060e82d7b3ef7e40d953bd629
-      #        with:
-      #          arguments: build -x test
-      #      - name: Test
-      #        uses: gradle/gradle-build-action@749f47bda3e44aa060e82d7b3ef7e40d953bd629
-      #        with:
-      #          arguments: test
-      - name: Build Docker with Gradle
+#      - name: Configure AWS credentials
+#        uses: aws-actions/configure-aws-credentials@v4 # More information on this action can be found below in the 'AWS Credentials' section
+#        with:
+#          aws-region: eu-central-1
+#          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#      - name: get caller identity
+#        run: |
+#          aws sts get-caller-identity
+#      - name: Login to Amazon ECR
+#        id: login-ecr
+#        uses: aws-actions/amazon-ecr-login@v2
+#        with:
+#          mask-password: 'false'
+      - name: Build
         uses: gradle/gradle-build-action@749f47bda3e44aa060e82d7b3ef7e40d953bd629
         with:
-          arguments: bootBuildImage --publishImage -x test
-        env: # Or as an environment variable
-          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_TOKEN: ${{ steps.login-ecr.outputs.docker_password_117535662239_dkr_ecr_eu_central_1_amazonaws_com }}
-          GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
+          arguments: build -x test
+      - name: Test
+        uses: gradle/gradle-build-action@749f47bda3e44aa060e82d7b3ef7e40d953bd629
+        with:
+          arguments: test
+#      - name: Build Docker with Gradle
+#        uses: gradle/gradle-build-action@749f47bda3e44aa060e82d7b3ef7e40d953bd629
+#        with:
+#          arguments: bootBuildImage --publishImage -x test
+#        env: # Or as an environment variable
+#          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+#          ECR_TOKEN: ${{ steps.login-ecr.outputs.docker_password_117535662239_dkr_ecr_eu_central_1_amazonaws_com }}
+#          GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
       - name: check docker images
         run: docker images
       - uses: actions/upload-artifact@v3
