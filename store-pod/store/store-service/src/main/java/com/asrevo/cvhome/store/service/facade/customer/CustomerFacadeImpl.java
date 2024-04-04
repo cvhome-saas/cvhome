@@ -36,7 +36,6 @@ import com.asrevo.cvhome.store.utils.LocaleUtils;
 import com.asrevo.cvhome.store.utils.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -107,7 +106,7 @@ public class CustomerFacadeImpl implements CustomerFacade {
     @Override
     public CustomerEntity getCustomerDataByUserName(final String userName, final MerchantStore store,
                                                     final Language language) throws Exception {
-        log.info("Fetching customer with userName" + userName);
+        log.info("Fetching customer with userName{}", userName);
         com.asrevo.cvhome.store.core.entity.customer.Customer customer = customerService.getByNick(userName);
 
         if (customer != null) {

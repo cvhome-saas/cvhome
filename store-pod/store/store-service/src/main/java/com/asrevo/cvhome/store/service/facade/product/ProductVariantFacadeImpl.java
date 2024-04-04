@@ -17,7 +17,6 @@ import com.asrevo.cvhome.store.core.services.catalog.product.variant.ProductVari
 import com.asrevo.cvhome.store.core.services.catalog.product.variation.ProductVariationService;
 import com.asrevo.cvhome.store.service.mapper.catalog.product.PersistableProductVariantMapper;
 import com.asrevo.cvhome.store.service.mapper.catalog.product.ReadableProductVariantMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;

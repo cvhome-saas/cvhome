@@ -11,7 +11,6 @@ import com.asrevo.cvhome.store.core.entity.reference.currency.Currency;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.utils.ProductPriceUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -66,7 +65,7 @@ public class PricingServiceImpl implements PricingService {
         try {
             return priceUtil.getStoreFormatedAmountWithCurrency(store, amount);
         } catch (Exception e) {
-            log.error("An error occured when trying to format an amount " + amount.toString());
+            log.error("An error occured when trying to format an amount {}", amount.toString());
             throw new ServiceException(e);
         }
     }
@@ -77,7 +76,7 @@ public class PricingServiceImpl implements PricingService {
         try {
             return priceUtil.getFormatedAmountWithCurrency(locale, currency, amount);
         } catch (Exception e) {
-            log.error("An error occured when trying to format an amunt " + amount.toString() + " using locale " + locale.toString() + " and currency " + currency.toString());
+            log.error("An error occured when trying to format an amunt {} using locale {} and currency {}", amount.toString(), locale.toString(), currency.toString());
             throw new ServiceException(e);
         }
     }
@@ -88,7 +87,7 @@ public class PricingServiceImpl implements PricingService {
         try {
             return priceUtil.getAdminFormatedAmount(store, amount);
         } catch (Exception e) {
-            log.error("An error occured when trying to format an amount " + amount.toString());
+            log.error("An error occured when trying to format an amount {}", amount.toString());
             throw new ServiceException(e);
         }
     }
@@ -99,7 +98,7 @@ public class PricingServiceImpl implements PricingService {
         try {
             return priceUtil.getAmount(amount);
         } catch (Exception e) {
-            log.error("An error occured when trying to format an amount " + amount);
+            log.error("An error occured when trying to format an amount {}", amount);
             throw new ServiceException(e);
         }
 

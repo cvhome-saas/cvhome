@@ -240,9 +240,9 @@ public class ShoppingCartServiceImpl extends SalesManagerEntityServiceImpl<Long,
                 // Set<ShoppingCartItem> shoppingCartItems = new
                 // HashSet<ShoppingCartItem>();
                 for (ShoppingCartItem item : items) {
-                    log.debug("Populate item " + item.getId());
+                    log.debug("Populate item {}", item.getId());
                     getPopulatedItem(item, store);
-                    log.debug("Obsolete item ? " + item.isObsolete());
+                    log.debug("Obsolete item ? {}", item.isObsolete());
                     if (item.isObsolete()) {
                         cartIsObsolete = true;
                     }
@@ -334,9 +334,7 @@ public class ShoppingCartServiceImpl extends SalesManagerEntityServiceImpl<Long,
 
         // cleanup orphean item
         if (CollectionUtils.isNotEmpty(removeAttributesList)) {
-            for (ShoppingCartAttributeItem attr : removeAttributesList) {
-                shoppingCartAttributeItemRepository.delete(attr);
-            }
+            shoppingCartAttributeItemRepository.deleteAll(removeAttributesList);
         }
 
         // cleanup detached attributes

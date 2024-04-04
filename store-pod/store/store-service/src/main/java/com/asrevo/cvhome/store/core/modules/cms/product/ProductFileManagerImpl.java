@@ -65,7 +65,7 @@ public class ProductFileManagerImpl extends ProductFileManager {
 
 
             if (bufferedImage == null) {
-                log.error("Cannot read image format for " + productImage.getProductImage());
+                log.error("Cannot read image format for {}", productImage.getProductImage());
                 throw new Exception("Cannot read image format " + productImage.getProductImage());
             }
 

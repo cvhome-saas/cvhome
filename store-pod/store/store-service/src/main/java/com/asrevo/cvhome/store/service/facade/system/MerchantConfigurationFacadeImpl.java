@@ -10,7 +10,6 @@ import com.asrevo.cvhome.store.core.model.system.Configs;
 import com.asrevo.cvhome.store.core.services.system.MerchantConfigurationService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -67,7 +66,7 @@ public class MerchantConfigurationFacadeImpl implements MerchantConfigurationFac
                 readableConfig.setDisplayShipping(Boolean.valueOf(displayShipping));
             }
         } catch (Exception e) {
-            log.error("Cannot parse value of " + displayShipping);
+            log.error("Cannot parse value of {}", displayShipping);
         }
 
         return readableConfig;

@@ -19,7 +19,6 @@ import com.asrevo.cvhome.store.core.services.catalog.product.relationship.Produc
 import com.asrevo.cvhome.store.service.populator.catalog.ReadableProductPopulator;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
 import org.apache.commons.collections.CollectionUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;

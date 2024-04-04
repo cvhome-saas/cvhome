@@ -10,7 +10,6 @@ import com.asrevo.cvhome.store.core.model.catalog.product.variation.PersistableP
 import com.asrevo.cvhome.store.core.services.catalog.product.attribute.ProductOptionService;
 import com.asrevo.cvhome.store.core.services.catalog.product.attribute.ProductOptionValueService;
 import com.asrevo.cvhome.store.service.mapper.Mapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 

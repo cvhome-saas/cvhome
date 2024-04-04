@@ -9,6 +9,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -28,6 +29,7 @@ public class MerchantConfiguration extends SalesManagerEntity<Long, MerchantConf
     /**
      *
      */
+    @Serial
     private static final long serialVersionUID = 4246917986731953459L;
 
     @Id

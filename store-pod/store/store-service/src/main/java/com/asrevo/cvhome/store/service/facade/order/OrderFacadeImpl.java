@@ -43,7 +43,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -233,7 +232,7 @@ public class OrderFacadeImpl implements OrderFacade {
                 cart.setOrderId(modelOrder.getId());
                 shoppingCartFacade.saveOrUpdateShoppingCart(cart);
             } catch (Exception e) {
-                log.error("Cannot delete cart " + cart.getId(), e);
+                log.error("Cannot delete cart {}", cart.getId(), e);
             }
 
             //email management
@@ -303,7 +302,7 @@ public class OrderFacadeImpl implements OrderFacade {
                 String shippingName = messages.getMessage(optionCodeBuilder.toString(), new String[]{store.getStorename()}, languageService.toLocale(language, store));
                 orderConfirmation.setShipping(shippingName);
             } catch (Exception e) { // label not found
-                log.warn("No shipping code found for " + optionCodeBuilder);
+                log.warn("No shipping code found for {}", optionCodeBuilder);
             }
         }
 

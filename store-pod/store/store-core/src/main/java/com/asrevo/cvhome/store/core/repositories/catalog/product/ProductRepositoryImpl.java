@@ -244,7 +244,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
         try {
             List<Product> products = q.getResultList();
             if (products.size() > 1) {
-                log.error("Found multiple products for list of criterias with main criteria [" + seUrl + "]");
+                log.error("Found multiple products for list of criterias with main criteria [{}]", seUrl);
             }
             // p = (Product)q.getSingleResult();
             p = products.get(0);

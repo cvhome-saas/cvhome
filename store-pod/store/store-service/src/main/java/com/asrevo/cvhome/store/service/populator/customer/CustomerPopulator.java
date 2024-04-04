@@ -23,7 +23,6 @@ import com.asrevo.cvhome.store.core.services.reference.zone.ZoneService;
 import com.asrevo.cvhome.store.utils.AbstractDataPopulator;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -183,7 +182,7 @@ public class CustomerPopulator extends
             }
 
             if (source.getRating() != null && source.getRating().doubleValue() > 0) {
-                target.setCustomerReviewAvg(new BigDecimal(source.getRating().doubleValue()));
+                target.setCustomerReviewAvg(BigDecimal.valueOf(source.getRating()));
             }
 
             if (source.getRatingCount() > 0) {

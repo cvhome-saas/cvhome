@@ -70,7 +70,7 @@ public class IntegrationModulesLoader {
                 try {
                     b = Boolean.valueOf((String) object.get("customModule"));
                 } catch (Exception e) {
-                    log.error("Cannot cast " + o.getClass() + " tp a boolean value");
+                    log.error("Cannot cast {} tp a boolean value", o.getClass());
                 }
             }
             module.setCustomModule(b);

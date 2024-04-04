@@ -32,7 +32,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
@@ -337,8 +336,8 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
         List<Product> products = productSkus.stream().map(p -> this.fetchProduct(p, store, store.getDefaultLanguage()))
                 .toList();
 
-        if (products == null || products.size() != shoppingCartItems.size()) {
-            log.warn("----------------------- Items with in id-list " + productSkus + " does not exist");
+        if (products.size() != shoppingCartItems.size()) {
+            log.warn("----------------------- Items with in id-list {} does not exist", productSkus);
             throw new ResourceNotFoundException("Item with skus " + productSkus + " does not exist");
         }
 
@@ -360,7 +359,7 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
             if (oShoppingCartItem.isEmpty()) {
                 // Should never happen if not something is updated in realtime or user has item
                 // in local storage and add it long time after to cart!
-                log.warn("Missing shoppingCartItem for product " + p.getSku() + " ( " + p.getId() + " )");
+                log.warn("Missing shoppingCartItem for product {} ( {} )", p.getSku(), p.getId());
                 continue;
             }
             PersistableShoppingCartItem shoppingCartItem = oShoppingCartItem.get();
@@ -448,13 +447,13 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
             for (com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem shoppingCartItem : cartModel
                     .getLineItems()) {
                 if (shoppingCartItem.getId() == entryId) {
-                    log.info("Found line item  for given entry id: " + entryId);
+                    log.info("Found line item  for given entry id: {}", entryId);
                     return shoppingCartItem;
 
                 }
             }
         }
-        log.info("Unable to find any entry for given Id: " + entryId);
+        log.info("Unable to find any entry for given Id: {}", entryId);
         return null;
     }
 
@@ -581,7 +580,7 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
 
                 entryToUpdate.getProduct();
 
-                log.info("Updating cart entry quantity to" + newQuantity);
+                log.info("Updating cart entry quantity to{}", newQuantity);
                 entryToUpdate.setQuantity((int) newQuantity);
                 List<ProductAttribute> productAttributes = new ArrayList<ProductAttribute>(entryToUpdate.getProduct().getAttributes());
                 final FinalPrice finalPrice = pricingService.calculateProductPrice(entryToUpdate.getProduct(),
@@ -629,7 +628,7 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
 
             entryToUpdate.getProduct();
 
-            log.info("Updating cart entry quantity to" + item.getQuantity());
+            log.info("Updating cart entry quantity to{}", item.getQuantity());
             entryToUpdate.setQuantity(item.getQuantity());
 
             List<ProductAttribute> productAttributes = new ArrayList<ProductAttribute>(entryToUpdate.getProduct().getAttributes());
@@ -665,7 +664,7 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
             try {
                 return shoppingCartService.getByCode(cartId, store);
             } catch (ServiceException e) {
-                log.error("unable to find any cart asscoiated with this Id: " + cartId);
+                log.error("unable to find any cart asscoiated with this Id: {}", cartId);
                 log.error("error while fetching cart model...", e);
                 return null;
             } catch (NoResultException nre) {
@@ -690,7 +689,7 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
             // nothing
 
         } catch (Exception e) {
-            log.error("Cannot retrieve cart code " + code, e);
+            log.error("Cannot retrieve cart code {}", code, e);
         }
 
         return null;
@@ -1118,8 +1117,7 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
     public void setOrderId(String code, Long orderId, MerchantStore store) throws Exception {
         ShoppingCart cart = this.getShoppingCartModel(code, store);
         if (cart == null) {
-            log.warn("Shopping cart with code [" + code + "] not found, expected to find a cart to set order id ["
-                    + orderId + "]");
+            log.warn("Shopping cart with code [{}] not found, expected to find a cart to set order id [{}]", code, orderId);
         } else {
             cart.setOrderId(orderId);
         }

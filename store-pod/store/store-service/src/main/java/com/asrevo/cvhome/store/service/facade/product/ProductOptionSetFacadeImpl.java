@@ -13,7 +13,6 @@ import com.asrevo.cvhome.store.core.model.catalog.product.type.ReadableProductTy
 import com.asrevo.cvhome.store.core.services.catalog.product.attribute.ProductOptionSetService;
 import com.asrevo.cvhome.store.service.mapper.catalog.PersistableProductOptionSetMapper;
 import com.asrevo.cvhome.store.service.mapper.catalog.ReadableProductOptionSetMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 

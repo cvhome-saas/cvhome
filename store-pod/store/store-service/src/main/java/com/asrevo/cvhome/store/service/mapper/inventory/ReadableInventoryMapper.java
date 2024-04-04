@@ -16,7 +16,6 @@ import com.asrevo.cvhome.store.service.populator.catalog.ReadableProductPricePop
 import com.asrevo.cvhome.store.service.populator.store.ReadableMerchantStorePopulator;
 import com.asrevo.cvhome.store.utils.DateUtil;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 

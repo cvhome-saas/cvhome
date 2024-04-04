@@ -23,7 +23,6 @@ import com.asrevo.cvhome.store.service.mapper.catalog.ReadableCategoryMapper;
 import com.asrevo.cvhome.store.service.populator.catalog.PersistableCategoryPopulator;
 import com.asrevo.cvhome.store.service.populator.catalog.ReadableCategoryPopulator;
 import org.apache.commons.collections.CollectionUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 

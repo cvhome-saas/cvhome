@@ -9,6 +9,8 @@ import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
+
 @Entity
 @Table(name = "SHIPING_ORIGIN")
 @Getter
@@ -19,6 +21,7 @@ public class ShippingOrigin extends SalesManagerEntity<Long, ShippingOrigin> {
     /**
      *
      */
+    @Serial
     private static final long serialVersionUID = 1172536723717691214L;
 
 

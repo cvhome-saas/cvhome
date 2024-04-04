@@ -12,7 +12,6 @@ import com.asrevo.cvhome.store.core.services.catalog.product.ProductService;
 import com.asrevo.cvhome.store.service.mapper.catalog.product.PersistableProductDefinitionMapper;
 import com.asrevo.cvhome.store.service.mapper.catalog.product.ReadableProductDefinitionMapper;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 

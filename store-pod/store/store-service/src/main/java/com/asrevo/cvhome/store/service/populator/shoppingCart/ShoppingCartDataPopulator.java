@@ -196,7 +196,7 @@ public class ShoppingCartDataPopulator extends AbstractDataPopulator<ShoppingCar
             cart.setQuantity(cartQuantity);
             cart.setId(shoppingCart.getId());
         } catch (ServiceException ex) {
-            log.error("Error while converting cart Model to cart Data.." + ex);
+            log.error("Error while converting cart Model to cart Data..{}", ex);
             throw new ConversionException("Unable to create cart data", ex);
         }
         return cart;

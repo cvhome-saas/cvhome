@@ -315,7 +315,7 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
 
 
         } catch (Exception e) {
-            log.error("Cannot save images " + e.getMessage());
+            log.error("Cannot save images {}", e.getMessage());
         }
 
         return product;

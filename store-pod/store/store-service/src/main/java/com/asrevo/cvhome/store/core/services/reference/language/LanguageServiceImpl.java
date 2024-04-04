@@ -68,7 +68,7 @@ public class LanguageServiceImpl extends SalesManagerEntityServiceImpl<Integer, 
         try {
             language = getLanguagesMap().get(locale.getLanguage());
         } catch (Exception e) {
-            log.error("Cannot convert locale " + locale.getLanguage() + " to language");
+            log.error("Cannot convert locale {} to language", locale.getLanguage());
         }
         if (language == null) {
             language = new Language(Constants.DEFAULT_LANGUAGE);

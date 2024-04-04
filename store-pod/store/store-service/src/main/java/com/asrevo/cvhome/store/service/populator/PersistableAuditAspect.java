@@ -48,7 +48,7 @@ public class PersistableAuditAspect {
                 entity.setAuditSection(audit);
             }
         } catch (Throwable e) {
-            log.error("Error while setting audit values" + e.getMessage());
+            log.error("Error while setting audit values{}", e.getMessage());
         }
 
     }

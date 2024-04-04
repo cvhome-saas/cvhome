@@ -9,6 +9,7 @@ import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +21,7 @@ import java.util.List;
 public class Permission extends SalesManagerEntity<Integer, Permission> implements Auditable {
 
 
+    @Serial
     private static final long serialVersionUID = 813468140197420748L;
 
     @Id

@@ -10,7 +10,6 @@ import com.asrevo.cvhome.store.core.model.catalog.product.attribute.api.Readable
 import com.asrevo.cvhome.store.core.services.catalog.pricing.PricingService;
 import com.asrevo.cvhome.store.service.mapper.Mapper;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component

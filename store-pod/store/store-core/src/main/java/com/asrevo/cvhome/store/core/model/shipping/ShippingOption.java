@@ -43,7 +43,7 @@ public class ShippingOption implements Serializable {
             try {
                 this.optionPrice = new BigDecimal(this.getOptionPriceText());
             } catch (Exception e) {
-                log.error("Can't convert price text " + this.getOptionPriceText() + " to big decimal");
+                log.error("Can't convert price text {} to big decimal", this.getOptionPriceText());
             }
         }
 

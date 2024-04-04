@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 @Entity
@@ -14,6 +15,7 @@ import java.io.Serializable;
 @Setter
 public class OrderProductDownload extends SalesManagerEntity<Long, OrderProductDownload> implements Serializable {
     public final static int DEFAULT_DOWNLOAD_MAX_DAYS = 31;
+    @Serial
     private static final long serialVersionUID = -8935511990745477240L;
     @Id
     @Column(name = "ORDER_PRODUCT_DOWNLOAD_ID")

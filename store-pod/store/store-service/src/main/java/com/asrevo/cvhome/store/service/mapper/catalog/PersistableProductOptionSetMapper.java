@@ -14,7 +14,6 @@ import com.asrevo.cvhome.store.core.services.catalog.product.attribute.ProductOp
 import com.asrevo.cvhome.store.core.services.catalog.product.type.ProductTypeService;
 import com.asrevo.cvhome.store.service.mapper.Mapper;
 import org.apache.commons.collections.CollectionUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 

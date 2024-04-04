@@ -27,7 +27,7 @@ public class ProductVariationServiceImpl extends
 
     @Autowired
     public ProductVariationServiceImpl(
-            ProductVariationRepository productVariationSetRepository,  PageableProductVariationRepository pageableProductVariationSetRepository) {
+            ProductVariationRepository productVariationSetRepository, PageableProductVariationRepository pageableProductVariationSetRepository) {
         super(productVariationSetRepository);
         this.productVariationRepository = productVariationSetRepository;
         this.pageableProductVariationSetRepository = pageableProductVariationSetRepository;

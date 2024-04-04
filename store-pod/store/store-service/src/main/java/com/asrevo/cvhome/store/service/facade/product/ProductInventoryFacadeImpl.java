@@ -16,7 +16,6 @@ import com.asrevo.cvhome.store.core.services.catalog.product.availability.Produc
 import com.asrevo.cvhome.store.core.services.catalog.product.variant.ProductVariantService;
 import com.asrevo.cvhome.store.service.mapper.inventory.PersistableInventoryMapper;
 import com.asrevo.cvhome.store.service.mapper.inventory.ReadableInventoryMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;

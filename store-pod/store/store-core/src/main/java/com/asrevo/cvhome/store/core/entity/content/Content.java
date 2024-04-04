@@ -10,6 +10,7 @@ import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +26,7 @@ import java.util.List;
 public class Content extends SalesManagerEntity<Long, Content> implements Serializable {
 
 
+    @Serial
     private static final long serialVersionUID = 1772757159185494620L;
 
     @Id

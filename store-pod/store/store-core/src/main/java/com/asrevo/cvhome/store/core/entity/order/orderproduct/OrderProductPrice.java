@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -14,6 +15,7 @@ import java.util.Date;
 @Getter
 @Setter
 public class OrderProductPrice implements Serializable {
+    @Serial
     private static final long serialVersionUID = 3734737890163564311L;
 
     @Id

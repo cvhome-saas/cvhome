@@ -24,7 +24,6 @@ import com.asrevo.cvhome.store.service.mapper.Mapper;
 import com.asrevo.cvhome.store.utils.DateUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
@@ -185,7 +184,7 @@ public class PersistableProductMapper implements Mapper<PersistableProduct, Prod
             destination.setProductVirtual(source.isProductVirtual());
             destination.setProductShipeable(source.isProductShipeable());
             if (source.getRating() != null) {
-                destination.setProductReviewAvg(new BigDecimal(source.getRating()));
+                destination.setProductReviewAvg(BigDecimal.valueOf(source.getRating()));
             }
             destination.setProductReviewCount(source.getRatingCount());
 

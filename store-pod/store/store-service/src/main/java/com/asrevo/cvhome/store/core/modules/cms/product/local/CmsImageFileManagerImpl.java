@@ -72,7 +72,7 @@ public class CmsImageFileManagerImpl
     void init() {
 
         this.rootName = ((CMSManager) cacheManager).getRootName();
-        log.info("init " + getClass().getName() + " setting root" + this.rootName);
+        log.info("init {} setting root{}", getClass().getName(), this.rootName);
 
     }
 

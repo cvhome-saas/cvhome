@@ -146,10 +146,10 @@ public class ShoppingCartModelPopulator
                 }// end for
             }// end if
         } catch (ServiceException se) {
-            log.error("Error while converting cart data to cart model.." + se);
+            log.error("Error while converting cart data to cart model..{}", se);
             throw new ConversionException("Unable to create cart model", se);
         } catch (Exception ex) {
-            log.error("Error while converting cart data to cart model.." + ex);
+            log.error("Error while converting cart data to cart model..{}", ex);
             throw new ConversionException("Unable to create cart model", ex);
         }
 

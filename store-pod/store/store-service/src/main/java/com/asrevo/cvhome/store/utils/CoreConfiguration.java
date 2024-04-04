@@ -32,7 +32,7 @@ public class CoreConfiguration {
         try {
             prop = properties.getProperty(propertyKey);
         } catch (Exception e) {
-            log.warn("Cannot find property " + propertyKey);
+            log.warn("Cannot find property {}", propertyKey);
         }
         return prop;
 

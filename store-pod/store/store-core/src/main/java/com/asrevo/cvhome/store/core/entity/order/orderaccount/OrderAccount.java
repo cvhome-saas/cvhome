@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -16,6 +17,7 @@ import java.util.Set;
 @Getter
 @Setter
 public class OrderAccount extends SalesManagerEntity<Long, OrderAccount> {
+    @Serial
     private static final long serialVersionUID = -2429388347536330540L;
 
     @Id

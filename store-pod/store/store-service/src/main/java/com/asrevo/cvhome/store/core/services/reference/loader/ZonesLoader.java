@@ -9,7 +9,6 @@ import com.asrevo.cvhome.store.core.services.reference.country.CountryService;
 import com.asrevo.cvhome.store.core.services.reference.language.LanguageService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Component;
@@ -204,7 +203,7 @@ public class ZonesLoader {
             zone = new Zone();
             Country country = countriesMap.get(list.get("countryCode"));
             if (country == null) {
-                log.warn("Country is null for " + zoneCode + " and country code " + list.get("countryCode"));
+                log.warn("Country is null for {} and country code {}", zoneCode, list.get("countryCode"));
                 return;
             }
             zone.setCountry(country);
@@ -215,7 +214,7 @@ public class ZonesLoader {
         }
 
         if (zonesMark.containsKey(l.getCode() + "_" + zoneCode)) {
-            log.warn("This zone seems to be a duplicate !  " + zoneCode + " and language code " + l.getCode());
+            log.warn("This zone seems to be a duplicate !  {} and language code {}", zoneCode, l.getCode());
             return;
         }
 

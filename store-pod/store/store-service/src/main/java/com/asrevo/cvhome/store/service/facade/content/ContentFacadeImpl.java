@@ -23,7 +23,6 @@ import com.asrevo.cvhome.store.utils.FilePathUtils;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;

@@ -3,10 +3,13 @@
  */
 package com.asrevo.cvhome.store.controller.exception;
 
+import java.io.Serial;
+
 /**
  * @author Umesh A
  */
 public class ConversionException extends Exception {
+    @Serial
     private static final long serialVersionUID = 687400310032876603L;
 
     public ConversionException(final String msg, final Throwable cause) {

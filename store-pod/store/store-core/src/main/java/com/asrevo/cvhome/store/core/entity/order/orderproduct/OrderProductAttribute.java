@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
@@ -13,6 +14,7 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 public class OrderProductAttribute implements Serializable {
+    @Serial
     private static final long serialVersionUID = 6037571119918073015L;
 
     @Id

@@ -62,7 +62,7 @@ public class ReadableOrderSummaryPopulator extends AbstractDataPopulator<OrderTo
 
 
         } catch (Exception e) {
-            log.error("Error during amount formatting " + e.getMessage());
+            log.error("Error during amount formatting {}", e.getMessage());
             throw new ConversionException(e);
         }
 

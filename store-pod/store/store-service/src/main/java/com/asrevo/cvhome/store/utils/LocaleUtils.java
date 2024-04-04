@@ -37,7 +37,7 @@ public class LocaleUtils {
                     break;
                 }
             } catch (Exception e) {
-                log.error("An error occured while getting ISO code for locale " + l.toString());
+                log.error("An error occured while getting ISO code for locale {}", l.toString());
             }
         }
 

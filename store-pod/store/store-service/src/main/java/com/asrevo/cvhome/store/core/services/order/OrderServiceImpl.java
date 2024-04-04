@@ -30,7 +30,6 @@ import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceIm
 import com.asrevo.cvhome.store.core.services.shoppingcart.ShoppingCartService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -108,7 +107,7 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
         try {
             return caculateShoppingCart(shoppingCart, customer, store, language);
         } catch (Exception e) {
-            log.error("Error while calculating shopping cart total" + e);
+            log.error("Error while calculating shopping cart total{}", e);
             throw new ServiceException(e);
         }
 
@@ -171,7 +170,7 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
         try {
             return caculateShoppingCart(shoppingCart, null, store, language);
         } catch (Exception e) {
-            log.error("Error while calculating shopping cart total" + e);
+            log.error("Error while calculating shopping cart total{}", e);
             throw new ServiceException(e);
         }
     }

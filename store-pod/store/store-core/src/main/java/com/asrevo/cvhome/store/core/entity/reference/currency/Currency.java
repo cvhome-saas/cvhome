@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -14,6 +15,7 @@ import java.util.Objects;
 @Getter
 @Setter
 public class Currency extends SalesManagerEntity<Long, Currency> implements Serializable {
+    @Serial
     private static final long serialVersionUID = -999926410367685145L;
 
     @Id

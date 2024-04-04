@@ -293,7 +293,7 @@ public class ProductPriceUtils {
             currency = store.getCurrency().getCurrency();
             locale = new Locale(store.getDefaultLanguage().getCode(), store.getCountry().getIsoCode());
         } catch (Exception e) {
-            log.error("Cannot create currency or locale instance for store " + store.getCode());
+            log.error("Cannot create currency or locale instance for store {}", store.getCode());
         }
 
         NumberFormat currencyInstance = null;

@@ -29,9 +29,9 @@ import java.util.regex.Pattern;
 public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Content> implements ContentService {
 
 
-    private final ContentRepository contentRepository;
     final
     StaticContentFileManager contentFileManager;
+    private final ContentRepository contentRepository;
     private final PageContentRepository pageContentRepository;
 
     @Autowired

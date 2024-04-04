@@ -26,7 +26,6 @@ import com.asrevo.cvhome.store.core.services.reference.loader.ZonesLoader;
 import com.asrevo.cvhome.store.core.services.reference.zone.ZoneService;
 import com.asrevo.cvhome.store.core.services.system.optin.OptinService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -199,7 +198,7 @@ public class InitializationDatabaseImpl implements InitializationDatabase {
                 Zone value = entry.getValue();
 
                 if (value.getDescriptions() == null) {
-                    log.warn("This zone " + key + " has no descriptions");
+                    log.warn("This zone {} has no descriptions", key);
                     continue;
                 }
 

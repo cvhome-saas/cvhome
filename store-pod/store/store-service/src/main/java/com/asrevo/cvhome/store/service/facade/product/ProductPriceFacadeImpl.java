@@ -14,7 +14,6 @@ import com.asrevo.cvhome.store.core.services.catalog.product.availability.Produc
 import com.asrevo.cvhome.store.core.services.catalog.product.price.ProductPriceService;
 import com.asrevo.cvhome.store.service.mapper.inventory.PersistableProductPriceMapper;
 import com.asrevo.cvhome.store.service.populator.catalog.ReadableProductPricePopulator;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 

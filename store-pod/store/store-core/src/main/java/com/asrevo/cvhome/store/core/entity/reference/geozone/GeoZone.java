@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,6 +17,7 @@ import java.util.List;
 @Getter
 @Setter
 public class GeoZone extends SalesManagerEntity<Long, GeoZone> {
+    @Serial
     private static final long serialVersionUID = -5992008645857938825L;
 
     @Id

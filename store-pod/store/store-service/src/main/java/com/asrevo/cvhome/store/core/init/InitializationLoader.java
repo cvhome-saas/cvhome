@@ -8,7 +8,6 @@ import com.asrevo.cvhome.store.core.services.reference.init.InitializationDataba
 import com.asrevo.cvhome.store.core.services.system.MerchantConfigurationService;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -18,13 +17,12 @@ import org.springframework.stereotype.Component;
 public class InitializationLoader {
 
     protected final MerchantStoreService merchantService;
-    @Value("${db.init.data:false}")
-    private boolean initDefaultData;
     private final MerchantConfigurationService merchantConfigurationService;
-
     //@Autowired
     //private InitData initData;
     private final InitializationDatabase initializationDatabase;
+    @Value("${db.init.data:false}")
+    private boolean initDefaultData;
 
     public InitializationLoader(MerchantStoreService merchantService, MerchantConfigurationService merchantConfigurationService, InitializationDatabase initializationDatabase) {
         this.merchantService = merchantService;

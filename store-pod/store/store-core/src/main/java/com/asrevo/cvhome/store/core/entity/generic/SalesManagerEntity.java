@@ -2,6 +2,7 @@ package com.asrevo.cvhome.store.core.entity.generic;
 
 import org.hibernate.Hibernate;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.text.Collator;
 import java.util.Locale;
@@ -16,6 +17,7 @@ public abstract class SalesManagerEntity<K extends Serializable & Comparable<K>,
         implements Serializable, Comparable<E> {
 
     public static final Collator DEFAULT_STRING_COLLATOR = Collator.getInstance(Locale.FRENCH);
+    @Serial
     private static final long serialVersionUID = -3988499137919577054L;
 
     static {

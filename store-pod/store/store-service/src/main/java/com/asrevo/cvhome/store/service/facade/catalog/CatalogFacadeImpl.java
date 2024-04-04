@@ -19,7 +19,6 @@ import com.asrevo.cvhome.store.service.mapper.Mapper;
 import com.asrevo.cvhome.store.service.mapper.catalog.PersistableCatalogMapper;
 import com.asrevo.cvhome.store.service.mapper.catalog.ReadableCatalogCategoryEntryMapper;
 import com.asrevo.cvhome.store.service.mapper.catalog.ReadableCatalogMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;

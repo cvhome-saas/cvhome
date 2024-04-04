@@ -22,7 +22,6 @@ import com.asrevo.cvhome.store.core.services.catalog.product.attribute.ProductOp
 import com.asrevo.cvhome.store.core.services.content.ContentService;
 import com.asrevo.cvhome.store.service.mapper.catalog.*;
 import org.apache.commons.lang3.NotImplementedException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;

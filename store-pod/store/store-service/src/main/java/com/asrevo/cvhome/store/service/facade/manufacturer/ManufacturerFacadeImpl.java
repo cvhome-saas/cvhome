@@ -18,7 +18,6 @@ import com.asrevo.cvhome.store.core.services.reference.language.LanguageService;
 import com.asrevo.cvhome.store.service.mapper.Mapper;
 import com.asrevo.cvhome.store.service.populator.manufacturer.PersistableManufacturerPopulator;
 import com.asrevo.cvhome.store.service.populator.manufacturer.ReadableManufacturerPopulator;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
