@@ -2004,7 +2004,7 @@ INSERT INTO store.category (category_id, date_created, date_modified, updt_id, c
 INSERT INTO store.category (category_id, date_created, date_modified, updt_id, category_image, category_status, code, depth, featured, lineage, sort_order, visible, merchant_id, parent_id) VALUES (2, '2024-03-31 15:24:48.000000', '2024-03-31 15:24:48.000000', 'admin@shopizer.com', null, false, 'cars', 0, false, '/2/', 0, true, 1, null);
 
 INSERT INTO store.category_description (description_id, date_created, date_modified, updt_id, description, name, title, category_highlight, meta_description, meta_keywords, meta_title, sef_url, language_id, category_id) VALUES (1, '2024-03-31 15:24:30.000000', '2024-03-31 15:24:30.000000', null, 'phones', 'phones', null, '', '', null, 'phones', 'phones', 1, 1);
-INSERT INTO store.category_description (description_id, date_created, date_modified, updt_id, description, name, title, category_highlight, meta_description, meta_keywords, meta_title, sef_url, language_id, category_id) VALUES (2, '2024-03-31 15:24:48.000000', '2024-03-31 15:24:48.000000', null, '', 'cars', null, '', '', null, 'cars', '2', 1, 2);
+INSERT INTO store.category_description (description_id, date_created, date_modified, updt_id, description, name, title, category_highlight, meta_description, meta_keywords, meta_title, sef_url, language_id, category_id) VALUES (2, '2024-03-31 15:24:48.000000', '2024-03-31 15:24:48.000000', null, '', 'cars', 'cars', '', '', null, 'cars', 'cars', 1, 2);
 
 
 INSERT INTO store.content (content_id, date_created, date_modified, updt_id, code, content_position, content_type, link_to_menu, product_group, sort_order, visible, merchant_id) VALUES (1, null, null, null, 'aboutus', null, 'PAGE', false, null, 0, true, 1);
