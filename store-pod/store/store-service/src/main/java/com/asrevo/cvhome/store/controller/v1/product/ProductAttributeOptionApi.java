@@ -179,7 +179,6 @@ public class ProductAttributeOptionApi {
                              HttpServletResponse response) {
         option.setId(optionId);
         productOptionFacade.saveOption(option, merchantStore, language);
-        return;
 
     }
 
@@ -193,7 +192,6 @@ public class ProductAttributeOptionApi {
                              @Parameter(hidden = true) Language language, HttpServletRequest request, HttpServletResponse response) {
 
         productOptionFacade.deleteOption(optionId, merchantStore);
-        return;
 
     }
 
@@ -212,7 +210,6 @@ public class ProductAttributeOptionApi {
 
         optionValue.setId(id);
         productOptionFacade.saveOptionValue(optionValue, merchantStore, language);
-        return;
 
     }
 
@@ -229,7 +226,6 @@ public class ProductAttributeOptionApi {
             HttpServletResponse response) {
 
         productOptionFacade.deleteOptionValue(id, merchantStore);
-        return;
 
     }
 
@@ -379,7 +375,6 @@ public class ProductAttributeOptionApi {
 
         attribute.setId(attributeId);
         productOptionFacade.saveAttribute(id, attribute, merchantStore, language);
-        return;
 
     }
 
@@ -394,7 +389,6 @@ public class ProductAttributeOptionApi {
                                 @Parameter(hidden = true) Language language, HttpServletRequest request, HttpServletResponse response) {
 
         productOptionFacade.deleteAttribute(id, attributeId, merchantStore);
-        return;
 
     }
 

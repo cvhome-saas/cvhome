@@ -35,6 +35,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -68,11 +69,11 @@ public class ContentFacadeImpl implements ContentFacade {
 
             // images from CMS
             List<ContentImage> contentImages = imageNames.stream().map(name -> convertToContentImage(name, store))
-                    .collect(Collectors.toList());
+                    .toList();
 
             ContentFolder contentFolder = new ContentFolder();
             if (!StringUtils.isBlank(folder)) {
-                contentFolder.setPath(URLEncoder.encode(folder, "UTF-8"));
+                contentFolder.setPath(URLEncoder.encode(folder, StandardCharsets.UTF_8));
             }
             contentFolder.getContent().addAll(contentImages);
             return contentFolder;

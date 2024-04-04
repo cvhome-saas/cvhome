@@ -12,6 +12,8 @@ import com.asrevo.cvhome.store.core.modules.cms.content.ContentAssetsManager;
 import com.asrevo.cvhome.store.core.modules.cms.impl.CMSManager;
 import com.asrevo.cvhome.store.core.modules.cms.impl.LocalCacheManagerImpl;
 import jakarta.annotation.PostConstruct;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +31,8 @@ import java.util.Optional;
  * @author Carl Samson
  * @since 1.0.3
  */
+@Setter
+@Getter
 public class CmsStaticContentFileManagerImpl implements ContentAssetsManager {
 
     /**
@@ -351,14 +355,6 @@ public class CmsStaticContentFileManagerImpl implements ContentAssetsManager {
         return new ArrayList<>();
     }
 
-    public String getRootName() {
-        return rootName;
-    }
-
-    public void setRootName(String rootName) {
-        this.rootName = rootName;
-    }
-
     private String buildRootPath() {
         return new StringBuilder().append(getRootName()).append(Constants.SLASH).append(ROOT_CONTAINER)
                 .append(Constants.SLASH).toString();
@@ -370,14 +366,6 @@ public class CmsStaticContentFileManagerImpl implements ContentAssetsManager {
         if (Files.notExists(path)) {
             Files.createDirectory(path);
         }
-    }
-
-    public LocalCacheManagerImpl getCacheManager() {
-        return cacheManager;
-    }
-
-    public void setCacheManager(LocalCacheManagerImpl cacheManager) {
-        this.cacheManager = cacheManager;
     }
 
     @Override

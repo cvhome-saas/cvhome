@@ -316,7 +316,6 @@ public class ProductApiV2 {
             @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language) {
         productCommonFacade.update(sku, product, merchantStore, language);
-        return;
 
     }
 

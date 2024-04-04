@@ -11,25 +11,21 @@ import com.asrevo.cvhome.store.core.services.customer.CustomerService;
 import com.asrevo.cvhome.store.core.services.reference.language.LanguageService;
 import com.asrevo.cvhome.store.utils.AbstractDataPopulator;
 import com.asrevo.cvhome.store.utils.DateUtil;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.util.Assert;
 
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+@Setter
+@Getter
 public class PersistableCustomerReviewPopulator extends AbstractDataPopulator<PersistableCustomerReview, CustomerReview> {
 
     private CustomerService customerService;
 
     private LanguageService languageService;
-
-    public LanguageService getLanguageService() {
-        return languageService;
-    }
-
-    public void setLanguageService(LanguageService languageService) {
-        this.languageService = languageService;
-    }
 
     @Override
     public CustomerReview populate(PersistableCustomerReview source, CustomerReview target, MerchantStore store,
@@ -94,14 +90,6 @@ public class PersistableCustomerReviewPopulator extends AbstractDataPopulator<Pe
     protected CustomerReview createTarget() {
         // TODO Auto-generated method stub
         return null;
-    }
-
-    public CustomerService getCustomerService() {
-        return customerService;
-    }
-
-    public void setCustomerService(CustomerService customerService) {
-        this.customerService = customerService;
     }
 
 }

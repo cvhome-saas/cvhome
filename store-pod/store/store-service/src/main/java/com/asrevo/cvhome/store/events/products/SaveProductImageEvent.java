@@ -2,7 +2,9 @@ package com.asrevo.cvhome.store.events.products;
 
 import com.asrevo.cvhome.store.core.entity.catalog.product.Product;
 import com.asrevo.cvhome.store.core.entity.catalog.product.image.ProductImage;
+import lombok.Getter;
 
+@Getter
 public class SaveProductImageEvent extends ProductEvent {
 
 
@@ -13,10 +15,6 @@ public class SaveProductImageEvent extends ProductEvent {
         super(source, product);
         this.productImage = productImage;
 
-    }
-
-    public ProductImage getProductImage() {
-        return productImage;
     }
 
 

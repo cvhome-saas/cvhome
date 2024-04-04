@@ -40,7 +40,6 @@ public class ReadableCountryPopulator extends AbstractDataPopulator<Country, Rea
                     for (ZoneDescription d : z.getDescriptions()) {
                         if (Objects.equals(d.getLanguage().getId(), language.getId())) {
                             readableZone.setName(d.getName());
-                            continue;
                         }
                     }
                 }

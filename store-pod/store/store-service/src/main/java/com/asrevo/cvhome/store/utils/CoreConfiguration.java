@@ -1,11 +1,15 @@
 package com.asrevo.cvhome.store.utils;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.Properties;
 
+@Setter
+@Getter
 @Component
 public class CoreConfiguration {
 
@@ -14,14 +18,6 @@ public class CoreConfiguration {
     public Properties properties = new Properties();
 
     public CoreConfiguration() {
-    }
-
-    public Properties getProperties() {
-        return properties;
-    }
-
-    public void setProperties(Properties properties) {
-        this.properties = properties;
     }
 
     public String getProperty(String propertyKey) {

@@ -148,7 +148,7 @@ public class ProductImageCropUtils {
         FileNameMap fileNameMap = URLConnection.getFileNameMap();
         String contentType = fileNameMap.getContentTypeFor(originalFile.getName());
 
-        String extension = contentType.substring(contentType.indexOf("/"), contentType.length());
+        String extension = contentType.substring(contentType.indexOf("/"));
 
         BufferedImage image = ImageIO.read(originalFile);
         BufferedImage out = image.getSubimage(x1, y1, width, height);

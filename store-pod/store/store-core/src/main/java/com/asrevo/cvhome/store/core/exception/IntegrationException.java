@@ -1,7 +1,12 @@
 package com.asrevo.cvhome.store.core.exception;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.List;
 
+@Setter
+@Getter
 public class IntegrationException extends ServiceException {
 	
 
@@ -17,15 +22,7 @@ public class IntegrationException extends ServiceException {
 	
 	private int errorCode = 0;
 
-	public int getErrorCode() {
-		return errorCode;
-	}
-
-	public void setErrorCode(int errorCode) {
-		this.errorCode = errorCode;
-	}
-
-	public IntegrationException(Exception e) {
+    public IntegrationException(Exception e) {
 		super(e);
 	}
 	
@@ -46,14 +43,6 @@ public class IntegrationException extends ServiceException {
 
 	public IntegrationException(String message) {
 		super(message);
-	}
-
-	public void setErrorFields(List<String> errorFields) {
-		this.errorFields = errorFields;
-	}
-
-	public List<String> getErrorFields() {
-		return errorFields;
 	}
 
 }

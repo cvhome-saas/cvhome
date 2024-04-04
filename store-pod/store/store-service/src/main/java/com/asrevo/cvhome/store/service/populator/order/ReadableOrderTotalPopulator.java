@@ -10,11 +10,15 @@ import com.asrevo.cvhome.store.core.services.catalog.pricing.PricingService;
 import com.asrevo.cvhome.store.utils.AbstractDataPopulator;
 import com.asrevo.cvhome.store.utils.LabelUtils;
 import com.asrevo.cvhome.store.utils.LocaleUtils;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.Assert;
 
 import java.util.Locale;
 
+@Setter
+@Getter
 public class ReadableOrderTotalPopulator extends
 		AbstractDataPopulator<OrderTotal, ReadableOrderTotal> {
 	
@@ -68,22 +72,6 @@ public class ReadableOrderTotalPopulator extends
 	@Override
 	protected ReadableOrderTotal createTarget() {
 		return new ReadableOrderTotal();
-	}
-	
-	public PricingService getPricingService() {
-		return pricingService;
-	}
-
-	public void setPricingService(PricingService pricingService) {
-		this.pricingService = pricingService;
-	}
-	
-	public LabelUtils getMessages() {
-		return messages;
-	}
-
-	public void setMessages(LabelUtils messages) {
-		this.messages = messages;
 	}
 
 }

@@ -152,7 +152,6 @@ public class ProductApi {
             @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language) {
         productCommonFacade.update(id, product, merchantStore, language);
-        return;
 
     }
 

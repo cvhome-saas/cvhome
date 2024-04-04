@@ -57,7 +57,7 @@ public class MerchantConfig implements Serializable, JSONAware {
         if (useDefaultSearchConfig != null) {
             JSONObject obj = new JSONObject();
             for (String key : useDefaultSearchConfig.keySet()) {
-                Boolean val = (Boolean) useDefaultSearchConfig.get(key);
+                Boolean val = useDefaultSearchConfig.get(key);
                 if (val != null) {
                     obj.put(key, val);
                 }
@@ -68,7 +68,7 @@ public class MerchantConfig implements Serializable, JSONAware {
         if (defaultSearchConfigPath != null) {
             JSONObject obj = new JSONObject();
             for (String key : defaultSearchConfigPath.keySet()) {
-                String val = (String) defaultSearchConfigPath.get(key);
+                String val = defaultSearchConfigPath.get(key);
                 if (!StringUtils.isBlank(val)) {
                     obj.put(key, val);
                 }

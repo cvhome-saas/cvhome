@@ -154,7 +154,7 @@ public class ProductItemsFacadeImpl implements ProductItemsFacade {
         try {
             existList = productRelationshipService.getByGroup(store, group).stream()
                     .filter(prod -> prod.getRelatedProduct() != null && (product.getId().longValue() == prod.getRelatedProduct().getId()))
-                    .collect(Collectors.toList());
+                    .toList();
         } catch (ServiceException e) {
             throw new ServiceRuntimeException("ExceptionWhile getting product group [" + group + "]", e);
         }

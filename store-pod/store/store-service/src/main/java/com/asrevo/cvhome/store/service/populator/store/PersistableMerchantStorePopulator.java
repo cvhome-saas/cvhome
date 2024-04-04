@@ -17,6 +17,8 @@ import com.asrevo.cvhome.store.core.services.reference.language.LanguageService;
 import com.asrevo.cvhome.store.core.services.reference.zone.ZoneService;
 import com.asrevo.cvhome.store.utils.AbstractDataPopulator;
 import com.asrevo.cvhome.store.utils.DateUtil;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,8 @@ import java.util.Date;
 import java.util.List;
 
 @Component
+@Getter
+@Setter
 public class PersistableMerchantStorePopulator extends AbstractDataPopulator<PersistableMerchantStore, MerchantStore> {
 
     @Autowired
@@ -163,38 +167,5 @@ public class PersistableMerchantStorePopulator extends AbstractDataPopulator<Per
         // TODO Auto-generated method stub
         return null;
     }
-
-    public ZoneService getZoneService() {
-        return zoneService;
-    }
-
-    public void setZoneService(ZoneService zoneService) {
-        this.zoneService = zoneService;
-    }
-
-    public CountryService getCountryService() {
-        return countryService;
-    }
-
-    public void setCountryService(CountryService countryService) {
-        this.countryService = countryService;
-    }
-
-    public LanguageService getLanguageService() {
-        return languageService;
-    }
-
-    public void setLanguageService(LanguageService languageService) {
-        this.languageService = languageService;
-    }
-
-    public CurrencyService getCurrencyService() {
-        return currencyService;
-    }
-
-    public void setCurrencyService(CurrencyService currencyService) {
-        this.currencyService = currencyService;
-    }
-
 
 }

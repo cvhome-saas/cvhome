@@ -5,6 +5,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
+import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
@@ -25,6 +26,7 @@ public class AuditSection implements Serializable {
     @Column(name = "DATE_MODIFIED")
     private Date dateModified;
 
+    @Getter
     @Column(name = "UPDT_ID", length = 60)
     private String modifiedBy;
 
@@ -45,10 +47,6 @@ public class AuditSection implements Serializable {
 
     public void setDateModified(Date dateModified) {
         this.dateModified = CloneUtils.clone(dateModified);
-    }
-
-    public String getModifiedBy() {
-        return modifiedBy;
     }
 
     public void setModifiedBy(String modifiedBy) {

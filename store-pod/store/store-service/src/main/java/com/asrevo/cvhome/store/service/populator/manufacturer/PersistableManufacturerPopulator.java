@@ -8,6 +8,8 @@ import com.asrevo.cvhome.store.core.model.catalog.manufacturer.ManufacturerDescr
 import com.asrevo.cvhome.store.core.model.catalog.manufacturer.PersistableManufacturer;
 import com.asrevo.cvhome.store.core.services.reference.language.LanguageService;
 import com.asrevo.cvhome.store.utils.AbstractDataPopulator;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.util.Assert;
 
@@ -20,6 +22,8 @@ import java.util.Set;
  */
 
 
+@Setter
+@Getter
 public class PersistableManufacturerPopulator extends AbstractDataPopulator<PersistableManufacturer, Manufacturer> {
 
 
@@ -78,14 +82,6 @@ public class PersistableManufacturerPopulator extends AbstractDataPopulator<Pers
     protected Manufacturer createTarget() {
         // TODO Auto-generated method stub
         return null;
-    }
-
-    public LanguageService getLanguageService() {
-        return languageService;
-    }
-
-    public void setLanguageService(LanguageService languageService) {
-        this.languageService = languageService;
     }
 
 

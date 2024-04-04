@@ -140,15 +140,6 @@ public class Customer extends SalesManagerEntity<Long, Customer> implements Audi
     public Customer() {
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-
     public Date getDateOfBirth() {
         return CloneUtils.clone(dateOfBirth);
     }

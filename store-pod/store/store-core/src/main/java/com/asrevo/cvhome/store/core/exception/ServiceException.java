@@ -1,8 +1,13 @@
 package com.asrevo.cvhome.store.core.exception;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * <p>Exception générée par les services de l'application.</p>
  */
+@Setter
+@Getter
 public class ServiceException extends Exception {
 
     public final static int EXCEPTION_ERROR = 500;
@@ -46,22 +51,6 @@ public class ServiceException extends Exception {
         super(message);
         this.messageCode = messageCode;
         this.exceptionType = exceptionType;
-    }
-
-    public int getExceptionType() {
-        return exceptionType;
-    }
-
-    public void setExceptionType(int exceptionType) {
-        this.exceptionType = exceptionType;
-    }
-
-    public String getMessageCode() {
-        return messageCode;
-    }
-
-    public void setMessageCode(String messageCode) {
-        this.messageCode = messageCode;
     }
 
 }

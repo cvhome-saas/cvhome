@@ -5,6 +5,8 @@ import com.asrevo.cvhome.store.core.entity.catalog.product.Product;
 import com.asrevo.cvhome.store.core.entity.catalog.product.manufacturer.Manufacturer;
 import com.asrevo.cvhome.store.core.entity.content.FileContentType;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -12,6 +14,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import java.util.Properties;
 
 
+@Setter
+@Getter
 public abstract class AbstractimageFilePath implements ImageFilePath {
 
 
@@ -25,14 +29,6 @@ public abstract class AbstractimageFilePath implements ImageFilePath {
     public abstract void setBasePath(String basePath);
 
     public abstract void setContentUrlPath(String contentUrl);
-
-    public Properties getProperties() {
-        return properties;
-    }
-
-    public void setProperties(Properties properties) {
-        this.properties = properties;
-    }
 
     /**
      * Builds a static content image file path that can be used by image servlet

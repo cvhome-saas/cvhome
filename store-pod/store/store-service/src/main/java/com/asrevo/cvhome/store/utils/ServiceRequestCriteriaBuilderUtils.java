@@ -31,7 +31,7 @@ public class ServiceRequestCriteriaBuilderUtils {
         if (criteria == null)
             throw new RestApiException("A criteria class type must be instantiated");
 
-        mappingFields.keySet().stream().forEach(p -> {
+        mappingFields.keySet().forEach(p -> {
             try {
                 setValue(criteria, request, p, mappingFields.get(p));
             } catch (Exception e) {

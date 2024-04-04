@@ -13,6 +13,8 @@ import com.asrevo.cvhome.store.core.services.customer.CustomerService;
 import com.asrevo.cvhome.store.core.services.reference.language.LanguageService;
 import com.asrevo.cvhome.store.utils.AbstractDataPopulator;
 import com.asrevo.cvhome.store.utils.DateUtil;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.util.Assert;
 
 import java.util.Date;
@@ -20,6 +22,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 
+@Setter
+@Getter
 public class PersistableProductReviewPopulator extends
         AbstractDataPopulator<PersistableProductReview, ProductReview> {
 
@@ -32,14 +36,6 @@ public class PersistableProductReviewPopulator extends
 
     private LanguageService languageService;
 
-
-    public LanguageService getLanguageService() {
-        return languageService;
-    }
-
-    public void setLanguageService(LanguageService languageService) {
-        this.languageService = languageService;
-    }
 
     @Override
     public ProductReview populate(PersistableProductReview source,
@@ -110,22 +106,6 @@ public class PersistableProductReviewPopulator extends
     @Override
     protected ProductReview createTarget() {
         return null;
-    }
-
-    public CustomerService getCustomerService() {
-        return customerService;
-    }
-
-    public void setCustomerService(CustomerService customerService) {
-        this.customerService = customerService;
-    }
-
-    public ProductService getProductService() {
-        return productService;
-    }
-
-    public void setProductService(ProductService productService) {
-        this.productService = productService;
     }
 
 

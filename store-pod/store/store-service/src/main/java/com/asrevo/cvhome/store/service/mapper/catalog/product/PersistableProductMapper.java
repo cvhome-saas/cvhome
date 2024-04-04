@@ -238,7 +238,7 @@ public class PersistableProductMapper implements Mapper<PersistableProduct, Prod
                 if (!CollectionUtils.isEmpty(destination.getVariants())) {
                     ProductAvailability defaultAvailability = null;
                     for (ProductVariant variant : destination.getVariants()) {
-                        defaultAvailability = this.defaultAvailability(variant.getAvailabilities().stream().collect(Collectors.toList()));
+                        defaultAvailability = this.defaultAvailability(new ArrayList<>(variant.getAvailabilities()));
                         if (defaultAvailability != null) {
                             break;
                         }

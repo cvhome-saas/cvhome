@@ -16,6 +16,7 @@ package com.asrevo.cvhome.store.utils;
 
 import com.asrevo.cvhome.store.core.constants.Constants;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,6 +26,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 
+@Getter
 public class DateUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DateUtil.class);
@@ -166,11 +168,4 @@ public class DateUtil {
         }
     }
 
-    public Date getEndDate() {
-        return endDate;
-    }
-
-    public Date getStartDate() {
-        return startDate;
-    }
 }

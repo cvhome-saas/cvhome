@@ -106,10 +106,6 @@ public class ShoppingCartCalculationServiceImpl implements ShoppingCartCalculati
 
     }
 
-    public ShoppingCartService getShoppingCartService() {
-        return shoppingCartService;
-    }
-
     private void updateCartModel(final ShoppingCart cartModel) throws ServiceException {
         shoppingCartService.saveOrUpdate(cartModel);
     }

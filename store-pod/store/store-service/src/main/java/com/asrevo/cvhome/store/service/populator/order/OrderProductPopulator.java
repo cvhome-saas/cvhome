@@ -15,6 +15,8 @@ import com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem;
 import com.asrevo.cvhome.store.core.services.catalog.product.ProductService;
 import com.asrevo.cvhome.store.core.services.catalog.product.attribute.ProductAttributeService;
 import com.asrevo.cvhome.store.utils.AbstractDataPopulator;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
@@ -23,6 +25,8 @@ import java.util.List;
 import java.util.Set;
 
 
+@Setter
+@Getter
 public class OrderProductPopulator extends
         AbstractDataPopulator<ShoppingCartItem, OrderProduct> {
 
@@ -33,16 +37,7 @@ public class OrderProductPopulator extends
     private ProductAttributeService productAttributeService;
 
 
-    public ProductAttributeService getProductAttributeService() {
-        return productAttributeService;
-    }
-
-    public void setProductAttributeService(
-            ProductAttributeService productAttributeService) {
-        this.productAttributeService = productAttributeService;
-    }
-
-/*
+    /*
 	public DigitalProductService getDigitalProductService() {
 		return digitalProductService;
 	}
@@ -157,14 +152,6 @@ public class OrderProductPopulator extends
     @Override
     protected OrderProduct createTarget() {
         return null;
-    }
-
-    public void setProductService(ProductService productService) {
-        this.productService = productService;
-    }
-
-    public ProductService getProductService() {
-        return productService;
     }
 
     private OrderProductPrice orderProductPrice(FinalPrice price) {

@@ -106,9 +106,7 @@ public class ReadableCatalogMapper implements Mapper<Catalog, ReadableCatalog> {
         ReadableCategory rp = null;
 
         if (CollectionUtils.isNotEmpty(c.getCategories())) {
-            c.getCategories().stream().forEach(element -> {
-                processCategory(element, store, language, hierarchy, processed);
-            });
+            c.getCategories().forEach(element -> processCategory(element, store, language, hierarchy, processed));
         }
 
         Category parent = c.getParent();

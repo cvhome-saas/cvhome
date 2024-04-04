@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.store.core.entity.system;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
 import org.json.simple.JSONAware;
 import org.json.simple.JSONObject;
 
@@ -16,6 +17,7 @@ import java.util.Set;
  *
  * @author csamson
  */
+@Getter
 public class IntegrationConfiguration implements JSONAware {
 
 
@@ -30,26 +32,14 @@ public class IntegrationConfiguration implements JSONAware {
     private String environment;
 
 
-    public String getModuleCode() {
-        return moduleCode;
-    }
-
     @JsonProperty("moduleCode")
     public void setModuleCode(String moduleCode) {
         this.moduleCode = moduleCode;
     }
 
-    public boolean isActive() {
-        return active;
-    }
-
     @JsonProperty("active")
     public void setActive(boolean active) {
         this.active = active;
-    }
-
-    public Map<String, String> getIntegrationKeys() {
-        return integrationKeys;
     }
 
     @JsonProperty("integrationKeys")
@@ -92,7 +82,7 @@ public class IntegrationConfiguration implements JSONAware {
             String dataField = data.toJSONString();
 
             returnString.append(",").append("\"integrationKeys\"").append(":");
-            returnString.append(dataField.toString());
+            returnString.append(dataField);
 
 
         }
@@ -145,7 +135,7 @@ public class IntegrationConfiguration implements JSONAware {
             String dataField = optionDataEntries.toString();
 
             returnString.append(",").append("\"integrationOptions\"").append(":{");
-            returnString.append(dataField.toString());
+            returnString.append(dataField);
             returnString.append("}");
 
         }
@@ -158,24 +148,12 @@ public class IntegrationConfiguration implements JSONAware {
 
     }
 
-    public String getEnvironment() {
-        return environment;
-    }
-
     public void setEnvironment(String environment) {
         this.environment = environment;
     }
 
-    public Map<String, List<String>> getIntegrationOptions() {
-        return integrationOptions;
-    }
-
     public void setIntegrationOptions(Map<String, List<String>> integrationOptions) {
         this.integrationOptions = integrationOptions;
-    }
-
-    public boolean isDefaultSelected() {
-        return defaultSelected;
     }
 
     public void setDefaultSelected(boolean defaultSelected) {

@@ -7,21 +7,17 @@ import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import com.asrevo.cvhome.store.core.model.catalog.product.ReadableProductPrice;
 import com.asrevo.cvhome.store.core.services.catalog.pricing.PricingService;
 import com.asrevo.cvhome.store.utils.AbstractDataPopulator;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.util.Assert;
 
+@Setter
+@Getter
 public class ReadableFinalPricePopulator extends
         AbstractDataPopulator<FinalPrice, ReadableProductPrice> {
 
 
     private PricingService pricingService;
-
-    public PricingService getPricingService() {
-        return pricingService;
-    }
-
-    public void setPricingService(PricingService pricingService) {
-        this.pricingService = pricingService;
-    }
 
     @Override
     public ReadableProductPrice populate(FinalPrice source,

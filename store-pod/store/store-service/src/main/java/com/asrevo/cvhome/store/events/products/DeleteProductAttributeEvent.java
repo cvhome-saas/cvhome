@@ -2,7 +2,9 @@ package com.asrevo.cvhome.store.events.products;
 
 import com.asrevo.cvhome.store.core.entity.catalog.product.Product;
 import com.asrevo.cvhome.store.core.entity.catalog.product.attribute.ProductAttribute;
+import lombok.Getter;
 
+@Getter
 public class DeleteProductAttributeEvent extends ProductEvent {
 
 
@@ -12,10 +14,6 @@ public class DeleteProductAttributeEvent extends ProductEvent {
     public DeleteProductAttributeEvent(Object source, ProductAttribute productAttribute, Product product) {
         super(source, product);
         this.productAttribute = productAttribute;
-    }
-
-    public ProductAttribute getProductAttribute() {
-        return productAttribute;
     }
 
 }

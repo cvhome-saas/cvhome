@@ -1,8 +1,10 @@
 package com.asrevo.cvhome.store.events.products;
 
 import com.asrevo.cvhome.store.core.entity.catalog.product.Product;
+import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 
+@Getter
 public abstract class ProductEvent extends ApplicationEvent {
 
     private static final long serialVersionUID = 1L;
@@ -13,9 +15,5 @@ public abstract class ProductEvent extends ApplicationEvent {
         this.product = product;
     }
 
-
-    public Product getProduct() {
-        return product;
-    }
 
 }

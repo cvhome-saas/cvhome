@@ -220,7 +220,7 @@ public class ProductCommonFacadeImpl implements ProductCommonFacade {
 
         // not alloweed if category already attached
         List<Category> assigned = product.getCategories().stream()
-                .filter(cat -> cat.getId().longValue() == category.getId().longValue()).collect(Collectors.toList());
+                .filter(cat -> cat.getId().longValue() == category.getId().longValue()).toList();
 
         if (assigned.size() > 0) {
             throw new OperationNotAllowedException("Category with id [" + category.getId()

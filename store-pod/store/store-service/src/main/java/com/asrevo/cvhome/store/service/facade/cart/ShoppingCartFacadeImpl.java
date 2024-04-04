@@ -334,21 +334,21 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
 	private List<com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem> createCartItems(ShoppingCart cartModel,
 			List<PersistableShoppingCartItem> shoppingCartItems, MerchantStore store) throws Exception {
 
-		List<String> productSkus = shoppingCartItems.stream().map(s -> s.getProduct()).collect(Collectors.toList());
+		List<String> productSkus = shoppingCartItems.stream().map(PersistableShoppingCartItem::getProduct).toList();
 
 		List<Product> products = productSkus.stream().map(p -> this.fetchProduct(p, store, store.getDefaultLanguage()))
-				.collect(Collectors.toList());
+				.toList();
 
 		if (products == null || products.size() != shoppingCartItems.size()) {
 			LOG.warn("----------------------- Items with in id-list " + productSkus + " does not exist");
 			throw new ResourceNotFoundException("Item with skus " + productSkus + " does not exist");
 		}
 
-		List<Product> wrongStoreProducts = products.stream().filter(p -> p.getMerchantStore().getId() != store.getId())
-				.collect(Collectors.toList());
-		if (wrongStoreProducts.size() > 0) {
+		List<Product> wrongStoreProducts = products.stream().filter(p -> !Objects.equals(p.getMerchantStore().getId(), store.getId()))
+				.toList();
+		if (!wrongStoreProducts.isEmpty()) {
 			throw new ResourceNotFoundException("One or more of the items with id's "
-					+ wrongStoreProducts.stream().map(s -> Long.valueOf(s.getId())).collect(Collectors.toList())
+					+ wrongStoreProducts.stream().map(Product::getId).toList()
 					+ " does not belong to merchant " + store.getId());
 		}
 
@@ -359,7 +359,7 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
 					.populateShoppingCartItem(p, store);
 			Optional<PersistableShoppingCartItem> oShoppingCartItem = shoppingCartItems.stream()
 					.filter(i -> i.getProduct().equals(p.getSku())).findFirst();
-			if (!oShoppingCartItem.isPresent()) {
+			if (oShoppingCartItem.isEmpty()) {
 				// Should never happen if not something is updated in realtime or user has item
 				// in local storage and add it long time after to cart!
 				LOG.warn("Missing shoppingCartItem for product " + p.getSku() + " ( " + p.getId() + " )");
@@ -449,7 +449,7 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
 		if (CollectionUtils.isNotEmpty(cartModel.getLineItems())) {
 			for (com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem shoppingCartItem : cartModel
 					.getLineItems()) {
-				if (shoppingCartItem.getId().longValue() == entryId) {
+				if (shoppingCartItem.getId() == entryId) {
 					LOG.info("Found line item  for given entry id: " + entryId);
 					return shoppingCartItem;
 
@@ -479,7 +479,7 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
 			}
 
 			else {
-				if (StringUtils.isNotBlank(shoppingCartId) && cart == null) {
+				if (StringUtils.isNotBlank(shoppingCartId)) {
 					cart = shoppingCartService.getByCode(shoppingCartId, store);
 				}
 
@@ -496,7 +496,7 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
 		}
 
 		// if cart has been completed return null
-		if (cart.getOrderId() != null && cart.getOrderId().longValue() > 0) {
+		if (cart.getOrderId() != null && cart.getOrderId() > 0) {
 			if (StringUtils.isNotBlank(shoppingCartId) && !(shoppingCartId.equals(cart.getShoppingCartCode()))) {
 				cart = shoppingCartService.getByCode(shoppingCartId, store);
 			} else {
@@ -635,7 +635,7 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
 			entryToUpdate.getProduct();
 
 			LOG.info("Updating cart entry quantity to" + item.getQuantity());
-			entryToUpdate.setQuantity((int) item.getQuantity());
+			entryToUpdate.setQuantity(item.getQuantity());
 
 			List<ProductAttribute> productAttributes = new ArrayList<ProductAttribute>();
 			productAttributes.addAll(entryToUpdate.getProduct().getAttributes());

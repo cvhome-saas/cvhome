@@ -4,12 +4,16 @@ import com.asrevo.cvhome.store.core.entity.order.Order;
 import com.asrevo.cvhome.store.core.utils.CloneUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.Serializable;
 import java.util.Date;
 
 @Entity
 @Table(name = "ORDER_STATUS_HISTORY")
+@Getter
+@Setter
 public class OrderStatusHistory implements Serializable {
     private static final long serialVersionUID = 3438730310126102187L;
 
@@ -41,30 +45,6 @@ public class OrderStatusHistory implements Serializable {
     public OrderStatusHistory() {
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Order getOrder() {
-        return order;
-    }
-
-    public void setOrder(Order order) {
-        this.order = order;
-    }
-
-    public OrderStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(OrderStatus status) {
-        this.status = status;
-    }
-
     public Date getDateAdded() {
         return CloneUtils.clone(dateAdded);
     }
@@ -73,20 +53,5 @@ public class OrderStatusHistory implements Serializable {
         this.dateAdded = CloneUtils.clone(dateAdded);
     }
 
-    public java.lang.Integer getCustomerNotified() {
-        return customerNotified;
-    }
-
-    public void setCustomerNotified(java.lang.Integer customerNotified) {
-        this.customerNotified = customerNotified;
-    }
-
-    public String getComments() {
-        return comments;
-    }
-
-    public void setComments(String comments) {
-        this.comments = comments;
-    }
 
 }

@@ -248,7 +248,7 @@ public class StoreFacadeImpl implements StoreFacade {
 
             ReadableMerchantStoreList storeList = new ReadableMerchantStoreList();
             storeList.setData(
-                    (List<ReadableMerchantStore>) stores.getList().stream()
+                    stores.getList().stream()
                             .map(s -> convertMerchantStoreToReadableMerchantStore(language, s))
                             .collect(Collectors.toList())
             );

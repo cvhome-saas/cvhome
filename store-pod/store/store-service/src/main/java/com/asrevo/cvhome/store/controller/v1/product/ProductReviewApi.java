@@ -227,7 +227,6 @@ public class ProductReviewApi {
             } catch (Exception ignore) {
             }
 
-            return;
         }
     }
 }

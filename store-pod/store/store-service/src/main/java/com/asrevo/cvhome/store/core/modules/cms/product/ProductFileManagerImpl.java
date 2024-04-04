@@ -11,6 +11,8 @@ import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.utils.CoreConfiguration;
 import com.asrevo.cvhome.store.utils.ProductImageCropUtils;
 import com.asrevo.cvhome.store.utils.ProductImageSizeUtils;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +25,8 @@ import java.net.URLConnection;
 import java.util.List;
 
 
+@Setter
+@Getter
 public class ProductFileManagerImpl extends ProductFileManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProductFileManagerImpl.class);
@@ -33,25 +37,6 @@ public class ProductFileManagerImpl extends ProductFileManager {
     private ProductImageGet getImage;
     private ProductImageRemove removeImage;
     private CoreConfiguration configuration;
-
-    public CoreConfiguration getConfiguration() {
-        return configuration;
-    }
-
-
-    public void setConfiguration(CoreConfiguration configuration) {
-        this.configuration = configuration;
-    }
-
-
-    public ProductImageRemove getRemoveImage() {
-        return removeImage;
-    }
-
-
-    public void setRemoveImage(ProductImageRemove removeImage) {
-        this.removeImage = removeImage;
-    }
 
 
     public void addProductImage(ProductImage productImage, ImageContentFile contentImage)
@@ -138,7 +123,7 @@ public class ProductFileManagerImpl extends ProductFileManager {
                 String contentType = fileNameMap.getContentTypeFor(contentImage.getFileName());
                 String extension = null;
                 if (contentType != null) {
-                    extension = contentType.substring(contentType.indexOf('/') + 1, contentType.length());
+                    extension = contentType.substring(contentType.indexOf('/') + 1);
                 }
 
                 if (extension == null) {
@@ -313,26 +298,6 @@ public class ProductFileManagerImpl extends ProductFileManager {
 
         this.removeImage.removeImages(merchantStoreCode);
 
-    }
-
-
-    public ProductImagePut getUploadImage() {
-        return uploadImage;
-    }
-
-
-    public void setUploadImage(ProductImagePut uploadImage) {
-        this.uploadImage = uploadImage;
-    }
-
-
-    public ProductImageGet getGetImage() {
-        return getImage;
-    }
-
-
-    public void setGetImage(ProductImageGet getImage) {
-        this.getImage = getImage;
     }
 
 

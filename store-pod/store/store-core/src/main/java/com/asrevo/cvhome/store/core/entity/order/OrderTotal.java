@@ -3,6 +3,8 @@ package com.asrevo.cvhome.store.core.entity.order;
 import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 
@@ -13,6 +15,8 @@ import java.math.BigDecimal;
  * @author casams1
  */
 
+@Setter
+@Getter
 @Entity
 @Table(name = "ORDER_TOTAL")
 public class OrderTotal extends SalesManagerEntity<Long, OrderTotal> {
@@ -56,86 +60,6 @@ public class OrderTotal extends SalesManagerEntity<Long, OrderTotal> {
     private Order order;
 
     public OrderTotal() {
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getText() {
-        return text;
-    }
-
-    public void setText(String text) {
-        this.text = text;
-    }
-
-    public BigDecimal getValue() {
-        return value;
-    }
-
-    public void setValue(BigDecimal value) {
-        this.value = value;
-    }
-
-    public String getModule() {
-        return module;
-    }
-
-    public void setModule(String module) {
-        this.module = module;
-    }
-
-    public int getSortOrder() {
-        return sortOrder;
-    }
-
-    public void setSortOrder(int sortOrder) {
-        this.sortOrder = sortOrder;
-    }
-
-    public Order getOrder() {
-        return order;
-    }
-
-    public void setOrder(Order order) {
-        this.order = order;
-    }
-
-    public String getOrderTotalCode() {
-        return orderTotalCode;
-    }
-
-    public void setOrderTotalCode(String orderTotalCode) {
-        this.orderTotalCode = orderTotalCode;
-    }
-
-    public OrderValueType getOrderValueType() {
-        return orderValueType;
-    }
-
-    public void setOrderValueType(OrderValueType orderValueType) {
-        this.orderValueType = orderValueType;
-    }
-
-    public OrderTotalType getOrderTotalType() {
-        return orderTotalType;
-    }
-
-    public void setOrderTotalType(OrderTotalType orderTotalType) {
-        this.orderTotalType = orderTotalType;
     }
 
 

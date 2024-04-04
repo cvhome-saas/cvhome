@@ -112,7 +112,7 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
 
     @Override
     public List<Product> getProductsByIds(List<Long> productIds) throws ServiceException {
-        Set<Long> idSet = productIds.stream().collect(Collectors.toSet());
+        Set<Long> idSet = new HashSet<>(productIds);
         return productRepository.getProductsListByIds(idSet);
     }
 

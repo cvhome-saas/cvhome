@@ -160,11 +160,9 @@ public class TransactionServiceImpl extends SalesManagerEntityServiceImpl<Long, 
                     Date currentDate = transaction.getTransactionDate();
                     if (previousDate.before(currentDate)) {
                         finalTransactions.put(TransactionType.REFUND.name(), transaction);
-                        continue;
                     }
                 } else {
                     finalTransactions.put(TransactionType.REFUND.name(), transaction);
-                    continue;
                 }
             }
         }

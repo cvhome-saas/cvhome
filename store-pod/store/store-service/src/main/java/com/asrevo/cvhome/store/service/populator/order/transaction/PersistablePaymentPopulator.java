@@ -9,11 +9,15 @@ import com.asrevo.cvhome.store.core.model.order.transaction.PersistablePayment;
 import com.asrevo.cvhome.store.core.model.payments.Payment;
 import com.asrevo.cvhome.store.core.services.catalog.pricing.PricingService;
 import com.asrevo.cvhome.store.utils.AbstractDataPopulator;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.util.Assert;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@Setter
+@Getter
 public class PersistablePaymentPopulator extends AbstractDataPopulator<PersistablePayment, Payment> {
 
 
@@ -52,14 +56,6 @@ public class PersistablePaymentPopulator extends AbstractDataPopulator<Persistab
     protected Payment createTarget() {
         // TODO Auto-generated method stub
         return null;
-    }
-
-    public PricingService getPricingService() {
-        return pricingService;
-    }
-
-    public void setPricingService(PricingService pricingService) {
-        this.pricingService = pricingService;
     }
 
 }

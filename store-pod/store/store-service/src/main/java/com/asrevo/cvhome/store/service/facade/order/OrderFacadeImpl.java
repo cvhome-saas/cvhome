@@ -27,7 +27,6 @@ import com.asrevo.cvhome.store.core.services.catalog.product.attribute.ProductAt
 import com.asrevo.cvhome.store.core.services.order.OrderService;
 import com.asrevo.cvhome.store.core.services.reference.language.LanguageService;
 import com.asrevo.cvhome.store.core.services.shipping.ShippingQuoteService;
-import com.asrevo.cvhome.store.core.services.shipping.ShippingService;
 import com.asrevo.cvhome.store.core.services.shoppingcart.ShoppingCartService;
 import com.asrevo.cvhome.store.service.facade.cart.ShoppingCartFacade;
 import com.asrevo.cvhome.store.service.facade.customer.CustomerFacade;
@@ -63,8 +62,6 @@ public class OrderFacadeImpl implements OrderFacade {
     @Autowired
     private ShoppingCartFacade shoppingCartFacade;
 
-    @Autowired
-    private ShippingService shippingService;
     @Autowired
     private OrderService orderService;
     @Autowired
@@ -169,7 +166,7 @@ public class OrderFacadeImpl implements OrderFacade {
 
             OrderSummary orderSummary = new OrderSummary();
             orderSummary.setShippingSummary(shippingSummary);
-            List<ShoppingCartItem> itemsSet = new ArrayList<ShoppingCartItem>(cart.getLineItems());
+            List<ShoppingCartItem> itemsSet = new ArrayList<>(cart.getLineItems());
             orderSummary.setProducts(itemsSet);
 
             orderTotalSummary = orderService.caculateOrderTotal(orderSummary, customer, store, language);

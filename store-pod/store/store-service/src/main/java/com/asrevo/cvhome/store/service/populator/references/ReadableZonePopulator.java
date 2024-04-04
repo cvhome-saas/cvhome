@@ -29,7 +29,6 @@ public class ReadableZonePopulator extends AbstractDataPopulator<Zone, ReadableZ
             for (ZoneDescription d : source.getDescriptions()) {
                 if (Objects.equals(d.getLanguage().getId(), language.getId())) {
                     target.setName(d.getName());
-                    continue;
                 }
             }
         }

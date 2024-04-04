@@ -217,7 +217,6 @@ public class CategoryApi {
 
 
         categoryFacade.move(id, parent, merchantStore);
-        return;
     }
 
     @DeleteMapping(value = "/private/category/{id}", produces = {APPLICATION_JSON_VALUE})

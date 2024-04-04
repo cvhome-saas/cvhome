@@ -9,11 +9,15 @@ import com.asrevo.cvhome.store.core.model.order.total.ReadableOrderTotal;
 import com.asrevo.cvhome.store.core.services.catalog.pricing.PricingService;
 import com.asrevo.cvhome.store.utils.AbstractDataPopulator;
 import com.asrevo.cvhome.store.utils.LabelUtils;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.util.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
 
+@Setter
+@Getter
 public class ReadableOrderSummaryPopulator extends AbstractDataPopulator<OrderTotalSummary, ReadableOrderTotalSummary> {
 
     private static final Logger LOGGER = LoggerFactory
@@ -74,21 +78,5 @@ public class ReadableOrderSummaryPopulator extends AbstractDataPopulator<OrderTo
         return null;
     }
 
-
-    public PricingService getPricingService() {
-        return pricingService;
-    }
-
-    public void setPricingService(PricingService pricingService) {
-        this.pricingService = pricingService;
-    }
-
-    public LabelUtils getMessages() {
-        return messages;
-    }
-
-    public void setMessages(LabelUtils messages) {
-        this.messages = messages;
-    }
 
 }

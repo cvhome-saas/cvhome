@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 @Entity
 @Table(name = "CURRENCY")
@@ -37,10 +38,6 @@ public class Currency extends SalesManagerEntity<Long, Currency> implements Seri
     }
 
 
-    public java.util.Currency getCurrency() {
-        return currency;
-    }
-
     public void setCurrency(java.util.Currency currency) {
         this.currency = currency;
         this.code = currency.getCurrencyCode();
@@ -48,7 +45,7 @@ public class Currency extends SalesManagerEntity<Long, Currency> implements Seri
 
 
     public String getCode() {
-        if (currency.getCurrencyCode() != code) {
+        if (!Objects.equals(currency.getCurrencyCode(), code)) {
             return currency.getCurrencyCode();
         }
         return code;

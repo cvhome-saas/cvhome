@@ -9,6 +9,8 @@ import com.asrevo.cvhome.store.core.model.catalog.category.PersistableCategory;
 import com.asrevo.cvhome.store.core.services.catalog.category.CategoryService;
 import com.asrevo.cvhome.store.core.services.reference.language.LanguageService;
 import com.asrevo.cvhome.store.utils.AbstractDataPopulator;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,8 @@ import org.springframework.util.Assert;
 import java.util.HashSet;
 import java.util.Set;
 
+@Setter
+@Getter
 @Component
 public class PersistableCategoryPopulator extends
         AbstractDataPopulator<PersistableCategory, Category> {
@@ -26,22 +30,6 @@ public class PersistableCategoryPopulator extends
     private CategoryService categoryService;
     @Autowired
     private LanguageService languageService;
-
-    public CategoryService getCategoryService() {
-        return categoryService;
-    }
-
-    public void setCategoryService(CategoryService categoryService) {
-        this.categoryService = categoryService;
-    }
-
-    public LanguageService getLanguageService() {
-        return languageService;
-    }
-
-    public void setLanguageService(LanguageService languageService) {
-        this.languageService = languageService;
-    }
 
     @Override
     public Category populate(PersistableCategory source, Category target,

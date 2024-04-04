@@ -103,7 +103,7 @@ public class CategoryFacadeImpl implements CategoryFacade {
                         }
                     });
 
-            List<ReadableCategory> filteredList = readableCategoryMap.values().stream().collect(Collectors.toList());
+            List<ReadableCategory> filteredList = new ArrayList<>(readableCategoryMap.values());
 
             //execute only if not admin filtered
             if (filter == null || (filter != null && !filter.contains(ADMIN_CATEGORY))) {

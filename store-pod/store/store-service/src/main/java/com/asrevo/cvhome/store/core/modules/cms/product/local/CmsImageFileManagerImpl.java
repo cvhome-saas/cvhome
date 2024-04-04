@@ -13,6 +13,8 @@ import com.asrevo.cvhome.store.core.modules.cms.impl.CMSManager;
 import com.asrevo.cvhome.store.core.modules.cms.impl.LocalCacheManagerImpl;
 import com.asrevo.cvhome.store.core.modules.cms.product.ProductAssetsManager;
 import jakarta.annotation.PostConstruct;
+import lombok.Getter;
+import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,6 +33,8 @@ import java.util.List;
  *
  * @author Carl Samson
  */
+@Setter
+@Getter
 public class CmsImageFileManagerImpl
         implements ProductAssetsManager {
 
@@ -281,22 +285,6 @@ public class CmsImageFileManagerImpl
         if (Files.notExists(path)) {
             Files.createDirectory(path);
         }
-    }
-
-    public String getRootName() {
-        return rootName;
-    }
-
-    public void setRootName(String rootName) {
-        this.rootName = rootName;
-    }
-
-    public LocalCacheManagerImpl getCacheManager() {
-        return cacheManager;
-    }
-
-    public void setCacheManager(LocalCacheManagerImpl cacheManager) {
-        this.cacheManager = cacheManager;
     }
 
 

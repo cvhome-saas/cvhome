@@ -10,6 +10,8 @@ import com.asrevo.cvhome.store.core.model.catalog.product.ReadableProductPrice;
 import com.asrevo.cvhome.store.core.model.catalog.product.ReadableProductPriceFull;
 import com.asrevo.cvhome.store.core.services.catalog.pricing.PricingService;
 import com.asrevo.cvhome.store.utils.AbstractDataPopulator;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.util.Assert;
 
 import java.util.ArrayList;
@@ -17,19 +19,13 @@ import java.util.List;
 import java.util.Set;
 
 
+@Setter
+@Getter
 public class ReadableProductPricePopulator extends
         AbstractDataPopulator<ProductPrice, ReadableProductPrice> {
 
 
     private PricingService pricingService;
-
-    public PricingService getPricingService() {
-        return pricingService;
-    }
-
-    public void setPricingService(PricingService pricingService) {
-        this.pricingService = pricingService;
-    }
 
     @Override
     public ReadableProductPrice populate(ProductPrice source,
