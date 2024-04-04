@@ -96,4 +96,9 @@ public class ShippingServiceImpl implements ShippingService {
 
     }
 
+    @Override
+    public boolean hasTaxOnShipping(MerchantStore store) throws ServiceException {
+        ShippingConfiguration shippingConfiguration = getShippingConfiguration(store);
+        return shippingConfiguration.isTaxOnShipping();
+    }
 }

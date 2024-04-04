@@ -1,6 +1,5 @@
 package com.asrevo.cvhome.store.core.entity.merchant;
 
-import com.asrevo.cvhome.store.core.constants.MeasureUnit;
 import com.asrevo.cvhome.store.core.entity.common.audit.AuditSection;
 import com.asrevo.cvhome.store.core.entity.common.audit.Auditable;
 import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
@@ -8,6 +7,7 @@ import com.asrevo.cvhome.store.core.entity.reference.country.Country;
 import com.asrevo.cvhome.store.core.entity.reference.currency.Currency;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import com.asrevo.cvhome.store.core.entity.reference.zone.Zone;
+import com.asrevo.cvhome.store.core.model.references.MeasureUnit;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;

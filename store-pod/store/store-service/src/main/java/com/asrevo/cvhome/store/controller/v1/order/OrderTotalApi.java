@@ -1,0 +1,124 @@
+package com.asrevo.cvhome.store.controller.v1.order;
+
+import com.asrevo.cvhome.store.core.constants.Constants;
+import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
+import com.asrevo.cvhome.store.core.entity.reference.language.Language;
+import com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCart;
+import com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem;
+import com.asrevo.cvhome.store.core.model.order.OrderSummary;
+import com.asrevo.cvhome.store.core.model.order.OrderTotalSummary;
+import com.asrevo.cvhome.store.core.model.order.ReadableOrderTotalSummary;
+import com.asrevo.cvhome.store.core.model.shipping.ShippingSummary;
+import com.asrevo.cvhome.store.core.services.catalog.pricing.PricingService;
+import com.asrevo.cvhome.store.core.services.order.OrderService;
+import com.asrevo.cvhome.store.core.services.shipping.ShippingQuoteService;
+import com.asrevo.cvhome.store.service.facade.shoppingCart.ShoppingCartFacade;
+import com.asrevo.cvhome.store.service.populator.order.ReadableOrderSummaryPopulator;
+import com.asrevo.cvhome.store.utils.LabelUtils;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Controller
+@RequestMapping("/api/v1")
+@Tag(name = "Order Total resource", description = "Calculates order total for a giben shopping cart")
+public class OrderTotalApi {
+
+    @Autowired
+    private ShoppingCartFacade shoppingCartFacade;
+
+    @Autowired
+    private LabelUtils messages;
+
+    @Autowired
+    private PricingService pricingService;
+
+
+    @Autowired
+    private ShippingQuoteService shippingQuoteService;
+
+    @Autowired
+    private OrderService orderService;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(OrderTotalApi.class);
+
+
+    /**
+     * Public api
+     *
+     * @param quote
+     * @param merchantStore
+     * @param language
+     * @param response
+     * @return
+     */
+    @RequestMapping(
+            value = {"/cart/{code}/total"},
+            method = RequestMethod.GET)
+    @ResponseBody
+    @Parameters({
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
+    })
+    public ReadableOrderTotalSummary calculateTotal(
+            @PathVariable final String code,
+            @RequestParam(value = "quote", required = false) Long quote,
+            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) Language language,//possible postal code, province and country
+            HttpServletResponse response) {
+
+        try {
+            ShoppingCart shoppingCart = shoppingCartFacade.getShoppingCartModel(code, merchantStore);
+
+            if (shoppingCart == null) {
+
+                response.sendError(404, "Cart code " + code + " does not exist");
+
+                return null;
+            }
+
+            ShippingSummary shippingSummary = null;
+
+            // get shipping quote if asked for
+            if (quote != null) {
+                shippingSummary = shippingQuoteService.getShippingSummary(quote, merchantStore);
+            }
+
+            OrderTotalSummary orderTotalSummary = null;
+
+            OrderSummary orderSummary = new OrderSummary();
+            orderSummary.setShippingSummary(shippingSummary);
+            List<ShoppingCartItem> itemsSet =
+                    new ArrayList<ShoppingCartItem>(shoppingCart.getLineItems());
+            orderSummary.setProducts(itemsSet);
+
+            orderTotalSummary = orderService.caculateOrderTotal(orderSummary, merchantStore, language);
+
+            ReadableOrderTotalSummary returnSummary = new ReadableOrderTotalSummary();
+            ReadableOrderSummaryPopulator populator = new ReadableOrderSummaryPopulator();
+            populator.setMessages(messages);
+            populator.setPricingService(pricingService);
+            populator.populate(orderTotalSummary, returnSummary, merchantStore, language);
+
+            return returnSummary;
+
+        } catch (Exception e) {
+            LOGGER.error("Error while calculating order summary", e);
+            try {
+                response.sendError(503, "Error while calculating order summary " + e.getMessage());
+            } catch (Exception ignore) {
+            }
+            return null;
+        }
+    }
+}

@@ -20,7 +20,6 @@ import java.util.Map;
 
 /**
  * @author Carl Samson
- *
  */
 public class ReadableCustomerDeliveryAddressPopulator extends AbstractDataPopulator<Delivery, ReadableDelivery> {
 

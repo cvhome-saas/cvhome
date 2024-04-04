@@ -1,2283 +1,2210 @@
-INSERT INTO store.CURRENCY (CURRENCY_ID, CURRENCY_CODE, CURRENCY_CURRENCY_CODE, CURRENCY_NAME, CURRENCY_SUPPORTED)
-VALUES (1, 'FJD', 'FJD', 'FJD', true),
-       (2, 'MXN', 'MXN', 'MXN', true),
-       (3, 'STD', 'STD', 'STD', true),
-       (4, 'LVL', 'LVL', 'LVL', true),
-       (5, 'SCR', 'SCR', 'SCR', true),
-       (6, 'CDF', 'CDF', 'CDF', true),
-       (7, 'BBD', 'BBD', 'BBD', true),
-       (8, 'GTQ', 'GTQ', 'GTQ', true),
-       (9, 'CLP', 'CLP', 'CLP', true),
-       (10, 'HNL', 'HNL', 'HNL', true),
-       (11, 'UGX', 'UGX', 'UGX', true),
-       (12, 'ZAR', 'ZAR', 'ZAR', true),
-       (13, 'MXV', 'MXV', 'MXV', true),
-       (14, 'TND', 'TND', 'TND', true),
-       (15, 'BSD', 'BSD', 'BSD', true),
-       (16, 'SLL', 'SLL', 'SLL', true),
-       (17, 'SDG', 'SDG', 'SDG', true),
-       (18, 'IQD', 'IQD', 'IQD', true),
-       (19, 'CUP', 'CUP', 'CUP', true),
-       (20, 'GMD', 'GMD', 'GMD', true),
-       (21, 'TWD', 'TWD', 'TWD', true),
-       (22, 'RSD', 'RSD', 'RSD', true),
-       (23, 'DOP', 'DOP', 'DOP', true),
-       (24, 'KMF', 'KMF', 'KMF', true),
-       (25, 'MYR', 'MYR', 'MYR', true),
-       (26, 'FKP', 'FKP', 'FKP', true),
-       (27, 'XOF', 'XOF', 'XOF', true),
-       (28, 'GEL', 'GEL', 'GEL', true),
-       (29, 'UYU', 'UYU', 'UYU', true),
-       (30, 'MAD', 'MAD', 'MAD', true),
-       (31, 'CVE', 'CVE', 'CVE', true),
-       (32, 'AZN', 'AZN', 'AZN', true),
-       (33, 'OMR', 'OMR', 'OMR', true),
-       (34, 'PGK', 'PGK', 'PGK', true),
-       (35, 'KES', 'KES', 'KES', true),
-       (36, 'SEK', 'SEK', 'SEK', true),
-       (37, 'BTN', 'BTN', 'BTN', true),
-       (38, 'UAH', 'UAH', 'UAH', true),
-       (39, 'GNF', 'GNF', 'GNF', true),
-       (40, 'ERN', 'ERN', 'ERN', true),
-       (41, 'MZN', 'MZN', 'MZN', true),
-       (42, 'SVC', 'SVC', 'SVC', true),
-       (43, 'ARS', 'ARS', 'ARS', true),
-       (44, 'QAR', 'QAR', 'QAR', true),
-       (45, 'IRR', 'IRR', 'IRR', true),
-       (46, 'MRO', 'MRO', 'MRO', true),
-       (47, 'CNY', 'CNY', 'CNY', true),
-       (48, 'XPF', 'XPF', 'XPF', true),
-       (49, 'THB', 'THB', 'THB', true),
-       (50, 'UZS', 'UZS', 'UZS', true),
-       (51, 'BDT', 'BDT', 'BDT', true),
-       (52, 'LYD', 'LYD', 'LYD', true),
-       (53, 'BMD', 'BMD', 'BMD', true),
-       (54, 'KWD', 'KWD', 'KWD', true),
-       (55, 'PHP', 'PHP', 'PHP', true),
-       (56, 'RUB', 'RUB', 'RUB', true),
-       (57, 'PYG', 'PYG', 'PYG', true),
-       (58, 'ISK', 'ISK', 'ISK', true),
-       (59, 'JMD', 'JMD', 'JMD', true),
-       (60, 'COP', 'COP', 'COP', true),
-       (61, 'USD', 'USD', 'USD', true),
-       (62, 'MKD', 'MKD', 'MKD', true),
-       (63, 'DZD', 'DZD', 'DZD', true),
-       (64, 'PAB', 'PAB', 'PAB', true),
-       (65, 'SGD', 'SGD', 'SGD', true),
-       (66, 'ETB', 'ETB', 'ETB', true),
-       (67, 'KGS', 'KGS', 'KGS', true),
-       (68, 'SOS', 'SOS', 'SOS', true),
-       (69, 'VUV', 'VUV', 'VUV', true),
-       (70, 'VEF', 'VEF', 'VEF', true),
-       (71, 'LAK', 'LAK', 'LAK', true),
-       (72, 'BND', 'BND', 'BND', true),
-       (73, 'ZMK', 'ZMK', 'ZMK', true),
-       (74, 'XAF', 'XAF', 'XAF', true),
-       (75, 'LRD', 'LRD', 'LRD', true),
-       (76, 'HRK', 'HRK', 'HRK', true),
-       (77, 'CHF', 'CHF', 'CHF', true),
-       (78, 'ALL', 'ALL', 'ALL', true),
-       (79, 'DJF', 'DJF', 'DJF', true),
-       (80, 'TZS', 'TZS', 'TZS', true),
-       (81, 'VND', 'VND', 'VND', true),
-       (82, 'AUD', 'AUD', 'AUD', true),
-       (83, 'ILS', 'ILS', 'ILS', true),
-       (84, 'GHS', 'GHS', 'GHS', true),
-       (85, 'GYD', 'GYD', 'GYD', true),
-       (86, 'KPW', 'KPW', 'KPW', true),
-       (87, 'BOB', 'BOB', 'BOB', true),
-       (88, 'KHR', 'KHR', 'KHR', true),
-       (89, 'MDL', 'MDL', 'MDL', true),
-       (90, 'IDR', 'IDR', 'IDR', true),
-       (91, 'KYD', 'KYD', 'KYD', true),
-       (92, 'AMD', 'AMD', 'AMD', true),
-       (93, 'BWP', 'BWP', 'BWP', true),
-       (94, 'SHP', 'SHP', 'SHP', true),
-       (95, 'TRY', 'TRY', 'TRY', true),
-       (96, 'LBP', 'LBP', 'LBP', true),
-       (97, 'TJS', 'TJS', 'TJS', true),
-       (98, 'JOD', 'JOD', 'JOD', true),
-       (99, 'HKD', 'HKD', 'HKD', true),
-       (100, 'RWF', 'RWF', 'RWF', true),
-       (101, 'AED', 'AED', 'AED', true),
-       (102, 'EUR', 'EUR', 'EUR', true),
-       (103, 'LSL', 'LSL', 'LSL', true),
-       (104, 'DKK', 'DKK', 'DKK', true),
-       (105, 'CAD', 'CAD', 'CAD', true),
-       (106, 'BOV', 'BOV', 'BOV', true),
-       (107, 'BGN', 'BGN', 'BGN', true),
-       (108, 'MMK', 'MMK', 'MMK', true),
-       (109, 'NOK', 'NOK', 'NOK', true),
-       (110, 'MUR', 'MUR', 'MUR', true),
-       (111, 'SYP', 'SYP', 'SYP', true),
-       (112, 'GIP', 'GIP', 'GIP', true),
-       (113, 'RON', 'RON', 'RON', true),
-       (114, 'LKR', 'LKR', 'LKR', true),
-       (115, 'NGN', 'NGN', 'NGN', true),
-       (116, 'CRC', 'CRC', 'CRC', true),
-       (117, 'CZK', 'CZK', 'CZK', true),
-       (118, 'PKR', 'PKR', 'PKR', true),
-       (119, 'XCD', 'XCD', 'XCD', true),
-       (120, 'ANG', 'ANG', 'ANG', true),
-       (121, 'HTG', 'HTG', 'HTG', true),
-       (122, 'BHD', 'BHD', 'BHD', true),
-       (123, 'KZT', 'KZT', 'KZT', true),
-       (124, 'SRD', 'SRD', 'SRD', true),
-       (125, 'SZL', 'SZL', 'SZL', true),
-       (126, 'LTL', 'LTL', 'LTL', true),
-       (127, 'SAR', 'SAR', 'SAR', true),
-       (128, 'TTD', 'TTD', 'TTD', true),
-       (129, 'YER', 'YER', 'YER', true),
-       (130, 'MVR', 'MVR', 'MVR', true),
-       (131, 'AFN', 'AFN', 'AFN', true),
-       (132, 'INR', 'INR', 'INR', true),
-       (133, 'AWG', 'AWG', 'AWG', true),
-       (134, 'KRW', 'KRW', 'KRW', true),
-       (135, 'NPR', 'NPR', 'NPR', true),
-       (136, 'JPY', 'JPY', 'JPY', true),
-       (137, 'MNT', 'MNT', 'MNT', true),
-       (138, 'AOA', 'AOA', 'AOA', true),
-       (139, 'PLN', 'PLN', 'PLN', true),
-       (140, 'GBP', 'GBP', 'GBP', true),
-       (141, 'SBD', 'SBD', 'SBD', true),
-       (142, 'HUF', 'HUF', 'HUF', true),
-       (143, 'BYR', 'BYR', 'BYR', true),
-       (144, 'BIF', 'BIF', 'BIF', true),
-       (145, 'MWK', 'MWK', 'MWK', true),
-       (146, 'MGA', 'MGA', 'MGA', true),
-       (147, 'XDR', 'XDR', 'XDR', true),
-       (148, 'BZD', 'BZD', 'BZD', true),
-       (149, 'BAM', 'BAM', 'BAM', true),
-       (150, 'EGP', 'EGP', 'EGP', true),
-       (151, 'MOP', 'MOP', 'MOP', true),
-       (152, 'NAD', 'NAD', 'NAD', true),
-       (153, 'NIO', 'NIO', 'NIO', true),
-       (154, 'PEN', 'PEN', 'PEN', true),
-       (155, 'NZD', 'NZD', 'NZD', true),
-       (156, 'WST', 'WST', 'WST', true),
-       (157, 'CLF', 'CLF', 'CLF', true),
-       (158, 'BRL', 'BRL', 'BRL', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (1, 'FJD', 'FJD', 'FJD', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (2, 'MXN', 'MXN', 'MXN', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (3, 'STD', 'STD', 'STD', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (4, 'LVL', 'LVL', 'LVL', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (5, 'SCR', 'SCR', 'SCR', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (6, 'CDF', 'CDF', 'CDF', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (7, 'BBD', 'BBD', 'BBD', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (8, 'GTQ', 'GTQ', 'GTQ', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (9, 'CLP', 'CLP', 'CLP', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (10, 'HNL', 'HNL', 'HNL', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (11, 'UGX', 'UGX', 'UGX', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (12, 'ZAR', 'ZAR', 'ZAR', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (13, 'MXV', 'MXV', 'MXV', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (14, 'TND', 'TND', 'TND', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (15, 'BSD', 'BSD', 'BSD', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (16, 'SLL', 'SLL', 'SLL', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (17, 'SDG', 'SDG', 'SDG', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (18, 'IQD', 'IQD', 'IQD', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (19, 'CUP', 'CUP', 'CUP', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (20, 'GMD', 'GMD', 'GMD', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (21, 'TWD', 'TWD', 'TWD', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (22, 'RSD', 'RSD', 'RSD', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (23, 'DOP', 'DOP', 'DOP', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (24, 'KMF', 'KMF', 'KMF', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (25, 'MYR', 'MYR', 'MYR', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (26, 'FKP', 'FKP', 'FKP', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (27, 'XOF', 'XOF', 'XOF', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (28, 'GEL', 'GEL', 'GEL', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (29, 'UYU', 'UYU', 'UYU', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (30, 'MAD', 'MAD', 'MAD', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (31, 'CVE', 'CVE', 'CVE', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (32, 'AZN', 'AZN', 'AZN', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (33, 'OMR', 'OMR', 'OMR', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (34, 'PGK', 'PGK', 'PGK', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (35, 'KES', 'KES', 'KES', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (36, 'SEK', 'SEK', 'SEK', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (37, 'BTN', 'BTN', 'BTN', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (38, 'UAH', 'UAH', 'UAH', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (39, 'GNF', 'GNF', 'GNF', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (40, 'ERN', 'ERN', 'ERN', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (41, 'MZN', 'MZN', 'MZN', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (42, 'SVC', 'SVC', 'SVC', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (43, 'ARS', 'ARS', 'ARS', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (44, 'QAR', 'QAR', 'QAR', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (45, 'IRR', 'IRR', 'IRR', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (46, 'MRO', 'MRO', 'MRO', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (47, 'CNY', 'CNY', 'CNY', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (48, 'XPF', 'XPF', 'XPF', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (49, 'THB', 'THB', 'THB', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (50, 'UZS', 'UZS', 'UZS', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (51, 'BDT', 'BDT', 'BDT', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (52, 'LYD', 'LYD', 'LYD', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (53, 'BMD', 'BMD', 'BMD', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (54, 'KWD', 'KWD', 'KWD', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (55, 'PHP', 'PHP', 'PHP', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (56, 'RUB', 'RUB', 'RUB', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (57, 'PYG', 'PYG', 'PYG', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (58, 'ISK', 'ISK', 'ISK', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (59, 'JMD', 'JMD', 'JMD', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (60, 'COP', 'COP', 'COP', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (61, 'USD', 'USD', 'USD', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (62, 'MKD', 'MKD', 'MKD', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (63, 'DZD', 'DZD', 'DZD', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (64, 'PAB', 'PAB', 'PAB', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (65, 'SGD', 'SGD', 'SGD', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (66, 'ETB', 'ETB', 'ETB', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (67, 'KGS', 'KGS', 'KGS', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (68, 'SOS', 'SOS', 'SOS', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (69, 'VUV', 'VUV', 'VUV', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (70, 'VEF', 'VEF', 'VEF', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (71, 'LAK', 'LAK', 'LAK', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (72, 'BND', 'BND', 'BND', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (73, 'ZMK', 'ZMK', 'ZMK', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (74, 'XAF', 'XAF', 'XAF', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (75, 'LRD', 'LRD', 'LRD', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (76, 'HRK', 'HRK', 'HRK', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (77, 'CHF', 'CHF', 'CHF', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (78, 'ALL', 'ALL', 'ALL', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (79, 'DJF', 'DJF', 'DJF', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (80, 'TZS', 'TZS', 'TZS', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (81, 'VND', 'VND', 'VND', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (82, 'AUD', 'AUD', 'AUD', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (83, 'ILS', 'ILS', 'ILS', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (84, 'GHS', 'GHS', 'GHS', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (85, 'GYD', 'GYD', 'GYD', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (86, 'KPW', 'KPW', 'KPW', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (87, 'BOB', 'BOB', 'BOB', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (88, 'KHR', 'KHR', 'KHR', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (89, 'MDL', 'MDL', 'MDL', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (90, 'IDR', 'IDR', 'IDR', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (91, 'KYD', 'KYD', 'KYD', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (92, 'AMD', 'AMD', 'AMD', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (93, 'BWP', 'BWP', 'BWP', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (94, 'SHP', 'SHP', 'SHP', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (95, 'TRY', 'TRY', 'TRY', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (96, 'LBP', 'LBP', 'LBP', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (97, 'TJS', 'TJS', 'TJS', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (98, 'JOD', 'JOD', 'JOD', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (99, 'HKD', 'HKD', 'HKD', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (100, 'RWF', 'RWF', 'RWF', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (101, 'AED', 'AED', 'AED', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (102, 'EUR', 'EUR', 'EUR', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (103, 'LSL', 'LSL', 'LSL', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (104, 'DKK', 'DKK', 'DKK', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (105, 'CAD', 'CAD', 'CAD', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (106, 'BOV', 'BOV', 'BOV', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (107, 'BGN', 'BGN', 'BGN', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (108, 'MMK', 'MMK', 'MMK', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (109, 'NOK', 'NOK', 'NOK', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (110, 'MUR', 'MUR', 'MUR', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (111, 'SYP', 'SYP', 'SYP', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (112, 'GIP', 'GIP', 'GIP', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (113, 'RON', 'RON', 'RON', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (114, 'LKR', 'LKR', 'LKR', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (115, 'NGN', 'NGN', 'NGN', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (116, 'CRC', 'CRC', 'CRC', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (117, 'CZK', 'CZK', 'CZK', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (118, 'PKR', 'PKR', 'PKR', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (119, 'XCD', 'XCD', 'XCD', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (120, 'ANG', 'ANG', 'ANG', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (121, 'HTG', 'HTG', 'HTG', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (122, 'BHD', 'BHD', 'BHD', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (123, 'KZT', 'KZT', 'KZT', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (124, 'SRD', 'SRD', 'SRD', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (125, 'SZL', 'SZL', 'SZL', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (126, 'LTL', 'LTL', 'LTL', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (127, 'SAR', 'SAR', 'SAR', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (128, 'TTD', 'TTD', 'TTD', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (129, 'YER', 'YER', 'YER', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (130, 'MVR', 'MVR', 'MVR', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (131, 'AFN', 'AFN', 'AFN', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (132, 'INR', 'INR', 'INR', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (133, 'AWG', 'AWG', 'AWG', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (134, 'KRW', 'KRW', 'KRW', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (135, 'NPR', 'NPR', 'NPR', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (136, 'JPY', 'JPY', 'JPY', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (137, 'MNT', 'MNT', 'MNT', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (138, 'AOA', 'AOA', 'AOA', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (139, 'PLN', 'PLN', 'PLN', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (140, 'GBP', 'GBP', 'GBP', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (141, 'SBD', 'SBD', 'SBD', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (142, 'HUF', 'HUF', 'HUF', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (143, 'BYR', 'BYR', 'BYR', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (144, 'BIF', 'BIF', 'BIF', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (145, 'MWK', 'MWK', 'MWK', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (146, 'MGA', 'MGA', 'MGA', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (147, 'XDR', 'XDR', 'XDR', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (148, 'BZD', 'BZD', 'BZD', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (149, 'BAM', 'BAM', 'BAM', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (150, 'EGP', 'EGP', 'EGP', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (151, 'MOP', 'MOP', 'MOP', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (152, 'NAD', 'NAD', 'NAD', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (153, 'NIO', 'NIO', 'NIO', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (154, 'PEN', 'PEN', 'PEN', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (155, 'NZD', 'NZD', 'NZD', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (156, 'WST', 'WST', 'WST', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (157, 'CLF', 'CLF', 'CLF', true);
+INSERT INTO store.currency (currency_id, currency_code, currency_currency_code, currency_name, currency_supported) VALUES (158, 'BRL', 'BRL', 'BRL', true);
 
 
-INSERT INTO store.COUNTRY (COUNTRY_ID, COUNTRY_ISOCODE, COUNTRY_SUPPORTED, GEOZONE_ID)
-VALUES (1, 'AF', true, NULL),
-       (2, 'AX', true, NULL),
-       (3, 'AL', true, NULL),
-       (4, 'DZ', true, NULL),
-       (5, 'AS', true, NULL),
-       (6, 'AD', true, NULL),
-       (7, 'AO', true, NULL),
-       (8, 'AI', true, NULL),
-       (9, 'AG', true, NULL),
-       (10, 'AR', true, NULL),
-       (11, 'AM', true, NULL),
-       (12, 'AW', true, NULL),
-       (13, 'AU', true, NULL),
-       (14, 'AT', true, NULL),
-       (15, 'AZ', true, NULL),
-       (16, 'BS', true, NULL),
-       (17, 'BH', true, NULL),
-       (18, 'BD', true, NULL),
-       (19, 'BB', true, NULL),
-       (20, 'BY', true, NULL),
-       (21, 'BE', true, NULL),
-       (22, 'BZ', true, NULL),
-       (23, 'BJ', true, NULL),
-       (24, 'BM', true, NULL),
-       (25, 'BT', true, NULL),
-       (26, 'BO', true, NULL),
-       (27, 'BA', true, NULL),
-       (28, 'BW', true, NULL),
-       (29, 'BR', true, NULL),
-       (30, 'IO', true, NULL),
-       (31, 'BN', true, NULL),
-       (32, 'BG', true, NULL),
-       (33, 'BF', true, NULL),
-       (34, 'BI', true, NULL),
-       (35, 'KH', true, NULL),
-       (36, 'CM', true, NULL),
-       (37, 'CA', true, NULL),
-       (38, 'CV', true, NULL),
-       (39, 'KY', true, NULL),
-       (40, 'CF', true, NULL),
-       (41, 'TD', true, NULL),
-       (42, 'CL', true, NULL),
-       (43, 'CN', true, NULL),
-       (44, 'CX', true, NULL),
-       (45, 'CC', true, NULL),
-       (46, 'CO', true, NULL),
-       (47, 'KM', true, NULL),
-       (48, 'CG', true, NULL),
-       (49, 'CD', true, NULL),
-       (50, 'CK', true, NULL),
-       (51, 'CR', true, NULL),
-       (52, 'CI', true, NULL),
-       (53, 'HR', true, NULL),
-       (54, 'CU', true, NULL),
-       (55, 'CY', true, NULL),
-       (56, 'CZ', true, NULL),
-       (57, 'DK', true, NULL),
-       (58, 'DJ', true, NULL),
-       (59, 'DM', true, NULL),
-       (60, 'DO', true, NULL),
-       (61, 'EC', true, NULL),
-       (62, 'EG', true, NULL),
-       (63, 'SV', true, NULL),
-       (64, 'GQ', true, NULL),
-       (65, 'ER', true, NULL),
-       (66, 'EE', true, NULL),
-       (67, 'ET', true, NULL),
-       (68, 'FK', true, NULL),
-       (69, 'FO', true, NULL),
-       (70, 'FJ', true, NULL),
-       (71, 'FI', true, NULL),
-       (72, 'FR', true, NULL),
-       (73, 'GF', true, NULL),
-       (74, 'PF', true, NULL),
-       (75, 'GA', true, NULL),
-       (76, 'GM', true, NULL),
-       (77, 'GE', true, NULL),
-       (78, 'DE', true, NULL),
-       (79, 'GH', true, NULL),
-       (80, 'GI', true, NULL),
-       (81, 'GR', true, NULL),
-       (82, 'GL', true, NULL),
-       (83, 'GD', true, NULL),
-       (84, 'GP', true, NULL),
-       (85, 'GU', true, NULL),
-       (86, 'GT', true, NULL),
-       (87, 'GG', true, NULL),
-       (88, 'GN', true, NULL),
-       (89, 'GW', true, NULL),
-       (90, 'GY', true, NULL),
-       (91, 'HT', true, NULL),
-       (92, 'VA', true, NULL),
-       (93, 'HN', true, NULL),
-       (94, 'HK', true, NULL),
-       (95, 'HU', true, NULL),
-       (96, 'IS', true, NULL),
-       (97, 'IN', true, NULL),
-       (98, 'ID', true, NULL),
-       (99, 'IR', true, NULL),
-       (100, 'IQ', true, NULL),
-       (101, 'IE', true, NULL),
-       (102, 'IM', true, NULL),
-       (103, 'IL', true, NULL),
-       (104, 'IT', true, NULL),
-       (105, 'JM', true, NULL),
-       (106, 'JP', true, NULL),
-       (107, 'JE', true, NULL),
-       (108, 'JO', true, NULL),
-       (109, 'KZ', true, NULL),
-       (110, 'KE', true, NULL),
-       (111, 'KI', true, NULL),
-       (112, 'KP', true, NULL),
-       (113, 'KR', true, NULL),
-       (114, 'KW', true, NULL),
-       (115, 'KG', true, NULL),
-       (116, 'LA', true, NULL),
-       (117, 'LV', true, NULL),
-       (118, 'LB', true, NULL),
-       (119, 'LS', true, NULL),
-       (120, 'LR', true, NULL),
-       (121, 'LY', true, NULL),
-       (122, 'LI', true, NULL),
-       (123, 'LT', true, NULL),
-       (124, 'LU', true, NULL),
-       (125, 'MO', true, NULL),
-       (126, 'MK', true, NULL),
-       (127, 'MG', true, NULL),
-       (128, 'MW', true, NULL),
-       (129, 'MY', true, NULL),
-       (130, 'ML', true, NULL),
-       (131, 'MT', true, NULL),
-       (132, 'MH', true, NULL),
-       (133, 'MQ', true, NULL),
-       (134, 'MR', true, NULL),
-       (135, 'MU', true, NULL),
-       (136, 'YT', true, NULL),
-       (137, 'MX', true, NULL),
-       (138, 'FM', true, NULL),
-       (139, 'MD', true, NULL),
-       (140, 'MC', true, NULL),
-       (141, 'MN', true, NULL),
-       (142, 'ME', true, NULL),
-       (143, 'MS', true, NULL),
-       (144, 'MA', true, NULL),
-       (145, 'MZ', true, NULL),
-       (146, 'MM', true, NULL),
-       (147, 'NA', true, NULL),
-       (148, 'NR', true, NULL),
-       (149, 'NP', true, NULL),
-       (150, 'NL', true, NULL),
-       (151, 'NC', true, NULL),
-       (152, 'NZ', true, NULL),
-       (153, 'NI', true, NULL),
-       (154, 'NE', true, NULL),
-       (155, 'NG', true, NULL),
-       (156, 'NU', true, NULL),
-       (157, 'NF', true, NULL),
-       (158, 'MP', true, NULL),
-       (159, 'NO', true, NULL),
-       (160, 'OM', true, NULL),
-       (161, 'PK', true, NULL),
-       (162, 'PW', true, NULL),
-       (163, 'PS', true, NULL),
-       (164, 'PA', true, NULL),
-       (165, 'PG', true, NULL),
-       (166, 'PY', true, NULL),
-       (167, 'PE', true, NULL),
-       (168, 'PH', true, NULL),
-       (169, 'PN', true, NULL),
-       (170, 'PL', true, NULL),
-       (171, 'PT', true, NULL),
-       (172, 'PR', true, NULL),
-       (173, 'QA', true, NULL),
-       (174, 'RE', true, NULL),
-       (175, 'RO', true, NULL),
-       (176, 'RU', true, NULL),
-       (177, 'RW', true, NULL),
-       (178, 'SH', true, NULL),
-       (179, 'KN', true, NULL),
-       (180, 'LC', true, NULL),
-       (181, 'PM', true, NULL),
-       (182, 'VC', true, NULL),
-       (183, 'WS', true, NULL),
-       (184, 'SM', true, NULL),
-       (185, 'ST', true, NULL),
-       (186, 'SA', true, NULL),
-       (187, 'SN', true, NULL),
-       (188, 'RS', true, NULL),
-       (189, 'SC', true, NULL),
-       (190, 'SL', true, NULL),
-       (191, 'SG', true, NULL),
-       (192, 'SK', true, NULL),
-       (193, 'SI', true, NULL),
-       (194, 'SB', true, NULL),
-       (195, 'SO', true, NULL),
-       (196, 'ZA', true, NULL),
-       (197, 'ES', true, NULL),
-       (198, 'LK', true, NULL),
-       (199, 'SD', true, NULL),
-       (200, 'SR', true, NULL),
-       (201, 'SJ', true, NULL),
-       (202, 'SZ', true, NULL),
-       (203, 'SE', true, NULL),
-       (204, 'CH', true, NULL),
-       (205, 'SY', true, NULL),
-       (206, 'TW', true, NULL),
-       (207, 'TJ', true, NULL),
-       (208, 'TZ', true, NULL),
-       (209, 'TH', true, NULL),
-       (210, 'TL', true, NULL),
-       (211, 'TG', true, NULL),
-       (212, 'TK', true, NULL),
-       (213, 'TO', true, NULL),
-       (214, 'TT', true, NULL),
-       (215, 'TN', true, NULL),
-       (216, 'TR', true, NULL),
-       (217, 'TM', true, NULL),
-       (218, 'TC', true, NULL),
-       (219, 'TV', true, NULL),
-       (220, 'UG', true, NULL),
-       (221, 'UA', true, NULL),
-       (222, 'AE', true, NULL),
-       (223, 'GB', true, NULL),
-       (224, 'US', true, NULL),
-       (225, 'UM', true, NULL),
-       (226, 'UY', true, NULL),
-       (227, 'UZ', true, NULL),
-       (228, 'VU', true, NULL),
-       (229, 'VE', true, NULL),
-       (230, 'VN', true, NULL),
-       (231, 'VG', true, NULL),
-       (232, 'VI', true, NULL),
-       (233, 'WF', true, NULL),
-       (234, 'EH', true, NULL),
-       (235, 'YE', true, NULL),
-       (236, 'ZM', true, NULL),
-       (237, 'ZW', true, NULL);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (1, 'AF', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (2, 'AX', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (3, 'AL', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (4, 'DZ', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (5, 'AS', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (6, 'AD', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (7, 'AO', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (8, 'AI', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (9, 'AG', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (10, 'AR', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (11, 'AM', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (12, 'AW', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (13, 'AU', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (14, 'AT', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (15, 'AZ', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (16, 'BS', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (17, 'BH', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (18, 'BD', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (19, 'BB', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (20, 'BY', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (21, 'BE', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (22, 'BZ', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (23, 'BJ', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (24, 'BM', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (25, 'BT', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (26, 'BO', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (27, 'BA', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (28, 'BW', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (29, 'BR', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (30, 'IO', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (31, 'BN', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (32, 'BG', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (33, 'BF', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (34, 'BI', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (35, 'KH', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (36, 'CM', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (37, 'CA', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (38, 'CV', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (39, 'KY', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (40, 'CF', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (41, 'TD', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (42, 'CL', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (43, 'CN', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (44, 'CX', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (45, 'CC', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (46, 'CO', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (47, 'KM', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (48, 'CG', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (49, 'CD', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (50, 'CK', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (51, 'CR', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (52, 'CI', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (53, 'HR', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (54, 'CU', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (55, 'CY', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (56, 'CZ', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (57, 'DK', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (58, 'DJ', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (59, 'DM', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (60, 'DO', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (61, 'EC', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (62, 'EG', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (63, 'SV', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (64, 'GQ', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (65, 'ER', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (66, 'EE', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (67, 'ET', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (68, 'FK', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (69, 'FO', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (70, 'FJ', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (71, 'FI', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (72, 'FR', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (73, 'GF', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (74, 'PF', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (75, 'GA', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (76, 'GM', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (77, 'GE', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (78, 'DE', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (79, 'GH', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (80, 'GI', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (81, 'GR', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (82, 'GL', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (83, 'GD', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (84, 'GP', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (85, 'GU', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (86, 'GT', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (87, 'GG', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (88, 'GN', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (89, 'GW', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (90, 'GY', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (91, 'HT', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (92, 'VA', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (93, 'HN', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (94, 'HK', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (95, 'HU', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (96, 'IS', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (97, 'IN', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (98, 'ID', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (99, 'IR', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (100, 'IQ', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (101, 'IE', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (102, 'IM', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (103, 'IL', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (104, 'IT', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (105, 'JM', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (106, 'JP', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (107, 'JE', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (108, 'JO', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (109, 'KZ', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (110, 'KE', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (111, 'KI', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (112, 'KP', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (113, 'KR', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (114, 'KW', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (115, 'KG', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (116, 'LA', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (117, 'LV', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (118, 'LB', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (119, 'LS', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (120, 'LR', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (121, 'LY', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (122, 'LI', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (123, 'LT', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (124, 'LU', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (125, 'MO', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (126, 'MK', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (127, 'MG', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (128, 'MW', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (129, 'MY', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (130, 'ML', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (131, 'MT', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (132, 'MH', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (133, 'MQ', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (134, 'MR', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (135, 'MU', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (136, 'YT', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (137, 'MX', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (138, 'FM', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (139, 'MD', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (140, 'MC', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (141, 'MN', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (142, 'ME', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (143, 'MS', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (144, 'MA', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (145, 'MZ', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (146, 'MM', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (147, 'NA', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (148, 'NR', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (149, 'NP', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (150, 'NL', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (151, 'NC', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (152, 'NZ', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (153, 'NI', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (154, 'NE', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (155, 'NG', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (156, 'NU', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (157, 'NF', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (158, 'MP', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (159, 'NO', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (160, 'OM', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (161, 'PK', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (162, 'PW', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (163, 'PS', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (164, 'PA', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (165, 'PG', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (166, 'PY', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (167, 'PE', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (168, 'PH', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (169, 'PN', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (170, 'PL', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (171, 'PT', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (172, 'PR', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (173, 'QA', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (174, 'RE', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (175, 'RO', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (176, 'RU', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (177, 'RW', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (178, 'SH', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (179, 'KN', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (180, 'LC', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (181, 'PM', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (182, 'VC', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (183, 'WS', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (184, 'SM', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (185, 'ST', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (186, 'SA', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (187, 'SN', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (188, 'RS', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (189, 'SC', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (190, 'SL', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (191, 'SG', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (192, 'SK', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (193, 'SI', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (194, 'SB', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (195, 'SO', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (196, 'ZA', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (197, 'ES', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (198, 'LK', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (199, 'SD', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (200, 'SR', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (201, 'SJ', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (202, 'SZ', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (203, 'SE', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (204, 'CH', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (205, 'SY', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (206, 'TW', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (207, 'TJ', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (208, 'TZ', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (209, 'TH', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (210, 'TL', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (211, 'TG', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (212, 'TK', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (213, 'TO', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (214, 'TT', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (215, 'TN', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (216, 'TR', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (217, 'TM', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (218, 'TC', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (219, 'TV', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (220, 'UG', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (221, 'UA', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (222, 'AE', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (223, 'GB', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (224, 'US', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (225, 'UM', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (226, 'UY', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (227, 'UZ', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (228, 'VU', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (229, 'VE', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (230, 'VN', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (231, 'VG', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (232, 'VI', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (233, 'WF', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (234, 'EH', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (235, 'YE', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (236, 'ZM', true, null);
+INSERT INTO store.country (country_id, country_isocode, country_supported, geozone_id) VALUES (237, 'ZW', true, null);
 
-INSERT INTO store.LANGUAGE (LANGUAGE_ID, DATE_CREATED, DATE_MODIFIED, UPDT_ID, CODE, SORT_ORDER)
-VALUES (1, '2024-03-31 08:45:18', '2024-03-31 08:45:18', NULL, 'en', NULL),
-       (2, '2024-03-31 08:45:18', '2024-03-31 08:45:18', NULL, 'fr', NULL),
-       (3, '2024-03-31 08:45:18', '2024-03-31 08:45:18', NULL, 'es', NULL);
+INSERT INTO store.language (language_id, date_created, date_modified, updt_id, code, sort_order) VALUES (1, '2024-03-31 08:45:18.000000', '2024-03-31 08:45:18.000000', null, 'en', null);
+INSERT INTO store.language (language_id, date_created, date_modified, updt_id, code, sort_order) VALUES (2, '2024-03-31 08:45:18.000000', '2024-03-31 08:45:18.000000', null, 'fr', null);
+INSERT INTO store.language (language_id, date_created, date_modified, updt_id, code, sort_order) VALUES (3, '2024-03-31 08:45:18.000000', '2024-03-31 08:45:18.000000', null, 'es', null);
 
-INSERT INTO store.COUNTRY_DESCRIPTION (DESCRIPTION_ID, DATE_CREATED, DATE_MODIFIED, UPDT_ID, DESCRIPTION, NAME, TITLE,
-                                       LANGUAGE_ID, COUNTRY_ID)
-VALUES (1, '2024-03-31 08:45:18', '2024-03-31 08:45:18', NULL, NULL, 'Afghanistan', NULL, 1, 1),
-       (2, '2024-03-31 08:45:18', '2024-03-31 08:45:18', NULL, NULL, 'Afghanistan', NULL, 2, 1),
-       (3, '2024-03-31 08:45:18', '2024-03-31 08:45:18', NULL, NULL, 'Afganistán', NULL, 3, 1),
-       (4, '2024-03-31 08:45:18', '2024-03-31 08:45:18', NULL, NULL, 'Åland Islands', NULL, 1, 2),
-       (5, '2024-03-31 08:45:18', '2024-03-31 08:45:18', NULL, NULL, 'Îles Åland', NULL, 2, 2),
-       (6, '2024-03-31 08:45:18', '2024-03-31 08:45:18', NULL, NULL, 'Islas Åland', NULL, 3, 2),
-       (7, '2024-03-31 08:45:18', '2024-03-31 08:45:18', NULL, NULL, 'Albania', NULL, 1, 3),
-       (8, '2024-03-31 08:45:18', '2024-03-31 08:45:18', NULL, NULL, 'Albanie', NULL, 2, 3),
-       (9, '2024-03-31 08:45:18', '2024-03-31 08:45:18', NULL, NULL, 'Albania', NULL, 3, 3),
-       (10, '2024-03-31 08:45:18', '2024-03-31 08:45:18', NULL, NULL, 'Algeria', NULL, 1, 4),
-       (11, '2024-03-31 08:45:18', '2024-03-31 08:45:18', NULL, NULL, 'Algérie', NULL, 2, 4),
-       (12, '2024-03-31 08:45:18', '2024-03-31 08:45:18', NULL, NULL, 'Argelia', NULL, 3, 4),
-       (13, '2024-03-31 08:45:18', '2024-03-31 08:45:18', NULL, NULL, 'American Samoa', NULL, 1, 5),
-       (14, '2024-03-31 08:45:18', '2024-03-31 08:45:18', NULL, NULL, 'Samoa américaines', NULL, 2, 5),
-       (15, '2024-03-31 08:45:18', '2024-03-31 08:45:18', NULL, NULL, 'Samoa Americana', NULL, 3, 5),
-       (16, '2024-03-31 08:45:18', '2024-03-31 08:45:18', NULL, NULL, 'Andorra', NULL, 1, 6),
-       (17, '2024-03-31 08:45:18', '2024-03-31 08:45:18', NULL, NULL, 'Andorre', NULL, 2, 6),
-       (18, '2024-03-31 08:45:18', '2024-03-31 08:45:18', NULL, NULL, 'Andorra', NULL, 3, 6),
-       (19, '2024-03-31 08:45:18', '2024-03-31 08:45:18', NULL, NULL, 'Angola', NULL, 1, 7),
-       (20, '2024-03-31 08:45:18', '2024-03-31 08:45:18', NULL, NULL, 'Angola', NULL, 2, 7),
-       (21, '2024-03-31 08:45:18', '2024-03-31 08:45:18', NULL, NULL, 'Angola', NULL, 3, 7),
-       (22, '2024-03-31 08:45:18', '2024-03-31 08:45:18', NULL, NULL, 'Anguilla', NULL, 1, 8),
-       (23, '2024-03-31 08:45:18', '2024-03-31 08:45:18', NULL, NULL, 'Anguilla', NULL, 2, 8),
-       (24, '2024-03-31 08:45:18', '2024-03-31 08:45:18', NULL, NULL, 'Anguila', NULL, 3, 8),
-       (25, '2024-03-31 08:45:18', '2024-03-31 08:45:18', NULL, NULL, 'Antigua & Barbuda', NULL, 1, 9),
-       (26, '2024-03-31 08:45:18', '2024-03-31 08:45:18', NULL, NULL, 'Antigua-et-Barbuda', NULL, 2, 9),
-       (27, '2024-03-31 08:45:18', '2024-03-31 08:45:18', NULL, NULL, 'Antigua y Barbuda', NULL, 3, 9),
-       (28, '2024-03-31 08:45:18', '2024-03-31 08:45:18', NULL, NULL, 'Argentina', NULL, 1, 10),
-       (29, '2024-03-31 08:45:18', '2024-03-31 08:45:18', NULL, NULL, 'Argentine', NULL, 2, 10),
-       (30, '2024-03-31 08:45:18', '2024-03-31 08:45:18', NULL, NULL, 'Argentina', NULL, 3, 10),
-       (31, '2024-03-31 08:45:19', '2024-03-31 08:45:19', NULL, NULL, 'Armenia', NULL, 1, 11),
-       (32, '2024-03-31 08:45:19', '2024-03-31 08:45:19', NULL, NULL, 'Arménie', NULL, 2, 11),
-       (33, '2024-03-31 08:45:19', '2024-03-31 08:45:19', NULL, NULL, 'Armenia', NULL, 3, 11),
-       (34, '2024-03-31 08:45:19', '2024-03-31 08:45:19', NULL, NULL, 'Aruba', NULL, 1, 12),
-       (35, '2024-03-31 08:45:19', '2024-03-31 08:45:19', NULL, NULL, 'Aruba', NULL, 2, 12),
-       (36, '2024-03-31 08:45:19', '2024-03-31 08:45:19', NULL, NULL, 'Aruba', NULL, 3, 12),
-       (37, '2024-03-31 08:45:19', '2024-03-31 08:45:19', NULL, NULL, 'Australia', NULL, 1, 13),
-       (38, '2024-03-31 08:45:19', '2024-03-31 08:45:19', NULL, NULL, 'Australie', NULL, 2, 13),
-       (39, '2024-03-31 08:45:19', '2024-03-31 08:45:19', NULL, NULL, 'Australia', NULL, 3, 13),
-       (40, '2024-03-31 08:45:19', '2024-03-31 08:45:19', NULL, NULL, 'Austria', NULL, 1, 14),
-       (41, '2024-03-31 08:45:19', '2024-03-31 08:45:19', NULL, NULL, 'Autriche', NULL, 2, 14),
-       (42, '2024-03-31 08:45:19', '2024-03-31 08:45:19', NULL, NULL, 'Austria', NULL, 3, 14),
-       (43, '2024-03-31 08:45:19', '2024-03-31 08:45:19', NULL, NULL, 'Azerbaijan', NULL, 1, 15),
-       (44, '2024-03-31 08:45:19', '2024-03-31 08:45:19', NULL, NULL, 'Azerbaïdjan', NULL, 2, 15),
-       (45, '2024-03-31 08:45:19', '2024-03-31 08:45:19', NULL, NULL, 'Azerbaiyán', NULL, 3, 15),
-       (46, '2024-03-31 08:45:19', '2024-03-31 08:45:19', NULL, NULL, 'Bahamas', NULL, 1, 16),
-       (47, '2024-03-31 08:45:19', '2024-03-31 08:45:19', NULL, NULL, 'Bahamas', NULL, 2, 16),
-       (48, '2024-03-31 08:45:19', '2024-03-31 08:45:19', NULL, NULL, 'Bahamas', NULL, 3, 16),
-       (49, '2024-03-31 08:45:19', '2024-03-31 08:45:19', NULL, NULL, 'Bahrain', NULL, 1, 17),
-       (50, '2024-03-31 08:45:19', '2024-03-31 08:45:19', NULL, NULL, 'Bahreïn', NULL, 2, 17),
-       (51, '2024-03-31 08:45:19', '2024-03-31 08:45:19', NULL, NULL, 'Baréin', NULL, 3, 17),
-       (52, '2024-03-31 08:45:19', '2024-03-31 08:45:19', NULL, NULL, 'Bangladesh', NULL, 1, 18),
-       (53, '2024-03-31 08:45:19', '2024-03-31 08:45:19', NULL, NULL, 'Bangladesh', NULL, 2, 18),
-       (54, '2024-03-31 08:45:19', '2024-03-31 08:45:19', NULL, NULL, 'Bangladés', NULL, 3, 18),
-       (55, '2024-03-31 08:45:19', '2024-03-31 08:45:19', NULL, NULL, 'Barbados', NULL, 1, 19),
-       (56, '2024-03-31 08:45:19', '2024-03-31 08:45:19', NULL, NULL, 'Barbade', NULL, 2, 19),
-       (57, '2024-03-31 08:45:19', '2024-03-31 08:45:19', NULL, NULL, 'Barbados', NULL, 3, 19),
-       (58, '2024-03-31 08:45:19', '2024-03-31 08:45:19', NULL, NULL, 'Belarus', NULL, 1, 20),
-       (59, '2024-03-31 08:45:19', '2024-03-31 08:45:19', NULL, NULL, 'Biélorussie', NULL, 2, 20),
-       (60, '2024-03-31 08:45:19', '2024-03-31 08:45:19', NULL, NULL, 'Bielorrusia', NULL, 3, 20),
-       (61, '2024-03-31 08:45:19', '2024-03-31 08:45:19', NULL, NULL, 'Belgium', NULL, 1, 21),
-       (62, '2024-03-31 08:45:19', '2024-03-31 08:45:19', NULL, NULL, 'Belgique', NULL, 2, 21),
-       (63, '2024-03-31 08:45:19', '2024-03-31 08:45:19', NULL, NULL, 'Bélgica', NULL, 3, 21),
-       (64, '2024-03-31 08:45:19', '2024-03-31 08:45:19', NULL, NULL, 'Belize', NULL, 1, 22),
-       (65, '2024-03-31 08:45:19', '2024-03-31 08:45:19', NULL, NULL, 'Belize', NULL, 2, 22),
-       (66, '2024-03-31 08:45:19', '2024-03-31 08:45:19', NULL, NULL, 'Belice', NULL, 3, 22),
-       (67, '2024-03-31 08:45:19', '2024-03-31 08:45:19', NULL, NULL, 'Benin', NULL, 1, 23),
-       (68, '2024-03-31 08:45:19', '2024-03-31 08:45:19', NULL, NULL, 'Bénin', NULL, 2, 23),
-       (69, '2024-03-31 08:45:19', '2024-03-31 08:45:19', NULL, NULL, 'Benín', NULL, 3, 23),
-       (70, '2024-03-31 08:45:19', '2024-03-31 08:45:19', NULL, NULL, 'Bermuda', NULL, 1, 24),
-       (71, '2024-03-31 08:45:19', '2024-03-31 08:45:19', NULL, NULL, 'Bermudes', NULL, 2, 24),
-       (72, '2024-03-31 08:45:19', '2024-03-31 08:45:19', NULL, NULL, 'Bermudas', NULL, 3, 24),
-       (73, '2024-03-31 08:45:19', '2024-03-31 08:45:19', NULL, NULL, 'Bhutan', NULL, 1, 25),
-       (74, '2024-03-31 08:45:19', '2024-03-31 08:45:19', NULL, NULL, 'Bhoutan', NULL, 2, 25),
-       (75, '2024-03-31 08:45:19', '2024-03-31 08:45:19', NULL, NULL, 'Bután', NULL, 3, 25),
-       (76, '2024-03-31 08:45:19', '2024-03-31 08:45:19', NULL, NULL, 'Bolivia', NULL, 1, 26),
-       (77, '2024-03-31 08:45:19', '2024-03-31 08:45:19', NULL, NULL, 'Bolivie', NULL, 2, 26),
-       (78, '2024-03-31 08:45:19', '2024-03-31 08:45:19', NULL, NULL, 'Bolivia', NULL, 3, 26),
-       (79, '2024-03-31 08:45:19', '2024-03-31 08:45:19', NULL, NULL, 'Bosnia & Herzegovina', NULL, 1, 27),
-       (80, '2024-03-31 08:45:19', '2024-03-31 08:45:19', NULL, NULL, 'Bosnie-Herzégovine', NULL, 2, 27),
-       (81, '2024-03-31 08:45:19', '2024-03-31 08:45:19', NULL, NULL, 'Bosnia y Herzegovina', NULL, 3, 27),
-       (82, '2024-03-31 08:45:19', '2024-03-31 08:45:19', NULL, NULL, 'Botswana', NULL, 1, 28),
-       (83, '2024-03-31 08:45:20', '2024-03-31 08:45:20', NULL, NULL, 'Botswana', NULL, 2, 28),
-       (84, '2024-03-31 08:45:20', '2024-03-31 08:45:20', NULL, NULL, 'Botsuana', NULL, 3, 28),
-       (85, '2024-03-31 08:45:20', '2024-03-31 08:45:20', NULL, NULL, 'Brazil', NULL, 1, 29),
-       (86, '2024-03-31 08:45:20', '2024-03-31 08:45:20', NULL, NULL, 'Brésil', NULL, 2, 29),
-       (87, '2024-03-31 08:45:20', '2024-03-31 08:45:20', NULL, NULL, 'Brasil', NULL, 3, 29),
-       (88, '2024-03-31 08:45:20', '2024-03-31 08:45:20', NULL, NULL, 'British Indian Ocean Territory', NULL, 1, 30),
-       (89, '2024-03-31 08:45:20', '2024-03-31 08:45:20', NULL, NULL, 'Territoire britannique de l’océan Indien', NULL,
-        2, 30),
-       (90, '2024-03-31 08:45:20', '2024-03-31 08:45:20', NULL, NULL, 'Territorio Británico del Océano Índico', NULL, 3,
-        30),
-       (91, '2024-03-31 08:45:20', '2024-03-31 08:45:20', NULL, NULL, 'Brunei', NULL, 1, 31),
-       (92, '2024-03-31 08:45:20', '2024-03-31 08:45:20', NULL, NULL, 'Brunéi Darussalam', NULL, 2, 31),
-       (93, '2024-03-31 08:45:20', '2024-03-31 08:45:20', NULL, NULL, 'Brunéi', NULL, 3, 31),
-       (94, '2024-03-31 08:45:20', '2024-03-31 08:45:20', NULL, NULL, 'Bulgaria', NULL, 1, 32),
-       (95, '2024-03-31 08:45:20', '2024-03-31 08:45:20', NULL, NULL, 'Bulgarie', NULL, 2, 32),
-       (96, '2024-03-31 08:45:20', '2024-03-31 08:45:20', NULL, NULL, 'Bulgaria', NULL, 3, 32),
-       (97, '2024-03-31 08:45:20', '2024-03-31 08:45:20', NULL, NULL, 'Burkina Faso', NULL, 1, 33),
-       (98, '2024-03-31 08:45:20', '2024-03-31 08:45:20', NULL, NULL, 'Burkina Faso', NULL, 2, 33),
-       (99, '2024-03-31 08:45:20', '2024-03-31 08:45:20', NULL, NULL, 'Burkina Faso', NULL, 3, 33),
-       (100, '2024-03-31 08:45:20', '2024-03-31 08:45:20', NULL, NULL, 'Burundi', NULL, 1, 34),
-       (101, '2024-03-31 08:45:20', '2024-03-31 08:45:20', NULL, NULL, 'Burundi', NULL, 2, 34),
-       (102, '2024-03-31 08:45:20', '2024-03-31 08:45:20', NULL, NULL, 'Burundi', NULL, 3, 34),
-       (103, '2024-03-31 08:45:20', '2024-03-31 08:45:20', NULL, NULL, 'Cambodia', NULL, 1, 35),
-       (104, '2024-03-31 08:45:20', '2024-03-31 08:45:20', NULL, NULL, 'Cambodge', NULL, 2, 35),
-       (105, '2024-03-31 08:45:20', '2024-03-31 08:45:20', NULL, NULL, 'Camboya', NULL, 3, 35),
-       (106, '2024-03-31 08:45:20', '2024-03-31 08:45:20', NULL, NULL, 'Cameroon', NULL, 1, 36),
-       (107, '2024-03-31 08:45:20', '2024-03-31 08:45:20', NULL, NULL, 'Cameroun', NULL, 2, 36),
-       (108, '2024-03-31 08:45:20', '2024-03-31 08:45:20', NULL, NULL, 'Camerún', NULL, 3, 36),
-       (109, '2024-03-31 08:45:20', '2024-03-31 08:45:20', NULL, NULL, 'Canada', NULL, 1, 37),
-       (110, '2024-03-31 08:45:20', '2024-03-31 08:45:20', NULL, NULL, 'Canada', NULL, 2, 37),
-       (111, '2024-03-31 08:45:20', '2024-03-31 08:45:20', NULL, NULL, 'Canadá', NULL, 3, 37),
-       (112, '2024-03-31 08:45:20', '2024-03-31 08:45:20', NULL, NULL, 'Cape Verde', NULL, 1, 38),
-       (113, '2024-03-31 08:45:20', '2024-03-31 08:45:20', NULL, NULL, 'Cap-Vert', NULL, 2, 38),
-       (114, '2024-03-31 08:45:20', '2024-03-31 08:45:20', NULL, NULL, 'Cabo Verde', NULL, 3, 38),
-       (115, '2024-03-31 08:45:20', '2024-03-31 08:45:20', NULL, NULL, 'Cayman Islands', NULL, 1, 39),
-       (116, '2024-03-31 08:45:20', '2024-03-31 08:45:20', NULL, NULL, 'Îles Caïmans', NULL, 2, 39),
-       (117, '2024-03-31 08:45:20', '2024-03-31 08:45:20', NULL, NULL, 'Islas Caimán', NULL, 3, 39),
-       (118, '2024-03-31 08:45:20', '2024-03-31 08:45:20', NULL, NULL, 'Central African Republic', NULL, 1, 40),
-       (119, '2024-03-31 08:45:20', '2024-03-31 08:45:20', NULL, NULL, 'République centrafricaine', NULL, 2, 40),
-       (120, '2024-03-31 08:45:20', '2024-03-31 08:45:20', NULL, NULL, 'República Centroafricana', NULL, 3, 40),
-       (121, '2024-03-31 08:45:20', '2024-03-31 08:45:20', NULL, NULL, 'Chad', NULL, 1, 41),
-       (122, '2024-03-31 08:45:20', '2024-03-31 08:45:20', NULL, NULL, 'Tchad', NULL, 2, 41),
-       (123, '2024-03-31 08:45:20', '2024-03-31 08:45:20', NULL, NULL, 'Chad', NULL, 3, 41),
-       (124, '2024-03-31 08:45:20', '2024-03-31 08:45:20', NULL, NULL, 'Chile', NULL, 1, 42),
-       (125, '2024-03-31 08:45:20', '2024-03-31 08:45:20', NULL, NULL, 'Chili', NULL, 2, 42),
-       (126, '2024-03-31 08:45:20', '2024-03-31 08:45:20', NULL, NULL, 'Chile', NULL, 3, 42),
-       (127, '2024-03-31 08:45:20', '2024-03-31 08:45:20', NULL, NULL, 'China', NULL, 1, 43),
-       (128, '2024-03-31 08:45:20', '2024-03-31 08:45:20', NULL, NULL, 'Chine', NULL, 2, 43),
-       (129, '2024-03-31 08:45:20', '2024-03-31 08:45:20', NULL, NULL, 'China', NULL, 3, 43),
-       (130, '2024-03-31 08:45:20', '2024-03-31 08:45:20', NULL, NULL, 'Christmas Island', NULL, 1, 44),
-       (131, '2024-03-31 08:45:20', '2024-03-31 08:45:20', NULL, NULL, 'Île Christmas', NULL, 2, 44),
-       (132, '2024-03-31 08:45:20', '2024-03-31 08:45:20', NULL, NULL, 'Isla de Navidad', NULL, 3, 44),
-       (133, '2024-03-31 08:45:20', '2024-03-31 08:45:20', NULL, NULL, 'Cocos (Keeling) Islands', NULL, 1, 45),
-       (134, '2024-03-31 08:45:20', '2024-03-31 08:45:20', NULL, NULL, 'Îles Cocos', NULL, 2, 45),
-       (135, '2024-03-31 08:45:20', '2024-03-31 08:45:20', NULL, NULL, 'Islas Cocos', NULL, 3, 45),
-       (136, '2024-03-31 08:45:20', '2024-03-31 08:45:20', NULL, NULL, 'Colombia', NULL, 1, 46),
-       (137, '2024-03-31 08:45:20', '2024-03-31 08:45:20', NULL, NULL, 'Colombie', NULL, 2, 46),
-       (138, '2024-03-31 08:45:20', '2024-03-31 08:45:20', NULL, NULL, 'Colombia', NULL, 3, 46),
-       (139, '2024-03-31 08:45:20', '2024-03-31 08:45:20', NULL, NULL, 'Comoros', NULL, 1, 47),
-       (140, '2024-03-31 08:45:20', '2024-03-31 08:45:20', NULL, NULL, 'Comores', NULL, 2, 47),
-       (141, '2024-03-31 08:45:21', '2024-03-31 08:45:21', NULL, NULL, 'Comoras', NULL, 3, 47),
-       (142, '2024-03-31 08:45:21', '2024-03-31 08:45:21', NULL, NULL, 'Congo - Brazzaville', NULL, 1, 48),
-       (143, '2024-03-31 08:45:21', '2024-03-31 08:45:21', NULL, NULL, 'Congo-Brazzaville', NULL, 2, 48),
-       (144, '2024-03-31 08:45:21', '2024-03-31 08:45:21', NULL, NULL, 'República del Congo', NULL, 3, 48),
-       (145, '2024-03-31 08:45:21', '2024-03-31 08:45:21', NULL, NULL, 'Congo - Kinshasa', NULL, 1, 49),
-       (146, '2024-03-31 08:45:21', '2024-03-31 08:45:21', NULL, NULL, 'Congo-Kinshasa', NULL, 2, 49),
-       (147, '2024-03-31 08:45:21', '2024-03-31 08:45:21', NULL, NULL, 'República Democrática del Congo', NULL, 3, 49),
-       (148, '2024-03-31 08:45:21', '2024-03-31 08:45:21', NULL, NULL, 'Cook Islands', NULL, 1, 50),
-       (149, '2024-03-31 08:45:21', '2024-03-31 08:45:21', NULL, NULL, 'Îles Cook', NULL, 2, 50),
-       (150, '2024-03-31 08:45:21', '2024-03-31 08:45:21', NULL, NULL, 'Islas Cook', NULL, 3, 50),
-       (151, '2024-03-31 08:45:21', '2024-03-31 08:45:21', NULL, NULL, 'Costa Rica', NULL, 1, 51),
-       (152, '2024-03-31 08:45:21', '2024-03-31 08:45:21', NULL, NULL, 'Costa Rica', NULL, 2, 51),
-       (153, '2024-03-31 08:45:21', '2024-03-31 08:45:21', NULL, NULL, 'Costa Rica', NULL, 3, 51),
-       (154, '2024-03-31 08:45:21', '2024-03-31 08:45:21', NULL, NULL, 'Côte d’Ivoire', NULL, 1, 52),
-       (155, '2024-03-31 08:45:21', '2024-03-31 08:45:21', NULL, NULL, 'Côte d’Ivoire', NULL, 2, 52),
-       (156, '2024-03-31 08:45:21', '2024-03-31 08:45:21', NULL, NULL, 'Côte d’Ivoire', NULL, 3, 52),
-       (157, '2024-03-31 08:45:21', '2024-03-31 08:45:21', NULL, NULL, 'Croatia', NULL, 1, 53),
-       (158, '2024-03-31 08:45:21', '2024-03-31 08:45:21', NULL, NULL, 'Croatie', NULL, 2, 53),
-       (159, '2024-03-31 08:45:21', '2024-03-31 08:45:21', NULL, NULL, 'Croacia', NULL, 3, 53),
-       (160, '2024-03-31 08:45:21', '2024-03-31 08:45:21', NULL, NULL, 'Cuba', NULL, 1, 54),
-       (161, '2024-03-31 08:45:21', '2024-03-31 08:45:21', NULL, NULL, 'Cuba', NULL, 2, 54),
-       (162, '2024-03-31 08:45:21', '2024-03-31 08:45:21', NULL, NULL, 'Cuba', NULL, 3, 54),
-       (163, '2024-03-31 08:45:21', '2024-03-31 08:45:21', NULL, NULL, 'Cyprus', NULL, 1, 55),
-       (164, '2024-03-31 08:45:21', '2024-03-31 08:45:21', NULL, NULL, 'Chypre', NULL, 2, 55),
-       (165, '2024-03-31 08:45:21', '2024-03-31 08:45:21', NULL, NULL, 'Chipre', NULL, 3, 55),
-       (166, '2024-03-31 08:45:21', '2024-03-31 08:45:21', NULL, NULL, 'Czechia', NULL, 1, 56),
-       (167, '2024-03-31 08:45:21', '2024-03-31 08:45:21', NULL, NULL, 'Tchéquie', NULL, 2, 56),
-       (168, '2024-03-31 08:45:21', '2024-03-31 08:45:21', NULL, NULL, 'Chequia', NULL, 3, 56),
-       (169, '2024-03-31 08:45:21', '2024-03-31 08:45:21', NULL, NULL, 'Denmark', NULL, 1, 57),
-       (170, '2024-03-31 08:45:21', '2024-03-31 08:45:21', NULL, NULL, 'Danemark', NULL, 2, 57),
-       (171, '2024-03-31 08:45:21', '2024-03-31 08:45:21', NULL, NULL, 'Dinamarca', NULL, 3, 57),
-       (172, '2024-03-31 08:45:21', '2024-03-31 08:45:21', NULL, NULL, 'Djibouti', NULL, 1, 58),
-       (173, '2024-03-31 08:45:21', '2024-03-31 08:45:21', NULL, NULL, 'Djibouti', NULL, 2, 58),
-       (174, '2024-03-31 08:45:21', '2024-03-31 08:45:21', NULL, NULL, 'Yibuti', NULL, 3, 58),
-       (175, '2024-03-31 08:45:21', '2024-03-31 08:45:21', NULL, NULL, 'Dominica', NULL, 1, 59),
-       (176, '2024-03-31 08:45:21', '2024-03-31 08:45:21', NULL, NULL, 'Dominique', NULL, 2, 59),
-       (177, '2024-03-31 08:45:21', '2024-03-31 08:45:21', NULL, NULL, 'Dominica', NULL, 3, 59),
-       (178, '2024-03-31 08:45:21', '2024-03-31 08:45:21', NULL, NULL, 'Dominican Republic', NULL, 1, 60),
-       (179, '2024-03-31 08:45:21', '2024-03-31 08:45:21', NULL, NULL, 'République dominicaine', NULL, 2, 60),
-       (180, '2024-03-31 08:45:21', '2024-03-31 08:45:21', NULL, NULL, 'República Dominicana', NULL, 3, 60),
-       (181, '2024-03-31 08:45:21', '2024-03-31 08:45:21', NULL, NULL, 'Ecuador', NULL, 1, 61),
-       (182, '2024-03-31 08:45:21', '2024-03-31 08:45:21', NULL, NULL, 'Équateur', NULL, 2, 61),
-       (183, '2024-03-31 08:45:21', '2024-03-31 08:45:21', NULL, NULL, 'Ecuador', NULL, 3, 61),
-       (184, '2024-03-31 08:45:21', '2024-03-31 08:45:21', NULL, NULL, 'Egypt', NULL, 1, 62),
-       (185, '2024-03-31 08:45:21', '2024-03-31 08:45:21', NULL, NULL, 'Égypte', NULL, 2, 62),
-       (186, '2024-03-31 08:45:21', '2024-03-31 08:45:21', NULL, NULL, 'Egipto', NULL, 3, 62),
-       (187, '2024-03-31 08:45:21', '2024-03-31 08:45:21', NULL, NULL, 'El Salvador', NULL, 1, 63),
-       (188, '2024-03-31 08:45:21', '2024-03-31 08:45:21', NULL, NULL, 'Salvador', NULL, 2, 63),
-       (189, '2024-03-31 08:45:21', '2024-03-31 08:45:21', NULL, NULL, 'El Salvador', NULL, 3, 63),
-       (190, '2024-03-31 08:45:21', '2024-03-31 08:45:21', NULL, NULL, 'Equatorial Guinea', NULL, 1, 64),
-       (191, '2024-03-31 08:45:21', '2024-03-31 08:45:21', NULL, NULL, 'Guinée équatoriale', NULL, 2, 64),
-       (192, '2024-03-31 08:45:21', '2024-03-31 08:45:21', NULL, NULL, 'Guinea Ecuatorial', NULL, 3, 64),
-       (193, '2024-03-31 08:45:22', '2024-03-31 08:45:22', NULL, NULL, 'Eritrea', NULL, 1, 65),
-       (194, '2024-03-31 08:45:22', '2024-03-31 08:45:22', NULL, NULL, 'Érythrée', NULL, 2, 65),
-       (195, '2024-03-31 08:45:22', '2024-03-31 08:45:22', NULL, NULL, 'Eritrea', NULL, 3, 65),
-       (196, '2024-03-31 08:45:22', '2024-03-31 08:45:22', NULL, NULL, 'Estonia', NULL, 1, 66),
-       (197, '2024-03-31 08:45:22', '2024-03-31 08:45:22', NULL, NULL, 'Estonie', NULL, 2, 66),
-       (198, '2024-03-31 08:45:22', '2024-03-31 08:45:22', NULL, NULL, 'Estonia', NULL, 3, 66),
-       (199, '2024-03-31 08:45:22', '2024-03-31 08:45:22', NULL, NULL, 'Ethiopia', NULL, 1, 67),
-       (200, '2024-03-31 08:45:22', '2024-03-31 08:45:22', NULL, NULL, 'Éthiopie', NULL, 2, 67),
-       (201, '2024-03-31 08:45:22', '2024-03-31 08:45:22', NULL, NULL, 'Etiopía', NULL, 3, 67),
-       (202, '2024-03-31 08:45:22', '2024-03-31 08:45:22', NULL, NULL, 'Falkland Islands', NULL, 1, 68),
-       (203, '2024-03-31 08:45:22', '2024-03-31 08:45:22', NULL, NULL, 'Îles Malouines', NULL, 2, 68),
-       (204, '2024-03-31 08:45:22', '2024-03-31 08:45:22', NULL, NULL, 'Islas Malvinas', NULL, 3, 68),
-       (205, '2024-03-31 08:45:22', '2024-03-31 08:45:22', NULL, NULL, 'Faroe Islands', NULL, 1, 69),
-       (206, '2024-03-31 08:45:22', '2024-03-31 08:45:22', NULL, NULL, 'Îles Féroé', NULL, 2, 69),
-       (207, '2024-03-31 08:45:22', '2024-03-31 08:45:22', NULL, NULL, 'Islas Feroe', NULL, 3, 69),
-       (208, '2024-03-31 08:45:22', '2024-03-31 08:45:22', NULL, NULL, 'Fiji', NULL, 1, 70),
-       (209, '2024-03-31 08:45:22', '2024-03-31 08:45:22', NULL, NULL, 'Fidji', NULL, 2, 70),
-       (210, '2024-03-31 08:45:22', '2024-03-31 08:45:22', NULL, NULL, 'Fiyi', NULL, 3, 70),
-       (211, '2024-03-31 08:45:22', '2024-03-31 08:45:22', NULL, NULL, 'Finland', NULL, 1, 71),
-       (212, '2024-03-31 08:45:22', '2024-03-31 08:45:22', NULL, NULL, 'Finlande', NULL, 2, 71),
-       (213, '2024-03-31 08:45:22', '2024-03-31 08:45:22', NULL, NULL, 'Finlandia', NULL, 3, 71),
-       (214, '2024-03-31 08:45:22', '2024-03-31 08:45:22', NULL, NULL, 'France', NULL, 1, 72),
-       (215, '2024-03-31 08:45:22', '2024-03-31 08:45:22', NULL, NULL, 'France', NULL, 2, 72),
-       (216, '2024-03-31 08:45:22', '2024-03-31 08:45:22', NULL, NULL, 'Francia', NULL, 3, 72),
-       (217, '2024-03-31 08:45:22', '2024-03-31 08:45:22', NULL, NULL, 'French Guiana', NULL, 1, 73),
-       (218, '2024-03-31 08:45:22', '2024-03-31 08:45:22', NULL, NULL, 'Guyane française', NULL, 2, 73),
-       (219, '2024-03-31 08:45:22', '2024-03-31 08:45:22', NULL, NULL, 'Guayana Francesa', NULL, 3, 73),
-       (220, '2024-03-31 08:45:22', '2024-03-31 08:45:22', NULL, NULL, 'French Polynesia', NULL, 1, 74),
-       (221, '2024-03-31 08:45:22', '2024-03-31 08:45:22', NULL, NULL, 'Polynésie française', NULL, 2, 74),
-       (222, '2024-03-31 08:45:22', '2024-03-31 08:45:22', NULL, NULL, 'Polinesia Francesa', NULL, 3, 74),
-       (223, '2024-03-31 08:45:22', '2024-03-31 08:45:22', NULL, NULL, 'Gabon', NULL, 1, 75),
-       (224, '2024-03-31 08:45:22', '2024-03-31 08:45:22', NULL, NULL, 'Gabon', NULL, 2, 75),
-       (225, '2024-03-31 08:45:22', '2024-03-31 08:45:22', NULL, NULL, 'Gabón', NULL, 3, 75),
-       (226, '2024-03-31 08:45:22', '2024-03-31 08:45:22', NULL, NULL, 'Gambia', NULL, 1, 76),
-       (227, '2024-03-31 08:45:22', '2024-03-31 08:45:22', NULL, NULL, 'Gambie', NULL, 2, 76),
-       (228, '2024-03-31 08:45:22', '2024-03-31 08:45:22', NULL, NULL, 'Gambia', NULL, 3, 76),
-       (229, '2024-03-31 08:45:22', '2024-03-31 08:45:22', NULL, NULL, 'Georgia', NULL, 1, 77),
-       (230, '2024-03-31 08:45:22', '2024-03-31 08:45:22', NULL, NULL, 'Géorgie', NULL, 2, 77),
-       (231, '2024-03-31 08:45:22', '2024-03-31 08:45:22', NULL, NULL, 'Georgia', NULL, 3, 77),
-       (232, '2024-03-31 08:45:22', '2024-03-31 08:45:22', NULL, NULL, 'Germany', NULL, 1, 78),
-       (233, '2024-03-31 08:45:22', '2024-03-31 08:45:22', NULL, NULL, 'Allemagne', NULL, 2, 78),
-       (234, '2024-03-31 08:45:22', '2024-03-31 08:45:22', NULL, NULL, 'Alemania', NULL, 3, 78),
-       (235, '2024-03-31 08:45:22', '2024-03-31 08:45:22', NULL, NULL, 'Ghana', NULL, 1, 79),
-       (236, '2024-03-31 08:45:22', '2024-03-31 08:45:22', NULL, NULL, 'Ghana', NULL, 2, 79),
-       (237, '2024-03-31 08:45:22', '2024-03-31 08:45:22', NULL, NULL, 'Ghana', NULL, 3, 79),
-       (238, '2024-03-31 08:45:22', '2024-03-31 08:45:22', NULL, NULL, 'Gibraltar', NULL, 1, 80),
-       (239, '2024-03-31 08:45:22', '2024-03-31 08:45:22', NULL, NULL, 'Gibraltar', NULL, 2, 80),
-       (240, '2024-03-31 08:45:22', '2024-03-31 08:45:22', NULL, NULL, 'Gibraltar', NULL, 3, 80),
-       (241, '2024-03-31 08:45:22', '2024-03-31 08:45:22', NULL, NULL, 'Greece', NULL, 1, 81),
-       (242, '2024-03-31 08:45:22', '2024-03-31 08:45:22', NULL, NULL, 'Grèce', NULL, 2, 81),
-       (243, '2024-03-31 08:45:22', '2024-03-31 08:45:22', NULL, NULL, 'Grecia', NULL, 3, 81),
-       (244, '2024-03-31 08:45:22', '2024-03-31 08:45:22', NULL, NULL, 'Greenland', NULL, 1, 82),
-       (245, '2024-03-31 08:45:22', '2024-03-31 08:45:22', NULL, NULL, 'Groenland', NULL, 2, 82),
-       (246, '2024-03-31 08:45:22', '2024-03-31 08:45:22', NULL, NULL, 'Groenlandia', NULL, 3, 82),
-       (247, '2024-03-31 08:45:22', '2024-03-31 08:45:22', NULL, NULL, 'Grenada', NULL, 1, 83),
-       (248, '2024-03-31 08:45:22', '2024-03-31 08:45:22', NULL, NULL, 'Grenade', NULL, 2, 83),
-       (249, '2024-03-31 08:45:22', '2024-03-31 08:45:22', NULL, NULL, 'Granada', NULL, 3, 83),
-       (250, '2024-03-31 08:45:22', '2024-03-31 08:45:22', NULL, NULL, 'Guadeloupe', NULL, 1, 84),
-       (251, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'Guadeloupe', NULL, 2, 84),
-       (252, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'Guadalupe', NULL, 3, 84),
-       (253, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'Guam', NULL, 1, 85),
-       (254, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'Guam', NULL, 2, 85),
-       (255, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'Guam', NULL, 3, 85),
-       (256, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'Guatemala', NULL, 1, 86),
-       (257, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'Guatemala', NULL, 2, 86),
-       (258, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'Guatemala', NULL, 3, 86),
-       (259, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'Guernsey', NULL, 1, 87),
-       (260, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'Guernesey', NULL, 2, 87),
-       (261, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'Guernsey', NULL, 3, 87),
-       (262, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'Guinea', NULL, 1, 88),
-       (263, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'Guinée', NULL, 2, 88),
-       (264, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'Guinea', NULL, 3, 88),
-       (265, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'Guinea-Bissau', NULL, 1, 89),
-       (266, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'Guinée-Bissau', NULL, 2, 89),
-       (267, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'Guinea-Bisáu', NULL, 3, 89),
-       (268, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'Guyana', NULL, 1, 90),
-       (269, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'Guyana', NULL, 2, 90),
-       (270, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'Guyana', NULL, 3, 90),
-       (271, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'Haiti', NULL, 1, 91),
-       (272, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'Haïti', NULL, 2, 91),
-       (273, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'Haití', NULL, 3, 91),
-       (274, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'Vatican City', NULL, 1, 92),
-       (275, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'État de la Cité du Vatican', NULL, 2, 92),
-       (276, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'Ciudad del Vaticano', NULL, 3, 92),
-       (277, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'Honduras', NULL, 1, 93),
-       (278, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'Honduras', NULL, 2, 93),
-       (279, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'Honduras', NULL, 3, 93),
-       (280, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'Hong Kong SAR China', NULL, 1, 94),
-       (281, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'R.A.S. chinoise de Hong Kong', NULL, 2, 94),
-       (282, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'RAE de Hong Kong (China)', NULL, 3, 94),
-       (283, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'Hungary', NULL, 1, 95),
-       (284, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'Hongrie', NULL, 2, 95),
-       (285, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'Hungría', NULL, 3, 95),
-       (286, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'Iceland', NULL, 1, 96),
-       (287, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'Islande', NULL, 2, 96),
-       (288, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'Islandia', NULL, 3, 96),
-       (289, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'India', NULL, 1, 97),
-       (290, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'Inde', NULL, 2, 97),
-       (291, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'India', NULL, 3, 97),
-       (292, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'Indonesia', NULL, 1, 98),
-       (293, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'Indonésie', NULL, 2, 98),
-       (294, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'Indonesia', NULL, 3, 98),
-       (295, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'Iran', NULL, 1, 99),
-       (296, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'Iran', NULL, 2, 99),
-       (297, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'Irán', NULL, 3, 99),
-       (298, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'Iraq', NULL, 1, 100),
-       (299, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'Irak', NULL, 2, 100),
-       (300, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'Irak', NULL, 3, 100),
-       (301, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'Ireland', NULL, 1, 101),
-       (302, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'Irlande', NULL, 2, 101),
-       (303, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'Irlanda', NULL, 3, 101),
-       (304, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'Isle of Man', NULL, 1, 102),
-       (305, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'Île de Man', NULL, 2, 102),
-       (306, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'Isla de Man', NULL, 3, 102),
-       (307, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'Israel', NULL, 1, 103),
-       (308, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'Israël', NULL, 2, 103),
-       (309, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'Israel', NULL, 3, 103),
-       (310, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'Italy', NULL, 1, 104),
-       (311, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'Italie', NULL, 2, 104),
-       (312, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'Italia', NULL, 3, 104),
-       (313, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'Jamaica', NULL, 1, 105),
-       (314, '2024-03-31 08:45:23', '2024-03-31 08:45:23', NULL, NULL, 'Jamaïque', NULL, 2, 105),
-       (315, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Jamaica', NULL, 3, 105),
-       (316, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Japan', NULL, 1, 106),
-       (317, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Japon', NULL, 2, 106),
-       (318, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Japón', NULL, 3, 106),
-       (319, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Jersey', NULL, 1, 107),
-       (320, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Jersey', NULL, 2, 107),
-       (321, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Jersey', NULL, 3, 107),
-       (322, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Jordan', NULL, 1, 108),
-       (323, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Jordanie', NULL, 2, 108),
-       (324, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Jordania', NULL, 3, 108),
-       (325, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Kazakhstan', NULL, 1, 109),
-       (326, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Kazakhstan', NULL, 2, 109),
-       (327, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Kazajistán', NULL, 3, 109),
-       (328, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Kenya', NULL, 1, 110),
-       (329, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Kenya', NULL, 2, 110),
-       (330, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Kenia', NULL, 3, 110),
-       (331, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Kiribati', NULL, 1, 111),
-       (332, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Kiribati', NULL, 2, 111),
-       (333, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Kiribati', NULL, 3, 111),
-       (334, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'North Korea', NULL, 1, 112),
-       (335, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Corée du Nord', NULL, 2, 112),
-       (336, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Corea del Norte', NULL, 3, 112),
-       (337, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'South Korea', NULL, 1, 113),
-       (338, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Corée du Sud', NULL, 2, 113),
-       (339, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Corea del Sur', NULL, 3, 113),
-       (340, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Kuwait', NULL, 1, 114),
-       (341, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Koweït', NULL, 2, 114),
-       (342, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Kuwait', NULL, 3, 114),
-       (343, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Kyrgyzstan', NULL, 1, 115),
-       (344, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Kirghizistan', NULL, 2, 115),
-       (345, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Kirguistán', NULL, 3, 115),
-       (346, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Laos', NULL, 1, 116),
-       (347, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Laos', NULL, 2, 116),
-       (348, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Laos', NULL, 3, 116),
-       (349, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Latvia', NULL, 1, 117),
-       (350, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Lettonie', NULL, 2, 117),
-       (351, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Letonia', NULL, 3, 117),
-       (352, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Lebanon', NULL, 1, 118),
-       (353, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Liban', NULL, 2, 118),
-       (354, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Líbano', NULL, 3, 118),
-       (355, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Lesotho', NULL, 1, 119),
-       (356, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Lesotho', NULL, 2, 119),
-       (357, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Lesoto', NULL, 3, 119),
-       (358, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Liberia', NULL, 1, 120),
-       (359, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Libéria', NULL, 2, 120),
-       (360, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Liberia', NULL, 3, 120),
-       (361, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Libya', NULL, 1, 121),
-       (362, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Libye', NULL, 2, 121),
-       (363, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Libia', NULL, 3, 121),
-       (364, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Liechtenstein', NULL, 1, 122),
-       (365, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Liechtenstein', NULL, 2, 122),
-       (366, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Liechtenstein', NULL, 3, 122),
-       (367, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Lithuania', NULL, 1, 123),
-       (368, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Lituanie', NULL, 2, 123),
-       (369, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Lituania', NULL, 3, 123),
-       (370, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Luxembourg', NULL, 1, 124),
-       (371, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Luxembourg', NULL, 2, 124),
-       (372, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Luxemburgo', NULL, 3, 124),
-       (373, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Macau SAR China', NULL, 1, 125),
-       (374, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'R.A.S. chinoise de Macao', NULL, 2, 125),
-       (375, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'RAE de Macao (China)', NULL, 3, 125),
-       (376, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Macedonia', NULL, 1, 126),
-       (377, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Macédoine', NULL, 2, 126),
-       (378, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Macedonia', NULL, 3, 126),
-       (379, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Madagascar', NULL, 1, 127),
-       (380, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Madagascar', NULL, 2, 127),
-       (381, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Madagascar', NULL, 3, 127),
-       (382, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Malawi', NULL, 1, 128),
-       (383, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Malawi', NULL, 2, 128),
-       (384, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Malaui', NULL, 3, 128),
-       (385, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Malaysia', NULL, 1, 129),
-       (386, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Malaisie', NULL, 2, 129),
-       (387, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Malasia', NULL, 3, 129),
-       (388, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Mali', NULL, 1, 130),
-       (389, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Mali', NULL, 2, 130),
-       (390, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Mali', NULL, 3, 130),
-       (391, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Malta', NULL, 1, 131),
-       (392, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Malte', NULL, 2, 131),
-       (393, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Malta', NULL, 3, 131),
-       (394, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Marshall Islands', NULL, 1, 132),
-       (395, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Îles Marshall', NULL, 2, 132),
-       (396, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Islas Marshall', NULL, 3, 132),
-       (397, '2024-03-31 08:45:24', '2024-03-31 08:45:24', NULL, NULL, 'Martinique', NULL, 1, 133),
-       (398, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'Martinique', NULL, 2, 133),
-       (399, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'Martinica', NULL, 3, 133),
-       (400, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'Mauritania', NULL, 1, 134),
-       (401, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'Mauritanie', NULL, 2, 134),
-       (402, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'Mauritania', NULL, 3, 134),
-       (403, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'Mauritius', NULL, 1, 135),
-       (404, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'Maurice', NULL, 2, 135),
-       (405, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'Mauricio', NULL, 3, 135),
-       (406, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'Mayotte', NULL, 1, 136),
-       (407, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'Mayotte', NULL, 2, 136),
-       (408, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'Mayotte', NULL, 3, 136),
-       (409, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'Mexico', NULL, 1, 137),
-       (410, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'Mexique', NULL, 2, 137),
-       (411, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'México', NULL, 3, 137),
-       (412, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'Micronesia', NULL, 1, 138),
-       (413, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'États fédérés de Micronésie', NULL, 2, 138),
-       (414, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'Micronesia', NULL, 3, 138),
-       (415, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'Moldova', NULL, 1, 139),
-       (416, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'Moldavie', NULL, 2, 139),
-       (417, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'Moldavia', NULL, 3, 139),
-       (418, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'Monaco', NULL, 1, 140),
-       (419, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'Monaco', NULL, 2, 140),
-       (420, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'Mónaco', NULL, 3, 140),
-       (421, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'Mongolia', NULL, 1, 141),
-       (422, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'Mongolie', NULL, 2, 141),
-       (423, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'Mongolia', NULL, 3, 141),
-       (424, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'Montenegro', NULL, 1, 142),
-       (425, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'Monténégro', NULL, 2, 142),
-       (426, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'Montenegro', NULL, 3, 142),
-       (427, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'Montserrat', NULL, 1, 143),
-       (428, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'Montserrat', NULL, 2, 143),
-       (429, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'Montserrat', NULL, 3, 143),
-       (430, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'Morocco', NULL, 1, 144),
-       (431, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'Maroc', NULL, 2, 144),
-       (432, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'Marruecos', NULL, 3, 144),
-       (433, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'Mozambique', NULL, 1, 145),
-       (434, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'Mozambique', NULL, 2, 145),
-       (435, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'Mozambique', NULL, 3, 145),
-       (436, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'Myanmar (Burma)', NULL, 1, 146),
-       (437, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'Myanmar (Birmanie)', NULL, 2, 146),
-       (438, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'Myanmar (Birmania)', NULL, 3, 146),
-       (439, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'Namibia', NULL, 1, 147),
-       (440, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'Namibie', NULL, 2, 147),
-       (441, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'Namibia', NULL, 3, 147),
-       (442, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'Nauru', NULL, 1, 148),
-       (443, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'Nauru', NULL, 2, 148),
-       (444, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'Nauru', NULL, 3, 148),
-       (445, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'Nepal', NULL, 1, 149),
-       (446, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'Népal', NULL, 2, 149),
-       (447, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'Nepal', NULL, 3, 149),
-       (448, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'Netherlands', NULL, 1, 150),
-       (449, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'Pays-Bas', NULL, 2, 150),
-       (450, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'Países Bajos', NULL, 3, 150),
-       (451, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'New Caledonia', NULL, 1, 151),
-       (452, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'Nouvelle-Calédonie', NULL, 2, 151),
-       (453, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'Nueva Caledonia', NULL, 3, 151),
-       (454, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'New Zealand', NULL, 1, 152),
-       (455, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'Nouvelle-Zélande', NULL, 2, 152),
-       (456, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'Nueva Zelanda', NULL, 3, 152),
-       (457, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'Nicaragua', NULL, 1, 153),
-       (458, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'Nicaragua', NULL, 2, 153),
-       (459, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'Nicaragua', NULL, 3, 153),
-       (460, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'Niger', NULL, 1, 154),
-       (461, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'Niger', NULL, 2, 154),
-       (462, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'Níger', NULL, 3, 154),
-       (463, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'Nigeria', NULL, 1, 155),
-       (464, '2024-03-31 08:45:25', '2024-03-31 08:45:25', NULL, NULL, 'Nigéria', NULL, 2, 155),
-       (465, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'Nigeria', NULL, 3, 155),
-       (466, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'Niue', NULL, 1, 156),
-       (467, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'Niue', NULL, 2, 156),
-       (468, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'Niue', NULL, 3, 156),
-       (469, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'Norfolk Island', NULL, 1, 157),
-       (470, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'Île Norfolk', NULL, 2, 157),
-       (471, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'Isla Norfolk', NULL, 3, 157),
-       (472, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'Northern Mariana Islands', NULL, 1, 158),
-       (473, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'Îles Mariannes du Nord', NULL, 2, 158),
-       (474, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'Islas Marianas del Norte', NULL, 3, 158),
-       (475, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'Norway', NULL, 1, 159),
-       (476, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'Norvège', NULL, 2, 159),
-       (477, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'Noruega', NULL, 3, 159),
-       (478, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'Oman', NULL, 1, 160),
-       (479, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'Oman', NULL, 2, 160),
-       (480, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'Omán', NULL, 3, 160),
-       (481, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'Pakistan', NULL, 1, 161),
-       (482, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'Pakistan', NULL, 2, 161),
-       (483, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'Pakistán', NULL, 3, 161),
-       (484, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'Palau', NULL, 1, 162),
-       (485, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'Palaos', NULL, 2, 162),
-       (486, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'Palaos', NULL, 3, 162),
-       (487, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'Palestinian Territories', NULL, 1, 163),
-       (488, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'Territoires palestiniens', NULL, 2, 163),
-       (489, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'Territorios Palestinos', NULL, 3, 163),
-       (490, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'Panama', NULL, 1, 164),
-       (491, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'Panama', NULL, 2, 164),
-       (492, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'Panamá', NULL, 3, 164),
-       (493, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'Papua New Guinea', NULL, 1, 165),
-       (494, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'Papouasie-Nouvelle-Guinée', NULL, 2, 165),
-       (495, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'Papúa Nueva Guinea', NULL, 3, 165),
-       (496, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'Paraguay', NULL, 1, 166),
-       (497, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'Paraguay', NULL, 2, 166),
-       (498, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'Paraguay', NULL, 3, 166),
-       (499, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'Peru', NULL, 1, 167),
-       (500, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'Pérou', NULL, 2, 167),
-       (501, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'Perú', NULL, 3, 167),
-       (502, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'Philippines', NULL, 1, 168),
-       (503, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'Philippines', NULL, 2, 168),
-       (504, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'Filipinas', NULL, 3, 168),
-       (505, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'Pitcairn Islands', NULL, 1, 169),
-       (506, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'Îles Pitcairn', NULL, 2, 169),
-       (507, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'Islas Pitcairn', NULL, 3, 169),
-       (508, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'Poland', NULL, 1, 170),
-       (509, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'Pologne', NULL, 2, 170),
-       (510, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'Polonia', NULL, 3, 170),
-       (511, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'Portugal', NULL, 1, 171),
-       (512, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'Portugal', NULL, 2, 171),
-       (513, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'Portugal', NULL, 3, 171),
-       (514, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'Puerto Rico', NULL, 1, 172),
-       (515, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'Porto Rico', NULL, 2, 172),
-       (516, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'Puerto Rico', NULL, 3, 172),
-       (517, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'Qatar', NULL, 1, 173),
-       (518, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'Qatar', NULL, 2, 173),
-       (519, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'Catar', NULL, 3, 173),
-       (520, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'Réunion', NULL, 1, 174),
-       (521, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'La Réunion', NULL, 2, 174),
-       (522, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'Reunión', NULL, 3, 174),
-       (523, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'Romania', NULL, 1, 175),
-       (524, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'Roumanie', NULL, 2, 175),
-       (525, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'Rumanía', NULL, 3, 175),
-       (526, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'Russia', NULL, 1, 176),
-       (527, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'Russie', NULL, 2, 176),
-       (528, '2024-03-31 08:45:26', '2024-03-31 08:45:26', NULL, NULL, 'Rusia', NULL, 3, 176),
-       (529, '2024-03-31 08:45:27', '2024-03-31 08:45:27', NULL, NULL, 'Rwanda', NULL, 1, 177),
-       (530, '2024-03-31 08:45:27', '2024-03-31 08:45:27', NULL, NULL, 'Rwanda', NULL, 2, 177),
-       (531, '2024-03-31 08:45:27', '2024-03-31 08:45:27', NULL, NULL, 'Ruanda', NULL, 3, 177),
-       (532, '2024-03-31 08:45:27', '2024-03-31 08:45:27', NULL, NULL, 'St. Helena', NULL, 1, 178),
-       (533, '2024-03-31 08:45:27', '2024-03-31 08:45:27', NULL, NULL, 'Sainte-Hélène', NULL, 2, 178),
-       (534, '2024-03-31 08:45:27', '2024-03-31 08:45:27', NULL, NULL, 'Santa Elena', NULL, 3, 178),
-       (535, '2024-03-31 08:45:27', '2024-03-31 08:45:27', NULL, NULL, 'St. Kitts & Nevis', NULL, 1, 179),
-       (536, '2024-03-31 08:45:27', '2024-03-31 08:45:27', NULL, NULL, 'Saint-Christophe-et-Niévès', NULL, 2, 179),
-       (537, '2024-03-31 08:45:27', '2024-03-31 08:45:27', NULL, NULL, 'San Cristóbal y Nieves', NULL, 3, 179),
-       (538, '2024-03-31 08:45:27', '2024-03-31 08:45:27', NULL, NULL, 'St. Lucia', NULL, 1, 180),
-       (539, '2024-03-31 08:45:27', '2024-03-31 08:45:27', NULL, NULL, 'Sainte-Lucie', NULL, 2, 180),
-       (540, '2024-03-31 08:45:27', '2024-03-31 08:45:27', NULL, NULL, 'Santa Lucía', NULL, 3, 180),
-       (541, '2024-03-31 08:45:27', '2024-03-31 08:45:27', NULL, NULL, 'St. Pierre & Miquelon', NULL, 1, 181),
-       (542, '2024-03-31 08:45:27', '2024-03-31 08:45:27', NULL, NULL, 'Saint-Pierre-et-Miquelon', NULL, 2, 181),
-       (543, '2024-03-31 08:45:27', '2024-03-31 08:45:27', NULL, NULL, 'San Pedro y Miquelón', NULL, 3, 181),
-       (544, '2024-03-31 08:45:27', '2024-03-31 08:45:27', NULL, NULL, 'St. Vincent & Grenadines', NULL, 1, 182),
-       (545, '2024-03-31 08:45:27', '2024-03-31 08:45:27', NULL, NULL, 'Saint-Vincent-et-les-Grenadines', NULL, 2, 182),
-       (546, '2024-03-31 08:45:27', '2024-03-31 08:45:27', NULL, NULL, 'San Vicente y las Granadinas', NULL, 3, 182),
-       (547, '2024-03-31 08:45:27', '2024-03-31 08:45:27', NULL, NULL, 'Samoa', NULL, 1, 183),
-       (548, '2024-03-31 08:45:27', '2024-03-31 08:45:27', NULL, NULL, 'Samoa', NULL, 2, 183),
-       (549, '2024-03-31 08:45:27', '2024-03-31 08:45:27', NULL, NULL, 'Samoa', NULL, 3, 183),
-       (550, '2024-03-31 08:45:27', '2024-03-31 08:45:27', NULL, NULL, 'San Marino', NULL, 1, 184),
-       (551, '2024-03-31 08:45:27', '2024-03-31 08:45:27', NULL, NULL, 'Saint-Marin', NULL, 2, 184),
-       (552, '2024-03-31 08:45:27', '2024-03-31 08:45:27', NULL, NULL, 'San Marino', NULL, 3, 184),
-       (553, '2024-03-31 08:45:27', '2024-03-31 08:45:27', NULL, NULL, 'São Tomé & Príncipe', NULL, 1, 185),
-       (554, '2024-03-31 08:45:27', '2024-03-31 08:45:27', NULL, NULL, 'Sao Tomé-et-Principe', NULL, 2, 185),
-       (555, '2024-03-31 08:45:27', '2024-03-31 08:45:27', NULL, NULL, 'Santo Tomé y Príncipe', NULL, 3, 185),
-       (556, '2024-03-31 08:45:27', '2024-03-31 08:45:27', NULL, NULL, 'Saudi Arabia', NULL, 1, 186),
-       (557, '2024-03-31 08:45:27', '2024-03-31 08:45:27', NULL, NULL, 'Arabie saoudite', NULL, 2, 186),
-       (558, '2024-03-31 08:45:27', '2024-03-31 08:45:27', NULL, NULL, 'Arabia Saudí', NULL, 3, 186),
-       (559, '2024-03-31 08:45:27', '2024-03-31 08:45:27', NULL, NULL, 'Senegal', NULL, 1, 187),
-       (560, '2024-03-31 08:45:27', '2024-03-31 08:45:27', NULL, NULL, 'Sénégal', NULL, 2, 187),
-       (561, '2024-03-31 08:45:27', '2024-03-31 08:45:27', NULL, NULL, 'Senegal', NULL, 3, 187),
-       (562, '2024-03-31 08:45:27', '2024-03-31 08:45:27', NULL, NULL, 'Serbia', NULL, 1, 188),
-       (563, '2024-03-31 08:45:27', '2024-03-31 08:45:27', NULL, NULL, 'Serbie', NULL, 2, 188),
-       (564, '2024-03-31 08:45:27', '2024-03-31 08:45:27', NULL, NULL, 'Serbia', NULL, 3, 188),
-       (565, '2024-03-31 08:45:27', '2024-03-31 08:45:27', NULL, NULL, 'Seychelles', NULL, 1, 189),
-       (566, '2024-03-31 08:45:27', '2024-03-31 08:45:27', NULL, NULL, 'Seychelles', NULL, 2, 189),
-       (567, '2024-03-31 08:45:27', '2024-03-31 08:45:27', NULL, NULL, 'Seychelles', NULL, 3, 189),
-       (568, '2024-03-31 08:45:27', '2024-03-31 08:45:27', NULL, NULL, 'Sierra Leone', NULL, 1, 190),
-       (569, '2024-03-31 08:45:27', '2024-03-31 08:45:27', NULL, NULL, 'Sierra Leone', NULL, 2, 190),
-       (570, '2024-03-31 08:45:27', '2024-03-31 08:45:27', NULL, NULL, 'Sierra Leona', NULL, 3, 190),
-       (571, '2024-03-31 08:45:27', '2024-03-31 08:45:27', NULL, NULL, 'Singapore', NULL, 1, 191),
-       (572, '2024-03-31 08:45:27', '2024-03-31 08:45:27', NULL, NULL, 'Singapour', NULL, 2, 191),
-       (573, '2024-03-31 08:45:27', '2024-03-31 08:45:27', NULL, NULL, 'Singapur', NULL, 3, 191),
-       (574, '2024-03-31 08:45:27', '2024-03-31 08:45:27', NULL, NULL, 'Slovakia', NULL, 1, 192),
-       (575, '2024-03-31 08:45:27', '2024-03-31 08:45:27', NULL, NULL, 'Slovaquie', NULL, 2, 192),
-       (576, '2024-03-31 08:45:27', '2024-03-31 08:45:27', NULL, NULL, 'Eslovaquia', NULL, 3, 192),
-       (577, '2024-03-31 08:45:27', '2024-03-31 08:45:27', NULL, NULL, 'Slovenia', NULL, 1, 193),
-       (578, '2024-03-31 08:45:27', '2024-03-31 08:45:27', NULL, NULL, 'Slovénie', NULL, 2, 193),
-       (579, '2024-03-31 08:45:27', '2024-03-31 08:45:27', NULL, NULL, 'Eslovenia', NULL, 3, 193),
-       (580, '2024-03-31 08:45:27', '2024-03-31 08:45:27', NULL, NULL, 'Solomon Islands', NULL, 1, 194),
-       (581, '2024-03-31 08:45:27', '2024-03-31 08:45:27', NULL, NULL, 'Îles Salomon', NULL, 2, 194),
-       (582, '2024-03-31 08:45:27', '2024-03-31 08:45:27', NULL, NULL, 'Islas Salomón', NULL, 3, 194),
-       (583, '2024-03-31 08:45:27', '2024-03-31 08:45:27', NULL, NULL, 'Somalia', NULL, 1, 195),
-       (584, '2024-03-31 08:45:27', '2024-03-31 08:45:27', NULL, NULL, 'Somalie', NULL, 2, 195),
-       (585, '2024-03-31 08:45:27', '2024-03-31 08:45:27', NULL, NULL, 'Somalia', NULL, 3, 195),
-       (586, '2024-03-31 08:45:27', '2024-03-31 08:45:27', NULL, NULL, 'South Africa', NULL, 1, 196),
-       (587, '2024-03-31 08:45:27', '2024-03-31 08:45:27', NULL, NULL, 'Afrique du Sud', NULL, 2, 196),
-       (588, '2024-03-31 08:45:27', '2024-03-31 08:45:27', NULL, NULL, 'Sudáfrica', NULL, 3, 196),
-       (589, '2024-03-31 08:45:27', '2024-03-31 08:45:27', NULL, NULL, 'Spain', NULL, 1, 197),
-       (590, '2024-03-31 08:45:27', '2024-03-31 08:45:27', NULL, NULL, 'Espagne', NULL, 2, 197),
-       (591, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'España', NULL, 3, 197),
-       (592, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Sri Lanka', NULL, 1, 198),
-       (593, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Sri Lanka', NULL, 2, 198),
-       (594, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Sri Lanka', NULL, 3, 198),
-       (595, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Sudan', NULL, 1, 199),
-       (596, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Soudan', NULL, 2, 199),
-       (597, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Sudán', NULL, 3, 199),
-       (598, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Suriname', NULL, 1, 200),
-       (599, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Suriname', NULL, 2, 200),
-       (600, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Surinam', NULL, 3, 200),
-       (601, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Svalbard & Jan Mayen', NULL, 1, 201),
-       (602, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Svalbard et Jan Mayen', NULL, 2, 201),
-       (603, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Svalbard y Jan Mayen', NULL, 3, 201),
-       (604, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Swaziland', NULL, 1, 202),
-       (605, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Swaziland', NULL, 2, 202),
-       (606, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Suazilandia', NULL, 3, 202),
-       (607, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Sweden', NULL, 1, 203),
-       (608, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Suède', NULL, 2, 203),
-       (609, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Suecia', NULL, 3, 203),
-       (610, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Switzerland', NULL, 1, 204),
-       (611, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Suisse', NULL, 2, 204),
-       (612, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Suiza', NULL, 3, 204),
-       (613, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Syria', NULL, 1, 205),
-       (614, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Syrie', NULL, 2, 205),
-       (615, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Siria', NULL, 3, 205),
-       (616, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Taiwan', NULL, 1, 206),
-       (617, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Taïwan', NULL, 2, 206),
-       (618, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Taiwán', NULL, 3, 206),
-       (619, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Tajikistan', NULL, 1, 207),
-       (620, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Tadjikistan', NULL, 2, 207),
-       (621, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Tayikistán', NULL, 3, 207),
-       (622, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Tanzania', NULL, 1, 208),
-       (623, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Tanzanie', NULL, 2, 208),
-       (624, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Tanzania', NULL, 3, 208),
-       (625, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Thailand', NULL, 1, 209),
-       (626, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Thaïlande', NULL, 2, 209),
-       (627, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Tailandia', NULL, 3, 209),
-       (628, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Timor-Leste', NULL, 1, 210),
-       (629, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Timor oriental', NULL, 2, 210),
-       (630, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Timor-Leste', NULL, 3, 210),
-       (631, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Togo', NULL, 1, 211),
-       (632, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Togo', NULL, 2, 211),
-       (633, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Togo', NULL, 3, 211),
-       (634, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Tokelau', NULL, 1, 212),
-       (635, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Tokélaou', NULL, 2, 212),
-       (636, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Tokelau', NULL, 3, 212),
-       (637, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Tonga', NULL, 1, 213),
-       (638, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Tonga', NULL, 2, 213),
-       (639, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Tonga', NULL, 3, 213),
-       (640, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Trinidad & Tobago', NULL, 1, 214),
-       (641, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Trinité-et-Tobago', NULL, 2, 214),
-       (642, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Trinidad y Tobago', NULL, 3, 214),
-       (643, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Tunisia', NULL, 1, 215),
-       (644, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Tunisie', NULL, 2, 215),
-       (645, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Túnez', NULL, 3, 215),
-       (646, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Turkey', NULL, 1, 216),
-       (647, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Turquie', NULL, 2, 216),
-       (648, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Turquía', NULL, 3, 216),
-       (649, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Turkmenistan', NULL, 1, 217),
-       (650, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Turkménistan', NULL, 2, 217),
-       (651, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Turkmenistán', NULL, 3, 217),
-       (652, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Turks & Caicos Islands', NULL, 1, 218),
-       (653, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Îles Turques-et-Caïques', NULL, 2, 218),
-       (654, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Islas Turcas y Caicos', NULL, 3, 218),
-       (655, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Tuvalu', NULL, 1, 219),
-       (656, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Tuvalu', NULL, 2, 219),
-       (657, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Tuvalu', NULL, 3, 219),
-       (658, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Uganda', NULL, 1, 220),
-       (659, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Ouganda', NULL, 2, 220),
-       (660, '2024-03-31 08:45:28', '2024-03-31 08:45:28', NULL, NULL, 'Uganda', NULL, 3, 220),
-       (661, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Ukraine', NULL, 1, 221),
-       (662, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Ukraine', NULL, 2, 221),
-       (663, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Ucrania', NULL, 3, 221),
-       (664, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'United Arab Emirates', NULL, 1, 222),
-       (665, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Émirats arabes unis', NULL, 2, 222),
-       (666, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Emiratos Árabes Unidos', NULL, 3, 222),
-       (667, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'United Kingdom', NULL, 1, 223),
-       (668, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Royaume-Uni', NULL, 2, 223),
-       (669, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Reino Unido', NULL, 3, 223),
-       (670, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'United States', NULL, 1, 224),
-       (671, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'États-Unis', NULL, 2, 224),
-       (672, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Estados Unidos', NULL, 3, 224),
-       (673, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'U.S. Outlying Islands', NULL, 1, 225),
-       (674, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Îles mineures éloignées des États-Unis', NULL,
-        2, 225),
-       (675, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Islas menores alejadas de EE. UU.', NULL, 3,
-        225),
-       (676, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Uruguay', NULL, 1, 226),
-       (677, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Uruguay', NULL, 2, 226),
-       (678, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Uruguay', NULL, 3, 226),
-       (679, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Uzbekistan', NULL, 1, 227),
-       (680, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Ouzbékistan', NULL, 2, 227),
-       (681, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Uzbekistán', NULL, 3, 227),
-       (682, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Vanuatu', NULL, 1, 228),
-       (683, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Vanuatu', NULL, 2, 228),
-       (684, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Vanuatu', NULL, 3, 228),
-       (685, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Venezuela', NULL, 1, 229),
-       (686, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Venezuela', NULL, 2, 229),
-       (687, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Venezuela', NULL, 3, 229),
-       (688, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Vietnam', NULL, 1, 230),
-       (689, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Vietnam', NULL, 2, 230),
-       (690, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Vietnam', NULL, 3, 230),
-       (691, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'British Virgin Islands', NULL, 1, 231),
-       (692, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Îles Vierges britanniques', NULL, 2, 231),
-       (693, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Islas Vírgenes Británicas', NULL, 3, 231),
-       (694, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'U.S. Virgin Islands', NULL, 1, 232),
-       (695, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Îles Vierges des États-Unis', NULL, 2, 232),
-       (696, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Islas Vírgenes de EE. UU.', NULL, 3, 232),
-       (697, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Wallis & Futuna', NULL, 1, 233),
-       (698, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Wallis-et-Futuna', NULL, 2, 233),
-       (699, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Wallis y Futuna', NULL, 3, 233),
-       (700, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Western Sahara', NULL, 1, 234),
-       (701, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Sahara occidental', NULL, 2, 234),
-       (702, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Sáhara Occidental', NULL, 3, 234),
-       (703, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Yemen', NULL, 1, 235),
-       (704, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Yémen', NULL, 2, 235),
-       (705, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Yemen', NULL, 3, 235),
-       (706, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Zambia', NULL, 1, 236),
-       (707, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Zambie', NULL, 2, 236),
-       (708, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Zambia', NULL, 3, 236),
-       (709, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Zimbabwe', NULL, 1, 237),
-       (710, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Zimbabwe', NULL, 2, 237),
-       (711, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Zimbabue', NULL, 3, 237);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (1, '2024-03-31 08:45:18.000000', '2024-03-31 08:45:18.000000', null, null, 'Afghanistan', null, 1, 1);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (2, '2024-03-31 08:45:18.000000', '2024-03-31 08:45:18.000000', null, null, 'Afghanistan', null, 2, 1);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (3, '2024-03-31 08:45:18.000000', '2024-03-31 08:45:18.000000', null, null, 'Afganistán', null, 3, 1);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (4, '2024-03-31 08:45:18.000000', '2024-03-31 08:45:18.000000', null, null, 'Åland Islands', null, 1, 2);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (5, '2024-03-31 08:45:18.000000', '2024-03-31 08:45:18.000000', null, null, 'Îles Åland', null, 2, 2);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (6, '2024-03-31 08:45:18.000000', '2024-03-31 08:45:18.000000', null, null, 'Islas Åland', null, 3, 2);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (7, '2024-03-31 08:45:18.000000', '2024-03-31 08:45:18.000000', null, null, 'Albania', null, 1, 3);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (8, '2024-03-31 08:45:18.000000', '2024-03-31 08:45:18.000000', null, null, 'Albanie', null, 2, 3);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (9, '2024-03-31 08:45:18.000000', '2024-03-31 08:45:18.000000', null, null, 'Albania', null, 3, 3);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (10, '2024-03-31 08:45:18.000000', '2024-03-31 08:45:18.000000', null, null, 'Algeria', null, 1, 4);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (11, '2024-03-31 08:45:18.000000', '2024-03-31 08:45:18.000000', null, null, 'Algérie', null, 2, 4);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (12, '2024-03-31 08:45:18.000000', '2024-03-31 08:45:18.000000', null, null, 'Argelia', null, 3, 4);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (13, '2024-03-31 08:45:18.000000', '2024-03-31 08:45:18.000000', null, null, 'American Samoa', null, 1, 5);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (14, '2024-03-31 08:45:18.000000', '2024-03-31 08:45:18.000000', null, null, 'Samoa américaines', null, 2, 5);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (15, '2024-03-31 08:45:18.000000', '2024-03-31 08:45:18.000000', null, null, 'Samoa Americana', null, 3, 5);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (16, '2024-03-31 08:45:18.000000', '2024-03-31 08:45:18.000000', null, null, 'Andorra', null, 1, 6);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (17, '2024-03-31 08:45:18.000000', '2024-03-31 08:45:18.000000', null, null, 'Andorre', null, 2, 6);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (18, '2024-03-31 08:45:18.000000', '2024-03-31 08:45:18.000000', null, null, 'Andorra', null, 3, 6);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (19, '2024-03-31 08:45:18.000000', '2024-03-31 08:45:18.000000', null, null, 'Angola', null, 1, 7);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (20, '2024-03-31 08:45:18.000000', '2024-03-31 08:45:18.000000', null, null, 'Angola', null, 2, 7);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (21, '2024-03-31 08:45:18.000000', '2024-03-31 08:45:18.000000', null, null, 'Angola', null, 3, 7);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (22, '2024-03-31 08:45:18.000000', '2024-03-31 08:45:18.000000', null, null, 'Anguilla', null, 1, 8);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (23, '2024-03-31 08:45:18.000000', '2024-03-31 08:45:18.000000', null, null, 'Anguilla', null, 2, 8);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (24, '2024-03-31 08:45:18.000000', '2024-03-31 08:45:18.000000', null, null, 'Anguila', null, 3, 8);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (25, '2024-03-31 08:45:18.000000', '2024-03-31 08:45:18.000000', null, null, 'Antigua & Barbuda', null, 1, 9);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (26, '2024-03-31 08:45:18.000000', '2024-03-31 08:45:18.000000', null, null, 'Antigua-et-Barbuda', null, 2, 9);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (27, '2024-03-31 08:45:18.000000', '2024-03-31 08:45:18.000000', null, null, 'Antigua y Barbuda', null, 3, 9);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (28, '2024-03-31 08:45:18.000000', '2024-03-31 08:45:18.000000', null, null, 'Argentina', null, 1, 10);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (29, '2024-03-31 08:45:18.000000', '2024-03-31 08:45:18.000000', null, null, 'Argentine', null, 2, 10);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (30, '2024-03-31 08:45:18.000000', '2024-03-31 08:45:18.000000', null, null, 'Argentina', null, 3, 10);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (31, '2024-03-31 08:45:19.000000', '2024-03-31 08:45:19.000000', null, null, 'Armenia', null, 1, 11);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (32, '2024-03-31 08:45:19.000000', '2024-03-31 08:45:19.000000', null, null, 'Arménie', null, 2, 11);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (33, '2024-03-31 08:45:19.000000', '2024-03-31 08:45:19.000000', null, null, 'Armenia', null, 3, 11);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (34, '2024-03-31 08:45:19.000000', '2024-03-31 08:45:19.000000', null, null, 'Aruba', null, 1, 12);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (35, '2024-03-31 08:45:19.000000', '2024-03-31 08:45:19.000000', null, null, 'Aruba', null, 2, 12);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (36, '2024-03-31 08:45:19.000000', '2024-03-31 08:45:19.000000', null, null, 'Aruba', null, 3, 12);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (37, '2024-03-31 08:45:19.000000', '2024-03-31 08:45:19.000000', null, null, 'Australia', null, 1, 13);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (38, '2024-03-31 08:45:19.000000', '2024-03-31 08:45:19.000000', null, null, 'Australie', null, 2, 13);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (39, '2024-03-31 08:45:19.000000', '2024-03-31 08:45:19.000000', null, null, 'Australia', null, 3, 13);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (40, '2024-03-31 08:45:19.000000', '2024-03-31 08:45:19.000000', null, null, 'Austria', null, 1, 14);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (41, '2024-03-31 08:45:19.000000', '2024-03-31 08:45:19.000000', null, null, 'Autriche', null, 2, 14);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (42, '2024-03-31 08:45:19.000000', '2024-03-31 08:45:19.000000', null, null, 'Austria', null, 3, 14);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (43, '2024-03-31 08:45:19.000000', '2024-03-31 08:45:19.000000', null, null, 'Azerbaijan', null, 1, 15);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (44, '2024-03-31 08:45:19.000000', '2024-03-31 08:45:19.000000', null, null, 'Azerbaïdjan', null, 2, 15);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (45, '2024-03-31 08:45:19.000000', '2024-03-31 08:45:19.000000', null, null, 'Azerbaiyán', null, 3, 15);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (46, '2024-03-31 08:45:19.000000', '2024-03-31 08:45:19.000000', null, null, 'Bahamas', null, 1, 16);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (47, '2024-03-31 08:45:19.000000', '2024-03-31 08:45:19.000000', null, null, 'Bahamas', null, 2, 16);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (48, '2024-03-31 08:45:19.000000', '2024-03-31 08:45:19.000000', null, null, 'Bahamas', null, 3, 16);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (49, '2024-03-31 08:45:19.000000', '2024-03-31 08:45:19.000000', null, null, 'Bahrain', null, 1, 17);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (50, '2024-03-31 08:45:19.000000', '2024-03-31 08:45:19.000000', null, null, 'Bahreïn', null, 2, 17);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (51, '2024-03-31 08:45:19.000000', '2024-03-31 08:45:19.000000', null, null, 'Baréin', null, 3, 17);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (52, '2024-03-31 08:45:19.000000', '2024-03-31 08:45:19.000000', null, null, 'Bangladesh', null, 1, 18);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (53, '2024-03-31 08:45:19.000000', '2024-03-31 08:45:19.000000', null, null, 'Bangladesh', null, 2, 18);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (54, '2024-03-31 08:45:19.000000', '2024-03-31 08:45:19.000000', null, null, 'Bangladés', null, 3, 18);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (55, '2024-03-31 08:45:19.000000', '2024-03-31 08:45:19.000000', null, null, 'Barbados', null, 1, 19);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (56, '2024-03-31 08:45:19.000000', '2024-03-31 08:45:19.000000', null, null, 'Barbade', null, 2, 19);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (57, '2024-03-31 08:45:19.000000', '2024-03-31 08:45:19.000000', null, null, 'Barbados', null, 3, 19);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (58, '2024-03-31 08:45:19.000000', '2024-03-31 08:45:19.000000', null, null, 'Belarus', null, 1, 20);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (59, '2024-03-31 08:45:19.000000', '2024-03-31 08:45:19.000000', null, null, 'Biélorussie', null, 2, 20);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (60, '2024-03-31 08:45:19.000000', '2024-03-31 08:45:19.000000', null, null, 'Bielorrusia', null, 3, 20);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (61, '2024-03-31 08:45:19.000000', '2024-03-31 08:45:19.000000', null, null, 'Belgium', null, 1, 21);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (62, '2024-03-31 08:45:19.000000', '2024-03-31 08:45:19.000000', null, null, 'Belgique', null, 2, 21);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (63, '2024-03-31 08:45:19.000000', '2024-03-31 08:45:19.000000', null, null, 'Bélgica', null, 3, 21);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (64, '2024-03-31 08:45:19.000000', '2024-03-31 08:45:19.000000', null, null, 'Belize', null, 1, 22);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (65, '2024-03-31 08:45:19.000000', '2024-03-31 08:45:19.000000', null, null, 'Belize', null, 2, 22);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (66, '2024-03-31 08:45:19.000000', '2024-03-31 08:45:19.000000', null, null, 'Belice', null, 3, 22);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (67, '2024-03-31 08:45:19.000000', '2024-03-31 08:45:19.000000', null, null, 'Benin', null, 1, 23);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (68, '2024-03-31 08:45:19.000000', '2024-03-31 08:45:19.000000', null, null, 'Bénin', null, 2, 23);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (69, '2024-03-31 08:45:19.000000', '2024-03-31 08:45:19.000000', null, null, 'Benín', null, 3, 23);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (70, '2024-03-31 08:45:19.000000', '2024-03-31 08:45:19.000000', null, null, 'Bermuda', null, 1, 24);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (71, '2024-03-31 08:45:19.000000', '2024-03-31 08:45:19.000000', null, null, 'Bermudes', null, 2, 24);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (72, '2024-03-31 08:45:19.000000', '2024-03-31 08:45:19.000000', null, null, 'Bermudas', null, 3, 24);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (73, '2024-03-31 08:45:19.000000', '2024-03-31 08:45:19.000000', null, null, 'Bhutan', null, 1, 25);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (74, '2024-03-31 08:45:19.000000', '2024-03-31 08:45:19.000000', null, null, 'Bhoutan', null, 2, 25);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (75, '2024-03-31 08:45:19.000000', '2024-03-31 08:45:19.000000', null, null, 'Bután', null, 3, 25);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (76, '2024-03-31 08:45:19.000000', '2024-03-31 08:45:19.000000', null, null, 'Bolivia', null, 1, 26);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (77, '2024-03-31 08:45:19.000000', '2024-03-31 08:45:19.000000', null, null, 'Bolivie', null, 2, 26);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (78, '2024-03-31 08:45:19.000000', '2024-03-31 08:45:19.000000', null, null, 'Bolivia', null, 3, 26);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (79, '2024-03-31 08:45:19.000000', '2024-03-31 08:45:19.000000', null, null, 'Bosnia & Herzegovina', null, 1, 27);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (80, '2024-03-31 08:45:19.000000', '2024-03-31 08:45:19.000000', null, null, 'Bosnie-Herzégovine', null, 2, 27);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (81, '2024-03-31 08:45:19.000000', '2024-03-31 08:45:19.000000', null, null, 'Bosnia y Herzegovina', null, 3, 27);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (82, '2024-03-31 08:45:19.000000', '2024-03-31 08:45:19.000000', null, null, 'Botswana', null, 1, 28);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (83, '2024-03-31 08:45:20.000000', '2024-03-31 08:45:20.000000', null, null, 'Botswana', null, 2, 28);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (84, '2024-03-31 08:45:20.000000', '2024-03-31 08:45:20.000000', null, null, 'Botsuana', null, 3, 28);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (85, '2024-03-31 08:45:20.000000', '2024-03-31 08:45:20.000000', null, null, 'Brazil', null, 1, 29);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (86, '2024-03-31 08:45:20.000000', '2024-03-31 08:45:20.000000', null, null, 'Brésil', null, 2, 29);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (87, '2024-03-31 08:45:20.000000', '2024-03-31 08:45:20.000000', null, null, 'Brasil', null, 3, 29);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (88, '2024-03-31 08:45:20.000000', '2024-03-31 08:45:20.000000', null, null, 'British Indian Ocean Territory', null, 1, 30);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (89, '2024-03-31 08:45:20.000000', '2024-03-31 08:45:20.000000', null, null, 'Territoire britannique de l’océan Indien', null, 2, 30);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (90, '2024-03-31 08:45:20.000000', '2024-03-31 08:45:20.000000', null, null, 'Territorio Británico del Océano Índico', null, 3, 30);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (91, '2024-03-31 08:45:20.000000', '2024-03-31 08:45:20.000000', null, null, 'Brunei', null, 1, 31);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (92, '2024-03-31 08:45:20.000000', '2024-03-31 08:45:20.000000', null, null, 'Brunéi Darussalam', null, 2, 31);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (93, '2024-03-31 08:45:20.000000', '2024-03-31 08:45:20.000000', null, null, 'Brunéi', null, 3, 31);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (94, '2024-03-31 08:45:20.000000', '2024-03-31 08:45:20.000000', null, null, 'Bulgaria', null, 1, 32);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (95, '2024-03-31 08:45:20.000000', '2024-03-31 08:45:20.000000', null, null, 'Bulgarie', null, 2, 32);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (96, '2024-03-31 08:45:20.000000', '2024-03-31 08:45:20.000000', null, null, 'Bulgaria', null, 3, 32);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (97, '2024-03-31 08:45:20.000000', '2024-03-31 08:45:20.000000', null, null, 'Burkina Faso', null, 1, 33);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (98, '2024-03-31 08:45:20.000000', '2024-03-31 08:45:20.000000', null, null, 'Burkina Faso', null, 2, 33);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (99, '2024-03-31 08:45:20.000000', '2024-03-31 08:45:20.000000', null, null, 'Burkina Faso', null, 3, 33);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (100, '2024-03-31 08:45:20.000000', '2024-03-31 08:45:20.000000', null, null, 'Burundi', null, 1, 34);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (101, '2024-03-31 08:45:20.000000', '2024-03-31 08:45:20.000000', null, null, 'Burundi', null, 2, 34);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (102, '2024-03-31 08:45:20.000000', '2024-03-31 08:45:20.000000', null, null, 'Burundi', null, 3, 34);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (103, '2024-03-31 08:45:20.000000', '2024-03-31 08:45:20.000000', null, null, 'Cambodia', null, 1, 35);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (104, '2024-03-31 08:45:20.000000', '2024-03-31 08:45:20.000000', null, null, 'Cambodge', null, 2, 35);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (105, '2024-03-31 08:45:20.000000', '2024-03-31 08:45:20.000000', null, null, 'Camboya', null, 3, 35);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (106, '2024-03-31 08:45:20.000000', '2024-03-31 08:45:20.000000', null, null, 'Cameroon', null, 1, 36);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (107, '2024-03-31 08:45:20.000000', '2024-03-31 08:45:20.000000', null, null, 'Cameroun', null, 2, 36);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (108, '2024-03-31 08:45:20.000000', '2024-03-31 08:45:20.000000', null, null, 'Camerún', null, 3, 36);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (109, '2024-03-31 08:45:20.000000', '2024-03-31 08:45:20.000000', null, null, 'Canada', null, 1, 37);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (110, '2024-03-31 08:45:20.000000', '2024-03-31 08:45:20.000000', null, null, 'Canada', null, 2, 37);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (111, '2024-03-31 08:45:20.000000', '2024-03-31 08:45:20.000000', null, null, 'Canadá', null, 3, 37);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (112, '2024-03-31 08:45:20.000000', '2024-03-31 08:45:20.000000', null, null, 'Cape Verde', null, 1, 38);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (113, '2024-03-31 08:45:20.000000', '2024-03-31 08:45:20.000000', null, null, 'Cap-Vert', null, 2, 38);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (114, '2024-03-31 08:45:20.000000', '2024-03-31 08:45:20.000000', null, null, 'Cabo Verde', null, 3, 38);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (115, '2024-03-31 08:45:20.000000', '2024-03-31 08:45:20.000000', null, null, 'Cayman Islands', null, 1, 39);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (116, '2024-03-31 08:45:20.000000', '2024-03-31 08:45:20.000000', null, null, 'Îles Caïmans', null, 2, 39);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (117, '2024-03-31 08:45:20.000000', '2024-03-31 08:45:20.000000', null, null, 'Islas Caimán', null, 3, 39);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (118, '2024-03-31 08:45:20.000000', '2024-03-31 08:45:20.000000', null, null, 'Central African Republic', null, 1, 40);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (119, '2024-03-31 08:45:20.000000', '2024-03-31 08:45:20.000000', null, null, 'République centrafricaine', null, 2, 40);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (120, '2024-03-31 08:45:20.000000', '2024-03-31 08:45:20.000000', null, null, 'República Centroafricana', null, 3, 40);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (121, '2024-03-31 08:45:20.000000', '2024-03-31 08:45:20.000000', null, null, 'Chad', null, 1, 41);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (122, '2024-03-31 08:45:20.000000', '2024-03-31 08:45:20.000000', null, null, 'Tchad', null, 2, 41);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (123, '2024-03-31 08:45:20.000000', '2024-03-31 08:45:20.000000', null, null, 'Chad', null, 3, 41);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (124, '2024-03-31 08:45:20.000000', '2024-03-31 08:45:20.000000', null, null, 'Chile', null, 1, 42);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (125, '2024-03-31 08:45:20.000000', '2024-03-31 08:45:20.000000', null, null, 'Chili', null, 2, 42);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (126, '2024-03-31 08:45:20.000000', '2024-03-31 08:45:20.000000', null, null, 'Chile', null, 3, 42);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (127, '2024-03-31 08:45:20.000000', '2024-03-31 08:45:20.000000', null, null, 'China', null, 1, 43);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (128, '2024-03-31 08:45:20.000000', '2024-03-31 08:45:20.000000', null, null, 'Chine', null, 2, 43);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (129, '2024-03-31 08:45:20.000000', '2024-03-31 08:45:20.000000', null, null, 'China', null, 3, 43);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (130, '2024-03-31 08:45:20.000000', '2024-03-31 08:45:20.000000', null, null, 'Christmas Island', null, 1, 44);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (131, '2024-03-31 08:45:20.000000', '2024-03-31 08:45:20.000000', null, null, 'Île Christmas', null, 2, 44);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (132, '2024-03-31 08:45:20.000000', '2024-03-31 08:45:20.000000', null, null, 'Isla de Navidad', null, 3, 44);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (133, '2024-03-31 08:45:20.000000', '2024-03-31 08:45:20.000000', null, null, 'Cocos (Keeling) Islands', null, 1, 45);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (134, '2024-03-31 08:45:20.000000', '2024-03-31 08:45:20.000000', null, null, 'Îles Cocos', null, 2, 45);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (135, '2024-03-31 08:45:20.000000', '2024-03-31 08:45:20.000000', null, null, 'Islas Cocos', null, 3, 45);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (136, '2024-03-31 08:45:20.000000', '2024-03-31 08:45:20.000000', null, null, 'Colombia', null, 1, 46);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (137, '2024-03-31 08:45:20.000000', '2024-03-31 08:45:20.000000', null, null, 'Colombie', null, 2, 46);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (138, '2024-03-31 08:45:20.000000', '2024-03-31 08:45:20.000000', null, null, 'Colombia', null, 3, 46);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (139, '2024-03-31 08:45:20.000000', '2024-03-31 08:45:20.000000', null, null, 'Comoros', null, 1, 47);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (140, '2024-03-31 08:45:20.000000', '2024-03-31 08:45:20.000000', null, null, 'Comores', null, 2, 47);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (141, '2024-03-31 08:45:21.000000', '2024-03-31 08:45:21.000000', null, null, 'Comoras', null, 3, 47);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (142, '2024-03-31 08:45:21.000000', '2024-03-31 08:45:21.000000', null, null, 'Congo - Brazzaville', null, 1, 48);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (143, '2024-03-31 08:45:21.000000', '2024-03-31 08:45:21.000000', null, null, 'Congo-Brazzaville', null, 2, 48);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (144, '2024-03-31 08:45:21.000000', '2024-03-31 08:45:21.000000', null, null, 'República del Congo', null, 3, 48);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (145, '2024-03-31 08:45:21.000000', '2024-03-31 08:45:21.000000', null, null, 'Congo - Kinshasa', null, 1, 49);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (146, '2024-03-31 08:45:21.000000', '2024-03-31 08:45:21.000000', null, null, 'Congo-Kinshasa', null, 2, 49);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (147, '2024-03-31 08:45:21.000000', '2024-03-31 08:45:21.000000', null, null, 'República Democrática del Congo', null, 3, 49);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (148, '2024-03-31 08:45:21.000000', '2024-03-31 08:45:21.000000', null, null, 'Cook Islands', null, 1, 50);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (149, '2024-03-31 08:45:21.000000', '2024-03-31 08:45:21.000000', null, null, 'Îles Cook', null, 2, 50);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (150, '2024-03-31 08:45:21.000000', '2024-03-31 08:45:21.000000', null, null, 'Islas Cook', null, 3, 50);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (151, '2024-03-31 08:45:21.000000', '2024-03-31 08:45:21.000000', null, null, 'Costa Rica', null, 1, 51);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (152, '2024-03-31 08:45:21.000000', '2024-03-31 08:45:21.000000', null, null, 'Costa Rica', null, 2, 51);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (153, '2024-03-31 08:45:21.000000', '2024-03-31 08:45:21.000000', null, null, 'Costa Rica', null, 3, 51);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (154, '2024-03-31 08:45:21.000000', '2024-03-31 08:45:21.000000', null, null, 'Côte d’Ivoire', null, 1, 52);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (155, '2024-03-31 08:45:21.000000', '2024-03-31 08:45:21.000000', null, null, 'Côte d’Ivoire', null, 2, 52);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (156, '2024-03-31 08:45:21.000000', '2024-03-31 08:45:21.000000', null, null, 'Côte d’Ivoire', null, 3, 52);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (157, '2024-03-31 08:45:21.000000', '2024-03-31 08:45:21.000000', null, null, 'Croatia', null, 1, 53);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (158, '2024-03-31 08:45:21.000000', '2024-03-31 08:45:21.000000', null, null, 'Croatie', null, 2, 53);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (159, '2024-03-31 08:45:21.000000', '2024-03-31 08:45:21.000000', null, null, 'Croacia', null, 3, 53);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (160, '2024-03-31 08:45:21.000000', '2024-03-31 08:45:21.000000', null, null, 'Cuba', null, 1, 54);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (161, '2024-03-31 08:45:21.000000', '2024-03-31 08:45:21.000000', null, null, 'Cuba', null, 2, 54);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (162, '2024-03-31 08:45:21.000000', '2024-03-31 08:45:21.000000', null, null, 'Cuba', null, 3, 54);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (163, '2024-03-31 08:45:21.000000', '2024-03-31 08:45:21.000000', null, null, 'Cyprus', null, 1, 55);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (164, '2024-03-31 08:45:21.000000', '2024-03-31 08:45:21.000000', null, null, 'Chypre', null, 2, 55);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (165, '2024-03-31 08:45:21.000000', '2024-03-31 08:45:21.000000', null, null, 'Chipre', null, 3, 55);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (166, '2024-03-31 08:45:21.000000', '2024-03-31 08:45:21.000000', null, null, 'Czechia', null, 1, 56);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (167, '2024-03-31 08:45:21.000000', '2024-03-31 08:45:21.000000', null, null, 'Tchéquie', null, 2, 56);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (168, '2024-03-31 08:45:21.000000', '2024-03-31 08:45:21.000000', null, null, 'Chequia', null, 3, 56);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (169, '2024-03-31 08:45:21.000000', '2024-03-31 08:45:21.000000', null, null, 'Denmark', null, 1, 57);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (170, '2024-03-31 08:45:21.000000', '2024-03-31 08:45:21.000000', null, null, 'Danemark', null, 2, 57);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (171, '2024-03-31 08:45:21.000000', '2024-03-31 08:45:21.000000', null, null, 'Dinamarca', null, 3, 57);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (172, '2024-03-31 08:45:21.000000', '2024-03-31 08:45:21.000000', null, null, 'Djibouti', null, 1, 58);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (173, '2024-03-31 08:45:21.000000', '2024-03-31 08:45:21.000000', null, null, 'Djibouti', null, 2, 58);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (174, '2024-03-31 08:45:21.000000', '2024-03-31 08:45:21.000000', null, null, 'Yibuti', null, 3, 58);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (175, '2024-03-31 08:45:21.000000', '2024-03-31 08:45:21.000000', null, null, 'Dominica', null, 1, 59);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (176, '2024-03-31 08:45:21.000000', '2024-03-31 08:45:21.000000', null, null, 'Dominique', null, 2, 59);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (177, '2024-03-31 08:45:21.000000', '2024-03-31 08:45:21.000000', null, null, 'Dominica', null, 3, 59);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (178, '2024-03-31 08:45:21.000000', '2024-03-31 08:45:21.000000', null, null, 'Dominican Republic', null, 1, 60);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (179, '2024-03-31 08:45:21.000000', '2024-03-31 08:45:21.000000', null, null, 'République dominicaine', null, 2, 60);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (180, '2024-03-31 08:45:21.000000', '2024-03-31 08:45:21.000000', null, null, 'República Dominicana', null, 3, 60);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (181, '2024-03-31 08:45:21.000000', '2024-03-31 08:45:21.000000', null, null, 'Ecuador', null, 1, 61);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (182, '2024-03-31 08:45:21.000000', '2024-03-31 08:45:21.000000', null, null, 'Équateur', null, 2, 61);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (183, '2024-03-31 08:45:21.000000', '2024-03-31 08:45:21.000000', null, null, 'Ecuador', null, 3, 61);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (184, '2024-03-31 08:45:21.000000', '2024-03-31 08:45:21.000000', null, null, 'Egypt', null, 1, 62);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (185, '2024-03-31 08:45:21.000000', '2024-03-31 08:45:21.000000', null, null, 'Égypte', null, 2, 62);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (186, '2024-03-31 08:45:21.000000', '2024-03-31 08:45:21.000000', null, null, 'Egipto', null, 3, 62);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (187, '2024-03-31 08:45:21.000000', '2024-03-31 08:45:21.000000', null, null, 'El Salvador', null, 1, 63);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (188, '2024-03-31 08:45:21.000000', '2024-03-31 08:45:21.000000', null, null, 'Salvador', null, 2, 63);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (189, '2024-03-31 08:45:21.000000', '2024-03-31 08:45:21.000000', null, null, 'El Salvador', null, 3, 63);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (190, '2024-03-31 08:45:21.000000', '2024-03-31 08:45:21.000000', null, null, 'Equatorial Guinea', null, 1, 64);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (191, '2024-03-31 08:45:21.000000', '2024-03-31 08:45:21.000000', null, null, 'Guinée équatoriale', null, 2, 64);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (192, '2024-03-31 08:45:21.000000', '2024-03-31 08:45:21.000000', null, null, 'Guinea Ecuatorial', null, 3, 64);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (193, '2024-03-31 08:45:22.000000', '2024-03-31 08:45:22.000000', null, null, 'Eritrea', null, 1, 65);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (194, '2024-03-31 08:45:22.000000', '2024-03-31 08:45:22.000000', null, null, 'Érythrée', null, 2, 65);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (195, '2024-03-31 08:45:22.000000', '2024-03-31 08:45:22.000000', null, null, 'Eritrea', null, 3, 65);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (196, '2024-03-31 08:45:22.000000', '2024-03-31 08:45:22.000000', null, null, 'Estonia', null, 1, 66);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (197, '2024-03-31 08:45:22.000000', '2024-03-31 08:45:22.000000', null, null, 'Estonie', null, 2, 66);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (198, '2024-03-31 08:45:22.000000', '2024-03-31 08:45:22.000000', null, null, 'Estonia', null, 3, 66);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (199, '2024-03-31 08:45:22.000000', '2024-03-31 08:45:22.000000', null, null, 'Ethiopia', null, 1, 67);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (200, '2024-03-31 08:45:22.000000', '2024-03-31 08:45:22.000000', null, null, 'Éthiopie', null, 2, 67);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (201, '2024-03-31 08:45:22.000000', '2024-03-31 08:45:22.000000', null, null, 'Etiopía', null, 3, 67);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (202, '2024-03-31 08:45:22.000000', '2024-03-31 08:45:22.000000', null, null, 'Falkland Islands', null, 1, 68);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (203, '2024-03-31 08:45:22.000000', '2024-03-31 08:45:22.000000', null, null, 'Îles Malouines', null, 2, 68);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (204, '2024-03-31 08:45:22.000000', '2024-03-31 08:45:22.000000', null, null, 'Islas Malvinas', null, 3, 68);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (205, '2024-03-31 08:45:22.000000', '2024-03-31 08:45:22.000000', null, null, 'Faroe Islands', null, 1, 69);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (206, '2024-03-31 08:45:22.000000', '2024-03-31 08:45:22.000000', null, null, 'Îles Féroé', null, 2, 69);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (207, '2024-03-31 08:45:22.000000', '2024-03-31 08:45:22.000000', null, null, 'Islas Feroe', null, 3, 69);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (208, '2024-03-31 08:45:22.000000', '2024-03-31 08:45:22.000000', null, null, 'Fiji', null, 1, 70);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (209, '2024-03-31 08:45:22.000000', '2024-03-31 08:45:22.000000', null, null, 'Fidji', null, 2, 70);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (210, '2024-03-31 08:45:22.000000', '2024-03-31 08:45:22.000000', null, null, 'Fiyi', null, 3, 70);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (211, '2024-03-31 08:45:22.000000', '2024-03-31 08:45:22.000000', null, null, 'Finland', null, 1, 71);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (212, '2024-03-31 08:45:22.000000', '2024-03-31 08:45:22.000000', null, null, 'Finlande', null, 2, 71);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (213, '2024-03-31 08:45:22.000000', '2024-03-31 08:45:22.000000', null, null, 'Finlandia', null, 3, 71);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (214, '2024-03-31 08:45:22.000000', '2024-03-31 08:45:22.000000', null, null, 'France', null, 1, 72);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (215, '2024-03-31 08:45:22.000000', '2024-03-31 08:45:22.000000', null, null, 'France', null, 2, 72);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (216, '2024-03-31 08:45:22.000000', '2024-03-31 08:45:22.000000', null, null, 'Francia', null, 3, 72);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (217, '2024-03-31 08:45:22.000000', '2024-03-31 08:45:22.000000', null, null, 'French Guiana', null, 1, 73);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (218, '2024-03-31 08:45:22.000000', '2024-03-31 08:45:22.000000', null, null, 'Guyane française', null, 2, 73);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (219, '2024-03-31 08:45:22.000000', '2024-03-31 08:45:22.000000', null, null, 'Guayana Francesa', null, 3, 73);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (220, '2024-03-31 08:45:22.000000', '2024-03-31 08:45:22.000000', null, null, 'French Polynesia', null, 1, 74);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (221, '2024-03-31 08:45:22.000000', '2024-03-31 08:45:22.000000', null, null, 'Polynésie française', null, 2, 74);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (222, '2024-03-31 08:45:22.000000', '2024-03-31 08:45:22.000000', null, null, 'Polinesia Francesa', null, 3, 74);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (223, '2024-03-31 08:45:22.000000', '2024-03-31 08:45:22.000000', null, null, 'Gabon', null, 1, 75);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (224, '2024-03-31 08:45:22.000000', '2024-03-31 08:45:22.000000', null, null, 'Gabon', null, 2, 75);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (225, '2024-03-31 08:45:22.000000', '2024-03-31 08:45:22.000000', null, null, 'Gabón', null, 3, 75);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (226, '2024-03-31 08:45:22.000000', '2024-03-31 08:45:22.000000', null, null, 'Gambia', null, 1, 76);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (227, '2024-03-31 08:45:22.000000', '2024-03-31 08:45:22.000000', null, null, 'Gambie', null, 2, 76);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (228, '2024-03-31 08:45:22.000000', '2024-03-31 08:45:22.000000', null, null, 'Gambia', null, 3, 76);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (229, '2024-03-31 08:45:22.000000', '2024-03-31 08:45:22.000000', null, null, 'Georgia', null, 1, 77);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (230, '2024-03-31 08:45:22.000000', '2024-03-31 08:45:22.000000', null, null, 'Géorgie', null, 2, 77);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (231, '2024-03-31 08:45:22.000000', '2024-03-31 08:45:22.000000', null, null, 'Georgia', null, 3, 77);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (232, '2024-03-31 08:45:22.000000', '2024-03-31 08:45:22.000000', null, null, 'Germany', null, 1, 78);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (233, '2024-03-31 08:45:22.000000', '2024-03-31 08:45:22.000000', null, null, 'Allemagne', null, 2, 78);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (234, '2024-03-31 08:45:22.000000', '2024-03-31 08:45:22.000000', null, null, 'Alemania', null, 3, 78);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (235, '2024-03-31 08:45:22.000000', '2024-03-31 08:45:22.000000', null, null, 'Ghana', null, 1, 79);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (236, '2024-03-31 08:45:22.000000', '2024-03-31 08:45:22.000000', null, null, 'Ghana', null, 2, 79);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (237, '2024-03-31 08:45:22.000000', '2024-03-31 08:45:22.000000', null, null, 'Ghana', null, 3, 79);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (238, '2024-03-31 08:45:22.000000', '2024-03-31 08:45:22.000000', null, null, 'Gibraltar', null, 1, 80);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (239, '2024-03-31 08:45:22.000000', '2024-03-31 08:45:22.000000', null, null, 'Gibraltar', null, 2, 80);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (240, '2024-03-31 08:45:22.000000', '2024-03-31 08:45:22.000000', null, null, 'Gibraltar', null, 3, 80);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (241, '2024-03-31 08:45:22.000000', '2024-03-31 08:45:22.000000', null, null, 'Greece', null, 1, 81);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (242, '2024-03-31 08:45:22.000000', '2024-03-31 08:45:22.000000', null, null, 'Grèce', null, 2, 81);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (243, '2024-03-31 08:45:22.000000', '2024-03-31 08:45:22.000000', null, null, 'Grecia', null, 3, 81);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (244, '2024-03-31 08:45:22.000000', '2024-03-31 08:45:22.000000', null, null, 'Greenland', null, 1, 82);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (245, '2024-03-31 08:45:22.000000', '2024-03-31 08:45:22.000000', null, null, 'Groenland', null, 2, 82);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (246, '2024-03-31 08:45:22.000000', '2024-03-31 08:45:22.000000', null, null, 'Groenlandia', null, 3, 82);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (247, '2024-03-31 08:45:22.000000', '2024-03-31 08:45:22.000000', null, null, 'Grenada', null, 1, 83);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (248, '2024-03-31 08:45:22.000000', '2024-03-31 08:45:22.000000', null, null, 'Grenade', null, 2, 83);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (249, '2024-03-31 08:45:22.000000', '2024-03-31 08:45:22.000000', null, null, 'Granada', null, 3, 83);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (250, '2024-03-31 08:45:22.000000', '2024-03-31 08:45:22.000000', null, null, 'Guadeloupe', null, 1, 84);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (251, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'Guadeloupe', null, 2, 84);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (252, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'Guadalupe', null, 3, 84);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (253, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'Guam', null, 1, 85);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (254, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'Guam', null, 2, 85);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (255, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'Guam', null, 3, 85);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (256, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'Guatemala', null, 1, 86);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (257, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'Guatemala', null, 2, 86);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (258, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'Guatemala', null, 3, 86);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (259, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'Guernsey', null, 1, 87);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (260, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'Guernesey', null, 2, 87);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (261, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'Guernsey', null, 3, 87);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (262, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'Guinea', null, 1, 88);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (263, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'Guinée', null, 2, 88);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (264, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'Guinea', null, 3, 88);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (265, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'Guinea-Bissau', null, 1, 89);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (266, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'Guinée-Bissau', null, 2, 89);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (267, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'Guinea-Bisáu', null, 3, 89);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (268, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'Guyana', null, 1, 90);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (269, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'Guyana', null, 2, 90);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (270, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'Guyana', null, 3, 90);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (271, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'Haiti', null, 1, 91);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (272, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'Haïti', null, 2, 91);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (273, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'Haití', null, 3, 91);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (274, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'Vatican City', null, 1, 92);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (275, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'État de la Cité du Vatican', null, 2, 92);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (276, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'Ciudad del Vaticano', null, 3, 92);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (277, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'Honduras', null, 1, 93);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (278, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'Honduras', null, 2, 93);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (279, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'Honduras', null, 3, 93);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (280, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'Hong Kong SAR China', null, 1, 94);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (281, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'R.A.S. chinoise de Hong Kong', null, 2, 94);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (282, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'RAE de Hong Kong (China)', null, 3, 94);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (283, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'Hungary', null, 1, 95);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (284, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'Hongrie', null, 2, 95);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (285, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'Hungría', null, 3, 95);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (286, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'Iceland', null, 1, 96);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (287, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'Islande', null, 2, 96);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (288, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'Islandia', null, 3, 96);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (289, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'India', null, 1, 97);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (290, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'Inde', null, 2, 97);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (291, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'India', null, 3, 97);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (292, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'Indonesia', null, 1, 98);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (293, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'Indonésie', null, 2, 98);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (294, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'Indonesia', null, 3, 98);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (295, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'Iran', null, 1, 99);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (296, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'Iran', null, 2, 99);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (297, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'Irán', null, 3, 99);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (298, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'Iraq', null, 1, 100);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (299, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'Irak', null, 2, 100);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (300, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'Irak', null, 3, 100);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (301, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'Ireland', null, 1, 101);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (302, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'Irlande', null, 2, 101);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (303, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'Irlanda', null, 3, 101);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (304, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'Isle of Man', null, 1, 102);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (305, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'Île de Man', null, 2, 102);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (306, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'Isla de Man', null, 3, 102);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (307, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'Israel', null, 1, 103);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (308, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'Israël', null, 2, 103);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (309, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'Israel', null, 3, 103);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (310, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'Italy', null, 1, 104);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (311, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'Italie', null, 2, 104);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (312, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'Italia', null, 3, 104);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (313, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'Jamaica', null, 1, 105);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (314, '2024-03-31 08:45:23.000000', '2024-03-31 08:45:23.000000', null, null, 'Jamaïque', null, 2, 105);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (315, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Jamaica', null, 3, 105);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (316, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Japan', null, 1, 106);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (317, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Japon', null, 2, 106);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (318, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Japón', null, 3, 106);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (319, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Jersey', null, 1, 107);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (320, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Jersey', null, 2, 107);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (321, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Jersey', null, 3, 107);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (322, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Jordan', null, 1, 108);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (323, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Jordanie', null, 2, 108);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (324, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Jordania', null, 3, 108);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (325, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Kazakhstan', null, 1, 109);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (326, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Kazakhstan', null, 2, 109);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (327, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Kazajistán', null, 3, 109);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (328, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Kenya', null, 1, 110);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (329, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Kenya', null, 2, 110);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (330, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Kenia', null, 3, 110);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (331, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Kiribati', null, 1, 111);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (332, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Kiribati', null, 2, 111);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (333, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Kiribati', null, 3, 111);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (334, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'North Korea', null, 1, 112);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (335, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Corée du Nord', null, 2, 112);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (336, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Corea del Norte', null, 3, 112);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (337, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'South Korea', null, 1, 113);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (338, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Corée du Sud', null, 2, 113);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (339, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Corea del Sur', null, 3, 113);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (340, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Kuwait', null, 1, 114);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (341, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Koweït', null, 2, 114);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (342, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Kuwait', null, 3, 114);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (343, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Kyrgyzstan', null, 1, 115);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (344, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Kirghizistan', null, 2, 115);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (345, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Kirguistán', null, 3, 115);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (346, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Laos', null, 1, 116);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (347, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Laos', null, 2, 116);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (348, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Laos', null, 3, 116);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (349, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Latvia', null, 1, 117);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (350, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Lettonie', null, 2, 117);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (351, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Letonia', null, 3, 117);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (352, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Lebanon', null, 1, 118);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (353, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Liban', null, 2, 118);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (354, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Líbano', null, 3, 118);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (355, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Lesotho', null, 1, 119);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (356, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Lesotho', null, 2, 119);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (357, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Lesoto', null, 3, 119);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (358, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Liberia', null, 1, 120);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (359, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Libéria', null, 2, 120);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (360, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Liberia', null, 3, 120);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (361, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Libya', null, 1, 121);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (362, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Libye', null, 2, 121);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (363, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Libia', null, 3, 121);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (364, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Liechtenstein', null, 1, 122);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (365, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Liechtenstein', null, 2, 122);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (366, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Liechtenstein', null, 3, 122);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (367, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Lithuania', null, 1, 123);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (368, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Lituanie', null, 2, 123);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (369, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Lituania', null, 3, 123);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (370, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Luxembourg', null, 1, 124);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (371, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Luxembourg', null, 2, 124);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (372, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Luxemburgo', null, 3, 124);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (373, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Macau SAR China', null, 1, 125);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (374, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'R.A.S. chinoise de Macao', null, 2, 125);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (375, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'RAE de Macao (China)', null, 3, 125);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (376, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Macedonia', null, 1, 126);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (377, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Macédoine', null, 2, 126);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (378, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Macedonia', null, 3, 126);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (379, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Madagascar', null, 1, 127);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (380, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Madagascar', null, 2, 127);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (381, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Madagascar', null, 3, 127);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (382, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Malawi', null, 1, 128);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (383, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Malawi', null, 2, 128);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (384, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Malaui', null, 3, 128);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (385, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Malaysia', null, 1, 129);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (386, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Malaisie', null, 2, 129);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (387, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Malasia', null, 3, 129);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (388, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Mali', null, 1, 130);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (389, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Mali', null, 2, 130);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (390, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Mali', null, 3, 130);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (391, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Malta', null, 1, 131);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (392, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Malte', null, 2, 131);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (393, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Malta', null, 3, 131);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (394, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Marshall Islands', null, 1, 132);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (395, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Îles Marshall', null, 2, 132);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (396, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Islas Marshall', null, 3, 132);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (397, '2024-03-31 08:45:24.000000', '2024-03-31 08:45:24.000000', null, null, 'Martinique', null, 1, 133);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (398, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'Martinique', null, 2, 133);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (399, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'Martinica', null, 3, 133);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (400, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'Mauritania', null, 1, 134);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (401, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'Mauritanie', null, 2, 134);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (402, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'Mauritania', null, 3, 134);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (403, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'Mauritius', null, 1, 135);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (404, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'Maurice', null, 2, 135);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (405, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'Mauricio', null, 3, 135);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (406, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'Mayotte', null, 1, 136);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (407, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'Mayotte', null, 2, 136);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (408, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'Mayotte', null, 3, 136);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (409, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'Mexico', null, 1, 137);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (410, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'Mexique', null, 2, 137);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (411, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'México', null, 3, 137);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (412, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'Micronesia', null, 1, 138);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (413, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'États fédérés de Micronésie', null, 2, 138);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (414, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'Micronesia', null, 3, 138);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (415, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'Moldova', null, 1, 139);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (416, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'Moldavie', null, 2, 139);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (417, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'Moldavia', null, 3, 139);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (418, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'Monaco', null, 1, 140);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (419, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'Monaco', null, 2, 140);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (420, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'Mónaco', null, 3, 140);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (421, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'Mongolia', null, 1, 141);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (422, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'Mongolie', null, 2, 141);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (423, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'Mongolia', null, 3, 141);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (424, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'Montenegro', null, 1, 142);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (425, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'Monténégro', null, 2, 142);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (426, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'Montenegro', null, 3, 142);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (427, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'Montserrat', null, 1, 143);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (428, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'Montserrat', null, 2, 143);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (429, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'Montserrat', null, 3, 143);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (430, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'Morocco', null, 1, 144);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (431, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'Maroc', null, 2, 144);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (432, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'Marruecos', null, 3, 144);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (433, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'Mozambique', null, 1, 145);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (434, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'Mozambique', null, 2, 145);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (435, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'Mozambique', null, 3, 145);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (436, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'Myanmar (Burma)', null, 1, 146);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (437, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'Myanmar (Birmanie)', null, 2, 146);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (438, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'Myanmar (Birmania)', null, 3, 146);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (439, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'Namibia', null, 1, 147);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (440, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'Namibie', null, 2, 147);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (441, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'Namibia', null, 3, 147);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (442, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'Nauru', null, 1, 148);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (443, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'Nauru', null, 2, 148);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (444, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'Nauru', null, 3, 148);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (445, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'Nepal', null, 1, 149);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (446, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'Népal', null, 2, 149);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (447, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'Nepal', null, 3, 149);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (448, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'Netherlands', null, 1, 150);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (449, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'Pays-Bas', null, 2, 150);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (450, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'Países Bajos', null, 3, 150);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (451, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'New Caledonia', null, 1, 151);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (452, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'Nouvelle-Calédonie', null, 2, 151);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (453, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'Nueva Caledonia', null, 3, 151);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (454, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'New Zealand', null, 1, 152);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (455, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'Nouvelle-Zélande', null, 2, 152);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (456, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'Nueva Zelanda', null, 3, 152);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (457, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'Nicaragua', null, 1, 153);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (458, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'Nicaragua', null, 2, 153);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (459, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'Nicaragua', null, 3, 153);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (460, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'Niger', null, 1, 154);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (461, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'Niger', null, 2, 154);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (462, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'Níger', null, 3, 154);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (463, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'Nigeria', null, 1, 155);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (464, '2024-03-31 08:45:25.000000', '2024-03-31 08:45:25.000000', null, null, 'Nigéria', null, 2, 155);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (465, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'Nigeria', null, 3, 155);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (466, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'Niue', null, 1, 156);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (467, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'Niue', null, 2, 156);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (468, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'Niue', null, 3, 156);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (469, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'Norfolk Island', null, 1, 157);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (470, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'Île Norfolk', null, 2, 157);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (471, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'Isla Norfolk', null, 3, 157);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (472, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'Northern Mariana Islands', null, 1, 158);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (473, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'Îles Mariannes du Nord', null, 2, 158);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (474, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'Islas Marianas del Norte', null, 3, 158);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (475, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'Norway', null, 1, 159);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (476, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'Norvège', null, 2, 159);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (477, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'Noruega', null, 3, 159);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (478, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'Oman', null, 1, 160);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (479, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'Oman', null, 2, 160);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (480, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'Omán', null, 3, 160);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (481, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'Pakistan', null, 1, 161);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (482, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'Pakistan', null, 2, 161);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (483, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'Pakistán', null, 3, 161);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (484, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'Palau', null, 1, 162);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (485, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'Palaos', null, 2, 162);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (486, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'Palaos', null, 3, 162);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (487, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'Palestinian Territories', null, 1, 163);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (488, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'Territoires palestiniens', null, 2, 163);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (489, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'Territorios Palestinos', null, 3, 163);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (490, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'Panama', null, 1, 164);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (491, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'Panama', null, 2, 164);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (492, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'Panamá', null, 3, 164);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (493, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'Papua New Guinea', null, 1, 165);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (494, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'Papouasie-Nouvelle-Guinée', null, 2, 165);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (495, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'Papúa Nueva Guinea', null, 3, 165);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (496, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'Paraguay', null, 1, 166);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (497, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'Paraguay', null, 2, 166);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (498, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'Paraguay', null, 3, 166);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (499, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'Peru', null, 1, 167);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (500, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'Pérou', null, 2, 167);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (501, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'Perú', null, 3, 167);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (502, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'Philippines', null, 1, 168);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (503, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'Philippines', null, 2, 168);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (504, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'Filipinas', null, 3, 168);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (505, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'Pitcairn Islands', null, 1, 169);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (506, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'Îles Pitcairn', null, 2, 169);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (507, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'Islas Pitcairn', null, 3, 169);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (508, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'Poland', null, 1, 170);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (509, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'Pologne', null, 2, 170);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (510, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'Polonia', null, 3, 170);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (511, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'Portugal', null, 1, 171);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (512, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'Portugal', null, 2, 171);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (513, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'Portugal', null, 3, 171);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (514, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'Puerto Rico', null, 1, 172);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (515, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'Porto Rico', null, 2, 172);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (516, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'Puerto Rico', null, 3, 172);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (517, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'Qatar', null, 1, 173);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (518, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'Qatar', null, 2, 173);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (519, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'Catar', null, 3, 173);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (520, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'Réunion', null, 1, 174);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (521, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'La Réunion', null, 2, 174);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (522, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'Reunión', null, 3, 174);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (523, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'Romania', null, 1, 175);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (524, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'Roumanie', null, 2, 175);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (525, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'Rumanía', null, 3, 175);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (526, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'Russia', null, 1, 176);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (527, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'Russie', null, 2, 176);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (528, '2024-03-31 08:45:26.000000', '2024-03-31 08:45:26.000000', null, null, 'Rusia', null, 3, 176);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (529, '2024-03-31 08:45:27.000000', '2024-03-31 08:45:27.000000', null, null, 'Rwanda', null, 1, 177);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (530, '2024-03-31 08:45:27.000000', '2024-03-31 08:45:27.000000', null, null, 'Rwanda', null, 2, 177);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (531, '2024-03-31 08:45:27.000000', '2024-03-31 08:45:27.000000', null, null, 'Ruanda', null, 3, 177);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (532, '2024-03-31 08:45:27.000000', '2024-03-31 08:45:27.000000', null, null, 'St. Helena', null, 1, 178);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (533, '2024-03-31 08:45:27.000000', '2024-03-31 08:45:27.000000', null, null, 'Sainte-Hélène', null, 2, 178);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (534, '2024-03-31 08:45:27.000000', '2024-03-31 08:45:27.000000', null, null, 'Santa Elena', null, 3, 178);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (535, '2024-03-31 08:45:27.000000', '2024-03-31 08:45:27.000000', null, null, 'St. Kitts & Nevis', null, 1, 179);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (536, '2024-03-31 08:45:27.000000', '2024-03-31 08:45:27.000000', null, null, 'Saint-Christophe-et-Niévès', null, 2, 179);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (537, '2024-03-31 08:45:27.000000', '2024-03-31 08:45:27.000000', null, null, 'San Cristóbal y Nieves', null, 3, 179);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (538, '2024-03-31 08:45:27.000000', '2024-03-31 08:45:27.000000', null, null, 'St. Lucia', null, 1, 180);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (539, '2024-03-31 08:45:27.000000', '2024-03-31 08:45:27.000000', null, null, 'Sainte-Lucie', null, 2, 180);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (540, '2024-03-31 08:45:27.000000', '2024-03-31 08:45:27.000000', null, null, 'Santa Lucía', null, 3, 180);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (541, '2024-03-31 08:45:27.000000', '2024-03-31 08:45:27.000000', null, null, 'St. Pierre & Miquelon', null, 1, 181);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (542, '2024-03-31 08:45:27.000000', '2024-03-31 08:45:27.000000', null, null, 'Saint-Pierre-et-Miquelon', null, 2, 181);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (543, '2024-03-31 08:45:27.000000', '2024-03-31 08:45:27.000000', null, null, 'San Pedro y Miquelón', null, 3, 181);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (544, '2024-03-31 08:45:27.000000', '2024-03-31 08:45:27.000000', null, null, 'St. Vincent & Grenadines', null, 1, 182);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (545, '2024-03-31 08:45:27.000000', '2024-03-31 08:45:27.000000', null, null, 'Saint-Vincent-et-les-Grenadines', null, 2, 182);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (546, '2024-03-31 08:45:27.000000', '2024-03-31 08:45:27.000000', null, null, 'San Vicente y las Granadinas', null, 3, 182);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (547, '2024-03-31 08:45:27.000000', '2024-03-31 08:45:27.000000', null, null, 'Samoa', null, 1, 183);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (548, '2024-03-31 08:45:27.000000', '2024-03-31 08:45:27.000000', null, null, 'Samoa', null, 2, 183);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (549, '2024-03-31 08:45:27.000000', '2024-03-31 08:45:27.000000', null, null, 'Samoa', null, 3, 183);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (550, '2024-03-31 08:45:27.000000', '2024-03-31 08:45:27.000000', null, null, 'San Marino', null, 1, 184);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (551, '2024-03-31 08:45:27.000000', '2024-03-31 08:45:27.000000', null, null, 'Saint-Marin', null, 2, 184);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (552, '2024-03-31 08:45:27.000000', '2024-03-31 08:45:27.000000', null, null, 'San Marino', null, 3, 184);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (553, '2024-03-31 08:45:27.000000', '2024-03-31 08:45:27.000000', null, null, 'São Tomé & Príncipe', null, 1, 185);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (554, '2024-03-31 08:45:27.000000', '2024-03-31 08:45:27.000000', null, null, 'Sao Tomé-et-Principe', null, 2, 185);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (555, '2024-03-31 08:45:27.000000', '2024-03-31 08:45:27.000000', null, null, 'Santo Tomé y Príncipe', null, 3, 185);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (556, '2024-03-31 08:45:27.000000', '2024-03-31 08:45:27.000000', null, null, 'Saudi Arabia', null, 1, 186);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (557, '2024-03-31 08:45:27.000000', '2024-03-31 08:45:27.000000', null, null, 'Arabie saoudite', null, 2, 186);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (558, '2024-03-31 08:45:27.000000', '2024-03-31 08:45:27.000000', null, null, 'Arabia Saudí', null, 3, 186);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (559, '2024-03-31 08:45:27.000000', '2024-03-31 08:45:27.000000', null, null, 'Senegal', null, 1, 187);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (560, '2024-03-31 08:45:27.000000', '2024-03-31 08:45:27.000000', null, null, 'Sénégal', null, 2, 187);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (561, '2024-03-31 08:45:27.000000', '2024-03-31 08:45:27.000000', null, null, 'Senegal', null, 3, 187);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (562, '2024-03-31 08:45:27.000000', '2024-03-31 08:45:27.000000', null, null, 'Serbia', null, 1, 188);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (563, '2024-03-31 08:45:27.000000', '2024-03-31 08:45:27.000000', null, null, 'Serbie', null, 2, 188);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (564, '2024-03-31 08:45:27.000000', '2024-03-31 08:45:27.000000', null, null, 'Serbia', null, 3, 188);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (565, '2024-03-31 08:45:27.000000', '2024-03-31 08:45:27.000000', null, null, 'Seychelles', null, 1, 189);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (566, '2024-03-31 08:45:27.000000', '2024-03-31 08:45:27.000000', null, null, 'Seychelles', null, 2, 189);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (567, '2024-03-31 08:45:27.000000', '2024-03-31 08:45:27.000000', null, null, 'Seychelles', null, 3, 189);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (568, '2024-03-31 08:45:27.000000', '2024-03-31 08:45:27.000000', null, null, 'Sierra Leone', null, 1, 190);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (569, '2024-03-31 08:45:27.000000', '2024-03-31 08:45:27.000000', null, null, 'Sierra Leone', null, 2, 190);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (570, '2024-03-31 08:45:27.000000', '2024-03-31 08:45:27.000000', null, null, 'Sierra Leona', null, 3, 190);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (571, '2024-03-31 08:45:27.000000', '2024-03-31 08:45:27.000000', null, null, 'Singapore', null, 1, 191);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (572, '2024-03-31 08:45:27.000000', '2024-03-31 08:45:27.000000', null, null, 'Singapour', null, 2, 191);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (573, '2024-03-31 08:45:27.000000', '2024-03-31 08:45:27.000000', null, null, 'Singapur', null, 3, 191);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (574, '2024-03-31 08:45:27.000000', '2024-03-31 08:45:27.000000', null, null, 'Slovakia', null, 1, 192);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (575, '2024-03-31 08:45:27.000000', '2024-03-31 08:45:27.000000', null, null, 'Slovaquie', null, 2, 192);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (576, '2024-03-31 08:45:27.000000', '2024-03-31 08:45:27.000000', null, null, 'Eslovaquia', null, 3, 192);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (577, '2024-03-31 08:45:27.000000', '2024-03-31 08:45:27.000000', null, null, 'Slovenia', null, 1, 193);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (578, '2024-03-31 08:45:27.000000', '2024-03-31 08:45:27.000000', null, null, 'Slovénie', null, 2, 193);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (579, '2024-03-31 08:45:27.000000', '2024-03-31 08:45:27.000000', null, null, 'Eslovenia', null, 3, 193);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (580, '2024-03-31 08:45:27.000000', '2024-03-31 08:45:27.000000', null, null, 'Solomon Islands', null, 1, 194);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (581, '2024-03-31 08:45:27.000000', '2024-03-31 08:45:27.000000', null, null, 'Îles Salomon', null, 2, 194);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (582, '2024-03-31 08:45:27.000000', '2024-03-31 08:45:27.000000', null, null, 'Islas Salomón', null, 3, 194);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (583, '2024-03-31 08:45:27.000000', '2024-03-31 08:45:27.000000', null, null, 'Somalia', null, 1, 195);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (584, '2024-03-31 08:45:27.000000', '2024-03-31 08:45:27.000000', null, null, 'Somalie', null, 2, 195);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (585, '2024-03-31 08:45:27.000000', '2024-03-31 08:45:27.000000', null, null, 'Somalia', null, 3, 195);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (586, '2024-03-31 08:45:27.000000', '2024-03-31 08:45:27.000000', null, null, 'South Africa', null, 1, 196);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (587, '2024-03-31 08:45:27.000000', '2024-03-31 08:45:27.000000', null, null, 'Afrique du Sud', null, 2, 196);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (588, '2024-03-31 08:45:27.000000', '2024-03-31 08:45:27.000000', null, null, 'Sudáfrica', null, 3, 196);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (589, '2024-03-31 08:45:27.000000', '2024-03-31 08:45:27.000000', null, null, 'Spain', null, 1, 197);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (590, '2024-03-31 08:45:27.000000', '2024-03-31 08:45:27.000000', null, null, 'Espagne', null, 2, 197);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (591, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'España', null, 3, 197);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (592, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Sri Lanka', null, 1, 198);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (593, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Sri Lanka', null, 2, 198);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (594, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Sri Lanka', null, 3, 198);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (595, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Sudan', null, 1, 199);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (596, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Soudan', null, 2, 199);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (597, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Sudán', null, 3, 199);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (598, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Suriname', null, 1, 200);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (599, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Suriname', null, 2, 200);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (600, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Surinam', null, 3, 200);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (601, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Svalbard & Jan Mayen', null, 1, 201);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (602, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Svalbard et Jan Mayen', null, 2, 201);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (603, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Svalbard y Jan Mayen', null, 3, 201);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (604, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Swaziland', null, 1, 202);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (605, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Swaziland', null, 2, 202);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (606, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Suazilandia', null, 3, 202);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (607, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Sweden', null, 1, 203);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (608, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Suède', null, 2, 203);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (609, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Suecia', null, 3, 203);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (610, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Switzerland', null, 1, 204);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (611, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Suisse', null, 2, 204);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (612, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Suiza', null, 3, 204);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (613, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Syria', null, 1, 205);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (614, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Syrie', null, 2, 205);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (615, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Siria', null, 3, 205);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (616, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Taiwan', null, 1, 206);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (617, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Taïwan', null, 2, 206);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (618, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Taiwán', null, 3, 206);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (619, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Tajikistan', null, 1, 207);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (620, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Tadjikistan', null, 2, 207);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (621, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Tayikistán', null, 3, 207);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (622, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Tanzania', null, 1, 208);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (623, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Tanzanie', null, 2, 208);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (624, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Tanzania', null, 3, 208);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (625, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Thailand', null, 1, 209);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (626, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Thaïlande', null, 2, 209);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (627, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Tailandia', null, 3, 209);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (628, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Timor-Leste', null, 1, 210);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (629, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Timor oriental', null, 2, 210);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (630, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Timor-Leste', null, 3, 210);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (631, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Togo', null, 1, 211);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (632, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Togo', null, 2, 211);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (633, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Togo', null, 3, 211);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (634, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Tokelau', null, 1, 212);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (635, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Tokélaou', null, 2, 212);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (636, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Tokelau', null, 3, 212);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (637, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Tonga', null, 1, 213);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (638, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Tonga', null, 2, 213);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (639, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Tonga', null, 3, 213);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (640, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Trinidad & Tobago', null, 1, 214);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (641, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Trinité-et-Tobago', null, 2, 214);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (642, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Trinidad y Tobago', null, 3, 214);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (643, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Tunisia', null, 1, 215);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (644, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Tunisie', null, 2, 215);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (645, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Túnez', null, 3, 215);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (646, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Turkey', null, 1, 216);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (647, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Turquie', null, 2, 216);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (648, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Turquía', null, 3, 216);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (649, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Turkmenistan', null, 1, 217);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (650, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Turkménistan', null, 2, 217);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (651, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Turkmenistán', null, 3, 217);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (652, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Turks & Caicos Islands', null, 1, 218);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (653, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Îles Turques-et-Caïques', null, 2, 218);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (654, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Islas Turcas y Caicos', null, 3, 218);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (655, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Tuvalu', null, 1, 219);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (656, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Tuvalu', null, 2, 219);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (657, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Tuvalu', null, 3, 219);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (658, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Uganda', null, 1, 220);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (659, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Ouganda', null, 2, 220);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (660, '2024-03-31 08:45:28.000000', '2024-03-31 08:45:28.000000', null, null, 'Uganda', null, 3, 220);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (661, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Ukraine', null, 1, 221);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (662, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Ukraine', null, 2, 221);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (663, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Ucrania', null, 3, 221);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (664, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'United Arab Emirates', null, 1, 222);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (665, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Émirats arabes unis', null, 2, 222);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (666, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Emiratos Árabes Unidos', null, 3, 222);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (667, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'United Kingdom', null, 1, 223);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (668, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Royaume-Uni', null, 2, 223);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (669, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Reino Unido', null, 3, 223);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (670, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'United States', null, 1, 224);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (671, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'États-Unis', null, 2, 224);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (672, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Estados Unidos', null, 3, 224);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (673, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'U.S. Outlying Islands', null, 1, 225);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (674, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Îles mineures éloignées des États-Unis', null, 2, 225);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (675, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Islas menores alejadas de EE. UU.', null, 3, 225);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (676, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Uruguay', null, 1, 226);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (677, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Uruguay', null, 2, 226);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (678, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Uruguay', null, 3, 226);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (679, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Uzbekistan', null, 1, 227);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (680, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Ouzbékistan', null, 2, 227);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (681, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Uzbekistán', null, 3, 227);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (682, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Vanuatu', null, 1, 228);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (683, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Vanuatu', null, 2, 228);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (684, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Vanuatu', null, 3, 228);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (685, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Venezuela', null, 1, 229);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (686, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Venezuela', null, 2, 229);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (687, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Venezuela', null, 3, 229);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (688, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Vietnam', null, 1, 230);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (689, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Vietnam', null, 2, 230);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (690, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Vietnam', null, 3, 230);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (691, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'British Virgin Islands', null, 1, 231);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (692, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Îles Vierges britanniques', null, 2, 231);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (693, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Islas Vírgenes Británicas', null, 3, 231);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (694, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'U.S. Virgin Islands', null, 1, 232);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (695, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Îles Vierges des États-Unis', null, 2, 232);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (696, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Islas Vírgenes de EE. UU.', null, 3, 232);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (697, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Wallis & Futuna', null, 1, 233);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (698, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Wallis-et-Futuna', null, 2, 233);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (699, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Wallis y Futuna', null, 3, 233);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (700, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Western Sahara', null, 1, 234);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (701, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Sahara occidental', null, 2, 234);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (702, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Sáhara Occidental', null, 3, 234);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (703, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Yemen', null, 1, 235);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (704, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Yémen', null, 2, 235);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (705, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Yemen', null, 3, 235);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (706, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Zambia', null, 1, 236);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (707, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Zambie', null, 2, 236);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (708, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Zambia', null, 3, 236);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (709, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Zimbabwe', null, 1, 237);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (710, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Zimbabwe', null, 2, 237);
+INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (711, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Zimbabue', null, 3, 237);
 
 
 
-INSERT INTO store.ZONE (ZONE_ID, ZONE_CODE, COUNTRY_ID)
-VALUES (1, 'Guipuzcoa', 197),
-       (2, 'HI', 224),
-       (3, 'PR', 224),
-       (4, 'Zamora', 197),
-       (5, 'Vizcaya', 197),
-       (6, 'OTR', 166),
-       (7, 'Albacete', 197),
-       (8, 'Lleida', 197),
-       (9, 'QC', 37),
-       (10, 'NRW', 78),
-       (11, 'IA', 224),
-       (12, 'ID', 224),
-       (13, 'YT', 37),
-       (14, 'Leon', 197),
-       (15, 'ACorua', 197),
-       (16, 'Castellon', 197),
-       (17, 'LasPalmas', 197),
-       (18, 'Pontevedra', 197),
-       (19, 'AA', 224),
-       (20, 'Teruel', 197),
-       (21, 'AB', 37),
-       (22, 'AC', 224),
-       (23, 'IL', 224),
-       (24, 'AE', 224),
-       (25, 'AF', 224),
-       (26, 'IN', 224),
-       (27, 'AG', 204),
-       (28, 'A Corua', 197),
-       (29, 'AI', 204),
-       (30, 'AK', 224),
-       (31, 'Caceres', 197),
-       (32, 'Segovia', 197),
-       (33, 'AL', 224),
-       (34, 'AM', 224),
-       (35, 'ZG', 204),
-       (36, 'Malaga', 197),
-       (37, 'CEN', 166),
-       (38, 'ZH', 204),
-       (39, 'LaRioja', 197),
-       (40, 'AP', 224),
-       (41, 'Melilla', 197),
-       (42, 'AR', 224),
-       (43, 'AS', 224),
-       (44, 'NSW', 13),
-       (45, 'Madrid', 197),
-       (46, 'RI', 224),
-       (47, 'AZ', 224),
-       (48, 'Ceuta', 197),
-       (49, 'BC', 37),
-       (50, 'Huelva', 197),
-       (51, 'BE', 204),
-       (52, 'Huesca', 197),
-       (53, 'ARCH', 204),
-       (54, 'BL', 204),
-       (55, 'JU', 204),
-       (56, 'Asturias', 197),
-       (57, 'SA', 13),
-       (58, 'SB', 14),
-       (59, 'TIAT', 14),
-       (60, 'SC', 224),
-       (61, 'THE', 78),
-       (62, 'SD', 224),
-       (63, 'BS', 204),
-       (64, 'Cordoba', 197),
-       (65, 'Tarragona', 197),
-       (66, 'Valladolid', 197),
-       (67, 'SG', 204),
-       (68, 'SH', 204),
-       (69, 'WAAU', 13),
-       (70, 'SK', 37),
-       (71, 'NDS', 78),
-       (72, 'SO', 204),
-       (73, 'CA', 224),
-       (74, 'NTAU', 13),
-       (75, 'ST', 14),
-       (76, 'KN', 14),
-       (77, 'Jaen', 197),
-       (78, 'ASU', 166),
-       (79, 'CiudadReal', 197),
-       (80, 'SZ', 204),
-       (81, 'Alava', 197),
-       (82, 'KS', 224),
-       (83, 'CO', 224),
-       (84, 'KY', 224),
-       (85, 'BER', 78),
-       (86, 'CT', 224),
-       (87, 'ACT', 13),
-       (88, 'TG', 204),
-       (89, 'LA', 224),
-       (90, 'HAM', 78),
-       (91, 'TI', 204),
-       (92, 'Lugo', 197),
-       (93, 'NECH', 204),
-       (94, 'TN', 224),
-       (95, 'Toledo', 197),
-       (96, 'DC', 224),
-       (97, 'Palencia', 197),
-       (98, 'DE', 224),
-       (99, 'TX', 224),
-       (100, 'TAS', 13),
-       (101, 'QLD', 13),
-       (102, 'LU', 204),
-       (103, 'Burgos', 197),
-       (104, 'Cadiz', 197),
-       (105, 'SantaCruzdeTenerife', 197),
-       (106, 'MA', 224),
-       (107, 'MB', 37),
-       (108, 'MD', 224),
-       (109, 'Girona', 197),
-       (110, 'ME', 224),
-       (111, 'Alicante', 197),
-       (112, 'Guadalajara', 197),
-       (113, 'Cantabria', 197),
-       (114, 'MH', 224),
-       (115, 'MI', 224),
-       (116, 'UR', 204),
-       (117, 'UT', 224),
-       (118, 'MN', 224),
-       (119, 'MO', 224),
-       (120, 'MP', 224),
-       (121, 'Barcelona', 197),
-       (122, 'MS', 224),
-       (123, 'MT', 224),
-       (124, 'Badajoz', 197),
-       (125, 'MEC', 78),
-       (126, 'VA', 224),
-       (127, 'VB', 14),
-       (128, 'Cuenca', 197),
-       (129, 'WIAT', 14),
-       (130, 'VD', 204),
-       (131, 'Sevilla', 197),
-       (132, 'VI', 224),
-       (133, 'Zaragoza', 197),
-       (134, 'NB', 37),
-       (135, 'SAC', 78),
-       (136, 'NC', 224),
-       (137, 'ND', 224),
-       (138, 'NE', 224),
-       (139, 'NF', 37),
-       (140, 'NH', 224),
-       (141, 'NJ', 224),
-       (142, 'VS', 204),
-       (143, 'VT', 224),
-       (144, 'NM', 224),
-       (145, 'NO', 14),
-       (146, 'SAS', 78),
-       (147, 'NS', 37),
-       (148, 'SAR', 78),
-       (149, 'FL', 224),
-       (150, 'NT', 37),
-       (151, 'FM', 224),
-       (152, 'NU', 37),
-       (153, 'NV', 224),
-       (154, 'NW', 204),
-       (155, 'WA', 224),
-       (156, 'NY', 224),
-       (157, 'Granada', 197),
-       (158, 'Soria', 197),
-       (159, 'FR', 204),
-       (160, 'RHE', 78),
-       (161, 'Ourense', 197),
-       (162, 'WI', 224),
-       (163, 'OH', 224),
-       (164, 'GA', 224),
-       (165, 'Murcia', 197),
-       (166, 'OK', 224),
-       (167, 'GE', 204),
-       (168, 'WV', 224),
-       (169, 'ON', 37),
-       (170, 'OO', 14),
-       (171, 'WY', 224),
-       (172, 'BLAT', 14),
-       (173, 'Avila', 197),
-       (174, 'OR', 224),
-       (175, 'Salamanca', 197),
-       (176, 'GL', 204),
-       (177, 'Baleares', 197),
-       (178, 'OW', 204),
-       (179, 'GR', 204),
-       (180, 'GU', 224),
-       (181, 'PA', 224),
-       (182, 'VIC', 13),
-       (183, 'BRE', 78),
-       (184, 'PE', 37),
-       (185, 'BRG', 78),
-       (186, 'HES', 78),
-       (187, 'Almeria', 197),
-       (188, 'BAW', 78),
-       (189, 'BAY', 78),
-       (190, 'Navarra', 197),
-       (191, 'Valencia', 197),
-       (192, 'SCN', 78),
-       (193, 'AndhraPradesh', 97),
-       (194, 'ArunachalPradesh', 97),
-       (195, 'Assam', 97),
-       (196, 'Bihar', 97),
-       (197, 'Chhattisgarh', 97),
-       (198, 'Goa', 97),
-       (199, 'Gujarat', 97),
-       (200, 'Haryana', 97),
-       (201, 'HimachalPradesh', 97),
-       (202, 'Jharkhand', 97),
-       (203, 'Karnataka', 97),
-       (204, 'Kerala', 97),
-       (205, 'MadhyaPradesh', 97),
-       (206, 'Maharashtra', 97),
-       (207, 'Manipur', 97),
-       (208, 'Meghalaya', 97),
-       (209, 'Mizoram', 97),
-       (210, 'Nagaland', 97),
-       (211, 'Odisha', 97),
-       (212, 'Punjab', 97),
-       (213, 'Rajasthan', 97),
-       (214, 'Sikkim', 97),
-       (215, 'TamilNadu', 97),
-       (216, 'Telangana', 97),
-       (217, 'Tripura', 97),
-       (218, 'Uttarakhand', 97),
-       (219, 'WestBengal', 97);
-INSERT INTO store.ZONE_DESCRIPTION (DESCRIPTION_ID, DATE_CREATED, DATE_MODIFIED, UPDT_ID, DESCRIPTION, NAME, TITLE,
-                                    LANGUAGE_ID, ZONE_ID)
-VALUES (1, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Guipuzcoa', NULL, 1, 1),
-       (2, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Guipuzcoa', NULL, 2, 1),
-       (3, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Guipuzcoa', NULL, 3, 1),
-       (4, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Hawaii', NULL, 1, 2),
-       (5, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Hawaii', NULL, 2, 2),
-       (6, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Hawaii', NULL, 3, 2),
-       (7, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Puerto Rico', NULL, 1, 3),
-       (8, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Puerto Rico', NULL, 2, 3),
-       (9, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Puerto Rico', NULL, 3, 3),
-       (10, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Zamora', NULL, 1, 4),
-       (11, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Zamora', NULL, 2, 4),
-       (12, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Zamora', NULL, 3, 4),
-       (13, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Vizcaya', NULL, 1, 5),
-       (14, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Vizcaya', NULL, 2, 5),
-       (15, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Vizcaya', NULL, 3, 5),
-       (16, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Other', NULL, 1, 6),
-       (17, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Otro', NULL, 3, 6),
-       (18, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Albacete', NULL, 1, 7),
-       (19, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Albacete', NULL, 2, 7),
-       (20, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Albacete', NULL, 3, 7),
-       (21, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Lleida', NULL, 1, 8),
-       (22, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Lleida', NULL, 2, 8),
-       (23, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Lleida', NULL, 3, 8),
-       (24, '2024-03-31 08:45:29', '2024-03-31 08:45:29', NULL, NULL, 'Quebec', NULL, 1, 9),
-       (25, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Québec', NULL, 2, 9),
-       (26, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Quebec', NULL, 3, 9),
-       (27, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Nordrhein-Westfalen', NULL, 1, 10),
-       (28, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Nordrhein-Westfalen', NULL, 2, 10),
-       (29, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Nordrhein-Westfalen', NULL, 3, 10),
-       (30, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Iowa', NULL, 1, 11),
-       (31, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Iowa', NULL, 2, 11),
-       (32, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Iowa', NULL, 3, 11),
-       (33, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Idaho', NULL, 1, 12),
-       (34, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Idaho', NULL, 2, 12),
-       (35, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Idaho', NULL, 3, 12),
-       (36, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Yukon Territory', NULL, 1, 13),
-       (37, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Yukon', NULL, 2, 13),
-       (38, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Yukon Territory', NULL, 3, 13),
-       (39, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Leon', NULL, 1, 14),
-       (40, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Leon', NULL, 2, 14),
-       (41, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Leon', NULL, 3, 14),
-       (42, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'A Corua', NULL, 1, 15),
-       (43, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'A Corua', NULL, 3, 15),
-       (44, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Castellon', NULL, 1, 16),
-       (45, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Castellon', NULL, 2, 16),
-       (46, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Castellon', NULL, 3, 16),
-       (47, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Las Palmas', NULL, 1, 17),
-       (48, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Las Palmas', NULL, 2, 17),
-       (49, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Las Palmas', NULL, 3, 17),
-       (50, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Pontevedra', NULL, 1, 18),
-       (51, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Pontevedra', NULL, 2, 18),
-       (52, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Pontevedra', NULL, 3, 18),
-       (53, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Armed Forces Americas', NULL, 1, 19),
-       (54, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Armed Forces Americas', NULL, 2, 19),
-       (55, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Armed Forces Americas', NULL, 3, 19),
-       (56, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Teruel', NULL, 1, 20),
-       (57, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Teruel', NULL, 2, 20),
-       (58, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Teruel', NULL, 3, 20),
-       (59, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Alberta', NULL, 1, 21),
-       (60, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Alberta', NULL, 2, 21),
-       (61, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Alberta', NULL, 3, 21),
-       (62, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Armed Forces Canada', NULL, 1, 22),
-       (63, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Armed Forces Canada', NULL, 2, 22),
-       (64, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Armed Forces Canada', NULL, 3, 22),
-       (65, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Illinois', NULL, 1, 23),
-       (66, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Illinois', NULL, 2, 23),
-       (67, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Illinois', NULL, 3, 23),
-       (68, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Armed Forces Europe', NULL, 1, 24),
-       (69, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Armed Forces Europe', NULL, 2, 24),
-       (70, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Armed Forces Europe', NULL, 3, 24),
-       (71, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Armed Forces Africa', NULL, 1, 25),
-       (72, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Armed Forces Africa', NULL, 2, 25),
-       (73, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Armed Forces Africa', NULL, 3, 25),
-       (74, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Indiana', NULL, 1, 26),
-       (75, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Indiana', NULL, 2, 26),
-       (76, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Indiana', NULL, 3, 26),
-       (77, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Aargau', NULL, 1, 27),
-       (78, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Aargau', NULL, 2, 27),
-       (79, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Aargau', NULL, 3, 27),
-       (80, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'A Corua', NULL, 2, 28),
-       (81, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Appenzell Innerrhoden', NULL, 1, 29),
-       (82, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Appenzell Innerrhoden', NULL, 2, 29),
-       (83, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Appenzell Innerrhoden', NULL, 3, 29),
-       (84, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Alaska', NULL, 1, 30),
-       (85, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Alaska', NULL, 2, 30),
-       (86, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Alaska', NULL, 3, 30),
-       (87, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Caceres', NULL, 1, 31),
-       (88, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Caceres', NULL, 2, 31),
-       (89, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Caceres', NULL, 3, 31),
-       (90, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Segovia', NULL, 1, 32),
-       (91, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Segovia', NULL, 2, 32),
-       (92, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Segovia', NULL, 3, 32),
-       (93, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Alabama', NULL, 1, 33),
-       (94, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Alabama', NULL, 2, 33),
-       (95, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Alabama', NULL, 3, 33),
-       (96, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Armed Forces Middle East', NULL, 1, 34),
-       (97, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Armed Forces Middle East', NULL, 2, 34),
-       (98, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Armed Forces Middle East', NULL, 3, 34),
-       (99, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Zug', NULL, 1, 35),
-       (100, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Zug', NULL, 2, 35),
-       (101, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Zug', NULL, 3, 35),
-       (102, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Malaga', NULL, 1, 36),
-       (103, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Malaga', NULL, 2, 36),
-       (104, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Malaga', NULL, 3, 36),
-       (105, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Central', NULL, 1, 37),
-       (106, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Central', NULL, 3, 37),
-       (107, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Zrich', NULL, 1, 38),
-       (108, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Zrich', NULL, 2, 38),
-       (109, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Zrich', NULL, 3, 38),
-       (110, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'La Rioja', NULL, 1, 39),
-       (111, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'La Rioja', NULL, 2, 39),
-       (112, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'La Rioja', NULL, 3, 39),
-       (113, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Armed Forces Pacific', NULL, 1, 40),
-       (114, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Armed Forces Pacific', NULL, 2, 40),
-       (115, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Armed Forces Pacific', NULL, 3, 40),
-       (116, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Melilla', NULL, 1, 41),
-       (117, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Melilla', NULL, 2, 41),
-       (118, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Melilla', NULL, 3, 41),
-       (119, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Arkansas', NULL, 1, 42),
-       (120, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Arkansas', NULL, 2, 42),
-       (121, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Arkansas', NULL, 3, 42),
-       (122, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'American Samoa', NULL, 1, 43),
-       (123, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'American Samoa', NULL, 2, 43),
-       (124, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'American Samoa', NULL, 3, 43),
-       (125, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'New South Wales', NULL, 1, 44),
-       (126, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Nouvelle-Galles du Sud', NULL, 2, 44),
-       (127, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'New South Wales', NULL, 3, 44),
-       (128, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Madrid', NULL, 1, 45),
-       (129, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Madrid', NULL, 2, 45),
-       (130, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Madrid', NULL, 3, 45),
-       (131, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Rhode Island', NULL, 1, 46),
-       (132, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Rhode Island', NULL, 2, 46),
-       (133, '2024-03-31 08:45:30', '2024-03-31 08:45:30', NULL, NULL, 'Rhode Island', NULL, 3, 46),
-       (134, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Arizona', NULL, 1, 47),
-       (135, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Arizona', NULL, 2, 47),
-       (136, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Arizona', NULL, 3, 47),
-       (137, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Ceuta', NULL, 1, 48),
-       (138, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Ceuta', NULL, 2, 48),
-       (139, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Ceuta', NULL, 3, 48),
-       (140, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'British Columbia', NULL, 1, 49),
-       (141, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Colombie Britanique', NULL, 2, 49),
-       (142, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'British Columbia', NULL, 3, 49),
-       (143, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Huelva', NULL, 1, 50),
-       (144, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Huelva', NULL, 2, 50),
-       (145, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Huelva', NULL, 3, 50),
-       (146, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Bern', NULL, 1, 51),
-       (147, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Bern', NULL, 2, 51),
-       (148, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Bern', NULL, 3, 51),
-       (149, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Huesca', NULL, 1, 52),
-       (150, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Huesca', NULL, 2, 52),
-       (151, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Huesca', NULL, 3, 52),
-       (152, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Appenzell Ausserrhoden', NULL, 1, 53),
-       (153, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Appenzell Ausserrhoden', NULL, 2, 53),
-       (154, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Appenzell Ausserrhoden', NULL, 3, 53),
-       (155, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Basel-Landschaft', NULL, 1, 54),
-       (156, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Basel-Landschaft', NULL, 2, 54),
-       (157, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Basel-Landschaft', NULL, 3, 54),
-       (158, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Jura', NULL, 1, 55),
-       (159, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Jura', NULL, 2, 55),
-       (160, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Jura', NULL, 3, 55),
-       (161, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Asturias', NULL, 1, 56),
-       (162, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Asturias', NULL, 2, 56),
-       (163, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Asturias', NULL, 3, 56),
-       (164, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'South Australia', NULL, 1, 57),
-       (165, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Australie-Mridionale', NULL, 2, 57),
-       (166, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'South Australia', NULL, 3, 57),
-       (167, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Salzburg', NULL, 1, 58),
-       (168, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Salzburg', NULL, 2, 58),
-       (169, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Salzburg', NULL, 3, 58),
-       (170, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Tirol', NULL, 1, 59),
-       (171, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Tirol', NULL, 2, 59),
-       (172, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Tirol', NULL, 3, 59),
-       (173, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'South Carolina', NULL, 1, 60),
-       (174, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Caroline du Sud', NULL, 2, 60),
-       (175, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'South Carolina', NULL, 3, 60),
-       (176, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Thringen', NULL, 1, 61),
-       (177, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Thringen', NULL, 2, 61),
-       (178, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Thringen', NULL, 3, 61),
-       (179, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'South Dakota', NULL, 1, 62),
-       (180, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Dakota du Sud', NULL, 2, 62),
-       (181, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'South Dakota', NULL, 3, 62),
-       (182, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Basel-Stadt', NULL, 1, 63),
-       (183, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Basel-Stadt', NULL, 2, 63),
-       (184, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Basel-Stadt', NULL, 3, 63),
-       (185, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Cordoba', NULL, 1, 64),
-       (186, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Cordoba', NULL, 2, 64),
-       (187, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Cordoba', NULL, 3, 64),
-       (188, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Tarragona', NULL, 1, 65),
-       (189, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Tarragona', NULL, 2, 65),
-       (190, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Tarragona', NULL, 3, 65),
-       (191, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Valladolid', NULL, 1, 66),
-       (192, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Valladolid', NULL, 2, 66),
-       (193, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Valladolid', NULL, 3, 66),
-       (194, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'St. Gallen', NULL, 1, 67),
-       (195, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'St. Gallen', NULL, 2, 67),
-       (196, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'St. Gallen', NULL, 3, 67),
-       (197, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Schaffhausen', NULL, 1, 68),
-       (198, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Schaffhausen', NULL, 2, 68),
-       (199, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Schaffhausen', NULL, 3, 68),
-       (200, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Western Australia', NULL, 1, 69),
-       (201, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Australie-Occidentale', NULL, 2, 69),
-       (202, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Western Australia', NULL, 3, 69),
-       (203, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Saskatchewan', NULL, 1, 70),
-       (204, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Saskatchewan', NULL, 2, 70),
-       (205, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Saskatchewan', NULL, 3, 70),
-       (206, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Niedersachsen', NULL, 1, 71),
-       (207, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Niedersachsen', NULL, 2, 71),
-       (208, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Niedersachsen', NULL, 3, 71),
-       (209, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Solothurn', NULL, 1, 72),
-       (210, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Solothurn', NULL, 2, 72),
-       (211, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Solothurn', NULL, 3, 72),
-       (212, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'California', NULL, 1, 73),
-       (213, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Californie', NULL, 2, 73),
-       (214, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'California', NULL, 3, 73),
-       (215, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Northern Territory', NULL, 1, 74),
-       (216, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Territoire du Nord', NULL, 2, 74),
-       (217, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Northern Territory', NULL, 3, 74),
-       (218, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Steiermark', NULL, 1, 75),
-       (219, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Steiermark', NULL, 2, 75),
-       (220, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Steiermark', NULL, 3, 75),
-       (221, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Katen', NULL, 1, 76),
-       (222, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Karten', NULL, 2, 76),
-       (223, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Katen', NULL, 3, 76),
-       (224, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Jaen', NULL, 1, 77),
-       (225, '2024-03-31 08:45:31', '2024-03-31 08:45:31', NULL, NULL, 'Jaen', NULL, 2, 77),
-       (226, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Jaen', NULL, 3, 77),
-       (227, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Asuncion', NULL, 1, 78),
-       (228, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Asunción', NULL, 3, 78),
-       (229, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Ciudad Real', NULL, 1, 79),
-       (230, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Ciudad Real', NULL, 2, 79),
-       (231, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Ciudad Real', NULL, 3, 79),
-       (232, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Schwyz', NULL, 1, 80),
-       (233, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Schwyz', NULL, 2, 80),
-       (234, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Schwyz', NULL, 3, 80),
-       (235, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Alava', NULL, 1, 81),
-       (236, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Alava', NULL, 2, 81),
-       (237, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Alava', NULL, 3, 81),
-       (238, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Kansas', NULL, 1, 82),
-       (239, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Kansas', NULL, 2, 82),
-       (240, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Kansas', NULL, 3, 82),
-       (241, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Colorado', NULL, 1, 83),
-       (242, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Colorado', NULL, 2, 83),
-       (243, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Colorado', NULL, 3, 83),
-       (244, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Kentucky', NULL, 1, 84),
-       (245, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Kentucky', NULL, 2, 84),
-       (246, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Kentucky', NULL, 3, 84),
-       (247, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Berlin', NULL, 1, 85),
-       (248, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Berlin', NULL, 2, 85),
-       (249, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Berlin', NULL, 3, 85),
-       (250, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Connecticut', NULL, 1, 86),
-       (251, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Connecticut', NULL, 2, 86),
-       (252, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Connecticut', NULL, 3, 86),
-       (253, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Australian Capital Territory', NULL, 1, 87),
-       (254, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Territoire de la capitale australienne', NULL,
-        2, 87),
-       (255, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Australian Capital Territory', NULL, 3, 87),
-       (256, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Thurgau', NULL, 1, 88),
-       (257, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Thurgau', NULL, 2, 88),
-       (258, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Thurgau', NULL, 3, 88),
-       (259, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Louisiana', NULL, 1, 89),
-       (260, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Louisiane', NULL, 2, 89),
-       (261, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Louisiana', NULL, 3, 89),
-       (262, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Hamburg', NULL, 1, 90),
-       (263, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Hamburg', NULL, 2, 90),
-       (264, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Hamburg', NULL, 3, 90),
-       (265, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Tessin', NULL, 1, 91),
-       (266, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Tessin', NULL, 2, 91),
-       (267, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Tessin', NULL, 3, 91),
-       (268, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Lugo', NULL, 1, 92),
-       (269, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Lugo', NULL, 2, 92),
-       (270, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Lugo', NULL, 3, 92),
-       (271, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Neuenburg', NULL, 1, 93),
-       (272, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Neuenburg', NULL, 2, 93),
-       (273, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Neuenburg', NULL, 3, 93),
-       (274, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Tennessee', NULL, 1, 94),
-       (275, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Tennessee', NULL, 2, 94),
-       (276, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Tennessee', NULL, 3, 94),
-       (277, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Toledo', NULL, 1, 95),
-       (278, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Toledo', NULL, 2, 95),
-       (279, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Toledo', NULL, 3, 95),
-       (280, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'District of Columbia', NULL, 1, 96),
-       (281, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'District de Columbia', NULL, 2, 96),
-       (282, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'District of Columbia', NULL, 3, 96),
-       (283, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Palencia', NULL, 1, 97),
-       (284, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Palencia', NULL, 2, 97),
-       (285, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Palencia', NULL, 3, 97),
-       (286, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Delaware', NULL, 1, 98),
-       (287, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Delaware', NULL, 2, 98),
-       (288, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Delaware', NULL, 3, 98),
-       (289, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Texas', NULL, 1, 99),
-       (290, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Texas', NULL, 2, 99),
-       (291, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Texas', NULL, 3, 99),
-       (292, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Tasmania', NULL, 1, 100),
-       (293, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Tasmanie', NULL, 2, 100),
-       (294, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Tasmania', NULL, 3, 100),
-       (295, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Queensland', NULL, 1, 101),
-       (296, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Queensland', NULL, 2, 101),
-       (297, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Queensland', NULL, 3, 101),
-       (298, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Luzern', NULL, 1, 102),
-       (299, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Luzern', NULL, 2, 102),
-       (300, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Luzern', NULL, 3, 102),
-       (301, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Burgos', NULL, 1, 103),
-       (302, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Burgos', NULL, 2, 103),
-       (303, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Burgos', NULL, 3, 103),
-       (304, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Cadiz', NULL, 1, 104),
-       (305, '2024-03-31 08:45:32', '2024-03-31 08:45:32', NULL, NULL, 'Cadiz', NULL, 2, 104),
-       (306, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Cadiz', NULL, 3, 104),
-       (307, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Santa Cruz de Tenerife', NULL, 1, 105),
-       (308, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Santa Cruz de Tenerife', NULL, 2, 105),
-       (309, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Santa Cruz de Tenerife', NULL, 3, 105),
-       (310, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Massachusetts', NULL, 1, 106),
-       (311, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Massachusetts', NULL, 2, 106),
-       (312, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Massachusetts', NULL, 3, 106),
-       (313, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Manitoba', NULL, 1, 107),
-       (314, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Manitoba', NULL, 2, 107),
-       (315, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Manitoba', NULL, 3, 107),
-       (316, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Maryland', NULL, 1, 108),
-       (317, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Maryland', NULL, 2, 108),
-       (318, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Maryland', NULL, 3, 108),
-       (319, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Girona', NULL, 1, 109),
-       (320, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Girona', NULL, 2, 109),
-       (321, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Girona', NULL, 3, 109),
-       (322, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Maine', NULL, 1, 110),
-       (323, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Maine', NULL, 2, 110),
-       (324, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Maine', NULL, 3, 110),
-       (325, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Alicante', NULL, 1, 111),
-       (326, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Alicante', NULL, 2, 111),
-       (327, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Alicante', NULL, 3, 111),
-       (328, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Guadalajara', NULL, 1, 112),
-       (329, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Guadalajara', NULL, 2, 112),
-       (330, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Guadalajara', NULL, 3, 112),
-       (331, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Cantabria', NULL, 1, 113),
-       (332, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Cantabria', NULL, 2, 113),
-       (333, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Cantabria', NULL, 3, 113),
-       (334, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Marshall Islands', NULL, 1, 114),
-       (335, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Marshall Islands', NULL, 2, 114),
-       (336, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Marshall Islands', NULL, 3, 114),
-       (337, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Michigan', NULL, 1, 115),
-       (338, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Michigan', NULL, 2, 115),
-       (339, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Michigan', NULL, 3, 115),
-       (340, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Uri', NULL, 1, 116),
-       (341, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Uri', NULL, 2, 116),
-       (342, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Uri', NULL, 3, 116),
-       (343, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Utah', NULL, 1, 117),
-       (344, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Utah', NULL, 2, 117),
-       (345, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Utah', NULL, 3, 117),
-       (346, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Minnesota', NULL, 1, 118),
-       (347, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Minnesota', NULL, 2, 118),
-       (348, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Minnesota', NULL, 3, 118),
-       (349, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Missouri', NULL, 1, 119),
-       (350, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Missouri', NULL, 2, 119),
-       (351, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Missouri', NULL, 3, 119),
-       (352, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Northern Mariana Islands', NULL, 1, 120),
-       (353, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Northern Mariana Islands', NULL, 2, 120),
-       (354, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Northern Mariana Islands', NULL, 3, 120),
-       (355, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Barcelona', NULL, 1, 121),
-       (356, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Barcelona', NULL, 2, 121),
-       (357, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Barcelona', NULL, 3, 121),
-       (358, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Mississippi', NULL, 1, 122),
-       (359, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Mississippi', NULL, 2, 122),
-       (360, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Mississippi', NULL, 3, 122),
-       (361, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Montana', NULL, 1, 123),
-       (362, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Montana', NULL, 2, 123),
-       (363, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Montana', NULL, 3, 123),
-       (364, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Badajoz', NULL, 1, 124),
-       (365, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Badajoz', NULL, 2, 124),
-       (366, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Badajoz', NULL, 3, 124),
-       (367, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Mecklenburg-Vorpommern', NULL, 1, 125),
-       (368, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Mecklenburg-Vorpommern', NULL, 2, 125),
-       (369, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Mecklenburg-Vorpommern', NULL, 3, 125),
-       (370, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Virginia', NULL, 1, 126),
-       (371, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Virginie', NULL, 2, 126),
-       (372, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Virginia', NULL, 3, 126),
-       (373, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Voralberg', NULL, 1, 127),
-       (374, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Voralberg', NULL, 2, 127),
-       (375, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Voralberg', NULL, 3, 127),
-       (376, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Cuenca', NULL, 1, 128),
-       (377, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Cuenca', NULL, 2, 128),
-       (378, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Cuenca', NULL, 3, 128),
-       (379, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Wien', NULL, 1, 129),
-       (380, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Wien', NULL, 2, 129),
-       (381, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Wien', NULL, 3, 129),
-       (382, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Waadt', NULL, 1, 130),
-       (383, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Waadt', NULL, 2, 130),
-       (384, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Waadt', NULL, 3, 130),
-       (385, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Sevilla', NULL, 1, 131),
-       (386, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Sevilla', NULL, 2, 131),
-       (387, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Sevilla', NULL, 3, 131),
-       (388, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Virgin Islands', NULL, 1, 132),
-       (389, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Virgin Islands', NULL, 2, 132),
-       (390, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Virgin Islands', NULL, 3, 132),
-       (391, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Zaragoza', NULL, 1, 133),
-       (392, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Zaragoza', NULL, 2, 133),
-       (393, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Zaragoza', NULL, 3, 133),
-       (394, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'New Brunswick', NULL, 1, 134),
-       (395, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Nouveau Brunswick', NULL, 2, 134),
-       (396, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'New Brunswick', NULL, 3, 134),
-       (397, '2024-03-31 08:45:33', '2024-03-31 08:45:33', NULL, NULL, 'Sachsen-Anhalt', NULL, 1, 135),
-       (398, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Sachsen-Anhalt', NULL, 2, 135),
-       (399, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Sachsen-Anhalt', NULL, 3, 135),
-       (400, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'North Carolina', NULL, 1, 136),
-       (401, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Caroline du Nord', NULL, 2, 136),
-       (402, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'North Carolina', NULL, 3, 136),
-       (403, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'North Dakota', NULL, 1, 137),
-       (404, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Dakota du Nord', NULL, 2, 137),
-       (405, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'North Dakota', NULL, 3, 137),
-       (406, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Nebraska', NULL, 1, 138),
-       (407, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Nebraska', NULL, 2, 138),
-       (408, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Nebraska', NULL, 3, 138),
-       (409, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Newfoundland - Labrador', NULL, 1, 139),
-       (410, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Terre-Neuve - Labrador', NULL, 2, 139),
-       (411, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Newfoundland - Labrador', NULL, 3, 139),
-       (412, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'New Hampshire', NULL, 1, 140),
-       (413, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Nouveau Hampshire', NULL, 2, 140),
-       (414, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'New Hampshire', NULL, 3, 140),
-       (415, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'New Jersey', NULL, 1, 141),
-       (416, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'New Jersey', NULL, 2, 141),
-       (417, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'New Jersey', NULL, 3, 141),
-       (418, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Wallis', NULL, 1, 142),
-       (419, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Wallis', NULL, 2, 142),
-       (420, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Wallis', NULL, 3, 142),
-       (421, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Vermont', NULL, 1, 143),
-       (422, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Vermont', NULL, 2, 143),
-       (423, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Vermont', NULL, 3, 143),
-       (424, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'New Mexico', NULL, 1, 144),
-       (425, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Nouveau Mexique', NULL, 2, 144),
-       (426, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'New Mexico', NULL, 3, 144),
-       (427, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Niederosterreich', NULL, 1, 145),
-       (428, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Niederosterreich', NULL, 2, 145),
-       (429, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Niederosterreich', NULL, 3, 145),
-       (430, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Sachsen', NULL, 1, 146),
-       (431, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Sachsen', NULL, 2, 146),
-       (432, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Sachsen', NULL, 3, 146),
-       (433, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Nova Scotia', NULL, 1, 147),
-       (434, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Nouvelle Écosse', NULL, 2, 147),
-       (435, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Nova Scotia', NULL, 3, 147),
-       (436, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Saarland', NULL, 1, 148),
-       (437, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Saarland', NULL, 2, 148),
-       (438, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Saarland', NULL, 3, 148),
-       (439, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Florida', NULL, 1, 149),
-       (440, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Floride', NULL, 2, 149),
-       (441, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Florida', NULL, 3, 149),
-       (442, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Northwest Territories', NULL, 1, 150),
-       (443, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Territores du Nord-Ouest', NULL, 2, 150),
-       (444, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Northwest Territories', NULL, 3, 150),
-       (445, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Federated States Of Micronesia', NULL, 1, 151),
-       (446, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Federated States Of Micronesia', NULL, 2, 151),
-       (447, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Federated States Of Micronesia', NULL, 3, 151),
-       (448, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Nunavut', NULL, 1, 152),
-       (449, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Nunavut', NULL, 2, 152),
-       (450, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Nunavut', NULL, 3, 152),
-       (451, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Nevada', NULL, 1, 153),
-       (452, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Nevada', NULL, 2, 153),
-       (453, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Nevada', NULL, 3, 153),
-       (454, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Nidwalden', NULL, 1, 154),
-       (455, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Nidwalden', NULL, 2, 154),
-       (456, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Nidwalden', NULL, 3, 154),
-       (457, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Washington', NULL, 1, 155),
-       (458, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Washington', NULL, 2, 155),
-       (459, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Washington', NULL, 3, 155),
-       (460, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'New York', NULL, 1, 156),
-       (461, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'New York', NULL, 2, 156),
-       (462, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'New York', NULL, 3, 156),
-       (463, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Granada', NULL, 1, 157),
-       (464, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Granada', NULL, 2, 157),
-       (465, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Granada', NULL, 3, 157),
-       (466, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Soria', NULL, 1, 158),
-       (467, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Soria', NULL, 2, 158),
-       (468, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Soria', NULL, 3, 158),
-       (469, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Freiburg', NULL, 1, 159),
-       (470, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Freiburg', NULL, 2, 159),
-       (471, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Freiburg', NULL, 3, 159),
-       (472, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Rheinland-Pfalz', NULL, 1, 160),
-       (473, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Rheinland-Pfalz', NULL, 2, 160),
-       (474, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Rheinland-Pfalz', NULL, 3, 160),
-       (475, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Ourense', NULL, 1, 161),
-       (476, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Ourense', NULL, 2, 161),
-       (477, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Ourense', NULL, 3, 161),
-       (478, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Wisconsin', NULL, 1, 162),
-       (479, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Wisconsin', NULL, 2, 162),
-       (480, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Wisconsin', NULL, 3, 162),
-       (481, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Ohio', NULL, 1, 163),
-       (482, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Ohio', NULL, 2, 163),
-       (483, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Ohio', NULL, 3, 163),
-       (484, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Georgia', NULL, 1, 164),
-       (485, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Georgie', NULL, 2, 164),
-       (486, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Georgia', NULL, 3, 164),
-       (487, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Murcia', NULL, 1, 165),
-       (488, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Murcia', NULL, 2, 165),
-       (489, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Murcia', NULL, 3, 165),
-       (490, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Oklahoma', NULL, 1, 166),
-       (491, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Oklahoma', NULL, 2, 166),
-       (492, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Oklahoma', NULL, 3, 166),
-       (493, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Genf', NULL, 1, 167),
-       (494, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Genf', NULL, 2, 167),
-       (495, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Genf', NULL, 3, 167),
-       (496, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'West Virginia', NULL, 1, 168),
-       (497, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'West Virginia', NULL, 2, 168),
-       (498, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'West Virginia', NULL, 3, 168),
-       (499, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Ontario', NULL, 1, 169),
-       (500, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Ontario', NULL, 2, 169),
-       (501, '2024-03-31 08:45:34', '2024-03-31 08:45:34', NULL, NULL, 'Ontario', NULL, 3, 169),
-       (502, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Oberosterreich', NULL, 1, 170),
-       (503, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Oberosterreich', NULL, 2, 170),
-       (504, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Oberosterreich', NULL, 3, 170),
-       (505, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Wyoming', NULL, 1, 171),
-       (506, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Wyoming', NULL, 2, 171),
-       (507, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Wyoming', NULL, 3, 171),
-       (508, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Burgenland', NULL, 1, 172),
-       (509, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Burgenland', NULL, 2, 172),
-       (510, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Burgenland', NULL, 3, 172),
-       (511, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Avila', NULL, 1, 173),
-       (512, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Avila', NULL, 2, 173),
-       (513, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Avila', NULL, 3, 173),
-       (514, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Oregon', NULL, 1, 174),
-       (515, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Oregon', NULL, 2, 174),
-       (516, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Oregon', NULL, 3, 174),
-       (517, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Salamanca', NULL, 1, 175),
-       (518, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Salamanca', NULL, 2, 175),
-       (519, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Salamanca', NULL, 3, 175),
-       (520, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Glarus', NULL, 1, 176),
-       (521, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Glarus', NULL, 2, 176),
-       (522, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Glarus', NULL, 3, 176),
-       (523, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Baleares', NULL, 1, 177),
-       (524, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Baleares', NULL, 2, 177),
-       (525, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Baleares', NULL, 3, 177),
-       (526, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Obwalden', NULL, 1, 178),
-       (527, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Obwalden', NULL, 2, 178),
-       (528, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Obwalden', NULL, 3, 178),
-       (529, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Graubnden', NULL, 1, 179),
-       (530, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Graubnden', NULL, 2, 179),
-       (531, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Graubnden', NULL, 3, 179),
-       (532, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Guam', NULL, 1, 180),
-       (533, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Guam', NULL, 2, 180),
-       (534, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Guam', NULL, 3, 180),
-       (535, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Pennsylvania', NULL, 1, 181),
-       (536, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Pennsylvanie', NULL, 2, 181),
-       (537, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Pennsylvania', NULL, 3, 181),
-       (538, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Victoria', NULL, 1, 182),
-       (539, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Victoria', NULL, 2, 182),
-       (540, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Victoria', NULL, 3, 182),
-       (541, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Bremen', NULL, 1, 183),
-       (542, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Bremen', NULL, 2, 183),
-       (543, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Bremen', NULL, 3, 183),
-       (544, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Prince Edward Island', NULL, 1, 184),
-       (545, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Île-du-Prince-Édouard', NULL, 2, 184),
-       (546, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Prince Edward Island', NULL, 3, 184),
-       (547, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Brandenburg', NULL, 1, 185),
-       (548, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Brandenburg', NULL, 2, 185),
-       (549, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Brandenburg', NULL, 3, 185),
-       (550, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Hessen', NULL, 1, 186),
-       (551, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Hessen', NULL, 2, 186),
-       (552, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Hessen', NULL, 3, 186),
-       (553, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Almeria', NULL, 1, 187),
-       (554, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Almeria', NULL, 2, 187),
-       (555, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Almeria', NULL, 3, 187),
-       (556, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Baden-Wrttemberg', NULL, 1, 188),
-       (557, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Baden-Wrttemberg', NULL, 2, 188),
-       (558, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Baden-Wrttemberg', NULL, 3, 188),
-       (559, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Bayern', NULL, 1, 189),
-       (560, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Bayern', NULL, 2, 189),
-       (561, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Bayern', NULL, 3, 189),
-       (562, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Navarra', NULL, 1, 190),
-       (563, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Navarra', NULL, 2, 190),
-       (564, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Navarra', NULL, 3, 190),
-       (565, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Valencia', NULL, 1, 191),
-       (566, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Valencia', NULL, 2, 191),
-       (567, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Valencia', NULL, 3, 191),
-       (568, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Schleswig-Holstein', NULL, 1, 192),
-       (569, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Schleswig-Holstein', NULL, 2, 192),
-       (570, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Schleswig-Holstein', NULL, 3, 192),
-       (571, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Andhra Pradesh', NULL, 1, 193),
-       (572, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Andhra Pradesh', NULL, 2, 193),
-       (573, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Andhra Pradesh', NULL, 3, 193),
-       (574, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Arunachal Pradesh', NULL, 1, 194),
-       (575, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Arunachal Pradesh', NULL, 2, 194),
-       (576, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Arunachal Pradesh', NULL, 3, 194),
-       (577, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Assam', NULL, 1, 195),
-       (578, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Assam', NULL, 2, 195),
-       (579, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Assam', NULL, 3, 195),
-       (580, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Bihar', NULL, 1, 196),
-       (581, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Bihar', NULL, 2, 196),
-       (582, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Bihar', NULL, 3, 196),
-       (583, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Chhattisgarh', NULL, 1, 197),
-       (584, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Chhattisgarh', NULL, 2, 197),
-       (585, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Chhattisgarh', NULL, 3, 197),
-       (586, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Goa', NULL, 1, 198),
-       (587, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Goa', NULL, 2, 198),
-       (588, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Goa', NULL, 3, 198),
-       (589, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Gujarat', NULL, 1, 199),
-       (590, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Gujarat', NULL, 2, 199),
-       (591, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Gujarat', NULL, 3, 199),
-       (592, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Haryana', NULL, 1, 200),
-       (593, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Haryana', NULL, 2, 200),
-       (594, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Haryana', NULL, 3, 200),
-       (595, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Himachal Pradesh', NULL, 1, 201),
-       (596, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Himachal Pradesh', NULL, 2, 201),
-       (597, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Himachal Pradesh', NULL, 3, 201),
-       (598, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Jharkhand', NULL, 1, 202),
-       (599, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Jharkhand', NULL, 2, 202),
-       (600, '2024-03-31 08:45:35', '2024-03-31 08:45:35', NULL, NULL, 'Jharkhand', NULL, 3, 202),
-       (601, '2024-03-31 08:45:36', '2024-03-31 08:45:36', NULL, NULL, 'Karnataka', NULL, 1, 203),
-       (602, '2024-03-31 08:45:36', '2024-03-31 08:45:36', NULL, NULL, 'Karnataka', NULL, 2, 203),
-       (603, '2024-03-31 08:45:36', '2024-03-31 08:45:36', NULL, NULL, 'Karnataka', NULL, 3, 203),
-       (604, '2024-03-31 08:45:36', '2024-03-31 08:45:36', NULL, NULL, 'Kerala', NULL, 1, 204),
-       (605, '2024-03-31 08:45:36', '2024-03-31 08:45:36', NULL, NULL, 'Kerala', NULL, 2, 204),
-       (606, '2024-03-31 08:45:36', '2024-03-31 08:45:36', NULL, NULL, 'Kerala', NULL, 3, 204),
-       (607, '2024-03-31 08:45:36', '2024-03-31 08:45:36', NULL, NULL, 'Madhya Pradesh', NULL, 1, 205),
-       (608, '2024-03-31 08:45:36', '2024-03-31 08:45:36', NULL, NULL, 'Madhya Pradesh', NULL, 2, 205),
-       (609, '2024-03-31 08:45:36', '2024-03-31 08:45:36', NULL, NULL, 'Madhya Pradesh', NULL, 3, 205),
-       (610, '2024-03-31 08:45:36', '2024-03-31 08:45:36', NULL, NULL, 'Maharashtra', NULL, 1, 206),
-       (611, '2024-03-31 08:45:36', '2024-03-31 08:45:36', NULL, NULL, 'Maharashtra', NULL, 2, 206),
-       (612, '2024-03-31 08:45:36', '2024-03-31 08:45:36', NULL, NULL, 'Maharashtra', NULL, 3, 206),
-       (613, '2024-03-31 08:45:36', '2024-03-31 08:45:36', NULL, NULL, 'Manipur', NULL, 1, 207),
-       (614, '2024-03-31 08:45:36', '2024-03-31 08:45:36', NULL, NULL, 'Manipur', NULL, 2, 207),
-       (615, '2024-03-31 08:45:36', '2024-03-31 08:45:36', NULL, NULL, 'Manipur', NULL, 3, 207),
-       (616, '2024-03-31 08:45:36', '2024-03-31 08:45:36', NULL, NULL, 'Meghalaya', NULL, 1, 208),
-       (617, '2024-03-31 08:45:36', '2024-03-31 08:45:36', NULL, NULL, 'Meghalaya', NULL, 2, 208),
-       (618, '2024-03-31 08:45:36', '2024-03-31 08:45:36', NULL, NULL, 'Meghalaya', NULL, 3, 208),
-       (619, '2024-03-31 08:45:36', '2024-03-31 08:45:36', NULL, NULL, 'Mizoram', NULL, 1, 209),
-       (620, '2024-03-31 08:45:36', '2024-03-31 08:45:36', NULL, NULL, 'Mizoram', NULL, 2, 209),
-       (621, '2024-03-31 08:45:36', '2024-03-31 08:45:36', NULL, NULL, 'Mizoram', NULL, 3, 209),
-       (622, '2024-03-31 08:45:36', '2024-03-31 08:45:36', NULL, NULL, 'Nagaland', NULL, 1, 210),
-       (623, '2024-03-31 08:45:36', '2024-03-31 08:45:36', NULL, NULL, 'Nagaland', NULL, 2, 210),
-       (624, '2024-03-31 08:45:36', '2024-03-31 08:45:36', NULL, NULL, 'Nagaland', NULL, 3, 210),
-       (625, '2024-03-31 08:45:36', '2024-03-31 08:45:36', NULL, NULL, 'Odisha', NULL, 1, 211),
-       (626, '2024-03-31 08:45:36', '2024-03-31 08:45:36', NULL, NULL, 'Odisha', NULL, 2, 211),
-       (627, '2024-03-31 08:45:36', '2024-03-31 08:45:36', NULL, NULL, 'Odisha', NULL, 3, 211),
-       (628, '2024-03-31 08:45:36', '2024-03-31 08:45:36', NULL, NULL, 'Punjab', NULL, 1, 212),
-       (629, '2024-03-31 08:45:36', '2024-03-31 08:45:36', NULL, NULL, 'Punjab', NULL, 2, 212),
-       (630, '2024-03-31 08:45:36', '2024-03-31 08:45:36', NULL, NULL, 'Punjab', NULL, 3, 212),
-       (631, '2024-03-31 08:45:36', '2024-03-31 08:45:36', NULL, NULL, 'Rajasthan', NULL, 1, 213),
-       (632, '2024-03-31 08:45:36', '2024-03-31 08:45:36', NULL, NULL, 'Rajasthan', NULL, 2, 213),
-       (633, '2024-03-31 08:45:36', '2024-03-31 08:45:36', NULL, NULL, 'Rajasthan', NULL, 3, 213),
-       (634, '2024-03-31 08:45:36', '2024-03-31 08:45:36', NULL, NULL, 'Sikkim', NULL, 1, 214),
-       (635, '2024-03-31 08:45:36', '2024-03-31 08:45:36', NULL, NULL, 'Sikkim', NULL, 2, 214),
-       (636, '2024-03-31 08:45:36', '2024-03-31 08:45:36', NULL, NULL, 'Sikkim', NULL, 3, 214),
-       (637, '2024-03-31 08:45:36', '2024-03-31 08:45:36', NULL, NULL, 'Tamil Nadu', NULL, 1, 215),
-       (638, '2024-03-31 08:45:36', '2024-03-31 08:45:36', NULL, NULL, 'Tamil Nadu', NULL, 2, 215),
-       (639, '2024-03-31 08:45:36', '2024-03-31 08:45:36', NULL, NULL, 'Tamil Nadu', NULL, 3, 215),
-       (640, '2024-03-31 08:45:36', '2024-03-31 08:45:36', NULL, NULL, 'Telangana', NULL, 1, 216),
-       (641, '2024-03-31 08:45:36', '2024-03-31 08:45:36', NULL, NULL, 'Telangana', NULL, 2, 216),
-       (642, '2024-03-31 08:45:36', '2024-03-31 08:45:36', NULL, NULL, 'Telangana', NULL, 3, 216),
-       (643, '2024-03-31 08:45:36', '2024-03-31 08:45:36', NULL, NULL, 'Tripura', NULL, 1, 217),
-       (644, '2024-03-31 08:45:36', '2024-03-31 08:45:36', NULL, NULL, 'Tripura', NULL, 2, 217),
-       (645, '2024-03-31 08:45:36', '2024-03-31 08:45:36', NULL, NULL, 'Tripura', NULL, 3, 217),
-       (646, '2024-03-31 08:45:36', '2024-03-31 08:45:36', NULL, NULL, 'Uttarakhand', NULL, 1, 218),
-       (647, '2024-03-31 08:45:36', '2024-03-31 08:45:36', NULL, NULL, 'Uttarakhand', NULL, 2, 218),
-       (648, '2024-03-31 08:45:36', '2024-03-31 08:45:36', NULL, NULL, 'Uttarakhand', NULL, 3, 218),
-       (649, '2024-03-31 08:45:36', '2024-03-31 08:45:36', NULL, NULL, 'West Bengal', NULL, 1, 219),
-       (650, '2024-03-31 08:45:37', '2024-03-31 08:45:37', NULL, NULL, 'West Bengal', NULL, 2, 219),
-       (651, '2024-03-31 08:45:37', '2024-03-31 08:45:37', NULL, NULL, 'West Bengal', NULL, 3, 219);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (1, 'Guipuzcoa', 197);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (2, 'HI', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (3, 'PR', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (4, 'Zamora', 197);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (5, 'Vizcaya', 197);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (6, 'OTR', 166);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (7, 'Albacete', 197);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (8, 'Lleida', 197);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (9, 'QC', 37);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (10, 'NRW', 78);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (11, 'IA', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (12, 'ID', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (13, 'YT', 37);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (14, 'Leon', 197);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (15, 'ACorua', 197);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (16, 'Castellon', 197);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (17, 'LasPalmas', 197);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (18, 'Pontevedra', 197);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (19, 'AA', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (20, 'Teruel', 197);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (21, 'AB', 37);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (22, 'AC', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (23, 'IL', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (24, 'AE', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (25, 'AF', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (26, 'IN', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (27, 'AG', 204);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (28, 'A Corua', 197);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (29, 'AI', 204);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (30, 'AK', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (31, 'Caceres', 197);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (32, 'Segovia', 197);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (33, 'AL', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (34, 'AM', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (35, 'ZG', 204);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (36, 'Malaga', 197);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (37, 'CEN', 166);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (38, 'ZH', 204);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (39, 'LaRioja', 197);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (40, 'AP', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (41, 'Melilla', 197);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (42, 'AR', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (43, 'AS', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (44, 'NSW', 13);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (45, 'Madrid', 197);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (46, 'RI', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (47, 'AZ', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (48, 'Ceuta', 197);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (49, 'BC', 37);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (50, 'Huelva', 197);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (51, 'BE', 204);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (52, 'Huesca', 197);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (53, 'ARCH', 204);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (54, 'BL', 204);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (55, 'JU', 204);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (56, 'Asturias', 197);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (57, 'SA', 13);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (58, 'SB', 14);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (59, 'TIAT', 14);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (60, 'SC', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (61, 'THE', 78);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (62, 'SD', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (63, 'BS', 204);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (64, 'Cordoba', 197);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (65, 'Tarragona', 197);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (66, 'Valladolid', 197);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (67, 'SG', 204);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (68, 'SH', 204);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (69, 'WAAU', 13);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (70, 'SK', 37);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (71, 'NDS', 78);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (72, 'SO', 204);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (73, 'CA', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (74, 'NTAU', 13);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (75, 'ST', 14);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (76, 'KN', 14);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (77, 'Jaen', 197);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (78, 'ASU', 166);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (79, 'CiudadReal', 197);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (80, 'SZ', 204);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (81, 'Alava', 197);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (82, 'KS', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (83, 'CO', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (84, 'KY', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (85, 'BER', 78);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (86, 'CT', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (87, 'ACT', 13);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (88, 'TG', 204);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (89, 'LA', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (90, 'HAM', 78);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (91, 'TI', 204);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (92, 'Lugo', 197);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (93, 'NECH', 204);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (94, 'TN', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (95, 'Toledo', 197);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (96, 'DC', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (97, 'Palencia', 197);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (98, 'DE', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (99, 'TX', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (100, 'TAS', 13);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (101, 'QLD', 13);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (102, 'LU', 204);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (103, 'Burgos', 197);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (104, 'Cadiz', 197);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (105, 'SantaCruzdeTenerife', 197);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (106, 'MA', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (107, 'MB', 37);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (108, 'MD', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (109, 'Girona', 197);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (110, 'ME', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (111, 'Alicante', 197);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (112, 'Guadalajara', 197);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (113, 'Cantabria', 197);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (114, 'MH', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (115, 'MI', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (116, 'UR', 204);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (117, 'UT', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (118, 'MN', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (119, 'MO', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (120, 'MP', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (121, 'Barcelona', 197);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (122, 'MS', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (123, 'MT', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (124, 'Badajoz', 197);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (125, 'MEC', 78);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (126, 'VA', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (127, 'VB', 14);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (128, 'Cuenca', 197);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (129, 'WIAT', 14);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (130, 'VD', 204);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (131, 'Sevilla', 197);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (132, 'VI', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (133, 'Zaragoza', 197);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (134, 'NB', 37);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (135, 'SAC', 78);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (136, 'NC', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (137, 'ND', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (138, 'NE', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (139, 'NF', 37);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (140, 'NH', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (141, 'NJ', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (142, 'VS', 204);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (143, 'VT', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (144, 'NM', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (145, 'NO', 14);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (146, 'SAS', 78);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (147, 'NS', 37);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (148, 'SAR', 78);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (149, 'FL', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (150, 'NT', 37);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (151, 'FM', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (152, 'NU', 37);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (153, 'NV', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (154, 'NW', 204);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (155, 'WA', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (156, 'NY', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (157, 'Granada', 197);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (158, 'Soria', 197);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (159, 'FR', 204);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (160, 'RHE', 78);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (161, 'Ourense', 197);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (162, 'WI', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (163, 'OH', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (164, 'GA', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (165, 'Murcia', 197);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (166, 'OK', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (167, 'GE', 204);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (168, 'WV', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (169, 'ON', 37);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (170, 'OO', 14);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (171, 'WY', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (172, 'BLAT', 14);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (173, 'Avila', 197);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (174, 'OR', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (175, 'Salamanca', 197);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (176, 'GL', 204);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (177, 'Baleares', 197);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (178, 'OW', 204);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (179, 'GR', 204);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (180, 'GU', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (181, 'PA', 224);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (182, 'VIC', 13);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (183, 'BRE', 78);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (184, 'PE', 37);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (185, 'BRG', 78);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (186, 'HES', 78);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (187, 'Almeria', 197);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (188, 'BAW', 78);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (189, 'BAY', 78);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (190, 'Navarra', 197);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (191, 'Valencia', 197);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (192, 'SCN', 78);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (193, 'AndhraPradesh', 97);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (194, 'ArunachalPradesh', 97);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (195, 'Assam', 97);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (196, 'Bihar', 97);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (197, 'Chhattisgarh', 97);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (198, 'Goa', 97);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (199, 'Gujarat', 97);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (200, 'Haryana', 97);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (201, 'HimachalPradesh', 97);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (202, 'Jharkhand', 97);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (203, 'Karnataka', 97);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (204, 'Kerala', 97);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (205, 'MadhyaPradesh', 97);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (206, 'Maharashtra', 97);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (207, 'Manipur', 97);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (208, 'Meghalaya', 97);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (209, 'Mizoram', 97);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (210, 'Nagaland', 97);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (211, 'Odisha', 97);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (212, 'Punjab', 97);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (213, 'Rajasthan', 97);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (214, 'Sikkim', 97);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (215, 'TamilNadu', 97);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (216, 'Telangana', 97);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (217, 'Tripura', 97);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (218, 'Uttarakhand', 97);
+INSERT INTO store.zone (zone_id, zone_code, country_id) VALUES (219, 'WestBengal', 97);
+
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (1, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Guipuzcoa', null, 1, 1);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (2, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Guipuzcoa', null, 2, 1);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (3, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Guipuzcoa', null, 3, 1);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (4, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Hawaii', null, 1, 2);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (5, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Hawaii', null, 2, 2);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (6, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Hawaii', null, 3, 2);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (7, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Puerto Rico', null, 1, 3);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (8, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Puerto Rico', null, 2, 3);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (9, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Puerto Rico', null, 3, 3);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (10, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Zamora', null, 1, 4);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (11, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Zamora', null, 2, 4);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (12, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Zamora', null, 3, 4);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (13, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Vizcaya', null, 1, 5);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (14, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Vizcaya', null, 2, 5);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (15, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Vizcaya', null, 3, 5);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (16, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Other', null, 1, 6);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (17, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Otro', null, 3, 6);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (18, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Albacete', null, 1, 7);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (19, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Albacete', null, 2, 7);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (20, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Albacete', null, 3, 7);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (21, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Lleida', null, 1, 8);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (22, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Lleida', null, 2, 8);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (23, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Lleida', null, 3, 8);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (24, '2024-03-31 08:45:29.000000', '2024-03-31 08:45:29.000000', null, null, 'Quebec', null, 1, 9);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (25, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Québec', null, 2, 9);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (26, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Quebec', null, 3, 9);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (27, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Nordrhein-Westfalen', null, 1, 10);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (28, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Nordrhein-Westfalen', null, 2, 10);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (29, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Nordrhein-Westfalen', null, 3, 10);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (30, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Iowa', null, 1, 11);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (31, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Iowa', null, 2, 11);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (32, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Iowa', null, 3, 11);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (33, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Idaho', null, 1, 12);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (34, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Idaho', null, 2, 12);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (35, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Idaho', null, 3, 12);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (36, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Yukon Territory', null, 1, 13);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (37, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Yukon', null, 2, 13);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (38, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Yukon Territory', null, 3, 13);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (39, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Leon', null, 1, 14);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (40, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Leon', null, 2, 14);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (41, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Leon', null, 3, 14);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (42, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'A Corua', null, 1, 15);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (43, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'A Corua', null, 3, 15);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (44, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Castellon', null, 1, 16);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (45, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Castellon', null, 2, 16);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (46, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Castellon', null, 3, 16);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (47, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Las Palmas', null, 1, 17);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (48, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Las Palmas', null, 2, 17);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (49, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Las Palmas', null, 3, 17);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (50, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Pontevedra', null, 1, 18);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (51, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Pontevedra', null, 2, 18);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (52, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Pontevedra', null, 3, 18);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (53, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Armed Forces Americas', null, 1, 19);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (54, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Armed Forces Americas', null, 2, 19);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (55, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Armed Forces Americas', null, 3, 19);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (56, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Teruel', null, 1, 20);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (57, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Teruel', null, 2, 20);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (58, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Teruel', null, 3, 20);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (59, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Alberta', null, 1, 21);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (60, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Alberta', null, 2, 21);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (61, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Alberta', null, 3, 21);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (62, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Armed Forces Canada', null, 1, 22);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (63, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Armed Forces Canada', null, 2, 22);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (64, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Armed Forces Canada', null, 3, 22);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (65, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Illinois', null, 1, 23);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (66, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Illinois', null, 2, 23);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (67, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Illinois', null, 3, 23);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (68, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Armed Forces Europe', null, 1, 24);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (69, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Armed Forces Europe', null, 2, 24);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (70, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Armed Forces Europe', null, 3, 24);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (71, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Armed Forces Africa', null, 1, 25);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (72, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Armed Forces Africa', null, 2, 25);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (73, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Armed Forces Africa', null, 3, 25);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (74, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Indiana', null, 1, 26);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (75, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Indiana', null, 2, 26);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (76, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Indiana', null, 3, 26);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (77, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Aargau', null, 1, 27);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (78, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Aargau', null, 2, 27);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (79, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Aargau', null, 3, 27);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (80, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'A Corua', null, 2, 28);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (81, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Appenzell Innerrhoden', null, 1, 29);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (82, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Appenzell Innerrhoden', null, 2, 29);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (83, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Appenzell Innerrhoden', null, 3, 29);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (84, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Alaska', null, 1, 30);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (85, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Alaska', null, 2, 30);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (86, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Alaska', null, 3, 30);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (87, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Caceres', null, 1, 31);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (88, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Caceres', null, 2, 31);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (89, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Caceres', null, 3, 31);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (90, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Segovia', null, 1, 32);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (91, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Segovia', null, 2, 32);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (92, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Segovia', null, 3, 32);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (93, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Alabama', null, 1, 33);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (94, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Alabama', null, 2, 33);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (95, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Alabama', null, 3, 33);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (96, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Armed Forces Middle East', null, 1, 34);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (97, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Armed Forces Middle East', null, 2, 34);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (98, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Armed Forces Middle East', null, 3, 34);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (99, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Zug', null, 1, 35);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (100, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Zug', null, 2, 35);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (101, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Zug', null, 3, 35);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (102, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Malaga', null, 1, 36);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (103, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Malaga', null, 2, 36);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (104, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Malaga', null, 3, 36);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (105, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Central', null, 1, 37);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (106, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Central', null, 3, 37);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (107, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Zrich', null, 1, 38);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (108, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Zrich', null, 2, 38);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (109, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Zrich', null, 3, 38);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (110, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'La Rioja', null, 1, 39);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (111, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'La Rioja', null, 2, 39);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (112, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'La Rioja', null, 3, 39);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (113, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Armed Forces Pacific', null, 1, 40);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (114, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Armed Forces Pacific', null, 2, 40);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (115, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Armed Forces Pacific', null, 3, 40);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (116, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Melilla', null, 1, 41);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (117, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Melilla', null, 2, 41);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (118, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Melilla', null, 3, 41);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (119, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Arkansas', null, 1, 42);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (120, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Arkansas', null, 2, 42);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (121, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Arkansas', null, 3, 42);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (122, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'American Samoa', null, 1, 43);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (123, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'American Samoa', null, 2, 43);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (124, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'American Samoa', null, 3, 43);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (125, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'New South Wales', null, 1, 44);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (126, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Nouvelle-Galles du Sud', null, 2, 44);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (127, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'New South Wales', null, 3, 44);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (128, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Madrid', null, 1, 45);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (129, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Madrid', null, 2, 45);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (130, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Madrid', null, 3, 45);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (131, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Rhode Island', null, 1, 46);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (132, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Rhode Island', null, 2, 46);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (133, '2024-03-31 08:45:30.000000', '2024-03-31 08:45:30.000000', null, null, 'Rhode Island', null, 3, 46);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (134, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Arizona', null, 1, 47);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (135, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Arizona', null, 2, 47);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (136, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Arizona', null, 3, 47);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (137, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Ceuta', null, 1, 48);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (138, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Ceuta', null, 2, 48);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (139, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Ceuta', null, 3, 48);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (140, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'British Columbia', null, 1, 49);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (141, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Colombie Britanique', null, 2, 49);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (142, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'British Columbia', null, 3, 49);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (143, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Huelva', null, 1, 50);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (144, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Huelva', null, 2, 50);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (145, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Huelva', null, 3, 50);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (146, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Bern', null, 1, 51);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (147, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Bern', null, 2, 51);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (148, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Bern', null, 3, 51);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (149, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Huesca', null, 1, 52);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (150, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Huesca', null, 2, 52);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (151, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Huesca', null, 3, 52);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (152, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Appenzell Ausserrhoden', null, 1, 53);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (153, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Appenzell Ausserrhoden', null, 2, 53);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (154, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Appenzell Ausserrhoden', null, 3, 53);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (155, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Basel-Landschaft', null, 1, 54);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (156, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Basel-Landschaft', null, 2, 54);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (157, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Basel-Landschaft', null, 3, 54);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (158, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Jura', null, 1, 55);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (159, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Jura', null, 2, 55);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (160, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Jura', null, 3, 55);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (161, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Asturias', null, 1, 56);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (162, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Asturias', null, 2, 56);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (163, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Asturias', null, 3, 56);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (164, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'South Australia', null, 1, 57);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (165, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Australie-Mridionale', null, 2, 57);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (166, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'South Australia', null, 3, 57);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (167, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Salzburg', null, 1, 58);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (168, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Salzburg', null, 2, 58);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (169, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Salzburg', null, 3, 58);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (170, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Tirol', null, 1, 59);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (171, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Tirol', null, 2, 59);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (172, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Tirol', null, 3, 59);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (173, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'South Carolina', null, 1, 60);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (174, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Caroline du Sud', null, 2, 60);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (175, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'South Carolina', null, 3, 60);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (176, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Thringen', null, 1, 61);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (177, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Thringen', null, 2, 61);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (178, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Thringen', null, 3, 61);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (179, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'South Dakota', null, 1, 62);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (180, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Dakota du Sud', null, 2, 62);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (181, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'South Dakota', null, 3, 62);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (182, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Basel-Stadt', null, 1, 63);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (183, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Basel-Stadt', null, 2, 63);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (184, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Basel-Stadt', null, 3, 63);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (185, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Cordoba', null, 1, 64);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (186, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Cordoba', null, 2, 64);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (187, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Cordoba', null, 3, 64);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (188, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Tarragona', null, 1, 65);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (189, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Tarragona', null, 2, 65);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (190, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Tarragona', null, 3, 65);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (191, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Valladolid', null, 1, 66);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (192, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Valladolid', null, 2, 66);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (193, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Valladolid', null, 3, 66);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (194, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'St. Gallen', null, 1, 67);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (195, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'St. Gallen', null, 2, 67);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (196, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'St. Gallen', null, 3, 67);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (197, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Schaffhausen', null, 1, 68);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (198, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Schaffhausen', null, 2, 68);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (199, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Schaffhausen', null, 3, 68);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (200, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Western Australia', null, 1, 69);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (201, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Australie-Occidentale', null, 2, 69);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (202, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Western Australia', null, 3, 69);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (203, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Saskatchewan', null, 1, 70);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (204, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Saskatchewan', null, 2, 70);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (205, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Saskatchewan', null, 3, 70);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (206, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Niedersachsen', null, 1, 71);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (207, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Niedersachsen', null, 2, 71);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (208, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Niedersachsen', null, 3, 71);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (209, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Solothurn', null, 1, 72);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (210, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Solothurn', null, 2, 72);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (211, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Solothurn', null, 3, 72);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (212, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'California', null, 1, 73);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (213, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Californie', null, 2, 73);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (214, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'California', null, 3, 73);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (215, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Northern Territory', null, 1, 74);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (216, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Territoire du Nord', null, 2, 74);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (217, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Northern Territory', null, 3, 74);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (218, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Steiermark', null, 1, 75);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (219, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Steiermark', null, 2, 75);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (220, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Steiermark', null, 3, 75);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (221, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Katen', null, 1, 76);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (222, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Karten', null, 2, 76);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (223, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Katen', null, 3, 76);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (224, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Jaen', null, 1, 77);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (225, '2024-03-31 08:45:31.000000', '2024-03-31 08:45:31.000000', null, null, 'Jaen', null, 2, 77);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (226, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Jaen', null, 3, 77);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (227, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Asuncion', null, 1, 78);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (228, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Asunción', null, 3, 78);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (229, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Ciudad Real', null, 1, 79);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (230, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Ciudad Real', null, 2, 79);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (231, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Ciudad Real', null, 3, 79);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (232, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Schwyz', null, 1, 80);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (233, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Schwyz', null, 2, 80);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (234, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Schwyz', null, 3, 80);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (235, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Alava', null, 1, 81);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (236, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Alava', null, 2, 81);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (237, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Alava', null, 3, 81);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (238, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Kansas', null, 1, 82);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (239, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Kansas', null, 2, 82);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (240, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Kansas', null, 3, 82);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (241, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Colorado', null, 1, 83);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (242, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Colorado', null, 2, 83);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (243, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Colorado', null, 3, 83);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (244, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Kentucky', null, 1, 84);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (245, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Kentucky', null, 2, 84);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (246, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Kentucky', null, 3, 84);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (247, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Berlin', null, 1, 85);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (248, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Berlin', null, 2, 85);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (249, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Berlin', null, 3, 85);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (250, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Connecticut', null, 1, 86);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (251, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Connecticut', null, 2, 86);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (252, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Connecticut', null, 3, 86);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (253, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Australian Capital Territory', null, 1, 87);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (254, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Territoire de la capitale australienne', null, 2, 87);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (255, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Australian Capital Territory', null, 3, 87);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (256, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Thurgau', null, 1, 88);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (257, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Thurgau', null, 2, 88);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (258, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Thurgau', null, 3, 88);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (259, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Louisiana', null, 1, 89);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (260, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Louisiane', null, 2, 89);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (261, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Louisiana', null, 3, 89);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (262, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Hamburg', null, 1, 90);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (263, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Hamburg', null, 2, 90);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (264, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Hamburg', null, 3, 90);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (265, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Tessin', null, 1, 91);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (266, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Tessin', null, 2, 91);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (267, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Tessin', null, 3, 91);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (268, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Lugo', null, 1, 92);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (269, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Lugo', null, 2, 92);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (270, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Lugo', null, 3, 92);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (271, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Neuenburg', null, 1, 93);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (272, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Neuenburg', null, 2, 93);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (273, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Neuenburg', null, 3, 93);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (274, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Tennessee', null, 1, 94);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (275, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Tennessee', null, 2, 94);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (276, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Tennessee', null, 3, 94);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (277, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Toledo', null, 1, 95);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (278, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Toledo', null, 2, 95);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (279, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Toledo', null, 3, 95);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (280, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'District of Columbia', null, 1, 96);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (281, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'District de Columbia', null, 2, 96);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (282, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'District of Columbia', null, 3, 96);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (283, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Palencia', null, 1, 97);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (284, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Palencia', null, 2, 97);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (285, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Palencia', null, 3, 97);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (286, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Delaware', null, 1, 98);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (287, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Delaware', null, 2, 98);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (288, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Delaware', null, 3, 98);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (289, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Texas', null, 1, 99);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (290, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Texas', null, 2, 99);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (291, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Texas', null, 3, 99);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (292, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Tasmania', null, 1, 100);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (293, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Tasmanie', null, 2, 100);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (294, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Tasmania', null, 3, 100);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (295, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Queensland', null, 1, 101);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (296, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Queensland', null, 2, 101);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (297, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Queensland', null, 3, 101);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (298, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Luzern', null, 1, 102);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (299, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Luzern', null, 2, 102);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (300, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Luzern', null, 3, 102);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (301, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Burgos', null, 1, 103);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (302, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Burgos', null, 2, 103);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (303, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Burgos', null, 3, 103);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (304, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Cadiz', null, 1, 104);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (305, '2024-03-31 08:45:32.000000', '2024-03-31 08:45:32.000000', null, null, 'Cadiz', null, 2, 104);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (306, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Cadiz', null, 3, 104);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (307, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Santa Cruz de Tenerife', null, 1, 105);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (308, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Santa Cruz de Tenerife', null, 2, 105);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (309, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Santa Cruz de Tenerife', null, 3, 105);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (310, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Massachusetts', null, 1, 106);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (311, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Massachusetts', null, 2, 106);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (312, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Massachusetts', null, 3, 106);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (313, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Manitoba', null, 1, 107);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (314, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Manitoba', null, 2, 107);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (315, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Manitoba', null, 3, 107);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (316, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Maryland', null, 1, 108);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (317, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Maryland', null, 2, 108);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (318, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Maryland', null, 3, 108);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (319, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Girona', null, 1, 109);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (320, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Girona', null, 2, 109);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (321, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Girona', null, 3, 109);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (322, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Maine', null, 1, 110);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (323, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Maine', null, 2, 110);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (324, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Maine', null, 3, 110);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (325, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Alicante', null, 1, 111);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (326, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Alicante', null, 2, 111);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (327, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Alicante', null, 3, 111);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (328, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Guadalajara', null, 1, 112);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (329, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Guadalajara', null, 2, 112);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (330, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Guadalajara', null, 3, 112);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (331, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Cantabria', null, 1, 113);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (332, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Cantabria', null, 2, 113);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (333, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Cantabria', null, 3, 113);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (334, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Marshall Islands', null, 1, 114);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (335, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Marshall Islands', null, 2, 114);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (336, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Marshall Islands', null, 3, 114);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (337, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Michigan', null, 1, 115);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (338, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Michigan', null, 2, 115);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (339, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Michigan', null, 3, 115);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (340, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Uri', null, 1, 116);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (341, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Uri', null, 2, 116);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (342, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Uri', null, 3, 116);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (343, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Utah', null, 1, 117);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (344, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Utah', null, 2, 117);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (345, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Utah', null, 3, 117);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (346, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Minnesota', null, 1, 118);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (347, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Minnesota', null, 2, 118);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (348, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Minnesota', null, 3, 118);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (349, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Missouri', null, 1, 119);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (350, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Missouri', null, 2, 119);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (351, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Missouri', null, 3, 119);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (352, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Northern Mariana Islands', null, 1, 120);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (353, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Northern Mariana Islands', null, 2, 120);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (354, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Northern Mariana Islands', null, 3, 120);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (355, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Barcelona', null, 1, 121);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (356, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Barcelona', null, 2, 121);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (357, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Barcelona', null, 3, 121);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (358, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Mississippi', null, 1, 122);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (359, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Mississippi', null, 2, 122);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (360, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Mississippi', null, 3, 122);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (361, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Montana', null, 1, 123);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (362, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Montana', null, 2, 123);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (363, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Montana', null, 3, 123);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (364, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Badajoz', null, 1, 124);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (365, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Badajoz', null, 2, 124);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (366, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Badajoz', null, 3, 124);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (367, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Mecklenburg-Vorpommern', null, 1, 125);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (368, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Mecklenburg-Vorpommern', null, 2, 125);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (369, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Mecklenburg-Vorpommern', null, 3, 125);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (370, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Virginia', null, 1, 126);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (371, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Virginie', null, 2, 126);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (372, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Virginia', null, 3, 126);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (373, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Voralberg', null, 1, 127);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (374, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Voralberg', null, 2, 127);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (375, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Voralberg', null, 3, 127);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (376, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Cuenca', null, 1, 128);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (377, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Cuenca', null, 2, 128);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (378, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Cuenca', null, 3, 128);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (379, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Wien', null, 1, 129);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (380, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Wien', null, 2, 129);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (381, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Wien', null, 3, 129);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (382, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Waadt', null, 1, 130);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (383, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Waadt', null, 2, 130);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (384, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Waadt', null, 3, 130);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (385, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Sevilla', null, 1, 131);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (386, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Sevilla', null, 2, 131);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (387, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Sevilla', null, 3, 131);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (388, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Virgin Islands', null, 1, 132);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (389, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Virgin Islands', null, 2, 132);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (390, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Virgin Islands', null, 3, 132);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (391, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Zaragoza', null, 1, 133);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (392, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Zaragoza', null, 2, 133);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (393, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Zaragoza', null, 3, 133);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (394, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'New Brunswick', null, 1, 134);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (395, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Nouveau Brunswick', null, 2, 134);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (396, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'New Brunswick', null, 3, 134);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (397, '2024-03-31 08:45:33.000000', '2024-03-31 08:45:33.000000', null, null, 'Sachsen-Anhalt', null, 1, 135);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (398, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Sachsen-Anhalt', null, 2, 135);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (399, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Sachsen-Anhalt', null, 3, 135);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (400, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'North Carolina', null, 1, 136);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (401, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Caroline du Nord', null, 2, 136);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (402, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'North Carolina', null, 3, 136);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (403, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'North Dakota', null, 1, 137);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (404, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Dakota du Nord', null, 2, 137);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (405, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'North Dakota', null, 3, 137);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (406, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Nebraska', null, 1, 138);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (407, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Nebraska', null, 2, 138);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (408, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Nebraska', null, 3, 138);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (409, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Newfoundland - Labrador', null, 1, 139);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (410, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Terre-Neuve - Labrador', null, 2, 139);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (411, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Newfoundland - Labrador', null, 3, 139);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (412, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'New Hampshire', null, 1, 140);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (413, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Nouveau Hampshire', null, 2, 140);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (414, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'New Hampshire', null, 3, 140);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (415, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'New Jersey', null, 1, 141);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (416, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'New Jersey', null, 2, 141);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (417, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'New Jersey', null, 3, 141);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (418, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Wallis', null, 1, 142);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (419, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Wallis', null, 2, 142);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (420, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Wallis', null, 3, 142);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (421, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Vermont', null, 1, 143);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (422, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Vermont', null, 2, 143);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (423, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Vermont', null, 3, 143);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (424, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'New Mexico', null, 1, 144);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (425, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Nouveau Mexique', null, 2, 144);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (426, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'New Mexico', null, 3, 144);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (427, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Niederosterreich', null, 1, 145);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (428, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Niederosterreich', null, 2, 145);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (429, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Niederosterreich', null, 3, 145);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (430, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Sachsen', null, 1, 146);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (431, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Sachsen', null, 2, 146);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (432, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Sachsen', null, 3, 146);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (433, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Nova Scotia', null, 1, 147);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (434, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Nouvelle Écosse', null, 2, 147);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (435, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Nova Scotia', null, 3, 147);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (436, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Saarland', null, 1, 148);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (437, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Saarland', null, 2, 148);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (438, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Saarland', null, 3, 148);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (439, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Florida', null, 1, 149);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (440, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Floride', null, 2, 149);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (441, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Florida', null, 3, 149);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (442, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Northwest Territories', null, 1, 150);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (443, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Territores du Nord-Ouest', null, 2, 150);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (444, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Northwest Territories', null, 3, 150);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (445, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Federated States Of Micronesia', null, 1, 151);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (446, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Federated States Of Micronesia', null, 2, 151);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (447, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Federated States Of Micronesia', null, 3, 151);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (448, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Nunavut', null, 1, 152);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (449, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Nunavut', null, 2, 152);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (450, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Nunavut', null, 3, 152);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (451, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Nevada', null, 1, 153);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (452, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Nevada', null, 2, 153);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (453, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Nevada', null, 3, 153);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (454, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Nidwalden', null, 1, 154);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (455, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Nidwalden', null, 2, 154);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (456, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Nidwalden', null, 3, 154);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (457, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Washington', null, 1, 155);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (458, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Washington', null, 2, 155);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (459, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Washington', null, 3, 155);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (460, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'New York', null, 1, 156);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (461, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'New York', null, 2, 156);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (462, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'New York', null, 3, 156);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (463, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Granada', null, 1, 157);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (464, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Granada', null, 2, 157);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (465, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Granada', null, 3, 157);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (466, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Soria', null, 1, 158);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (467, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Soria', null, 2, 158);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (468, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Soria', null, 3, 158);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (469, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Freiburg', null, 1, 159);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (470, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Freiburg', null, 2, 159);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (471, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Freiburg', null, 3, 159);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (472, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Rheinland-Pfalz', null, 1, 160);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (473, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Rheinland-Pfalz', null, 2, 160);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (474, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Rheinland-Pfalz', null, 3, 160);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (475, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Ourense', null, 1, 161);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (476, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Ourense', null, 2, 161);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (477, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Ourense', null, 3, 161);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (478, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Wisconsin', null, 1, 162);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (479, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Wisconsin', null, 2, 162);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (480, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Wisconsin', null, 3, 162);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (481, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Ohio', null, 1, 163);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (482, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Ohio', null, 2, 163);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (483, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Ohio', null, 3, 163);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (484, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Georgia', null, 1, 164);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (485, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Georgie', null, 2, 164);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (486, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Georgia', null, 3, 164);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (487, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Murcia', null, 1, 165);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (488, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Murcia', null, 2, 165);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (489, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Murcia', null, 3, 165);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (490, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Oklahoma', null, 1, 166);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (491, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Oklahoma', null, 2, 166);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (492, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Oklahoma', null, 3, 166);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (493, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Genf', null, 1, 167);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (494, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Genf', null, 2, 167);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (495, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Genf', null, 3, 167);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (496, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'West Virginia', null, 1, 168);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (497, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'West Virginia', null, 2, 168);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (498, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'West Virginia', null, 3, 168);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (499, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Ontario', null, 1, 169);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (500, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Ontario', null, 2, 169);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (501, '2024-03-31 08:45:34.000000', '2024-03-31 08:45:34.000000', null, null, 'Ontario', null, 3, 169);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (502, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Oberosterreich', null, 1, 170);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (503, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Oberosterreich', null, 2, 170);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (504, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Oberosterreich', null, 3, 170);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (505, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Wyoming', null, 1, 171);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (506, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Wyoming', null, 2, 171);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (507, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Wyoming', null, 3, 171);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (508, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Burgenland', null, 1, 172);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (509, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Burgenland', null, 2, 172);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (510, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Burgenland', null, 3, 172);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (511, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Avila', null, 1, 173);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (512, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Avila', null, 2, 173);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (513, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Avila', null, 3, 173);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (514, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Oregon', null, 1, 174);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (515, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Oregon', null, 2, 174);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (516, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Oregon', null, 3, 174);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (517, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Salamanca', null, 1, 175);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (518, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Salamanca', null, 2, 175);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (519, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Salamanca', null, 3, 175);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (520, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Glarus', null, 1, 176);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (521, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Glarus', null, 2, 176);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (522, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Glarus', null, 3, 176);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (523, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Baleares', null, 1, 177);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (524, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Baleares', null, 2, 177);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (525, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Baleares', null, 3, 177);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (526, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Obwalden', null, 1, 178);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (527, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Obwalden', null, 2, 178);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (528, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Obwalden', null, 3, 178);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (529, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Graubnden', null, 1, 179);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (530, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Graubnden', null, 2, 179);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (531, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Graubnden', null, 3, 179);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (532, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Guam', null, 1, 180);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (533, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Guam', null, 2, 180);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (534, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Guam', null, 3, 180);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (535, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Pennsylvania', null, 1, 181);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (536, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Pennsylvanie', null, 2, 181);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (537, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Pennsylvania', null, 3, 181);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (538, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Victoria', null, 1, 182);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (539, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Victoria', null, 2, 182);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (540, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Victoria', null, 3, 182);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (541, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Bremen', null, 1, 183);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (542, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Bremen', null, 2, 183);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (543, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Bremen', null, 3, 183);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (544, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Prince Edward Island', null, 1, 184);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (545, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Île-du-Prince-Édouard', null, 2, 184);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (546, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Prince Edward Island', null, 3, 184);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (547, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Brandenburg', null, 1, 185);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (548, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Brandenburg', null, 2, 185);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (549, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Brandenburg', null, 3, 185);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (550, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Hessen', null, 1, 186);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (551, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Hessen', null, 2, 186);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (552, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Hessen', null, 3, 186);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (553, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Almeria', null, 1, 187);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (554, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Almeria', null, 2, 187);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (555, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Almeria', null, 3, 187);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (556, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Baden-Wrttemberg', null, 1, 188);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (557, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Baden-Wrttemberg', null, 2, 188);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (558, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Baden-Wrttemberg', null, 3, 188);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (559, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Bayern', null, 1, 189);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (560, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Bayern', null, 2, 189);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (561, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Bayern', null, 3, 189);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (562, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Navarra', null, 1, 190);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (563, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Navarra', null, 2, 190);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (564, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Navarra', null, 3, 190);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (565, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Valencia', null, 1, 191);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (566, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Valencia', null, 2, 191);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (567, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Valencia', null, 3, 191);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (568, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Schleswig-Holstein', null, 1, 192);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (569, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Schleswig-Holstein', null, 2, 192);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (570, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Schleswig-Holstein', null, 3, 192);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (571, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Andhra Pradesh', null, 1, 193);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (572, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Andhra Pradesh', null, 2, 193);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (573, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Andhra Pradesh', null, 3, 193);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (574, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Arunachal Pradesh', null, 1, 194);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (575, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Arunachal Pradesh', null, 2, 194);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (576, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Arunachal Pradesh', null, 3, 194);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (577, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Assam', null, 1, 195);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (578, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Assam', null, 2, 195);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (579, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Assam', null, 3, 195);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (580, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Bihar', null, 1, 196);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (581, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Bihar', null, 2, 196);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (582, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Bihar', null, 3, 196);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (583, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Chhattisgarh', null, 1, 197);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (584, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Chhattisgarh', null, 2, 197);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (585, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Chhattisgarh', null, 3, 197);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (586, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Goa', null, 1, 198);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (587, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Goa', null, 2, 198);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (588, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Goa', null, 3, 198);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (589, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Gujarat', null, 1, 199);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (590, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Gujarat', null, 2, 199);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (591, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Gujarat', null, 3, 199);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (592, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Haryana', null, 1, 200);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (593, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Haryana', null, 2, 200);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (594, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Haryana', null, 3, 200);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (595, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Himachal Pradesh', null, 1, 201);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (596, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Himachal Pradesh', null, 2, 201);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (597, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Himachal Pradesh', null, 3, 201);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (598, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Jharkhand', null, 1, 202);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (599, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Jharkhand', null, 2, 202);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (600, '2024-03-31 08:45:35.000000', '2024-03-31 08:45:35.000000', null, null, 'Jharkhand', null, 3, 202);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (601, '2024-03-31 08:45:36.000000', '2024-03-31 08:45:36.000000', null, null, 'Karnataka', null, 1, 203);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (602, '2024-03-31 08:45:36.000000', '2024-03-31 08:45:36.000000', null, null, 'Karnataka', null, 2, 203);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (603, '2024-03-31 08:45:36.000000', '2024-03-31 08:45:36.000000', null, null, 'Karnataka', null, 3, 203);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (604, '2024-03-31 08:45:36.000000', '2024-03-31 08:45:36.000000', null, null, 'Kerala', null, 1, 204);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (605, '2024-03-31 08:45:36.000000', '2024-03-31 08:45:36.000000', null, null, 'Kerala', null, 2, 204);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (606, '2024-03-31 08:45:36.000000', '2024-03-31 08:45:36.000000', null, null, 'Kerala', null, 3, 204);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (607, '2024-03-31 08:45:36.000000', '2024-03-31 08:45:36.000000', null, null, 'Madhya Pradesh', null, 1, 205);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (608, '2024-03-31 08:45:36.000000', '2024-03-31 08:45:36.000000', null, null, 'Madhya Pradesh', null, 2, 205);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (609, '2024-03-31 08:45:36.000000', '2024-03-31 08:45:36.000000', null, null, 'Madhya Pradesh', null, 3, 205);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (610, '2024-03-31 08:45:36.000000', '2024-03-31 08:45:36.000000', null, null, 'Maharashtra', null, 1, 206);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (611, '2024-03-31 08:45:36.000000', '2024-03-31 08:45:36.000000', null, null, 'Maharashtra', null, 2, 206);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (612, '2024-03-31 08:45:36.000000', '2024-03-31 08:45:36.000000', null, null, 'Maharashtra', null, 3, 206);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (613, '2024-03-31 08:45:36.000000', '2024-03-31 08:45:36.000000', null, null, 'Manipur', null, 1, 207);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (614, '2024-03-31 08:45:36.000000', '2024-03-31 08:45:36.000000', null, null, 'Manipur', null, 2, 207);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (615, '2024-03-31 08:45:36.000000', '2024-03-31 08:45:36.000000', null, null, 'Manipur', null, 3, 207);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (616, '2024-03-31 08:45:36.000000', '2024-03-31 08:45:36.000000', null, null, 'Meghalaya', null, 1, 208);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (617, '2024-03-31 08:45:36.000000', '2024-03-31 08:45:36.000000', null, null, 'Meghalaya', null, 2, 208);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (618, '2024-03-31 08:45:36.000000', '2024-03-31 08:45:36.000000', null, null, 'Meghalaya', null, 3, 208);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (619, '2024-03-31 08:45:36.000000', '2024-03-31 08:45:36.000000', null, null, 'Mizoram', null, 1, 209);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (620, '2024-03-31 08:45:36.000000', '2024-03-31 08:45:36.000000', null, null, 'Mizoram', null, 2, 209);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (621, '2024-03-31 08:45:36.000000', '2024-03-31 08:45:36.000000', null, null, 'Mizoram', null, 3, 209);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (622, '2024-03-31 08:45:36.000000', '2024-03-31 08:45:36.000000', null, null, 'Nagaland', null, 1, 210);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (623, '2024-03-31 08:45:36.000000', '2024-03-31 08:45:36.000000', null, null, 'Nagaland', null, 2, 210);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (624, '2024-03-31 08:45:36.000000', '2024-03-31 08:45:36.000000', null, null, 'Nagaland', null, 3, 210);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (625, '2024-03-31 08:45:36.000000', '2024-03-31 08:45:36.000000', null, null, 'Odisha', null, 1, 211);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (626, '2024-03-31 08:45:36.000000', '2024-03-31 08:45:36.000000', null, null, 'Odisha', null, 2, 211);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (627, '2024-03-31 08:45:36.000000', '2024-03-31 08:45:36.000000', null, null, 'Odisha', null, 3, 211);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (628, '2024-03-31 08:45:36.000000', '2024-03-31 08:45:36.000000', null, null, 'Punjab', null, 1, 212);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (629, '2024-03-31 08:45:36.000000', '2024-03-31 08:45:36.000000', null, null, 'Punjab', null, 2, 212);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (630, '2024-03-31 08:45:36.000000', '2024-03-31 08:45:36.000000', null, null, 'Punjab', null, 3, 212);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (631, '2024-03-31 08:45:36.000000', '2024-03-31 08:45:36.000000', null, null, 'Rajasthan', null, 1, 213);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (632, '2024-03-31 08:45:36.000000', '2024-03-31 08:45:36.000000', null, null, 'Rajasthan', null, 2, 213);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (633, '2024-03-31 08:45:36.000000', '2024-03-31 08:45:36.000000', null, null, 'Rajasthan', null, 3, 213);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (634, '2024-03-31 08:45:36.000000', '2024-03-31 08:45:36.000000', null, null, 'Sikkim', null, 1, 214);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (635, '2024-03-31 08:45:36.000000', '2024-03-31 08:45:36.000000', null, null, 'Sikkim', null, 2, 214);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (636, '2024-03-31 08:45:36.000000', '2024-03-31 08:45:36.000000', null, null, 'Sikkim', null, 3, 214);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (637, '2024-03-31 08:45:36.000000', '2024-03-31 08:45:36.000000', null, null, 'Tamil Nadu', null, 1, 215);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (638, '2024-03-31 08:45:36.000000', '2024-03-31 08:45:36.000000', null, null, 'Tamil Nadu', null, 2, 215);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (639, '2024-03-31 08:45:36.000000', '2024-03-31 08:45:36.000000', null, null, 'Tamil Nadu', null, 3, 215);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (640, '2024-03-31 08:45:36.000000', '2024-03-31 08:45:36.000000', null, null, 'Telangana', null, 1, 216);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (641, '2024-03-31 08:45:36.000000', '2024-03-31 08:45:36.000000', null, null, 'Telangana', null, 2, 216);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (642, '2024-03-31 08:45:36.000000', '2024-03-31 08:45:36.000000', null, null, 'Telangana', null, 3, 216);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (643, '2024-03-31 08:45:36.000000', '2024-03-31 08:45:36.000000', null, null, 'Tripura', null, 1, 217);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (644, '2024-03-31 08:45:36.000000', '2024-03-31 08:45:36.000000', null, null, 'Tripura', null, 2, 217);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (645, '2024-03-31 08:45:36.000000', '2024-03-31 08:45:36.000000', null, null, 'Tripura', null, 3, 217);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (646, '2024-03-31 08:45:36.000000', '2024-03-31 08:45:36.000000', null, null, 'Uttarakhand', null, 1, 218);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (647, '2024-03-31 08:45:36.000000', '2024-03-31 08:45:36.000000', null, null, 'Uttarakhand', null, 2, 218);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (648, '2024-03-31 08:45:36.000000', '2024-03-31 08:45:36.000000', null, null, 'Uttarakhand', null, 3, 218);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (649, '2024-03-31 08:45:36.000000', '2024-03-31 08:45:36.000000', null, null, 'West Bengal', null, 1, 219);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (650, '2024-03-31 08:45:37.000000', '2024-03-31 08:45:37.000000', null, null, 'West Bengal', null, 2, 219);
+INSERT INTO store.zone_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, zone_id) VALUES (651, '2024-03-31 08:45:37.000000', '2024-03-31 08:45:37.000000', null, null, 'West Bengal', null, 3, 219);
 
 
-INSERT INTO store.MERCHANT_STORE (org, MERCHANT_ID, DATE_CREATED, DATE_MODIFIED, UPDT_ID, STORE_CODE,
-                                  CONTINUESHOPPINGURL,
-                                  CURRENCY_FORMAT_NATIONAL, DOMAIN_NAME, IN_BUSINESS_SINCE, INVOICE_TEMPLATE,
-                                  IS_RETAILER, SEIZEUNITCODE, STORE_EMAIL, STORE_LOGO, STORE_TEMPLATE, STORE_ADDRESS,
-                                  STORE_CITY, STORE_NAME, STORE_PHONE, STORE_POSTAL_CODE, STORE_STATE_PROV, USE_CACHE,
-                                  WEIGHTUNITCODE, COUNTRY_ID, CURRENCY_ID, LANGUAGE_ID, PARENT_ID, ZONE_ID)
-VALUES ('d1952c95-312e-4bb9-9a2d-b703d031276f', 1, NULL, NULL, NULL, '65f023632bc46470c104b76f', NULL, false, 'localhost:8080',
-        '2024-03-31', NULL, true, 'IN',
-        'john@test.com',
-        '500_333.jpeg', 'december', '1234 Street address', 'My city', 'Default store', '888-888-8888', 'H2H-2H2', NULL,
-        false, 'LB', 37, 105, 1, NULL, 9);
+INSERT INTO store.merchant_store (merchant_id, date_created, date_modified, updt_id, store_code, continueshoppingurl, currency_format_national, domain_name, in_business_since, invoice_template, lineage, org, is_retailer, seizeunitcode, store_email, store_logo, store_template, store_address, store_city, store_name, store_phone, store_postal_code, store_state_prov, use_cache, weightunitcode, country_id, currency_id, language_id, parent_id, zone_id) VALUES (1, null, null, null, '65f023632bc46470c104b76f', null, false, 'localhost:8080', '2024-03-31', null, null, 'd1952c95-312e-4bb9-9a2d-b703d031276f', true, 'IN', 'john@test.com', '500_333.jpeg', 'december', '1234 Street address', 'My city', 'Default store', '888-888-8888', 'H2H-2H2', null, false, 'LB', 37, 105, 1, null, 9);
 
-INSERT INTO store.MERCHANT_LANGUAGE (stores_MERCHANT_ID, languages_LANGUAGE_ID)
-VALUES (1, 1);
+INSERT INTO store.merchant_language (stores_merchant_id, languages_language_id) VALUES (1, 1);
 
-INSERT INTO store.MERCHANT_CONFIGURATION (MERCHANT_CONFIG_ID, ACTIVE, DATE_CREATED, DATE_MODIFIED, UPDT_ID, CONFIG_KEY,
-                                          TYPE, VALUE, MERCHANT_ID)
-VALUES (1, false, '2024-03-31 08:45:39', '2024-03-31 08:45:39', NULL, 'CONFIG', 'CONFIG',
-        '{\"allowPurchaseItems\":true,\"displayContactUs\":false,\"displayCustomerAgreement\":false,\"defaultSearchConfigPath\":{},\"displayCustomerSection\":false,\"displayAddToCartOnFeaturedItems\":true,\"displayPagesMenu\":true,\"testMode\":false,\"displayStoreAddress\":false,\"displaySearchBox\":true,\"debugMode\":false,\"useDefaultSearchConfig\":{}}',
-        1);
+INSERT INTO store.merchant_configuration (merchant_config_id, active, date_created, date_modified, updt_id, config_key, type, value, merchant_id) VALUES (1, false, '2024-03-31 08:45:39.000000', '2024-03-31 08:45:39.000000', null, 'CONFIG', 'CONFIG', '{"allowPurchaseItems":true,"displayContactUs":false,"displayCustomerAgreement":false,"defaultSearchConfigPath":{},"displayCustomerSection":false,"displayAddToCartOnFeaturedItems":true,"displayPagesMenu":true,"testMode":false,"displayStoreAddress":false,"displaySearchBox":true,"debugMode":false,"useDefaultSearchConfig":{}}', 1);
 
-INSERT INTO store.MANUFACTURER (MANUFACTURER_ID, DATE_CREATED, DATE_MODIFIED, UPDT_ID, CODE, MANUFACTURER_IMAGE,
-                                SORT_ORDER, MERCHANT_ID)
-VALUES (1, '2024-03-31 08:45:39', '2024-03-31 08:45:39', NULL, 'DEFAULT', NULL, 0, 1),
-       (50, '2024-03-31 15:32:13', '2024-03-31 15:32:13', NULL, 'cars', NULL, 0, 1);
+INSERT INTO store.manufacturer (manufacturer_id, date_created, date_modified, updt_id, code, manufacturer_image, sort_order, merchant_id) VALUES (1, '2024-03-31 08:45:39.000000', '2024-03-31 08:45:39.000000', null, 'DEFAULT', null, 0, 1);
+INSERT INTO store.manufacturer (manufacturer_id, date_created, date_modified, updt_id, code, manufacturer_image, sort_order, merchant_id) VALUES (50, '2024-03-31 15:32:13.000000', '2024-03-31 15:32:13.000000', null, 'cars', null, 0, 1);
+
+INSERT INTO store.manufacturer_description (description_id, date_created, date_modified, updt_id, description, name, title, date_last_click, manufacturers_url, url_clicked, language_id, manufacturer_id) VALUES (1, '2024-03-31 08:45:39.000000', '2024-03-31 08:45:39.000000', null, 'DEFAULT', 'DEFAULT', null, null, null, null, 1, 1);
+INSERT INTO store.manufacturer_description (description_id, date_created, date_modified, updt_id, description, name, title, date_last_click, manufacturers_url, url_clicked, language_id, manufacturer_id) VALUES (2, '2024-03-31 15:32:13.000000', '2024-03-31 15:32:13.000000', null, '', 'cars', null, null, null, null, 1, 50);
 
 
-INSERT INTO store.MANUFACTURER_DESCRIPTION (DESCRIPTION_ID, DATE_CREATED, DATE_MODIFIED, UPDT_ID, DESCRIPTION, NAME,
-                                            TITLE, DATE_LAST_CLICK, MANUFACTURERS_URL, URL_CLICKED, LANGUAGE_ID,
-                                            MANUFACTURER_ID)
-VALUES (1, '2024-03-31 08:45:39', '2024-03-31 08:45:39', NULL, 'DEFAULT', 'DEFAULT', NULL, NULL, NULL, NULL, 1, 1),
-       (2, '2024-03-31 15:32:13', '2024-03-31 15:32:13', NULL, '', 'cars', NULL, NULL, NULL, NULL, 1, 50);
+INSERT INTO store.category (category_id, date_created, date_modified, updt_id, category_image, category_status, code, depth, featured, lineage, sort_order, visible, merchant_id, parent_id) VALUES (1, '2024-03-31 15:24:30.000000', '2024-03-31 15:24:31.000000', 'admin@shopizer.com', null, false, 'phones', 0, false, '/1/', 0, true, 1, null);
+INSERT INTO store.category (category_id, date_created, date_modified, updt_id, category_image, category_status, code, depth, featured, lineage, sort_order, visible, merchant_id, parent_id) VALUES (2, '2024-03-31 15:24:48.000000', '2024-03-31 15:24:48.000000', 'admin@shopizer.com', null, false, 'cars', 0, false, '/2/', 0, true, 1, null);
 
-INSERT INTO store.CATEGORY (CATEGORY_ID, DATE_CREATED, DATE_MODIFIED, UPDT_ID, CATEGORY_IMAGE, CATEGORY_STATUS, CODE,
-                            DEPTH, FEATURED, LINEAGE, SORT_ORDER, VISIBLE, MERCHANT_ID, PARENT_ID)
-VALUES (1, '2024-03-31 15:24:30', '2024-03-31 15:24:31', 'admin@shopizer.com', NULL, false, 'phones', 0, false, '/1/',
-        0, true, 1, NULL),
-       (2, '2024-03-31 15:24:48', '2024-03-31 15:24:48', 'admin@shopizer.com', NULL, false, 'cars', 0, false, '/2/', 0,
-        true, 1, NULL);
-
-INSERT INTO store.CATEGORY_DESCRIPTION (DESCRIPTION_ID, DATE_CREATED, DATE_MODIFIED, UPDT_ID, DESCRIPTION, NAME, TITLE,
-                                        CATEGORY_HIGHLIGHT, META_DESCRIPTION, META_KEYWORDS, META_TITLE, SEF_URL,
-                                        LANGUAGE_ID, CATEGORY_ID)
-VALUES (1, '2024-03-31 15:24:30', '2024-03-31 15:24:30', NULL, 'phones', 'phones', NULL, '', '', NULL, 'phones',
-        'phones', 1, 1),
-       (2, '2024-03-31 15:24:48', '2024-03-31 15:24:48', NULL, '', 'cars', NULL, '', '', NULL, 'cars', '2', 1, 2);
+INSERT INTO store.category_description (description_id, date_created, date_modified, updt_id, description, name, title, category_highlight, meta_description, meta_keywords, meta_title, sef_url, language_id, category_id) VALUES (1, '2024-03-31 15:24:30.000000', '2024-03-31 15:24:30.000000', null, 'phones', 'phones', null, '', '', null, 'phones', 'phones', 1, 1);
+INSERT INTO store.category_description (description_id, date_created, date_modified, updt_id, description, name, title, category_highlight, meta_description, meta_keywords, meta_title, sef_url, language_id, category_id) VALUES (2, '2024-03-31 15:24:48.000000', '2024-03-31 15:24:48.000000', null, '', 'cars', null, '', '', null, 'cars', '2', 1, 2);
 
 
-INSERT INTO store.CONTENT (CONTENT_ID, DATE_CREATED, DATE_MODIFIED, UPDT_ID, CODE, CONTENT_POSITION, CONTENT_TYPE,
-                           LINK_TO_MENU, PRODUCT_GROUP, SORT_ORDER, VISIBLE, MERCHANT_ID)
-VALUES (1, NULL, NULL, NULL, 'aboutus', NULL, 'PAGE', false, NULL, 0, true, 1),
-       (2, NULL, NULL, NULL, 'callus', NULL, 'PAGE', false, NULL, 0, true, 1),
-       (3, NULL, NULL, NULL, 'agreement', NULL, 'BOX', false, NULL, 0, true, 1),
-       (4, NULL, NULL, NULL, 'headerMessage', NULL, 'BOX', false, NULL, 0, true, 1);
+INSERT INTO store.content (content_id, date_created, date_modified, updt_id, code, content_position, content_type, link_to_menu, product_group, sort_order, visible, merchant_id) VALUES (1, null, null, null, 'aboutus', null, 'PAGE', false, null, 0, true, 1);
+INSERT INTO store.content (content_id, date_created, date_modified, updt_id, code, content_position, content_type, link_to_menu, product_group, sort_order, visible, merchant_id) VALUES (2, null, null, null, 'callus', null, 'PAGE', false, null, 0, true, 1);
+INSERT INTO store.content (content_id, date_created, date_modified, updt_id, code, content_position, content_type, link_to_menu, product_group, sort_order, visible, merchant_id) VALUES (3, null, null, null, 'agreement', null, 'BOX', false, null, 0, true, 1);
+INSERT INTO store.content (content_id, date_created, date_modified, updt_id, code, content_position, content_type, link_to_menu, product_group, sort_order, visible, merchant_id) VALUES (4, null, null, null, 'headerMessage', null, 'BOX', false, null, 0, true, 1);
 
 
-INSERT INTO store.CONTENT_DESCRIPTION (DESCRIPTION_ID, DATE_CREATED, DATE_MODIFIED, UPDT_ID, DESCRIPTION, NAME, TITLE,
-                                       META_DESCRIPTION, META_KEYWORDS, META_TITLE, SEF_URL, LANGUAGE_ID, CONTENT_ID)
-VALUES (1, '2024-03-31 15:28:01', '2024-03-31 15:28:01', NULL, 'welcome to us', 'about us', 'about us', 'about us',
-        NULL, 'about us', 'about-us', 1, 1),
-       (2, '2024-03-31 15:28:20', '2024-03-31 15:28:20', NULL, 'callus', 'callus', 'callus', 'callus', NULL, 'callus',
-        'callus', 1, 2),
-       (3, '2024-03-31 15:28:40', '2024-03-31 15:28:40', NULL, 'agreement&nbsp;agreementvagreement&nbsp;agreement&nbsp;agreement', 'agreement', '',
-        NULL, NULL, '', NULL, 1, 3),
-       (4, '2024-03-31 15:28:40', '2024-03-31 15:28:40', NULL, 'headerMessage&nbsp;headerMessagevheaderMessage&nbsp;headerMessage&nbsp;headerMessage', 'headerMessage', '',
-        NULL, NULL, '', NULL, 1, 4);
-INSERT INTO store.PRODUCT (PRODUCT_ID, DATE_CREATED, DATE_MODIFIED, UPDT_ID, AVAILABLE, COND, DATE_AVAILABLE, PREORDER,
-                           PRODUCT_HEIGHT, PRODUCT_FREE, PRODUCT_LENGTH, QUANTITY_ORDERED, REVIEW_AVG, REVIEW_COUNT,
-                           PRODUCT_SHIP, PRODUCT_VIRTUAL, PRODUCT_WEIGHT, PRODUCT_WIDTH, REF_SKU, RENTAL_DURATION,
-                           RENTAL_PERIOD, RENTAL_STATUS, SKU, SORT_ORDER, MANUFACTURER_ID, MERCHANT_ID, CUSTOMER_ID,
-                           TAX_CLASS_ID, PRODUCT_TYPE_ID)
-VALUES (1, '2024-03-31 15:26:49', '2024-03-31 15:26:49', NULL, true, NULL, '2024-03-31 00:00:00', false, NULL, false,
-        NULL, NULL, NULL, NULL, true, false, NULL, NULL, 'iphone', NULL, NULL, NULL, 'iphone', 1, 1, 1, NULL, NULL,
-        NULL),
-       (2, '2024-03-31 15:32:47', '2024-03-31 15:32:47', NULL, true, NULL, '2024-03-31 00:00:00', false, NULL, false,
-        NULL, NULL, NULL, NULL, true, false, NULL, NULL, 'fiat', NULL, NULL, NULL, 'fiat', 12, 50, 1, NULL, NULL, NULL);
-INSERT INTO store.PRODUCT_AVAILABILITY (PRODUCT_AVAIL_ID, DATE_CREATED, DATE_MODIFIED, UPDT_ID, AVAILABLE, HEIGHT,
-                                        LENGTH, WEIGHT, WIDTH, OWNER, DATE_AVAILABLE, FREE_SHIPPING, QUANTITY,
-                                        QUANTITY_ORD_MAX, QUANTITY_ORD_MIN, STATUS, REGION, REGION_VARIANT, SKU,
-                                        MERCHANT_ID, PRODUCT_ID)
-VALUES (1, NULL, NULL, NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, false, 10, 1, 1, true, '*', NULL, NULL, 1, 1),
-       (2, NULL, NULL, NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, false, 22, 1, 1, true, '*', NULL, NULL, 1, 2);
-INSERT INTO store.PRODUCT_CATEGORY (PRODUCT_ID, CATEGORY_ID)
-VALUES (1, 1),
-       (2, 2);
+INSERT INTO store.content_description (description_id, date_created, date_modified, updt_id, description, name, title, meta_description, meta_keywords, meta_title, sef_url, language_id, content_id) VALUES (1, '2024-03-31 15:28:01.000000', '2024-03-31 15:28:01.000000', null, 'welcome to us', 'about us', 'about us', 'about us', null, 'about us', 'about-us', 1, 1);
+INSERT INTO store.content_description (description_id, date_created, date_modified, updt_id, description, name, title, meta_description, meta_keywords, meta_title, sef_url, language_id, content_id) VALUES (2, '2024-03-31 15:28:20.000000', '2024-03-31 15:28:20.000000', null, 'callus', 'callus', 'callus', 'callus', null, 'callus', 'callus', 1, 2);
+INSERT INTO store.content_description (description_id, date_created, date_modified, updt_id, description, name, title, meta_description, meta_keywords, meta_title, sef_url, language_id, content_id) VALUES (3, '2024-03-31 15:28:40.000000', '2024-03-31 15:28:40.000000', null, 'agreement&nbsp;agreementvagreement&nbsp;agreement&nbsp;agreement', 'agreement', '', null, null, '', null, 1, 3);
+INSERT INTO store.content_description (description_id, date_created, date_modified, updt_id, description, name, title, meta_description, meta_keywords, meta_title, sef_url, language_id, content_id) VALUES (4, '2024-03-31 15:28:40.000000', '2024-03-31 15:28:40.000000', null, 'headerMessage&nbsp;headerMessagevheaderMessage&nbsp;headerMessage&nbsp;headerMessage', 'headerMessage', '', null, null, '', null, 1, 4);
 
-INSERT INTO store.PRODUCT_DESCRIPTION (DESCRIPTION_ID, DATE_CREATED, DATE_MODIFIED, UPDT_ID, DESCRIPTION, NAME, TITLE,
-                                       META_DESCRIPTION, META_KEYWORDS, META_TITLE, DOWNLOAD_LNK, PRODUCT_HIGHLIGHT,
-                                       SEF_URL, LANGUAGE_ID, PRODUCT_ID)
-VALUES (1, '2024-03-31 15:26:49', '2024-03-31 15:26:49', NULL, '', 'iphone', 'iphone', '', 'iphone', NULL, NULL,
-        'iphone', 'iphone', 1, 1),
-       (2, '2024-03-31 15:32:47', '2024-03-31 15:32:47', NULL, '', 'fiat', 'fiat', '', '', NULL, NULL, 'fiat', 'fiat',
-        1, 2);
+INSERT INTO store.product (product_id, date_created, date_modified, updt_id, available, cond, date_available, preorder, product_height, product_free, product_length, quantity_ordered, review_avg, review_count, product_ship, product_virtual, product_weight, product_width, ref_sku, rental_duration, rental_period, rental_status, sku, sort_order, manufacturer_id, merchant_id, customer_id, tax_class_id, product_type_id) VALUES (1, '2024-03-31 15:26:49.000000', '2024-03-31 15:26:49.000000', null, true, null, '2024-03-31 00:00:00.000000', false, null, false, null, null, null, null, true, false, null, null, 'iphone', null, null, null, 'iphone', 1, 1, 1, null, null, null);
+INSERT INTO store.product (product_id, date_created, date_modified, updt_id, available, cond, date_available, preorder, product_height, product_free, product_length, quantity_ordered, review_avg, review_count, product_ship, product_virtual, product_weight, product_width, ref_sku, rental_duration, rental_period, rental_status, sku, sort_order, manufacturer_id, merchant_id, customer_id, tax_class_id, product_type_id) VALUES (2, '2024-03-31 15:32:47.000000', '2024-03-31 15:32:47.000000', null, true, null, '2024-03-31 00:00:00.000000', false, null, false, null, null, null, null, true, false, null, null, 'fiat', null, null, null, 'fiat', 12, 50, 1, null, null, null);
 
-INSERT INTO store.PRODUCT_IMAGE (PRODUCT_IMAGE_ID, DEFAULT_IMAGE, IMAGE_CROP, IMAGE_TYPE, PRODUCT_IMAGE,
-                                 PRODUCT_IMAGE_URL, SORT_ORDER, PRODUCT_ID)
-VALUES (1, true, false, 0, '500_333.jpeg', NULL, 0, 1),
-       (2, true, false, 0, 'maserati-mc20-lead.jpg', NULL, 0, 2);
+INSERT INTO store.product_availability (product_avail_id, date_created, date_modified, updt_id, available, height, length, weight, width, owner, date_available, free_shipping, quantity, quantity_ord_max, quantity_ord_min, status, region, region_variant, sku, merchant_id, product_id, product_variant) VALUES (1, null, null, null, true, null, null, null, null, null, null, false, 9, 1, 1, true, '*', null, null, 1, 1, null);
+INSERT INTO store.product_availability (product_avail_id, date_created, date_modified, updt_id, available, height, length, weight, width, owner, date_available, free_shipping, quantity, quantity_ord_max, quantity_ord_min, status, region, region_variant, sku, merchant_id, product_id, product_variant) VALUES (2, null, null, null, true, null, null, null, null, null, null, false, 21, 1, 1, true, '*', null, null, 1, 2, null);
 
-INSERT INTO store.PRODUCT_PRICE (PRODUCT_PRICE_ID, PRODUCT_PRICE_CODE, DEFAULT_PRICE, PRODUCT_IDENTIFIER_ID,
-                                 PRODUCT_PRICE_AMOUNT, PRODUCT_PRICE_SPECIAL_AMOUNT, PRODUCT_PRICE_SPECIAL_END_DATE,
-                                 PRODUCT_PRICE_SPECIAL_ST_DATE, PRODUCT_PRICE_TYPE, PRODUCT_AVAIL_ID)
-VALUES (1, 'base', true, NULL, 200.00, NULL, NULL, NULL, 'ONE_TIME', 1),
-       (2, 'base', true, NULL, 498.00, NULL, NULL, NULL, 'ONE_TIME', 2);
+INSERT INTO store.product_category (product_id, category_id) VALUES (1, 1);
+INSERT INTO store.product_category (product_id, category_id) VALUES (2, 2);
 
-INSERT INTO store.PRODUCT_PRICE_DESCRIPTION (DESCRIPTION_ID, DATE_CREATED, DATE_MODIFIED, UPDT_ID, DESCRIPTION, NAME,
-                                             TITLE, PRICE_APPENDER, LANGUAGE_ID, PRODUCT_PRICE_ID)
-VALUES (1, '2024-03-31 15:26:49', '2024-03-31 15:26:49', NULL, NULL, 'DEFAULT', NULL, NULL, 1, 1),
-       (2, '2024-03-31 15:32:47', '2024-03-31 15:32:47', NULL, NULL, 'DEFAULT', NULL, NULL, 1, 2);
+INSERT INTO store.product_description (description_id, date_created, date_modified, updt_id, description, name, title, meta_description, meta_keywords, meta_title, download_lnk, product_highlight, sef_url, language_id, product_id) VALUES (1, '2024-03-31 15:26:49.000000', '2024-03-31 15:26:49.000000', null, '', 'iphone', 'iphone', '', 'iphone', null, null, 'iphone', 'iphone', 1, 1);
+INSERT INTO store.product_description (description_id, date_created, date_modified, updt_id, description, name, title, meta_description, meta_keywords, meta_title, download_lnk, product_highlight, sef_url, language_id, product_id) VALUES (2, '2024-03-31 15:32:47.000000', '2024-03-31 15:32:47.000000', null, '', 'fiat', 'fiat', '', '', null, null, 'fiat', 'fiat', 1, 2);
 
-INSERT INTO store.PRODUCT_RELATIONSHIP (PRODUCT_RELATIONSHIP_ID, ACTIVE, CODE, PRODUCT_ID, RELATED_PRODUCT_ID,
-                                        MERCHANT_ID)
-VALUES (1, true, 'FEATURED_ITEM', NULL, NULL, 1),
-       (2, true, 'FEATURED_ITEM', NULL, 1, 1),
-       (3, true, 'RELATED_ITEM', NULL, NULL, 1),
-       (4, true, 'RELATED_ITEM', NULL, 1, 1);
-INSERT INTO store.PRODUCT_TYPE (PRODUCT_TYPE_ID, PRD_TYPE_ADD_TO_CART, DATE_CREATED, DATE_MODIFIED, UPDT_ID,
-                                PRD_TYPE_CODE, PRD_TYPE_VISIBLE, MERCHANT_ID)
-VALUES (1, NULL, '2024-03-31 08:45:38', '2024-03-31 08:45:38', NULL, 'GENERAL', NULL, NULL);
-INSERT INTO store.TAX_CLASS (TAX_CLASS_ID, TAX_CLASS_CODE, TAX_CLASS_TITLE, MERCHANT_ID)
-VALUES (1, 'DEFAULT', 'DEFAULT', 1);
-INSERT INTO store.OPTIN (OPTIN_ID, CODE, DESCRIPTION, END_DATE, TYPE, START_DATE, MERCHANT_ID)
-VALUES (1, 'NEWSLETTER', NULL, NULL, 'NEWSLETTER', NULL, 1);
+INSERT INTO store.product_image (product_image_id, default_image, image_crop, image_type, product_image, product_image_url, sort_order, product_id) VALUES (1, true, false, 0, '500_333.jpeg', null, 0, 1);
+INSERT INTO store.product_image (product_image_id, default_image, image_crop, image_type, product_image, product_image_url, sort_order, product_id) VALUES (2, true, false, 0, 'maserati-mc20-lead.jpg', null, 0, 2);
 
-INSERT INTO store.MODULE_CONFIGURATION (MODULE_CONF_ID, DATE_CREATED, DATE_MODIFIED, UPDT_ID, CODE, DETAILS,
-                                        CONFIGURATION, CUSTOM_IND, IMAGE, MODULE, REGIONS, TYPE)
-VALUES (1, '2024-03-31 08:45:38', '2024-03-31 08:45:38', NULL, 'usps', NULL,
-        '[{\"scheme\":\"http\",\"host\":\"testing.shippingapis.com\",\"port\":\"80\",\"uri\":\"/ShippingAPI.dll\",\"env\":\"TEST\",\"config1\":null,\"config2\":null},{\"scheme\":\"http\",\"host\":\"production.shippingapis.com\",\"port\":\"80\",\"uri\":\"/ShippingAPI.dll\",\"env\":\"PROD\",\"config1\":null,\"config2\":null}]',
-        false, 'usps.jpg', 'SHIPPING', '[\"US\"]', NULL),
-       (2, '2024-03-31 08:45:38', '2024-03-31 08:45:38', NULL, 'canadapost', NULL,
-        '[{\"scheme\":\"https\",\"host\":\"ct.soa-gw.canadapost.ca\",\"port\":\"443\",\"uri\":\"/rs/ship/price\",\"env\":\"TEST\",\"config1\":null,\"config2\":null},{\"scheme\":\"https\",\"host\":\"soa-gw.canadapost.ca\",\"port\":\"443\",\"uri\":\"/rs/ship/price\",\"env\":\"PROD\",\"config1\":null,\"config2\":null}]',
-        false, 'canadapost.jpg', 'SHIPPING', '[\"CA\"]', NULL),
-       (3, '2024-03-31 08:45:38', '2024-03-31 08:45:38', NULL, 'ups',
-        '{\"01\":\"UPS Next Day Air\",\"02\":\"UPS Second Day Air\",\"03\":\"UPS Ground\",\"07\":\"UPS Worldwide Express\",\"08\":\"UPS Worldwide Expedited\",\"11\":\"UPS Standard\",\"12\":\"UPS Three-Day Select\",\"13\":\"UPS Next Day Air Saver\",\"14\":\"UPS Next Day Air Early A.M.\",\"54\":\"UPS Worldwide Express Plus\",\"59\":\"UPS Second Day Air A.M.\",\"69\":\"UPS Saver\"}',
-        '[{\"scheme\":\"https\",\"host\":\"wwwcie.ups.com\",\"port\":\"443\",\"uri\":\"/ups.app/xml/Rate\",\"env\":\"TEST\",\"config1\":null,\"config2\":null},{\"scheme\":\"https\",\"host\":\"onlinetools.ups.com\",\"port\":\"443\",\"uri\":\"/xml/Rate\",\"env\":\"PROD\",\"config1\":null,\"config2\":null}]',
-        false, 'ups.jpg', 'SHIPPING', '[\"US\",\"CA\",\"FR\",\"GB\"]', NULL),
-       (4, '2024-03-31 08:45:38', '2024-03-31 08:45:38', NULL, 'weightBased', NULL, NULL, true, NULL, 'SHIPPING',
-        '[\"*\"]', NULL),
-       (5, '2024-03-31 08:45:38', '2024-03-31 08:45:38', NULL, 'customQuotesRules', NULL, NULL, false, NULL, 'SHIPPING',
-        '[\"*\"]', NULL),
-       (6, '2024-03-31 08:45:38', '2024-03-31 08:45:38', NULL, 'priceByDistance', NULL, NULL, false, NULL, 'SHIPPING',
-        '[\"*\"]', NULL),
-       (7, '2024-03-31 08:45:38', '2024-03-31 08:45:38', NULL, 'storePickUp', NULL, NULL, false, NULL, 'SHIPPING',
-        '[\"*\"]', NULL),
-       (8, '2024-03-31 08:45:38', '2024-03-31 08:45:38', NULL, 'moneyorder', NULL, NULL, false, 'moneyorder.gif',
-        'PAYMENT', '[\"*\"]', 'moneyorder'),
-       (9, '2024-03-31 08:45:38', '2024-03-31 08:45:38', NULL, 'paypal-express-checkout', NULL,
-        '[{\"scheme\":\"\",\"host\":\"\",\"port\":\"\",\"uri\":\"\",\"env\":\"TEST\",\"config1\":\"https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_express-checkout&token=\",\"config2\":null},{\"scheme\":\"\",\"host\":\"\",\"port\":\"\",\"uri\":\"\",\"env\":\"PROD\",\"config1\":\"https://www.paypal.com/cgi-bin/webscr?cmd=_express-checkout&token=\",\"config2\":null}]',
-        false, 'icon-paypal.png', 'PAYMENT', '[\"*\"]', 'paypal'),
-       (10, '2024-03-31 08:45:38', '2024-03-31 08:45:38', NULL, 'beanstream', NULL,
-        '[{\"scheme\":\"https\",\"host\":\"www.beanstream.com\",\"port\":\"443\",\"uri\":\"/scripts/process_transaction.asp\",\"env\":\"TEST\",\"config1\":null,\"config2\":null},{\"scheme\":\"https\",\"host\":\"www.beanstream.com\",\"port\":\"443\",\"uri\":\"/scripts/process_transaction.asp\",\"env\":\"PROD\",\"config1\":null,\"config2\":null}]',
-        false, 'beanstream.gif', 'PAYMENT', '[\"US\",\"CA\",\"GB\"]', 'creditcard'),
-       (11, '2024-03-31 08:45:38', '2024-03-31 08:45:38', NULL, 'stripe', NULL,
-        '[{\"scheme\":\"https\",\"host\":\"www.stripe.com\",\"port\":\"443\",\"uri\":\"/\",\"env\":\"TEST\",\"config1\":null,\"config2\":null},{\"scheme\":\"https\",\"host\":\"www.stripe.com\",\"port\":\"443\",\"uri\":\"/\",\"env\":\"PROD\",\"config1\":null,\"config2\":null}]',
-        false, 'stripe.png', 'PAYMENT',
-        '[\"US\",\"CA\",\"GB\",\"AU\",\"FI\",\"DK\",\"IE\",\"NO\",\"SE\",\"ES\",\"PT\"]', 'creditcard'),
-       (12, '2024-03-31 08:45:38', '2024-03-31 08:45:38', NULL, 'stripe3', NULL,
-        '[{\"scheme\":\"https\",\"host\":\"www.stripe.com\",\"port\":\"443\",\"uri\":\"/\",\"env\":\"TEST\",\"config1\":null,\"config2\":null},{\"scheme\":\"https\",\"host\":\"www.stripe.com\",\"port\":\"443\",\"uri\":\"/\",\"env\":\"PROD\",\"config1\":null,\"config2\":null}]',
-        false, 'stripe.png', 'PAYMENT',
-        '[\"US\",\"CA\",\"GB\",\"AU\",\"FI\",\"DK\",\"IE\",\"NO\",\"SE\",\"ES\",\"PT\"]', 'creditcard'),
-       (13, '2024-03-31 08:45:38', '2024-03-31 08:45:38', NULL, 'braintree', NULL,
-        '[{\"scheme\":\"https\",\"host\":\"NOTREQUIRED\",\"port\":\"NOTREQUIRED\",\"uri\":\"NOTREQUIRED\",\"env\":\"TEST\",\"config1\":null,\"config2\":null},{\"scheme\":\"https\",\"host\":\"NOTREQUIRED\",\"port\":\"NOTREQUIRED\",\"uri\":\"NOTREQUIRED\",\"env\":\"PROD\",\"config1\":null,\"config2\":null}]',
-        false, 'braintree.jpg', 'PAYMENT',
-        '[\"US\",\"CA\",\"GB\",\"AU\",\"FI\",\"DK\",\"IE\",\"NO\",\"SE\",\"AL\",\"AD\",\"AT\",\"BY\",\"BE\",\"BG\",\"HY\",\"CY\",\"CZ\",\"FR\",\"GR\",\"IS\",\"IE\",\"IM\",\"IT\",\"PL\",\"LU\",\"CH\",\"RS\",\"SG\",\"MY\",\"HK\",\"NZ\"]',
-        'creditcard');
+INSERT INTO store.product_price (product_price_id, product_price_code, default_price, product_identifier_id, product_price_amount, product_price_special_amount, product_price_special_end_date, product_price_special_st_date, product_price_type, product_avail_id) VALUES (1, 'base', true, null, 200.00, null, null, null, 'ONE_TIME', 1);
+INSERT INTO store.product_price (product_price_id, product_price_code, default_price, product_identifier_id, product_price_amount, product_price_special_amount, product_price_special_end_date, product_price_special_st_date, product_price_type, product_avail_id) VALUES (2, 'base', true, null, 498.00, null, null, null, 'ONE_TIME', 2);
+
+INSERT INTO store.product_price_description (description_id, date_created, date_modified, updt_id, description, name, title, price_appender, language_id, product_price_id) VALUES (1, '2024-03-31 15:26:49.000000', '2024-03-31 15:26:49.000000', null, null, 'DEFAULT', null, null, 1, 1);
+INSERT INTO store.product_price_description (description_id, date_created, date_modified, updt_id, description, name, title, price_appender, language_id, product_price_id) VALUES (2, '2024-03-31 15:32:47.000000', '2024-03-31 15:32:47.000000', null, null, 'DEFAULT', null, null, 1, 2);
+
+INSERT INTO store.product_relationship (product_relationship_id, active, code, product_id, related_product_id, merchant_id) VALUES (1, true, 'FEATURED_ITEMS', null, null, 1);
+INSERT INTO store.product_relationship (product_relationship_id, active, code, product_id, related_product_id, merchant_id) VALUES (2, true, 'FEATURED_ITEMS', null, 1, 1);
+INSERT INTO store.product_relationship (product_relationship_id, active, code, product_id, related_product_id, merchant_id) VALUES (3, true, 'RELATED_ITEM', null, null, 1);
+INSERT INTO store.product_relationship (product_relationship_id, active, code, product_id, related_product_id, merchant_id) VALUES (4, true, 'RELATED_ITEM', null, 1, 1);
+
+INSERT INTO store.product_type (product_type_id, prd_type_add_to_cart, date_created, date_modified, updt_id, prd_type_code, prd_type_visible, merchant_id) VALUES (1, null, '2024-03-31 08:45:38.000000', '2024-03-31 08:45:38.000000', null, 'GENERAL', null, null);
+
+INSERT INTO store.tax_class (tax_class_id, tax_class_code, tax_class_title, merchant_id) VALUES (1, 'DEFAULT', 'DEFAULT', 1);
+
+INSERT INTO store.optin (optin_id, code, description, end_date, type, start_date, merchant_id) VALUES (1, 'NEWSLETTER', null, null, 'NEWSLETTER', null, 1);
+
+INSERT INTO store.module_configuration (module_conf_id, date_created, date_modified, updt_id, code, details, configuration, custom_ind, image, module, regions, type) VALUES (1, '2024-03-31 08:45:38.000000', '2024-03-31 08:45:38.000000', null, 'usps', null, '[{\"scheme\":\"http\",\"host\":\"testing.shippingapis.com\",\"port\":\"80\",\"uri\":\"/ShippingAPI.dll\",\"env\":\"TEST\",\"config1\":null,\"config2\":null},{\"scheme\":\"http\",\"host\":\"production.shippingapis.com\",\"port\":\"80\",\"uri\":\"/ShippingAPI.dll\",\"env\":\"PROD\",\"config1\":null,\"config2\":null}]', false, 'usps.jpg', 'SHIPPING', '[\"US\"]', null);
+INSERT INTO store.module_configuration (module_conf_id, date_created, date_modified, updt_id, code, details, configuration, custom_ind, image, module, regions, type) VALUES (2, '2024-03-31 08:45:38.000000', '2024-03-31 08:45:38.000000', null, 'canadapost', null, '[{\"scheme\":\"https\",\"host\":\"ct.soa-gw.canadapost.ca\",\"port\":\"443\",\"uri\":\"/rs/ship/price\",\"env\":\"TEST\",\"config1\":null,\"config2\":null},{\"scheme\":\"https\",\"host\":\"soa-gw.canadapost.ca\",\"port\":\"443\",\"uri\":\"/rs/ship/price\",\"env\":\"PROD\",\"config1\":null,\"config2\":null}]', false, 'canadapost.jpg', 'SHIPPING', '[\"CA\"]', null);
+INSERT INTO store.module_configuration (module_conf_id, date_created, date_modified, updt_id, code, details, configuration, custom_ind, image, module, regions, type) VALUES (3, '2024-03-31 08:45:38.000000', '2024-03-31 08:45:38.000000', null, 'ups', '{\"01\":\"UPS Next Day Air\",\"02\":\"UPS Second Day Air\",\"03\":\"UPS Ground\",\"07\":\"UPS Worldwide Express\",\"08\":\"UPS Worldwide Expedited\",\"11\":\"UPS Standard\",\"12\":\"UPS Three-Day Select\",\"13\":\"UPS Next Day Air Saver\",\"14\":\"UPS Next Day Air Early A.M.\",\"54\":\"UPS Worldwide Express Plus\",\"59\":\"UPS Second Day Air A.M.\",\"69\":\"UPS Saver\"}', '[{\"scheme\":\"https\",\"host\":\"wwwcie.ups.com\",\"port\":\"443\",\"uri\":\"/ups.app/xml/Rate\",\"env\":\"TEST\",\"config1\":null,\"config2\":null},{\"scheme\":\"https\",\"host\":\"onlinetools.ups.com\",\"port\":\"443\",\"uri\":\"/xml/Rate\",\"env\":\"PROD\",\"config1\":null,\"config2\":null}]', false, 'ups.jpg', 'SHIPPING', '[\"US\",\"CA\",\"FR\",\"GB\"]', null);
+INSERT INTO store.module_configuration (module_conf_id, date_created, date_modified, updt_id, code, details, configuration, custom_ind, image, module, regions, type) VALUES (4, '2024-03-31 08:45:38.000000', '2024-03-31 08:45:38.000000', null, 'weightBased', null, null, true, null, 'SHIPPING', '[\"*\"]', null);
+INSERT INTO store.module_configuration (module_conf_id, date_created, date_modified, updt_id, code, details, configuration, custom_ind, image, module, regions, type) VALUES (5, '2024-03-31 08:45:38.000000', '2024-03-31 08:45:38.000000', null, 'customQuotesRules', null, null, false, null, 'SHIPPING', '[\"*\"]', null);
+INSERT INTO store.module_configuration (module_conf_id, date_created, date_modified, updt_id, code, details, configuration, custom_ind, image, module, regions, type) VALUES (6, '2024-03-31 08:45:38.000000', '2024-03-31 08:45:38.000000', null, 'priceByDistance', null, null, false, null, 'SHIPPING', '[\"*\"]', null);
+INSERT INTO store.module_configuration (module_conf_id, date_created, date_modified, updt_id, code, details, configuration, custom_ind, image, module, regions, type) VALUES (7, '2024-03-31 08:45:38.000000', '2024-03-31 08:45:38.000000', null, 'storePickUp', null, null, false, null, 'SHIPPING', '[\"*\"]', null);
+INSERT INTO store.module_configuration (module_conf_id, date_created, date_modified, updt_id, code, details, configuration, custom_ind, image, module, regions, type) VALUES (8, '2024-03-31 08:45:38.000000', '2024-03-31 08:45:38.000000', null, 'moneyorder', null, null, false, 'moneyorder.gif', 'PAYMENT', '[\"*\"]', 'moneyorder');
+INSERT INTO store.module_configuration (module_conf_id, date_created, date_modified, updt_id, code, details, configuration, custom_ind, image, module, regions, type) VALUES (9, '2024-03-31 08:45:38.000000', '2024-03-31 08:45:38.000000', null, 'paypal-express-checkout', null, '[{\"scheme\":\"\",\"host\":\"\",\"port\":\"\",\"uri\":\"\",\"env\":\"TEST\",\"config1\":\"https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_express-checkout&token=\",\"config2\":null},{\"scheme\":\"\",\"host\":\"\",\"port\":\"\",\"uri\":\"\",\"env\":\"PROD\",\"config1\":\"https://www.paypal.com/cgi-bin/webscr?cmd=_express-checkout&token=\",\"config2\":null}]', false, 'icon-paypal.png', 'PAYMENT', '[\"*\"]', 'paypal');
+INSERT INTO store.module_configuration (module_conf_id, date_created, date_modified, updt_id, code, details, configuration, custom_ind, image, module, regions, type) VALUES (10, '2024-03-31 08:45:38.000000', '2024-03-31 08:45:38.000000', null, 'beanstream', null, '[{\"scheme\":\"https\",\"host\":\"www.beanstream.com\",\"port\":\"443\",\"uri\":\"/scripts/process_transaction.asp\",\"env\":\"TEST\",\"config1\":null,\"config2\":null},{\"scheme\":\"https\",\"host\":\"www.beanstream.com\",\"port\":\"443\",\"uri\":\"/scripts/process_transaction.asp\",\"env\":\"PROD\",\"config1\":null,\"config2\":null}]', false, 'beanstream.gif', 'PAYMENT', '[\"US\",\"CA\",\"GB\"]', 'creditcard');
+INSERT INTO store.module_configuration (module_conf_id, date_created, date_modified, updt_id, code, details, configuration, custom_ind, image, module, regions, type) VALUES (11, '2024-03-31 08:45:38.000000', '2024-03-31 08:45:38.000000', null, 'stripe', null, '[{\"scheme\":\"https\",\"host\":\"www.stripe.com\",\"port\":\"443\",\"uri\":\"/\",\"env\":\"TEST\",\"config1\":null,\"config2\":null},{\"scheme\":\"https\",\"host\":\"www.stripe.com\",\"port\":\"443\",\"uri\":\"/\",\"env\":\"PROD\",\"config1\":null,\"config2\":null}]', false, 'stripe.png', 'PAYMENT', '[\"US\",\"CA\",\"GB\",\"AU\",\"FI\",\"DK\",\"IE\",\"NO\",\"SE\",\"ES\",\"PT\"]', 'creditcard');
+INSERT INTO store.module_configuration (module_conf_id, date_created, date_modified, updt_id, code, details, configuration, custom_ind, image, module, regions, type) VALUES (12, '2024-03-31 08:45:38.000000', '2024-03-31 08:45:38.000000', null, 'stripe3', null, '[{\"scheme\":\"https\",\"host\":\"www.stripe.com\",\"port\":\"443\",\"uri\":\"/\",\"env\":\"TEST\",\"config1\":null,\"config2\":null},{\"scheme\":\"https\",\"host\":\"www.stripe.com\",\"port\":\"443\",\"uri\":\"/\",\"env\":\"PROD\",\"config1\":null,\"config2\":null}]', false, 'stripe.png', 'PAYMENT', '[\"US\",\"CA\",\"GB\",\"AU\",\"FI\",\"DK\",\"IE\",\"NO\",\"SE\",\"ES\",\"PT\"]', 'creditcard');
+INSERT INTO store.module_configuration (module_conf_id, date_created, date_modified, updt_id, code, details, configuration, custom_ind, image, module, regions, type) VALUES (13, '2024-03-31 08:45:38.000000', '2024-03-31 08:45:38.000000', null, 'braintree', null, '[{\"scheme\":\"https\",\"host\":\"NOTREQUIRED\",\"port\":\"NOTREQUIRED\",\"uri\":\"NOTREQUIRED\",\"env\":\"TEST\",\"config1\":null,\"config2\":null},{\"scheme\":\"https\",\"host\":\"NOTREQUIRED\",\"port\":\"NOTREQUIRED\",\"uri\":\"NOTREQUIRED\",\"env\":\"PROD\",\"config1\":null,\"config2\":null}]', false, 'braintree.jpg', 'PAYMENT', '[\"US\",\"CA\",\"GB\",\"AU\",\"FI\",\"DK\",\"IE\",\"NO\",\"SE\",\"AL\",\"AD\",\"AT\",\"BY\",\"BE\",\"BG\",\"HY\",\"CY\",\"CZ\",\"FR\",\"GR\",\"IS\",\"IE\",\"IM\",\"IT\",\"PL\",\"LU\",\"CH\",\"RS\",\"SG\",\"MY\",\"HK\",\"NZ\"]', 'creditcard');
+
+INSERT INTO store.sm_group (group_id, date_created, date_modified, updt_id, group_name, group_type) VALUES (1, '2024-03-31 08:45:17.000000', '2024-03-31 08:45:17.000000', null, 'SUPERADMIN', 'ADMIN');
+INSERT INTO store.sm_group (group_id, date_created, date_modified, updt_id, group_name, group_type) VALUES (2, '2024-03-31 08:45:17.000000', '2024-03-31 08:45:17.000000', null, 'ADMIN', 'ADMIN');
+INSERT INTO store.sm_group (group_id, date_created, date_modified, updt_id, group_name, group_type) VALUES (3, '2024-03-31 08:45:17.000000', '2024-03-31 08:45:17.000000', null, 'ADMIN_RETAILER', 'ADMIN');
+INSERT INTO store.sm_group (group_id, date_created, date_modified, updt_id, group_name, group_type) VALUES (4, '2024-03-31 08:45:17.000000', '2024-03-31 08:45:17.000000', null, 'ADMIN_STORE', 'ADMIN');
+INSERT INTO store.sm_group (group_id, date_created, date_modified, updt_id, group_name, group_type) VALUES (5, '2024-03-31 08:45:17.000000', '2024-03-31 08:45:17.000000', null, 'ADMIN_CATALOGUE', 'ADMIN');
+INSERT INTO store.sm_group (group_id, date_created, date_modified, updt_id, group_name, group_type) VALUES (6, '2024-03-31 08:45:17.000000', '2024-03-31 08:45:17.000000', null, 'ADMIN_ORDER', 'ADMIN');
+INSERT INTO store.sm_group (group_id, date_created, date_modified, updt_id, group_name, group_type) VALUES (7, '2024-03-31 08:45:17.000000', '2024-03-31 08:45:17.000000', null, 'ADMIN_CONTENT', 'ADMIN');
+INSERT INTO store.sm_group (group_id, date_created, date_modified, updt_id, group_name, group_type) VALUES (8, '2024-03-31 08:45:17.000000', '2024-03-31 08:45:17.000000', null, 'CUSTOMER', 'CUSTOMER');
 
 
+INSERT INTO store.permission (permission_id, date_created, date_modified, updt_id, permission_name) VALUES (1, '2024-03-31 08:45:17.000000', '2024-03-31 08:45:17.000000', null, 'AUTH');
+INSERT INTO store.permission (permission_id, date_created, date_modified, updt_id, permission_name) VALUES (2, '2024-03-31 08:45:17.000000', '2024-03-31 08:45:17.000000', null, 'SUPERADMIN');
+INSERT INTO store.permission (permission_id, date_created, date_modified, updt_id, permission_name) VALUES (3, '2024-03-31 08:45:17.000000', '2024-03-31 08:45:17.000000', null, 'ADMIN');
+INSERT INTO store.permission (permission_id, date_created, date_modified, updt_id, permission_name) VALUES (4, '2024-03-31 08:45:17.000000', '2024-03-31 08:45:17.000000', null, 'PRODUCTS');
+INSERT INTO store.permission (permission_id, date_created, date_modified, updt_id, permission_name) VALUES (5, '2024-03-31 08:45:17.000000', '2024-03-31 08:45:17.000000', null, 'ORDER');
+INSERT INTO store.permission (permission_id, date_created, date_modified, updt_id, permission_name) VALUES (6, '2024-03-31 08:45:17.000000', '2024-03-31 08:45:17.000000', null, 'CONTENT');
+INSERT INTO store.permission (permission_id, date_created, date_modified, updt_id, permission_name) VALUES (7, '2024-03-31 08:45:17.000000', '2024-03-31 08:45:17.000000', null, 'STORE');
+INSERT INTO store.permission (permission_id, date_created, date_modified, updt_id, permission_name) VALUES (8, '2024-03-31 08:45:17.000000', '2024-03-31 08:45:17.000000', null, 'TAX');
+INSERT INTO store.permission (permission_id, date_created, date_modified, updt_id, permission_name) VALUES (9, '2024-03-31 08:45:17.000000', '2024-03-31 08:45:17.000000', null, 'PAYMENT');
+INSERT INTO store.permission (permission_id, date_created, date_modified, updt_id, permission_name) VALUES (10, '2024-03-31 08:45:17.000000', '2024-03-31 08:45:17.000000', null, 'CUSTOMER');
+INSERT INTO store.permission (permission_id, date_created, date_modified, updt_id, permission_name) VALUES (11, '2024-03-31 08:45:17.000000', '2024-03-31 08:45:17.000000', null, 'SHIPPING');
+INSERT INTO store.permission (permission_id, date_created, date_modified, updt_id, permission_name) VALUES (12, '2024-03-31 08:45:17.000000', '2024-03-31 08:45:17.000000', null, 'AUTH_CUSTOMER');
 
-INSERT INTO store.SM_GROUP (GROUP_ID, DATE_CREATED, DATE_MODIFIED, UPDT_ID, GROUP_NAME, GROUP_TYPE)
-VALUES (1, '2024-03-31 08:45:17', '2024-03-31 08:45:17', NULL, 'SUPERADMIN', 'ADMIN'),
-       (2, '2024-03-31 08:45:17', '2024-03-31 08:45:17', NULL, 'ADMIN', 'ADMIN'),
-       (3, '2024-03-31 08:45:17', '2024-03-31 08:45:17', NULL, 'ADMIN_RETAILER', 'ADMIN'),
-       (4, '2024-03-31 08:45:17', '2024-03-31 08:45:17', NULL, 'ADMIN_STORE', 'ADMIN'),
-       (5, '2024-03-31 08:45:17', '2024-03-31 08:45:17', NULL, 'ADMIN_CATALOGUE', 'ADMIN'),
-       (6, '2024-03-31 08:45:17', '2024-03-31 08:45:17', NULL, 'ADMIN_ORDER', 'ADMIN'),
-       (7, '2024-03-31 08:45:17', '2024-03-31 08:45:17', NULL, 'ADMIN_CONTENT', 'ADMIN'),
-       (8, '2024-03-31 08:45:17', '2024-03-31 08:45:17', NULL, 'CUSTOMER', 'CUSTOMER');
 
-INSERT INTO store.PERMISSION (PERMISSION_ID, DATE_CREATED, DATE_MODIFIED, UPDT_ID, PERMISSION_NAME)
-VALUES (1, '2024-03-31 08:45:17', '2024-03-31 08:45:17', NULL, 'AUTH'),
-       (2, '2024-03-31 08:45:17', '2024-03-31 08:45:17', NULL, 'SUPERADMIN'),
-       (3, '2024-03-31 08:45:17', '2024-03-31 08:45:17', NULL, 'ADMIN'),
-       (4, '2024-03-31 08:45:17', '2024-03-31 08:45:17', NULL, 'PRODUCTS'),
-       (5, '2024-03-31 08:45:17', '2024-03-31 08:45:17', NULL, 'ORDER'),
-       (6, '2024-03-31 08:45:17', '2024-03-31 08:45:17', NULL, 'CONTENT'),
-       (7, '2024-03-31 08:45:17', '2024-03-31 08:45:17', NULL, 'STORE'),
-       (8, '2024-03-31 08:45:17', '2024-03-31 08:45:17', NULL, 'TAX'),
-       (9, '2024-03-31 08:45:17', '2024-03-31 08:45:17', NULL, 'PAYMENT'),
-       (10, '2024-03-31 08:45:17', '2024-03-31 08:45:17', NULL, 'CUSTOMER'),
-       (11, '2024-03-31 08:45:17', '2024-03-31 08:45:17', NULL, 'SHIPPING'),
-       (12, '2024-03-31 08:45:17', '2024-03-31 08:45:17', NULL, 'AUTH_CUSTOMER');
+INSERT INTO store.permission_group (group_id, permission_id) VALUES (1, 1);
+INSERT INTO store.permission_group (group_id, permission_id) VALUES (2, 1);
+INSERT INTO store.permission_group (group_id, permission_id) VALUES (3, 1);
+INSERT INTO store.permission_group (group_id, permission_id) VALUES (4, 1);
+INSERT INTO store.permission_group (group_id, permission_id) VALUES (5, 1);
+INSERT INTO store.permission_group (group_id, permission_id) VALUES (6, 1);
+INSERT INTO store.permission_group (group_id, permission_id) VALUES (7, 1);
+INSERT INTO store.permission_group (group_id, permission_id) VALUES (8, 1);
+INSERT INTO store.permission_group (group_id, permission_id) VALUES (1, 2);
+INSERT INTO store.permission_group (group_id, permission_id) VALUES (1, 3);
+INSERT INTO store.permission_group (group_id, permission_id) VALUES (2, 3);
+INSERT INTO store.permission_group (group_id, permission_id) VALUES (3, 3);
+INSERT INTO store.permission_group (group_id, permission_id) VALUES (1, 4);
+INSERT INTO store.permission_group (group_id, permission_id) VALUES (2, 4);
+INSERT INTO store.permission_group (group_id, permission_id) VALUES (3, 4);
+INSERT INTO store.permission_group (group_id, permission_id) VALUES (5, 4);
+INSERT INTO store.permission_group (group_id, permission_id) VALUES (1, 5);
+INSERT INTO store.permission_group (group_id, permission_id) VALUES (2, 5);
+INSERT INTO store.permission_group (group_id, permission_id) VALUES (3, 5);
+INSERT INTO store.permission_group (group_id, permission_id) VALUES (6, 5);
+INSERT INTO store.permission_group (group_id, permission_id) VALUES (1, 6);
+INSERT INTO store.permission_group (group_id, permission_id) VALUES (2, 6);
+INSERT INTO store.permission_group (group_id, permission_id) VALUES (3, 6);
+INSERT INTO store.permission_group (group_id, permission_id) VALUES (4, 6);
+INSERT INTO store.permission_group (group_id, permission_id) VALUES (7, 6);
+INSERT INTO store.permission_group (group_id, permission_id) VALUES (1, 7);
+INSERT INTO store.permission_group (group_id, permission_id) VALUES (2, 7);
+INSERT INTO store.permission_group (group_id, permission_id) VALUES (3, 7);
+INSERT INTO store.permission_group (group_id, permission_id) VALUES (4, 7);
+INSERT INTO store.permission_group (group_id, permission_id) VALUES (1, 8);
+INSERT INTO store.permission_group (group_id, permission_id) VALUES (2, 8);
+INSERT INTO store.permission_group (group_id, permission_id) VALUES (3, 8);
+INSERT INTO store.permission_group (group_id, permission_id) VALUES (4, 8);
+INSERT INTO store.permission_group (group_id, permission_id) VALUES (1, 9);
+INSERT INTO store.permission_group (group_id, permission_id) VALUES (2, 9);
+INSERT INTO store.permission_group (group_id, permission_id) VALUES (3, 9);
+INSERT INTO store.permission_group (group_id, permission_id) VALUES (4, 9);
+INSERT INTO store.permission_group (group_id, permission_id) VALUES (1, 10);
+INSERT INTO store.permission_group (group_id, permission_id) VALUES (2, 10);
+INSERT INTO store.permission_group (group_id, permission_id) VALUES (3, 10);
+INSERT INTO store.permission_group (group_id, permission_id) VALUES (4, 10);
+INSERT INTO store.permission_group (group_id, permission_id) VALUES (1, 11);
+INSERT INTO store.permission_group (group_id, permission_id) VALUES (2, 11);
+INSERT INTO store.permission_group (group_id, permission_id) VALUES (3, 11);
+INSERT INTO store.permission_group (group_id, permission_id) VALUES (4, 11);
+INSERT INTO store.permission_group (group_id, permission_id) VALUES (8, 12);
 
-INSERT INTO store.PERMISSION_GROUP (GROUP_ID, PERMISSION_ID)
-VALUES (1, 1),
-       (2, 1),
-       (3, 1),
-       (4, 1),
-       (5, 1),
-       (6, 1),
-       (7, 1),
-       (8, 1),
-       (1, 2),
-       (1, 3),
-       (2, 3),
-       (3, 3),
-       (1, 4),
-       (2, 4),
-       (3, 4),
-       (5, 4),
-       (1, 5),
-       (2, 5),
-       (3, 5),
-       (6, 5),
-       (1, 6),
-       (2, 6),
-       (3, 6),
-       (4, 6),
-       (7, 6),
-       (1, 7),
-       (2, 7),
-       (3, 7),
-       (4, 7),
-       (1, 8),
-       (2, 8),
-       (3, 8),
-       (4, 8),
-       (1, 9),
-       (2, 9),
-       (3, 9),
-       (4, 9),
-       (1, 10),
-       (2, 10),
-       (3, 10),
-       (4, 10),
-       (1, 11),
-       (2, 11),
-       (3, 11),
-       (4, 11),
-       (8, 12);
+INSERT INTO store.users (user_id, active, admin_email, admin_name, admin_password, admin_a1, admin_a2, admin_a3, date_created, date_modified, updt_id, reset_credentials_req, reset_credentials_exp, admin_first_name, last_access, admin_last_name, login_access, admin_q1, admin_q2, admin_q3, language_id, merchant_id) VALUES (1, true, 'admin@shopizer.com', 'admin@shopizer.com', '$2a$10$Keudp1X4aLyDqkiPB0T/ludohJVNlcTWD..DpbeZOkQnrL82zahci', null, null, null, '2024-03-31 08:45:39.000000', '2024-03-31 08:45:39.000000', null, null, null, 'Administrator', null, 'User', null, null, null, null, null, 1);
 
-INSERT INTO store.USERS (USER_ID, ACTIVE, ADMIN_EMAIL, ADMIN_NAME, ADMIN_PASSWORD, ADMIN_A1, ADMIN_A2, ADMIN_A3,
-                         DATE_CREATED, DATE_MODIFIED, UPDT_ID, RESET_CREDENTIALS_REQ, RESET_CREDENTIALS_EXP,
-                         ADMIN_FIRST_NAME, LAST_ACCESS, ADMIN_LAST_NAME, LOGIN_ACCESS, ADMIN_Q1, ADMIN_Q2, ADMIN_Q3,
-                         LANGUAGE_ID, MERCHANT_ID)
-VALUES (1, true, 'admin@shopizer.com', 'admin@shopizer.com',
-        '$2a$10$Keudp1X4aLyDqkiPB0T/ludohJVNlcTWD..DpbeZOkQnrL82zahci', NULL, NULL, NULL, '2024-03-31 08:45:39',
-        '2024-03-31 08:45:39', NULL, NULL, NULL, 'Administrator', NULL, 'User', NULL, NULL, NULL, NULL, NULL, 1);
-INSERT INTO store.USER_GROUP (USER_ID, GROUP_ID)
-VALUES (1, 1),
-       (1, 2);
+INSERT INTO store.user_group (user_id, group_id) VALUES (1, 1);
+INSERT INTO store.user_group (user_id, group_id) VALUES (1, 2);
+
+INSERT INTO store.customer (customer_id, customer_anonymous, date_created, date_modified, updt_id, billing_street_address, billing_city, billing_company, billing_first_name, billing_last_name, latitude, longitude, billing_postcode, billing_state, billing_telephone, customer_company, reset_credentials_req, reset_credentials_exp, review_avg, review_count, customer_dob, delivery_street_address, delivery_city, delivery_company, delivery_first_name, delivery_last_name, delivery_postcode, delivery_state, delivery_telephone, customer_email_address, customer_gender, customer_nick, customer_password, provider, billing_country_id, billing_zone_id, language_id, delivery_country_id, delivery_zone_id, merchant_id) VALUES (1, false, null, '2024-04-04 15:43:46.034000', null, 'erer', 'wwwwwwwwww', null, 'ali', 'mahmou', null, null, 'ashraf', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 'asmahmou@unifonic.com', 'M', null, null, null, 37, 13, 1, null, null, 1);
+INSERT INTO store.customer (customer_id, customer_anonymous, date_created, date_modified, updt_id, billing_street_address, billing_city, billing_company, billing_first_name, billing_last_name, latitude, longitude, billing_postcode, billing_state, billing_telephone, customer_company, reset_credentials_req, reset_credentials_exp, review_avg, review_count, customer_dob, delivery_street_address, delivery_city, delivery_company, delivery_first_name, delivery_last_name, delivery_postcode, delivery_state, delivery_telephone, customer_email_address, customer_gender, customer_nick, customer_password, provider, billing_country_id, billing_zone_id, language_id, delivery_country_id, delivery_zone_id, merchant_id) VALUES (2, false, null, '2024-04-04 15:45:19.389000', null, 'test1user', 'test1user', null, 'test1user', 'test1user', null, null, 'tets', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 'ahmed@mail.com', 'M', null, null, null, 37, 70, 1, null, null, 1);
+
+
+INSERT INTO store.orders (order_id, billing_street_address, billing_city, billing_company, billing_first_name, billing_last_name, latitude, longitude, billing_postcode, billing_state, billing_telephone, channel, confirmed_address, card_type, cc_cvv, cc_expires, cc_number, cc_owner, currency_value, customer_agreed, customer_email_address, customer_id, date_purchased, delivery_street_address, delivery_city, delivery_company, delivery_first_name, delivery_last_name, delivery_postcode, delivery_state, delivery_telephone, ip_address, last_modified, locale, order_date_finished, order_type, payment_module_code, payment_type, shipping_module_code, cart_code, order_status, order_total, billing_country_id, billing_zone_id, currency_id, delivery_country_id, delivery_zone_id, merchantid) VALUES (1, 'erer', 'wwwwwwwwww', null, 'ali', 'mahmou', null, null, 'ashraf', null, null, 'API', true, null, null, null, null, null, 0.00, false, 'asmahmou@unifonic.com', 1, '2024-04-04', null, null, null, null, null, null, null, null, null, null, 'en', null, 'ORDER', 'stripe', 'CREDITCARD', null, '13a52597bc1f49c996a1b4ad8a29006a', 'ORDERED', 200.00, 37, 13, 105, null, null, 1);
+INSERT INTO store.orders (order_id, billing_street_address, billing_city, billing_company, billing_first_name, billing_last_name, latitude, longitude, billing_postcode, billing_state, billing_telephone, channel, confirmed_address, card_type, cc_cvv, cc_expires, cc_number, cc_owner, currency_value, customer_agreed, customer_email_address, customer_id, date_purchased, delivery_street_address, delivery_city, delivery_company, delivery_first_name, delivery_last_name, delivery_postcode, delivery_state, delivery_telephone, ip_address, last_modified, locale, order_date_finished, order_type, payment_module_code, payment_type, shipping_module_code, cart_code, order_status, order_total, billing_country_id, billing_zone_id, currency_id, delivery_country_id, delivery_zone_id, merchantid) VALUES (2, 'test1user', 'test1user', null, 'test1user', 'test1user', null, null, 'tets', null, null, 'API', true, null, null, null, null, null, 0.00, false, 'ahmed@mail.com', 2, '2024-04-04', null, null, null, null, null, null, null, null, null, null, 'en', null, 'ORDER', 'stripe', 'CREDITCARD', null, '88c1ebd9d7ca4e22b198efbbb68e2a2d', 'ORDERED', 498.00, 37, 70, 105, null, null, 1);
+
+
+INSERT INTO store.order_product (order_product_id, onetime_charge, product_name, product_quantity, product_sku, order_id) VALUES (1, 200.00, 'iphone', 1, 'iphone', 1);
+INSERT INTO store.order_product (order_product_id, onetime_charge, product_name, product_quantity, product_sku, order_id) VALUES (2, 498.00, 'fiat', 1, 'fiat', 2);
+
+INSERT INTO store.order_product_price (order_product_price_id, default_price, product_price, product_price_code, product_price_name, product_price_special, prd_price_special_end_dt, prd_price_special_st_dt, order_product_id) VALUES (1, true, 200.00, 'base', 'DEFAULT', null, null, null, 1);
+INSERT INTO store.order_product_price (order_product_price_id, default_price, product_price, product_price_code, product_price_name, product_price_special, prd_price_special_end_dt, prd_price_special_st_dt, order_product_id) VALUES (2, true, 498.00, 'base', 'DEFAULT', null, null, null, 2);
+
+INSERT INTO store.order_status_history (order_status_history_id, comments, customer_notified, date_added, status, order_id) VALUES (1, null, null, '2024-04-04 15:43:46.612000', 'ORDERED', 1);
+INSERT INTO store.order_status_history (order_status_history_id, comments, customer_notified, date_added, status, order_id) VALUES (2, null, null, '2024-04-04 15:45:19.885000', 'ORDERED', 2);
+
+INSERT INTO store.order_total (order_account_id, module, code, order_total_type, order_value_type, sort_order, text, title, value, order_id) VALUES (1, 'subtotal', 'order.total.subtotal', 'SUBTOTAL', 'ONE_TIME', 5, null, 'subtotal', 200.0000, 1);
+INSERT INTO store.order_total (order_account_id, module, code, order_total_type, order_value_type, sort_order, text, title, value, order_id) VALUES (2, 'total', 'order.total.total', 'TOTAL', 'ONE_TIME', 500, null, 'total', 200.0000, 1);
+INSERT INTO store.order_total (order_account_id, module, code, order_total_type, order_value_type, sort_order, text, title, value, order_id) VALUES (3, 'subtotal', 'order.total.subtotal', 'SUBTOTAL', 'ONE_TIME', 5, null, 'subtotal', 498.0000, 2);
+INSERT INTO store.order_total (order_account_id, module, code, order_total_type, order_value_type, sort_order, text, title, value, order_id) VALUES (4, 'total', 'order.total.total', 'TOTAL', 'ONE_TIME', 500, null, 'total', 498.0000, 2);
+
+
+INSERT INTO store.shopping_cart (shp_cart_id, date_created, date_modified, updt_id, customer_id, ip_address, order_id, promo_added, promo_code, shp_cart_code, merchant_id) VALUES (1, '2024-04-04 15:42:42.779000', '2024-04-04 15:43:54.716000', null, null, null, 1, null, null, '13a52597bc1f49c996a1b4ad8a29006a', 1);
+INSERT INTO store.shopping_cart (shp_cart_id, date_created, date_modified, updt_id, customer_id, ip_address, order_id, promo_added, promo_code, shp_cart_code, merchant_id) VALUES (2, '2024-04-04 15:44:22.493000', '2024-04-04 15:45:22.568000', null, null, null, 2, null, null, '88c1ebd9d7ca4e22b198efbbb68e2a2d', 1);
+
+INSERT INTO store.shopping_cart_item (shp_cart_item_id, date_created, date_modified, updt_id, product_id, quantity, sku, product_variant, shp_cart_id) VALUES (1, '2024-04-04 15:42:42.798000', '2024-04-04 15:42:42.798000', null, 1, 1, 'iphone', null, 1);
+INSERT INTO store.shopping_cart_item (shp_cart_item_id, date_created, date_modified, updt_id, product_id, quantity, sku, product_variant, shp_cart_id) VALUES (2, '2024-04-04 15:44:22.493000', '2024-04-04 15:44:22.493000', null, 2, 1, 'fiat', null, 2);
 
 
 
-INSERT INTO store.SM_SEQUENCER (SEQ_NAME, SEQ_COUNT)
-VALUES ('category_description_seq', 3),
-       ('CATEGORY_SEQ_NEXT_VAL', 1),
-       ('content_description_seq', 5),
-       ('CONTENT_SEQ_NEXT_VAL', 5),
-       ('country_description_seq', 712),
-       ('COUNTRY_SEQ_NEXT_VAL', 5),
-       ('CURRENCY_SEQ_NEXT_VAL', 4),
-       ('GROUP_SEQ_NEXT_VAL', 1),
-       ('LANG_SEQ_NEXT_VAL', 1),
-       ('MANUFACT_SEQ_NEXT_VAL', 2),
-       ('manufacturer_description_seq', 3),
-       ('MERCH_CONF_SEQ_NEXT_VAL', 1),
-       ('MOD_CONF_SEQ_NEXT_VAL', 1),
-       ('OPTIN_SEQ_NEXT_VAL', 1),
-       ('PERMISSION_SEQ_NEXT_VAL', 1),
-       ('PRD_TYPE_SEQ_NEXT_VAL', 1),
-       ('PRODUCT_AVAIL_SEQ_NEXT_VAL', 1),
-       ('product_description_seq', 3),
-       ('PRODUCT_IMG_SEQ_NEXT_VAL', 1),
-       ('product_price_description_seq', 3),
-       ('PRODUCT_PRICE_SEQ_NEXT_VAL', 1),
-       ('PRODUCT_RELATION_SEQ_NEXT_VAL', 1),
-       ('PRODUCT_SEQ_NEXT_VAL', 1),
-       ('STORE_SEQ_NEXT_VAL', 1),
-       ('TX_CLASS_SEQ_NEXT_VAL', 1),
-       ('USER_SEQ_NEXT_VAL', 1),
-       ('zone_description_seq', 652),
-       ('ZONE_SEQ_NEXT_VAL', 5);
+
+INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('category_description_seq', 3);
+INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('CATEGORY_SEQ_NEXT_VAL', 1);
+INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('content_description_seq', 5);
+INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('CONTENT_SEQ_NEXT_VAL', 5);
+INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('country_description_seq', 712);
+INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('COUNTRY_SEQ_NEXT_VAL', 5);
+INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('CURRENCY_SEQ_NEXT_VAL', 4);
+INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('GROUP_SEQ_NEXT_VAL', 1);
+INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('LANG_SEQ_NEXT_VAL', 1);
+INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('MANUFACT_SEQ_NEXT_VAL', 2);
+INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('manufacturer_description_seq', 3);
+INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('MERCH_CONF_SEQ_NEXT_VAL', 1);
+INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('MOD_CONF_SEQ_NEXT_VAL', 1);
+INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('OPTIN_SEQ_NEXT_VAL', 1);
+INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('PERMISSION_SEQ_NEXT_VAL', 1);
+INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('PRD_TYPE_SEQ_NEXT_VAL', 1);
+INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('PRODUCT_AVAIL_SEQ_NEXT_VAL', 1);
+INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('product_description_seq', 3);
+INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('PRODUCT_IMG_SEQ_NEXT_VAL', 1);
+INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('product_price_description_seq', 3);
+INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('PRODUCT_PRICE_SEQ_NEXT_VAL', 1);
+INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('PRODUCT_RELATION_SEQ_NEXT_VAL', 1);
+INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('PRODUCT_SEQ_NEXT_VAL', 1);
+INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('STORE_SEQ_NEXT_VAL', 1);
+INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('TX_CLASS_SEQ_NEXT_VAL', 1);
+INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('USER_SEQ_NEXT_VAL', 1);
+INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('zone_description_seq', 652);
+INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('ZONE_SEQ_NEXT_VAL', 5);
+INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('ORDER_TOTAL_ID_NEXT_VALUE', 100);
+INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('SHP_CRT_SEQ_NEXT_VAL', 100);
+INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('SHP_CRT_ITM_SEQ_NEXT_VAL', 100);
+INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('CUSTOMER_SEQ_NEXT_VAL', 100);
+INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('ORDER_ID_SEQ_NEXT_VAL', 100);
+INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('STATUS_HIST_ID_NEXT_VALUE', 100);
+INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('ORDER_PRODUCT_ID_NEXT_VALUE', 100);
+INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('ORDER_PRD_PRICE_ID_NEXT_VAL', 100);

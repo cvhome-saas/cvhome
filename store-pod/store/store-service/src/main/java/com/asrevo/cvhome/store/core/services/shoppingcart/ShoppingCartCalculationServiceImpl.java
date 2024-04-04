@@ -4,14 +4,14 @@
 package com.asrevo.cvhome.store.core.services.shoppingcart;
 
 
+import com.asrevo.cvhome.store.core.entity.customer.Customer;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCart;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
-import com.asrevo.cvhome.store.core.model.customer.Customer;
 import com.asrevo.cvhome.store.core.model.order.OrderTotalSummary;
 import com.asrevo.cvhome.store.core.services.order.OrderService;
-import org.apache.commons.lang3.Validate;
+import org.springframework.util.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,10 +63,10 @@ public class ShoppingCartCalculationServiceImpl implements ShoppingCartCalculati
     public OrderTotalSummary calculate(final ShoppingCart cartModel, final Customer customer, final MerchantStore store,
                                        final Language language) throws ServiceException {
 
-        Validate.notNull(cartModel, "cart cannot be null");
-        Validate.notNull(cartModel.getLineItems(), "Cart should have line items.");
-        Validate.notNull(store, "MerchantStore cannot be null");
-        Validate.notNull(customer, "Customer cannot be null");
+        Assert.notNull(cartModel, "cart cannot be null");
+        Assert.notNull(cartModel.getLineItems(), "Cart should have line items.");
+        Assert.notNull(store, "MerchantStore cannot be null");
+        Assert.notNull(customer, "Customer cannot be null");
         OrderTotalSummary orderTotalSummary = orderService.calculateShoppingCartTotal(cartModel, customer, store,
                 language);
         updateCartModel(cartModel);
@@ -97,9 +97,9 @@ public class ShoppingCartCalculationServiceImpl implements ShoppingCartCalculati
     public OrderTotalSummary calculate(final ShoppingCart cartModel, final MerchantStore store, final Language language)
             throws ServiceException {
 
-        Validate.notNull(cartModel, "cart cannot be null");
-        Validate.notNull(cartModel.getLineItems(), "Cart should have line items.");
-        Validate.notNull(store, "MerchantStore cannot be null");
+        Assert.notNull(cartModel, "cart cannot be null");
+        Assert.notNull(cartModel.getLineItems(), "Cart should have line items.");
+        Assert.notNull(store, "MerchantStore cannot be null");
         OrderTotalSummary orderTotalSummary = orderService.calculateShoppingCartTotal(cartModel, store, language);
         updateCartModel(cartModel);
         return orderTotalSummary;

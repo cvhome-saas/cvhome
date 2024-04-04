@@ -7,6 +7,7 @@ import com.asrevo.cvhome.store.core.modules.cms.product.ProductFileManager;
 import com.asrevo.cvhome.store.core.modules.cms.product.ProductFileManagerImpl;
 import com.asrevo.cvhome.store.core.modules.cms.product.local.CmsImageFileManagerImpl;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
+import com.asrevo.cvhome.store.utils.LabelUtils;
 import com.asrevo.cvhome.store.utils.LocalImageFilePathUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -61,5 +62,9 @@ public class TempConfig {
         properties.put("IMAGE_FORMATS", "jpg|png|gif");
         properties.put("POPULATE_TEST_DATA", true);
         return properties;
+    }
+    @Bean
+    public LabelUtils messages() {
+        return new LabelUtils();
     }
 }

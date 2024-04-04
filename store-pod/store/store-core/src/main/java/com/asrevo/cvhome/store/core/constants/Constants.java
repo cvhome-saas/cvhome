@@ -5,6 +5,8 @@ import java.util.Locale;
 
 public class Constants {
 
+    public final static String PAYMENT_MODULES = "PAYMENT";
+
     public static final String ALL_REGIONS = "*";
     public final static String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
     public final static String DEFAULT_DATE_FORMAT_YEAR = "yyyy";
@@ -43,10 +45,22 @@ public class Constants {
     public final static String SMALL_IMAGE = "SMALL";
     public final static int MAX_REVIEW_RATING_SCORE = 5;
 
+    public final static int MAX_DOWNLOAD_DAYS = 30;
+
     public final static String OT_ITEM_PRICE_MODULE_CODE = "itemprice";
     public final static String OT_SUBTOTAL_MODULE_CODE = "subtotal";
     public final static String OT_SHIPPING_MODULE_CODE = "shipping";
     public final static String OT_TOTAL_MODULE_CODE = "total";
     public final static String SHIPPING_CONFIGURATION = "SHIPPING_CONFIG";
+
+    public final static String KEY_FACEBOOK_PAGE_URL = "facebook_page_url";
+    public final static String KEY_PINTEREST_PAGE_URL = "pinterest";
+    public final static String KEY_GOOGLE_ANALYTICS_URL = "google_analytics_url";
+    public final static String KEY_INSTAGRAM_URL = "instagram";
+
+
+    public final static String OT_HANDLING_MODULE_CODE = "handling";
+    public final static String OT_TAX_MODULE_CODE = "tax";
+    public final static String OT_REFUND_MODULE_CODE = "refund";
 
 }

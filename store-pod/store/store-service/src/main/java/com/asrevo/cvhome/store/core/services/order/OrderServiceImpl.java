@@ -1,29 +1,39 @@
 package com.asrevo.cvhome.store.core.services.order;
 
 import com.asrevo.cvhome.store.core.constants.Constants;
+import com.asrevo.cvhome.store.core.entity.catalog.product.Product;
+import com.asrevo.cvhome.store.core.entity.catalog.product.availability.ProductAvailability;
 import com.asrevo.cvhome.store.core.entity.catalog.product.price.FinalPrice;
+import com.asrevo.cvhome.store.core.entity.customer.Customer;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.order.Order;
 import com.asrevo.cvhome.store.core.entity.order.OrderTotal;
 import com.asrevo.cvhome.store.core.entity.order.OrderTotalType;
 import com.asrevo.cvhome.store.core.entity.order.OrderValueType;
+import com.asrevo.cvhome.store.core.entity.order.orderproduct.OrderProduct;
+import com.asrevo.cvhome.store.core.entity.order.orderstatus.OrderStatus;
+import com.asrevo.cvhome.store.core.entity.order.orderstatus.OrderStatusHistory;
+import com.asrevo.cvhome.store.core.entity.payments.Transaction;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCart;
 import com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
-import com.asrevo.cvhome.store.core.model.customer.Customer;
+import com.asrevo.cvhome.store.core.model.common.UserContext;
 import com.asrevo.cvhome.store.core.model.order.OrderSummary;
 import com.asrevo.cvhome.store.core.model.order.OrderSummaryType;
 import com.asrevo.cvhome.store.core.model.order.OrderTotalSummary;
+import com.asrevo.cvhome.store.core.model.payments.Payment;
 import com.asrevo.cvhome.store.core.repositories.order.OrderRepository;
+import com.asrevo.cvhome.store.core.services.catalog.product.ProductService;
+import com.asrevo.cvhome.store.core.services.customer.CustomerService;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
 import com.asrevo.cvhome.store.core.services.shoppingcart.ShoppingCartService;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -42,18 +52,60 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
 
     @Autowired
     private ShoppingCartService shoppingCartService;
+    @Autowired
+    private ProductService productService;
+    @Autowired
+    private CustomerService customerService;
 
     public OrderServiceImpl(OrderRepository repository) {
         super(repository);
+    }
+
+
+    @Override
+    public void addOrderStatusHistory(Order order, OrderStatusHistory history) throws ServiceException {
+        order.getOrderHistory().add(history);
+        history.setOrder(order);
+        update(order);
+    }
+
+
+    @Override
+    public OrderTotalSummary caculateOrderTotal(final OrderSummary orderSummary, final Customer customer, final MerchantStore store, final Language language) throws ServiceException {
+        Assert.notNull(orderSummary, "Order summary cannot be null");
+        Assert.notNull(orderSummary.getProducts(), "Order summary.products cannot be null");
+        Assert.notNull(store, "MerchantStore cannot be null");
+        Assert.notNull(customer, "Customer cannot be null");
+
+        try {
+            return caculateOrder(orderSummary, customer, store, language);
+        } catch (Exception e) {
+            throw new ServiceException(e);
+        }
+
+    }
+
+    @Override
+    public OrderTotalSummary caculateOrderTotal(final OrderSummary orderSummary, final MerchantStore store, final Language language) throws ServiceException {
+        Assert.notNull(orderSummary, "Order summary cannot be null");
+        Assert.notNull(orderSummary.getProducts(), "Order summary.products cannot be null");
+        Assert.notNull(store, "MerchantStore cannot be null");
+
+        try {
+            return caculateOrder(orderSummary, null, store, language);
+        } catch (Exception e) {
+            throw new ServiceException(e);
+        }
+
     }
 
     @Override
     public OrderTotalSummary calculateShoppingCartTotal(
             final ShoppingCart shoppingCart, final Customer customer, final MerchantStore store,
             final Language language) throws ServiceException {
-        Validate.notNull(shoppingCart, "Order summary cannot be null");
-        Validate.notNull(customer, "Customery cannot be null");
-        Validate.notNull(store, "MerchantStore cannot be null.");
+        Assert.notNull(shoppingCart, "Order summary cannot be null");
+        Assert.notNull(customer, "Customery cannot be null");
+        Assert.notNull(store, "MerchantStore cannot be null.");
         try {
             return caculateShoppingCart(shoppingCart, customer, store, language);
         } catch (Exception e) {
@@ -114,8 +166,8 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
     public OrderTotalSummary calculateShoppingCartTotal(
             final ShoppingCart shoppingCart, final MerchantStore store, final Language language)
             throws ServiceException {
-        Validate.notNull(shoppingCart, "Order summary cannot be null");
-        Validate.notNull(store, "MerchantStore cannot be null");
+        Assert.notNull(shoppingCart, "Order summary cannot be null");
+        Assert.notNull(store, "MerchantStore cannot be null");
 
         try {
             return caculateShoppingCart(shoppingCart, null, store, language);
@@ -123,6 +175,125 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
             LOGGER.error("Error while calculating shopping cart total" + e);
             throw new ServiceException(e);
         }
+    }
+
+    @Override
+    public Order processOrder(Order order, Customer customer, List<ShoppingCartItem> items, OrderTotalSummary summary, Payment payment, MerchantStore store) throws ServiceException {
+
+        return process(order, customer, items, summary, payment, null, store);
+    }
+
+    @Override
+    public Order processOrder(Order order, Customer customer, List<ShoppingCartItem> items, OrderTotalSummary summary, Payment payment, Transaction transaction, MerchantStore store) throws ServiceException {
+        return process(order, customer, items, summary, payment, transaction, store);
+    }
+
+    @Override
+    public void saveOrUpdate(final Order order) throws ServiceException {
+
+        if (order.getId() != null && order.getId() > 0) {
+            LOGGER.debug("Updating Order");
+            super.update(order);
+
+        } else {
+            LOGGER.debug("Creating Order");
+            super.create(order);
+
+        }
+    }
+
+    private Order process(Order order, Customer customer, List<ShoppingCartItem> items, OrderTotalSummary summary, Payment payment, Transaction transaction, MerchantStore store) throws ServiceException {
+
+
+        Assert.notNull(order, "Order cannot be null");
+        Assert.notNull(customer, "Customer cannot be null (even if anonymous order)");
+        Assert.notEmpty(items, "ShoppingCart items cannot be null");
+        Assert.notNull(payment, "Payment cannot be null");
+        Assert.notNull(store, "MerchantStore cannot be null");
+        Assert.notNull(summary, "Order total Summary cannot be null");
+
+        UserContext context = UserContext.getCurrentInstance();
+        if (context != null) {
+            String ipAddress = context.getIpAddress();
+            if (!StringUtils.isBlank(ipAddress)) {
+                order.setIpAddress(ipAddress);
+            }
+        }
+
+
+        //first process payment
+        //@TODO ASHRAF
+//        Transaction processTransaction = paymentService.processPayment(customer, store, payment, items, order);
+
+        if (order.getOrderHistory() == null || order.getOrderHistory().isEmpty() || order.getStatus() == null) {
+            OrderStatus status = order.getStatus();
+            if (status == null) {
+                status = OrderStatus.ORDERED;
+                order.setStatus(status);
+            }
+            Set<OrderStatusHistory> statusHistorySet = new HashSet<>();
+            OrderStatusHistory statusHistory = new OrderStatusHistory();
+            statusHistory.setStatus(status);
+            statusHistory.setDateAdded(new Date());
+            statusHistory.setOrder(order);
+            statusHistorySet.add(statusHistory);
+            order.setOrderHistory(statusHistorySet);
+
+        }
+
+        if (customer.getId() == null || customer.getId() == 0) {
+            customerService.create(customer);
+        }
+
+        order.setCustomerId(customer.getId());
+        this.create(order);
+
+   /*        @TODO ASHRAF
+
+                    if(transaction!=null) {
+            transaction.setOrder(order);
+            if(transaction.getId()==null || transaction.getId()==0) {
+                transactionService.create(transaction);
+            } else {
+                transactionService.update(transaction);
+            }
+        }
+
+
+
+if(processTransaction!=null) {
+            processTransaction.setOrder(order);
+            if(processTransaction.getId()==null || processTransaction.getId()==0) {
+                transactionService.create(processTransaction);
+            } else {
+                transactionService.update(processTransaction);
+            }
+        }*/
+
+        /**
+         * decrement inventory
+         */
+        LOGGER.debug("Update inventory");
+        Set<OrderProduct> products = order.getOrderProducts();
+        for (OrderProduct orderProduct : products) {
+//            Product p = productService.getById(orderProduct.getId());
+            Product p = productService.getBySku(orderProduct.getSku(), store);
+            if (p == null)
+                throw new ServiceException(ServiceException.EXCEPTION_INVENTORY_MISMATCH);
+            for (ProductAvailability availability : p.getAvailabilities()) {
+                int qty = availability.getProductQuantity();
+                if (qty < orderProduct.getProductQuantity()) {
+                    //throw new ServiceException(ServiceException.EXCEPTION_INVENTORY_MISMATCH);
+                    LOGGER.error("APP-BACKEND [" + ServiceException.EXCEPTION_INVENTORY_MISMATCH + "]");
+                }
+                qty = qty - orderProduct.getProductQuantity();
+                availability.setProductQuantity(qty);
+            }
+            productService.update(p);
+        }
+
+
+        return order;
     }
 
     private OrderTotalSummary caculateOrder(OrderSummary summary, Customer customer, final MerchantStore store, final Language language) throws Exception {

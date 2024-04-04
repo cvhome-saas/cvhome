@@ -11,7 +11,7 @@ import com.asrevo.cvhome.store.core.services.customer.CustomerService;
 import com.asrevo.cvhome.store.core.services.reference.language.LanguageService;
 import com.asrevo.cvhome.store.utils.AbstractDataPopulator;
 import com.asrevo.cvhome.store.utils.DateUtil;
-import org.apache.commons.lang3.Validate;
+import org.springframework.util.Assert;
 
 import java.util.Date;
 import java.util.HashSet;
@@ -35,9 +35,9 @@ public class PersistableCustomerReviewPopulator extends AbstractDataPopulator<Pe
     public CustomerReview populate(PersistableCustomerReview source, CustomerReview target, MerchantStore store,
                                    Language language) throws ConversionException {
 
-        Validate.notNull(customerService, "customerService cannot be null");
-        Validate.notNull(languageService, "languageService cannot be null");
-        Validate.notNull(source.getRating(), "Rating cannot bot be null");
+        Assert.notNull(customerService, "customerService cannot be null");
+        Assert.notNull(languageService, "languageService cannot be null");
+        Assert.notNull(source.getRating(), "Rating cannot bot be null");
 
         try {
 

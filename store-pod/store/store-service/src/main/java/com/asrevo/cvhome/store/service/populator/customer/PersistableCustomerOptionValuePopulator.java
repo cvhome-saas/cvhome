@@ -9,7 +9,7 @@ import com.asrevo.cvhome.store.core.model.customer.attribute.PersistableCustomer
 import com.asrevo.cvhome.store.core.services.reference.language.LanguageService;
 import com.asrevo.cvhome.store.utils.AbstractDataPopulator;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.Validate;
+import org.springframework.util.Assert;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -26,7 +26,7 @@ public class PersistableCustomerOptionValuePopulator extends
             throws ConversionException {
 
 
-        Validate.notNull(languageService, "Requires to set LanguageService");
+        Assert.notNull(languageService, "Requires to set LanguageService");
 
 
         try {

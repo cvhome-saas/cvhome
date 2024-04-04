@@ -84,5 +84,7 @@ public class Transaction extends SalesManagerEntity<Long, Transaction> implement
 
         return null;
     }
-
+    public String getTransactionTypeName() {
+        return this.getTransactionType()!=null?this.getTransactionType().name():"";
+    }
 }

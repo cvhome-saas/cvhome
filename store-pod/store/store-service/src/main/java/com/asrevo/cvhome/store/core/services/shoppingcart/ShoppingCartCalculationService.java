@@ -4,11 +4,11 @@
 package com.asrevo.cvhome.store.core.services.shoppingcart;
 
 
+import com.asrevo.cvhome.store.core.entity.customer.Customer;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCart;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
-import com.asrevo.cvhome.store.core.model.customer.Customer;
 import com.asrevo.cvhome.store.core.model.order.OrderTotalSummary;
 
 /**

@@ -20,7 +20,7 @@ import com.asrevo.cvhome.store.core.services.catalog.product.ProductService;
 import com.asrevo.cvhome.store.core.services.catalog.product.attribute.ProductAttributeService;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.Validate;
+import org.springframework.util.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -98,8 +98,8 @@ public class ShoppingCartServiceImpl extends SalesManagerEntityServiceImpl<Long,
     @Override
     public void saveOrUpdate(ShoppingCart shoppingCart) throws ServiceException {
 
-        Validate.notNull(shoppingCart, "ShoppingCart must not be null");
-        Validate.notNull(shoppingCart.getMerchantStore(), "ShoppingCart.merchantStore must not be null");
+        Assert.notNull(shoppingCart, "ShoppingCart must not be null");
+        Assert.notNull(shoppingCart.getMerchantStore(), "ShoppingCart.merchantStore must not be null");
 
         try {
             UserContext userContext = UserContext.getCurrentInstance();
@@ -271,9 +271,9 @@ public class ShoppingCartServiceImpl extends SalesManagerEntityServiceImpl<Long,
 
     @Override
     public ShoppingCartItem populateShoppingCartItem(Product product, MerchantStore store) throws ServiceException {
-        Validate.notNull(product, "Product should not be null");
-        Validate.notNull(product.getMerchantStore(), "Product.merchantStore should not be null");
-        Validate.notNull(store, "MerchantStore should not be null");
+        Assert.notNull(product, "Product should not be null");
+        Assert.notNull(product.getMerchantStore(), "Product.merchantStore should not be null");
+        Assert.notNull(store, "MerchantStore should not be null");
 
         ShoppingCartItem item = new ShoppingCartItem(product);
         item.setSku(product.getSku());//already in the constructor
