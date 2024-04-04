@@ -249,7 +249,7 @@ public class CategoryServiceImpl extends SalesManagerEntityServiceImpl<Long, Cat
             // categories
 
             for (Product product : products) {
-                // session.evict(product);// refresh product so we get all
+                // session.evict(product);// refresh product, so we get all
                 // product categories
                 Product dbProduct = productService.getById(product.getId());
                 Set<Category> productCategories = dbProduct.getCategories();

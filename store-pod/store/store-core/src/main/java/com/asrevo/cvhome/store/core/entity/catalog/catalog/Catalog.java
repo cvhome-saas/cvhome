@@ -13,6 +13,7 @@ import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -38,6 +39,7 @@ import java.util.Set;
 @Getter
 @Setter
 public class Catalog extends SalesManagerEntity<Long, Catalog> implements Auditable {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Id

@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.io.InputStream;
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,6 +16,7 @@ import java.util.List;
 @Getter
 @Setter
 public class ProductImage extends SalesManagerEntity<Long, ProductImage> {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Id

@@ -456,9 +456,8 @@ public class ShoppingCartServiceImpl extends SalesManagerEntityServiceImpl<Long,
                 item.setQuantity(shoppingCartItem.getQuantity());
                 item.setShoppingCart(cartModel);
 
-                List<ShoppingCartAttributeItem> cartAttributes = new ArrayList<ShoppingCartAttributeItem>();
-                if (shoppingCartItem != null && !CollectionUtils.isEmpty(shoppingCartItem.getAttributes())) {
-                    cartAttributes.addAll(shoppingCartItem.getAttributes());
+                if (!CollectionUtils.isEmpty(shoppingCartItem.getAttributes())) {
+                    List<ShoppingCartAttributeItem> cartAttributes = new ArrayList<ShoppingCartAttributeItem>(shoppingCartItem.getAttributes());
                     if (CollectionUtils.isNotEmpty(cartAttributes)) {
                         for (ShoppingCartAttributeItem shoppingCartAttributeItem : cartAttributes) {
                             ProductAttribute productAttribute = productAttributeService

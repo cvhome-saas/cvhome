@@ -4,6 +4,7 @@ import com.asrevo.cvhome.store.core.model.catalog.product.attribute.ProductOptio
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 @Setter
@@ -13,6 +14,7 @@ public class ProductOptionValueEntity extends ProductOptionValue implements Seri
     /**
      *
      */
+    @Serial
     private static final long serialVersionUID = 1L;
     private int order;
 

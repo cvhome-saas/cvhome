@@ -4,6 +4,8 @@ package com.asrevo.cvhome.store.controller.exception;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
+
 @Setter
 @Getter
 public class GenericRuntimeException extends RuntimeException {
@@ -11,6 +13,7 @@ public class GenericRuntimeException extends RuntimeException {
     /**
      *
      */
+    @Serial
     private static final long serialVersionUID = 1L;
     private String errorCode;
     private String errorMessage;

@@ -7,6 +7,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
+
 @Entity
 @Table(name = "PRODUCT_PRICE_DESCRIPTION",
         uniqueConstraints = {
@@ -25,6 +27,7 @@ public class ProductPriceDescription extends Description {
     /**
      *
      */
+    @Serial
     private static final long serialVersionUID = 1L;
     @JsonIgnore
     @ManyToOne(targetEntity = ProductPrice.class)

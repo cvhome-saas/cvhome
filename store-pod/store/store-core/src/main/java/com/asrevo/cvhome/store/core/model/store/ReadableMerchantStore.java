@@ -8,6 +8,7 @@ import com.asrevo.cvhome.store.core.model.references.ReadableLanguage;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 
@@ -18,6 +19,7 @@ public class ReadableMerchantStore extends MerchantStoreEntity implements Readab
     /**
      *
      */
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private String currentUserLanguage;

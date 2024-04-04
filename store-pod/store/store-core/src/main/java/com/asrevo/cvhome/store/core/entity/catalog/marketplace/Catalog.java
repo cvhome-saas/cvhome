@@ -8,6 +8,7 @@ import jakarta.persistence.Embedded;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +25,7 @@ public class Catalog extends SalesManagerEntity<Long, Catalog> implements Audita
     /**
      *
      */
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private Long id;

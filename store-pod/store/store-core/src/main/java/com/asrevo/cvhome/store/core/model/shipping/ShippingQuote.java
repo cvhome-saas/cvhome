@@ -5,6 +5,7 @@ import com.asrevo.cvhome.store.core.entity.system.IntegrationModule;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -24,6 +25,7 @@ public class ShippingQuote implements Serializable {
     /**
      *
      */
+    @Serial
     private static final long serialVersionUID = 1L;
     /**
      * shipping module used

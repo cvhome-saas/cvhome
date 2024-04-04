@@ -4,6 +4,8 @@ import com.asrevo.cvhome.store.core.model.catalog.product.attribute.ReadableProd
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
+
 @Setter
 @Getter
 public class ReadableShoppingCartAttributeOptionValue extends ReadableProductOptionValue {
@@ -11,6 +13,7 @@ public class ReadableShoppingCartAttributeOptionValue extends ReadableProductOpt
     /**
      *
      */
+    @Serial
     private static final long serialVersionUID = 1L;
     private String name;
 

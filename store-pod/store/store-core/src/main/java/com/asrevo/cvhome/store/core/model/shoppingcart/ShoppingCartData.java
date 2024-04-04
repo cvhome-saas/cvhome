@@ -7,6 +7,7 @@ import lombok.Setter;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 
@@ -20,6 +21,7 @@ public class ShoppingCartData extends ShopEntity implements Serializable {
     /**
      *
      */
+    @Serial
     private static final long serialVersionUID = 1L;
     private String message;
     private String code;

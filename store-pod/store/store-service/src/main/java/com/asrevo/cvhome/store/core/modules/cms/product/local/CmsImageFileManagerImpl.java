@@ -19,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serial;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -41,6 +42,7 @@ public class CmsImageFileManagerImpl
     /**
      *
      */
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final static String ROOT_NAME = "";

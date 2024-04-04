@@ -9,6 +9,7 @@ import com.asrevo.cvhome.store.core.entity.content.OutputContentFile;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.modules.cms.impl.CMSManager;
 
+import java.io.Serial;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,6 +21,7 @@ public class StaticContentFileManagerImpl extends StaticContentFileManager {
     /**
      *
      */
+    @Serial
     private static final long serialVersionUID = 1L;
     private FilePut uploadFile;
     private FileGet getFile;

@@ -3,6 +3,7 @@ package com.asrevo.cvhome.store.core.entity.common;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 @Setter
@@ -13,6 +14,7 @@ public class EntityList implements Serializable {
     /**
      *
      */
+    @Serial
     private static final long serialVersionUID = 1L;
     //private int totalCount;
     private long totalCount;

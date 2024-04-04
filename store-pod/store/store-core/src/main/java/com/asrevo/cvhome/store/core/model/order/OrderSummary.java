@@ -6,6 +6,7 @@ import com.asrevo.cvhome.store.core.model.shipping.ShippingSummary;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +26,7 @@ public class OrderSummary implements Serializable {
     /**
      *
      */
+    @Serial
     private static final long serialVersionUID = 1L;
     private OrderSummaryType orderSummaryType = OrderSummaryType.ORDERTOTAL;
     private ShippingSummary shippingSummary;

@@ -10,6 +10,7 @@ import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -24,6 +25,7 @@ public class Group extends SalesManagerEntity<Integer, Group> implements Auditab
     /**
      *
      */
+    @Serial
     private static final long serialVersionUID = 1L;
     @Id
     @Column(name = "GROUP_ID", unique = true, nullable = false)

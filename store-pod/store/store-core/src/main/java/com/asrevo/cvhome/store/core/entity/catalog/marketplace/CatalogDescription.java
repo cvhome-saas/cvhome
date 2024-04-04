@@ -6,6 +6,8 @@ import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
+
 
 /*@Entity
 @Table(name="CATEGORY_DESCRIPTION",uniqueConstraints={
@@ -23,6 +25,7 @@ public class CatalogDescription extends Description {
     /**
      *
      */
+    @Serial
     private static final long serialVersionUID = 1L;
     /*	@ManyToOne(targetEntity = Catalog.class)
     @JoinColumn(name = "CATALOG_ID", nullable = false)*/

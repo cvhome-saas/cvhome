@@ -3,6 +3,7 @@ package com.asrevo.cvhome.store.core.model.system;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,6 +16,7 @@ public class IntegrationModuleConfiguration extends IntegrationModuleEntity {
     /**
      *
      */
+    @Serial
     private static final long serialVersionUID = 1L;
     private boolean defaultSelected;
     private Map<String, String> integrationKeys = new HashMap<String, String>();

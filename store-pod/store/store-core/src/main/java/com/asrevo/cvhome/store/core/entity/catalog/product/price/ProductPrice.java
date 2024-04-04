@@ -10,6 +10,7 @@ import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashSet;
@@ -21,6 +22,7 @@ import java.util.Set;
 @Setter
 public class ProductPrice extends SalesManagerEntity<Long, ProductPrice> {
     public final static String DEFAULT_PRICE_CODE = "base";
+    @Serial
     private static final long serialVersionUID = 1L;
     @Id
     @Column(name = "PRODUCT_PRICE_ID")

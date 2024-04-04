@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.math.BigDecimal;
 
 @Entity
@@ -29,6 +30,7 @@ import java.math.BigDecimal;
 @Setter
 
 public class ProductAttribute extends SalesManagerEntity<Long, ProductAttribute> implements Optionable {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Id

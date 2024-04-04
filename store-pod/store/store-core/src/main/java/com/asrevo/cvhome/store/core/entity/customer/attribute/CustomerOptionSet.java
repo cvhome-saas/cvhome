@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
+
 @Entity
 @Table(name = "CUSTOMER_OPTION_SET",
         uniqueConstraints = {
@@ -22,6 +24,7 @@ public class CustomerOptionSet extends SalesManagerEntity<Long, CustomerOptionSe
     /**
      *
      */
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Id

@@ -65,7 +65,7 @@ public class ProductReviewServiceImpl extends
         Product product = productService.getById(review.getProduct().getId());
 
         //ajust product rating
-        Integer count = 0;
+        int count = 0;
         if (product.getProductReviewCount() != null) {
             count = product.getProductReviewCount();
         }

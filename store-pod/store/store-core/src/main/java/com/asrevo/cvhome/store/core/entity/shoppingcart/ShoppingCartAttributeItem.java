@@ -10,6 +10,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
+
 
 @Entity
 @EntityListeners(value = AuditListener.class)
@@ -19,6 +21,7 @@ import lombok.Setter;
 public class ShoppingCartAttributeItem extends SalesManagerEntity<Long, ShoppingCartAttributeItem> implements Auditable {
 
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Id

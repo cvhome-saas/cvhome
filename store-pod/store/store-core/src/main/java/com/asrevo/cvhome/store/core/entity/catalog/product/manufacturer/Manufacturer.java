@@ -10,6 +10,7 @@ import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -20,6 +21,7 @@ import java.util.Set;
 @Getter
 @Setter
 public class Manufacturer extends SalesManagerEntity<Long, Manufacturer> implements Auditable {
+    @Serial
     private static final long serialVersionUID = 1L;
     @Id
     @Column(name = "MANUFACTURER_ID", unique = true, nullable = false)

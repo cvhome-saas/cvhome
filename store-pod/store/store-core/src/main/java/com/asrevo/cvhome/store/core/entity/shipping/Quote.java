@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -25,6 +26,7 @@ public class Quote extends SalesManagerEntity<Long, Quote> {
     /**
      *
      */
+    @Serial
     private static final long serialVersionUID = 1L;
     @Id
     @Column(name = "SHIPPING_QUOTE_ID", unique = true, nullable = false)

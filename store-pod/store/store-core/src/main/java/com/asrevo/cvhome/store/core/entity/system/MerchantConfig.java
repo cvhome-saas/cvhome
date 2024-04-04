@@ -6,6 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONAware;
 import org.json.simple.JSONObject;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,6 +22,7 @@ public class MerchantConfig implements Serializable, JSONAware {
      * on the fly from the client application and read from a key value map
      */
 
+    @Serial
     private static final long serialVersionUID = 1L;
     private boolean displayCustomerSection = false;
     private boolean displayContactUs = false;

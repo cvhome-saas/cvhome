@@ -21,6 +21,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
+
 @Entity
 @Table(name = "CUSTOMER_REVIEW_DESCRIPTION", uniqueConstraints = {
         @UniqueConstraint(columnNames = {
@@ -34,6 +36,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CustomerReviewDescription extends Description {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @ManyToOne(targetEntity = CustomerReview.class)

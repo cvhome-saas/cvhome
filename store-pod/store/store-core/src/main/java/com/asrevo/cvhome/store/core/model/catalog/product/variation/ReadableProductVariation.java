@@ -5,6 +5,8 @@ import com.asrevo.cvhome.store.core.model.catalog.product.attribute.ReadableProd
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
+
 @Setter
 @Getter
 public class ReadableProductVariation extends ProductVariationEntity {
@@ -12,6 +14,7 @@ public class ReadableProductVariation extends ProductVariationEntity {
     /**
      *
      */
+    @Serial
     private static final long serialVersionUID = 1L;
 
     ReadableProductOption option = null;

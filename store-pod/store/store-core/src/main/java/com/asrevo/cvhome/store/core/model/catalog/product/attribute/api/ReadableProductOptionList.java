@@ -4,6 +4,7 @@ import com.asrevo.cvhome.store.core.model.entity.ReadableList;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,6 +15,7 @@ public class ReadableProductOptionList extends ReadableList {
     /**
      *
      */
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private List<ReadableProductOptionEntity> options = new ArrayList<ReadableProductOptionEntity>();

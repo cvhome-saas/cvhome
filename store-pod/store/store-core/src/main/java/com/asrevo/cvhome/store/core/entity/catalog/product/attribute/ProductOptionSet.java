@@ -9,6 +9,7 @@ import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -36,6 +37,7 @@ public class ProductOptionSet extends SalesManagerEntity<Long, ProductOptionSet>
     /**
      *
      */
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Id

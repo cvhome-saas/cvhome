@@ -10,6 +10,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
+
 @Entity
 @EntityListeners(value = AuditListener.class)
 @Table(name = "CATALOG_ENTRY", uniqueConstraints =
@@ -22,6 +24,7 @@ public class CatalogCategoryEntry extends SalesManagerEntity<Long, CatalogCatego
     /**
      *
      */
+    @Serial
     private static final long serialVersionUID = 1L;
     @ManyToOne
     @JoinColumn(name = "CATEGORY_ID", nullable = false)

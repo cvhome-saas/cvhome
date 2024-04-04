@@ -42,8 +42,8 @@ public class OrderApi {
     @Autowired
     private OrderFacade orderFacade;
 
-/*	@Autowired
-	private com.salesmanager.shop.store.controller.order.facade.v1.OrderFacade orderFacadeV1;*/
+    /*	@Autowired
+        private com.salesmanager.shop.store.controller.order.facade.v1.OrderFacade orderFacadeV1;*/
     @Autowired
     private OrderService orderService;
     @Autowired

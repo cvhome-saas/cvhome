@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
+
 /**
  * This object is used when processing an order from the API
  * It will be used for processing the payment and as Order meta data
@@ -18,6 +20,7 @@ public class PersistableOrder extends Order {
     /**
      *
      */
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private PersistablePayment payment;

@@ -5,6 +5,7 @@ import com.asrevo.cvhome.store.core.entity.payments.TransactionType;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 @Setter
@@ -14,6 +15,7 @@ public class ReadableTransaction extends TransactionEntity implements Serializab
     /**
      *
      */
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private PaymentType paymentType;

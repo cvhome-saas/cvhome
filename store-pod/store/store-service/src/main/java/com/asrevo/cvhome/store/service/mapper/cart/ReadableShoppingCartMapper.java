@@ -236,8 +236,7 @@ public class ReadableShoppingCartMapper implements Mapper<ShoppingCart, Readable
             // OrderSummary contains ShoppingCart items
 
             OrderSummary summary = new OrderSummary();
-            List<ShoppingCartItem> productsList = new ArrayList<>();
-            productsList.addAll(source.getLineItems());
+            List<ShoppingCartItem> productsList = new ArrayList<>(source.getLineItems());
             summary.setProducts(productsList);
 
             // OrdetTotalSummary contains all calculations
@@ -246,8 +245,7 @@ public class ReadableShoppingCartMapper implements Mapper<ShoppingCart, Readable
 
             if (CollectionUtils.isNotEmpty(orderSummary.getTotals())) {
 
-                if (orderSummary.getTotals().stream()
-                        .filter(t -> Constants.OT_DISCOUNT_TITLE.equals(t.getOrderTotalCode())).count() == 0) {
+                if (orderSummary.getTotals().stream().noneMatch(t -> Constants.OT_DISCOUNT_TITLE.equals(t.getOrderTotalCode()))) {
                     // no promo coupon applied
                     destination.setPromoCode(null);
 

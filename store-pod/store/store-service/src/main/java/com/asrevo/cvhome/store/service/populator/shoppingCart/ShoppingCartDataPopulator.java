@@ -175,8 +175,7 @@ public class ShoppingCartDataPopulator extends AbstractDataPopulator<ShoppingCar
             }
 
             OrderSummary summary = new OrderSummary();
-            List<com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem> productsList = new ArrayList<>();
-            productsList.addAll(shoppingCart.getLineItems());
+            List<com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem> productsList = new ArrayList<>(shoppingCart.getLineItems());
             summary.setProducts(productsList.stream().filter(p -> p.getProduct().isAvailable()).collect(Collectors.toList()));
             OrderTotalSummary orderSummary = shoppingCartCalculationService.calculate(shoppingCart, store, language);
 

@@ -1,9 +1,12 @@
 package com.asrevo.cvhome.store.controller.exception;
 
+import java.io.Serial;
+
 public class UnauthorizedException extends GenericRuntimeException {
 
     private final static String ERROR_CODE = "401";
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public UnauthorizedException() {

@@ -10,6 +10,7 @@ import com.asrevo.cvhome.store.core.model.shipping.ShippingOption;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.util.List;
 
 @Setter
@@ -19,6 +20,7 @@ public class ReadableOrder extends Order {
     /**
      *
      */
+    @Serial
     private static final long serialVersionUID = 1L;
 
 

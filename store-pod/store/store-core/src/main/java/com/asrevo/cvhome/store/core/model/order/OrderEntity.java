@@ -10,6 +10,7 @@ import com.asrevo.cvhome.store.core.model.order.v0.Order;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
@@ -22,6 +23,7 @@ public class OrderEntity extends Order implements Serializable {
     /**
      *
      */
+    @Serial
     private static final long serialVersionUID = 1L;
     private List<OrderTotal> totals;
     private List<OrderAttribute> attributes = new ArrayList<OrderAttribute>();

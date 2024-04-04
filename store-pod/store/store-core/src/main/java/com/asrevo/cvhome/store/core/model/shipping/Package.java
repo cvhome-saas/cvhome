@@ -3,6 +3,7 @@ package com.asrevo.cvhome.store.core.model.shipping;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 @Setter
@@ -12,6 +13,7 @@ public class Package implements Serializable {
     /**
      *
      */
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private String code;

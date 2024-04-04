@@ -42,7 +42,7 @@ public class CustomerReviewServiceImpl extends
         Customer customer = customerService.getById(review.getReviewedCustomer().getId());
 
         //ajust product rating
-        Integer count = 0;
+        int count = 0;
         if (customer.getCustomerReviewCount() != null) {
             count = customer.getCustomerReviewCount();
         }

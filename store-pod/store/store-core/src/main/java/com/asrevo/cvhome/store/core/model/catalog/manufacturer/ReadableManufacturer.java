@@ -3,6 +3,7 @@ package com.asrevo.cvhome.store.core.model.catalog.manufacturer;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 @Setter
@@ -13,6 +14,7 @@ public class ReadableManufacturer extends ManufacturerEntity implements
     /**
      *
      */
+    @Serial
     private static final long serialVersionUID = 1L;
     private ManufacturerDescription description;
 

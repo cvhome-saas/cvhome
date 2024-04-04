@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
+
 @Entity
 @Table(name = "PRODUCT_IMAGE_DESCRIPTION", uniqueConstraints = {
         @UniqueConstraint(columnNames = {
@@ -18,6 +20,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ProductImageDescription extends Description {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @ManyToOne(targetEntity = ProductImage.class)

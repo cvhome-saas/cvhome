@@ -5,6 +5,7 @@ import com.asrevo.cvhome.store.core.model.entity.Entity;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,6 +16,7 @@ public class Order extends Entity {
     /**
      *
      */
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private boolean customerAgreement;

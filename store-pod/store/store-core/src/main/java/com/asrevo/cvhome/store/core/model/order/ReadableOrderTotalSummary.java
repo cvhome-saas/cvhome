@@ -5,6 +5,7 @@ import com.asrevo.cvhome.store.core.model.order.total.ReadableOrderTotal;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +17,7 @@ public class ReadableOrderTotalSummary implements Serializable {
     /**
      *
      */
+    @Serial
     private static final long serialVersionUID = 1L;
     private String subTotal;//one time price for items
     private String total;//final price

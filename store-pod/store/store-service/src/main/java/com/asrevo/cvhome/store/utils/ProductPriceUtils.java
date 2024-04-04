@@ -700,8 +700,8 @@ public class ProductPriceUtils {
         double arith = finalPrice.getProductPrice().getProductPriceSpecialAmount().doubleValue()
                 / finalPrice.getProductPrice().getProductPriceAmount().doubleValue();
         double fsdiscount = 100 - (arith * 100);
-        Float percentagediscount = Double.valueOf(fsdiscount).floatValue();
-        int percent = percentagediscount.intValue();
+        float percentagediscount = Double.valueOf(fsdiscount).floatValue();
+        int percent = (int) percentagediscount;
         finalPrice.setDiscountPercent(percent);
 
         // calculate percent

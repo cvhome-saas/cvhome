@@ -4,10 +4,13 @@ import com.asrevo.cvhome.store.core.entity.catalog.product.Product;
 import com.asrevo.cvhome.store.core.entity.catalog.product.attribute.ProductAttribute;
 import lombok.Getter;
 
+import java.io.Serial;
+
 @Getter
 public class SaveProductAttributeEvent extends ProductEvent {
 
 
+    @Serial
     private static final long serialVersionUID = 1L;
     private final ProductAttribute productAttribute;
 

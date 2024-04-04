@@ -24,8 +24,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -37,7 +35,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.Principal;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -136,7 +133,7 @@ public class MerchantStoreApi {
 
         MerchantStoreCriteria criteria = createMerchantStoreCriteria(request);
 
-        if (userFacade.userInRoles(authenticatedUser, Arrays.asList(Constants.GROUP_SUPER_ADMIN))) {
+        if (userFacade.userInRoles(authenticatedUser, List.of(Constants.GROUP_SUPER_ADMIN))) {
             criteria.setStoreCode(null);
         } else {
             criteria.setStoreCode(merchantStore.getCode());
@@ -179,7 +176,7 @@ public class MerchantStoreApi {
 
         MerchantStoreCriteria criteria = createMerchantStoreCriteria(request);
 
-        if (userFacade.userInRoles(authenticatedUser, Arrays.asList(Constants.GROUP_SUPER_ADMIN))) {
+        if (userFacade.userInRoles(authenticatedUser, List.of(Constants.GROUP_SUPER_ADMIN))) {
             criteria.setStoreCode(null);
         } else {
             criteria.setStoreCode(merchantStore.getCode());

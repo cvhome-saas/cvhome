@@ -21,6 +21,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
+import java.io.Serial;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -35,6 +36,23 @@ import com.asrevo.cvhome.store.core.model.content.Content;
  *
  * @author carlsamson
  * <p>
+ * <p>
+ * Works with ng-file-man client
+ * @param path
+ * @param merchantStore
+ * @param language
+ * @return
+ * @throws Exception
+ * @param path
+ * @param merchantStore
+ * @param language
+ * @return
+ * @throws Exception
+ * <p>
+ * works with file manager (javascript client)
+ * @param files
+ * @param merchantStore
+ * @param language
  * <p>
  * Works with ng-file-man client
  * @param path
@@ -352,7 +370,8 @@ public class ContentAdministrationApi {
  *
  *//*
 
-		private static final long serialVersionUID = 1L;
+		    @Serial
+    private static final long serialVersionUID = 1L;
 		private boolean success = true;
 		private String error = null;
 		private boolean preventRetry = true;
@@ -433,7 +452,8 @@ public class ContentAdministrationApi {
  *
  *//*
 
-		private static final long serialVersionUID = 1L;
+		    @Serial
+    private static final long serialVersionUID = 1L;
 		private String url;
 		private String name;
 		private String size;

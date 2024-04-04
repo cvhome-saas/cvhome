@@ -3,6 +3,7 @@ package com.asrevo.cvhome.store.core.model.customer.address;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 
@@ -18,6 +19,7 @@ public class Address extends AddressLocation implements Serializable {
     /**
      *
      */
+    @Serial
     private static final long serialVersionUID = 1L;
 
     //@NotEmpty(message="{NotEmpty.customer.firstName}")

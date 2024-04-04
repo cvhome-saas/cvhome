@@ -20,6 +20,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
+
 
 @Entity
 @Table(name = "TAX_RATE_DESCRIPTION", uniqueConstraints = {
@@ -35,6 +37,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class TaxRateDescription extends Description {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @ManyToOne(targetEntity = TaxRate.class)

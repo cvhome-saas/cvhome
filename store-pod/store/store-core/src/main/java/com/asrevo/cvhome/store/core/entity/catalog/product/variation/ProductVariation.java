@@ -13,6 +13,8 @@ import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
+
 
 /**
  * Product configuration pre 3.0
@@ -34,6 +36,7 @@ public class ProductVariation extends SalesManagerEntity<Long, ProductVariation>
     /**
      *
      */
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Embedded

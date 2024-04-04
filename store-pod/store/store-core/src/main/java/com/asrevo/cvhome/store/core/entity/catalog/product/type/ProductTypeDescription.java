@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
+
 @Entity
 @Table(name = "PRODUCT_TYPE_DESCRIPTION",
         uniqueConstraints = {@UniqueConstraint(columnNames = {"PRODUCT_TYPE_ID", "LANGUAGE_ID"})})
@@ -18,6 +20,7 @@ public class ProductTypeDescription extends Description {
     /**
      *
      */
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @ManyToOne(targetEntity = ProductType.class)

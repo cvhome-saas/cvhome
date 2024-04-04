@@ -3,6 +3,7 @@ package com.asrevo.cvhome.store.core.model.catalog.category;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 @Setter
@@ -12,6 +13,7 @@ public class CategoryEntity extends Category implements Serializable {
     /**
      *
      */
+    @Serial
     private static final long serialVersionUID = 1L;
 
 

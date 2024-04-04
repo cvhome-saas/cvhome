@@ -581,8 +581,7 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
 
                 log.info("Updating cart entry quantity to" + newQuantity);
                 entryToUpdate.setQuantity((int) newQuantity);
-                List<ProductAttribute> productAttributes = new ArrayList<ProductAttribute>();
-                productAttributes.addAll(entryToUpdate.getProduct().getAttributes());
+                List<ProductAttribute> productAttributes = new ArrayList<ProductAttribute>(entryToUpdate.getProduct().getAttributes());
                 final FinalPrice finalPrice = pricingService.calculateProductPrice(entryToUpdate.getProduct(),
                         productAttributes);
                 entryToUpdate.setItemPrice(finalPrice.getFinalPrice());
@@ -631,8 +630,7 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
             log.info("Updating cart entry quantity to" + item.getQuantity());
             entryToUpdate.setQuantity(item.getQuantity());
 
-            List<ProductAttribute> productAttributes = new ArrayList<ProductAttribute>();
-            productAttributes.addAll(entryToUpdate.getProduct().getAttributes());
+            List<ProductAttribute> productAttributes = new ArrayList<ProductAttribute>(entryToUpdate.getProduct().getAttributes());
 
             final FinalPrice finalPrice = pricingService.calculateProductPrice(entryToUpdate.getProduct(),
                     productAttributes);

@@ -8,6 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 
@@ -18,6 +19,7 @@ public class CustomerReviewEntity extends ShopEntity implements Serializable {
     /**
      *
      */
+    @Serial
     private static final long serialVersionUID = 1L;
     @NotEmpty
     private String description;

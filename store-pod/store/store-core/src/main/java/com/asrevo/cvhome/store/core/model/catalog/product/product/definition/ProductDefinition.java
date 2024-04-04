@@ -5,6 +5,8 @@ import com.asrevo.cvhome.store.core.model.entity.Entity;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
+
 /**
  * Applies to product version 2 management
  *
@@ -17,6 +19,7 @@ public class ProductDefinition extends Entity {
     /**
      *
      */
+    @Serial
     private static final long serialVersionUID = 1L;
     private boolean visible = true;
     private boolean shipeable = true;

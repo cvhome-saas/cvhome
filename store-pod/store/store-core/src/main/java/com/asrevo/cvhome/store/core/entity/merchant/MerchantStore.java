@@ -16,6 +16,7 @@ import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.util.*;
 
 @Entity
@@ -25,6 +26,7 @@ import java.util.*;
 @Setter
 public class MerchantStore extends SalesManagerEntity<Integer, MerchantStore> implements Auditable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
     @Id
     @Column(name = "MERCHANT_ID", unique = true, nullable = false)

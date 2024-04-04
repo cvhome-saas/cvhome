@@ -5,6 +5,7 @@ import com.asrevo.cvhome.store.core.model.order.total.ReadableOrderTotal;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +23,7 @@ public class ReadableShoppingCart extends ShoppingCartEntity {
     /**
      *
      */
+    @Serial
     private static final long serialVersionUID = 1L;
     List<ReadableShoppingCartItem> products = new ArrayList<ReadableShoppingCartItem>();
     List<ReadableOrderTotal> totals;

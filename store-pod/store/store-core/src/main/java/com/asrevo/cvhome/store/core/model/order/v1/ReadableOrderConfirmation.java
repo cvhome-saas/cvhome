@@ -7,6 +7,7 @@ import com.asrevo.cvhome.store.core.model.order.total.ReadableTotal;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.util.List;
 
 @Setter
@@ -16,6 +17,7 @@ public class ReadableOrderConfirmation extends Entity {
     /**
      *
      */
+    @Serial
     private static final long serialVersionUID = 1L;
     private Address billing;
     private Address delivery;

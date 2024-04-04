@@ -5,11 +5,14 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.Serial;
+
 @Setter
 @Getter
 public class PersistableImage extends Entity {
 
 
+    @Serial
     private static final long serialVersionUID = 1L;
     private boolean defaultImage;
     private int imageType = 0;

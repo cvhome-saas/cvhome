@@ -19,6 +19,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.SQLOrder;
 
+import java.io.Serial;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.LinkedHashSet;
@@ -35,6 +36,7 @@ public class Order extends SalesManagerEntity<Long, Order> {
     /**
      *
      */
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Id

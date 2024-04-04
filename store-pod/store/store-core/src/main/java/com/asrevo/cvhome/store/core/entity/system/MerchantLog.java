@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 @Entity
@@ -20,6 +21,7 @@ public class MerchantLog extends SalesManagerEntity<Long, MerchantLog> implement
     /**
      *
      */
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Id

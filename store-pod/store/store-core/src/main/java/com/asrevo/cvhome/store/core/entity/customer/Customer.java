@@ -21,6 +21,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Cascade;
 
+import java.io.Serial;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -31,6 +32,7 @@ import java.util.*;
 @Getter
 @Setter
 public class Customer extends SalesManagerEntity<Long, Customer> implements Auditable {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Id

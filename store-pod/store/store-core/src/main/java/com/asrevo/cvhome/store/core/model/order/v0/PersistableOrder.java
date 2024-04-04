@@ -7,6 +7,7 @@ import com.asrevo.cvhome.store.core.model.order.PersistableOrderProduct;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 
@@ -18,6 +19,7 @@ public class PersistableOrder extends OrderEntity implements Serializable {
     /**
      *
      */
+    @Serial
     private static final long serialVersionUID = 1L;
     private PersistableCustomer customer;//might already exist if id > 0, otherwise persist
     private List<PersistableOrderProduct> orderProductItems;

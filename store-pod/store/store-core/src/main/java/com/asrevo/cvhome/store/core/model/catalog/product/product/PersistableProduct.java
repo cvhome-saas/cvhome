@@ -8,6 +8,7 @@ import com.asrevo.cvhome.store.core.model.catalog.product.product.variant.Persis
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +21,7 @@ public class PersistableProduct extends ProductEntity implements Serializable {
     /**
      *
      */
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private List<ProductDescription> descriptions = new ArrayList<ProductDescription>();

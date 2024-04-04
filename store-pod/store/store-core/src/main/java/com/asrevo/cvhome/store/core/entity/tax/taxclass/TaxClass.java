@@ -9,6 +9,7 @@ import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +23,7 @@ import java.util.List;
 
 
 public class TaxClass extends SalesManagerEntity<Long, TaxClass> {
+    @Serial
     private static final long serialVersionUID = 1L;
     @Id
     @Column(name = "TAX_CLASS_ID", unique = true, nullable = false)

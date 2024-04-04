@@ -4,6 +4,7 @@ import com.asrevo.cvhome.store.core.model.entity.Entity;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 @Setter
@@ -14,6 +15,7 @@ public class ReadableOrderProductAttribute extends Entity implements Serializabl
     /**
      *
      */
+    @Serial
     private static final long serialVersionUID = 1L;
     private String attributeName;
     private String attributePrice;

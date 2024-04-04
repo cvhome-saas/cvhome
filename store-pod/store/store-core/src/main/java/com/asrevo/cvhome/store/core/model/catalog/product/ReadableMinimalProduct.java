@@ -5,6 +5,7 @@ import com.asrevo.cvhome.store.core.model.entity.ReadableDescription;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 
@@ -15,6 +16,7 @@ public class ReadableMinimalProduct extends ProductEntity implements Serializabl
     /**
      *
      */
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private ReadableDescription description;

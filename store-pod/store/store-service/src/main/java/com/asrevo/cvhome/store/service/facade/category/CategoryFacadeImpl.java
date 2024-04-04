@@ -171,7 +171,7 @@ public class CategoryFacadeImpl implements CategoryFacade {
          * c.children1
          *
          * <p>
-         * children1.children1 children1.children2
+         * children1.children1.children2
          *
          * <p>
          * children1.children2.children1

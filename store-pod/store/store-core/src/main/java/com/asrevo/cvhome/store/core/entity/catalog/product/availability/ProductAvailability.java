@@ -17,6 +17,7 @@ import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -50,6 +51,7 @@ public class ProductAvailability extends SalesManagerEntity<Long, ProductAvailab
     /**
      *
      */
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Embedded

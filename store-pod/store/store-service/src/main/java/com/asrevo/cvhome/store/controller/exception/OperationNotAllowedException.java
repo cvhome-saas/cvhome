@@ -1,5 +1,7 @@
 package com.asrevo.cvhome.store.controller.exception;
 
+import java.io.Serial;
+
 public class OperationNotAllowedException extends ServiceRuntimeException {
 
     private final static String ERROR_CODE = "304";
@@ -7,6 +9,7 @@ public class OperationNotAllowedException extends ServiceRuntimeException {
     /**
      *
      */
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public OperationNotAllowedException(String message) {

@@ -5,6 +5,7 @@ import com.asrevo.cvhome.store.core.model.references.WeightUnitOfMeasure;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
@@ -20,6 +21,7 @@ public class ProductSpecification implements Serializable {
     /**
      *
      */
+    @Serial
     private static final long serialVersionUID = 1L;
 
 

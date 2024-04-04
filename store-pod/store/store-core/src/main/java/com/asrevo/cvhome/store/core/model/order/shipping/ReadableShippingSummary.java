@@ -6,6 +6,7 @@ import com.asrevo.cvhome.store.core.model.shipping.ShippingOption;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -19,6 +20,7 @@ public class ReadableShippingSummary implements Serializable {
     /**
      *
      */
+    @Serial
     private static final long serialVersionUID = 1L;
     private BigDecimal shipping;
     private BigDecimal handling;

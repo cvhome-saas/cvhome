@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.util.List;
 
 @Setter
@@ -14,6 +15,7 @@ public class PersistableInventory extends InventoryEntity {
     /**
      * An inventory for a given product and possibly a given variant
      */
+    @Serial
     private static final long serialVersionUID = 1L;
     private String store;
     @NotNull

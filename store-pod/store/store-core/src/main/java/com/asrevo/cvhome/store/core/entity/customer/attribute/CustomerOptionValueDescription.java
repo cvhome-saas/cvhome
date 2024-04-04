@@ -7,6 +7,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
+
 @Entity
 @Table(name = "CUSTOMER_OPT_VAL_DESCRIPTION", uniqueConstraints = {
         @UniqueConstraint(columnNames = {
@@ -21,6 +23,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CustomerOptionValueDescription extends Description {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @JsonIgnore

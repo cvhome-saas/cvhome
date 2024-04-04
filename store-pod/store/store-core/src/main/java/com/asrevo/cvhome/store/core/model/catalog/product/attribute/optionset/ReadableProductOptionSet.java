@@ -6,6 +6,7 @@ import com.asrevo.cvhome.store.core.model.catalog.product.type.ReadableProductTy
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.util.List;
 
 @Setter
@@ -15,6 +16,7 @@ public class ReadableProductOptionSet extends ProductOptionSetEntity {
     /**
      *
      */
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private ReadableProductOption option;

@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
+
 
 /**
  * Representation of a digital product
@@ -20,6 +22,7 @@ import lombok.Setter;
 public class DigitalProduct extends SalesManagerEntity<Long, DigitalProduct> {
 
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
 

@@ -10,6 +10,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +21,7 @@ import java.util.List;
 @Getter
 @Setter
 public class Language extends SalesManagerEntity<Integer, Language> implements Auditable {
+    @Serial
     private static final long serialVersionUID = 1L;
 
 

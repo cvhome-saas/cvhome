@@ -3,6 +3,8 @@
  */
 package com.asrevo.cvhome.store.core.modules.cms.content;
 
+import java.io.Serial;
+
 /**
  * @author Umesh Awasthi
  */
@@ -12,6 +14,7 @@ public abstract class StaticContentFileManager
     /**
      *
      */
+    @Serial
     private static final long serialVersionUID = 1L;
 
 }

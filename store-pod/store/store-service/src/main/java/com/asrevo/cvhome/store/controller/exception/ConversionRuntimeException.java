@@ -1,10 +1,13 @@
 package com.asrevo.cvhome.store.controller.exception;
 
+import java.io.Serial;
+
 public class ConversionRuntimeException extends GenericRuntimeException {
 
     /**
      *
      */
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public ConversionRuntimeException(String errorCode, String message) {

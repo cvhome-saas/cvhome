@@ -9,6 +9,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -19,6 +20,7 @@ import java.util.Set;
 @Setter
 public class ProductType extends SalesManagerEntity<Long, ProductType> implements Auditable {
     public final static String GENERAL_TYPE = "GENERAL";
+    @Serial
     private static final long serialVersionUID = 1L;
     @Id
     @Column(name = "PRODUCT_TYPE_ID", unique = true, nullable = false)

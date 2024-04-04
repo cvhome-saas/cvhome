@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
+
 /**
  * Entity used for storing various attributes related to an Order
  *
@@ -20,6 +22,7 @@ public class OrderAttribute extends SalesManagerEntity<Long, OrderAttribute> {
     /**
      *
      */
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Id

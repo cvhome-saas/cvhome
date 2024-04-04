@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.net.URLConnection;
 import java.nio.file.*;
 import java.util.ArrayList;
@@ -38,6 +39,7 @@ public class CmsStaticContentFileManagerImpl implements ContentAssetsManager {
     /**
      *
      */
+    @Serial
     private static final long serialVersionUID = 1L;
     private static final String ROOT_NAME = "static";
     private static final String ROOT_CONTAINER = "files";
