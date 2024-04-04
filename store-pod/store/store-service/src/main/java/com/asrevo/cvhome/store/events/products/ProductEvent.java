@@ -8,7 +8,7 @@ import org.springframework.context.ApplicationEvent;
 public abstract class ProductEvent extends ApplicationEvent {
 
     private static final long serialVersionUID = 1L;
-    private Product product;
+    private final Product product;
 
     public ProductEvent(Object source, Product product) {
         super(source);

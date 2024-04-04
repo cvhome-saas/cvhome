@@ -22,15 +22,15 @@ public class CatalogServiceImpl
         implements CatalogService {
 
 
-    private CatalogRepository catalogRepository;
+    private final CatalogRepository catalogRepository;
+
+    private final PageableCatalogRepository pageableCatalogRepository;
 
     @Autowired
-    private PageableCatalogRepository pageableCatalogRepository;
-
-    @Autowired
-    public CatalogServiceImpl(CatalogRepository repository) {
+    public CatalogServiceImpl(CatalogRepository repository, PageableCatalogRepository pageableCatalogRepository) {
         super(repository);
         this.catalogRepository = repository;
+        this.pageableCatalogRepository = pageableCatalogRepository;
     }
 
     @Override

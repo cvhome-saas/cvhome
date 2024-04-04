@@ -21,10 +21,9 @@ import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.boot.beanvalidation.IntegrationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.Assert;
@@ -33,33 +32,26 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1")
 @Tag(name = "Order flow resource", description = "Manage orders (create, list, get)")
+@Slf4j
 public class OrderApi {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(OrderApi.class);
-
-    @Autowired
-    private CustomerService customerService;
-
-    @Autowired
-    private OrderFacade orderFacade;
-
-    @Autowired
-    private OrderService orderService;
-
-/*	@Autowired
-	private com.salesmanager.shop.store.controller.order.facade.v1.OrderFacade orderFacadeV1;*/
-
-    @Autowired
-    private ShoppingCartService shoppingCartService;
-
-    @Autowired
-    private CustomerFacade customerFacade;
-
-    @Autowired
-    private CustomerFacade customerFacadev1; //v1 version
 
 
     private static final String DEFAULT_ORDER_LIST_COUNT = "25";
+    @Autowired
+    private CustomerService customerService;
+    @Autowired
+    private OrderFacade orderFacade;
+
+/*	@Autowired
+	private com.salesmanager.shop.store.controller.order.facade.v1.OrderFacade orderFacadeV1;*/
+    @Autowired
+    private OrderService orderService;
+    @Autowired
+    private ShoppingCartService shoppingCartService;
+    @Autowired
+    private CustomerFacade customerFacade;
+    @Autowired
+    private CustomerFacade customerFacadev1; //v1 version
 
     /**
      * Main checkout resource that will complete the order flow

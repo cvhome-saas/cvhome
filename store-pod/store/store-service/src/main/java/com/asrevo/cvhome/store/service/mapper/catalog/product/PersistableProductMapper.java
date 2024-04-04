@@ -174,7 +174,7 @@ public class PersistableProductMapper implements Mapper<PersistableProduct, Prod
                 }
             }
 
-            if (descriptions.size() > 0) {
+            if (!descriptions.isEmpty()) {
                 destination.setDescriptions(descriptions);
             }
 

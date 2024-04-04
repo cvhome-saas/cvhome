@@ -21,7 +21,7 @@ public class ReadableCategoryPopulator extends
         Assert.notNull(source, "Category must not be null");
 
         target.setLineage(source.getLineage());
-        if (source.getDescriptions() != null && source.getDescriptions().size() > 0) {
+        if (source.getDescriptions() != null && !source.getDescriptions().isEmpty()) {
 
             CategoryDescription description = source.getDescription();
             if (source.getDescriptions().size() > 1) {

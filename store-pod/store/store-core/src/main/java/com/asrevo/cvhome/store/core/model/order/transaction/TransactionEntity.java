@@ -8,21 +8,21 @@ import java.io.Serializable;
 
 /**
  * Readable version of Transaction entity object
- * @author c.samson
  *
+ * @author c.samson
  */
 @Setter
 @Getter
 public class TransactionEntity extends Entity implements Serializable {
-	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	private Long orderId;
-	private String details;
-	private String transactionDate;
-	private String amount;
+
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
+    private Long orderId;
+    private String details;
+    private String transactionDate;
+    private String amount;
 
 
 }

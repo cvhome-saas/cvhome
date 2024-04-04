@@ -1,8 +1,9 @@
 package com.asrevo.cvhome.store.controller.exception;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -13,9 +14,9 @@ import java.util.Optional;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice({"com.asrevo.cvhome.store.store.api"})
+@Slf4j
 public class RestErrorHandler {
 
-    private static final Logger log = LoggerFactory.getLogger(RestErrorHandler.class);
 
     @RequestMapping(produces = "application/json")
     @ExceptionHandler(Exception.class)

@@ -15,7 +15,7 @@ import org.springframework.util.Assert;
 public class CustomerOptinServiceImpl extends SalesManagerEntityServiceImpl<Long, CustomerOptin> implements CustomerOptinService {
 
 
-    private CustomerOptinRepository customerOptinRepository;
+    private final CustomerOptinRepository customerOptinRepository;
 
 
     @Autowired

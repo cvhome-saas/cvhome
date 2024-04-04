@@ -14,8 +14,9 @@ import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -24,9 +25,9 @@ import org.springframework.web.bind.annotation.*;
 @Controller
 @RequestMapping("/api/v1")
 @Tag(name = "Product inventory resource (Product Inventory Api)")
+@Slf4j
 public class ProductInventoryApi {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ProductInventoryApi.class);
     @Autowired
     private ProductInventoryFacade productInventoryFacade;
 

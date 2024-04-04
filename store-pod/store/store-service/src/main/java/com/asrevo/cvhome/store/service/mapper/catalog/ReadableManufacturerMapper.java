@@ -53,13 +53,8 @@ public class ReadableManufacturerMapper implements Mapper<Manufacturer, Readable
 
     private Optional<ManufacturerDescription> getDescription(
             Set<ManufacturerDescription> descriptionsLang, Language language) {
-        Optional<ManufacturerDescription> descriptionByLang = descriptionsLang.stream()
+        return descriptionsLang.stream()
                 .filter(desc -> desc.getLanguage().getCode().equals(language.getCode())).findAny();
-        if (descriptionByLang.isPresent()) {
-            return descriptionByLang;
-        } else {
-            return Optional.empty();
-        }
     }
 
     private com.asrevo.cvhome.store.core.model.catalog.manufacturer.ManufacturerDescription convertDescription(

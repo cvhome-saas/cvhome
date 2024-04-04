@@ -17,8 +17,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -28,9 +29,9 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/api/v1")
+@Slf4j
 public class ProductReviewApi {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ProductReviewApi.class);
     @Autowired
     private ProductCommonFacade productCommonFacade;
     @Autowired
@@ -83,7 +84,7 @@ public class ProductReviewApi {
             return review;
 
         } catch (Exception e) {
-            LOGGER.error("Error while saving product review", e);
+            log.error("Error while saving product review", e);
             try {
                 response.sendError(503, "Error while saving product review" + e.getMessage());
             } catch (Exception ignore) {
@@ -121,7 +122,7 @@ public class ProductReviewApi {
             return reviews;
 
         } catch (Exception e) {
-            LOGGER.error("Error while getting product reviews", e);
+            log.error("Error while getting product reviews", e);
             try {
                 response.sendError(503, "Error while getting product reviews" + e.getMessage());
             } catch (Exception ignore) {
@@ -177,7 +178,7 @@ public class ProductReviewApi {
             return review;
 
         } catch (Exception e) {
-            LOGGER.error("Error while saving product review", e);
+            log.error("Error while saving product review", e);
             try {
                 response.sendError(503, "Error while saving product review" + e.getMessage());
             } catch (Exception ignore) {
@@ -221,7 +222,7 @@ public class ProductReviewApi {
             productCommonFacade.deleteReview(prodReview, merchantStore, language);
 
         } catch (Exception e) {
-            LOGGER.error("Error while deleting product review", e);
+            log.error("Error while deleting product review", e);
             try {
                 response.sendError(503, "Error while deleting product review" + e.getMessage());
             } catch (Exception ignore) {

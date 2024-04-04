@@ -8,7 +8,7 @@ import lombok.Getter;
 public class DeleteProductVariantEvent extends ProductEvent {
 
     private static final long serialVersionUID = 1L;
-    private ProductVariant variant;
+    private final ProductVariant variant;
 
     public DeleteProductVariantEvent(Object source, ProductVariant variant, Product product) {
         super(source, product);

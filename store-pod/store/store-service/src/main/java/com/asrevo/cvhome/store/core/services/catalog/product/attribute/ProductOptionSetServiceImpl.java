@@ -16,7 +16,7 @@ public class ProductOptionSetServiceImpl extends
         SalesManagerEntityServiceImpl<Long, ProductOptionSet> implements ProductOptionSetService {
 
 
-    private ProductOptionSetRepository productOptionSetRepository;
+    private final ProductOptionSetRepository productOptionSetRepository;
 
 
     @Autowired

@@ -73,7 +73,7 @@ public class Content extends SalesManagerEntity<Long, Content> implements Serial
 
     public ContentDescription getDescription() {
 
-        if (this.getDescriptions() != null && this.getDescriptions().size() > 0) {
+        if (this.getDescriptions() != null && !this.getDescriptions().isEmpty()) {
             return this.getDescriptions().get(0);
         }
 

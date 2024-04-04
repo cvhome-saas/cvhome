@@ -7,9 +7,8 @@ import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.repositories.reference.country.CountryRepository;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
 import com.asrevo.cvhome.store.core.utils.CacheUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -20,21 +19,21 @@ import java.util.List;
 import java.util.Map;
 
 @Service("countryService")
+@Slf4j
 public class CountryServiceImpl extends SalesManagerEntityServiceImpl<Integer, Country>
         implements CountryService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CountryServiceImpl.class);
 
-    private CountryRepository countryRepository;
+    private final CountryRepository countryRepository;
 
-    @Autowired
-    private CacheUtils cache;
+    private final CacheUtils cache;
 
 
     @Autowired
-    public CountryServiceImpl(CountryRepository countryRepository) {
+    public CountryServiceImpl(CountryRepository countryRepository, CacheUtils cache) {
         super(countryRepository);
         this.countryRepository = countryRepository;
+        this.cache = cache;
     }
 
     @Cacheable("countrByCode")
@@ -104,7 +103,7 @@ public class CountryServiceImpl extends SalesManagerEntityServiceImpl<Integer, C
             }
 
         } catch (Exception e) {
-            LOGGER.error("getCountries()", e);
+            log.error("getCountries()", e);
         }
 
         return countries;
@@ -117,7 +116,7 @@ public class CountryServiceImpl extends SalesManagerEntityServiceImpl<Integer, C
         try {
             return countryRepository.listCountryZonesByLanguage(language.getId());
         } catch (Exception e) {
-            LOGGER.error("listCountryZones", e);
+            log.error("listCountryZones", e);
             throw new ServiceException(e);
         }
 

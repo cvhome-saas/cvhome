@@ -27,8 +27,7 @@ import com.asrevo.cvhome.store.core.services.catalog.product.relationship.Produc
 import com.asrevo.cvhome.store.core.services.catalog.product.review.ProductReviewService;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
 import com.asrevo.cvhome.store.utils.CatalogServiceHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
@@ -39,12 +38,11 @@ import org.springframework.util.Assert;
 
 import java.io.InputStream;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service("productService")
+@Slf4j
 public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Product> implements ProductService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ProductServiceImpl.class);
 
     ProductRepository productRepository;
 
@@ -270,7 +268,7 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
 
         try {
 
-            if (images != null && images.size() > 0) {
+            if (images != null && !images.isEmpty()) {
                 for (ProductImage image : images) {
                     if (image.getImage() != null && (image.getId() == null || image.getId() == 0L)) {
                         image.setProduct(product);
@@ -317,7 +315,7 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
 
 
         } catch (Exception e) {
-            LOGGER.error("Cannot save images " + e.getMessage());
+            log.error("Cannot save images " + e.getMessage());
         }
 
         return product;

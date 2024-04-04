@@ -16,7 +16,7 @@ import java.util.List;
 public class CustomerAttributeServiceImpl extends
         SalesManagerEntityServiceImpl<Long, CustomerAttribute> implements CustomerAttributeService {
 
-    private CustomerAttributeRepository customerAttributeRepository;
+    private final CustomerAttributeRepository customerAttributeRepository;
 
     @Autowired
     public CustomerAttributeServiceImpl(CustomerAttributeRepository customerAttributeRepository) {

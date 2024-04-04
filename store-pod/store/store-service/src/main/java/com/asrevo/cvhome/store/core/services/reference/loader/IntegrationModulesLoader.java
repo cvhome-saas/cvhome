@@ -4,8 +4,7 @@ import com.asrevo.cvhome.store.core.entity.system.IntegrationModule;
 import com.asrevo.cvhome.store.core.entity.system.ModuleConfig;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.io.InputStream;
@@ -15,10 +14,8 @@ import java.util.List;
 import java.util.Map;
 
 @Component
+@Slf4j
 public class IntegrationModulesLoader {
-
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(IntegrationModulesLoader.class);
 
 
     public List<IntegrationModule> loadIntegrationModules(String jsonFilePath) throws Exception {
@@ -73,7 +70,7 @@ public class IntegrationModulesLoader {
                 try {
                     b = Boolean.valueOf((String) object.get("customModule"));
                 } catch (Exception e) {
-                    LOGGER.error("Cannot cast " + o.getClass() + " tp a boolean value");
+                    log.error("Cannot cast " + o.getClass() + " tp a boolean value");
                 }
             }
             module.setCustomModule(b);

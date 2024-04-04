@@ -57,7 +57,7 @@ public class ReadableProductPricePopulator extends
                 target.setFinalPrice(pricingService.getDisplayAmount(finalPrice.getOriginalPrice(), store));
             }
 
-            if (source.getDescriptions() != null && source.getDescriptions().size() > 0) {
+            if (source.getDescriptions() != null && !source.getDescriptions().isEmpty()) {
                 List<com.asrevo.cvhome.store.core.model.catalog.product.ProductPriceDescription> fulldescriptions = new ArrayList<com.asrevo.cvhome.store.core.model.catalog.product.ProductPriceDescription>();
 
                 Set<ProductPriceDescription> descriptions = source.getDescriptions();

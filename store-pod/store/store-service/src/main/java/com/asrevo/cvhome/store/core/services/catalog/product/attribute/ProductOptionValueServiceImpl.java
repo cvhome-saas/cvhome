@@ -22,19 +22,19 @@ public class ProductOptionValueServiceImpl extends
         SalesManagerEntityServiceImpl<Long, ProductOptionValue> implements
         ProductOptionValueService {
 
-    @Autowired
-    private ProductAttributeService productAttributeService;
+    private final ProductAttributeService productAttributeService;
 
-    @Autowired
-    private PageableProductOptionValueRepository pageableProductOptionValueRepository;
+    private final PageableProductOptionValueRepository pageableProductOptionValueRepository;
 
-    private ProductOptionValueRepository productOptionValueRepository;
+    private final ProductOptionValueRepository productOptionValueRepository;
 
     @Autowired
     public ProductOptionValueServiceImpl(
-            ProductOptionValueRepository productOptionValueRepository) {
+            ProductOptionValueRepository productOptionValueRepository, ProductAttributeService productAttributeService, PageableProductOptionValueRepository pageableProductOptionValueRepository) {
         super(productOptionValueRepository);
         this.productOptionValueRepository = productOptionValueRepository;
+        this.productAttributeService = productAttributeService;
+        this.pageableProductOptionValueRepository = pageableProductOptionValueRepository;
     }
 
 

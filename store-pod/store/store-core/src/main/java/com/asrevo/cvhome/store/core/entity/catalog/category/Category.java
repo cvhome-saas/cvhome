@@ -87,7 +87,7 @@ public class Category extends SalesManagerEntity<Long, Category> implements Audi
     }
 
     public CategoryDescription getDescription() {
-        if (descriptions != null && descriptions.size() > 0) {
+        if (descriptions != null && !descriptions.isEmpty()) {
             return descriptions.iterator().next();
         }
 

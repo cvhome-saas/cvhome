@@ -2,18 +2,17 @@ package com.asrevo.cvhome.store.core.model.shipping;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 
 @Getter
 @Setter
+@Slf4j
 public class ShippingOption implements Serializable {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ShippingOption.class);
 
     /**
      *
@@ -42,7 +41,7 @@ public class ShippingOption implements Serializable {
             try {
                 this.optionPrice = new BigDecimal(this.getOptionPriceText());
             } catch (Exception e) {
-                LOGGER.error("Can't convert price text " + this.getOptionPriceText() + " to big decimal");
+                log.error("Can't convert price text " + this.getOptionPriceText() + " to big decimal");
             }
         }
 

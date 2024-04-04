@@ -18,15 +18,15 @@ import org.springframework.stereotype.Service;
 public class CatalogEntryServiceImpl extends SalesManagerEntityServiceImpl<Long, CatalogCategoryEntry>
         implements CatalogEntryService {
 
-    @Autowired
-    private PageableCatalogEntryRepository pageableCatalogEntryRepository;
+    private final PageableCatalogEntryRepository pageableCatalogEntryRepository;
 
-    private CatalogEntryRepository catalogEntryRepository;
+    private final CatalogEntryRepository catalogEntryRepository;
 
     @Autowired
-    public CatalogEntryServiceImpl(CatalogEntryRepository repository) {
+    public CatalogEntryServiceImpl(CatalogEntryRepository repository, PageableCatalogEntryRepository pageableCatalogEntryRepository) {
         super(repository);
         this.catalogEntryRepository = repository;
+        this.pageableCatalogEntryRepository = pageableCatalogEntryRepository;
     }
 
     @Override

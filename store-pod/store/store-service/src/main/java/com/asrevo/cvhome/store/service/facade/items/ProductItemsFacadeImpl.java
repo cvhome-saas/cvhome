@@ -159,7 +159,7 @@ public class ProductItemsFacadeImpl implements ProductItemsFacade {
             throw new ServiceRuntimeException("ExceptionWhile getting product group [" + group + "]", e);
         }
 
-        if (existList.size() > 0) {
+        if (!existList.isEmpty()) {
             throw new OperationNotAllowedException("Product with id [" + product.getId() + "] is already in the group");
         }
 

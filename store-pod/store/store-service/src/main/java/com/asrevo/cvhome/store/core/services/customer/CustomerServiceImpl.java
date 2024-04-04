@@ -11,8 +11,7 @@ import com.asrevo.cvhome.store.core.repositories.customer.CustomerRepository;
 import com.asrevo.cvhome.store.core.services.customer.attribute.CustomerAttributeService;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
 import com.asrevo.cvhome.store.core.services.geo.GeoLocation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,23 +19,23 @@ import java.util.List;
 
 
 @Service("customerService")
+@Slf4j
 public class CustomerServiceImpl extends SalesManagerEntityServiceImpl<Long, Customer> implements CustomerService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CustomerServiceImpl.class);
 
-    private CustomerRepository customerRepository;
+    private final CustomerRepository customerRepository;
 
-    @Autowired
-    private CustomerAttributeService customerAttributeService;
+    private final CustomerAttributeService customerAttributeService;
 
-    @Autowired
-    private GeoLocation geoLocation;
+    private final GeoLocation geoLocation;
 
 
     @Autowired
-    public CustomerServiceImpl(CustomerRepository customerRepository) {
+    public CustomerServiceImpl(CustomerRepository customerRepository, CustomerAttributeService customerAttributeService, GeoLocation geoLocation) {
         super(customerRepository);
         this.customerRepository = customerRepository;
+        this.customerAttributeService = customerAttributeService;
+        this.geoLocation = geoLocation;
     }
 
     @Override
@@ -83,7 +82,7 @@ public class CustomerServiceImpl extends SalesManagerEntityServiceImpl<Long, Cus
     @Override
     public void saveOrUpdate(Customer customer) throws ServiceException {
 
-        LOGGER.debug("Creating Customer");
+        log.debug("Creating Customer");
 
         if (customer.getId() != null && customer.getId() > 0) {
             super.update(customer);

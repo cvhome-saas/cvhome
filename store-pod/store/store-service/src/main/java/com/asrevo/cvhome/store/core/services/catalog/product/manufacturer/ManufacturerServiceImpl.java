@@ -10,8 +10,7 @@ import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.repositories.catalog.product.manufacturer.ManufacturerRepository;
 import com.asrevo.cvhome.store.core.repositories.catalog.product.manufacturer.PageableManufacturerRepository;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,20 +23,20 @@ import java.util.List;
 
 
 @Service("manufacturerService")
+@Slf4j
 public class ManufacturerServiceImpl extends SalesManagerEntityServiceImpl<Long, Manufacturer>
         implements ManufacturerService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ManufacturerServiceImpl.class);
+
+    private final PageableManufacturerRepository pageableManufacturerRepository;
+
+    private final ManufacturerRepository manufacturerRepository;
 
     @Autowired
-    private PageableManufacturerRepository pageableManufacturerRepository;
-
-    private ManufacturerRepository manufacturerRepository;
-
-    @Autowired
-    public ManufacturerServiceImpl(ManufacturerRepository manufacturerRepository) {
+    public ManufacturerServiceImpl(ManufacturerRepository manufacturerRepository, PageableManufacturerRepository pageableManufacturerRepository) {
         super(manufacturerRepository);
         this.manufacturerRepository = manufacturerRepository;
+        this.pageableManufacturerRepository = pageableManufacturerRepository;
     }
 
     @Override
@@ -87,7 +86,7 @@ public class ManufacturerServiceImpl extends SalesManagerEntityServiceImpl<Long,
     @Override
     public void saveOrUpdate(Manufacturer manufacturer) throws ServiceException {
 
-        LOGGER.debug("Creating Manufacturer");
+        log.debug("Creating Manufacturer");
 
         if (manufacturer.getId() != null && manufacturer.getId() > 0) {
             super.update(manufacturer);

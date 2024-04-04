@@ -36,7 +36,7 @@ public interface CustomerFacade {
      * @param language
      * @throws Exception
      */
-    public CustomerEntity getCustomerDataByUserName(final String userName, final MerchantStore store, final Language language) throws Exception;
+    CustomerEntity getCustomerDataByUserName(final String userName, final MerchantStore store, final Language language) throws Exception;
 
     /**
      * Creates a ReadableCustomer
@@ -70,20 +70,20 @@ public interface CustomerFacade {
      * @param sessionShoppingCartId session shopping cart, if user already have few items in Cart.
      * @throws Exception
      */
-    public ShoppingCart mergeCart(final Customer customer, final String sessionShoppingCartId, final MerchantStore store, final Language language) throws Exception;
+    ShoppingCart mergeCart(final Customer customer, final String sessionShoppingCartId, final MerchantStore store, final Language language) throws Exception;
 
-    public Customer getCustomerByUserName(final String userName, final MerchantStore store);
+    Customer getCustomerByUserName(final String userName, final MerchantStore store);
 
-    public boolean checkIfUserExists(final String userName, final MerchantStore store) throws Exception;
+    boolean checkIfUserExists(final String userName, final MerchantStore store) throws Exception;
 
-    public PersistableCustomer registerCustomer(final PersistableCustomer customer, final MerchantStore merchantStore, final Language language) throws Exception;
+    PersistableCustomer registerCustomer(final PersistableCustomer customer, final MerchantStore merchantStore, final Language language) throws Exception;
 
-    public Address getAddress(final Long userId, final MerchantStore merchantStore, boolean isBillingAddress) throws Exception;
+    Address getAddress(final Long userId, final MerchantStore merchantStore, boolean isBillingAddress) throws Exception;
 
-    public void updateAddress(Long userId, MerchantStore merchantStore, Address address, final Language language)
+    void updateAddress(Long userId, MerchantStore merchantStore, Address address, final Language language)
             throws Exception;
 
-    public void setCustomerModelDefaultProperties(Customer customer, MerchantStore store) throws Exception;
+    void setCustomerModelDefaultProperties(Customer customer, MerchantStore store) throws Exception;
 
 
     Customer getCustomerModel(PersistableCustomer customer,

@@ -21,6 +21,7 @@ import java.util.List;
 public interface OrderService extends SalesManagerEntityService<Long, Order> {
     void addOrderStatusHistory(Order order, OrderStatusHistory history)
             throws ServiceException;
+
     OrderTotalSummary caculateOrderTotal(OrderSummary orderSummary,
                                          Customer customer, MerchantStore store, Language language)
             throws ServiceException;

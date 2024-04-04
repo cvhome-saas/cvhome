@@ -32,9 +32,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -60,10 +61,10 @@ import java.util.Set;
 @Controller
 @RequestMapping("/api/v2")
 @Tags(value = @Tag(name = "Product variation resource (Product variant Api)"))
+@Slf4j
 public class ProductVariationApi {
 
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ProductVariationApi.class);
     @Autowired
     private PricingService pricingService;
     @Autowired

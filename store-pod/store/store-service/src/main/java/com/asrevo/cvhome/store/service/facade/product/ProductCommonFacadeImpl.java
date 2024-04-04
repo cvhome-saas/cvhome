@@ -34,7 +34,6 @@ import org.springframework.util.Assert;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 /**
@@ -222,7 +221,7 @@ public class ProductCommonFacadeImpl implements ProductCommonFacade {
         List<Category> assigned = product.getCategories().stream()
                 .filter(cat -> cat.getId().longValue() == category.getId().longValue()).toList();
 
-        if (assigned.size() > 0) {
+        if (!assigned.isEmpty()) {
             throw new OperationNotAllowedException("Category with id [" + category.getId()
                     + "] already attached to product [" + product.getId() + "]");
         }

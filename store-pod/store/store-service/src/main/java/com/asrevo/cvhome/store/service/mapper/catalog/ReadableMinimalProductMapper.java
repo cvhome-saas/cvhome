@@ -107,8 +107,8 @@ public class ReadableMinimalProductMapper implements Mapper<Product, ReadableMin
 
         //image
         Set<ProductImage> images = source.getImages();
-        if (images != null && images.size() > 0) {
-            List<ReadableImage> imageList = new ArrayList<ReadableImage>();
+        if (images != null && !images.isEmpty()) {
+            List<ReadableImage> imageList = new ArrayList<>();
 
             String contextPath = imageUtils.getContextPath();
 
@@ -117,10 +117,7 @@ public class ReadableMinimalProductMapper implements Mapper<Product, ReadableMin
                 prdImage.setImageName(img.getProductImage());
                 prdImage.setDefaultImage(img.isDefaultImage());
 
-                StringBuilder imgPath = new StringBuilder();
-                imgPath.append(contextPath).append(imageUtils.buildProductImageUtils(store, source.getSku(), img.getProductImage()));
-
-                prdImage.setImageUrl(imgPath.toString());
+                prdImage.setImageUrl(contextPath + imageUtils.buildProductImageUtils(store, source.getSku(), img.getProductImage()));
                 prdImage.setId(img.getId());
                 prdImage.setImageType(img.getImageType());
                 if (img.getProductImageUrl() != null) {

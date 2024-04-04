@@ -22,15 +22,15 @@ public class ProductVariantServiceImpl extends SalesManagerEntityServiceImpl<Lon
         implements ProductVariantService {
 
 
-    private ProductVariantRepository productVariantRepository;
+    private final ProductVariantRepository productVariantRepository;
+
+    private final PageableProductVariantRepositoty pageableProductVariantRepositoty;
 
     @Autowired
-    private PageableProductVariantRepositoty pageableProductVariantRepositoty;
-
-    @Autowired
-    public ProductVariantServiceImpl(ProductVariantRepository productVariantRepository) {
+    public ProductVariantServiceImpl(ProductVariantRepository productVariantRepository, PageableProductVariantRepositoty pageableProductVariantRepositoty) {
         super(productVariantRepository);
         this.productVariantRepository = productVariantRepository;
+        this.pageableProductVariantRepositoty = pageableProductVariantRepositoty;
     }
 
     @Override

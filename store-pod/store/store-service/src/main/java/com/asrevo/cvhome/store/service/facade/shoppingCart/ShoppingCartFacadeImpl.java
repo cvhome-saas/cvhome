@@ -28,10 +28,9 @@ import com.asrevo.cvhome.store.service.populator.shoppingCart.ShoppingCartDataPo
 import com.asrevo.cvhome.store.utils.DateUtil;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
 import jakarta.persistence.NoResultException;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.lang.Nullable;
@@ -45,7 +44,6 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @author Umesh Awasthi
@@ -54,9 +52,9 @@ import java.util.stream.Collectors;
  * @since 1.0
  */
 @Service(value = "shoppingCartFacade")
+@Slf4j
 public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ShoppingCartFacadeImpl.class);
 
     @Autowired
     private ShoppingCartService shoppingCartService;
@@ -338,7 +336,7 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
                 .toList();
 
         if (products.size() != shoppingCartItems.size()) {
-            LOG.warn("----------------------- Items with in id-list " + productSkus + " does not exist");
+            log.warn("----------------------- Items with in id-list " + productSkus + " does not exist");
             throw new ResourceNotFoundException("Item with skus " + productSkus + " does not exist");
         }
 
@@ -360,7 +358,7 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
             if (oShoppingCartItem.isEmpty()) {
                 // Should never happen if not something is updated in realtime or user has item
                 // in local storage and add it long time after to cart!
-                LOG.warn("Missing shoppingCartItem for product " + p.getSku() + " ( " + p.getId() + " )");
+                log.warn("Missing shoppingCartItem for product " + p.getSku() + " ( " + p.getId() + " )");
                 continue;
             }
             PersistableShoppingCartItem shoppingCartItem = oShoppingCartItem.get();
@@ -448,13 +446,13 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
             for (com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem shoppingCartItem : cartModel
                     .getLineItems()) {
                 if (shoppingCartItem.getId().longValue() == entryId) {
-                    LOG.info("Found line item  for given entry id: " + entryId);
+                    log.info("Found line item  for given entry id: " + entryId);
                     return shoppingCartItem;
 
                 }
             }
         }
-        LOG.info("Unable to find any entry for given Id: " + entryId);
+        log.info("Unable to find any entry for given Id: " + entryId);
         return null;
     }
 
@@ -471,7 +469,7 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
         ShoppingCart cart = null;
         try {
             if (customer != null) {
-                LOG.info("Reteriving customer shopping cart...");
+                log.info("Reteriving customer shopping cart...");
                 cart = shoppingCartService.getShoppingCart(customer, store);
 
             } else {
@@ -482,7 +480,7 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
             }
 
         } catch (ServiceException ex) {
-            LOG.error("Error while retriving cart from customer", ex);
+            log.error("Error while retriving cart from customer", ex);
         } catch (NoResultException nre) {
             // nothing
         }
@@ -500,7 +498,7 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
             }
         }
 
-        LOG.info("Cart model found.");
+        log.info("Cart model found.");
 
         ShoppingCartDataPopulator shoppingCartDataPopulator = new ShoppingCartDataPopulator();
         shoppingCartDataPopulator.setShoppingCartCalculationService(shoppingCartCalculationService);
@@ -581,7 +579,7 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
 
                 entryToUpdate.getProduct();
 
-                LOG.info("Updating cart entry quantity to" + newQuantity);
+                log.info("Updating cart entry quantity to" + newQuantity);
                 entryToUpdate.setQuantity((int) newQuantity);
                 List<ProductAttribute> productAttributes = new ArrayList<ProductAttribute>();
                 productAttributes.addAll(entryToUpdate.getProduct().getAttributes());
@@ -590,7 +588,7 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
                 entryToUpdate.setItemPrice(finalPrice.getFinalPrice());
                 shoppingCartService.saveOrUpdate(cartModel);
 
-                LOG.info("Cart entry updated with desired quantity");
+                log.info("Cart entry updated with desired quantity");
                 ShoppingCartDataPopulator shoppingCartDataPopulator = new ShoppingCartDataPopulator();
                 shoppingCartDataPopulator.setShoppingCartCalculationService(shoppingCartCalculationService);
                 shoppingCartDataPopulator.setPricingService(pricingService);
@@ -630,7 +628,7 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
 
             entryToUpdate.getProduct();
 
-            LOG.info("Updating cart entry quantity to" + item.getQuantity());
+            log.info("Updating cart entry quantity to" + item.getQuantity());
             entryToUpdate.setQuantity(item.getQuantity());
 
             List<ProductAttribute> productAttributes = new ArrayList<ProductAttribute>();
@@ -653,7 +651,7 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
         cartModel.setLineItems(cartItems);
         shoppingCartService.saveOrUpdate(cartModel);
 
-        LOG.info("Cart entry updated with desired quantity");
+        log.info("Cart entry updated with desired quantity");
         ShoppingCartDataPopulator shoppingCartDataPopulator = new ShoppingCartDataPopulator();
         shoppingCartDataPopulator.setShoppingCartCalculationService(shoppingCartCalculationService);
         shoppingCartDataPopulator.setPricingService(pricingService);
@@ -667,8 +665,8 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
             try {
                 return shoppingCartService.getByCode(cartId, store);
             } catch (ServiceException e) {
-                LOG.error("unable to find any cart asscoiated with this Id: " + cartId);
-                LOG.error("error while fetching cart model...", e);
+                log.error("unable to find any cart asscoiated with this Id: " + cartId);
+                log.error("error while fetching cart model...", e);
                 return null;
             } catch (NoResultException nre) {
                 // nothing
@@ -692,7 +690,7 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
             // nothing
 
         } catch (Exception e) {
-            LOG.error("Cannot retrieve cart code " + code, e);
+            log.error("Cannot retrieve cart code " + code, e);
         }
 
         return null;
@@ -797,14 +795,14 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
         }
 
         // remaining items
-        if (items.size() > 0) {
+        if (!items.isEmpty()) {
             cart.setLineItems(items);
         } else {
             cart.getLineItems().clear();
         }
 
         shoppingCartService.saveOrUpdate(cart);// update cart with remaining items
-        if (items.size() > 0 & returnCart) {
+        if (!items.isEmpty() & returnCart) {
             return this.getByCode(cartCode, merchant, language);
         }
         return null;
@@ -1121,7 +1119,7 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
     public void setOrderId(String code, Long orderId, MerchantStore store) throws Exception {
         ShoppingCart cart = this.getShoppingCartModel(code, store);
         if (cart == null) {
-            LOG.warn("Shopping cart with code [" + code + "] not found, expected to find a cart to set order id ["
+            log.warn("Shopping cart with code [" + code + "] not found, expected to find a cart to set order id ["
                     + orderId + "]");
         } else {
             cart.setOrderId(orderId);

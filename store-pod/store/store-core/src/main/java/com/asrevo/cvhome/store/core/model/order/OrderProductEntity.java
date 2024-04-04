@@ -10,12 +10,12 @@ import java.io.Serializable;
 @Getter
 public class OrderProductEntity extends OrderProduct implements Serializable {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	private int orderedQuantity;
-	private ReadableProduct product;
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
+    private int orderedQuantity;
+    private ReadableProduct product;
 
 
 }

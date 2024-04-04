@@ -11,10 +11,10 @@ import java.io.Serializable;
 @Getter
 public class OrderProduct extends Entity implements Serializable {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	private String sku;
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
+    private String sku;
 
 }

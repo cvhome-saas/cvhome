@@ -19,24 +19,24 @@ import java.util.List;
 @Getter
 public class OrderEntity extends Order implements Serializable {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	private List<OrderTotal> totals;
-	private List<OrderAttribute> attributes = new ArrayList<OrderAttribute>();
-	
-	private PaymentType paymentType;
-	private String paymentModule;
-	private String shippingModule;
-	private List<OrderStatus> previousOrderStatus;
-	private OrderStatus orderStatus;
-	private CreditCard creditCard;
-	private Date datePurchased;
-	private String currency;
-	private boolean customerAgreed;
-	private boolean confirmedAddress;
-	private String comments;
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
+    private List<OrderTotal> totals;
+    private List<OrderAttribute> attributes = new ArrayList<OrderAttribute>();
+
+    private PaymentType paymentType;
+    private String paymentModule;
+    private String shippingModule;
+    private List<OrderStatus> previousOrderStatus;
+    private OrderStatus orderStatus;
+    private CreditCard creditCard;
+    private Date datePurchased;
+    private String currency;
+    private boolean customerAgreed;
+    private boolean confirmedAddress;
+    private String comments;
 
 
 }

@@ -57,8 +57,8 @@ public class ProductOptionValue extends SalesManagerEntity<Long, ProductOptionVa
     }
 
     public List<ProductOptionValueDescription> getDescriptionsSettoList() {
-        if (descriptionsList == null || descriptionsList.size() == 0) {
-            descriptionsList = new ArrayList<ProductOptionValueDescription>(this.getDescriptions());
+        if (descriptionsList == null || descriptionsList.isEmpty()) {
+            descriptionsList = new ArrayList<>(this.getDescriptions());
         }
         return descriptionsList;
     }

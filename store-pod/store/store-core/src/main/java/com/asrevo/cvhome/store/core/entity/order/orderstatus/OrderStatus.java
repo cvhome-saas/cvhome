@@ -12,7 +12,7 @@ public enum OrderStatus {
     CANCELED("canceled");
 
 
-    private String value;
+    private final String value;
 
     OrderStatus(String value) {
         this.value = value;

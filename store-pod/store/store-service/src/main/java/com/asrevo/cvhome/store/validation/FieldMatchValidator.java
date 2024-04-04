@@ -2,13 +2,12 @@ package com.asrevo.cvhome.store.validation;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 
+@Slf4j
 public class FieldMatchValidator implements ConstraintValidator<FieldMatch, Object> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(FieldMatchValidator.class);
     private String firstFieldName;
     private String secondFieldName;
     private BeanUtils beanUtils;
@@ -26,7 +25,7 @@ public class FieldMatchValidator implements ConstraintValidator<FieldMatch, Obje
             final Object secondObj = this.beanUtils.getPropertyValue(value, this.secondFieldName);
             return firstObj == null && secondObj == null || firstObj != null && firstObj.equals(secondObj);
         } catch (final Exception ex) {
-            LOG.info("Error while getting values from object", ex);
+            log.info("Error while getting values from object", ex);
             return false;
 
         }

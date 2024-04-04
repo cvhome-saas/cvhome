@@ -12,8 +12,8 @@ import com.asrevo.cvhome.store.service.facade.content.ContentFacade;
 import com.asrevo.cvhome.store.utils.FileNameUtils;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -103,17 +103,34 @@ import com.asrevo.cvhome.store.core.model.content.Content;
  * @param files
  * @param merchantStore
  * @param language
+ * <p>
+ * Works with ng-file-man client
+ * @param path
+ * @param merchantStore
+ * @param language
+ * @return
+ * @throws Exception
+ * @param path
+ * @param merchantStore
+ * @param language
+ * @return
+ * @throws Exception
+ * <p>
+ * works with file manager (javascript client)
+ * @param files
+ * @param merchantStore
+ * @param language
  *//*
 
 @RestController
 @RequestMapping(value = "/api/v1")
 @CrossOrigin(origins = "*", maxAge = 3600)
+@Slf4j
 public class ContentAdministrationApi {
 	
 	
 	private static final String DEFAULT_PATH = "/";
 	
-	private static final Logger LOGGER = LoggerFactory.getLogger(ContentAdministrationApi.class);
 
 	@Autowired
 	private ContentFacade contentFacade;

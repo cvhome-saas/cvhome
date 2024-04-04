@@ -1,17 +1,16 @@
 package com.asrevo.cvhome.store.core.utils;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.Cache;
 import org.springframework.cache.Cache.ValueWrapper;
 import org.springframework.cache.concurrent.ConcurrentMapCache;
 import org.springframework.stereotype.Component;
 
 @Component("cache")
+@Slf4j
 public class CacheUtils {
 
     public final static String REFERENCE_CACHE = "REF";
-    private static final Logger LOGGER = LoggerFactory.getLogger(CacheUtils.class);
     private final static String KEY_DELIMITER = "_";
     //	@TODO ASHRAF
 //    @Autowired

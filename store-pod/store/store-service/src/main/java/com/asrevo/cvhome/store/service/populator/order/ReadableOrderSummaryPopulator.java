@@ -11,17 +11,15 @@ import com.asrevo.cvhome.store.utils.AbstractDataPopulator;
 import com.asrevo.cvhome.store.utils.LabelUtils;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
 
 @Setter
 @Getter
+@Slf4j
 public class ReadableOrderSummaryPopulator extends AbstractDataPopulator<OrderTotalSummary, ReadableOrderTotalSummary> {
 
-    private static final Logger LOGGER = LoggerFactory
-            .getLogger(ReadableOrderSummaryPopulator.class);
 
     private PricingService pricingService;
 
@@ -64,7 +62,7 @@ public class ReadableOrderSummaryPopulator extends AbstractDataPopulator<OrderTo
 
 
         } catch (Exception e) {
-            LOGGER.error("Error during amount formatting " + e.getMessage());
+            log.error("Error during amount formatting " + e.getMessage());
             throw new ConversionException(e);
         }
 

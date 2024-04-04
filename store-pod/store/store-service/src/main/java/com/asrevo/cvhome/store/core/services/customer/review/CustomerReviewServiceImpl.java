@@ -17,16 +17,16 @@ import java.util.List;
 public class CustomerReviewServiceImpl extends
         SalesManagerEntityServiceImpl<Long, CustomerReview> implements CustomerReviewService {
 
-    private CustomerReviewRepository customerReviewRepository;
+    private final CustomerReviewRepository customerReviewRepository;
 
-    @Autowired
-    private CustomerService customerService;
+    private final CustomerService customerService;
 
     @Autowired
     public CustomerReviewServiceImpl(
-            CustomerReviewRepository customerReviewRepository) {
+            CustomerReviewRepository customerReviewRepository, CustomerService customerService) {
         super(customerReviewRepository);
         this.customerReviewRepository = customerReviewRepository;
+        this.customerService = customerService;
     }
 
 

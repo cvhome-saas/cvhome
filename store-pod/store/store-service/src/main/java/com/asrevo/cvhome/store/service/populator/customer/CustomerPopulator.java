@@ -21,9 +21,8 @@ import com.asrevo.cvhome.store.core.services.reference.country.CountryService;
 import com.asrevo.cvhome.store.core.services.reference.language.LanguageService;
 import com.asrevo.cvhome.store.core.services.reference.zone.ZoneService;
 import com.asrevo.cvhome.store.utils.AbstractDataPopulator;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -31,10 +30,10 @@ import java.math.BigDecimal;
 import java.util.Map;
 
 @Component
+@Slf4j
 public class CustomerPopulator extends
         AbstractDataPopulator<PersistableCustomer, Customer> {
 
-    protected static final Logger LOG = LoggerFactory.getLogger(CustomerPopulator.class);
     @Autowired
     private CountryService countryService;
     @Autowired
@@ -135,7 +134,7 @@ public class CustomerPopulator extends
 
             }
             if (target.getBilling() == null && source.getBilling() != null) {
-                LOG.info("Setting default values for billing");
+                log.info("Setting default values for billing");
                 Billing billing = new Billing();
                 Country billingCountry = null;
                 if (StringUtils.isNotBlank(source.getBilling().getCountry())) {
@@ -190,7 +189,7 @@ public class CustomerPopulator extends
 
 
             if (target.getDelivery() == null && source.getDelivery() != null) {
-                LOG.info("Setting default value for delivery");
+                log.info("Setting default value for delivery");
                 Delivery delivery = new Delivery();
                 Country deliveryCountry = null;
                 if (StringUtils.isNotBlank(source.getDelivery().getCountry())) {

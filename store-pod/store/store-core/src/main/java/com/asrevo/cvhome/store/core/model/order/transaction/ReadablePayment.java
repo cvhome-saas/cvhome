@@ -10,11 +10,11 @@ import lombok.Setter;
 @Getter
 public class ReadablePayment extends PaymentEntity {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	private PaymentType paymentType;
-	private TransactionType transactionType;
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
+    private PaymentType paymentType;
+    private TransactionType transactionType;
 
 }

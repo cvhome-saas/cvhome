@@ -12,15 +12,15 @@ import java.util.List;
 @Getter
 public class Order extends Entity {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	
-	private boolean customerAgreement;
-	private String comments;
-	private String currency;
-	private List<OrderAttribute> attributes = new ArrayList<OrderAttribute>();
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
+
+    private boolean customerAgreement;
+    private String comments;
+    private String currency;
+    private List<OrderAttribute> attributes = new ArrayList<OrderAttribute>();
 
 
 }

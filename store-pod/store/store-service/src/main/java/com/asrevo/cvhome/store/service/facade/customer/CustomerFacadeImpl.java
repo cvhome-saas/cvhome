@@ -34,9 +34,8 @@ import com.asrevo.cvhome.store.service.populator.customer.*;
 import com.asrevo.cvhome.store.utils.CoreConfiguration;
 import com.asrevo.cvhome.store.utils.LocaleUtils;
 import com.asrevo.cvhome.store.utils.UUID;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -56,9 +55,8 @@ import java.util.stream.Collectors;
 // @TODO ASHRAF
 
 @Service("customerFacade")
+@Slf4j
 public class CustomerFacadeImpl implements CustomerFacade {
-
-    private static final Logger LOG = LoggerFactory.getLogger(CustomerFacadeImpl.class);
 
 
     @Autowired
@@ -106,17 +104,17 @@ public class CustomerFacadeImpl implements CustomerFacade {
     @Override
     public CustomerEntity getCustomerDataByUserName(final String userName, final MerchantStore store,
                                                     final Language language) throws Exception {
-        LOG.info("Fetching customer with userName" + userName);
+        log.info("Fetching customer with userName" + userName);
         com.asrevo.cvhome.store.core.entity.customer.Customer customer = customerService.getByNick(userName);
 
         if (customer != null) {
-            LOG.info("Found customer, converting to CustomerEntity");
+            log.info("Found customer, converting to CustomerEntity");
             try {
                 CustomerEntityPopulator customerEntityPopulator = new CustomerEntityPopulator();
                 return customerEntityPopulator.populate(customer, store, language); // store, language
 
             } catch (ConversionException ex) {
-                LOG.error("Error while converting Customer to CustomerEntity", ex);
+                log.error("Error while converting Customer to CustomerEntity", ex);
                 throw new Exception(ex);
             }
         }
@@ -137,7 +135,7 @@ public class CustomerFacadeImpl implements CustomerFacade {
     public ShoppingCart mergeCart(final Customer customerModel, final String sessionShoppingCartId,
                                   final MerchantStore store, final Language language) throws Exception {
 
-        LOG.debug("Starting merge cart process");
+        log.debug("Starting merge cart process");
         if (customerModel != null) {
             ShoppingCart customerCart = shoppingCartService.getShoppingCart(customerModel, store);
             if (StringUtils.isNotBlank(sessionShoppingCartId)) {
@@ -147,7 +145,7 @@ public class CustomerFacadeImpl implements CustomerFacade {
                     if (customerCart == null) {
                         if (sessionShoppingCart.getCustomerId() == null) {// saved shopping cart does not belong
                             // to a customer
-                            LOG.debug("Not able to find any shoppingCart with current customer");
+                            log.debug("Not able to find any shoppingCart with current customer");
                             // give it to the customer
                             sessionShoppingCart.setCustomerId(customerModel.getId());
                             shoppingCartService.saveOrUpdate(sessionShoppingCart);
@@ -161,7 +159,7 @@ public class CustomerFacadeImpl implements CustomerFacade {
                         if (sessionShoppingCart.getCustomerId() == null) {// saved shopping cart does not belong
                             // to a customer
                             // assign it to logged in user
-                            LOG.debug("Customer shopping cart as well session cart is available, merging carts");
+                            log.debug("Customer shopping cart as well session cart is available, merging carts");
                             customerCart =
                                     shoppingCartService.mergeShoppingCarts(customerCart, sessionShoppingCart, store);
                             customerCart = shoppingCartService.getById(customerCart.getId(), store);
@@ -173,7 +171,7 @@ public class CustomerFacadeImpl implements CustomerFacade {
                                 if (!customerCart.getShoppingCartCode()
                                         .equals(sessionShoppingCart.getShoppingCartCode())) {
                                     // merge carts
-                                    LOG.info("Customer shopping cart as well session cart is available");
+                                    log.info("Customer shopping cart as well session cart is available");
                                     customerCart = shoppingCartService.mergeShoppingCarts(customerCart,
                                             sessionShoppingCart, store);
                                     customerCart = shoppingCartService.getById(customerCart.getId(), store);
@@ -201,7 +199,7 @@ public class CustomerFacadeImpl implements CustomerFacade {
 
             }
         }
-        LOG.info(
+        log.info(
                 "Seems some issue with system, unable to find any customer after successful authentication");
         return null;
 
@@ -253,16 +251,16 @@ public class CustomerFacadeImpl implements CustomerFacade {
         if (StringUtils.isNotBlank(userName) && store != null) {
             Customer customer = customerService.getByNick(userName, store.getId());
             if (customer != null) {
-                LOG.info("Customer with userName {} already exists for store {} ", userName,
+                log.info("Customer with userName {} already exists for store {} ", userName,
                         store.getStorename());
                 return true;
             }
 
-            LOG.info("No customer found with userName {} for store {} ", userName, store.getStorename());
+            log.info("No customer found with userName {} for store {} ", userName, store.getStorename());
             return false;
 
         }
-        LOG.info("Either userName is empty or we have not found any value for store");
+        log.info("Either userName is empty or we have not found any value for store");
         return false;
     }
 
@@ -270,7 +268,7 @@ public class CustomerFacadeImpl implements CustomerFacade {
     @Override
     public PersistableCustomer registerCustomer(final PersistableCustomer customer,
                                                 final MerchantStore merchantStore, Language language) throws Exception {
-        LOG.info("Starting customer registration process..");
+        log.info("Starting customer registration process..");
 
         if (userExist(customer.getUserName())) {
             throw new UserAlreadyExistException("User already exist");
@@ -278,15 +276,15 @@ public class CustomerFacadeImpl implements CustomerFacade {
 
         Customer customerModel = getCustomerModel(customer, merchantStore, language);
         if (customerModel == null) {
-            LOG.equals("Unable to create customer in system");
+            log.equals("Unable to create customer in system");
             // throw new CustomerRegistrationException( "Unable to register customer" );
             throw new Exception("Unable to register customer");
         }
 
-        LOG.info("About to persist customer to database.");
+        log.info("About to persist customer to database.");
         customerService.saveOrUpdate(customerModel);
 
-        LOG.info("Returning customer data to controller..");
+        log.info("Returning customer data to controller..");
         // return customerEntityPoulator(customerModel,merchantStore);
         customer.setId(customerModel.getId());
         return customer;
@@ -296,7 +294,7 @@ public class CustomerFacadeImpl implements CustomerFacade {
     public Customer getCustomerModel(final PersistableCustomer customer,
                                      final MerchantStore merchantStore, Language language) throws Exception {
 
-        LOG.info("Starting to populate customer model from customer data");
+        log.info("Starting to populate customer model from customer data");
         Customer customerModel = null;
 
         customerModel = customerPopulator.populate(customer, merchantStore, language);
@@ -351,18 +349,18 @@ public class CustomerFacadeImpl implements CustomerFacade {
     @Override
     public Address getAddress(Long userId, final MerchantStore merchantStore,
                               boolean isBillingAddress) throws Exception {
-        LOG.info("Fetching customer for id {} ", userId);
+        log.info("Fetching customer for id {} ", userId);
         Address address = null;
         final Customer customerModel = customerService.getById(userId);
 
         if (customerModel == null) {
-            LOG.error("Customer with ID {} does not exists..", userId);
+            log.error("Customer with ID {} does not exists..", userId);
             // throw new CustomerNotFoundException( "customer with given id does not exists" );
             throw new Exception("customer with given id does not exists");
         }
 
         if (isBillingAddress) {
-            LOG.info("getting billing address..");
+            log.info("getting billing address..");
             CustomerBillingAddressPopulator billingAddressPopulator =
                     new CustomerBillingAddressPopulator();
             address = billingAddressPopulator.populate(customerModel, merchantStore,
@@ -371,7 +369,7 @@ public class CustomerFacadeImpl implements CustomerFacade {
             return address;
         }
 
-        LOG.info("getting Delivery address..");
+        log.info("getting Delivery address..");
         CustomerDeliveryAddressPopulator deliveryAddressPopulator =
                 new CustomerDeliveryAddressPopulator();
         return deliveryAddressPopulator.populate(customerModel, merchantStore,
@@ -389,13 +387,13 @@ public class CustomerFacadeImpl implements CustomerFacade {
         Country country = countriesMap.get(address.getCountry());
 
         if (customerModel == null) {
-            LOG.error("Customer with ID {} does not exists..", userId);
+            log.error("Customer with ID {} does not exists..", userId);
             // throw new CustomerNotFoundException( "customer with given id does not exists" );
             throw new Exception("customer with given id does not exists");
 
         }
         if (address.isBillingAddress()) {
-            LOG.info("updating customer billing address..");
+            log.info("updating customer billing address..");
             PersistableCustomerBillingAddressPopulator billingAddressPopulator =
                     new PersistableCustomerBillingAddressPopulator();
             customerModel = billingAddressPopulator.populate(address, customerModel, merchantStore,
@@ -414,7 +412,7 @@ public class CustomerFacadeImpl implements CustomerFacade {
             }
 
         } else {
-            LOG.info("updating customer shipping address..");
+            log.info("updating customer shipping address..");
             PersistableCustomerShippingAddressPopulator shippingAddressPopulator =
                     new PersistableCustomerShippingAddressPopulator();
             customerModel = shippingAddressPopulator.populate(address, customerModel, merchantStore,
@@ -455,12 +453,12 @@ public class CustomerFacadeImpl implements CustomerFacade {
     @Override
     public Customer populateCustomerModel(Customer customerModel, PersistableCustomer customer,
                                           MerchantStore merchantStore, Language language) throws Exception {
-        LOG.info("Starting to populate customer model from customer data");
+        log.info("Starting to populate customer model from customer data");
 
 
         customerModel = customerPopulator.populate(customer, customerModel, merchantStore, language);
 
-        LOG.info("About to persist customer to database.");
+        log.info("About to persist customer to database.");
         customerService.saveOrUpdate(customerModel);
         return customerModel;
     }

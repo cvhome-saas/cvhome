@@ -3,15 +3,14 @@ package com.asrevo.cvhome.store.utils;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Locale;
 
 
+@Slf4j
 public class LocaleUtils {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(LocaleUtils.class);
 
     public static Locale getLocale(Language language) {
 
@@ -38,7 +37,7 @@ public class LocaleUtils {
                     break;
                 }
             } catch (Exception e) {
-                LOGGER.error("An error occured while getting ISO code for locale " + l.toString());
+                log.error("An error occured while getting ISO code for locale " + l.toString());
             }
         }
 

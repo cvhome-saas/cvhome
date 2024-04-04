@@ -7,8 +7,7 @@ import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import com.asrevo.cvhome.store.core.model.catalog.category.ReadableCategory;
 import com.asrevo.cvhome.store.core.model.catalog.category.ReadableCategoryFull;
 import com.asrevo.cvhome.store.service.mapper.Mapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -17,9 +16,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
+@Slf4j
 public class ReadableCategoryMapper implements Mapper<Category, ReadableCategory> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ReadableCategoryMapper.class);
 
     @Override
     public ReadableCategory convert(Category source, MerchantStore store, Language language) {
@@ -92,9 +91,7 @@ public class ReadableCategoryMapper implements Mapper<Category, ReadableCategory
 
             parent.setCode(source.getParent().getCode());
             parent.setId(source.getParent().getId());
-            if (description.isPresent()) {
-                parent.setDescription(description.get());
-            }
+            description.ifPresent(parent::setDescription);
             return parent;
         });
     }
@@ -113,9 +110,7 @@ public class ReadableCategoryMapper implements Mapper<Category, ReadableCategory
                 .getDescriptions().stream().filter(d -> language.getId().equals(d.getLanguage().getId()))
                 .map(this::convertDescription).findAny();
 
-        if (description.isPresent()) {
-            current.setDescription(description.get());
-        }
+        description.ifPresent(current::setDescription);
 
         if (category.getParent() != null) {
             current.setParent(this.createReadable(category.getParent(), language));

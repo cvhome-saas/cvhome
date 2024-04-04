@@ -2,8 +2,7 @@ package com.asrevo.cvhome.store.utils;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.Properties;
@@ -11,10 +10,10 @@ import java.util.Properties;
 @Setter
 @Getter
 @Component
+@Slf4j
 public class CoreConfiguration {
 
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CoreConfiguration.class);
     public Properties properties = new Properties();
 
     public CoreConfiguration() {
@@ -33,7 +32,7 @@ public class CoreConfiguration {
         try {
             prop = properties.getProperty(propertyKey);
         } catch (Exception e) {
-            LOGGER.warn("Cannot find property " + propertyKey);
+            log.warn("Cannot find property " + propertyKey);
         }
         return prop;
 

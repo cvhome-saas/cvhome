@@ -15,14 +15,14 @@ import java.util.List;
 @Deprecated
 public class PersistableOrder extends OrderEntity implements Serializable {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	private PersistableCustomer customer;//might already exist if id > 0, otherwise persist
-	private List<PersistableOrderProduct> orderProductItems;
-	private boolean shipToBillingAdress = true;
-	private boolean shipToDeliveryAddress = false;
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
+    private PersistableCustomer customer;//might already exist if id > 0, otherwise persist
+    private List<PersistableOrderProduct> orderProductItems;
+    private boolean shipToBillingAdress = true;
+    private boolean shipToDeliveryAddress = false;
 
 
 }

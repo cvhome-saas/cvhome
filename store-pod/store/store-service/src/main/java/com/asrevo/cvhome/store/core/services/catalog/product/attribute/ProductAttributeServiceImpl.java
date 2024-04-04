@@ -20,14 +20,14 @@ import java.util.List;
 public class ProductAttributeServiceImpl extends SalesManagerEntityServiceImpl<Long, ProductAttribute>
         implements ProductAttributeService {
 
-    private ProductAttributeRepository productAttributeRepository;
-    @Autowired
-    private PageableProductAttributeRepository pageableProductAttributeRepository;
+    private final ProductAttributeRepository productAttributeRepository;
+    private final PageableProductAttributeRepository pageableProductAttributeRepository;
 
     @Autowired
-    public ProductAttributeServiceImpl(ProductAttributeRepository productAttributeRepository) {
+    public ProductAttributeServiceImpl(ProductAttributeRepository productAttributeRepository, PageableProductAttributeRepository pageableProductAttributeRepository) {
         super(productAttributeRepository);
         this.productAttributeRepository = productAttributeRepository;
+        this.pageableProductAttributeRepository = pageableProductAttributeRepository;
     }
 
     @Override

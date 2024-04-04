@@ -72,7 +72,7 @@ public class IntegrationConfiguration implements JSONAware {
         StringBuilder returnString = new StringBuilder();
         returnString.append(getJsonInfo());
 
-        if (this.getIntegrationKeys().size() > 0) {
+        if (!this.getIntegrationKeys().isEmpty()) {
 
             JSONObject data = new JSONObject();
             Set<String> keys = this.getIntegrationKeys().keySet();
@@ -88,7 +88,7 @@ public class IntegrationConfiguration implements JSONAware {
         }
 
 
-        if (this.getIntegrationOptions() != null && this.getIntegrationOptions().size() > 0) {
+        if (this.getIntegrationOptions() != null && !this.getIntegrationOptions().isEmpty()) {
 
             // JSONObject data = new JSONObject();
             StringBuilder optionDataEntries = new StringBuilder();
@@ -122,9 +122,9 @@ public class IntegrationConfiguration implements JSONAware {
                     count++;
                 }
 
-                optionsEntries.append("[").append(dataEntries.toString()).append("]");
+                optionsEntries.append("[").append(dataEntries).append("]");
 
-                optionDataEntries.append("\"").append(key).append("\":").append(optionsEntries.toString());
+                optionDataEntries.append("\"").append(key).append("\":").append(optionsEntries);
 
                 if (countOptions < keySize - 1) {
                     optionDataEntries.append(",");

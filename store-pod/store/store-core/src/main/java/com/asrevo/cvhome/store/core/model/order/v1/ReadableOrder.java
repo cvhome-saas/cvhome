@@ -16,17 +16,17 @@ import java.util.List;
 @Getter
 public class ReadableOrder extends Order {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	
-	
-	private ReadableBilling billing;
-	private ReadableDelivery delivery;
-	private ShippingOption shippingOption;
-	private ReadablePayment payment;
-	private ReadableTotal total;
-	private List<ReadableOrderProduct> products;
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
+
+
+    private ReadableBilling billing;
+    private ReadableDelivery delivery;
+    private ShippingOption shippingOption;
+    private ReadablePayment payment;
+    private ReadableTotal total;
+    private List<ReadableOrderProduct> products;
 
 }

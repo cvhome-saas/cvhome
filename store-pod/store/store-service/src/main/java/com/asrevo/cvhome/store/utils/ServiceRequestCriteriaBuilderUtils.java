@@ -5,17 +5,16 @@ import com.asrevo.cvhome.store.core.entity.common.Criteria;
 import com.asrevo.cvhome.store.core.entity.common.CriteriaOrderBy;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStoreCriteria;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.PropertyAccessor;
 import org.springframework.beans.PropertyAccessorFactory;
 
 import java.util.Map;
 
+@Slf4j
 public class ServiceRequestCriteriaBuilderUtils {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ServiceRequestCriteriaBuilderUtils.class);
 
     /**
      * Binds request parameter values to specific request criterias
@@ -103,7 +102,7 @@ public class ServiceRequestCriteriaBuilderUtils {
             criteria.setRetailers(retail);
             criteria.setStores(sto);
         } catch (Exception e) {
-            LOGGER.error("Error parsing boolean values", e);
+            log.error("Error parsing boolean values", e);
         }
 
         criteria.setSearch(searchParam);

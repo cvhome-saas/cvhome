@@ -9,7 +9,7 @@ public class DeleteProductAttributeEvent extends ProductEvent {
 
 
     private static final long serialVersionUID = 1L;
-    private ProductAttribute productAttribute;
+    private final ProductAttribute productAttribute;
 
     public DeleteProductAttributeEvent(Object source, ProductAttribute productAttribute, Product product) {
         super(source, product);

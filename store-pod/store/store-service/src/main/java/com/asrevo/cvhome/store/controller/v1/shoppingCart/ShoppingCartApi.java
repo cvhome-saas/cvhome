@@ -16,8 +16,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,9 +32,9 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @Controller
 @RequestMapping("/api/v1")
 @Tag(name = "Shopping cart resource", description = "Add, remove and retrieve shopping carts")
+@Slf4j
 public class ShoppingCartApi {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ShoppingCartApi.class);
     /*
 
         @Autowired

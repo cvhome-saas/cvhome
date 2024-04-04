@@ -25,10 +25,9 @@ import com.asrevo.cvhome.store.service.populator.store.ReadableMerchantStorePopu
 import com.asrevo.cvhome.store.utils.ImageFilePath;
 import com.asrevo.cvhome.store.utils.LanguageUtils;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
@@ -42,9 +41,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service("storeFacade")
+@Slf4j
 public class StoreFacadeImpl implements StoreFacade {
 
-    private static final Logger LOG = LoggerFactory.getLogger(StoreFacadeImpl.class);
     @Autowired
     private MerchantStoreService merchantStoreService;
     @Autowired
@@ -78,7 +77,7 @@ public class StoreFacadeImpl implements StoreFacade {
             MerchantStore store = merchantStoreService.getByCode(code);
             return store;
         } catch (ServiceException e) {
-            LOG.error("Error while getting MerchantStore", e);
+            log.error("Error while getting MerchantStore", e);
             throw new ServiceRuntimeException(e);
         }
 
@@ -276,7 +275,7 @@ public class StoreFacadeImpl implements StoreFacade {
         try {
             merchantStoreService.delete(mStore);
         } catch (Exception e) {
-            LOG.error("Error while deleting MerchantStore", e);
+            log.error("Error while deleting MerchantStore", e);
             throw new ServiceRuntimeException("Error while deleting MerchantStore " + e.getMessage());
         }
 

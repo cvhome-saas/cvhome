@@ -7,22 +7,22 @@ import java.io.Serializable;
 
 /**
  * This class is used for writing a transaction in the System
- * @author c.samson
  *
+ * @author c.samson
  */
 @Setter
 @Getter
 public class PersistableTransaction extends TransactionEntity implements Serializable {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	
-//	@com.salesmanager.shop.validation.Enum(enumClass=PaymentType.class, ignoreCase=true)
-	private String paymentType;
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
 
-//	@com.salesmanager.shop.validation.Enum(enumClass=TransactionType.class, ignoreCase=true)
-	private String transactionType;
+    //	@com.salesmanager.shop.validation.Enum(enumClass=PaymentType.class, ignoreCase=true)
+    private String paymentType;
+
+    //	@com.salesmanager.shop.validation.Enum(enumClass=TransactionType.class, ignoreCase=true)
+    private String transactionType;
 
 }

@@ -17,8 +17,7 @@ package com.asrevo.cvhome.store.utils;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.Getter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -27,9 +26,9 @@ import java.util.Date;
 
 
 @Getter
+@Slf4j
 public class DateUtil {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DateUtil.class);
     private final static String LONGDATE_FORMAT = "EEE, d MMM yyyy HH:mm:ss Z";
     private Date startDate = new Date(new Date().getTime());
     private Date endDate = new Date(new Date().getTime());
@@ -162,7 +161,7 @@ public class DateUtil {
             this.startDate = sDate;
             this.endDate = eDate;
         } catch (Exception e) {
-            LOGGER.error("", e);
+            log.error("", e);
             this.startDate = new Date(dt.getTime());
             this.endDate = new Date(dt.getTime());
         }

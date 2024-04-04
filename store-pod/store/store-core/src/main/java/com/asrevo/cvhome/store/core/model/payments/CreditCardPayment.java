@@ -6,18 +6,18 @@ import lombok.Setter;
 
 /**
  * When the user performs a payment using a credit card
- * @author Carl Samson
  *
+ * @author Carl Samson
  */
 @Setter
 @Getter
 public class CreditCardPayment extends Payment {
-	
-	private String creditCardNumber;
-	private String credidCardValidationNumber;
-	private String expirationMonth;
-	private String expirationYear;
-	private String cardOwner;
-	private CreditCardType creditCard;
+
+    private String creditCardNumber;
+    private String credidCardValidationNumber;
+    private String expirationMonth;
+    private String expirationYear;
+    private String cardOwner;
+    private CreditCardType creditCard;
 
 }

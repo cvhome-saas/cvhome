@@ -8,6 +8,6 @@ public enum MeasureUnit {
     //METER,
     //FOOT
     KG,
-    LB;
+    LB
 
 }

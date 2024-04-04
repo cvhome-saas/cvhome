@@ -9,14 +9,14 @@ import java.io.Serializable;
 @Setter
 @Getter
 public class ReadableOrderProductAttribute extends Entity implements Serializable {
-	
-	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	private String attributeName;
-	private String attributePrice;
-	private String attributeValue;
+
+
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
+    private String attributeName;
+    private String attributePrice;
+    private String attributeValue;
 
 }

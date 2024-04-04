@@ -22,18 +22,18 @@ import java.util.Optional;
 public class MerchantStoreServiceImpl extends SalesManagerEntityServiceImpl<Integer, MerchantStore>
         implements MerchantStoreService {
 
-    @Autowired
-    protected ProductTypeService productTypeService;
+    protected final ProductTypeService productTypeService;
+
+    private final PageableMerchantRepository pageableMerchantRepository;
+
+    private final MerchantRepository merchantRepository;
 
     @Autowired
-    private PageableMerchantRepository pageableMerchantRepository;
-
-    private MerchantRepository merchantRepository;
-
-    @Autowired
-    public MerchantStoreServiceImpl(MerchantRepository merchantRepository) {
+    public MerchantStoreServiceImpl(MerchantRepository merchantRepository, ProductTypeService productTypeService, PageableMerchantRepository pageableMerchantRepository) {
         super(merchantRepository);
         this.merchantRepository = merchantRepository;
+        this.productTypeService = productTypeService;
+        this.pageableMerchantRepository = pageableMerchantRepository;
     }
 
     @Override
@@ -166,7 +166,7 @@ public class MerchantStoreServiceImpl extends SalesManagerEntityServiceImpl<Inte
         List<MerchantStore> stores = merchantRepository.listByGroup(code, id.get());
 
 
-        return stores.size() > 0;
+        return !stores.isEmpty();
     }
 
 

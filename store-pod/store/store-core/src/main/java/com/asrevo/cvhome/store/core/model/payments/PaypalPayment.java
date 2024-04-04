@@ -6,19 +6,19 @@ import lombok.Setter;
 
 /**
  * When the user performs a payment using paypal
- * @author Carl Samson
  *
+ * @author Carl Samson
  */
 @Setter
 @Getter
 public class PaypalPayment extends Payment {
-	
-	//express checkout
-	private String payerId;
-	private String paymentToken;
-	
-	public PaypalPayment() {
-		super.setPaymentType(PaymentType.PAYPAL);
-	}
+
+    //express checkout
+    private String payerId;
+    private String paymentToken;
+
+    public PaypalPayment() {
+        super.setPaymentType(PaymentType.PAYPAL);
+    }
 
 }

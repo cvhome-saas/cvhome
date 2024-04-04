@@ -17,8 +17,9 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.servlet.http.HttpServletResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -28,9 +29,9 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/api/v1")
+@Slf4j
 public class ProductRelationshipApi {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ProductRelationshipApi.class);
     @Autowired
     private ProductFacade productFacade;
     @Autowired
@@ -120,7 +121,7 @@ public class ProductRelationshipApi {
             return relatedItems;
 
         } catch (Exception e) {
-            LOGGER.error("Error while getting product reviews", e);
+            log.error("Error while getting product reviews", e);
             try {
                 response.sendError(503, "Error while getting product reviews" + e.getMessage());
             } catch (Exception ignore) {

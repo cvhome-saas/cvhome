@@ -14,9 +14,8 @@ import com.asrevo.cvhome.store.core.modules.cms.impl.LocalCacheManagerImpl;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URLConnection;
@@ -33,13 +32,13 @@ import java.util.Optional;
  */
 @Setter
 @Getter
+@Slf4j
 public class CmsStaticContentFileManagerImpl implements ContentAssetsManager {
 
     /**
      *
      */
     private static final long serialVersionUID = 1L;
-    private static final Logger LOGGER = LoggerFactory.getLogger(CmsStaticContentFileManagerImpl.class);
     private static final String ROOT_NAME = "static";
     private static final String ROOT_CONTAINER = "files";
     private static CmsStaticContentFileManagerImpl fileManager = null;
@@ -61,7 +60,7 @@ public class CmsStaticContentFileManagerImpl implements ContentAssetsManager {
     void init() {
 
         this.rootName = ((CMSManager) cacheManager).getRootName();
-        LOGGER.info("init " + getClass().getName() + " setting root" + this.rootName);
+        log.info("init " + getClass().getName() + " setting root" + this.rootName);
 
     }
 
@@ -90,7 +89,7 @@ public class CmsStaticContentFileManagerImpl implements ContentAssetsManager {
     public void addFile(final String merchantStoreCode, Optional<String> folderPath,
                         final InputContentFile inputStaticContentData) throws ServiceException {
         /*
-         * if ( cacheManager.getTreeCache() == null ) { LOGGER.error(
+         * if ( cacheManager.getTreeCache() == null ) {log.error(
          * "Unable to find cacheManager.getTreeCache() in Infinispan.." ); throw
          * new ServiceException(
          * "CmsStaticContentFileManagerInfinispanImpl has a null cacheManager.getTreeCache()"
@@ -138,9 +137,9 @@ public class CmsStaticContentFileManagerImpl implements ContentAssetsManager {
             // IOUtils.toByteArray(
             // inputStaticContentData.getFile() ));
 
-            LOGGER.info("Content data added successfully.");
+            log.info("Content data added successfully.");
         } catch (final Exception e) {
-            LOGGER.error("Error while saving static content data", e);
+            log.error("Error while saving static content data", e);
             throw new ServiceException(e);
 
         }
@@ -170,7 +169,7 @@ public class CmsStaticContentFileManagerImpl implements ContentAssetsManager {
     public void addFiles(final String merchantStoreCode, Optional<String> folderPath,
                          final List<InputContentFile> inputStaticContentDataList) throws ServiceException {
         /*
-         * if ( cacheManager.getTreeCache() == null ) { LOGGER.error(
+         * if ( cacheManager.getTreeCache() == null ) {log.error(
          * "Unable to find cacheManager.getTreeCache() in Infinispan.." ); throw
          * new ServiceException(
          * "CmsStaticContentFileManagerInfinispanImpl has a null cacheManager.getTreeCache()"
@@ -215,10 +214,10 @@ public class CmsStaticContentFileManagerImpl implements ContentAssetsManager {
 
             }
 
-            LOGGER.info("Total {} files added successfully.", inputStaticContentDataList.size());
+            log.info("Total {} files added successfully.", inputStaticContentDataList.size());
 
         } catch (final Exception e) {
-            LOGGER.error("Error while saving content image", e);
+            log.error("Error while saving content image", e);
             throw new ServiceException(e);
 
         }
@@ -266,7 +265,7 @@ public class CmsStaticContentFileManagerImpl implements ContentAssetsManager {
             Files.deleteIfExists(path);
 
         } catch (final Exception e) {
-            LOGGER.error("Error while deleting files for {} merchant ", merchantStoreCode);
+            log.error("Error while deleting files for {} merchant ", merchantStoreCode);
             throw new ServiceException(e);
         }
 
@@ -278,7 +277,7 @@ public class CmsStaticContentFileManagerImpl implements ContentAssetsManager {
     @Override
     public void removeFiles(final String merchantStoreCode, Optional<String> folderPath) throws ServiceException {
 
-        LOGGER.debug("Removing all images for {} merchant ", merchantStoreCode);
+        log.debug("Removing all images for {} merchant ", merchantStoreCode);
 
         try {
 
@@ -290,7 +289,7 @@ public class CmsStaticContentFileManagerImpl implements ContentAssetsManager {
             Files.deleteIfExists(path);
 
         } catch (final Exception e) {
-            LOGGER.error("Error while deleting content image for {} merchant ", merchantStoreCode);
+            log.error("Error while deleting content image for {} merchant ", merchantStoreCode);
             throw new ServiceException(e);
         }
 
@@ -349,7 +348,7 @@ public class CmsStaticContentFileManagerImpl implements ContentAssetsManager {
                 return fileNames;
             }
         } catch (final Exception e) {
-            LOGGER.error("Error while fetching file for {} merchant ", merchantStoreCode);
+            log.error("Error while fetching file for {} merchant ", merchantStoreCode);
             throw new ServiceException(e);
         }
         return new ArrayList<>();
@@ -378,11 +377,9 @@ public class CmsStaticContentFileManagerImpl implements ContentAssetsManager {
             Path merchantPath = this.buildMerchantPath(merchantStoreCode);
 
             StringBuilder nodePath = new StringBuilder();
-            if (folderPath.isPresent()) {
-                nodePath
-                        .append(merchantPath.toString())
-                        .append(Constants.SLASH).append(folderPath.get()).append(Constants.SLASH);
-            }
+            folderPath.ifPresent(s -> nodePath
+                    .append(merchantPath)
+                    .append(Constants.SLASH).append(s).append(Constants.SLASH));
             // add folder
             nodePath.append(folderName);
 
@@ -390,7 +387,7 @@ public class CmsStaticContentFileManagerImpl implements ContentAssetsManager {
             this.createDirectoryIfNorExist(dirPath);
 
         } catch (IOException e) {
-            LOGGER.error("Error while creating fiolder for {} merchant ", merchantStoreCode);
+            log.error("Error while creating fiolder for {} merchant ", merchantStoreCode);
             throw new ServiceException(e);
         }
 
@@ -404,7 +401,7 @@ public class CmsStaticContentFileManagerImpl implements ContentAssetsManager {
         // node path
         StringBuilder nodePath = new StringBuilder();
         nodePath
-                .append(confDir.toString())
+                .append(confDir)
                 .append(rootPath).append(merchantCode);
         Path merchantPath = Paths.get(nodePath.toString());
         this.createDirectoryIfNorExist(merchantPath);
@@ -422,10 +419,8 @@ public class CmsStaticContentFileManagerImpl implements ContentAssetsManager {
 
             Path merchantPath = this.buildMerchantPath(merchantStoreCode);
             StringBuilder nodePath = new StringBuilder();
-            nodePath.append(merchantPath.toString()).append(Constants.SLASH);
-            if (folderPath.isPresent()) {
-                nodePath.append(folderPath.get()).append(Constants.SLASH);
-            }
+            nodePath.append(merchantPath).append(Constants.SLASH);
+            folderPath.ifPresent(s -> nodePath.append(s).append(Constants.SLASH));
 
             nodePath.append(folderName);
 
@@ -436,7 +431,7 @@ public class CmsStaticContentFileManagerImpl implements ContentAssetsManager {
             }
 
         } catch (IOException e) {
-            LOGGER.error("Error while creating fiolder for {} merchant ", merchantStoreCode);
+            log.error("Error while creating fiolder for {} merchant ", merchantStoreCode);
             throw new ServiceException(e);
         }
 

@@ -19,13 +19,12 @@ import com.asrevo.cvhome.store.core.services.catalog.pricing.PricingService;
 import com.asrevo.cvhome.store.core.services.catalog.product.ProductService;
 import com.asrevo.cvhome.store.core.services.catalog.product.attribute.ProductAttributeService;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
-import org.springframework.util.Assert;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -35,27 +34,27 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service("shoppingCartService")
+@Slf4j
 public class ShoppingCartServiceImpl extends SalesManagerEntityServiceImpl<Long, ShoppingCart>
         implements ShoppingCartService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ShoppingCartServiceImpl.class);
-    private ShoppingCartRepository shoppingCartRepository;
-    @Autowired
-    private ProductService productService;
-    @Autowired
-    private ShoppingCartItemRepository shoppingCartItemRepository;
-    @Autowired
-    private ShoppingCartAttributeRepository shoppingCartAttributeItemRepository;
-    @Autowired
-    private PricingService pricingService;
-    @Autowired
-    private ProductAttributeService productAttributeService;
+    private final ShoppingCartRepository shoppingCartRepository;
+    private final ProductService productService;
+    private final ShoppingCartItemRepository shoppingCartItemRepository;
+    private final ShoppingCartAttributeRepository shoppingCartAttributeItemRepository;
+    private final PricingService pricingService;
+    private final ProductAttributeService productAttributeService;
 
     @Autowired
-    public ShoppingCartServiceImpl(ShoppingCartRepository shoppingCartRepository) {
+    public ShoppingCartServiceImpl(ShoppingCartRepository shoppingCartRepository, ProductService productService, ShoppingCartItemRepository shoppingCartItemRepository, ShoppingCartAttributeRepository shoppingCartAttributeItemRepository, PricingService pricingService, ProductAttributeService productAttributeService) {
         super(shoppingCartRepository);
         this.shoppingCartRepository = shoppingCartRepository;
 
+        this.productService = productService;
+        this.shoppingCartItemRepository = shoppingCartItemRepository;
+        this.shoppingCartAttributeItemRepository = shoppingCartAttributeItemRepository;
+        this.pricingService = pricingService;
+        this.productAttributeService = productAttributeService;
     }
 
     /**
@@ -107,7 +106,7 @@ public class ShoppingCartServiceImpl extends SalesManagerEntityServiceImpl<Long,
                 shoppingCart.setIpAddress(userContext.getIpAddress());
             }
         } catch (Exception s) {
-            LOGGER.error("Cannot add ip address to shopping cart ", s);
+            log.error("Cannot add ip address to shopping cart ", s);
         }
 
         if (shoppingCart.getId() == null || shoppingCart.getId() == 0) {
@@ -232,7 +231,7 @@ public class ShoppingCartServiceImpl extends SalesManagerEntityServiceImpl<Long,
             if (shoppingCart != null) {
 
                 Set<ShoppingCartItem> items = shoppingCart.getLineItems();
-                if (items == null || items.size() == 0) {
+                if (items == null || items.isEmpty()) {
                     shoppingCart.setObsolete(true);
                     return shoppingCart;
 
@@ -241,9 +240,9 @@ public class ShoppingCartServiceImpl extends SalesManagerEntityServiceImpl<Long,
                 // Set<ShoppingCartItem> shoppingCartItems = new
                 // HashSet<ShoppingCartItem>();
                 for (ShoppingCartItem item : items) {
-                    LOGGER.debug("Populate item " + item.getId());
+                    log.debug("Populate item " + item.getId());
                     getPopulatedItem(item, store);
-                    LOGGER.debug("Obsolete item ? " + item.isObsolete());
+                    log.debug("Obsolete item ? " + item.isObsolete());
                     if (item.isObsolete()) {
                         cartIsObsolete = true;
                     }
@@ -261,7 +260,7 @@ public class ShoppingCartServiceImpl extends SalesManagerEntityServiceImpl<Long,
             }
 
         } catch (Exception e) {
-            LOGGER.error(e.getMessage());
+            log.error(e.getMessage());
             throw new ServiceException(e);
         }
 
@@ -309,8 +308,8 @@ public class ShoppingCartServiceImpl extends SalesManagerEntityServiceImpl<Long,
         List<ShoppingCartAttributeItem> removeAttributesList = new ArrayList<ShoppingCartAttributeItem>();// attributes
         // to remove
         // DELETE ORPHEANS MANUALLY
-        if ((productAttributes != null && productAttributes.size() > 0)
-                || (cartAttributes != null && cartAttributes.size() > 0)) {
+        if ((productAttributes != null && !productAttributes.isEmpty())
+                || (cartAttributes != null && !cartAttributes.isEmpty())) {
             if (cartAttributes != null) {
                 for (ShoppingCartAttributeItem attribute : cartAttributes) {
                     long attributeId = attribute.getProductAttributeId();
@@ -390,14 +389,14 @@ public class ShoppingCartServiceImpl extends SalesManagerEntityServiceImpl<Long,
                                            final MerchantStore store) throws Exception {
         if (sessionCart.getCustomerId() != null
                 && sessionCart.getCustomerId().equals(userShoppingModel.getCustomerId())) {
-            LOGGER.info("Session Shopping cart belongs to same logged in user");
+            log.info("Session Shopping cart belongs to same logged in user");
             if (CollectionUtils.isNotEmpty(userShoppingModel.getLineItems())
                     && CollectionUtils.isNotEmpty(sessionCart.getLineItems())) {
                 return userShoppingModel;
             }
         }
 
-        LOGGER.info("Starting merging shopping carts");
+        log.info("Starting merging shopping carts");
         if (CollectionUtils.isNotEmpty(sessionCart.getLineItems())) {
             Set<ShoppingCartItem> shoppingCartItemsSet = getShoppingCartItems(sessionCart, store, userShoppingModel);
             boolean duplicateFound = false;
@@ -409,7 +408,7 @@ public class ShoppingCartServiceImpl extends SalesManagerEntityServiceImpl<Long,
                                     .getId().longValue()) {
                                 if (CollectionUtils.isNotEmpty(cartItem.getAttributes())) {
                                     if (!duplicateFound) {
-                                        LOGGER.info("Dupliate item found..updating exisitng product quantity");
+                                        log.info("Dupliate item found..updating exisitng product quantity");
                                         cartItem.setQuantity(
                                                 cartItem.getQuantity() + sessionShoppingCartItem.getQuantity());
                                         duplicateFound = true;
@@ -420,7 +419,7 @@ public class ShoppingCartServiceImpl extends SalesManagerEntityServiceImpl<Long,
                         }
                     }
                     if (!duplicateFound) {
-                        LOGGER.info("New item found..adding item to Shopping cart");
+                        log.info("New item found..adding item to Shopping cart");
                         userShoppingModel.getLineItems().add(sessionShoppingCartItem);
                     }
                 }
@@ -428,7 +427,7 @@ public class ShoppingCartServiceImpl extends SalesManagerEntityServiceImpl<Long,
             }
 
         }
-        LOGGER.info("Shopping Cart merged successfully.....");
+        log.info("Shopping Cart merged successfully.....");
         saveOrUpdate(userShoppingModel);
         removeShoppingCart(sessionCart);
 

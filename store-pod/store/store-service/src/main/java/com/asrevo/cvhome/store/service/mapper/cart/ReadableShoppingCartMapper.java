@@ -25,10 +25,9 @@ import com.asrevo.cvhome.store.service.mapper.Mapper;
 import com.asrevo.cvhome.store.service.mapper.catalog.ReadableMinimalProductMapper;
 import com.asrevo.cvhome.store.service.mapper.catalog.ReadableProductVariationMapper;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -43,9 +42,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
+@Slf4j
 public class ReadableShoppingCartMapper implements Mapper<ShoppingCart, ReadableShoppingCart> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ReadableShoppingCartMapper.class);
 
     @Autowired
     private ShoppingCartCalculationService shoppingCartCalculationService;
@@ -168,7 +167,7 @@ public class ReadableShoppingCartMapper implements Mapper<ShoppingCart, Readable
                                     .getById(attribute.getProductAttributeId());
 
                             if (productAttribute == null) {
-                                LOG.warn("Product attribute with ID " + attribute.getId()
+                                log.warn("Product attribute with ID " + attribute.getId()
                                         + " not found, skipping cart attribute " + attribute.getId());
                                 continue;
                             }

@@ -10,8 +10,7 @@ import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.currency.Currency;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.utils.ProductPriceUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,9 +24,8 @@ import java.util.Locale;
  * @author Carl Samson
  */
 @Service("pricingService")
+@Slf4j
 public class PricingServiceImpl implements PricingService {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(PricingServiceImpl.class);
 
 
     @Autowired
@@ -65,7 +63,7 @@ public class PricingServiceImpl implements PricingService {
         try {
             return priceUtil.getStoreFormatedAmountWithCurrency(store, amount);
         } catch (Exception e) {
-            LOGGER.error("An error occured when trying to format an amount " + amount.toString());
+            log.error("An error occured when trying to format an amount " + amount.toString());
             throw new ServiceException(e);
         }
     }
@@ -76,7 +74,7 @@ public class PricingServiceImpl implements PricingService {
         try {
             return priceUtil.getFormatedAmountWithCurrency(locale, currency, amount);
         } catch (Exception e) {
-            LOGGER.error("An error occured when trying to format an amunt " + amount.toString() + " using locale " + locale.toString() + " and currency " + currency.toString());
+            log.error("An error occured when trying to format an amunt " + amount.toString() + " using locale " + locale.toString() + " and currency " + currency.toString());
             throw new ServiceException(e);
         }
     }
@@ -87,7 +85,7 @@ public class PricingServiceImpl implements PricingService {
         try {
             return priceUtil.getAdminFormatedAmount(store, amount);
         } catch (Exception e) {
-            LOGGER.error("An error occured when trying to format an amount " + amount.toString());
+            log.error("An error occured when trying to format an amount " + amount.toString());
             throw new ServiceException(e);
         }
     }
@@ -98,7 +96,7 @@ public class PricingServiceImpl implements PricingService {
         try {
             return priceUtil.getAmount(amount);
         } catch (Exception e) {
-            LOGGER.error("An error occured when trying to format an amount " + amount);
+            log.error("An error occured when trying to format an amount " + amount);
             throw new ServiceException(e);
         }
 

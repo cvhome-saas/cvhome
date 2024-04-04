@@ -82,7 +82,7 @@ public class ReadableProductPopulator extends
 
             ProductDescription description = source.getProductDescription();
 
-            if (source.getDescriptions() != null && source.getDescriptions().size() > 0) {
+            if (source.getDescriptions() != null && !source.getDescriptions().isEmpty()) {
                 for (ProductDescription desc : source.getDescriptions()) {
                     if (language != null && desc.getLanguage() != null && desc.getLanguage().getId().intValue() == language.getId().intValue()) {
                         description = desc;
@@ -191,8 +191,8 @@ public class ReadableProductPopulator extends
              * TODO use ProductImageMapper
              */
             Set<ProductImage> images = source.getImages();
-            if (images != null && images.size() > 0) {
-                List<ReadableImage> imageList = new ArrayList<ReadableImage>();
+            if (images != null && !images.isEmpty()) {
+                List<ReadableImage> imageList = new ArrayList<>();
 
                 String contextPath = imageUtils.getContextPath();
 
@@ -336,7 +336,7 @@ public class ReadableProductPopulator extends
                             readableOption.setId(attribute.getProductOption().getId());
 
                             Set<ProductOptionDescription> podescriptions = attribute.getProductOption().getDescriptions();
-                            if (podescriptions != null && podescriptions.size() > 0) {
+                            if (podescriptions != null && !podescriptions.isEmpty()) {
                                 for (ProductOptionDescription optionDescription : podescriptions) {
                                     if (optionDescription.getLanguage().getCode().equals(language.getCode())) {
                                         readableOption.setName(optionDescription.getName());
@@ -348,7 +348,7 @@ public class ReadableProductPopulator extends
 
                             Set<ProductOptionValueDescription> povdescriptions = attribute.getProductOptionValue().getDescriptions();
                             readableOptionValue.setId(attribute.getProductOptionValue().getId());
-                            if (povdescriptions != null && povdescriptions.size() > 0) {
+                            if (povdescriptions != null && !povdescriptions.isEmpty()) {
                                 for (ProductOptionValueDescription optionValueDescription : povdescriptions) {
                                     if (optionValueDescription.getLanguage().getCode().equals(language.getCode())) {
                                         readableOptionValue.setName(optionValueDescription.getName());
@@ -425,7 +425,7 @@ public class ReadableProductPopulator extends
 
                             List<ProductOptionValueDescription> podescriptions = optionValue.getDescriptionsSettoList();
                             ProductOptionValueDescription podescription = null;
-                            if (podescriptions != null && podescriptions.size() > 0) {
+                            if (podescriptions != null && !podescriptions.isEmpty()) {
                                 podescription = podescriptions.get(0);
                                 if (podescriptions.size() > 1) {
                                     for (ProductOptionValueDescription optionValueDescription : podescriptions) {
@@ -558,7 +558,7 @@ public class ReadableProductPopulator extends
         option.setCode(productAttribute.getProductOption().getCode());
         List<ProductOptionDescription> descriptions = productAttribute.getProductOption().getDescriptionsSettoList();
         ProductOptionDescription description = null;
-        if (descriptions != null && descriptions.size() > 0) {
+        if (descriptions != null && !descriptions.isEmpty()) {
             description = descriptions.get(0);
             if (descriptions.size() > 1) {
                 for (ProductOptionDescription optionDescription : descriptions) {
@@ -591,9 +591,7 @@ public class ReadableProductPopulator extends
         if (!CollectionUtils.isEmpty(type.getDescriptions())) {
             Optional<ProductTypeDescription> desc = type.getDescriptions().stream().filter(t -> t.getLanguage().getCode().equals(language.getCode()))
                     .map(d -> typeDescription(d)).findFirst();
-            if (desc.isPresent()) {
-                readableType.setDescription(desc.get());
-            }
+            desc.ifPresent(readableType::setDescription);
         }
 
         return readableType;
@@ -616,7 +614,7 @@ public class ReadableProductPopulator extends
         attr.setType(productAttribute.getProductOption().getProductOptionType());
         List<ProductOptionDescription> descriptions = productAttribute.getProductOption().getDescriptionsSettoList();
         ProductOptionDescription description = null;
-        if (descriptions != null && descriptions.size() > 0) {
+        if (descriptions != null && !descriptions.isEmpty()) {
             description = descriptions.get(0);
             if (descriptions.size() > 1) {
                 for (ProductOptionDescription optionDescription : descriptions) {
@@ -654,7 +652,7 @@ public class ReadableProductPopulator extends
         ReadableProductPropertyValue propertyValue = new ReadableProductPropertyValue();
 
 
-        if (descriptions != null && descriptions.size() > 0) {
+        if (descriptions != null && !descriptions.isEmpty()) {
             for (ProductOptionDescription optionDescription : descriptions) {
                 com.asrevo.cvhome.store.core.model.catalog.product.attribute.ProductOptionValueDescription productOptionValueDescription = new com.asrevo.cvhome.store.core.model.catalog.product.attribute.ProductOptionValueDescription();
                 productOptionValueDescription.setId(optionDescription.getId());

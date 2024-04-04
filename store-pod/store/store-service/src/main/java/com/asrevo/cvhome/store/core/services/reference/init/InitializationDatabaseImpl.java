@@ -25,8 +25,7 @@ import com.asrevo.cvhome.store.core.services.reference.loader.IntegrationModules
 import com.asrevo.cvhome.store.core.services.reference.loader.ZonesLoader;
 import com.asrevo.cvhome.store.core.services.reference.zone.ZoneService;
 import com.asrevo.cvhome.store.core.services.system.optin.OptinService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,9 +34,9 @@ import java.sql.Date;
 import java.util.*;
 
 @Service("initializationDatabase")
+@Slf4j
 public class InitializationDatabaseImpl implements InitializationDatabase {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(InitializationDatabaseImpl.class);
     @Autowired
     protected MerchantStoreService merchantService;
     @Autowired
@@ -96,7 +95,7 @@ public class InitializationDatabaseImpl implements InitializationDatabase {
 
 
     private void createCurrencies() throws ServiceException {
-        LOGGER.info(String.format("%s : Populating Currencies ", name));
+        log.info(String.format("%s : Populating Currencies ", name));
 
         for (String code : SchemaConstant.CURRENCY_MAP.keySet()) {
 
@@ -104,7 +103,7 @@ public class InitializationDatabaseImpl implements InitializationDatabase {
                 java.util.Currency c = java.util.Currency.getInstance(code);
 
                 if (c == null) {
-                    LOGGER.info(String.format("%s : Populating Currencies : no currency for code : %s", name, code));
+                    log.info(String.format("%s : Populating Currencies : no currency for code : %s", name, code));
                 }
 
                 //check if it exist
@@ -116,13 +115,13 @@ public class InitializationDatabaseImpl implements InitializationDatabase {
 
                 //System.out.println(l.getCountry() + "   " + c.getSymbol() + "  " + c.getSymbol(l));
             } catch (IllegalArgumentException e) {
-                LOGGER.info(String.format("%s : Populating Currencies : no currency for code : %s", name, code));
+                log.info(String.format("%s : Populating Currencies : no currency for code : %s", name, code));
             }
         }
     }
 
     private void createCountries() throws ServiceException {
-        LOGGER.info(String.format("%s : Populating Countries ", name));
+        log.info(String.format("%s : Populating Countries ", name));
         List<Language> languages = languageService.list();
         for (String code : SchemaConstant.COUNTRY_ISO_CODE) {
             Locale locale = SchemaConstant.LOCALES.get(code);
@@ -142,7 +141,7 @@ public class InitializationDatabaseImpl implements InitializationDatabase {
     }
 
     private void createZones() throws ServiceException {
-        LOGGER.info(String.format("%s : Populating Zones ", name));
+        log.info(String.format("%s : Populating Zones ", name));
         try {
 
             Map<String, Zone> zonesMap = new HashMap<String, Zone>();
@@ -171,7 +170,7 @@ public class InitializationDatabaseImpl implements InitializationDatabase {
 
             //lookup additional zones
             //iterate configured languages
-            LOGGER.info("Populating additional zones");
+            log.info("Populating additional zones");
 
             //load reference/zones/* (zone config for additional country)
             //example in.json and in-fr.son
@@ -197,7 +196,7 @@ public class InitializationDatabaseImpl implements InitializationDatabase {
                 Zone value = entry.getValue();
 
                 if (value.getDescriptions() == null) {
-                    LOGGER.warn("This zone " + key + " has no descriptions");
+                    log.warn("This zone " + key + " has no descriptions");
                     continue;
                 }
 
@@ -213,14 +212,14 @@ public class InitializationDatabaseImpl implements InitializationDatabase {
             }
 
         } catch (Exception e) {
-            LOGGER.error("An error occured while loading zones", e);
+            log.error("An error occured while loading zones", e);
 
         }
 
     }
 
     private void createLanguages() throws ServiceException {
-        LOGGER.info(String.format("%s : Populating Languages ", name));
+        log.info(String.format("%s : Populating Languages ", name));
         for (String code : SchemaConstant.LANGUAGE_ISO_CODE) {
             Language language = new Language(code);
             languageService.create(language);
@@ -228,7 +227,7 @@ public class InitializationDatabaseImpl implements InitializationDatabase {
     }
 
     private void createMerchant() throws ServiceException {
-        LOGGER.info(String.format("%s : Creating merchant ", name));
+        log.info(String.format("%s : Creating merchant ", name));
 
         Date date = new Date(System.currentTimeMillis());
 
@@ -314,7 +313,7 @@ public class InitializationDatabaseImpl implements InitializationDatabase {
 
     private void createSubReferences() throws ServiceException {
 
-        LOGGER.info(String.format("%s : Loading catalog sub references ", name));
+        log.info(String.format("%s : Loading catalog sub references ", name));
 
 
         ProductType productType = new ProductType();

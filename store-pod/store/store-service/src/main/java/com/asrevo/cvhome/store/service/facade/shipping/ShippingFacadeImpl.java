@@ -9,9 +9,8 @@ import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import com.asrevo.cvhome.store.core.model.references.ReadableCountry;
 import com.asrevo.cvhome.store.core.services.shipping.ShippingService;
 import com.asrevo.cvhome.store.service.populator.references.ReadableCountryPopulator;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,9 +20,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service("shippingFacade")
+@Slf4j
 public class ShippingFacadeImpl implements ShippingFacade {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(ShippingFacadeImpl.class);
 
 
     @Autowired

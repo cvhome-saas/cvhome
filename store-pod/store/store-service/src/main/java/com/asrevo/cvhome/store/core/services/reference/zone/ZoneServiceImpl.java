@@ -9,8 +9,7 @@ import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.repositories.reference.zone.ZoneRepository;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
 import com.asrevo.cvhome.store.core.utils.CacheUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -22,19 +21,19 @@ import java.util.List;
 import java.util.Map;
 
 @Service("zoneService")
+@Slf4j
 public class ZoneServiceImpl extends SalesManagerEntityServiceImpl<Long, Zone> implements
         ZoneService {
 
     private final static String ZONE_CACHE_PREFIX = "ZONES_";
-    private static final Logger LOGGER = LoggerFactory.getLogger(ZoneServiceImpl.class);
-    private ZoneRepository zoneRepository;
-    @Autowired
-    private CacheUtils cache;
+    private final ZoneRepository zoneRepository;
+    private final CacheUtils cache;
 
     @Autowired
-    public ZoneServiceImpl(ZoneRepository zoneRepository) {
+    public ZoneServiceImpl(ZoneRepository zoneRepository, CacheUtils cache) {
         super(zoneRepository);
         this.zoneRepository = zoneRepository;
+        this.cache = cache;
     }
 
     @Override
@@ -92,7 +91,7 @@ public class ZoneServiceImpl extends SalesManagerEntityServiceImpl<Long, Zone> i
             }
 
         } catch (Exception e) {
-            LOGGER.error("getZones()", e);
+            log.error("getZones()", e);
         }
         return zones;
 
@@ -129,7 +128,7 @@ public class ZoneServiceImpl extends SalesManagerEntityServiceImpl<Long, Zone> i
             }
 
         } catch (Exception e) {
-            LOGGER.error("getZones()", e);
+            log.error("getZones()", e);
         }
         return zones;
 
@@ -163,7 +162,7 @@ public class ZoneServiceImpl extends SalesManagerEntityServiceImpl<Long, Zone> i
             }
 
         } catch (Exception e) {
-            LOGGER.error("getZones()", e);
+            log.error("getZones()", e);
         }
         return zones;
 

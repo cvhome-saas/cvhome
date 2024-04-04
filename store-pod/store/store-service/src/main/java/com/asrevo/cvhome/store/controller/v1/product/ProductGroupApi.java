@@ -19,8 +19,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -36,9 +37,9 @@ import java.util.List;
 @Controller
 @RequestMapping("/api/v1")
 @Tag(name = "Product groups management resource (Product Groups Management Api)")
+@Slf4j
 public class ProductGroupApi {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ProductGroupApi.class);
     @Autowired
     private ProductService productService;
     @Autowired
@@ -138,7 +139,7 @@ public class ProductGroupApi {
             return list;
 
         } catch (Exception e) {
-            LOGGER.error("Error while getting products", e);
+            log.error("Error while getting products", e);
             response.sendError(503, "An error occured while retrieving products " + e.getMessage());
         }
 
@@ -170,7 +171,7 @@ public class ProductGroupApi {
             }
 
         } catch (Exception e) {
-            LOGGER.error("Error while adding product to group", e);
+            log.error("Error while adding product to group", e);
             try {
                 response.sendError(503, "Error while adding product to group " + e.getMessage());
             } catch (Exception ignore) {
@@ -218,7 +219,7 @@ public class ProductGroupApi {
             return list;
 
         } catch (Exception e) {
-            LOGGER.error("Error while removing product from category", e);
+            log.error("Error while removing product from category", e);
             try {
                 response.sendError(503, "Error while removing product from category " + e.getMessage());
             } catch (Exception ignore) {

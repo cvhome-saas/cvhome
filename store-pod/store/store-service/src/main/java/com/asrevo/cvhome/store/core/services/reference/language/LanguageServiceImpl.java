@@ -7,8 +7,7 @@ import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.repositories.reference.language.LanguageRepository;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
 import com.asrevo.cvhome.store.core.utils.CacheUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -25,20 +24,20 @@ import java.util.Map;
  */
 
 @Service("languageService")
+@Slf4j
 public class LanguageServiceImpl extends SalesManagerEntityServiceImpl<Integer, Language>
         implements LanguageService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(LanguageServiceImpl.class);
+
+    private final CacheUtils cache;
+
+    private final LanguageRepository languageRepository;
 
     @Autowired
-    private CacheUtils cache;
-
-    private LanguageRepository languageRepository;
-
-    @Autowired
-    public LanguageServiceImpl(LanguageRepository languageRepository) {
+    public LanguageServiceImpl(LanguageRepository languageRepository, CacheUtils cache) {
         super(languageRepository);
         this.languageRepository = languageRepository;
+        this.cache = cache;
     }
 
 
@@ -69,7 +68,7 @@ public class LanguageServiceImpl extends SalesManagerEntityServiceImpl<Integer, 
         try {
             language = getLanguagesMap().get(locale.getLanguage());
         } catch (Exception e) {
-            LOGGER.error("Cannot convert locale " + locale.getLanguage() + " to language");
+            log.error("Cannot convert locale " + locale.getLanguage() + " to language");
         }
         if (language == null) {
             language = new Language(Constants.DEFAULT_LANGUAGE);
@@ -109,7 +108,7 @@ public class LanguageServiceImpl extends SalesManagerEntityServiceImpl<Integer, 
             }
 
         } catch (Exception e) {
-            LOGGER.error("getCountries()", e);
+            log.error("getCountries()", e);
             throw new ServiceException(e);
         }
 

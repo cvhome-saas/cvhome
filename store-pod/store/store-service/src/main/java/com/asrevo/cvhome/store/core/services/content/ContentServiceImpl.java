@@ -8,8 +8,7 @@ import com.asrevo.cvhome.store.core.modules.cms.content.StaticContentFileManager
 import com.asrevo.cvhome.store.core.repositories.content.ContentRepository;
 import com.asrevo.cvhome.store.core.repositories.content.PageContentRepository;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,9 +25,9 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 
 @Service("contentService")
+@Slf4j
 public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Content> implements ContentService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ContentServiceImpl.class);
 
     private final ContentRepository contentRepository;
     @Autowired
@@ -177,14 +176,14 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
     private void addImage(String merchantStoreCode, InputContentFile contentImage) throws ServiceException {
 
         try {
-            LOG.info("Adding content image for merchant id {}", merchantStoreCode);
+            log.info("Adding content image for merchant id {}", merchantStoreCode);
 
             String p = contentImage.getPath();
             Optional<String> path = Optional.ofNullable(p);
             contentFileManager.addFile(merchantStoreCode, path, contentImage);
 
         } catch (Exception e) {
-            LOG.error("Error while trying to convert input stream to buffered image", e);
+            log.error("Error while trying to convert input stream to buffered image", e);
             throw new ServiceException(e);
 
         } finally {
@@ -203,7 +202,7 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
     private void addFile(final String merchantStoreCode, InputContentFile contentImage) throws ServiceException {
 
         try {
-            LOG.info("Adding content file for merchant id {}", merchantStoreCode);
+            log.info("Adding content file for merchant id {}", merchantStoreCode);
             // staticContentFileManager.addFile(merchantStoreCode,
             // contentImage);
 
@@ -213,7 +212,7 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
             contentFileManager.addFile(merchantStoreCode, path, contentImage);
 
         } catch (Exception e) {
-            LOG.error("Error while trying to convert input stream to buffered image", e);
+            log.error("Error while trying to convert input stream to buffered image", e);
             throw new ServiceException(e);
 
         } finally {
@@ -243,12 +242,12 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
 
         Assert.notNull(merchantStoreCode, "Merchant store ID can not be null");
         Assert.notEmpty(contentFilesList, "File list can not be empty");
-        LOG.info("Adding total {} images for given merchant", contentFilesList.size());
+        log.info("Adding total {} images for given merchant", contentFilesList.size());
 
         String p = null;
         Optional<String> path = Optional.ofNullable(p);
 
-        LOG.info("Adding content images for merchant....");
+        log.info("Adding content images for merchant....");
         contentFileManager.addFiles(merchantStoreCode, path, contentFilesList);
         // staticContentFileManager.addFiles(merchantStoreCode,
         // contentFilesList);

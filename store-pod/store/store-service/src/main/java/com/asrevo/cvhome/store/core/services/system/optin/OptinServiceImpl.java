@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 public class OptinServiceImpl extends SalesManagerEntityServiceImpl<Long, Optin> implements OptinService {
 
 
-    private OptinRepository optinRepository;
+    private final OptinRepository optinRepository;
 
     @Autowired
     public OptinServiceImpl(OptinRepository optinRepository) {

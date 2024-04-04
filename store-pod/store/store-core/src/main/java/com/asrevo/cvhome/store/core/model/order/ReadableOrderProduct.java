@@ -9,20 +9,20 @@ import java.util.List;
 @Setter
 @Getter
 public class ReadableOrderProduct extends OrderProductEntity implements
-		Serializable {
+        Serializable {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	private String productName;
-	private String price;
-	private String subTotal;
-	
-	private List<ReadableOrderProductAttribute> attributes = null;
-	
-	private String sku;
-	private String image;
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
+    private String productName;
+    private String price;
+    private String subTotal;
+
+    private List<ReadableOrderProductAttribute> attributes = null;
+
+    private String sku;
+    private String image;
 
 
 }

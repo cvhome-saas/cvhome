@@ -20,8 +20,9 @@ import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -32,6 +33,7 @@ import java.util.List;
 @Controller
 @RequestMapping("/api/v1")
 @Tag(name = "Order Total resource", description = "Calculates order total for a giben shopping cart")
+@Slf4j
 public class OrderTotalApi {
 
     @Autowired
@@ -49,8 +51,6 @@ public class OrderTotalApi {
 
     @Autowired
     private OrderService orderService;
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(OrderTotalApi.class);
 
 
     /**
@@ -113,7 +113,7 @@ public class OrderTotalApi {
             return returnSummary;
 
         } catch (Exception e) {
-            LOGGER.error("Error while calculating order summary", e);
+            log.error("Error while calculating order summary", e);
             try {
                 response.sendError(503, "Error while calculating order summary " + e.getMessage());
             } catch (Exception ignore) {

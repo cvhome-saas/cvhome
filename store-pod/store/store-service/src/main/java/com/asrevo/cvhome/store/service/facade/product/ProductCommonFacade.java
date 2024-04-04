@@ -177,7 +177,7 @@ public interface ProductCommonFacade {
      * @param store
      * @return
      */
-    public boolean exists(String sku, MerchantStore store);
+    boolean exists(String sku, MerchantStore store);
 
 
 }

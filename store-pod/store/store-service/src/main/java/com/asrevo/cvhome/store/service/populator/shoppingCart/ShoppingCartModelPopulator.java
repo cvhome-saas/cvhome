@@ -18,11 +18,10 @@ import com.asrevo.cvhome.store.core.services.catalog.product.ProductService;
 import com.asrevo.cvhome.store.core.services.catalog.product.attribute.ProductAttributeService;
 import com.asrevo.cvhome.store.core.services.shoppingcart.ShoppingCartService;
 import com.asrevo.cvhome.store.utils.AbstractDataPopulator;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.ConversionException;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -34,10 +33,10 @@ import java.util.Set;
  */
 
 @Service(value = "shoppingCartModelPopulator")
+@Slf4j
 public class ShoppingCartModelPopulator
         extends AbstractDataPopulator<ShoppingCartData, ShoppingCart> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ShoppingCartModelPopulator.class);
 
     private ShoppingCartService shoppingCartService;
 
@@ -101,11 +100,11 @@ public class ShoppingCartModelPopulator
             List<ShoppingCartItem> items = shoppingCart.getShoppingCartItems();
             Set<com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem> newItems =
                     new HashSet<>();
-            if (items != null && items.size() > 0) {
+            if (items != null && !items.isEmpty()) {
                 for (ShoppingCartItem item : items) {
 
                     Set<com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem> cartItems = cartMdel.getLineItems();
-                    if (cartItems != null && cartItems.size() > 0) {
+                    if (cartItems != null && !cartItems.isEmpty()) {
 
                         for (com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem dbItem : cartItems) {
                             if (dbItem.getId().longValue() == item.getId()) {
@@ -147,10 +146,10 @@ public class ShoppingCartModelPopulator
                 }// end for
             }// end if
         } catch (ServiceException se) {
-            LOG.error("Error while converting cart data to cart model.." + se);
+            log.error("Error while converting cart data to cart model.." + se);
             throw new ConversionException("Unable to create cart model", se);
         } catch (Exception ex) {
-            LOG.error("Error while converting cart data to cart model.." + ex);
+            log.error("Error while converting cart data to cart model.." + ex);
             throw new ConversionException("Unable to create cart model", ex);
         }
 

@@ -29,16 +29,16 @@ import java.util.Optional;
 public class ProductImageServiceImpl extends SalesManagerEntityServiceImpl<Long, ProductImage>
         implements ProductImageService {
 
-    private ProductImageRepository productImageRepository;
-    @Autowired
-    private ProductFileManager productFileManager;
-    @Autowired
-    private ApplicationEventPublisher eventPublisher;
+    private final ProductImageRepository productImageRepository;
+    private final ProductFileManager productFileManager;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Autowired
-    public ProductImageServiceImpl(ProductImageRepository productImageRepository) {
+    public ProductImageServiceImpl(ProductImageRepository productImageRepository, ProductFileManager productFileManager, ApplicationEventPublisher eventPublisher) {
         super(productImageRepository);
         this.productImageRepository = productImageRepository;
+        this.productFileManager = productFileManager;
+        this.eventPublisher = eventPublisher;
     }
 
     public ProductImage getById(Long id) {

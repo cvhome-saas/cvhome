@@ -30,10 +30,10 @@ public class ReadableManufacturerPopulator extends
         target.setOrder(source.getOrder());
         target.setId(source.getId());
         target.setCode(source.getCode());
-        if (source.getDescriptions() != null && source.getDescriptions().size() > 0) {
+        if (source.getDescriptions() != null && !source.getDescriptions().isEmpty()) {
 
             List<com.asrevo.cvhome.store.core.model.catalog.manufacturer.ManufacturerDescription> fulldescriptions =
-                    new ArrayList<com.asrevo.cvhome.store.core.model.catalog.manufacturer.ManufacturerDescription>();
+                    new ArrayList<>();
 
             Set<ManufacturerDescription> descriptions = source.getDescriptions();
             ManufacturerDescription description = null;

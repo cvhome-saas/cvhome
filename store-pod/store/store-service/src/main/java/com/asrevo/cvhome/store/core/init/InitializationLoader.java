@@ -7,17 +7,16 @@ import com.asrevo.cvhome.store.core.services.merchant.MerchantStoreService;
 import com.asrevo.cvhome.store.core.services.reference.init.InitializationDatabase;
 import com.asrevo.cvhome.store.core.services.system.MerchantConfigurationService;
 import jakarta.annotation.PostConstruct;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 
 @Component
+@Slf4j
 public class InitializationLoader {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(InitializationLoader.class);
     @Autowired
     protected MerchantStoreService merchantService;
     @Value("${db.init.data:false}")
@@ -45,7 +44,7 @@ public class InitializationLoader {
 
                 //All default data to be created
 
-                LOGGER.info(String.format("%s : Shopizer database is empty, populate it....", "sm-shop"));
+                log.info(String.format("%s : Shopizer database is empty, populate it....", "sm-shop"));
 
                 initializationDatabase.populate("sm-shop");
 
@@ -61,7 +60,7 @@ public class InitializationLoader {
             }
 
         } catch (Exception e) {
-            LOGGER.error("Error in the init method", e);
+            log.error("Error in the init method", e);
         }
 
     }

@@ -57,12 +57,8 @@ public class CatalogServiceHelper {
 
         Optional<ProductAvailability> defaultAvailability = availabilities.stream().filter(productAvailability -> productAvailability.getRegion().equals(Constants.ALL_REGIONS)).findFirst();
         Optional<ProductAvailability> localeAvailability = availabilities.stream().filter(productAvailability -> productAvailability.getRegion().equals(locale.getCountry())).findFirst();
-        if (defaultAvailability.isPresent()) {
-            productAvailabilities.add(defaultAvailability.get());
-        }
-        if (localeAvailability.isPresent()) {
-            productAvailabilities.add(localeAvailability.get());
-        }
+        defaultAvailability.ifPresent(productAvailabilities::add);
+        localeAvailability.ifPresent(productAvailabilities::add);
 
         if (productAvailabilities.isEmpty()) {
             product.setAvailabilities(productAvailabilities);

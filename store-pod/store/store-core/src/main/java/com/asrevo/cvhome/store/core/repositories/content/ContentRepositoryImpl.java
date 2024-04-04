@@ -90,7 +90,7 @@ public class ContentRepositoryImpl implements ContentRepositoryCustom {
         List<Content> results = q.getResultList();
         if (results.isEmpty()) {
             return null;
-        } else if (results.size() >= 1) {
+        } else {
             content = results.get(0);
         }
 

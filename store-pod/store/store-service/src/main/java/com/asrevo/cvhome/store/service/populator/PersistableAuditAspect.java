@@ -2,11 +2,10 @@ package com.asrevo.cvhome.store.service.populator;
 
 import com.asrevo.cvhome.store.core.entity.common.audit.AuditSection;
 import com.asrevo.cvhome.store.core.entity.common.audit.Auditable;
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.Date;
@@ -18,10 +17,9 @@ import java.util.Date;
  */
 @Aspect
 @Configuration
+@Slf4j
 public class PersistableAuditAspect {
 
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(PersistableAuditAspect.class);
 
     @AfterReturning(value = "execution(* populate(..))",
             returning = "result")
@@ -50,7 +48,7 @@ public class PersistableAuditAspect {
                 entity.setAuditSection(audit);
             }
         } catch (Throwable e) {
-            LOGGER.error("Error while setting audit values" + e.getMessage());
+            log.error("Error while setting audit values" + e.getMessage());
         }
 
     }

@@ -1,7 +1,6 @@
 package com.asrevo.cvhome.store.utils;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -11,9 +10,9 @@ import java.io.IOException;
 import java.net.FileNameMap;
 import java.net.URLConnection;
 
+@Slf4j
 public class ProductImageCropUtils {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ProductImageCropUtils.class);
 
     private boolean cropeable = true;
 
@@ -46,7 +45,7 @@ public class ProductImageCropUtils {
             determineCropArea(width, largeImageWidth, height, largeImageHeight);
 
         } catch (Exception e) {
-            LOGGER.error("Image Utils error in constructor", e);
+            log.error("Image Utils error in constructor", e);
         }
 
 

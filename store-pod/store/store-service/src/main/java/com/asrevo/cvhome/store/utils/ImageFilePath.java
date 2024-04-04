@@ -12,10 +12,10 @@ public interface ImageFilePath {
      *
      * @return
      */
-    public String getContextPath();
+    String getContextPath();
 
 
-    public String getBasePath(MerchantStore store);
+    String getBasePath(MerchantStore store);
 
     /**
      * Builds a static content image file path that can be used by image servlet
@@ -25,7 +25,7 @@ public interface ImageFilePath {
      * @param imageName
      * @return
      */
-    public String buildStaticImageUtils(MerchantStore store, String imageName);
+    String buildStaticImageUtils(MerchantStore store, String imageName);
 
     /**
      * Builds a static content image file path that can be used by image servlet
@@ -35,7 +35,7 @@ public interface ImageFilePath {
      * @param imageName
      * @return
      */
-    public String buildStaticImageUtils(MerchantStore store, String type, String imageName);
+    String buildStaticImageUtils(MerchantStore store, String type, String imageName);
 
     /**
      * Builds a manufacturer image file path that can be used by image servlet
@@ -46,7 +46,7 @@ public interface ImageFilePath {
      * @param imageName
      * @return
      */
-    public String buildManufacturerImageUtils(MerchantStore store, Manufacturer manufacturer, String imageName);
+    String buildManufacturerImageUtils(MerchantStore store, Manufacturer manufacturer, String imageName);
 
     /**
      * Builds a product image file path that can be used by image servlet
@@ -57,7 +57,7 @@ public interface ImageFilePath {
      * @param imageName
      * @return
      */
-    public String buildProductImageUtils(MerchantStore store, Product product, String imageName);
+    String buildProductImageUtils(MerchantStore store, Product product, String imageName);
 
     /**
      * Builds a default product image file path that can be used by image servlet
@@ -68,7 +68,7 @@ public interface ImageFilePath {
      * @param imageName
      * @return
      */
-    public String buildProductImageUtils(MerchantStore store, String sku, String imageName);
+    String buildProductImageUtils(MerchantStore store, String sku, String imageName);
 
     /**
      * Builds a large product image file path that can be used by the image servlet
@@ -78,7 +78,7 @@ public interface ImageFilePath {
      * @param imageName
      * @return
      */
-    public String buildLargeProductImageUtils(MerchantStore store, String sku, String imageName);
+    String buildLargeProductImageUtils(MerchantStore store, String sku, String imageName);
 
 
     /**
@@ -87,7 +87,7 @@ public interface ImageFilePath {
      * @param store
      * @return
      */
-    public String buildStoreLogoFilePath(MerchantStore store);
+    String buildStoreLogoFilePath(MerchantStore store);
 
     /**
      * Builds product property image url path
@@ -96,7 +96,7 @@ public interface ImageFilePath {
      * @param imageName
      * @return
      */
-    public String buildProductPropertyImageUtils(MerchantStore store, String imageName);
+    String buildProductPropertyImageUtils(MerchantStore store, String imageName);
 
     /**
      * A custom file type image handler
@@ -116,7 +116,7 @@ public interface ImageFilePath {
      * @param fileName
      * @return
      */
-    public String buildStaticContentFilePath(MerchantStore store, String fileName);
+    String buildStaticContentFilePath(MerchantStore store, String fileName);
 
 
 }

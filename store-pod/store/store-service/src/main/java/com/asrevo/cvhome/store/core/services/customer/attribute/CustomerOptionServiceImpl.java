@@ -19,20 +19,20 @@ public class CustomerOptionServiceImpl extends
         SalesManagerEntityServiceImpl<Long, CustomerOption> implements CustomerOptionService {
 
 
-    private CustomerOptionRepository customerOptionRepository;
+    private final CustomerOptionRepository customerOptionRepository;
 
-    @Autowired
-    private CustomerAttributeService customerAttributeService;
+    private final CustomerAttributeService customerAttributeService;
 
-    @Autowired
-    private CustomerOptionSetService customerOptionSetService;
+    private final CustomerOptionSetService customerOptionSetService;
 
 
     @Autowired
     public CustomerOptionServiceImpl(
-            CustomerOptionRepository customerOptionRepository) {
+            CustomerOptionRepository customerOptionRepository, CustomerAttributeService customerAttributeService, CustomerOptionSetService customerOptionSetService) {
         super(customerOptionRepository);
         this.customerOptionRepository = customerOptionRepository;
+        this.customerAttributeService = customerAttributeService;
+        this.customerOptionSetService = customerOptionSetService;
     }
 
     @Override

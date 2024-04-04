@@ -29,9 +29,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -51,10 +52,10 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequestMapping("/api/v2")
 @Tags(value = @Tag(name =
         "Product display and management resource (Product display and Management Api such as adding a product to category. Serves api v1 and v2 with backward compatibility)"))
+@Slf4j
 public class ProductApiV2 {
 
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ProductApiV2.class);
     @Autowired
     private ProductDefinitionFacade productDefinitionFacade;
     @Autowired
@@ -237,7 +238,7 @@ public class ProductApiV2 {
             throw rnf;
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            LOGGER.error("Error while getting category by friendlyUrl", e);
+            log.error("Error while getting category by friendlyUrl", e);
             throw new ServiceRuntimeException(e);
         }
 
@@ -293,7 +294,7 @@ public class ProductApiV2 {
             return productFacadeV2.getProductListsByCriterias(merchantStore, language, searchCriterias);
 
         } catch (Exception e) {
-            LOGGER.error("Error while filtering products product", e);
+            log.error("Error while filtering products product", e);
             throw new ServiceRuntimeException(e);
 
         }

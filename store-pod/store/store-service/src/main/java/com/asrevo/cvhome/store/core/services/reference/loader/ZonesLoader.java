@@ -8,8 +8,7 @@ import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.services.reference.country.CountryService;
 import com.asrevo.cvhome.store.core.services.reference.language.LanguageService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
@@ -27,9 +26,9 @@ import java.util.*;
  * @author carlsamson
  */
 @Component
+@Slf4j
 public class ZonesLoader {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ZonesLoader.class);
     private static final String PATH = "classpath:/reference/zones/*.json";
     private static final String ALL_REGIONS = "*";
     @Autowired
@@ -202,7 +201,7 @@ public class ZonesLoader {
             zone = new Zone();
             Country country = countriesMap.get(list.get("countryCode"));
             if (country == null) {
-                LOGGER.warn("Country is null for " + zoneCode + " and country code " + list.get("countryCode"));
+                log.warn("Country is null for " + zoneCode + " and country code " + list.get("countryCode"));
                 return;
             }
             zone.setCountry(country);
@@ -213,7 +212,7 @@ public class ZonesLoader {
         }
 
         if (zonesMark.containsKey(l.getCode() + "_" + zoneCode)) {
-            LOGGER.warn("This zone seems to be a duplicate !  " + zoneCode + " and language code " + l.getCode());
+            log.warn("This zone seems to be a duplicate !  " + zoneCode + " and language code " + l.getCode());
             return;
         }
 

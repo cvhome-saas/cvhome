@@ -14,33 +14,33 @@ import java.util.Map;
 
 /**
  * Orders saved on the website
- * @author Carl Samson
  *
+ * @author Carl Samson
  */
 @Setter
 @Getter
 public class ShopOrder extends PersistableOrder implements Serializable {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	private List<ShoppingCartItem> shoppingCartItems;//overrides parent API list of shoppingcartitem
-	private String cartCode = null;
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
+    private List<ShoppingCartItem> shoppingCartItems;//overrides parent API list of shoppingcartitem
+    private String cartCode = null;
 
-	private OrderTotalSummary orderTotalSummary;//The order total displayed to the end user. That object will be used when committing the order
-	
-	
-	private ShippingSummary shippingSummary;
-	private ShippingOption selectedShippingOption = null;//Default selected option
-	
-	private String defaultPaymentMethodCode = null;
-	
-	
-	private String paymentMethodType = null;//user selected payment type
-	private Map<String,String> payment;//user payment information
-	
-	private String errorMessage = null;
+    private OrderTotalSummary orderTotalSummary;//The order total displayed to the end user. That object will be used when committing the order
+
+
+    private ShippingSummary shippingSummary;
+    private ShippingOption selectedShippingOption = null;//Default selected option
+
+    private String defaultPaymentMethodCode = null;
+
+
+    private String paymentMethodType = null;//user selected payment type
+    private Map<String, String> payment;//user payment information
+
+    private String errorMessage = null;
 
 
 }

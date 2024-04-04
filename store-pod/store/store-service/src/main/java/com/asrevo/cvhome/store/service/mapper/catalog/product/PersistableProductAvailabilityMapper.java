@@ -65,9 +65,7 @@ public class PersistableProductAvailabilityMapper implements Mapper<PersistableP
                     Optional<com.asrevo.cvhome.store.core.model.catalog.product.ProductPriceDescription> description = source
                             .getPrice().getDescriptions().stream()
                             .filter(d -> d.getLanguage() != null && d.getLanguage().equals(lang.getCode())).findFirst();
-                    if (description.isPresent()) {
-                        ppd.setPriceAppender(description.get().getPriceAppender());
-                    }
+                    description.ifPresent(productPriceDescription -> ppd.setPriceAppender(productPriceDescription.getPriceAppender()));
                     price.getDescriptions().add(ppd);
                 }
 

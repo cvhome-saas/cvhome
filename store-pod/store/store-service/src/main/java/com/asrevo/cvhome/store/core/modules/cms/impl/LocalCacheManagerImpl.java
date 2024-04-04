@@ -7,7 +7,7 @@ package com.asrevo.cvhome.store.core.modules.cms.impl;
  */
 public class LocalCacheManagerImpl implements CMSManager {
 
-    private String rootName;// file location root
+    private final String rootName;// file location root
 
     public LocalCacheManagerImpl(String rootName) {
         this.rootName = rootName;

@@ -19,15 +19,15 @@ import java.util.List;
 public class ProductTypeServiceImpl extends SalesManagerEntityServiceImpl<Long, ProductType>
         implements ProductTypeService {
 
-    private ProductTypeRepository productTypeRepository;
+    private final ProductTypeRepository productTypeRepository;
+
+    private final PageableProductTypeRepository pageableProductTypeRepository;
 
     @Autowired
-    private PageableProductTypeRepository pageableProductTypeRepository;
-
-    @Autowired
-    public ProductTypeServiceImpl(ProductTypeRepository productTypeRepository) {
+    public ProductTypeServiceImpl(ProductTypeRepository productTypeRepository, PageableProductTypeRepository pageableProductTypeRepository) {
         super(productTypeRepository);
         this.productTypeRepository = productTypeRepository;
+        this.pageableProductTypeRepository = pageableProductTypeRepository;
     }
 
     @Override

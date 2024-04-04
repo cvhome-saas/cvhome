@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 public class CurrencyServiceImpl extends SalesManagerEntityServiceImpl<Long, Currency>
         implements CurrencyService {
 
-    private CurrencyRepository currencyRepository;
+    private final CurrencyRepository currencyRepository;
 
     @Autowired
     public CurrencyServiceImpl(CurrencyRepository currencyRepository) {

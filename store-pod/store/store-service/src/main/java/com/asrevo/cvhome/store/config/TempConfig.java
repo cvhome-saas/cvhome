@@ -63,6 +63,7 @@ public class TempConfig {
         properties.put("POPULATE_TEST_DATA", true);
         return properties;
     }
+
     @Bean
     public LabelUtils messages() {
         return new LabelUtils();

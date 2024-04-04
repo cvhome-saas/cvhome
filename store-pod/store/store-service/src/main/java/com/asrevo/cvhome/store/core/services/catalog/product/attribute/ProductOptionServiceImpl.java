@@ -22,19 +22,19 @@ public class ProductOptionServiceImpl extends
         SalesManagerEntityServiceImpl<Long, ProductOption> implements ProductOptionService {
 
 
-    private ProductOptionRepository productOptionRepository;
+    private final ProductOptionRepository productOptionRepository;
 
-    @Autowired
-    private PageableProductOptionRepository pageableProductOptionRepository;
+    private final PageableProductOptionRepository pageableProductOptionRepository;
 
-    @Autowired
-    private ProductAttributeService productAttributeService;
+    private final ProductAttributeService productAttributeService;
 
     @Autowired
     public ProductOptionServiceImpl(
-            ProductOptionRepository productOptionRepository) {
+            ProductOptionRepository productOptionRepository, PageableProductOptionRepository pageableProductOptionRepository, ProductAttributeService productAttributeService) {
         super(productOptionRepository);
         this.productOptionRepository = productOptionRepository;
+        this.pageableProductOptionRepository = pageableProductOptionRepository;
+        this.productAttributeService = productAttributeService;
     }
 
     @Override

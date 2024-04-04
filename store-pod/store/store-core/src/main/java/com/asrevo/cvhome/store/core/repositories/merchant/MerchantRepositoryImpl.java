@@ -8,15 +8,14 @@ import com.asrevo.cvhome.store.core.utils.RepositoryHelper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
+@Slf4j
 public class MerchantRepositoryImpl implements MerchantRepositoryCustom {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MerchantRepositoryImpl.class);
     @PersistenceContext
     private EntityManager em;
 
@@ -82,7 +81,7 @@ public class MerchantRepositoryImpl implements MerchantRepositoryCustom {
 
         } catch (jakarta.persistence.NoResultException ers) {
         } catch (Exception e) {
-            LOGGER.error(e.getMessage());
+            log.error(e.getMessage());
             throw new ServiceException(e);
         }
         return null;

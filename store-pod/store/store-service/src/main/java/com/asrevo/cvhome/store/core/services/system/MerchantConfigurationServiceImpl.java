@@ -18,7 +18,7 @@ public class MerchantConfigurationServiceImpl extends
         SalesManagerEntityServiceImpl<Long, MerchantConfiguration> implements
         MerchantConfigurationService {
 
-    private MerchantConfigurationRepository merchantConfigurationRepository;
+    private final MerchantConfigurationRepository merchantConfigurationRepository;
 
     @Autowired
     public MerchantConfigurationServiceImpl(

@@ -15,8 +15,7 @@ import com.asrevo.cvhome.store.core.modules.cms.product.ProductAssetsManager;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.Setter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,6 +34,7 @@ import java.util.List;
  */
 @Setter
 @Getter
+@Slf4j
 public class CmsImageFileManagerImpl
         implements ProductAssetsManager {
 
@@ -43,7 +43,6 @@ public class CmsImageFileManagerImpl
      */
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CmsImageFileManagerImpl.class);
     private final static String ROOT_NAME = "";
     private final static String SMALL = "SMALL";
     private final static String LARGE = "LARGE";
@@ -71,7 +70,7 @@ public class CmsImageFileManagerImpl
     void init() {
 
         this.rootName = ((CMSManager) cacheManager).getRootName();
-        LOGGER.info("init " + getClass().getName() + " setting root" + this.rootName);
+        log.info("init " + getClass().getName() + " setting root" + this.rootName);
 
     }
 

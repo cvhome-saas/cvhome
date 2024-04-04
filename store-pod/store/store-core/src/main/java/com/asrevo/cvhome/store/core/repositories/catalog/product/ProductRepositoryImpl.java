@@ -11,16 +11,15 @@ import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import com.asrevo.cvhome.store.core.entity.tax.taxclass.TaxClass;
 import com.asrevo.cvhome.store.core.utils.RepositoryHelper;
 import jakarta.persistence.*;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
+@Slf4j
 public class ProductRepositoryImpl implements ProductRepositoryCustom {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ProductRepositoryImpl.class);
 
     @PersistenceContext
     private EntityManager em;
@@ -245,7 +244,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
         try {
             List<Product> products = q.getResultList();
             if (products.size() > 1) {
-                LOGGER.error("Found multiple products for list of criterias with main criteria [" + seUrl + "]");
+                log.error("Found multiple products for list of criterias with main criteria [" + seUrl + "]");
             }
             // p = (Product)q.getSingleResult();
             p = products.get(0);
@@ -662,7 +661,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
         }
 
 
-        Query countQ = this.em.createQuery(countBuilderSelect.toString() + countBuilderWhere.toString());
+        Query countQ = this.em.createQuery(countBuilderSelect + countBuilderWhere.toString());
 
         countQ.setParameter("mId", store.getId());
 

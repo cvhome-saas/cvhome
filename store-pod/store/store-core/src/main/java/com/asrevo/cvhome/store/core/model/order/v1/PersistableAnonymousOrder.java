@@ -9,11 +9,11 @@ import lombok.Setter;
 @Getter
 public class PersistableAnonymousOrder extends PersistableOrder {
 
-  /**
-   * 
-   */
-  private static final long serialVersionUID = 1L;
-  
-  private PersistableCustomer customer;
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
+
+    private PersistableCustomer customer;
 
 }

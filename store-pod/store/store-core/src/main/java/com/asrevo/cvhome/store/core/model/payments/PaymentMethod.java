@@ -11,21 +11,21 @@ import java.io.Serializable;
 /**
  * Object to be used in store front with meta data and configuration
  * informations required to display to the end user
- * @author Carl Samson
  *
+ * @author Carl Samson
  */
 @Setter
 @Getter
 public class PaymentMethod implements Serializable {
-	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	private String paymentMethodCode;
-	private PaymentType paymentType;
-	private boolean defaultSelected;
-	private IntegrationModule module;
-	private IntegrationConfiguration informations;
+
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
+    private String paymentMethodCode;
+    private PaymentType paymentType;
+    private boolean defaultSelected;
+    private IntegrationModule module;
+    private IntegrationConfiguration informations;
 
 }

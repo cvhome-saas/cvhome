@@ -8,9 +8,8 @@ import com.asrevo.cvhome.store.core.entity.system.MerchantConfiguration;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.system.Configs;
 import com.asrevo.cvhome.store.core.services.system.MerchantConfigurationService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -21,10 +20,9 @@ import static com.asrevo.cvhome.store.core.constants.Constants.*;
 
 
 @Service
+@Slf4j
 public class MerchantConfigurationFacadeImpl implements MerchantConfigurationFacade {
 
-    private static final Logger LOGGER = LoggerFactory
-            .getLogger(MerchantConfigurationFacadeImpl.class);
 
     @Autowired
     private MerchantConfigurationService merchantConfigurationService;
@@ -66,7 +64,7 @@ public class MerchantConfigurationFacadeImpl implements MerchantConfigurationFac
                 readableConfig.setDisplayShipping(Boolean.valueOf(displayShipping));
             }
         } catch (Exception e) {
-            LOGGER.error("Cannot parse value of " + displayShipping);
+            log.error("Cannot parse value of " + displayShipping);
         }
 
         return readableConfig;

@@ -27,15 +27,15 @@ import java.util.Optional;
 public class ProductAvailabilityServiceImpl extends SalesManagerEntityServiceImpl<Long, ProductAvailability>
         implements ProductAvailabilityService {
 
-    private ProductAvailabilityRepository productAvailabilityRepository;
+    private final ProductAvailabilityRepository productAvailabilityRepository;
+
+    private final PageableProductAvailabilityRepository pageableProductAvailabilityRepository;
 
     @Autowired
-    private PageableProductAvailabilityRepository pageableProductAvailabilityRepository;
-
-    @Autowired
-    public ProductAvailabilityServiceImpl(ProductAvailabilityRepository productAvailabilityRepository) {
+    public ProductAvailabilityServiceImpl(ProductAvailabilityRepository productAvailabilityRepository, PageableProductAvailabilityRepository pageableProductAvailabilityRepository) {
         super(productAvailabilityRepository);
         this.productAvailabilityRepository = productAvailabilityRepository;
+        this.pageableProductAvailabilityRepository = pageableProductAvailabilityRepository;
     }
 
     @Override

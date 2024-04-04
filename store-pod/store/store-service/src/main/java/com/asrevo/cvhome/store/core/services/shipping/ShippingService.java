@@ -1,13 +1,10 @@
 package com.asrevo.cvhome.store.core.services.shipping;
 
-import com.asrevo.cvhome.store.core.entity.common.Delivery;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.country.Country;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.shipping.ShippingConfiguration;
-import com.asrevo.cvhome.store.core.model.shipping.ShippingProduct;
-import com.asrevo.cvhome.store.core.model.shipping.ShippingQuote;
 
 import java.util.List;
 
@@ -30,6 +27,7 @@ public interface ShippingService {
             throws ServiceException;
 
     ShippingConfiguration getShippingConfiguration(MerchantStore store) throws ServiceException;
+
     boolean hasTaxOnShipping(MerchantStore store) throws ServiceException;
 
 

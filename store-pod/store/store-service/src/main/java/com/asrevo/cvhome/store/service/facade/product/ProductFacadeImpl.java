@@ -108,8 +108,8 @@ public class ProductFacadeImpl implements ProductFacade {
                     List<Category> categories = categoryService
                             .getListByLineage(store, lineage);
 
-                    List<Long> ids = new ArrayList<Long>();
-                    if (categories != null && categories.size() > 0) {
+                    List<Long> ids = new ArrayList<>();
+                    if (categories != null && !categories.isEmpty()) {
                         for (Category c : categories) {
                             ids.add(c.getId());
                         }
@@ -184,7 +184,7 @@ public class ProductFacadeImpl implements ProductFacade {
 
         List<ProductRelationship> relatedItems = productRelationshipService.getByType(store, product,
                 ProductRelationshipType.RELATED_ITEM);
-        if (relatedItems != null && relatedItems.size() > 0) {
+        if (relatedItems != null && !relatedItems.isEmpty()) {
             List<ReadableProduct> items = new ArrayList<ReadableProduct>();
             for (ProductRelationship relationship : relatedItems) {
                 Product relatedProduct = relationship.getRelatedProduct();

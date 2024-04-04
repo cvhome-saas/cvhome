@@ -21,9 +21,8 @@ import com.asrevo.cvhome.store.core.services.content.ContentService;
 import com.asrevo.cvhome.store.core.services.reference.language.LanguageService;
 import com.asrevo.cvhome.store.utils.FilePathUtils;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
@@ -43,10 +42,10 @@ import java.util.stream.Collectors;
 
 
 @Component("contentFacade")
+@Slf4j
 public class ContentFacadeImpl implements ContentFacade {
 
     public static final String FILE_CONTENT_DELIMETER = "/";
-    private static final Logger LOGGER = LoggerFactory.getLogger(ContentFacade.class);
     @Autowired
     private ContentService contentService;
 

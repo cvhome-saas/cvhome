@@ -13,12 +13,12 @@ import java.util.Map;
 @Setter
 @Getter
 public class Payment {
-	
-	private PaymentType paymentType;
-	private TransactionType transactionType = TransactionType.AUTHORIZECAPTURE;
-	private String moduleName;
-	private Currency currency;
-	private BigDecimal amount;
-	private Map<String,String> paymentMetaData = null;
+
+    private PaymentType paymentType;
+    private TransactionType transactionType = TransactionType.AUTHORIZECAPTURE;
+    private String moduleName;
+    private Currency currency;
+    private BigDecimal amount;
+    private Map<String, String> paymentMetaData = null;
 
 }

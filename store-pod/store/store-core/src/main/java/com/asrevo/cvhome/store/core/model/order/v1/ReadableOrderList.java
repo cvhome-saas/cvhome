@@ -12,11 +12,11 @@ import java.util.List;
 @Getter
 public class ReadableOrderList extends ReadableList implements Serializable {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	private List<ReadableOrder> orders;
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
+    private List<ReadableOrder> orders;
 
 
 }

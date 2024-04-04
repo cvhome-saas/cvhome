@@ -25,9 +25,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -42,9 +43,9 @@ import java.util.stream.Collectors;
 @Controller
 @RequestMapping("/api/v1")
 @Tag(name = "Product images management. Add, remove and set the order of product images.")
+@Slf4j
 public class ProductImageApi {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ProductImageApi.class);
     @Autowired
     private ProductImageService productImageService;
     @Autowired
@@ -125,7 +126,7 @@ public class ProductImageApi {
             }
 
         } catch (Exception e) {
-            LOGGER.error("Error while creating ProductImage", e);
+            log.error("Error while creating ProductImage", e);
             throw new ServiceRuntimeException("Error while creating image");
         }
     }
@@ -146,7 +147,7 @@ public class ProductImageApi {
             }
 
         } catch (Exception e) {
-            LOGGER.error("Error while deleting ProductImage", e);
+            log.error("Error while deleting ProductImage", e);
             try {
                 response.sendError(503, "Error while deleting ProductImage " + e.getMessage());
             } catch (Exception ignore) {
@@ -166,7 +167,7 @@ public class ProductImageApi {
             try {
                 productImageService.delete(productImage.get());
             } catch (ServiceException e) {
-                LOGGER.error("Error while deleting ProductImage", e);
+                log.error("Error while deleting ProductImage", e);
                 throw new ServiceRuntimeException("ProductImage [" + imageId + "] cannot be deleted", e);
 
             }
@@ -216,10 +217,10 @@ public class ProductImageApi {
                     + "] and merchant [" + merchantStore.getCode() + "]");
         }
 
-        List<ReadableImage> target = new ArrayList<ReadableImage>();
+        List<ReadableImage> target = new ArrayList<>();
 
         Set<ProductImage> images = p.getImages();
-        if (images != null && images.size() > 0) {
+        if (images != null && !images.isEmpty()) {
 
 
             target = images.stream().map(i -> image(i, merchantStore, language))
@@ -286,7 +287,7 @@ public class ProductImageApi {
 
 
         } catch (Exception e) {
-            LOGGER.error("Error while deleting ProductImage", e);
+            log.error("Error while deleting ProductImage", e);
             throw new ServiceRuntimeException("ProductImage [" + imageId + "] cannot be edited");
         }
     }

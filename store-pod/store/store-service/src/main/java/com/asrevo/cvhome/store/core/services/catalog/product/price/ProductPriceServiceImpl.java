@@ -16,7 +16,7 @@ import java.util.List;
 public class ProductPriceServiceImpl extends SalesManagerEntityServiceImpl<Long, ProductPrice>
         implements ProductPriceService {
 
-    private ProductPriceRepository productPriceRepository;
+    private final ProductPriceRepository productPriceRepository;
 
     @Autowired
     public ProductPriceServiceImpl(ProductPriceRepository productPriceRepository) {

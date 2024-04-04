@@ -9,9 +9,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONAware;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -25,10 +24,9 @@ import java.util.Map;
 @Table(name = "SM_TRANSACTION")
 @Getter
 @Setter
+@Slf4j
 public class Transaction extends SalesManagerEntity<Long, Transaction> implements Serializable, Auditable, JSONAware {
 
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(Transaction.class);
     /**
      *
      */
@@ -72,19 +70,20 @@ public class Transaction extends SalesManagerEntity<Long, Transaction> implement
     @Override
     public String toJSONString() {
 
-        if (this.getTransactionDetails() != null && this.getTransactionDetails().size() > 0) {
+        if (this.getTransactionDetails() != null && !this.getTransactionDetails().isEmpty()) {
             ObjectMapper mapper = new ObjectMapper();
             try {
                 return mapper.writeValueAsString(this.getTransactionDetails());
             } catch (Exception e) {
-                LOGGER.error("Cannot parse transactions map", e);
+                log.error("Cannot parse transactions map", e);
             }
 
         }
 
         return null;
     }
+
     public String getTransactionTypeName() {
-        return this.getTransactionType()!=null?this.getTransactionType().name():"";
+        return this.getTransactionType() != null ? this.getTransactionType().name() : "";
     }
 }

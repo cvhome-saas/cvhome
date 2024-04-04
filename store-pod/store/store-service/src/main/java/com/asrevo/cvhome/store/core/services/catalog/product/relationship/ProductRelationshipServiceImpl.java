@@ -19,7 +19,7 @@ public class ProductRelationshipServiceImpl extends
         ProductRelationshipService {
 
 
-    private ProductRelationshipRepository productRelationshipRepository;
+    private final ProductRelationshipRepository productRelationshipRepository;
 
     @Autowired
     public ProductRelationshipServiceImpl(

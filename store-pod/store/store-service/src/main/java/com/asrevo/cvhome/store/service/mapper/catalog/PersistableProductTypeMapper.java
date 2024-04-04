@@ -89,11 +89,7 @@ public class PersistableProductTypeMapper implements Mapper<PersistableProductTy
 
     private com.asrevo.cvhome.store.core.entity.catalog.product.type.ProductTypeDescription findAppropriateDescription(ProductType typeModel, String lang) {
         java.util.Optional<com.asrevo.cvhome.store.core.entity.catalog.product.type.ProductTypeDescription> d = typeModel.getDescriptions().stream().filter(t -> t.getLanguage().getCode().equals(lang)).findFirst();
-        if (d.isPresent()) {
-            return d.get();
-        } else {
-            return null;
-        }
+        return d.orElse(null);
     }
 
 }

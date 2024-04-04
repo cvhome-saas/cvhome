@@ -28,9 +28,8 @@ import com.asrevo.cvhome.store.core.services.catalog.product.ProductService;
 import com.asrevo.cvhome.store.core.services.customer.CustomerService;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
 import com.asrevo.cvhome.store.core.services.shoppingcart.ShoppingCartService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -46,9 +45,9 @@ import java.util.stream.Collectors;
 
 // @TODO ASHRAF
 @Service
+@Slf4j
 public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order> implements OrderService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(OrderServiceImpl.class);
 
     @Autowired
     private ShoppingCartService shoppingCartService;
@@ -109,7 +108,7 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
         try {
             return caculateShoppingCart(shoppingCart, customer, store, language);
         } catch (Exception e) {
-            LOGGER.error("Error while calculating shopping cart total" + e);
+            log.error("Error while calculating shopping cart total" + e);
             throw new ServiceException(e);
         }
 
@@ -172,7 +171,7 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
         try {
             return caculateShoppingCart(shoppingCart, null, store, language);
         } catch (Exception e) {
-            LOGGER.error("Error while calculating shopping cart total" + e);
+            log.error("Error while calculating shopping cart total" + e);
             throw new ServiceException(e);
         }
     }
@@ -192,11 +191,11 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
     public void saveOrUpdate(final Order order) throws ServiceException {
 
         if (order.getId() != null && order.getId() > 0) {
-            LOGGER.debug("Updating Order");
+            log.debug("Updating Order");
             super.update(order);
 
         } else {
-            LOGGER.debug("Creating Order");
+            log.debug("Creating Order");
             super.create(order);
 
         }
@@ -273,7 +272,7 @@ if(processTransaction!=null) {
         /**
          * decrement inventory
          */
-        LOGGER.debug("Update inventory");
+        log.debug("Update inventory");
         Set<OrderProduct> products = order.getOrderProducts();
         for (OrderProduct orderProduct : products) {
 //            Product p = productService.getById(orderProduct.getId());
@@ -284,7 +283,7 @@ if(processTransaction!=null) {
                 int qty = availability.getProductQuantity();
                 if (qty < orderProduct.getProductQuantity()) {
                     //throw new ServiceException(ServiceException.EXCEPTION_INVENTORY_MISMATCH);
-                    LOGGER.error("APP-BACKEND [" + ServiceException.EXCEPTION_INVENTORY_MISMATCH + "]");
+                    log.error("APP-BACKEND [" + ServiceException.EXCEPTION_INVENTORY_MISMATCH + "]");
                 }
                 qty = qty - orderProduct.getProductQuantity();
                 availability.setProductQuantity(qty);

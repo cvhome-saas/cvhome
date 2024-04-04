@@ -9,12 +9,12 @@ import java.io.Serializable;
 @Getter
 public class PaymentEntity implements Serializable {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	
-	private String paymentModule;//stripe|paypal|braintree|moneyorder ...
-	private String amount;
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
+
+    private String paymentModule;//stripe|paypal|braintree|moneyorder ...
+    private String amount;
 
 }

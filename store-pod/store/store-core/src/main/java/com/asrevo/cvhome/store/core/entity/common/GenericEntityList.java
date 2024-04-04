@@ -14,6 +14,6 @@ public class GenericEntityList<T> extends EntityList {
      */
     private static final long serialVersionUID = 1L;
 
-   private List<T> list;
+    private List<T> list;
 
 }

@@ -22,10 +22,9 @@ import com.asrevo.cvhome.store.core.services.catalog.pricing.PricingService;
 import com.asrevo.cvhome.store.core.services.shoppingcart.ShoppingCartCalculationService;
 import com.asrevo.cvhome.store.utils.AbstractDataPopulator;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.ConversionException;
 import org.apache.commons.collections.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
 import java.util.ArrayList;
@@ -40,9 +39,9 @@ import java.util.stream.Collectors;
  */
 
 @Deprecated
+@Slf4j
 public class ShoppingCartDataPopulator extends AbstractDataPopulator<ShoppingCart, ShoppingCartData> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ShoppingCartDataPopulator.class);
 
     private PricingService pricingService;
 
@@ -80,7 +79,6 @@ public class ShoppingCartDataPopulator extends AbstractDataPopulator<ShoppingCar
         this.pricingService = pricingService;
     }
 
-    ;
 
     @Override
     public ShoppingCartData populate(final ShoppingCart shoppingCart,
@@ -199,7 +197,7 @@ public class ShoppingCartDataPopulator extends AbstractDataPopulator<ShoppingCar
             cart.setQuantity(cartQuantity);
             cart.setId(shoppingCart.getId());
         } catch (ServiceException ex) {
-            LOG.error("Error while converting cart Model to cart Data.." + ex);
+            log.error("Error while converting cart Model to cart Data.." + ex);
             throw new ConversionException("Unable to create cart data", ex);
         }
         return cart;

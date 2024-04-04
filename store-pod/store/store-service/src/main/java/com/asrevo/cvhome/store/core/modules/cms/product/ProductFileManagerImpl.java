@@ -13,9 +13,8 @@ import com.asrevo.cvhome.store.utils.ProductImageCropUtils;
 import com.asrevo.cvhome.store.utils.ProductImageSizeUtils;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -27,9 +26,9 @@ import java.util.List;
 
 @Setter
 @Getter
+@Slf4j
 public class ProductFileManagerImpl extends ProductFileManager {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ProductFileManagerImpl.class);
     private final static String PRODUCT_IMAGE_HEIGHT_SIZE = "PRODUCT_IMAGE_HEIGHT_SIZE";
     private final static String PRODUCT_IMAGE_WIDTH_SIZE = "PRODUCT_IMAGE_WIDTH_SIZE";
     private final static String CROP_UPLOADED_IMAGES = "CROP_UPLOADED_IMAGES";
@@ -66,7 +65,7 @@ public class ProductFileManagerImpl extends ProductFileManager {
 
 
             if (bufferedImage == null) {
-                LOGGER.error("Cannot read image format for " + productImage.getProductImage());
+                log.error("Cannot read image format for " + productImage.getProductImage());
                 throw new Exception("Cannot read image format " + productImage.getProductImage());
             }
 
@@ -138,7 +137,7 @@ public class ProductFileManagerImpl extends ProductFileManager {
                     String sizeMsg =
                             "Image configuration set to an invalid value [PRODUCT_IMAGE_HEIGHT_SIZE] "
                                     + largeImageHeight + " , [PRODUCT_IMAGE_WIDTH_SIZE] " + largeImageWidth;
-                    LOGGER.error(sizeMsg);
+                    log.error(sizeMsg);
                     throw new ServiceException(sizeMsg);
                 }
 

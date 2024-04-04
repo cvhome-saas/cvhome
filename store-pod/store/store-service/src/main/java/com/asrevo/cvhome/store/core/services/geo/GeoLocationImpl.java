@@ -3,14 +3,15 @@ package com.asrevo.cvhome.store.core.services.geo;
 
 //import java.net.InetAddress;
 //
-//import org.slf4j.Logger;
-//import org.slf4j.LoggerFactory;
+//
+//
 //
 //import com.maxmind.geoip2.DatabaseReader;
 //import com.maxmind.geoip2.model.CityResponse;
 //import com.asrevo.cvhome.store.core.exception.ServiceException;
 
 import com.asrevo.cvhome.store.core.entity.common.Address;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 /**
@@ -20,12 +21,12 @@ import org.springframework.stereotype.Service;
  * @author c.samson
  */
 @Service
+@Slf4j
 public class GeoLocationImpl implements GeoLocation {
 
 //	private DatabaseReader reader = null;
-//	private static final Logger LOGGER = LoggerFactory.getLogger( GeoLocationImpl.class );
 
-
+    //@TODO ASHRAF
     @Override
     public Address getAddress(String ipAddress) throws Exception {
 

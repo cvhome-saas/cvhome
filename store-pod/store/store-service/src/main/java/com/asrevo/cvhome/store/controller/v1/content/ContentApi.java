@@ -26,8 +26,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -44,9 +45,9 @@ import java.util.Optional;
 @RestController
 @RequestMapping(value = "/api/v1")
 @Tag(name = "Content management resource (Content Management Api)")
+@Slf4j
 public class ContentApi {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ContentApi.class);
 
     private static final String DEFAULT_PATH = "/";
 

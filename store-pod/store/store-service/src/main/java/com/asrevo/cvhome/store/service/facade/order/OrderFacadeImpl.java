@@ -39,11 +39,10 @@ import com.asrevo.cvhome.store.service.populator.order.transaction.PersistablePa
 import com.asrevo.cvhome.store.utils.CoreConfiguration;
 import com.asrevo.cvhome.store.utils.LabelUtils;
 import com.asrevo.cvhome.store.utils.ProductPriceUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -53,9 +52,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service("orderFacade")
+@Slf4j
 public class OrderFacadeImpl implements OrderFacade {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(OrderFacadeImpl.class);
 
     @Autowired
     private ShoppingCartService shoppingCartService;
@@ -134,8 +133,8 @@ public class OrderFacadeImpl implements OrderFacade {
 
             modelOrder.setOrderProducts(orderProducts);
 
-            if (order.getAttributes() != null && order.getAttributes().size() > 0) {
-                Set<OrderAttribute> attrs = new HashSet<OrderAttribute>();
+            if (order.getAttributes() != null && !order.getAttributes().isEmpty()) {
+                Set<OrderAttribute> attrs = new HashSet<>();
                 for (OrderAttribute attribute : order.getAttributes()) {
                     OrderAttribute attr = new OrderAttribute();
                     attr.setKey(attribute.getKey());
@@ -231,7 +230,7 @@ public class OrderFacadeImpl implements OrderFacade {
                 cart.setOrderId(modelOrder.getId());
                 shoppingCartFacade.saveOrUpdateShoppingCart(cart);
             } catch (Exception e) {
-                LOGGER.error("Cannot delete cart " + cart.getId(), e);
+                log.error("Cannot delete cart " + cart.getId(), e);
             }
 
             //email management
@@ -243,7 +242,7 @@ public class OrderFacadeImpl implements OrderFacade {
 
 
                 } catch (Exception e) {
-                    LOGGER.error("Cannot send order confirmation email", e);
+                    log.error("Cannot send order confirmation email", e);
                 }
             }
 
@@ -284,9 +283,7 @@ public class OrderFacadeImpl implements OrderFacade {
         Optional<ReadableOrderTotal> grandTotal = readableTotals.stream().filter(tot -> tot.getCode().equals("order.total.total")).findFirst();
 
 
-        if (grandTotal.isPresent()) {
-            readableTotal.setGrandTotal(grandTotal.get().getText());
-        }
+        grandTotal.ifPresent(readableOrderTotal -> readableTotal.setGrandTotal(readableOrderTotal.getText()));
         orderConfirmation.setTotal(readableTotal);
 
 
@@ -303,7 +300,7 @@ public class OrderFacadeImpl implements OrderFacade {
                 String shippingName = messages.getMessage(optionCodeBuilder.toString(), new String[]{store.getStorename()}, languageService.toLocale(language, store));
                 orderConfirmation.setShipping(shippingName);
             } catch (Exception e) { // label not found
-                LOGGER.warn("No shipping code found for " + optionCodeBuilder.toString());
+                log.warn("No shipping code found for " + optionCodeBuilder);
             }
         }
 

@@ -7,7 +7,6 @@ import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.repositories.catalog.product.variant.PageableProductVariantGroupRepository;
 import com.asrevo.cvhome.store.core.repositories.catalog.product.variant.ProductVariantGroupRepository;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -20,14 +19,14 @@ import java.util.Optional;
 public class ProductVariantGroupServiceImpl extends SalesManagerEntityServiceImpl<Long, ProductVariantGroup> implements ProductVariantGroupService {
 
 
-    @Autowired
-    private PageableProductVariantGroupRepository pageableProductVariantGroupRepository;
+    private final PageableProductVariantGroupRepository pageableProductVariantGroupRepository;
 
-    private ProductVariantGroupRepository productVariantGroupRepository;
+    private final ProductVariantGroupRepository productVariantGroupRepository;
 
-    public ProductVariantGroupServiceImpl(ProductVariantGroupRepository repository) {
+    public ProductVariantGroupServiceImpl(ProductVariantGroupRepository repository, PageableProductVariantGroupRepository pageableProductVariantGroupRepository) {
         super(repository);
         this.productVariantGroupRepository = repository;
+        this.pageableProductVariantGroupRepository = pageableProductVariantGroupRepository;
     }
 
     @Override

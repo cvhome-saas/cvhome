@@ -32,10 +32,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -59,9 +60,9 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequestMapping("/api/v1")
 @Tag(name =
         "Product definition resource (Create udtate and delete product definition. Serves api v1 and v2 with backward compatibility)")
+@Slf4j
 public class ProductApi {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ProductApi.class);
     @Autowired
     private CategoryService categoryService;
     @Autowired
@@ -124,7 +125,7 @@ public class ProductApi {
             productCommonFacade.saveProduct(merchantStore, product,
                     merchantStore.getDefaultLanguage());
         } catch (Exception e) {
-            LOGGER.error("Error while updating product", e);
+            log.error("Error while updating product", e);
             try {
                 response.sendError(503, "Error while updating product " + e.getMessage());
             } catch (Exception ignore) {
@@ -231,7 +232,7 @@ public class ProductApi {
         if (category != null) {
             categoryIds.add(category);
         }
-        if (categoryIds.size() > 0) {
+        if (!categoryIds.isEmpty()) {
             criteria.setCategoryIds(categoryIds);
         }
         // End Category handling
@@ -277,7 +278,7 @@ public class ProductApi {
 
         } catch (Exception e) {
 
-            LOGGER.error("Error while filtering products product", e);
+            log.error("Error while filtering products product", e);
             try {
                 response.sendError(503, "Error while filtering products " + e.getMessage());
             } catch (Exception ignore) {
@@ -522,7 +523,7 @@ public class ProductApi {
             p.setSortOrder(position);
 
         } catch (Exception e) {
-            LOGGER.error("Error while updating Product position", e);
+            log.error("Error while updating Product position", e);
             throw new ServiceRuntimeException("Product [" + id + "] cannot be edited");
         }
     }

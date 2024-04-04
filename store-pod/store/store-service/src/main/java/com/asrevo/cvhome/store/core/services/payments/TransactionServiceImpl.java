@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 public class TransactionServiceImpl extends SalesManagerEntityServiceImpl<Long, Transaction> implements TransactionService {
 
 
-    private TransactionRepository transactionRepository;
+    private final TransactionRepository transactionRepository;
 
     @Autowired
     public TransactionServiceImpl(TransactionRepository transactionRepository) {

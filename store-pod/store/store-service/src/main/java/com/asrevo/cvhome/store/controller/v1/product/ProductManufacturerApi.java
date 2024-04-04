@@ -22,8 +22,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -41,9 +42,9 @@ import java.util.List;
 @Controller
 @RequestMapping("/api/v1")
 @Tag(name = "Manufacturer / Brand management resource (Manufacturer / Brand Management Api)")
+@Slf4j
 public class ProductManufacturerApi {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ProductManufacturerApi.class);
 
     @Autowired
     private ManufacturerService manufacturerService;
@@ -76,7 +77,7 @@ public class ProductManufacturerApi {
             return manufacturer;
 
         } catch (Exception e) {
-            LOGGER.error("Error while creating manufacturer", e);
+            log.error("Error while creating manufacturer", e);
             try {
                 response.sendError(503, "Error while creating manufacturer " + e.getMessage());
             } catch (Exception ignore) {
@@ -106,7 +107,7 @@ public class ProductManufacturerApi {
             return manufacturer;
 
         } catch (Exception e) {
-            LOGGER.error("Error while getting manufacturer", e);
+            log.error("Error while getting manufacturer", e);
             try {
                 response.sendError(503, "Error while getting manufacturer " + e.getMessage());
             } catch (Exception ignore) {
@@ -191,7 +192,7 @@ public class ProductManufacturerApi {
             manufacturer.setId(id);
             manufacturerFacade.saveOrUpdateManufacturer(manufacturer, merchantStore, language);
         } catch (Exception e) {
-            LOGGER.error("Error while creating manufacturer", e);
+            log.error("Error while creating manufacturer", e);
             try {
                 response.sendError(503, "Error while creating manufacturer " + e.getMessage());
             } catch (Exception ignore) {
@@ -219,7 +220,7 @@ public class ProductManufacturerApi {
             }
 
         } catch (Exception e) {
-            LOGGER.error("Error while deleting manufacturer id " + id, e);
+            log.error("Error while deleting manufacturer id " + id, e);
             try {
                 response.sendError(503, "Error while deleting manufacturer id " + id + " - " + e.getMessage());
             } catch (Exception ignore) {

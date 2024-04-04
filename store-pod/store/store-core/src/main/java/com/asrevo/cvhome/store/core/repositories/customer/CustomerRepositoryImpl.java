@@ -69,11 +69,11 @@ public class CustomerRepositoryImpl implements CustomerRepositoryCustom {
 
         //count query
         Query countQ = em.createQuery(
-                countBuilderSelect.toString() + countBuilderWhere.toString());
+                countBuilderSelect + countBuilderWhere.toString());
 
         //object query
         Query objectQ = em.createQuery(
-                objectBuilderSelect.toString() + objectBuilderWhere.toString());
+                objectBuilderSelect + objectBuilderWhere.toString());
 
         countQ.setParameter("mId", store.getId());
         objectQ.setParameter("mId", store.getId());

@@ -10,12 +10,11 @@ import com.asrevo.cvhome.store.core.entity.catalog.product.variant.ProductVarian
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.order.orderproduct.OrderProduct;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.BigDecimalValidator;
 import org.apache.commons.validator.routines.CurrencyValidator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
@@ -33,13 +32,13 @@ import java.util.stream.Collectors;
  * @author casams1
  */
 @Component("priceUtil")
+@Slf4j
 public class ProductPriceUtils {
 
     private final static char DECIMALCOUNT = '2';
     private final static char DECIMALPOINT = '.';
     private final static char THOUSANDPOINT = ',';
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ProductPriceUtils.class);
 
     /**
      * Get the price without discount
@@ -86,7 +85,7 @@ public class ProductPriceUtils {
 
         // attributes
         BigDecimal attributePrice = null;
-        if (attributes != null && attributes.size() > 0) {
+        if (attributes != null && !attributes.isEmpty()) {
             for (ProductAttribute attribute : attributes) {
                 if (attribute.getProductAttributePrice() != null
                         && attribute.getProductAttributePrice().doubleValue() > 0) {
@@ -135,7 +134,7 @@ public class ProductPriceUtils {
 
         // attributes
         BigDecimal attributePrice = null;
-        if (product.getAttributes() != null && product.getAttributes().size() > 0) {
+        if (product.getAttributes() != null && !product.getAttributes().isEmpty()) {
             for (ProductAttribute attribute : product.getAttributes()) {
                 if (attribute.isAttributeDefault()) {
                     if (attribute.getProductAttributePrice() != null
@@ -294,7 +293,7 @@ public class ProductPriceUtils {
             currency = store.getCurrency().getCurrency();
             locale = new Locale(store.getDefaultLanguage().getCode(), store.getCountry().getIsoCode());
         } catch (Exception e) {
-            LOGGER.error("Cannot create currency or locale instance for store " + store.getCode());
+            log.error("Cannot create currency or locale instance for store " + store.getCode());
         }
 
         NumberFormat currencyInstance = null;
@@ -534,8 +533,8 @@ public class ProductPriceUtils {
                     "No applicable inventory to calculate the price.");
         }
 
-        return new HashSet<ProductAvailability>(availabilities.stream()
-                .filter(a -> !CollectionUtils.isEmpty(a.getPrices())).collect(Collectors.toList()));
+        return availabilities.stream()
+                .filter(a -> !CollectionUtils.isEmpty(a.getPrices())).collect(Collectors.toSet());
     }
 
     private FinalPrice calculateFinalPrice(Product product) throws ServiceException {

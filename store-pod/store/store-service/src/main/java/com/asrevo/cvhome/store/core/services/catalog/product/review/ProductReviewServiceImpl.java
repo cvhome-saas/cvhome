@@ -21,16 +21,16 @@ public class ProductReviewServiceImpl extends
         ProductReviewService {
 
 
-    private ProductReviewRepository productReviewRepository;
+    private final ProductReviewRepository productReviewRepository;
 
-    @Autowired
-    private ProductService productService;
+    private final ProductService productService;
 
     @Autowired
     public ProductReviewServiceImpl(
-            ProductReviewRepository productReviewRepository) {
+            ProductReviewRepository productReviewRepository, ProductService productService) {
         super(productReviewRepository);
         this.productReviewRepository = productReviewRepository;
+        this.productService = productService;
     }
 
     @Override

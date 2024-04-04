@@ -25,22 +25,22 @@ import java.util.*;
 public class CategoryServiceImpl extends SalesManagerEntityServiceImpl<Long, Category> implements CategoryService {
 
 
-    private CategoryRepository categoryRepository;
+    private final CategoryRepository categoryRepository;
 
-    @Autowired
-    private ProductService productService;
+    private final ProductService productService;
 
-    @Autowired
-    private PageableCategoryRepository pageableCategoryRepository;
+    private final PageableCategoryRepository pageableCategoryRepository;
 
-    @Autowired
-    private CategoryDescriptionRepository categoryDescriptionRepository;
+    private final CategoryDescriptionRepository categoryDescriptionRepository;
 
 
     @Autowired
-    public CategoryServiceImpl(CategoryRepository categoryRepository) {
+    public CategoryServiceImpl(CategoryRepository categoryRepository, ProductService productService, PageableCategoryRepository pageableCategoryRepository, CategoryDescriptionRepository categoryDescriptionRepository) {
         super(categoryRepository);
         this.categoryRepository = categoryRepository;
+        this.productService = productService;
+        this.pageableCategoryRepository = pageableCategoryRepository;
+        this.categoryDescriptionRepository = categoryDescriptionRepository;
     }
 
     public void create(Category category) throws ServiceException {
@@ -259,7 +259,7 @@ public class CategoryServiceImpl extends SalesManagerEntityServiceImpl<Long, Cat
                         productService.update(dbProduct);
                     }
 
-                    if (product.getCategories() == null || product.getCategories().size() == 0) {
+                    if (product.getCategories() == null || product.getCategories().isEmpty()) {
                         productService.delete(dbProduct);
                     }
 
@@ -325,7 +325,7 @@ public class CategoryServiceImpl extends SalesManagerEntityServiceImpl<Long, Cat
             List<Category> subCategories = getListByLineage(child.getMerchantStore(), childLineage.toString());
 
             // ajust all sub categories lineages
-            if (subCategories != null && subCategories.size() > 0) {
+            if (subCategories != null && !subCategories.isEmpty()) {
                 for (Category subCategory : subCategories) {
                     if (!child.getId().equals(subCategory.getId())) {
                         addChild(child, subCategory);
