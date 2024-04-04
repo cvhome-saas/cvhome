@@ -61,17 +61,19 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @Slf4j
 public class ProductApi {
 
-    @Autowired
-    private CategoryService categoryService;
-    @Autowired
-    private ProductService productService;
-    @Autowired
-    private ProductFacade productFacade;
-    @Autowired
-    private ProductCommonFacade productCommonFacade;
-    @Autowired
-    @Qualifier("img")
-    private ImageFilePath imageUtils;
+    private final CategoryService categoryService;
+    private final ProductService productService;
+    private final ProductFacade productFacade;
+    private final ProductCommonFacade productCommonFacade;
+    private final ImageFilePath imageUtils;
+
+    public ProductApi(CategoryService categoryService, ProductService productService, ProductFacade productFacade, ProductCommonFacade productCommonFacade, @Qualifier("img") ImageFilePath imageUtils) {
+        this.categoryService = categoryService;
+        this.productService = productService;
+        this.productFacade = productFacade;
+        this.productCommonFacade = productCommonFacade;
+        this.imageUtils = imageUtils;
+    }
 
     /**
      * Create product

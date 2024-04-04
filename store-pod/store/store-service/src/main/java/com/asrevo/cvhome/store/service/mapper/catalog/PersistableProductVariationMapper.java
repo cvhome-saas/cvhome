@@ -17,11 +17,14 @@ import org.springframework.util.Assert;
 @Component
 public class PersistableProductVariationMapper implements Mapper<PersistableProductVariation, ProductVariation> {
 
-    @Autowired
-    private ProductOptionService productOptionService;
+    private final ProductOptionService productOptionService;
 
-    @Autowired
-    private ProductOptionValueService productOptionValueService;
+    private final ProductOptionValueService productOptionValueService;
+
+    public PersistableProductVariationMapper(ProductOptionService productOptionService, ProductOptionValueService productOptionValueService) {
+        this.productOptionService = productOptionService;
+        this.productOptionValueService = productOptionValueService;
+    }
 
     @Override
     public ProductVariation convert(PersistableProductVariation source, MerchantStore store, Language language) {

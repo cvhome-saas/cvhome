@@ -41,11 +41,14 @@ public class CategoryApi {
 
     private static final int DEFAULT_CATEGORY_DEPTH = 0;
 
-    @Autowired
-    private CategoryFacade categoryFacade;
+    private final CategoryFacade categoryFacade;
 
-    @Autowired
-    private UserFacade userFacade;
+    private final UserFacade userFacade;
+
+    public CategoryApi(CategoryFacade categoryFacade, UserFacade userFacade) {
+        this.categoryFacade = categoryFacade;
+        this.userFacade = userFacade;
+    }
 
     @GetMapping(value = "/private/category/{id}", produces = {APPLICATION_JSON_VALUE})
     @Operation(method = "GET", description = "Get category list for an given Category id", summary = "List current Category and child category")

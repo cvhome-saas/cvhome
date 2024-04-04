@@ -32,20 +32,23 @@ import java.util.List;
 public class ReferencesApi {
 
 
-    @Autowired
-    private StoreFacade storeFacade;
+    private final StoreFacade storeFacade;
 
-    @Autowired
-    private LanguageFacade languageFacade;
+    private final LanguageFacade languageFacade;
 
-    @Autowired
-    private CountryFacade countryFacade;
+    private final CountryFacade countryFacade;
 
-    @Autowired
-    private ZoneFacade zoneFacade;
+    private final ZoneFacade zoneFacade;
 
-    @Autowired
-    private CurrencyFacade currencyFacade;
+    private final CurrencyFacade currencyFacade;
+
+    public ReferencesApi(StoreFacade storeFacade, LanguageFacade languageFacade, CountryFacade countryFacade, ZoneFacade zoneFacade, CurrencyFacade currencyFacade) {
+        this.storeFacade = storeFacade;
+        this.languageFacade = languageFacade;
+        this.countryFacade = countryFacade;
+        this.zoneFacade = zoneFacade;
+        this.currencyFacade = currencyFacade;
+    }
 
     /**
      * Search languages by language code private/languages returns everything

@@ -38,10 +38,13 @@ import java.util.List;
 @Slf4j
 public class ProductGroupApi {
 
-    @Autowired
-    private ProductService productService;
-    @Autowired
-    private ProductItemsFacade productItemsFacade;
+    private final ProductService productService;
+    private final ProductItemsFacade productItemsFacade;
+
+    public ProductGroupApi(ProductService productService, ProductItemsFacade productItemsFacade) {
+        this.productService = productService;
+        this.productItemsFacade = productItemsFacade;
+    }
 
     @ResponseStatus(HttpStatus.OK)
     @PostMapping("/private/products/group")

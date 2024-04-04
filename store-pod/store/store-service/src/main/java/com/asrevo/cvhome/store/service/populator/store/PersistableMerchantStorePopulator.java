@@ -33,16 +33,19 @@ import java.util.List;
 @Setter
 public class PersistableMerchantStorePopulator extends AbstractDataPopulator<PersistableMerchantStore, MerchantStore> {
 
-    @Autowired
-    private CountryService countryService;
-    @Autowired
-    private ZoneService zoneService;
-    @Autowired
-    private LanguageService languageService;
-    @Autowired
-    private CurrencyService currencyService;
-    @Autowired
-    private MerchantStoreService merchantStoreService;
+    private final CountryService countryService;
+    private final ZoneService zoneService;
+    private final LanguageService languageService;
+    private final CurrencyService currencyService;
+    private final MerchantStoreService merchantStoreService;
+
+    public PersistableMerchantStorePopulator(CountryService countryService, ZoneService zoneService, LanguageService languageService, CurrencyService currencyService, MerchantStoreService merchantStoreService) {
+        this.countryService = countryService;
+        this.zoneService = zoneService;
+        this.languageService = languageService;
+        this.currencyService = currencyService;
+        this.merchantStoreService = merchantStoreService;
+    }
 
 
     @Override

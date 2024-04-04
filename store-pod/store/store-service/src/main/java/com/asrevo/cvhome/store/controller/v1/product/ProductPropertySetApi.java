@@ -31,8 +31,11 @@ import java.util.List;
 @Tag(name = "Product property set regroupment management resource (Product Options Set Management Api)")
 public class ProductPropertySetApi {
 
-    @Autowired
-    private ProductOptionSetFacade productOptionSetFacade;
+    private final ProductOptionSetFacade productOptionSetFacade;
+
+    public ProductPropertySetApi(ProductOptionSetFacade productOptionSetFacade) {
+        this.productOptionSetFacade = productOptionSetFacade;
+    }
 
     @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(value = {"/private/product/property/set"}, method = RequestMethod.POST)

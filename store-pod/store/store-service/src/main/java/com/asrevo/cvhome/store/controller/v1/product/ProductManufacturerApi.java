@@ -44,11 +44,14 @@ import java.util.List;
 public class ProductManufacturerApi {
 
 
-    @Autowired
-    private ManufacturerService manufacturerService;
+    private final ManufacturerService manufacturerService;
 
-    @Autowired
-    private ManufacturerFacade manufacturerFacade;
+    private final ManufacturerFacade manufacturerFacade;
+
+    public ProductManufacturerApi(ManufacturerService manufacturerService, ManufacturerFacade manufacturerFacade) {
+        this.manufacturerService = manufacturerService;
+        this.manufacturerFacade = manufacturerFacade;
+    }
 
     /**
      * Method for creating a manufacturer

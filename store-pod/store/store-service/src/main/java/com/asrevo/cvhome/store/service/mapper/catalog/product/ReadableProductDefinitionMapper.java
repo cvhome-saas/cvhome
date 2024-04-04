@@ -39,21 +39,23 @@ import java.util.stream.Collectors;
 @Component
 public class ReadableProductDefinitionMapper implements Mapper<Product, ReadableProductDefinition> {
 
-    @Autowired
-    private ReadableCategoryMapper readableCategoryMapper;
+    private final ReadableCategoryMapper readableCategoryMapper;
 
-    @Autowired
-    private ReadableProductTypeMapper readableProductTypeMapper;
+    private final ReadableProductTypeMapper readableProductTypeMapper;
 
-    @Autowired
-    private ReadableManufacturerMapper readableManufacturerMapper;
+    private final ReadableManufacturerMapper readableManufacturerMapper;
 
-    @Autowired
-    private ReadableInventoryMapper readableInventoryMapper;
+    private final ReadableInventoryMapper readableInventoryMapper;
 
-    @Autowired
-    @Qualifier("img")
-    private ImageFilePath imageUtils;
+    private final ImageFilePath imageUtils;
+
+    public ReadableProductDefinitionMapper(ReadableCategoryMapper readableCategoryMapper, ReadableProductTypeMapper readableProductTypeMapper, ReadableManufacturerMapper readableManufacturerMapper, ReadableInventoryMapper readableInventoryMapper, @Qualifier("img") ImageFilePath imageUtils) {
+        this.readableCategoryMapper = readableCategoryMapper;
+        this.readableProductTypeMapper = readableProductTypeMapper;
+        this.readableManufacturerMapper = readableManufacturerMapper;
+        this.readableInventoryMapper = readableInventoryMapper;
+        this.imageUtils = imageUtils;
+    }
 
     @Override
     public ReadableProductDefinition convert(Product source, MerchantStore store, Language language) {

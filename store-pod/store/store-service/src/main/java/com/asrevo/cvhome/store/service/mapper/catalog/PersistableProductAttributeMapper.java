@@ -24,14 +24,17 @@ import java.util.UUID;
 @Component
 public class PersistableProductAttributeMapper implements Mapper<PersistableProductAttribute, ProductAttribute> {
 
-    @Autowired
-    private ProductOptionService productOptionService;
-    @Autowired
-    private ProductOptionValueService productOptionValueService;
-    @Autowired
-    private ProductService productService;
-    @Autowired
-    private PersistableProductOptionValueMapper persistableProductOptionValueMapper;
+    private final ProductOptionService productOptionService;
+    private final ProductOptionValueService productOptionValueService;
+    private final ProductService productService;
+    private final PersistableProductOptionValueMapper persistableProductOptionValueMapper;
+
+    public PersistableProductAttributeMapper(ProductOptionService productOptionService, ProductOptionValueService productOptionValueService, ProductService productService, PersistableProductOptionValueMapper persistableProductOptionValueMapper) {
+        this.productOptionService = productOptionService;
+        this.productOptionValueService = productOptionValueService;
+        this.productService = productService;
+        this.persistableProductOptionValueMapper = persistableProductOptionValueMapper;
+    }
 
     @Override
     public ProductAttribute convert(PersistableProductAttribute source, MerchantStore store, Language language) {

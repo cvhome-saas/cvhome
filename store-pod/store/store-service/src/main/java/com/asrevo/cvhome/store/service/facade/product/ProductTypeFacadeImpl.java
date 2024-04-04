@@ -23,14 +23,17 @@ import java.util.stream.Collectors;
 @Service("productTypeFacade")
 public class ProductTypeFacadeImpl implements ProductTypeFacade {
 
-    @Autowired
-    private ProductTypeService productTypeService;
+    private final ProductTypeService productTypeService;
 
-    @Autowired
-    private ReadableProductTypeMapper readableProductTypeMapper;
+    private final ReadableProductTypeMapper readableProductTypeMapper;
 
-    @Autowired
-    private PersistableProductTypeMapper persistableProductTypeMapper;
+    private final PersistableProductTypeMapper persistableProductTypeMapper;
+
+    public ProductTypeFacadeImpl(ProductTypeService productTypeService, ReadableProductTypeMapper readableProductTypeMapper, PersistableProductTypeMapper persistableProductTypeMapper) {
+        this.productTypeService = productTypeService;
+        this.readableProductTypeMapper = readableProductTypeMapper;
+        this.persistableProductTypeMapper = persistableProductTypeMapper;
+    }
 
     @Override
     public ReadableProductTypeList getByMerchant(MerchantStore store, Language language, int count, int page) {

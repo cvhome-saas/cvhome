@@ -18,12 +18,14 @@ import java.util.Optional;
 public class ReadableCatalogCategoryEntryMapper implements Mapper<CatalogCategoryEntry, ReadableCatalogCategoryEntry> {
 
 
-    @Autowired
-    private ReadableCategoryMapper readableCategoryMapper;
+    private final ReadableCategoryMapper readableCategoryMapper;
 
-    @Autowired
-    @Qualifier("img")
-    private ImageFilePath imageUtils;
+    private final ImageFilePath imageUtils;
+
+    public ReadableCatalogCategoryEntryMapper(ReadableCategoryMapper readableCategoryMapper, @Qualifier("img") ImageFilePath imageUtils) {
+        this.readableCategoryMapper = readableCategoryMapper;
+        this.imageUtils = imageUtils;
+    }
 
     @Override
     public ReadableCatalogCategoryEntry convert(CatalogCategoryEntry source, MerchantStore store, Language language) {

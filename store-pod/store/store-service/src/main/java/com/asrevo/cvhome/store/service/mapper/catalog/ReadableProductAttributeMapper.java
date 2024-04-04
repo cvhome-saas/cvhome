@@ -16,14 +16,17 @@ import org.springframework.stereotype.Component;
 @Component
 public class ReadableProductAttributeMapper implements Mapper<ProductAttribute, ReadableProductAttributeEntity> {
 
-    @Autowired
-    private ReadableProductOptionMapper readableProductOptionMapper;
+    private final ReadableProductOptionMapper readableProductOptionMapper;
 
-    @Autowired
-    private ReadableProductOptionValueMapper readableProductOptionValueMapper;
+    private final ReadableProductOptionValueMapper readableProductOptionValueMapper;
 
-    @Autowired
-    private PricingService pricingService;
+    private final PricingService pricingService;
+
+    public ReadableProductAttributeMapper(ReadableProductOptionMapper readableProductOptionMapper, ReadableProductOptionValueMapper readableProductOptionValueMapper, PricingService pricingService) {
+        this.readableProductOptionMapper = readableProductOptionMapper;
+        this.readableProductOptionValueMapper = readableProductOptionValueMapper;
+        this.pricingService = pricingService;
+    }
 
 
     @Override

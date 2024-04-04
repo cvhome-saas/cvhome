@@ -28,13 +28,15 @@ import java.util.Set;
 @Component
 public class ReadableMinimalProductMapper implements Mapper<Product, ReadableMinimalProduct> {
 
-    @Autowired
-    private PricingService pricingService;
+    private final PricingService pricingService;
 
 
-    @Autowired
-    @Qualifier("img")
-    private ImageFilePath imageUtils;
+    private final ImageFilePath imageUtils;
+
+    public ReadableMinimalProductMapper(PricingService pricingService, @Qualifier("img") ImageFilePath imageUtils) {
+        this.pricingService = pricingService;
+        this.imageUtils = imageUtils;
+    }
 
     @Override
     public ReadableMinimalProduct convert(Product source, MerchantStore store, Language language) {

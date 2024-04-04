@@ -46,24 +46,27 @@ import java.util.stream.Collectors;
 public class PersistableProductMapper implements Mapper<PersistableProduct, Product> {
 
 
-    @Autowired
-    private PersistableProductAvailabilityMapper persistableProductAvailabilityMapper;
+    private final PersistableProductAvailabilityMapper persistableProductAvailabilityMapper;
 
-    @Autowired
-    private PersistableProductVariantMapper persistableProductVariantMapper;
+    private final PersistableProductVariantMapper persistableProductVariantMapper;
 
 
-    @Autowired
-    private CategoryService categoryService;
-    @Autowired
-    private LanguageService languageService;
+    private final CategoryService categoryService;
+    private final LanguageService languageService;
 
 
-    @Autowired
-    private ManufacturerService manufacturerService;
+    private final ManufacturerService manufacturerService;
 
-    @Autowired
-    private ProductTypeService productTypeService;
+    private final ProductTypeService productTypeService;
+
+    public PersistableProductMapper(PersistableProductAvailabilityMapper persistableProductAvailabilityMapper, PersistableProductVariantMapper persistableProductVariantMapper, CategoryService categoryService, LanguageService languageService, ManufacturerService manufacturerService, ProductTypeService productTypeService) {
+        this.persistableProductAvailabilityMapper = persistableProductAvailabilityMapper;
+        this.persistableProductVariantMapper = persistableProductVariantMapper;
+        this.categoryService = categoryService;
+        this.languageService = languageService;
+        this.manufacturerService = manufacturerService;
+        this.productTypeService = productTypeService;
+    }
 
     @Override
     public Product convert(PersistableProduct source, MerchantStore store, Language language) {

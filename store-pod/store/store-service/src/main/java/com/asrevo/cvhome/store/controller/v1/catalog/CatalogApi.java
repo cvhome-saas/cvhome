@@ -37,8 +37,11 @@ import java.util.Optional;
 public class CatalogApi {
 
 
-    @Autowired
-    private CatalogFacade catalogFacade;
+    private final CatalogFacade catalogFacade;
+
+    public CatalogApi(CatalogFacade catalogFacade) {
+        this.catalogFacade = catalogFacade;
+    }
 
 
     @GetMapping(value = "/private/catalogs")

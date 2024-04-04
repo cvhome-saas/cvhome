@@ -20,12 +20,15 @@ import java.util.*;
 @Component
 public class ReadableCatalogMapper implements Mapper<Catalog, ReadableCatalog> {
 
-    @Autowired
-    private StoreFacade storeFacade;
+    private final StoreFacade storeFacade;
 
 
-    @Autowired
-    private ReadableCategoryMapper readableCategoryMapper;
+    private final ReadableCategoryMapper readableCategoryMapper;
+
+    public ReadableCatalogMapper(StoreFacade storeFacade, ReadableCategoryMapper readableCategoryMapper) {
+        this.storeFacade = storeFacade;
+        this.readableCategoryMapper = readableCategoryMapper;
+    }
 
     @Override
     public ReadableCatalog convert(Catalog source, MerchantStore store, Language language) {

@@ -35,23 +35,26 @@ import static com.asrevo.cvhome.store.utils.ReadableEntityUtil.createReadableLis
 public class CatalogFacadeImpl implements CatalogFacade {
 
 
-    @Autowired
-    private CatalogService catalogService;
+    private final CatalogService catalogService;
 
-    @Autowired
-    private CatalogEntryService catalogEntryService;
+    private final CatalogEntryService catalogEntryService;
 
-    @Autowired
-    private PersistableCatalogMapper persistableCatalogMapper;
+    private final PersistableCatalogMapper persistableCatalogMapper;
 
-    @Autowired
-    private ReadableCatalogMapper readableCatalogMapper;
+    private final ReadableCatalogMapper readableCatalogMapper;
 
-    @Autowired
-    private Mapper<PersistableCatalogCategoryEntry, CatalogCategoryEntry> persistableCatalogEntryMapper;
+    private final Mapper<PersistableCatalogCategoryEntry, CatalogCategoryEntry> persistableCatalogEntryMapper;
 
-    @Autowired
-    private ReadableCatalogCategoryEntryMapper readableCatalogEntryMapper;
+    private final ReadableCatalogCategoryEntryMapper readableCatalogEntryMapper;
+
+    public CatalogFacadeImpl(CatalogService catalogService, CatalogEntryService catalogEntryService, PersistableCatalogMapper persistableCatalogMapper, ReadableCatalogMapper readableCatalogMapper, Mapper<PersistableCatalogCategoryEntry, CatalogCategoryEntry> persistableCatalogEntryMapper, ReadableCatalogCategoryEntryMapper readableCatalogEntryMapper) {
+        this.catalogService = catalogService;
+        this.catalogEntryService = catalogEntryService;
+        this.persistableCatalogMapper = persistableCatalogMapper;
+        this.readableCatalogMapper = readableCatalogMapper;
+        this.persistableCatalogEntryMapper = persistableCatalogEntryMapper;
+        this.readableCatalogEntryMapper = readableCatalogEntryMapper;
+    }
 
 
     @Override

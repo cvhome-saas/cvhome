@@ -46,27 +46,29 @@ import java.util.List;
 public class ProductCommonFacadeImpl implements ProductCommonFacade {
 
 
-    @Autowired
-    private LanguageService languageService;
+    private final LanguageService languageService;
 
-    @Autowired
-    private ProductService productService;
+    private final ProductService productService;
 
-    @Autowired
-    private PricingService pricingService;
+    private final PricingService pricingService;
 
-    @Autowired
-    private CustomerService customerService;
+    private final CustomerService customerService;
 
-    @Autowired
-    private ProductReviewService productReviewService;
+    private final ProductReviewService productReviewService;
 
-    @Autowired
-    private PersistableProductMapper persistableProductMapper;
+    private final PersistableProductMapper persistableProductMapper;
 
-    @Autowired
-    @Qualifier("img")
-    private ImageFilePath imageUtils;
+    private final ImageFilePath imageUtils;
+
+    public ProductCommonFacadeImpl(LanguageService languageService, ProductService productService, PricingService pricingService, CustomerService customerService, ProductReviewService productReviewService, PersistableProductMapper persistableProductMapper, @Qualifier("img") ImageFilePath imageUtils) {
+        this.languageService = languageService;
+        this.productService = productService;
+        this.pricingService = pricingService;
+        this.customerService = customerService;
+        this.productReviewService = productReviewService;
+        this.persistableProductMapper = persistableProductMapper;
+        this.imageUtils = imageUtils;
+    }
 
     @Override
     public Long saveProduct(MerchantStore store, PersistableProduct product, Language language) {

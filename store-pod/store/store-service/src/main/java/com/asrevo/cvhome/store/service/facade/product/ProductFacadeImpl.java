@@ -38,25 +38,27 @@ import java.util.stream.Collectors;
 //@Profile({"default", "cloud", "gcp", "aws", "mysql", "local"})
 public class ProductFacadeImpl implements ProductFacade {
 
-    @Autowired
-    private CategoryService categoryService;
+    private final CategoryService categoryService;
 
-    @Autowired
-    private ProductAttributeService productAttributeService;
+    private final ProductAttributeService productAttributeService;
 
-    @Autowired
-    private ProductService productService;
+    private final ProductService productService;
 
-    @Autowired
-    private PricingService pricingService;
+    private final PricingService pricingService;
 
-    @Autowired
-    private ProductRelationshipService productRelationshipService;
+    private final ProductRelationshipService productRelationshipService;
 
 
-    @Autowired
-    @Qualifier("img")
-    private ImageFilePath imageUtils;
+    private final ImageFilePath imageUtils;
+
+    public ProductFacadeImpl(CategoryService categoryService, ProductAttributeService productAttributeService, ProductService productService, PricingService pricingService, ProductRelationshipService productRelationshipService, @Qualifier("img") ImageFilePath imageUtils) {
+        this.categoryService = categoryService;
+        this.productAttributeService = productAttributeService;
+        this.productService = productService;
+        this.pricingService = pricingService;
+        this.productRelationshipService = productRelationshipService;
+        this.imageUtils = imageUtils;
+    }
 
     public void updateProduct(MerchantStore store, PersistableProduct product, Language language) {
 

@@ -39,24 +39,27 @@ import static com.asrevo.cvhome.store.utils.ReadableEntityUtil.createReadableLis
 public class ProductVariantFacadeImpl implements ProductVariantFacade {
 
 
-    @Autowired
-    private ReadableProductVariantMapper readableProductVariantMapper;
+    private final ReadableProductVariantMapper readableProductVariantMapper;
 
-    @Autowired
-    private PersistableProductVariantMapper persistableProductVariantMapper;
+    private final PersistableProductVariantMapper persistableProductVariantMapper;
 
-    @Autowired
-    private ProductVariantService productVariantService;
+    private final ProductVariantService productVariantService;
 
 
-    @Autowired
-    private ProductVariationService productVariationService;
+    private final ProductVariationService productVariationService;
 
-    @Autowired
-    private ProductFacade productFacade;
+    private final ProductFacade productFacade;
 
-    @Autowired
-    private ProductCommonFacade productCommonFacade;
+    private final ProductCommonFacade productCommonFacade;
+
+    public ProductVariantFacadeImpl(ReadableProductVariantMapper readableProductVariantMapper, PersistableProductVariantMapper persistableProductVariantMapper, ProductVariantService productVariantService, ProductVariationService productVariationService, ProductFacade productFacade, ProductCommonFacade productCommonFacade) {
+        this.readableProductVariantMapper = readableProductVariantMapper;
+        this.persistableProductVariantMapper = persistableProductVariantMapper;
+        this.productVariantService = productVariantService;
+        this.productVariationService = productVariationService;
+        this.productFacade = productFacade;
+        this.productCommonFacade = productCommonFacade;
+    }
 
     @Override
     public ReadableProductVariant get(Long instanceId, Long productId, MerchantStore store, Language language) {

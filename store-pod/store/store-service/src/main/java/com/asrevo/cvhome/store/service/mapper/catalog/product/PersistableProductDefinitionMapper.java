@@ -36,18 +36,21 @@ import java.util.*;
 @Component
 public class PersistableProductDefinitionMapper implements Mapper<PersistableProductDefinition, Product> {
 
-    @Autowired
-    private CategoryService categoryService;
-    @Autowired
-    private LanguageService languageService;
-    @Autowired
-    private PersistableProductAttributeMapper persistableProductAttributeMapper;
+    private final CategoryService categoryService;
+    private final LanguageService languageService;
+    private final PersistableProductAttributeMapper persistableProductAttributeMapper;
 
-    @Autowired
-    private ProductTypeService productTypeService;
+    private final ProductTypeService productTypeService;
 
-    @Autowired
-    private ManufacturerService manufacturerService;
+    private final ManufacturerService manufacturerService;
+
+    public PersistableProductDefinitionMapper(CategoryService categoryService, LanguageService languageService, PersistableProductAttributeMapper persistableProductAttributeMapper, ProductTypeService productTypeService, ManufacturerService manufacturerService) {
+        this.categoryService = categoryService;
+        this.languageService = languageService;
+        this.persistableProductAttributeMapper = persistableProductAttributeMapper;
+        this.productTypeService = productTypeService;
+        this.manufacturerService = manufacturerService;
+    }
 
     @Override
     public Product convert(PersistableProductDefinition source, MerchantStore store, Language language) {

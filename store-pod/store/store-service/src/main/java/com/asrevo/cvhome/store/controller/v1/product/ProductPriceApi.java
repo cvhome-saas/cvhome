@@ -34,8 +34,11 @@ import java.util.List;
 public class ProductPriceApi {
 
 
-    @Autowired
-    private ProductPriceFacade productPriceFacade;
+    private final ProductPriceFacade productPriceFacade;
+
+    public ProductPriceApi(ProductPriceFacade productPriceFacade) {
+        this.productPriceFacade = productPriceFacade;
+    }
 
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(value = {"/private/product/{sku}/inventory/{inventoryId}/price"},

@@ -30,8 +30,11 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Manage customer subscription to newsletter", description = "Manage customer subscription to newsletter")
 public class CustomerNewsletterApi {
 
-    @Autowired
-    private CustomerFacade customerFacade;
+    private final CustomerFacade customerFacade;
+
+    public CustomerNewsletterApi(CustomerFacade customerFacade) {
+        this.customerFacade = customerFacade;
+    }
 
 
     /**

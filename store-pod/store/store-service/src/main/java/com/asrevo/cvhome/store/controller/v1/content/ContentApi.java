@@ -52,12 +52,14 @@ public class ContentApi {
     private final static String BOX = "BOX";
     private final static String PAGE = "PAGE";
 
-    @Autowired
-    private ContentFacade contentFacade;
+    private final ContentFacade contentFacade;
 
-    @Autowired
-    @Qualifier("img")
-    private ImageFilePath imageUtils;
+    private final ImageFilePath imageUtils;
+
+    public ContentApi(ContentFacade contentFacade, @Qualifier("img") ImageFilePath imageUtils) {
+        this.contentFacade = contentFacade;
+        this.imageUtils = imageUtils;
+    }
 
     /**
      * List content pages

@@ -26,10 +26,13 @@ public class ShippingServiceImpl implements ShippingService {
     private final static String SHIPPING_MODULES = "SHIPPING";
     private final static String SHIPPING_DISTANCE = "shippingDistanceModule";
 
-    @Autowired
-    private CountryService countryService;
-    @Autowired
-    private MerchantConfigurationService merchantConfigurationService;
+    private final CountryService countryService;
+    private final MerchantConfigurationService merchantConfigurationService;
+
+    public ShippingServiceImpl(CountryService countryService, MerchantConfigurationService merchantConfigurationService) {
+        this.countryService = countryService;
+        this.merchantConfigurationService = merchantConfigurationService;
+    }
 
     @Override
     public List<Country> getShipToCountryList(MerchantStore store, Language language) throws ServiceException {

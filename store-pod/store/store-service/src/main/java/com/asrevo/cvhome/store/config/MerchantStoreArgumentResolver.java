@@ -26,11 +26,14 @@ import static com.asrevo.cvhome.store.core.constants.Constants.DEFAULT_STORE;
 public class MerchantStoreArgumentResolver implements HandlerMethodArgumentResolver {
 
     public static final String REQUEST_PARAMETER_STORE = "store";
-    @Autowired
-    private StoreFacade storeFacade;
+    private final StoreFacade storeFacade;
 
-    @Autowired
-    private AccessEvaluator accessEvaluator;
+    private final AccessEvaluator accessEvaluator;
+
+    public MerchantStoreArgumentResolver(StoreFacade storeFacade, AccessEvaluator accessEvaluator) {
+        this.storeFacade = storeFacade;
+        this.accessEvaluator = accessEvaluator;
+    }
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {

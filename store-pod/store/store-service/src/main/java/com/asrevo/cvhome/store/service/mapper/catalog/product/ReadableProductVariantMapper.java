@@ -31,15 +31,17 @@ import java.util.stream.Collectors;
 public class ReadableProductVariantMapper implements Mapper<ProductVariant, ReadableProductVariant> {
 
 
-    @Autowired
-    private ReadableProductVariationMapper readableProductVariationMapper;
+    private final ReadableProductVariationMapper readableProductVariationMapper;
 
-    @Autowired
-    private ReadableInventoryMapper readableInventoryMapper;
+    private final ReadableInventoryMapper readableInventoryMapper;
 
-    @Autowired
-    @Qualifier("img")
-    private ImageFilePath imagUtils;
+    private final ImageFilePath imagUtils;
+
+    public ReadableProductVariantMapper(ReadableProductVariationMapper readableProductVariationMapper, ReadableInventoryMapper readableInventoryMapper, @Qualifier("img") ImageFilePath imagUtils) {
+        this.readableProductVariationMapper = readableProductVariationMapper;
+        this.readableInventoryMapper = readableInventoryMapper;
+        this.imagUtils = imagUtils;
+    }
 
     @Override
     public ReadableProductVariant convert(ProductVariant source, MerchantStore store, Language language) {

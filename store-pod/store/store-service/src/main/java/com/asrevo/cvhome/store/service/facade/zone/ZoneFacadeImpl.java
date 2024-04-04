@@ -20,8 +20,11 @@ import java.util.stream.Collectors;
 @Service
 public class ZoneFacadeImpl implements ZoneFacade {
 
-    @Autowired
-    private ZoneService zoneService;
+    private final ZoneService zoneService;
+
+    public ZoneFacadeImpl(ZoneService zoneService) {
+        this.zoneService = zoneService;
+    }
 
     @Override
     public List<ReadableZone> getZones(String countryCode, Language language, MerchantStore merchantStore) {

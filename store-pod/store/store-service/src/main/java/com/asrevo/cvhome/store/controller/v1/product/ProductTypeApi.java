@@ -37,8 +37,11 @@ import java.util.List;
 @Slf4j
 public class ProductTypeApi {
 
-    @Autowired
-    private ProductTypeFacade productTypeFacade;
+    private final ProductTypeFacade productTypeFacade;
+
+    public ProductTypeApi(ProductTypeFacade productTypeFacade) {
+        this.productTypeFacade = productTypeFacade;
+    }
 
     @GetMapping(value = "/private/product/types", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(method = "GET", description = "Get product types list", summary = "", responses = @ApiResponse(content = @Content(schema = @Schema(implementation = List.class))))

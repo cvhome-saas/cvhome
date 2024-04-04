@@ -30,16 +30,17 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
 
 
     private final ContentRepository contentRepository;
-    @Autowired
+    final
     StaticContentFileManager contentFileManager;
-    @Autowired
-    private PageContentRepository pageContentRepository;
+    private final PageContentRepository pageContentRepository;
 
     @Autowired
-    public ContentServiceImpl(ContentRepository contentRepository) {
+    public ContentServiceImpl(ContentRepository contentRepository, StaticContentFileManager contentFileManager, PageContentRepository pageContentRepository) {
         super(contentRepository);
 
         this.contentRepository = contentRepository;
+        this.contentFileManager = contentFileManager;
+        this.pageContentRepository = pageContentRepository;
     }
 
     @Override

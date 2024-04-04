@@ -63,17 +63,19 @@ import java.util.Set;
 public class ProductVariationApi {
 
 
-    @Autowired
-    private PricingService pricingService;
-    @Autowired
-    private ProductService productService;
-    @Autowired
-    private CategoryFacade categoryFacade;
-    @Autowired
-    private ProductVariationFacade productVariationFacade;
-    @Autowired
-    @Qualifier("img")
-    private ImageFilePath imageUtils;
+    private final PricingService pricingService;
+    private final ProductService productService;
+    private final CategoryFacade categoryFacade;
+    private final ProductVariationFacade productVariationFacade;
+    private final ImageFilePath imageUtils;
+
+    public ProductVariationApi(PricingService pricingService, ProductService productService, CategoryFacade categoryFacade, ProductVariationFacade productVariationFacade, @Qualifier("img") ImageFilePath imageUtils) {
+        this.pricingService = pricingService;
+        this.productService = productService;
+        this.categoryFacade = categoryFacade;
+        this.productVariationFacade = productVariationFacade;
+        this.imageUtils = imageUtils;
+    }
 
     /**
      * Calculates the price based on selected options if any

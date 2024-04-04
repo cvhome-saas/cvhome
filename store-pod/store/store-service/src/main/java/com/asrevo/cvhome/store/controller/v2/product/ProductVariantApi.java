@@ -46,11 +46,14 @@ import java.util.stream.Stream;
 public class ProductVariantApi {
 
 
-    @Autowired
-    private ProductVariantFacade productVariantFacade;
+    private final ProductVariantFacade productVariantFacade;
 
-    @Autowired
-    private UserFacade userFacade;
+    private final UserFacade userFacade;
+
+    public ProductVariantApi(ProductVariantFacade productVariantFacade, UserFacade userFacade) {
+        this.productVariantFacade = productVariantFacade;
+        this.userFacade = userFacade;
+    }
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(value = {"/private/product/{productId}/variant"})

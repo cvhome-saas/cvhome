@@ -37,23 +37,26 @@ import static com.asrevo.cvhome.store.utils.ReadableEntityUtil.createReadableLis
 @Component
 public class ProductVariantGroupFacadeImpl implements ProductVariantGroupFacade {
 
-    @Autowired
-    private ProductVariantGroupService productVariantGroupService;
+    private final ProductVariantGroupService productVariantGroupService;
 
-    @Autowired
-    private ProductVariantService productVariantService;
+    private final ProductVariantService productVariantService;
 
-    @Autowired
-    private ProductVariantImageService productVariantImageService;
+    private final ProductVariantImageService productVariantImageService;
 
-    @Autowired
-    private PersistableProductVariantGroupMapper persistableProductIntanceGroupMapper;
+    private final PersistableProductVariantGroupMapper persistableProductIntanceGroupMapper;
 
-    @Autowired
-    private ReadableProductVariantGroupMapper readableProductVariantGroupMapper;
+    private final ReadableProductVariantGroupMapper readableProductVariantGroupMapper;
 
-    @Autowired
-    private ContentService contentService; //file management
+    private final ContentService contentService; //file management
+
+    public ProductVariantGroupFacadeImpl(ProductVariantGroupService productVariantGroupService, ProductVariantService productVariantService, ProductVariantImageService productVariantImageService, PersistableProductVariantGroupMapper persistableProductIntanceGroupMapper, ReadableProductVariantGroupMapper readableProductVariantGroupMapper, ContentService contentService) {
+        this.productVariantGroupService = productVariantGroupService;
+        this.productVariantService = productVariantService;
+        this.productVariantImageService = productVariantImageService;
+        this.persistableProductIntanceGroupMapper = persistableProductIntanceGroupMapper;
+        this.readableProductVariantGroupMapper = readableProductVariantGroupMapper;
+        this.contentService = contentService;
+    }
 
     @Override
     public ReadableProductVariantGroup get(Long instanceGroupId, MerchantStore store, Language language) {

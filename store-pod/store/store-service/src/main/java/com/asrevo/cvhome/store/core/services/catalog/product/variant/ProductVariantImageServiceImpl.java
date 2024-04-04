@@ -14,10 +14,9 @@ import java.util.List;
 @Service("productVariantImageService")
 public class ProductVariantImageServiceImpl extends SalesManagerEntityServiceImpl<Long, ProductVariantImage> implements ProductVariantImageService {
 
-    @Autowired
-    private ProductVariantImageRepository productVariantImageRepository;
+    private final ProductVariantImageRepository productVariantImageRepository;
 
-    public ProductVariantImageServiceImpl(ProductVariantImageRepository productVariantImageRepository) {
+    public ProductVariantImageServiceImpl( ProductVariantImageRepository productVariantImageRepository) {
         super(productVariantImageRepository);
         this.productVariantImageRepository = productVariantImageRepository;
     }

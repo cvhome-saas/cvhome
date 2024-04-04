@@ -35,11 +35,14 @@ import java.util.stream.Stream;
 @Tags(value = @Tag(name = "Product instances group api"))
 public class ProductVariantGroupApi {
 
-    @Autowired
-    private ProductVariantGroupFacade productVariantGroupFacade;
+    private final ProductVariantGroupFacade productVariantGroupFacade;
 
-    @Autowired
-    private UserFacade userFacade;
+    private final UserFacade userFacade;
+
+    public ProductVariantGroupApi(ProductVariantGroupFacade productVariantGroupFacade, UserFacade userFacade) {
+        this.productVariantGroupFacade = productVariantGroupFacade;
+        this.userFacade = userFacade;
+    }
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(value = {"/private/product/productVariantGroup"})

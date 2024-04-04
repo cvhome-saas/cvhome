@@ -24,8 +24,11 @@ import java.util.stream.Collectors;
 public class ShippingFacadeImpl implements ShippingFacade {
 
 
-    @Autowired
-    ShippingService shippingService;
+    final ShippingService shippingService;
+
+    public ShippingFacadeImpl(ShippingService shippingService) {
+        this.shippingService = shippingService;
+    }
 
 
     @Override

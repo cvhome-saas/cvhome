@@ -10,8 +10,11 @@ import java.util.List;
 
 @Service
 public class OrderStatusHistoryServiceImpl implements OrderStatusHistoryService {
-    @Autowired
-    private OrderStatusHistoryRepository orderStatusHistoryRepository;
+    private final OrderStatusHistoryRepository orderStatusHistoryRepository;
+
+    public OrderStatusHistoryServiceImpl(OrderStatusHistoryRepository orderStatusHistoryRepository) {
+        this.orderStatusHistoryRepository = orderStatusHistoryRepository;
+    }
 
     @Override
     public List<OrderStatusHistory> findByOrder(Order order) {

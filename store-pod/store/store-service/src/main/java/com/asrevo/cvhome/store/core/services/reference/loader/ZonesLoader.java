@@ -31,12 +31,15 @@ public class ZonesLoader {
 
     private static final String PATH = "classpath:/reference/zones/*.json";
     private static final String ALL_REGIONS = "*";
-    @Autowired
-    private LanguageService languageService;
-    @Autowired
-    private CountryService countryService;
-    @Autowired
-    private ResourcePatternResolver resourceResolver;
+    private final LanguageService languageService;
+    private final CountryService countryService;
+    private final ResourcePatternResolver resourceResolver;
+
+    public ZonesLoader(LanguageService languageService, CountryService countryService, ResourcePatternResolver resourceResolver) {
+        this.languageService = languageService;
+        this.countryService = countryService;
+        this.resourceResolver = resourceResolver;
+    }
 
     //
     @SuppressWarnings({"rawtypes", "unchecked"})

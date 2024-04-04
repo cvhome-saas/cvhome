@@ -17,17 +17,20 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class InitializationLoader {
 
-    @Autowired
-    protected MerchantStoreService merchantService;
+    protected final MerchantStoreService merchantService;
     @Value("${db.init.data:false}")
     private boolean initDefaultData;
-    @Autowired
-    private MerchantConfigurationService merchantConfigurationService;
+    private final MerchantConfigurationService merchantConfigurationService;
 
     //@Autowired
     //private InitData initData;
-    @Autowired
-    private InitializationDatabase initializationDatabase;
+    private final InitializationDatabase initializationDatabase;
+
+    public InitializationLoader(MerchantStoreService merchantService, MerchantConfigurationService merchantConfigurationService, InitializationDatabase initializationDatabase) {
+        this.merchantService = merchantService;
+        this.merchantConfigurationService = merchantConfigurationService;
+        this.initializationDatabase = initializationDatabase;
+    }
 
     @PostConstruct
     public void init() {

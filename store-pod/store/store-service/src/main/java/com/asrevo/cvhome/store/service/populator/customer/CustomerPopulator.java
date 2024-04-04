@@ -34,16 +34,19 @@ import java.util.Map;
 public class CustomerPopulator extends
         AbstractDataPopulator<PersistableCustomer, Customer> {
 
-    @Autowired
-    private CountryService countryService;
-    @Autowired
-    private ZoneService zoneService;
-    @Autowired
-    private LanguageService languageService;
-    @Autowired
-    private CustomerOptionService customerOptionService;
-    @Autowired
-    private CustomerOptionValueService customerOptionValueService;
+    private final CountryService countryService;
+    private final ZoneService zoneService;
+    private final LanguageService languageService;
+    private final CustomerOptionService customerOptionService;
+    private final CustomerOptionValueService customerOptionValueService;
+
+    public CustomerPopulator(CountryService countryService, ZoneService zoneService, LanguageService languageService, CustomerOptionService customerOptionService, CustomerOptionValueService customerOptionValueService) {
+        this.countryService = countryService;
+        this.zoneService = zoneService;
+        this.languageService = languageService;
+        this.customerOptionService = customerOptionService;
+        this.customerOptionValueService = customerOptionValueService;
+    }
 
 
     /**

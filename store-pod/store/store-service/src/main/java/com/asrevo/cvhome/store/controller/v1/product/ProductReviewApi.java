@@ -30,12 +30,15 @@ import java.util.List;
 @Slf4j
 public class ProductReviewApi {
 
-    @Autowired
-    private ProductCommonFacade productCommonFacade;
-    @Autowired
-    private ProductService productService;
-    @Autowired
-    private ProductReviewService productReviewService;
+    private final ProductCommonFacade productCommonFacade;
+    private final ProductService productService;
+    private final ProductReviewService productReviewService;
+
+    public ProductReviewApi(ProductCommonFacade productCommonFacade, ProductService productService, ProductReviewService productReviewService) {
+        this.productCommonFacade = productCommonFacade;
+        this.productService = productService;
+        this.productReviewService = productReviewService;
+    }
 
     @RequestMapping(
             value = {

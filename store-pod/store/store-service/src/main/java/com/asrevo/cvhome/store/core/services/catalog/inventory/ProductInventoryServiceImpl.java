@@ -21,8 +21,11 @@ import java.util.Set;
 public class ProductInventoryServiceImpl implements ProductInventoryService {
 
 
-    @Autowired
-    private PricingService pricingService;
+    private final PricingService pricingService;
+
+    public ProductInventoryServiceImpl(PricingService pricingService) {
+        this.pricingService = pricingService;
+    }
 
     @Override
     public ProductInventory inventory(Product product) throws ServiceException {

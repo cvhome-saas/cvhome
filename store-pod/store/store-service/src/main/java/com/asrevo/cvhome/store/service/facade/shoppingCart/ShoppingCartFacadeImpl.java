@@ -56,28 +56,30 @@ import java.util.*;
 public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
 
 
-    @Autowired
-    private ShoppingCartService shoppingCartService;
+    private final ShoppingCartService shoppingCartService;
 
-    @Autowired
-    private ShoppingCartCalculationService shoppingCartCalculationService;
+    private final ShoppingCartCalculationService shoppingCartCalculationService;
 
 
-    @Autowired
-    private ProductService productService;
+    private final ProductService productService;
 
-    @Autowired
-    private PricingService pricingService;
+    private final PricingService pricingService;
 
-    @Autowired
-    private ProductAttributeService productAttributeService;
+    private final ProductAttributeService productAttributeService;
 
-    @Autowired
-    @Qualifier("img")
-    private ImageFilePath imageUtils;
+    private final ImageFilePath imageUtils;
 
-    @Autowired
-    private ReadableShoppingCartMapper readableShoppingCartMapper;
+    private final ReadableShoppingCartMapper readableShoppingCartMapper;
+
+    public ShoppingCartFacadeImpl(ShoppingCartService shoppingCartService, ShoppingCartCalculationService shoppingCartCalculationService, ProductService productService, PricingService pricingService, ProductAttributeService productAttributeService, @Qualifier("img") ImageFilePath imageUtils, ReadableShoppingCartMapper readableShoppingCartMapper) {
+        this.shoppingCartService = shoppingCartService;
+        this.shoppingCartCalculationService = shoppingCartCalculationService;
+        this.productService = productService;
+        this.pricingService = pricingService;
+        this.productAttributeService = productAttributeService;
+        this.imageUtils = imageUtils;
+        this.readableShoppingCartMapper = readableShoppingCartMapper;
+    }
 
     public void deleteShoppingCart(final Long id, final MerchantStore store) throws Exception {
         ShoppingCart cart = shoppingCartService.getById(id, store);

@@ -34,21 +34,24 @@ import java.util.List;
 @Slf4j
 public class OrderTotalApi {
 
-    @Autowired
-    private ShoppingCartFacade shoppingCartFacade;
+    private final ShoppingCartFacade shoppingCartFacade;
 
-    @Autowired
-    private LabelUtils messages;
+    private final LabelUtils messages;
 
-    @Autowired
-    private PricingService pricingService;
+    private final PricingService pricingService;
 
 
-    @Autowired
-    private ShippingQuoteService shippingQuoteService;
+    private final ShippingQuoteService shippingQuoteService;
 
-    @Autowired
-    private OrderService orderService;
+    private final OrderService orderService;
+
+    public OrderTotalApi(ShoppingCartFacade shoppingCartFacade, LabelUtils messages, PricingService pricingService, ShippingQuoteService shippingQuoteService, OrderService orderService) {
+        this.shoppingCartFacade = shoppingCartFacade;
+        this.messages = messages;
+        this.pricingService = pricingService;
+        this.shippingQuoteService = shippingQuoteService;
+        this.orderService = orderService;
+    }
 
 
     /**

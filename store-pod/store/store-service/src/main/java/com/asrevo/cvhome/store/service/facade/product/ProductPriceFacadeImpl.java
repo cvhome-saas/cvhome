@@ -27,18 +27,21 @@ import static com.asrevo.cvhome.store.utils.NumberUtils.isPositive;
 public class ProductPriceFacadeImpl implements ProductPriceFacade {
 
 
-    @Autowired
-    private ProductPriceService productPriceService;
+    private final ProductPriceService productPriceService;
 
-    @Autowired
-    private PricingService pricingService;
+    private final PricingService pricingService;
 
-    @Autowired
-    private ProductAvailabilityService productAvailabilityService;
+    private final ProductAvailabilityService productAvailabilityService;
 
 
-    @Autowired
-    private PersistableProductPriceMapper persistableProductPriceMapper;
+    private final PersistableProductPriceMapper persistableProductPriceMapper;
+
+    public ProductPriceFacadeImpl(ProductPriceService productPriceService, PricingService pricingService, ProductAvailabilityService productAvailabilityService, PersistableProductPriceMapper persistableProductPriceMapper) {
+        this.productPriceService = productPriceService;
+        this.pricingService = pricingService;
+        this.productAvailabilityService = productAvailabilityService;
+        this.persistableProductPriceMapper = persistableProductPriceMapper;
+    }
 
     @Override
     public Long save(PersistableProductPrice price, MerchantStore store) {

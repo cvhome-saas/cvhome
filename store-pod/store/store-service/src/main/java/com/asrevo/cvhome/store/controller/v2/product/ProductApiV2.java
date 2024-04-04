@@ -54,14 +54,17 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class ProductApiV2 {
 
 
-    @Autowired
-    private ProductDefinitionFacade productDefinitionFacade;
-    @Autowired
-    private ProductFacade productFacadeV2;
-    @Autowired
-    private ProductCommonFacade productCommonFacade;
-    @Autowired
-    private CategoryFacade categoryFacade;
+    private final ProductDefinitionFacade productDefinitionFacade;
+    private final ProductFacade productFacadeV2;
+    private final ProductCommonFacade productCommonFacade;
+    private final CategoryFacade categoryFacade;
+
+    public ProductApiV2(ProductDefinitionFacade productDefinitionFacade, ProductFacade productFacadeV2, ProductCommonFacade productCommonFacade, CategoryFacade categoryFacade) {
+        this.productDefinitionFacade = productDefinitionFacade;
+        this.productFacadeV2 = productFacadeV2;
+        this.productCommonFacade = productCommonFacade;
+        this.categoryFacade = categoryFacade;
+    }
 
     /**
      * Create product inventory with variants, quantity and prices

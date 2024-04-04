@@ -44,36 +44,38 @@ import java.util.stream.Collectors;
 public class ProductFacadeV2Impl implements ProductFacade {
 
 
-    @Autowired
-    private ProductService productService;
+    private final ProductService productService;
 
-    @Autowired
-    private CategoryService categoryService;
+    private final CategoryService categoryService;
 
-    @Autowired
-    private ProductRelationshipService productRelationshipService;
+    private final ProductRelationshipService productRelationshipService;
 
-    @Autowired
-    private ReadableProductMapper readableProductMapper;
+    private final ReadableProductMapper readableProductMapper;
 
-    @Autowired
-    private ProductVariantService productVariantService;
+    private final ProductVariantService productVariantService;
 
-    @Autowired
-    private ReadableProductVariantMapper readableProductVariantMapper;
+    private final ReadableProductVariantMapper readableProductVariantMapper;
 
-    @Autowired
-    private ProductAvailabilityService productAvailabilityService;
+    private final ProductAvailabilityService productAvailabilityService;
 
-    @Autowired
-    private ProductAttributeService productAttributeService;
+    private final ProductAttributeService productAttributeService;
 
-    @Autowired
-    private PricingService pricingService;
+    private final PricingService pricingService;
 
-    @Autowired
-    @Qualifier("img")
-    private ImageFilePath imageUtils;
+    private final ImageFilePath imageUtils;
+
+    public ProductFacadeV2Impl(ProductService productService, CategoryService categoryService, ProductRelationshipService productRelationshipService, ReadableProductMapper readableProductMapper, ProductVariantService productVariantService, ReadableProductVariantMapper readableProductVariantMapper, ProductAvailabilityService productAvailabilityService, ProductAttributeService productAttributeService, PricingService pricingService, @Qualifier("img") ImageFilePath imageUtils) {
+        this.productService = productService;
+        this.categoryService = categoryService;
+        this.productRelationshipService = productRelationshipService;
+        this.readableProductMapper = readableProductMapper;
+        this.productVariantService = productVariantService;
+        this.readableProductVariantMapper = readableProductVariantMapper;
+        this.productAvailabilityService = productAvailabilityService;
+        this.productAttributeService = productAttributeService;
+        this.pricingService = pricingService;
+        this.imageUtils = imageUtils;
+    }
 
 
     @Override

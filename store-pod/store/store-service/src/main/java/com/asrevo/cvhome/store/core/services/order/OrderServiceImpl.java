@@ -49,15 +49,15 @@ import java.util.stream.Collectors;
 public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order> implements OrderService {
 
 
-    @Autowired
-    private ShoppingCartService shoppingCartService;
-    @Autowired
-    private ProductService productService;
-    @Autowired
-    private CustomerService customerService;
+    private final ShoppingCartService shoppingCartService;
+    private final ProductService productService;
+    private final CustomerService customerService;
 
-    public OrderServiceImpl(OrderRepository repository) {
+    public OrderServiceImpl(OrderRepository repository, ShoppingCartService shoppingCartService, ProductService productService, CustomerService customerService) {
         super(repository);
+        this.shoppingCartService = shoppingCartService;
+        this.productService = productService;
+        this.customerService = customerService;
     }
 
 

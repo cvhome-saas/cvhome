@@ -19,8 +19,11 @@ import java.util.stream.Collectors;
 @Service
 public class CountryFacadeImpl implements CountryFacade {
 
-    @Autowired
-    private CountryService countryService;
+    private final CountryService countryService;
+
+    public CountryFacadeImpl(CountryService countryService) {
+        this.countryService = countryService;
+    }
 
     @Override
     public List<ReadableCountry> getListCountryZones(Language language, MerchantStore merchantStore) {

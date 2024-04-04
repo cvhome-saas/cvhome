@@ -24,11 +24,14 @@ import static com.asrevo.cvhome.store.core.constants.Constants.*;
 public class MerchantConfigurationFacadeImpl implements MerchantConfigurationFacade {
 
 
-    @Autowired
-    private MerchantConfigurationService merchantConfigurationService;
+    private final MerchantConfigurationService merchantConfigurationService;
 
     @Value("${config.displayShipping:false}")
     private String displayShipping;
+
+    public MerchantConfigurationFacadeImpl(MerchantConfigurationService merchantConfigurationService) {
+        this.merchantConfigurationService = merchantConfigurationService;
+    }
 
     @Override
     public Configs getMerchantConfig(MerchantStore merchantStore, Language language) {

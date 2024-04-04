@@ -23,12 +23,14 @@ import java.util.stream.Collectors;
 public class ReadableProductVariantGroupMapper implements Mapper<ProductVariantGroup, ReadableProductVariantGroup> {
 
 
-    @Autowired
-    private ReadableProductVariantMapper readableProductVariantMapper;
+    private final ReadableProductVariantMapper readableProductVariantMapper;
 
-    @Autowired
-    @Qualifier("img")
-    private ImageFilePath imageUtils;
+    private final ImageFilePath imageUtils;
+
+    public ReadableProductVariantGroupMapper(ReadableProductVariantMapper readableProductVariantMapper, @Qualifier("img") ImageFilePath imageUtils) {
+        this.readableProductVariantMapper = readableProductVariantMapper;
+        this.imageUtils = imageUtils;
+    }
 
     @Override
     public ReadableProductVariantGroup convert(ProductVariantGroup source, MerchantStore store, Language language) {

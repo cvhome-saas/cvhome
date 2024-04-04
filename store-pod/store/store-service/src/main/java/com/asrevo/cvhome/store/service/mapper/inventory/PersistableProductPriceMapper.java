@@ -27,14 +27,17 @@ import static com.asrevo.cvhome.store.utils.NumberUtils.isPositive;
 @Component
 public class PersistableProductPriceMapper implements Mapper<PersistableProductPrice, ProductPrice> {
 
-    @Autowired
-    private LanguageService languageService;
+    private final LanguageService languageService;
 
-    @Autowired
-    private ProductService productService;
+    private final ProductService productService;
 
-    @Autowired
-    private ProductAvailabilityService productAvailabilityService;
+    private final ProductAvailabilityService productAvailabilityService;
+
+    public PersistableProductPriceMapper(LanguageService languageService, ProductService productService, ProductAvailabilityService productAvailabilityService) {
+        this.languageService = languageService;
+        this.productService = productService;
+        this.productAvailabilityService = productAvailabilityService;
+    }
 
     @Override
     public ProductPrice convert(PersistableProductPrice source, MerchantStore store, Language language) {

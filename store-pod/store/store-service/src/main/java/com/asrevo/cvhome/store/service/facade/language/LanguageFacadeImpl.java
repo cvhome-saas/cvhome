@@ -13,8 +13,11 @@ import java.util.List;
 @Service
 public class LanguageFacadeImpl implements LanguageFacade {
 
-    @Autowired
-    private LanguageService languageService;
+    private final LanguageService languageService;
+
+    public LanguageFacadeImpl(LanguageService languageService) {
+        this.languageService = languageService;
+    }
 
     @Override
     public List<Language> getLanguages() {

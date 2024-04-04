@@ -24,14 +24,17 @@ import java.util.Optional;
 @Component
 public class PersistableProductVariantMapper implements Mapper<PersistableProductVariant, ProductVariant> {
 
-    @Autowired
-    private ProductVariationService productVariationService;
+    private final ProductVariationService productVariationService;
 
-    @Autowired
-    private PersistableProductAvailabilityMapper persistableProductAvailabilityMapper;
+    private final PersistableProductAvailabilityMapper persistableProductAvailabilityMapper;
 
-    @Autowired
-    private ProductService productService;
+    private final ProductService productService;
+
+    public PersistableProductVariantMapper(ProductVariationService productVariationService, PersistableProductAvailabilityMapper persistableProductAvailabilityMapper, ProductService productService) {
+        this.productVariationService = productVariationService;
+        this.persistableProductAvailabilityMapper = persistableProductAvailabilityMapper;
+        this.productService = productService;
+    }
 
     @Override
     public ProductVariant convert(PersistableProductVariant source, MerchantStore store, Language language) {

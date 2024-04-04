@@ -29,18 +29,23 @@ import java.util.List;
 @Component
 public class ReadableOrderProductMapper implements Mapper<OrderProduct, ReadableOrderProduct> {
 
-    @Autowired
+    final
     PricingService pricingService;
 
-    @Autowired
+    final
     ProductService productService;
 
-    @Autowired
+    final
     ReadableProductMapper readableProductMapper;
 
-    @Autowired
-    @Qualifier("img")
-    private ImageFilePath imageUtils;
+    private final ImageFilePath imageUtils;
+
+    public ReadableOrderProductMapper(PricingService pricingService, ProductService productService, ReadableProductMapper readableProductMapper, @Qualifier("img") ImageFilePath imageUtils) {
+        this.pricingService = pricingService;
+        this.productService = productService;
+        this.readableProductMapper = readableProductMapper;
+        this.imageUtils = imageUtils;
+    }
 
     @Override
     public ReadableOrderProduct convert(OrderProduct source, MerchantStore store, Language language) {

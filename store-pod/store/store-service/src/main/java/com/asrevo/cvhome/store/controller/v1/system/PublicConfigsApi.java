@@ -22,8 +22,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class PublicConfigsApi {
 
 
-    @Autowired
-    private MerchantConfigurationFacade configurationFacade;
+    private final MerchantConfigurationFacade configurationFacade;
+
+    public PublicConfigsApi(MerchantConfigurationFacade configurationFacade) {
+        this.configurationFacade = configurationFacade;
+    }
 
     /**
      * Get public set of merchant configuration --- allow online purchase --- social links

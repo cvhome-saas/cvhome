@@ -13,8 +13,11 @@ import java.util.List;
 @Service
 public class CurrencyFacadeImpl implements CurrencyFacade {
 
-    @Autowired
-    private CurrencyService currencyService;
+    private final CurrencyService currencyService;
+
+    public CurrencyFacadeImpl(CurrencyService currencyService) {
+        this.currencyService = currencyService;
+    }
 
     @Override
     public List<Currency> getList() {

@@ -25,14 +25,17 @@ import java.util.stream.Collectors;
 @Service
 public class ProductVariationFacadeImpl implements ProductVariationFacade {
 
-    @Autowired
-    private PersistableProductVariationMapper persistableProductVariationMapper;
+    private final PersistableProductVariationMapper persistableProductVariationMapper;
 
-    @Autowired
-    private ReadableProductVariationMapper readableProductVariationMapper;
+    private final ReadableProductVariationMapper readableProductVariationMapper;
 
-    @Autowired
-    private ProductVariationService productVariationService;
+    private final ProductVariationService productVariationService;
+
+    public ProductVariationFacadeImpl(PersistableProductVariationMapper persistableProductVariationMapper, ReadableProductVariationMapper readableProductVariationMapper, ProductVariationService productVariationService) {
+        this.persistableProductVariationMapper = persistableProductVariationMapper;
+        this.readableProductVariationMapper = readableProductVariationMapper;
+        this.productVariationService = productVariationService;
+    }
 
 
     @Override

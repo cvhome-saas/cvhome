@@ -56,39 +56,42 @@ import java.util.stream.Collectors;
 public class OrderFacadeImpl implements OrderFacade {
 
 
-    @Autowired
-    private ShoppingCartService shoppingCartService;
-    @Autowired
-    private ShoppingCartFacade shoppingCartFacade;
+    private final ShoppingCartService shoppingCartService;
+    private final ShoppingCartFacade shoppingCartFacade;
 
-    @Autowired
-    private OrderService orderService;
-    @Autowired
-    private ShippingQuoteService shippingQuoteService;
-    @Autowired
-    private ProductAttributeService productAttributeService;
-    @Autowired
-    private ProductService productService;
-    @Autowired
-    private PersistableOrderApiPopulator persistableOrderApiPopulator;
-    @Autowired
-    private ProductPriceUtils productPriceUtils;
-    @Autowired
-    private PricingService pricingService;
-    @Autowired
-    private CustomerFacade customerFacade;
-    @Autowired
-    private CoreConfiguration coreConfiguration;
-    @Autowired
-    private LabelUtils messages;
-    @Autowired
-    private ReadableOrderTotalMapper readableOrderTotalMapper;
-    @Autowired
-    private LanguageService languageService;
-    @Autowired
-    private ReadableCustomerMapper readableCustomerMapper;
-    @Autowired
-    private ReadableOrderProductMapper readableOrderProductMapper;
+    private final OrderService orderService;
+    private final ShippingQuoteService shippingQuoteService;
+    private final ProductAttributeService productAttributeService;
+    private final ProductService productService;
+    private final PersistableOrderApiPopulator persistableOrderApiPopulator;
+    private final ProductPriceUtils productPriceUtils;
+    private final PricingService pricingService;
+    private final CustomerFacade customerFacade;
+    private final CoreConfiguration coreConfiguration;
+    private final LabelUtils messages;
+    private final ReadableOrderTotalMapper readableOrderTotalMapper;
+    private final LanguageService languageService;
+    private final ReadableCustomerMapper readableCustomerMapper;
+    private final ReadableOrderProductMapper readableOrderProductMapper;
+
+    public OrderFacadeImpl(ShoppingCartFacade shoppingCartFacade, ShoppingCartService shoppingCartService, OrderService orderService, ShippingQuoteService shippingQuoteService, ProductAttributeService productAttributeService, ProductService productService, PersistableOrderApiPopulator persistableOrderApiPopulator, ProductPriceUtils productPriceUtils, PricingService pricingService, ReadableOrderProductMapper readableOrderProductMapper, LabelUtils messages, CustomerFacade customerFacade, CoreConfiguration coreConfiguration, ReadableCustomerMapper readableCustomerMapper, ReadableOrderTotalMapper readableOrderTotalMapper, LanguageService languageService) {
+        this.shoppingCartFacade = shoppingCartFacade;
+        this.shoppingCartService = shoppingCartService;
+        this.orderService = orderService;
+        this.shippingQuoteService = shippingQuoteService;
+        this.productAttributeService = productAttributeService;
+        this.productService = productService;
+        this.persistableOrderApiPopulator = persistableOrderApiPopulator;
+        this.productPriceUtils = productPriceUtils;
+        this.pricingService = pricingService;
+        this.readableOrderProductMapper = readableOrderProductMapper;
+        this.messages = messages;
+        this.customerFacade = customerFacade;
+        this.coreConfiguration = coreConfiguration;
+        this.readableCustomerMapper = readableCustomerMapper;
+        this.readableOrderTotalMapper = readableOrderTotalMapper;
+        this.languageService = languageService;
+    }
 
     @Override
     public Order processOrder(PersistableOrder order, Customer customer,

@@ -30,16 +30,19 @@ import java.util.List;
 @Slf4j
 public class ProductRelationshipApi {
 
-    @Autowired
-    private ProductFacade productFacade;
-    @Autowired
-    private StoreFacade storeFacade;
-    @Autowired
-    private LanguageUtils languageUtils;
-    @Autowired
-    private ProductService productService;
-    @Autowired
-    private ProductReviewService productReviewService;
+    private final ProductFacade productFacade;
+    private final StoreFacade storeFacade;
+    private final LanguageUtils languageUtils;
+    private final ProductService productService;
+    private final ProductReviewService productReviewService;
+
+    public ProductRelationshipApi(ProductFacade productFacade, StoreFacade storeFacade, LanguageUtils languageUtils, ProductService productService, ProductReviewService productReviewService) {
+        this.productFacade = productFacade;
+        this.storeFacade = storeFacade;
+        this.languageUtils = languageUtils;
+        this.productService = productService;
+        this.productReviewService = productReviewService;
+    }
 
   /*	@RequestMapping( value={"/private/products/{id}/related","/auth/products/{id}/related"}, method=RequestMethod.POST)
   @ResponseStatus(HttpStatus.CREATED)

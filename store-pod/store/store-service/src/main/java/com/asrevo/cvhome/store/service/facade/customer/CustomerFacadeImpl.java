@@ -59,38 +59,41 @@ import java.util.stream.Collectors;
 public class CustomerFacadeImpl implements CustomerFacade {
 
 
-    @Autowired
-    private CustomerService customerService;
+    private final CustomerService customerService;
 
-    @Autowired
-    private OptinService optinService;
+    private final OptinService optinService;
 
-    @Autowired
-    private CustomerOptinService customerOptinService;
+    private final CustomerOptinService customerOptinService;
 
-    @Autowired
-    private ShoppingCartService shoppingCartService;
+    private final ShoppingCartService shoppingCartService;
 
-    @Autowired
-    private LanguageService languageService;
+    private final LanguageService languageService;
 
 
-    @Autowired
-    private CountryService countryService;
+    private final CountryService countryService;
 
 
-    @Autowired
-    private ZoneService zoneService;
+    private final ZoneService zoneService;
 
 
-    @Autowired
-    private CustomerReviewService customerReviewService;
+    private final CustomerReviewService customerReviewService;
 
-    @Autowired
-    private CoreConfiguration coreConfiguration;
+    private final CoreConfiguration coreConfiguration;
 
-    @Autowired
-    private CustomerPopulator customerPopulator;
+    private final CustomerPopulator customerPopulator;
+
+    public CustomerFacadeImpl(CustomerService customerService, OptinService optinService, CustomerOptinService customerOptinService, ShoppingCartService shoppingCartService, LanguageService languageService, CountryService countryService, ZoneService zoneService, CustomerReviewService customerReviewService, CoreConfiguration coreConfiguration, CustomerPopulator customerPopulator) {
+        this.customerService = customerService;
+        this.optinService = optinService;
+        this.customerOptinService = customerOptinService;
+        this.shoppingCartService = shoppingCartService;
+        this.languageService = languageService;
+        this.countryService = countryService;
+        this.zoneService = zoneService;
+        this.customerReviewService = customerReviewService;
+        this.coreConfiguration = coreConfiguration;
+        this.customerPopulator = customerPopulator;
+    }
 
 
     /**

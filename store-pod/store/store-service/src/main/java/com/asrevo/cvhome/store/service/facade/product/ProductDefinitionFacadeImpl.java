@@ -23,22 +23,24 @@ import java.util.Optional;
 public class ProductDefinitionFacadeImpl implements ProductDefinitionFacade {
 
 
-    @Autowired
-    private ProductService productService;
+    private final ProductService productService;
 
 
-    @Autowired
-    private PersistableProductDefinitionMapper persistableProductDefinitionMapper;
+    private final PersistableProductDefinitionMapper persistableProductDefinitionMapper;
 
-    @Autowired
-    private ReadableProductDefinitionMapper readableProductDefinitionMapper;
+    private final ReadableProductDefinitionMapper readableProductDefinitionMapper;
 
-    @Autowired
-    private ProductVariantFacade productVariantFacade;
+    private final ProductVariantFacade productVariantFacade;
 
-    @Autowired
-    @Qualifier("img")
-    private ImageFilePath imageUtils;
+    private final ImageFilePath imageUtils;
+
+    public ProductDefinitionFacadeImpl(ProductService productService, PersistableProductDefinitionMapper persistableProductDefinitionMapper, ReadableProductDefinitionMapper readableProductDefinitionMapper, ProductVariantFacade productVariantFacade, @Qualifier("img") ImageFilePath imageUtils) {
+        this.productService = productService;
+        this.persistableProductDefinitionMapper = persistableProductDefinitionMapper;
+        this.readableProductDefinitionMapper = readableProductDefinitionMapper;
+        this.productVariantFacade = productVariantFacade;
+        this.imageUtils = imageUtils;
+    }
 
     @Override
     public Long saveProductDefinition(MerchantStore store, PersistableProductDefinition product, Language language) {

@@ -20,11 +20,14 @@ import java.util.List;
 public class PersistableProductVariantGroupMapper implements Mapper<PersistableProductVariantGroup, ProductVariantGroup> {
 
 
-    @Autowired
-    private ProductVariantService productVariantService;
+    private final ProductVariantService productVariantService;
 
-    @Autowired
-    private ProductVariantImageService productVariantImageService;
+    private final ProductVariantImageService productVariantImageService;
+
+    public PersistableProductVariantGroupMapper(ProductVariantService productVariantService, ProductVariantImageService productVariantImageService) {
+        this.productVariantService = productVariantService;
+        this.productVariantImageService = productVariantImageService;
+    }
 
     @Override
     public ProductVariantGroup convert(PersistableProductVariantGroup source, MerchantStore store,

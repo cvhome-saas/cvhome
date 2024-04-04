@@ -26,14 +26,17 @@ import java.util.stream.Collectors;
 @Component
 public class PersistableProductOptionSetMapper implements Mapper<PersistableProductOptionSet, ProductOptionSet> {
 
-    @Autowired
-    private ProductOptionService productOptionService;
+    private final ProductOptionService productOptionService;
 
-    @Autowired
-    private ProductOptionValueService productOptionValueService;
+    private final ProductOptionValueService productOptionValueService;
 
-    @Autowired
-    private ProductTypeService productTypeService;
+    private final ProductTypeService productTypeService;
+
+    public PersistableProductOptionSetMapper(ProductOptionService productOptionService, ProductOptionValueService productOptionValueService, ProductTypeService productTypeService) {
+        this.productOptionService = productOptionService;
+        this.productOptionValueService = productOptionValueService;
+        this.productTypeService = productTypeService;
+    }
 
     @Override
     public ProductOptionSet convert(PersistableProductOptionSet source, MerchantStore store, Language language) {

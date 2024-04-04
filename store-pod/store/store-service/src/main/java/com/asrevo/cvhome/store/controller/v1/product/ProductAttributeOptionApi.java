@@ -36,8 +36,11 @@ import java.util.List;
 @Tag(name = "Product attributes and options / options values management resource (Product Option Management Api)")
 public class ProductAttributeOptionApi {
 
-    @Autowired
-    private ProductOptionFacade productOptionFacade;
+    private final ProductOptionFacade productOptionFacade;
+
+    public ProductAttributeOptionApi(ProductOptionFacade productOptionFacade) {
+        this.productOptionFacade = productOptionFacade;
+    }
 
     @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(value = {"/private/product/option"}, method = RequestMethod.POST)

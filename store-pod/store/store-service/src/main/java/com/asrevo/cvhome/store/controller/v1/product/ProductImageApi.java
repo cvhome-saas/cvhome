@@ -44,12 +44,15 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ProductImageApi {
 
-    @Autowired
-    private ProductImageService productImageService;
-    @Autowired
-    private ProductService productService;
-    @Autowired
-    private ReadableProductImageMapper readableProductImageMapper;
+    private final ProductImageService productImageService;
+    private final ProductService productService;
+    private final ReadableProductImageMapper readableProductImageMapper;
+
+    public ProductImageApi(ProductImageService productImageService, ProductService productService, ReadableProductImageMapper readableProductImageMapper) {
+        this.productImageService = productImageService;
+        this.productService = productService;
+        this.readableProductImageMapper = readableProductImageMapper;
+    }
 
     /**
      * To be used with MultipartFile

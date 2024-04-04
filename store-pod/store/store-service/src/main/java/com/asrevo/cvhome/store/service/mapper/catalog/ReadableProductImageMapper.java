@@ -14,9 +14,11 @@ import org.springframework.stereotype.Component;
 public class ReadableProductImageMapper implements Mapper<ProductImage, ReadableImage> {
 
 
-    @Autowired
-    @Qualifier("img")
-    private ImageFilePath imageUtils;
+    private final ImageFilePath imageUtils;
+
+    public ReadableProductImageMapper(@Qualifier("img") ImageFilePath imageUtils) {
+        this.imageUtils = imageUtils;
+    }
 
     @Override
     public ReadableImage convert(ProductImage source, MerchantStore store, Language language) {

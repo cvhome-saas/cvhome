@@ -27,11 +27,14 @@ import java.util.List;
 @Component
 public class ReadableInventoryMapper implements Mapper<ProductAvailability, ReadableInventory> {
 
-    @Autowired
-    private PricingService pricingService;
+    private final PricingService pricingService;
 
-    @Autowired
-    private ReadableMerchantStorePopulator readableMerchantStorePopulator;
+    private final ReadableMerchantStorePopulator readableMerchantStorePopulator;
+
+    public ReadableInventoryMapper(PricingService pricingService, ReadableMerchantStorePopulator readableMerchantStorePopulator) {
+        this.pricingService = pricingService;
+        this.readableMerchantStorePopulator = readableMerchantStorePopulator;
+    }
 
     @Override
     public ReadableInventory convert(ProductAvailability source, MerchantStore store, Language language) {

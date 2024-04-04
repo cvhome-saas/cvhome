@@ -23,17 +23,20 @@ import java.util.stream.Collectors;
 @Service
 public class ProductOptionSetFacadeImpl implements ProductOptionSetFacade {
 
-    @Autowired
-    private PersistableProductOptionSetMapper persistableProductOptionSetMapper;
+    private final PersistableProductOptionSetMapper persistableProductOptionSetMapper;
 
-    @Autowired
-    private ReadableProductOptionSetMapper readableProductOptionSetMapper;
+    private final ReadableProductOptionSetMapper readableProductOptionSetMapper;
 
-    @Autowired
-    private ProductOptionSetService productOptionSetService;
+    private final ProductOptionSetService productOptionSetService;
 
-    @Autowired
-    private ProductTypeFacade productTypeFacade;
+    private final ProductTypeFacade productTypeFacade;
+
+    public ProductOptionSetFacadeImpl(PersistableProductOptionSetMapper persistableProductOptionSetMapper, ReadableProductOptionSetMapper readableProductOptionSetMapper, ProductOptionSetService productOptionSetService, ProductTypeFacade productTypeFacade) {
+        this.persistableProductOptionSetMapper = persistableProductOptionSetMapper;
+        this.readableProductOptionSetMapper = readableProductOptionSetMapper;
+        this.productOptionSetService = productOptionSetService;
+        this.productTypeFacade = productTypeFacade;
+    }
 
     @Override
     public ReadableProductOptionSet get(Long id, MerchantStore store, Language language) {

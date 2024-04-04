@@ -26,8 +26,11 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 public class ProductInventoryApi {
 
-    @Autowired
-    private ProductInventoryFacade productInventoryFacade;
+    private final ProductInventoryFacade productInventoryFacade;
+
+    public ProductInventoryApi(ProductInventoryFacade productInventoryFacade) {
+        this.productInventoryFacade = productInventoryFacade;
+    }
 
     @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(value = {"/private/product/{productId}/inventory"}, method = RequestMethod.POST)

@@ -24,8 +24,11 @@ import java.util.stream.Collectors;
 public class ReadableProductOptionSetMapper implements Mapper<ProductOptionSet, ReadableProductOptionSet> {
 
 
-    @Autowired
-    private ReadableProductTypeMapper readableProductTypeMapper;
+    private final ReadableProductTypeMapper readableProductTypeMapper;
+
+    public ReadableProductOptionSetMapper(ReadableProductTypeMapper readableProductTypeMapper) {
+        this.readableProductTypeMapper = readableProductTypeMapper;
+    }
 
     @Override
     public ReadableProductOptionSet convert(ProductOptionSet source, MerchantStore store, Language language) {

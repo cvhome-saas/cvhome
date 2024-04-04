@@ -20,9 +20,11 @@ import java.util.List;
 @Component
 public class ReadableProductOptionValueMapper implements Mapper<ProductOptionValue, ReadableProductOptionValue> {
 
-    @Autowired
-    @Qualifier("img")
-    private ImageFilePath imageUtils;
+    private final ImageFilePath imageUtils;
+
+    public ReadableProductOptionValueMapper(@Qualifier("img") ImageFilePath imageUtils) {
+        this.imageUtils = imageUtils;
+    }
 
     @Override
     public ReadableProductOptionValue merge(ProductOptionValue source, ReadableProductOptionValue destination,

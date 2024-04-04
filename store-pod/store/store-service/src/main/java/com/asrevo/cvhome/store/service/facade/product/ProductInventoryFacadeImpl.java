@@ -33,20 +33,23 @@ import static com.asrevo.cvhome.store.utils.ReadableEntityUtil.createReadableLis
 @Service("productInventoryFacade")
 public class ProductInventoryFacadeImpl implements ProductInventoryFacade {
 
-    @Autowired
-    private ProductAvailabilityService productAvailabilityService;
+    private final ProductAvailabilityService productAvailabilityService;
 
-    @Autowired
-    private ProductService productService;
+    private final ProductService productService;
 
-    @Autowired
-    private ProductVariantService productVariantService;
+    private final ProductVariantService productVariantService;
 
-    @Autowired
-    private ReadableInventoryMapper readableInventoryMapper;
+    private final ReadableInventoryMapper readableInventoryMapper;
 
-    @Autowired
-    private PersistableInventoryMapper productInventoryMapper;
+    private final PersistableInventoryMapper productInventoryMapper;
+
+    public ProductInventoryFacadeImpl(ProductAvailabilityService productAvailabilityService, ProductService productService, ProductVariantService productVariantService, ReadableInventoryMapper readableInventoryMapper, PersistableInventoryMapper productInventoryMapper) {
+        this.productAvailabilityService = productAvailabilityService;
+        this.productService = productService;
+        this.productVariantService = productVariantService;
+        this.readableInventoryMapper = readableInventoryMapper;
+        this.productInventoryMapper = productInventoryMapper;
+    }
 
 
     private void validateProductHasSameStore(MerchantStore store, Product product) {

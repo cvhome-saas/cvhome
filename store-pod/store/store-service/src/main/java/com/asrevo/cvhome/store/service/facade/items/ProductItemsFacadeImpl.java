@@ -33,18 +33,20 @@ import java.util.stream.Collectors;
 public class ProductItemsFacadeImpl implements ProductItemsFacade {
 
 
-    @Autowired
-    ProductService productService;
+    final ProductService productService;
 
-    @Autowired
-    PricingService pricingService;
+    final PricingService pricingService;
 
-    @Autowired
-    @Qualifier("img")
-    private ImageFilePath imageUtils;
+    private final ImageFilePath imageUtils;
 
-    @Autowired
-    private ProductRelationshipService productRelationshipService;
+    private final ProductRelationshipService productRelationshipService;
+
+    public ProductItemsFacadeImpl(ProductService productService, PricingService pricingService, @Qualifier("img") ImageFilePath imageUtils, ProductRelationshipService productRelationshipService) {
+        this.productService = productService;
+        this.pricingService = pricingService;
+        this.imageUtils = imageUtils;
+        this.productRelationshipService = productRelationshipService;
+    }
 
     @Override
     public ReadableProductList listItemsByManufacturer(MerchantStore store,

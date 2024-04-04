@@ -20,8 +20,11 @@ import java.util.List;
 public class ShippingExpeditionApi {
 
 
-    @Autowired
-    private ShippingFacade shippingFacade;
+    private final ShippingFacade shippingFacade;
+
+    public ShippingExpeditionApi(ShippingFacade shippingFacade) {
+        this.shippingFacade = shippingFacade;
+    }
 
 
     @GetMapping("/shipping/country")

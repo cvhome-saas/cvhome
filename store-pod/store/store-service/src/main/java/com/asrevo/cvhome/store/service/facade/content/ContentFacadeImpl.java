@@ -46,18 +46,20 @@ import java.util.stream.Collectors;
 public class ContentFacadeImpl implements ContentFacade {
 
     public static final String FILE_CONTENT_DELIMETER = "/";
-    @Autowired
-    private ContentService contentService;
+    private final ContentService contentService;
 
-    @Autowired
-    private LanguageService languageService;
+    private final LanguageService languageService;
 
-    @Autowired
-    @Qualifier("img")
-    private ImageFilePath imageUtils;
+    private final ImageFilePath imageUtils;
 
-    @Autowired
-    private FilePathUtils fileUtils;
+    private final FilePathUtils fileUtils;
+
+    public ContentFacadeImpl(ContentService contentService, LanguageService languageService, @Qualifier("img") ImageFilePath imageUtils, FilePathUtils fileUtils) {
+        this.contentService = contentService;
+        this.languageService = languageService;
+        this.imageUtils = imageUtils;
+        this.fileUtils = fileUtils;
+    }
 
     @Override
     public ContentFolder getContentFolder(String folder, MerchantStore store) throws Exception {

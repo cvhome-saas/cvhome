@@ -32,11 +32,14 @@ import org.springframework.util.Assert;
 public class ShoppingCartCalculationServiceImpl implements ShoppingCartCalculationService {
 
 
-    @Autowired
-    private ShoppingCartService shoppingCartService;
+    private final ShoppingCartService shoppingCartService;
 
-    @Autowired
-    private OrderService orderService;
+    private final OrderService orderService;
+
+    public ShoppingCartCalculationServiceImpl(ShoppingCartService shoppingCartService, OrderService orderService) {
+        this.shoppingCartService = shoppingCartService;
+        this.orderService = orderService;
+    }
 
     /**
      * <p>

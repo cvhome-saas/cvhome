@@ -34,10 +34,8 @@ import java.util.Set;
 @Component
 public class PersistableOrderApiPopulator extends AbstractDataPopulator<PersistableOrder, Order> {
 
-    @Autowired
-    private CurrencyService currencyService;
-    @Autowired
-    private CustomerService customerService;
+    private final CurrencyService currencyService;
+    private final CustomerService customerService;
     /*	@Autowired
         private ShoppingCartService shoppingCartService;
         @Autowired
@@ -46,8 +44,13 @@ public class PersistableOrderApiPopulator extends AbstractDataPopulator<Persista
         private ProductAttributeService productAttributeService;
         @Autowired
         private DigitalProductService digitalProductService;*/
-    @Autowired
-    private CustomerPopulator customerPopulator;
+    private final CustomerPopulator customerPopulator;
+
+    public PersistableOrderApiPopulator(CurrencyService currencyService, CustomerService customerService, CustomerPopulator customerPopulator) {
+        this.currencyService = currencyService;
+        this.customerService = customerService;
+        this.customerPopulator = customerPopulator;
+    }
 
 
     @Override

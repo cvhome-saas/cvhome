@@ -29,8 +29,11 @@ import java.util.Locale;
 public class ContactApi {
 
 
-    @Autowired
-    private LanguageService languageService;
+    private final LanguageService languageService;
+
+    public ContactApi(LanguageService languageService) {
+        this.languageService = languageService;
+    }
 
     /*  @Autowired private EmailTemplatesUtils emailTemplatesUtils;*/
 

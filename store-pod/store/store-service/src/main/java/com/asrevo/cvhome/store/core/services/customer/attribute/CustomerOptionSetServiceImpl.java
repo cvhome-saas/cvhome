@@ -20,8 +20,7 @@ public class CustomerOptionSetServiceImpl extends
         SalesManagerEntityServiceImpl<Long, CustomerOptionSet> implements CustomerOptionSetService {
 
 
-    @Autowired
-    private CustomerOptionSetRepository customerOptionSetRepository;
+    private final CustomerOptionSetRepository customerOptionSetRepository;
 
 
     @Autowired

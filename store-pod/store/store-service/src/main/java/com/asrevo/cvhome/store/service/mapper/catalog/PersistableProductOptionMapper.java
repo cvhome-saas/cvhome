@@ -17,8 +17,11 @@ import org.springframework.util.Assert;
 @Component
 public class PersistableProductOptionMapper implements Mapper<PersistableProductOptionEntity, ProductOption> {
 
-    @Autowired
-    private LanguageService languageService;
+    private final LanguageService languageService;
+
+    public PersistableProductOptionMapper(LanguageService languageService) {
+        this.languageService = languageService;
+    }
 
 
     ProductOptionDescription description(com.asrevo.cvhome.store.core.model.catalog.product.attribute.ProductOptionDescription description) throws Exception {

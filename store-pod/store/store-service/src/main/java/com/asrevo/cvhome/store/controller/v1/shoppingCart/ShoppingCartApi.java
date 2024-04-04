@@ -47,8 +47,11 @@ public class ShoppingCartApi {
         @Autowired
         private com.salesmanager.shop.store.controller.customer.facade.CustomerFacade customerFacade;
     */
-    @Autowired
-    private ShoppingCartFacade shoppingCartFacade;
+    private final ShoppingCartFacade shoppingCartFacade;
+
+    public ShoppingCartApi(ShoppingCartFacade shoppingCartFacade) {
+        this.shoppingCartFacade = shoppingCartFacade;
+    }
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(value = "/cart")

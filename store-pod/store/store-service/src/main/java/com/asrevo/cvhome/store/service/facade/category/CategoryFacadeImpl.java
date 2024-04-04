@@ -38,16 +38,19 @@ public class CategoryFacadeImpl implements CategoryFacade {
     private static final String FEATURED_CATEGORY = "featured";
     private static final String VISIBLE_CATEGORY = "visible";
     private static final String ADMIN_CATEGORY = "admin";
-    @Autowired
-    private CategoryService categoryService;
-    @Autowired
-    private MerchantStoreService merchantStoreService;
-    @Autowired
-    private PersistableCategoryPopulator persistableCatagoryPopulator;
-    @Autowired
-    private ReadableCategoryMapper readableCategoryMapper;
-    @Autowired
-    private ProductAttributeService productAttributeService;
+    private final CategoryService categoryService;
+    private final MerchantStoreService merchantStoreService;
+    private final PersistableCategoryPopulator persistableCatagoryPopulator;
+    private final ReadableCategoryMapper readableCategoryMapper;
+    private final ProductAttributeService productAttributeService;
+
+    public CategoryFacadeImpl(CategoryService categoryService, MerchantStoreService merchantStoreService, PersistableCategoryPopulator persistableCatagoryPopulator, ReadableCategoryMapper readableCategoryMapper, ProductAttributeService productAttributeService) {
+        this.categoryService = categoryService;
+        this.merchantStoreService = merchantStoreService;
+        this.persistableCatagoryPopulator = persistableCatagoryPopulator;
+        this.readableCategoryMapper = readableCategoryMapper;
+        this.productAttributeService = productAttributeService;
+    }
 
     @Override
     public ReadableCategoryList getCategoryHierarchy(MerchantStore store, ListCriteria criteria, int depth,

@@ -44,23 +44,25 @@ import java.util.stream.Collectors;
 @Slf4j
 public class StoreFacadeImpl implements StoreFacade {
 
-    @Autowired
-    private MerchantStoreService merchantStoreService;
-    @Autowired
-    private MerchantConfigurationService merchantConfigurationService;
-    @Autowired
-    private LanguageService languageService;
-    @Autowired
-    private ContentService contentService;
-    @Autowired
-    private PersistableMerchantStorePopulator persistableMerchantStorePopulator;
-    @Autowired
-    @Qualifier("img")
-    private ImageFilePath imageUtils;
-    @Autowired
-    private LanguageUtils languageUtils;
-    @Autowired
-    private ReadableMerchantStorePopulator readableMerchantStorePopulator;
+    private final MerchantStoreService merchantStoreService;
+    private final MerchantConfigurationService merchantConfigurationService;
+    private final LanguageService languageService;
+    private final ContentService contentService;
+    private final PersistableMerchantStorePopulator persistableMerchantStorePopulator;
+    private final ImageFilePath imageUtils;
+    private final LanguageUtils languageUtils;
+    private final ReadableMerchantStorePopulator readableMerchantStorePopulator;
+
+    public StoreFacadeImpl(MerchantStoreService merchantStoreService, MerchantConfigurationService merchantConfigurationService, LanguageService languageService, ContentService contentService, PersistableMerchantStorePopulator persistableMerchantStorePopulator, @Qualifier("img") ImageFilePath imageUtils, LanguageUtils languageUtils, ReadableMerchantStorePopulator readableMerchantStorePopulator) {
+        this.merchantStoreService = merchantStoreService;
+        this.merchantConfigurationService = merchantConfigurationService;
+        this.languageService = languageService;
+        this.contentService = contentService;
+        this.persistableMerchantStorePopulator = persistableMerchantStorePopulator;
+        this.imageUtils = imageUtils;
+        this.languageUtils = languageUtils;
+        this.readableMerchantStorePopulator = readableMerchantStorePopulator;
+    }
 
     @Override
     public MerchantStore getByCode(HttpServletRequest request) {

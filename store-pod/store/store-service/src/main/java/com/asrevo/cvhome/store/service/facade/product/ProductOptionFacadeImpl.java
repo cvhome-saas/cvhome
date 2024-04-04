@@ -35,38 +35,41 @@ import java.util.stream.Collectors;
 @Service
 public class ProductOptionFacadeImpl implements ProductOptionFacade {
 
-    @Autowired
-    private ProductOptionService productOptionService;
+    private final ProductOptionService productOptionService;
 
-    @Autowired
-    private ProductOptionValueService productOptionValueService;
+    private final ProductOptionValueService productOptionValueService;
 
-    @Autowired
-    private ReadableProductOptionMapper readableMapper;
+    private final ReadableProductOptionMapper readableMapper;
 
-    @Autowired
-    private PersistableProductOptionMapper persistableeMapper;
+    private final PersistableProductOptionMapper persistableeMapper;
 
-    @Autowired
-    private PersistableProductOptionValueMapper persistableOptionValueMapper;
+    private final PersistableProductOptionValueMapper persistableOptionValueMapper;
 
-    @Autowired
-    private ReadableProductOptionValueMapper readableOptionValueMapper;
+    private final ReadableProductOptionValueMapper readableOptionValueMapper;
 
-    @Autowired
-    private ContentService contentService;
+    private final ContentService contentService;
 
-    @Autowired
-    private ProductAttributeService productAttributeService;
+    private final ProductAttributeService productAttributeService;
 
-    @Autowired
-    private PersistableProductAttributeMapper persistableProductAttributeMapper;
+    private final PersistableProductAttributeMapper persistableProductAttributeMapper;
 
-    @Autowired
-    private ReadableProductAttributeMapper readableProductAttributeMapper;
+    private final ReadableProductAttributeMapper readableProductAttributeMapper;
 
-    @Autowired
-    private ProductService productService;
+    private final ProductService productService;
+
+    public ProductOptionFacadeImpl(ReadableProductOptionValueMapper readableOptionValueMapper, ProductOptionService productOptionService, ProductOptionValueService productOptionValueService, ReadableProductOptionMapper readableMapper, PersistableProductOptionMapper persistableeMapper, PersistableProductOptionValueMapper persistableOptionValueMapper, ContentService contentService, ProductAttributeService productAttributeService, PersistableProductAttributeMapper persistableProductAttributeMapper, ReadableProductAttributeMapper readableProductAttributeMapper, ProductService productService) {
+        this.readableOptionValueMapper = readableOptionValueMapper;
+        this.productOptionService = productOptionService;
+        this.productOptionValueService = productOptionValueService;
+        this.readableMapper = readableMapper;
+        this.persistableeMapper = persistableeMapper;
+        this.persistableOptionValueMapper = persistableOptionValueMapper;
+        this.contentService = contentService;
+        this.productAttributeService = productAttributeService;
+        this.persistableProductAttributeMapper = persistableProductAttributeMapper;
+        this.readableProductAttributeMapper = readableProductAttributeMapper;
+        this.productService = productService;
+    }
 
     @Override
     public ReadableProductOptionEntity saveOption(PersistableProductOptionEntity option, MerchantStore store,

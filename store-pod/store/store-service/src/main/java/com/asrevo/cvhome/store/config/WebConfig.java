@@ -12,11 +12,14 @@ import java.util.List;
 public class WebConfig implements WebMvcConfigurer {
 
 
-    @Autowired
-    private MerchantStoreArgumentResolver merchantStoreArgumentResolver;
+    private final MerchantStoreArgumentResolver merchantStoreArgumentResolver;
 
-    @Autowired
-    private LanguageArgumentResolver languageArgumentResolver;
+    private final LanguageArgumentResolver languageArgumentResolver;
+
+    public WebConfig(MerchantStoreArgumentResolver merchantStoreArgumentResolver, LanguageArgumentResolver languageArgumentResolver) {
+        this.merchantStoreArgumentResolver = merchantStoreArgumentResolver;
+        this.languageArgumentResolver = languageArgumentResolver;
+    }
 
 
     @Override

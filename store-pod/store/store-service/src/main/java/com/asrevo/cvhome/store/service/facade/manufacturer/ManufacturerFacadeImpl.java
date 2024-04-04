@@ -31,18 +31,21 @@ import java.util.stream.Collectors;
 @Service("manufacturerFacade")
 public class ManufacturerFacadeImpl implements ManufacturerFacade {
 
-    @Autowired
-    private Mapper<Manufacturer, ReadableManufacturer> readableManufacturerConverter;
+    private final Mapper<Manufacturer, ReadableManufacturer> readableManufacturerConverter;
 
 
-    @Autowired
-    private ManufacturerService manufacturerService;
+    private final ManufacturerService manufacturerService;
 
-    @Autowired
-    private CategoryService categoryService;
+    private final CategoryService categoryService;
 
-    @Autowired
-    private LanguageService languageService;
+    private final LanguageService languageService;
+
+    public ManufacturerFacadeImpl(Mapper<Manufacturer, ReadableManufacturer> readableManufacturerConverter, ManufacturerService manufacturerService, CategoryService categoryService, LanguageService languageService) {
+        this.readableManufacturerConverter = readableManufacturerConverter;
+        this.manufacturerService = manufacturerService;
+        this.categoryService = categoryService;
+        this.languageService = languageService;
+    }
 
     @Override
     public List<ReadableManufacturer> getByProductInCategory(MerchantStore store, Language language,

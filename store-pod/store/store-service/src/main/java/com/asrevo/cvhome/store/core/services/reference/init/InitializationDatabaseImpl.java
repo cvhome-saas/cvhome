@@ -37,42 +37,45 @@ import java.util.*;
 @Slf4j
 public class InitializationDatabaseImpl implements InitializationDatabase {
 
-    @Autowired
-    protected MerchantStoreService merchantService;
-    @Autowired
-    protected ProductTypeService productTypeService;
-    @Autowired
-    private ZoneService zoneService;
-    @Autowired
-    private LanguageService languageService;
-    @Autowired
-    private CountryService countryService;
-    @Autowired
-    private CurrencyService currencyService;
+    protected final MerchantStoreService merchantService;
+    protected final ProductTypeService productTypeService;
+    private final ZoneService zoneService;
+    private final LanguageService languageService;
+    private final CountryService countryService;
+    private final CurrencyService currencyService;
 
     /*
         @Autowired
         private TaxClassService taxClassService;
     */
-    @Autowired
-    private ZonesLoader zonesLoader;
+    private final ZonesLoader zonesLoader;
 
-    @Autowired
-    private IntegrationModulesLoader modulesLoader;
+    private final IntegrationModulesLoader modulesLoader;
 
-    @Autowired
-    private ManufacturerService manufacturerService;
+    private final ManufacturerService manufacturerService;
 
 /*
     @Autowired
     private ModuleConfigurationService moduleConfigurationService;
 */
 
-    @Autowired
-    private OptinService optinService;
+    private final OptinService optinService;
 
 
     private String name;
+
+    public InitializationDatabaseImpl(MerchantStoreService merchantService, ProductTypeService productTypeService, ZoneService zoneService, LanguageService languageService, CountryService countryService, CurrencyService currencyService, ZonesLoader zonesLoader, IntegrationModulesLoader modulesLoader, ManufacturerService manufacturerService, OptinService optinService) {
+        this.merchantService = merchantService;
+        this.productTypeService = productTypeService;
+        this.zoneService = zoneService;
+        this.languageService = languageService;
+        this.countryService = countryService;
+        this.currencyService = currencyService;
+        this.zonesLoader = zonesLoader;
+        this.modulesLoader = modulesLoader;
+        this.manufacturerService = manufacturerService;
+        this.optinService = optinService;
+    }
 
     public boolean isEmpty() {
         return languageService.count() == 0;

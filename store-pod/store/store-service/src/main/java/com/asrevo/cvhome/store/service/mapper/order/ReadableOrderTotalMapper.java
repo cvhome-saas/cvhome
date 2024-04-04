@@ -20,11 +20,14 @@ import java.util.Locale;
 @Component
 public class ReadableOrderTotalMapper implements Mapper<OrderTotal, ReadableOrderTotal> {
 
-    @Autowired
-    private PricingService pricingService;
+    private final PricingService pricingService;
 
-    @Autowired
-    private LabelUtils messages;
+    private final LabelUtils messages;
+
+    public ReadableOrderTotalMapper(PricingService pricingService, LabelUtils messages) {
+        this.pricingService = pricingService;
+        this.messages = messages;
+    }
 
     @Override
     public ReadableOrderTotal convert(OrderTotal source, MerchantStore store, Language language) {

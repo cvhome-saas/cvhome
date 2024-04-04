@@ -28,8 +28,11 @@ import java.util.Locale;
 public class PricingServiceImpl implements PricingService {
 
 
-    @Autowired
-    private ProductPriceUtils priceUtil;
+    private final ProductPriceUtils priceUtil;
+
+    public PricingServiceImpl(ProductPriceUtils priceUtil) {
+        this.priceUtil = priceUtil;
+    }
 
     @Override
     public FinalPrice calculateProductPrice(Product product) throws ServiceException {

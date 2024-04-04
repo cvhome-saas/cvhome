@@ -46,27 +46,29 @@ import java.util.stream.Collectors;
 public class ReadableShoppingCartMapper implements Mapper<ShoppingCart, ReadableShoppingCart> {
 
 
-    @Autowired
-    private ShoppingCartCalculationService shoppingCartCalculationService;
+    private final ShoppingCartCalculationService shoppingCartCalculationService;
 
-    @Autowired
-    private PricingService pricingService;
+    private final PricingService pricingService;
 
-    @Autowired
-    private ProductAttributeService productAttributeService;
+    private final ProductAttributeService productAttributeService;
 
-    @Autowired
-    private ProductVariantService productVariantService;
+    private final ProductVariantService productVariantService;
 
-    @Autowired
-    private ReadableMinimalProductMapper readableMinimalProductMapper;
+    private final ReadableMinimalProductMapper readableMinimalProductMapper;
 
-    @Autowired
-    private ReadableProductVariationMapper readableProductVariationMapper;
+    private final ReadableProductVariationMapper readableProductVariationMapper;
 
-    @Autowired
-    @Qualifier("img")
-    private ImageFilePath imageUtils;
+    private final ImageFilePath imageUtils;
+
+    public ReadableShoppingCartMapper(ShoppingCartCalculationService shoppingCartCalculationService, PricingService pricingService, ProductAttributeService productAttributeService, ProductVariantService productVariantService, ReadableMinimalProductMapper readableMinimalProductMapper, ReadableProductVariationMapper readableProductVariationMapper, @Qualifier("img") ImageFilePath imageUtils) {
+        this.shoppingCartCalculationService = shoppingCartCalculationService;
+        this.pricingService = pricingService;
+        this.productAttributeService = productAttributeService;
+        this.productVariantService = productVariantService;
+        this.readableMinimalProductMapper = readableMinimalProductMapper;
+        this.readableProductVariationMapper = readableProductVariationMapper;
+        this.imageUtils = imageUtils;
+    }
 
     @Override
     public ReadableShoppingCart convert(ShoppingCart source, MerchantStore store, Language language) {

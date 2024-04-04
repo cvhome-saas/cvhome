@@ -32,14 +32,17 @@ import static com.asrevo.cvhome.store.utils.NumberUtils.isPositive;
 @Component
 public class PersistableInventoryMapper implements Mapper<PersistableInventory, ProductAvailability> {
 
-    @Autowired
-    private LanguageService languageService;
+    private final LanguageService languageService;
 
-    @Autowired
-    private ProductVariantService productVariantService;
+    private final ProductVariantService productVariantService;
 
-    @Autowired
-    private ProductService productService;
+    private final ProductService productService;
+
+    public PersistableInventoryMapper(LanguageService languageService, ProductVariantService productVariantService, ProductService productService) {
+        this.languageService = languageService;
+        this.productVariantService = productVariantService;
+        this.productService = productService;
+    }
 
     @Override
     public ProductAvailability convert(PersistableInventory source, MerchantStore store, Language language) {

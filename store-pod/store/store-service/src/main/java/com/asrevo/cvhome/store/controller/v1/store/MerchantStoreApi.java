@@ -49,11 +49,14 @@ public class MerchantStoreApi {
 
     private static final Map<String, String> MAPPING_FIELDS = Map.of("name", "name", "readableAudit.user", "auditSection.modifiedBy");
 
-    @Autowired
-    private StoreFacade storeFacade;
+    private final StoreFacade storeFacade;
 
-    @Autowired
-    private UserFacade userFacade;
+    private final UserFacade userFacade;
+
+    public MerchantStoreApi(StoreFacade storeFacade, UserFacade userFacade) {
+        this.storeFacade = storeFacade;
+        this.userFacade = userFacade;
+    }
 
     @GetMapping(value = {"/store/{code}"}, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(method = "GET", description = "Get merchant store", summary = "",

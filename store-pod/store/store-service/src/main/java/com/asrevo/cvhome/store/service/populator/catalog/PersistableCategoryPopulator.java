@@ -26,10 +26,13 @@ import java.util.Set;
 public class PersistableCategoryPopulator extends
         AbstractDataPopulator<PersistableCategory, Category> {
 
-    @Autowired
-    private CategoryService categoryService;
-    @Autowired
-    private LanguageService languageService;
+    private final CategoryService categoryService;
+    private final LanguageService languageService;
+
+    public PersistableCategoryPopulator(CategoryService categoryService, LanguageService languageService) {
+        this.categoryService = categoryService;
+        this.languageService = languageService;
+    }
 
     @Override
     public Category populate(PersistableCategory source, Category target,

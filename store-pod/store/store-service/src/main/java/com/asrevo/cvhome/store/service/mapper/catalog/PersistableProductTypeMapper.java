@@ -22,8 +22,11 @@ import java.util.List;
 @Component
 public class PersistableProductTypeMapper implements Mapper<PersistableProductType, ProductType> {
 
-    @Autowired
-    private LanguageService languageService;
+    private final LanguageService languageService;
+
+    public PersistableProductTypeMapper(LanguageService languageService) {
+        this.languageService = languageService;
+    }
 
     @Override
     public ProductType convert(PersistableProductType source, MerchantStore store, Language language) {
