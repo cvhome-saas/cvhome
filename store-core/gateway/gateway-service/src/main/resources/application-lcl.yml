@@ -75,3 +75,8 @@ spring:
           uri: lb://store-ui
           predicates:
             - FHost=store-ui.${com.asrevo.cvhome.services.core-gateway.domain}
+com:
+  asrevo:
+    cvhome:
+      calls:
+        store: DIRECT
