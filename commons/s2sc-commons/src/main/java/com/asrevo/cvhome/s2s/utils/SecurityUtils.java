@@ -37,7 +37,7 @@ public class SecurityUtils {
     public static CorsConfiguration buildReactivCorsConfiguration() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(List.of("http://localhost", "http://localhost:4200")); // www - obligatory
+        configuration.setAllowedOrigins(List.of("http://localhost", "http://localhost:4200", "http://store-ui.gateway.com:7000'")); // www - obligatory
         configuration.setAllowedMethods(List.of("OPTIONS", "GET", "POST", "PUT", "DELETE"));
         configuration.setAllowCredentials(true);
         configuration.setAllowedHeaders(List.of("Authorization", "Cache-Control", "Content-Type"));
@@ -51,7 +51,7 @@ public class SecurityUtils {
     public static CorsConfiguration buildServletCorsConfiguration() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(List.of("http://localhost", "http://localhost:4200")); // www - obligatory
+        configuration.setAllowedOrigins(List.of("http://localhost", "http://localhost:4200", "http://store-ui.gateway.com:7000")); // www - obligatory
         configuration.setAllowedMethods(List.of("OPTIONS", "GET", "POST", "PUT", "DELETE"));
         configuration.setAllowCredentials(true);
         configuration.setAllowedHeaders(List.of("Authorization", "Cache-Control", "Content-Type"));
