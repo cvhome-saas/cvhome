@@ -14,7 +14,6 @@ import org.springframework.web.server.session.CookieWebSessionIdResolver;
 import org.springframework.web.server.session.WebSessionIdResolver;
 import reactor.core.publisher.Mono;
 
-import static com.asrevo.cvhome.s2s.utils.SecurityUtils.buildReactivCorsConfiguration;
 import static org.springframework.security.config.Customizer.withDefaults;
 import static org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher.MatchResult.match;
 import static org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher.MatchResult.notMatch;
@@ -48,11 +47,13 @@ public class SecurityConfig {
 //                                .csrfTokenRepository(tokenRepository)
 //                                .requireCsrfProtectionMatcher(SecurityConfig::matches)
                 )
+/*
                 .cors(httpSecurityCorsConfigurer ->
                         httpSecurityCorsConfigurer.configurationSource(request ->
                                 buildReactivCorsConfiguration()
                         )
                 )
+*/
                 .build();
         // @formatter:on
     }

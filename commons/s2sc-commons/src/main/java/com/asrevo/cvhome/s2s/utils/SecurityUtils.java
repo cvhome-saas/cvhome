@@ -47,6 +47,7 @@ public class SecurityUtils {
 
         return configuration;
     }
+
     public static CorsConfiguration buildServletCorsConfiguration() {
         CorsConfiguration configuration = new CorsConfiguration();
 
