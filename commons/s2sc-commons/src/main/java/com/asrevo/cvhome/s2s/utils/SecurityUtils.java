@@ -6,6 +6,8 @@ import com.asrevo.cvhome.commons.domain.UserOrgStoreInfo;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
 import java.util.Map;
@@ -30,5 +32,19 @@ public class SecurityUtils {
             String adminStore = ((String) claims.get("store"));
             return new UserOrgStoreInfo(IdentityId.of(adminOrg), adminStore, roles);
         }
+    }
+
+    public static CorsConfiguration buildCorsConfiguration() {
+        CorsConfiguration configuration = new CorsConfiguration();
+
+        configuration.setAllowedOrigins(List.of("http://localhost", "http://localhost:4200")); // www - obligatory
+        configuration.setAllowedMethods(List.of("OPTIONS", "GET", "POST", "PUT", "DELETE"));
+        configuration.setAllowCredentials(true);
+        configuration.setAllowedHeaders(List.of("Authorization", "Cache-Control", "Content-Type"));
+
+        final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+
+        return configuration;
     }
 }
