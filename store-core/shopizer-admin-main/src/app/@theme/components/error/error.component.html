@@ -1,0 +1,24 @@
+<div class="limiter">
+  <div class="container-login100">
+    <div class="wrap-login100 p-l-85 p-r-85 p-t-55 p-b-55">
+      <form class="login100-form" style="text-align: center">
+        <span class="titleClass">
+
+          <img src="assets/img/shopizer-logo.png">
+
+        </span>
+        <div>
+          <h1 class="error-status">Oups</h1>
+          <h2 class="error-title">{{ 'ERROR.SERVER_UNAVAILABLE' | translate}}</h2>
+          <p class="error-message">
+            {{ 'ERROR.SERVER_RETRY' | translate}}
+          </p>
+        </div>
+        <button nbButton matRipple fullWidth (click)="goToHome()" type="button" class="home-button">
+          {{ 'COMPONENTS.TAKE_ME_HOME' | translate }}
+        </button>
+
+      </form>
+    </div>
+  </div>
+</div>

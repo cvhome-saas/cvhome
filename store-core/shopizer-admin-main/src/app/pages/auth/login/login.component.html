@@ -1,0 +1,87 @@
+<div class="limiter">
+  <div [nbSpinner]="loading" nbSpinnerSize="large" nbSpinnerStatus="primary">
+  <div class="container-login100">
+    <div class="wrap-login100 p-l-85 p-r-85 p-t-55 p-b-55">
+      <form class="login100-form validate-form flex-sb flex-w" [formGroup]='form' (ngSubmit)='onSubmit()'>
+        <span style="width:100%;" class="titleClass">
+
+          <img src="assets/img/shopizer-logo.png" width="200" style="margin-top:-15px;">
+
+        </span>
+
+        <div class="form-group row alert-error" *ngIf="errorMessage !== ''" style="width:100%;line-height: 2.5;color:#ff0648;font-size: 16px;margin-bottom:10px;">
+          {{errorMessage}}
+        </div>
+
+        <div style="width:100%;">
+          <span class="txt1 p-b-11">
+            {{ 'LOGIN.USERNAME' | translate}}
+          </span>
+          <div class="validate-input m-b-36">
+            <input class="inputLogin" type="text" id="inputUsername1" name="username" placeholder="Username"
+              formControlName='username' required>
+          </div>
+        </div>
+
+        <div *ngIf="isSubmitted && formControls.username.errors" class="help-block" style="margin-top:-32px; color:#ff3d71;font-size: 12px;">
+          <span *ngIf="isSubmitted && formControls.username.errors.required">{{ 'LOGIN.INVALID_EMPTY_USERNAME' |
+            translate}}</span>
+          <span *ngIf="isSubmitted && formControls.username.errors.email">{{ 'LOGIN.INVALID_FORMAT_USERNAME' |
+            translate}}</span>
+        </div>
+
+        <div style="width:100%;">
+          <span class="txt1 p-b-11">
+            {{ 'LOGIN.PASSWORD' | translate}}
+          </span>
+          <div class="validate-input m-b-12">
+            <span class="btn-show-pass">
+              <i [class]="passwordType()==0 ? 'fa fa-eye' : 'fa fa-eye-slash'" (click)="showPassword()"></i>
+            </span>
+            <!-- <input class="inputLogin" [type]="passwordType()==0 ? 'password' : 'text'" name="password" formControlName='password'
+              placeholder="Password" required> -->
+            <input [class]="passwordType()==0 ? 'inputLogin password_type' : 'inputLogin'" type="text" name="password"
+              formControlName='password' autocomplete="off" placeholder="Password" required>
+          </div>
+        </div>
+
+        <div *ngIf="isSubmitted && formControls.password.errors" class="help-block" style="margin-top:-8px; color:#ff3d71;font-size: 12px;">
+          <span *ngIf="isSubmitted && formControls.password.errors.required">{{ 'LOGIN.INVALID_EMPTY_PASSWORD' |
+            translate}}</span>
+        </div>
+
+
+        <div style="width:100%;">
+          <div class="flex-sb-m w-full p-b-28 p-t-26">
+            <div class="contact100-form-checkbox">
+              <nb-checkbox [checked]="isRemember" (change)="onCheckRemember($event)">&nbsp;{{ 'LOGIN.REMEMBER_USERNAME'
+                |
+                translate}}</nb-checkbox>
+            </div>
+
+            <div>
+              <a href="javascript:void(0);" class="txt3" (click)="onClickForgotPassword()">
+                {{ 'LOGIN.FORGOT_PASSWORD' | translate}}
+              </a>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="container-login100-form-btn">
+          <button type="submit" nbButton class="login100-form-btn">
+            {{ 'COMMON.LOGIN' | translate}}
+          </button>
+        </div>
+        <section aria-label="Register" class="another-action">
+          <p class="txt4"> Don't have an account? <a class="txt3" href="javascript:void(0);" (click)="onClickRegister()">Register</a></p>
+        </section>
+
+      </form>
+    </div>
+  </div>
+</div>
+</div>
+
+
+<div id="dropDownSelect1"></div>
