@@ -1,0 +1,155 @@
+/**
+ *
+ */
+package com.asrevo.cvhome.store.core.modules.cms.content;
+
+import com.asrevo.cvhome.store.core.entity.content.FileContentType;
+import com.asrevo.cvhome.store.core.entity.content.InputContentFile;
+import com.asrevo.cvhome.store.core.entity.content.OutputContentFile;
+import com.asrevo.cvhome.store.core.exception.ServiceException;
+import com.asrevo.cvhome.store.core.modules.cms.impl.CMSManager;
+
+import java.io.Serial;
+import java.util.List;
+import java.util.Optional;
+
+/**
+ * @author Umesh Awasthi
+ */
+public class StaticContentFileManagerImpl extends StaticContentFileManager {
+
+    /**
+     *
+     */
+    @Serial
+    private static final long serialVersionUID = 1L;
+    private FilePut uploadFile;
+    private FileGet getFile;
+    private FileRemove removeFile;
+    private FolderRemove removeFolder;
+    private FolderPut addFolder;
+    private FolderList listFolder;
+
+    @Override
+    public void addFile(final String merchantStoreCode, Optional<String> path, final InputContentFile inputContentFile)
+            throws ServiceException {
+        uploadFile.addFile(merchantStoreCode, path, inputContentFile);
+
+    }
+
+    /**
+     * Implementation for add static data files. This method will called
+     * respected add files method of underlying CMSStaticContentManager. For CMS
+     * adding given content images with Infinispan cache.
+     *
+     * @param merchantStoreCode          merchant store.
+     * @param inputStaticContentDataList Input content images
+     * @throws ServiceException
+     */
+    @Override
+    public void addFiles(final String merchantStoreCode, Optional<String> path, final List<InputContentFile> inputStaticContentDataList)
+            throws ServiceException {
+        uploadFile.addFiles(merchantStoreCode, path, inputStaticContentDataList);
+    }
+
+    @Override
+    public void removeFile(final String merchantStoreCode, final FileContentType staticContentType,
+                           final String fileName, Optional<String> path) throws ServiceException {
+        removeFile.removeFile(merchantStoreCode, staticContentType, fileName, path);
+
+    }
+
+    @Override
+    public OutputContentFile getFile(String merchantStoreCode, Optional<String> path, FileContentType fileContentType, String contentName)
+            throws ServiceException {
+        return getFile.getFile(merchantStoreCode, path, fileContentType, contentName);
+    }
+
+    @Override
+    public List<String> getFileNames(String merchantStoreCode, Optional<String> path, FileContentType fileContentType)
+            throws ServiceException {
+        return getFile.getFileNames(merchantStoreCode, path, fileContentType);
+    }
+
+    @Override
+    public List<OutputContentFile> getFiles(String merchantStoreCode, Optional<String> path, FileContentType fileContentType)
+            throws ServiceException {
+        return getFile.getFiles(merchantStoreCode, path, fileContentType);
+    }
+
+    @Override
+    public void removeFiles(String merchantStoreCode, Optional<String> path) throws ServiceException {
+        removeFile.removeFiles(merchantStoreCode, path);
+    }
+
+    public FileRemove getRemoveFile() {
+        return removeFile;
+    }
+
+    public void setRemoveFile(FileRemove removeFile) {
+        this.removeFile = removeFile;
+    }
+
+    public FileGet getGetFile() {
+        return getFile;
+    }
+
+    public void setGetFile(FileGet getFile) {
+        this.getFile = getFile;
+    }
+
+    public FilePut getUploadFile() {
+        return uploadFile;
+    }
+
+    public void setUploadFile(FilePut uploadFile) {
+        this.uploadFile = uploadFile;
+    }
+
+    @Override
+    public void removeFolder(String merchantStoreCode, String folderName, Optional<String> path) throws ServiceException {
+        this.removeFolder.removeFolder(merchantStoreCode, folderName, path);
+
+    }
+
+    @Override
+    public void addFolder(String merchantStoreCode, String folderName, Optional<String> path) throws ServiceException {
+        addFolder.addFolder(merchantStoreCode, folderName, path);
+    }
+
+    public FolderRemove getRemoveFolder() {
+        return removeFolder;
+    }
+
+    public void setRemoveFolder(FolderRemove removeFolder) {
+        this.removeFolder = removeFolder;
+    }
+
+    public FolderPut getAddFolder() {
+        return addFolder;
+    }
+
+    public void setAddFolder(FolderPut addFolder) {
+        this.addFolder = addFolder;
+    }
+
+    @Override
+    public List<String> listFolders(String merchantStoreCode, Optional<String> path) throws ServiceException {
+        return this.listFolder.listFolders(merchantStoreCode, path);
+    }
+
+    public FolderList getListFolder() {
+        return listFolder;
+    }
+
+    public void setListFolder(FolderList listFolder) {
+        this.listFolder = listFolder;
+    }
+
+    @Override
+    public CMSManager getCmsManager() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+}

@@ -1,8 +1,8 @@
 package com.asrevo.cvhome.manager.commons.dto;
 
 import com.asrevo.cvhome.commons.domain.IdentityId;
+import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.manager.commons.domain.KeyCloakQuery;
-import com.asrevo.cvhome.manager.commons.domain.ManagerStoreId;
 
 import java.util.Map;
 import java.util.stream.Collectors;

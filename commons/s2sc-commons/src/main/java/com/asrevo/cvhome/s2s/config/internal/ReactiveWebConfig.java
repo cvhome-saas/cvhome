@@ -17,6 +17,7 @@ public class ReactiveWebConfig {
         @Override
         public void configureArgumentResolvers(ArgumentResolverConfigurer configurer) {
             configurer.addCustomResolver(new ReactivePageableHandlerMethodArgumentResolver());
+            configurer.addCustomResolver(new ReactiveOrgStorePrincipalInfoArgumentResolver());
         }
     }
 }

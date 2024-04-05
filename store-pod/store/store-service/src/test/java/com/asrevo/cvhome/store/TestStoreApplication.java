@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.store;
 
 import com.asrevo.cvhome.s2s.config.ServletTestCustomSecurityConfig;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
@@ -21,5 +22,14 @@ public class TestStoreApplication {
 
     public static void main(String[] args) {
         SpringApplication.from(StoreApplication::main).with(TestStoreApplication.class).run(args);
+    }
+
+    @Bean
+    public CommandLineRunner runner(PostgreSQLContainer<?> postgresContainer) {
+        return args -> {
+            System.out.println(postgresContainer.getJdbcUrl());
+            System.out.println(postgresContainer.getUsername());
+            System.out.println(postgresContainer.getPassword());
+        };
     }
 }

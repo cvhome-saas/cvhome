@@ -2,9 +2,9 @@ package com.asrevo.cvhome.manager.controller;
 
 import com.asrevo.cvhome.commons.annotation.OrgStorePrincipalInfo;
 import com.asrevo.cvhome.commons.domain.Groups;
+import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.commons.domain.UserOrgStoreInfo;
 import com.asrevo.cvhome.commons.utils.OperationExecution;
-import com.asrevo.cvhome.manager.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.manager.commons.dto.CreateUserRequestDto;
 import com.asrevo.cvhome.manager.commons.dto.KeyCloakUserDto;
 import com.asrevo.cvhome.manager.commons.dto.ListUsersQuery;
@@ -43,6 +43,9 @@ public class UserAccountController {
         }
         if (create.groups().contains(Groups.ORG_ADMIN)) {
             throw new OperationExecution(ErrorCodes.create_org_admin_not_allowed);
+        }
+        if (create.groups().contains(Groups.SUPER_ADMIN)) {
+            throw new OperationExecution(ErrorCodes.create_super_admin_not_allowed);
         }
         if (userAccountService.usernameExist(create.username())) {
             throw new OperationExecution(ErrorCodes.username_already_taken);

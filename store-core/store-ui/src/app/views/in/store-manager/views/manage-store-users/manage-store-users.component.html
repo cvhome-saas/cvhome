@@ -66,9 +66,9 @@
                                     </label>
                                     <div class="input-group error validate">
 
-                                        <select multiple class="form-control" formControlName="groups"
+                                        <select class="form-control" formControlName="groups" multiple
                                                 placeholder="groups">
-                                            <option [value]="c" *ngFor="let c of groups">{{ c }}</option>
+                                            <option *ngFor="let c of groups" [value]="c">{{ c }}</option>
                                         </select>
                                     </div>
                                     <div class="help-block">
@@ -128,26 +128,26 @@
                         </td>
                         <td>
                             <p class="mb-0 fs-3">
-                                <input type="checkbox" [checked]="u.enabled" [value]="u.enabled"
-                                       (change)="statusChange(u.id,$event)">
+                                <input (change)="statusChange(u.id,$event)" [checked]="u.enabled" [value]="u.enabled"
+                                       type="checkbox">
                             </p>
                         </td>
                         <td>
                             <p>
                                 Select Groups
                             </p>
-                            <select multiple style="height:125px;" name="cities" (change)="groupsChanged(u.id,$event)">
-                                <option *ngFor="let g of u.selectedGroups" [value]="g.group"
-                                        [selected]="g.selected">{{ g.group }}
+                            <select (change)="groupsChanged(u.id,$event)" multiple name="cities" style="height:125px;">
+                                <option *ngFor="let g of u.selectedGroups" [selected]="g.selected"
+                                        [value]="g.group">{{ g.group }}
                                 </option>
                             </select>
                         </td>
                         <td>
-                            <div class="btn-group me-2 mb-2" role="group" aria-label="First group">
-                                <button type="button" class="btn btn-secondary" (click)="deleteUser(u.id)">
+                            <div aria-label="First group" class="btn-group me-2 mb-2" role="group">
+                                <button (click)="deleteUser(u.id)" class="btn btn-secondary" type="button">
                                     <i class="ti ti-trash fs-4"></i>
                                 </button>
-                                <button type="button" class="btn btn-secondary">
+                                <button class="btn btn-secondary" type="button">
                                     <i class="ti ti-settings fs-4"></i>
                                 </button>
                             </div>

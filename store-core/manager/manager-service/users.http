@@ -86,13 +86,13 @@ Content-Type: application/json
     "ROLE_CATALOG_MANAGER",
     "ROLE_ORDERS_MANAGER"
   ]
-
 }
 
 
 
 ### disable user
-POST http://localhost:7001/api/v1/user-account/disable?storeId=65f023632bc46470c104b76f&userId=0ea70fdd-4828-4a0d-a742-59a87334eec6
+POST http://localhost:7001/api/v1/user-account/disable?storeId=65f023632bc46470c104b76f&
+    userId=0ea70fdd-4828-4a0d-a742-59a87334eec6
 Authorization: Bearer {{access_token}}
 Content-Type: application/json
 
@@ -100,7 +100,8 @@ Content-Type: application/json
 }
 
 ### enable user
-POST http://localhost:7001/api/v1/user-account/enable?storeId=65f023632bc46470c104b76f&userId=0ea70fdd-4828-4a0d-a742-59a87334eec6
+POST http://localhost:7001/api/v1/user-account/enable?storeId=65f023632bc46470c104b76f&
+    userId=0ea70fdd-4828-4a0d-a742-59a87334eec6
 Authorization: Bearer {{access_token}}
 Content-Type: application/json
 

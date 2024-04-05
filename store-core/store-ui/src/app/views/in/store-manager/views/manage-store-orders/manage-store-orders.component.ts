@@ -9,7 +9,6 @@ import {StoreService} from "../../../../../service/store.service";
 export class ManageStoreOrdersComponent implements OnInit {
 
 
-
     constructor(private storeService: StoreService) {
 
     }

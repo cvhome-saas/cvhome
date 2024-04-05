@@ -1,8 +1,8 @@
 package com.asrevo.cvhome.manager.config;
 
 import com.asrevo.cvhome.commons.domain.IdentityId;
+import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.commons.event.EventId;
-import com.asrevo.cvhome.manager.commons.domain.ManagerStoreId;
 import org.springdoc.core.utils.SpringDocUtils;
 import org.springframework.context.annotation.Configuration;
 

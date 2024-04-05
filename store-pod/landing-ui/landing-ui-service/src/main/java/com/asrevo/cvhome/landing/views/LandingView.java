@@ -2,9 +2,7 @@ package com.asrevo.cvhome.landing.views;
 
 import com.asrevo.cvhome.commons.utils.CustomPageImpl;
 import com.asrevo.cvhome.landing.service.ProductService;
-import com.asrevo.cvhome.storepod.commons.domain.ProductId;
 import com.asrevo.cvhome.storepod.commons.domain.StoreId;
-import com.asrevo.cvhome.storepod.commons.dto.DetailedProductDto;
 import com.asrevo.cvhome.storepod.commons.dto.ProductDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -16,7 +14,6 @@ import org.springframework.web.reactive.result.view.Rendering;
 import org.thymeleaf.spring6.context.webflux.ReactiveDataDriverContextVariable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
 @Controller
 @RequestMapping(params = "storeId")

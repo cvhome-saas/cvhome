@@ -1,8 +1,8 @@
 package com.asrevo.cvhome.manager.commons.event.store;
 
+import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.commons.event.Event;
 import com.asrevo.cvhome.commons.event.EventId;
-import com.asrevo.cvhome.manager.commons.domain.ManagerStoreId;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 

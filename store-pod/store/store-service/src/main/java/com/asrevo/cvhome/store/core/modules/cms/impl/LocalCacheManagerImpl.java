@@ -1,0 +1,28 @@
+package com.asrevo.cvhome.store.core.modules.cms.impl;
+
+/**
+ * Http server bootstrap
+ *
+ * @author carlsamson
+ */
+public class LocalCacheManagerImpl implements CMSManager {
+
+    private final String rootName;// file location root
+
+    public LocalCacheManagerImpl(String rootName) {
+        this.rootName = rootName;
+    }
+
+
+    @Override
+    public String getRootName() {
+        return rootName;
+    }
+
+    @Override
+    public String getLocation() {
+        return "";
+    }
+
+
+}

@@ -1,8 +1,13 @@
 package com.asrevo.cvhome.manager.config;
 
+import com.asrevo.cvhome.manager.service.InternalStoreService;
 import com.asrevo.cvhome.s2s.jwt.KeyClockJwtGrantedAuthoritiesConverter;
+import com.asrevo.cvhome.s2s.services.AccessEvaluator;
+import com.asrevo.cvhome.s2s.services.AccessEvaluatorImpl;
+import com.asrevo.cvhome.s2s.services.StoreSecurityServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.oauth2.server.resource.authentication.ReactiveJwtAuthenticationConverter;
@@ -39,5 +44,11 @@ public class SecurityConfig {
         KeyClockJwtGrantedAuthoritiesConverter keyClockJwtGrantedAuthoritiesConverter = new KeyClockJwtGrantedAuthoritiesConverter();
         converter.setJwtGrantedAuthoritiesConverter(source -> Flux.fromIterable(keyClockJwtGrantedAuthoritiesConverter.convert(source)));
         return converter;
+    }
+
+    @Bean
+    @Lazy
+    public AccessEvaluator accessEvaluator(InternalStoreService internalStoreService) {
+        return new AccessEvaluatorImpl(new StoreSecurityServiceImpl(internalStoreService::getStoreOwner));
     }
 }
