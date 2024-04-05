@@ -25,7 +25,7 @@ public class SecurityConfig {
     private static CorsConfiguration buildCorsConfiguration() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(List.of("http://localhost")); // www - obligatory
+        configuration.setAllowedOrigins(List.of("http://localhost","http://localhost:4200")); // www - obligatory
         configuration.setAllowedMethods(List.of("OPTIONS", "GET", "POST", "PUT", "DELETE"));
         configuration.setAllowCredentials(true);
         configuration.setAllowedHeaders(List.of("Authorization", "Cache-Control", "Content-Type"));
