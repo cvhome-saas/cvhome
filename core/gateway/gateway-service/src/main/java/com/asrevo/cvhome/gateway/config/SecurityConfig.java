@@ -14,7 +14,7 @@ import org.springframework.web.server.session.CookieWebSessionIdResolver;
 import org.springframework.web.server.session.WebSessionIdResolver;
 import reactor.core.publisher.Mono;
 
-import static com.asrevo.cvhome.s2s.utils.SecurityUtils.buildCorsConfiguration;
+import static com.asrevo.cvhome.s2s.utils.SecurityUtils.buildReactivCorsConfiguration;
 import static org.springframework.security.config.Customizer.withDefaults;
 import static org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher.MatchResult.match;
 import static org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher.MatchResult.notMatch;
@@ -50,7 +50,7 @@ public class SecurityConfig {
                 )
                 .cors(httpSecurityCorsConfigurer ->
                         httpSecurityCorsConfigurer.configurationSource(request ->
-                                buildCorsConfiguration()
+                                buildReactivCorsConfiguration()
                         )
                 )
                 .build();

@@ -34,7 +34,20 @@ public class SecurityUtils {
         }
     }
 
-    public static CorsConfiguration buildCorsConfiguration() {
+    public static CorsConfiguration buildReactivCorsConfiguration() {
+        CorsConfiguration configuration = new CorsConfiguration();
+
+        configuration.setAllowedOrigins(List.of("http://localhost", "http://localhost:4200")); // www - obligatory
+        configuration.setAllowedMethods(List.of("OPTIONS", "GET", "POST", "PUT", "DELETE"));
+        configuration.setAllowCredentials(true);
+        configuration.setAllowedHeaders(List.of("Authorization", "Cache-Control", "Content-Type"));
+
+        final org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource source = new org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+
+        return configuration;
+    }
+    public static CorsConfiguration buildServletCorsConfiguration() {
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowedOrigins(List.of("http://localhost", "http://localhost:4200")); // www - obligatory
