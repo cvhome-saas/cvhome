@@ -11,7 +11,7 @@ const routes: Routes = [
   {
     path: "pages",
     loadChildren: "app/pages/pages.module#PagesModule",
-    canActivate: [AuthGuard],
+    // canActivate: [AuthGuard],
   },
   { path: "gallery", component: ImageBrowserComponent },
   { path: "", redirectTo: "pages", pathMatch: "full" },

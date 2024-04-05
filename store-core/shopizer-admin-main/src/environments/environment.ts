@@ -18,7 +18,7 @@ export const environment = {
     mode: 'STANDARD',
     //API URL
     //apiUrl: "http://localhost:8080/api/api",
-    apiUrl: "http://localhost:6001/api",
+    apiUrl: "http://localhost:6000/store/api",
     shippingApi: 'http://localhost:9090/shipping/api/v1',
     client: {
         language: {

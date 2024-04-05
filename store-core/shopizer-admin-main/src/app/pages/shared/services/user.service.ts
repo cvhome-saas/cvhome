@@ -32,7 +32,7 @@ export class UserService {
   }
 
   getUserProfile(): Observable<any> {
-    return this.crudService.get(`/v1/private/user/profile`);
+    return this.crudService.get(`/v1/auth/me`);
   }
 
   checkIfUserExist(body): Observable<any> {
