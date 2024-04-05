@@ -14,6 +14,7 @@ import org.springframework.security.oauth2.server.resource.authentication.Reacti
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import reactor.core.publisher.Flux;
 
+import static com.asrevo.cvhome.s2s.utils.SecurityUtils.buildCorsConfiguration;
 import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
@@ -34,6 +35,11 @@ public class SecurityConfig {
                         it.jwt(withDefaults())
                 )
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
+                .cors(httpSecurityCorsConfigurer ->
+                        httpSecurityCorsConfigurer.configurationSource(request ->
+                                buildCorsConfiguration()
+                        )
+                )
                 .build();
         // @formatter:on
     }
