@@ -1,0 +1,4 @@
+*
+<nb-select placeholder="Select Store" [selected]="selectedItem?.id" (selectedChange)="changed({id:$event})">
+  <nb-option *ngFor="let s of stores" [value]="s.id.id">{{ s.name }}</nb-option>
+</nb-select>
