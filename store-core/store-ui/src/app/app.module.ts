@@ -6,7 +6,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgModule } from '@angular/core';
-import { HttpClientModule } from '@angular/common/http';
+import {HttpClient, HttpClientModule} from '@angular/common/http';
 import { ThemeModule } from './@theme/theme.module';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
@@ -24,6 +24,8 @@ import {UserService} from "./@core/mock/users.service";
 import {NbRoleProvider, NbSecurityModule} from "@nebular/security";
 import {NbAuthModule} from "@nebular/auth";
 import {of} from "rxjs";
+import {TranslateLoader, TranslateModule} from "@ngx-translate/core";
+import {TranslateHttpLoader} from "@ngx-translate/http-loader";
 
 export class NbSimpleRoleProvider extends NbRoleProvider {
   getRole() {
@@ -59,8 +61,18 @@ export class NbSimpleRoleProvider extends NbRoleProvider {
     }),
     NbSecurityModule.forRoot(),
     ThemeModule.forRoot(),
+    TranslateModule.forRoot({
+      loader: {
+        provide: TranslateLoader,
+        useFactory: HttpLoaderFactory,
+        deps: [HttpClient]
+      }
+    })
   ],
   bootstrap: [AppComponent],
 })
 export class AppModule {
+}
+export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
+  return new TranslateHttpLoader(http);
 }
