@@ -10,6 +10,7 @@ import {
   NbRadioModule,
   NbSelectModule
 } from "@nebular/theme";
+import {SharedModule} from "../../shared/shared.module";
 
 const routes: Route[] = [
   {path: "", component: ProductsComponent}
@@ -17,13 +18,12 @@ const routes: Route[] = [
 
 @NgModule({
   declarations: [
-    ProductsComponent
+    ProductsComponent,
   ],
   imports: [
     CommonModule,
     RouterModule.forChild(routes),
-    NbCardModule, NbButtonModule, NbInputModule, NbRadioModule, NbOptionModule, NbSelectModule
-
+    SharedModule
   ]
 })
 export class ProductsModule {

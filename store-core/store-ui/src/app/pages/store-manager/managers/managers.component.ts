@@ -5,13 +5,13 @@ import {Group, ManagerStoreId, User} from "../../../shared/domain/commons";
 import {UserService} from "../../../shared/service/user.service";
 
 @Component({
-  selector: 'app-manage-store-users',
-  templateUrl: './manage-store-users.component.html',
-  styleUrls: ['./manage-store-users.component.css']
+  selector: 'app-managers',
+  templateUrl: './managers.component.html',
+  styleUrls: ['./managers.component.css']
 })
-export class ManageStoreUsersComponent implements OnInit, OnDestroy {
+export class ManagersComponent implements OnInit, OnDestroy {
   currentStoreId: string = '';
-  users: Users[] = [];
+  managers: Users[] = [];
   groups: string[] = Object.values(Group)
   userForm: FormGroup;
 
@@ -56,8 +56,8 @@ export class ManageStoreUsersComponent implements OnInit, OnDestroy {
         groups: value.groups
       }, {id: this.currentStoreId})
         .subscribe((it: User) => {
-          if (!this.users) this.users = []
-          this.users.push(this.toUsers(it));
+          if (!this.managers) this.managers = []
+          this.managers.push(this.toUsers(it));
           this.userForm.reset();
         });
     }
@@ -74,7 +74,7 @@ export class ManageStoreUsersComponent implements OnInit, OnDestroy {
 
   deleteUser(userId: string) {
     this.userService.delete({id: this.currentStoreId}, userId).subscribe(() => {
-      this.users = this.users.filter(u => u.id != userId)
+      this.managers = this.managers.filter(u => u.id != userId)
     })
   }
 
@@ -103,7 +103,7 @@ export class ManageStoreUsersComponent implements OnInit, OnDestroy {
   storeSelectedChanged($event: ManagerStoreId) {
     this.currentStoreId = $event.id
     this.userService.list($event).subscribe(it => {
-      this.users = it.map(x => this.toUsers(x))
+      this.managers = it.map(x => this.toUsers(x))
     })
   }
 }

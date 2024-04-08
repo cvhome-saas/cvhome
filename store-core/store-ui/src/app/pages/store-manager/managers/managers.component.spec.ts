@@ -1,18 +1,18 @@
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 
-import {ManageStoreUsersComponent} from './manage-store-users.component';
+import {UsersComponent} from './managers.component';
 
-describe('ManageStoreUsersComponent', () => {
-    let component: ManageStoreUsersComponent;
-    let fixture: ComponentFixture<ManageStoreUsersComponent>;
+describe('UsersComponent', () => {
+    let component: UsersComponent;
+    let fixture: ComponentFixture<UsersComponent>;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [ManageStoreUsersComponent]
+            declarations: [UsersComponent]
         })
             .compileComponents();
 
-        fixture = TestBed.createComponent(ManageStoreUsersComponent);
+        fixture = TestBed.createComponent(UsersComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });

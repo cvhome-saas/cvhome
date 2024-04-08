@@ -3,9 +3,10 @@
     <nb-card class="inline-form-card">
       <nb-card-header>
         CATEGORY
+        <ngx-store-selector (storeSelectionChange)="storeSelectedChanged($event)"></ngx-store-selector>
       </nb-card-header>
       <nb-card-body>
-
+        <ngx-datatable [rows]="rows" [columns]="columns"></ngx-datatable>
       </nb-card-body>
     </nb-card>
   </div>

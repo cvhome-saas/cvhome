@@ -2,30 +2,22 @@ import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {StoreManagerComponent} from './store-manager/store-manager.component';
 import {StoreManagerRoutingModule} from "./store-manager-routing.module";
-import {
-  NbButtonModule,
-  NbCardModule,
-  NbInputModule,
-  NbOptionModule,
-  NbRadioModule,
-  NbSelectModule
-} from "@nebular/theme";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
-import {ManageStoreUsersComponent} from "./manage-store-users/manage-store-users.component";
-import {StoreSelectorComponent} from "./shared/store-selector/store-selector.component";
+import {ManagersComponent} from "./managers/managers.component";
+import {SharedModule} from "./shared/shared.module";
 
 
 @NgModule({
   declarations: [
     StoreManagerComponent,
-    ManageStoreUsersComponent,
-    StoreSelectorComponent
+    ManagersComponent,
   ],
   imports: [
     CommonModule,
-    FormsModule, ReactiveFormsModule,
+    FormsModule,
+    ReactiveFormsModule,
     StoreManagerRoutingModule,
-    NbCardModule, NbButtonModule, NbInputModule, NbRadioModule, NbOptionModule, NbSelectModule
+    SharedModule
   ]
 })
 export class StoreManagerModule {

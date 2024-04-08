@@ -2,14 +2,7 @@ import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {CategoryComponent} from './category.component';
 import {RouterModule, Routes} from "@angular/router";
-import {
-  NbButtonModule,
-  NbCardModule,
-  NbInputModule,
-  NbOptionModule,
-  NbRadioModule,
-  NbSelectModule
-} from "@nebular/theme";
+import {SharedModule} from "../../shared/shared.module";
 
 const routes: Routes = [
   {path: '', component: CategoryComponent},
@@ -21,8 +14,9 @@ const routes: Routes = [
     CategoryComponent
   ],
   imports: [
-    CommonModule, RouterModule.forChild(routes),
-    NbCardModule, NbButtonModule, NbInputModule, NbRadioModule, NbOptionModule, NbSelectModule
+    CommonModule,
+    RouterModule.forChild(routes),
+    SharedModule
   ]
 })
 export class CategoryModule {
