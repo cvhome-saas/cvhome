@@ -31,7 +31,7 @@ public class ReactiveOrgStorePrincipalInfoArgumentResolver implements HandlerMet
     }
 
     private Object resolvePrincipal(MethodParameter parameter, Authentication authentication) {
-        return SecurityUtils.getOrgStoreInfo(authentication);
+        return SecurityUtils.getOrgStoreIdentity(authentication);
 
     }
 

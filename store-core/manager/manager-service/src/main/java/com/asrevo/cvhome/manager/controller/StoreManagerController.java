@@ -2,7 +2,7 @@ package com.asrevo.cvhome.manager.controller;
 
 import com.asrevo.cvhome.commons.annotation.OrgStorePrincipalInfo;
 import com.asrevo.cvhome.commons.domain.ManagerStoreId;
-import com.asrevo.cvhome.commons.domain.UserOrgStoreInfo;
+import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
 import com.asrevo.cvhome.manager.commons.dto.CreateManagerStoreRequest;
 import com.asrevo.cvhome.manager.commons.dto.CreateManagerStoreResponse;
 import com.asrevo.cvhome.manager.commons.dto.ListManagerStoreQuery;
@@ -26,19 +26,19 @@ public class StoreManagerController {
     private final InternalStoreService storeService;
 
     @PostMapping("list")
-    public Mono<Page<ManagerStoreDto>> findAllStores(@OrgStorePrincipalInfo UserOrgStoreInfo info, @RequestBody ListManagerStoreQuery listManagerStoreQuery, Pageable pageable) {
-        return Mono.just(storeService.findAll(listManagerStoreQuery, info.org(), pageable));
+    public Mono<Page<ManagerStoreDto>> findAllStores(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestBody ListManagerStoreQuery listManagerStoreQuery, Pageable pageable) {
+        return Mono.just(storeService.findAll(identity,listManagerStoreQuery, pageable));
     }
 
     @PostMapping("create")
     @PreAuthorize("hasAnyRole('ROLE_ORG_ADMIN')")
-    public Mono<CreateManagerStoreResponse> create(@RequestBody CreateManagerStoreRequest request, @OrgStorePrincipalInfo UserOrgStoreInfo info) {
-        return Mono.just(managerService.createStore(request, info.org()));
+    public Mono<CreateManagerStoreResponse> create(@RequestBody CreateManagerStoreRequest request, @OrgStorePrincipalInfo UserOrgStoreIdentity identity) {
+        return Mono.just(managerService.createStore(request, identity.org()));
     }
 
     @GetMapping("store-info")
     @PreAuthorize("hasPermission(#storeId,'ManagerStoreId','STORE.FIND-ONE')")
-    public Mono<ManagerStoreDto> storeInfo(@OrgStorePrincipalInfo UserOrgStoreInfo info, @RequestParam ManagerStoreId storeId) {
+    public Mono<ManagerStoreDto> storeInfo(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId storeId) {
         return Mono.just(storeService.findStore(storeId));
     }
 }

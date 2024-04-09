@@ -2,7 +2,7 @@ package com.asrevo.cvhome.manager.service.impl;
 
 import com.asrevo.cvhome.commons.domain.IdentityId;
 import com.asrevo.cvhome.commons.domain.ManagerStoreId;
-import com.asrevo.cvhome.commons.domain.UserOrgStoreInfo;
+import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
 import com.asrevo.cvhome.commons.utils.OperationExecution;
 import com.asrevo.cvhome.manager.commons.dto.CreateUserRequestDto;
 import com.asrevo.cvhome.manager.commons.dto.KeyCloakUserDto;
@@ -90,7 +90,7 @@ public class KeycloakUserAccountServiceImpl implements UserAccountService {
     }
 
     @Override
-    public void resetPassword(UserOrgStoreInfo userOrgStoreInfo, ManagerStoreId storeId, RestPasswordRequestDto passwordRequestDto, String userId) {
+    public void resetPassword(UserOrgStoreIdentity userOrgStoreInfo, ManagerStoreId storeId, RestPasswordRequestDto passwordRequestDto, String userId) {
         UserResource userResource = usersResource.get(userId);
         UserRepresentation representation = userResource.toRepresentation();
         checkAttrAndValidate(userOrgStoreInfo, storeId, representation, () -> doResetPassword(passwordRequestDto, userId));
@@ -112,14 +112,14 @@ public class KeycloakUserAccountServiceImpl implements UserAccountService {
     }
 
     @Override
-    public void deleteUser(UserOrgStoreInfo userOrgStoreInfo, ManagerStoreId storeId, String userId) {
+    public void deleteUser(UserOrgStoreIdentity userOrgStoreInfo, ManagerStoreId storeId, String userId) {
         UserResource userResource = usersResource.get(userId);
         UserRepresentation representation = userResource.toRepresentation();
         checkAttrAndValidate(userOrgStoreInfo, storeId, representation, userResource::remove);
     }
 
     @Override
-    public void enableUser(UserOrgStoreInfo userOrgStoreInfo, ManagerStoreId storeId, String userId) {
+    public void enableUser(UserOrgStoreIdentity userOrgStoreInfo, ManagerStoreId storeId, String userId) {
         UserResource userResource = usersResource.get(userId);
         UserRepresentation representation = userResource.toRepresentation();
         checkAttrAndValidate(userOrgStoreInfo, storeId, representation, () -> {
@@ -129,7 +129,7 @@ public class KeycloakUserAccountServiceImpl implements UserAccountService {
     }
 
     @Override
-    public void disableUser(UserOrgStoreInfo userOrgStoreInfo, ManagerStoreId storeId, String userId) {
+    public void disableUser(UserOrgStoreIdentity userOrgStoreInfo, ManagerStoreId storeId, String userId) {
         UserResource userResource = usersResource.get(userId);
         UserRepresentation representation = userResource.toRepresentation();
         checkAttrAndValidate(userOrgStoreInfo, storeId, representation, () -> {
@@ -147,7 +147,7 @@ public class KeycloakUserAccountServiceImpl implements UserAccountService {
      * @param runnable
      */
 
-    private void checkAttrAndValidate(UserOrgStoreInfo userOrgStoreInfo, ManagerStoreId storeId, UserRepresentation representation, Runnable runnable) {
+    private void checkAttrAndValidate(UserOrgStoreIdentity userOrgStoreInfo, ManagerStoreId storeId, UserRepresentation representation, Runnable runnable) {
         if (attrMatch(representation, userOrgStoreInfo, storeId)) {
             runnable.run();
         } else {
@@ -155,7 +155,7 @@ public class KeycloakUserAccountServiceImpl implements UserAccountService {
         }
     }
 
-    private boolean attrMatch(UserRepresentation representation, UserOrgStoreInfo userOrgStoreInfo, ManagerStoreId storeId) {
+    private boolean attrMatch(UserRepresentation representation, UserOrgStoreIdentity userOrgStoreInfo, ManagerStoreId storeId) {
         String orgAttr = extractKey(representation.getAttributes(), ORG_ATTR_KEY).orElseThrow(() -> new OperationExecution(ErrorCodes.KEYCLOAK_USER_ATTR_NOT_CONTAIN_ORG));
         if (!orgAttr.equals(userOrgStoreInfo.org().id())) {
             return false;
