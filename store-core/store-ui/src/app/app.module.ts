@@ -44,6 +44,7 @@ export class NbSimpleRoleProvider extends NbRoleProvider {
   ],
   exports: [
     NbAuthModule,
+    TranslateModule
   ],
   imports: [
     BrowserModule,

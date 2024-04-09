@@ -4,6 +4,7 @@ import { NbMediaBreakpointsService, NbMenuService, NbSidebarService, NbThemeServ
 import { UserData } from '../../../@core/data/users';
 import { map, takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
+import {TranslateService} from "@ngx-translate/core";
 
 @Component({
   selector: 'ngx-header',
@@ -34,7 +35,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
       name: 'Corporate',
     },
   ];
-
+  languages=["en","ar"]
+  currentLanguage=this.languages[0]
   currentTheme = 'default';
 
   userMenu = [ { title: 'Profile' }, { title: 'Log out' } ];
@@ -43,7 +45,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
               private menuService: NbMenuService,
               private themeService: NbThemeService,
               private userService: UserData,
-              private breakpointService: NbMediaBreakpointsService) {
+              private breakpointService: NbMediaBreakpointsService,
+              private translateService:TranslateService
+              ) {
   }
 
   ngOnInit() {
@@ -77,7 +81,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
   changeTheme(themeName: string) {
     this.themeService.changeTheme(themeName);
   }
-
+  changeLanguage(language:string){
+this.translateService.use(language);
+  }
   toggleSidebar(): boolean {
     this.sidebarService.toggle(true, 'menu-sidebar');
 

@@ -10,6 +10,7 @@ import {
   NbSelectModule
 } from "@nebular/theme";
 import {NgxDatatableModule} from "@swimlane/ngx-datatable";
+import {TranslateModule} from "@ngx-translate/core";
 
 
 @NgModule({
@@ -23,7 +24,9 @@ import {NgxDatatableModule} from "@swimlane/ngx-datatable";
     NbRadioModule,
     NbOptionModule,
     NbSelectModule,
-    NgxDatatableModule],
+    NgxDatatableModule,
+    TranslateModule
+  ],
   imports: [
     CommonModule,
     NbSelectModule,
@@ -33,7 +36,8 @@ import {NgxDatatableModule} from "@swimlane/ngx-datatable";
     NbRadioModule,
     NbOptionModule,
     NbSelectModule,
-    NgxDatatableModule
+    NgxDatatableModule,
+    TranslateModule
   ]
 })
 export class SharedModule {

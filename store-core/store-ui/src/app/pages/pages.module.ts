@@ -9,6 +9,9 @@ import { PagesRoutingModule } from './pages-routing.module';
 // import { MiscellaneousModule } from './miscellaneous/miscellaneous.module';
 
 @NgModule({
+  exports:[
+
+  ],
   imports: [
     PagesRoutingModule,
     ThemeModule,
