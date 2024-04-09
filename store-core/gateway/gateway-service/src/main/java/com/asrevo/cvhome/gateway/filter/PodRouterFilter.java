@@ -18,6 +18,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
+import java.util.Map;
+import java.util.Optional;
 
 import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.GATEWAY_REQUEST_URL_ATTR;
 
@@ -31,15 +33,16 @@ public class PodRouterFilter implements GlobalFilter, Ordered {
 
     public PodRouterFilter(RouterAllocationService router, GatewayProperties gatewayProperties, ServiceDomainProperties serviceDomainProperties) {
         this.router = router;
-        if (CallStrategy.DIRECT.equals(serviceDomainProperties.calls().getOrDefault("store", CallStrategy.GATEWAY))) {
+        Map<String, CallStrategy> calls = Optional.ofNullable(serviceDomainProperties.calls()).orElse(Map.of());
+        if (CallStrategy.DIRECT.equals(calls.getOrDefault("store", CallStrategy.GATEWAY))) {
             this.storeUri = serviceDomainProperties.services().get("store").getServiceHost();
             this.callStrategy = CallStrategy.DIRECT;
-        } else if (CallStrategy.GATEWAY.equals(serviceDomainProperties.calls().getOrDefault("store", CallStrategy.GATEWAY))) {
+        } else if (CallStrategy.GATEWAY.equals(calls.getOrDefault("store", CallStrategy.GATEWAY))) {
             this.storeUri = gatewayProperties.getRoutes().stream().filter(routeDefinition -> routeDefinition.getId().equals("store")).findFirst()
                     .map(it -> it.getUri().toString()).orElse(null);
             this.callStrategy = CallStrategy.GATEWAY;
         } else {
-            throw new RuntimeException("Unsupported call strategy: " + serviceDomainProperties.calls().get("store"));
+            throw new RuntimeException("Unsupported call strategy: " + calls.get("store"));
         }
     }
 
@@ -60,14 +63,14 @@ public class PodRouterFilter implements GlobalFilter, Ordered {
         URI uri = exchange.getRequest().getURI();
         if (uri.getPath().startsWith(STORE_SERVICE_PREFIX)) {
             UriComponents uriComponents = UriComponentsBuilder.fromUri(uri).build();
-            String storeId = uriComponents.getQueryParams().getFirst(STORE_ID_PARAM);
-            if (storeId != null) {
-                Mono<ServerHttpRequest> httpRequest = getServerHttpRequest(exchange, uriComponents, new DomainReference(storeId));
-                return httpRequest.flatMap(it -> {
-                    exchange.getAttributes().put(GATEWAY_REQUEST_URL_ATTR, it.getURI());
-                    return chain.filter(exchange.mutate().request(it).build());
-                });
-            }
+//            String storeId = uriComponents.getQueryParams().getFirst(STORE_ID_PARAM);
+//            if (storeId != null) {
+            Mono<ServerHttpRequest> httpRequest = getServerHttpRequest(exchange, uriComponents, new DomainReference("storeId"));
+            return httpRequest.flatMap(it -> {
+                exchange.getAttributes().put(GATEWAY_REQUEST_URL_ATTR, it.getURI());
+                return chain.filter(exchange.mutate().request(it).build());
+            });
+//            }
         }
         return chain.filter(exchange);
     }
