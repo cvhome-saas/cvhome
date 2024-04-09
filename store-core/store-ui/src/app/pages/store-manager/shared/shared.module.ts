@@ -7,10 +7,11 @@ import {
   NbInputModule,
   NbOptionModule,
   NbRadioModule,
-  NbSelectModule
+  NbSelectModule, NbSpinnerModule
 } from "@nebular/theme";
 import {NgxDatatableModule} from "@swimlane/ngx-datatable";
 import {TranslateModule} from "@ngx-translate/core";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 
 
 @NgModule({
@@ -25,7 +26,10 @@ import {TranslateModule} from "@ngx-translate/core";
     NbOptionModule,
     NbSelectModule,
     NgxDatatableModule,
-    TranslateModule
+    NbSpinnerModule,
+    TranslateModule,
+    FormsModule,
+    ReactiveFormsModule,
   ],
   imports: [
     CommonModule,
@@ -37,7 +41,10 @@ import {TranslateModule} from "@ngx-translate/core";
     NbOptionModule,
     NbSelectModule,
     NgxDatatableModule,
-    TranslateModule
+    NbSpinnerModule,
+    TranslateModule,
+    FormsModule,
+    ReactiveFormsModule,
   ]
 })
 export class SharedModule {

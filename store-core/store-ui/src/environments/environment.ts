@@ -10,4 +10,22 @@
 
 export const environment = {
   production: false,
+  //GOOGLE MAP
+  googleApiKey: '',
+  //MARKETPLACE | BTB | STANDARD
+  mode: 'STANDARD',
+  //API URL
+  //apiUrl: "http://localhost:8080/api/api",
+  apiUrl: '',
+  shippingApi: '',
+  client: {
+    language: {
+      default: 'en',
+      array: [
+        'fr',
+        'en',
+        'ar'
+      ],
+    },
+  }
 };

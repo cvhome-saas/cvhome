@@ -12,6 +12,12 @@ const routes: Routes = [{
   path: '',
   component: PagesComponent,
   children: [
+    {
+      path: 'orders',
+      // canActivate: [OrdersGuard],
+      loadChildren: () => import('./orders/orders.module')
+        .then(m => m.OrdersModule),
+    },
 
     // {
     //   path: 'dashboard',

@@ -1,0 +1,36 @@
+<nb-card class="page-card inner_pages ">
+  <nb-card-body [nbSpinner]="loadingList" nbSpinnerSize="large" nbSpinnerStatus="primary" class="image-content">
+    <div class="inner_pages_legacy">
+      <nb-card-header class="main_header">
+        <h1 class="page_title">{{ 'filemanager.title' | translate}}</h1>
+        <div class="content_spacing_empty"></div>
+
+      </nb-card-header>
+      <!-- <div class="custom_scroll" malihu-scrollbar [scrollbarOptions]="scrollbarOptions"> -->
+      <fm-file-manager [tree]="tree" [language]="appLanguage" [isPopup]="isPopup" [folderContentBackTemplate]="folderContentBackTemplate"
+      [loadingOverlayTemplate]="loadingOverlayTemplate" [folderContentTemplate]="folderContentTemplate"></fm-file-manager>
+
+
+      <ng-template let-timeoutMessage #loadingOverlayTemplate></ng-template>
+      
+      <ng-template let-node #folderContentTemplate>
+
+         <div class="file-name">
+              {{node.name}}
+         </div>
+         <img src="{{node.id}}" alt="{{node.name}}" style="max-width: 100%;box-shadow: 2px 2px 6px 0px  rgba(0,0,0,0.3);border: 1px solid #ccc;">
+
+      </ng-template>
+
+
+
+      <ng-template let-node #folderContentBackTemplate>
+        <div class="item" style="font-weight: bold; padding: 5px;  margin: 15px; border-radius: 5px; width: 100px; height: 100px; cursor: pointer;">
+          <i class="fas fa-arrow-left" style="padding: 0 5px;line-height: 2;font-size: 3em;"></i>
+        </div>
+      </ng-template>
+
+      <!-- </div> -->
+    </div>
+  </nb-card-body>
+</nb-card>

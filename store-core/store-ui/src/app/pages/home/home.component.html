@@ -1,0 +1,65 @@
+<div [nbSpinner]="loadingList" nbSpinnerSize="large" nbSpinnerStatus="primary">
+<div class="inner_pages home_page">
+  <nb-card-header class="main_header">
+      <h1 class="page_title"> {{ "HOME.STORE_INFORMATION" | translate }}</h1>
+      <div class="main_spacer">
+          &nbsp;
+      </div>
+  </nb-card-header>
+</div>
+
+<div class="row">
+    <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
+        <nb-card class="nb-card inline-form-card">
+          <nb-card-header class="nb-card-header">{{"COMPONENTS.STORE_DETAILS" | translate}}</nb-card-header>
+          <nb-card-body class="nb-card-body">
+              <div class="info-block">
+                  <span><strong>{{user?.merchantName}}</strong></span>
+                  <span>{{user?.address}}</span>
+                  <span>{{user?.city}}, {{user?.stateProvince}}, {{user?.postalCode}}</span>
+                  <span>{{user?.country}}</span>
+                  <span>{{user?.phone}}</span>
+                </div>
+                <div class="info-block">
+                    <span>
+                      <i class="fa fa-user"></i>
+                      {{user?.userName}}
+                    </span>
+                    <span>
+                      <i class="fa fa-calendar-alt"></i>
+                      {{ "HOME.LAST_ACCESS" | translate }}: {{user?.lastAccess | date : 'medium'}}
+                    </span>
+                </div>
+          </nb-card-body>
+        </nb-card>
+    </div>
+    
+    <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 box-overlay">
+        <div [nbSpinner]="loading" nbSpinnerSize="large" nbSpinnerStatus="primary">
+        <nb-card class="nb-card inline-form-card">
+          <nb-card-header class="nb-card-header">System management</nb-card-header>
+          <nb-card-body class="nb-card-body">
+              <div>
+                  <button type="button" disabled nbButton status="primary" (click)="deleteCache()">{{'SYSTEM.DELETE_CACHE' | translate }}</button>
+              </div>
+          </nb-card-body>
+        </nb-card>
+      </div>
+    </div>
+    
+</div>
+
+
+<!--
+<div class="row">
+    <div class="col-xxl-12" >
+      <span id="draft">
+        <p id="bg-text">Draft</p>
+        <ngx-ecommerce-charts></ngx-ecommerce-charts>
+      </span>
+    </div>
+</div>
+-->
+
+</div>
+
