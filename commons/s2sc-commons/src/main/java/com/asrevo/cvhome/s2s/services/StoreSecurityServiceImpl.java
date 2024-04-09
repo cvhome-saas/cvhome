@@ -3,13 +3,13 @@ package com.asrevo.cvhome.s2s.services;
 import com.asrevo.cvhome.commons.domain.IdentityId;
 import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.commons.domain.Roles;
-import com.asrevo.cvhome.commons.domain.UserOrgStoreInfo;
+import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
 
 import java.util.function.Function;
 
-import static com.asrevo.cvhome.s2s.utils.SecurityUtils.getOrgStoreInfo;
+import static com.asrevo.cvhome.s2s.utils.SecurityUtils.getOrgStoreIdentity;
 
 @AllArgsConstructor
 public class StoreSecurityServiceImpl implements StoreSecurityService {
@@ -54,11 +54,11 @@ public class StoreSecurityServiceImpl implements StoreSecurityService {
         if (!hasStoreAdminRole(authentication)) {
             return false;
         }
-        UserOrgStoreInfo info = getOrgStoreInfo(authentication);
-        if (!requestedStoreId.getId().toString().equals(info.store())) {
+        UserOrgStoreIdentity identity = getOrgStoreIdentity(authentication);
+        if (!requestedStoreId.getId().toString().equals(identity.store())) {
             return false;
         }
-        return getOwnerForStore.apply((requestedStoreId)).equals(info.org());
+        return getOwnerForStore.apply((requestedStoreId)).equals(identity.org());
     }
 
     @Override
@@ -66,11 +66,11 @@ public class StoreSecurityServiceImpl implements StoreSecurityService {
         if (!hasStoreModeratorRole(authentication)) {
             return false;
         }
-        UserOrgStoreInfo info = getOrgStoreInfo(authentication);
-        if (!requestedStoreId.getId().toString().equals(info.store())) {
+        UserOrgStoreIdentity identity = getOrgStoreIdentity(authentication);
+        if (!requestedStoreId.getId().toString().equals(identity.store())) {
             return false;
         }
-        return getOwnerForStore.apply((requestedStoreId)).equals(info.org());
+        return getOwnerForStore.apply((requestedStoreId)).equals(identity.org());
     }
 
 
