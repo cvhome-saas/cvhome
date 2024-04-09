@@ -31,4 +31,5 @@ spring:
         - id: welcome-ui
           uri: lb://welcome-ui
           predicates:
+            - FNotService=store,manager,wallet,dcm,router,wallet,auth
             - FHost=www.${com.asrevo.cvhome.services.core-gateway.domain},${com.asrevo.cvhome.services.core-gateway.domain}
