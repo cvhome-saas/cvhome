@@ -4,6 +4,7 @@ import {Router} from "@angular/router";
 import {TranslateService} from "@ngx-translate/core";
 import {StorageService} from "../../shared/services/storage.service";
 import {StoreService} from "../../store-management/services/store.service";
+import {ManagerStoreId} from "../../../shared/domain/commons";
 @Component({
   selector: 'ngx-order-list',
   templateUrl: './order-list.component.html',
@@ -49,7 +50,6 @@ export class OrderListComponent implements OnInit {
       });
   }
   ngOnInit() {
-    this.getOrderList();
     this.translate.onLangChange.subscribe((lang) => {
       this.params.lang = this.storageService.getLanguage();
       this.getOrderList();
@@ -99,18 +99,20 @@ export class OrderListComponent implements OnInit {
 
     this.loadingList = true;
     this.ordersService.getOrders(this.params)
-      .subscribe(orders => {
-        this.loadingList = false;
-        if (orders.orders && orders.orders.length !== 0) {
-          // this.source.load(orders.orders);
-        } else {
-          // this.source.load([]);
-        }
-        this.totalCount = orders.recordsTotal;
-      }, error => {
-        this.loadingList = false;
-       // this.source.load([]);
-      });
+      .subscribe({
+        next:(orders)=>{
+          this.loadingList = false;
+          if (orders.orders && orders.orders.length !== 0) {
+            // this.source.load(orders.orders);
+          } else {
+            // this.source.load([]);
+          }
+          this.totalCount = orders.recordsTotal;
+        },
+        error:(err)=>{
+          this.loadingList = false;
+        },
+      })
     this.setSettings();
   }
 
@@ -246,14 +248,15 @@ export class OrderListComponent implements OnInit {
     this.getOrderList()
   }
 
-  onSelectStore(e) {
-    this.params["store"] = e.value;
-    this.getOrderList();
-  }
+
 
   route(e) {
     localStorage.setItem('orderID', e.data.id);
     this.router.navigate(['pages/orders/order-details']);
   }
 
+  onSelectStore($event:ManagerStoreId) {
+    this.params["store"] = $event.id;
+    this.getOrderList();
+  }
 }
