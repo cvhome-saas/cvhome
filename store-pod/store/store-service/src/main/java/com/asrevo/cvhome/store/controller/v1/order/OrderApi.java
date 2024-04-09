@@ -8,6 +8,8 @@ import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.order.Order;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCart;
+import com.asrevo.cvhome.store.core.model.order.OrderCriteria;
+import com.asrevo.cvhome.store.core.model.order.v0.ReadableOrderList;
 import com.asrevo.cvhome.store.core.model.order.v1.PersistableAnonymousOrder;
 import com.asrevo.cvhome.store.core.model.order.v1.ReadableOrderConfirmation;
 import com.asrevo.cvhome.store.core.services.customer.CustomerService;
@@ -27,6 +29,9 @@ import org.hibernate.boot.beanvalidation.IntegrationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -117,6 +122,39 @@ public class OrderApi {
             }
             throw new ServiceRuntimeException("Error during checkout [" + message + "]", e);
         }
+
+    }
+    @RequestMapping(value = { "/private/orders" }, method = RequestMethod.GET)
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public ReadableOrderList list(
+            @RequestParam(value = "count", required = false, defaultValue = DEFAULT_ORDER_LIST_COUNT) Integer count,
+            @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
+            @RequestParam(value = "name", required = false) String name,
+            @RequestParam(value = "id", required = false) Long id,
+            @RequestParam(value = "status", required = false) String status,
+            @RequestParam(value = "phone", required = false) String phone,
+            @RequestParam(value = "email", required = false) String email,
+            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) Language language) {
+
+        OrderCriteria orderCriteria = new OrderCriteria();
+        orderCriteria.setPageSize(count);
+        orderCriteria.setStartPage(page);
+
+        orderCriteria.setCustomerName(name);
+        orderCriteria.setCustomerPhone(phone);
+        orderCriteria.setStatus(status);
+        orderCriteria.setEmail(email);
+        orderCriteria.setId(id);
+
+
+//        String user = authorizationUtils.authenticatedUser();
+//        authorizationUtils.authorizeUser(user, Stream.of(Constants.GROUP_SUPERADMIN, Constants.GROUP_ADMIN,
+//                Constants.GROUP_ADMIN_ORDER, Constants.GROUP_ADMIN_RETAIL).collect(Collectors.toList()), merchantStore);
+//
+
+        return orderFacade.getReadableOrderList(orderCriteria, merchantStore);
 
     }
 

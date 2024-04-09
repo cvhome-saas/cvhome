@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.store.service.facade.order;
 
 import com.asrevo.cvhome.store.controller.exception.ConversionException;
+import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
 import com.asrevo.cvhome.store.core.entity.customer.Customer;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.order.Order;
@@ -12,9 +13,7 @@ import com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCart;
 import com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.customer.ReadableCustomer;
-import com.asrevo.cvhome.store.core.model.order.OrderSummary;
-import com.asrevo.cvhome.store.core.model.order.OrderTotalSummary;
-import com.asrevo.cvhome.store.core.model.order.ReadableOrderProduct;
+import com.asrevo.cvhome.store.core.model.order.*;
 import com.asrevo.cvhome.store.core.model.order.total.ReadableOrderTotal;
 import com.asrevo.cvhome.store.core.model.order.total.ReadableTotal;
 import com.asrevo.cvhome.store.core.model.order.v1.PersistableOrder;
@@ -35,10 +34,10 @@ import com.asrevo.cvhome.store.service.mapper.order.ReadableOrderProductMapper;
 import com.asrevo.cvhome.store.service.mapper.order.ReadableOrderTotalMapper;
 import com.asrevo.cvhome.store.service.populator.order.OrderProductPopulator;
 import com.asrevo.cvhome.store.service.populator.order.PersistableOrderApiPopulator;
+import com.asrevo.cvhome.store.service.populator.order.ReadableOrderPopulator;
+import com.asrevo.cvhome.store.service.populator.order.ReadableOrderProductPopulator;
 import com.asrevo.cvhome.store.service.populator.order.transaction.PersistablePaymentPopulator;
-import com.asrevo.cvhome.store.utils.CoreConfiguration;
-import com.asrevo.cvhome.store.utils.LabelUtils;
-import com.asrevo.cvhome.store.utils.ProductPriceUtils;
+import com.asrevo.cvhome.store.utils.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -72,8 +71,10 @@ public class OrderFacadeImpl implements OrderFacade {
     private final LanguageService languageService;
     private final ReadableCustomerMapper readableCustomerMapper;
     private final ReadableOrderProductMapper readableOrderProductMapper;
+    private final ReadableOrderPopulator readableOrderPopulator;
+    private final ImageFilePathUtils imageUtils;
 
-    public OrderFacadeImpl(ShoppingCartFacade shoppingCartFacade, ShoppingCartService shoppingCartService, OrderService orderService, ShippingQuoteService shippingQuoteService, ProductAttributeService productAttributeService, ProductService productService, PersistableOrderApiPopulator persistableOrderApiPopulator, ProductPriceUtils productPriceUtils, PricingService pricingService, ReadableOrderProductMapper readableOrderProductMapper, LabelUtils messages, CustomerFacade customerFacade, CoreConfiguration coreConfiguration, ReadableCustomerMapper readableCustomerMapper, ReadableOrderTotalMapper readableOrderTotalMapper, LanguageService languageService) {
+    public OrderFacadeImpl(ShoppingCartFacade shoppingCartFacade, ShoppingCartService shoppingCartService, OrderService orderService, ShippingQuoteService shippingQuoteService, ProductAttributeService productAttributeService, ProductService productService, PersistableOrderApiPopulator persistableOrderApiPopulator, ProductPriceUtils productPriceUtils, PricingService pricingService, ReadableOrderProductMapper readableOrderProductMapper, LabelUtils messages, CustomerFacade customerFacade, CoreConfiguration coreConfiguration, ReadableCustomerMapper readableCustomerMapper, ReadableOrderTotalMapper readableOrderTotalMapper, LanguageService languageService, ReadableOrderPopulator readableOrderPopulator, ImageFilePathUtils imageUtils) {
         this.shoppingCartFacade = shoppingCartFacade;
         this.shoppingCartService = shoppingCartService;
         this.orderService = orderService;
@@ -90,6 +91,8 @@ public class OrderFacadeImpl implements OrderFacade {
         this.readableCustomerMapper = readableCustomerMapper;
         this.readableOrderTotalMapper = readableOrderTotalMapper;
         this.languageService = languageService;
+        this.readableOrderPopulator = readableOrderPopulator;
+        this.imageUtils = imageUtils;
     }
 
     @Override
@@ -320,6 +323,61 @@ public class OrderFacadeImpl implements OrderFacade {
         return orderConfirmation;
     }
 
+    @Override
+    public com.asrevo.cvhome.store.core.model.order.v0.ReadableOrderList getReadableOrderList(MerchantStore store, Customer customer, int start, int maxCount, Language language) throws Exception {
+        OrderCriteria criteria = new OrderCriteria();
+        criteria.setStartIndex(start);
+        criteria.setMaxCount(maxCount);
+        criteria.setCustomerId(customer.getId());
+
+        return this.getReadableOrderList(criteria, store, language);
+    }
+
+    @Override
+    public com.asrevo.cvhome.store.core.model.order.v0.ReadableOrderList getReadableOrderList(OrderCriteria criteria, MerchantStore store) {
+        try {
+            criteria.setLegacyPagination(false);
+
+            OrderList orderList = orderService.getOrders(criteria, store);
+
+            List<Order> orders = orderList.getOrders();
+            com.asrevo.cvhome.store.core.model.order.v0.ReadableOrderList returnList = new com.asrevo.cvhome.store.core.model.order.v0.ReadableOrderList();
+
+            if (CollectionUtils.isEmpty(orders)) {
+                returnList.setRecordsTotal(0);
+                return returnList;
+            }
+
+            List<com.asrevo.cvhome.store.core.model.order.v0.ReadableOrder> readableOrders = new ArrayList<>();
+            for (Order order : orders) {
+                com.asrevo.cvhome.store.core.model.order.v0.ReadableOrder readableOrder = new com.asrevo.cvhome.store.core.model.order.v0.ReadableOrder();
+                readableOrderPopulator.populate(order, readableOrder, null, null);
+                readableOrders.add(readableOrder);
+
+            }
+            returnList.setOrders(readableOrders);
+
+            returnList.setRecordsTotal(orderList.getTotalCount());
+            returnList.setTotalPages(orderList.getTotalPages());
+            returnList.setNumber(orderList.getOrders().size());
+            returnList.setRecordsFiltered(orderList.getOrders().size());
+
+            return returnList;
+
+        } catch (Exception e) {
+            throw new ServiceRuntimeException("Error while getting orders", e);
+        }
+    }
+    @Override
+    public com.asrevo.cvhome.store.core.model.order.v0.ReadableOrderList getReadableOrderList(MerchantStore store, int start,
+                                                                                       int maxCount, Language language) throws Exception {
+
+        OrderCriteria criteria = new OrderCriteria();
+        criteria.setStartIndex(start);
+        criteria.setMaxCount(maxCount);
+
+        return getReadableOrderList(criteria, store, language);
+    }
     private ReadableOrderTotal convertOrderTotal(OrderTotal total, MerchantStore store, Language language) {
 
         return readableOrderTotalMapper.convert(total, store, language);
@@ -330,6 +388,92 @@ public class OrderFacadeImpl implements OrderFacade {
         return readableOrderProductMapper.convert(product, store, language);
 
     }
+    private com.asrevo.cvhome.store.core.model.order.v0.ReadableOrderList getReadableOrderList(OrderCriteria criteria,
+                                                                                        MerchantStore store, Language language) throws Exception {
+
+        OrderList orderList = orderService.listByStore(store, criteria);
+
+        // ReadableOrderPopulator orderPopulator = new ReadableOrderPopulator();
+        Locale locale = LocaleUtils.getLocale(language);
+        readableOrderPopulator.setLocale(locale);
+
+        List<Order> orders = orderList.getOrders();
+        com.asrevo.cvhome.store.core.model.order.v0.ReadableOrderList returnList = new com.asrevo.cvhome.store.core.model.order.v0.ReadableOrderList();
+
+        if (CollectionUtils.isEmpty(orders)) {
+            returnList.setRecordsTotal(0);
+            // returnList.setMessage("No results for store code " + store);
+            return null;
+        }
+
+        List<com.asrevo.cvhome.store.core.model.order.v0.ReadableOrder> readableOrders = new ArrayList<com.asrevo.cvhome.store.core.model.order.v0.ReadableOrder>();
+        for (Order order : orders) {
+            com.asrevo.cvhome.store.core.model.order.v0.ReadableOrder readableOrder = new com.asrevo.cvhome.store.core.model.order.v0.ReadableOrder();
+            readableOrderPopulator.populate(order, readableOrder, store, language);
+            readableOrders.add(readableOrder);
+
+        }
+
+        returnList.setRecordsTotal(orderList.getTotalCount());
+        return this.populateOrderList(orderList, store, language);
+
+    }
+    private com.asrevo.cvhome.store.core.model.order.v0.ReadableOrderList populateOrderList(final OrderList orderList,
+                                                                                     final MerchantStore store, final Language language) {
+        List<Order> orders = orderList.getOrders();
+        com.asrevo.cvhome.store.core.model.order.v0.ReadableOrderList returnList = new com.asrevo.cvhome.store.core.model.order.v0.ReadableOrderList();
+        if (CollectionUtils.isEmpty(orders)) {
+            log.info("Order list if empty..Returning empty list");
+            returnList.setRecordsTotal(0);
+            // returnList.setMessage("No results for store code " + store);
+            return returnList;
+        }
+
+        // ReadableOrderPopulator orderPopulator = new ReadableOrderPopulator();
+        Locale locale = LocaleUtils.getLocale(language);
+        readableOrderPopulator.setLocale(locale);
+
+        List<com.asrevo.cvhome.store.core.model.order.v0.ReadableOrder> readableOrders = new ArrayList<com.asrevo.cvhome.store.core.model.order.v0.ReadableOrder>();
+        for (Order order : orders) {
+            com.asrevo.cvhome.store.core.model.order.v0.ReadableOrder readableOrder = new com.asrevo.cvhome.store.core.model.order.v0.ReadableOrder();
+            try {
+                readableOrderPopulator.populate(order, readableOrder, store, language);
+                setOrderProductList(order, locale, store, language, readableOrder);
+            } catch (ConversionException ex) {
+                log.error("Error while converting order to order data", ex);
+
+            }
+            readableOrders.add(readableOrder);
+
+        }
+
+        returnList.setOrders(readableOrders);
+        return returnList;
+
+    }
+    private void setOrderProductList(final Order order, final Locale locale, final MerchantStore store,
+                                     final Language language, final com.asrevo.cvhome.store.core.model.order.v0.ReadableOrder readableOrder)
+            throws ConversionException {
+        List<ReadableOrderProduct> orderProducts = new ArrayList<ReadableOrderProduct>();
+        for (OrderProduct p : order.getOrderProducts()) {
+            ReadableOrderProductPopulator orderProductPopulator = new ReadableOrderProductPopulator();
+            orderProductPopulator.setLocale(locale);
+            orderProductPopulator.setProductService(productService);
+            orderProductPopulator.setPricingService(pricingService);
+            orderProductPopulator.setimageUtils(imageUtils);
+            ReadableOrderProduct orderProduct = new ReadableOrderProduct();
+            orderProductPopulator.populate(p, orderProduct, store, language);
+
+            // image
+
+            // attributes
+
+            orderProducts.add(orderProduct);
+        }
+
+        readableOrder.setProducts(orderProducts);
+    }
+
 
     private void notify(Order modelOrder, Customer customer, MerchantStore store, Language language, Locale locale) {
 //@TODO ASHRAF

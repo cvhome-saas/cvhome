@@ -9,10 +9,13 @@ import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCart;
 import com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
+import com.asrevo.cvhome.store.core.model.order.OrderCriteria;
+import com.asrevo.cvhome.store.core.model.order.OrderList;
 import com.asrevo.cvhome.store.core.model.order.OrderSummary;
 import com.asrevo.cvhome.store.core.model.order.OrderTotalSummary;
 import com.asrevo.cvhome.store.core.model.payments.Payment;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
+import org.apache.commons.lang3.Validate;
 
 import java.util.List;
 
@@ -42,5 +45,13 @@ public interface OrderService extends SalesManagerEntityService<Long, Order> {
                        Payment payment, Transaction transaction, MerchantStore store)
             throws ServiceException;
 
-    void saveOrUpdate(Order order) throws ServiceException;
+    Order getOrder(final Long orderId, MerchantStore store);
+
+    OrderList listByStore(final MerchantStore store, final OrderCriteria criteria);
+
+    OrderList getOrders(final OrderCriteria criteria, MerchantStore store);
+
+    void saveOrUpdate(final Order order) throws ServiceException;
+
+    boolean hasDownloadFiles(Order order) throws ServiceException;
 }
