@@ -43,4 +43,5 @@ spring:
           order: -1
           uri: lb://store-ui
           predicates:
+            - FNotService=store,manager,wallet,dcm,router,wallet,auth
             - FHost=store-ui.${com.asrevo.cvhome.services.core-gateway.domain}

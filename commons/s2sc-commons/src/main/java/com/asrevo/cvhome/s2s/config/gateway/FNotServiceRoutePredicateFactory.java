@@ -18,28 +18,24 @@ package com.asrevo.cvhome.s2s.config.gateway;
 
 import org.springframework.cloud.gateway.handler.predicate.AbstractRoutePredicateFactory;
 import org.springframework.cloud.gateway.handler.predicate.GatewayPredicate;
+import org.springframework.http.server.RequestPath;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.server.ServerWebExchange;
 
-import java.net.InetSocketAddress;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 /**
  * @author Spencer Gibb
  */
-public class FHostRoutePredicateFactory extends AbstractRoutePredicateFactory<FHostRoutePredicateFactory.Config> {
+public class FNotServiceRoutePredicateFactory extends AbstractRoutePredicateFactory<FNotServiceRoutePredicateFactory.Config> {
 
 
-    public FHostRoutePredicateFactory() {
+    public FNotServiceRoutePredicateFactory() {
         super(Config.class);
-    }
-
-    @Override
-    public List<String> shortcutFieldOrder() {
-        return Collections.singletonList("host");
     }
     @Override
     public ShortcutType shortcutType() {
@@ -47,15 +43,23 @@ public class FHostRoutePredicateFactory extends AbstractRoutePredicateFactory<FH
     }
 
     @Override
+    public List<String> shortcutFieldOrder() {
+        return Collections.singletonList("services");
+    }
+    @Override
     public Predicate<ServerWebExchange> apply(Config config) {
         return new GatewayPredicate() {
             @Override
             public boolean test(ServerWebExchange exchange) {
-                InetSocketAddress address = exchange.getRequest().getHeaders().getHost();
-                if (address != null) {
-                    return config.host.contains(address.getHostName());
+                RequestPath path = exchange.getRequest().getPath();
+                String[] splits = path.toString().split("/");
+                String[] parts = Stream.of(splits).filter(it -> !it.isEmpty()).toArray(String[]::new);
+                if (parts.length >0) {
+                    return !config.services.contains(parts[0]);
+                }else {
+                    return true;
                 }
-                return false;
+
             }
 
             @Override
@@ -63,15 +67,12 @@ public class FHostRoutePredicateFactory extends AbstractRoutePredicateFactory<FH
                 return config;
             }
 
-            @Override
-            public String toString() {
-                return String.format("Hosts: %s", config.host());
-            }
+
         };
     }
 
     @Validated
-    public record Config(Set<String> host) {
+    public record Config(Set<String> services) {
     }
 
 }
