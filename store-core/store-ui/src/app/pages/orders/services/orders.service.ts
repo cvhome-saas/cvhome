@@ -20,7 +20,7 @@ export class OrdersService {
     //   'count': '50',
     //   'start': '0'
     // };
-    return this.crudService.get('/v1/private/orders', params);
+    return this.crudService.get('/store/api/v1/private/orders', params);
   }
   getOrderDetails(orderID): Observable<any> {
     return this.crudService.get('/v1/private/orders/' + orderID);
