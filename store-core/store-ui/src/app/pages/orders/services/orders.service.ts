@@ -1,9 +1,6 @@
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
-
-import { environment } from '../../../../environments/environment';
-import { Observable } from 'rxjs';
-import { CrudService } from '../../shared/services/crud.service';
+import {Injectable} from '@angular/core';
+import {Observable} from 'rxjs';
+import {CrudService} from '../../shared/services/crud.service';
 
 @Injectable({
   providedIn: 'root'
@@ -15,44 +12,55 @@ export class OrdersService {
   ) {
   }
 
-  getOrders(params): Observable<any> {
+  getOrders(storeId, params): Observable<any> {
     // const params = {
     //   'count': '50',
     //   'start': '0'
     // };
-    return this.crudService.get('/store/api/v1/private/orders', params);
+    return this.crudService.get(`/store/api/v1/private/orders?store=${storeId}`, params);
   }
-  getOrderDetails(orderID): Observable<any> {
-    return this.crudService.get('/store/api/v1/private/orders/' + orderID);
+
+  getOrderDetails(storeId, orderID): Observable<any> {
+    return this.crudService.get(`/store/api/v1/private/orders/${orderID}?store=${storeId}`);
   }
-  getCountry(): Observable<any> {
-    return this.crudService.get('/store/api/v1/country')
+
+  getCountry(storeId): Observable<any> {
+    return this.crudService.get(`/store/api/v1/country?store=${storeId}`)
   }
-  getBillingZone(value): Observable<any> {
-    return this.crudService.get('/store/api/v1/zones?code=' + value)
+
+  getBillingZone(storeId, value): Observable<any> {
+    return this.crudService.get(`/store/api/v1/zones?code=${value}&store=${storeId}`)
   }
-  getShippingZone(value): Observable<any> {
-    return this.crudService.get('/store/api/v1/zones?code=' + value)
+
+  getShippingZone(storeId, value): Observable<any> {
+    return this.crudService.get(`/store/api/v1/zones?code=${value}&store=${storeId}`)
   }
-  getHistory(orderID): Observable<any> {
-    return this.crudService.get('/store/api/v1/private/orders/' + orderID + '/history')
+
+  getHistory(storeId, orderID): Observable<any> {
+    return this.crudService.get(`/store/api/v1/private/orders/${orderID}/history?store=${storeId}`)
   }
-  addHistory(orderID, param): Observable<any> {
-    return this.crudService.post('/store/api/v1/private/orders/' + orderID + '/history', param);
+
+  addHistory(storeId, orderID, param): Observable<any> {
+    return this.crudService.post(`/store/api/v1/private/orders/${orderID}/history?store=${storeId}`, param);
   }
-  updateOrder(orderID, param): Observable<any> {
-    return this.crudService.patch('/store/api/v1/private/orders/' + orderID + '/customer', param);
+
+  updateOrder(storeId, orderID, param): Observable<any> {
+    return this.crudService.patch(`/store/api/v1/private/orders/${orderID}/customer?store=${storeId}`, param);
   }
-  getNextTransaction(orderID): Observable<any> {
-    return this.crudService.get('/store/api/v1/private/orders/' + orderID + '/payment/nextTransaction');
+
+  getNextTransaction(storeId, orderID): Observable<any> {
+    return this.crudService.get(`/store/api/v1/private/orders/${orderID}/payment/nextTransaction?store=${storeId}`);
   }
-  refundOrder(orderID): Observable<any> {
-    return this.crudService.post('/store/api/v1/private/orders/' + orderID + '/refund', {});
+
+  refundOrder(storeId, orderID): Observable<any> {
+    return this.crudService.post(`/store/api/v1/private/orders/${orderID}/refund?store=${storeId}`, {});
   }
-  captureOrder(orderID): Observable<any> {
-    return this.crudService.post('/store/api/v1/private/orders/' + orderID + '/capture', {});
+
+  captureOrder(storeId, orderID): Observable<any> {
+    return this.crudService.post(`/store/api/v1/private/orders/${orderID}/capture?store=${storeId}`, {});
   }
-  getTransactions(orderID): Observable<any> {
-    return this.crudService.get('/store/api/v1/private/orders/' + orderID + '/payment/transactions');
+
+  getTransactions(storeId, orderID): Observable<any> {
+    return this.crudService.get(`/store/api/v1/private/orders/${orderID}/payment/transactions?store=${storeId}`);
   }
 }

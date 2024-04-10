@@ -15,24 +15,19 @@ import {Page} from "../../shared/models/Page";
 })
 export class OrderListComponent implements OnInit {
   rows = [];
-  columns = [{ name: 'Id' }];  ColumnMode = ColumnMode;
-  page:Page = new Page();
+  columns = [{name: 'Id'}];
+  ColumnMode = ColumnMode;
+  page: Page = new Page();
 
 
   // source: LocalDataSource = new LocalDataSource();
   loadingList = false;
   settings = {};
   stores: Array<any> = [];
-  selectedStore: String = '';
-  paginator
   perPage = 20;
   currentPage = 0;
   totalCount;
   roles;
-  // searchValue: string = '';
-  isSuperAdmin: boolean;
-
-  timeoutHandler: any;
   params = this.loadParams();
 
   constructor(
@@ -95,18 +90,18 @@ export class OrderListComponent implements OnInit {
     this.params.page = this.currentPage;
 
     this.loadingList = true;
-    this.ordersService.getOrders(this.params)
+    this.ordersService.getOrders(this.params.store, this.params)
       .subscribe({
         next: (orders) => {
           this.loadingList = false;
           if (orders.orders && orders.orders.length !== 0) {
             // this.source.load(orders.orders);
-           this.rows=orders.orders
-            this.page.totalPages=orders.totalPages
-            this.page.totalElements=orders.recordsTotal
-            this.page.size=orders.numbers
+            this.rows = orders.orders
+            this.page.totalPages = orders.totalPages
+            this.page.totalElements = orders.recordsTotal
+            this.page.size = orders.numbers
           } else {
-            this.rows=[];
+            this.rows = [];
           }
           this.totalCount = orders.recordsTotal;
         },
@@ -224,10 +219,11 @@ export class OrderListComponent implements OnInit {
   }
 
   onSelectStore($event: ManagerStoreId) {
-    this.params["store"] = $event.id;
-    this.setPage({offset:0})
+    this.params.store = $event.id;
+    this.setPage({offset: 0})
   }
-  setPage(pageInfo){
+
+  setPage(pageInfo) {
     this.page.pageNumber = pageInfo.offset;
     this.getOrderList();
   }

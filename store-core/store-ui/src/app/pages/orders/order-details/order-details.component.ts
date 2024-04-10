@@ -72,23 +72,21 @@ export class OrderDetailsComponent implements OnInit {
   }
   transactionType: string = ''
   orderID: any;
+  storeID: any;
   defaultCountry: any;
   buttonText: any = 'Update Order'
   languages: Array<any> = [{'code': 'en', 'name': 'English'}, {'code': 'fr', 'name': 'French'}]
 
   constructor(private ordersService: OrdersService, private toastr: NbToastrService,
-              private dialogService: NbDialogService, private router: Router,private activatedRoute:ActivatedRoute) {
-    // console.log(this.router.getCurrentNavigation());
-    this.getCountry();
-
+              private dialogService: NbDialogService, private router: Router, private activatedRoute: ActivatedRoute) {
 
   }
 
   getOrderDetails() {
     this.loadingList = true;
-    this.ordersService.getOrderDetails(this.orderID)
+    this.ordersService.getOrderDetails(this.storeID, this.orderID)
       .subscribe({
-        next:(data)=>{
+        next: (data) => {
           this.loadingList = false;
           // console.log(data);
           this.orderDetailsData = data;
@@ -104,16 +102,18 @@ export class OrderDetailsComponent implements OnInit {
             this.shipping = data.delivery;
           }
         },
-        error:(err)=>{
+        error: (err) => {
           this.loadingList = false;
         },
       });
   }
 
   ngOnInit() {
-    console.log(this.activatedRoute.params.subscribe(it=>{
-      console.log("news asdf sss "+it["id"])
-      this.orderID = it["id"];
+    console.log(this.activatedRoute.params.subscribe(it => {
+      const ids: string[] = it["id"].split("-");
+      this.storeID = ids[0];
+      this.orderID = ids[1];
+      this.getCountry();
       this.getOrderDetails();
       this.getHistory();
       this.getNextTransaction();
@@ -121,7 +121,7 @@ export class OrderDetailsComponent implements OnInit {
   }
 
   getNextTransaction() {
-    this.ordersService.getNextTransaction(this.orderID)
+    this.ordersService.getNextTransaction(this.storeID, this.orderID)
       .subscribe(data => {
         // console.log(data);
         this.transactionType = data.transactionType;
@@ -131,7 +131,7 @@ export class OrderDetailsComponent implements OnInit {
   }
 
   getHistory() {
-    this.ordersService.getHistory(this.orderID)
+    this.ordersService.getHistory(this.storeID, this.orderID)
       .subscribe(data => {
         // console.log(data);
         this.historyListData = data;
@@ -142,7 +142,7 @@ export class OrderDetailsComponent implements OnInit {
   }
 
   geTransactions() {
-    this.ordersService.getTransactions(this.orderID)
+    this.ordersService.getTransactions(this.storeID, this.orderID)
       .subscribe({
         next: (data) => {
           this.transactionListData = data;
@@ -152,9 +152,9 @@ export class OrderDetailsComponent implements OnInit {
   }
 
   getCountry() {
-    this.ordersService.getCountry()
+    this.ordersService.getCountry(this.storeID)
       .subscribe({
-        next:(data)=>{
+        next: (data) => {
           this.shippingCountry = data;
           this.billingCountry = data;
         }
@@ -162,9 +162,9 @@ export class OrderDetailsComponent implements OnInit {
   }
 
   onBillingChange(value, flag) {
-    this.ordersService.getBillingZone(value)
+    this.ordersService.getBillingZone(this.storeID, value)
       .subscribe({
-        next:(data)=>{
+        next: (data) => {
           if (data.length > 0) {
 
             this.billingStateData = data;
@@ -188,9 +188,9 @@ export class OrderDetailsComponent implements OnInit {
 
   onShippingChange(value, flag) {
 
-    this.ordersService.getShippingZone(value)
+    this.ordersService.getShippingZone(this.storeID, value)
       .subscribe({
-        next:(data)=>{
+        next: (data) => {
           if (data.length > 0) {
 
 
@@ -218,9 +218,9 @@ export class OrderDetailsComponent implements OnInit {
       date: moment().format('yyyy-MM-DD'),
       status: this.statusFields.status
     }
-    this.ordersService.addHistory(this.orderID, param)
+    this.ordersService.addHistory(this.storeID, this.orderID, param)
       .subscribe({
-        next:(data)=>{
+        next: (data) => {
           this.loadingList = false;
           this.toastr.success("History Status has been submitted successfully");
           this.statusFields = {
@@ -228,7 +228,7 @@ export class OrderDetailsComponent implements OnInit {
             status: ''
           }
         },
-        error:(err)=>{
+        error: (err) => {
           this.loadingList = false;
           this.toastr.success("History Status has been submitted fail");
 
@@ -265,13 +265,13 @@ export class OrderDetailsComponent implements OnInit {
         "country": this.shipping.country
       }
     }
-    this.ordersService.updateOrder(this.orderID, param)
+    this.ordersService.updateOrder(this.storeID, this.orderID, param)
       .subscribe({
-        next:(data)=>{
+        next: (data) => {
           this.loadingList = false;
           this.toastr.success("Order has been updated successfully");
         },
-        error:(err)=>{
+        error: (err) => {
           this.loadingList = false;
           this.toastr.success("Order has been updated fail");
         },
@@ -292,14 +292,14 @@ export class OrderDetailsComponent implements OnInit {
 
   onClickRefund() {
     this.loadingList = true;
-    this.ordersService.refundOrder(this.orderID)
+    this.ordersService.refundOrder(this.storeID, this.orderID)
       .subscribe({
-        next:(data)=>{
+        next: (data) => {
           console.log(data)
           this.loadingList = false;
           this.toastr.success("Order has been refunded successfully");
         },
-        error:(err)=>{
+        error: (err) => {
           this.loadingList = false;
           this.toastr.danger("Order has been refunded fail");
         }
@@ -308,13 +308,13 @@ export class OrderDetailsComponent implements OnInit {
 
   onClickCapture() {
     this.loadingList = true;
-    this.ordersService.captureOrder(this.orderID)
+    this.ordersService.captureOrder(this.storeID, this.orderID)
       .subscribe({
-        next:(data)=>{
+        next: (data) => {
           this.loadingList = false;
           this.toastr.success("Order has been captured successfully");
         },
-        error:(err)=>{
+        error: (err) => {
           this.loadingList = false;
           this.toastr.danger("Order has been captured fail");
         }
