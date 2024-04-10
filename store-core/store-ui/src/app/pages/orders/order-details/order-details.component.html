@@ -1,8 +1,9 @@
 <div class="inner_pages order_details">
-
   <nb-card-header class="main_header" *ngIf="orderDetailsData">
-    <h1 class="page_title">{{ 'COMPONENTS.ORDERS' | translate }} {{ 'COMMON.ID' | translate }} {{ orderID }} -
-      {{ orderDetailsData.orderStatus }}</h1>
+    <h1 class="page_title">
+      {{ 'COMPONENTS.ORDERS' | translate }} {{ 'COMMON.ID' | translate }}
+      {{ orderID }} - {{ orderDetailsData.orderStatus }}
+    </h1>
     <div class="content_spacing">
       <div>
         <nb-select placeholder="{{'ORDER_FORM.MORE_OPTIONS' | translate}}" outline shape="rectangle"
@@ -13,7 +14,6 @@
         </nb-select>
       </div>
     </div>
-
     <div class="content_spacing" *ngIf="transactionType == 'REFUND'">
       <button type="button" nbButton class="refund_button"
               (click)="onClickRefund()">{{ 'ORDER_FORM.REFUND'|translate }}
@@ -34,9 +34,7 @@
       </button>
     </div>
   </nb-card-header>
-
   <div [nbSpinner]="loadingList" nbSpinnerSize="large" nbSpinnerStatus="primary">
-
     <div>
       <form #orderForm="ngForm" role="form">
         <div class="row">
@@ -44,32 +42,37 @@
             <nb-card class="nb-card inline-form-card">
               <nb-card-header class="nb-card-header">{{ 'ORDER_FORM.BILLING_INFO' | translate }}</nb-card-header>
               <nb-card-body class="nb-card-body">
-
                 <div class="row">
                   <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                     <div class="form-group">
-                      <label class="label inputLabel">{{ 'ORDER_FORM.FIRST_NAME' | translate }}<span>*</span></label>
-                      <input type="text" class="form-control inputText" id="first_name"
+                      <label for="billing_first_name" class="label inputLabel">
+                        {{ 'ORDER_FORM.FIRST_NAME' | translate }}
+                        <span>*</span>
+                      </label>
+                      <input type="text" class="form-control inputText" id="billing_first_name"
                              placeholder="{{'ORDER_FORM.FIRST_NAME' | translate}}"
                              [(ngModel)]="billing.firstName" name="firstName" required #firstName="ngModel">
                     </div>
                   </div>
                   <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                     <div class="form-group">
-                      <label class="label inputLabel">{{ 'ORDER_FORM.LAST_NAME' | translate }}<span>*</span></label>
-                      <input type="text" class="form-control inputText" id="last_name"
+                      <label for="billing_last_name" class="label inputLabel">
+                        {{ 'ORDER_FORM.LAST_NAME' | translate }}
+                        <span>*</span>
+                      </label>
+                      <input type="text" class="form-control inputText" id="billing_last_name"
                              placeholder="{{'ORDER_FORM.LAST_NAME' | translate}}"
                              [(ngModel)]="billing.lastName" name="lastName" required #lastName="ngModel">
                     </div>
                   </div>
                 </div>
-
-
                 <div class="row">
                   <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                     <div class="form-group">
-                      <label class="label inputLabel">{{ 'ORDER_FORM.STREET_ADDRESS' | translate }}
-                        <span>*</span></label>
+                      <label class="label inputLabel">
+                        {{ 'ORDER_FORM.STREET_ADDRESS' | translate }}
+                        <span>*</span>
+                      </label>
                       <input type="text" class="form-control inputText" id="billing_address"
                              placeholder="{{'ORDER_FORM.STREET_ADDRESS' | translate}}"
                              [(ngModel)]="billing.address" name="address" required #address="ngModel">
@@ -89,10 +92,10 @@
                     <div class="form-group">
                       <label class="label inputLabel">{{ 'ORDER_FORM.COUNTRY' | translate }}<span>*</span></label>
                       <!-- <p-dropdown *ngIf="billingCountry.length" [options]="billingCountry" [(ngModel)]="billing.country"
-                        name="country" filter="true" (onChange)="onBillingChange(billing.country, 1)" required>
-                        <ng-template let-item pTemplate="selectedItem">{{billing.tempCountry}}</ng-template>
-                        <ng-template let-country pTemplate="item">{{country.label}}</ng-template>
-                      </p-dropdown> -->
+                         name="country" filter="true" (onChange)="onBillingChange(billing.country, 1)" required>
+                         <ng-template let-item pTemplate="selectedItem">{{billing.tempCountry}}</ng-template>
+                         <ng-template let-country pTemplate="item">{{country.label}}</ng-template>
+                         </p-dropdown> -->
                       <nb-select *ngIf="billingCountry.length > 0"
                                  placeholder="{{'ORDER_FORM.SELECT_COUNTRY' | translate}}"
                                  outline shape="rectangle" [(ngModel)]="billing.country" name="country"
@@ -107,10 +110,10 @@
                     <div class="form-group" *ngIf="billingStateData.length > 0">
                       <label class="label inputLabel">{{ 'ORDER_FORM.STATE' | translate }}<span>*</span></label>
                       <!-- <p-dropdown [options]="billingStateData" [(ngModel)]="billing.zone" name="zone" filter="true"
-                        (onChange)="onChangeStateBilling(billing.zone)">
-                        <ng-template let-item pTemplate="selectedItem">{{billing.tempZone}}</ng-template>
-                        <ng-template let-state pTemplate="item">{{state.label}}</ng-template>
-                      </p-dropdown> -->
+                         (onChange)="onChangeStateBilling(billing.zone)">
+                         <ng-template let-item pTemplate="selectedItem">{{billing.tempZone}}</ng-template>
+                         <ng-template let-state pTemplate="item">{{state.label}}</ng-template>
+                         </p-dropdown> -->
                       <nb-select placeholder="{{'ORDER_FORM.SELECT_STATE' | translate}}" outline shape="rectangle"
                                  [(ngModel)]="billing.zone" name="zone" class="select_fields" required>
                         <nb-option *ngFor="let state of billingStateData" [value]="state.code">{{ state.name }}
@@ -132,7 +135,7 @@
                       <input type="text" class="form-control inputText" id="billing_postal"
                              placeholder="{{'ORDER_FORM.POSTAL_CODE' | translate}}"
                              [(ngModel)]="
-                        billing.postalCode" name="postalCode" required
+                                 billing.postalCode" name="postalCode" required
                              #postalCode="ngModel">
                     </div>
                   </div>
@@ -147,7 +150,6 @@
                     </div>
                   </div>
                 </div>
-
                 <div class="row">
                   <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                     <div class="form-group">
@@ -156,7 +158,6 @@
                              placeholder="{{'ORDER_FORM.PHONE_NUMBER' | translate}}" [(ngModel)]="billing.phone"
                              name="billing_phone"
                              required #phone="ngModel" minlength=10 maxlength=14>
-
                     </div>
                   </div>
                   <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
@@ -167,14 +168,10 @@
                              [(ngModel)]="info.datePurchased" name="datePurchased" required #datePurchased="ngModel">
                     </div>
                   </div>
-
                 </div>
-
-
               </nb-card-body>
             </nb-card>
           </div>
-
           <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
             <nb-card class="nb-card inline-form-card">
               <nb-card-header class="nb-card-header">{{ 'ORDER_FORM.SHIPPING_INFO' | translate }}</nb-card-header>
@@ -182,22 +179,20 @@
                 <div class="row">
                   <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                     <div class="form-group">
-                      <label for="exampleInputPassword1" class="label inputLabel">{{
-                          'ORDER_FORM.FIRST_NAME' |
-                            translate
-                        }}</label>
-                      <input type="text" class="form-control inputText" id="first_name"
+                      <label for="shipping_first_name" class="label inputLabel">
+                        {{ 'ORDER_FORM.FIRST_NAME' |translate }}
+                      </label>
+                      <input type="text" class="form-control inputText" id="shipping_first_name"
                              placeholder="{{'ORDER_FORM.FIRST_NAME' | translate}}"
                              [(ngModel)]="shipping.firstName" name="shipping.firstName" #firstName="ngModel">
                     </div>
                   </div>
                   <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                     <div class="form-group">
-                      <label for="exampleInputPassword1" class="label inputLabel">{{
-                          'ORDER_FORM.LAST_NAME' |
-                            translate
-                        }}</label>
-                      <input type="text" class="form-control inputText" id="last_name"
+                      <label for="shipping_last_name" class="label inputLabel">
+                        {{ 'ORDER_FORM.LAST_NAME' |translate }}
+                      </label>
+                      <input type="text" class="form-control inputText" id="shipping_last_name"
                              placeholder="{{'ORDER_FORM.LAST_NAME' | translate}}"
                              [(ngModel)]="shipping.lastName" name="shipping.lastName" #lastName="ngModel">
                     </div>
@@ -206,10 +201,9 @@
                 <div class="row">
                   <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                     <div class="form-group">
-                      <label for="exampleInputPassword1" class="label inputLabel">{{
-                          'ORDER_FORM.STREET_ADDRESS' |
-                            translate
-                        }}</label>
+                      <label for="shipping_address" class="label inputLabel">
+                        {{ 'ORDER_FORM.STREET_ADDRESS' |translate }}
+                      </label>
                       <input type="text" class="form-control inputText" id="shipping_address"
                              placeholder="{{'ORDER_FORM.STREET_ADDRESS' | translate}}"
                              [(ngModel)]="shipping.address" name="shipping.address" #address="ngModel">
@@ -217,8 +211,9 @@
                   </div>
                   <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                     <div class="form-group">
-                      <label for="exampleInputPassword1"
-                             class="label inputLabel">{{ 'ORDER_FORM.CITY' | translate }}</label>
+                      <label for="shipping_city" class="label inputLabel">
+                        {{ 'ORDER_FORM.CITY' | translate }}
+                      </label>
                       <input type="text" class="form-control inputText" id="shipping_city"
                              placeholder="{{'ORDER_FORM.CITY' | translate}}"
                              [(ngModel)]="shipping.city" name="shipping.city" #city="ngModel">
@@ -240,20 +235,20 @@
                         </nb-option>
                       </nb-select>
                       <!-- <p-dropdown *ngIf="shippingCountry.length" [options]="shippingCountry" [(ngModel)]="shipping.country"
-                        name="shipping.country" filter="true" (onChange)="onShippingChange(shipping.country, 1)">
-                        <ng-template let-item pTemplate="selectedItem">{{shipping.tempCountry}}</ng-template>
-                        <ng-template let-country pTemplate="item">{{country.label}}</ng-template>
-                      </p-dropdown> -->
+                         name="shipping.country" filter="true" (onChange)="onShippingChange(shipping.country, 1)">
+                         <ng-template let-item pTemplate="selectedItem">{{shipping.tempCountry}}</ng-template>
+                         <ng-template let-country pTemplate="item">{{country.label}}</ng-template>
+                         </p-dropdown> -->
                     </div>
                   </div>
                   <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                     <div class="form-group" *ngIf="shippingStateData.length > 0">
                       <label class="label inputLabel">{{ 'ORDER_FORM.STATE' | translate }}</label>
                       <!-- <p-dropdown [options]="shippingStateData" [(ngModel)]="shipping.zone" name="shipping.zone" filter="true"
-                        (onChange)="onChangeStateShipping(shipping.zone)">
-                        <ng-template let-item pTemplate="selectedItem">{{shipping.tempZone}}</ng-template>
-                        <ng-template let-state pTemplate="item">{{state.label}}</ng-template>
-                      </p-dropdown> -->
+                         (onChange)="onChangeStateShipping(shipping.zone)">
+                         <ng-template let-item pTemplate="selectedItem">{{shipping.tempZone}}</ng-template>
+                         <ng-template let-state pTemplate="item">{{state.label}}</ng-template>
+                         </p-dropdown> -->
                       <nb-select placeholder="{{'ORDER_FORM.SELECT_STATE' | translate}}" outline shape="rectangle"
                                  [(ngModel)]="shipping.zone" name="shipping.zone" class="select_fields">
                         <nb-option *ngFor="let state of shippingStateData" [value]="state.code">{{ state.name }}
@@ -285,7 +280,6 @@
                              placeholder="{{'ORDER_FORM.PHONE_NUMBER' | translate}}" [(ngModel)]="shipping.phone"
                              name="shipping_phone"
                              minlength=10 maxlength=14>
-
                     </div>
                   </div>
                 </div>
@@ -326,7 +320,8 @@
                 </div>
                 <div class="statusSec">
                   <label class="terms">
-                    {{ 'ORDER_FORM.TERMS_CONDITIONS' | translate }}:<span class="boldTxt">{{ orderDetailsData.customerAgreed }}</span>
+                    {{ 'ORDER_FORM.TERMS_CONDITIONS' | translate }}:
+                    <span class="boldTxt">{{ orderDetailsData.customerAgreed }}</span>
                   </label>
                   <label>{{ 'ORDER_FORM.PAYMENT_MODE' | translate }}</label>
                   <label class="boldTxt">
@@ -341,13 +336,12 @@
                 </div>
                 <div class="btnSec">
                   <label>{{ 'ORDER_FORM.STATUS_COMMENT' | translate }}</label>
-                  <textarea id="" name="" rows="10" cols="90" class="txtArea" [(ngModel)]="statusFields.comments"
-                            name="comments"
+                  <textarea rows="10" cols="90" class="txtArea" [(ngModel)]="statusFields.comments" name="comments"
                             required>
-                  </textarea>
+                           </textarea>
                   <button type="button" (click)="updateHistory()" nbButton class="success_button lastBtn"
                           [disabled]="statusFields.comments == '' || statusFields.status == ''">
-                    {{'ORDER_FORM.UPDATE_STATUS'| translate }}
+                    {{ 'ORDER_FORM.UPDATE_STATUS'| translate }}
                   </button>
                 </div>
               </div>
@@ -356,8 +350,5 @@
         </div>
       </div>
     </div>
-
   </div>
-
-
 </div>
