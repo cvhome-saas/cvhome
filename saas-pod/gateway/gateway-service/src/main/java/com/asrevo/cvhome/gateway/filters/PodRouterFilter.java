@@ -31,7 +31,7 @@ public class PodRouterFilter implements GlobalFilter, Ordered {
 
     @SneakyThrows
     private static URI buildUri(UriComponentsBuilder uriComponents, PodReferenceDto dto) {
-        uriComponents.queryParam("storeId", dto.reference());
+        uriComponents.queryParam("store", dto.reference());
         URI location = new URI(dto.location());
         uriComponents.host(location.getHost());
         uriComponents.scheme(location.getScheme());
