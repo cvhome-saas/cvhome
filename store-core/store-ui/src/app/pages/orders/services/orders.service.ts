@@ -23,36 +23,36 @@ export class OrdersService {
     return this.crudService.get('/store/api/v1/private/orders', params);
   }
   getOrderDetails(orderID): Observable<any> {
-    return this.crudService.get('/v1/private/orders/' + orderID);
+    return this.crudService.get('/store/api/v1/private/orders/' + orderID);
   }
   getCountry(): Observable<any> {
-    return this.crudService.get('/v1/country')
+    return this.crudService.get('/store/api/v1/country')
   }
   getBillingZone(value): Observable<any> {
-    return this.crudService.get('/v1/zones?code=' + value)
+    return this.crudService.get('/store/api/v1/zones?code=' + value)
   }
   getShippingZone(value): Observable<any> {
-    return this.crudService.get('/v1/zones?code=' + value)
+    return this.crudService.get('/store/api/v1/zones?code=' + value)
   }
   getHistory(orderID): Observable<any> {
-    return this.crudService.get('/v1/private/orders/' + orderID + '/history')
+    return this.crudService.get('/store/api/v1/private/orders/' + orderID + '/history')
   }
   addHistory(orderID, param): Observable<any> {
-    return this.crudService.post('/v1/private/orders/' + orderID + '/history', param);
+    return this.crudService.post('/store/api/v1/private/orders/' + orderID + '/history', param);
   }
   updateOrder(orderID, param): Observable<any> {
-    return this.crudService.patch('/v1/private/orders/' + orderID + '/customer', param);
+    return this.crudService.patch('/store/api/v1/private/orders/' + orderID + '/customer', param);
   }
   getNextTransaction(orderID): Observable<any> {
-    return this.crudService.get('/v1/private/orders/' + orderID + '/payment/nextTransaction');
+    return this.crudService.get('/store/api/v1/private/orders/' + orderID + '/payment/nextTransaction');
   }
   refundOrder(orderID): Observable<any> {
-    return this.crudService.post('/v1/private/orders/' + orderID + '/refund', {});
+    return this.crudService.post('/store/api/v1/private/orders/' + orderID + '/refund', {});
   }
   captureOrder(orderID): Observable<any> {
-    return this.crudService.post('/v1/private/orders/' + orderID + '/capture', {});
+    return this.crudService.post('/store/api/v1/private/orders/' + orderID + '/capture', {});
   }
   getTransactions(orderID): Observable<any> {
-    return this.crudService.get('/v1/private/orders/' + orderID + '/payment/transactions');
+    return this.crudService.get('/store/api/v1/private/orders/' + orderID + '/payment/transactions');
   }
 }

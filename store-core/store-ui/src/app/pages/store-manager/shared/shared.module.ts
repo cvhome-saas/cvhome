@@ -7,7 +7,7 @@ import {
   NbInputModule,
   NbOptionModule,
   NbRadioModule,
-  NbSelectModule, NbSpinnerModule
+  NbSelectModule, NbSpinnerModule, NbToastrModule, NbToastrService
 } from "@nebular/theme";
 import {NgxDatatableModule} from "@swimlane/ngx-datatable";
 import {TranslateModule} from "@ngx-translate/core";
@@ -25,8 +25,9 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
     NbRadioModule,
     NbOptionModule,
     NbSelectModule,
-    NgxDatatableModule,
     NbSpinnerModule,
+    NbToastrModule,
+    NgxDatatableModule,
     TranslateModule,
     FormsModule,
     ReactiveFormsModule,
@@ -40,8 +41,9 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
     NbRadioModule,
     NbOptionModule,
     NbSelectModule,
-    NgxDatatableModule,
     NbSpinnerModule,
+    NbToastrModule.forRoot({}),
+    NgxDatatableModule,
     TranslateModule,
     FormsModule,
     ReactiveFormsModule,

@@ -1,14 +1,13 @@
-import { Component, OnInit } from '@angular/core';
-import { ToastrService } from 'ngx-toastr';
-import { NbDialogService } from '@nebular/theme';
-import { OrdersService } from '../services/orders.service';
+import {Component, OnInit} from '@angular/core';
+import {NbDialogService, NbToastrService} from '@nebular/theme';
+import {OrdersService} from '../services/orders.service';
 import * as moment from 'moment';
-import { OrderInvoiceComponent } from '../order-invoice/order-invoice';
-import { OrderHistoryComponent } from '../order-history/order-history';
-import { OrderTransactionComponent } from '../order-transaction/order-transaction';
+import {OrderInvoiceComponent} from '../order-invoice/order-invoice';
+import {OrderHistoryComponent} from '../order-history/order-history';
+import {OrderTransactionComponent} from '../order-transaction/order-transaction';
 
-import { Router } from '@angular/router';
-import {  AsYouType } from 'libphonenumber-js';
+import {ActivatedRoute, Router} from '@angular/router';
+import {AsYouType} from 'libphonenumber-js';
 
 @Component({
   selector: 'ngx-order-details',
@@ -16,6 +15,7 @@ import {  AsYouType } from 'libphonenumber-js';
   styleUrls: ['./order-details.component.scss']
 })
 export class OrderDetailsComponent implements OnInit {
+
   shippingCountry: Array<any> = []
   shippingStateData: Array<any> = []
   billingStateData: Array<any> = []
@@ -26,7 +26,13 @@ export class OrderDetailsComponent implements OnInit {
   orderDetailsData: any;
   historyListData: Array<any> = [];
   transactionListData: Array<any> = [];
-  statusList: Array<any> = [{ 'name': 'ORDERED', 'id': 'ORDERED' }, { 'name': 'PROCESSED', 'id': 'PROCESSED' }, { 'name': 'DELIVERED', 'id': 'DELIVERED' }, { 'name': 'REFUNDED', 'id': 'REFUNDED' }, { 'name': 'CANCELED', 'id': 'CANCELED' }]
+  statusList: Array<any> = [{'name': 'ORDERED', 'id': 'ORDERED'}, {
+    'name': 'PROCESSED',
+    'id': 'PROCESSED'
+  }, {'name': 'DELIVERED', 'id': 'DELIVERED'}, {'name': 'REFUNDED', 'id': 'REFUNDED'}, {
+    'name': 'CANCELED',
+    'id': 'CANCELED'
+  }]
   info = {
     userName: '',
     language: '',
@@ -68,46 +74,52 @@ export class OrderDetailsComponent implements OnInit {
   orderID: any;
   defaultCountry: any;
   buttonText: any = 'Update Order'
-  languages: Array<any> = [{ 'code': 'en', 'name': 'English' }, { 'code': 'fr', 'name': 'French' }]
-  constructor(private ordersService: OrdersService, private toastr: ToastrService,
-    private dialogService: NbDialogService, private router: Router) {
+  languages: Array<any> = [{'code': 'en', 'name': 'English'}, {'code': 'fr', 'name': 'French'}]
+
+  constructor(private ordersService: OrdersService, private toastr: NbToastrService,
+              private dialogService: NbDialogService, private router: Router,private activatedRoute:ActivatedRoute) {
     // console.log(this.router.getCurrentNavigation());
     this.getCountry();
 
 
   }
+
   getOrderDetails() {
     this.loadingList = true;
     this.ordersService.getOrderDetails(this.orderID)
-      .subscribe(data => {
-        this.loadingList = false;
-        // console.log(data);
-        this.orderDetailsData = data;
-        this.onBillingChange(data.billing.country, 0)
+      .subscribe({
+        next:(data)=>{
+          this.loadingList = false;
+          // console.log(data);
+          this.orderDetailsData = data;
+          this.onBillingChange(data.billing.country, 0)
 
 
-        this.info.emailAddress = data.customer.emailAddress;
-        this.info.datePurchased = data.datePurchased;
+          this.info.emailAddress = data.customer.emailAddress;
+          this.info.datePurchased = data.datePurchased;
 
-        this.billing = data.billing;
-        if (data.delivery) {
-          this.onShippingChange(data.delivery.country, 0)
-
-          this.shipping = data.delivery;
-        }
-
-      }, error => {
-        this.loadingList = false;
+          this.billing = data.billing;
+          if (data.delivery) {
+            this.onShippingChange(data.delivery.country, 0)
+            this.shipping = data.delivery;
+          }
+        },
+        error:(err)=>{
+          this.loadingList = false;
+        },
       });
   }
+
   ngOnInit() {
-    if (localStorage.getItem('orderID')) {
-      this.orderID = localStorage.getItem('orderID')
+    console.log(this.activatedRoute.params.subscribe(it=>{
+      console.log("news asdf sss "+it["id"])
+      this.orderID = it["id"];
       this.getOrderDetails();
-    }
-    this.getHistory();
-    this.getNextTransaction();
+      this.getHistory();
+      this.getNextTransaction();
+    }))
   }
+
   getNextTransaction() {
     this.ordersService.getNextTransaction(this.orderID)
       .subscribe(data => {
@@ -117,6 +129,7 @@ export class OrderDetailsComponent implements OnInit {
 
       });
   }
+
   getHistory() {
     this.ordersService.getHistory(this.orderID)
       .subscribe(data => {
@@ -127,71 +140,77 @@ export class OrderDetailsComponent implements OnInit {
       });
     this.geTransactions()
   }
+
   geTransactions() {
     this.ordersService.getTransactions(this.orderID)
-      .subscribe(data => {
-        // console.log(data);
-        this.transactionListData = data;
-      }, error => {
-
+      .subscribe({
+        next: (data) => {
+          this.transactionListData = data;
+        }
       });
+
   }
+
   getCountry() {
     this.ordersService.getCountry()
-      .subscribe(data => {
-
-        this.shippingCountry = data;
-        this.billingCountry = data;
-      }, error => {
-
-      });
+      .subscribe({
+        next:(data)=>{
+          this.shippingCountry = data;
+          this.billingCountry = data;
+        }
+      })
   }
+
   onBillingChange(value, flag) {
     this.ordersService.getBillingZone(value)
-      .subscribe(data => {
-        if (data.length > 0) {
+      .subscribe({
+        next:(data)=>{
+          if (data.length > 0) {
 
-          this.billingStateData = data;
-          if (flag == 1) {
-            this.billing.zone = data[0].code;
+            this.billingStateData = data;
+            if (flag == 1) {
+              this.billing.zone = data[0].code;
+
+            }
+          } else {
+            this.billingStateData = data;
+            this.billing.zone = '';
 
           }
-        } else {
-          this.billingStateData = data;
-          this.billing.zone = '';
 
         }
-      }, error => {
-
-      });
+      })
   }
+
   onChangeStateBilling(value) {
 
   }
+
   onShippingChange(value, flag) {
 
     this.ordersService.getShippingZone(value)
-      .subscribe(data => {
-        if (data.length > 0) {
+      .subscribe({
+        next:(data)=>{
+          if (data.length > 0) {
 
 
-          this.shippingStateData = data;
-          if (flag == 1) {
-            this.shipping.zone = data[0].code
+            this.shippingStateData = data;
+            if (flag == 1) {
+              this.shipping.zone = data[0].code
 
+            }
+          } else {
+            this.shippingStateData = data;
+            this.shipping.zone = '';
           }
-        } else {
-          this.shippingStateData = data;
-          this.shipping.zone = '';
-
         }
-      }, error => {
-
-      });
+      })
   }
+
   onChangeStateShipping(value) {
 
   }
+
   updateHistory() {
     this.loadingList = true;
     let param = {
@@ -200,20 +219,23 @@ export class OrderDetailsComponent implements OnInit {
       status: this.statusFields.status
     }
     this.ordersService.addHistory(this.orderID, param)
-      .subscribe(data => {
-        this.loadingList = false;
-        this.toastr.success("History Status has been submitted successfully");
-        this.statusFields = {
-          comments: '',
-          status: ''
+      .subscribe({
+        next:(data)=>{
+          this.loadingList = false;
+          this.toastr.success("History Status has been submitted successfully");
+          this.statusFields = {
+            comments: '',
+            status: ''
+          }
+        },
+        error:(err)=>{
+          this.loadingList = false;
+          this.toastr.success("History Status has been submitted fail");
+
         }
-
-      }, error => {
-        this.loadingList = false;
-        this.toastr.success("History Status has been submitted fail");
-
-      });
+      })
   }
+
   updateOrder() {
     this.loadingList = true;
     let param = {
@@ -244,50 +266,61 @@ export class OrderDetailsComponent implements OnInit {
       }
     }
     this.ordersService.updateOrder(this.orderID, param)
-      .subscribe(data => {
-        this.loadingList = false;
-        this.toastr.success("Order has been updated successfully");
-        // this.shippingStateData = data;
-      }, error => {
-        this.loadingList = false;
-        this.toastr.success("Order has been updated fail");
-      });
+      .subscribe({
+        next:(data)=>{
+          this.loadingList = false;
+          this.toastr.success("Order has been updated successfully");
+        },
+        error:(err)=>{
+          this.loadingList = false;
+          this.toastr.success("Order has been updated fail");
+        },
+      })
   }
+
   onPhoneChange() {
     this.billing.phone = new AsYouType('US').input(this.billing.phone);
   }
+
   onShippingPhoneChange() {
     this.shipping.phone = new AsYouType('US').input(this.shipping.phone);
   }
+
   goToback() {
     this.router.navigate(['pages/orders/order-list']);
   }
+
   onClickRefund() {
     this.loadingList = true;
     this.ordersService.refundOrder(this.orderID)
-      .subscribe(data => {
-        console.log(data)
-        this.loadingList = false;
-        this.toastr.success("Order has been refunded successfully");
-        // this.shippingStateData = data;
-      }, error => {
-        this.loadingList = false;
-        this.toastr.error("Order has been refunded fail");
-      });
+      .subscribe({
+        next:(data)=>{
+          console.log(data)
+          this.loadingList = false;
+          this.toastr.success("Order has been refunded successfully");
+        },
+        error:(err)=>{
+          this.loadingList = false;
+          this.toastr.danger("Order has been refunded fail");
+        }
+      })
   }
+
   onClickCapture() {
     this.loadingList = true;
     this.ordersService.captureOrder(this.orderID)
-      .subscribe(data => {
-        console.log()
-        this.loadingList = false;
-        this.toastr.success("Order has been captured successfully");
-        // this.shippingStateData = data;
-      }, error => {
-        this.loadingList = false;
-        this.toastr.error("Order has been captured fail");
-      });
+      .subscribe({
+        next:(data)=>{
+          this.loadingList = false;
+          this.toastr.success("Order has been captured successfully");
+        },
+        error:(err)=>{
+          this.loadingList = false;
+          this.toastr.danger("Order has been captured fail");
+        }
+      })
   }
+
   showDialog(value) {
     // console.log(value)
     if (value == 1) {

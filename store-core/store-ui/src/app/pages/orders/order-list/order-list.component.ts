@@ -101,7 +101,6 @@ export class OrderListComponent implements OnInit {
           this.loadingList = false;
           if (orders.orders && orders.orders.length !== 0) {
             // this.source.load(orders.orders);
-            console.log("set vales")
            this.rows=orders.orders
             this.page.totalPages=orders.totalPages
             this.page.totalElements=orders.recordsTotal
@@ -222,39 +221,6 @@ export class OrderListComponent implements OnInit {
 
     };
 
-  }
-
-  // paginator
-  changePage(event) {
-    switch (event.action) {
-      case 'onPage': {
-        this.currentPage = event.data;
-        break;
-      }
-      case 'onPrev': {
-        this.currentPage--;
-        break;
-      }
-      case 'onNext': {
-        this.currentPage++;
-        break;
-      }
-      case 'onFirst': {
-        this.currentPage = 1;
-        break;
-      }
-      case 'onLast': {
-        this.currentPage = event.data;
-        break;
-      }
-    }
-    this.getOrderList()
-  }
-
-
-  route(e) {
-    localStorage.setItem('orderID', e.data.id);
-    this.router.navigate(['pages/orders/order-details']);
   }
 
   onSelectStore($event: ManagerStoreId) {
