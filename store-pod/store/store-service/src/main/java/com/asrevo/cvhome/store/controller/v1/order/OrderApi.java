@@ -9,6 +9,7 @@ import com.asrevo.cvhome.store.core.entity.order.Order;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCart;
 import com.asrevo.cvhome.store.core.model.order.OrderCriteria;
+import com.asrevo.cvhome.store.core.model.order.v0.ReadableOrder;
 import com.asrevo.cvhome.store.core.model.order.v0.ReadableOrderList;
 import com.asrevo.cvhome.store.core.model.order.v1.PersistableAnonymousOrder;
 import com.asrevo.cvhome.store.core.model.order.v1.ReadableOrderConfirmation;
@@ -157,5 +158,23 @@ public class OrderApi {
         return orderFacade.getReadableOrderList(orderCriteria, merchantStore);
 
     }
+    @RequestMapping(value = { "/private/orders/{id}" }, method = RequestMethod.GET)
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    @Parameters({
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
+    })
+    public ReadableOrder get(
+            @PathVariable final Long id,
+            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) Language language) {
 
+//        String user = authorizationUtils.authenticatedUser();
+//        authorizationUtils.authorizeUser(user, Stream.of(Constants.GROUP_SUPERADMIN, Constants.GROUP_ADMIN,
+//                Constants.GROUP_ADMIN_ORDER, Constants.GROUP_ADMIN_RETAIL).collect(Collectors.toList()), merchantStore);
+
+
+        return orderFacade.getReadableOrder(id, merchantStore, language);
+    }
 }
