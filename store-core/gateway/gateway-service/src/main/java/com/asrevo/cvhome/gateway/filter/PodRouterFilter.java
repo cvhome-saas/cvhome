@@ -26,7 +26,7 @@ import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.G
 @Component
 public class PodRouterFilter implements GlobalFilter, Ordered {
     private static final String STORE_SERVICE_PREFIX = "/store/";
-    private static final String STORE_ID_PARAM = "storeId";
+    private static final String STORE_ID_PARAM = "store";
     private final RouterAllocationService router;
     private final String storeUri;
     private final CallStrategy callStrategy;

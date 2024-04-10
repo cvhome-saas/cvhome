@@ -12,55 +12,55 @@ export class OrdersService {
   ) {
   }
 
-  getOrders(storeId, params): Observable<any> {
+  getOrders(store, params): Observable<any> {
     // const params = {
     //   'count': '50',
     //   'start': '0'
     // };
-    return this.crudService.get(`/store/api/v1/private/orders?store=${storeId}`, params);
+    return this.crudService.get(`/store/api/v1/private/orders?store=${store}`, params);
   }
 
-  getOrderDetails(storeId, orderID): Observable<any> {
-    return this.crudService.get(`/store/api/v1/private/orders/${orderID}?store=${storeId}`);
+  getOrderDetails(store, orderID): Observable<any> {
+    return this.crudService.get(`/store/api/v1/private/orders/${orderID}?store=${store}`);
   }
 
-  getCountry(storeId): Observable<any> {
-    return this.crudService.get(`/store/api/v1/country?store=${storeId}`)
+  getCountry(store): Observable<any> {
+    return this.crudService.get(`/store/api/v1/country?store=${store}`)
   }
 
-  getBillingZone(storeId, value): Observable<any> {
-    return this.crudService.get(`/store/api/v1/zones?code=${value}&store=${storeId}`)
+  getBillingZone(store, value): Observable<any> {
+    return this.crudService.get(`/store/api/v1/zones?code=${value}&store=${store}`)
   }
 
-  getShippingZone(storeId, value): Observable<any> {
-    return this.crudService.get(`/store/api/v1/zones?code=${value}&store=${storeId}`)
+  getShippingZone(store, value): Observable<any> {
+    return this.crudService.get(`/store/api/v1/zones?code=${value}&store=${store}`)
   }
 
-  getHistory(storeId, orderID): Observable<any> {
-    return this.crudService.get(`/store/api/v1/private/orders/${orderID}/history?store=${storeId}`)
+  getHistory(store, orderID): Observable<any> {
+    return this.crudService.get(`/store/api/v1/private/orders/${orderID}/history?store=${store}`)
   }
 
-  addHistory(storeId, orderID, param): Observable<any> {
-    return this.crudService.post(`/store/api/v1/private/orders/${orderID}/history?store=${storeId}`, param);
+  addHistory(store, orderID, param): Observable<any> {
+    return this.crudService.post(`/store/api/v1/private/orders/${orderID}/history?store=${store}`, param);
   }
 
-  updateOrder(storeId, orderID, param): Observable<any> {
-    return this.crudService.patch(`/store/api/v1/private/orders/${orderID}/customer?store=${storeId}`, param);
+  updateOrder(store, orderID, param): Observable<any> {
+    return this.crudService.patch(`/store/api/v1/private/orders/${orderID}/customer?store=${store}`, param);
   }
 
-  getNextTransaction(storeId, orderID): Observable<any> {
-    return this.crudService.get(`/store/api/v1/private/orders/${orderID}/payment/nextTransaction?store=${storeId}`);
+  getNextTransaction(store, orderID): Observable<any> {
+    return this.crudService.get(`/store/api/v1/private/orders/${orderID}/payment/nextTransaction?store=${store}`);
   }
 
-  refundOrder(storeId, orderID): Observable<any> {
-    return this.crudService.post(`/store/api/v1/private/orders/${orderID}/refund?store=${storeId}`, {});
+  refundOrder(store, orderID): Observable<any> {
+    return this.crudService.post(`/store/api/v1/private/orders/${orderID}/refund?store=${store}`, {});
   }
 
-  captureOrder(storeId, orderID): Observable<any> {
-    return this.crudService.post(`/store/api/v1/private/orders/${orderID}/capture?store=${storeId}`, {});
+  captureOrder(store, orderID): Observable<any> {
+    return this.crudService.post(`/store/api/v1/private/orders/${orderID}/capture?store=${store}`, {});
   }
 
-  getTransactions(storeId, orderID): Observable<any> {
-    return this.crudService.get(`/store/api/v1/private/orders/${orderID}/payment/transactions?store=${storeId}`);
+  getTransactions(store, orderID): Observable<any> {
+    return this.crudService.get(`/store/api/v1/private/orders/${orderID}/payment/transactions?store=${store}`);
   }
 }
