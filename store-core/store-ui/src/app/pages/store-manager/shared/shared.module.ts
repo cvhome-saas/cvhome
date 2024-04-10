@@ -17,6 +17,7 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 @NgModule({
   declarations: [StoreSelectorComponent],
   exports: [
+    CommonModule,
     StoreSelectorComponent,
     NbSelectModule,
     NbCardModule,
