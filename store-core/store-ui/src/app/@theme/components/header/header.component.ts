@@ -35,7 +35,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
       name: 'Corporate',
     },
   ];
-  languages=["en","ar"]
+  languages=["en","ar","es","ru","fr"]
   currentLanguage=this.languages[0]
   currentTheme = 'default';
 

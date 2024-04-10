@@ -37,7 +37,6 @@ export const canActivateTeam: CanActivateFn = (
 ) => {
   const oauthService: AuthService = inject(AuthService);
   const router: Router = inject(Router);
-  console.log("dddddddddddddddddddddddrdrdr")
   return oauthService.getAuthUser().pipe(map(it => true), catchError(
     it => {
       return of(router.parseUrl('external-login-link'));
@@ -49,7 +48,6 @@ export const canActivateTeamu: CanActivateChildFn = (
 ) => {
   const oauthService: AuthService = inject(AuthService);
   const router: Router = inject(Router);
-  console.log("dddddddddddddddddddddddrdrdr")
   return oauthService.getAuthUser().pipe(map(it => true), catchError(
     it => {
       return of(router.parseUrl('external-login-link'));

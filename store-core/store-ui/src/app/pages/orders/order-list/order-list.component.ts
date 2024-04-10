@@ -5,6 +5,8 @@ import {TranslateService} from "@ngx-translate/core";
 import {StorageService} from "../../shared/services/storage.service";
 import {StoreService} from "../../store-management/services/store.service";
 import {ManagerStoreId} from "../../../shared/domain/commons";
+import {ColumnMode} from "@swimlane/ngx-datatable";
+import {Page} from "../../shared/models/Page";
 
 @Component({
   selector: 'ngx-order-list',
@@ -12,6 +14,10 @@ import {ManagerStoreId} from "../../../shared/domain/commons";
   styleUrls: ['./order-list.component.scss']
 })
 export class OrderListComponent implements OnInit {
+  rows = [];
+  columns = [{ name: 'Id' }];  ColumnMode = ColumnMode;
+  page:Page = new Page();
+
 
   // source: LocalDataSource = new LocalDataSource();
   loadingList = false;
@@ -42,7 +48,6 @@ export class OrderListComponent implements OnInit {
   ngOnInit() {
     this.translate.onLangChange.subscribe((lang) => {
       this.params.lang = this.storageService.getLanguage();
-      this.getOrderList();
     });
     // this.source.onChanged().subscribe((change) => {
     //   if (change.action == 'refresh' || change.action == 'load') {
@@ -96,8 +101,13 @@ export class OrderListComponent implements OnInit {
           this.loadingList = false;
           if (orders.orders && orders.orders.length !== 0) {
             // this.source.load(orders.orders);
+            console.log("set vales")
+           this.rows=orders.orders
+            this.page.totalPages=orders.totalPages
+            this.page.totalElements=orders.recordsTotal
+            this.page.size=orders.numbers
           } else {
-            // this.source.load([]);
+            this.rows=[];
           }
           this.totalCount = orders.recordsTotal;
         },
@@ -249,6 +259,10 @@ export class OrderListComponent implements OnInit {
 
   onSelectStore($event: ManagerStoreId) {
     this.params["store"] = $event.id;
+    this.setPage({offset:0})
+  }
+  setPage(pageInfo){
+    this.page.pageNumber = pageInfo.offset;
     this.getOrderList();
   }
 }
