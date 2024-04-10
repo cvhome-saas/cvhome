@@ -53,32 +53,32 @@ public class InternalStoreServiceImpl implements InternalStoreService {
 
     @Transactional
     @Override
-    public void syncInRouter(ManagerStoreId storeId) {
-        ManagerStoreEntity storeEntity = getManagerStoreEntity(storeId);
+    public void syncInRouter(ManagerStoreId store) {
+        ManagerStoreEntity storeEntity = getManagerStoreEntity(store);
         storeEntity.syncInRouter();
         storeRepository.save(storeEntity);
     }
 
     @Transactional
     @Override
-    public void syncInStore(ManagerStoreId storeId) {
-        ManagerStoreEntity storeEntity = getManagerStoreEntity(storeId);
+    public void syncInStore(ManagerStoreId store) {
+        ManagerStoreEntity storeEntity = getManagerStoreEntity(store);
         storeEntity.syncInStore();
         storeRepository.save(storeEntity);
     }
 
-    private ManagerStoreEntity getManagerStoreEntity(ManagerStoreId storeId) {
-        return storeRepository.findById(storeId)
+    private ManagerStoreEntity getManagerStoreEntity(ManagerStoreId store) {
+        return storeRepository.findById(store)
                 .orElseThrow(() -> new OperationExecution(ErrorCodes.store_not_found));
     }
 
     @Override
-    public IdentityId getStoreOwner(ManagerStoreId storeId) {
-        return getManagerStoreEntity(storeId).getOwner();
+    public IdentityId getStoreOwner(ManagerStoreId store) {
+        return getManagerStoreEntity(store).getOwner();
     }
 
     @Override
-    public ManagerStoreDto findStore(ManagerStoreId storeId) {
-        return storeMappers.toDto(getManagerStoreEntity(storeId));
+    public ManagerStoreDto findStore(ManagerStoreId store) {
+        return storeMappers.toDto(getManagerStoreEntity(store));
     }
 }

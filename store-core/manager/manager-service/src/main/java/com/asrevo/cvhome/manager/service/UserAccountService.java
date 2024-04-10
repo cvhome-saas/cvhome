@@ -16,14 +16,14 @@ public interface UserAccountService {
 
     KeyCloakUserDto createUser(IdentityId identityId, ManagerStoreId managerStoreId, CreateUserRequestDto createUserRequestDto);
 
-    void resetPassword(UserOrgStoreIdentity userOrgStoreInfo, ManagerStoreId storeId, RestPasswordRequestDto passwordRequestDto, String userId);
+    void resetPassword(UserOrgStoreIdentity userOrgStoreInfo, ManagerStoreId store, RestPasswordRequestDto passwordRequestDto, String userId);
 
     boolean usernameExist(String username);
 
-    void deleteUser(UserOrgStoreIdentity userOrgStoreInfo, ManagerStoreId storeId, String userId);
+    void deleteUser(UserOrgStoreIdentity userOrgStoreInfo, ManagerStoreId store, String userId);
 
-    void enableUser(UserOrgStoreIdentity userOrgStoreInfo, ManagerStoreId storeId, String userId);
+    void enableUser(UserOrgStoreIdentity userOrgStoreInfo, ManagerStoreId store, String userId);
 
-    void disableUser(UserOrgStoreIdentity userOrgStoreInfo, ManagerStoreId storeId, String userId);
+    void disableUser(UserOrgStoreIdentity userOrgStoreInfo, ManagerStoreId store, String userId);
 
 }

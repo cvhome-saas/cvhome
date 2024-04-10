@@ -68,13 +68,13 @@ password = microservice-gateway
 
 
 ### list my users
-GET http://localhost:7001/api/v1/user-account/list?storeId=65f023632bc46470c104b76f
+GET http://localhost:7001/api/v1/user-account/list?store=65f023632bc46470c104b76f
 Authorization: Bearer {{access_token}}
 
 
 
 ### create user
-POST http://localhost:7001/api/v1/user-account/create?storeId=65f023632bc46470c104b76f
+POST http://localhost:7001/api/v1/user-account/create?store=65f023632bc46470c104b76f
 Authorization: Bearer {{access_token}}
 Content-Type: application/json
 
@@ -91,7 +91,7 @@ Content-Type: application/json
 
 
 ### disable user
-POST http://localhost:7001/api/v1/user-account/disable?storeId=65f023632bc46470c104b76f&
+POST http://localhost:7001/api/v1/user-account/disable?store=65f023632bc46470c104b76f&
     userId=0ea70fdd-4828-4a0d-a742-59a87334eec6
 Authorization: Bearer {{access_token}}
 Content-Type: application/json
@@ -100,7 +100,7 @@ Content-Type: application/json
 }
 
 ### enable user
-POST http://localhost:7001/api/v1/user-account/enable?storeId=65f023632bc46470c104b76f&
+POST http://localhost:7001/api/v1/user-account/enable?store=65f023632bc46470c104b76f&
     userId=0ea70fdd-4828-4a0d-a742-59a87334eec6
 Authorization: Bearer {{access_token}}
 Content-Type: application/json

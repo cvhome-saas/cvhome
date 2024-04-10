@@ -90,10 +90,10 @@ public class KeycloakUserAccountServiceImpl implements UserAccountService {
     }
 
     @Override
-    public void resetPassword(UserOrgStoreIdentity userOrgStoreInfo, ManagerStoreId storeId, RestPasswordRequestDto passwordRequestDto, String userId) {
+    public void resetPassword(UserOrgStoreIdentity userOrgStoreInfo, ManagerStoreId store, RestPasswordRequestDto passwordRequestDto, String userId) {
         UserResource userResource = usersResource.get(userId);
         UserRepresentation representation = userResource.toRepresentation();
-        checkAttrAndValidate(userOrgStoreInfo, storeId, representation, () -> doResetPassword(passwordRequestDto, userId));
+        checkAttrAndValidate(userOrgStoreInfo, store, representation, () -> doResetPassword(passwordRequestDto, userId));
     }
 
     private void doResetPassword(RestPasswordRequestDto passwordRequestDto, String userId) {
@@ -112,27 +112,27 @@ public class KeycloakUserAccountServiceImpl implements UserAccountService {
     }
 
     @Override
-    public void deleteUser(UserOrgStoreIdentity userOrgStoreInfo, ManagerStoreId storeId, String userId) {
+    public void deleteUser(UserOrgStoreIdentity userOrgStoreInfo, ManagerStoreId store, String userId) {
         UserResource userResource = usersResource.get(userId);
         UserRepresentation representation = userResource.toRepresentation();
-        checkAttrAndValidate(userOrgStoreInfo, storeId, representation, userResource::remove);
+        checkAttrAndValidate(userOrgStoreInfo, store, representation, userResource::remove);
     }
 
     @Override
-    public void enableUser(UserOrgStoreIdentity userOrgStoreInfo, ManagerStoreId storeId, String userId) {
+    public void enableUser(UserOrgStoreIdentity userOrgStoreInfo, ManagerStoreId store, String userId) {
         UserResource userResource = usersResource.get(userId);
         UserRepresentation representation = userResource.toRepresentation();
-        checkAttrAndValidate(userOrgStoreInfo, storeId, representation, () -> {
+        checkAttrAndValidate(userOrgStoreInfo, store, representation, () -> {
             representation.setEnabled(Boolean.TRUE);
             userResource.update(representation);
         });
     }
 
     @Override
-    public void disableUser(UserOrgStoreIdentity userOrgStoreInfo, ManagerStoreId storeId, String userId) {
+    public void disableUser(UserOrgStoreIdentity userOrgStoreInfo, ManagerStoreId store, String userId) {
         UserResource userResource = usersResource.get(userId);
         UserRepresentation representation = userResource.toRepresentation();
-        checkAttrAndValidate(userOrgStoreInfo, storeId, representation, () -> {
+        checkAttrAndValidate(userOrgStoreInfo, store, representation, () -> {
             representation.setEnabled(Boolean.FALSE);
             userResource.update(representation);
         });
@@ -142,20 +142,20 @@ public class KeycloakUserAccountServiceImpl implements UserAccountService {
      * used to check if a user in a specific org and store
      *
      * @param userOrgStoreInfo
-     * @param storeId
+     * @param store
      * @param representation
      * @param runnable
      */
 
-    private void checkAttrAndValidate(UserOrgStoreIdentity userOrgStoreInfo, ManagerStoreId storeId, UserRepresentation representation, Runnable runnable) {
-        if (attrMatch(representation, userOrgStoreInfo, storeId)) {
+    private void checkAttrAndValidate(UserOrgStoreIdentity userOrgStoreInfo, ManagerStoreId store, UserRepresentation representation, Runnable runnable) {
+        if (attrMatch(representation, userOrgStoreInfo, store)) {
             runnable.run();
         } else {
             throw new OperationExecution(ErrorCodes.NOT_ALLOWED_TO_ACCESS_THIS_ORG_AND_STORE);
         }
     }
 
-    private boolean attrMatch(UserRepresentation representation, UserOrgStoreIdentity userOrgStoreInfo, ManagerStoreId storeId) {
+    private boolean attrMatch(UserRepresentation representation, UserOrgStoreIdentity userOrgStoreInfo, ManagerStoreId store) {
         String orgAttr = extractKey(representation.getAttributes(), ORG_ATTR_KEY).orElseThrow(() -> new OperationExecution(ErrorCodes.KEYCLOAK_USER_ATTR_NOT_CONTAIN_ORG));
         if (!orgAttr.equals(userOrgStoreInfo.org().id())) {
             return false;
@@ -165,9 +165,9 @@ public class KeycloakUserAccountServiceImpl implements UserAccountService {
             if (!storeAttr.equals(userOrgStoreInfo.store())) {
                 return false;
             }
-            return storeId.getId().toString().equals(userOrgStoreInfo.store());
+            return store.getId().toString().equals(userOrgStoreInfo.store());
         } else {
-            return storeAttr.equals(storeId.getId().toString());
+            return storeAttr.equals(store.getId().toString());
         }
     }
 

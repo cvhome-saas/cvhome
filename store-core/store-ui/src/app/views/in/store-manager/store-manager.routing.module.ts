@@ -10,7 +10,7 @@ import {ManageStoreOrdersComponent} from "./views/manage-store-orders/manage-sto
 const routes: Routes = [
     {path: '', component: StoreManagerComponent},
     {
-        path: ':storeId', component: ManageStoreComponent, children: [
+        path: ':store', component: ManageStoreComponent, children: [
             {path: '', component: ManageStoreLandingComponent},
             {path: 'users', component: ManageStoreUsersComponent},
             {path: 'orders', component: ManageStoreOrdersComponent},

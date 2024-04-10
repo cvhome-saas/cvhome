@@ -14,7 +14,7 @@ import java.util.List;
 public sealed interface StoreEvent extends Event permits StoreCreatedEvent {
     EventId eventId();
 
-    ManagerStoreId storeId();
+    ManagerStoreId store();
 
     @Override
     default List<String> getDestinations() {

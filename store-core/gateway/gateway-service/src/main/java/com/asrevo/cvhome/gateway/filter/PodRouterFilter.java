@@ -26,7 +26,7 @@ import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.G
 @Component
 public class PodRouterFilter implements GlobalFilter, Ordered {
     private static final String STORE_SERVICE_PREFIX = "/store/";
-    private static final String STORE_ID_PARAM = "storeId";
+    private static final String STORE_ID_PARAM = "store";
     private final RouterAllocationService router;
     private final String storeUri;
     private final CallStrategy callStrategy;
@@ -63,9 +63,9 @@ public class PodRouterFilter implements GlobalFilter, Ordered {
         URI uri = exchange.getRequest().getURI();
         if (uri.getPath().startsWith(STORE_SERVICE_PREFIX)) {
             UriComponents uriComponents = UriComponentsBuilder.fromUri(uri).build();
-            String storeId = uriComponents.getQueryParams().getFirst(STORE_ID_PARAM);
-            if (storeId != null) {
-            Mono<ServerHttpRequest> httpRequest = getServerHttpRequest(exchange, uriComponents, new DomainReference("storeId"));
+            String store = uriComponents.getQueryParams().getFirst(STORE_ID_PARAM);
+            if (store != null) {
+            Mono<ServerHttpRequest> httpRequest = getServerHttpRequest(exchange, uriComponents, new DomainReference("store"));
             return httpRequest.flatMap(it -> {
                 exchange.getAttributes().put(GATEWAY_REQUEST_URL_ATTR, it.getURI());
                 return chain.filter(exchange.mutate().request(it).build());

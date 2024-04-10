@@ -46,7 +46,7 @@ export class ManageStoreUsersComponent implements OnInit, OnDestroy {
     ngAfterViewInit(): void {
         this.userListSubscribe = this.activatedRoute.parent?.params
             .pipe(
-                map(it => it['storeId']),
+                map(it => it['store']),
                 tap(it => this.currentStoreId = it),
                 mergeMap(it => this.userService.list({id: it}))
             )

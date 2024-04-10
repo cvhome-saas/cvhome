@@ -23,7 +23,7 @@ export class ManageStoreComponent implements OnInit, AfterViewInit, OnDestroy {
     ngAfterViewInit(): void {
         this.storeInfoSubscription = this.activatedRoute?.params
             .pipe(
-                map(it => it['storeId']),
+                map(it => it['store']),
                 tap(it => this.currentStoreId = it),
                 mergeMap(it => this.storeService.getStoreInfo({id: it}))
             )
