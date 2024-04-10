@@ -6,6 +6,7 @@ import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.order.Order;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
+import com.asrevo.cvhome.store.core.model.order.OrderCriteria;
 import com.asrevo.cvhome.store.core.model.order.v1.PersistableOrder;
 import com.asrevo.cvhome.store.core.model.order.v1.ReadableOrderConfirmation;
 
@@ -16,4 +17,13 @@ public interface OrderFacade {
 
     ReadableOrderConfirmation orderConfirmation(Order order, Customer customer, MerchantStore store,
                                                 Language language);
+
+    com.asrevo.cvhome.store.core.model.order.v0.ReadableOrderList getReadableOrderList(MerchantStore store, Customer customer, int start,
+                                                                                       int maxCount, Language language) throws Exception;
+
+    com.asrevo.cvhome.store.core.model.order.v0.ReadableOrderList getReadableOrderList(OrderCriteria criteria, MerchantStore store);
+
+    com.asrevo.cvhome.store.core.model.order.v0.ReadableOrderList getReadableOrderList(MerchantStore store, int start,
+                                                                                       int maxCount, Language language) throws Exception;
+
 }

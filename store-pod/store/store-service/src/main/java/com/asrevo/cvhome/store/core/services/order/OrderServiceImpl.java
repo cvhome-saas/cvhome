@@ -19,9 +19,7 @@ import com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCart;
 import com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.common.UserContext;
-import com.asrevo.cvhome.store.core.model.order.OrderSummary;
-import com.asrevo.cvhome.store.core.model.order.OrderSummaryType;
-import com.asrevo.cvhome.store.core.model.order.OrderTotalSummary;
+import com.asrevo.cvhome.store.core.model.order.*;
 import com.asrevo.cvhome.store.core.model.payments.Payment;
 import com.asrevo.cvhome.store.core.repositories.order.OrderRepository;
 import com.asrevo.cvhome.store.core.services.catalog.product.ProductService;
@@ -30,8 +28,10 @@ import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceIm
 import com.asrevo.cvhome.store.core.services.shoppingcart.ShoppingCartService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -51,12 +51,15 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
     private final ShoppingCartService shoppingCartService;
     private final ProductService productService;
     private final CustomerService customerService;
+    private final OrderRepository orderRepository;
 
-    public OrderServiceImpl(OrderRepository repository, ShoppingCartService shoppingCartService, ProductService productService, CustomerService customerService) {
-        super(repository);
+
+    public OrderServiceImpl(OrderRepository orderRepository, ShoppingCartService shoppingCartService, ProductService productService, CustomerService customerService) {
+        super(orderRepository);
         this.shoppingCartService = shoppingCartService;
         this.productService = productService;
         this.customerService = customerService;
+        this.orderRepository = orderRepository;
     }
 
 
@@ -187,6 +190,32 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
     }
 
     @Override
+    public void delete(final Order order) throws ServiceException {
+
+
+        super.delete(order);
+    }
+
+    @Override
+    public Order getOrder(final Long orderId, MerchantStore store ) {
+        Validate.notNull(orderId, "Order id cannot be null");
+        Validate.notNull(store, "Store cannot be null");
+        return orderRepository.findOne(orderId, store.getId());
+    }
+
+
+    /** legacy **/
+    @Override
+    public OrderList listByStore(final MerchantStore store, final OrderCriteria criteria) {
+        return orderRepository.listByStore(store, criteria);
+    }
+
+    @Override
+    public OrderList getOrders(final OrderCriteria criteria, MerchantStore store) {
+        return orderRepository.listOrders(store, criteria);
+    }
+
+    @Override
     public void saveOrUpdate(final Order order) throws ServiceException {
 
         if (order.getId() != null && order.getId() > 0) {
@@ -198,6 +227,24 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
             super.create(order);
 
         }
+    }
+    @Override
+    public boolean hasDownloadFiles(Order order) throws ServiceException {
+
+        Validate.notNull(order,"Order cannot be null");
+        Validate.notNull(order.getOrderProducts(),"Order products cannot be null");
+        Validate.notEmpty(order.getOrderProducts(),"Order products cannot be empty");
+
+        boolean hasDownloads = false;
+        for(OrderProduct orderProduct : order.getOrderProducts()) {
+
+            if(!CollectionUtils.isEmpty(orderProduct.getDownloads())) {
+                hasDownloads = true;
+                break;
+            }
+        }
+
+        return hasDownloads;
     }
 
     private Order process(Order order, Customer customer, List<ShoppingCartItem> items, OrderTotalSummary summary, Payment payment, Transaction transaction, MerchantStore store) throws ServiceException {
