@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.store.service.facade.order;
 
 import com.asrevo.cvhome.store.controller.exception.ConversionException;
+import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
 import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
 import com.asrevo.cvhome.store.core.entity.customer.Customer;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
@@ -8,12 +9,15 @@ import com.asrevo.cvhome.store.core.entity.order.Order;
 import com.asrevo.cvhome.store.core.entity.order.OrderTotal;
 import com.asrevo.cvhome.store.core.entity.order.attributes.OrderAttribute;
 import com.asrevo.cvhome.store.core.entity.order.orderproduct.OrderProduct;
+import com.asrevo.cvhome.store.core.entity.order.orderstatus.OrderStatusHistory;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCart;
 import com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.customer.ReadableCustomer;
 import com.asrevo.cvhome.store.core.model.order.*;
+import com.asrevo.cvhome.store.core.model.order.history.PersistableOrderStatusHistory;
+import com.asrevo.cvhome.store.core.model.order.history.ReadableOrderStatusHistory;
 import com.asrevo.cvhome.store.core.model.order.total.ReadableOrderTotal;
 import com.asrevo.cvhome.store.core.model.order.total.ReadableTotal;
 import com.asrevo.cvhome.store.core.model.order.v1.PersistableOrder;
@@ -474,6 +478,104 @@ public class OrderFacadeImpl implements OrderFacade {
         readableOrder.setProducts(orderProducts);
     }
 
+    @Override
+    public com.asrevo.cvhome.store.core.model.order.v0.ReadableOrder getReadableOrder(Long orderId, MerchantStore store,
+                                                                               Language language) {
+        Validate.notNull(store, "MerchantStore cannot be null");
+        Order modelOrder = orderService.getOrder(orderId, store);
+        if (modelOrder == null) {
+            throw new ResourceNotFoundException("Order not found with id " + orderId);
+        }
+
+        com.asrevo.cvhome.store.core.model.order.v0.ReadableOrder readableOrder = new com.asrevo.cvhome.store.core.model.order.v0.ReadableOrder();
+
+        Long customerId = modelOrder.getCustomerId();
+        if (customerId != null) {
+            ReadableCustomer readableCustomer = customerFacade.getCustomerById(customerId, store, language);
+            if (readableCustomer == null) {
+                log.warn("Customer id " + customerId + " not found in order " + orderId);
+            } else {
+                readableOrder.setCustomer(readableCustomer);
+            }
+        }
+
+        try {
+            readableOrderPopulator.populate(modelOrder, readableOrder, store, language);
+
+            // order products
+            List<ReadableOrderProduct> orderProducts = new ArrayList<ReadableOrderProduct>();
+            for (OrderProduct p : modelOrder.getOrderProducts()) {
+                ReadableOrderProductPopulator orderProductPopulator = new ReadableOrderProductPopulator();
+                orderProductPopulator.setProductService(productService);
+                orderProductPopulator.setPricingService(pricingService);
+                orderProductPopulator.setimageUtils(imageUtils);
+
+                ReadableOrderProduct orderProduct = new ReadableOrderProduct();
+                orderProductPopulator.populate(p, orderProduct, store, language);
+                orderProducts.add(orderProduct);
+            }
+
+            readableOrder.setProducts(orderProducts);
+        } catch (Exception e) {
+            throw new ServiceRuntimeException("Error while getting order [" + orderId + "]");
+        }
+
+        return readableOrder;
+    }
+
+    @Override
+    public List<ReadableOrderStatusHistory> getReadableOrderHistory(Long orderId, MerchantStore store,
+                                                                    Language language) {
+
+        Order order = orderService.getOrder(orderId, store);
+        if (order == null) {
+            throw new ResourceNotFoundException(
+                    "Order id [" + orderId + "] not found for merchand [" + store.getId() + "]");
+        }
+
+        Set<OrderStatusHistory> historyList = order.getOrderHistory();
+        List<ReadableOrderStatusHistory> returnList = historyList.stream().map(f -> mapToReadbleOrderStatusHistory(f))
+                .collect(Collectors.toList());
+        return returnList;
+    }
+
+    ReadableOrderStatusHistory mapToReadbleOrderStatusHistory(OrderStatusHistory source) {
+        ReadableOrderStatusHistory readable = new ReadableOrderStatusHistory();
+        readable.setComments(source.getComments());
+        readable.setDate(DateUtil.formatLongDate(source.getDateAdded()));
+        readable.setId(source.getId());
+        readable.setOrderId(source.getOrder().getId());
+        readable.setOrderStatus(source.getStatus().name());
+
+        return readable;
+    }
+    @Override
+    public void createOrderStatus(PersistableOrderStatusHistory status, Long id, MerchantStore store) {
+        Validate.notNull(status, "OrderStatusHistory must not be null");
+        Validate.notNull(id, "Order id must not be null");
+        Validate.notNull(store, "MerchantStore must not be null");
+
+        // retrieve original order
+        Order order = orderService.getOrder(id, store);
+        if (order == null) {
+            throw new ResourceNotFoundException(
+                    "Order with id [" + id + "] does not exist for merchant [" + store.getCode() + "]");
+        }
+
+        try {
+            OrderStatusHistory history = new OrderStatusHistory();
+            history.setComments(status.getComments());
+            history.setDateAdded(DateUtil.getDate(status.getDate()));
+            history.setOrder(order);
+            history.setStatus(status.getStatus());
+
+            orderService.addOrderStatusHistory(order, history);
+
+        } catch (Exception e) {
+            throw new ServiceRuntimeException("An error occured while converting orderstatushistory", e);
+        }
+
+    }
 
     private void notify(Order modelOrder, Customer customer, MerchantStore store, Language language, Locale locale) {
 //@TODO ASHRAF
