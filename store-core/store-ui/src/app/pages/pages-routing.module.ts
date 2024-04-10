@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 
 import { PagesComponent } from './pages.component';
 import {NotFoundComponent} from "./learn/miscellaneous/not-found/not-found.component";
+import {canActivateTeam,canActivateTeamu,isLoggedInUser, isLoggedInUserChild} from "../shared/service/auth-guard.service";
 // import {DashboardComponent} from "./dashboard/dashboard.component";
 // import { DashboardComponent } from './dashboard/dashboard.component';
 // import { ECommerceComponent } from './e-commerce/e-commerce.component';
@@ -10,11 +11,12 @@ import {NotFoundComponent} from "./learn/miscellaneous/not-found/not-found.compo
 
 const routes: Routes = [{
   path: '',
+  canActivate:[canActivateTeam],
+  canActivateChild:[canActivateTeamu],
   component: PagesComponent,
   children: [
     {
       path: 'orders',
-      // canActivate: [OrdersGuard],
       loadChildren: () => import('./orders/orders.module')
         .then(m => m.OrdersModule),
     },

@@ -8,6 +8,7 @@ import {
   NbRequestPasswordComponent,
   NbResetPasswordComponent,
 } from '@nebular/auth';
+import {environment} from "../environments/environment";
 
 export const routes: Routes = [
   {
@@ -15,6 +16,13 @@ export const routes: Routes = [
     loadChildren: () => import('./pages/pages.module')
       .then(m => m.PagesModule),
   },
+  {
+    path: 'external-login-link',
+    loadChildren: () => new Promise(() => {
+      window.location.href = environment.LOGIN_URL;
+    })
+  },
+
   {
     path: 'auth',
     component: NbAuthComponent,

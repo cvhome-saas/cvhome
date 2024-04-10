@@ -27,5 +27,6 @@ export const environment = {
         'ar'
       ],
     },
-  }
+  },
+  LOGIN_URL: "/oauth2/authorization/keycloak"
 };
