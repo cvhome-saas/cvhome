@@ -27,14 +27,14 @@ public class UserAccountController {
     private final UserAccountService userAccountService;
 
     @GetMapping("list")
-    @PreAuthorize("hasPermission(#storeId,'ManagerStoreId','STORE.USERS.LIST')")
-    public Mono<List<KeyCloakUserDto>> list(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId storeId) {
-        return Mono.just(userAccountService.list(new ListUsersQuery(identity.org(), storeId)));
+    @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE.USERS.LIST')")
+    public Mono<List<KeyCloakUserDto>> list(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store) {
+        return Mono.just(userAccountService.list(new ListUsersQuery(identity.org(), store)));
     }
 
     @PostMapping("create")
-    @PreAuthorize("hasPermission(#storeId,'ManagerStoreId','STORE.USERS.CREATE')")
-    public Mono<KeyCloakUserDto> create(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId storeId, @RequestBody CreateUserRequestDto create) {
+    @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE.USERS.CREATE')")
+    public Mono<KeyCloakUserDto> create(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store, @RequestBody CreateUserRequestDto create) {
         if (create.groups() == null || create.groups().isEmpty()) {
             throw new OperationExecution(ErrorCodes.groups_should_not_be_empty);
         }
@@ -50,33 +50,33 @@ public class UserAccountController {
         if (userAccountService.usernameExist(create.username())) {
             throw new OperationExecution(ErrorCodes.username_already_taken);
         }
-        return Mono.just(userAccountService.createUser(identity.org(), storeId, create));
+        return Mono.just(userAccountService.createUser(identity.org(), store, create));
     }
 
     @PostMapping("reset")
-    @PreAuthorize("hasPermission(#storeId,'ManagerStoreId','STORE.USERS.RESET_PASSWORD')")
-    public void resetPassword(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId storeId, @RequestParam String userId, @RequestBody RestPasswordRequestDto passwordRequestDto) {
-        userAccountService.resetPassword(identity, storeId, passwordRequestDto, userId);
+    @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE.USERS.RESET_PASSWORD')")
+    public void resetPassword(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store, @RequestParam String userId, @RequestBody RestPasswordRequestDto passwordRequestDto) {
+        userAccountService.resetPassword(identity, store, passwordRequestDto, userId);
     }
 
     @DeleteMapping("delete")
-    @PreAuthorize("hasPermission(#storeId,'ManagerStoreId','STORE.USERS.DELETE')")
-    public Mono<Void> delete(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId storeId, @RequestParam String userId) {
-        userAccountService.deleteUser(identity, storeId, userId);
+    @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE.USERS.DELETE')")
+    public Mono<Void> delete(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store, @RequestParam String userId) {
+        userAccountService.deleteUser(identity, store, userId);
         return Mono.empty();
     }
 
     @PostMapping("enable")
-    @PreAuthorize("hasPermission(#storeId,'ManagerStoreId','STORE.USERS.ENABLE')")
-    public Mono<Object> enable(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId storeId, @RequestParam String userId) {
-        userAccountService.enableUser(identity, storeId, userId);
+    @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE.USERS.ENABLE')")
+    public Mono<Object> enable(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store, @RequestParam String userId) {
+        userAccountService.enableUser(identity, store, userId);
         return Mono.empty();
     }
 
     @PostMapping("disable")
-    @PreAuthorize("hasPermission(#storeId,'ManagerStoreId','STORE.USERS.DISABLE')")
-    public Mono<Object> disable(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId storeId, @RequestParam String userId) {
-        userAccountService.disableUser(identity, storeId, userId);
+    @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE.USERS.DISABLE')")
+    public Mono<Object> disable(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store, @RequestParam String userId) {
+        userAccountService.disableUser(identity, store, userId);
         return Mono.empty();
     }
 

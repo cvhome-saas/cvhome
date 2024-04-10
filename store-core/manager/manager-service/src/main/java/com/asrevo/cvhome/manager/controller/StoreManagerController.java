@@ -37,8 +37,8 @@ public class StoreManagerController {
     }
 
     @GetMapping("store-info")
-    @PreAuthorize("hasPermission(#storeId,'ManagerStoreId','STORE.FIND-ONE')")
-    public Mono<ManagerStoreDto> storeInfo(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId storeId) {
-        return Mono.just(storeService.findStore(storeId));
+    @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE.FIND-ONE')")
+    public Mono<ManagerStoreDto> storeInfo(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store) {
+        return Mono.just(storeService.findStore(store));
     }
 }

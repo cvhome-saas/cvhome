@@ -14,11 +14,11 @@ public interface InternalStoreService {
 
     Page<ManagerStoreDto> findAll(UserOrgStoreIdentity identity, ListManagerStoreQuery listManagerStoreQuery, Pageable pageable);
 
-    void syncInRouter(ManagerStoreId storeId);
+    void syncInRouter(ManagerStoreId store);
 
-    void syncInStore(ManagerStoreId storeId);
+    void syncInStore(ManagerStoreId store);
 
-    IdentityId getStoreOwner(ManagerStoreId storeId);
+    IdentityId getStoreOwner(ManagerStoreId store);
 
-    ManagerStoreDto findStore(ManagerStoreId storeId);
+    ManagerStoreDto findStore(ManagerStoreId store);
 }

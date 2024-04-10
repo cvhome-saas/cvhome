@@ -21,6 +21,6 @@ export class StoreService {
     }
 
     getStoreInfo(param: ManagerStoreId): Observable<Store> {
-        return this.httpClient.get<Store>(`${this.STORE_MANAGER_BASE_URL}/store-info?storeId=${param.id}`, {})
+        return this.httpClient.get<Store>(`${this.STORE_MANAGER_BASE_URL}/store-info?store=${param.id}`, {})
     }
 }
