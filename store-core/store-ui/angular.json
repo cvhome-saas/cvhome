@@ -37,6 +37,7 @@
               "node_modules/nebular-icons/scss/nebular-icons.scss",
               "node_modules/pace-js/templates/pace-theme-flash.tmpl.css",
               "node_modules/leaflet/dist/leaflet.css",
+              "node_modules/summernote/dist/summernote-lite.min.css",
               "src/app/@theme/styles/styles.scss"
             ],
             "scripts": [
@@ -45,7 +46,9 @@
               "node_modules/tinymce/themes/modern/theme.min.js",
               "node_modules/tinymce/plugins/link/plugin.min.js",
               "node_modules/tinymce/plugins/paste/plugin.min.js",
-              "node_modules/tinymce/plugins/table/plugin.min.js"
+              "node_modules/tinymce/plugins/table/plugin.min.js",
+              "node_modules/jquery/dist/jquery.min.js",
+              "node_modules/summernote/dist/summernote-lite.min.js"
             ],
             "allowedCommonJsDependencies": [
               "lodash",

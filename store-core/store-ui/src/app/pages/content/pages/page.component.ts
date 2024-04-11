@@ -93,7 +93,7 @@ export class PageComponent {
     }).onClose.subscribe(res => {
       if (res) {
         this.loadingList = true;
-        this.crudService.delete('/store/api/v1/private/content/' + event.id + '?id=' + event.id)
+        this.crudService.delete('/store/api/v1/private/content/' + event.id + '?id=' + event.id+"&store="+this.params.store)
           .subscribe({
             next:(data)=>{
               this.loadingList = false;
