@@ -6,6 +6,7 @@ import {PageComponent} from './pages/page.component';
 import {BoxesComponent} from './boxes/boxes.component';
 import {AddPageComponent} from './pages/add-page.component';
 import {AddBoxComponent} from './boxes/add-box.component';
+import {ImagesComponent} from "./images/images.component";
 
 const routes: Routes = [{
   path: '',
@@ -34,11 +35,11 @@ const routes: Routes = [{
     {
       path: 'boxes/add',
       component: AddBoxComponent,
-    }/*,
+    },
     {
       path: 'images/list',
       component: ImagesComponent,
-    },
+    }/*,
     {
       path: 'files/list',
       component: FilesComponent,
@@ -63,10 +64,9 @@ export const routedComponents = [
   AddPageComponent,
   BoxesComponent,
   AddBoxComponent,
-  /*
     ImagesComponent,
-    UploadComponent,
-    PromotionComponent,
-    FilesComponent
-  */
+  /*  UploadComponent,
+  PromotionComponent,
+  FilesComponent
+*/
 ];
