@@ -59,7 +59,6 @@ export class BoxesComponent {
           this.page.totalElements = data.recordsTotal
           this.page.size = data.numbers
           this.loadingList = false;
-
         },
         error: (err) => {
           this.loadingList = false;
@@ -94,7 +93,7 @@ export class BoxesComponent {
     }).onClose.subscribe(res => {
       if (res) {
         this.loadingList = true;
-        this.crudService.delete('/store/api/v1/private/content/' + event.id + '?id=' + event.id)
+        this.crudService.delete('/store/api/v1/private/content/' + event.id + '?id=' + event.id + '&store=' + this.params.store)
           .subscribe({
             next: (data) => {
               this.loadingList = false;

@@ -1,17 +1,16 @@
-import { Component, OnInit } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { CrudService } from '../../shared/services/crud.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import {Component, OnInit} from '@angular/core';
+import {FormArray, FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {CrudService} from '../../shared/services/crud.service';
+import {ActivatedRoute, Router} from '@angular/router';
 // import { ImageBrowserComponent } from '../../../@theme/components/image-browser/image-browser.component';
 import {NbDialogService, NbToastrService} from '@nebular/theme';
-import { validators } from '../../shared/validation/validators';
-import { TranslateService } from '@ngx-translate/core';
-import { ConfigService } from '../../shared/services/config.service';
-import { forkJoin } from 'rxjs';
-import { Description } from '../../shared/models/description';
+import {validators} from '../../shared/validation/validators';
+import {TranslateService} from '@ngx-translate/core';
+import {ConfigService} from '../../shared/services/config.service';
+import {ImageBrowserComponent} from "../../store-manager/shared/image-browser/image-browser.component";
 
-declare var jquery: any;
 declare var $: any;
+
 @Component({
   selector: 'add-box',
   templateUrl: './add-box.component.html',
@@ -19,7 +18,7 @@ declare var $: any;
 })
 export class AddBoxComponent implements OnInit {
   loader = false;
-
+  store: string;
   form: FormGroup;
   content: any;
 
@@ -60,7 +59,8 @@ export class AddBoxComponent implements OnInit {
     fontNames: ['Helvetica', 'Arial', 'Arial Black', 'Comic Sans MS', 'Courier New', 'Roboto', 'Times']
   };
   params = this.param();
-  public scrollbarOptions = { axis: 'y', theme: 'minimal-dark' };
+  public scrollbarOptions = {axis: 'y', theme: 'minimal-dark'};
+
   constructor(
     private fb: FormBuilder,
     private crudService: CrudService,
@@ -70,35 +70,47 @@ export class AddBoxComponent implements OnInit {
     private dialogService: NbDialogService,
     private activatedRoute: ActivatedRoute,
     private translate: TranslateService
-  ) { }
+  ) {
+  }
 
   param() {
     return {
-      store: localStorage.getItem('merchant'),
+      store: this.store,
       lang: "_all"
     };
   }
+
+
   ngOnInit() {
     this.loader = true;
-    this.uniqueCode = this.activatedRoute.snapshot.paramMap.get('code');
+    this.activatedRoute.params.subscribe(it => {
+      const split: string[] = it['code'].split("-");
+      this.store = split[0];
+      this.getLanguages();
+      if (split.length == 2 && split[1] != "") {
+        this.action = 'edit';
+        this.uniqueCode = split[1];
+        this.loadContent();
+      }
+    });
     this.createForm();
+  }
 
-    const languages = this.configService.getListOfSupportedLanguages(localStorage.getItem('merchant'))
-      .subscribe((languages) => {
-        this.languages = [...languages];
-        this.addFormArray();//create array
-        if (this.uniqueCode != null) {
-          this.action = 'edit';
-          this.loadContent();
-        } else {
+  private getLanguages() {
+    this.configService.getListOfSupportedLanguages(this.store)
+      .subscribe({
+        next: (languages) => {
+          this.languages = [...languages];
+          this.addFormArray();
           this.loader = false;
-        }
-
-      }, error => {
-        this.toastr.danger(error.error.message);
-        this.loader = false;
+        },
+        error: (err) => {
+          this.toastr.danger(err.error.message);
+          this.loader = false;
+        },
       });
   }
+
 
 
   private loadContent() {
@@ -168,7 +180,7 @@ export class AddBoxComponent implements OnInit {
   private checkCode(event) {
     //check if box code already exists
     const code = event.target.value.trim();
-    this.crudService.get('/store/api/v1/private/content/box/' + code + '/exists', this.param())
+    this.crudService.get('/store/api/v1/private/content/box/' + code + '/exists?store='+this.store, this.param())
       .subscribe(res => {
         this.isCodeExists = res.exists;
       });
@@ -230,12 +242,12 @@ export class AddBoxComponent implements OnInit {
     }
 
     /**
-    let errors = this.findInvalidControls();
-    if (errors.length > 0) {
-      this.toastr.error(this.translate.instant('COMMON.FILL_REQUIRED_FIELDS'));
-      return;
-    }
-    **/
+     let errors = this.findInvalidControls();
+     if (errors.length > 0) {
+     this.toastr.error(this.translate.instant('COMMON.FILL_REQUIRED_FIELDS'));
+     return;
+     }
+     **/
     //for debugging
     //console.log(JSON.stringify(categoryObject));
     //return;
@@ -244,7 +256,7 @@ export class AddBoxComponent implements OnInit {
 
     if (object.id > 0) {//update
       //set content name required field
-      this.crudService.put('/store/api/v1/private/content/box/' + this.content.id, object, this.param())
+      this.crudService.put('/store/api/v1/private/content/box/' + this.content.id+'?store='+this.store, object, this.param())
         .subscribe(data => {
           this.loader = false;
           this.toastr.success(this.translate.instant('CONTENT.CONTENT_UPDATED'));
@@ -256,7 +268,7 @@ export class AddBoxComponent implements OnInit {
 
     } else {
 
-      this.crudService.post('/store/api/v1/private/content/box', object)
+      this.crudService.post('/store/api/v1/private/content/box?store='+this.store, object)
         .subscribe(data => {
           this.loader = false;
           this.toastr.success(this.translate.instant('PRODUCT.PRODUCT_UPDATED'));
@@ -306,6 +318,7 @@ export class AddBoxComponent implements OnInit {
   goToback() {
     this.router.navigate(['/pages/content/boxes/list']);
   }
+
   customButton(context) {
     const me = this;
     const ui = $.summernote.ui;
@@ -315,7 +328,11 @@ export class AddBoxComponent implements OnInit {
       container: '.note-editor',
       className: 'note-btn',
       click: function () {
-        // me.dialogService.open(ImageBrowserComponent, {}).onClose.subscribe(name => name && context.invoke('editor.pasteHTML', '<img src="' + name + '">'));
+        me.dialogService.open(ImageBrowserComponent, {
+          context: {
+            store: me.store
+          }
+        }).onClose.subscribe(name => name && context.invoke('editor.pasteHTML', '<img src="' + name + '">'));
       }
     });
     return button.render();
