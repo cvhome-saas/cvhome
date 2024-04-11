@@ -84,7 +84,7 @@ export class FilesComponent {
   // }
   getFiles() {
     this.loadingList = true;
-    this.crudService.get('/v1/content/folder')
+    this.crudService.get('/store/api/v1/content/folder')
       .subscribe(data => {
         this.loadingList = false;
         this.data = data.content;
@@ -126,7 +126,7 @@ export class FilesComponent {
 
       let formData = new FormData();
       formData.append('file', files.addedFiles[i]);
-      this.crudService.post('/v1/private/file', formData)
+      this.crudService.post('/store/api/v1/private/file', formData)
         .subscribe(data => {
           this.loadingList = false;
           // this.uploadedFiles = data.content;
@@ -141,7 +141,7 @@ export class FilesComponent {
   //   for (var i = 0; i < this.files.length; i++) {
   //     let formData = new FormData();
   //     formData.append('file', this.files[i]);
-  //     this.crudService.post('/v1/private/file', formData)
+  //     this.crudService.post('/store/api/v1/private/file', formData)
   //       .subscribe(data => {
   //         console.log(data);
   //         this.loadingList = false;
@@ -166,7 +166,7 @@ export class FilesComponent {
       .onClose.subscribe(res => {
         if (res) {
           this.loadingList = true;
-          this.crudService.delete('/v1/private/content/?contentType=IMAGE&name=' + e)
+          this.crudService.delete('/store/api/v1/private/content/?contentType=IMAGE&name=' + e)
             .subscribe(data => {
               this.loadingList = false;
               // this.toastr.success('Page deleted successfully');

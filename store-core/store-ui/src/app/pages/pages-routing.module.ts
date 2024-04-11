@@ -1,9 +1,9 @@
-import { RouterModule, Routes } from '@angular/router';
-import { NgModule } from '@angular/core';
+import {RouterModule, Routes} from '@angular/router';
+import {NgModule} from '@angular/core';
 
-import { PagesComponent } from './pages.component';
+import {PagesComponent} from './pages.component';
 import {NotFoundComponent} from "./learn/miscellaneous/not-found/not-found.component";
-import {canActivateTeam,canActivateTeamu,isLoggedInUser, isLoggedInUserChild} from "../shared/service/auth-guard.service";
+import {canActivateTeam, canActivateTeamu} from "../shared/service/auth-guard.service";
 // import {DashboardComponent} from "./dashboard/dashboard.component";
 // import { DashboardComponent } from './dashboard/dashboard.component';
 // import { ECommerceComponent } from './e-commerce/e-commerce.component';
@@ -11,15 +11,67 @@ import {canActivateTeam,canActivateTeamu,isLoggedInUser, isLoggedInUserChild} fr
 
 const routes: Routes = [{
   path: '',
-  canActivate:[canActivateTeam],
-  canActivateChild:[canActivateTeamu],
+  canActivate: [canActivateTeam],
+  canActivateChild: [canActivateTeamu],
   component: PagesComponent,
   children: [
+    // {
+    //   path: 'home',
+    //   loadChildren: 'app/pages/home/home.module#HomeModule'
+    // },
     {
       path: 'orders',
       loadChildren: () => import('./orders/orders.module')
         .then(m => m.OrdersModule),
     },
+    // {
+    //   path: 'user-management',
+    //   loadChildren: 'app/pages/user-management/user-management.module#UserManagementModule'
+    // },
+    // {
+    //   path: 'store-management',
+    //   loadChildren: 'app/pages/store-management/store-management.module#StoreManagementModule'
+    // },
+    // {
+    //   path: 'catalogue',
+    //   canActivate: [SuperadminStoreRetailCatalogueGuard],
+    //   loadChildren: 'app/pages/catalogue/catalogue.module#CatalogueModule'
+    // },
+    {
+      path: 'content',
+      loadChildren: () => import('./content/content.module')
+        .then(m => m.ContentModule),
+    },
+    // {
+    //   path: 'shipping',
+    //   loadChildren: 'app/pages/shipping/shipping.module#ShippingModule'
+    // },
+    // {
+    //   path: 'payment',
+    //   loadChildren: 'app/pages/payment/payment.module#PaymentModule'
+    // },
+    // {
+    //   path: 'tax-management',
+    //   loadChildren: 'app/pages/tax-management/tax-management.module#TaxManagementModule'
+    // },
+    // {
+    //   path: 'customer',
+    //   loadChildren: 'app/pages/customers/customer.module#CustomersModule'
+    // },
+    // {
+    //   path: 'error-500',
+    //   component: FiveHundredComponent
+    // },
+    // {
+    //   path: '',
+    //   redirectTo: 'home',
+    //   pathMatch: 'full'
+    // },
+    // {
+    //   path: '**',
+    //   component: NotFoundComponent
+    // }
+
 
     // {
     //   path: 'dashboard',

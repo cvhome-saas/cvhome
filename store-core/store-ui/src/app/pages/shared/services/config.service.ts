@@ -24,7 +24,7 @@ export class ConfigService {
       'store': store
     };
 
-    return this.crudService.get(`/v1/store/languages`, params)
+    return this.crudService.get(`/store/api/v1/store/languages`, params)
 
 
     /**
@@ -41,7 +41,7 @@ export class ConfigService {
       });
     })
     **/
-    
+
 
    /**
     return this.crudService.get(`/v1/store/languages`, params)
@@ -59,7 +59,7 @@ export class ConfigService {
         })
       );
  **/
-      
+
 
     //console.log('Return langs ' + JSON.stringify(supportedLangs));
     //return supportedLangs;

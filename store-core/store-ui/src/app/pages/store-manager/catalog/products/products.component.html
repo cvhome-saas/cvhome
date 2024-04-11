@@ -3,7 +3,7 @@
     <nb-card class="inline-form-card">
       <nb-card-header>
         PRODUCTS
-        <ngx-store-selector (storeSelectionChange)="storeSelectedChanged($event)"></ngx-store-selector>
+        <ngx-store-autocomplete (onStore)="storeSelectedChanged($event)"></ngx-store-autocomplete>
       </nb-card-header>
       <nb-card-body>
 

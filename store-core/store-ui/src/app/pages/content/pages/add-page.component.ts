@@ -1,15 +1,15 @@
-import { Component, OnInit } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { CrudService } from '../../shared/services/crud.service';
-import { ActivatedRoute, Router } from '@angular/router';
-import { ToastrService } from 'ngx-toastr';
-import { ConfigService } from '../../shared/services/config.service';
-import { ImageBrowserComponent } from '../../../@theme/components/image-browser/image-browser.component';
-import { NbDialogService } from '@nebular/theme';
-import { validators } from '../../shared/validation/validators';
-import { slugify } from '../../shared/utils/slugifying';
+import {Component, OnInit} from '@angular/core';
+import {FormArray, FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {CrudService} from '../../shared/services/crud.service';
+import {ActivatedRoute, Router} from '@angular/router';
+import {ConfigService} from '../../shared/services/config.service';
+// import { ImageBrowserComponent } from '../../../@theme/components/image-browser/image-browser.component';
+import {NbDialogService, NbToastrService} from '@nebular/theme';
+import {validators} from '../../shared/validation/validators';
+import {slugify} from '../../shared/utils/slugifying';
 
-import { TranslateService } from '@ngx-translate/core';
+import {TranslateService} from '@ngx-translate/core';
+
 declare var jquery: any;
 declare var $: any;
 
@@ -21,6 +21,7 @@ declare var $: any;
 export class AddPageComponent implements OnInit {
 
   loader = false;
+  store: string;//identifier fromroute
   uniqueCode: string;//identifier fromroute
   form: FormGroup;
   content: any;
@@ -29,7 +30,7 @@ export class AddPageComponent implements OnInit {
   // visible: any = false;
   // descData: any;
   // updatedID: any;
-  // mainmenu: any = false;
+  // linkToMenu: any = false;
   // code: string = '';
   // order: number = 0;
   action: string = 'save';
@@ -43,7 +44,7 @@ export class AddPageComponent implements OnInit {
 
   isCodeExists = false;
   message: string = '';
-  public scrollbarOptions = { axis: 'y', theme: 'minimal-dark' };
+  public scrollbarOptions = {axis: 'y', theme: 'minimal-dark'};
 
 
   editorConfig = {
@@ -65,10 +66,11 @@ export class AddPageComponent implements OnInit {
     },
     fontNames: ['Helvetica', 'Arial', 'Arial Black', 'Comic Sans MS', 'Courier New', 'Roboto', 'Times']
   };
+
   constructor(
     private crudService: CrudService,
     public router: Router,
-    private toastr: ToastrService,
+    private toastr: NbToastrService,
     private configService: ConfigService,
     private dialogService: NbDialogService,
     private activatedRoute: ActivatedRoute,
@@ -80,38 +82,46 @@ export class AddPageComponent implements OnInit {
 
   ngOnInit() {
     this.loader = true;
-    this.uniqueCode = this.activatedRoute.snapshot.paramMap.get('code');
+    this.activatedRoute.params.subscribe(it => {
+      const split: string[] = it['code'].split("-");
+      this.store = split[0];
+      this.getLanguages();
+      if (split.length == 2) {
+        this.action = 'edit';
+        this.uniqueCode = split[1];
+        this.getPage();
+      }
+    });
+
     this.createForm();
+  }
 
-    const languages = this.configService.getListOfSupportedLanguages(localStorage.getItem('merchant'))
-      .subscribe((languages) => {
-        this.languages = [...languages];
-        this.addFormArray();//create array
-        if (this.uniqueCode != null) {
-          this.action = 'edit';
-          this.getPage();
-        } else {
+  private getLanguages() {
+    this.configService.getListOfSupportedLanguages(this.store)
+      .subscribe({
+        next: (languages) => {
+          this.languages = [...languages];
+          this.addFormArray();//create array
+        },
+        error: (err) => {
+          this.toastr.danger(err.error.message);
           this.loader = false;
-        }
-
-      }, error => {
-        this.toastr.error(error.error.message);
-        this.loader = false;
+        },
       });
   }
 
   private getPage() {
-    this.crudService.get('/v1/content/pages/' + this.uniqueCode + '?lang=_all')
-      .subscribe(data => {
-        // this.updatedID = data.id;
-        this.content = data;
-        this.fillForm();
-        this.loader = false;
-
-      }, error => {
+    this.crudService.get('/store/api/v1/content/pages/' + this.uniqueCode + '?lang=_all&store=' + this.store)
+      .subscribe({
+        next: (data) => {
+          this.content = data;
+          this.fillForm();
+          this.loader = false;
+        },
+        error: (err) => {
+        }
       });
   }
-
 
 
   private createForm() {
@@ -119,7 +129,7 @@ export class AddPageComponent implements OnInit {
       id: [''],
       code: ['', [Validators.required, Validators.pattern(validators.alphanumeric)]],
       visible: [false],
-      mainmenu: [false],
+      linkToMenu: [false],
       order: [0],
       selectedLanguage: [this.defaultLanguage, [Validators.required]],
       descriptions: this.fb.array([]),
@@ -147,7 +157,7 @@ export class AddPageComponent implements OnInit {
       id: this.content.id,
       code: this.content.code,
       visible: this.content.visible,
-      mainmenu: this.content.mainmenu,
+      linkToMenu: this.content.linkToMenu,
       selectedLanguage: this.defaultLanguage,
       descriptions: [],
     });
@@ -186,12 +196,12 @@ export class AddPageComponent implements OnInit {
         invalid.push(name);
       }
     }
-    console.log(invalid)
     if (invalid.length > 0) {
-      this.toastr.error(this.translate.instant('COMMON.FILL_REQUIRED_FIELDS'));
+      this.toastr.danger(this.translate.instant('COMMON.FILL_REQUIRED_FIELDS'));
     }
     return invalid;
   }
+
   selectLanguage(lang) {
     this.form.patchValue({
       selectedLanguage: lang,
@@ -215,11 +225,12 @@ export class AddPageComponent implements OnInit {
   focusOutFunction(event) {
     console.log(event)
     const code = event.target.value.trim();
-    this.crudService.get('/v1/private/content/page/' + code + '/exists')
+    this.crudService.get('/store/api/v1/private/content/page/' + code + '/exists')
       .subscribe(res => {
         this.isCodeExists = res.exists;
       });
   }
+
   urlTitle(event, index) {
     (<FormArray>this.form.get('descriptions')).at(index).patchValue({
       friendlyUrl: slugify(event)
@@ -244,9 +255,8 @@ export class AddPageComponent implements OnInit {
     console.log(object)
 
 
-
     if (object.id) {
-      this.crudService.put('/v1/private/content/page/' + object.id, object)
+      this.crudService.put('/store/api/v1/private/content/page/' + object.id+"?store="+this.store, object)
         .subscribe(data => {
           this.loadingList = false;
           this.toastr.success('Page updated successfully');
@@ -255,7 +265,7 @@ export class AddPageComponent implements OnInit {
           this.loadingList = false;
         });
     } else {
-      this.crudService.post('/v1/private/content/page', object)
+      this.crudService.post('/store/api/v1/private/content/page', object)
         .subscribe(data => {
           console.log(data);
           this.loadingList = false;
@@ -269,11 +279,10 @@ export class AddPageComponent implements OnInit {
   }
 
 
-
-
   goToback() {
     this.router.navigate(['/pages/content/pages/list']);
   }
+
   customButton(context) {
     const me = this;
     const ui = $.summernote.ui;
@@ -283,7 +292,7 @@ export class AddPageComponent implements OnInit {
       container: '.note-editor',
       className: 'note-btn',
       click: function () {
-        me.dialogService.open(ImageBrowserComponent, {}).onClose.subscribe(name => name && context.invoke('editor.pasteHTML', '<img src="' + name + '">'));
+        // me.dialogService.open(ImageBrowserComponent, {}).onClose.subscribe(name => name && context.invoke('editor.pasteHTML', '<img src="' + name + '">'));
       }
     });
     return button.render();

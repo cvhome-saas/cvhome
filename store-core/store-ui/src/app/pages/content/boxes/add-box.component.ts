@@ -1,11 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { LocalDataSource } from 'ng2-smart-table';
 import { CrudService } from '../../shared/services/crud.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ToastrService } from 'ngx-toastr';
-import { ImageBrowserComponent } from '../../../@theme/components/image-browser/image-browser.component';
-import { NbDialogService } from '@nebular/theme';
+// import { ImageBrowserComponent } from '../../../@theme/components/image-browser/image-browser.component';
+import {NbDialogService, NbToastrService} from '@nebular/theme';
 import { validators } from '../../shared/validation/validators';
 import { TranslateService } from '@ngx-translate/core';
 import { ConfigService } from '../../shared/services/config.service';
@@ -67,7 +65,7 @@ export class AddBoxComponent implements OnInit {
     private fb: FormBuilder,
     private crudService: CrudService,
     public router: Router,
-    private toastr: ToastrService,
+    private toastr: NbToastrService,
     private configService: ConfigService,
     private dialogService: NbDialogService,
     private activatedRoute: ActivatedRoute,
@@ -97,14 +95,14 @@ export class AddBoxComponent implements OnInit {
         }
 
       }, error => {
-        this.toastr.error(error.error.message);
+        this.toastr.danger(error.error.message);
         this.loader = false;
       });
   }
 
 
   private loadContent() {
-    const box = this.crudService.get('/v1/private/content/boxes/' + this.uniqueCode, this.param()).subscribe(data => {
+    const box = this.crudService.get('/store/api/v1/private/content/boxes/' + this.uniqueCode, this.param()).subscribe(data => {
       this.content = data;
       this.fillForm();
       this.loader = false;
@@ -170,7 +168,7 @@ export class AddBoxComponent implements OnInit {
   private checkCode(event) {
     //check if box code already exists
     const code = event.target.value.trim();
-    this.crudService.get('/v1/private/content/box/' + code + '/exists', this.param())
+    this.crudService.get('/store/api/v1/private/content/box/' + code + '/exists', this.param())
       .subscribe(res => {
         this.isCodeExists = res.exists;
       });
@@ -246,25 +244,25 @@ export class AddBoxComponent implements OnInit {
 
     if (object.id > 0) {//update
       //set content name required field
-      this.crudService.put('/v1/private/content/box/' + this.content.id, object, this.param())
+      this.crudService.put('/store/api/v1/private/content/box/' + this.content.id, object, this.param())
         .subscribe(data => {
           this.loader = false;
           this.toastr.success(this.translate.instant('CONTENT.CONTENT_UPDATED'));
           this.router.navigate(['/pages/content/boxes/list']);
         }, error => {
-          this.toastr.error(error.error.message);
+          this.toastr.danger(error.error.message);
           this.loader = false;
         });
 
     } else {
 
-      this.crudService.post('/v1/private/content/box', object)
+      this.crudService.post('/store/api/v1/private/content/box', object)
         .subscribe(data => {
           this.loader = false;
           this.toastr.success(this.translate.instant('PRODUCT.PRODUCT_UPDATED'));
           this.router.navigate(['/pages/content/boxes/list']);
         }, error => {
-          this.toastr.error(error.error.message);
+          this.toastr.danger(error.error.message);
           this.loader = false;
         });
 
@@ -317,7 +315,7 @@ export class AddBoxComponent implements OnInit {
       container: '.note-editor',
       className: 'note-btn',
       click: function () {
-        me.dialogService.open(ImageBrowserComponent, {}).onClose.subscribe(name => name && context.invoke('editor.pasteHTML', '<img src="' + name + '">'));
+        // me.dialogService.open(ImageBrowserComponent, {}).onClose.subscribe(name => name && context.invoke('editor.pasteHTML', '<img src="' + name + '">'));
       }
     });
     return button.render();

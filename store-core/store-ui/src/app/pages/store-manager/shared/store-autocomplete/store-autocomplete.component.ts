@@ -4,19 +4,19 @@ import {NbSelectComponent} from "@nebular/theme";
 import {StoreService} from "../../../../shared/service/store.service";
 
 @Component({
-  selector: 'ngx-store-selector',
-  templateUrl: './store-selector.component.html',
-  styleUrls: ['./store-selector.component.scss']
+  selector: 'ngx-store-autocomplete',
+  templateUrl: './store-autocomplete.component.html',
+  styleUrls: ['./store-autocomplete.component.scss']
 })
-export class StoreSelectorComponent implements AfterViewInit {
+export class StoreAutocompleteComponent implements AfterViewInit {
   @ViewChild(NbSelectComponent) routeSelect: NbSelectComponent;
 
-  @Output() storeSelectionChange: EventEmitter<ManagerStoreId> = new EventEmitter<ManagerStoreId>()
+  @Output() onStore: EventEmitter<ManagerStoreId> = new EventEmitter<ManagerStoreId>()
   selectedItem: ManagerStoreId | undefined;
   stores: Store[]|undefined ;
 
   changed($event: ManagerStoreId) {
-    this.storeSelectionChange.emit($event)
+    this.onStore.emit($event)
   }
 
   constructor(private cdr: ChangeDetectorRef, private storeService: StoreService) {

@@ -19,10 +19,6 @@
         </div>
         <div class="filter_right_section">
           <ngx-store-autocomplete (onStore)="onSelectStore($event)"></ngx-store-autocomplete>
-          <!-- <p-dropdown *ngIf="stores.length> 0" [options]="stores" filter="true" (onChange)="onSelectStore($event)">
-            <ng-template let-item pTemplate="selectedItem">{{item.label}}</ng-template>
-            <ng-template let-car pTemplate="item">{{car.label}}</ng-template>
-          </p-dropdown> -->
           <a class="createBtn" (click)="addBoxes()">
             <img class="pointer sda" src="../../../../assets/img/plus.png" title="{{ 'COMPONENTS.CREATE_OPTION' | translate}}"
               alt="">
@@ -30,14 +26,50 @@
           </a>
         </div>
       </form>
+      <ngx-datatable
+        class="material"
+        [rows]="rows"
+        [columnMode]="ColumnMode.force"
+        [headerHeight]="50"
+        [footerHeight]="50"
+        rowHeight="auto"
+        [externalPaging]="true"
+        [count]="page.totalElements"
+        [offset]="page.pageNumber"
+        [limit]="page.size"
+        (page)="setPage($event)">
 
+        <ngx-datatable-column name="Id">
+          <ng-template let-column="column" ngx-datatable-header-template> {{ 'COMMON.ID' |translate }}</ng-template>
+          <ng-template let-value="value" ngx-datatable-cell-template>
+            <strong>{{ value }}</strong>
+          </ng-template>
+        </ngx-datatable-column>
 
-      <ng2-smart-table [settings]="settings" [source]="source" (custom)="onClickAction($event)" class="custom_scroll home-table">
-      </ng2-smart-table>
+        <ngx-datatable-column name="code">
+          <ng-template let-column="column" ngx-datatable-header-template> {{ 'CONTENT.CODE' |translate }}</ng-template>
+          <ng-template let-value="value" ngx-datatable-cell-template>
+            <strong>{{ value }}</strong>
+          </ng-template>
+        </ngx-datatable-column>
 
-      <ngx-paginator (changePage)="changePage($event)" [pagesToShow]="5" [currentPage]="currentPage" [perPage]="perPage"
-        [count]="totalCount">
-      </ngx-paginator>
+        <ngx-datatable-column name="name">
+          <ng-template let-column="column" ngx-datatable-header-template> {{ 'CONTENT.NAME' |translate }}</ng-template>
+          <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+            {{ row.description.name }}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="actions">
+          <ng-template let-column="column" ngx-datatable-header-template>
+            {{ 'ORDER.ACTIONS' |translate }}
+          </ng-template>
+          <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+            <button nbButton shape="round" size="small" status="primary" (click)="onEdit(row)"><i class="nb-edit"></i></button>
+            <button nbButton shape="round" size="small" status="danger" (click)="onDelete(row)"><i class="nb-trash"></i></button>
+          </ng-template>
+        </ngx-datatable-column>
+      </ngx-datatable>
     </div>
   </nb-card-body>
 </nb-card>

@@ -2,7 +2,7 @@
   <nb-card-body [nbSpinner]="loadingList" nbSpinnerSize="large" nbSpinnerStatus="primary" class="pagesList">
     <div class="inner_pages_legacy">
       <nb-card-header class="main_header">
-        <h1 class="page_title">{{'COMPONENTS.CONTENT_PAGES' | translate}}</h1>
+        <h1 class="page_title">{{ 'COMPONENTS.CONTENT_PAGES' | translate }}</h1>
         <div class="content_spacing_empty"></div>
 
       </nb-card-header>
@@ -13,20 +13,64 @@
         <div class="filter_right_section">
           <ngx-store-autocomplete (onStore)="onSelectStore($event)"></ngx-store-autocomplete>
           <a class="createBtn" (click)="addPages()">
-            <img class="pointer sda" src="../../../../assets/img/plus.png" title="{{ 'CONTENT.CREATE_PAGE' | translate}}"
-              alt="">
-            <label>{{'CONTENT.CREATE_PAGE' | translate}}</label>
+            <img class="pointer sda" src="../../../../assets/img/plus.png"
+                 title="{{ 'CONTENT.CREATE_PAGE' | translate}}"
+                 alt="">
+            <label>{{ 'CONTENT.CREATE_PAGE' | translate }}</label>
           </a>
         </div>
       </form>
 
+      <ngx-datatable
+        class="material"
+        [rows]="rows"
+        [columnMode]="ColumnMode.force"
+        [headerHeight]="50"
+        [footerHeight]="50"
+        rowHeight="auto"
+        [externalPaging]="true"
+        [count]="page.totalElements"
+        [offset]="page.pageNumber"
+        [limit]="page.size"
+        (page)="setPage($event)">
 
-      <ng2-smart-table [settings]="settings" [source]="source" (custom)="onClickAction($event)" class="home-table">
-      </ng2-smart-table>
+        <ngx-datatable-column name="Id">
+          <ng-template let-column="column" ngx-datatable-header-template> {{ 'COMMON.ID' |translate }}</ng-template>
+          <ng-template let-value="value" ngx-datatable-cell-template>
+            <strong>{{ value }}</strong>
+          </ng-template>
+        </ngx-datatable-column>
 
-      <ngx-paginator (changePage)="changePage($event)" [pagesToShow]="5" [currentPage]="currentPage" [perPage]="perPage"
-        [count]="totalCount">
-      </ngx-paginator>
+        <ngx-datatable-column name="code">
+          <ng-template let-column="column" ngx-datatable-header-template> {{ 'CONTENT.CODE' |translate }}</ng-template>
+          <ng-template let-value="value" ngx-datatable-cell-template>
+            <strong>{{ value }}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="name">
+          <ng-template let-column="column" ngx-datatable-header-template> {{ 'CONTENT.NAME' |translate }}</ng-template>
+          <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+            {{ row.description.name }}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="url">
+          <ng-template let-column="column" ngx-datatable-header-template> {{ 'CONTENT.URL' |translate }}</ng-template>
+          <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+            {{ row.description.friendlyUrl }}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="actions">
+          <ng-template let-column="column" ngx-datatable-header-template>
+            {{ 'ORDER.ACTIONS' |translate }}
+          </ng-template>
+          <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+            <button nbButton shape="round" size="small" status="primary" (click)="onEdit(row)"><i class="nb-edit"></i></button>
+            <button nbButton shape="round" size="small" status="danger" (click)="onDelete(row)"><i class="nb-trash"></i></button>
+          </ng-template>
+        </ngx-datatable-column>
+      </ngx-datatable>
     </div>
   </nb-card-body>
 </nb-card>

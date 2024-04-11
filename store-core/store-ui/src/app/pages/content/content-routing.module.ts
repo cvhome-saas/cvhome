@@ -1,17 +1,11 @@
-import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
+import {NgModule} from '@angular/core';
+import {RouterModule, Routes} from '@angular/router';
 
-import { ContentComponent } from './content.component';
-import { PageComponent } from './pages/page.component';
-import { BoxesComponent } from './boxes/boxes.component';
-import { AddPageComponent } from './pages/add-page.component';
-import { AddBoxComponent } from './boxes/add-box.component';
-import { ImagesComponent } from './images/images.component';
-import { UploadComponent } from './upload/upload.component';
-import { FilesComponent } from './files/files.component';
-
-import { PromotionComponent } from './promotion/promotion.component';
-// import { ImagesComponent } from './images/images.component';
+import {ContentComponent} from './content.component';
+import {PageComponent} from './pages/page.component';
+import {BoxesComponent} from './boxes/boxes.component';
+import {AddPageComponent} from './pages/add-page.component';
+import {AddBoxComponent} from './boxes/add-box.component';
 
 const routes: Routes = [{
   path: '',
@@ -40,7 +34,7 @@ const routes: Routes = [{
     {
       path: 'boxes/add',
       component: AddBoxComponent,
-    },
+    }/*,
     {
       path: 'images/list',
       component: ImagesComponent,
@@ -53,14 +47,15 @@ const routes: Routes = [{
       path: 'promotion',
       component: PromotionComponent,
     }
-  ],
+*/],
 }];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule],
 })
-export class ContentRoutingModule { }
+export class ContentRoutingModule {
+}
 
 export const routedComponents = [
   ContentComponent,
@@ -68,8 +63,10 @@ export const routedComponents = [
   AddPageComponent,
   BoxesComponent,
   AddBoxComponent,
-  ImagesComponent,
-  UploadComponent,
-  PromotionComponent,
-  FilesComponent
+  /*
+    ImagesComponent,
+    UploadComponent,
+    PromotionComponent,
+    FilesComponent
+  */
 ];

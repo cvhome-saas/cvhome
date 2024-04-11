@@ -20,7 +20,6 @@ import {SharedModule} from "../store-manager/shared/shared.module";
   ],
   imports: [
     OrdersRoutingModule,
-
     SharedModule,
     NbDialogModule.forChild(),
   ]

@@ -4,9 +4,16 @@
       <nb-card-header class="main_header">
         <h1 class="page_title">{{ 'COMPONENTS.ORDERS' | translate}}</h1>
         <div class="content_spacing_empty"></div>
-        <ngx-store-selector (storeSelectionChange)="onSelectStore($event)"></ngx-store-selector>
       </nb-card-header>
 
+      <form class="form-inline filter_section">
+        <div class="filter_left_section">
+        </div>
+        <div class="filter_right_section">
+          <ngx-store-autocomplete (onStore)="onSelectStore($event)"></ngx-store-autocomplete>
+
+        </div>
+      </form>
       <ngx-datatable
         class="material"
         [rows]="rows"
@@ -27,19 +34,6 @@
             <strong>{{ value }}</strong>
           </ng-template>
         </ngx-datatable-column>
-<!--
-        <ngx-datatable-column name="CustomerName">
-          <ng-template let-column="column" ngx-datatable-header-template> {{'ORDER.CUSTOMER_NAME' |translate}} </ng-template>
-          <ng-template let-value="value" ngx-datatable-cell-template>
-            <strong>{{ value }}</strong>
-          </ng-template>
-          <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-            My name is: <i [innerHTML]="row['billing']['firstName']"></i> and <i>{{ value }}</i>
-          </ng-template>
-
-        </ngx-datatable-column>
--->
-
         <ngx-datatable-column name="CustomerName">
           <ng-template let-column="column"  ngx-datatable-header-template>
             {{'ORDER.CUSTOMER_NAME' |translate}}
@@ -50,7 +44,7 @@
         </ngx-datatable-column>
         <ngx-datatable-column name="CustomerPhone">
           <ng-template let-column="column"  ngx-datatable-header-template>
-           {{'ORDER.CUSTOMER_PHONE' |translate}}
+            {{'ORDER.CUSTOMER_PHONE' |translate}}
           </ng-template>
           <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
             {{row.billing.phone}}
@@ -66,7 +60,7 @@
         </ngx-datatable-column>
         <ngx-datatable-column name="total">
           <ng-template let-column="column"  ngx-datatable-header-template>
-           {{'ORDER.TOTAL' |translate}}
+            {{'ORDER.TOTAL' |translate}}
           </ng-template>
           <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
             {{row.total.value}}

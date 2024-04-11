@@ -4,7 +4,7 @@
       <nb-card-header>
         CATEGORY
         {{'demo.heading' | translate}}
-        <ngx-store-selector (storeSelectionChange)="storeSelectedChanged($event)"></ngx-store-selector>
+        <ngx-store-autocomplete (onStore)="storeSelectedChanged($event)"></ngx-store-autocomplete>
       </nb-card-header>
       <nb-card-body>
         <ngx-datatable [rows]="rows" [columns]="columns"></ngx-datatable>

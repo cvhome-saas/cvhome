@@ -24,6 +24,8 @@
     "@nebular/eva-icons": "12.0.0",
     "@nebular/security": "12.0.0",
     "@nebular/theme": "12.0.0",
+    "@ngx-dropzone/cdk": "^16.1.1",
+    "@ngx-dropzone/material": "^16.1.1",
     "@ngx-translate/core": "^15.0.0",
     "@ngx-translate/http-loader": "^8.0.0",
     "@swimlane/ngx-charts": "20.0.0",
