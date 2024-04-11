@@ -273,7 +273,11 @@ export class AddPageComponent implements OnInit {
       container: '.note-editor',
       className: 'note-btn',
       click: function () {
-        me.dialogService.open(ImageBrowserComponent, {})
+        me.dialogService.open(ImageBrowserComponent, {
+          context: {
+            store: me.store
+          }
+        })
           .onClose.subscribe(name => name && context.invoke('editor.pasteHTML', '<img src="' + name + '">'));
       }
     });

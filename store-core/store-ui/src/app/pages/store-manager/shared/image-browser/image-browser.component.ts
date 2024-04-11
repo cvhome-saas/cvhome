@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import {NbDialogRef} from '@nebular/theme';
 import {CrudService} from "../../../shared/services/crud.service";
 
@@ -8,6 +8,8 @@ import {CrudService} from "../../../shared/services/crud.service";
   styleUrls: ['./image-browser.component.scss']
 })
 export class ImageBrowserComponent implements OnInit {
+  @Input()
+  store: string;
   uploadedFiles: any[] = [];
   loadingList = false;
 
@@ -18,12 +20,12 @@ export class ImageBrowserComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.getImages();
+    this.getImages(this.store);
   }
 
-  getImages() {
+  getImages(store: string) {
     this.loadingList = true;
-    this.crudService.get('/v1/content/images')
+    this.crudService.get('/store/api/v1/content/images?store=' + store)
       .subscribe({
         next: (data) => {
           this.uploadedFiles = data.content;
@@ -31,7 +33,6 @@ export class ImageBrowserComponent implements OnInit {
         },
         error: (err) => {
           this.loadingList = false;
-
         }
       });
   }
