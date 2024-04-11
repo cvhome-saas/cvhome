@@ -556,15 +556,17 @@ public class ContentFacadeImpl implements ContentFacade {
             page.setCode(content.getCode());
             page.setId(content.getId());
             page.setVisible(content.isVisible());
+            page.setLinkToMenu(content.isLinkToMenu());
             return page;
         } else {
             ReadableContentPageFull page = new ReadableContentPageFull();
             List<com.asrevo.cvhome.store.core.model.content.common.ContentDescription> descriptions = content.getDescriptions()
-                    .stream().map(d -> this.contentDescription(d)).collect(Collectors.toList());
+                    .stream().map(this::contentDescription).collect(Collectors.toList());
             page.setDescriptions(descriptions);
             page.setCode(content.getCode());
             page.setId(content.getId());
             page.setVisible(content.isVisible());
+            page.setLinkToMenu(content.isLinkToMenu());
             return page;
         }
 
