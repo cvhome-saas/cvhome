@@ -24,10 +24,11 @@ const routes: Routes = [{
       loadChildren: () => import('./orders/orders.module')
         .then(m => m.OrdersModule),
     },
-    // {
-    //   path: 'user-management',
-    //   loadChildren: 'app/pages/user-management/user-management.module#UserManagementModule'
-    // },
+    {
+      path: 'user-management',
+      loadChildren: () => import('./user-management/user-management.module')
+        .then(m => m.UserManagementModule),
+    },
     // {
     //   path: 'store-management',
     //   loadChildren: 'app/pages/store-management/store-management.module#StoreManagementModule'
