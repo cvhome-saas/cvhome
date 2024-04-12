@@ -6,7 +6,7 @@ import {map, takeUntil} from 'rxjs/operators';
 import {Subject} from 'rxjs';
 import {TranslateService} from "@ngx-translate/core";
 import {NbMenuItem} from "@nebular/theme/components/menu/menu.service";
-import {environment} from "../../../../environments/environment";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'ngx-header',
@@ -47,6 +47,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
               private menuService: NbMenuService,
               private themeService: NbThemeService,
               private userService: UserData,
+              private router: Router,
               private breakpointService: NbMediaBreakpointsService,
               private translateService: TranslateService
   ) {
@@ -101,10 +102,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   onNbMenuItemClick(item: NbMenuItem) {
     if (item.title == 'Profile') {
-      console.log("profile clicked")
+      this.router.navigate(['/pages/user-management/profile'])
     }
     if (item.title == 'Log out') {
-      window.location.href = new URL(window.location.href).origin + environment.LOGOUT_URL
+      this.router.navigate(['external-logout-link'])
     }
   }
 }

@@ -366,12 +366,12 @@ export const MENU_ITEMS: MenuItem[] =
       key: 'COMPONENTS.USER_MANAGEMENT',
       icon: 'person',
       children: [
-        {
-          title: 'COMPONENTS.MY_PROFILE',
-          key: 'COMPONENTS.MY_PROFILE',
-          link: '/pages/user-management/profile',
-          hidden: false
-        },
+        // {
+        //   title: 'COMPONENTS.MY_PROFILE',
+        //   key: 'COMPONENTS.MY_PROFILE',
+        //   link: '/pages/user-management/profile',
+        //   hidden: false
+        // },
         {
           title: 'COMPONENTS.CREATE_USER',
           key: 'COMPONENTS.CREATE_USER',
