@@ -55,10 +55,11 @@ const routes: Routes = [{
     //   path: 'tax-management',
     //   loadChildren: 'app/pages/tax-management/tax-management.module#TaxManagementModule'
     // },
-    // {
-    //   path: 'customer',
-    //   loadChildren: 'app/pages/customers/customer.module#CustomersModule'
-    // },
+     {
+       path: 'customer',
+       loadChildren: () => import('./customers/customer.module')
+         .then(m => m.CustomersModule),
+     },
     // {
     //   path: 'error-500',
     //   component: FiveHundredComponent

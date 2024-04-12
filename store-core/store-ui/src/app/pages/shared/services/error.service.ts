@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
 
-import { ToastrService } from 'ngx-toastr';
 import { TranslateService } from '@ngx-translate/core';
-import { environment } from '../../../../environments/environment';
+import {NbToastrService} from "@nebular/theme";
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +9,7 @@ import { environment } from '../../../../environments/environment';
 export class ErrorService {
 
   constructor(
-    private toastrService: ToastrService,
+    private toastrService: NbToastrService,
     private translateService: TranslateService
   ) {
   }
@@ -20,7 +19,7 @@ export class ErrorService {
   }
 
   error(errorCode, code) {
-    this.toastrService.error(this.translateService.instant(errorCode));
+    this.toastrService.danger(this.translateService.instant(errorCode));
     console.log('Application error [' + errorCode + ']' + code != null ? code:'');
   }
 
