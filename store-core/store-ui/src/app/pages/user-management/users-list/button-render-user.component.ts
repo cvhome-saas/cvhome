@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 
 import { TranslateService } from '@ngx-translate/core';
-import { ToastrService } from 'ngx-toastr';
+import {NbToastrService} from '@nebular/theme';
 import { UserService } from '../../shared/services/user.service';
 import { StorageService } from '../../shared/services/storage.service';
 import { NbDialogService } from '@nebular/theme';
@@ -19,7 +19,7 @@ export class ButtonRenderUserComponent {
   constructor(
     private userService: UserService,
     private translate: TranslateService,
-    private toastr: ToastrService,
+    private toastr: NbToastrService,
     private storageService: StorageService,
     private dialogService: NbDialogService,
   ) {

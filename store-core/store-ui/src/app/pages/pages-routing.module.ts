@@ -33,11 +33,13 @@ const routes: Routes = [{
     //   path: 'store-management',
     //   loadChildren: 'app/pages/store-management/store-management.module#StoreManagementModule'
     // },
-    // {
-    //   path: 'catalogue',
-    //   canActivate: [SuperadminStoreRetailCatalogueGuard],
-    //   loadChildren: 'app/pages/catalogue/catalogue.module#CatalogueModule'
-    // },
+    {
+      path: 'catalogue',
+      // canActivate: [SuperadminStoreRetailCatalogueGuard],
+      loadChildren: () => import('./catalogue/catalogue.module')
+        .then(m => m.CatalogueModule),
+
+    },
     {
       path: 'content',
       loadChildren: () => import('./content/content.module')

@@ -5,7 +5,7 @@ import { Router, UrlTree, UrlSegment, UrlSegmentGroup, PRIMARY_OUTLET } from '@a
 import { ConfigService } from '../../shared/services/config.service';
 import { UserService } from '../../shared/services/user.service';
 import { User } from '../../shared/models/user';
-import { ToastrService } from 'ngx-toastr';
+import {NbToastrService} from '@nebular/theme';
 import { TranslateService } from '@ngx-translate/core';
 import { StoreService } from '../../store-management/services/store.service';
 import { SecurityService } from '../../shared/services/security.service';
@@ -101,7 +101,7 @@ export class UserFormComponent implements OnInit {
     private securityService: SecurityService,
     private router: Router,
     private cdr: ChangeDetectorRef,
-    private toastr: ToastrService,
+    private toastr: NbToastrService,
     private translate: TranslateService
   ) {
     this.roles = JSON.parse(localStorage.getItem('roles'));
@@ -310,7 +310,7 @@ export class UserFormComponent implements OnInit {
       store = this.store;
     }
     if (this.form.value.store === '' && (this.roles.isSuperadmin || this.roles.isRetailerAdmin)) {
-      this.toastr.error(this.translate.instant('USER_FORM.STORE_REQUIRED'));
+      this.toastr.danger(this.translate.instant('USER_FORM.STORE_REQUIRED'));
       this.loader = false;
       return;
     }
@@ -320,7 +320,7 @@ export class UserFormComponent implements OnInit {
     }
 
     if (!this.isEmaillUnique) {
-      this.toastr.error(this.translate.instant('USER_FORM.EMAIL_EXISTS'));
+      this.toastr.danger(this.translate.instant('USER_FORM.EMAIL_EXISTS'));
       this.loader = false;
       return;
     }
@@ -344,7 +344,7 @@ export class UserFormComponent implements OnInit {
           this.loader = false;
         }, err => {
           this.errorMessage = err.message;
-          this.toastr.error(this.errorMessage);
+          this.toastr.danger(this.errorMessage);
           this.loader = false;
           return;
         });
@@ -356,7 +356,7 @@ export class UserFormComponent implements OnInit {
           this.router.navigate(['pages/user-management/users']);
         }, err => {
           this.errorMessage = err.message;
-          this.toastr.error(this.errorMessage);
+          this.toastr.danger(this.errorMessage);
           this.loader = false;
           return;
         });
@@ -392,12 +392,12 @@ export class UserFormComponent implements OnInit {
     //cannot remove superadmin
     //cannot remove self
     if (this.selfEdit) {
-      this.toastr.error(this.translate.instant('USER.CANNOT_REMOVE_SELF'));
+      this.toastr.danger(this.translate.instant('USER.CANNOT_REMOVE_SELF'));
       return;
     }
 
     if (this.superAdmin) {
-      this.toastr.error(this.translate.instant('USER.CANNOT_REMOVE_SELF'));
+      this.toastr.danger(this.translate.instant('USER.CANNOT_REMOVE_SELF'));
       return;
     }
 

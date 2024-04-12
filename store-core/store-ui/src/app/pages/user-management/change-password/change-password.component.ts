@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 
 import { UserService } from '../../shared/services/user.service';
 import { User } from '../../shared/models/user';
-import { ToastrService } from 'ngx-toastr';
+import {NbToastrService} from '@nebular/theme';
 import { TranslateService } from '@ngx-translate/core';
 
 @Component({
@@ -13,7 +13,7 @@ import { TranslateService } from '@ngx-translate/core';
   styleUrls: ['./change-password.component.scss']
 })
 export class ChangePasswordComponent implements OnInit {
-  
+
   private _user: User;
 
   get user(): User { return this._user; }
@@ -43,7 +43,7 @@ export class ChangePasswordComponent implements OnInit {
     private userService: UserService,
     private fb: FormBuilder,
     private router: Router,
-    private toastr: ToastrService,
+    private toastr: NbToastrService,
     private translate: TranslateService
   ) {
     this.createForm();
@@ -53,7 +53,7 @@ export class ChangePasswordComponent implements OnInit {
     this.userService.getUserProfile()
       .subscribe(user => {
         this._user = user;
-      }); 
+      });
   }
 
   private createForm() {

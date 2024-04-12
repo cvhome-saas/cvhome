@@ -244,7 +244,7 @@ export class AddBoxComponent implements OnInit {
     /**
      let errors = this.findInvalidControls();
      if (errors.length > 0) {
-     this.toastr.error(this.translate.instant('COMMON.FILL_REQUIRED_FIELDS'));
+     this.toastr.danger(this.translate.instant('COMMON.FILL_REQUIRED_FIELDS'));
      return;
      }
      **/

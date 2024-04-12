@@ -7,7 +7,7 @@ import { NbDialogService } from '@nebular/theme';
 import { StorageService } from '../../shared/services/storage.service';
 import { SecurityService } from '../../shared/services/security.service';
 import { StoreService } from '../../store-management/services/store.service';
-import { ToastrService } from 'ngx-toastr';
+import {NbToastrService} from '@nebular/theme';
 import { ButtonRenderUserComponent } from './button-render-user.component'
 import { ListingService } from '../../shared/services/listing.service';
 import {ShowcaseDialogComponent} from "../../store-manager/shared/showcase-dialog/showcase-dialog.component";
@@ -43,7 +43,7 @@ export class UsersListComponent implements OnInit {
     private securityService: SecurityService,
     private dialogService: NbDialogService,
     private storeService: StoreService,
-    private toastr: ToastrService
+    private toastr: NbToastrService
   ) {
     this.listingService = new ListingService()
     this.getList();
