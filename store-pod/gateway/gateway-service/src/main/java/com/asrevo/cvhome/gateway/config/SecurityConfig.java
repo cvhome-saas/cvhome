@@ -42,6 +42,7 @@ public class SecurityConfig {
                 )
                 .oauth2Login(withDefaults())
                 .oauth2Client(withDefaults())
+                .logout(ServerHttpSecurity.LogoutSpec::disable)
                 .csrf(ServerHttpSecurity.CsrfSpec::disable
 //                                .csrfTokenRequestHandler(new ServerCsrfTokenRequestAttributeHandler())
 //                                .csrfTokenRepository(tokenRepository)
