@@ -51,6 +51,8 @@
               "node_modules/summernote/dist/summernote-lite.min.js"
             ],
             "allowedCommonJsDependencies": [
+              "file-saver",
+              "moment",
               "lodash",
               "zrender/lib/svg/svg",
               "zrender/lib/vml/vml",
