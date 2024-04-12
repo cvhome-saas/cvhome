@@ -28,5 +28,6 @@ export const environment = {
       ],
     },
   },
-  LOGIN_URL: "/oauth2/authorization/keycloak"
+  LOGIN_URL: "/oauth2/authorization/keycloak",
+  LOGOUT_URL: "/logout"
 };

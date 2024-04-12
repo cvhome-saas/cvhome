@@ -6,6 +6,7 @@ import {map, takeUntil} from 'rxjs/operators';
 import {Subject} from 'rxjs';
 import {TranslateService} from "@ngx-translate/core";
 import {NbMenuItem} from "@nebular/theme/components/menu/menu.service";
+import {environment} from "../../../../environments/environment";
 
 @Component({
   selector: 'ngx-header',
@@ -103,7 +104,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
       console.log("profile clicked")
     }
     if (item.title == 'Log out') {
-      window.location.href = new URL(window.location.href).origin + "/logout"
+      window.location.href = new URL(window.location.href).origin + environment.LOGOUT_URL
     }
   }
 }

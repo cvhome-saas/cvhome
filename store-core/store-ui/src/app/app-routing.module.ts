@@ -22,6 +22,12 @@ export const routes: Routes = [
       window.location.href = environment.LOGIN_URL;
     })
   },
+  {
+    path: 'external-logout-link',
+    loadChildren: () => new Promise(() => {
+      window.location.href = environment.LOGOUT_URL;
+    })
+  },
 
   {
     path: 'auth',
