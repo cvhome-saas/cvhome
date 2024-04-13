@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import {Component, OnInit} from '@angular/core';
+import {ActivatedRoute} from '@angular/router';
 
-import { CategoryService } from '../services/category.service';
+import {CategoryService} from '../services/category.service';
 
 @Component({
   selector: 'ngx-category-detail',
@@ -12,6 +12,7 @@ export class CategoryDetailComponent implements OnInit {
   category: any = {};
   loadingInfo = false;
   loading: boolean = false;
+
   constructor(
     private categoryService: CategoryService,
     private activatedRoute: ActivatedRoute
@@ -20,12 +21,17 @@ export class CategoryDetailComponent implements OnInit {
 
   ngOnInit() {
     this.loadingInfo = true;
-    const id = this.activatedRoute.snapshot.paramMap.get('id');
-    this.categoryService.getCategoryById(id,"")
-      .subscribe(res => {
-        this.category = res;
-        this.loadingInfo = false;
-      });
+    this.activatedRoute.params.subscribe(it => {
+      let split: string[] = it["id"].split("-");
+      let store = split[0];
+      let id = split[1];
+      this.categoryService.getCategoryById(id, store)
+        .subscribe(res => {
+          this.category = res;
+          this.loadingInfo = false;
+        })
+    });
+
   }
 
 }

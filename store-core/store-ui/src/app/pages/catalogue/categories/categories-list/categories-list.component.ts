@@ -175,13 +175,13 @@ export class CategoriesListComponent implements OnInit {
   onDelete(event) {
     this.dialogService.open(ShowcaseDialogComponent, {
       context: {
-        title: "",
-        text: ""
+        title: 'Are you sure!',
+        text: 'Do you really want to remove this entity?'
       }
     })
       .onClose.subscribe(res => {
       if (res) {
-        this.categoryService.deleteCategory(event.data.id,"")
+        this.categoryService.deleteCategory(event.id, event.store)
           .subscribe(data => {
             this.toastr.success(this.translate.instant('CATEGORY_FORM.CATEGORY_REMOVED'));
             this.getCategories();

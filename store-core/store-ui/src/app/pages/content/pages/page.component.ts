@@ -88,7 +88,8 @@ export class PageComponent {
   onDelete(event) {
     this.dialogService.open(ShowcaseDialogComponent, {
       context: {
-        title: 'Do you really want to remove this entity?'
+        title: 'Are you sure!',
+        text: 'Do you really want to remove this entity?'
       }
     }).onClose.subscribe(res => {
       if (res) {
