@@ -161,7 +161,7 @@ export class OptionValuesComponent implements OnInit {
       });
     }
   }
-  goToback() {
+  goToBack() {
     this.router.navigate(['pages/catalogue/options/options-values-list']);
   }
 }

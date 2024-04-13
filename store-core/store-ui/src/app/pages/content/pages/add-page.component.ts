@@ -260,7 +260,7 @@ export class AddPageComponent implements OnInit {
   }
 
 
-  goToback() {
+  goToBack() {
     this.router.navigate(['/pages/content/pages/list']);
   }
 

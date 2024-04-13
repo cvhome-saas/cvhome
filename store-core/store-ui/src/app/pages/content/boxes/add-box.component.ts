@@ -315,7 +315,7 @@ export class AddBoxComponent implements OnInit {
   }
 
 
-  goToback() {
+  goToBack() {
     this.router.navigate(['/pages/content/boxes/list']);
   }
 

@@ -1,13 +1,11 @@
-import {ChangeDetectorRef, Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import {FormArray, FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {Router} from '@angular/router';
 import {NbDialogService, NbToastrService} from '@nebular/theme';
 import {CategoryService} from '../services/category.service';
 import {ConfigService} from '../../../shared/services/config.service';
 import {TranslateService} from '@ngx-translate/core';
-import {StoreService} from '../../../store-management/services/store.service';
 import {StorageService} from '../../../shared/services/storage.service';
-import {SecurityService} from '../../../shared/services/security.service';
 import {validators} from '../../../shared/validation/validators';
 import {slugify} from '../../../shared/utils/slugifying';
 import {ImageBrowserComponent} from "../../../store-manager/shared/image-browser/image-browser.component";
@@ -22,23 +20,11 @@ declare var $: any;
 export class CategoryFormComponent implements OnInit {
   @Input() category: any;
   form: FormGroup;
-  //category
   roots = [];
-
   perPage = 100;
-  //supported languages
   languages = [];
-  //default language
   defaultLanguage = localStorage.getItem('lang');
-  //select store
-  stores = [];
-  isSuperAdmin = false;
-  isRetailAdmin = false;
-  //roles;
-  //current user associated merchant
-  merchant;
 
-  //inline editor
   editorConfig = {
     placeholder: '',
     tabsize: 2,
@@ -69,7 +55,7 @@ export class CategoryFormComponent implements OnInit {
   loadParams() {
     return {
       lang: this.storageService.getLanguage(),
-      store: this.storageService.getMerchant(),
+      store: "",
       count: this.perPage,
       page: 0
     };
@@ -79,30 +65,19 @@ export class CategoryFormComponent implements OnInit {
     private fb: FormBuilder,
     private categoryService: CategoryService,
     private configService: ConfigService,
-    private storeService: StoreService,
     private storageService: StorageService,
-    private securityService: SecurityService,
-    private cdr: ChangeDetectorRef,
     private router: Router,
     private toastr: NbToastrService,
     private translate: TranslateService,
     private dialogService: NbDialogService
   ) {
-    //this.roles = JSON.parse(localStorage.getItem('roles'));
   }
 
   ngOnInit() {
+    this.loader = true;
+  }
 
-    this.isSuperAdmin = this.securityService.isSuperAdmin();
-    this.isRetailAdmin = this.securityService.isRetailAdmin();
-    this.merchant = this.storageService.getMerchant();
-    //for populating stores dropdown list
-    this.storeService.getListOfMerchantStoreNames({'store': ''})
-      .subscribe(res => {
-        this.stores = res;
-      });
-
-    //for selecting parent category - root or child of a parent
+  init() {
     this.categoryService.getListOfCategories(this.params)
       .subscribe(res => {
         res.categories.push({id: 0, code: 'root', children: []});
@@ -119,10 +94,9 @@ export class CategoryFormComponent implements OnInit {
         //this.roots = [...res.categories];
         //console.log(JSON.stringify(this.roots));
       });
-    this.loader = true;
 
     //determines how many languages should be supported
-    this.configService.getListOfSupportedLanguages(localStorage.getItem('merchant'))
+    this.configService.getListOfSupportedLanguages(this.params.store)
       .subscribe(res => {
         this.languages = [...res];
         this.createForm();
@@ -150,16 +124,13 @@ export class CategoryFormComponent implements OnInit {
   private createForm() {
     this.form = this.fb.group({
       parent: ['root', [Validators.required]],
-      store: [this.merchant],
+      store: [this.params.store],
       visible: [false],
       code: ['', [Validators.required, Validators.pattern(validators.alphanumericwithhyphen)]],
       sortOrder: [0, [Validators.required, Validators.pattern(validators.number)]],
       selectedLanguage: ['', [Validators.required]],
       descriptions: this.fb.array([]),
     });
-    if (!this.isSuperAdmin) {
-      this.form.get("store").disable();
-    }
   }
 
   addFormArray() {
@@ -181,7 +152,7 @@ export class CategoryFormComponent implements OnInit {
 
   fillEmptyForm() {
     this.form.patchValue({
-      store: this.merchant,
+      store: this.params.store,
       sortOrder: 0,
       selectedLanguage: this.defaultLanguage,
       descriptions: [],
@@ -251,17 +222,15 @@ export class CategoryFormComponent implements OnInit {
   }
 
   changeName(event, index) {
-
     (<FormArray>this.form.get('descriptions')).at(index).patchValue({
       friendlyUrl: slugify(event)
     });
 
   }
 
-  //determines if category code is unique
   checkCode(event) {
     const code = event.target.value;
-    this.categoryService.checkCategoryCode(code,"")
+    this.categoryService.checkCategoryCode(code, this.params.store)
       .subscribe(res => {
         this.isCodeUnique = !(res.exists && (this.category.code !== code));
       });
@@ -271,17 +240,12 @@ export class CategoryFormComponent implements OnInit {
     const data = this.form.value;
     const category = this.roots.find((el) => el.code === data.parent);
     data.parent = {id: category.id, code: category.code};
-
     return data;
   }
 
   save() {
     this.loading = true;
     const categoryObject = this.prepareSaveData();
-
-    if (!this.isSuperAdmin) {
-      this.form.patchValue({store: this.merchant});
-    }
 
     /**
      * TODO put in utility
@@ -344,18 +308,14 @@ export class CategoryFormComponent implements OnInit {
         this.loading = false;
         return;
       }
-      //for debugging
-      //console.log(JSON.stringify(categoryObject));
-      //return;
-
       if (this.category.id) {
-        this.categoryService.updateCategory(this.category.id, categoryObject,"")
+        this.categoryService.updateCategory(this.category.id, categoryObject, this.params.store)
           .subscribe(result => {
             this.loading = false;
             this.toastr.success(this.translate.instant('CATEGORY_FORM.CATEGORY_UPDATED'));
           });
       } else {
-        this.categoryService.addCategory(categoryObject,"")
+        this.categoryService.addCategory(categoryObject, this.params.store)
           .subscribe(result => {
             this.loading = false;
             this.toastr.success(this.translate.instant('CATEGORY_FORM.CATEGORY_CREATED'));
@@ -372,14 +332,13 @@ export class CategoryFormComponent implements OnInit {
         const control = form.get(field);
         if (control.invalid) invalidControls.push(field);
         if (control instanceof FormGroup) {
-          recursiveFunc(control);
+          recursiveFunc(<FormGroup>control);
         } else if (control instanceof FormArray) {
-          recursiveFunc(control);
+          recursiveFunc(<FormArray>control);
         }
       });
     }
     recursiveFunc(this.form);
-    //console.log('Invalids ' + invalidControls);
     return invalidControls;
   }
 
@@ -392,10 +351,9 @@ export class CategoryFormComponent implements OnInit {
       container: '.note-editor',
       className: 'note-btn',
       click: function () {
-        //console.log(me);
         me.dialogService.open(ImageBrowserComponent, {
           context: {
-            store: ""
+            store: me.params.store
           }
         }).onClose.subscribe(name => name && context.invoke('editor.pasteHTML', '<img src="' + name + '">'));
       }
@@ -403,7 +361,13 @@ export class CategoryFormComponent implements OnInit {
     return button.render();
   }
 
-  goToback() {
+  goToBack() {
     this.router.navigate(['pages/catalogue/categories/categories-list']);
   }
+
+  onSelectStore(e) {
+    this.params.store = e.id
+    this.init()
+  }
+
 }

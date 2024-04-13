@@ -178,14 +178,14 @@ export class TypeDetailsComponent implements OnInit {
       this.typesService.createType(obj)
         .subscribe((res) => {
           this.toastr.success(this.translate.instant('PRODUCT_TYPE.PRODUCT_TYPE_CREATED'));
-          this.goToback();
+          this.goToBack();
           this.loading = false;
         }, error => {
           this.loading = false;
         });
     }
   }
-  goToback() {
+  goToBack() {
     this.router.navigate(['pages/catalogue/types/types-list']);
   }
 

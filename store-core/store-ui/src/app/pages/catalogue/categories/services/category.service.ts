@@ -35,7 +35,7 @@ export class CategoryService {
   }
 
   addCategory(category, store): Observable<any> {
-    return this.crudService.post(`/v1/private/category?store=${store}`, category);
+    return this.crudService.post(`/store/api/v1/private/category?store=${store}`, category);
   }
 
   updateCategory(id, category, store): Observable<any> {

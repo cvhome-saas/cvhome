@@ -1,7 +1,7 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { CategoryService } from '../services/category.service';
-import { TranslateService } from '@ngx-translate/core';
-import { StorageService } from '../../../shared/services/storage.service';
+import {Component, OnInit} from '@angular/core';
+import {CategoryService} from '../services/category.service';
+import {TranslateService} from '@ngx-translate/core';
+import {StorageService} from '../../../shared/services/storage.service';
 import {NbToastrService} from "@nebular/theme";
 
 @Component({
@@ -10,7 +10,7 @@ import {NbToastrService} from "@nebular/theme";
   styleUrls: ['./categories-hierarchy.component.scss']
 })
 export class CategoriesHierarchyComponent implements OnInit {
-  @ViewChild('tree', { static: false }) tree;
+  // @ViewChild('tree', { static: false }) tree;
   nodes = [];
   options = {
     allowDrag: true
@@ -30,13 +30,12 @@ export class CategoriesHierarchyComponent implements OnInit {
   loadParams() {
     return {
       lang: this.storageService.getLanguage(),
-      store: this.storageService.getMerchant(),
+      store: "",
       page: 0
     };
   }
 
   ngOnInit() {
-    this.getList();
   }
 
   getList() {
@@ -73,10 +72,14 @@ export class CategoriesHierarchyComponent implements OnInit {
       parentId = -1;
     }
 
-    this.categoryService.updateHierarchy(event.node.id, parentId,"")
+    this.categoryService.updateHierarchy(event.node.id, parentId, this.params.store)
       .subscribe(res => {
         this.toastr.success(this.translate.instant('CATEGORY.HIERARCHY_UPDATED'));
       });
   }
 
+  onSelectStore($event) {
+    this.params.store=$event.id
+    this.getList();
+  }
 }

@@ -224,14 +224,14 @@ export class AddVariationsComponent implements OnInit {
       this.variationService.addVariations(this.form.value)
         .subscribe((res) => {
           this.toastr.success(this.translate.instant('OPTION.SET_OPTION_CREATED'));
-          this.goToback();
+          this.goToBack();
           this.loading = false;
         }, error => {
           this.loading = false;
         });
     }
   }
-  goToback() {
+  goToBack() {
     this.router.navigate(['pages/catalogue/options/varations/list']);
   }
   // setSelected(e) {

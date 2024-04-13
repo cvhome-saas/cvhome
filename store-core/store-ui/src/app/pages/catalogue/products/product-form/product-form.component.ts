@@ -489,7 +489,7 @@ export class ProductFormComponent implements OnInit {
   route(link) {
     this.router.navigate(['pages/catalogue/products/' + this.product.id + '/' + link]);
   }
-  goToback() {
+  goToBack() {
     this.router.navigate(['pages/catalogue/products/products-list'])
   }
   public findInvalidControls() {

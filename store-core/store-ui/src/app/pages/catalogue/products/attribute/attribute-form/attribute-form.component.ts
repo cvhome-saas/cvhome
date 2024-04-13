@@ -205,7 +205,7 @@ export class AttributeFormComponent implements OnInit {
           this.loading = false;
           // this.attribute = res;
           this.errorService.success("PRODUCT_ATTRIBUTES.PRODUCT_ATTRIBUTES_UPDATED");
-          this.goToback();
+          this.goToBack();
         }, error => {
           this.loading = false;
           this.errorService.error("ERROR.SYSTEM_ERROR_TEXT", 500);
@@ -216,14 +216,14 @@ export class AttributeFormComponent implements OnInit {
         // this.attribute = res;
 
         this.toastr.success(this.translate.instant('PRODUCT_ATTRIBUTES.PRODUCT_ATTRIBUTES_UPDATED'));
-        this.goToback();
+        this.goToBack();
       }, error => {
         this.loading = false;
         this.errorService.error("ERROR.SYSTEM_ERROR_TEXT", 500);
       });
     }
   }
-  goToback() {
+  goToBack() {
     this.ref.close();
   }
 

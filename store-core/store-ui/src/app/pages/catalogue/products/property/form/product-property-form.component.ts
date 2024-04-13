@@ -205,7 +205,7 @@ export class ProductPropertyForm implements OnInit {
                 .subscribe(res => {
                     this.loader = false;
                     // this.attribute = res;
-                    this.goToback();
+                    this.goToBack();
                     this.toastr.success(this.translate.instant('PROPERTY.PRODUCT_PROPERTY_UPDATED'));
                 }, error => {
                     this.loader = false;
@@ -213,14 +213,14 @@ export class ProductPropertyForm implements OnInit {
         } else {
             this.productAttributesService.createAttribute(this.productId, param).subscribe(res => {
                 this.loader = false;
-                this.goToback();
+                this.goToBack();
                 this.toastr.success(this.translate.instant('PROPERTY.PRODUCT_PROPERTY_CREATED'));
             }, error => {
                 this.loader = false;
             });
         }
     }
-    goToback() {
+    goToBack() {
         this.ref.close();
     }
 

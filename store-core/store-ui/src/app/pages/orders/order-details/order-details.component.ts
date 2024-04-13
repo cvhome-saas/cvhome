@@ -286,7 +286,7 @@ export class OrderDetailsComponent implements OnInit {
     this.shipping.phone = new AsYouType('US').input(this.shipping.phone);
   }
 
-  goToback() {
+  goToBack() {
     this.router.navigate(['pages/orders/order-list']);
   }
 

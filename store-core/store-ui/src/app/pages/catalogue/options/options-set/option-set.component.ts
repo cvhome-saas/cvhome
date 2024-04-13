@@ -244,14 +244,14 @@ export class OptionSetComponent implements OnInit {
       this.optionService.createSetOption(optionObj)
         .subscribe((res) => {
           this.toastr.success(this.translate.instant('OPTION.SET_OPTION_CREATED'));
-          this.goToback();
+          this.goToBack();
           this.loading = false;
         }, error => {
           this.loading = false;
         });
     }
   }
-  goToback() {
+  goToBack() {
     this.router.navigate(['pages/catalogue/options/options-set-list']);
   }
   setSelected(e) {

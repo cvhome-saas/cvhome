@@ -223,7 +223,7 @@ export class BrandFormComponent implements OnInit {
       }
     }
   }
-  goToback() {
+  goToBack() {
     this.router.navigate(['pages/catalogue/brands/brands-list']);
   }
 }

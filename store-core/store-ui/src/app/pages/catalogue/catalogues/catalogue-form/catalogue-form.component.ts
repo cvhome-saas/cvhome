@@ -126,7 +126,7 @@ export class CatalogueFormComponent implements OnInit {
         }
       });
   }
-  goToback() {
+  goToBack() {
     this.router.navigate(['pages/catalogue/catalogues/catalogues-list']);
   }
 }

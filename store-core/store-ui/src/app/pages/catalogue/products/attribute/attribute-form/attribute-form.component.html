@@ -4,7 +4,7 @@
     <h1 class="page_title">{{ 'PRODUCT_ATTRIBUTES.OPTIONS_ATTRIBUTES' | translate}}</h1>
 
     <div class="content_spacing">
-      <button type="button" nbButton class="cancel_button" (click)="goToback()">{{ 'ORDER_FORM.CANCLE'
+      <button type="button" nbButton class="cancel_button" (click)="goToBack()">{{ 'ORDER_FORM.CANCLE'
         | translate}}</button>
       <!--
       <button type="submit" nbButton class="success_button" (click)="save()" [nbSpinner]="loader" nbSpinnerSize="large"
@@ -63,28 +63,28 @@
                   {{ 'COMMON.VALUE_REQUIRED' | translate}}
                 </span>
               </div>
-                
 
-          <!--  
+
+          <!--
           <p-autoComplete class="autoStore" placeholder="{{ 'OPTION_VALUE.SELECT_OPTION_VALUE' | translate }}" name="optionValue" formControlName="optionValue" [suggestions]="optionValues"
             [dropdown]="true" (onSelect)="onSelectOptionValue($event)" (completeMethod)="searchOptionValue($event)">
             <ng-template let-item pTemplate="selectedItem">{{item.label}}</ng-template>
             <ng-template let-el pTemplate="item">{{el.label}}</ng-template>
-            
+
           </p-autoComplete>
           -->
 
           <!--
           <p-autoComplete name="searchSuggestions" formControlName="optionValue" (completeMethod)="searchOptionValue($event)" [suggestions]="optionValues" field="field"></p-autoComplete>
           -->
-            
+
           <!--
             <p-dropdown *ngIf="optionValues.length" [options]="optionValues" placeholder="OPTION_VALUE.SELECT_OPTION_VALUE"
               formControlName='optionValue' filter="true">
               <ng-template let-item pTemplate="selectedItem">{{item.label}}</ng-template>
               <ng-template let-el pTemplate="item">{{el.label}}</ng-template>
             </p-dropdown>
-           
+
             <span *ngIf="(optionValue.dirty || optionValue.touched) && optionValue.errors.required" class="err-message">
               {{ 'COMMON.VALUE_REQUIRED' | translate}}
             </span>
@@ -93,7 +93,7 @@
             </span>
           -->
 
-          
+
         </div>
 
 
