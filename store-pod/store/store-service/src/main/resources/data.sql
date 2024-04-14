@@ -2173,16 +2173,16 @@ INSERT INTO store.shopping_cart_item (shp_cart_item_id, date_created, date_modif
 
 
 INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('category_description_seq', 3);
-INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('CATEGORY_SEQ_NEXT_VAL', 1);
+INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('CATEGORY_SEQ_NEXT_VAL', 2);
 INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('content_description_seq', 5);
 INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('CONTENT_SEQ_NEXT_VAL', 5);
 INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('country_description_seq', 712);
 INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('COUNTRY_SEQ_NEXT_VAL', 5);
 INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('CURRENCY_SEQ_NEXT_VAL', 4);
-INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('GROUP_SEQ_NEXT_VAL', 1);
-INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('LANG_SEQ_NEXT_VAL', 1);
-INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('MANUFACT_SEQ_NEXT_VAL', 2);
-INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('manufacturer_description_seq', 3);
+INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('GROUP_SEQ_NEXT_VAL', 8);
+INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('LANG_SEQ_NEXT_VAL', 3);
+INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('MANUFACT_SEQ_NEXT_VAL', 50);
+INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('manufacturer_description_seq', 2);
 INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('MERCH_CONF_SEQ_NEXT_VAL', 1);
 INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('MOD_CONF_SEQ_NEXT_VAL', 1);
 INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('OPTIN_SEQ_NEXT_VAL', 1);
