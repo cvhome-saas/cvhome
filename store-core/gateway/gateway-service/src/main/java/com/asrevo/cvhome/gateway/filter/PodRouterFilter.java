@@ -65,11 +65,11 @@ public class PodRouterFilter implements GlobalFilter, Ordered {
             UriComponents uriComponents = UriComponentsBuilder.fromUri(uri).build();
             String store = uriComponents.getQueryParams().getFirst(STORE_ID_PARAM);
             if (store != null) {
-            Mono<ServerHttpRequest> httpRequest = getServerHttpRequest(exchange, uriComponents, new DomainReference("store"));
-            return httpRequest.flatMap(it -> {
-                exchange.getAttributes().put(GATEWAY_REQUEST_URL_ATTR, it.getURI());
-                return chain.filter(exchange.mutate().request(it).build());
-            });
+                Mono<ServerHttpRequest> httpRequest = getServerHttpRequest(exchange, uriComponents, new DomainReference("store"));
+                return httpRequest.flatMap(it -> {
+                    exchange.getAttributes().put(GATEWAY_REQUEST_URL_ATTR, it.getURI());
+                    return chain.filter(exchange.mutate().request(it).build());
+                });
             }
         }
         return chain.filter(exchange);

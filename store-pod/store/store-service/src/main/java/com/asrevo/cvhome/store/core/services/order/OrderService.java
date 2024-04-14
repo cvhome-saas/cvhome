@@ -15,7 +15,6 @@ import com.asrevo.cvhome.store.core.model.order.OrderSummary;
 import com.asrevo.cvhome.store.core.model.order.OrderTotalSummary;
 import com.asrevo.cvhome.store.core.model.payments.Payment;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
-import org.apache.commons.lang3.Validate;
 
 import java.util.List;
 

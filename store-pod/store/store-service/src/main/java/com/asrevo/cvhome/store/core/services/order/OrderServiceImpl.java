@@ -197,14 +197,16 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
     }
 
     @Override
-    public Order getOrder(final Long orderId, MerchantStore store ) {
+    public Order getOrder(final Long orderId, MerchantStore store) {
         Validate.notNull(orderId, "Order id cannot be null");
         Validate.notNull(store, "Store cannot be null");
         return orderRepository.findOne(orderId, store.getId());
     }
 
 
-    /** legacy **/
+    /**
+     * legacy
+     **/
     @Override
     public OrderList listByStore(final MerchantStore store, final OrderCriteria criteria) {
         return orderRepository.listByStore(store, criteria);
@@ -228,17 +230,18 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
 
         }
     }
+
     @Override
     public boolean hasDownloadFiles(Order order) throws ServiceException {
 
-        Validate.notNull(order,"Order cannot be null");
-        Validate.notNull(order.getOrderProducts(),"Order products cannot be null");
-        Validate.notEmpty(order.getOrderProducts(),"Order products cannot be empty");
+        Validate.notNull(order, "Order cannot be null");
+        Validate.notNull(order.getOrderProducts(), "Order products cannot be null");
+        Validate.notEmpty(order.getOrderProducts(), "Order products cannot be empty");
 
         boolean hasDownloads = false;
-        for(OrderProduct orderProduct : order.getOrderProducts()) {
+        for (OrderProduct orderProduct : order.getOrderProducts()) {
 
-            if(!CollectionUtils.isEmpty(orderProduct.getDownloads())) {
+            if (!CollectionUtils.isEmpty(orderProduct.getDownloads())) {
                 hasDownloads = true;
                 break;
             }

@@ -15,15 +15,27 @@ import java.net.URI;
 import java.util.Optional;
 
 public class KeycloakLogoutSuccessHandler {
+    public static final String DEFAULT_LOGOUT_SUCCESS_URL = "/login?logout";
     private final ReactiveClientRegistrationRepository registrationRepository;
     private final ServerRedirectStrategy redirectStrategy = new DefaultServerRedirectStrategy();
-    public static final String DEFAULT_LOGOUT_SUCCESS_URL = "/login?logout";
-
     private final URI logoutSuccessUrl = URI.create(DEFAULT_LOGOUT_SUCCESS_URL);
 
 
     public KeycloakLogoutSuccessHandler(ReactiveClientRegistrationRepository registrationRepository) {
         this.registrationRepository = registrationRepository;
+    }
+
+    private static String extractLogoutUrl(ServerWebExchange exchange, ClientRegistration.ProviderDetails providerDetails, String idToken) {
+        ServerHttpRequest request = exchange.getRequest();
+        String redirectPath = Optional.ofNullable(exchange.getRequest().getQueryParams().getFirst("redirect_path")).orElse("");
+        String idTokenHintParam = Optional.ofNullable(idToken)
+                .map(it -> "&id_token_hint=" + it)
+                .orElse("");
+        String authorizationUri = providerDetails.getAuthorizationUri();
+        String redirectUri = request.getURI().getScheme() + "://" + request.getURI().getAuthority() + "/" + redirectPath;
+        String logoutPath = "protocol/openid-connect/logout?post_logout_redirect_uri=" + redirectUri + idTokenHintParam;
+        String logoutUrl = authorizationUri.replace("protocol/openid-connect/auth", logoutPath);
+        return logoutUrl;
     }
 
     public Mono<Void> onLogoutSuccess(ServerWebExchange exchange, Authentication authentication) {
@@ -46,18 +58,5 @@ public class KeycloakLogoutSuccessHandler {
         }
         return this.redirectStrategy.sendRedirect(exchange, logoutSuccessUrl);
 
-    }
-
-    private static String extractLogoutUrl(ServerWebExchange exchange, ClientRegistration.ProviderDetails providerDetails, String idToken) {
-        ServerHttpRequest request = exchange.getRequest();
-        String redirectPath = Optional.ofNullable(exchange.getRequest().getQueryParams().getFirst("redirect_path")).orElse("");
-        String idTokenHintParam = Optional.ofNullable(idToken)
-                .map(it -> "&id_token_hint=" + it)
-                .orElse("");
-        String authorizationUri = providerDetails.getAuthorizationUri();
-        String redirectUri = request.getURI().getScheme() + "://" + request.getURI().getAuthority() + "/" + redirectPath;
-        String logoutPath = "protocol/openid-connect/logout?post_logout_redirect_uri=" + redirectUri + idTokenHintParam;
-        String logoutUrl = authorizationUri.replace("protocol/openid-connect/auth", logoutPath);
-        return logoutUrl;
     }
 }

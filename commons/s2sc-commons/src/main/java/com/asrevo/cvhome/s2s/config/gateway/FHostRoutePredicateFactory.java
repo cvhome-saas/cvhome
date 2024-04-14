@@ -41,6 +41,7 @@ public class FHostRoutePredicateFactory extends AbstractRoutePredicateFactory<FH
     public List<String> shortcutFieldOrder() {
         return Collections.singletonList("host");
     }
+
     @Override
     public ShortcutType shortcutType() {
         return ShortcutType.GATHER_LIST;

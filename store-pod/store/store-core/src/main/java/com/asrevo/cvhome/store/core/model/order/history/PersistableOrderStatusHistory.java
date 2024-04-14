@@ -10,13 +10,13 @@ import java.io.Serial;
 @Getter
 public class PersistableOrderStatusHistory extends OrderStatusHistory {
 
-	/**
-	 * 
-	 */
-	@Serial
-	private static final long serialVersionUID = 1L;
-	
-	private String date;
+    /**
+     *
+     */
+    @Serial
+    private static final long serialVersionUID = 1L;
+
+    private String date;
 
 
 }

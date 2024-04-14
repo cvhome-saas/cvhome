@@ -37,6 +37,7 @@ public class FNotServiceRoutePredicateFactory extends AbstractRoutePredicateFact
     public FNotServiceRoutePredicateFactory() {
         super(Config.class);
     }
+
     @Override
     public ShortcutType shortcutType() {
         return ShortcutType.GATHER_LIST;
@@ -46,6 +47,7 @@ public class FNotServiceRoutePredicateFactory extends AbstractRoutePredicateFact
     public List<String> shortcutFieldOrder() {
         return Collections.singletonList("services");
     }
+
     @Override
     public Predicate<ServerWebExchange> apply(Config config) {
         return new GatewayPredicate() {
@@ -54,9 +56,9 @@ public class FNotServiceRoutePredicateFactory extends AbstractRoutePredicateFact
                 RequestPath path = exchange.getRequest().getPath();
                 String[] splits = path.toString().split("/");
                 String[] parts = Stream.of(splits).filter(it -> !it.isEmpty()).toArray(String[]::new);
-                if (parts.length >0) {
+                if (parts.length > 0) {
                     return !config.services.contains(parts[0]);
-                }else {
+                } else {
                     return true;
                 }
 

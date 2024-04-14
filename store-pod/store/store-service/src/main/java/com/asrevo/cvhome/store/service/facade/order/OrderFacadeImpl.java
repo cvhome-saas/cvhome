@@ -372,9 +372,10 @@ public class OrderFacadeImpl implements OrderFacade {
             throw new ServiceRuntimeException("Error while getting orders", e);
         }
     }
+
     @Override
     public com.asrevo.cvhome.store.core.model.order.v0.ReadableOrderList getReadableOrderList(MerchantStore store, int start,
-                                                                                       int maxCount, Language language) throws Exception {
+                                                                                              int maxCount, Language language) throws Exception {
 
         OrderCriteria criteria = new OrderCriteria();
         criteria.setStartIndex(start);
@@ -382,6 +383,7 @@ public class OrderFacadeImpl implements OrderFacade {
 
         return getReadableOrderList(criteria, store, language);
     }
+
     private ReadableOrderTotal convertOrderTotal(OrderTotal total, MerchantStore store, Language language) {
 
         return readableOrderTotalMapper.convert(total, store, language);
@@ -392,8 +394,9 @@ public class OrderFacadeImpl implements OrderFacade {
         return readableOrderProductMapper.convert(product, store, language);
 
     }
+
     private com.asrevo.cvhome.store.core.model.order.v0.ReadableOrderList getReadableOrderList(OrderCriteria criteria,
-                                                                                        MerchantStore store, Language language) throws Exception {
+                                                                                               MerchantStore store, Language language) throws Exception {
 
         OrderList orderList = orderService.listByStore(store, criteria);
 
@@ -422,8 +425,9 @@ public class OrderFacadeImpl implements OrderFacade {
         return this.populateOrderList(orderList, store, language);
 
     }
+
     private com.asrevo.cvhome.store.core.model.order.v0.ReadableOrderList populateOrderList(final OrderList orderList,
-                                                                                     final MerchantStore store, final Language language) {
+                                                                                            final MerchantStore store, final Language language) {
         List<Order> orders = orderList.getOrders();
         com.asrevo.cvhome.store.core.model.order.v0.ReadableOrderList returnList = new com.asrevo.cvhome.store.core.model.order.v0.ReadableOrderList();
         if (CollectionUtils.isEmpty(orders)) {
@@ -455,6 +459,7 @@ public class OrderFacadeImpl implements OrderFacade {
         return returnList;
 
     }
+
     private void setOrderProductList(final Order order, final Locale locale, final MerchantStore store,
                                      final Language language, final com.asrevo.cvhome.store.core.model.order.v0.ReadableOrder readableOrder)
             throws ConversionException {
@@ -480,7 +485,7 @@ public class OrderFacadeImpl implements OrderFacade {
 
     @Override
     public com.asrevo.cvhome.store.core.model.order.v0.ReadableOrder getReadableOrder(Long orderId, MerchantStore store,
-                                                                               Language language) {
+                                                                                      Language language) {
         Validate.notNull(store, "MerchantStore cannot be null");
         Order modelOrder = orderService.getOrder(orderId, store);
         if (modelOrder == null) {
@@ -549,6 +554,7 @@ public class OrderFacadeImpl implements OrderFacade {
 
         return readable;
     }
+
     @Override
     public void createOrderStatus(PersistableOrderStatusHistory status, Long id, MerchantStore store) {
         Validate.notNull(status, "OrderStatusHistory must not be null");

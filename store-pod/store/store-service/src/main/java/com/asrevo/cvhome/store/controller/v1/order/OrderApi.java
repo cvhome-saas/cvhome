@@ -31,9 +31,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 @RestController
 @RequestMapping("/api/v1")
 @Tag(name = "Order flow resource", description = "Manage orders (create, list, get)")
@@ -125,7 +122,8 @@ public class OrderApi {
         }
 
     }
-    @RequestMapping(value = { "/private/orders" }, method = RequestMethod.GET)
+
+    @RequestMapping(value = {"/private/orders"}, method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public ReadableOrderList list(
@@ -158,7 +156,8 @@ public class OrderApi {
         return orderFacade.getReadableOrderList(orderCriteria, merchantStore);
 
     }
-    @RequestMapping(value = { "/private/orders/{id}" }, method = RequestMethod.GET)
+
+    @RequestMapping(value = {"/private/orders/{id}"}, method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     @Parameters({

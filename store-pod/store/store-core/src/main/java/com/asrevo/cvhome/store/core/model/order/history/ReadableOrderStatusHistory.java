@@ -10,15 +10,15 @@ import java.io.Serial;
 @Getter
 public class ReadableOrderStatusHistory extends OrderStatusHistory {
 
-	/**
-	 * 
-	 */
-	@Serial
-	private static final long serialVersionUID = 1L;
-	
-	/**
-	 * YYYY-mm-DD:HH mm SSS
-	 */
-	private String date;
+    /**
+     *
+     */
+    @Serial
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * YYYY-mm-DD:HH mm SSS
+     */
+    private String date;
 
 }
