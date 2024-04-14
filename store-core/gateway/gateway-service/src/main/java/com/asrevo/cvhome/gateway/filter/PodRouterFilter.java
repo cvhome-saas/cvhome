@@ -51,7 +51,7 @@ public class PodRouterFilter implements GlobalFilter, Ordered {
         String path = uriComponents.getPath();
         if (CallStrategy.DIRECT.equals(callStrategy)) {
             if (path != null) {
-                path = path.replace(STORE_SERVICE_PREFIX, "/");
+                path = path.replaceFirst(STORE_SERVICE_PREFIX, "/");
             }
         }
 
