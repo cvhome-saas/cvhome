@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.store.core.entity.order.orderproduct;
 
+import com.asrevo.cvhome.store.core.constants.SchemaConstant;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -21,7 +22,7 @@ public class OrderProductPrice implements Serializable {
     @Id
     @Column(name = "ORDER_PRODUCT_PRICE_ID")
     @TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME", valueColumnName = "SEQ_COUNT",
-            pkColumnValue = "ORDER_PRD_PRICE_ID_NEXT_VAL")
+            pkColumnValue = "ORDER_PRD_PRICE_ID_NEXT_VAL", allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE, initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
     private Long id;
 

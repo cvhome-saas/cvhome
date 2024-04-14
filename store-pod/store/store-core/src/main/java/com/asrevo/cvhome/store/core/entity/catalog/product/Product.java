@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.store.core.entity.catalog.product;
 
+import com.asrevo.cvhome.store.core.constants.SchemaConstant;
 import com.asrevo.cvhome.store.core.entity.catalog.category.Category;
 import com.asrevo.cvhome.store.core.entity.catalog.product.attribute.ProductAttribute;
 import com.asrevo.cvhome.store.core.entity.catalog.product.availability.ProductAvailability;
@@ -47,7 +48,8 @@ public class Product extends SalesManagerEntity<Long, Product> implements Audita
             table = "SM_SEQUENCER",
             pkColumnName = "SEQ_NAME",
             valueColumnName = "SEQ_COUNT",
-            pkColumnValue = "PRODUCT_SEQ_NEXT_VAL")
+            pkColumnValue = "PRODUCT_SEQ_NEXT_VAL"
+            , allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE, initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
     private Long id;
 

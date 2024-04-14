@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.store.core.entity.reference.country;
 
+import com.asrevo.cvhome.store.core.constants.SchemaConstant;
 import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
 import com.asrevo.cvhome.store.core.entity.reference.geozone.GeoZone;
 import com.asrevo.cvhome.store.core.entity.reference.zone.Zone;
@@ -24,7 +25,7 @@ public class Country extends SalesManagerEntity<Integer, Country> {
     @Id
     @Column(name = "COUNTRY_ID")
     @TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME", valueColumnName = "SEQ_COUNT",
-            pkColumnValue = "COUNTRY_SEQ_NEXT_VAL")
+            pkColumnValue = "COUNTRY_SEQ_NEXT_VAL", allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE, initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
     private Integer id;
 
