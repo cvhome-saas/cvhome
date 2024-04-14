@@ -1,8 +1,5 @@
 package com.asrevo.cvhome.store.config;
 
-import com.asrevo.cvhome.store.core.modules.cms.content.StaticContentFileManager;
-import com.asrevo.cvhome.store.core.modules.cms.content.StaticContentFileManagerImpl;
-import com.asrevo.cvhome.store.core.modules.cms.content.local.CmsStaticContentFileManagerImpl;
 import com.asrevo.cvhome.store.core.modules.cms.product.ProductFileManager;
 import com.asrevo.cvhome.store.core.modules.cms.product.ProductFileManagerImpl;
 import com.asrevo.cvhome.store.core.modules.cms.product.local.CmsImageFileManagerImpl;
@@ -24,19 +21,6 @@ public class TempConfig {
         productFileManager.setGetImage(instance);
         productFileManager.setRemoveImage(instance);
         return productFileManager;
-    }
-
-    @Bean
-    public StaticContentFileManager staticContentFileManager() {
-        CmsStaticContentFileManagerImpl cmsStaticContentFileManager = new CmsStaticContentFileManagerImpl();
-        StaticContentFileManagerImpl fileManager = new StaticContentFileManagerImpl();
-        fileManager.setGetFile(cmsStaticContentFileManager);
-        fileManager.setRemoveFile(cmsStaticContentFileManager);
-        fileManager.setUploadFile(cmsStaticContentFileManager);
-        fileManager.setAddFolder(cmsStaticContentFileManager);
-        fileManager.setListFolder(cmsStaticContentFileManager);
-        fileManager.setRemoveFolder(cmsStaticContentFileManager);
-        return fileManager;
     }
 
     @Bean("img")

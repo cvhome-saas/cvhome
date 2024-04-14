@@ -4,7 +4,7 @@ import com.asrevo.cvhome.store.core.entity.content.*;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
-import com.asrevo.cvhome.store.core.modules.cms.content.StaticContentFileManager;
+import com.asrevo.cvhome.store.core.modules.cms.content.ContentAssetsManager;
 import com.asrevo.cvhome.store.core.repositories.content.ContentRepository;
 import com.asrevo.cvhome.store.core.repositories.content.PageContentRepository;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
@@ -29,17 +29,16 @@ import java.util.regex.Pattern;
 public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Content> implements ContentService {
 
 
-    final
-    StaticContentFileManager contentFileManager;
+    private final ContentAssetsManager assetsManager;
     private final ContentRepository contentRepository;
     private final PageContentRepository pageContentRepository;
 
     @Autowired
-    public ContentServiceImpl(ContentRepository contentRepository, StaticContentFileManager contentFileManager, PageContentRepository pageContentRepository) {
+    public ContentServiceImpl(ContentRepository contentRepository, ContentAssetsManager assetsManager, PageContentRepository pageContentRepository) {
         super(contentRepository);
 
         this.contentRepository = contentRepository;
-        this.contentFileManager = contentFileManager;
+        this.assetsManager = assetsManager;
         this.pageContentRepository = pageContentRepository;
     }
 
@@ -181,7 +180,7 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
 
             String p = contentImage.getPath();
             Optional<String> path = Optional.ofNullable(p);
-            contentFileManager.addFile(merchantStoreCode, path, contentImage);
+            assetsManager.addFile(merchantStoreCode, path, contentImage);
 
         } catch (Exception e) {
             log.error("Error while trying to convert input stream to buffered image", e);
@@ -204,13 +203,13 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
 
         try {
             log.info("Adding content file for merchant id {}", merchantStoreCode);
-            // staticContentFileManager.addFile(merchantStoreCode,
+            // staticassetsManager.addFile(merchantStoreCode,
             // contentImage);
 
             String p = null;
             Optional<String> path = Optional.ofNullable(p);
 
-            contentFileManager.addFile(merchantStoreCode, path, contentImage);
+            assetsManager.addFile(merchantStoreCode, path, contentImage);
 
         } catch (Exception e) {
             log.error("Error while trying to convert input stream to buffered image", e);
@@ -249,8 +248,8 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
         Optional<String> path = Optional.ofNullable(p);
 
         log.info("Adding content images for merchant....");
-        contentFileManager.addFiles(merchantStoreCode, path, contentFilesList);
-        // staticContentFileManager.addFiles(merchantStoreCode,
+        assetsManager.addFiles(merchantStoreCode, path, contentFilesList);
+        // staticassetsManager.addFiles(merchantStoreCode,
         // contentFilesList);
 
         try {
@@ -284,7 +283,7 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
         String p = null;
         Optional<String> path = Optional.ofNullable(p);
 
-        contentFileManager.removeFile(merchantStoreCode, fileContentType, fileName, path);
+        assetsManager.removeFile(merchantStoreCode, fileContentType, fileName, path);
 
     }
 
@@ -300,7 +299,7 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
         String p = null;
         Optional<String> path = Optional.ofNullable(p);
 
-        contentFileManager.removeFile(storeCode, FileContentType.valueOf(fileType), fileName, path);
+        assetsManager.removeFile(storeCode, FileContentType.valueOf(fileType), fileName, path);
 
     }
 
@@ -319,7 +318,7 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
         String p = null;
         Optional<String> path = Optional.ofNullable(p);
 
-        contentFileManager.removeFiles(merchantStoreCode, path);
+        assetsManager.removeFiles(merchantStoreCode, path);
     }
 
     /**
@@ -343,7 +342,7 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
         String p = null;
         Optional<String> path = Optional.ofNullable(p);
 
-        return contentFileManager.getFile(merchantStoreCode, path, fileContentType, fileName);
+        return assetsManager.getFile(merchantStoreCode, path, fileContentType, fileName);
 
     }
 
@@ -362,11 +361,11 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
     public List<OutputContentFile> getContentFiles(String merchantStoreCode, FileContentType fileContentType)
             throws ServiceException {
         Assert.notNull(merchantStoreCode, "Merchant store Id can not be null");
-        // return staticContentFileManager.getFiles(merchantStoreCode,
+        // return staticassetsManager.getFiles(merchantStoreCode,
         // fileContentType);
         String p = null;
         Optional<String> path = Optional.ofNullable(p);
-        return contentFileManager.getFiles(merchantStoreCode, path, fileContentType);
+        return assetsManager.getFiles(merchantStoreCode, path, fileContentType);
     }
 
     /**
@@ -385,14 +384,14 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
         String p = null;
         Optional<String> path = Optional.ofNullable(p);
 
-        return contentFileManager.getFileNames(merchantStoreCode, path, fileContentType);
+        return assetsManager.getFileNames(merchantStoreCode, path, fileContentType);
 
         /*
          * if(fileContentType.name().equals(FileContentType.IMAGE.name()) ||
          * fileContentType.name().equals(FileContentType.STATIC_FILE.name())) {
-         * return contentFileManager.getFileNames(merchantStoreCode,
+         * return assetsManager.getFileNames(merchantStoreCode,
          * fileContentType); } else { return
-         * contentFileManager.getFileNames(merchantStoreCode, fileContentType);
+         * assetsManager.getFileNames(merchantStoreCode, fileContentType);
          * }
          */
     }
@@ -444,7 +443,7 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
                 throw new ServiceException("Path format [" + path.get() + "] not a valid directory format");
             }
         }
-        contentFileManager.addFolder(store.getCode(), folderName, path);
+        assetsManager.addFolder(store.getCode(), folderName, path);
 
 
     }
@@ -453,7 +452,7 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
     public List<String> listFolders(MerchantStore store, Optional<String> path) throws ServiceException {
         Assert.notNull(store, "MerchantStore cannot be null");
 
-        return contentFileManager.listFolders(store.getCode(), path);
+        return assetsManager.listFolders(store.getCode(), path);
     }
 
     @Override
@@ -461,7 +460,7 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
         Assert.notNull(store, "MerchantStore cannot be null");
         Assert.notNull(folderName, "Folder name cannot be null");
 
-        contentFileManager.removeFolder(store.getCode(), folderName, path);
+        assetsManager.removeFolder(store.getCode(), folderName, path);
 
     }
 
@@ -474,7 +473,7 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
     public void renameFile(String merchantStoreCode, FileContentType fileContentType, Optional<String> path,
                            String originalName, String newName) throws ServiceException {
 
-        OutputContentFile file = contentFileManager.getFile(merchantStoreCode, path, fileContentType, originalName);
+        OutputContentFile file = assetsManager.getFile(merchantStoreCode, path, fileContentType, originalName);
 
         if (file == null) {
             throw new ServiceException("File name [" + originalName + "] not found for merchant [" + merchantStoreCode + "]");
@@ -484,7 +483,7 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
         InputStream is = new ByteArrayInputStream(os.toByteArray());
 
         //remove file
-        contentFileManager.removeFile(merchantStoreCode, fileContentType, originalName, path);
+        assetsManager.removeFile(merchantStoreCode, fileContentType, originalName, path);
 
         //recreate file
         InputContentFile inputFile = new InputContentFile();
@@ -493,7 +492,7 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
         inputFile.setMimeType(file.getMimeType());
         inputFile.setFile(is);
 
-        contentFileManager.addFile(merchantStoreCode, path, inputFile);
+        assetsManager.addFile(merchantStoreCode, path, inputFile);
 
     }
 
