@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.store.core.entity.catalog.product.review;
 
+import com.asrevo.cvhome.store.core.constants.SchemaConstant;
 import com.asrevo.cvhome.store.core.entity.catalog.product.Product;
 import com.asrevo.cvhome.store.core.entity.common.audit.AuditListener;
 import com.asrevo.cvhome.store.core.entity.common.audit.AuditSection;
@@ -34,7 +35,7 @@ public class ProductReview extends SalesManagerEntity<Long, ProductReview> imple
     @Id
     @Column(name = "PRODUCT_REVIEW_ID", unique = true, nullable = false)
     @TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME", valueColumnName = "SEQ_COUNT",
-            pkColumnValue = "PRODUCT_REVIEW_SEQ_NEXT_VAL")
+            pkColumnValue = "PRODUCT_REVIEW_SEQ_NEXT_VAL", allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE, initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
     private Long id;
 

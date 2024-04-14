@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.store.core.entity.customer;
 
+import com.asrevo.cvhome.store.core.constants.SchemaConstant;
 import com.asrevo.cvhome.store.core.entity.catalog.product.review.ProductReview;
 import com.asrevo.cvhome.store.core.entity.common.Billing;
 import com.asrevo.cvhome.store.core.entity.common.CredentialsReset;
@@ -38,7 +39,7 @@ public class Customer extends SalesManagerEntity<Long, Customer> implements Audi
     @Id
     @Column(name = "CUSTOMER_ID", unique = true, nullable = false)
     @TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME", valueColumnName = "SEQ_COUNT",
-            pkColumnValue = "CUSTOMER_SEQ_NEXT_VAL")
+            pkColumnValue = "CUSTOMER_SEQ_NEXT_VAL", allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE, initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
     private Long id;
 

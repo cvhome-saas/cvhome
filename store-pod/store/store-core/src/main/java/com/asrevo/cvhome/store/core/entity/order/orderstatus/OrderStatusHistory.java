@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.store.core.entity.order.orderstatus;
 
+import com.asrevo.cvhome.store.core.constants.SchemaConstant;
 import com.asrevo.cvhome.store.core.entity.order.Order;
 import com.asrevo.cvhome.store.core.utils.CloneUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -22,7 +23,7 @@ public class OrderStatusHistory implements Serializable {
     @Id
     @Column(name = "ORDER_STATUS_HISTORY_ID")
     @TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME", valueColumnName = "SEQ_COUNT",
-            pkColumnValue = "STATUS_HIST_ID_NEXT_VALUE")
+            pkColumnValue = "STATUS_HIST_ID_NEXT_VALUE", allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE, initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
     private Long id;
 

@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.store.core.entity.catalog.product.variant;
 
+import com.asrevo.cvhome.store.core.constants.SchemaConstant;
 import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -25,7 +26,7 @@ public class ProductVariantImage extends SalesManagerEntity<Long, ProductVariant
             table = "SM_SEQUENCER",
             pkColumnName = "SEQ_NAME",
             valueColumnName = "SEQ_COUNT",
-            pkColumnValue = "PRD_VAR_IMG_SEQ_NEXT_VAL")
+            pkColumnValue = "PRD_VAR_IMG_SEQ_NEXT_VAL", allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE, initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
     private Long id;
 

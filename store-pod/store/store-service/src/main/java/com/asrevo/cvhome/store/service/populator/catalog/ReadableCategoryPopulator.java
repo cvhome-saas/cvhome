@@ -43,6 +43,7 @@ public class ReadableCategoryPopulator extends
                 desc.setHighlights(description.getCategoryHighlight());
                 desc.setTitle(description.getMetatagTitle());
                 desc.setMetaDescription(description.getMetatagDescription());
+                desc.setLanguage(description.getLanguage().getCode());
 
                 target.setDescription(desc);
             }

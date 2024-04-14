@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.store.core.entity.order;
 
+import com.asrevo.cvhome.store.core.constants.SchemaConstant;
 import com.asrevo.cvhome.store.core.converter.LocaleConverter;
 import com.asrevo.cvhome.store.core.entity.common.Billing;
 import com.asrevo.cvhome.store.core.entity.common.Delivery;
@@ -42,7 +43,7 @@ public class Order extends SalesManagerEntity<Long, Order> {
     @Id
     @Column(name = "ORDER_ID", unique = true, nullable = false)
     @TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME", valueColumnName = "SEQ_COUNT",
-            pkColumnValue = "ORDER_ID_SEQ_NEXT_VAL")
+            pkColumnValue = "ORDER_ID_SEQ_NEXT_VAL", allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE, initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
     private Long id;
 
