@@ -72,7 +72,6 @@ import { DragDropModule } from "@angular/cdk/drag-drop";
     // EqualValidator
   ],
   providers: [CurrencyPipe],
-  entryComponents: [ShowcaseDialogComponent],
 })
 export class SharedModule {
 }
