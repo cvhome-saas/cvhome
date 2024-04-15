@@ -11,7 +11,6 @@ import com.asrevo.cvhome.store.core.model.catalog.product.product.variant.Readab
 import com.asrevo.cvhome.store.core.model.catalog.product.product.variantGroup.ReadableProductVariantGroup;
 import com.asrevo.cvhome.store.service.mapper.Mapper;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
@@ -26,7 +25,7 @@ public class ReadableProductVariantGroupMapper implements Mapper<ProductVariantG
 
     private final ImageFilePath imageUtils;
 
-    public ReadableProductVariantGroupMapper(ReadableProductVariantMapper readableProductVariantMapper, @Qualifier("img") ImageFilePath imageUtils) {
+    public ReadableProductVariantGroupMapper(ReadableProductVariantMapper readableProductVariantMapper, ImageFilePath imageUtils) {
         this.readableProductVariantMapper = readableProductVariantMapper;
         this.imageUtils = imageUtils;
     }

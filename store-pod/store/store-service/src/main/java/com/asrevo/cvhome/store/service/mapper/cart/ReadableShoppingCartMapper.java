@@ -28,7 +28,6 @@ import com.asrevo.cvhome.store.utils.ImageFilePath;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
@@ -59,7 +58,7 @@ public class ReadableShoppingCartMapper implements Mapper<ShoppingCart, Readable
 
     private final ImageFilePath imageUtils;
 
-    public ReadableShoppingCartMapper(ShoppingCartCalculationService shoppingCartCalculationService, PricingService pricingService, ProductAttributeService productAttributeService, ProductVariantService productVariantService, ReadableMinimalProductMapper readableMinimalProductMapper, ReadableProductVariationMapper readableProductVariationMapper, @Qualifier("img") ImageFilePath imageUtils) {
+    public ReadableShoppingCartMapper(ShoppingCartCalculationService shoppingCartCalculationService, PricingService pricingService, ProductAttributeService productAttributeService, ProductVariantService productVariantService, ReadableMinimalProductMapper readableMinimalProductMapper, ReadableProductVariationMapper readableProductVariationMapper, ImageFilePath imageUtils) {
         this.shoppingCartCalculationService = shoppingCartCalculationService;
         this.pricingService = pricingService;
         this.productAttributeService = productAttributeService;

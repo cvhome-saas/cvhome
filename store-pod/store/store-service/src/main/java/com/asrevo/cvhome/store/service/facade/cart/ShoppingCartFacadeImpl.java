@@ -32,7 +32,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -70,7 +69,7 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
 
     private final ReadableShoppingCartMapper readableShoppingCartMapper;
 
-    public ShoppingCartFacadeImpl(ShoppingCartService shoppingCartService, ShoppingCartCalculationService shoppingCartCalculationService, ProductService productService, PricingService pricingService, ProductAttributeService productAttributeService, @Qualifier("img") ImageFilePath imageUtils, ReadableShoppingCartMapper readableShoppingCartMapper) {
+    public ShoppingCartFacadeImpl(ShoppingCartService shoppingCartService, ShoppingCartCalculationService shoppingCartCalculationService, ProductService productService, PricingService pricingService, ProductAttributeService productAttributeService, ImageFilePath imageUtils, ReadableShoppingCartMapper readableShoppingCartMapper) {
         this.shoppingCartService = shoppingCartService;
         this.shoppingCartCalculationService = shoppingCartCalculationService;
         this.productService = productService;

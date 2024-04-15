@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.store.service.facade.order;
 
+import com.asrevo.cvhome.s2s.model.StoreProperties;
 import com.asrevo.cvhome.store.controller.exception.ConversionException;
 import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
 import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
@@ -69,16 +70,16 @@ public class OrderFacadeImpl implements OrderFacade {
     private final ProductPriceUtils productPriceUtils;
     private final PricingService pricingService;
     private final CustomerFacade customerFacade;
-    private final CoreConfiguration coreConfiguration;
     private final LabelUtils messages;
     private final ReadableOrderTotalMapper readableOrderTotalMapper;
     private final LanguageService languageService;
     private final ReadableCustomerMapper readableCustomerMapper;
     private final ReadableOrderProductMapper readableOrderProductMapper;
     private final ReadableOrderPopulator readableOrderPopulator;
-    private final ImageFilePathUtils imageUtils;
+    private final ImageFilePath imageUtils;
+    private final StoreProperties storeProperties;
 
-    public OrderFacadeImpl(ShoppingCartFacade shoppingCartFacade, ShoppingCartService shoppingCartService, OrderService orderService, ShippingQuoteService shippingQuoteService, ProductAttributeService productAttributeService, ProductService productService, PersistableOrderApiPopulator persistableOrderApiPopulator, ProductPriceUtils productPriceUtils, PricingService pricingService, ReadableOrderProductMapper readableOrderProductMapper, LabelUtils messages, CustomerFacade customerFacade, CoreConfiguration coreConfiguration, ReadableCustomerMapper readableCustomerMapper, ReadableOrderTotalMapper readableOrderTotalMapper, LanguageService languageService, ReadableOrderPopulator readableOrderPopulator, ImageFilePathUtils imageUtils) {
+    public OrderFacadeImpl(ShoppingCartFacade shoppingCartFacade, ShoppingCartService shoppingCartService, OrderService orderService, ShippingQuoteService shippingQuoteService, ProductAttributeService productAttributeService, ProductService productService, PersistableOrderApiPopulator persistableOrderApiPopulator, ProductPriceUtils productPriceUtils, PricingService pricingService, ReadableOrderProductMapper readableOrderProductMapper, LabelUtils messages, CustomerFacade customerFacade, ReadableCustomerMapper readableCustomerMapper, ReadableOrderTotalMapper readableOrderTotalMapper, LanguageService languageService, ReadableOrderPopulator readableOrderPopulator, ImageFilePath imageUtils, StoreProperties storeProperties) {
         this.shoppingCartFacade = shoppingCartFacade;
         this.shoppingCartService = shoppingCartService;
         this.orderService = orderService;
@@ -91,12 +92,12 @@ public class OrderFacadeImpl implements OrderFacade {
         this.readableOrderProductMapper = readableOrderProductMapper;
         this.messages = messages;
         this.customerFacade = customerFacade;
-        this.coreConfiguration = coreConfiguration;
         this.readableCustomerMapper = readableCustomerMapper;
         this.readableOrderTotalMapper = readableOrderTotalMapper;
         this.languageService = languageService;
         this.readableOrderPopulator = readableOrderPopulator;
         this.imageUtils = imageUtils;
+        this.storeProperties = storeProperties;
     }
 
     @Override
@@ -243,7 +244,7 @@ public class OrderFacadeImpl implements OrderFacade {
             }
 
             //email management
-            if ("true".equals(coreConfiguration.getProperty("ORDER_EMAIL_API"))) {
+            if (this.storeProperties.enableOrderMailApi()) {
                 // send email
                 try {
 

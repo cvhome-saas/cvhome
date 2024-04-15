@@ -23,7 +23,6 @@ import com.asrevo.cvhome.store.service.populator.catalog.ReadableProductPopulato
 import com.asrevo.cvhome.store.utils.ImageFilePath;
 import com.asrevo.cvhome.store.utils.LocaleUtils;
 import org.apache.commons.collections.CollectionUtils;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -50,7 +49,7 @@ public class ProductFacadeImpl implements ProductFacade {
 
     private final ImageFilePath imageUtils;
 
-    public ProductFacadeImpl(CategoryService categoryService, ProductAttributeService productAttributeService, ProductService productService, PricingService pricingService, ProductRelationshipService productRelationshipService, @Qualifier("img") ImageFilePath imageUtils) {
+    public ProductFacadeImpl(CategoryService categoryService, ProductAttributeService productAttributeService, ProductService productService, PricingService pricingService, ProductRelationshipService productRelationshipService, ImageFilePath imageUtils) {
         this.categoryService = categoryService;
         this.productAttributeService = productAttributeService;
         this.productService = productService;

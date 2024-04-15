@@ -17,7 +17,6 @@ import com.asrevo.cvhome.store.service.mapper.inventory.ReadableInventoryMapper;
 import com.asrevo.cvhome.store.utils.DateUtil;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
 import org.apache.commons.collections.CollectionUtils;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
@@ -36,7 +35,7 @@ public class ReadableProductVariantMapper implements Mapper<ProductVariant, Read
 
     private final ImageFilePath imagUtils;
 
-    public ReadableProductVariantMapper(ReadableProductVariationMapper readableProductVariationMapper, ReadableInventoryMapper readableInventoryMapper, @Qualifier("img") ImageFilePath imagUtils) {
+    public ReadableProductVariantMapper(ReadableProductVariationMapper readableProductVariationMapper, ReadableInventoryMapper readableInventoryMapper, ImageFilePath imagUtils) {
         this.readableProductVariationMapper = readableProductVariationMapper;
         this.readableInventoryMapper = readableInventoryMapper;
         this.imagUtils = imagUtils;

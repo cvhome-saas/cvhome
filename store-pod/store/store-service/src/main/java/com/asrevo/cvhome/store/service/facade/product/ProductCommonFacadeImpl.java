@@ -26,7 +26,6 @@ import com.asrevo.cvhome.store.service.populator.catalog.ReadableProductReviewPo
 import com.asrevo.cvhome.store.utils.DateUtil;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -59,7 +58,7 @@ public class ProductCommonFacadeImpl implements ProductCommonFacade {
 
     private final ImageFilePath imageUtils;
 
-    public ProductCommonFacadeImpl(LanguageService languageService, ProductService productService, PricingService pricingService, CustomerService customerService, ProductReviewService productReviewService, PersistableProductMapper persistableProductMapper, @Qualifier("img") ImageFilePath imageUtils) {
+    public ProductCommonFacadeImpl(LanguageService languageService, ProductService productService, PricingService pricingService, CustomerService customerService, ProductReviewService productReviewService, PersistableProductMapper persistableProductMapper, ImageFilePath imageUtils) {
         this.languageService = languageService;
         this.productService = productService;
         this.pricingService = pricingService;

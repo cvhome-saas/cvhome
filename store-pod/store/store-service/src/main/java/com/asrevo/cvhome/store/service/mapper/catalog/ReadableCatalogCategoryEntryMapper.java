@@ -8,7 +8,6 @@ import com.asrevo.cvhome.store.core.model.catalog.catalog.ReadableCatalogCategor
 import com.asrevo.cvhome.store.core.model.catalog.category.ReadableCategory;
 import com.asrevo.cvhome.store.service.mapper.Mapper;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -21,7 +20,7 @@ public class ReadableCatalogCategoryEntryMapper implements Mapper<CatalogCategor
 
     private final ImageFilePath imageUtils;
 
-    public ReadableCatalogCategoryEntryMapper(ReadableCategoryMapper readableCategoryMapper, @Qualifier("img") ImageFilePath imageUtils) {
+    public ReadableCatalogCategoryEntryMapper(ReadableCategoryMapper readableCategoryMapper, ImageFilePath imageUtils) {
         this.readableCategoryMapper = readableCategoryMapper;
         this.imageUtils = imageUtils;
     }

@@ -1,6 +1,6 @@
 package com.asrevo.cvhome.store.core.modules.cms.product;
 
-import com.asrevo.cvhome.store.core.constants.Constants;
+import com.asrevo.cvhome.s2s.model.StoreProductImageProperties;
 import com.asrevo.cvhome.store.core.entity.catalog.product.Product;
 import com.asrevo.cvhome.store.core.entity.catalog.product.file.ProductImageSize;
 import com.asrevo.cvhome.store.core.entity.catalog.product.image.ProductImage;
@@ -8,7 +8,6 @@ import com.asrevo.cvhome.store.core.entity.content.FileContentType;
 import com.asrevo.cvhome.store.core.entity.content.ImageContentFile;
 import com.asrevo.cvhome.store.core.entity.content.OutputContentFile;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
-import com.asrevo.cvhome.store.utils.CoreConfiguration;
 import com.asrevo.cvhome.store.utils.ProductImageCropUtils;
 import com.asrevo.cvhome.store.utils.ProductImageSizeUtils;
 import lombok.Getter;
@@ -28,14 +27,17 @@ import java.util.List;
 @Getter
 @Slf4j
 public class ProductFileManagerImpl extends ProductFileManager {
+    private final ProductImagePut uploadImage;
+    private final ProductImageGet getImage;
+    private final ProductImageRemove removeImage;
+    private final StoreProductImageProperties storeProductImageProperties;
 
-    private final static String PRODUCT_IMAGE_HEIGHT_SIZE = "PRODUCT_IMAGE_HEIGHT_SIZE";
-    private final static String PRODUCT_IMAGE_WIDTH_SIZE = "PRODUCT_IMAGE_WIDTH_SIZE";
-    private final static String CROP_UPLOADED_IMAGES = "CROP_UPLOADED_IMAGES";
-    private ProductImagePut uploadImage;
-    private ProductImageGet getImage;
-    private ProductImageRemove removeImage;
-    private CoreConfiguration configuration;
+    public ProductFileManagerImpl(ProductImagePut uploadImage, ProductImageGet getImage, ProductImageRemove removeImage, StoreProductImageProperties storeProductImageProperties) {
+        this.uploadImage = uploadImage;
+        this.getImage = getImage;
+        this.removeImage = removeImage;
+        this.storeProductImageProperties = storeProductImageProperties;
+    }
 
 
     public void addProductImage(ProductImage productImage, ImageContentFile contentImage)
@@ -103,8 +105,8 @@ public class ProductFileManagerImpl extends ProductFileManager {
 
             // get template properties file
 
-            String slargeImageHeight = configuration.getProperty(PRODUCT_IMAGE_HEIGHT_SIZE);
-            String slargeImageWidth = configuration.getProperty(PRODUCT_IMAGE_WIDTH_SIZE);
+            String slargeImageHeight = storeProductImageProperties.height();
+            String slargeImageWidth = storeProductImageProperties.width();
 
             // String ssmallImageHeight = configuration.getProperty("SMALL_IMAGE_HEIGHT_SIZE");
             // String ssmallImageWidth = configuration.getProperty("SMALL_IMAGE_WIDTH_SIZE");
@@ -141,8 +143,7 @@ public class ProductFileManagerImpl extends ProductFileManager {
                     throw new ServiceException(sizeMsg);
                 }
 
-                if (!StringUtils.isBlank(configuration.getProperty(CROP_UPLOADED_IMAGES))
-                        && configuration.getProperty(CROP_UPLOADED_IMAGES).equals(Constants.TRUE)) {
+                if (storeProductImageProperties.cropUploads()) {
                     // crop image
                     ProductImageCropUtils utils =
                             new ProductImageCropUtils(bufferedImage, largeImageWidth, largeImageHeight);

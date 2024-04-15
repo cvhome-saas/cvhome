@@ -6,7 +6,6 @@ import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import com.asrevo.cvhome.store.core.model.catalog.product.ReadableImage;
 import com.asrevo.cvhome.store.service.mapper.Mapper;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -15,7 +14,7 @@ public class ReadableProductImageMapper implements Mapper<ProductImage, Readable
 
     private final ImageFilePath imageUtils;
 
-    public ReadableProductImageMapper(@Qualifier("img") ImageFilePath imageUtils) {
+    public ReadableProductImageMapper(ImageFilePath imageUtils) {
         this.imageUtils = imageUtils;
     }
 

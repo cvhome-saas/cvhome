@@ -28,7 +28,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -52,7 +51,7 @@ public class StoreFacadeImpl implements StoreFacade {
     private final LanguageUtils languageUtils;
     private final ReadableMerchantStorePopulator readableMerchantStorePopulator;
 
-    public StoreFacadeImpl(MerchantStoreService merchantStoreService, MerchantConfigurationService merchantConfigurationService, LanguageService languageService, ContentService contentService, PersistableMerchantStorePopulator persistableMerchantStorePopulator, @Qualifier("img") ImageFilePath imageUtils, LanguageUtils languageUtils, ReadableMerchantStorePopulator readableMerchantStorePopulator) {
+    public StoreFacadeImpl(MerchantStoreService merchantStoreService, MerchantConfigurationService merchantConfigurationService, LanguageService languageService, ContentService contentService, PersistableMerchantStorePopulator persistableMerchantStorePopulator, ImageFilePath imageUtils, LanguageUtils languageUtils, ReadableMerchantStorePopulator readableMerchantStorePopulator) {
         this.merchantStoreService = merchantStoreService;
         this.merchantConfigurationService = merchantConfigurationService;
         this.languageService = languageService;

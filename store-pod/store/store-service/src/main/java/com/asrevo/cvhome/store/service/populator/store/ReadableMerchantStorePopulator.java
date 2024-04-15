@@ -24,7 +24,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
@@ -47,7 +46,7 @@ public class ReadableMerchantStorePopulator extends
     private final ImageFilePath filePath;
     private final LanguageService languageService;
 
-    public ReadableMerchantStorePopulator(CountryService countryService, ZoneService zoneService, @Qualifier("img") ImageFilePath filePath, LanguageService languageService) {
+    public ReadableMerchantStorePopulator(CountryService countryService, ZoneService zoneService, ImageFilePath filePath, LanguageService languageService) {
         this.countryService = countryService;
         this.zoneService = zoneService;
         this.filePath = filePath;

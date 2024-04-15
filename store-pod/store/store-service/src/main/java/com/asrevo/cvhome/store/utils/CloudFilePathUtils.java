@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.store.utils;
 
+import com.asrevo.cvhome.s2s.model.CdnProperties;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.entity.content.FileContentType;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
@@ -7,25 +8,24 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CloudFilePathUtils extends AbstractimageFilePath {
+public class CloudFilePathUtils implements AbstractimageFilePath {
 
-    private String basePath = Constants.STATIC_URI;
-    private String contentUrl = null;
+    private final CdnProperties cdnProperties;
+
+    public CloudFilePathUtils(CdnProperties cdnProperties) {
+        this.cdnProperties = cdnProperties;
+    }
 
     @Override
     public String getBasePath(MerchantStore store) {
         //store has no incidence, basepath drives the url
-        return basePath;
+        return cdnProperties.basePath();
     }
 
-    @Override
-    public void setBasePath(String basePath) {
-        this.basePath = basePath;
-    }
 
     @Override
     public String getContextPath() {
-        return super.getProperties().getProperty(CONTEXT_PATH);
+        return this.cdnProperties.contextPath();
     }
 
     /**
@@ -67,10 +67,5 @@ public class CloudFilePathUtils extends AbstractimageFilePath {
 
     }
 
-    @Override
-    public void setContentUrlPath(String contentUrl) {
-        this.contentUrl = contentUrl;
-
-    }
 
 }

@@ -16,7 +16,6 @@ import com.asrevo.cvhome.store.core.services.catalog.pricing.PricingService;
 import com.asrevo.cvhome.store.service.mapper.Mapper;
 import com.asrevo.cvhome.store.utils.DateUtil;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
@@ -32,7 +31,7 @@ public class ReadableMinimalProductMapper implements Mapper<Product, ReadableMin
 
     private final ImageFilePath imageUtils;
 
-    public ReadableMinimalProductMapper(PricingService pricingService, @Qualifier("img") ImageFilePath imageUtils) {
+    public ReadableMinimalProductMapper(PricingService pricingService, ImageFilePath imageUtils) {
         this.pricingService = pricingService;
         this.imageUtils = imageUtils;
     }

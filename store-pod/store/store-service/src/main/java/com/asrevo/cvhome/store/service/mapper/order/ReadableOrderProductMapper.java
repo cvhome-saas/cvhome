@@ -18,7 +18,6 @@ import com.asrevo.cvhome.store.service.mapper.catalog.product.ReadableProductMap
 import com.asrevo.cvhome.store.utils.ImageFilePath;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -39,7 +38,7 @@ public class ReadableOrderProductMapper implements Mapper<OrderProduct, Readable
 
     private final ImageFilePath imageUtils;
 
-    public ReadableOrderProductMapper(PricingService pricingService, ProductService productService, ReadableProductMapper readableProductMapper, @Qualifier("img") ImageFilePath imageUtils) {
+    public ReadableOrderProductMapper(PricingService pricingService, ProductService productService, ReadableProductMapper readableProductMapper, ImageFilePath imageUtils) {
         this.pricingService = pricingService;
         this.productService = productService;
         this.readableProductMapper = readableProductMapper;

@@ -12,7 +12,6 @@ import com.asrevo.cvhome.store.core.services.catalog.product.ProductService;
 import com.asrevo.cvhome.store.service.mapper.catalog.product.PersistableProductDefinitionMapper;
 import com.asrevo.cvhome.store.service.mapper.catalog.product.ReadableProductDefinitionMapper;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -33,7 +32,7 @@ public class ProductDefinitionFacadeImpl implements ProductDefinitionFacade {
 
     private final ImageFilePath imageUtils;
 
-    public ProductDefinitionFacadeImpl(ProductService productService, PersistableProductDefinitionMapper persistableProductDefinitionMapper, ReadableProductDefinitionMapper readableProductDefinitionMapper, ProductVariantFacade productVariantFacade, @Qualifier("img") ImageFilePath imageUtils) {
+    public ProductDefinitionFacadeImpl(ProductService productService, PersistableProductDefinitionMapper persistableProductDefinitionMapper, ReadableProductDefinitionMapper readableProductDefinitionMapper, ProductVariantFacade productVariantFacade, ImageFilePath imageUtils) {
         this.productService = productService;
         this.persistableProductDefinitionMapper = persistableProductDefinitionMapper;
         this.readableProductDefinitionMapper = readableProductDefinitionMapper;
