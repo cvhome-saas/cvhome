@@ -27,7 +27,7 @@ public class StoreManagerController {
 
     @PostMapping("list")
     public Mono<Page<ManagerStoreDto>> findAllStores(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestBody ListManagerStoreQuery listManagerStoreQuery, Pageable pageable) {
-        return Mono.just(storeService.findAll(identity,listManagerStoreQuery, pageable));
+        return Mono.just(storeService.findAll(identity, listManagerStoreQuery, pageable));
     }
 
     @PostMapping("create")

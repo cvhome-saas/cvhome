@@ -29,11 +29,11 @@ public record UserOrgStoreIdentity(IdentityId org, String store, Set<Roles> role
         return this.hasRole(Roles.ROLE_STORE_RETAIL);
     }
 
-    public  boolean isAnyStoreAdmin() {
+    public boolean isAnyStoreAdmin() {
         return isStoreAdmin() || isStoreModerator() || isStoreRetail();
     }
 
-    public  boolean isOrgAdminOrAnyStoreAdmin() {
+    public boolean isOrgAdminOrAnyStoreAdmin() {
         return isOrgAdmin() || isAnyStoreAdmin();
     }
 

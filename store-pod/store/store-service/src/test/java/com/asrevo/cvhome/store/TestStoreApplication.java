@@ -25,8 +25,12 @@ public class TestStoreApplication {
     }
 
     @Bean
-    public CommandLineRunner runner(PostgreSQLContainer<?> postgresContainer) {
+    public CommandLineRunner runner(PostgreSQLContainer<?> postgresContainer, MinIOContainer minIOContainer) {
         return args -> {
+            System.out.println(minIOContainer.getUiURL());
+            System.out.println(minIOContainer.getUserName());
+            System.out.println(minIOContainer.getPassword());
+
             System.out.println(postgresContainer.getJdbcUrl());
             System.out.println(postgresContainer.getUsername());
             System.out.println(postgresContainer.getPassword());

@@ -12,7 +12,11 @@ import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import java.util.Optional;
 
 @RestController
@@ -20,36 +24,36 @@ import java.util.Optional;
 @Tag(name = "Customer management resource", description = "Manage customers")
 public class CustomerApi {
 
-	@Autowired
-	private CustomerFacade customerFacade;
+    @Autowired
+    private CustomerFacade customerFacade;
 
 
-	/**
-	 * Get all customers
-	 *
-	 * @param count
-	 * @return
-	 * @throws Exception
-	 */
-	@GetMapping("/private/customers")
-	@Parameters({
-			@Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
-			@Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
-	})
-	public ReadableCustomerList list(@RequestParam(value = "page", required = false) Integer page,
-									 @RequestParam(value = "count", required = false) Integer count,
-									 @Parameter(hidden = true) MerchantStore merchantStore,
-									 @Parameter(hidden = true) Language language) {
-		CustomerCriteria customerCriteria = createCustomerCriteria(page, count);
-		return customerFacade.getListByStore(merchantStore, customerCriteria, language);
-	}
+    /**
+     * Get all customers
+     *
+     * @param count
+     * @return
+     * @throws Exception
+     */
+    @GetMapping("/private/customers")
+    @Parameters({
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
+    })
+    public ReadableCustomerList list(@RequestParam(value = "page", required = false) Integer page,
+                                     @RequestParam(value = "count", required = false) Integer count,
+                                     @Parameter(hidden = true) MerchantStore merchantStore,
+                                     @Parameter(hidden = true) Language language) {
+        CustomerCriteria customerCriteria = createCustomerCriteria(page, count);
+        return customerFacade.getListByStore(merchantStore, customerCriteria, language);
+    }
 
-	private CustomerCriteria createCustomerCriteria(Integer start, Integer count) {
-		CustomerCriteria customerCriteria = new CustomerCriteria();
-		Optional.ofNullable(start).ifPresent(customerCriteria::setStartIndex);
-		Optional.ofNullable(count).ifPresent(customerCriteria::setMaxCount);
-		return customerCriteria;
-	}
+    private CustomerCriteria createCustomerCriteria(Integer start, Integer count) {
+        CustomerCriteria customerCriteria = new CustomerCriteria();
+        Optional.ofNullable(start).ifPresent(customerCriteria::setStartIndex);
+        Optional.ofNullable(count).ifPresent(customerCriteria::setMaxCount);
+        return customerCriteria;
+    }
 
 
 }

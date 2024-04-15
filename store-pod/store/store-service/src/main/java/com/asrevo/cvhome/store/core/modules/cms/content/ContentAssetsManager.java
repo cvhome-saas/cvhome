@@ -4,7 +4,6 @@ import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.entity.content.FileContentType;
 import com.asrevo.cvhome.store.core.entity.content.OutputContentFile;
 import com.asrevo.cvhome.store.core.modules.cms.common.AssetsManager;
-import com.asrevo.cvhome.store.core.modules.cms.impl.CMSManager;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.ByteArrayOutputStream;
@@ -13,19 +12,9 @@ import java.io.Serializable;
 public interface ContentAssetsManager extends AssetsManager, FileGet, FilePut, FileRemove, FolderPut, FolderList, FolderRemove, Serializable {
     char UNIX_SEPARATOR = '/';
     char WINDOWS_SEPARATOR = '\\';
-    String DEFAULT_BUCKET_NAME = "shopizer";
-    String DEFAULT_REGION_NAME = "us-east-1";
     String ROOT_NAME = "files";
 
-    CMSManager getCmsManager();
-
-    default String bucketName() {
-        String name = getCmsManager().getRootName();
-        if (StringUtils.isBlank(name)) {
-            name = DEFAULT_BUCKET_NAME;
-        }
-        return name;
-    }
+    String bucketName();
 
     default String nodePath(String store, FileContentType type) {
 

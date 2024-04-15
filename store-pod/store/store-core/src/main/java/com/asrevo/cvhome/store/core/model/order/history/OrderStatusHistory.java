@@ -11,14 +11,14 @@ import java.io.Serial;
 @Getter
 public class OrderStatusHistory extends Entity {
 
-	/**
-	 * 
-	 */
-	@Serial
-	private static final long serialVersionUID = 1L;
-	private long orderId;
-	private String orderStatus;
-	private String comments;
+    /**
+     *
+     */
+    @Serial
+    private static final long serialVersionUID = 1L;
+    private long orderId;
+    private String orderStatus;
+    private String comments;
 
 
 }
