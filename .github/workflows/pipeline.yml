@@ -51,7 +51,7 @@ jobs:
       - name: Test
         uses: gradle/gradle-build-action@749f47bda3e44aa060e82d7b3ef7e40d953bd629
         with:
-          arguments: test --scan --showStackTraces
+          arguments: test --scan --stacktrace --info
 #      - name: Build Docker with Gradle
 #        uses: gradle/gradle-build-action@749f47bda3e44aa060e82d7b3ef7e40d953bd629
 #        with:
