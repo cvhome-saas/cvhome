@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 
 import java.net.URI;
@@ -29,6 +30,7 @@ public class MinioS3Config {
                                 .pathStyleAccessEnabled(true)
                                 .chunkedEncodingEnabled(false)
                 )
+                .region(Region.EU_CENTRAL_1)
                 .credentialsProvider(StaticCredentialsProvider
                         .create(AwsBasicCredentials
                                 .create(minIOContainer.getAccessKey(), minIOContainer.getSecretKey())))
