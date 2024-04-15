@@ -65,7 +65,7 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: reports
-          path: ${{ github.workspace }}/**/reports/tests/test/index.html
+          path: ${{ github.workspace }}/**/reports/*/test/*
       - uses: actions/upload-artifact@v3
         with:
           name: libs
