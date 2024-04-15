@@ -189,6 +189,23 @@ import com.asrevo.cvhome.store.core.model.content.Content;
  * @param files
  * @param merchantStore
  * @param language
+ * <p>
+ * Works with ng-file-man client
+ * @param path
+ * @param merchantStore
+ * @param language
+ * @return
+ * @throws Exception
+ * @param path
+ * @param merchantStore
+ * @param language
+ * @return
+ * @throws Exception
+ * <p>
+ * works with file manager (javascript client)
+ * @param files
+ * @param merchantStore
+ * @param language
  *//*
 
 @RestController

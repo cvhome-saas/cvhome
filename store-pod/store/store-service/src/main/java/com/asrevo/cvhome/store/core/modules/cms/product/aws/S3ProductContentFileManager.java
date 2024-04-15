@@ -36,26 +36,31 @@ import java.util.Map;
 @Service
 public class S3ProductContentFileManager
         implements ProductAssetsManager {
-
-    /**
-     *
-     */
     @Serial
     private static final long serialVersionUID = 1L;
-    private final S3Client s3;
-
-
-    private static final String DEFAULT_BUCKET_NAME = "shopizer-content";
-    private static final String DEFAULT_REGION_NAME = "us-east-1";
     private static final String ROOT_NAME = "products";
-
     private static final char UNIX_SEPARATOR = '/';
     private static final char WINDOWS_SEPARATOR = '\\';
-
-
     private final static String SMALL = "SMALL";
     private final static String LARGE = "LARGE";
+    private final S3Client s3;
 
+    public static String getName(String filename) {
+        if (filename == null) {
+            return null;
+        }
+        int index = indexOfLastSeparator(filename);
+        return filename.substring(index + 1);
+    }
+
+    public static int indexOfLastSeparator(String filename) {
+        if (filename == null) {
+            return -1;
+        }
+        int lastUnixPos = filename.lastIndexOf(UNIX_SEPARATOR);
+        int lastWindowsPos = filename.lastIndexOf(WINDOWS_SEPARATOR);
+        return Math.max(lastUnixPos, lastWindowsPos);
+    }
 
     @Override
     public List<OutputContentFile> getImages(String merchantStoreCode,
@@ -225,7 +230,6 @@ public class S3ProductContentFileManager
 
     }
 
-
     private Bucket getBucket(String bucket_name) {
 
         Bucket named_bucket = null;
@@ -257,7 +261,6 @@ public class S3ProductContentFileManager
     private String bucketName() {
         return "cvhome";
     }
-
 
     private String nodePath(String store) {
         return new StringBuilder().append(ROOT_NAME).append(Constants.SLASH).append(store)
@@ -294,22 +297,5 @@ public class S3ProductContentFileManager
         return sb.append(Constants.SLASH).toString();
 
 
-    }
-
-    public static String getName(String filename) {
-        if (filename == null) {
-            return null;
-        }
-        int index = indexOfLastSeparator(filename);
-        return filename.substring(index + 1);
-    }
-
-    public static int indexOfLastSeparator(String filename) {
-        if (filename == null) {
-            return -1;
-        }
-        int lastUnixPos = filename.lastIndexOf(UNIX_SEPARATOR);
-        int lastWindowsPos = filename.lastIndexOf(WINDOWS_SEPARATOR);
-        return Math.max(lastUnixPos, lastWindowsPos);
     }
 }
