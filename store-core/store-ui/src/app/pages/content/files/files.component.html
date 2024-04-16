@@ -1,49 +1,66 @@
-<div class="inner_pages">
-  <h1 class="page_title_marg">Manage Files</h1>.
-  <ngx-dropzone class="custom_dropzone_click" (change)="handleUpload($event)">
-    <ngx-dropzone-label>Drop files here or click to upload.</ngx-dropzone-label>
-    <!-- <ngx-dropzone-preview *ngFor="let f of files" [removable]="true">
-      <ngx-dropzone-label>{{ f.name }} ({{ f.type }})</ngx-dropzone-label>
-    </ngx-dropzone-preview> -->
-  </ngx-dropzone>
-  <div class="row" [nbSpinner]="loadingList" nbSpinnerSize="large" nbSpinnerStatus="primary">
-    <div class="col-md-12 col-sm-12 col-xs-12 col-lg-12">
-      <div class="file_listing_scroll">
+<nb-card class="page-card inner_pages">
+  <nb-card-body [nbSpinner]="loadingList" nbSpinnerSize="large" nbSpinnerStatus="primary" class="image-content">
+    <div class="inner_pages_legacy">
+      <nb-card-header class="main_header">
+        <h1 class="page_title">{{ 'filemanager.title' | translate }}</h1>
+        <div class="content_spacing_empty"></div>
+      </nb-card-header>
+      <form class="form-inline filter_section">
+        <div class="filter_left_section">
+
+        </div>
+        <div class="filter_right_section">
+          <ngx-store-autocomplete (onStore)="onSelectStore($event)"></ngx-store-autocomplete>
+        </div>
+      </form>
+      <form class="form-inline filter_section">
+        <div class="filter_left_section">
+        </div>
+        <div class="filter_right_section">
+          <ngx-file-drop dropZoneLabel="Drop files here" (onFileDrop)="dropped($event)" accept="image/*">
+            <ng-template ngx-file-drop-content-tmp let-openFileSelector="openFileSelector">
+              <button nbButton status="primary" (click)="openFileSelector()">{{ 'COMMON.BROWSE_FILES' | translate }}</button>
+            </ng-template>
+          </ngx-file-drop>
+        </div>
+      </form>
+      <div [hidden]="files.length==0" class="file_listing_scroll">
         <ul class="file_listing_main">
-          <ngx-dropzone class="custom_dropzone_full" (change)="handleUpload($event)">
-            <!-- <ngx-dropzone-preview *ngFor="let f of files" [removable]="true">
-              <ngx-dropzone-label>{{ f.name }} ({{ f.type }})</ngx-dropzone-label>
-            </ngx-dropzone-preview> -->
-          </ngx-dropzone>
-          <li *ngFor="let images of data;let i=index">
+          <li *ngFor="let images of files;let i=index">
             <div class="file_listing_box">
               <div class="image-title-main">
                 <div class="close_main">
-                  <i class="fa fa-eye" (click)="openImage(i)"></i>
-                  <i class="fa fa-copy" (click)="copyText(images.path + images.name)"></i>
-                  <i class="fa fa-trash" (click)="removeImage(images.name)"></i>
+                  <i class="fa fa-eye" (click)="openImage(files,i)"></i>
+
+                  <i class="fa fa-trash" (click)="unSelectImage(i)"></i>
                 </div>
               </div>
-              <div class="image_box" *ngIf="images.contentType == 1">
-                <img src="{{images.path}}" class="banner-image">
-              </div>
-              <div class="image_box" *ngIf="images.contentType != 1">
-                <img src="{{images.path}}{{images.name}}" class="banner-image">
+              <div class="image_box">
+                <img [id]="'blah-'+i" [src]="images.src" class="banner-image"/>
               </div>
             </div>
           </li>
-          <!-- <li>
-            <ngx-dropzone class="dropzone_custom" (change)="onSelect($event)">
-              <ngx-dropzone-label>Drop files here or click to upload.</ngx-dropzone-label>
-              <ngx-dropzone-preview *ngFor="let f of files" [removable]="true">
-                <ngx-dropzone-label>{{ f.name }} ({{ f.type }})</ngx-dropzone-label>
-              </ngx-dropzone-preview>
-            </ngx-dropzone>
-            <!-- <upload [onUpload]="handleUpload" [multi]="true"></upload> --
-          </li> -->
+        </ul>
+        <button nbButton status="success" (click)="upload()" [disabled]="files.length==0">{{ 'filemanager.upload' | translate }}</button>
+      </div>
+      <div class="file_listing_scroll">
+        <ul class="file_listing_main">
+          <li *ngFor="let image of images;let i=index">
+            <div class="file_listing_box">
+              <div class="image-title-main">
+                <div class="close_main">
+                  <i class="fa fa-eye" (click)="openImage(images,i)"></i>
+                  <i class="fa fa-trash" (click)="removeImage(image.name)"></i>
+                </div>
+              </div>
+              <div class="image_box">
+                <img src="{{image.src}}" class="banner-image"/>
+              </div>
+            </div>
+          </li>
         </ul>
       </div>
-
     </div>
-  </div>
-</div>
+  </nb-card-body>
+</nb-card>
+

@@ -1,10 +1,11 @@
-import { Component } from '@angular/core';
-import { LocalDataSource } from 'ng2-smart-table';
-import { CrudService } from '../../shared/services/crud.service';
-import { NbDialogService } from '@nebular/theme';
-import { ShowcaseDialogComponent } from '../../shared/components/showcase-dialog/showcase-dialog.component';
-import { Lightbox } from 'ngx-lightbox';
-import { MalihuScrollbarService } from 'ngx-malihu-scrollbar';
+import {Component} from '@angular/core';
+import {CrudService} from '../../shared/services/crud.service';
+import {NbDialogService} from '@nebular/theme';
+import {Lightbox} from 'ngx-lightbox';
+import {IAlbum} from "ngx-lightbox/lightbox-event.service";
+import {ShowcaseDialogComponent} from "../../store-manager/shared/showcase-dialog/showcase-dialog.component";
+import {NgxFileDropEntry} from "ngx-file-drop";
+import {FileSystemFileEntry} from "ngx-file-drop/lib/dom.types";
 
 @Component({
   selector: 'files-content',
@@ -12,181 +13,136 @@ import { MalihuScrollbarService } from 'ngx-malihu-scrollbar';
   styleUrls: ['./files.component.scss'],
 })
 export class FilesComponent {
-  name: string;
-  copyText(val: string) {
-    let selBox = document.createElement('textarea');
-    selBox.style.position = 'fixed';
-    selBox.style.left = '0';
-    selBox.style.top = '0';
-    selBox.style.opacity = '0';
-    selBox.value = val;
-    document.body.appendChild(selBox);
-    selBox.focus();
-    selBox.select();
-    document.execCommand('copy');
-    document.body.removeChild(selBox);
-  }
-  files: File[] = [];
-  _albums: any[] = [];
-  onSelect(event) {
-  }
-  // onRemove(event) {
-  //   this.files.splice(this.files.indexOf(event), 1);
-  // }
-  data: Array<any> = [];
+  store: string = '';
   loadingList = false;
-  isDisbaled = false;
-  // settings = {
-  //   mode: 'external',
-  //   hideSubHeader: true,
-  //   actions: {
-  //     add: false,
-  //     edit: false,
-  //     delete: false,
-  //     position: 'right',
-  //     custom: [
-  //       {
-  //         name: 'delete',
-  //         title: '<i class="nb-trash"></i>'
-  //       }
-  //     ]
-  //   },
-  //   columns: {
-  //     name: {
-  //       title: 'Name',
-  //       type: 'string',
-  //     },
-  //     path: {
-  //       title: 'URL',
-  //       type: 'string',
-  //       valuePrepareFunction: (cell, row) => {
-  //         return row.path + row.name
-  //       }
-  //     }
-  //   },
-  // };
-
-  // source: LocalDataSource = new LocalDataSource();
+  files: FileImage[] = [];
+  images: FileImage[] = [];
 
   constructor(
     private crudService: CrudService,
     private dialogService: NbDialogService,
-    private _lightbox: Lightbox,
-    private mScrollbarService: MalihuScrollbarService,
-  ) {
-    this.getFiles()
+    private _lightbox: Lightbox) {
   }
-  // onClickAction(event) {
-  //   switch (event.action) {
-  //     case 'delete':
-  //       this.onDelete(event);
-  //   }
-  // }
+
+  onSelectStore(e) {
+    this.store = e.id
+    this.getFiles();
+  }
+
   getFiles() {
     this.loadingList = true;
-    this.crudService.get('/store/api/v1/content/folder')
-      .subscribe(data => {
-        this.loadingList = false;
-        this.data = data.content;
-        for (let i = 0; i < this.data.length; i++) {
-          const src = this.data[i].path + this.data[i].name;
-          const caption = this.data[i].name;
-          // const thumb = this.uploadedFiles[i].path + this.uploadedFiles[i].name;
-          const album = {
-            src: src,
-            caption: caption,
-            // thumb: thumb
-          };
-          this._albums.push(album);
-        }
-      }, error => {
-        this.loadingList = false;
-
-      });
-  }
-  // onChange(event) {
-  //   this.isDisbaled = true;
-  //   this.files = event.srcElement.files;
-  // }
-  handleUpload = (files: any) => {
-    console.log(files)
-    this.loadingList = true;
-    files.addedFiles.forEach(element => {
-      let reader = new FileReader();
-      reader.onload = (e: any) => {
-        this.data.push({
-          name: element.name,
-          contentType: 1,
-          path: e.target.result
-        });
-      }
-      reader.readAsDataURL(element);
-    });
-    for (var i = 0; i < files.addedFiles.length; i++) {
-
-      let formData = new FormData();
-      formData.append('file', files.addedFiles[i]);
-      this.crudService.post('/store/api/v1/private/file', formData)
-        .subscribe(data => {
+    this.crudService.get('/store/api/v1/content/images?store=' + this.store)
+      .subscribe({
+        next: (data: any) => {
+          this.images = data.content.map(img => {
+            const src = img.path + img.name;
+            return {
+              path: img.path,
+              name: img.name,
+              src: src,
+              thumb: src,
+            }
+          })
+        },
+        error: (data) => {
           this.loadingList = false;
-          // this.uploadedFiles = data.content;
-        }, error => {
-          this.loadingList = false;
-
-        });
-    }
+        },
+      })
 
   }
-  // uploadFiles() {
-  //   for (var i = 0; i < this.files.length; i++) {
-  //     let formData = new FormData();
-  //     formData.append('file', this.files[i]);
-  //     this.crudService.post('/store/api/v1/private/file', formData)
-  //       .subscribe(data => {
-  //         console.log(data);
-  //         this.loadingList = false;
-  //         this.getFiles();
-  //         // this.uploadedFiles = data.content;
-  //       }, error => {
-  //         this.loadingList = false;
 
-  //       });
-  //   }
-  // }
-        //context: {
-      //  title: 'Are you sure!',
-      //  body: 'Do you really want to remove this entity?'
-      //},
   removeImage(e) {
-    // this.loadingList = true;
-    /**
+    this.loadingList = true;
     this.dialogService.open(ShowcaseDialogComponent, {
-      context : {title: 'Do you really want to remove this entity?'}
+      context: {
+        title: 'Are you sure!',
+        text: 'Do you really want to remove this entity?'
+      }
     })
       .onClose.subscribe(res => {
-        if (res) {
-          this.loadingList = true;
-          this.crudService.delete('/store/api/v1/private/content/?contentType=IMAGE&name=' + e)
-            .subscribe(data => {
+      if (res) {
+        this.loadingList = true;
+        this.crudService.delete(`/store/api/v1/private/content/?store=${this.store}&contentType=IMAGE&name=${e}`)
+          .subscribe({
+            next: (data) => {
               this.loadingList = false;
-              // this.toastr.success('Page deleted successfully');
               this.getFiles();
-            }, error => {
+            },
+            error: (data) => {
               this.loadingList = false;
-            });
-        } else {
-          this.loadingList = false;
-        }
-      });
-      **/
+            },
+          });
+      } else {
+        this.loadingList = false;
+      }
+    });
   }
-  ngAfterViewInit() {
-    this.mScrollbarService.initScrollbar('.file_listing_scroll', { axis: 'y', theme: 'minimal-dark', scrollButtons: { enable: true } });
+
+  openImage(data: FileImage[], index: number): void {
+    this._lightbox.open(data, index);
   }
-  openImage(index: number): void {
-    this._lightbox.open(this._albums, index);
-  }
+
   close(): void {
     this._lightbox.close();
   }
+
+  unSelectImage(i: number) {
+    this.files.splice(i, 1);
+  }
+
+  readURL(file: File) {
+    const reader = new FileReader();
+    const me = this;
+    reader.onload = function (e) {
+      const data: string = e.target.result as string;
+      const item = {
+        file,
+        src: data,
+        thumb: data,
+      };
+      me.files.push(item);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  public dropped(files: NgxFileDropEntry[]) {
+    this.files = [];
+    files.forEach(droppedFile => {
+      if (droppedFile.fileEntry.isFile) {
+        const fileEntry: FileSystemFileEntry = droppedFile.fileEntry as FileSystemFileEntry;
+        fileEntry.file((file: File) => {
+          this.readURL(file)
+        });
+      }
+    });
+
+  }
+
+  upload() {
+    let formData = new FormData();
+    this.files.forEach(item => {
+      formData.append("files", item.file);
+    });
+    if (this.files.length > 0) {
+      this.crudService.post(`/store/api/v1/private/files?store=${this.store}`, formData)
+        .subscribe({
+          next: (data) => {
+            console.log(data);
+            this.loadingList = false;
+            this.getFiles();
+          },
+          error: (err) => {
+            this.loadingList = false;
+          },
+        });
+    }
+    this.files = [];
+  }
+}
+
+
+interface FileImage extends IAlbum {
+  file?: File
+  path?: string
+  name?: string
 }

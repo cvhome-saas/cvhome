@@ -7,6 +7,7 @@ import {BoxesComponent} from './boxes/boxes.component';
 import {AddPageComponent} from './pages/add-page.component';
 import {AddBoxComponent} from './boxes/add-box.component';
 import {ImagesComponent} from "./images/images.component";
+import {FilesComponent} from "./files/files.component";
 
 const routes: Routes = [{
   path: '',
@@ -39,16 +40,16 @@ const routes: Routes = [{
     {
       path: 'images/list',
       component: ImagesComponent,
-    }/*,
+    },
     {
       path: 'files/list',
       component: FilesComponent,
     },
-    {
-      path: 'promotion',
-      component: PromotionComponent,
-    }
-*/],
+    /*   {
+         path: 'promotion',
+         component: PromotionComponent,
+       }
+   */],
 }];
 
 @NgModule({
@@ -64,9 +65,9 @@ export const routedComponents = [
   AddPageComponent,
   BoxesComponent,
   AddBoxComponent,
-    ImagesComponent,
+  ImagesComponent,
+  FilesComponent
   /*  UploadComponent,
   PromotionComponent,
-  FilesComponent
 */
 ];

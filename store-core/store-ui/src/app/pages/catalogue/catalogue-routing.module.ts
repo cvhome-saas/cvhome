@@ -30,11 +30,11 @@ const routes: Routes = [{
     //   loadChildren: () => import('./catalogues/catalogues.module')
     //     .then(m => m.CataloguesModule),
     // },
-    {
-      path: 'products-groups',
-      loadChildren: () => import('./products-groups/products-groups.module')
-        .then(m => m.ProductsGroupsModule),
-    },
+    // {
+    //   path: 'products-groups',
+    //   loadChildren: () => import('./products-groups/products-groups.module')
+    //     .then(m => m.ProductsGroupsModule),
+    // },
     // {
     //   path: 'options',
     //   loadChildren: () => import('./options/options.module')

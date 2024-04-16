@@ -611,16 +611,16 @@ export const MENU_ITEMS: MenuItem[] =
           key: 'COMPONENTS.CONTENT_BOXES',
           link: '/pages/content/boxes/list',
         },
-        {
-          title: 'COMPONENTS.CONTENT_IMAGES',
-          key: 'COMPONENTS.CONTENT_IMAGES',
-          link: '/pages/content/images/list',
-        },
         // {
-        //   title: 'COMPONENTS.CONTENT_FILES',
-        //   key: 'COMPONENTS.CONTENT_FILES',
-        //   link: '/pages/content/files/list',
+        //   title: 'COMPONENTS.CONTENT_IMAGES',
+        //   key: 'COMPONENTS.CONTENT_IMAGES',
+        //   link: '/pages/content/images/list',
         // },
+        {
+          title: 'COMPONENTS.CONTENT_FILES',
+          key: 'COMPONENTS.CONTENT_FILES',
+          link: '/pages/content/files/list',
+        },
         // {
         //   title: 'Promotion',
         //   key: 'sideNav.managecontent',

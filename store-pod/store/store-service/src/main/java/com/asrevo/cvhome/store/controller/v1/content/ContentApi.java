@@ -451,13 +451,14 @@ public class ContentApi {
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
-    public void uploadMultipleFiles(@RequestParam(value = "file[]", required = true) MultipartFile[] files,
-                                    @Parameter(hidden = true) MerchantStore merchantStore, @Parameter(hidden = true) Language language) {
+    public void uploadMultipleFiles(@RequestParam(value = "files") MultipartFile[] files,
+                                    @Parameter(hidden = true) MerchantStore merchantStore,
+                                    @Parameter(hidden = true) Language language) {
 
         for (MultipartFile f : files) {
             ContentFile cf = new ContentFile();
             cf.setContentType(f.getContentType());
-            cf.setName(f.getName());
+            cf.setName(f.getOriginalFilename());
             try {
                 cf.setFile(f.getBytes());
                 contentFacade.addContentFile(cf, merchantStore.getCode());

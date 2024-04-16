@@ -4,7 +4,8 @@ import { NbDialogModule } from '@nebular/theme';
 import { LightboxModule } from 'ngx-lightbox';
 import { NgxSummernoteModule } from 'ngx-summernote';
 import {SharedModule} from "../store-manager/shared/shared.module";
-import {DropzoneCdkModule} from "@ngx-dropzone/cdk";
+import {NgOptimizedImage} from "@angular/common";
+import {NgxFileDropModule} from "ngx-file-drop";
 @NgModule({
   declarations: [
     ...routedComponents
@@ -14,8 +15,9 @@ import {DropzoneCdkModule} from "@ngx-dropzone/cdk";
     SharedModule,
     NbDialogModule.forChild(),
     NgxSummernoteModule,
-    DropzoneCdkModule,
     LightboxModule,
+    NgOptimizedImage,
+    NgxFileDropModule
   ],
   exports: []
 })
