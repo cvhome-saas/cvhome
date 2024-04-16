@@ -81,6 +81,9 @@ public class MinIOContainer extends GenericContainer<MinIOContainer> {
      */
     @Override
     public void configure() {
+        this.addEnv("MINIO_API_PORT_NUMBER", MINIO_S3_PORT + "");
+        this.addEnv("MINIO_CONSOLE_PORT_NUMBER", MINIO_UI_PORT + "");
+
         if (this.userName != null) {
             addEnv("MINIO_ROOT_USER", this.userName);
         } else {
@@ -117,7 +120,7 @@ public class MinIOContainer extends GenericContainer<MinIOContainer> {
     }
 
     public String getUiURL() {
-        return String.format("http://%s:%s", this.getHost(), getMappedPort(MINIO_UI_PORT));
+        return String.format("http://%s:%s", this.getHost(), (getMappedPort(MINIO_UI_PORT) - 1));
     }
 
     public String getUserName() {

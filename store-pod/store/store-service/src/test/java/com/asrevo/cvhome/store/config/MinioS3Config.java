@@ -11,14 +11,21 @@ import software.amazon.awssdk.services.s3.S3Client;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.UUID;
+import java.util.function.Supplier;
 
 @Configuration
 public class MinioS3Config {
     @Bean
     public MinIOContainer minIOContainer(DynamicPropertyRegistry properties) {
+        String bucket = UUID.randomUUID().toString();
         MinIOContainer container = new MinIOContainer("bitnami/minio")
-                .withEnv("MINIO_DEFAULT_BUCKETS", "cvhome");
+                .withEnv("MINIO_DEFAULT_BUCKETS", bucket);
         container.start();
+        Supplier<Object> getUiURL = container::getUiURL;
+        properties.add("com.asrevo.cvhome.cdn.basePath", getUiURL);
+        properties.add("com.asrevo.cvhome.cdn.storage.bucket", () -> bucket);
+        properties.add("com.asrevo.cvhome.cdn.storage.provider", () -> "minio");
         return container;
     }
 

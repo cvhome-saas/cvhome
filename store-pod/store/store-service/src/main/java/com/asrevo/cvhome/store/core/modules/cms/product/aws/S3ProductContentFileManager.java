@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.store.core.modules.cms.product.aws;
 
+import com.asrevo.cvhome.s2s.model.CdnStorageProperties;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.entity.catalog.product.Product;
 import com.asrevo.cvhome.store.core.entity.catalog.product.file.ProductImageSize;
@@ -44,6 +45,7 @@ public class S3ProductContentFileManager
     private final static String SMALL = "SMALL";
     private final static String LARGE = "LARGE";
     private final S3Client s3;
+    private final CdnStorageProperties cdnStorageProperties;
 
     public static String getName(String filename) {
         if (filename == null) {
@@ -259,7 +261,7 @@ public class S3ProductContentFileManager
     }
 
     private String bucketName() {
-        return "cvhome";
+        return this.cdnStorageProperties.bucket();
     }
 
     private String nodePath(String store) {
