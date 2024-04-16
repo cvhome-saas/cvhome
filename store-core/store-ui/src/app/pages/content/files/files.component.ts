@@ -42,7 +42,8 @@ export class FilesComponent {
               src: src,
               thumb: src,
             }
-          })
+          });
+          this.loadingList = false;
         },
         error: (data) => {
           this.loadingList = false;
