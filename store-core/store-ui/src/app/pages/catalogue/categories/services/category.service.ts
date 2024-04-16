@@ -19,6 +19,10 @@ export class CategoryService {
     return this.crudService.get(`/store/api/v1/category`, params);
   }
 
+  getListOfCategories0(params?): Observable<any> {
+    return this.crudService.get(`/store/api/v1/private/category`, params);
+  }
+
   getCategoryById(id, store): Observable<any> {
     const params = {
       lang: '_all'

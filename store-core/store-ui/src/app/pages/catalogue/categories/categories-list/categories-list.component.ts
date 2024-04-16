@@ -89,7 +89,7 @@ export class CategoriesListComponent implements OnInit {
     this.loadingList = true;
     var page = this.currentPage - 1;
     this.params.page = page;
-    this.categoryService.getListOfCategories(this.params)
+    this.categoryService.getListOfCategories0(this.params)
       .subscribe({
           next: (data) => {
             data.categories.forEach((el) => {
