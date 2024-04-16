@@ -11,6 +11,7 @@ import { CategoryDetailComponent } from './category-detail/category-detail.compo
 import { NgxSummernoteModule } from 'ngx-summernote';
 import { NbDialogModule } from '@nebular/theme';
 import {SharedModule} from "../../store-manager/shared/shared.module";
+import {TreeModule} from "@odymaui/angular-tree-component";
 
 
 @NgModule({
@@ -28,6 +29,7 @@ import {SharedModule} from "../../store-manager/shared/shared.module";
     SharedModule,
     NgxSummernoteModule,
     NbDialogModule.forChild(),
+    TreeModule
   ],
   providers: []
 })

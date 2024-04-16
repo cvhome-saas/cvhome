@@ -28,6 +28,7 @@
     "@ngx-dropzone/material": "^16.1.1",
     "@ngx-translate/core": "^15.0.0",
     "@ngx-translate/http-loader": "^8.0.0",
+    "@odymaui/angular-tree-component": "^16.0.4",
     "@swimlane/ngx-charts": "20.0.0",
     "@swimlane/ngx-datatable": "^20.1.0",
     "@types/jasminewd2": "^2.0.13",

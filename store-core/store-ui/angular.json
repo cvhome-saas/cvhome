@@ -39,7 +39,8 @@
               "node_modules/leaflet/dist/leaflet.css",
               "node_modules/summernote/dist/summernote-lite.min.css",
               "src/app/@theme/styles/styles.scss",
-              "node_modules/ngx-lightbox/lightbox.css"
+              "node_modules/ngx-lightbox/lightbox.css",
+              "node_modules/@odymaui/angular-tree-component/css/angular-tree-component.css"
             ],
             "scripts": [
               "node_modules/pace-js/pace.min.js",

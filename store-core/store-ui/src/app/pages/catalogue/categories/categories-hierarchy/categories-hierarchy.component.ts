@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, ViewChild} from '@angular/core';
 import {CategoryService} from '../services/category.service';
 import {TranslateService} from '@ngx-translate/core';
 import {StorageService} from '../../../shared/services/storage.service';
@@ -9,22 +9,20 @@ import {NbToastrService} from "@nebular/theme";
   templateUrl: './categories-hierarchy.component.html',
   styleUrls: ['./categories-hierarchy.component.scss']
 })
-export class CategoriesHierarchyComponent implements OnInit {
-  // @ViewChild('tree', { static: false }) tree;
-  nodes = [];
+export class CategoriesHierarchyComponent {
+  @ViewChild('tree', {static: false}) tree;
+  nodes: TreeNode[] = [];
   options = {
     allowDrag: true
   }
   loader = false;
-  loading: boolean = false;
   params = this.loadParams();
 
   constructor(
     private categoryService: CategoryService,
     private toastr: NbToastrService,
     private translate: TranslateService,
-    private storageService: StorageService,
-  ) {
+    private storageService: StorageService) {
   }
 
   loadParams() {
@@ -35,38 +33,42 @@ export class CategoriesHierarchyComponent implements OnInit {
     };
   }
 
-  ngOnInit() {
-  }
-
   getList() {
-    // TODO need possibility to get all items at once
     this.loader = true;
     this.categoryService.getListOfCategories(this.params)
       .subscribe(res => {
-        res.categories.forEach((el) => {
-          this.transformList(el);
-        });
-        this.nodes = res.categories
+        this.nodes = this.toTreeRoot(res.categories)
         this.loader = false;
       });
   }
 
-  transformList(node) {
-    node.name = node.description.name;
-    node.title = node.description.title;
-    node.description = node.description.description;
-    if (node.children && node.children.length !== 0) {
-      node.children.forEach((el) => {
-        this.transformList(el);
-      });
-    }
+  toTreeRoot(categories: any[]): TreeNode[] {
+    const root = this.toNode(undefined, "-1");
+    this.toTreeNode(root, categories);
+    return [root]
   }
 
+  toTreeNode(root: TreeNode, categories: any[]): void {
+    categories.forEach(it => {
+      const node: TreeNode = this.toNode(it.description.name, it.id);
+      root.children.push(node);
+      if (it.children) {
+        this.toTreeNode(node, it.children)
+      }
+    });
+  }
+
+  toNode(name?: string, id?: string): TreeNode {
+    return {
+      id: id,
+      name: name ? name : "root",
+      children: []
+    };
+  }
+
+
   onMoveNode(event) {
-    //console.log(event);
-    // const someNode = this.tree.treeModel.getNodeById(event.to.parent.id);
-    // someNode.expand();
-    var parentId = event.to.parent.id;
+    let parentId = event.to.parent.id;
 
     if (event.to.parent.name === undefined) {
       parentId = -1;
@@ -79,7 +81,13 @@ export class CategoriesHierarchyComponent implements OnInit {
   }
 
   onSelectStore($event) {
-    this.params.store=$event.id
+    this.params.store = $event.id
     this.getList();
   }
+}
+
+interface TreeNode {
+  id: string
+  name: string
+  children: TreeNode[];
 }
