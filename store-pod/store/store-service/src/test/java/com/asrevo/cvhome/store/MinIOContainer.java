@@ -120,6 +120,10 @@ public class MinIOContainer extends GenericContainer<MinIOContainer> {
     }
 
     public String getUiURL() {
+        return String.format("http://%s:%s", this.getHost(), (getMappedPort(MINIO_UI_PORT)));
+    }
+
+    public String getAdminURL() {
         return String.format("http://%s:%s", this.getHost(), (getMappedPort(MINIO_UI_PORT) - 1));
     }
 
