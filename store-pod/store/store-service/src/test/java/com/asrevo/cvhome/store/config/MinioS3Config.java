@@ -22,10 +22,11 @@ public class MinioS3Config {
         MinIOContainer container = new MinIOContainer("bitnami/minio")
                 .withEnv("MINIO_DEFAULT_BUCKETS", bucket);
         container.start();
-        Supplier<Object> getUiURL = container::getUiURL;
+        Supplier<Object> getUiURL = () -> container.getUiURL() + "/" + bucket;
         properties.add("com.asrevo.cvhome.cdn.basePath", getUiURL);
         properties.add("com.asrevo.cvhome.cdn.storage.bucket", () -> bucket);
         properties.add("com.asrevo.cvhome.cdn.storage.provider", () -> "minio");
+        System.out.println(container.getAdminURL());
         return container;
     }
 
