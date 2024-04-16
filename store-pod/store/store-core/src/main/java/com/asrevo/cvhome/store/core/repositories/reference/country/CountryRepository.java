@@ -13,10 +13,11 @@ public interface CountryRepository extends JpaRepository<Country, Integer> {
     Country findByIsoCode(String code);
 
 
-    @Query("select c from Country c "
-            + "left join fetch c.descriptions cd "
-            + "left join fetch c.zones cz left join fetch cz.descriptions "
-            + "where cd.language.id=?1")
+    @Query("""
+            select c from Country c
+            left join fetch c.descriptions cd
+            left join fetch c.zones cz left join fetch cz.descriptions
+            where cd.language.id=?1""")
     List<Country> listByLanguage(Integer id);
 
     /**
