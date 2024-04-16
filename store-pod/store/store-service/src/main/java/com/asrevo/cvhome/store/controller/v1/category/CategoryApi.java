@@ -100,13 +100,40 @@ public class CategoryApi {
      *
      * @return
      */
-    @GetMapping(value = "/category", produces = {APPLICATION_JSON_VALUE})
+    @GetMapping(value = "private/category", produces = {APPLICATION_JSON_VALUE})
     @Operation(method = "GET", description = "Get category hierarchy from root. Supports filtering FEATURED_CATEGORIES and VISIBLE ONLY by adding ?filter=[featured] or ?filter=[visible] or ? filter=[featured,visible", summary = "Does not return any product attached")
     @Parameters({
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public ReadableCategoryList list(
+            @RequestParam(value = "filter", required = false) List<String> filter,
+            @RequestParam(value = "name", required = false) String name,
+            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) Language language,
+            @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
+            @RequestParam(value = "count", required = false, defaultValue = "10") Integer count) {
+
+
+        ListCriteria criteria = new ListCriteria();
+        criteria.setName(name);
+        return categoryFacade.getReadableCategoryList(merchantStore, criteria, DEFAULT_CATEGORY_DEPTH, language, filter,
+                page, count);
+    }
+
+    /**
+     * Get all category starting from root filter can be used for filtering on
+     * fields only featured is supported
+     *
+     * @return
+     */
+    @GetMapping(value = "/category", produces = {APPLICATION_JSON_VALUE})
+    @Operation(method = "GET", description = "Get category hierarchy from root. Supports filtering FEATURED_CATEGORIES and VISIBLE ONLY by adding ?filter=[featured] or ?filter=[visible] or ? filter=[featured,visible", summary = "Does not return any product attached")
+    @Parameters({
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
+    })
+    public ReadableCategoryList hierarchyList(
             @RequestParam(value = "filter", required = false) List<String> filter,
             @RequestParam(value = "name", required = false) String name,
             @Parameter(hidden = true) MerchantStore merchantStore,

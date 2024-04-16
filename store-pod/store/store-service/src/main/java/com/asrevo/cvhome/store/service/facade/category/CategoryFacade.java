@@ -3,6 +3,7 @@ package com.asrevo.cvhome.store.service.facade.category;
 import com.asrevo.cvhome.store.core.entity.catalog.category.Category;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
+import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.catalog.category.PersistableCategory;
 import com.asrevo.cvhome.store.core.model.catalog.category.ReadableCategory;
 import com.asrevo.cvhome.store.core.model.catalog.category.ReadableCategoryList;
@@ -13,6 +14,19 @@ import java.util.List;
 
 public interface CategoryFacade {
 
+
+    /**
+     * Returns a list of ReadableCategory ordered and built according to a given depth
+     *
+     * @param store
+     * @param depth
+     * @param language
+     * @param filter
+     * @param page
+     * @param count
+     * @return ReadableCategoryList
+     */
+    ReadableCategoryList getReadableCategoryList(MerchantStore store, ListCriteria criteria, int depth, Language language, List<String> filter, int page, int count) ;
 
     /**
      * Returns a list of ReadableCategory ordered and built according to a given depth

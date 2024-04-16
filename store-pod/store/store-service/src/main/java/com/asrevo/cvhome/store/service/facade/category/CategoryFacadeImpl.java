@@ -59,12 +59,51 @@ public class CategoryFacadeImpl implements CategoryFacade {
 
 
         //get parent store
+
+
+        ReadableCategoryList returnList = getReadableCategoryList(store, criteria, depth, language, filter, page, count);
+
+        Map<Long, ReadableCategory> readableCategoryMap = returnList.getCategories().stream()
+                .collect(Collectors.toMap(ReadableCategory::getId, Function.identity()));
+
+        returnList.getCategories().stream()
+                // .filter(ReadableCategory::isVisible)
+                .filter(cat -> Objects.nonNull(cat.getParent()))
+                .filter(cat -> readableCategoryMap.containsKey(cat.getParent().getId())).forEach(readableCategory -> {
+                    ReadableCategory parentCategory = readableCategoryMap.get(readableCategory.getParent().getId());
+                    if (parentCategory != null) {
+                        parentCategory.getChildren().add(readableCategory);
+                    }
+                });
+
+        List<ReadableCategory> filteredList = new ArrayList<>(readableCategoryMap.values());
+
+        //execute only if not admin filtered
+        if (filter == null || (filter != null && !filter.contains(ADMIN_CATEGORY))) {
+            filteredList = readableCategoryMap.values().stream().filter(cat -> cat.getDepth() == 0)
+                    .sorted(Comparator.comparing(ReadableCategory::getSortOrder)).collect(Collectors.toList());
+
+            returnList.setNumber(filteredList.size());
+
+        }
+
+        returnList.setCategories(filteredList);
+
+
+        return returnList;
+
+
+    }
+
+    @Override
+    public ReadableCategoryList getReadableCategoryList(MerchantStore store, ListCriteria criteria, int depth, Language language, List<String> filter, int page, int count) {
         try {
+
 
             MerchantStore parent = merchantStoreService.getParent(store.getCode());
 
 
-            List<Category> categories = null;
+            List<Category> categories;
             ReadableCategoryList returnList = new ReadableCategoryList();
             if (!CollectionUtils.isEmpty(filter) && filter.contains(FEATURED_CATEGORY)) {
                 categories = categoryService.getListByDepthFilterByFeatured(parent, depth, language);
@@ -81,50 +120,21 @@ public class CategoryFacadeImpl implements CategoryFacade {
             }
 
 
-            List<ReadableCategory> readableCategories = null;
             if (filter != null && filter.contains(VISIBLE_CATEGORY)) {
-                readableCategories = categories.stream().filter(Category::isVisible)
+                List<ReadableCategory> categoryList = categories.stream().filter(Category::isVisible)
                         .map(cat -> readableCategoryMapper.convert(cat, store, language))
                         .collect(Collectors.toList());
+                returnList.setCategories(categoryList);
             } else {
-                readableCategories = categories.stream()
+                List<ReadableCategory> categoryList = categories.stream()
                         .map(cat -> readableCategoryMapper.convert(cat, store, language))
                         .collect(Collectors.toList());
+                returnList.setCategories(categoryList);
             }
-
-            Map<Long, ReadableCategory> readableCategoryMap = readableCategories.stream()
-                    .collect(Collectors.toMap(ReadableCategory::getId, Function.identity()));
-
-            readableCategories.stream()
-                    // .filter(ReadableCategory::isVisible)
-                    .filter(cat -> Objects.nonNull(cat.getParent()))
-                    .filter(cat -> readableCategoryMap.containsKey(cat.getParent().getId())).forEach(readableCategory -> {
-                        ReadableCategory parentCategory = readableCategoryMap.get(readableCategory.getParent().getId());
-                        if (parentCategory != null) {
-                            parentCategory.getChildren().add(readableCategory);
-                        }
-                    });
-
-            List<ReadableCategory> filteredList = new ArrayList<>(readableCategoryMap.values());
-
-            //execute only if not admin filtered
-            if (filter == null || (filter != null && !filter.contains(ADMIN_CATEGORY))) {
-                filteredList = readableCategoryMap.values().stream().filter(cat -> cat.getDepth() == 0)
-                        .sorted(Comparator.comparing(ReadableCategory::getSortOrder)).collect(Collectors.toList());
-
-                returnList.setNumber(filteredList.size());
-
-            }
-
-            returnList.setCategories(filteredList);
-
-
             return returnList;
-
         } catch (ServiceException e) {
             throw new ServiceRuntimeException(e);
         }
-
     }
 
     @Override
