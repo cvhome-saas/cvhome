@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.store.config;
 
+import com.asrevo.cvhome.s2s.model.CdnStorageProperties;
 import com.asrevo.cvhome.store.core.modules.cms.content.ContentAssetsManager;
 import com.asrevo.cvhome.store.core.modules.cms.s3.S3StaticContentAssetsManagerImpl;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -16,8 +17,8 @@ public class S3Config {
     }
 
     @Bean
-    public ContentAssetsManager staticContentFileManager(S3Client s3Client) {
-        return new S3StaticContentAssetsManagerImpl(s3Client);
+    public ContentAssetsManager staticContentFileManager(S3Client s3Client, CdnStorageProperties properties) {
+        return new S3StaticContentAssetsManagerImpl(s3Client, properties);
     }
 
 }

@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.store.core.modules.cms.s3;
 
+import com.asrevo.cvhome.s2s.model.CdnStorageProperties;
 import com.asrevo.cvhome.store.core.entity.content.FileContentType;
 import com.asrevo.cvhome.store.core.entity.content.InputContentFile;
 import com.asrevo.cvhome.store.core.entity.content.OutputContentFile;
@@ -33,9 +34,11 @@ public class S3StaticContentAssetsManagerImpl implements ContentAssetsManager {
     @Serial
     private static final long serialVersionUID = 1L;
     private final S3Client s3;
+    private final CdnStorageProperties cdnStorageProperties;
 
-    public S3StaticContentAssetsManagerImpl(S3Client s3Client) {
+    public S3StaticContentAssetsManagerImpl(S3Client s3Client, CdnStorageProperties cdnStorageProperties) {
         this.s3 = s3Client;
+        this.cdnStorageProperties = cdnStorageProperties;
     }
 
 
@@ -280,7 +283,7 @@ public class S3StaticContentAssetsManagerImpl implements ContentAssetsManager {
 
     @Override
     public String bucketName() {
-        return "cvhome";
+        return this.cdnStorageProperties.bucket();
     }
 
 }

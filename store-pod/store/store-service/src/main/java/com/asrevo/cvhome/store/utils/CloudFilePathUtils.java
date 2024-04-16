@@ -7,6 +7,8 @@ import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 @Component
 public class CloudFilePathUtils implements AbstractimageFilePath {
 
@@ -25,7 +27,7 @@ public class CloudFilePathUtils implements AbstractimageFilePath {
 
     @Override
     public String getContextPath() {
-        return this.cdnProperties.contextPath();
+        return Optional.ofNullable(this.cdnProperties.contextPath()).orElse("");
     }
 
     /**
