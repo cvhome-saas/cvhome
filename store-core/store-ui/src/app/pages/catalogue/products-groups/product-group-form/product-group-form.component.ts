@@ -83,7 +83,7 @@ export class ProductGroupFormComponent implements OnInit {
       });
   }
   getProductByCode() {
-    this.productGroupsService.getProductsByGroup(this.uniqueCode, this.itemsParams)
+    this.productGroupsService.getProductsByGroup("this.store",this.uniqueCode, this.itemsParams)
       .subscribe(res => {
         let temp = []
         res.products.map((value) => {
@@ -137,12 +137,12 @@ export class ProductGroupFormComponent implements OnInit {
   }
 
   save() {
-    this.productGroupsService.createProductGroup(this.form.value).subscribe(res => {
+    this.productGroupsService.createProductGroup("this.store",this.form.value).subscribe(res => {
       this.router.navigate(['pages/catalogue/products-groups/groups-list']);
     });
   }
   update() {
-    this.productGroupsService.updateGroupActiveValue(this.form.value)
+    this.productGroupsService.updateGroupActiveValue("this.store",this.form.value)
       .subscribe(res => {
         this.router.navigate(['pages/catalogue/products-groups/groups-list']);
       });
@@ -160,7 +160,7 @@ export class ProductGroupFormComponent implements OnInit {
   }
   addProductToGroup(productId, groupCode) {
     this.loading = true;
-    this.productGroupsService.addProductToGroup(productId, groupCode)
+    this.productGroupsService.addProductToGroup("this.store",productId, groupCode)
       .subscribe(res => {
         this.loading = false;
       });
@@ -168,7 +168,7 @@ export class ProductGroupFormComponent implements OnInit {
 
   removeProductFromGroup(productId, groupCode) {
     this.loading = true;
-    this.productGroupsService.removeProductFromGroup(productId, groupCode)
+    this.productGroupsService.removeProductFromGroup("this.store",productId, groupCode)
       .subscribe(res => {
         this.loading = false;
       });

@@ -28,9 +28,9 @@ export class ProductsGroupsListComponent implements OnInit {
       count: -1,
       start: 0
     };
-    
+
     forkJoin(
-      this.productService.getListOfProducts(params), 
+      this.productService.getListOfProducts(params),
       this.productGroupsService.getListOfProductGroups({ store: this.storageService.getMerchant() }))
       .subscribe(([products, groups]) => {
         this.availableList = [...products.products];
@@ -59,7 +59,7 @@ export class ProductsGroupsListComponent implements OnInit {
       case 'allToTarget':
         const addArray = [];
         e.items.forEach((el) => {
-          const req = this.productGroupsService.addProductToGroup(el.id, this.selectedGroup);
+          const req = this.productGroupsService.addProductToGroup("this.store",el.id, this.selectedGroup);
           addArray.push(req);
         });
         forkJoin(addArray).subscribe(res => {
@@ -69,7 +69,7 @@ export class ProductsGroupsListComponent implements OnInit {
       case 'allToSource':
         const removeArr = [];
         e.items.forEach((el) => {
-          const req = this.productGroupsService.removeProductFromGroup(el.id, this.selectedGroup);
+          const req = this.productGroupsService.removeProductFromGroup("this.store",el.id, this.selectedGroup);
           removeArr.push(req);
         });
         forkJoin(removeArr).subscribe(res => {
@@ -80,14 +80,14 @@ export class ProductsGroupsListComponent implements OnInit {
   }
 
   addProductToGroup(productId, groupCode) {
-    this.productGroupsService.addProductToGroup(productId, groupCode)
+    this.productGroupsService.addProductToGroup("this.store",productId, groupCode)
       .subscribe(res => {
         //console.log(res);
       });
   }
 
   removeProductFromGroup(productId, groupCode) {
-    this.productGroupsService.removeProductFromGroup(productId, groupCode)
+    this.productGroupsService.removeProductFromGroup("this.store",productId, groupCode)
       .subscribe(res => {
         //console.log(res);
       });
@@ -95,7 +95,7 @@ export class ProductsGroupsListComponent implements OnInit {
 
   selectGroup(groupCode) {
     this.selectedGroup = groupCode;
-    this.productGroupsService.getProductsByGroup(this.selectedGroup, this.itemsParams)
+    this.productGroupsService.getProductsByGroup("this.store",this.selectedGroup, this.itemsParams)
       .subscribe(res => {
         this.selectedList = [...res.products];
         this.availableList = this.availableList.filter(n => !this.selectedList.some(n2 => n.id === n2.id));

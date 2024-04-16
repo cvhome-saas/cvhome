@@ -17,7 +17,7 @@ export class ProductGroupsService {
 
   getListOfProductGroups(param): Observable<any> {
     // const store = this.storageService.getMerchant();
-    return this.crudService.get(`/v1/private/product/groups`, param);
+    return this.crudService.get(`/store/api/v1/private/product/groups`, param);
   }
 
   // TODO
@@ -25,31 +25,31 @@ export class ProductGroupsService {
   //   const params = {
   //     'code': code,
   //   };
-  //   return this.crudService.get(`/v1/private/product/unique`, params);
+  //   return this.crudService.get(`/store/api/v1/private/product/unique`, params);
   // }
 
   createProductGroup(store, group): Observable<any> {
-    return this.crudService.post(`/v1/private/product/group?store=${store}`, group);
+    return this.crudService.post(`/store/api/v1/private/product/group?store=${store}`, group);
   }
 
   updateGroupActiveValue(store, group): Observable<any> {
-    return this.crudService.patch(`/v1/private/product/group/${group.code}?store=${store}`, group);
+    return this.crudService.patch(`/store/api/v1/private/product/group/${group.code}?store=${store}`, group);
   }
 
   addProductToGroup(store, productId, groupCode): Observable<any> {
-    return this.crudService.post(`/v1/private/product/${productId}/group/${groupCode}?store=${store}`, {});
+    return this.crudService.post(`/store/api/v1/private/product/${productId}/group/${groupCode}?store=${store}`, {});
   }
 
   removeProductFromGroup(store, productId, groupCode) {
-    return this.crudService.delete(`/v1/private/product/${productId}/group/${groupCode}?store=${store}`);
+    return this.crudService.delete(`/store/api/v1/private/product/${productId}/group/${groupCode}?store=${store}`);
   }
 
   getProductsByGroup(store, groupCode, params) {
-    return this.crudService.get(`/v1/product/group/${groupCode}?store=${store}`, params);
+    return this.crudService.get(`/store/api/v1/product/group/${groupCode}?store=${store}`, params);
   }
 
   removeProductGroup(store, groupCode) {
-    return this.crudService.delete(`/v1/product/group/${groupCode}?store=${store}`);
+    return this.crudService.delete(`/store/api/v1/product/group/${groupCode}?store=${store}`);
   }
 
 }

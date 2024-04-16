@@ -11,36 +11,69 @@
 
       <form class="form-inline filter_section">
         <div class="filter_left_section">
-          <!-- <input #search class="search form-control ng-pristine ng-valid ng-touched" value="{{ searchValue }}" type="text"
-            placeholder="{{ 'COMPONENTS.SEARCH' | translate }}" (keydown.enter)="onSearch(search.value)" style="width:45%">
-          <img class="pointer sda" src="../../../../assets/img/magnifying-glass.png" title="{{ 'COMMON.SEARCH' | translate}}"
-            (click)="onSearch(search.value)">
-          <img class="pointer sda" src="../../../../assets/img/reload.png" title="{{ 'COMMON.RESET' | translate}}" alt=""
-            (click)="resetSearch()"> -->
-
         </div>
         <div class="filter_right_section">
           <ngx-store-autocomplete (onStore)="onSelectStore($event)"></ngx-store-autocomplete>
 
           <a class="createBtn" [routerLink]="['/pages/catalogue/products-groups/create-products-group']">
-            <img class="pointer sda" src="../../../../assets/img/plus.png" title="{{ 'COMPONENTS.CREATE_PRODUCTS_GROUPS' | translate}}"
-              alt="">
-            <label>{{ 'COMPONENTS.CREATE_PRODUCTS_GROUPS' | translate}}</label>
+            <img class="pointer sda" src="../../../../assets/img/plus.png"
+                 title="{{ 'COMPONENTS.CREATE_PRODUCTS_GROUPS' | translate}}"
+                 alt="">
+            <label>{{ 'COMPONENTS.CREATE_PRODUCTS_GROUPS' | translate }}</label>
           </a>
         </div>
-
       </form>
 
+      <ngx-datatable
+        class="material"
+        [rows]="rows"
+        [columnMode]="ColumnMode.force"
+        [headerHeight]="50"
+        [footerHeight]="50"
+        rowHeight="auto"
+        [externalPaging]="true"
+        [count]="page.totalElements"
+        [offset]="page.pageNumber"
+        [limit]="page.size"
+        (page)="setPage($event)">
+
+        <ngx-datatable-column name="code">
+          <ng-template let-column="column" ngx-datatable-header-template> {{ 'CONTENT.CODE' |translate }}</ng-template>
+          <ng-template let-value="value" ngx-datatable-cell-template>
+            <strong>{{ value }}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="name">
+          <ng-template let-column="column" ngx-datatable-header-template> {{ 'CONTENT.NAME' |translate }}</ng-template>
+          <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+            {{ row.description.name }}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="active">
+          <ng-template let-column="column" ngx-datatable-header-template> {{ 'COMMON.ACTIVE' |translate }}
+          </ng-template>
+          <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+            <ngx-product-groups-active [value]="row.visible" [store]="row.store"
+                                       [rowData]="row"></ngx-product-groups-active>
+          </ng-template>
+        </ngx-datatable-column>
 
 
-      <ng2-smart-table [settings]="settings" [source]="source" (custom)="deleteRecord($event)" class="home-table">
-      </ng2-smart-table>
+        <ngx-datatable-column name="actions">
+          <ng-template let-column="column" ngx-datatable-header-template>
+            {{ 'COMMON.ACTIONS' |translate }}
+          </ng-template>
+          <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+            <button nbButton shape="round" size="small" status="primary" (click)="onEdit(row)"><i class="nb-edit"></i>
+            </button>
+            <button nbButton shape="round" size="small" status="danger" (click)="onDelete(row)"><i class="nb-trash"></i>
+            </button>
+          </ng-template>
+        </ngx-datatable-column>
+      </ngx-datatable>
 
-      <!-- <ngx-paginator (changePage)="changePage($event)" [pagesToShow]="5" [currentPage]="currentPage" [perPage]="perPage"
-        [count]="totalCount">
-      </ngx-paginator> -->
-      <!-- <ngx-paginator [pagesToShow]="5" [currentPage]="currentPage" [perPage]="perPage" [count]="totalCount">
-      </ngx-paginator> -->
     </div>
   </nb-card-body>
 </nb-card>

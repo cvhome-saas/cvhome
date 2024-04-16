@@ -30,12 +30,7 @@ export class BoxesComponent {
     private storageService: StorageService,
     private translate: TranslateService,
     private toastr: NbToastrService,
-    private dialogService: NbDialogService
-  ) {
-    this.translate.onLangChange.subscribe((lang) => {
-      this.params.lang = this.storageService.getLanguage();
-      this.getBox();
-    });
+    private dialogService: NbDialogService) {
   }
 
 
