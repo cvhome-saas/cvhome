@@ -3,6 +3,7 @@
  */
 package com.asrevo.cvhome.store.service.facade.customer;
 
+import com.asrevo.cvhome.s2s.model.StoreProperties;
 import com.asrevo.cvhome.store.controller.exception.*;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.entity.customer.Customer;
@@ -31,7 +32,6 @@ import com.asrevo.cvhome.store.core.services.reference.zone.ZoneService;
 import com.asrevo.cvhome.store.core.services.shoppingcart.ShoppingCartService;
 import com.asrevo.cvhome.store.core.services.system.optin.OptinService;
 import com.asrevo.cvhome.store.service.populator.customer.*;
-import com.asrevo.cvhome.store.utils.CoreConfiguration;
 import com.asrevo.cvhome.store.utils.LocaleUtils;
 import com.asrevo.cvhome.store.utils.UUID;
 import lombok.extern.slf4j.Slf4j;
@@ -77,11 +77,11 @@ public class CustomerFacadeImpl implements CustomerFacade {
 
     private final CustomerReviewService customerReviewService;
 
-    private final CoreConfiguration coreConfiguration;
-
     private final CustomerPopulator customerPopulator;
 
-    public CustomerFacadeImpl(CustomerService customerService, OptinService optinService, CustomerOptinService customerOptinService, ShoppingCartService shoppingCartService, LanguageService languageService, CountryService countryService, ZoneService zoneService, CustomerReviewService customerReviewService, CoreConfiguration coreConfiguration, CustomerPopulator customerPopulator) {
+    private final StoreProperties storeProperties;
+
+    public CustomerFacadeImpl(CustomerService customerService, OptinService optinService, CustomerOptinService customerOptinService, ShoppingCartService shoppingCartService, LanguageService languageService, CountryService countryService, ZoneService zoneService, CustomerReviewService customerReviewService, CustomerPopulator customerPopulator, StoreProperties storeProperties) {
         this.customerService = customerService;
         this.optinService = optinService;
         this.customerOptinService = customerOptinService;
@@ -90,8 +90,8 @@ public class CustomerFacadeImpl implements CustomerFacade {
         this.countryService = countryService;
         this.zoneService = zoneService;
         this.customerReviewService = customerReviewService;
-        this.coreConfiguration = coreConfiguration;
         this.customerPopulator = customerPopulator;
+        this.storeProperties = storeProperties;
     }
 
 
@@ -538,16 +538,19 @@ public class CustomerFacadeImpl implements CustomerFacade {
 
     @Async
     protected void notifyNewCustomer(PersistableCustomer customer, MerchantStore store, Language lang) {
-        System.out.println("Customer notification");
-        long startTime = System.nanoTime();
-        Locale customerLocale = LocaleUtils.getLocale(lang);
-        String shopSchema = coreConfiguration.getProperty("SHOP_SCHEME");
-/* @TODO ASHRAF
-        emailTemplatesUtils.sendRegistrationEmail(customer, store, customerLocale, shopSchema);
-*/
-        long endTime = System.nanoTime();
-        long duration = (endTime - startTime) / 1000;
-        System.out.println("End Notification " + duration);
+        if (storeProperties.enableNotifyNewCustomerMailApi()) {
+            System.out.println("Customer notification");
+            long startTime = System.nanoTime();
+            Locale customerLocale = LocaleUtils.getLocale(lang);
+            String shopSchema = storeProperties.shopName();
+            /* @TODO ASHRAF
+                    emailTemplatesUtils.sendRegistrationEmail(customer, store, customerLocale, shopSchema);
+            */
+            long endTime = System.nanoTime();
+            long duration = (endTime - startTime) / 1000;
+            System.out.println("End Notification " + duration);
+
+        }
     }
 
 

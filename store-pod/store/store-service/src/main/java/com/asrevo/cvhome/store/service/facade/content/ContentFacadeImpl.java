@@ -23,7 +23,6 @@ import com.asrevo.cvhome.store.utils.FilePathUtils;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
@@ -53,7 +52,7 @@ public class ContentFacadeImpl implements ContentFacade {
 
     private final FilePathUtils fileUtils;
 
-    public ContentFacadeImpl(ContentService contentService, LanguageService languageService, @Qualifier("img") ImageFilePath imageUtils, FilePathUtils fileUtils) {
+    public ContentFacadeImpl(ContentService contentService, LanguageService languageService, ImageFilePath imageUtils, FilePathUtils fileUtils) {
         this.contentService = contentService;
         this.languageService = languageService;
         this.imageUtils = imageUtils;

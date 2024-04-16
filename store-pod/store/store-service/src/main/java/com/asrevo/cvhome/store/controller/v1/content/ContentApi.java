@@ -27,7 +27,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -55,7 +54,7 @@ public class ContentApi {
 
     private final ImageFilePath imageUtils;
 
-    public ContentApi(ContentFacade contentFacade, @Qualifier("img") ImageFilePath imageUtils) {
+    public ContentApi(ContentFacade contentFacade, ImageFilePath imageUtils) {
         this.contentFacade = contentFacade;
         this.imageUtils = imageUtils;
     }

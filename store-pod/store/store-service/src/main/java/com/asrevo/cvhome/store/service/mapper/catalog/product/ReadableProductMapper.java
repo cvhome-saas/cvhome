@@ -39,7 +39,6 @@ import com.asrevo.cvhome.store.utils.DateUtil;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
@@ -67,7 +66,7 @@ public class ReadableProductMapper implements Mapper<Product, ReadableProduct> {
 
     private final PricingService pricingService;
 
-    public ReadableProductMapper(@Qualifier("img") ImageFilePath imageUtils, ReadableCategoryMapper readableCategoryMapper, ReadableProductTypeMapper readableProductTypeMapper, ReadableProductVariantMapper readableProductVariantMapper, ReadableManufacturerMapper readableManufacturerMapper, PricingService pricingService) {
+    public ReadableProductMapper(ImageFilePath imageUtils, ReadableCategoryMapper readableCategoryMapper, ReadableProductTypeMapper readableProductTypeMapper, ReadableProductVariantMapper readableProductVariantMapper, ReadableManufacturerMapper readableManufacturerMapper, PricingService pricingService) {
         this.imageUtils = imageUtils;
         this.readableCategoryMapper = readableCategoryMapper;
         this.readableProductTypeMapper = readableProductTypeMapper;

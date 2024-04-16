@@ -35,7 +35,6 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -66,7 +65,7 @@ public class ProductApi {
     private final ProductCommonFacade productCommonFacade;
     private final ImageFilePath imageUtils;
 
-    public ProductApi(CategoryService categoryService, ProductService productService, ProductFacade productFacade, ProductCommonFacade productCommonFacade, @Qualifier("img") ImageFilePath imageUtils) {
+    public ProductApi(CategoryService categoryService, ProductService productService, ProductFacade productFacade, ProductCommonFacade productCommonFacade, ImageFilePath imageUtils) {
         this.categoryService = categoryService;
         this.productService = productService;
         this.productFacade = productFacade;
