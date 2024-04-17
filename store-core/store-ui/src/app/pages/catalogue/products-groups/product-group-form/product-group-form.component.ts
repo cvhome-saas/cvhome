@@ -1,14 +1,14 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
+import {Component, OnInit} from '@angular/core';
+import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 
-import { ProductGroupsService } from '../services/product-groups.service';
-import { Router, ActivatedRoute } from '@angular/router';
+import {ProductGroupsService} from '../services/product-groups.service';
+import {ActivatedRoute, Router} from '@angular/router';
 
-import { StorageService } from '../../../shared/services/storage.service';
-import { validators } from '../../../shared/validation/validators';
-import { TranslateService } from '@ngx-translate/core';
+import {StorageService} from '../../../shared/services/storage.service';
+import {validators} from '../../../shared/validation/validators';
+import {TranslateService} from '@ngx-translate/core';
 
-import { ProductService } from '../../products/services/product.service';
+import {ProductService} from '../../products/services/product.service';
 
 @Component({
   selector: 'ngx-product-group-form',
@@ -26,6 +26,9 @@ export class ProductGroupFormComponent implements OnInit {
   params = this.loadParams();
   itemsParams = this.loadItemsParams();
   products: Array<any> = [];
+  store: string;
+  action: string;
+
   constructor(
     private fb: FormBuilder,
     private productGroupsService: ProductGroupsService,
@@ -33,28 +36,12 @@ export class ProductGroupFormComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private storageService: StorageService,
     private productService: ProductService,
-    private translate: TranslateService,
-  ) {
-    this.uniqueCode = this.activatedRoute.snapshot.paramMap.get('code');
-    if (this.uniqueCode) {
-      this.getProductByCode();
-    }
-    this.dropdownSettings = {
-      singleSelection: false,
-      idField: 'id',
-      textField: 'name',
-      enableCheckAll: false,
-      searchPlaceholderText: this.translate.instant('COMMON.SEARCH'),
-      // unSelectAllText: 'UnSelect All',
-      itemsShowLimit: 7,
-      allowSearchFilter: true,
-      allowRemoteDataSearch: true
-
-    };
+    private translate: TranslateService) {
   }
+
   loadParams() {
     return {
-      store: this.storageService.getMerchant(),
+      store: "",
       lang: this.storageService.getLanguage(),
       count: this.perPage,
       page: 0
@@ -63,12 +50,23 @@ export class ProductGroupFormComponent implements OnInit {
 
   loadItemsParams() {
     return {
-      store: this.storageService.getMerchant(),
+      store: "",
       lang: this.storageService.getLanguage()
     };
   }
 
   ngOnInit() {
+    this.activatedRoute.params.subscribe(it => {
+      const split: string[] = it['code'].split("-");
+      this.params.store = split[0];
+      this.itemsParams.store = split[0];
+      if (split.length == 2 && split[1] != "") {
+        this.action = 'edit';
+        this.uniqueCode = split[1];
+        this.getProductByCode();
+      }
+      this.getProductList();
+    });
     this.createForm();
   }
 
@@ -77,24 +75,24 @@ export class ProductGroupFormComponent implements OnInit {
       .subscribe(res => {
         let temp = []
         res.products.map((value) => {
-          temp.push({ 'id': value.id, 'name': value.description.name })
+          temp.push({'id': value.id, 'name': value.description.name})
         });
         this.products = temp;
       });
   }
+
   getProductByCode() {
-    this.productGroupsService.getProductsByGroup("this.store",this.uniqueCode, this.itemsParams)
+    this.productGroupsService.getProductsByGroup( this.uniqueCode, this.itemsParams)
       .subscribe(res => {
         let temp = []
         res.products.map((value) => {
-          temp.push({ 'id': value.id, 'name': value.description.name })
+          temp.push({'id': value.id, 'name': value.description.name})
         });
         this.selectedItems = temp;
 
-        this.getProductList()
         this.createForm();
 
-        this.fillForm();
+        this.fillForm(res.productGroup);
       });
   }
 
@@ -120,14 +118,15 @@ export class ProductGroupFormComponent implements OnInit {
       product: [this.selectedItems]
     });
   }
-  private fillForm() {
-    let data = JSON.parse(localStorage.getItem('groupData'));
+
+  private fillForm(data) {
     this.form.patchValue({
       code: data.code,
       active: data.active,
     });
 
   }
+
   checkCode(event) {
     // const code = event.target.value.trim();
     // this.productGroupsService.checkGroupCode(code)
@@ -137,16 +136,18 @@ export class ProductGroupFormComponent implements OnInit {
   }
 
   save() {
-    this.productGroupsService.createProductGroup("this.store",this.form.value).subscribe(res => {
+    this.productGroupsService.createProductGroup(this.params.store, this.form.value).subscribe(res => {
       this.router.navigate(['pages/catalogue/products-groups/groups-list']);
     });
   }
+
   update() {
-    this.productGroupsService.updateGroupActiveValue("this.store",this.form.value)
+    this.productGroupsService.updateGroupActiveValue(this.params.store, this.form.value)
       .subscribe(res => {
         this.router.navigate(['pages/catalogue/products-groups/groups-list']);
       });
   }
+
   goToBack() {
     this.router.navigate(['pages/catalogue/products-groups/groups-list']);
   }
@@ -155,12 +156,14 @@ export class ProductGroupFormComponent implements OnInit {
     this.addProductToGroup(item.id, this.uniqueCode)
     // this.loading = true;
   }
+
   onItemDeSelect(item: any) {
     this.removeProductFromGroup(item.id, this.uniqueCode)
   }
+
   addProductToGroup(productId, groupCode) {
     this.loading = true;
-    this.productGroupsService.addProductToGroup("this.store",productId, groupCode)
+    this.productGroupsService.addProductToGroup(this.params.store, productId, groupCode)
       .subscribe(res => {
         this.loading = false;
       });
@@ -168,7 +171,7 @@ export class ProductGroupFormComponent implements OnInit {
 
   removeProductFromGroup(productId, groupCode) {
     this.loading = true;
-    this.productGroupsService.removeProductFromGroup("this.store",productId, groupCode)
+    this.productGroupsService.removeProductFromGroup(this.params.store, productId, groupCode)
       .subscribe(res => {
         this.loading = false;
       });

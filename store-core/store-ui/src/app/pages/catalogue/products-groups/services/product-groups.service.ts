@@ -33,7 +33,7 @@ export class ProductGroupsService {
   }
 
   updateGroupActiveValue(store, group): Observable<any> {
-    return this.crudService.patch(`/store/api/v1/private/product/group/${group.code}?store=${store}`, group);
+    return this.crudService.patch(`/store/api/v1/private/products/group/${group.code}?store=${store}`, group);
   }
 
   addProductToGroup(store, productId, groupCode): Observable<any> {
@@ -44,8 +44,8 @@ export class ProductGroupsService {
     return this.crudService.delete(`/store/api/v1/private/product/${productId}/group/${groupCode}?store=${store}`);
   }
 
-  getProductsByGroup(store, groupCode, params) {
-    return this.crudService.get(`/store/api/v1/product/group/${groupCode}?store=${store}`, params);
+  getProductsByGroup( groupCode, params) {
+    return this.crudService.get(`/store/api/v1/products/group/${groupCode}`, params);
   }
 
   removeProductGroup(store, groupCode) {

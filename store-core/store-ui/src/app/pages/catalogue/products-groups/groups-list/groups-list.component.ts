@@ -50,7 +50,11 @@ export class GroupsListComponent implements OnInit {
   getList() {
     this.loadingList = true;
     this.productGroupsService.getListOfProductGroups(this.params).subscribe(res => {
-      // this.source.load(res);
+      this.loadingList = false;
+      this.rows = res
+      this.page.totalPages = 1
+      this.page.totalElements = res.length
+      this.page.size = res.length
       this.loadingList = false;
     });
 
@@ -66,8 +70,7 @@ export class GroupsListComponent implements OnInit {
   protected readonly ColumnMode = ColumnMode;
 
   onEdit(row: any) {
-    this.router.navigate(['/pages/catalogue/products-groups/create-products-group/' + row.code]);
-
+    this.router.navigate([`/pages/catalogue/products-groups/create-products-group/${this.params.store}-${row.code}`]);
   }
 
   onDelete(row: any) {

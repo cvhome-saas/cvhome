@@ -95,7 +95,7 @@ export class ProductsGroupsListComponent implements OnInit {
 
   selectGroup(groupCode) {
     this.selectedGroup = groupCode;
-    this.productGroupsService.getProductsByGroup("this.store",this.selectedGroup, this.itemsParams)
+    this.productGroupsService.getProductsByGroup(this.selectedGroup, this.itemsParams)
       .subscribe(res => {
         this.selectedList = [...res.products];
         this.availableList = this.availableList.filter(n => !this.selectedList.some(n2 => n.id === n2.id));

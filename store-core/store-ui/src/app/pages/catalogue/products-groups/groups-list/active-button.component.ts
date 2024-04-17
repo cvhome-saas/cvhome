@@ -1,6 +1,8 @@
 import {Component, Input} from '@angular/core';
 
 import {ProductGroupsService} from '../services/product-groups.service';
+import {TranslateService} from "@ngx-translate/core";
+import {NbToastrService} from "@nebular/theme";
 
 
 @Component({
@@ -13,8 +15,9 @@ export class ActiveButtonComponent {
   @Input() store: string;
 
   constructor(
-    private productGroupsService: ProductGroupsService
-  ) {
+    private productGroupsService: ProductGroupsService,
+    private translate: TranslateService,
+    private toastr: NbToastrService) {
   }
 
   clicked() {
@@ -25,6 +28,7 @@ export class ActiveButtonComponent {
     };
     this.productGroupsService.updateGroupActiveValue(this.store, group)
       .subscribe(res => {
+        this.toastr.success(this.translate.instant('PRODUCT_GROUP.GROUP_ACTIVATION'));
       });
   }
 

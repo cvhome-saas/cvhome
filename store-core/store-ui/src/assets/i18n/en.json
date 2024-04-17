@@ -333,7 +333,8 @@
   },
   "PRODUCT_GROUP": {
     "CREATE_PRODUCT_GROUP": "Create group",
-    "SELECT_PRODUCT_GROUP": "Select group"
+    "SELECT_PRODUCT_GROUP": "Select group",
+    "GROUP_ACTIVATION": "Product Group Activation updated"
   },
   "OPTION": {
     "OPTION_NAME": "Option name",

@@ -333,7 +333,8 @@
     },
     "PRODUCT_GROUP": {
         "CREATE_PRODUCT_GROUP": "Ajouter un groupe",
-        "SELECT_PRODUCT_GROUP": "Sélectionner un groupe"
+        "SELECT_PRODUCT_GROUP": "Sélectionner un groupe",
+        "GROUP_ACTIVATION": "Activation du groupe de produits mise à jour"
     },
     "OPTION": {
         "OPTION_NAME": "Nom de l'option",

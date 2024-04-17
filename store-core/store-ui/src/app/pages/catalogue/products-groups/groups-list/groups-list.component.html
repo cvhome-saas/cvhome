@@ -15,7 +15,7 @@
         <div class="filter_right_section">
           <ngx-store-autocomplete (onStore)="onSelectStore($event)"></ngx-store-autocomplete>
 
-          <a class="createBtn" [routerLink]="['/pages/catalogue/products-groups/create-products-group']">
+          <a class="createBtn" [routerLink]="['/pages/catalogue/products-groups/create-products-group',params.store+'-']">
             <img class="pointer sda" src="../../../../assets/img/plus.png"
                  title="{{ 'COMPONENTS.CREATE_PRODUCTS_GROUPS' | translate}}"
                  alt="">
@@ -44,18 +44,11 @@
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column name="name">
-          <ng-template let-column="column" ngx-datatable-header-template> {{ 'CONTENT.NAME' |translate }}</ng-template>
-          <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-            {{ row.description.name }}
-          </ng-template>
-        </ngx-datatable-column>
-
         <ngx-datatable-column name="active">
           <ng-template let-column="column" ngx-datatable-header-template> {{ 'COMMON.ACTIVE' |translate }}
           </ng-template>
           <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-            <ngx-product-groups-active [value]="row.visible" [store]="row.store"
+            <ngx-product-groups-active [value]="row.active" [store]="params.store"
                                        [rowData]="row"></ngx-product-groups-active>
           </ng-template>
         </ngx-datatable-column>

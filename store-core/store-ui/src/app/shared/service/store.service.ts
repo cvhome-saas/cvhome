@@ -1,26 +1,34 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {Observable} from "rxjs";
+import {Observable, of} from "rxjs";
 import {CreateStoreRequest, ManagerStoreId, Page, Store} from "../domain/commons";
 
 @Injectable({
-    providedIn: 'root'
+  providedIn: 'root'
 })
 export class StoreService {
-    private readonly STORE_MANAGER_BASE_URL: string = '/manager/api/v1/store-manager';
+  private readonly STORE_MANAGER_BASE_URL: string = '/manager/api/v1/store-manager';
 
-    constructor(private httpClient: HttpClient) {
-    }
+  constructor(private httpClient: HttpClient) {
+  }
 
-    create(request: CreateStoreRequest): Observable<Store> {
-        return this.httpClient.post<Store>(`${this.STORE_MANAGER_BASE_URL}/create`, request)
-    }
+  create(request: CreateStoreRequest): Observable<Store> {
+    return this.httpClient.post<Store>(`${this.STORE_MANAGER_BASE_URL}/create`, request)
+  }
 
-    list(): Observable<Page<Store>> {
-        return this.httpClient.post<Page<Store>>(`${this.STORE_MANAGER_BASE_URL}/list`, {})
-    }
+  list(): Observable<Page<Store>> {
+    return of({
+      content: [{
+        id: {
+          id: "65f023632bc46470c104b76f"
+        },
+        name: "ashraf"
+      }]
+    })
+    // return this.httpClient.post<Page<Store>>(`${this.STORE_MANAGER_BASE_URL}/list`, {})
+  }
 
-    getStoreInfo(param: ManagerStoreId): Observable<Store> {
-        return this.httpClient.get<Store>(`${this.STORE_MANAGER_BASE_URL}/store-info?store=${param.id}`, {})
-    }
+  getStoreInfo(param: ManagerStoreId): Observable<Store> {
+    return this.httpClient.get<Store>(`${this.STORE_MANAGER_BASE_URL}/store-info?store=${param.id}`, {})
+  }
 }
