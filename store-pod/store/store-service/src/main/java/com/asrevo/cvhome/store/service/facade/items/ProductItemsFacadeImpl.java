@@ -121,7 +121,6 @@ public class ProductItemsFacadeImpl implements ProductItemsFacade {
     @Override
     public ReadableProductList listItemsByGroup(String group, MerchantStore store, Language language) throws Exception {
 
-
         //get product group
         List<ProductRelationship> groups = productRelationshipService.getByGroup(store, group, language);
 
@@ -136,6 +135,8 @@ public class ProductItemsFacadeImpl implements ProductItemsFacade {
             List<ReadableProduct> prds = list.getProducts().stream().sorted(Comparator.comparing(ReadableProduct::getSortOrder)).collect(Collectors.toList());
             list.setProducts(prds);
             list.setTotalPages(1);//no paging
+            ProductGroup productGroup = getProductGroup(store, group);
+            list.setProductGroup(productGroup);
             return list;
         }
 
@@ -262,6 +263,18 @@ public class ProductItemsFacadeImpl implements ProductItemsFacade {
         }
 
         return groups;
+    }
+
+    @Override
+    public ProductGroup getProductGroup(MerchantStore store, String code) {
+        Assert.notNull(store, "MerchantStore cannot be null");
+
+        ProductRelationship group = productRelationshipService.getGroup(store, code);
+        ProductGroup g = new ProductGroup();
+        g.setActive(group.isActive());
+        g.setCode(group.getCode());
+        g.setId(group.getId());
+        return g;
     }
 
 }

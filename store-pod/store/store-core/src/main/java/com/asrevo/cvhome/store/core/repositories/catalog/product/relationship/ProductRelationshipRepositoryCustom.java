@@ -20,6 +20,8 @@ public interface ProductRelationshipRepositoryCustom {
 
     List<ProductRelationship> getGroups(MerchantStore store);
 
+    ProductRelationship getGroup(MerchantStore store, String code);
+
     List<ProductRelationship> getByType(MerchantStore store, String type);
 
     List<ProductRelationship> getGroupByType(MerchantStore store, String type);
