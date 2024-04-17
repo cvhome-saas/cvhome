@@ -334,7 +334,11 @@
     "PRODUCT_GROUP": {
         "CREATE_PRODUCT_GROUP": "Ajouter un groupe",
         "SELECT_PRODUCT_GROUP": "Sélectionner un groupe",
-        "GROUP_ACTIVATION": "Activation du groupe de produits mise à jour"
+        "GROUP_ACTIVATION": "Activation du groupe de produits mise à jour",
+        "PRODUCT_ADDED":"Produit ajouté avec succès",
+        "PRODUCT_REMOVED":"Produit supprimé avec succès",
+        "PRODUCT_ADDED_ERROR":"Erreur lors de l'ajout du produit",
+        "PRODUCT_REMOVED_ERROR":"Erreur lors de la suppression du produit"
     },
     "OPTION": {
         "OPTION_NAME": "Nom de l'option",
@@ -682,7 +686,8 @@
         "METATAG": "Métabalise de description",
         "PAGE_CONTENT": "Contenu de la page",
         "CONTENT_ADDED": "Contenu ajouté avec succès",
-        "CONTENT_UPDATED": "Contenu mis à jour avec succès"
+        "CONTENT_UPDATED": "Contenu mis à jour avec succès",
+        "BOX_DELETED": "Zone de contenu supprimée avec succès"
     },
     "PROPERTY": {
         "PROPERTY": "Propriété",

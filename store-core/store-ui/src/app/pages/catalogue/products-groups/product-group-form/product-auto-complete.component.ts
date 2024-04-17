@@ -13,8 +13,9 @@ import {StorageService} from "../../../shared/services/storage.service";
   template: `<input #autoInput
                     nbInput
                     type="text"
+                    [disabled]="disabled"
                     (input)="onChange($event)"
-                    placeholder="Enter value"
+                    [placeholder]="'COMMON.SEARCH_BY_NAME'|translate"
                     [nbAutocomplete]="auto"/>
 
   <nb-autocomplete #auto (selectedChange)="onSelectionChange($event)">
@@ -27,6 +28,7 @@ import {StorageService} from "../../../shared/services/storage.service";
 })
 export class ProductAutoCompleteComponent implements AfterViewInit {
   @Input() store: string;
+  @Input() disabled: boolean=false;
   filteredOptions$: Observable<any[]>;
   @Output()
   onProduct: EventEmitter<any> = new EventEmitter<any>()

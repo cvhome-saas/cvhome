@@ -3,23 +3,17 @@
     <nb-card-header class="main_header">
       <h1 class="page_title">{{ 'PRODUCT_GROUP.CREATE_PRODUCT_GROUP' | translate }}</h1>
       <div class="content_spacing">
-        <button type="button" nbButton class="cancel_button" (click)="goToBack()">{{
-            'ORDER_FORM.CANCLE'
-              | translate
-          }}
+        <button type="button" nbButton class="cancel_button" (click)="goToBack()">
+          {{'COMMON.CANCEL'| translate }}
         </button>
       </div>
       <div class="content_spacing">
         <button type="submit" nbButton *ngIf="!uniqueCode" class="success_button" [nbSpinner]="loading"
-                nbSpinnerSize="large" nbSpinnerStatus="control" (click)="save()" [disabled]="!form.valid">{{
-            (!loading ?
-              'COMMON.SAVE' : '') | translate
-          }}
+                nbSpinnerSize="large" nbSpinnerStatus="control" (click)="save()" [disabled]="!form.valid">
+          {{(!loading ? 'COMMON.SAVE' : '') | translate }}
         </button>
-        <button type="button" nbButton *ngIf="uniqueCode" class="success_button" (click)="update()">{{
-            'COMMON.UPDATE'|
-              translate
-          }}
+        <button type="button" nbButton *ngIf="uniqueCode" class="success_button" (click)="update()">
+          {{'COMMON.UPDATE'|translate }}
         </button>
       </div>
     </nb-card-header>
@@ -56,17 +50,46 @@
             </span>
           </div>
         </div>
-        <div class="form-group" *ngIf="uniqueCode && products?.length > 0">
-          <div class="col-sm-12">
-            <ngx-product-auto-complete [store]="params.store" (onProduct)="onItemSelect($event)"></ngx-product-auto-complete>
-          </div>
+        <div class="col-sm-12">
+          <ngx-product-auto-complete [store]="params.store" [disabled]="uniqueCode==undefined"
+                                     (onProduct)="onItemSelect($event,uniqueCode)"></ngx-product-auto-complete>
+
+          <ngx-datatable
+            class="material"
+            [rows]="rows"
+            [columnMode]="ColumnMode.force"
+            [headerHeight]="50"
+            [footerHeight]="50"
+            rowHeight="auto"
+            [externalPaging]="true"
+            [count]="page.totalElements"
+            [offset]="page.pageNumber"
+            [limit]="page.size"
+            (page)="setPage($event)">
+
+
+            <ngx-datatable-column name="name">
+              <ng-template let-column="column" ngx-datatable-header-template> {{ 'CONTENT.NAME' |translate }}
+              </ng-template>
+              <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+                {{ row.description.name }}
+              </ng-template>
+            </ngx-datatable-column>
+
+            <ngx-datatable-column name="actions">
+              <ng-template let-column="column" ngx-datatable-header-template>
+                {{ 'ORDER.ACTIONS' |translate }}
+              </ng-template>
+              <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+                <button nbButton shape="round" size="small" status="danger" (click)="onItemDeSelect(row,uniqueCode)">
+                  <i class="nb-trash"></i></button>
+              </ng-template>
+            </ngx-datatable-column>
+          </ngx-datatable>
         </div>
       </nb-card-body>
     </nb-card>
 
 
-    <!-- </div> -->
   </form>
 </div>
-<!-- </nb-card-body>
-</nb-card> -->

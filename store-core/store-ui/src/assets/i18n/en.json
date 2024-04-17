@@ -334,7 +334,11 @@
   "PRODUCT_GROUP": {
     "CREATE_PRODUCT_GROUP": "Create group",
     "SELECT_PRODUCT_GROUP": "Select group",
-    "GROUP_ACTIVATION": "Product Group Activation updated"
+    "GROUP_ACTIVATION": "Product Group Activation updated",
+    "PRODUCT_ADDED":"Product added successfully",
+    "PRODUCT_REMOVED":"Product removed successfully",
+    "PRODUCT_ADDED_ERROR":"Error while adding product",
+    "PRODUCT_REMOVED_ERROR":"Error while removing product"
   },
   "OPTION": {
     "OPTION_NAME": "Option name",
@@ -682,7 +686,8 @@
     "METATAG": "Description metatag",
     "PAGE_CONTENT": "Page content",
     "CONTENT_ADDED": "Content added successfully",
-    "CONTENT_UPDATED": "Content updated successfully"
+    "CONTENT_UPDATED": "Content updated successfully",
+    "BOX_DELETED": "Content box deleted successfully"
   },
   "PROPERTY": {
     "PROPERTY": "Property",

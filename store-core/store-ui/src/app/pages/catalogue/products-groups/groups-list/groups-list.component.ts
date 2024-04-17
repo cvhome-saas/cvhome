@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 
-import {NbDialogService} from '@nebular/theme';
+import {NbDialogService, NbToastrService} from '@nebular/theme';
 import {TranslateService} from '@ngx-translate/core';
 import {ProductGroupsService} from '../services/product-groups.service';
 import {StorageService} from '../../../shared/services/storage.service';
@@ -25,6 +25,7 @@ export class GroupsListComponent implements OnInit {
     private translate: TranslateService,
     private productGroupsService: ProductGroupsService,
     private storageService: StorageService,
+    private toastr: NbToastrService,
     private router: Router) {
   }
 

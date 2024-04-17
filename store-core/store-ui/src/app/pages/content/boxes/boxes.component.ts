@@ -92,7 +92,7 @@ export class BoxesComponent {
           .subscribe({
             next: (data) => {
               this.loadingList = false;
-              this.toastr.success('Content box deleted successfully');
+              this.toastr.success(this.translate.instant('CONTENT.BOX_DELETED'));
               this.getBox();
             },
             error: (err) => {

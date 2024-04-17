@@ -9,6 +9,9 @@ import {validators} from '../../../shared/validation/validators';
 import {TranslateService} from '@ngx-translate/core';
 
 import {ProductService} from '../../products/services/product.service';
+import {ColumnMode} from "@swimlane/ngx-datatable";
+import {Page} from "../../../shared/models/Page";
+import {NbToastrService} from "@nebular/theme";
 
 @Component({
   selector: 'ngx-product-group-form',
@@ -20,14 +23,14 @@ export class ProductGroupFormComponent implements OnInit {
   isCodeUnique = true;
   uniqueCode: string;
   loading: boolean = false;
-  selectedItems = [];
-  dropdownSettings = {};
   perPage = 50;
   params = this.loadParams();
-  itemsParams = this.loadItemsParams();
   products: Array<any> = [];
+  rows: Array<any> = [];
   store: string;
   action: string;
+  page: Page = new Page();
+  protected readonly ColumnMode = ColumnMode;
 
   constructor(
     private fb: FormBuilder,
@@ -36,6 +39,7 @@ export class ProductGroupFormComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private storageService: StorageService,
     private productService: ProductService,
+    private toastr: NbToastrService,
     private translate: TranslateService) {
   }
 
@@ -48,50 +52,27 @@ export class ProductGroupFormComponent implements OnInit {
     };
   }
 
-  loadItemsParams() {
-    return {
-      store: "",
-      lang: this.storageService.getLanguage()
-    };
-  }
-
   ngOnInit() {
     this.activatedRoute.params.subscribe(it => {
       const split: string[] = it['code'].split("-");
       this.params.store = split[0];
-      this.itemsParams.store = split[0];
       if (split.length == 2 && split[1] != "") {
         this.action = 'edit';
         this.uniqueCode = split[1];
         this.getProductByCode();
       }
-      this.getProductList();
     });
     this.createForm();
   }
 
-  getProductList() {
-    this.productService.getListOfProducts(this.params)
-      .subscribe(res => {
-        let temp = []
-        res.products.map((value) => {
-          temp.push({'id': value.id, 'name': value.description.name})
-        });
-        this.products = temp;
-      });
-  }
-
   getProductByCode() {
-    this.productGroupsService.getProductsByGroup( this.uniqueCode, this.itemsParams)
+    this.productGroupsService.getProductsByGroup(this.uniqueCode, this.params)
       .subscribe(res => {
-        let temp = []
-        res.products.map((value) => {
-          temp.push({'id': value.id, 'name': value.description.name})
-        });
-        this.selectedItems = temp;
-
+        this.rows = res.products;
+        this.page.totalPages = 1
+        this.page.totalElements = this.rows.length
+        this.page.size = this.rows.length
         this.createForm();
-
         this.fillForm(res.productGroup);
       });
   }
@@ -105,7 +86,7 @@ export class ProductGroupFormComponent implements OnInit {
     this.form = this.fb.group({
       code: ['', [Validators.required, Validators.pattern(validators.alphanumericwithhyphen)]],
       active: [true],
-      product: [this.selectedItems]
+      product: [this.rows]
     });
   }
 
@@ -118,7 +99,8 @@ export class ProductGroupFormComponent implements OnInit {
   }
 
   checkCode(event) {
-    // const code = event.target.value.trim();
+    const code = event.target.value.trim();
+    this.uniqueCode=code;
     // this.productGroupsService.checkGroupCode(code)
     //   .subscribe(res => {
     //     this.isCodeUnique = !(res.exists && (this.option.code !== code));
@@ -142,29 +124,47 @@ export class ProductGroupFormComponent implements OnInit {
     this.router.navigate(['pages/catalogue/products-groups/groups-list']);
   }
 
-  onItemSelect(item: any) {
-    this.addProductToGroup(item.id, this.uniqueCode)
-    // this.loading = true;
-  }
-
-  onItemDeSelect(item: any) {
-    this.removeProductFromGroup(item.id, this.uniqueCode)
-  }
-
-  addProductToGroup(productId, groupCode) {
+  onItemSelect(item: any, groupCode: string) {
     this.loading = true;
-    this.productGroupsService.addProductToGroup(this.params.store, productId, groupCode)
-      .subscribe(res => {
-        this.loading = false;
+    this.productGroupsService.addProductToGroup(this.params.store, item.id, groupCode)
+      .subscribe({
+        next: (data) => {
+          this.loading = false;
+          this.rows.push(item)
+          this.rows=this.rows.map(it=>it);
+          this.page.totalPages = 1
+          this.page.totalElements = this.rows.length
+          this.page.size = this.rows.length
+          this.toastr.success(this.translate.instant('PRODUCT_GROUP.PRODUCT_ADDED'))
+        },
+        error: (err) => {
+          this.loading = false;
+          this.toastr.danger(this.translate.instant('PRODUCT_GROUP.PRODUCT_ADDED_ERROR'))
+        },
       });
   }
 
-  removeProductFromGroup(productId, groupCode) {
+  onItemDeSelect(item, groupCode) {
     this.loading = true;
-    this.productGroupsService.removeProductFromGroup(this.params.store, productId, groupCode)
-      .subscribe(res => {
-        this.loading = false;
+    this.productGroupsService.removeProductFromGroup(this.params.store, item.id, groupCode)
+      .subscribe({
+        next: (data) => {
+          this.loading = false;
+          this.rows = this.rows.filter(it => it.id != item.id)
+          this.page.totalPages = 1
+          this.page.totalElements = this.rows.length
+          this.page.size = this.rows.length
+          this.toastr.success(this.translate.instant('PRODUCT_GROUP.PRODUCT_REMOVED'))
+        },
+        error: (err) => {
+          this.loading = false;
+          this.toastr.danger(this.translate.instant('PRODUCT_GROUP.PRODUCT_REMOVED_ERROR'))
+        },
       });
   }
 
+  setPage(pageInfo) {
+    this.page.pageNumber = pageInfo.offset;
+    this.getProductByCode();
+  }
 }
