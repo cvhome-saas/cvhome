@@ -2193,7 +2193,7 @@ INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('product_descriptio
 INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('PRODUCT_IMG_SEQ_NEXT_VAL', 1);
 INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('product_price_description_seq', 3);
 INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('PRODUCT_PRICE_SEQ_NEXT_VAL', 1);
-INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('PRODUCT_RELATION_SEQ_NEXT_VAL', 1);
+INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('PRODUCT_RELATION_SEQ_NEXT_VAL', 4);
 INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('PRODUCT_SEQ_NEXT_VAL', 1);
 INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('STORE_SEQ_NEXT_VAL', 1);
 INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('TX_CLASS_SEQ_NEXT_VAL', 1);
