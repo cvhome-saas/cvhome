@@ -37,11 +37,11 @@ export class ProductGroupsService {
   }
 
   addProductToGroup(store, productId, groupCode): Observable<any> {
-    return this.crudService.post(`/store/api/v1/private/product/${productId}/group/${groupCode}?store=${store}`, {});
+    return this.crudService.post(`/store/api/v1/private/products/${productId}/group/${groupCode}?store=${store}`, {});
   }
 
   removeProductFromGroup(store, productId, groupCode) {
-    return this.crudService.delete(`/store/api/v1/private/product/${productId}/group/${groupCode}?store=${store}`);
+    return this.crudService.delete(`/store/api/v1/private/products/${productId}/group/${groupCode}?store=${store}`);
   }
 
   getProductsByGroup( groupCode, params) {
@@ -49,7 +49,7 @@ export class ProductGroupsService {
   }
 
   removeProductGroup(store, groupCode) {
-    return this.crudService.delete(`/store/api/v1/product/group/${groupCode}?store=${store}`);
+    return this.crudService.delete(`/store/api/v1/products/group/${groupCode}?store=${store}`);
   }
 
 }

@@ -35,7 +35,7 @@ export class ProductAutoCompleteComponent implements AfterViewInit {
   firstProducts: any[] = [];
   params = {
     "store": "",
-    "productName": "",
+    "name": "",
     "lang": this.storageService.getLanguage()
   };
 
@@ -47,7 +47,7 @@ export class ProductAutoCompleteComponent implements AfterViewInit {
   }
 
   onChange($event) {
-    if (this.autoInput.nativeElement.value && this.autoInput.nativeElement.value.trim().length > 3 && this.autoInput.nativeElement.value.trim() != this.params.productName)
+    if (this.autoInput.nativeElement.value && this.autoInput.nativeElement.value.trim().length > 3 && this.autoInput.nativeElement.value.trim() != this.params.name)
       this.getProductList();
     if (this.autoInput.nativeElement.value.trim().length == 0) {
       this.resetResultToFirst();
@@ -61,7 +61,7 @@ export class ProductAutoCompleteComponent implements AfterViewInit {
   }
 
   getProductList() {
-    this.params.productName = this.autoInput.nativeElement.value;
+    this.params.name = this.autoInput.nativeElement.value;
     this.filteredOptions$ = this.productService.getListOfProducts(this.params).pipe(map(it => {
       return it.products
     }));
@@ -74,7 +74,7 @@ export class ProductAutoCompleteComponent implements AfterViewInit {
     })).subscribe((it: any[]) => {
       this.firstProducts = it
       this.resetResultToFirst();
-    })
+    });
 
   }
 

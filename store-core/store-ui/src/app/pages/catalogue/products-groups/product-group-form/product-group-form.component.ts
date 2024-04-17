@@ -96,16 +96,6 @@ export class ProductGroupFormComponent implements OnInit {
       });
   }
 
-  onFilterChange(e) {
-    if (e.length > 3) {
-      this.params["name"] = e;
-      this.getProductList();
-    }
-    if (e === '') {
-      this.params = this.loadParams();
-      this.getProductList();
-    }
-  }
 
   get code() {
     return this.form.get('code');

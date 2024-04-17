@@ -58,7 +58,7 @@
         </div>
         <div class="form-group" *ngIf="uniqueCode && products?.length > 0">
           <div class="col-sm-12">
-            <ngx-product-auto-complete [store]="params.store"></ngx-product-auto-complete>
+            <ngx-product-auto-complete [store]="params.store" (onProduct)="onItemSelect($event)"></ngx-product-auto-complete>
           </div>
         </div>
       </nb-card-body>
