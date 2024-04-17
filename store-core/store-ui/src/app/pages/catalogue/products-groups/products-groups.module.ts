@@ -9,6 +9,7 @@ import {ProductsGroupsCreationComponent} from './products-groups-creation/produc
 import {ProductGroupFormComponent} from './product-group-form/product-group-form.component';
 import {ActiveButtonComponent} from './groups-list/active-button.component';
 import {SharedModule} from "../../store-manager/shared/shared.module";
+import {ProductAutoCompleteComponent} from "./product-group-form/product-auto-complete.component";
 
 @NgModule({
   declarations: [
@@ -17,7 +18,8 @@ import {SharedModule} from "../../store-manager/shared/shared.module";
     ProductsGroupsListComponent,
     GroupsListComponent,
     ProductGroupFormComponent,
-    ActiveButtonComponent
+    ActiveButtonComponent,
+    ProductAutoCompleteComponent
   ],
   imports: [
     ProductsGroupsRoutingModule,

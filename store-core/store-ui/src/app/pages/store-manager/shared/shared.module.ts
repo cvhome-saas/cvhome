@@ -2,10 +2,11 @@ import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {StoreAutocompleteComponent} from "./store-autocomplete/store-autocomplete.component";
 import {
+  NbAutocompleteModule,
   NbButtonModule,
   NbCardModule,
   NbCheckboxModule,
-  NbDialogModule,
+  NbDialogModule, NbIconModule,
   NbInputModule,
   NbOptionModule,
   NbRadioModule,
@@ -19,6 +20,7 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {ShowcaseDialogComponent} from "./showcase-dialog/showcase-dialog.component";
 import {NgxSummernoteModule} from "ngx-summernote";
 import {ImageBrowserComponent} from "./image-browser/image-browser.component";
+import {NbEvaIconsModule} from "@nebular/eva-icons";
 
 
 @NgModule({
@@ -39,6 +41,9 @@ import {ImageBrowserComponent} from "./image-browser/image-browser.component";
     NbCheckboxModule,
     NbToastrModule,
     NbDialogModule,
+    NbAutocompleteModule,
+    NbEvaIconsModule,
+    NbIconModule,
     NgxDatatableModule,
     NgxSummernoteModule,
     TranslateModule,
@@ -58,6 +63,9 @@ import {ImageBrowserComponent} from "./image-browser/image-browser.component";
     NbCheckboxModule,
     NbToastrModule.forRoot({}),
     NbDialogModule.forRoot({}),
+    NbAutocompleteModule,
+    NbEvaIconsModule,
+    NbIconModule,
     NgxDatatableModule,
     NgxSummernoteModule,
     TranslateModule,

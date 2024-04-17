@@ -1,0 +1,84 @@
+import {AfterViewInit, Component, ElementRef, EventEmitter, Input, Output, ViewChild} from '@angular/core';
+
+import {ProductGroupsService} from '../services/product-groups.service';
+import {TranslateService} from "@ngx-translate/core";
+import {Observable, of} from "rxjs";
+import {ProductService} from "../../products/services/product.service";
+import {map} from "rxjs/operators";
+import {StorageService} from "../../../shared/services/storage.service";
+
+
+@Component({
+  selector: 'ngx-product-auto-complete',
+  template: `<input #autoInput
+                    nbInput
+                    type="text"
+                    (input)="onChange($event)"
+                    placeholder="Enter value"
+                    [nbAutocomplete]="auto"/>
+
+  <nb-autocomplete #auto (selectedChange)="onSelectionChange($event)">
+    <nb-option *ngFor="let option of filteredOptions$ | async" [value]="option">
+      {{ option.description.name }}
+      <nb-icon icon="heart-outline" status="success"></nb-icon>
+    </nb-option>
+  </nb-autocomplete>
+  `,
+})
+export class ProductAutoCompleteComponent implements AfterViewInit {
+  @Input() store: string;
+  filteredOptions$: Observable<any[]>;
+  @Output()
+  onProduct: EventEmitter<any> = new EventEmitter<any>()
+  @ViewChild('autoInput', {static: false})
+  autoInput: ElementRef;
+  firstProducts: any[] = [];
+  params = {
+    "store": "",
+    "productName": "",
+    "lang": this.storageService.getLanguage()
+  };
+
+  constructor(
+    private productGroupsService: ProductGroupsService,
+    private productService: ProductService,
+    private translate: TranslateService,
+    private storageService: StorageService) {
+  }
+
+  onChange($event) {
+    if (this.autoInput.nativeElement.value && this.autoInput.nativeElement.value.trim().length > 3 && this.autoInput.nativeElement.value.trim() != this.params.productName)
+      this.getProductList();
+    if (this.autoInput.nativeElement.value.trim().length == 0) {
+      this.resetResultToFirst();
+    }
+  }
+
+  onSelectionChange($event) {
+    this.onProduct.emit($event);
+    this.autoInput.nativeElement.value = '';
+    this.resetResultToFirst()
+  }
+
+  getProductList() {
+    this.params.productName = this.autoInput.nativeElement.value;
+    this.filteredOptions$ = this.productService.getListOfProducts(this.params).pipe(map(it => {
+      return it.products
+    }));
+  }
+
+  ngAfterViewInit(): void {
+    this.params.store = this.store;
+    this.productService.getListOfProducts(this.params).pipe(map(it => {
+      return it.products
+    })).subscribe((it: any[]) => {
+      this.firstProducts = it
+      this.resetResultToFirst();
+    })
+
+  }
+
+  resetResultToFirst() {
+    this.filteredOptions$ = of(this.firstProducts);
+  }
+}
