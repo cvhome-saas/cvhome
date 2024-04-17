@@ -57,6 +57,11 @@ public class ProductRelationshipServiceImpl extends
     }
 
     @Override
+    public ProductRelationship getGroup(MerchantStore store, String code) {
+        return productRelationshipRepository.getGroup(store, code);
+    }
+
+    @Override
     public void deleteGroup(MerchantStore store, String groupName) throws ServiceException {
         List<ProductRelationship> entities = productRelationshipRepository.getByGroup(store, groupName);
         for (ProductRelationship relation : entities) {

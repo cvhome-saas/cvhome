@@ -23,6 +23,7 @@ public interface ProductItemsFacade {
 
     List<ProductGroup> listProductGroups(MerchantStore store, Language language);
 
+    ProductGroup getProductGroup(MerchantStore store, String code);
     /**
      * Update product group visible flag
      *

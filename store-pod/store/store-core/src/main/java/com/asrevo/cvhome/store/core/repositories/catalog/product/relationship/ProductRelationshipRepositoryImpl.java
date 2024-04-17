@@ -117,6 +117,12 @@ public class ProductRelationshipRepositoryImpl implements ProductRelationshipRep
                         where pr.store.id=:store
                         and pr.product is null
             """;
+    private static final String HQL_GET_PRODUCT_RELATIONSHIP_BY_STORE_ID_AND_CODE = """
+                        select distinct pr from ProductRelationship as pr
+                        where pr.store.id=:store
+                        and pr.code=:code
+                        and pr.product is null
+            """;
     private static final String HQL_GET_PRODUCT_RELATIONSHIP_BY_CODE_AND_STORE_ID = """
                        select distinct pr from ProductRelationship as pr
                         left join fetch pr.product p
@@ -179,6 +185,16 @@ public class ProductRelationshipRepositoryImpl implements ProductRelationshipRep
         Map<String, ProductRelationship> relationMap = relations.stream()
                 .collect(Collectors.toMap(ProductRelationship::getCode, p -> p, (p, q) -> p));
         return relationMap.values().stream().toList();
+    }
+
+    @Override
+    public ProductRelationship getGroup(MerchantStore store, String code) {
+        return (ProductRelationship)
+                entityManager.createQuery(HQL_GET_PRODUCT_RELATIONSHIP_BY_STORE_ID_AND_CODE)
+                        .setParameter("store", store.getId())
+                        .setParameter("code", code)
+                        .setMaxResults(1)
+                        .getSingleResult();
     }
 
 
