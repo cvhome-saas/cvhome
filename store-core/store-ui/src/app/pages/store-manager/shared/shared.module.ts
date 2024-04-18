@@ -2,16 +2,17 @@ import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {StoreAutocompleteComponent} from "./store-autocomplete/store-autocomplete.component";
 import {
+  NbActionsModule,
   NbAutocompleteModule,
   NbButtonModule,
   NbCardModule,
-  NbCheckboxModule,
+  NbCheckboxModule, NbDatepickerModule,
   NbDialogModule, NbIconModule,
   NbInputModule,
   NbOptionModule,
-  NbRadioModule,
+  NbRadioModule, NbRouteTabsetModule,
   NbSelectModule,
-  NbSpinnerModule,
+  NbSpinnerModule, NbTabsetModule,
   NbToastrModule
 } from "@nebular/theme";
 import {NgxDatatableModule} from "@swimlane/ngx-datatable";
@@ -41,6 +42,10 @@ import {NbEvaIconsModule} from "@nebular/eva-icons";
     NbCheckboxModule,
     NbToastrModule,
     NbDialogModule,
+    NbDatepickerModule,
+    NbActionsModule,
+    NbTabsetModule,
+    NbRouteTabsetModule,
     NbAutocompleteModule,
     NbEvaIconsModule,
     NbIconModule,
@@ -63,6 +68,10 @@ import {NbEvaIconsModule} from "@nebular/eva-icons";
     NbCheckboxModule,
     NbToastrModule.forRoot({}),
     NbDialogModule.forRoot({}),
+    NbDatepickerModule.forRoot(),
+    NbActionsModule,
+    NbTabsetModule,
+    NbRouteTabsetModule,
     NbAutocompleteModule,
     NbEvaIconsModule,
     NbIconModule,

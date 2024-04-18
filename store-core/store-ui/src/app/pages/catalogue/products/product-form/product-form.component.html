@@ -2,8 +2,7 @@
   <nb-card-header class="main_header">
     <h1 class="page_title">{{_title | translate}}</h1>
     <div class="content_spacing">
-      <button type="button" nbButton class="cancel_button" (click)="goToBack()">{{ 'ORDER_FORM.CANCLE'
-        | translate}}</button>
+      <button type="button" nbButton class="cancel_button" (click)="goToBack()">{{ 'ORDER_FORM.CANCLE'| translate}}</button>
     </div>
   </nb-card-header>
 
@@ -76,11 +75,9 @@
                     <label class="col-form-label inputLabel">{{ 'PRODUCT.MANUFACTURER' | translate}} <span
                         class="mandatory">*</span></label>
                     <div>
-                      <p-dropdown [options]="manufacturers" placeholder="{{ 'PRODUCT.MANUFACTURER' | translate}}"
-                        formControlName='manufacturer' filter="true" required>
-                        <ng-template let-item pTemplate="selectedItem">{{item.label}}</ng-template>
-                        <ng-template let-el pTemplate="item">{{el.label}}</ng-template>
-                      </p-dropdown>
+                      <nb-select formControlName='manufacturer' placeholder="{{ 'PRODUCT.MANUFACTURER' | translate}}" >
+                        <nb-option [value]="item.value" *ngFor="let item of manufacturers">{{item.label}}</nb-option>
+                      </nb-select>
                     </div>
                     <span *ngIf="(manufacturer.dirty || manufacturer.touched) && manufacturer.invalid"
                       class="err-message">
@@ -97,11 +94,9 @@
                   <div class="form-group">
                     <label class=" col-form-label inputLabel">{{ 'PRODUCT.PRODUCT_TYPE' | translate}}</label>
                     <div>
-                      <p-dropdown [options]="productTypes" placeholder="{{ 'PRODUCT.PRODUCT_TYPE' | translate}}"
-                        formControlName='type' filter="true">
-                        <ng-template let-item pTemplate="selectedItem">{{item.label}}</ng-template>
-                        <ng-template let-el pTemplate="item">{{el.label}}</ng-template>
-                      </p-dropdown>
+                      <nb-select formControlName='type' placeholder="{{ 'PRODUCT.PRODUCT_TYPE' | translate}}" >
+                        <nb-option [value]="item.value" *ngFor="let item of productTypes">{{item.label}}</nb-option>
+                      </nb-select>
                     </div>
                   </div>
                 </div>
