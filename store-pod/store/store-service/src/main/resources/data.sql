@@ -2044,7 +2044,7 @@ INSERT INTO store.product_relationship (product_relationship_id, active, code, p
 INSERT INTO store.product_relationship (product_relationship_id, active, code, product_id, related_product_id, merchant_id) VALUES (3, true, 'RELATED_ITEM', null, null, 1);
 INSERT INTO store.product_relationship (product_relationship_id, active, code, product_id, related_product_id, merchant_id) VALUES (4, true, 'RELATED_ITEM', null, 1, 1);
 
-INSERT INTO store.product_type (product_type_id, prd_type_add_to_cart, date_created, date_modified, updt_id, prd_type_code, prd_type_visible, merchant_id) VALUES (1, null, '2024-03-31 08:45:38.000000', '2024-03-31 08:45:38.000000', null, 'GENERAL', null, null);
+INSERT INTO store.product_type (product_type_id, prd_type_add_to_cart, date_created, date_modified, updt_id, prd_type_code, prd_type_visible, merchant_id) VALUES (1, null, '2024-03-31 08:45:38.000000', '2024-03-31 08:45:38.000000', null, 'GENERAL', null, 1);
 
 INSERT INTO store.tax_class (tax_class_id, tax_class_code, tax_class_title, merchant_id) VALUES (1, 'DEFAULT', 'DEFAULT', 1);
 
