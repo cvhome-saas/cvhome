@@ -5,7 +5,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {ManufactureService} from '../../../shared/services/manufacture.service';
 import {ConfigService} from '../../../shared/services/config.service';
 import * as moment from 'moment';
-import {NbDialogService, NbToastrService} from '@nebular/theme';
+import {NbDialogService, NbRouteTab, NbToastrService} from '@nebular/theme';
 import {ProductService} from '../services/product.service';
 import {ProductImageService} from '../services/product-image.service';
 import {TranslateService} from '@ngx-translate/core';
@@ -43,34 +43,27 @@ export class ProductFormComponent implements OnInit {
   currentLanguage = localStorage.getItem('lang');
 
 
-  tabs = [
+  tabs:NbRouteTab[] = [
     {
       title: this.translate.instant('COMPONENTS.PRODUCTS_IMAGES'),
       route: 'images',
-      icon: 'home',
-      fragment: 'tabs',
-      responsive: true, // hide title before `$tabset-tab-text-hide-breakpoint` value
     },
     {
       title: this.translate.instant('COMPONENTS.PRODUCT_TO_CATEGORY'),
       route: 'category',
-      fragment: 'tabs',
 
     },
     {
       title: this.translate.instant('COMPONENTS.OPTIONS_CONFIG'),
       route: 'options',
-      fragment: 'tab1',
     },
     {
       title: this.translate.instant('COMPONENTS.PRODUCTS_PROPERTIES'),
       route: 'properties',
-      fragment: 'tab1',
     },
     {
       title: this.translate.instant('COMPONENTS.PRODUCTS_DISCOUNT'),
       route: 'discount',
-      fragment: 'tab1',
     }
   ];
 

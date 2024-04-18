@@ -35,7 +35,7 @@ export class CategoryService {
       store: store,
       lang: this.storageService.getLanguage()
     };
-    return this.crudService.get(`/store/api/v1/category/product/${id}?store=${store}`, params);
+    return this.crudService.get(`/store/api/v1/category/product/${id}`, params);
   }
 
   addCategory(category, store): Observable<any> {

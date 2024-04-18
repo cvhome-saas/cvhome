@@ -14,14 +14,14 @@ import { NgxSummernoteModule } from 'ngx-summernote';
 // import { InventoryDetailsComponent } from './inventory/inventory-details/inventory-details.component';
 // import { PricesListComponent } from './price/prices-list/prices-list.component';
 // import { PriceFormComponent } from './price/price-form/price-form.component';
-// import { ProductToCategoryComponent } from './product-to-category/product-to-category.component';
+import { ProductToCategoryComponent } from './product-to-category/product-to-category.component';
 // import { ProductAttributesComponent } from './attribute/product-attributes/product-attributes.component';
 // import { AttributeFormComponent } from './attribute/attribute-form/attribute-form.component';
 //import { AttributeRoutingModule } from './routing/attribute-routing.module';
 import { ProductsRoutingModule } from './routing/products-routing.module';
 //import { PriceRoutingModule } from './routing/price-routing.module';
 //import { InventoryRoutingModule } from './routing/inventory-routing.module';
-// import { ProductsImagesComponent } from './products-images/products-images.component';
+import { ProductsImagesComponent } from './products-images/products-images.component';
 // import { ProductProperties } from './property/list/product-property.component';
 // import { ProductPropertyForm } from './property/form/product-property-form.component';
 import { NbDialogModule } from '@nebular/theme';
@@ -40,7 +40,7 @@ import {ProductDetailsComponent} from "./product-details/product-details.compone
     ProductCreationComponent,
     ProductFormComponent,
     ProductDetailsComponent,
-    // ProductToCategoryComponent,
+    ProductToCategoryComponent,
 
     // AvailableButtonComponent,
     //
@@ -54,7 +54,7 @@ import {ProductDetailsComponent} from "./product-details/product-details.compone
     //
     // ProductAttributesComponent,
     // AttributeFormComponent,
-    // ProductsImagesComponent,
+    ProductsImagesComponent,
     // ProductProperties,
     // ProductPropertyForm,
     // ProductDiscountComponent,

@@ -1,140 +1,151 @@
-import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
-import { Router } from '@angular/router';
+import {Component, OnInit} from '@angular/core';
+import {ActivatedRoute, Router} from '@angular/router';
 
-import { CategoryService } from '../../categories/services/category.service';
-import { ProductService } from '../services/product.service';
-import { TranslateService } from '@ngx-translate/core';
-import { StorageService } from '../../../shared/services/storage.service';
-import { IDropdownSettings } from 'ng-multiselect-dropdown';
-import { forkJoin } from 'rxjs';
-import { Location } from '@angular/common';
+import {CategoryService} from '../../categories/services/category.service';
+import {ProductService} from '../services/product.service';
+import {TranslateService} from '@ngx-translate/core';
+import {StorageService} from '../../../shared/services/storage.service';
+import {forkJoin} from 'rxjs';
+import {Location} from '@angular/common';
 
 @Component({
-    selector: 'ngx-product-to-category',
-    templateUrl: './product-to-category.component.html',
-    styleUrls: ['./product-to-category.component.scss']
+  selector: 'ngx-product-to-category',
+  templateUrl: './product-to-category.component.html',
+  styleUrls: ['./product-to-category.component.scss']
 })
 export class ProductToCategoryComponent implements OnInit {
 
-    id : any;
-    loaded = false;
-    loading = false;
+  loaded = false;
+  loading = false;
+  uniqueCode: string;
+  perPage: number = 50;//ideally display all category
+  currentPage: number = 1;
 
-    perPage: number = 50;//ideally display all category
-    currentPage: number = 1;
+  dropdownList = [];
+  categories = [];
+  selectedItems = [];
+  dropdownSettings = {};
+  categoryLoading = false;
+  filteredCategories = [];
 
-    dropdownList = [];
-    categories = [];
-    selectedItems = [];
-    dropdownSettings = {};
-    categoryLoading = false;
-    filteredCategories = [];
+  params = this.loadParams();
 
-    params = this.loadParams();
-    constructor(
-        private translate: TranslateService,
-        private categoryService: CategoryService,
-        private storageService: StorageService,
-        private productService: ProductService,
-        private location: Location,
-        private router: Router
-    ) {
-        this.dropdownSettings = {
-            singleSelection: false,
-            idField: 'id',
-            textField: 'name',
-            enableCheckAll: false,
-            searchPlaceholderText: 'Search by code',
-            // unSelectAllText: 'UnSelect All',
-            itemsShowLimit: 10,
-            allowSearchFilter: true,
-            allowRemoteDataSearch: true
+  constructor(
+    private translate: TranslateService,
+    private categoryService: CategoryService,
+    private storageService: StorageService,
+    private productService: ProductService,
+    private location: Location,
+    private router: Router,
+    private activatedRoute: ActivatedRoute) {
+    //
+    // this.dropdownSettings = {
+    //   singleSelection: false,
+    //   idField: 'id',
+    //   textField: 'name',
+    //   enableCheckAll: false,
+    //   searchPlaceholderText: 'Search by code',
+    //   // unSelectAllText: 'UnSelect All',
+    //   itemsShowLimit: 10,
+    //   allowSearchFilter: true,
+    //   allowRemoteDataSearch: true
+    //
+    // };
+  }
 
-        };
-    }
-    loadParams() {
-        return {
-            count: this.perPage,
-            page: 0,
-            lang: localStorage.getItem('lang')
-        };
-    }
-    ngOnInit() {
-        this.id = this.productService.getProductIdRoute(this.router,this.location);
+  loadParams() {
+    return {
+      store: "",
+      count: this.perPage,
+      page: 0,
+      lang: localStorage.getItem('lang')
+    };
+  }
 
+  ngOnInit() {
+    this.activatedRoute.parent.params.subscribe(it => {
+      const split: string[] = it['code'].split("-");
+      this.params.store = split[0];
+      if (split.length == 2 && split[1] != "") {
+        this.uniqueCode = split[1];
         this.load();
+      }
+    });
 
-        //specify add image url to image component
-        let el = document.getElementById('tabs');
-        el.scrollIntoView();
-    }
+    this.load();
 
-    private load() {
-        this.loading = true;
+    //specify add image url to image component
+    let el = document.getElementById('tabs');
+    el.scrollIntoView();
+  }
 
-        const p$ = this.categoryService.getCategoryByProductId(this.id,"")
-        const c$ = this.categoryService.getListOfCategories(this.params)
+  private load() {
+    this.loading = true;
 
-        forkJoin([p$, c$])
-            .subscribe(([p$, c$]) => {
-                p$.categories.forEach((data) => {
-                    this.selectedItems.push({ 'id': data.id, 'name': data.code })
-                });
-                c$.categories.forEach((value) => {
-                    this.getChildren(value);
+    const p$ = this.categoryService.getCategoryByProductId(this.uniqueCode, this.params.store)
+    const c$ = this.categoryService.getListOfCategories(this.params)
 
-                })
-                this.loading = false;
+    forkJoin([p$, c$])
+      .subscribe(([p$, c$]) => {
+        p$.categories.forEach((data) => {
+          this.selectedItems.push({'id': data.id, 'name': data.code})
         });
+        c$.categories.forEach((value) => {
+          this.getChildren(value);
 
+        })
+        this.loading = false;
+      });
+
+  }
+
+
+  getChildren(node) {
+
+    if (node.children && node.children.length !== 0) {
+      this.categories.push({'id': node.id, 'name': node.description.name})
+      node.children.forEach((el) => {
+        this.getChildren(el);
+      });
+    } else {
+      this.categories.push({'id': node.id, 'name': node.description.name})
     }
+  }
 
+  onFilterChange(e) {
+    //console.log(e);
+    if (e.length > 2) {
+      this.params["name"] = e;
+      this.categoryService.filterCategory(this.params, "").subscribe(res => {
+        }, error => {
 
-
-    getChildren(node) {
-
-        if (node.children && node.children.length !== 0) {
-            this.categories.push({ 'id': node.id, 'name': node.description.name })
-            node.children.forEach((el) => {
-                this.getChildren(el);
-            });
-        } else {
-            this.categories.push({ 'id': node.id, 'name': node.description.name })
         }
+      )
+      // this.getList();
     }
+  }
 
-    onFilterChange(e) {
-        //console.log(e);
-        if (e.length > 2) {
-            this.params["name"] = e;
-            this.categoryService.filterCategory(this.params,"").subscribe(res => {
-            }, error => {
+  onItemSelect(item: any) {
+    this.addProductToCategory(this.params.store, this.uniqueCode, item.id)
+  }
 
-            }
-        )
-            // this.getList();
-        }
-    }
+  onItemDeSelect(item: any) {
+    this.removeProductFromCategory(this.params.store, this.uniqueCode, item.id)
+  }
 
-    onItemSelect(item: any) {
-        this.addProductToCategory(this.id, item.id)
-    }
-    onItemDeSelect(item: any) {
-        this.removeProductFromCategory(this.id, item.id)
-    }
-    addProductToCategory(productId, groupCode) {
-        this.productService.addProductToCategory(productId, groupCode)
-            .subscribe(res => {
-                this.load();
-        });
-    }
+  addProductToCategory(store, productId, groupCode) {
+    this.productService.addProductToCategory(store, productId, groupCode)
+      .subscribe(res => {
+        this.load();
+      });
+  }
 
-    removeProductFromCategory(productId, groupCode) {
-        this.productService.removeProductFromCategory(productId, groupCode)
-            .subscribe(res => {
-                this.load();
-        });
-    }
+  removeProductFromCategory(store, productId, groupCode) {
+    this.productService.removeProductFromCategory(store, productId, groupCode)
+      .subscribe(res => {
+        this.load();
+      });
+  }
 
 
 }
