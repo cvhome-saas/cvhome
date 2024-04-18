@@ -1,0 +1,66 @@
+<nb-card class="page-card inner_pages">
+  <nb-card-body [nbSpinner]="loadingList" nbSpinnerSize="large" nbSpinnerStatus="primary" class="image-content">
+    <div class="inner_pages_legacy">
+      <nb-card-header class="main_header">
+        <h1 class="page_title">{{ 'filemanager.title' | translate }}</h1>
+        <div class="content_spacing_empty"></div>
+      </nb-card-header>
+      <form class="form-inline filter_section">
+        <div class="filter_left_section">
+
+        </div>
+        <div class="filter_right_section">
+          <ngx-store-autocomplete (onStore)="onSelectStore($event)"></ngx-store-autocomplete>
+        </div>
+      </form>
+      <form class="form-inline filter_section">
+        <div class="filter_left_section">
+        </div>
+        <div class="filter_right_section">
+          <ngx-file-drop dropZoneLabel="Drop files here" (onFileDrop)="dropped($event)" accept="image/*">
+            <ng-template ngx-file-drop-content-tmp let-openFileSelector="openFileSelector">
+              <button nbButton status="primary" (click)="openFileSelector()">{{ 'COMMON.BROWSE_FILES' | translate }}</button>
+            </ng-template>
+          </ngx-file-drop>
+        </div>
+      </form>
+      <div [hidden]="files.length==0" class="file_listing_scroll">
+        <ul class="file_listing_main">
+          <li *ngFor="let images of files;let i=index">
+            <div class="file_listing_box">
+              <div class="image-title-main">
+                <div class="close_main">
+                  <i class="fa fa-eye" (click)="openImage(files,i)"></i>
+
+                  <i class="fa fa-trash" (click)="unSelectImage(i)"></i>
+                </div>
+              </div>
+              <div class="image_box">
+                <img [id]="'blah-'+i" [src]="images.src" class="banner-image"/>
+              </div>
+            </div>
+          </li>
+        </ul>
+        <button nbButton status="success" (click)="upload()" [disabled]="files.length==0">{{ 'filemanager.upload' | translate }}</button>
+      </div>
+      <div class="file_listing_scroll">
+        <ul class="file_listing_main">
+          <li *ngFor="let image of images;let i=index">
+            <div class="file_listing_box">
+              <div class="image-title-main">
+                <div class="close_main">
+                  <i class="fa fa-eye" (click)="openImage(images,i)"></i>
+                  <i class="fa fa-trash" (click)="removeImage(image.name)"></i>
+                </div>
+              </div>
+              <div class="image_box">
+                <img src="{{image.src}}" class="banner-image"/>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nb-card-body>
+</nb-card>
+

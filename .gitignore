@@ -35,3 +35,4 @@ bin/
 .vscode/
 /*/package-lock.json
 **/node_modules/
+/store-core/shopizer-admin-main/

@@ -1,0 +1,147 @@
+<div class="row">
+  <div class="col-md-12">
+    <nb-card class="inline-form-card">
+      <nb-card-header>
+        MANAGERS
+        <ngx-store-autocomplete (onStore)="storeSelectedChanged($event)"></ngx-store-autocomplete>
+      </nb-card-header>
+      <nb-card-body>
+        <form (ngSubmit)="onSubmit()" [formGroup]="userForm">
+          <div class="form-group row">
+            <label for="inputUsername" class="label col-sm-3 col-form-label">Username</label>
+            <div class="col-sm-9">
+              <input type="text" formControlName="username" nbInput fullWidth id="inputUsername" placeholder="Username">
+              <div class="help-block">
+                <div
+                  *ngIf="userForm.controls['username'].invalid && (userForm.controls['username'].dirty || userForm.controls['username'].touched)"
+                  class="text-danger">
+                  <div *ngIf="userForm.controls['username'].errors?.['required']">
+                    Username is required.
+                  </div>
+                  <div *ngIf="userForm.controls['username'].errors?.['minlength']">
+                    Username is minLength.
+                  </div>
+                  <div *ngIf="userForm.controls['username'].errors?.['pattern']">
+                    Username is pattern.
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+          <div class="form-group row">
+            <label for="inputPassword" class="label col-sm-3 col-form-label">Password</label>
+            <div class="col-sm-9">
+              <input type="text" formControlName="password" nbInput fullWidth id="inputPassword" placeholder="Password">
+              <div class="help-block">
+                <div
+                  *ngIf="userForm.controls['password'].invalid && (userForm.controls['password'].dirty || userForm.controls['password'].touched)"
+                  class="text-danger">
+                  <div *ngIf="userForm.controls['password'].errors?.['required']">
+                    Password is required.
+                  </div>
+                  <div *ngIf="userForm.controls['password'].errors?.['minlength']">
+                    Password is minLength.
+                  </div>
+                  <div *ngIf="userForm.controls['password'].errors?.['pattern']">
+                    Password is pattern.
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+          <div class="form-group row">
+            <label class="col-sm-3 label">groups</label>
+            <div class="col-sm-9">
+              <nb-select multiple formControlName="groups">
+                <nb-option *ngFor="let g of groups" [value]="g">{{ g }}</nb-option>
+              </nb-select>
+              <div class="help-block">
+                <div
+                  *ngIf="userForm.controls['groups'].invalid && (userForm.controls['groups'].dirty || userForm.controls['groups'].touched)"
+                  class="text-danger">
+                  <div *ngIf="userForm.controls['groups'].errors?.['required']">
+                    Groups is required.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="form-group row">
+            <div class="offset-sm-3 col-sm-9">
+              <button type="submit" nbButton status="primary">Save</button>
+            </div>
+          </div>
+        </form>
+
+
+
+
+        <div>
+          <table class="table text-nowrap mb-0 align-middle">
+            <thead class="text-dark fs-4">
+            <tr>
+              <th class="border-bottom-0">
+                <h6 class="fw-semibold mb-0">Username</h6>
+              </th>
+              <th class="border-bottom-0">
+                <h6 class="fw-semibold mb-0">Enabled</h6>
+              </th>
+              <th class="border-bottom-0">
+                <h6 class="fw-semibold mb-0">Groups</h6>
+              </th>
+              <th class="border-bottom-0">
+                <h6 class="fw-semibold mb-0">Actions</h6>
+              </th>
+            </tr>
+            </thead>
+            <tbody *ngIf="managers">
+            <tr *ngFor="let u of managers">
+              <td class="ps-0">
+                <div class="d-flex align-items-center">
+                  <div>
+                    <h6 class="fw-semibold mb-1">{{ u.username }}</h6>
+                    <p class="fs-2 mb-0 text-muted">
+                      {{ u.email }}
+                    </p>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <p class="mb-0 fs-3">
+                  <input (change)="statusChange(u.id,$event)" [checked]="u.enabled" [value]="u.enabled"
+                         type="checkbox">
+                </p>
+              </td>
+              <td>
+                <p>
+                  Select Groups
+                </p>
+                <select (change)="groupsChanged(u.id,$event)" multiple name="cities" style="height:125px;">
+                  <option *ngFor="let g of u.selectedGroups" [selected]="g.selected"
+                          [value]="g.group">{{ g.group }}
+                  </option>
+                </select>
+              </td>
+              <td>
+                <div aria-label="First group" class="btn-group me-2 mb-2" role="group">
+                  <button (click)="deleteUser(u.id)" class="btn btn-secondary" type="button">
+                    <i class="ti ti-trash fs-4"></i>
+                  </button>
+                  <button class="btn btn-secondary" type="button">
+                    <i class="ti ti-settings fs-4"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </nb-card-body>
+    </nb-card>
+  </div>
+</div>
