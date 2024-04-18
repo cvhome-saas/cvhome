@@ -13,7 +13,7 @@ export class ManufactureService {
   ) {
   }
 
-  getManufacturers(): Observable<any> {
-    return this.crudService.get(`/v1/manufacturers/`);
+  getManufacturers(store): Observable<any> {
+    return this.crudService.get(`/store/api/v1/manufacturers?store=${store}`);
   }
 }

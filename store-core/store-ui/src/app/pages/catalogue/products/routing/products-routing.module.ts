@@ -3,7 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 
 import { ProductsComponent } from '../products.component';
 import { ProductsListComponent } from '../products-list/products-list.component';
-// import { ProductCreationComponent } from '../product-creation/product-creation.component';
+import { ProductCreationComponent } from '../product-creation/product-creation.component';
 // import { ProductDetailsComponent } from '../product-details/product-details.component';
 // import { ProductToCategoryComponent } from '../product-to-category/product-to-category.component';
 // import { ProductsImagesComponent } from './../products-images/products-images.component';
@@ -19,11 +19,11 @@ const routes: Routes = [
     path: '',
     component: ProductsComponent,
     children: [
-      // {
-      //   path: 'create-product',
-      //   // canDeactivate: [ExitGuard],
-      //   component: ProductCreationComponent,
-      // },
+      {
+        path: 'create-product/:code',
+        // canDeactivate: [ExitGuard],
+        component: ProductCreationComponent,
+      },
       {
         path: 'products-list',
         component: ProductsListComponent,

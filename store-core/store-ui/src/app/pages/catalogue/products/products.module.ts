@@ -3,9 +3,9 @@ import { NgModule } from '@angular/core';
 
 import { ProductsComponent } from './products.component';
 import { ProductsListComponent } from './products-list/products-list.component';
-// import { ProductCreationComponent } from './product-creation/product-creation.component';
+import { ProductCreationComponent } from './product-creation/product-creation.component';
 // import { ProductDetailsComponent } from './product-details/product-details.component';
-// import { ProductFormComponent } from './product-form/product-form.component';
+import { ProductFormComponent } from './product-form/product-form.component';
 // import { AvailableButtonComponent } from './products-list/available-button.component';
 import { NgxSummernoteModule } from 'ngx-summernote';
 // import { ManageInventoryComponent } from './inventory/manage-inventory/manage-inventory.component';
@@ -36,8 +36,8 @@ import {SharedModule} from "../../store-manager/shared/shared.module";
   declarations: [
     ProductsComponent,
      ProductsListComponent,
-    // ProductCreationComponent,
-    // ProductFormComponent,
+    ProductCreationComponent,
+    ProductFormComponent,
     // ProductDetailsComponent,
     // ProductToCategoryComponent,
 

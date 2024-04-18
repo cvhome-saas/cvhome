@@ -65,8 +65,8 @@ export class ProductService {
     return this.crudService.delete(`/store/api/v1/private/product/${id}`);
   }
 
-  getProductTypes(): Observable<any> {
-    return this.crudService.get(`/store/api/v1/private/product/types`);
+  getProductTypes(store): Observable<any> {
+    return this.crudService.get(`/store/api/v1/private/product/types?store=${store}`);
   }
 
   checkProductSku(code): Observable<any> {

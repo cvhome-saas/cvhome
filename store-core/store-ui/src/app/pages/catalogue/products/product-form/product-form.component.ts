@@ -1,6 +1,6 @@
 import { Component, Input, OnInit, Output } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 
 import { ManufactureService } from '../../../shared/services/manufacture.service';
 import { ConfigService } from '../../../shared/services/config.service';
@@ -16,9 +16,7 @@ import { forkJoin } from 'rxjs';
 import { TypesService } from '../../types/services/types.service';
 import { StorageService } from '../../../shared/services/storage.service';
 import { Image } from '../../../shared/models/image';
-import { ImageBrowserComponent } from '../../../../@theme/components/image-browser/image-browser.component';
-//import { threadId } from 'worker_threads';
-declare var jquery: any;
+import {ImageBrowserComponent} from "../../../store-manager/shared/image-browser/image-browser.component";
 declare var $: any;
 
 export interface TabItem {
@@ -35,6 +33,9 @@ export interface TabItem {
 export class ProductFormComponent implements OnInit {
   @Input() product: any;
   @Input() _title: string;
+  store: string;
+  action: any = 'save'
+  uniqueCode: string;//identifier fromroute
 
   form: FormGroup;
   loaded = false;
@@ -117,36 +118,27 @@ export class ProductFormComponent implements OnInit {
     private translate: TranslateService,
     private typeService: TypesService,
     private dialogService: NbDialogService,
-    private storageService: StorageService
+    private storageService: StorageService,
+    private activatedRoute: ActivatedRoute,
+
   ) {
   }
 
   ngOnInit() {
 
-    this.loadEvent();
 
-    const manufacture$ = this.manufactureService.getManufacturers();
-    const types$ = this.productService.getProductTypes();
-    const config$ = this.configService.getListOfSupportedLanguages(localStorage.getItem('merchant'));
-    forkJoin([manufacture$, types$, config$])
-      .subscribe(([manufacturers, productTypes, languages]) => {
 
-        manufacturers.manufacturers.forEach((option) => {
-          this.manufacturers.push({ value: option.code, label: option.code });
-        });
+    this.activatedRoute.params.subscribe(it => {
+      const split: string[] = it['code'].split("-");
+      this.store = split[0];
+      if (split.length == 2 && split[1] != "") {
+        this.action = 'edit';
+        this.uniqueCode = split[1];
+      }
+      this.loadssss();
+    });
 
-        productTypes.list.forEach((option) => {
-          this.productTypes.push({ value: option.code, label: option.code });
-        });
 
-        this.languages = [...languages];
-        this.createForm();//init
-        this.addFormArray();//create array
-        if (this.product.id) {
-          this.fillForm();//bind content to the form
-        }
-        this.loadedEvent();
-      });
   }
 
   ngAfterViewInit() {
@@ -518,12 +510,45 @@ export class ProductFormComponent implements OnInit {
       className: 'note-btn',
       click: function () {
         //console.log(me);
-        me.dialogService.open(ImageBrowserComponent, {}).onClose.subscribe(name => name && context.invoke('editor.pasteHTML', '<img src="' + name + '">'));
+        me.dialogService.open(ImageBrowserComponent, {
+          context:{
+            store:me.store
+          }
+        }).onClose
+          .subscribe(name => name && context.invoke('editor.pasteHTML', '<img src="' + name + '">'));
       }
     });
     return button.render();
   }
   loadingTab(e) {
     this.tabLoader = e;
+  }
+
+  private loadssss() {
+    this.loadEvent();
+
+    const manufacture = this.manufactureService.getManufacturers(this.store);
+    const types = this.productService.getProductTypes(this.store);
+    const config = this.configService.getListOfSupportedLanguages(this.store);
+    forkJoin([manufacture, types, config])
+      .subscribe(([manufacturers, productTypes, languages]) => {
+
+        manufacturers.manufacturers.forEach((option) => {
+          this.manufacturers.push({ value: option.code, label: option.code });
+        });
+
+        productTypes.list.forEach((option) => {
+          this.productTypes.push({ value: option.code, label: option.code });
+        });
+
+        this.languages = [...languages];
+        this.createForm();//init
+        this.addFormArray();//create array
+        if (this.product.id) {
+          this.fillForm();//bind content to the form
+        }
+        this.loadedEvent();
+      });
+
   }
 }
