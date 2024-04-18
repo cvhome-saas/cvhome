@@ -26,7 +26,6 @@ public class MinioS3Config {
         properties.add("com.asrevo.cvhome.cdn.basePath", getS3URL);
         properties.add("com.asrevo.cvhome.cdn.storage.bucket", () -> bucket);
         properties.add("com.asrevo.cvhome.cdn.storage.provider", () -> "minio");
-        System.out.println(container.getAdminURL());
         return container;
     }
 
