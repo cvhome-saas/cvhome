@@ -35,11 +35,12 @@ export class ProductService {
     return this.crudService.get(`/store/api/v1/product/${id}`, params);
   }
 
-  getProductDefinitionById(id): Observable<any> {
+  getProductDefinitionById(store,id): Observable<any> {
     const params = {
+      store,
       lang: '_all'
     };
-    return this.crudService.get(`/store/api/v2/private/product/definition/${id}`, params);
+    return this.crudService.get(`/store/api/v2/private/product/${id}`, params);
   }
 
   getProductDefinitionBySku(sku): Observable<any> {

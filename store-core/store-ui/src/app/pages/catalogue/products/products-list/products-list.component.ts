@@ -118,7 +118,7 @@ export class ProductsListComponent implements OnInit {
    }
 
   onEdit(row: any) {
-
+    this.router.navigate(['pages/catalogue/products/product/'+ this.params.store+"-"+ row.id]);
   }
 
   onDelete(row: any) {

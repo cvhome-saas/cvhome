@@ -30,6 +30,7 @@ import { NbDialogModule } from '@nebular/theme';
 
 
 import {SharedModule} from "../../store-manager/shared/shared.module";
+import {ProductDetailsComponent} from "./product-details/product-details.component";
 
 @NgModule({
 
@@ -38,7 +39,7 @@ import {SharedModule} from "../../store-manager/shared/shared.module";
      ProductsListComponent,
     ProductCreationComponent,
     ProductFormComponent,
-    // ProductDetailsComponent,
+    ProductDetailsComponent,
     // ProductToCategoryComponent,
 
     // AvailableButtonComponent,

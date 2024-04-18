@@ -9,6 +9,9 @@ import { ProductService } from '../services/product.service';
 })
 export class ProductDetailsComponent implements OnInit {
   product: any = {};
+  store: string;
+  action: any = 'save'
+  uniqueCode: string;//identifier fromroute
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -18,11 +21,18 @@ export class ProductDetailsComponent implements OnInit {
   }
 
   ngOnInit() {
-    const id = this.activatedRoute.snapshot.paramMap.get('id');
-    this.productService.getProductById(id)
-      .subscribe(res => {
-        this.product = res;
-      });
+    this.activatedRoute.params.subscribe(it => {
+      const split: string[] = it['code'].split("-");
+      this.store = split[0];
+      if (split.length == 2 && split[1] != "") {
+        this.uniqueCode = split[1];
+
+        this.productService.getProductDefinitionById(this.store,this.uniqueCode)
+          .subscribe(res => {
+            this.product = res;
+          });
+      }
+    });
   }
 
   route(link) {
