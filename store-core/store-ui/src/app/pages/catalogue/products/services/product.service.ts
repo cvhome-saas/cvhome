@@ -22,8 +22,8 @@ export class ProductService {
     return this.crudService.get(`/store/api/v2/products`, params);
   }
 
-  updateProductFromTable(id, product): Observable<any> {
-    return this.crudService.patch(`/store/api/v1/private/product/${id}`, product);
+  updateProductFromTable(store,id, product): Observable<any> {
+    return this.crudService.patch(`/store/api/v1/private/product/${id}?store=${store}`, product);
   }
 
   updateProduct(id, product): Observable<any> {

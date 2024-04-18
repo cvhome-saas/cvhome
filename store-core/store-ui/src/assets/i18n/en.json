@@ -280,7 +280,7 @@
     "PRODUCT_TYPE": "Product type",
     "QUANTITY": "Quantity",
     "PRODUCT_SHIPEABLE": "Product will be shipped",
-    "PRODUCT_UPDATED": "Product updated.",
+    "PRODUCT_UPDATED_ERROR": "Error while updating product",
     "PRODUCT_CREATED": "Product created.",
     "PRODUCT_REMOVED": "Product removed.",
     "DEFINITION": "Product definition",

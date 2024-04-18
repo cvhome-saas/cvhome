@@ -281,6 +281,7 @@
         "QUANTITY": "Quantité",
         "PRODUCT_SHIPEABLE": "Le produit sera expédié",
         "PRODUCT_UPDATED": "Produit mis à jour.",
+        "PRODUCT_UPDATED_ERROR": "Erreur lors de la mise à jour du produit",
         "PRODUCT_CREATED": "Produit créé.",
         "PRODUCT_REMOVED": "Produit retiré.",
         "DEFINITION": "Définition du produit",

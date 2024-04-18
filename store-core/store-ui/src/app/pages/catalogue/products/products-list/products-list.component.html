@@ -11,7 +11,7 @@
         <div class="filter_left_section">
         </div>
         <div class="filter_right_section">
-          <ngx-store-autocomplete (onStore)="onSelectStore($event)"></ngx-store-autocomplete>
+          <ngx-store-autocomplete  (onStore)="onSelectStore($event)"></ngx-store-autocomplete>
 
             <a class="createBtn" [routerLink]="['/pages/catalogue/products/create-product',params.store+'-']">
               <img class="pointer sda add" src="../../../../assets/img/plus.png" title="{{ 'COMPONENTS.CREATE_PRODUCT' | translate}}"
@@ -56,22 +56,36 @@
 
         <ngx-datatable-column name="quantity">
           <ng-template let-column="column" ngx-datatable-header-template> {{ 'PRODUCT.QTY' |translate }}</ng-template>
-          <ng-template let-value="value" ngx-datatable-cell-template>
-            <strong>{{ value }}</strong>
+          <ng-template ngx-datatable-cell-template let-rowIndex="rowIndex" let-value="value" let-row="row">
+            <span
+              title="Double click to edit"
+              (dblclick)="editing[rowIndex + '-quantity'] = true"
+              *ngIf="!editing[rowIndex + '-quantity']"
+            >
+              {{ value }}
+            </span>
+            <input nbInput fieldSize="tiny" autofocus (blur)="updateValue($event, 'quantity', rowIndex)" *ngIf="editing[rowIndex + '-quantity']" type="number" min="0" max="1000000" [value]="value"/>
           </ng-template>
         </ngx-datatable-column>
 
         <ngx-datatable-column name="available">
           <ng-template let-column="column" ngx-datatable-header-template> {{ 'COMMON.AVAILABLE' |translate }}</ng-template>
-          <ng-template let-value="value" ngx-datatable-cell-template>
-            <strong>{{ value }}</strong>
+          <ng-template let-value="value" let-rowIndex="rowIndex" ngx-datatable-cell-template>
+            <input type="checkbox" [checked]="value" [value]="value" (click)="updateValue($event,'available',rowIndex)"/>
           </ng-template>
         </ngx-datatable-column>
 
         <ngx-datatable-column name="price">
           <ng-template let-column="column" ngx-datatable-header-template> {{ 'PRODUCT.PRICE' |translate }}</ng-template>
-          <ng-template let-value="value" ngx-datatable-cell-template>
-            <strong>{{ value }}</strong>
+          <ng-template ngx-datatable-cell-template let-rowIndex="rowIndex" let-value="value" let-row="row">
+            <span
+              title="Double click to edit"
+              (dblclick)="editing[rowIndex + '-price'] = true"
+              *ngIf="!editing[rowIndex + '-price']"
+            >
+              {{ value }}
+            </span>
+            <input nbInput fieldSize="tiny" autofocus (blur)="updateValue($event, 'price', rowIndex)" *ngIf="editing[rowIndex + '-price']" type="number" min="0" max="1000000" [value]="value"/>
           </ng-template>
         </ngx-datatable-column>
 

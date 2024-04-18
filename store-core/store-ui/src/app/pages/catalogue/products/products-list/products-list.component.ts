@@ -17,6 +17,7 @@ import {ShowcaseDialogComponent} from "../../../store-manager/shared/showcase-di
 export class ProductsListComponent implements OnInit {
   page: Page = new Page();
   rows = [];
+  editing = {};
   loadingList = false;
   loading: boolean = false;
   perPage = 20;
@@ -82,25 +83,42 @@ export class ProductsListComponent implements OnInit {
     this.page.pageNumber = pageInfo.offset;
     this.getList();
   }
+  updateValue(event,cell,rowIndex){
+    let newValue=undefined;
+    console.log(event.target.type)
+    if (event.target.type=='checkbox'){
+      newValue=event.target.checked
+    }
+    else if (event.target.type=='number'){
+      newValue=event.target.value
+    }
+    if (newValue!=undefined){
+      this.rows[rowIndex][cell] = newValue;
+      this.updateRecord(this.rows[rowIndex])
+      this.rows = [...this.rows];
+    }
+    this.editing[rowIndex + '-' + cell] = false;
 
+  }
+   updateRecord(newData) {
+     const product = {
+       available: newData.available,
+       price: newData.price,
+       quantity: newData.quantity
+     };
+     this.productService.updateProductFromTable(this.params.store,newData.id, product)
+       .subscribe({
+         next:(data)=>{
+           this.toastr.success(this.translate.instant('PRODUCT.PRODUCT_UPDATED'));
+         },
+         error:(err)=>{
+           this.toastr.danger(this.translate.instant('PRODUCT.PRODUCT_UPDATED_ERROR'));
+         }
+       })
+   }
 
   onEdit(row: any) {
-    //  updateRecord(event) {
-    //    const product = {
-    //      available: event.newData.available,
-    //      price: event.newData.price,
-    //      quantity: event.newData.quantity
-    //    };
-    //    event.confirm.resolve(event.newData);
-    //    this.productService.updateProductFromTable(event.newData.id, product)
-    //      .subscribe(res => {
-    //        event.confirm.resolve(event.newData);
-    //        this.toastr.success(this.translate.instant('PRODUCT.PRODUCT_UPDATED'));
-    //      }, error => {
-    //        console.log(error.error.message);
-    //      });
-    //  }
-    //
+
   }
 
   onDelete(row: any) {
