@@ -51,7 +51,7 @@ export class ProductService {
 
   createProduct(store, product): Observable<any> {
 
-    return this.crudService.post(`/store/api/v2/private/product/definition?store=${store}`, product);
+    return this.crudService.post(`/store/api/v2/private/product?store=${store}`, product);
   }
 
   deleteProduct(id): Observable<any> {
