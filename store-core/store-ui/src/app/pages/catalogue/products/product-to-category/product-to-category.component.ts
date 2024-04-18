@@ -7,6 +7,7 @@ import {TranslateService} from '@ngx-translate/core';
 import {StorageService} from '../../../shared/services/storage.service';
 import {forkJoin} from 'rxjs';
 import {Location} from '@angular/common';
+import {NbToastrService} from "@nebular/theme";
 
 @Component({
   selector: 'ngx-product-to-category',
@@ -15,18 +16,13 @@ import {Location} from '@angular/common';
 })
 export class ProductToCategoryComponent implements OnInit {
 
-  loaded = false;
   loading = false;
   uniqueCode: string;
   perPage: number = 50;//ideally display all category
   currentPage: number = 1;
 
-  dropdownList = [];
   categories = [];
-  selectedItems = [];
-  dropdownSettings = {};
-  categoryLoading = false;
-  filteredCategories = [];
+  selectedItems: string[] = [];
 
   params = this.loadParams();
 
@@ -37,20 +33,9 @@ export class ProductToCategoryComponent implements OnInit {
     private productService: ProductService,
     private location: Location,
     private router: Router,
+    private toastr: NbToastrService,
     private activatedRoute: ActivatedRoute) {
-    //
-    // this.dropdownSettings = {
-    //   singleSelection: false,
-    //   idField: 'id',
-    //   textField: 'name',
-    //   enableCheckAll: false,
-    //   searchPlaceholderText: 'Search by code',
-    //   // unSelectAllText: 'UnSelect All',
-    //   itemsShowLimit: 10,
-    //   allowSearchFilter: true,
-    //   allowRemoteDataSearch: true
-    //
-    // };
+
   }
 
   loadParams() {
@@ -72,8 +57,6 @@ export class ProductToCategoryComponent implements OnInit {
       }
     });
 
-    this.load();
-
     //specify add image url to image component
     let el = document.getElementById('tabs');
     el.scrollIntoView();
@@ -83,67 +66,69 @@ export class ProductToCategoryComponent implements OnInit {
     this.loading = true;
 
     const p$ = this.categoryService.getCategoryByProductId(this.uniqueCode, this.params.store)
-    const c$ = this.categoryService.getListOfCategories(this.params)
+    const c$ = this.categoryService.getListOfCategories0(this.params)
 
     forkJoin([p$, c$])
       .subscribe(([p$, c$]) => {
+        this.selectedItems = [];
+        this.categories = [];
         p$.categories.forEach((data) => {
-          this.selectedItems.push({'id': data.id, 'name': data.code})
+          this.selectedItems.push(data.id)
         });
         c$.categories.forEach((value) => {
-          this.getChildren(value);
-
+          this.categories.push({'id': value.id, 'name': value.description.name})
         })
         this.loading = false;
       });
 
   }
 
+  change($event: string[]) {
+    const oldItems = this.selectedItems;
+    const newItems = $event;
+    if (newItems.length > oldItems.length) {
+      // find new item
+      this.onItemSelect(newItems.filter(it => !oldItems.includes(it))[0]);
 
-  getChildren(node) {
-
-    if (node.children && node.children.length !== 0) {
-      this.categories.push({'id': node.id, 'name': node.description.name})
-      node.children.forEach((el) => {
-        this.getChildren(el);
-      });
-    } else {
-      this.categories.push({'id': node.id, 'name': node.description.name})
     }
-  }
-
-  onFilterChange(e) {
-    //console.log(e);
-    if (e.length > 2) {
-      this.params["name"] = e;
-      this.categoryService.filterCategory(this.params, "").subscribe(res => {
-        }, error => {
-
-        }
-      )
-      // this.getList();
+    if (oldItems.length > newItems.length) {
+      // find removed item
+      this.onItemDeSelect(oldItems.filter(it => !newItems.includes(it))[0]);
     }
+
   }
 
-  onItemSelect(item: any) {
-    this.addProductToCategory(this.params.store, this.uniqueCode, item.id)
+  onItemSelect(id: string) {
+    this.addProductToCategory(this.params.store, this.uniqueCode, id)
   }
 
-  onItemDeSelect(item: any) {
-    this.removeProductFromCategory(this.params.store, this.uniqueCode, item.id)
+  onItemDeSelect(id: string) {
+    this.removeProductFromCategory(this.params.store, this.uniqueCode, id)
   }
 
   addProductToCategory(store, productId, groupCode) {
     this.productService.addProductToCategory(store, productId, groupCode)
-      .subscribe(res => {
-        this.load();
+      .subscribe({
+        next: () => {
+          this.toastr.success(this.translate.instant('PRODUCT.PRODUCT_TO_CATEGORY_ADDED'));
+          this.load()
+        },
+        error: (err) => {
+          this.toastr.success(this.translate.instant('PRODUCT.PRODUCT_TO_CATEGORY_ADDED_ERROR'));
+        }
       });
   }
 
   removeProductFromCategory(store, productId, groupCode) {
     this.productService.removeProductFromCategory(store, productId, groupCode)
-      .subscribe(res => {
-        this.load();
+      .subscribe({
+        next: () => {
+          this.toastr.success(this.translate.instant('PRODUCT.PRODUCT_TO_CATEGORY_REMOVED'));
+          this.load()
+        },
+        error: (err) => {
+          this.toastr.success(this.translate.instant('PRODUCT.PRODUCT_TO_CATEGORY_REMOVED_ERROR'));
+        }
       });
   }
 
