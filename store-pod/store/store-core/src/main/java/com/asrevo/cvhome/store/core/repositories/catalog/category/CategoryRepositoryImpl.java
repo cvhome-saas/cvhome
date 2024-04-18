@@ -24,7 +24,7 @@ public class CategoryRepositoryImpl implements CategoryRepositoryCustom {
         qs.append("inner join product.categories category ");
         qs.append("where category.id in (:cid) ");
         qs.append("and product.available=true and product.dateAvailable<=:dt ");
-        qs.append("group by category.id");
+        qs.append("group by category");
 
         String hql = qs.toString();
         Query q = this.em.createQuery(hql);
@@ -99,7 +99,7 @@ public class CategoryRepositoryImpl implements CategoryRepositoryCustom {
         qs.append("select category from Product product ");
         qs.append("inner join product.categories category inner join product.merchantStore pm ");
         qs.append("where product.id=:id and pm.id=:mid ");
-        qs.append("group by category.id");
+        qs.append("group by category");
 
         String hql = qs.toString();
         Query q = this.em.createQuery(hql);
