@@ -7,7 +7,7 @@ import {NbToastrService} from "@nebular/theme";
 
 @Component({
   selector: 'ngx-product-groups-active',
-  template: `<input type="checkbox" [checked]="value" (click)="clicked() "/>`,
+  template: `<nb-checkbox [checked]="value" (checkedChange)="clicked()"/>`,
 })
 export class ActiveButtonComponent {
   @Input() value: boolean;

@@ -8,8 +8,7 @@ import {NbToastrService} from "@nebular/theme";
   selector: 'ngx-categories-visibility',
 
   template: `
-    <input type="checkbox" [checked]="value" (click)="clicked()"/>
-  `,
+    <nb-checkbox [checked]="value" (checkedChange)="clicked()"/>`,
 })
 export class ButtonRenderComponent {
   @Input() value: boolean;
