@@ -1,14 +1,13 @@
 <div [nbSpinner]="loading" nbSpinnerSize="large" nbSpinnerStatus="primary">
 <p *ngIf="loaded" class="top-20">
-  images
- <!--   <ngx-image-uploading
+    <ngx-image-uploading
         [images]="images"
         (update)="updateImage($event)"
         (remove)="removeImage($event)"
         (error)="errorImage($event)"
         (success)="addedImage($event)"
-        [addImageUrl]="addImageUrlComponent"
+        [addImageUrl]="addImageUrl"
         (fileAdded)="fileAdded($event)">
-    </ngx-image-uploading>-->
+    </ngx-image-uploading>
 </p>
 </div>

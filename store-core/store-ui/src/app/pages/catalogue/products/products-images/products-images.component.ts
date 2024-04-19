@@ -25,7 +25,8 @@ export class ProductsImagesComponent implements OnInit {
 
 
   // loading = true;
-  addImageUrlComponent = '';//add image url to be used by uploader
+  addImageUrl = '';
+  removeImageUrl = '';
 
   constructor(
     private toastr: NbToastrService,
@@ -46,6 +47,8 @@ export class ProductsImagesComponent implements OnInit {
       if (split.length == 2 && split[1] != "") {
         this.uniqueCode = split[1];
         this.load();
+        this.addImageUrl=this.productImageService.addImageUrl(this.store,this.uniqueCode)
+        this.removeImageUrl=this.productImageService.removeImageUrl(this.store,this.uniqueCode)
       }
     });
 

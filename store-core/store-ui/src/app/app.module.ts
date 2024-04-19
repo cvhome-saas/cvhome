@@ -22,7 +22,6 @@ import {
 import {UserData} from "./@core/data/users";
 import {UserService} from "./@core/mock/users.service";
 import {NbRoleProvider, NbSecurityModule} from "@nebular/security";
-import {NbAuthModule} from "@nebular/auth";
 import {of} from "rxjs";
 import {TranslateLoader, TranslateModule} from "@ngx-translate/core";
 import {TranslateHttpLoader} from "@ngx-translate/http-loader";
@@ -43,7 +42,6 @@ export class NbSimpleRoleProvider extends NbRoleProvider {
     },
   ],
   exports: [
-    NbAuthModule,
     TranslateModule
   ],
   imports: [

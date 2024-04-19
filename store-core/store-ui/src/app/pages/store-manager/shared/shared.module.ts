@@ -6,13 +6,17 @@ import {
   NbAutocompleteModule,
   NbButtonModule,
   NbCardModule,
-  NbCheckboxModule, NbDatepickerModule,
-  NbDialogModule, NbIconModule,
+  NbCheckboxModule,
+  NbDatepickerModule,
+  NbDialogModule,
+  NbIconModule,
   NbInputModule,
   NbOptionModule,
-  NbRadioModule, NbRouteTabsetModule,
+  NbRadioModule,
+  NbRouteTabsetModule,
   NbSelectModule,
-  NbSpinnerModule, NbTabsetModule,
+  NbSpinnerModule,
+  NbTabsetModule,
   NbToastrModule
 } from "@nebular/theme";
 import {NgxDatatableModule} from "@swimlane/ngx-datatable";
@@ -22,15 +26,18 @@ import {ShowcaseDialogComponent} from "./showcase-dialog/showcase-dialog.compone
 import {NgxSummernoteModule} from "ngx-summernote";
 import {ImageBrowserComponent} from "./image-browser/image-browser.component";
 import {NbEvaIconsModule} from "@nebular/eva-icons";
+import {ImageUploadingComponent} from "./image-uploading/image-uploading.component";
+import {FilePickerModule} from "ngx-awesome-uploader";
 
 
 @NgModule({
-  declarations: [StoreAutocompleteComponent, ShowcaseDialogComponent, ImageBrowserComponent],
+  declarations: [StoreAutocompleteComponent, ShowcaseDialogComponent, ImageBrowserComponent, ImageUploadingComponent],
   exports: [
     CommonModule,
     StoreAutocompleteComponent,
     ShowcaseDialogComponent,
     ImageBrowserComponent,
+    ImageUploadingComponent,
     NbSelectModule,
     NbCardModule,
     NbButtonModule,
@@ -52,6 +59,7 @@ import {NbEvaIconsModule} from "@nebular/eva-icons";
     NgxDatatableModule,
     NgxSummernoteModule,
     TranslateModule,
+    FilePickerModule,
     FormsModule,
     ReactiveFormsModule,
   ],
@@ -78,6 +86,7 @@ import {NbEvaIconsModule} from "@nebular/eva-icons";
     NgxDatatableModule,
     NgxSummernoteModule,
     TranslateModule,
+    FilePickerModule,
     FormsModule,
     ReactiveFormsModule,
   ]

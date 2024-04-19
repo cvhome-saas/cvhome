@@ -1,7 +1,7 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 
-import { CrudService } from '../../../shared/services/crud.service';
-import { Observable } from 'rxjs';
+import {CrudService} from '../../../shared/services/crud.service';
+import {Observable} from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -13,15 +13,15 @@ export class ProductImageService {
   ) {
   }
 
-  addImageUrl(id) {//post
-    return this.crudService.getBaseUrl() + `/v1/private/product/${id}/images`;
+  addImageUrl(store, id) {//post
+    return this.crudService.getBaseUrl() + `/store/api/v1/private/product/${id}/image?store=${store}`;
   }
 
-  removeImageUrl(id) {//delete
-    return this.crudService.getBaseUrl() + `/v1/private/product/${id}/images`;
+  removeImageUrl(store, id) {//delete
+    return this.crudService.getBaseUrl() + `/store/api/v1/private/product/${id}/image?store=${store}`;
   }
 
-  getImages(store,productId): Observable<any> {
+  getImages(store, productId): Observable<any> {
     return this.crudService.get(`/store/api/v1/product/${productId}/images?store=${store}`);
   }
 
