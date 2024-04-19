@@ -22,10 +22,10 @@ jobs:
         with:
           java-version: '17'
           distribution: 'corretto'
-      - name: Use Node.js 18
-        uses: actions/setup-node@v3
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
       - name: Make gradlew executable
         run: chmod +x ./gradlew
       - name: Validate Gradle wrapper
@@ -62,11 +62,11 @@ jobs:
 #          GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
       - name: check docker images
         run: docker images
-      - uses: actions/upload-artifact@v3
+      - uses: upload-artifact@v4
         with:
           name: reports
           path: ${{ github.workspace }}/**/reports/*/test/*
-      - uses: actions/upload-artifact@v3
+      - uses: upload-artifact@v4
         with:
           name: libs
-          path: build/libs
+          path: ${{ github.workspace}}/**/build/libs/*
