@@ -29,7 +29,7 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x ./gradlew
       - name: Validate Gradle wrapper
-        uses: gradle/wrapper-validation-action@v3
+        uses: gradle/actions/wrapper-validation@v3
 #      - name: Configure AWS credentials
 #        uses: aws-actions/configure-aws-credentials@v4 # More information on this action can be found below in the 'AWS Credentials' section
 #        with:
@@ -45,15 +45,15 @@ jobs:
 #        with:
 #          mask-password: 'false'
       - name: Build
-        uses: gradle/gradle-build-action@v3
+        uses: gradle/actions/setup-gradle@v3
         with:
           arguments: build -x test
       - name: Test
-        uses: gradle/gradle-build-action@v3
+        uses: gradle/actions/setup-gradle@v3
         with:
           arguments: test
 #      - name: Build Docker with Gradle
-#        uses: gradle/gradle-build-action@v3
+#        uses: gradle/actions/setup-gradle@v3
 #        with:
 #          arguments: bootBuildImage --publishImage -x test
 #        env: # Or as an environment variable
