@@ -37,3 +37,4 @@ bin/
 **/node_modules/
 /store-core/shopizer-admin-main/
 /store-core/store-ui/package-lock.json
+/store-core/store-ui/src/app/pages/learn/
