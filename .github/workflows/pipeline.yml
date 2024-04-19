@@ -62,11 +62,11 @@ jobs:
 #          GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
       - name: check docker images
         run: docker images
-      - uses: upload-artifact@v4
-        with:
-          name: reports
-          path: ${{ github.workspace }}/**/reports/*/test/*
-      - uses: upload-artifact@v4
-        with:
-          name: libs
-          path: ${{ github.workspace}}/**/build/libs/*
+#      - uses: upload-artifact@v4
+#        with:
+#          name: reports
+#          path: ${{ github.workspace }}/**/reports/*/test/*
+#      - uses: upload-artifact@v4
+#        with:
+#          name: libs
+#          path: ${{ github.workspace}}/**/build/libs/*
