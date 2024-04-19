@@ -13,6 +13,7 @@ import com.asrevo.cvhome.store.utils.ProductImageSizeUtils;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.imageio.ImageIO;
@@ -46,30 +47,11 @@ public class ProductFileManagerImpl extends ProductFileManager {
 
         try {
 
-            /** copy to input stream **/
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            // Fake code simulating the copy
-            // You can generally do better with nio if you need...
-            // And please, unlike me, do something about the Exceptions :D
-            byte[] buffer = new byte[1024];
-            int len;
-            while ((len = contentImage.getFile().read(buffer)) > -1) {
-                baos.write(buffer, 0, len);
-            }
-            baos.flush();
 
             // Open new InputStreams using the recorded bytes
             // Can be repeated as many times as you wish
-            InputStream is1 = new ByteArrayInputStream(baos.toByteArray());
-            InputStream is2 = new ByteArrayInputStream(baos.toByteArray());
-
-            BufferedImage bufferedImage = ImageIO.read(is2);
-
-
-            if (bufferedImage == null) {
-                log.error("Cannot read image format for {}", productImage.getProductImage());
-                throw new Exception("Cannot read image format " + productImage.getProductImage());
-            }
+            byte[] byteArray = IOUtils.toByteArray(contentImage.getFile());
+            InputStream is1 = new ByteArrayInputStream(byteArray);
 
             // contentImage.setBufferedImage(bufferedImage);
             contentImage.setFile(is1);
@@ -77,6 +59,8 @@ public class ProductFileManagerImpl extends ProductFileManager {
 
             // upload original -- L
             contentImage.setFileContentType(FileContentType.PRODUCTLG);
+            String mimeType = URLConnection.guessContentTypeFromName(contentImage.getFileName());
+            contentImage.setMimeType(mimeType);
             uploadImage.addProductImage(productImage, contentImage);
 
             /*
@@ -112,12 +96,7 @@ public class ProductFileManagerImpl extends ProductFileManager {
             // String ssmallImageWidth = configuration.getProperty("SMALL_IMAGE_WIDTH_SIZE");
 
             //Resizes
-            if (!StringUtils.isBlank(slargeImageHeight) && !StringUtils.isBlank(slargeImageWidth)) { // &&
-                // !StringUtils.isBlank(ssmallImageHeight)
-                // &&
-                // !StringUtils.isBlank(ssmallImageWidth))
-                // {
-
+            if (!StringUtils.isBlank(slargeImageHeight) && !StringUtils.isBlank(slargeImageWidth)) {
 
                 FileNameMap fileNameMap = URLConnection.getFileNameMap();
 
@@ -143,7 +122,18 @@ public class ProductFileManagerImpl extends ProductFileManager {
                     throw new ServiceException(sizeMsg);
                 }
 
+                InputStream is2 = new ByteArrayInputStream(byteArray);
+
+                BufferedImage bufferedImage = ImageIO.read(is2);
+
+
+                if (bufferedImage == null) {
+                    log.error("Cannot read image format for {}", productImage.getProductImage());
+                    throw new Exception("Cannot read image format " + productImage.getProductImage());
+                }
+
                 if (storeProductImageProperties.cropUploads()) {
+
                     // crop image
                     ProductImageCropUtils utils =
                             new ProductImageCropUtils(bufferedImage, largeImageWidth, largeImageHeight);
@@ -230,6 +220,8 @@ public class ProductFileManagerImpl extends ProductFileManager {
             } else {
                 // small will be the same as the original
                 contentImage.setFileContentType(FileContentType.PRODUCT);
+                InputStream is2 = new ByteArrayInputStream(byteArray);
+                contentImage.setFile(is2);
                 uploadImage.addProductImage(productImage, contentImage);
             }
 

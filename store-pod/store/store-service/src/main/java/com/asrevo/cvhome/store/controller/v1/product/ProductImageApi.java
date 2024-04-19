@@ -111,6 +111,7 @@ public class ProductImageApi {
                     productImage.setProductImage(multipartFile.getOriginalFilename());
                     productImage.setProduct(product);
 
+
                     if (!hasDefaultImage) {
                         productImage.setDefaultImage(true);
                         hasDefaultImage = true;
