@@ -70,3 +70,9 @@ jobs:
         with:
           name: libs
           path: ${{ github.workspace}}/**/build/libs/*
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: | 
+            ${{ github.workspace}}/core/welcome-ui/dist/*
+            ${{ github.workspace}}/store-core/store-ui/dist/*
