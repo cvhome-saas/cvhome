@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {AfterViewInit, Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 
 import {CategoryService} from '../../categories/services/category.service';
@@ -14,14 +14,14 @@ import {NbToastrService} from "@nebular/theme";
   templateUrl: './product-to-category.component.html',
   styleUrls: ['./product-to-category.component.scss']
 })
-export class ProductToCategoryComponent implements OnInit {
+export class ProductToCategoryComponent implements OnInit, AfterViewInit {
 
-  loading = false;
+  loading: boolean = false;
   uniqueCode: string;
   perPage: number = 50;//ideally display all category
   currentPage: number = 1;
 
-  categories = [];
+  categories: any[] = [];
   selectedItems: string[] = [];
 
   params = this.loadParams();
@@ -56,10 +56,6 @@ export class ProductToCategoryComponent implements OnInit {
         this.load();
       }
     });
-
-    //specify add image url to image component
-    let el = document.getElementById('tabs');
-    el.scrollIntoView();
   }
 
   private load() {
@@ -132,5 +128,9 @@ export class ProductToCategoryComponent implements OnInit {
       });
   }
 
+  ngAfterViewInit(): void {
+    const el: HTMLElement = document.getElementById('tabs');
+    el.scrollIntoView();
+  }
 
 }

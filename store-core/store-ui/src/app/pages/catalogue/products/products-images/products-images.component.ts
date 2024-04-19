@@ -1,4 +1,4 @@
-import {Component, EventEmitter, OnInit, Output} from '@angular/core';
+import {AfterViewInit, Component, EventEmitter, OnInit, Output} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {NbToastrService} from '@nebular/theme';
 import {TranslateService} from '@ngx-translate/core';
@@ -11,7 +11,7 @@ import {Location} from '@angular/common';
   templateUrl: './products-images.component.html',
   styleUrls: ['./products-images.component.css']
 })
-export class ProductsImagesComponent implements OnInit {
+export class ProductsImagesComponent implements OnInit ,AfterViewInit {
 
   // product: any;
   images: any;
@@ -118,5 +118,12 @@ export class ProductsImagesComponent implements OnInit {
 
   fileAdded(e) {
     this.load();
+  }
+
+  ngAfterViewInit(): void {
+    if (this.location.path().includes('images')) {
+      const el:HTMLElement = document.getElementById('tabs');
+      el.scrollIntoView();
+    }
   }
 }

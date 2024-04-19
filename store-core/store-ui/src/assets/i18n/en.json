@@ -66,6 +66,7 @@
     "PRODUCT_DETAILS": "Product details",
     "LIST_INVENTORY": "List inventory",
     "PRODUCT_TO_CATEGORY": "Product to category",
+    "PRODUCT_TO_CATEGORY_ADD": "Add category",
     "PRODUCT_ATTRIBUTES": "Product attributes",
     "CREATE_PRODUCT_ATTRIBUTES": "Create product option / attribute",
     "MANAGE_INVENTORY": "Manage inventory",
@@ -285,7 +286,11 @@
     "PRODUCT_CREATED": "Product created.",
     "PRODUCT_REMOVED": "Product removed.",
     "DEFINITION": "Product definition",
-    "SELECT": "Select product"
+    "SELECT": "Select product",
+    "PRODUCT_TO_CATEGORY_ADDED": "Product added to the category",
+    "PRODUCT_TO_CATEGORY_ADDED_ERROR": "Error while adding product to category",
+    "PRODUCT_TO_CATEGORY_REMOVED": "Product removed from the category",
+    "PRODUCT_TO_CATEGORY_REMOVED_ERROR": "Error while removing product form category"
   },
   "PRODUCT_ATTRIBUTES": {
     "PRODUCT_OPTIONS_ATTRIBUTES": "Product options / attributes",
@@ -336,10 +341,10 @@
     "CREATE_PRODUCT_GROUP": "Create group",
     "SELECT_PRODUCT_GROUP": "Select group",
     "GROUP_ACTIVATION": "Product Group Activation updated",
-    "PRODUCT_ADDED":"Product added successfully",
-    "PRODUCT_REMOVED":"Product removed successfully",
-    "PRODUCT_ADDED_ERROR":"Error while adding product",
-    "PRODUCT_REMOVED_ERROR":"Error while removing product"
+    "PRODUCT_ADDED": "Product added successfully",
+    "PRODUCT_REMOVED": "Product removed successfully",
+    "PRODUCT_ADDED_ERROR": "Error while adding product",
+    "PRODUCT_REMOVED_ERROR": "Error while removing product"
   },
   "OPTION": {
     "OPTION_NAME": "Option name",
