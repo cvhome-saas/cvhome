@@ -19,7 +19,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   userPictureOnly: boolean = false;
   user: any;
 
-  themes = [
+  themes: any[] = [
     {
       value: 'default',
       name: 'Light',
@@ -46,7 +46,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   constructor(private sidebarService: NbSidebarService,
               private menuService: NbMenuService,
               private themeService: NbThemeService,
-              private authService:AuthService,
+              private authService: AuthService,
               private router: Router,
               private breakpointService: NbMediaBreakpointsService,
               private translateService: TranslateService
@@ -57,8 +57,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.currentTheme = this.themeService.currentTheme;
     this.menuService.onItemClick().subscribe(it => this.onNbMenuItemClick(it.item));
     this.authService.getAuthUser().subscribe(it => {
-      console.log("is this user")
-      console.log(it)
       this.user = it
     });
 
@@ -94,7 +92,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   toggleSidebar(): boolean {
     this.sidebarService.toggle(true, 'menu-sidebar');
-
     return false;
   }
 
