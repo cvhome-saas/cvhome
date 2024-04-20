@@ -1,12 +1,12 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {NbMediaBreakpointsService, NbMenuService, NbSidebarService, NbThemeService} from '@nebular/theme';
 
-import {UserData} from '../../../@core/data/users';
 import {map, takeUntil} from 'rxjs/operators';
 import {Subject} from 'rxjs';
 import {TranslateService} from "@ngx-translate/core";
 import {NbMenuItem} from "@nebular/theme/components/menu/menu.service";
 import {Router} from "@angular/router";
+import {AuthService} from "../../../shared/service/auth.service";
 
 @Component({
   selector: 'ngx-header',
@@ -46,7 +46,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   constructor(private sidebarService: NbSidebarService,
               private menuService: NbMenuService,
               private themeService: NbThemeService,
-              private userService: UserData,
+              private authService:AuthService,
               private router: Router,
               private breakpointService: NbMediaBreakpointsService,
               private translateService: TranslateService
@@ -56,9 +56,12 @@ export class HeaderComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.currentTheme = this.themeService.currentTheme;
     this.menuService.onItemClick().subscribe(it => this.onNbMenuItemClick(it.item));
-    this.userService.getUsers()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((users: any) => this.user = users.nick);
+    this.authService.getAuthUser().subscribe(it => {
+      console.log("is this user")
+      console.log(it)
+      this.user = it
+    });
+
 
     const {xl} = this.breakpointService.getBreakpointsMap();
     this.themeService.onMediaQueryChange()

@@ -3,6 +3,7 @@ import {Component} from '@angular/core';
 import {MENU_ITEMS} from './pages-menu';
 import {MenuItem} from "./menu-item";
 import {TranslateService} from "@ngx-translate/core";
+import {AuthService} from "../shared/service/auth.service";
 
 @Component({
   selector: 'ngx-pages',
@@ -16,21 +17,10 @@ import {TranslateService} from "@ngx-translate/core";
 })
 export class PagesComponent {
   menu: MenuItem[];
-  roles = {
-    isAdmin: true,
-    canAccessToOrder: true,
-    isAdminCatalogue: true,
-    isAdminContent: true,
-    isAdminOrder: true,
-    isAdminRetail: true,
-    isAdminStore: true,
-    isCustomer: true,
-    isSuperadmin: true,
-  };
 
   constructor(
     private translate: TranslateService,
-  ) {
+    private authService: AuthService) {
     this.menu = MENU_ITEMS;
     this.translateMenu(this.menu);
     this.checkAccess(this.menu);
@@ -40,8 +30,9 @@ export class PagesComponent {
   }
 
   checkAccess(menu) {
+    const roles = this.authService.getRoles();
     menu.forEach(el => {
-      el.hidden = el.guards && !el.guards.some((guard) => guard(this.roles));
+      el.hidden = el.guards && !el.guards.some((guard) => guard(roles));
       if (!el.hidden) {
         if (el.children && el.children.length) {
           this.checkAccess(el.children);

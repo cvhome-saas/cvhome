@@ -20,11 +20,11 @@ const routes: Routes = [{
       loadChildren: () => import('./products/products.module')
         .then(m => m.ProductsModule),
     },
-    // {
-    //   path: 'brands',
-    //   loadChildren: () => import('./brands/brands.module')
-    //     .then(m => m.BrandsModule),
-    // },
+    {
+      path: 'brands',
+      loadChildren: () => import('./brands/brands.module')
+        .then(m => m.BrandsModule),
+    },
     // {
     //   path: 'catalogues',
     //   loadChildren: () => import('./catalogues/catalogues.module')

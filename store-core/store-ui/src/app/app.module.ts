@@ -19,27 +19,15 @@ import {
   NbToastrModule,
   NbWindowModule,
 } from '@nebular/theme';
-import {UserData} from "./@core/data/users";
-import {UserService} from "./@core/mock/users.service";
-import {NbRoleProvider, NbSecurityModule} from "@nebular/security";
-import {of} from "rxjs";
 import {TranslateLoader, TranslateModule} from "@ngx-translate/core";
 import {TranslateHttpLoader} from "@ngx-translate/http-loader";
 
-export class NbSimpleRoleProvider extends NbRoleProvider {
-  getRole() {
-    // here you could provide any role based on any auth flow
-    return of('guest');
-  }
-}
+
 
 @NgModule({
   declarations: [AppComponent],
   providers:[
-    { provide: UserData, useClass: UserService },
-    {
-      provide: NbRoleProvider, useClass: NbSimpleRoleProvider,
-    },
+
   ],
   exports: [
     TranslateModule
@@ -58,7 +46,6 @@ export class NbSimpleRoleProvider extends NbRoleProvider {
     NbChatModule.forRoot({
       messageGoogleMapKey: 'AIzaSyA_wNuCzia92MAmdLRzmqitRGvCF7wCZPY',
     }),
-    NbSecurityModule.forRoot(),
     ThemeModule.forRoot(),
     TranslateModule.forRoot({
       loader: {

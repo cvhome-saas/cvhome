@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import {Component, OnInit} from '@angular/core';
+import {ActivatedRoute} from '@angular/router';
 
-import { BrandService } from '../services/brand.service';
+import {BrandService} from '../services/brand.service';
 
 @Component({
   selector: 'ngx-brand-details',
@@ -11,21 +11,27 @@ import { BrandService } from '../services/brand.service';
 export class BrandDetailsComponent implements OnInit {
   brand: any = {};
   loadingInfo = false;
+  store: string
 
   constructor(
     private brandService: BrandService,
-    private activatedRoute: ActivatedRoute,
-  ) {
+    private activatedRoute: ActivatedRoute) {
   }
 
   ngOnInit() {
     this.loadingInfo = true;
-    const id = this.activatedRoute.snapshot.paramMap.get('id');
-    this.brandService.getBrandById(id)
-      .subscribe(brand => {
-        this.brand = brand;
-        this.loadingInfo = false;
-      });
+    this.activatedRoute.params.subscribe(it => {
+      let split: string[] = it["id"].split("-");
+      let store = split[0];
+      let id = split[1];
+      this.store=store;
+      this.brandService.getBrandById(store, id)
+        .subscribe(brand => {
+          this.brand = brand;
+          this.loadingInfo = false;
+        })
+    });
   }
+
 
 }

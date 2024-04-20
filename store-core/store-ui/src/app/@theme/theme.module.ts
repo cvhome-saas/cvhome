@@ -1,36 +1,26 @@
-import { ModuleWithProviders, NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import {ModuleWithProviders, NgModule} from '@angular/core';
+import {CommonModule} from '@angular/common';
 import {
   NbActionsModule,
+  NbButtonModule,
+  NbContextMenuModule,
+  NbIconModule,
   NbLayoutModule,
   NbMenuModule,
   NbSearchModule,
-  NbSidebarModule,
-  NbUserModule,
-  NbContextMenuModule,
-  NbButtonModule,
   NbSelectModule,
-  NbIconModule,
+  NbSidebarModule,
   NbThemeModule,
+  NbUserModule,
 } from '@nebular/theme';
-import { NbEvaIconsModule } from '@nebular/eva-icons';
-import { NbSecurityModule } from '@nebular/security';
+import {NbEvaIconsModule} from '@nebular/eva-icons';
 
-import {
-  FooterComponent,
-  HeaderComponent,
-  SearchInputComponent,
-  TinyMCEComponent,
-} from './components';
-import {
-  OneColumnLayoutComponent,
-  ThreeColumnsLayoutComponent,
-  TwoColumnsLayoutComponent,
-} from './layouts';
-import { DEFAULT_THEME } from './styles/theme.default';
-import { COSMIC_THEME } from './styles/theme.cosmic';
-import { CORPORATE_THEME } from './styles/theme.corporate';
-import { DARK_THEME } from './styles/theme.dark';
+import {FooterComponent, HeaderComponent, SearchInputComponent,} from './components';
+import {OneColumnLayoutComponent, ThreeColumnsLayoutComponent, TwoColumnsLayoutComponent,} from './layouts';
+import {DEFAULT_THEME} from './styles/theme.default';
+import {COSMIC_THEME} from './styles/theme.cosmic';
+import {CORPORATE_THEME} from './styles/theme.corporate';
+import {DARK_THEME} from './styles/theme.dark';
 import {TranslateModule} from "@ngx-translate/core";
 
 const NB_MODULES = [
@@ -41,7 +31,6 @@ const NB_MODULES = [
   NbSearchModule,
   NbSidebarModule,
   NbContextMenuModule,
-  NbSecurityModule,
   NbButtonModule,
   NbSelectModule,
   NbIconModule,
@@ -51,15 +40,14 @@ const COMPONENTS = [
   HeaderComponent,
   FooterComponent,
   SearchInputComponent,
-  TinyMCEComponent,
   OneColumnLayoutComponent,
   ThreeColumnsLayoutComponent,
   TwoColumnsLayoutComponent,
 ];
 
 @NgModule({
-  imports: [CommonModule,TranslateModule, ...NB_MODULES],
-  exports: [CommonModule,  ...COMPONENTS],
+  imports: [CommonModule, TranslateModule, ...NB_MODULES],
+  exports: [CommonModule, ...COMPONENTS],
   declarations: [...COMPONENTS],
 })
 export class ThemeModule {
@@ -71,7 +59,7 @@ export class ThemeModule {
           {
             name: 'default',
           },
-          [ DEFAULT_THEME, COSMIC_THEME, CORPORATE_THEME, DARK_THEME ],
+          [DEFAULT_THEME, COSMIC_THEME, CORPORATE_THEME, DARK_THEME],
         ).providers,
       ],
     };

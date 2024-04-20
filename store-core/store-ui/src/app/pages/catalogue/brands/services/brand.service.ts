@@ -1,7 +1,7 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 
-import { CrudService } from '../../../shared/services/crud.service';
-import { Observable } from 'rxjs';
+import {CrudService} from '../../../shared/services/crud.service';
+import {Observable} from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -14,33 +14,35 @@ export class BrandService {
   }
 
   getListOfBrands(params): Observable<any> {
-    return this.crudService.get(`/v1/private/manufacturers/`, params);
+    return this.crudService.get(`/store/api/v1/private/manufacturers`, params);
   }
 
-  updateBrand(id, brand): Observable<any> {
-    return this.crudService.put(`/v1/private/manufacturer/${id}`, brand);
+  updateBrand(store,id, brand): Observable<any> {
+    return this.crudService.put(`/store/api/v1/private/manufacturer/${id}?store=${store}`, brand);
   }
 
-  getBrandById(id): Observable<any> {
+  getBrandById(store, id): Observable<any> {
     const params = {
+      store,
       lang: '_all'
     };
-    return this.crudService.get(`/v1/manufacturers/${id}`, params);
+    return this.crudService.get(`/store/api/v1/manufacturer/${id}`, params);
   }
 
-  createBrand(brand): Observable<any> {
-    return this.crudService.post(`/v1/private/manufacturer`, brand);
+  createBrand(store,brand): Observable<any> {
+    return this.crudService.post(`/store/api/v1/private/manufacturer?store=${store}`, brand);
   }
 
-  deleteBrand(id): Observable<any> {
-    return this.crudService.delete(`/v1/manufacturer/${id}`);
+  deleteBrand(store, id): Observable<any> {
+    return this.crudService.delete(`/store/api/v1/private/manufacturer/${id}?store=${store}`);
   }
 
-  checkCategoryCode(code): Observable<any> {
+  checkBrandCode(store, code): Observable<any> {
     const params = {
-      'code': code,
+      store,
+      code
     };
-    return this.crudService.get(`/v1/private/manufacturer/unique`, params);
+    return this.crudService.get(`/store/api/v1/private/manufacturer/unique`, params);
   }
 
 }

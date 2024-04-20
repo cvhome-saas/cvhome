@@ -12,7 +12,7 @@ const routes: Routes = [
     component: BrandsComponent,
     children: [
       {
-        path: 'create-brand',
+        path: 'create-brand/:id',
         component: BrandCreationComponent,
       },
       {

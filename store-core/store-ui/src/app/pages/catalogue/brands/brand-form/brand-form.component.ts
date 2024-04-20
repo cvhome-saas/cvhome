@@ -1,12 +1,12 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {Component, Input, OnInit} from '@angular/core';
+import {FormArray, FormBuilder, FormGroup, Validators} from '@angular/forms';
 
-import { BrandService } from '../services/brand.service';
-import { ConfigService } from '../../../shared/services/config.service';
-import { TranslateService } from '@ngx-translate/core';
-import { Router } from '@angular/router';
-import { validators } from '../../../shared/validation/validators';
-import { slugify } from '../../../shared/utils/slugifying';
+import {BrandService} from '../services/brand.service';
+import {ConfigService} from '../../../shared/services/config.service';
+import {TranslateService} from '@ngx-translate/core';
+import {Router} from '@angular/router';
+import {validators} from '../../../shared/validation/validators';
+import {slugify} from '../../../shared/utils/slugifying';
 import {NbToastrService} from "@nebular/theme";
 
 @Component({
@@ -17,6 +17,7 @@ import {NbToastrService} from "@nebular/theme";
 export class BrandFormComponent implements OnInit {
   @Input() brand;
   @Input() title;
+  @Input() store: string;
   form: FormGroup;
   loader = false;
   defaultLanguage = localStorage.getItem('lang');
@@ -51,7 +52,7 @@ export class BrandFormComponent implements OnInit {
   ngOnInit() {
     this.createForm();
     this.loader = true;
-    this.configService.getListOfSupportedLanguages(localStorage.getItem('merchant'))
+    this.configService.getListOfSupportedLanguages(this.store)
       .subscribe(res => {
         this.languages = [...res];
         this.createForm();
@@ -60,7 +61,7 @@ export class BrandFormComponent implements OnInit {
           this.fillForm();
         }
         this.loader = false;
-    });
+      });
   }
 
   createForm() {
@@ -121,6 +122,7 @@ export class BrandFormComponent implements OnInit {
       }
     });
   }
+
   selectLanguage(lang) {
     this.form.patchValue({
       selectedLanguage: lang,
@@ -149,7 +151,7 @@ export class BrandFormComponent implements OnInit {
 
   checkCode(event) {
     const code = event.target.value;
-    this.brandService.checkCategoryCode(code)
+    this.brandService.checkBrandCode(this.store,code)
       .subscribe(res => {
         this.isCodeUnique = !(res.exists && (this.brand.code !== code));
       });
@@ -210,12 +212,12 @@ export class BrandFormComponent implements OnInit {
       }
 
       if (this.brand.id) {
-        this.brandService.updateBrand(this.brand.id, brandObject)
+        this.brandService.updateBrand(this.store,this.brand.id, brandObject)
           .subscribe(result => {
             this.toastr.success(this.translate.instant('BRAND.BRAND_UPDATED'));
           });
       } else {
-        this.brandService.createBrand(brandObject)
+        this.brandService.createBrand(this.store,brandObject)
           .subscribe(result => {
             this.toastr.success(this.translate.instant('BRAND.BRAND_CREATED'));
             this.router.navigate(['pages/catalogue/brands/brands-list']);
@@ -223,6 +225,7 @@ export class BrandFormComponent implements OnInit {
       }
     }
   }
+
   goToBack() {
     this.router.navigate(['pages/catalogue/brands/brands-list']);
   }

@@ -73,5 +73,10 @@ import { DragDropModule } from "@angular/cdk/drag-drop";
   ],
   providers: [CurrencyPipe],
 })
-export class SharedModule {
+export class ShsaredMosdulse {
 }
+
+
+
+
+
