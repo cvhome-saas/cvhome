@@ -12,6 +12,7 @@ import com.asrevo.cvhome.manager.service.StoreManagerService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -23,11 +24,21 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class StoreManagerController {
     private final StoreManagerService managerService;
-    private final InternalStoreService storeService;
+    private final InternalStoreService internalStoreService;
 
     @PostMapping("list")
     public Mono<Page<ManagerStoreDto>> findAllStores(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestBody ListManagerStoreQuery listManagerStoreQuery, Pageable pageable) {
-        return Mono.just(storeService.findAll(identity, listManagerStoreQuery, pageable));
+        return Mono.just(internalStoreService.findAll(identity, listManagerStoreQuery, pageable));
+    }
+
+    @GetMapping("private/store")
+    public Mono<PageImpl<Object>> findAllStoresDetailed(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, Pageable pageable) {
+        return managerService.findAll(identity, new ListManagerStoreQuery(null, null, null), pageable);
+    }
+
+    @GetMapping("private/store/{code}")
+    public Mono<Object> getStoreDetailed(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @PathVariable("code") ManagerStoreId managerStoreId) {
+        return managerService.getStore(identity, managerStoreId);
     }
 
     @PostMapping("create")
@@ -39,6 +50,6 @@ public class StoreManagerController {
     @GetMapping("store-info")
     @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE.FIND-ONE')")
     public Mono<ManagerStoreDto> storeInfo(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store) {
-        return Mono.just(storeService.findStore(store));
+        return Mono.just(internalStoreService.findStore(store));
     }
 }
