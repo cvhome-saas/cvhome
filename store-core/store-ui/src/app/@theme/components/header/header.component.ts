@@ -108,7 +108,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
       this.router.navigate(['/pages/user-management/profile'])
     }
     if (item.title == 'Log out') {
-      this.router.navigate(['external-logout-link'])
+      this.authService.logout();
     }
   }
 }

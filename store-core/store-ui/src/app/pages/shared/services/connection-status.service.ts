@@ -1,10 +1,9 @@
 import { Injectable } from "@angular/core";
 import { Observable, timer } from "rxjs";
-import { CrudService } from "./crud.service";
-import { Health } from "../../../@core/data/health";
 import { switchMap } from "rxjs/operators";
 import { HttpClient } from "@angular/common/http";
 import { environment } from '../../../../environments/environment';
+import {Health} from "../models/health";
 
 @Injectable({
     providedIn: 'root'

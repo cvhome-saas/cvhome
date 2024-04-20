@@ -1,6 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {map, Observable, of} from "rxjs";
+import {Router} from "@angular/router";
 
 @Injectable({
   providedIn: 'root'
@@ -8,7 +9,7 @@ import {map, Observable, of} from "rxjs";
 export class AuthService {
   private authUser: AuthUser | undefined;
 
-  constructor(private httpClient: HttpClient) {
+  constructor(private httpClient: HttpClient, private router: Router) {
     /*
             this.authUser = {
               email_verified: false,
@@ -44,7 +45,10 @@ export class AuthService {
       isCustomer: true,
       isSuperadmin: true,
     };
+  }
 
+  logout() {
+    this.router.navigate(['external-logout-link'])
   }
 }
 
