@@ -399,6 +399,8 @@ INSERT INTO store.country (country_id, country_isocode, country_supported, geozo
 INSERT INTO store.language (language_id, date_created, date_modified, updt_id, code, sort_order) VALUES (1, '2024-03-31 08:45:18.000000', '2024-03-31 08:45:18.000000', null, 'en', null);
 INSERT INTO store.language (language_id, date_created, date_modified, updt_id, code, sort_order) VALUES (2, '2024-03-31 08:45:18.000000', '2024-03-31 08:45:18.000000', null, 'fr', null);
 INSERT INTO store.language (language_id, date_created, date_modified, updt_id, code, sort_order) VALUES (3, '2024-03-31 08:45:18.000000', '2024-03-31 08:45:18.000000', null, 'es', null);
+INSERT INTO store.language (language_id, date_created, date_modified, updt_id, code, sort_order) VALUES (4, '2024-03-31 08:45:18.000000', '2024-03-31 08:45:18.000000', null, 'ar', null);
+INSERT INTO store.language (language_id, date_created, date_modified, updt_id, code, sort_order) VALUES (5, '2024-03-31 08:45:18.000000', '2024-03-31 08:45:18.000000', null, 'ru', null);
 
 INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (1, '2024-03-31 08:45:18.000000', '2024-03-31 08:45:18.000000', null, null, 'Afghanistan', null, 1, 1);
 INSERT INTO store.country_description (description_id, date_created, date_modified, updt_id, description, name, title, language_id, country_id) VALUES (2, '2024-03-31 08:45:18.000000', '2024-03-31 08:45:18.000000', null, null, 'Afghanistan', null, 2, 1);
@@ -1990,6 +1992,10 @@ INSERT INTO store.zone_description (description_id, date_created, date_modified,
 INSERT INTO store.merchant_store (merchant_id, date_created, date_modified, updt_id, store_code, continueshoppingurl, currency_format_national, domain_name, in_business_since, invoice_template, lineage, org, is_retailer, seizeunitcode, store_email, store_logo, store_template, store_address, store_city, store_name, store_phone, store_postal_code, store_state_prov, use_cache, weightunitcode, country_id, currency_id, language_id, parent_id, zone_id) VALUES (1, null, null, null, '65f023632bc46470c104b76f', null, false, 'localhost:8080', '2024-03-31', null, null, 'd1952c95-312e-4bb9-9a2d-b703d031276f', true, 'IN', 'john@test.com', '500_333.jpeg', 'december', '1234 Street address', 'My city', 'Default store', '888-888-8888', 'H2H-2H2', null, false, 'LB', 37, 105, 1, null, 9);
 
 INSERT INTO store.merchant_language (stores_merchant_id, languages_language_id) VALUES (1, 1);
+INSERT INTO store.merchant_language (stores_merchant_id, languages_language_id) VALUES (1, 2);
+INSERT INTO store.merchant_language (stores_merchant_id, languages_language_id) VALUES (1, 3);
+INSERT INTO store.merchant_language (stores_merchant_id, languages_language_id) VALUES (1, 4);
+INSERT INTO store.merchant_language (stores_merchant_id, languages_language_id) VALUES (1, 5);
 
 INSERT INTO store.merchant_configuration (merchant_config_id, active, date_created, date_modified, updt_id, config_key, type, value, merchant_id) VALUES (1, false, '2024-03-31 08:45:39.000000', '2024-03-31 08:45:39.000000', null, 'CONFIG', 'CONFIG', '{"allowPurchaseItems":true,"displayContactUs":false,"displayCustomerAgreement":false,"defaultSearchConfigPath":{},"displayCustomerSection":false,"displayAddToCartOnFeaturedItems":true,"displayPagesMenu":true,"testMode":false,"displayStoreAddress":false,"displaySearchBox":true,"debugMode":false,"useDefaultSearchConfig":{}}', 1);
 
@@ -2180,7 +2186,7 @@ INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('country_descriptio
 INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('COUNTRY_SEQ_NEXT_VAL', 5);
 INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('CURRENCY_SEQ_NEXT_VAL', 4);
 INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('GROUP_SEQ_NEXT_VAL', 8);
-INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('LANG_SEQ_NEXT_VAL', 3);
+INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('LANG_SEQ_NEXT_VAL', 5);
 INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('MANUFACT_SEQ_NEXT_VAL', 50);
 INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('manufacturer_description_seq', 2);
 INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('MERCH_CONF_SEQ_NEXT_VAL', 1);
