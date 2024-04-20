@@ -1,14 +1,15 @@
-import { Component, OnInit } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { TranslateService } from '@ngx-translate/core';
-import { validators } from '../../../shared/validation/validators';
-import { TypesService } from '../services/types.service';
-import { StorageService } from '../../../shared/services/storage.service';
+import {Component, OnInit} from '@angular/core';
+import {FormArray, FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {TranslateService} from '@ngx-translate/core';
+import {validators} from '../../../shared/validation/validators';
+import {TypesService} from '../services/types.service';
+import {StorageService} from '../../../shared/services/storage.service';
 import {NbDialogService, NbToastrService} from '@nebular/theme';
-import { forkJoin } from 'rxjs';
-import { Router, ActivatedRoute } from '@angular/router';
-import { DomSanitizer } from '@angular/platform-browser';
-import { ConfigService } from '../../../shared/services/config.service';
+import {forkJoin} from 'rxjs';
+import {ActivatedRoute, Router} from '@angular/router';
+import {DomSanitizer} from '@angular/platform-browser';
+import {ConfigService} from '../../../shared/services/config.service';
+
 @Component({
   selector: 'ngx-types',
   templateUrl: './type-details.component.html',
@@ -29,9 +30,11 @@ export class TypeDetailsComponent implements OnInit {
     code: '',
     allowAddToCart: false,
     visible: '',
-    description: { name: '', language: '' },
+    description: {name: '', language: ''},
     descriptions: []
   }
+  store: string;
+  uniqueCode: string;//identifier fromroute
 
   constructor(
     private _sanitizer: DomSanitizer,
@@ -44,55 +47,58 @@ export class TypeDetailsComponent implements OnInit {
     private typesService: TypesService,
     private activatedRoute: ActivatedRoute,
     private configService: ConfigService
-  ) { }
+  ) {
+  }
 
   ngOnInit(): void {
 
-    this.loading = true;
-
-    let param = {
-      //lang: this.storageService.getLanguage(),
-      lang: "_all",
-      store: this.storageService.getMerchant()
-    }
-    const typeId = this.activatedRoute.snapshot.paramMap.get('id');
-    if (typeId) {
-    const types$ = this.typesService.getType(typeId, param)
-    const config$ = this.configService.getListOfSupportedLanguages(localStorage.getItem('merchant'));
-    forkJoin([types$, config$])
-      .subscribe(([productType, languages]) => {
-
-        this.type.id = productType.id;
-        this.type.code = productType.code;
-        this.type.allowAddToCart = productType.allowAddToCart;
-        this.type.visible = productType.visible;
-        this.type.description = productType.description;
-        this.type.descriptions = productType.descriptions;
-
-        this.isReadonlyCode = true;
-        this.languages = [...languages];
-        this.createForm();
-        this.addFormArray();
-        if(this.type) {
-          this.fillForm();
-        }
-
-        this.loading = false;
-        this.loaded = true;
-
-
+    this.activatedRoute.params.subscribe(it => {
+      const split: string[] = it['id'].split("-");
+      this.store = split[0];
+      this.getLanguages();
+      if (split.length == 2 && split[1] != "") {
+        this.uniqueCode = split[1];
+        this.fillData()
+      }
     });
-  } else {
-    const config$ = this.configService.getListOfSupportedLanguages(localStorage.getItem('merchant'))
+
+  }
+
+  fillData() {
+    this.typesService.getType(this.store, this.uniqueCode, {
+      lang: "_all",
+    })
+      .subscribe({
+        next:(types)=>{
+          this.type.id = types.id;
+          this.type.code = types.code;
+          this.type.allowAddToCart = types.allowAddToCart;
+          this.type.visible = types.visible;
+          this.type.description = types.description;
+          this.type.descriptions = types.descriptions;
+
+          this.isReadonlyCode = true;
+          if (this.type) {
+            this.fillForm();
+          }
+          this.loading = false;
+          this.loaded = true;
+
+        }
+      })
+
+
+  }
+
+  getLanguages() {
+    const config$ = this.configService.getListOfSupportedLanguages(this.store)
       .subscribe((languages) => {
         this.languages = [...languages];
         this.createForm();
         this.addFormArray();
         this.loading = false;
         this.loaded = true;
-    });
-  }
-
+      });
 
   }
 
@@ -100,7 +106,7 @@ export class TypeDetailsComponent implements OnInit {
     this.form = this.fb.group({
       allowAddToCart: [true],
       visible: [false],
-      code: [{ value: '', disabled: false }, [Validators.required, Validators.pattern(validators.alphanumeric)]],
+      code: [{value: '', disabled: false}, [Validators.required, Validators.pattern(validators.alphanumeric)]],
       selectedLanguage: this.defaultLanguage,
       descriptions: this.fb.array([]),
     });
@@ -132,11 +138,12 @@ export class TypeDetailsComponent implements OnInit {
       this.fillFormArray();
     }
   }
+
   fillFormArray() {
     this.form.value.descriptions.forEach((desc, index) => {
       if (desc.language === this.selectedLanguage.value) {
         this.type.descriptions.forEach((d, i) => {
-          if(d.language === this.selectedLanguage.value) {
+          if (d.language === this.selectedLanguage.value) {
             (<FormArray>this.form.get('descriptions')).at(index).patchValue({
               language: d.language,
               name: d.name,
@@ -151,7 +158,6 @@ export class TypeDetailsComponent implements OnInit {
     this.loading = true;
     this.isValidCode = true;
 
-
     if (this.form.invalid) {
       if (this.code.invalid) {
         this.isValidCode = false;
@@ -165,26 +171,33 @@ export class TypeDetailsComponent implements OnInit {
 
     if (this.type.id) {
 
-      this.typesService.updateType(this.type.id, obj)
-        .subscribe((res) => {
-          this.toastr.success(this.translate.instant('PRODUCT_TYPE.PRODUCT_TYPE_UPDATED'));
-          this.loading = false;
-        }, error => {
-          this.loading = false;
+      this.typesService.updateType(this.store, this.type.id, obj)
+        .subscribe({
+          next: (data) => {
+            this.toastr.success(this.translate.instant('PRODUCT_TYPE.PRODUCT_TYPE_UPDATED'));
+            this.loading = false;
+          },
+          error: (err) => {
+            this.loading = false;
+          },
         });
 
-    }
-    else {
-      this.typesService.createType(obj)
-        .subscribe((res) => {
-          this.toastr.success(this.translate.instant('PRODUCT_TYPE.PRODUCT_TYPE_CREATED'));
-          this.goToBack();
-          this.loading = false;
-        }, error => {
-          this.loading = false;
+    } else {
+      this.typesService.createType(this.store, obj)
+        .subscribe({
+          next: (data) => {
+            this.toastr.success(this.translate.instant('PRODUCT_TYPE.PRODUCT_TYPE_CREATED'));
+            this.goToBack();
+            this.loading = false;
+
+          },
+          error: (err) => {
+            this.loading = false;
+          }
         });
     }
   }
+
   goToBack() {
     this.router.navigate(['pages/catalogue/types/types-list']);
   }
@@ -193,10 +206,10 @@ export class TypeDetailsComponent implements OnInit {
   get code() {
     return this.form.get('code');
   }
+
   get selectedLanguage() {
     return this.form.get('selectedLanguage');
   }
-
 
 
   selectLanguage(lang) {
@@ -211,12 +224,9 @@ export class TypeDetailsComponent implements OnInit {
 
   checkCode(event) {
     const code = event.target.value.trim();
-    //console.log('Entering checkCode ' + code);
     this.isValidCode = true;
-
-    this.typesService.checkCode(code)
+    this.typesService.checkCode(this.store, code)
       .subscribe(res => {
-        //console.log(res)
         this.isCodeExist = res.exists;
       });
   }

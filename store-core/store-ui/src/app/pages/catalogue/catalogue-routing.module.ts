@@ -40,11 +40,11 @@ const routes: Routes = [{
     //   loadChildren: () => import('./options/options.module')
     //     .then(m => m.OptionsModule),
     // },
-    // {
-    //   path: 'types',
-    //   loadChildren: () => import('./types/types.module')
-    //     .then(m => m.TypesModule),
-    // },
+    {
+      path: 'types',
+      loadChildren: () => import('./types/types.module')
+        .then(m => m.TypesModule),
+    },
   ]
 }];
 

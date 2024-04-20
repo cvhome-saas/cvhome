@@ -1,5 +1,5 @@
 <div [nbSpinner]="loading" nbSpinnerSize="large" nbSpinnerStatus="primary">
-<div class="inner_pages create_page">
+<div class="inner_pages type_create_page">
 
   <form *ngIf="loaded" [formGroup]='form'>
     <nb-card-header class="main_header">
@@ -8,13 +8,16 @@
 
       </div>
       <div class="content_spacing">
-        <button type="button" nbButton class="cancel_button" (click)="goToBack()">{{ 'ORDER_FORM.CANCLE'
-          | translate}}</button>
+        <button type="button" nbButton class="cancel_button" (click)="goToBack()">
+          {{ 'ORDER_FORM.CANCEL'| translate}}
+        </button>
       </div>
 
       <div class="content_spacing">
         <button nbButton type="button" class="success_button" [nbSpinner]="loading" nbSpinnerSize="large"
-          nbSpinnerStatus="control" (click)="save()">{{ ( !loading ? 'COMMON.SAVE' : '' ) | translate }}</button>
+          nbSpinnerStatus="control" (click)="save()">
+          {{ ( !loading ? 'COMMON.SAVE' : '' ) | translate }}
+        </button>
       </div>
     </nb-card-header>
 

@@ -11,7 +11,7 @@ const routes: Routes = [
     component: TypesComponent,
     children: [
       {
-        path: 'create-type',
+        path: 'create-type/:id',
         component: TypeDetailsComponent,
         // canActivate: [StoreGuard]
       },
