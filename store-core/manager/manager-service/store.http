@@ -63,14 +63,36 @@ password = microservice-gateway
 
 
 ### create store
-POST http://localhost:8083/api/v1/store
+POST http://localhost:7001/api/v1/store-manager/private/store
 Content-Type: application/json
 Authorization: Bearer {{access_token}}
 
 {
-  "name": "store name"
+  "name": "ORG_ADMINss",
+  "code": "123456",
+  "phone": "+201120266849",
+  "email": "ashraf1abdelrasool@gmail.com",
+  "address": {
+    "searchControl": "",
+    "stateProvince": "Cario",
+    "country": "EG",
+    "address": "ashraf",
+    "postalCode": "63263",
+    "city": "wwwwwwwwww"
+  },
+  "supportedLanguages": [
+    "fr",
+    "en"
+  ],
+  "defaultLanguage": "en",
+  "currency": "EGP",
+  "currencyFormatNational": true,
+  "weight": "KG",
+  "dimension": "CM",
+  "inBusinessSince": "2024-04-20T19:59:25.053Z",
+  "useCache": true,
+  "retailer": true
 }
-
 ### get my stores
 GET http://localhost:8083/api/v1/store/me
 Authorization: Bearer {{access_token}}

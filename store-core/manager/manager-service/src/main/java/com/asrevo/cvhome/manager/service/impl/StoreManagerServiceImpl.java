@@ -3,7 +3,6 @@ package com.asrevo.cvhome.manager.service.impl;
 import com.asrevo.cvhome.commons.domain.*;
 import com.asrevo.cvhome.commons.dto.IpodDto;
 import com.asrevo.cvhome.manager.commons.dto.CreateManagerStoreRequest;
-import com.asrevo.cvhome.manager.commons.dto.CreateManagerStoreResponse;
 import com.asrevo.cvhome.manager.commons.dto.ListManagerStoreQuery;
 import com.asrevo.cvhome.manager.commons.dto.ManagerStoreDto;
 import com.asrevo.cvhome.manager.service.InternalStoreService;
@@ -23,7 +22,10 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -35,13 +37,31 @@ public class StoreManagerServiceImpl implements StoreManagerService {
     private final StorePodClientFactory storePodClientFactory;
 
     @Override
-    public CreateManagerStoreResponse createStore(CreateManagerStoreRequest storeRequest, IdentityId identityId) {
+    public Mono<Void> createStore(IdentityId identityId, Map<Object, Object> request) {
+        CreateManagerStoreRequest storeRequest = buildInternalCreateRequest(request);
         ManagerStoreDto store = internalStoreService.createStore(storeRequest, identityId);
-        CreateReferenceResponse referenceResponse = createReference(storeRequest, store);
-        internalStoreService.syncInRouter(store.id());
-        CreateStoreResponse createStoreResponse = createStoreInStorePod(storeRequest, referenceResponse);
-        internalStoreService.syncInStore(store.id());
-        return new CreateManagerStoreResponse(store, referenceResponse);
+        return createReference(storeRequest, store)
+                .map(it -> {
+                    internalStoreService.syncInRouter(store.id());
+                    return it;
+                })
+                .flatMap(it -> createStoreInStorePod(request, it).map(x -> {
+                    internalStoreService.syncInStore(store.id());
+                    return x;
+                }))
+                .then();
+    }
+
+    private CreateManagerStoreRequest buildInternalCreateRequest(Map<Object, Object> request) {
+        String name = (String) request.get("name");
+        String email = (String) request.get("email");
+        String phone = (String) request.get("phone");
+        Object address = request.get("address");
+        String country = Optional.ofNullable(address)
+                .map(it -> ((Map<String, String>) it))
+                .map(it -> it.get("country"))
+                .orElse(null);
+        return new CreateManagerStoreRequest(name, new Phone(phone), Country.valueOf(country), new Email(email));
     }
 
     @Override
@@ -62,15 +82,22 @@ public class StoreManagerServiceImpl implements StoreManagerService {
                 .flatMap(it -> getStorePodClient(it).getStore(it.reference()));
     }
 
-    private CreateStoreResponse createStoreInStorePod(CreateManagerStoreRequest storeRequest, CreateReferenceResponse referenceResponse) {
-        return getStorePodClient(referenceResponse.podDto()).create(new CreateStoreResponse(storeRequest.name()));
+    private Mono<CreateStoreResponse> createStoreInStorePod(Map<Object, Object> request, CreateReferenceResponse response) {
+        Map<Object, Object> newRequest = buildExternalCreateRequest(request, response.referenceDto().reference());
+        return getStorePodClient(response.podDto()).create(newRequest);
+    }
+
+    private Map<Object, Object> buildExternalCreateRequest(Map<Object, Object> request, DomainReference reference) {
+        HashMap<Object, Object> newRequest = new HashMap<>(request);
+        newRequest.put("code", reference.reference());
+        return newRequest;
     }
 
     private StorePodClient getStorePodClient(IpodDto ipodDto) {
         return storePodClientFactory.createClient(ipodDto);
     }
 
-    private CreateReferenceResponse createReference(CreateManagerStoreRequest storeRequest, ManagerStoreDto store) {
+    private Mono<CreateReferenceResponse> createReference(CreateManagerStoreRequest storeRequest, ManagerStoreDto store) {
         DomainReference reference = new DomainReference(store.id().getId().toString());
         Domain suggestedSubDomain = new Domain(storeRequest.name() + "." + saasProperties.getDefaultDomain());
         CreateNewReferenceDto createNewReferenceDto = new CreateNewReferenceDto(reference, suggestedSubDomain, storeRequest.country());

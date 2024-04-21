@@ -3,8 +3,6 @@ package com.asrevo.cvhome.manager.controller;
 import com.asrevo.cvhome.commons.annotation.OrgStorePrincipalInfo;
 import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
-import com.asrevo.cvhome.manager.commons.dto.CreateManagerStoreRequest;
-import com.asrevo.cvhome.manager.commons.dto.CreateManagerStoreResponse;
 import com.asrevo.cvhome.manager.commons.dto.ListManagerStoreQuery;
 import com.asrevo.cvhome.manager.commons.dto.ManagerStoreDto;
 import com.asrevo.cvhome.manager.service.InternalStoreService;
@@ -17,6 +15,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("api/v1/store-manager")
@@ -31,6 +31,12 @@ public class StoreManagerController {
         return Mono.just(internalStoreService.findAll(identity, listManagerStoreQuery, pageable));
     }
 
+    @PostMapping("private/store")
+    @PreAuthorize("hasAnyRole('ROLE_ORG_ADMIN')")
+    public Mono<Void> create(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestBody Map<Object,Object> request) {
+        return this.managerService.createStore(identity.org(), request);
+    }
+
     @GetMapping("private/store")
     public Mono<PageImpl<Object>> findAllStoresDetailed(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, Pageable pageable) {
         return managerService.findAll(identity, new ListManagerStoreQuery(null, null, null), pageable);
@@ -39,12 +45,6 @@ public class StoreManagerController {
     @GetMapping("private/store/{code}")
     public Mono<Object> getStoreDetailed(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @PathVariable("code") ManagerStoreId managerStoreId) {
         return managerService.getStore(identity, managerStoreId);
-    }
-
-    @PostMapping("create")
-    @PreAuthorize("hasAnyRole('ROLE_ORG_ADMIN')")
-    public Mono<CreateManagerStoreResponse> create(@RequestBody CreateManagerStoreRequest request, @OrgStorePrincipalInfo UserOrgStoreIdentity identity) {
-        return Mono.just(managerService.createStore(request, identity.org()));
     }
 
     @GetMapping("store-info")

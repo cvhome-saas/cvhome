@@ -7,13 +7,14 @@ import com.asrevo.cvhome.router.commons.dto.CreateReferenceResponse;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.service.annotation.HttpExchange;
 import org.springframework.web.service.annotation.PostExchange;
+import reactor.core.publisher.Mono;
 
 @HttpExchange("api/v1/router")
 public interface RouterService {
 
     @PostExchange("create")
-    CreateReferenceResponse create(@RequestBody CreateNewReferenceDto dto);
+    Mono<CreateReferenceResponse> create(@RequestBody CreateNewReferenceDto dto);
 
     @PostExchange("add-alis")
-    CreateReferenceResponse addAlis(@RequestBody AddAlisDto dto);
+    Mono<CreateReferenceResponse> addAlis(@RequestBody AddAlisDto dto);
 }

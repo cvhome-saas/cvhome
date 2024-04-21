@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS manager.manager_store
     created_date     timestamp   not null,
     country          varchar(20) not null,
     email            varchar(50) not null,
+    phone            varchar(50) not null,
     owner_id         varchar(50) not null,
     synced_in_router boolean default false,
     synced_in_store  boolean default false,

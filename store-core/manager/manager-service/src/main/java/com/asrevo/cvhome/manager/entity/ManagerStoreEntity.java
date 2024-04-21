@@ -24,6 +24,8 @@ public class ManagerStoreEntity extends BaseEntity<ManagerStoreEntity, ManagerSt
     private Country country;
     @Embedded(onEmpty = Embedded.OnEmpty.USE_NULL)
     private Email email;
+    @Embedded(onEmpty = Embedded.OnEmpty.USE_NULL)
+    private Phone phone;
     private Boolean syncedInRouter;
     private Boolean syncedInStore;
 
@@ -34,6 +36,7 @@ public class ManagerStoreEntity extends BaseEntity<ManagerStoreEntity, ManagerSt
         entity.setCreatedDate(Instant.now());
         entity.setOwner(identityId);
         entity.setEmail(request.email());
+        entity.setPhone(request.phone());
         entity.setCountry(request.country());
         entity.setSyncedInRouter(Boolean.FALSE);
         entity.setSyncedInRouter(Boolean.FALSE);
