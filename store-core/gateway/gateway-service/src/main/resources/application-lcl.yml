@@ -80,4 +80,7 @@ com:
   asrevo:
     cvhome:
       calls:
+#        store: GATEWAY
+#        router: DEFAULT
         store: DIRECT
+        router: IGNORE
