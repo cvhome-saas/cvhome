@@ -10,4 +10,6 @@ import java.util.List;
 
 public interface ManagerStoreRepository extends CrudRepository<ManagerStoreEntity, ManagerStoreId>, QueryByExampleExecutor<ManagerStoreEntity> {
     List<ManagerStoreEntity> findAllByOwner(IdentityId identityId);
+
+    Boolean existsByName(String name);
 }

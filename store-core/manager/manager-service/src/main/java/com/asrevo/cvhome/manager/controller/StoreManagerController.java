@@ -33,11 +33,18 @@ public class StoreManagerController {
 
     @PostMapping("private/store")
     @PreAuthorize("hasAnyRole('ROLE_ORG_ADMIN')")
-    public Mono<Void> create(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestBody Map<Object,Object> request) {
+    public Mono<Void> create(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestBody Map<Object, Object> request) {
         return this.managerService.createStore(identity.org(), request);
     }
 
+    @GetMapping(value = "private/store/unique", params = "name")
+    @PreAuthorize("hasAnyRole('ROLE_ORG_ADMIN')")
+    public Mono<Map<String, Boolean>> checkExist(@RequestParam("name") String name) {
+        return Mono.just(Map.of("exists", internalStoreService.checkNameExists(name)));
+    }
+
     @GetMapping("private/store")
+    @PreAuthorize("hasAnyRole('ROLE_ORG_ADMIN')")
     public Mono<PageImpl<Object>> findAllStoresDetailed(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, Pageable pageable) {
         return managerService.findAll(identity, new ListManagerStoreQuery(null, null, null), pageable);
     }

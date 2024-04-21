@@ -81,4 +81,9 @@ public class InternalStoreServiceImpl implements InternalStoreService {
     public ManagerStoreDto findStore(ManagerStoreId store) {
         return storeMappers.toDto(getManagerStoreEntity(store));
     }
+
+    @Override
+    public Boolean checkNameExists(String name) {
+        return storeRepository.existsByName(name);
+    }
 }

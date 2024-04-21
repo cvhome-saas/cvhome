@@ -96,3 +96,9 @@ Authorization: Bearer {{access_token}}
 ### get my stores
 GET http://localhost:8083/api/v1/store/me
 Authorization: Bearer {{access_token}}
+
+
+### check store
+GET http://localhost:7001/api/v1/store-manager/private/store/unique?name=ali
+Content-Type: application/json
+Authorization: Bearer {{access_token}}

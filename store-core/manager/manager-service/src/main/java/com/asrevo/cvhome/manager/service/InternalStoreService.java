@@ -21,4 +21,6 @@ public interface InternalStoreService {
     IdentityId getStoreOwner(ManagerStoreId store);
 
     ManagerStoreDto findStore(ManagerStoreId store);
+
+    Boolean checkNameExists(String name);
 }
