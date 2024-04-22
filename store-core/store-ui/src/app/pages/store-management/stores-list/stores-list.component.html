@@ -8,12 +8,65 @@
 
       </nb-card-header>
 
-<!--      <ng2-smart-table [settings]="settings" [source]="source" (custom)="route($event)" class="home-table">-->
-<!--      </ng2-smart-table>-->
+      <ngx-datatable
+        class="material"
+        [rows]="rows"
+        [columnMode]="ColumnMode.force"
+        [headerHeight]="50"
+        [footerHeight]="50"
+        rowHeight="auto"
+        [externalPaging]="true"
+        [count]="page.totalElements"
+        [offset]="page.pageNumber"
+        [limit]="page.size"
+        (page)="setPage($event)">
 
-<!--      <ngx-paginator (changePage)="changePage($event)" [pagesToShow]="5" [currentPage]="currentPage" [perPage]="perPage"-->
-<!--        [count]="totalCount" class="home-table">-->
-<!--      </ngx-paginator>-->
+        <ngx-datatable-column name="Id">
+          <ng-template let-column="column" ngx-datatable-header-template> {{ 'COMMON.ID' |translate }}</ng-template>
+          <ng-template let-value="value" ngx-datatable-cell-template>
+            <strong>{{ value }}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="code">
+          <ng-template let-column="column" ngx-datatable-header-template> {{ 'CONTENT.CODE' |translate }}</ng-template>
+          <ng-template let-value="value" ngx-datatable-cell-template>
+            <strong>{{ value }}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="name">
+          <ng-template let-column="column" ngx-datatable-header-template> {{ 'COMMON.STORE_NAME' |translate }}</ng-template>
+          <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+            {{ row.name }}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="retailer">
+          <ng-template let-column="column" ngx-datatable-header-template> {{ 'COMPONENTS.RETAILER' |translate }}</ng-template>
+          <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+            {{ row.retailer }}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="name">
+          <ng-template let-column="column" ngx-datatable-header-template> {{ 'COMMON.EMAIL_ADDRESS' |translate }}</ng-template>
+          <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+            {{ row.email }}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="actions">
+          <ng-template let-column="column" ngx-datatable-header-template>
+            {{ 'ORDER.ACTIONS' |translate }}
+          </ng-template>
+          <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+            <button nbButton shape="round" size="small" status="primary" (click)="onEdit(row)"><i class="nb-edit"></i></button>
+            <button nbButton shape="round" size="small" status="danger" (click)="onDelete(row)"><i class="nb-trash"></i></button>
+          </ng-template>
+        </ngx-datatable-column>
+      </ngx-datatable>
+
     </div>
   </nb-card-body>
 </nb-card>

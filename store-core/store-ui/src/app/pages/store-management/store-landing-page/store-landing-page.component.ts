@@ -157,11 +157,11 @@ export class StoreLandingPageComponent implements OnInit {
   }
 
   save() {
-    this.form.patchValue({ name: this.storageService.getMerchant() });
+    this.form.patchValue({ name: this.store.name });
     this.form.patchValue({ code: 'LANDING_PAGE' });
     console.log(JSON.stringify(this.form.value));
     if (this.page && this.page.id) {
-      this.storeService.updatePageContent(this.page.id, this.form.value)
+      this.storeService.updatePageContent(this.store.code,this.page.id, this.form.value)
         .subscribe(res => {
           this.toastr.success(this.translate.instant('STORE_LANDING.PAGE_UPDATED'));
         });

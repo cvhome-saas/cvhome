@@ -22,9 +22,11 @@ export const environment = {
     language: {
       default: 'en',
       array: [
-        'fr',
         'en',
-        'ar'
+        'fr',
+        'ar',
+        'es',
+        'ru',
       ],
     },
   },

@@ -7,6 +7,7 @@ import {TranslateService} from "@ngx-translate/core";
 import {NbMenuItem} from "@nebular/theme/components/menu/menu.service";
 import {Router} from "@angular/router";
 import {AuthService} from "../../../shared/service/auth.service";
+import {ConfigService} from "../../../pages/shared/services/config.service";
 
 @Component({
   selector: 'ngx-header',
@@ -37,8 +38,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
       name: 'Corporate',
     },
   ];
-  languages = ["en", "ar", "es", "ru", "fr"]
-  currentLanguage = this.languages[0]
+  languages: string[];
+  currentLanguage: string;
   currentTheme = 'default';
 
   userMenu = [{title: 'Profile'}, {title: 'Log out'}];
@@ -49,8 +50,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
               private authService: AuthService,
               private router: Router,
               private breakpointService: NbMediaBreakpointsService,
-              private translateService: TranslateService
+              private translateService: TranslateService,
+              private configService: ConfigService
   ) {
+    this.languages = this.configService.getListOfGlobalLanguages().map(it => it.code);
+    this.currentLanguage = this.languages[0];
   }
 
   ngOnInit() {

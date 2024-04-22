@@ -1,16 +1,17 @@
-import { ChangeDetectorRef, Component, ElementRef, Input, NgZone, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import {ChangeDetectorRef, Component, ElementRef, Input, NgZone, OnInit, ViewChild} from '@angular/core';
+import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {ActivatedRoute, Router} from '@angular/router';
 
-import { ConfigService } from '../../shared/services/config.service';
-import { environment } from '../../../../environments/environment';
-import { StoreService } from '../services/store.service';
-import { UserService } from '../../shared/services/user.service';
-import { SecurityService } from '../../shared/services/security.service';
+import {ConfigService} from '../../shared/services/config.service';
+import {environment} from '../../../../environments/environment';
+import {StoreService} from '../services/store.service';
+import {UserService} from '../../shared/services/user.service';
+import {SecurityService} from '../../shared/services/security.service';
 import {NbToastrService} from "@nebular/theme";
-import { TranslateService } from '@ngx-translate/core';
-import { validators } from '../../shared/validation/validators';
-import { forkJoin } from 'rxjs';
+import {TranslateService} from '@ngx-translate/core';
+import {validators} from '../../shared/validation/validators';
+import {forkJoin} from 'rxjs';
+import {CrudService} from "../../shared/services/crud.service";
 
 @Component({
   selector: 'ngx-store-form',
@@ -22,7 +23,7 @@ export class StoreFormComponent implements OnInit {
   @Input() store: any;
   @Input() isCancel: string;
 
-  @ViewChild('search', { static: false })
+  @ViewChild('search', {static: false})
   searchElementRef: ElementRef;
   supportedLanguages = [];
   supportedLanguagesSelected = [];
@@ -48,16 +49,11 @@ export class StoreFormComponent implements OnInit {
   showRemoveButton = true;
   isReadonlyCode = false;
   isSuperadmin: boolean;
-  retailerArray = [];
   roles: any = {};
   isCodeUnique = true;
-  isRetailer = false;
-  isRetailerRole = false;
   establishmentType = 'STORE';
-  parentRetailer: any;
-  merchant = '';
   parent: any;
-  selectedItem = '1';
+  selectedItem = '2';
   sidemenuLinks = [
     {
       id: '0',
@@ -67,16 +63,22 @@ export class StoreFormComponent implements OnInit {
     },
     {
       id: '1',
+      title: 'Store home page',
+      key: 'COMPONENTS.STORE_LANDING',
+      link: 'store-landing'
+    },
+    {
+      id: '2',
       title: 'Store details',
       key: 'COMPONENTS.STORE_DETAILS',
       link: 'store'
     }
   ];
+
   constructor(
     private fb: FormBuilder,
     private configService: ConfigService,
     private storeService: StoreService,
-    //private mapsAPILoader: MapsAPILoader,
     private ngZone: NgZone,
     private cdr: ChangeDetectorRef,
     private userService: UserService,
@@ -84,19 +86,19 @@ export class StoreFormComponent implements OnInit {
     private toastr: NbToastrService,
     private translate: TranslateService,
     private activatedRoute: ActivatedRoute,
-    private securityService: SecurityService
+    private securityService: SecurityService,
+    private crudService: CrudService
   ) {
-    this.establishmentType = window.location.hash.indexOf('retailer') !== -1 ? 'RETAILER' : 'STORE';
-    this.merchant = localStorage.getItem('merchant');
+  }
+
+  ngOnInit() {
     this.roles = JSON.parse(localStorage.getItem('roles'));
     this.loading = true;
     forkJoin(
-      this.configService.getListOfCountries(),
-      this.configService.getListOfSupportedCurrency(),
-      this.configService.getWeightAndSizes(),
-      this.storeService.getListOfStores({ start: 0, length: 1500, retailers: true, store: this.merchant }),
-      this.configService.getListOfSupportedLanguages(localStorage.getItem('merchant')))
-      .subscribe(([countries, currencies, measures, stores, languages]) => {
+      this.getListOfCountries(),
+      this.getListOfSupportedCurrency(),
+      this.getWeightAndSizes())
+      .subscribe(([countries, currencies, measures]) => {
         this.countries = [...countries];
         this.supportedCurrency = [...currencies];
         this.weightList = [...measures.weights];
@@ -104,107 +106,26 @@ export class StoreFormComponent implements OnInit {
 
         this.supportedLanguages = this.configService.getListOfGlobalLanguages();
 
-        // use method for getting only retailer store
-        //list of retailers
 
-        this.form.controls['retailer'].disable();
-        this.form.controls['retailerStore'].disable();
-        if (this.securityService.isSuperAdmin()) {
-          this.form.controls['retailer'].enable();
-          this.form.controls['retailerStore'].enable();
-          this.isRetailerRole = true;
-        }
 
-        if (this.roles.isAdminRetail) {
-          this.isRetailerRole = true;
-        }
-
-        stores.data.forEach(el => {
-          if (el.retailer) {
-            this.retailerArray.push(el);
-          }
-          if (el.code === this.merchant) {
-            this.parent = el;
-          }
-        });
-
-        //console.log('Retailer size ' + this.retailerArray.length);
-        //console.log('Is retailer ' + this.isRetailer);
-
-        this.adjustForm();
 
         this.loading = false;
 
       });
-    if (this.env.googleApiKey) {
-      this.addressAutocomplete();
-    }
-  }
 
-  ngOnInit() {
+
     this.createForm();
-  }
-
-  addressAutocomplete() {
-    // load Places Autocomplete
-    /**
-    this.mapsAPILoader.load().then(() => {
-      const autocomplete = new google.maps.places.Autocomplete(this.searchElementRef.nativeElement, {
-        types: ['address']
-      });
-      autocomplete.addListener('place_changed', () => {
-        this.ngZone.run(() => {
-
-          // get the place result
-          const place: google.maps.places.PlaceResult = autocomplete.getPlace();
-
-          if (place.address_components) {
-            const obj = {
-              street_number: '',
-              route: '',
-              locality: '',
-              administrative_area_level_1: '',
-              administrative_area_level_2: '',
-              sublocality_level_1: '',
-              country: '',
-              postal_code: '',
-            };
-            for (let i = 0; i < place.address_components.length; i++) {
-              const addressType = place.address_components[i].types[0];
-              if (this.componentForm[addressType]) {
-                obj[addressType] = place.address_components[i][this.componentForm[addressType]];
-              }
-            }
-            // rewrite form
-            this.form.controls['address'].patchValue({ postalCode: obj.postal_code });
-            this.form.controls['address'].patchValue({ country: obj.country });
-            this.form.controls['address'].patchValue({ stateProvince: obj.administrative_area_level_1 });
-            this.form.controls['address'].patchValue({ city: obj.locality });
-            this.form.controls['address'].patchValue({ address: obj.route + ' ' + obj.street_number });
-            if (obj.country) {
-              this.countryIsSelected(obj.country);
-            }
-            this.cdr.markForCheck();
-
-
-          } else {
-            // console.log('Choose address from list');
-          }
-        });
-      });
-    });
-    **/
   }
 
   private createForm() {
     this.form = this.fb.group({
       name: ['', [Validators.required]],
-      code: [{ value: '', disabled: false }, [Validators.required, Validators.pattern(validators.alphanumeric)]],
+      code: [{value: '', disabled: false}, [Validators.required, Validators.pattern(validators.alphanumeric)]],
       phone: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.pattern(validators.emailPattern)]],
       address: this.fb.group({
         searchControl: [''],
-        stateProvince: [{ value: '', disabled: false }],
+        stateProvince: [{value: '', disabled: false}],
         country: ['', [Validators.required]],
         address: ['', [Validators.required]],
         postalCode: ['', [Validators.required]],
@@ -218,15 +139,7 @@ export class StoreFormComponent implements OnInit {
       dimension: ['', [Validators.required]],
       inBusinessSince: [new Date()],
       useCache: [false],
-      retailer: [false],
-      retailerStore: '',
     });
-    if (this.store && (!this.store.id && this.roles.isAdminRetail)) {
-      this.form.patchValue({ retailer: false });
-      this.form.patchValue({ retailerStore: this.merchant });
-      this.form.controls['retailer'].disable();
-      this.form.controls['retailerStore'].disable();
-    }
 
     //console.log('Creating form 3 ');
     //console.log('Store id' + this.store.id);
@@ -236,48 +149,9 @@ export class StoreFormComponent implements OnInit {
 
   }
 
-  adjustForm() {
-
-    if (this.parent != null) {
-
-      if (this.parent.retailer) {
-        this.isRetailer = true;
-      }
-
-      this.form.patchValue({
-
-        supportedLanguages: this.parent.supportedLanguages,
-        defaultLanguage: this.parent.defaultLanguage,
-        currency: this.parent.currency,
-        currencyFormatNational: this.parent.currencyFormatNational,
-        weight: this.parent.weight,
-        dimension: this.parent.dimension,
-      });
-
-
-      this.form.controls['address'].patchValue({ country: this.parent.address.country });
-      this.countryIsSelected(this.parent.address.country);
-      this.form.controls['address'].patchValue({ stateProvince: this.parent.address.stateProvince }, { disabled: false });
-
-
-      /** can't assign parent to root */
-      if (this.roles.isSuperadmin) {
-        this.form.controls['retailerStore'].disable();
-      }
-
-
-    }
-
-  }
 
   fillForm() {
 
-    this.isRetailer = this.store.retailer;
-    //console.log('Fill form store ' + JSON.stringify(this.store));
-    if (this.store.parent && this.store.parent != null) {
-      this.parentRetailer = this.store.parent;
-    }
-    //console.log('Parent code ' + this.parentRetailer.code);
 
     this.store.supportedLanguages.forEach(lang => {
       this.supportedLanguagesSelected.push(lang.code);
@@ -295,15 +169,13 @@ export class StoreFormComponent implements OnInit {
       dimension: this.store.dimension,
       inBusinessSince: new Date(this.store.inBusinessSince),
       useCache: this.store.useCache,
-      retailer: this.isRetailer,
-      retailerStore: this.parentRetailer != null ? this.parentRetailer.code : '',
     });
-    this.form.controls['address'].patchValue({ searchControl: '' });
-    this.form.controls['address'].patchValue({ stateProvince: this.store.address.stateProvince }, { disabled: false });
-    this.form.controls['address'].patchValue({ country: this.store.address.country });
-    this.form.controls['address'].patchValue({ address: this.store.address.address });
-    this.form.controls['address'].patchValue({ postalCode: this.store.address.postalCode });
-    this.form.controls['address'].patchValue({ city: this.store.address.city });
+    this.form.controls['address'].patchValue({searchControl: ''});
+    this.form.controls['address'].patchValue({stateProvince: this.store.address.stateProvince}, {disabled: false});
+    this.form.controls['address'].patchValue({country: this.store.address.country});
+    this.form.controls['address'].patchValue({address: this.store.address.address});
+    this.form.controls['address'].patchValue({postalCode: this.store.address.postalCode});
+    this.form.controls['address'].patchValue({city: this.store.address.city});
     if (this.store.address.country) {
       this.countryIsSelected(this.store.address.country);
     }
@@ -352,31 +224,12 @@ export class StoreFormComponent implements OnInit {
     return this.form.get('inBusinessSince');
   }
 
-  get retailer() {
-    return this.form.get('retailer');
-  }
-
-  get retailerStore() {
-    return this.form.get('retailerStore');
-  }
 
   save() {
     //this.findInvalidControls();
-    this.form.controls['address'].patchValue({ country: this.form.value.address.country });
-    this.form.controls['address'].patchValue({ stateProvince: this.form.value.address.stateProvince });
+    this.form.controls['address'].patchValue({country: this.form.value.address.country});
+    this.form.controls['address'].patchValue({stateProvince: this.form.value.address.stateProvince});
     const storeObj = this.form.value;
-
-    //creating a child
-    if (this.store && !this.store.id) {
-      if (!this.roles.isSuperadmin && this.isRetailer) {
-        storeObj.retailer = false;
-        storeObj.retailerStore = this.merchant;
-      }
-    }
-
-    if (this.store && (this.store.id && this.isRetailer)) {
-      storeObj.retailer = true;
-    }
 
 
     storeObj.supportedLanguages = this.supportedLanguagesSelected;
@@ -403,25 +256,22 @@ export class StoreFormComponent implements OnInit {
     }
   }
 
-  remove() {
-    this.storeService.deleteStore(this.store.code)
-      .subscribe(res => {
-        this.toastr.success(this.translate.instant('STORE_FORM.' + this.establishmentType + '_REMOVED'));
-        this.router.navigate(['pages/store-management/stores-list']);
-      });
-  }
-
   countryIsSelected(code) {
     this.provinces = [];
     // this.stateProvince.disable();
-    this.configService.getListOfZonesProvincesByCountry(code)
-      .subscribe(provinces => {
-        this.provinces = [...provinces];
-        if (this.provinces.length > 0) {
-          // this.stateProvince.enable();
-        }
-      }, error1 => {
-        this.toastr.success(this.translate.instant('STORE_FORM.ERROR_STATE_PROVINCE'));
+    this.getListOfZonesProvincesByCountry(code)
+      .subscribe({
+        next: (data) => {
+          this.provinces = [...data];
+          if (this.provinces.length > 0) {
+            // this.stateProvince.enable();
+          }
+
+        },
+        error: (err) => {
+          this.toastr.success(this.translate.instant('STORE_FORM.ERROR_STATE_PROVINCE'));
+
+        },
       });
   }
 
@@ -438,7 +288,7 @@ export class StoreFormComponent implements OnInit {
       this.supportedLanguagesSelected.push(languageCode);
     }
 
-    this.form.patchValue({ 'supportedLanguages': this.supportedLanguagesSelected }); // rewrite form
+    this.form.patchValue({'supportedLanguages': this.supportedLanguagesSelected}); // rewrite form
 
   }
 
@@ -459,16 +309,6 @@ export class StoreFormComponent implements OnInit {
     return this.store.supportedLanguages.find((l: any) => l.code === language.code);
   }
 
-  showRetailers(event) {
-    if (!event.target.checked) {
-      this.isRetailer = false;
-      this.form.controls['retailerStore'].enable();
-    } else {
-      this.isRetailer = true;
-      this.form.controls['retailerStore'].disable()
-    }
-    //event ? this.form.controls['retailerStore'].disable() : this.form.controls['retailerStore'].enable();
-  }
 
   checkCode(event) {
     const code = event.target.value;
@@ -478,14 +318,31 @@ export class StoreFormComponent implements OnInit {
       });
   }
 
-  canRemove() {
-    return this.store.id && ((this.roles.isSuperadmin && this.establishmentType === 'RETAILER')
-      || (this.roles.isSuperadmin && this.establishmentType === 'STORE')) && this.store.code !== 'DEFAULT';
-  }
   onClickRoute(link) {
     this.router.navigate(['pages/store-management/' + link + "/", this.store.code]);
   }
+
   goToBack() {
     this.router.navigate(['pages/store-management/stores-list']);
+  }
+
+  getListOfSupportedCurrency() {
+    return this.crudService.get(`/store/api/v1/currency?store=${this.store.code}`);
+  }
+
+  getWeightAndSizes() {
+    return this.crudService.get(`/store/api/v1/measures?store=${this.store.code}`);
+  }
+
+  getListOfCountries() {
+    return this.crudService.get(`/store/api/v1/country?store=${this.store.code}`);
+  }
+
+  getListOfZonesProvincesByCountry(countryCode) {
+    const params = {
+      'code': countryCode,
+      'store': this.store.code
+    };
+    return this.crudService.get(`/store/api/v1/zones`, params);
   }
 }

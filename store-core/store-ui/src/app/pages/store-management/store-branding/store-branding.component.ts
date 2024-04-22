@@ -1,12 +1,11 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
-import { StoreService } from '../services/store.service';
-import { Logo } from '../models/logo';
+import {Component, OnInit, ViewChild} from '@angular/core';
+import {FormArray, FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {ActivatedRoute, Router} from '@angular/router';
+import {StoreService} from '../services/store.service';
+import {Logo} from '../models/logo';
 import {NbToastrService} from "@nebular/theme";
-import { TranslateService } from '@ngx-translate/core';
-import { forkJoin } from 'rxjs';
-import { ActivatedRoute } from '@angular/router';
+import {TranslateService} from '@ngx-translate/core';
+import {forkJoin} from 'rxjs';
 
 @Component({
   selector: 'ngx-store-branding',
@@ -39,8 +38,8 @@ export class StoreBrandingComponent implements OnInit {
     }
   ];
 
-  @ViewChild('imageDrop', { static: false }) imageDrop;
-  acceptedImageTypes = { 'image/png': true, 'image/jpeg': true, 'image/gif': true };
+  @ViewChild('imageDrop', {static: false}) imageDrop;
+  acceptedImageTypes = {'image/png': true, 'image/jpeg': true, 'image/gif': true};
   imageUpload = this.formBuilder.group({
     imageInput: ['', Validators.required]
   });
@@ -146,7 +145,7 @@ export class StoreBrandingComponent implements OnInit {
 
   saveLogo() {
     this.loadingButton = true;
-    this.storeService.addStoreLogo(this.logoFile)
+    this.storeService.addStoreLogo(this.store.code, this.logoFile)
       .subscribe(res => {
         this.toastr.success(this.translate.instant('STORE_BRANDING.LOGO_SAVED'));
         this.loadingButton = false;

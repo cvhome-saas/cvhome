@@ -18,11 +18,11 @@ export class StoreService {
 
 
   getStore(code): Observable<any> {
-    return this.crudService.get(`/v1/store/${code}`);
+    return this.crudService.get(`/store/api/v1/store/${code}?store=${code}`);
   }
 
   getListOfStores(params): Observable<any> {
-    return this.crudService.get(`/v1/private/stores`, params);
+    return this.crudService.get(`/manager/api/v1/store-manager/private/store`, params);
   }
 
   getListOfMerchantStoreNames(params): Observable<any> {
@@ -50,21 +50,21 @@ export class StoreService {
 
   // PAGE CONTENT
 
-  getPageContent(pageCode: string, storeCode: string): Observable<any> {
+  getPageContent(pageCode: string, store: string): Observable<any> {
     const params = {
       lang: '_all',
-      store: storeCode
+      store
     };
-    return this.crudService.getWithEmpty(`/v1/private/content/any/${pageCode}`, params);
+    return this.crudService.getWithEmpty(`/store/api/v1/private/content/any/${pageCode}?store=${store}`, params);
   }
 
-  updatePageContent(id, content: any): Observable<any> {
-    return this.crudService.put(`/v1/private/content/${id}`, content);
+  updatePageContent(store,id, content: any): Observable<any> {
+    return this.crudService.put(`/store/api/v1/private/content/${id}?store=${store}`, content);
   }
 
   createPageContent(content: any, storeCode: string) : Observable<any> {
 
-    return this.crudService.postWithStoreParam(`/v1/private/content`, content, storeCode);
+    return this.crudService.postWithStoreParam(`/store/api/v1/private/content`, content, storeCode);
   }
 
   // end PAGE CONTENT
@@ -80,11 +80,10 @@ export class StoreService {
     return this.crudService.post(`/v1/private/store/${code}/marketing`, body);
   }
 
-  addStoreLogo(file: any): Observable<any> {
-    const code = this.storageService.getMerchant();
+  addStoreLogo(store:string,file: any): Observable<any> {
     const uploadData = new FormData();
     uploadData.append('file', file, file.name);
-    return this.crudService.post(`/v1/private/store/${code}/marketing/logo`, uploadData);
+    return this.crudService.post(`/store/api/v1/private/store/${store}/marketing/logo?store=${store}`, uploadData);
   }
 
   removeStoreLogo(code: string): Observable<any> {

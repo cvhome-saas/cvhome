@@ -1,5 +1,4 @@
 <div class="inner_pages storeManagement">
-
   <nb-card-header class="main_header">
     <h1 class="page_title">{{ title | translate }}</h1>
 
@@ -11,7 +10,7 @@
       </nb-select>
     </div>
     <div class="content_spacing" *ngIf="isCancel == '0'">
-      <button type="button" nbButton class="cancel_button" (click)="goToBack()">{{ 'ORDER_FORM.CANCLE'
+      <button type="button" nbButton class="cancel_button" (click)="goToBack()">{{ 'ORDER_FORM.CANCEL'
         | translate}}</button>
     </div>
     <div class="content_spacing">
@@ -257,33 +256,8 @@
           </div>
         </div>
 
-
-        <div>
-          <div class="form-group">
-            <div class="col-sm-12 group-block">
-              <nb-checkbox formControlName='retailer' (change)="showRetailers($event)">
-                {{ 'COMPONENTS.RETAILER' | translate }}
-              </nb-checkbox>
-            </div>
-          </div>
-
-          <div class="form-group" *ngIf="isRetailerRole">
-            <label class="col-sm-10 col-form-label inputLabel">{{ 'STORE_FORM.SELECT_RETAILER' | translate }}
-            </label>
-            <div class="col-sm-12">
-              <nb-select *ngIf="retailerArray.length" placeholder="{{ 'STORE_FORM.SELECT_RETAILER' | translate }}"
-                formControlName='retailerStore' outline shape="rectangle" class="fullWidth">
-                <nb-option *ngFor="let el of retailerArray" [value]="el.code">{{ el.name }}</nb-option>
-              </nb-select>
-            </div>
-          </div>
-
-        </div>
-
-
       </nb-card-body>
     </nb-card>
 
   </form>
-  <!-- </div> -->
 </div>
