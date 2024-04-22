@@ -13,7 +13,7 @@ import java.util.Map;
 @HttpExchange("/api/v1")
 public interface StorePodClient {
     @PostExchange("/private/store")
-    Mono<ResponseEntity<Void>> create(@RequestBody Map<Object,Object> dto);
+    Mono<ResponseEntity<Void>> create(@RequestBody Map<Object, Object> dto);
 
     @GetExchange("private/store/{code}")
     Mono<Object> getStore(@PathVariable("code") String code);
