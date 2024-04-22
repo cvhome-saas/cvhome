@@ -1,6 +1,5 @@
 package com.asrevo.cvhome.manager.service;
 
-import com.asrevo.cvhome.storepod.commons.dto.CreateStoreResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
