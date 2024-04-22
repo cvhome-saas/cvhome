@@ -29,15 +29,15 @@ export class StoreService {
     return this.crudService.get(`/v1/private/stores/names`, params);
   }
 
-  checkIfStoreExist(code): Observable<any> {
+  checkIfStoreExist(name): Observable<any> {
     const params = {
-      'code': code,
+      name
     };
-    return this.crudService.get(`/v1/private/store/unique`, params);
+    return this.crudService.get(`/manager/api/v1/store-manager/private/store/unique`, params);
   }
 
   createStore(store: any): Observable<any> {
-    return this.crudService.post(`/manager/api/v1/private/store`, store);
+    return this.crudService.post(`/manager/api/v1/store-manager/private/store`, store);
   }
 
   deleteStore(store: any): Observable<any> {

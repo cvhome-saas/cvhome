@@ -3,6 +3,8 @@ import { environment } from '../../../../environments/environment';
 import { CrudService } from './crud.service';
 import { Language } from '../models/Language';
 import { TranslateService } from '@ngx-translate/core';
+import {of} from "rxjs";
+import {countries, currency, weightSizes} from "./data";
 
 
 
@@ -101,7 +103,7 @@ export class ConfigService {
   }
 
   getListOfCountries() {
-    return this.crudService.get(`/v1/country`);
+    return of(countries);
   }
 
   getListOfCountriesByLanguage(lang) {
@@ -119,11 +121,11 @@ export class ConfigService {
   }
 
   getListOfSupportedCurrency() {
-    return this.crudService.get(`/v1/currency`);
+    return of(currency);
   }
 
   getWeightAndSizes() {
-    return this.crudService.get(`/v1/measures`);
+    return of(weightSizes);
   }
 
   getSiteConfig() {

@@ -10,8 +10,6 @@
 
 export const environment = {
   production: false,
-  //GOOGLE MAP
-  googleApiKey: '',
   //MARKETPLACE | BTB | STANDARD
   mode: 'STANDARD',
   //API URL

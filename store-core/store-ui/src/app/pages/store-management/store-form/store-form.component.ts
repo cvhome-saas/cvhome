@@ -1,12 +1,9 @@
-import {ChangeDetectorRef, Component, ElementRef, Input, NgZone, OnInit, ViewChild} from '@angular/core';
+import {ChangeDetectorRef, Component, Input, NgZone, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {ActivatedRoute, Router} from '@angular/router';
 
 import {ConfigService} from '../../shared/services/config.service';
-import {environment} from '../../../../environments/environment';
 import {StoreService} from '../services/store.service';
-import {UserService} from '../../shared/services/user.service';
-import {SecurityService} from '../../shared/services/security.service';
 import {NbToastrService} from "@nebular/theme";
 import {TranslateService} from '@ngx-translate/core';
 import {validators} from '../../shared/validation/validators';
@@ -23,36 +20,17 @@ export class StoreFormComponent implements OnInit {
   @Input() store: any;
   @Input() isCancel: string;
 
-  @ViewChild('search', {static: false})
-  searchElementRef: ElementRef;
   supportedLanguages = [];
   supportedLanguagesSelected = [];
   supportedCurrency = [];
   weightList = [];
   sizeList = [];
-  flag = true;
-  provinces = [];
   countries = [];
   form: FormGroup;
-  env = environment;
-  componentForm = {
-    street_number: 'short_name',
-    route: 'long_name',
-    locality: 'long_name',
-    administrative_area_level_1: 'short_name',
-    administrative_area_level_2: 'short_name',
-    country: 'short_name',
-    postal_code: 'short_name',
-    sublocality_level_1: 'long_name'
-  };
   loading = false;
-  showRemoveButton = true;
-  isReadonlyCode = false;
-  isSuperadmin: boolean;
-  roles: any = {};
-  isCodeUnique = true;
+  isReadonlyName = false;
+  isNameUnique = true;
   establishmentType = 'STORE';
-  parent: any;
   selectedItem = '2';
   sidemenuLinks = [
     {
@@ -81,36 +59,24 @@ export class StoreFormComponent implements OnInit {
     private storeService: StoreService,
     private ngZone: NgZone,
     private cdr: ChangeDetectorRef,
-    private userService: UserService,
     private router: Router,
     private toastr: NbToastrService,
-    private translate: TranslateService,
-    private activatedRoute: ActivatedRoute,
-    private securityService: SecurityService,
-    private crudService: CrudService
-  ) {
+    private translate: TranslateService) {
   }
 
   ngOnInit() {
-    this.roles = JSON.parse(localStorage.getItem('roles'));
     this.loading = true;
     forkJoin(
-      this.getListOfCountries(),
-      this.getListOfSupportedCurrency(),
-      this.getWeightAndSizes())
+      this.configService.getListOfCountries(),
+      this.configService.getListOfSupportedCurrency(),
+      this.configService.getWeightAndSizes())
       .subscribe(([countries, currencies, measures]) => {
         this.countries = [...countries];
         this.supportedCurrency = [...currencies];
         this.weightList = [...measures.weights];
         this.sizeList = [...measures.measures];
-
         this.supportedLanguages = this.configService.getListOfGlobalLanguages();
-
-
-
-
         this.loading = false;
-
       });
 
 
@@ -119,8 +85,7 @@ export class StoreFormComponent implements OnInit {
 
   private createForm() {
     this.form = this.fb.group({
-      name: ['', [Validators.required]],
-      code: [{value: '', disabled: false}, [Validators.required, Validators.pattern(validators.alphanumeric)]],
+      name: ['', [Validators.required, Validators.pattern(validators.alphanumeric)]],
       phone: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.pattern(validators.emailPattern)]],
       address: this.fb.group({
@@ -141,8 +106,6 @@ export class StoreFormComponent implements OnInit {
       useCache: [false],
     });
 
-    //console.log('Creating form 3 ');
-    //console.log('Store id' + this.store.id);
     if (this.store && this.store.id > 0) {
       this.fillForm();
     }
@@ -151,7 +114,6 @@ export class StoreFormComponent implements OnInit {
 
 
   fillForm() {
-
 
     this.store.supportedLanguages.forEach(lang => {
       this.supportedLanguagesSelected.push(lang.code);
@@ -176,10 +138,7 @@ export class StoreFormComponent implements OnInit {
     this.form.controls['address'].patchValue({address: this.store.address.address});
     this.form.controls['address'].patchValue({postalCode: this.store.address.postalCode});
     this.form.controls['address'].patchValue({city: this.store.address.city});
-    if (this.store.address.country) {
-      this.countryIsSelected(this.store.address.country);
-    }
-    this.isReadonlyCode = true;
+    this.isReadonlyName = true;
     this.cdr.markForCheck();
 
   }
@@ -237,18 +196,18 @@ export class StoreFormComponent implements OnInit {
     if (this.store && this.store.id) {
       this.storeService.updateStore(storeObj)
         .subscribe(store => {
-          this.toastr.success(this.translate.instant('STORE_FORM.' + this.establishmentType + '_UPDATED'));
+          this.toastr.success(this.translate.instant('STORE_FORM.STORE_UPDATED'));
           this.router.navigate(['pages/store-management/stores-list']);
         });
     } else {
-      this.storeService.checkIfStoreExist(this.form.value.code)
+      this.storeService.checkIfStoreExist(this.form.value.name)
         .subscribe(res => {
           if (res.exist) {
-            this.toastr.success(this.translate.instant('COMMON.CODE_EXISTS'));
+            this.toastr.success(this.translate.instant('COMMON.NAME_EXISTS'));
           } else {
             this.storeService.createStore(storeObj)
               .subscribe(store => {
-                this.toastr.success(this.translate.instant('STORE_FORM.' + this.establishmentType + '_CREATED'));
+                this.toastr.success(this.translate.instant('STORE_FORM.STORE_CREATED'));
                 this.router.navigate(['pages/store-management/stores-list']);
               });
           }
@@ -256,24 +215,6 @@ export class StoreFormComponent implements OnInit {
     }
   }
 
-  countryIsSelected(code) {
-    this.provinces = [];
-    // this.stateProvince.disable();
-    this.getListOfZonesProvincesByCountry(code)
-      .subscribe({
-        next: (data) => {
-          this.provinces = [...data];
-          if (this.provinces.length > 0) {
-            // this.stateProvince.enable();
-          }
-
-        },
-        error: (err) => {
-          this.toastr.success(this.translate.instant('STORE_FORM.ERROR_STATE_PROVINCE'));
-
-        },
-      });
-  }
 
   addSupportedLanguage(languageCode) {
     let newLanguages = this.form.value.supportedLanguages ? [...this.form.value.supportedLanguages] : [];
@@ -300,11 +241,10 @@ export class StoreFormComponent implements OnInit {
   }
 
 
-  checkCode(event) {
-    const code = event.target.value;
-    this.storeService.checkIfStoreExist(this.form.value.code)
+  checkName(event) {
+    this.storeService.checkIfStoreExist(this.form.value.name)
       .subscribe(res => {
-        this.isCodeUnique = !(res.exists && (this.store.code !== code));
+        this.isNameUnique = !res.exists
       });
   }
 
@@ -316,23 +256,4 @@ export class StoreFormComponent implements OnInit {
     this.router.navigate(['pages/store-management/stores-list']);
   }
 
-  getListOfSupportedCurrency() {
-    return this.crudService.get(`/store/api/v1/currency?store=${this.store.code}`);
-  }
-
-  getWeightAndSizes() {
-    return this.crudService.get(`/store/api/v1/measures?store=${this.store.code}`);
-  }
-
-  getListOfCountries() {
-    return this.crudService.get(`/store/api/v1/country?store=${this.store.code}`);
-  }
-
-  getListOfZonesProvincesByCountry(countryCode) {
-    const params = {
-      'code': countryCode,
-      'store': this.store.code
-    };
-    return this.crudService.get(`/store/api/v1/zones`, params);
-  }
 }
