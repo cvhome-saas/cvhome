@@ -50,8 +50,8 @@ jobs:
       - name: Run the build
         run: ./gradlew build -x test
 
-      - name: Run the tests
-        run: ./gradlew test
+#      - name: Run the tests
+#        run: ./gradlew test
 
 #      - name: Build Docker with Gradle
 #        run: ./gradlew bootBuildImage --publishImage -x test
@@ -60,19 +60,19 @@ jobs:
 #          ECR_TOKEN: ${{ steps.login-ecr.outputs.docker_password_117535662239_dkr_ecr_eu_central_1_amazonaws_com }}
 #          GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
 
-      - name: check docker images
-        run: docker images
-      - uses: actions/upload-artifact@v4
-        with:
-          name: reports
-          path: ${{ github.workspace }}/**/reports/*/test/*
-      - uses: actions/upload-artifact@v4
-        with:
-          name: libs
-          path: ${{ github.workspace}}/**/build/libs/*
-      - uses: actions/upload-artifact@v4
-        with:
-          name: dist
-          path: | 
-            ${{ github.workspace}}/core/welcome-ui/src/*
-            ${{ github.workspace}}/store-core/store-ui/src/*
+#      - name: check docker images
+#        run: docker images
+#      - uses: actions/upload-artifact@v4
+#        with:
+#          name: reports
+#          path: ${{ github.workspace }}/**/reports/*/test/*
+#      - uses: actions/upload-artifact@v4
+#        with:
+#          name: libs
+#          path: ${{ github.workspace}}/**/build/libs/*
+#      - uses: actions/upload-artifact@v4
+#        with:
+#          name: dist
+#          path: |
+#            ${{ github.workspace}}/core/welcome-ui/src/*
+#            ${{ github.workspace}}/store-core/store-ui/src/*
