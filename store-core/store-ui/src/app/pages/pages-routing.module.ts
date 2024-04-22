@@ -28,10 +28,11 @@ const routes: Routes = [{
       loadChildren: () => import('./user-management/user-management.module')
         .then(m => m.UserManagementModule),
     },
-    // {
-    //   path: 'store-management',
-    //   loadChildren: 'app/pages/store-management/store-management.module#StoreManagementModule'
-    // },
+    {
+      path: 'store-management',
+      loadChildren: () => import('./store-management/store-management.module')
+        .then(m => m.StoreManagementModule),
+    },
     {
       path: 'catalogue',
       // canActivate: [SuperadminStoreRetailCatalogueGuard],
@@ -56,11 +57,11 @@ const routes: Routes = [{
     //   path: 'tax-management',
     //   loadChildren: 'app/pages/tax-management/tax-management.module#TaxManagementModule'
     // },
-     {
-       path: 'customer',
-       loadChildren: () => import('./customers/customer.module')
-         .then(m => m.CustomersModule),
-     },
+    {
+      path: 'customer',
+      loadChildren: () => import('./customers/customer.module')
+        .then(m => m.CustomersModule),
+    },
     // {
     //   path: 'error-500',
     //   component: FiveHundredComponent
