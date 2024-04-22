@@ -22,7 +22,7 @@ export class StoreService {
         id: {
           id: "65f023632bc46470c104b76f"
         },
-        name: "ashraf"
+        name: "default"
       }]
     })
     // return this.httpClient.post<Page<Store>>(`${this.STORE_MANAGER_BASE_URL}/list`, {})

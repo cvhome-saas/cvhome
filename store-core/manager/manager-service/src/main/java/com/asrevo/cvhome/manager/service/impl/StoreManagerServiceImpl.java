@@ -15,10 +15,10 @@ import com.asrevo.cvhome.router.commons.dto.CreateNewReferenceDto;
 import com.asrevo.cvhome.s2s.clients.RouterAllocationService;
 import com.asrevo.cvhome.s2s.model.SaasProperties;
 import com.asrevo.cvhome.s2s.model.ServiceDomainProperties;
-import com.asrevo.cvhome.storepod.commons.dto.CreateStoreResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -95,7 +95,7 @@ public class StoreManagerServiceImpl implements StoreManagerService {
         return PodReferenceDto.from(this.fallbackStoreUrl, reference.reference());
     }
 
-    private Mono<CreateStoreResponse> createStoreInStorePod(Map<Object, Object> request, PodReferenceDto podReferenceDto) {
+    private Mono<ResponseEntity<Void>> createStoreInStorePod(Map<Object, Object> request, PodReferenceDto podReferenceDto) {
         Map<Object, Object> newRequest = managerStoreMappers.toExternalCreateRequest(request, podReferenceDto.reference());
         return getStorePodClient(podReferenceDto).create(newRequest);
     }
