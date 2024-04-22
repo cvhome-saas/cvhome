@@ -4251,4 +4251,4 @@ export const currency = [
   }
 ];
 
-export const weightSizes = {"weights": ["LB", "KG"], "measures": ["CM", "IN", "KG", "LB"]};
+export const weightSizes = {"weights": ["LB", "KG"], "measures": ["CM", "IN"]};

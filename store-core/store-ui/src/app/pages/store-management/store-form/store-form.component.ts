@@ -1,6 +1,6 @@
 import {ChangeDetectorRef, Component, Input, NgZone, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {ActivatedRoute, Router} from '@angular/router';
+import {Router} from '@angular/router';
 
 import {ConfigService} from '../../shared/services/config.service';
 import {StoreService} from '../services/store.service';
@@ -8,7 +8,6 @@ import {NbToastrService} from "@nebular/theme";
 import {TranslateService} from '@ngx-translate/core';
 import {validators} from '../../shared/validation/validators';
 import {forkJoin} from 'rxjs';
-import {CrudService} from "../../shared/services/crud.service";
 
 @Component({
   selector: 'ngx-store-form',
@@ -30,7 +29,6 @@ export class StoreFormComponent implements OnInit {
   loading = false;
   isReadonlyName = false;
   isNameUnique = true;
-  establishmentType = 'STORE';
   selectedItem = '2';
   sidemenuLinks = [
     {
@@ -192,7 +190,7 @@ export class StoreFormComponent implements OnInit {
 
 
     storeObj.supportedLanguages = this.supportedLanguagesSelected;
-
+    storeObj.code = this.store.code;
     if (this.store && this.store.id) {
       this.storeService.updateStore(storeObj)
         .subscribe(store => {
@@ -237,7 +235,7 @@ export class StoreFormComponent implements OnInit {
   userHasSupportedLanguage(language) {
     if (!this.store || !this.store.supportedLanguages)
       return false;
-    return this.store.supportedLanguages.find((l: any) => l.code === language.code);
+    return this.store.supportedLanguages.find((l: any) => l.code === language.code) != undefined;
   }
 
 
