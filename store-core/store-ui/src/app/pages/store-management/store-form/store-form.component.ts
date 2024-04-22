@@ -292,16 +292,6 @@ export class StoreFormComponent implements OnInit {
 
   }
 
-  public findInvalidControls() {
-    const invalid = [];
-    const controls = this.form.controls;
-    for (const name in controls) {
-      if (controls[name].invalid) {
-        invalid.push(name);
-      }
-    }
-    //console.log('Invalid fields ' + invalid);
-  }
 
   userHasSupportedLanguage(language) {
     if (!this.store || !this.store.supportedLanguages)

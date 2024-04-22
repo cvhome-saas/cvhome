@@ -83,7 +83,7 @@ export class StoresListComponent implements OnInit {
     this.router.navigate(['pages/store-management/store/', row.code]);
   }
 
-  onRemove(row) {
+  onDelete(row) {
     this.dialogService.open(ShowcaseDialogComponent, {
       context: {
         title: 'Are you sure!',

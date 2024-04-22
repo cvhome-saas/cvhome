@@ -37,15 +37,15 @@ export class StoreService {
   }
 
   createStore(store: any): Observable<any> {
-    return this.crudService.post(`/v1/private/store`, store);
+    return this.crudService.post(`/manager/api/v1/private/store`, store);
   }
 
-  deleteStore(storeCode: any): Observable<any> {
-    return this.crudService.delete(`/v1/private/store/${ storeCode }`);
+  deleteStore(store: any): Observable<any> {
+    return this.crudService.delete(`/store/api/v1/private/store/${store}?store=${store}`);
   }
 
   updateStore(store: any): Observable<any> {
-    return this.crudService.put(`/v1/private/store/${ store.code }`, store);
+    return this.crudService.put(`/store/api/v1/private/store/${ store.code }?store=${store.code}`, store);
   }
 
   // PAGE CONTENT

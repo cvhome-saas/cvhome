@@ -10,9 +10,6 @@ import { StoreLandingPageComponent } from './store-landing-page/store-landing-pa
 import { NgxSummernoteModule } from 'ngx-summernote';
 import { StoreDetailInfoComponent } from './store-detail-info/store-detail-info.component';
 import { StoreBrandingComponent } from './store-branding/store-branding.component';
-import { RetailerComponent } from './retailer/retailer.component';
-import { RetailerListComponent } from './retailer-list/retailer-list.component';
-import { RetailerStoresComponent } from './retailer-stores/retailer-stores.component';
 import { NbDialogModule } from '@nebular/theme';
 import { SharedModule } from "../store-manager/shared/shared.module";
 
@@ -27,9 +24,6 @@ import { SharedModule } from "../store-manager/shared/shared.module";
     StoreFormComponent,
     StoreLandingPageComponent,
     StoreDetailInfoComponent,
-    RetailerComponent,
-    RetailerListComponent,
-    RetailerStoresComponent
   ],
   imports: [
     StoreManagementRoutingModule,
