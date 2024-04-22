@@ -12,7 +12,7 @@ import com.asrevo.cvhome.store.core.model.shipping.ShippingSummary;
 import com.asrevo.cvhome.store.core.services.catalog.pricing.PricingService;
 import com.asrevo.cvhome.store.core.services.order.OrderService;
 import com.asrevo.cvhome.store.core.services.shipping.ShippingQuoteService;
-import com.asrevo.cvhome.store.service.facade.shoppingCart.ShoppingCartFacade;
+import com.asrevo.cvhome.store.service.facade.cart.ShoppingCartFacade;
 import com.asrevo.cvhome.store.service.populator.order.ReadableOrderSummaryPopulator;
 import com.asrevo.cvhome.store.utils.LabelUtils;
 import io.swagger.v3.oas.annotations.Parameter;

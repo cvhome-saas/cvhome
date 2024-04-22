@@ -8,7 +8,7 @@ import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import com.asrevo.cvhome.store.core.model.shoppingcart.PersistableShoppingCartItem;
 import com.asrevo.cvhome.store.core.model.shoppingcart.ReadableShoppingCart;
-import com.asrevo.cvhome.store.service.facade.shoppingCart.ShoppingCartFacade;
+import com.asrevo.cvhome.store.service.facade.cart.ShoppingCartFacade;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
