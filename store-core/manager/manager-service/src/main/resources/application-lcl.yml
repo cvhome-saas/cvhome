@@ -53,3 +53,11 @@ spring:
               metadata:
                 service-name: landing-ui
                 instance: landing-ui-1
+com:
+  asrevo:
+    cvhome:
+      calls:
+        #        store: GATEWAY
+        #        router: DEFAULT
+        store: DIRECT
+        router: IGNORE
