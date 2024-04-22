@@ -19,6 +19,8 @@ public class StorePodClientFactory {
 
     public StorePodClient createClient(IpodDto ipodDto) {
         return clientsMap.computeIfAbsent(ipodDto.id(), podId ->
-                WebClientsUtils.build(defaultWebMicroServiceBuilder, ipodDto.location()+"/store", StorePodClient.class));
+                WebClientsUtils.build(defaultWebMicroServiceBuilder, ipodDto.location(), StorePodClient.class));
     }
+
+
 }
