@@ -550,6 +550,7 @@
     "CODE_REQUIRED": "Le code est requis.",
     "NAME_REQUIRED": "Le nom est obligatoire.",
     "CODE_EXISTS": "Ce code existe déjà.",
+    "NAME_EXISTS": "Ce nom existe déjà.",
     "SKU_EXISTS": "Ce SKU existe déjà.",
     "FILL_REQUIRED_FIELDS": "Veuillez remplir les champs obligatoires.",
     "ALPHA_DECIMAL_RULE": "Seuls les lettres et les chiffres sont autorisés.",
