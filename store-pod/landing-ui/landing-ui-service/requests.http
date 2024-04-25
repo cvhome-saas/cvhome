@@ -1,3 +1,0 @@
-### test find products in a store
-GET http://localhost:8083/api/v1/public/products/find-all?storeId=65f023632bc46470c104b76f
-Accept: application/json
