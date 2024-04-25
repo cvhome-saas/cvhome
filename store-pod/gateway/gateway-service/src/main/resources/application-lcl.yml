@@ -62,4 +62,4 @@ spring:
           order: 10
           uri: lb://landing-ui
           predicates:
-            - FHost={domain}.{x},{sub}.{domain}.{x}
+            - FNotService=store,manager,wallet,dcm,router,wallet,auth
