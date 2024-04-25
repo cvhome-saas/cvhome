@@ -1,6 +1,6 @@
 ###
 
-# curl 'http://localhost:6001/api/v1/cart/a0a9ddc9b9704f95aa1d6dc7e6da6819/checkout'
+# curl 'http://localhost:7101/api/v1/cart/a0a9ddc9b9704f95aa1d6dc7e6da6819/checkout'
 #  -H 'Accept: application/json, text/plain, */*'
 #  -H 'Accept-Language: en-US,en;q=0.9'
 #  -H 'Authorization;'
@@ -16,7 +16,7 @@
 #  -H 'sec-ch-ua-mobile: ?0'
 #  -H 'sec-ch-ua-platform: "Linux"'
 #  --data-raw '{"shippingQuote":"","currency":"CAD","payment":{"paymentType":"CREDITCARD","transactionType":"CAPTURE","paymentModule":"stripe","amount":200},"customer":{"emailAddress":"asga@sfa.ca","billing":{"address":"eeeeee","city":"fdfd","postalCode":"eeee","country":"CA","zone":"YT","firstName":"sfasdf","lastName":"asdfasdf"}}}'
-POST http://localhost:6001/api/v1/cart/a0a9ddc9b9704f95aa1d6dc7e6da6819/checkout
+POST http://localhost:7101/api/v1/cart/a0a9ddc9b9704f95aa1d6dc7e6da6819/checkout
 Accept: application/json, text/plain, */*
 Accept-Language: en-US,en;q=0.9
 Authorization:

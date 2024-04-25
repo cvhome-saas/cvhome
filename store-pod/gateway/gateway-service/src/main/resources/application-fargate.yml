@@ -13,8 +13,8 @@ spring:
         enabled: true
         default-port: 8080
         service-ports:
-          "store": 6001
-          "landing-ui": 6002
+          "store": 7101
+          "landing-ui": 7102
     gateway:
       discovery:
         locator:

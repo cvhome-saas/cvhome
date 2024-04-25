@@ -1,5 +1,5 @@
 ### get token from test application
-POST http://localhost:6001/api/v1/test/sign
+POST http://localhost:7101/api/v1/test/sign
 Content-Type: application/json
 
 {
@@ -68,7 +68,7 @@ password = microservice-gateway
 
 
 ### API for creating a manufacturer / Brand
-POST http://localhost:6001/api/v1/private/manufacturer
+POST http://localhost:7101/api/v1/private/manufacturer
 Content-Type: application/json
 Authorization: Bearer {{access_token}}
 
@@ -90,7 +90,7 @@ Authorization: Bearer {{access_token}}
 
 
 ### Creates a category
-POST http://localhost:6001/api/v1/private/category
+POST http://localhost:7101/api/v1/private/category
 Content-Type: application/json
 Authorization: Bearer {{access_token}}
 
@@ -117,7 +117,7 @@ Authorization: Bearer {{access_token}}
 
 
 ### Create Product Definition SIMBEATS
-POST http://localhost:6001/api/v2/private/product?lang=en
+POST http://localhost:7101/api/v2/private/product?lang=en
 Content-Type: application/json
 Authorization: Bearer {{access_token}}
 

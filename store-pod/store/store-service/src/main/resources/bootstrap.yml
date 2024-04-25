@@ -77,21 +77,21 @@ com:
         store-pod-gateway:
           name: store-pod-gateway
           domain: "store-pod-1.gateway.com"
-          port: 6000
+          port: 7100
           schema: http
           namespace: store-pod.cvhome.lcl
           gateway-service-name: store-pod-gateway
         store:
           name: store
           domain: "store-pod-1.gateway.com"
-          port: 6001
+          port: 7101
           schema: http
           namespace: store-pod.cvhome.lcl
           gateway-service-name: store-pod-gateway
         landing-ui:
           name: landing-ui
           domain: "store-pod-1.gateway.com"
-          port: 6002
+          port: 7102
           schema: http
           namespace: store-pod.cvhome.lcl
           gateway-service-name: store-pod-gateway
