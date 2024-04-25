@@ -19,9 +19,9 @@ COPY  --chown=nextjs:nodejs /.next/static ./.next/static
 
 USER nextjs
 
-EXPOSE 6002
+EXPOSE 7102
 
-ENV PORT 6002
+ENV PORT 7102
 # set hostname to localhost
 ENV HOSTNAME "0.0.0.0"
 
