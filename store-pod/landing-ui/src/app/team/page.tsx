@@ -1,4 +1,5 @@
 import {Suspense} from "react";
+import {cookies} from "next/headers";
 
 async function wait(duration: number) {
     return new Promise(resolve => {
@@ -7,6 +8,7 @@ async function wait(duration: number) {
 }
 
 export default async function Team() {
+    console.log(cookies().getAll())
     return (
         <main className="flex min-h-screen flex-col items-center justify-between p-24">
             hello
