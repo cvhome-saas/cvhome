@@ -29,6 +29,7 @@ import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.G
 public class PodRouterFilter implements GlobalFilter, Ordered {
     private static final String STORE_SERVICE_PREFIX = "/store/";
     private static final String STORE_ID_PARAM = "store";
+    private static final String STORE_ID_HEADER = "store";
     private static final String STORE_SERVICE_NAME = "store";
     private static final String ROUTER_SERVICE_NAME = "router";
     private final RouterAllocationService router;
@@ -78,7 +79,13 @@ public class PodRouterFilter implements GlobalFilter, Ordered {
     private Mono<ServerHttpRequest> getServerHttpRequest(ServerWebExchange exchange, UriComponents uriComponents, DomainReference reference) {
         return Mono
                 .defer(() -> getPodReference(serviceDomainProperties, router.getAllocation(reference), () -> buildFallbackPodReference(reference)))
-                .map(it -> exchange.getRequest().mutate().uri(buildUri(uriComponents, it)).build());
+                .map(it -> {
+                    URI newUri = buildUri(uriComponents, it);
+                    return exchange.getRequest().mutate()
+                            .uri(newUri)
+                            .header(STORE_ID_HEADER, reference.reference())
+                            .build();
+                });
     }
 
     private PodReferenceDto buildFallbackPodReference(DomainReference reference) {
