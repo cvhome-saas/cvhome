@@ -23,6 +23,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_STORE;
 
 @Controller
 @RequestMapping("/api/v1")
@@ -96,7 +97,7 @@ public class ProductRelationshipApi {
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = List.class))))
     @ResponseBody
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_STORE)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public List<ReadableProduct> getAll(

@@ -32,6 +32,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.sql.Date;
 import java.util.*;
 
+import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_STORE;
+
 @Service("initializationDatabase")
 @Slf4j
 public class InitializationDatabaseImpl implements InitializationDatabase {
@@ -251,7 +253,7 @@ public class InitializationDatabaseImpl implements InitializationDatabase {
         store.setStorename("Shopizer");
         store.setOrg("d1952c95-312e-4bb9-9a2d-b703d031276f");
         store.setStorephone("888-888-8888");
-        store.setCode(Constants.DEFAULT_STORE);
+        store.setCode(DEFAULT_STORE);
         store.setStorecity("My city");
         store.setStoreaddress("1234 Street address");
         store.setStorepostalcode("H2H-2H2");

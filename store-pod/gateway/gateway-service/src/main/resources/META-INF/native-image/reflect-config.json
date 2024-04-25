@@ -40,7 +40,7 @@
     ]
   },
   {
-    "name": "com.asrevo.cvhome.gateway.filters.MapHostAsRequestParamGatewayFilterFactory",
+    "name": "com.asrevo.cvhome.gateway.filters.AddStoreParamGatewayFilterFactory",
     "allDeclaredFields": true,
     "allDeclaredConstructors": true,
     "allDeclaredMethods": true

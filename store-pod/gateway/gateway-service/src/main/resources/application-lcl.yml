@@ -63,3 +63,13 @@ spring:
           uri: lb://landing-ui
           predicates:
             - FNotService=store,manager,wallet,dcm,router,wallet,auth
+          filters:
+            - AddStoreParam=store
+com:
+  asrevo:
+    cvhome:
+      calls:
+        #        store: GATEWAY
+        #        router: DEFAULT
+        store: DIRECT
+        router: IGNORE

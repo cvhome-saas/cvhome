@@ -29,6 +29,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_STORE;
+
 @Controller
 @RequestMapping("/api/v2")
 @Tags(value = @Tag(name = "Product instances group api"))
@@ -46,7 +48,7 @@ public class ProductVariantGroupApi {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(value = {"/private/product/productVariantGroup"})
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_STORE)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public @ResponseBody Entity create(
@@ -150,7 +152,7 @@ public class ProductVariantGroupApi {
     @RequestMapping(value = {"/private/product/productVariantGroup/{id}/image"}, consumes = {
             MediaType.MULTIPART_FORM_DATA_VALUE}, method = RequestMethod.POST)
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_STORE)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public void addImage(

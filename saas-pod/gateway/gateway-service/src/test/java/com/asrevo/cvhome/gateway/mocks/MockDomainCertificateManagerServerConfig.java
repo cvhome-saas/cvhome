@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.gateway.mocks;
 
+import com.asrevo.cvhome.commons.utils.Constants;
 import org.mockserver.client.MockServerClient;
 import org.mockserver.model.JsonBody;
 import org.mockserver.model.MediaType;
@@ -13,6 +14,7 @@ import org.testcontainers.utility.DockerImageName;
 
 import java.util.List;
 
+import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_STORE;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 
@@ -52,9 +54,9 @@ public class MockDomainCertificateManagerServerConfig {
                                                {
                                                   "id": 1,
                                                   "domain":"ashraf.gateway.me",
-                                                  "reference":"65f023632bc46470c104b76f"
+                                                  "reference":"{DEFAULT_STORE}"
                                                }
-                                            """
+                                            """.replace("{DEFAULT_STORE}", DEFAULT_STORE)
                                     ));
         };
     }

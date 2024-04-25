@@ -32,6 +32,7 @@ import java.util.stream.Stream;
 
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_STORE;
 
 @RestController
 @RequestMapping(value = "/api/v1")
@@ -54,7 +55,7 @@ public class CategoryApi {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of category found")})
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_STORE)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public ReadableCategory get(
@@ -70,7 +71,7 @@ public class CategoryApi {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of category found")})
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_STORE)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public ReadableCategory getByfriendlyUrl(
@@ -84,7 +85,7 @@ public class CategoryApi {
     @ResponseStatus(HttpStatus.OK)
     @GetMapping(value = {"/private/category/unique"}, produces = MediaType.APPLICATION_JSON_VALUE)
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_STORE)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     @Operation(method = "GET", description = "Check if category code already exists", summary = "", responses = @ApiResponse(content = @Content(schema = @Schema(implementation = EntityExists.class))))
@@ -103,7 +104,7 @@ public class CategoryApi {
     @GetMapping(value = "private/category", produces = {APPLICATION_JSON_VALUE})
     @Operation(method = "GET", description = "Get category hierarchy from root. Supports filtering FEATURED_CATEGORIES and VISIBLE ONLY by adding ?filter=[featured] or ?filter=[visible] or ? filter=[featured,visible", summary = "Does not return any product attached")
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_STORE)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public ReadableCategoryList list(
@@ -130,7 +131,7 @@ public class CategoryApi {
     @GetMapping(value = "/category", produces = {APPLICATION_JSON_VALUE})
     @Operation(method = "GET", description = "Get category hierarchy from root. Supports filtering FEATURED_CATEGORIES and VISIBLE ONLY by adding ?filter=[featured] or ?filter=[visible] or ? filter=[featured,visible", summary = "Does not return any product attached")
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_STORE)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public ReadableCategoryList hierarchyList(
@@ -152,7 +153,7 @@ public class CategoryApi {
     @GetMapping(value = "/category/product/{ProductId}", produces = {APPLICATION_JSON_VALUE})
     @Operation(method = "GET", description = "Get category by product", summary = "")
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_STORE)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public ReadableCategoryList list(
@@ -168,7 +169,7 @@ public class CategoryApi {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(value = "/private/category", produces = {APPLICATION_JSON_VALUE})
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_STORE)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public PersistableCategory create(
@@ -189,7 +190,7 @@ public class CategoryApi {
 
     @PutMapping(value = "/private/category/{id}", produces = {APPLICATION_JSON_VALUE})
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_STORE))
     })
     public PersistableCategory update(@PathVariable Long id, @Valid @RequestBody PersistableCategory category,
                                       @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore) {
@@ -209,7 +210,7 @@ public class CategoryApi {
 
     @PatchMapping(value = "/private/category/{id}/visible", produces = {APPLICATION_JSON_VALUE})
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_STORE))
     })
     public void updateVisible(@PathVariable Long id, @Valid @RequestBody PersistableCategory category,
                               @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore
@@ -230,7 +231,7 @@ public class CategoryApi {
     @PutMapping(value = "/private/category/{id}/move/{parent}", produces = {APPLICATION_JSON_VALUE})
     @Operation(method = "PUT", description = "Move a category under another category", summary = "Move category {id} under category {parent}")
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE))
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_STORE))
     })
     public void move(
             @PathVariable Long id,

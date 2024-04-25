@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_STORE;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -30,7 +31,7 @@ public class OrderStatusHistoryApi {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_STORE)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public List<ReadableOrderStatusHistory> list(@PathVariable final Long id, @Parameter(hidden = true) MerchantStore merchantStore,
@@ -49,7 +50,7 @@ public class OrderStatusHistoryApi {
     @ResponseBody
     @Operation(method = "POST", description = "Add order history", summary = "Adds a new status to an order")
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = Constants.DEFAULT_STORE)),
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_STORE)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public void create(@PathVariable final Long id, @RequestBody PersistableOrderStatusHistory history,

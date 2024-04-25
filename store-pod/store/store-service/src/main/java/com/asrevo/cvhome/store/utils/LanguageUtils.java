@@ -24,7 +24,7 @@ import org.springframework.web.servlet.support.RequestContextUtils;
 import java.util.Locale;
 import java.util.Optional;
 
-import static com.asrevo.cvhome.store.core.constants.Constants.DEFAULT_STORE;
+import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_STORE;
 
 
 @Component

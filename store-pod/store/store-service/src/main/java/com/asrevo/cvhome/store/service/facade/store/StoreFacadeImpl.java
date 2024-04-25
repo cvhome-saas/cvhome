@@ -38,6 +38,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_STORE;
+
 @Service("storeFacade")
 @Slf4j
 public class StoreFacadeImpl implements StoreFacade {
@@ -66,7 +68,7 @@ public class StoreFacadeImpl implements StoreFacade {
     public MerchantStore getByCode(HttpServletRequest request) {
         String code = request.getParameter("store");
         if (StringUtils.isEmpty(code)) {
-            code = Constants.DEFAULT_STORE;
+            code = DEFAULT_STORE;
         }
         return get(code);
     }
@@ -266,7 +268,7 @@ public class StoreFacadeImpl implements StoreFacade {
     @Override
     public void delete(String code) {
 
-        if (Constants.DEFAULT_STORE.equals(code.toUpperCase())) {
+        if (DEFAULT_STORE.equals(code.toUpperCase())) {
             throw new ServiceRuntimeException("Cannot remove default store");
         }
 

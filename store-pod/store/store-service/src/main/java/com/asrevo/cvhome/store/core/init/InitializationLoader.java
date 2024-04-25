@@ -11,6 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_STORE;
+
 
 @Component
 @Slf4j
@@ -49,7 +51,7 @@ public class InitializationLoader {
 
                 initializationDatabase.populate("sm-shop");
 
-                MerchantStore store = merchantService.getByCode(Constants.DEFAULT_STORE);
+                MerchantStore store = merchantService.getByCode(DEFAULT_STORE);
 
                 MerchantConfig config = new MerchantConfig();
                 config.setAllowPurchaseItems(true);
