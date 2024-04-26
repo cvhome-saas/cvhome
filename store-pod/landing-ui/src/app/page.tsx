@@ -1,119 +1,220 @@
-import Image from "next/image";
 
 export default function Home() {
     return (
-        <main className="flex min-h-screen flex-col items-center justify-between p-24">
-            <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-                <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-                    Get started by editing&nbsp;
-                    <code className="font-mono font-bold">src/app/page.tsx</code>
-                </p>
-                <div
-                    className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:size-auto lg:bg-none">
-                    <a
-                        className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-                        href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                    >
-                        By{" "}
-                        <Image
-                            src="/vercel.svg"
-                            alt="Vercel Logo"
-                            className="dark:invert"
-                            width={100}
-                            height={24}
-                            priority
-                        />
-                    </a>
+        <>
+            <div className="site-blocks-cover">
+                <div className="container">
+                    <div className="row">
+                        <div className="col-md-4 ml-auto order-md-2 align-self-start">
+                            <div className="site-block-cover-content"><h2 className="sub-title">#New Collection
+                                2022</h2><h1>Imports from the world</h1><p><a href="!#"
+                                                                              className="btn btn-black rounded-0">Shop
+                                Now</a></p></div>
+                        </div>
+                        <div className="col-md-8 order-1 align-self-end"><img src="assets/img/banner/table.png"
+                                                                              alt="banner" className="img-fluid"/></div>
+                    </div>
                 </div>
             </div>
 
-            <div
-                className="relative z-[-1] flex place-items-center before:absolute before:h-[300px] before:w-full before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 sm:before:w-[480px] sm:after:w-[240px] before:lg:h-[360px]">
-                <Image
-                    className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-                    src="/next.svg"
-                    alt="Next.js Logo"
-                    width={180}
-                    height={37}
-                    priority
-                />
+            <div className="support-area hm9-section-padding pt-50 pb-40 ">
+                <div>
+                    <div className="row">
+                        <div className="col-lg-2"></div>
+                        <div className="col-lg-8"><img src="/assets/img/promo/promo.png" alt="promo20" width="1200"/>
+                        </div>
+                        <div className="col-lg-2"></div>
+                    </div>
+                </div>
             </div>
 
-            <div className="mb-32 grid text-center lg:mb-0 lg:w-full lg:max-w-5xl lg:grid-cols-4 lg:text-left">
-                <a
-                    href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-                    className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    <h2 className="mb-3 text-2xl font-semibold">
-                        Docs{" "}
-                        <span
-                            className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-                    </h2>
-                    <p className="m-0 max-w-[30ch] text-sm opacity-50">
-                        Find in-depth information about Next.js features and API.
-                    </p>
-                </a>
-
-                <a
-                    href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-                    className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    <h2 className="mb-3 text-2xl font-semibold">
-                        Learn{" "}
-                        <span
-                            className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-                    </h2>
-                    <p className="m-0 max-w-[30ch] text-sm opacity-50">
-                        Learn about Next.js in an interactive course with&nbsp;quizzes!
-                    </p>
-                </a>
-
-                <a
-                    href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-                    className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    <h2 className="mb-3 text-2xl font-semibold">
-                        Templates{" "}
-                        <span
-                            className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-                    </h2>
-                    <p className="m-0 max-w-[30ch] text-sm opacity-50">
-                        Explore starter templates for Next.js.
-                    </p>
-                </a>
-
-                <a
-                    href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-                    className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    <h2 className="mb-3 text-2xl font-semibold">
-                        Deploy{" "}
-                        <span
-                            className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-                    </h2>
-                    <p className="m-0 max-w-[30ch] text-balance text-sm opacity-50">
-                        Instantly deploy your Next.js site to a shareable URL with Vercel.
-                    </p>
-                </a>
+            <div className="product-area pt-100 pb-100 ">
+                <div className="container">
+                    <div className="section-title-5 text-center "><h2 className="">Featured Products</h2></div>
+                    <div className="product-tab-list pt-30 pb-55 text-center nav nav-pills" role="tablist">
+                        <div className="nav-item"><a href="#" role="tab" data-rb-event-key="all" aria-selected="true"
+                                                     className="nav-link active"><h4>All</h4></a></div>
+                        <div className="nav-item"><a href="#" role="tab" data-rb-event-key="phones" tabIndex="-1"
+                                                     aria-selected="false" className="nav-link"><h4>phones</h4></a>
+                        </div>
+                        <div className="nav-item"><a href="#" role="tab" data-rb-event-key="cars" tabIndex="-1"
+                                                     aria-selected="false" className="nav-link"><h4>cars</h4></a></div>
+                        <div className="nav-item"><a href="#" role="tab" data-rb-event-key="ncansa" tabIndex="-1"
+                                                     aria-selected="false" className="nav-link"><h4>ncansa</h4></a>
+                        </div>
+                    </div>
+                    <div className="tab-content">
+                        <div role="tabpanel" aria-hidden="false" className="fade tab-pane active show">
+                            <div className="row">
+                                <div className="col-xl-3 col-md-6 col-lg-4 col-sm-6 ">
+                                    <div className="product-wrap-2 mb-25  ">
+                                        <div className="product-img"><a href="/product/iphone"><img
+                                            src="http://localhost:8080/static/products/DEFAULT/iphone/SMALL/Apple_iphone13_hero_09142021_inline.jpg.large.jpg"
+                                            alt=""/></a>
+                                            <div className="product-action-2"><a title="Select options"
+                                                                                 href="/product/iphone"><i
+                                                className="fa fa-cog"></i></a>
+                                                <button className="active" title="Add to cart"><i
+                                                    className="fa fa-shopping-cart"></i></button>
+                                                <button title="Quick View"><i className="fa fa-eye"></i></button>
+                                            </div>
+                                        </div>
+                                        <div className="product-content-2">
+                                            <div className="title-price-wrap-2 "><h3><a
+                                                href="/product/iphone">iphone</a></h3>
+                                                <div className="price-2"><span>CA$1,500.00 </span></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="col-xl-3 col-md-6 col-lg-4 col-sm-6 ">
+                                    <div className="product-wrap-2 mb-25  ">
+                                        <div className="product-img"><a href="/product/fiat"><img
+                                            src="http://localhost:8080/static/products/DEFAULT/fiat/SMALL/500_333.jpeg"
+                                            alt=""/></a>
+                                            <div className="product-action-2"><a title="Select options"
+                                                                                 href="/product/fiat"><i
+                                                className="fa fa-cog"></i></a>
+                                                <button className="active" title="Add to cart"><i
+                                                    className="fa fa-shopping-cart"></i></button>
+                                                <button title="Quick View"><i className="fa fa-eye"></i></button>
+                                            </div>
+                                        </div>
+                                        <div className="product-content-2">
+                                            <div className="title-price-wrap-2 "><h3><a href="/product/fiat">fiat</a>
+                                            </h3>
+                                                <div className="price-2"><span>CA$200.00 </span></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div role="tabpanel" aria-hidden="true" className="fade tab-pane">
+                            <div className="row">
+                                <div className="col-xl-3 col-md-6 col-lg-4 col-sm-6 ">
+                                    <div className="product-wrap-2 mb-25  ">
+                                        <div className="product-img"><a href="/product/iphone"><img
+                                            src="http://localhost:8080/static/products/DEFAULT/iphone/SMALL/Apple_iphone13_hero_09142021_inline.jpg.large.jpg"
+                                            alt=""/></a>
+                                            <div className="product-action-2"><a title="Select options"
+                                                                                 href="/product/iphone"><i
+                                                className="fa fa-cog"></i></a>
+                                                <button className="active" title="Add to cart"><i
+                                                    className="fa fa-shopping-cart"></i></button>
+                                                <button title="Quick View"><i className="fa fa-eye"></i></button>
+                                            </div>
+                                        </div>
+                                        <div className="product-content-2">
+                                            <div className="title-price-wrap-2 "><h3><a
+                                                href="/product/iphone">iphone</a></h3>
+                                                <div className="price-2"><span>CA$1,500.00 </span></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div role="tabpanel" aria-hidden="true" className="fade tab-pane">
+                            <div className="row">
+                                <div className="col-xl-3 col-md-6 col-lg-4 col-sm-6 ">
+                                    <div className="product-wrap-2 mb-25  ">
+                                        <div className="product-img"><a href="/product/iphone"><img
+                                            src="http://localhost:8080/static/products/DEFAULT/iphone/SMALL/Apple_iphone13_hero_09142021_inline.jpg.large.jpg"
+                                            alt=""/></a>
+                                            <div className="product-action-2"><a title="Select options"
+                                                                                 href="/product/iphone"><i
+                                                className="fa fa-cog"></i></a>
+                                                <button className="active" title="Add to cart"><i
+                                                    className="fa fa-shopping-cart"></i></button>
+                                                <button title="Quick View"><i className="fa fa-eye"></i></button>
+                                            </div>
+                                        </div>
+                                        <div className="product-content-2">
+                                            <div className="title-price-wrap-2 "><h3><a
+                                                href="/product/iphone">iphone</a></h3>
+                                                <div className="price-2"><span>CA$1,500.00 </span></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="col-xl-3 col-md-6 col-lg-4 col-sm-6 ">
+                                    <div className="product-wrap-2 mb-25  ">
+                                        <div className="product-img"><a href="/product/fiat"><img
+                                            src="http://localhost:8080/static/products/DEFAULT/fiat/SMALL/500_333.jpeg"
+                                            alt=""/></a>
+                                            <div className="product-action-2"><a title="Select options"
+                                                                                 href="/product/fiat"><i
+                                                className="fa fa-cog"></i></a>
+                                                <button className="active" title="Add to cart"><i
+                                                    className="fa fa-shopping-cart"></i></button>
+                                                <button title="Quick View"><i className="fa fa-eye"></i></button>
+                                            </div>
+                                        </div>
+                                        <div className="product-content-2">
+                                            <div className="title-price-wrap-2 "><h3><a href="/product/fiat">fiat</a>
+                                            </h3>
+                                                <div className="price-2"><span>CA$200.00 </span></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div role="tabpanel" aria-hidden="true" className="fade tab-pane">
+                            <div className="row">
+                                <div className="col-xl-3 col-md-6 col-lg-4 col-sm-6 ">
+                                    <div className="product-wrap-2 mb-25  ">
+                                        <div className="product-img"><a href="/product/iphone"><img
+                                            src="http://localhost:8080/static/products/DEFAULT/iphone/SMALL/Apple_iphone13_hero_09142021_inline.jpg.large.jpg"
+                                            alt=""/></a>
+                                            <div className="product-action-2"><a title="Select options"
+                                                                                 href="/product/iphone"><i
+                                                className="fa fa-cog"></i></a>
+                                                <button className="active" title="Add to cart"><i
+                                                    className="fa fa-shopping-cart"></i></button>
+                                                <button title="Quick View"><i className="fa fa-eye"></i></button>
+                                            </div>
+                                        </div>
+                                        <div className="product-content-2">
+                                            <div className="title-price-wrap-2 "><h3><a
+                                                href="/product/iphone">iphone</a></h3>
+                                                <div className="price-2"><span>CA$1,500.00 </span></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </main>
+
+            <div className="subscribe-area-3  pt-100 pb-100 ">
+                <div className="container-fluid">
+                    <div className="row">
+                        <div className="col-xl-5 col-lg-7 col-md-10 ml-auto mr-auto">
+                            <div className="subscribe-style-3 text-center "><h2>Subscribe to our newsletter! </h2>
+                                <p>Subscribe to our newsletter to receive news on update</p>
+                                <div>
+                                    <div className="subscribe-form-3 mt-35">
+                                        <form>
+                                            <div className="mc-form">
+                                                <div><input className="email" name="email" type="email"
+                                                            placeholder="Email address"/></div>
+                                                <div className="clear-3 dark-red-subscribe">
+                                                    <button className="button">Subscribe</button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </>
     );
 }
