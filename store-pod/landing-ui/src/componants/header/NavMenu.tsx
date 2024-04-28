@@ -1,4 +1,3 @@
-'use client'
 import PropTypes from "prop-types";
 import {Link} from "@/navigation";
 
@@ -14,12 +13,6 @@ export const NavMenu = ({
                             home,
                         }) => {
 
-    const onClickCategory = (item) => {
-        setCategoryID(item.id)
-    }
-    const onClickContent = (item) => {
-        setContent(item)
-    }
     return (
         <div
             className={` ${
@@ -40,17 +33,15 @@ export const NavMenu = ({
                             return (
                                 item.visible &&
                                 <li key={index}>
-                                    <Link href={"/category/" + item.description.friendlyUrl}
-                                          onClick={() => onClickCategory(item)}>{item.description.name}
+                                    <Link href={"/category/" + item.description.friendlyUrl}>{item.description.name}
                                         {item.children && item.children.length > 0 &&
-                                            sidebarMenu ? (
-                                                <span>
-                                                    <i className="fa fa-angle-right"></i>
+                                        sidebarMenu ? (
+                                            <span>
+                                                <i className="fa fa-angle-right"></i>
                                                 </span>
-                                            ) : (
-                                                <i className="fa fa-angle-down"/>
-                                            )
-
+                                        ) : (
+                                            <i className="fa fa-angle-down"/>
+                                        )
                                         }
 
                                     </Link>
@@ -60,8 +51,7 @@ export const NavMenu = ({
                                             {
                                                 item.children.map((submenu, index) => {
                                                     return (<li key={index}>
-                                                        <Link href={"/category/" + submenu.description.friendlyUrl}
-                                                              onClick={() => onClickCategory(submenu)}>
+                                                        <Link href={"/category/" + submenu.description.friendlyUrl}>
                                                             {submenu.description.name}
                                                         </Link>
                                                     </li>)
@@ -78,8 +68,7 @@ export const NavMenu = ({
                         contents.map((content, index) => {
                             return (
                                 content.visible && content.description &&
-                                <li key={index}><Link locale={'fr'} href={"/content/" + content.description.friendlyUrl}
-                                                      onClick={() => onClickContent(content.code)}> {content.description.name}</Link>
+                                <li key={index}><Link href={"/content/" + content.description.friendlyUrl}> {content.description.name}</Link>
                                 </li>
                             )
                         })

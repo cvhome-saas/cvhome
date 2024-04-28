@@ -23,6 +23,13 @@
     "Your Email Address": "Your Email Address",
     "Subscribe": "Subscribe"
   },
+  "Cart": {
+    "No items added to cart": "No items added to cart",
+    "Checkout": "Checkout",
+    "View Cart": "View Cart",
+    "Total": "Total",
+    "Qty": "Qty"
+  },
   "Metadata": {
     "Home": "Home",
     "Terms and Policy": "Terms and Policy",

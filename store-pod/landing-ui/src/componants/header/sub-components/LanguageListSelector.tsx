@@ -1,12 +1,12 @@
 'use client'
 import {Language} from "@/componants/header/HeaderTop";
 import {usePathname, useRouter} from '@/navigation';
+import {Store} from "@/types/store";
 
-export const LanguageListSelector = ({languages}: { languages: Language[] }) => {
+export const LanguageListSelector = ({store, languages}: { store: Store, languages: Language[] }) => {
     const router = useRouter();
     const pathname = usePathname();
     const switchLanguage = (it: Language) => router.push(pathname, {locale: it.lang});
-
     return <ul>
         {
             languages.map(it => {

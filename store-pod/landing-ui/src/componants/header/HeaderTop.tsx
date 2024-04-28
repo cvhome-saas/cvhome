@@ -1,20 +1,18 @@
+'use server'
 import {StoreCallUs} from "@/componants/header/sub-components/StoreCallUs";
 import {StoreOffers} from "@/componants/header/sub-components/StoreOffers";
 import {LanguageListSelector} from "@/componants/header/sub-components/LanguageListSelector";
 import {CurrentLanguage} from "@/componants/header/sub-components/CurrentLanguage";
 import {useTranslations} from "next-intl";
-import {locales} from "@/navigation";
 import {Store} from "@/types/store";
 
 
-export const NEXT_LOCALE_KEY = 'NEXT_LOCALE';
-
-export const HeaderTop = ({store}:{store:Store}) => {
+export const HeaderTop = async ({store}: { store: Store }) => {
     const t = useTranslations('Language');
-    const languages: Language[] = locales.map(it => {
+    const languages: Language[] = store.supportedLanguages.map(it => {
         return {
-            lang: it,
-            name: t(it)
+            lang: it.code,
+            name: t(it.code)
         }
     });
     return (
@@ -22,11 +20,11 @@ export const HeaderTop = ({store}:{store:Store}) => {
             <div className="language-currency-wrap">
                 <div className="same-language-currency language-style">
                     <span>
-                        <CurrentLanguage/>
+                        <CurrentLanguage store={store}/>
                         <i className="fa fa-angle-down"></i>
                     </span>
                     <div className="lang-car-dropdown">
-                        <LanguageListSelector languages={languages}/>
+                        <LanguageListSelector languages={languages} store={store}/>
                     </div>
                 </div>
                 <StoreCallUs store={store}/>
