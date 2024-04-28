@@ -1,8 +1,18 @@
 'use client'
 import PropTypes from "prop-types";
-import Link from "next/link";
+import {Link} from "@/navigation";
 
-export const NavMenu = ({ props, strings, menuWhiteClass, sidebarMenu, categories, contents, setCategoryID, setContent }) => {
+export const NavMenu = ({
+                            props,
+                            strings,
+                            menuWhiteClass,
+                            sidebarMenu,
+                            categories,
+                            contents,
+                            setCategoryID,
+                            setContent,
+                            home,
+                        }) => {
 
     const onClickCategory = (item) => {
         setCategoryID(item.id)
@@ -22,7 +32,7 @@ export const NavMenu = ({ props, strings, menuWhiteClass, sidebarMenu, categorie
                 <ul>
                     <li>
                         <Link href={"/"}>
-                            Home
+                            {home}
                         </Link>
                     </li>
                     {
@@ -30,16 +40,17 @@ export const NavMenu = ({ props, strings, menuWhiteClass, sidebarMenu, categorie
                             return (
                                 item.visible &&
                                 <li key={index}>
-                                    <Link href={"/category/" + item.description.friendlyUrl} onClick={() => onClickCategory(item)}>{item.description.name}
-                                        {item.children && item.children.length > 0 ?
+                                    <Link href={"/category/" + item.description.friendlyUrl}
+                                          onClick={() => onClickCategory(item)}>{item.description.name}
+                                        {item.children && item.children.length > 0 &&
                                             sidebarMenu ? (
                                                 <span>
-                          <i className="fa fa-angle-right"></i>
-                        </span>
+                                                    <i className="fa fa-angle-right"></i>
+                                                </span>
                                             ) : (
-                                                <i className="fa fa-angle-down" />
+                                                <i className="fa fa-angle-down"/>
                                             )
-                                            : ''
+
                                         }
 
                                     </Link>
@@ -49,7 +60,8 @@ export const NavMenu = ({ props, strings, menuWhiteClass, sidebarMenu, categorie
                                             {
                                                 item.children.map((submenu, index) => {
                                                     return (<li key={index}>
-                                                        <Link href={"/category/" + submenu.description.friendlyUrl} onClick={() => onClickCategory(submenu)} >
+                                                        <Link href={"/category/" + submenu.description.friendlyUrl}
+                                                              onClick={() => onClickCategory(submenu)}>
                                                             {submenu.description.name}
                                                         </Link>
                                                     </li>)
@@ -66,7 +78,9 @@ export const NavMenu = ({ props, strings, menuWhiteClass, sidebarMenu, categorie
                         contents.map((content, index) => {
                             return (
                                 content.visible && content.description &&
-                                <li key={index}> <Link href={"/content/" + content.description.friendlyUrl} onClick={() => onClickContent(content.code)}> {content.description.name}</Link></li>
+                                <li key={index}><Link locale={'fr'} href={"/content/" + content.description.friendlyUrl}
+                                                      onClick={() => onClickContent(content.code)}> {content.description.name}</Link>
+                                </li>
                             )
                         })
                     }

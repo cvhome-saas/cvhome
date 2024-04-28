@@ -7,7 +7,7 @@ export default async function Team() {
                 <div className="container">
                     <div className="breadcrumb-content text-center"><span><span><a aria-current="page"
                                                                                    className="active"
-                                                                                   href="/">Home</a><span>/</span></span><span
+                                                                                   href="/public">Home</a><span>/</span></span><span
                         to="/product/fiat">fiat</span></span></div>
                 </div>
             </div>
@@ -210,7 +210,7 @@ export default async function Team() {
                                 </div>
                                 <div className="pro-details-meta"><span>SKU :</span>
                                     <ul>
-                                        <li><a href="/">fiat</a></li>
+                                        <li><a href="/public">fiat</a></li>
                                     </ul>
                                 </div>
                                 <div className="pro-details-meta"><span>Categories :</span>

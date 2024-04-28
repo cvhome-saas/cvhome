@@ -1,5 +1,6 @@
+import {NewsLetter} from "@/componants/news-letter/NewsLetter";
 
-export default function Home() {
+export default function Home({params}) {
     return (
         <>
             <div className="site-blocks-cover">
@@ -48,11 +49,11 @@ export default function Home() {
                             <div className="row">
                                 <div className="col-xl-3 col-md-6 col-lg-4 col-sm-6 ">
                                     <div className="product-wrap-2 mb-25  ">
-                                        <div className="product-img"><a href="/product/iphone"><img
+                                        <div className="product-img"><a href="/[local]/product/iphone"><img
                                             src="http://localhost:8080/static/products/DEFAULT/iphone/SMALL/Apple_iphone13_hero_09142021_inline.jpg.large.jpg"
                                             alt=""/></a>
                                             <div className="product-action-2"><a title="Select options"
-                                                                                 href="/product/iphone"><i
+                                                                                 href="/[local]/product/iphone"><i
                                                 className="fa fa-cog"></i></a>
                                                 <button className="active" title="Add to cart"><i
                                                     className="fa fa-shopping-cart"></i></button>
@@ -61,7 +62,7 @@ export default function Home() {
                                         </div>
                                         <div className="product-content-2">
                                             <div className="title-price-wrap-2 "><h3><a
-                                                href="/product/iphone">iphone</a></h3>
+                                                href="/[local]/product/iphone">iphone</a></h3>
                                                 <div className="price-2"><span>CA$1,500.00 </span></div>
                                             </div>
                                         </div>
@@ -69,11 +70,11 @@ export default function Home() {
                                 </div>
                                 <div className="col-xl-3 col-md-6 col-lg-4 col-sm-6 ">
                                     <div className="product-wrap-2 mb-25  ">
-                                        <div className="product-img"><a href="/product/fiat"><img
+                                        <div className="product-img"><a href="/[local]/product/fiat"><img
                                             src="http://localhost:8080/static/products/DEFAULT/fiat/SMALL/500_333.jpeg"
                                             alt=""/></a>
                                             <div className="product-action-2"><a title="Select options"
-                                                                                 href="/product/fiat"><i
+                                                                                 href="/[local]/product/fiat"><i
                                                 className="fa fa-cog"></i></a>
                                                 <button className="active" title="Add to cart"><i
                                                     className="fa fa-shopping-cart"></i></button>
@@ -81,7 +82,8 @@ export default function Home() {
                                             </div>
                                         </div>
                                         <div className="product-content-2">
-                                            <div className="title-price-wrap-2 "><h3><a href="/product/fiat">fiat</a>
+                                            <div className="title-price-wrap-2 "><h3><a
+                                                href="/[local]/product/fiat">fiat</a>
                                             </h3>
                                                 <div className="price-2"><span>CA$200.00 </span></div>
                                             </div>
@@ -94,11 +96,11 @@ export default function Home() {
                             <div className="row">
                                 <div className="col-xl-3 col-md-6 col-lg-4 col-sm-6 ">
                                     <div className="product-wrap-2 mb-25  ">
-                                        <div className="product-img"><a href="/product/iphone"><img
+                                        <div className="product-img"><a href="/[local]/product/iphone"><img
                                             src="http://localhost:8080/static/products/DEFAULT/iphone/SMALL/Apple_iphone13_hero_09142021_inline.jpg.large.jpg"
                                             alt=""/></a>
                                             <div className="product-action-2"><a title="Select options"
-                                                                                 href="/product/iphone"><i
+                                                                                 href="/[local]/product/iphone"><i
                                                 className="fa fa-cog"></i></a>
                                                 <button className="active" title="Add to cart"><i
                                                     className="fa fa-shopping-cart"></i></button>
@@ -107,7 +109,7 @@ export default function Home() {
                                         </div>
                                         <div className="product-content-2">
                                             <div className="title-price-wrap-2 "><h3><a
-                                                href="/product/iphone">iphone</a></h3>
+                                                href="/[local]/product/iphone">iphone</a></h3>
                                                 <div className="price-2"><span>CA$1,500.00 </span></div>
                                             </div>
                                         </div>
@@ -119,11 +121,11 @@ export default function Home() {
                             <div className="row">
                                 <div className="col-xl-3 col-md-6 col-lg-4 col-sm-6 ">
                                     <div className="product-wrap-2 mb-25  ">
-                                        <div className="product-img"><a href="/product/iphone"><img
+                                        <div className="product-img"><a href="/[local]/product/iphone"><img
                                             src="http://localhost:8080/static/products/DEFAULT/iphone/SMALL/Apple_iphone13_hero_09142021_inline.jpg.large.jpg"
                                             alt=""/></a>
                                             <div className="product-action-2"><a title="Select options"
-                                                                                 href="/product/iphone"><i
+                                                                                 href="/[local]/product/iphone"><i
                                                 className="fa fa-cog"></i></a>
                                                 <button className="active" title="Add to cart"><i
                                                     className="fa fa-shopping-cart"></i></button>
@@ -132,7 +134,7 @@ export default function Home() {
                                         </div>
                                         <div className="product-content-2">
                                             <div className="title-price-wrap-2 "><h3><a
-                                                href="/product/iphone">iphone</a></h3>
+                                                href="/[local]/product/iphone">iphone</a></h3>
                                                 <div className="price-2"><span>CA$1,500.00 </span></div>
                                             </div>
                                         </div>
@@ -140,11 +142,11 @@ export default function Home() {
                                 </div>
                                 <div className="col-xl-3 col-md-6 col-lg-4 col-sm-6 ">
                                     <div className="product-wrap-2 mb-25  ">
-                                        <div className="product-img"><a href="/product/fiat"><img
+                                        <div className="product-img"><a href="/[local]/product/fiat"><img
                                             src="http://localhost:8080/static/products/DEFAULT/fiat/SMALL/500_333.jpeg"
                                             alt=""/></a>
                                             <div className="product-action-2"><a title="Select options"
-                                                                                 href="/product/fiat"><i
+                                                                                 href="/[local]/product/fiat"><i
                                                 className="fa fa-cog"></i></a>
                                                 <button className="active" title="Add to cart"><i
                                                     className="fa fa-shopping-cart"></i></button>
@@ -152,7 +154,8 @@ export default function Home() {
                                             </div>
                                         </div>
                                         <div className="product-content-2">
-                                            <div className="title-price-wrap-2 "><h3><a href="/product/fiat">fiat</a>
+                                            <div className="title-price-wrap-2 "><h3><a
+                                                href="/[local]/product/fiat">fiat</a>
                                             </h3>
                                                 <div className="price-2"><span>CA$200.00 </span></div>
                                             </div>
@@ -165,11 +168,11 @@ export default function Home() {
                             <div className="row">
                                 <div className="col-xl-3 col-md-6 col-lg-4 col-sm-6 ">
                                     <div className="product-wrap-2 mb-25  ">
-                                        <div className="product-img"><a href="/product/iphone"><img
+                                        <div className="product-img"><a href="/[local]/product/iphone"><img
                                             src="http://localhost:8080/static/products/DEFAULT/iphone/SMALL/Apple_iphone13_hero_09142021_inline.jpg.large.jpg"
                                             alt=""/></a>
                                             <div className="product-action-2"><a title="Select options"
-                                                                                 href="/product/iphone"><i
+                                                                                 href="/[local]/product/iphone"><i
                                                 className="fa fa-cog"></i></a>
                                                 <button className="active" title="Add to cart"><i
                                                     className="fa fa-shopping-cart"></i></button>
@@ -178,7 +181,7 @@ export default function Home() {
                                         </div>
                                         <div className="product-content-2">
                                             <div className="title-price-wrap-2 "><h3><a
-                                                href="/product/iphone">iphone</a></h3>
+                                                href="/[local]/product/iphone">iphone</a></h3>
                                                 <div className="price-2"><span>CA$1,500.00 </span></div>
                                             </div>
                                         </div>
@@ -189,32 +192,7 @@ export default function Home() {
                     </div>
                 </div>
             </div>
-
-            <div className="subscribe-area-3  pt-100 pb-100 ">
-                <div className="container-fluid">
-                    <div className="row">
-                        <div className="col-xl-5 col-lg-7 col-md-10 ml-auto mr-auto">
-                            <div className="subscribe-style-3 text-center "><h2>Subscribe to our newsletter! </h2>
-                                <p>Subscribe to our newsletter to receive news on update</p>
-                                <div>
-                                    <div className="subscribe-form-3 mt-35">
-                                        <form>
-                                            <div className="mc-form">
-                                                <div><input className="email" name="email" type="email"
-                                                            placeholder="Email address"/></div>
-                                                <div className="clear-3 dark-red-subscribe">
-                                                    <button className="button">Subscribe</button>
-                                                </div>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
+            <NewsLetter/>
         </>
     );
 }
