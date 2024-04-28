@@ -2,6 +2,7 @@ import {NavMenu} from "@/componants/header/NavMenu";
 import {HeaderTop} from "@/componants/header/HeaderTop";
 import {getTranslations} from "next-intl/server";
 import {Store} from "@/types/store";
+import {NavCart} from "@/componants/header/NavCart";
 
 export const Header = async ({store}:{store:Store}) => {
 
@@ -50,27 +51,7 @@ export const Header = async ({store}:{store:Store}) => {
                                 <div className="same-style cart-wrap d-none d-lg-block">
                                     <button className="icon-cart"><i className="pe-7s-shopbag"></i><span
                                         className="count-style">1</span></button>
-                                    <div className="shopping-cart-content active">
-                                        <ul>
-                                            <li className="single-shopping-cart">
-                                                <div className="shopping-cart-img"><a href="/product/2"><img alt=""
-                                                                                                             src="http://localhost:8080/static/products/DEFAULT/fiat/SMALL/500_333.jpeg"
-                                                                                                             className="img-fluid"/></a>
-                                                </div>
-                                                <div className="shopping-cart-title"><h4><a href="/">fiat</a></h4>
-                                                    <h6>Qty: 1</h6><span>CA$200.00</span></div>
-                                                <div className="shopping-cart-delete">
-                                                    <button><i className="fa fa-times-circle"></i></button>
-                                                </div>
-                                            </li>
-                                        </ul>
-                                        <div className="shopping-cart-total"><h4>Total :<span
-                                            className="shop-total">CA$200.00</span></h4></div>
-                                        <div className="shopping-cart-btn btn-hover text-center"><a
-                                            className="default-btn" href="/cart">View Cart</a><a className="default-btn"
-                                                                                                 href="/checkout">Checkout</a>
-                                        </div>
-                                    </div>
+                                    <NavCart store={store}/>
                                 </div>
                                 <div className="same-style cart-wrap d-block d-lg-none"><a className="icon-cart"
                                                                                            href="/cart"><i
