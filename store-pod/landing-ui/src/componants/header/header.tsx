@@ -27,7 +27,7 @@ export const Header = async ({store}: { store: Store }) => {
                         <div className="col-xl-2 col-lg-2 col-md-6 col-4">
                             <div className="logo">
                                 <a href="/">
-                                    <img src={store.logo.path}/>
+                                    <img src={store.logo.path} alt={""}/>
                                 </a>
                             </div>
                         </div>
