@@ -4,6 +4,7 @@ import "../../assets/scss/style.scss";
 import {Header} from "@/componants/header/header";
 import {Footer} from "@/componants/footer/footer";
 import {Store} from "@/types/store";
+import {create} from "zustand";
 
 const inter = Inter({subsets: ["latin"]});
 
@@ -21,7 +22,14 @@ export default async function RootLayout({
     params: { locale: string };
 
 }>) {
-
+    //
+    // const useBearStore = create((set) => ({
+    //     bears: 0,
+    //     increasePopulation: () => set((state) => ({bears: state.bears + 1})),
+    //     removeAllBears: () => set({bears: 0}),
+    // }));
+    // const bears = useBearStore((state) => state.bears)
+    // console.log(bears);
     const store: Store = await fetch('http://localhost:8080/api/v1/store/DEFAULT')
         .then(it => it.json())
         .then(it => it as Store);
