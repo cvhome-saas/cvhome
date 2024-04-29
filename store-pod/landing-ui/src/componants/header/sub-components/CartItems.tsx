@@ -26,7 +26,7 @@ export const CartItems = ({store, cart, t}: { store: Store, cart: Cart | undefin
         <div className="same-style cart-wrap d-none d-lg-block">
             <button className="icon-cart" onClick={showOrHideCart}>
                 <i className="pe-7s-shopbag"></i>
-                <span className="count-style">{cart?.quantity}</span>
+                <span className={cart?.quantity > 0 ? "count-style" : ""}>{cart?.quantity}</span>
             </button>
             <div className={active}>
                 {cart && cart.products && cart.products.length > 0 ? (
