@@ -20,9 +20,12 @@ export const routes: Routes = [
       window.location.href = environment.LOGOUT_URL;
     })
   },
-
-  { path: '', redirectTo: 'pages', pathMatch: 'full' },
-  { path: '**', redirectTo: 'pages' },
+  {
+    path: '',
+    loadChildren: () => import('./welcome/welcome.module')
+      .then(m => m.WelcomeModule),
+  },
+  { path: '**', redirectTo: '' },
 ];
 
 const config: ExtraOptions = {
