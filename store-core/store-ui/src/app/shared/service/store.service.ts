@@ -17,15 +17,15 @@ export class StoreService {
   }
 
   list(): Observable<Page<Store>> {
-    // return of({
-    //   content: [{
-    //     id: {
-    //       id: "65f023632bc46470c104b76f"
-    //     },
-    //     name: "default"
-    //   }]
-    // })
-    return this.httpClient.post<Page<Store>>(`${this.STORE_MANAGER_BASE_URL}/list`, {})
+    return of({
+      content: [{
+        id: {
+          id: "65f023632bc46470c104b76f"
+        },
+        name: "default"
+      }]
+    })
+    // return this.httpClient.post<Page<Store>>(`${this.STORE_MANAGER_BASE_URL}/list`, {})
   }
 
   getStoreInfo(param: ManagerStoreId): Observable<Store> {

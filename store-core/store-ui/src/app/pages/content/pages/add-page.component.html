@@ -160,8 +160,8 @@
                 <div *ngFor="let descr of descriptions.controls; let j=index">
                   <div *ngIf="descr.value.language === selectedLanguage.value">
                     <div [formGroupName]="j">
-                      <div [ngxSummernote]="editorConfig" formControlName="description">
-                      </div>
+                      <quill-editor [styles]="{height: '200px'}" formControlName="description">
+                      </quill-editor>
                     </div>
                   </div>
                 </div>

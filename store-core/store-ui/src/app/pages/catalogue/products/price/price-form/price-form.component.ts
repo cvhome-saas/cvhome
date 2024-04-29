@@ -25,21 +25,7 @@ export class PriceFormComponent implements OnInit {
   loader = false;
   languages = [];
   prices = [];
-  config = {
-    placeholder: '',
-    tabsize: 2,
-    height: 300,
-    uploadImagePath: '',
-    toolbar: [
-      ['misc', ['codeview', 'undo', 'redo']],
-      ['style', ['bold', 'italic', 'underline', 'clear']],
-      ['font', ['bold', 'italic', 'underline', 'strikethrough', 'superscript', 'subscript', 'clear']],
-      ['fontsize', ['fontname', 'fontsize', 'color']],
-      ['para', ['style', 'ul', 'ol', 'paragraph', 'height']],
-      ['insert', ['table', 'picture', 'link', 'video', 'hr']]
-    ],
-    fontNames: ['Helvetica', 'Arial', 'Arial Black', 'Comic Sans MS', 'Courier New', 'Roboto', 'Times']
-  };
+
   inventory;
   params = {
     productId: '',

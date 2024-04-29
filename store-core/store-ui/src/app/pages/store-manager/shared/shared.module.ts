@@ -23,11 +23,11 @@ import {NgxDatatableModule} from "@swimlane/ngx-datatable";
 import {TranslateModule} from "@ngx-translate/core";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {ShowcaseDialogComponent} from "./showcase-dialog/showcase-dialog.component";
-import {NgxSummernoteModule} from "ngx-summernote";
 import {ImageBrowserComponent} from "./image-browser/image-browser.component";
 import {NbEvaIconsModule} from "@nebular/eva-icons";
 import {ImageUploadingComponent} from "./image-uploading/image-uploading.component";
 import {FilePickerModule} from "ngx-awesome-uploader";
+import {QuillModule} from "ngx-quill";
 
 
 @NgModule({
@@ -57,7 +57,7 @@ import {FilePickerModule} from "ngx-awesome-uploader";
     NbEvaIconsModule,
     NbIconModule,
     NgxDatatableModule,
-    NgxSummernoteModule,
+    QuillModule,
     TranslateModule,
     FilePickerModule,
     FormsModule,
@@ -84,7 +84,7 @@ import {FilePickerModule} from "ngx-awesome-uploader";
     NbEvaIconsModule,
     NbIconModule,
     NgxDatatableModule,
-    NgxSummernoteModule,
+    QuillModule.forRoot(),
     TranslateModule,
     FilePickerModule,
     FormsModule,

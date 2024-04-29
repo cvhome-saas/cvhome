@@ -33,26 +33,6 @@ export class AddPageComponent implements OnInit {
 
   isCodeExists = false;
 
-  editorConfig = {
-    placeholder: '',
-    tabsize: 2,
-    height: 300,
-    toolbar: [
-      ['misc', ['codeview', 'fullscreen', 'undo', 'redo']],
-      ['style', ['bold', 'italic', 'underline', 'clear']],
-      ['font', ['bold', 'italic', 'underline', 'strikethrough', 'superscript', 'subscript', 'clear']],
-      ['fontsize', ['fontname', 'fontsize', 'color']],
-      ['para', ['style', 'ul', 'ol', 'height']],
-      ['insert', ['table', 'link', 'video']],
-      ['customButtons', ['testBtn']]
-    ],
-
-    buttons: {
-      'testBtn': this.customButton.bind(this)
-    },
-    fontNames: ['Helvetica', 'Arial', 'Arial Black', 'Comic Sans MS', 'Courier New', 'Roboto', 'Times']
-  };
-
   constructor(
     private crudService: CrudService,
     public router: Router,

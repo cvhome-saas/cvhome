@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 
 import { SharedModule } from '../../shared/shared.module';
-import { NgxSummernoteModule } from 'ngx-summernote';
 import { NbDialogModule } from '@nebular/theme';
 import { CataloguesComponent } from './catalogues.component';
 import { CataloguesRoutingModule } from './catalogues-routing.module';
@@ -21,7 +20,6 @@ import { CustomModule } from '../../custom-component/custom.module';
 
     SharedModule,
 
-    NgxSummernoteModule,
     NbDialogModule.forChild(),
     CustomModule
   ]

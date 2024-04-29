@@ -8,7 +8,6 @@ import { CategoriesHierarchyComponent } from './categories-hierarchy/categories-
 import { ButtonRenderComponent } from './categories-list/button-render.component';
 import { CategoryFormComponent } from './category-form/category-form.component';
 import { CategoryDetailComponent } from './category-detail/category-detail.component';
-import { NgxSummernoteModule } from 'ngx-summernote';
 import { NbDialogModule } from '@nebular/theme';
 import {SharedModule} from "../../store-manager/shared/shared.module";
 import {TreeModule} from "@odymaui/angular-tree-component";
@@ -27,7 +26,6 @@ import {TreeModule} from "@odymaui/angular-tree-component";
   imports: [
     CategoriesRoutingModule,
     SharedModule,
-    NgxSummernoteModule,
     NbDialogModule.forChild(),
     TreeModule
   ],

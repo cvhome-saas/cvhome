@@ -7,7 +7,6 @@ import { StoreCreationComponent } from './store-creation/store-creation.componen
 import { StoresListComponent } from './stores-list/stores-list.component';
 import { StoreFormComponent } from './store-form/store-form.component';
 import { StoreLandingPageComponent } from './store-landing-page/store-landing-page.component';
-import { NgxSummernoteModule } from 'ngx-summernote';
 import { StoreDetailInfoComponent } from './store-detail-info/store-detail-info.component';
 import { StoreBrandingComponent } from './store-branding/store-branding.component';
 import { NbDialogModule } from '@nebular/theme';
@@ -42,7 +41,6 @@ import { SharedModule } from "../store-manager/shared/shared.module";
 
     SharedModule,
     NbDialogModule.forChild(),
-    NgxSummernoteModule
   ]
 })
 export class StoreManagementModule {

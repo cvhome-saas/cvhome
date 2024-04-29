@@ -40,26 +40,7 @@ export class AddBoxComponent implements OnInit {
     code: '',
     order: '',
   }
-  config = {
-    placeholder: '',
-    tabsize: 2,
-    height: 195,
-    toolbar: [
-      ['misc', ['codeview', 'fullscreen', 'undo', 'redo']],
-      ['style', ['bold', 'italic', 'underline', 'clear']],
-      ['font', ['bold', 'italic', 'underline', 'strikethrough', 'superscript', 'subscript', 'clear']],
-      ['fontsize', ['fontname', 'fontsize', 'color']],
-      ['para', ['style', 'ul', 'ol', 'height']],
-      ['insert', ['table', 'link', 'video']],
-      ['customButtons', ['testBtn']]
-    ],
-    buttons: {
-      'testBtn': this.customButton.bind(this)
-    },
-    fontNames: ['Helvetica', 'Arial', 'Arial Black', 'Comic Sans MS', 'Courier New', 'Roboto', 'Times']
-  };
   params = this.param();
-  public scrollbarOptions = {axis: 'y', theme: 'minimal-dark'};
 
   constructor(
     private fb: FormBuilder,
