@@ -49,7 +49,6 @@ include(
         'store-core:router:router-service',
         'store-core:store-ui',
 
-//        'saas-pod:gateway:gateway-service',
-//        'saas-pod:gateway:gateway-service-v2',
+        'saas-pod:gateway:gateway-service-v2',
 
 )
