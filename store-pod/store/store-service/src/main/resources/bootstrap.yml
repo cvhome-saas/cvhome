@@ -4,41 +4,20 @@ com:
       saas:
         default-domain: "gateway.click"
       services:
-        core-gateway:
-          name: core-gateway
-          domain: "gateway.com"
-          port: 8000
-          schema: http
-          namespace: core.cvhome.lcl
-          gateway-service-name: core-gateway
-        dcm:
-          name: dcm
-          domain: "gateway.com"
-          port: 8001
-          schema: http
-          namespace: core.cvhome.lcl
-          gateway-service-name: core-gateway
         router:
           name: router
           domain: "gateway.com"
           port: 8002
           schema: http
-          namespace: core.cvhome.lcl
-          gateway-service-name: core-gateway
-        welcome-ui:
-          name: welcome-ui
-          domain: "gateway.com"
-          port: 4400
-          schema: http
-          namespace: core.cvhome.lcl
-          gateway-service-name: core-gateway
+          namespace: store-core.cvhome.lcl
+          gateway-service-name: store-core-gateway
         auth:
           name: auth
           domain: "auth.gateway.com"
           port: 9999
           schema: http
-          namespace: core.cvhome.lcl
-          gateway-service-name: core-gateway
+          namespace: store-core.cvhome.lcl
+          gateway-service-name: store-core-gateway
         store-core-gateway:
           name: store-core-gateway
           domain: "store-ui.gateway.com"
