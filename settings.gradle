@@ -27,12 +27,6 @@ include(
         'commons:cvhome-commons',
         'commons:s2sc-commons',
 
-        'core:gateway:gateway-service',
-        'core:dcm:dcm-commons',
-        'core:dcm:dcm-events',
-        'core:dcm:dcm-service',
-        'core:welcome-ui',
-
         'store-pod:commons',
         'store-pod:gateway:gateway-service',
         'store-pod:store:store-commons',
@@ -55,7 +49,7 @@ include(
         'store-core:router:router-service',
         'store-core:store-ui',
 
-        'saas-pod:gateway:gateway-service',
-        'saas-pod:gateway:gateway-service-v2',
+//        'saas-pod:gateway:gateway-service',
+//        'saas-pod:gateway:gateway-service-v2',
 
 )
