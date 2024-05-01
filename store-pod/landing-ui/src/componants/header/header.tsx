@@ -10,10 +10,10 @@ import {baseServiceUrl, StoreContext} from "@/types/store-context";
 
 export const Header = async ({storeContext, store}: { storeContext: StoreContext, store: Store }) => {
 
-    const categoriesResult: CategoryPage = await fetch(`${baseServiceUrl(storeContext,'store')}/api/v1/category?count=20&page=0&store=${storeContext.store}&lang=${storeContext.local}`)
+    const categoriesResult: CategoryPage = await fetch(`${baseServiceUrl(storeContext, 'store')}/api/v1/category?count=20&page=0&store=${storeContext.store}&lang=${storeContext.local}`)
         .then(it => it.json())
 
-    const contentResult: ContentPage = await fetch(`${baseServiceUrl(storeContext,'store')}/api/v1/content/pages?page=0&count=20&store=${storeContext.store}&lang=${storeContext.local}`)
+    const contentResult: ContentPage = await fetch(`${baseServiceUrl(storeContext, 'store')}/api/v1/content/pages?page=0&count=20&store=${storeContext.store}&lang=${storeContext.local}`)
         .then(it => it.json())
 
     const t = await getTranslations('Nav');
@@ -40,7 +40,7 @@ export const Header = async ({storeContext, store}: { storeContext: StoreContext
                         </div>
                         <div className="col-xl-2 col-lg-2 col-md-6 col-8">
                             <div className="header-right-wrap ">
-                                <NavCart  storeContext={storeContext} store={store}/>
+                                <NavCart storeContext={storeContext} store={store}/>
                             </div>
                         </div>
                     </div>

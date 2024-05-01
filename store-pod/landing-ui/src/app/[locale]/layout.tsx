@@ -23,16 +23,8 @@ export default async function RootLayout({
     params: { locale: string };
 
 }>) {
-    //
-    // const useBearStore = create((set) => ({
-    //     bears: 0,
-    //     increasePopulation: () => set((state) => ({bears: state.bears + 1})),
-    //     removeAllBears: () => set({bears: 0}),
-    // }));
-    // const bears = useBearStore((state) => state.bears)
-    // console.log(bears);
     const storeContext: StoreContext = extractStoreContext(headers(), cookies());
-    const store: Store = await fetch(`${baseServiceUrl(storeContext,'store')}/api/v1/store/${storeContext.store}`)
+    const store: Store = await fetch(`${baseServiceUrl(storeContext, 'store')}/api/v1/store/${storeContext.store}`)
         .then(it => it.json())
         .then(it => it as Store);
 

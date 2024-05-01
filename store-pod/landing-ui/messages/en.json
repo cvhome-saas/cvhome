@@ -1,7 +1,10 @@
 {
   "Language": {
     "en": "English",
-    "fr": "French"
+    "fr": "French",
+    "ar": "Arabic",
+    "ru": "Rusha",
+    "es": "Espanoal"
   },
   "Nav": {
     "Home": "Home",

@@ -1,5 +1,4 @@
 import {Store} from "@/types/store";
-import Image from "next/image";
 
 export const Copyright = ({store, t}: { store: Store, t: (it: string) => string }) => {
     return (

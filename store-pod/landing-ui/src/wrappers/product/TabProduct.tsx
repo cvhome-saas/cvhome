@@ -1,11 +1,10 @@
 import {SectionTitle} from "@/componants/section-title/SectionTitle";
 import {Product, ProductGroupPage} from "@/types/product-groups";
-import Image from "next/image";
 import {baseServiceUrl, StoreContext} from "@/types/store-context";
 import {Link} from "@/navigation";
 
-export const TabProduct = async ({storeContext}:{storeContext:StoreContext}) => {
-    const response: ProductGroupPage = await fetch(`${baseServiceUrl(storeContext,'store')}/api/v1/products/group/FEATURED_ITEMS?store=${storeContext.store}&lang=${storeContext.local}`)
+export const TabProduct = async ({storeContext}: { storeContext: StoreContext }) => {
+    const response: ProductGroupPage = await fetch(`${baseServiceUrl(storeContext, 'store')}/api/v1/products/group/FEATURED_ITEMS?store=${storeContext.store}&lang=${storeContext.local}`)
         .then((it: Response) => {
             return it.json() as unknown as ProductGroupPage
         })
@@ -33,10 +32,10 @@ const ProductGrid = ({key, product}: { key: number, product: Product }) => {
     return <div className="col-xl-3 col-md-6 col-lg-4 col-sm-6 " key={key}>
         <div className="product-wrap-2 mb-25  ">
             <div className="product-img">
-                <a href="/[local]/product/iphone">
+                <Link href={`/product/${product.description.friendlyUrl}`}>
                     <img alt=""
-                           src={product.images.length > 0 ? product.images[0].imageUrl : product.image.imageUrl}/>
-                </a>
+                         src={product.images.length > 0 ? product.images[0].imageUrl : product.image.imageUrl}/>
+                </Link>
                 <div className="product-action-2">
                     <Link title="Select options" href={`/product/${product.description.friendlyUrl}`}>
                         <i className="fa fa-cog"></i>
@@ -50,8 +49,12 @@ const ProductGrid = ({key, product}: { key: number, product: Product }) => {
                 </div>
             </div>
             <div className="product-content-2">
-                <div className="title-price-wrap-2 "><h3>
-                    <a href="/[local]/product/iphone">{product.description.name}</a></h3>
+                <div className="title-price-wrap-2 ">
+                    <h3>
+                        <Link href={`/product/${product.description.friendlyUrl}`}>
+                            {product.description.name}
+                        </Link>
+                    </h3>
                     <div className="price-2">
                         <span>{product.finalPrice}</span>
                     </div>
