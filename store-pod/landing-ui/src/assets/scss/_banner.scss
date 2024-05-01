@@ -4,6 +4,7 @@
   position: relative;
 
   overflow: hidden;
+
   a {
     img {
       width: 100%;
@@ -12,9 +13,11 @@
       transform: scale(1);
     }
   }
+
   &:hover img {
     transform: scale(1.2);
   }
+
   .banner-content {
     position: absolute;
     top: 40px;
@@ -35,6 +38,7 @@
 
       transform: translateY(-50%);
     }
+
     h3 {
       font-family: "Cormorant Garamond";
       font-size: 36px;
@@ -50,6 +54,7 @@
         font-size: 30px;
       }
     }
+
     h4 {
       font-family: "Cormorant Garamond";
       font-size: 18px;
@@ -70,6 +75,7 @@
       @media #{$xs-layout} {
         margin: 3px 0 20px;
       }
+
       span {
         font-size: 20px;
         line-height: 1;
@@ -84,6 +90,7 @@
         color: #935644;
       }
     }
+
     a {
       font-size: 14px;
 
@@ -97,18 +104,22 @@
       color: #97584a;
       border: 2px solid #97584a;
       border-radius: 100%;
+
       i {
         line-height: 25px;
       }
+
       &:hover {
         color: $theme-color;
         border: 2px solid $theme-color;
       }
     }
+
     &.banner-pink {
       a {
         color: #ed59a0;
         border: 2px solid #ed59a0;
+
         &:hover {
           color: $theme-color;
           border: 2px solid $theme-color;
@@ -120,26 +131,32 @@
       h3 {
         color: #1c1c1c;
       }
+
       a {
         color: #c61a32;
         border-color: #c61a32;
       }
     }
   }
+
   &.banner-green-color {
     .banner-content {
       h3 {
         color: #617d05;
       }
+
       h4 {
         color: #010101;
+
         span {
           color: #617d05;
         }
       }
+
       a {
         color: #617d05;
         border: 2px solid #617d05;
+
         &:hover {
           color: #aabb72;
           border: 2px solid #aabb72;
@@ -147,20 +164,25 @@
       }
     }
   }
+
   &.banner-red-color {
     .banner-content {
       h3 {
         color: #df262b;
       }
+
       h4 {
         color: #010101;
+
         span {
           color: #df262b;
         }
       }
+
       a {
         color: #df262b;
         border: 2px solid #df262b;
+
         &:hover {
           color: #dc6266;
           border: 2px solid #dc6266;
@@ -168,9 +190,11 @@
       }
     }
   }
+
   &.banner-shape {
     border: 4px solid #fff;
   }
+
   .banner-position-hm15-1 {
     position: absolute;
     top: 45px;
@@ -195,6 +219,7 @@
       right: 30px;
     }
   }
+
   .banner-position-hm15-2 {
     position: absolute;
     top: 45px;
@@ -219,6 +244,7 @@
       left: 30px;
     }
   }
+
   .banner-position-hm17-1 {
     position: absolute;
     right: 105px;
@@ -232,6 +258,7 @@
       bottom: 20px;
     }
   }
+
   .banner-content-3 {
     h3 {
       font-size: 30px;
@@ -256,6 +283,7 @@
         font-size: 20px;
       }
     }
+
     p {
       font-size: 18px;
 
@@ -274,10 +302,12 @@
       @media #{$xs-layout} {
         margin: 5px 0 10px;
       }
+
       span {
         color: #6eab49;
       }
     }
+
     > a {
       font-size: 14px;
 
@@ -291,21 +321,26 @@
       color: #6eab49;
       border: 2px solid #6eab49;
       border-radius: 100%;
+
       &:hover {
         color: $theme-color;
         border: 2px solid $theme-color;
       }
     }
+
     &.pink-banner {
       p {
         color: #010101;
+
         span {
           color: #ed59a0;
         }
       }
+
       > a {
         color: #ed59a0;
         border: 2px solid #ed59a0;
+
         &:hover {
           color: $theme-color;
           border: 2px solid $theme-color;
@@ -313,12 +348,14 @@
       }
     }
   }
+
   .banner-content-4 {
     span {
       font-size: 18px;
 
       color: #6eab49;
     }
+
     h2 {
       font-size: 55px;
       font-weight: bold;
@@ -348,6 +385,7 @@
         margin: 7px 0 10px;
       }
     }
+
     h5 {
       font-size: 24px;
       line-height: 1;
@@ -377,6 +415,7 @@
         letter-spacing: 2.3px;
       }
     }
+
     > a {
       font-size: 14px;
       line-height: 1;
@@ -389,25 +428,31 @@
 
       color: #fff;
       background-color: #6eab49;
+
       &:hover {
         background-color: $theme-color;
       }
     }
+
     &.pink-banner {
       span {
         color: #ed59a0;
       }
+
       h2 {
         color: #ed59a0;
       }
+
       > a {
         background-color: #ed59a0;
+
         &:hover {
           background-color: $theme-color;
         }
       }
     }
   }
+
   .banner-content-5 {
     position: absolute;
     top: 32px;
@@ -427,6 +472,7 @@
       top: 50px;
       left: 50px;
     }
+
     span {
       font-size: 24px;
       line-height: 1;
@@ -438,6 +484,7 @@
         font-size: 20px;
       }
     }
+
     h3 {
       font-family: $cormorantgaramond;
       font-size: 36px;
@@ -465,6 +512,7 @@
         margin: 9px 0 40px;
       }
     }
+
     a {
       font-size: 14px;
 
@@ -478,21 +526,25 @@
       color: #e90042;
       border: 2px solid #e90042;
       border-radius: 100%;
+
       &:hover {
         color: $theme-color;
         border: 2px solid $theme-color;
       }
     }
+
     &.banner-content-5-white {
       h3 {
         color: #fff;
       }
     }
   }
+
   .banner-content-6 {
     position: absolute;
     bottom: 30px;
     left: 30px;
+
     a {
       font-size: 14px;
       line-height: 1;
@@ -505,11 +557,13 @@
 
       color: #fff;
       background-color: #e90042;
+
       &:hover {
         background-color: $theme-color;
       }
     }
   }
+
   .banner-content-7 {
     position: absolute;
     bottom: 30px;
@@ -526,6 +580,7 @@
       bottom: 40px;
       left: 40px;
     }
+
     span {
       font-size: 24px;
       font-weight: 600;
@@ -538,6 +593,7 @@
         font-size: 20px;
       }
     }
+
     h2 {
       font-size: 72px;
       font-weight: 700;
@@ -565,6 +621,7 @@
         margin: 9px 0 35px;
       }
     }
+
     > a {
       font-size: 14px;
 
@@ -578,12 +635,14 @@
       color: #e90042;
       border: 2px solid #e90042;
       border-radius: 100%;
+
       &:hover {
         color: $theme-color;
         border: 2px solid $theme-color;
       }
     }
   }
+
   .banner-content-8 {
     position: absolute;
     bottom: 40px;
@@ -600,6 +659,7 @@
       bottom: 30px;
       left: 30px;
     }
+
     span {
       font-size: 24px;
       line-height: 1;
@@ -616,6 +676,7 @@
         font-size: 17px;
       }
     }
+
     h2 {
       font-family: $abrilfatface;
       font-size: 64px;
@@ -645,6 +706,7 @@
         margin: 15px 0 5px;
       }
     }
+
     p {
       font-family: $abrilfatface;
       font-size: 20px;
@@ -674,6 +736,7 @@
         margin: 0 0 35px;
       }
     }
+
     > a {
       font-size: 14px;
 
@@ -687,12 +750,14 @@
       color: #e90042;
       border: 2px solid #e90042;
       border-radius: 100%;
+
       &:hover {
         color: $theme-color;
         border: 2px solid $theme-color;
       }
     }
   }
+
   .banner-content-33 {
     position: absolute;
     top: 50px;
@@ -717,6 +782,7 @@
       top: 50px;
       left: 30px;
     }
+
     h3 {
       font-size: 18px;
       font-weight: 600;
@@ -724,6 +790,7 @@
 
       margin: 0;
     }
+
     h2 {
       font-size: 36px;
       font-weight: bold;
@@ -764,10 +831,12 @@
       }
     }
   }
+
   .banner-33-offer {
     position: absolute;
     bottom: 0;
     left: 0;
+
     h2 {
       font-size: 60px;
       font-weight: bold;
@@ -794,6 +863,7 @@
       }
     }
   }
+
   .banner-content-33-2-position1 {
     position: absolute;
     top: 50%;
@@ -804,6 +874,7 @@
       right: 20px;
     }
   }
+
   .banner-content-33-2-position2 {
     position: absolute;
     top: 6%;
@@ -812,6 +883,7 @@
 
     text-align: center;
   }
+
   .banner-content-33-2-position3 {
     position: absolute;
     top: 50%;
@@ -822,6 +894,7 @@
       left: 20px;
     }
   }
+
   .banner-content-33-2 {
     h4 {
       font-size: 18px;
@@ -832,6 +905,7 @@
 
       color: #fff;
     }
+
     h2 {
       font-size: 36px;
       font-weight: bold;
@@ -853,6 +927,7 @@
         margin: 10px 0 10px;
       }
     }
+
     a {
       font-size: 18px;
       font-weight: 600;
@@ -867,6 +942,7 @@
 
       color: #fff;
       border-bottom: 2px solid #fff;
+
       &:hover {
         color: #000;
         border-bottom: 2px solid #000;
@@ -890,20 +966,24 @@
       padding-left: 15px;
     }
   }
+
   &.pb-85 {
     @media #{$xs-layout} {
       padding-bottom: 42px;
     }
   }
+
   &.banner-area-2 {
     .single-banner {
       @media #{$xx-layout} {
         .banner-content {
           top: 15px;
           left: 15px;
+
           h3 {
             font-size: 25px;
           }
+
           h4 {
             margin: 3px 0 10px;
           }
@@ -913,9 +993,11 @@
         .banner-content {
           top: 15px;
           left: 15px;
+
           h3 {
             font-size: 25px;
           }
+
           h4 {
             margin: 3px 0 10px;
           }
@@ -924,15 +1006,18 @@
       @media #{$md-layout} {
         .banner-content {
           top: 25px;
+
           h3 {
             font-size: 30px;
           }
+
           h4 {
             margin: 3px 0 40px;
           }
         }
       }
     }
+
     @media #{$md-layout} {
       &.pt-10 {
         padding-top: 30px;
@@ -947,6 +1032,7 @@
   position: relative;
 
   overflow: hidden;
+
   a {
     img {
       width: 100%;
@@ -955,6 +1041,7 @@
       transform: scale(1);
     }
   }
+
   .banner-content-2 {
     position: absolute;
     top: 50%;
@@ -964,6 +1051,7 @@
     @media #{$xs-layout} {
       left: 20px;
     }
+
     h3 {
       font-family: "Cormorant Garamond";
       font-size: 48px;
@@ -978,6 +1066,7 @@
         font-size: 33px;
       }
     }
+
     h4 {
       font-family: "Cormorant Garamond";
       font-size: 24px;
@@ -995,10 +1084,12 @@
       @media #{$xs-layout} {
         margin: 10px 0 20px;
       }
+
       span {
         color: #935644;
       }
     }
+
     a {
       font-size: 14px;
 
@@ -1012,16 +1103,19 @@
       color: #97584a;
       border: 2px solid #97584a;
       border-radius: 100%;
+
       &:hover {
         color: #000;
         border: 2px solid #000;
       }
     }
+
     &.jewellery-banner {
       h3 {
         font-weight: 600;
       }
     }
+
     &--style2 {
       h3 {
         font-size: 36px;
@@ -1038,6 +1132,7 @@
           font-size: 30px;
         }
       }
+
       h4 {
         font-size: 16px;
         font-weight: 600;
@@ -1059,6 +1154,7 @@
           margin: 0;
         }
       }
+
       a {
         color: #1c1c1c;
       }
@@ -1085,6 +1181,7 @@
 
         color: #1c1c1c;
       }
+
       h4 {
         font-size: 18px;
         font-weight: 600;
@@ -1097,19 +1194,24 @@
         border-color: #c61a32;
       }
     }
+
     &.banner-content-2-black {
       h3 {
         color: #fff;
       }
+
       h4 {
         color: #fff;
+
         span {
           color: #af163b;
         }
       }
+
       a {
         color: #af163b;
         border: 2px solid #af163b;
+
         &:hover {
           color: #fff;
           border: 2px solid #fff;
@@ -1117,6 +1219,7 @@
       }
     }
   }
+
   &:hover a img {
     transform: scale(1.1);
   }
@@ -1136,9 +1239,11 @@
 
 .single-banner-3 {
   position: relative;
+
   img {
     transition-duration: 1.3s;
   }
+
   .banner-content-3 {
     position: absolute;
     top: 20%;
@@ -1170,6 +1275,7 @@
         font-size: 15px;
       }
     }
+
     a {
       font-family: $josefin;
       font-size: 18px;
@@ -1203,6 +1309,7 @@
       h4 {
         color: #fff;
       }
+
       a {
         color: #fff;
 
@@ -1228,6 +1335,7 @@
     .pt-100 {
       padding-top: 50px;
     }
+
     .pb-100 {
       padding-bottom: 50px;
     }
@@ -1246,6 +1354,7 @@
 
     text-align: center;
   }
+
   h2 {
     font-size: 36px;
     font-weight: bold;
@@ -1272,6 +1381,7 @@
       margin: 0 0 20px 0;
     }
   }
+
   .save-money-btn {
     a {
       font-size: 16px;
@@ -1283,6 +1393,7 @@
 
       color: #fff;
       background-color: #ed59a0;
+
       &:hover {
         background-color: $theme-color;
       }
@@ -1293,6 +1404,7 @@
 .medical-contact-area {
   padding: 52px 0 60px;
 }
+
 .medical-contact-text {
   h3 {
     font-family: $lobster;
@@ -1306,6 +1418,7 @@
       margin: 0 0 7px;
     }
   }
+
   h2 {
     font-size: 30px;
     font-weight: 600;
@@ -1321,6 +1434,7 @@
       font-size: 27px;
     }
   }
+
   @media #{$xs-layout} {
     text-align: center;
   }
@@ -1333,9 +1447,11 @@
   @media #{$xs-layout} {
     justify-content: center;
   }
+
   .medical-contact-img {
     margin-right: 20px;
   }
+
   .medical-contact-number {
     h2 {
       font-size: 30px;
@@ -1372,6 +1488,7 @@
     max-width: 100%;
   }
 }
+
 .col-width-banner33-2 {
   position: relative;
 
@@ -1408,15 +1525,18 @@
       font-size: 25px;
     }
   }
+
   .text {
     font-size: 18px;
     font-weight: 500;
 
     margin-bottom: 30px;
+
     span {
       color: #053399;
     }
   }
+
   .cta-btn {
     font-size: 16px;
 

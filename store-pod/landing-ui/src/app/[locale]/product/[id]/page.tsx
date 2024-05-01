@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 export default async function Team() {
 
     return (
@@ -5,10 +7,17 @@ export default async function Team() {
 
             <div className="breadcrumb-area pt-35 pb-35 bg-gray-3">
                 <div className="container">
-                    <div className="breadcrumb-content text-center"><span><span><a aria-current="page"
-                                                                                   className="active"
-                                                                                   href="/public">Home</a><span>/</span></span><span
-                        to="/product/fiat">fiat</span></span></div>
+                    <div className="breadcrumb-content text-center"><span>
+                        <span>
+                            <a aria-current="page" className="active" href="/public">Home</a>
+                            <span>/</span>
+                        </span>
+                        <span>
+                        <a href={"/product/fiat"}>
+                            fiat
+                        </a>
+                        </span>
+                    </span></div>
                 </div>
             </div>
 
@@ -30,7 +39,7 @@ export default async function Team() {
                                             <div className="react_lightgallery_item">
                                                 <button><i className="pe-7s-expand1"></i></button>
                                             </div>
-                                            <div className="single-image"><img
+                                            <div className="single-image"><Image
                                                 src="http://localhost:8080/static/products/DEFAULT/fiat/SMALL/500_333.jpeg"
                                                 className="img-fluid" alt=""/></div>
                                         </div>
@@ -231,9 +240,11 @@ export default async function Team() {
                             <div className="nav-item"><a href="#" role="tab" data-rb-event-key="productDescription"
                                                          aria-selected="true"
                                                          className="nav-link active">Description</a></div>
-                            <div className="nav-item"><a href="#" role="tab" data-rb-event-key="productReviews"
-                                                         tabIndex="-1" aria-selected="false"
-                                                         className="nav-link">Reviews(0)</a></div>
+                            <div className="nav-item">
+                                <a href="#" role="tab" data-rb-event-key="productReviews"
+                                   tabIndex={-1} aria-selected="false"
+                                   className="nav-link">Reviews(0)</a>
+                            </div>
                         </div>
                         <div className="description-review-bottom tab-content">
                             <div role="tabpanel" aria-hidden="false" className="fade tab-pane active show"><p></p>

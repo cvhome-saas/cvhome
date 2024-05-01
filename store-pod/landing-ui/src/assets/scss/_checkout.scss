@@ -58,7 +58,6 @@
   }
 
 
-
   input[type="checkbox"] {
     height: 15px;
     margin: 0;
@@ -66,7 +65,6 @@
     top: 1px;
     width: 17px;
   }
-
 
 
   .billing-info,
@@ -297,7 +295,6 @@
             color: #212121;
 
 
-
           }
         }
       }
@@ -430,8 +427,8 @@
     }
   }
 
-  .place-order>a,
-  .place-order>button {
+  .place-order > a,
+  .place-order > button {
     font-weight: 500;
     line-height: 1;
 

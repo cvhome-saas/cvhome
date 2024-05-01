@@ -274,9 +274,9 @@
   }
 
     {
-    margin-top: 10px;
+      margin-top: 10px;
+    }
   }
-}
 }
 
 .product-wrap,
@@ -352,7 +352,7 @@
 
       transform: translateX(-50%);
 
-      >div {
+      > div {
         display: flex;
         visibility: hidden;
         align-items: center;
@@ -498,7 +498,7 @@
     opacity: 1;
   }
 
-  &:hover .product-action>div {
+  &:hover .product-action > div {
     visibility: visible;
 
     transform: translateY(0);
@@ -794,7 +794,7 @@
             opacity: 0;
 
             &:checked {
-              &~.checkmark {
+              & ~ .checkmark {
                 &:after {
                   visibility: visible;
 
@@ -881,7 +881,7 @@
 
           &:hover {
             input {
-              &~.checkmark {
+              & ~ .checkmark {
                 &:after {
                   visibility: visible;
 
@@ -980,7 +980,7 @@
             opacity: 0;
 
             &:checked {
-              &~.size-name {
+              & ~ .size-name {
                 color: $white;
                 background-color: $theme-color;
               }
@@ -1291,7 +1291,7 @@
 }
 
 .quickview-wrap {
-  .nav-style-1.owl-carousel>.owl-nav div {
+  .nav-style-1.owl-carousel > .owl-nav div {
     font-size: 20px;
 
     left: 0;
@@ -1308,7 +1308,7 @@
     }
   }
 
-  &:hover .nav-style-1.owl-carousel>.owl-nav div {
+  &:hover .nav-style-1.owl-carousel > .owl-nav div {
     visibility: visible;
 
     opacity: 1;
@@ -1472,7 +1472,8 @@
           margin-bottom: 0;
         }
 
-        a {}
+        a {
+        }
       }
     }
 
@@ -1747,7 +1748,7 @@
       top: 12px;
       right: 12px;
 
-      &>span {
+      & > span {
         font-size: 13px;
         font-weight: 500;
         line-height: 1;
@@ -2306,8 +2307,6 @@
     opacity: 1;
   }
 }
-
-
 
 
 /* product hm6 */
@@ -3034,7 +3033,7 @@
       top: 12px;
       left: 12px;
 
-      &>span {
+      & > span {
         font-size: 13px;
         font-weight: 500;
         line-height: 1;
@@ -3442,7 +3441,7 @@
       top: 12px;
       right: 12px;
 
-      &>span {
+      & > span {
         font-size: 13px;
         font-weight: 500;
         line-height: 1;
@@ -3659,7 +3658,7 @@
       top: 12px;
       right: 12px;
 
-      &>span {
+      & > span {
         font-size: 13px;
         font-weight: 500;
         line-height: 1;
@@ -3822,7 +3821,7 @@
         }
 
         &-badges {
-          &>span {
+          & > span {
             color: #053399;
           }
         }
@@ -3901,7 +3900,6 @@
     transform: scale(1.1);
   }
 }
-
 
 
 /* product hm9 */

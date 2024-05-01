@@ -327,7 +327,7 @@
         }
       }
 
-      &>button {
+      & > button {
         border: none;
         background: none;
 
@@ -704,7 +704,7 @@
     }
   }
 
-  &:hover.nav-style-1.owl-carousel>.owl-nav div {
+  &:hover.nav-style-1.owl-carousel > .owl-nav div {
     visibility: visible;
 
     opacity: 1;
@@ -851,8 +851,8 @@
   }
 
     {
-    height: auto;
-    margin-top: 15px;
+      height: auto;
+      margin-top: 15px;
+    }
   }
-}
 }

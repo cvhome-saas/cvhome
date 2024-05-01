@@ -4,13 +4,16 @@ import {HeaderTop} from "@/componants/header/HeaderTop";
 import {getTranslations} from "next-intl/server";
 import {Store} from "@/types/store";
 import {NavCart} from "@/componants/header/NavCart";
+import Image from "next/image";
+import {ContentPage} from "@/types/content";
+import {CategoryPage} from "@/types/category";
 
 export const Header = async ({store}: { store: Store }) => {
 
-    const categoriesResult = await fetch('http://localhost:8080/api/v1/category/?count=20&page=0&store=DEFAULT&lang=en')
+    const categoriesResult: CategoryPage = await fetch('http://localhost:8080/api/v1/category/?count=20&page=0&store=DEFAULT&lang=en')
         .then(it => it.json())
 
-    const contentResult = await fetch('http://localhost:8080/api/v1/content/pages/?page=0&count=20&store=DEFAULT&lang=en')
+    const contentResult: ContentPage = await fetch('http://localhost:8080/api/v1/content/pages/?page=0&count=20&store=DEFAULT&lang=en')
         .then(it => it.json())
 
     const t = await getTranslations('Nav');
@@ -27,7 +30,7 @@ export const Header = async ({store}: { store: Store }) => {
                         <div className="col-xl-2 col-lg-2 col-md-6 col-4">
                             <div className="logo">
                                 <a href="/">
-                                    <img src={store.logo.path} alt={""}/>
+                                    <Image src={store.logo.path} alt={""}/>
                                 </a>
                             </div>
                         </div>

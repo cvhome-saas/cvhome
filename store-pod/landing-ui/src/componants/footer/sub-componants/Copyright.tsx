@@ -1,4 +1,5 @@
 import {Store} from "@/types/store";
+import Image from "next/image";
 
 export const Copyright = ({store, t}: { store: Store, t: (it: string) => string }) => {
     return (
@@ -6,7 +7,7 @@ export const Copyright = ({store, t}: { store: Store, t: (it: string) => string 
             <div className="copyright mb-30 ">
                 <div className="footer-logo">
                     <a href="/">
-                        <img alt="" src={store.logo.path}/>
+                        <Image alt="" src={store.logo.path}/>
                     </a>
                 </div>
                 <p>Copyright © 2024-2024 <a rel="noopener noreferrer" href="/">

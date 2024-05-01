@@ -1,17 +1,22 @@
 import PropTypes from "prop-types";
 import {Link} from "@/navigation";
+import {Category} from "@/types/category";
+import {Page} from "@/types/content";
 
 export const NavMenu = ({
-                            props,
-                            strings,
-                            menuWhiteClass,
-                            sidebarMenu,
                             categories,
                             contents,
-                            setCategoryID,
-                            setContent,
                             home,
-                        }) => {
+                            menuWhiteClass,
+                            sidebarMenu,
+                        }:
+                            {
+                                categories: Category[],
+                                contents: Page[],
+                                home: string,
+                                menuWhiteClass?: string,
+                                sidebarMenu?: string,
+                            }) => {
 
     return (
         <div
@@ -68,7 +73,8 @@ export const NavMenu = ({
                         contents.map((content, index) => {
                             return (
                                 content.visible && content.description &&
-                                <li key={index}><Link href={"/content/" + content.description.friendlyUrl}> {content.description.name}</Link>
+                                <li key={index}><Link
+                                    href={"/content/" + content.description.friendlyUrl}> {content.description.name}</Link>
                                 </li>
                             )
                         })

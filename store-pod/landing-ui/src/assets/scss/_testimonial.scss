@@ -4,6 +4,7 @@
   img {
     border-radius: 50%;
   }
+
   p {
     font-size: 16px;
     font-weight: 500;
@@ -17,13 +18,16 @@
       font-size: 15px;
     }
   }
+
   .client-info {
     margin: 20px 0 0;
+
     i {
       font-size: 26px;
 
       color: #666666;
     }
+
     h5 {
       font-size: 14px;
 
@@ -34,6 +38,7 @@
 
       color: #010101;
     }
+
     span {
       font-size: 14px;
 
@@ -50,10 +55,12 @@
 
       color: #ffffff;
     }
+
     .client-info {
       h5 {
         color: #ffffff;
       }
+
       span {
         color: #ffffff;
       }
@@ -65,6 +72,7 @@
   .swiper-button-next {
     right: 0 !important;
   }
+
   .swiper-button-prev {
     left: 0 !important;
   }
@@ -84,6 +92,7 @@
 
     opacity: 1;
   }
+
   &.ml-70 {
     @media #{$xl-layout} {
       margin-left: 15px;
@@ -101,6 +110,7 @@
       margin-left: 30px;
     }
   }
+
   &.mr-70 {
     @media #{$xl-layout} {
       margin-right: 15px;
@@ -118,6 +128,7 @@
       margin-right: 30px;
     }
   }
+
   @media #{$lg-layout} {
     &.mt-195 {
       margin-top: 125px;
@@ -150,6 +161,7 @@
   @media #{$xs-layout} {
     margin-top: 30px;
   }
+
   img {
     width: 100%;
   }
@@ -159,6 +171,7 @@
   img {
     border-radius: 50%;
   }
+
   p {
     font-size: 16px;
     font-weight: 500;
@@ -170,13 +183,16 @@
 
     color: #fff;
   }
+
   .client-info {
     margin: 18px 0 0;
+
     i {
       font-size: 26px;
 
       color: #fff;
     }
+
     h5 {
       font-size: 14px;
       line-height: 1;
@@ -188,6 +204,7 @@
 
       color: #fff;
     }
+
     span {
       font-size: 14px;
       line-height: 1;
@@ -200,6 +217,7 @@
       color: #fff;
     }
   }
+
   &.testi-paragraph-mrg {
     p {
       margin: 32px 0 0;
@@ -212,10 +230,12 @@
     margin: 15px 0 0;
 
     text-align: center;
+
     .owl-dot {
       display: inline-block;
 
       margin: 0 5px;
+
       span {
         display: inline-block;
 
@@ -226,6 +246,7 @@
         border-radius: 100%;
         background-color: #fff;
       }
+
       &.active {
         span {
           border: 2px solid #fff;

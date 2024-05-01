@@ -3,9 +3,11 @@
 .blog-details-top {
   .blog-details-img {
     position: relative;
+
     img {
       width: 100%;
     }
+
     .video-icon {
       position: absolute;
       top: 50%;
@@ -14,6 +16,7 @@
 
       transform: translateY(-50%);
       text-align: center;
+
       a {
         font-size: 25px;
         line-height: 61px;
@@ -26,16 +29,20 @@
         color: #fff;
         border-radius: 50px;
         background-color: #ff0000;
+
         &:hover {
           background-color: $theme-color;
         }
       }
     }
   }
+
   .blog-details-content {
     margin-top: 30px;
+
     .blog-meta-2 {
       display: flex;
+
       ul {
         li {
           font-size: 14px;
@@ -53,6 +60,7 @@
           text-transform: uppercase;
 
           color: #333;
+
           &::before {
             position: absolute;
             top: 6px;
@@ -66,11 +74,14 @@
 
             background-color: #555;
           }
+
           &:last-child::before {
             display: none;
           }
+
           a {
             color: #333;
+
             &:hover {
               color: $theme-color;
             }
@@ -78,6 +89,7 @@
         }
       }
     }
+
     h3 {
       font-size: 24px;
       font-weight: 500;
@@ -93,11 +105,13 @@
         font-size: 18px;
       }
     }
+
     p {
       line-height: 26px;
 
       margin: 0;
     }
+
     blockquote {
       font-size: 18px;
       font-weight: 500;
@@ -126,10 +140,12 @@
   @media #{$xs-layout} {
     margin-top: 30px;
   }
+
   .dec-img {
     img {
       width: 100%;
     }
+
     &.mb-50 {
       @media #{$xs-layout} {
         margin-bottom: 30px;
@@ -149,16 +165,20 @@
 
     margin: 20px 0 25px;
   }
+
   .dec-tag {
     @media #{$xs-layout} {
       margin-bottom: 10px;
     }
+
     ul {
       display: flex;
+
       li {
         position: relative;
 
         margin-right: 10px;
+
         a {
           font-size: 15px;
 
@@ -167,18 +187,23 @@
       }
     }
   }
+
   .blog-share {
     display: flex;
     align-items: center;
+
     span {
       font-size: 15px;
 
       text-transform: capitalize;
     }
+
     ul {
       display: flex;
+
       li {
         margin-left: 10px;
+
         a {
           font-size: 16px;
         }
@@ -195,6 +220,7 @@
 
   border-top: 1px solid #f1f1f1;
   border-bottom: 1px solid #f1f1f1;
+
   a {
     font-size: 15px;
 
@@ -208,6 +234,7 @@
       margin-top: 25px;
     }
   }
+
   .blog-dec-title {
     font-size: 20px;
     font-weight: 600;
@@ -219,6 +246,7 @@
       font-size: 18px;
     }
   }
+
   .single-comment-wrapper {
     display: flex;
     @media #{$xs-layout} {
@@ -230,6 +258,7 @@
         margin-top: 30px;
       }
     }
+
     .blog-comment-img {
       flex: 0 0 120px;
 
@@ -238,6 +267,7 @@
         margin-right: 28px;
         margin-bottom: 20px;
       }
+
       img {
         width: 100%;
         @media #{$xs-layout} {
@@ -245,6 +275,7 @@
         }
       }
     }
+
     .blog-comment-content {
       h4 {
         font-size: 16px;
@@ -253,6 +284,7 @@
 
         margin: 0;
       }
+
       span {
         font-size: 15px;
 
@@ -260,11 +292,13 @@
 
         margin: 6px 0 8px;
       }
+
       p {
         font-size: 14px;
 
         margin-bottom: 10px;
       }
+
       .blog-details-btn {
         a {
           font-size: 14px;
@@ -274,6 +308,7 @@
         }
       }
     }
+
     &.ml-120 {
       @media #{$xs-layout} {
         margin-left: 0;
@@ -288,6 +323,7 @@
       margin-top: 30px;
     }
   }
+
   .blog-dec-title {
     font-size: 20px;
     font-weight: 600;
@@ -299,11 +335,13 @@
       font-size: 18px;
     }
   }
+
   .blog-form {
     margin-top: 35px;
     @media #{$xs-layout} {
       margin-top: 20px;
     }
+
     .leave-form {
       input {
         height: 45px;
@@ -316,6 +354,7 @@
         box-shadow: none;
       }
     }
+
     .text-leave {
       textarea {
         height: 250px;
@@ -328,6 +367,7 @@
         background: transparent none repeat scroll 0 0;
         box-shadow: none;
       }
+
       input {
         font-weight: 500;
 
@@ -344,6 +384,7 @@
         color: #fff;
         border: medium none;
         background-color: $theme-color;
+
         &:hover {
           background-color: #333;
         }

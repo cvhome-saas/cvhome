@@ -82,12 +82,12 @@
 
             opacity: 0;
 
-            &:checked~.checkmark {
+            &:checked ~ .checkmark {
               border: 2px solid $theme-color;
               background-color: $theme-color;
             }
 
-            &:checked~.checkmark::after {
+            &:checked ~ .checkmark::after {
               display: block;
             }
           }
@@ -175,7 +175,7 @@
               background-color: $theme-color;
             }
 
-            &>.checkmark {
+            & > .checkmark {
               border-color: $theme-color;
               background-color: $theme-color;
 

@@ -1,10 +1,11 @@
 import {SectionTitle} from "@/componants/section-title/SectionTitle";
 import {Product, ProductGroupPage} from "@/types/product-groups";
+import Image from "next/image";
 
 export const TabProduct = async () => {
     const response: ProductGroupPage = await fetch(`http://localhost:8080/api/v1/products/group/FEATURED_ITEM?store=DEFAULT&lang=en`)
-        .then(it => {
-            return it.json() as ProductGroupPage
+        .then((it: Response) => {
+            return it.json() as unknown as ProductGroupPage
         })
 
     return (
@@ -23,17 +24,17 @@ export const TabProduct = async () => {
 
 const TabProductContent = ({group}: { group: ProductGroupPage }) => {
     return group.products.map((product, i) => {
-        return <Product product={product}/>
+        return <ProductGrid key={product.id} product={product}/>
     })
 }
 
-const Product = ({product}: { product: Product }) => {
-    return <div className="col-xl-3 col-md-6 col-lg-4 col-sm-6 ">
+const ProductGrid = ({key, product}: { key: number, product: Product }) => {
+    return <div className="col-xl-3 col-md-6 col-lg-4 col-sm-6 " key={key}>
         <div className="product-wrap-2 mb-25  ">
             <div className="product-img">
                 <a href="/[local]/product/iphone">
-                    <img alt=""
-                         src={product.images.length > 0 ? product.images[0].imageUrl : product.image.imageUrl}/>
+                    <Image alt=""
+                           src={product.images.length > 0 ? product.images[0].imageUrl : product.image.imageUrl}/>
                 </a>
                 <div className="product-action-2">
                     <a title="Select options" href="/[local]/product/iphone">

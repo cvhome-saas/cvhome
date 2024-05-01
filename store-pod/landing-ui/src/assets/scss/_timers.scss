@@ -37,6 +37,7 @@
 .funfact-content {
   position: relative;
   z-index: 9;
+
   h2 {
     font-size: 48px;
 
@@ -47,6 +48,7 @@
       font-size: 32px;
     }
   }
+
   .timer {
     margin: 65px 0 0;
 
@@ -57,6 +59,7 @@
     @media #{$xs-layout} {
       margin: 24px 0 0;
     }
+
     span {
       font-size: 48px;
       font-weight: 300;
@@ -78,6 +81,7 @@
         min-width: 55px;
         margin: 0 5px;
       }
+
       p {
         font-size: 18px;
         font-weight: 500;
@@ -104,11 +108,13 @@
       font-family: $josefin;
     }
   }
+
   .funfact-btn {
     margin-top: 43px;
     @media #{$xs-layout} {
       margin-top: 23px;
     }
+
     a {
       line-height: 1;
 
@@ -121,52 +127,64 @@
       color: #fff;
       border: 1px solid transparent;
       background-color: #000;
+
       &:hover {
         border: 1px solid $theme-color;
       }
     }
+
     &.btn-only-round {
       a {
         overflow: hidden;
 
         border-radius: 50px;
+
         &:hover {
           border: 1px solid $theme-color;
         }
       }
     }
+
     &.funfact-btn-red {
       a {
         background-color: #c61a32;
+
         &:hover {
           border: 1px solid $theme-color;
         }
       }
     }
+
     &.funfact-btn-red-2 {
       a {
         background-color: #c61a32;
+
         &:hover {
           border: 1px solid $theme-color;
         }
       }
     }
+
     &.funfact-btn-violet {
       a {
         background-color: #ab87cd;
+
         &:hover {
           border: 1px solid $theme-color;
         }
       }
     }
+
     &.funfact-btn-green {
       a {
         background-color: #6eab49;
+
         &:hover {
           border: 1px solid $theme-color;
         }
       }
     }
+
     &.funfact-btn-brown {
       a {
         font-weight: 500;
@@ -174,6 +192,7 @@
         color: #000;
         border: 2px solid #000;
         background-color: transparent;
+
         &:after {
           background-color: #bca487;
         }
@@ -188,6 +207,7 @@
       }
     }
   }
+
   @media #{$lg-layout} {
     &.mt-90 {
       margin-top: 0;
@@ -198,12 +218,15 @@
       h2 {
         font-size: 35px;
       }
+
       .timer {
         margin: 30px 0 0;
+
         span {
           font-size: 30px;
 
           margin: 0 9px;
+
           p {
             font-size: 15px;
 
@@ -225,13 +248,16 @@
 
 .gift-img {
   margin: 0 10px;
+
   a {
     display: block;
+
     img {
       width: 100%;
     }
   }
 }
+
 .fruits-deal-img {
   margin: 0 90px;
   @media #{$lg-layout} {
@@ -246,8 +272,10 @@
   @media #{$sm-layout} {
     margin: 30px 30px 0;
   }
+
   a {
     display: block;
+
     img {
       width: 100%;
     }

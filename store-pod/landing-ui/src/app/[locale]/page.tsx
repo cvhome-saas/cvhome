@@ -1,6 +1,8 @@
 import {NewsLetter} from "@/componants/news-letter/NewsLetter";
 import {TabProduct} from "@/wrappers/product/TabProduct";
-export default async function Home({params}) {
+import Image from "next/image";
+
+export default async function Home() {
 
     return (
         <>
@@ -13,8 +15,9 @@ export default async function Home({params}) {
                                                                               className="btn btn-black rounded-0">Shop
                                 Now</a></p></div>
                         </div>
-                        <div className="col-md-8 order-1 align-self-end"><img src="assets/img/banner/table.png"
-                                                                              alt="banner" className="img-fluid"/></div>
+                        <div className="col-md-8 order-1 align-self-end"><Image src="assets/img/banner/table.png"
+                                                                                alt="banner" className="img-fluid"/>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -23,7 +26,7 @@ export default async function Home({params}) {
                 <div>
                     <div className="row">
                         <div className="col-lg-2"></div>
-                        <div className="col-lg-8"><img src="/assets/img/promo/promo.png" alt="promo20" width="1200"/>
+                        <div className="col-lg-8"><Image src="/assets/img/promo/promo.png" alt="promo20" width="1200"/>
                         </div>
                         <div className="col-lg-2"></div>
                     </div>

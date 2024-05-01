@@ -6,6 +6,7 @@
       margin-bottom: 30px;
     }
   }
+
   h2 {
     font-size: 30px;
     font-weight: 600;
@@ -22,6 +23,7 @@
         margin-bottom: 30px;
       }
     }
+
     &::before {
       position: absolute;
       top: 17px;
@@ -39,6 +41,7 @@
         width: 30px;
       }
     }
+
     &::after {
       position: absolute;
       top: 17px;
@@ -57,6 +60,7 @@
       }
     }
   }
+
   &.mb-55 {
     @media #{$xs-layout} {
       margin-bottom: 30px;
@@ -77,6 +81,7 @@
   &.no-border {
     h2 {
       font-size: 36px;
+
       &:before,
       &:after {
         display: none;
@@ -98,6 +103,7 @@
     padding: 0 0 15px;
 
     color: #000000;
+
     &:before {
       position: absolute;
       right: 0;
@@ -113,11 +119,13 @@
       background-color: #000000;
     }
   }
+
   p {
     margin: 0;
 
     color: #333;
   }
+
   &.mb-60 {
     @media #{$xs-layout} {
       margin-bottom: 30px;
@@ -132,6 +140,7 @@
 
     color: #000000;
   }
+
   &.mb-40 {
     @media #{$xs-layout} {
       margin-bottom: 20px;
@@ -148,6 +157,7 @@
   @media #{$xs-layout} {
     margin-right: 0;
   }
+
   &::before {
     position: absolute;
     z-index: 1;
@@ -170,6 +180,7 @@
 .section-title-4 {
   position: relative;
   z-index: 999;
+
   h3 {
     font-size: 20px;
     font-weight: 600;
@@ -203,6 +214,7 @@
       line-height: 27px;
     }
   }
+
   @media #{$xs-layout} {
     &.mb-60 {
       margin-bottom: 30px;
@@ -244,6 +256,7 @@
 
     color: #010101;
   }
+
   p {
     width: 600px;
     max-width: 100%;
@@ -255,6 +268,7 @@
     position: relative;
 
     padding-bottom: 15px;
+
     &:before {
       position: absolute;
       bottom: 0;

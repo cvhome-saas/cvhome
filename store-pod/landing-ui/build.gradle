@@ -4,7 +4,7 @@ task "clean" {
     }
 }
 
-task "bootJar" {
+task "build" {
     doLast {
         exec {
             workingDir '.'
@@ -12,13 +12,13 @@ task "bootJar" {
         }
         exec {
             workingDir '.'
-            commandLine "npm", "run", "build:ssr"
+            commandLine "npm", "run", "build"
         }
     }
 }
 
 tasks.register('bootBuildImage', BootBuildImageTask) {
-    dependsOn('bootJar')
+    dependsOn('build')
 }
 
 
@@ -56,7 +56,7 @@ abstract class BootBuildImageTask extends DefaultTask {
 
     @TaskAction
     void bootBuildImage() {
-        String image = "${System.getenv('REGISTRY')}/core/${project.name}"
+        String image = "${System.getenv('REGISTRY')}/store-pod/${project.name}"
         project.exec {
             workingDir '.'
             commandLine "docker", "build", "-t", "${image}:${project.version}", "-t", "${image}:latest", "."

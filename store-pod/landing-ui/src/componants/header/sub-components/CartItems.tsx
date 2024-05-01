@@ -3,8 +3,9 @@ import {Store} from "@/types/store";
 import {Cart, Product} from "@/types/cart";
 import {Fragment, useState} from "react";
 import Link from "next/link";
+import Image from "next/image";
 
-export const CartItems = ({store, cart, t}: { store: Store, cart: Cart | undefined, t: {} }) => {
+export const CartItems = ({store, cart, t}: { store: Store, cart: Cart | undefined, t: { [key: string]: string } }) => {
     if (cart && typeof window !== "undefined") {
         localStorage.setItem("store-ui-cart-data", JSON.stringify(cart))
     }
@@ -26,7 +27,7 @@ export const CartItems = ({store, cart, t}: { store: Store, cart: Cart | undefin
         <div className="same-style cart-wrap d-none d-lg-block">
             <button className="icon-cart" onClick={showOrHideCart}>
                 <i className="pe-7s-shopbag"></i>
-                <span className={cart?.quantity > 0 ? "count-style" : ""}>{cart?.quantity}</span>
+                <span className={cart?.quantity && cart?.quantity > 0 ? "count-style" : ""}>{cart?.quantity}</span>
             </button>
             <div className={active}>
                 {cart && cart.products && cart.products.length > 0 ? (
@@ -40,7 +41,7 @@ export const CartItems = ({store, cart, t}: { store: Store, cart: Cart | undefin
                                     <li className="single-shopping-cart" key={key}>
                                         <div className="shopping-cart-img">
                                             <Link href={"/product/" + single.id}>
-                                                <img alt="" src={defaultImage(single)} className="img-fluid"/>
+                                                <Image alt="" src={defaultImage(single)} className="img-fluid"/>
                                             </Link>
                                         </div>
                                         <div className="shopping-cart-title">
@@ -99,12 +100,12 @@ export const CartItems = ({store, cart, t}: { store: Store, cart: Cart | undefin
     </div>
 };
 
-function defaultImage(product) {
+function defaultImage(product: Product): string {
     if (product.images && product.images.length > 0) {
         return product.images[0].imageUrl;
     } else if (product.image != null) {
-        return product.imageUrl;
+        return product.image.imageUrl;
     } else {
-        return null;
+        return '';
     }
 }

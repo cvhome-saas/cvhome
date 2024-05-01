@@ -2,6 +2,7 @@
 
 .single-image {
   overflow: hidden;
+
   a {
     img {
       width: 100%;
@@ -9,6 +10,7 @@
       transform: scale(1);
     }
   }
+
   &:hover a img {
     transform: scale(1.1);
   }

@@ -7,7 +7,10 @@ export const CurrentLanguage = ({store}: { store: Store }) => {
     const NEXT_LOCALE_KEY = 'NEXT_LOCALE';
     const [local, setLocal] = useState(store.defaultLanguage);
     useEffect(() => {
-        setLocal(Cookies.get(NEXT_LOCALE_KEY))
-    })
+        const cookie = Cookies.get(NEXT_LOCALE_KEY);
+        if (cookie) {
+            setLocal(cookie);
+        }
+    }, [])
     return <>{local}</>
 }

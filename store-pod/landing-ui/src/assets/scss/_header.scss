@@ -14,11 +14,11 @@
   }
 
     {
-    position: relative;
+      position: relative;
 
-    width: auto;
+      width: auto;
+    }
   }
-}
 }
 
 .sticky-bar.stick {
@@ -50,7 +50,7 @@
 
   .header-right-wrap-white {
     .same-style {
-      >a {
+      > a {
         color: #000;
       }
 
@@ -60,8 +60,8 @@
       &.account-setting,
       &.header-search {
 
-        >button,
-        &>a {
+        > button,
+        & > a {
           color: #000;
 
           span {
@@ -131,33 +131,33 @@
     }
 
       {
-      display: block;
+        display: block;
+      }
     }
-  }
 
-  a.sticky-none {
-    display: block;
-    @media #{$md-layout,
+    a.sticky-none {
+      display: block;
+      @media #{$md-layout,
  $xs-layout
   }
 
-    {
-    display: none;
+      {
+        display: none;
+      }
+    }
+
+    @media #{$md-layout} {
+      margin-top: 0;
+
+      text-align: left !important;
+    }
+
+    @media #{$xs-layout} {
+      margin-top: 0;
+
+      text-align: left !important;
+    }
   }
-}
-
-@media #{$md-layout} {
-  margin-top: 0;
-
-  text-align: left !important;
-}
-
-@media #{$xs-layout} {
-  margin-top: 0;
-
-  text-align: left !important;
-}
-}
 }
 
 .stick {
@@ -283,7 +283,7 @@
             left: -75px;
           }
 
-          >li {
+          > li {
             display: inline-block;
             float: left;
 
@@ -391,13 +391,13 @@
           }
         }
 
-        &:hover>ul.submenu {
+        &:hover > ul.submenu {
           visibility: visible;
 
           transform: rotateX(0deg);
         }
 
-        &:hover>ul.mega-menu {
+        &:hover > ul.mega-menu {
           visibility: visible;
 
           transform: rotateX(0deg);
@@ -411,7 +411,7 @@
           padding: 0 10px;
         }
 
-        >a {
+        > a {
           font-size: 15px;
           font-weight: 500;
           line-height: 55px;
@@ -459,7 +459,7 @@
             padding: 0 14px 0 0;
           }
 
-          >a {
+          > a {
             line-height: 112px;
 
             color: #ffffff;
@@ -524,7 +524,6 @@
 }
 
 
-
 .autoComplete {
   margin-top: 20px;
   border-top: 1px dotted grey;
@@ -567,14 +566,14 @@
       margin-left: 20px;
     }
 
-    >a,
+    > a,
     button {
       font-size: 23px;
 
       color: #000;
     }
 
-    >button {
+    > button {
       border: none;
       background: none;
     }
@@ -591,8 +590,8 @@
       }
     }
 
-    &:hover>a,
-    &:hover>button {
+    &:hover > a,
+    &:hover > button {
       color: $theme-color;
     }
 
@@ -693,12 +692,12 @@
 
   .same-style.account-setting {
 
-    >a,
+    > a,
     button {
       font-size: 24px;
     }
 
-    >button {
+    > button {
       border: none;
       background: none;
     }
@@ -722,7 +721,7 @@
     }
 
     button,
-    &>a {
+    & > a {
       font-size: 24px;
 
       position: relative;
@@ -760,7 +759,7 @@
       }
     }
 
-    &:hover>button {
+    &:hover > button {
       color: $theme-color;
     }
 
@@ -926,7 +925,7 @@
     margin-top: 40px;
 
     .same-style {
-      >a {
+      > a {
         color: #fff;
       }
 
@@ -936,8 +935,8 @@
       &.account-setting,
       &.header-search {
 
-        >button,
-        &>a {
+        > button,
+        & > a {
           color: #fff;
 
           span {
@@ -954,7 +953,7 @@
       margin-top: 0;
 
       .same-style {
-        >a {
+        > a {
           color: #000;
         }
 
@@ -964,8 +963,8 @@
         &.account-setting,
         &.header-search {
 
-          >button,
-          &>a {
+          > button,
+          & > a {
             color: #000;
 
             span {
@@ -983,7 +982,7 @@
       margin-top: 3px;
 
       .same-style {
-        >a {
+        > a {
           color: #000;
         }
 
@@ -993,8 +992,8 @@
         &.account-setting,
         &.header-search {
 
-          >button,
-          &>a {
+          > button,
+          & > a {
             color: #000;
 
             span {
@@ -1113,7 +1112,7 @@
   }
 
   .same-style {
-    >a {
+    > a {
       color: #000;
 
       &:hover {
@@ -1122,7 +1121,7 @@
     }
 
     &.cart-wrap {
-      >button {
+      > button {
         color: #000;
 
         &:hover {
@@ -1337,7 +1336,7 @@
 
     &:hover {
 
-      &>a,
+      & > a,
       span {
         color: $theme-color;
       }
@@ -1534,7 +1533,6 @@
 }
 
 
-
 .sidebar-menu {
   padding: 0 0 0 108px;
 
@@ -1658,7 +1656,7 @@
           }
         }
 
-        &:hover>ul.submenu {
+        &:hover > ul.submenu {
           visibility: visible;
 
           transform: rotateX(0deg);
@@ -1696,7 +1694,7 @@
             top: -80px;
           }
 
-          >li {
+          > li {
             display: inline-block;
             float: left;
 
@@ -1800,7 +1798,7 @@
           }
         }
 
-        &:hover>ul.mega-menu {
+        &:hover > ul.mega-menu {
           visibility: visible;
 
           transform: rotateX(0deg);
@@ -1901,7 +1899,6 @@
     padding: 0 15px;
   }
 }
-
 
 
 /* home 7 */
@@ -2119,7 +2116,6 @@
 }
 
 
-
 .header-hm-7.stick {
   .clickable-menu {
     margin-top: 19px;
@@ -2318,7 +2314,7 @@
     nav {
       ul {
         li {
-          >a {
+          > a {
             line-height: 60px;
           }
         }
@@ -2328,7 +2324,6 @@
 }
 
 /* home 9 */
-
 
 
 .header-hm9 {
@@ -2448,8 +2443,6 @@
 .mobile-aside-button {
   padding: 0;
 }
-
-
 
 
 /* offcanvas mobile menu */
@@ -2658,7 +2651,7 @@
 .offcanvas-navigation {
   margin-bottom: 50px;
 
-  &>ul {
+  & > ul {
     li {
       &.menu-item-has-children {
         .sub-menu {
@@ -2672,7 +2665,7 @@
         }
 
         &.active {
-          &>.sub-menu {
+          & > .sub-menu {
             visibility: visible;
 
             height: 100%;
@@ -2682,7 +2675,7 @@
         }
       }
 
-      &>a {
+      & > a {
         font-weight: 600;
 
         display: block;
@@ -2709,8 +2702,8 @@
 
       transition: 0.3s;
 
-      &>li {
-        &>a {
+      & > li {
+        & > a {
           font-size: 13px;
           font-weight: 400;
 
@@ -2744,7 +2737,7 @@
         }
 
         &.active {
-          &>.menu-expand {
+          & > .menu-expand {
             i {
               &:before {
                 transform: rotate(0);
@@ -2823,9 +2816,9 @@
 
 .offcanvas-settings {
   .offcanvas-navigation {
-    &>ul {
-      &>li {
-        &>a {
+    & > ul {
+      & > li {
+        & > a {
           font-size: 12px;
           font-weight: 400;
 
@@ -2845,8 +2838,8 @@
 
     ul {
       &.sub-menu {
-        &>li {
-          &>a {
+        & > li {
+          & > a {
             padding: 5px 0;
           }
         }
@@ -2870,12 +2863,12 @@
 }
 
   {
-  position: relative;
-}
+    position: relative;
+  }
 
-.header-top {
-  display: none !important;
-}
+  .header-top {
+    display: none !important;
+  }
 }
 
 
@@ -2922,7 +2915,7 @@
   }
 }
 
-@media only screen and (min-width:1025px) and (max-width:1225px) {
+@media only screen and (min-width: 1025px) and (max-width: 1225px) {
   .logo {
     margin-top: 20px;
   }
@@ -2936,7 +2929,7 @@
   }
 }
 
-@media only screen and (min-width:992px) and (max-width:1024px) {
+@media only screen and (min-width: 992px) and (max-width: 1024px) {
   .logo {
     margin-top: 24px;
   }

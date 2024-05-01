@@ -4,7 +4,6 @@ import "../../assets/scss/style.scss";
 import {Header} from "@/componants/header/header";
 import {Footer} from "@/componants/footer/footer";
 import {Store} from "@/types/store";
-import {create} from "zustand";
 
 const inter = Inter({subsets: ["latin"]});
 

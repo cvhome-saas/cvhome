@@ -4,7 +4,7 @@ task "clean" {
     }
 }
 
-task "bootJar" {
+task "build" {
     doLast {
         exec {
             workingDir '.'
@@ -18,7 +18,7 @@ task "bootJar" {
 }
 
 tasks.register('bootBuildImage', BootBuildImageTask) {
-    dependsOn('bootJar')
+    dependsOn('build')
 }
 
 

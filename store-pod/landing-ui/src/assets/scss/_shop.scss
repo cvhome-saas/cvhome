@@ -447,7 +447,7 @@
     }
 
     &.two-column {
-      &>.col-xl-4 {
+      & > .col-xl-4 {
         flex: 1 0 50%;
 
         max-width: 50%;
@@ -474,7 +474,7 @@
       }
     }
 
-    &>.col-xl-4 {
+    & > .col-xl-4 {
       flex: 1 0 100%;
 
       max-width: 100%;
