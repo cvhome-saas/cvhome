@@ -2,17 +2,18 @@
 import {Store} from "@/types/store";
 import {Cart, Product} from "@/types/cart";
 import {Fragment, useState} from "react";
-import Link from "next/link";
 import Image from "next/image";
+import {baseServiceUrl, StoreContext} from "@/types/store-context";
+import {Link} from "@/navigation";
 
-export const CartItems = ({store, cart, t}: { store: Store, cart: Cart | undefined, t: { [key: string]: string } }) => {
+export const CartItems = ({storeContext,store, cart, t}: {storeContext:StoreContext, store: Store, cart: Cart | undefined, t: { [key: string]: string } }) => {
     if (cart && typeof window !== "undefined") {
         localStorage.setItem("store-ui-cart-data", JSON.stringify(cart))
     }
 
     const [active, setActive] = useState('shopping-cart-content');
     const deleteFromCart = async (p: Product) => {
-        await fetch(`http://localhost:8080/api/v1/cart/${cart?.code}/product/${p.id}?store=${store.code}`, {
+        await fetch(`${baseServiceUrl(storeContext,'store')}/api/v1/cart/${cart?.code}/product/${p.id}?store=${store.code}`, {
             method: 'DELETE',
         });
     };
@@ -41,7 +42,7 @@ export const CartItems = ({store, cart, t}: { store: Store, cart: Cart | undefin
                                     <li className="single-shopping-cart" key={key}>
                                         <div className="shopping-cart-img">
                                             <Link href={"/product/" + single.id}>
-                                                <Image alt="" src={defaultImage(single)} className="img-fluid"/>
+                                                <img alt="" src={defaultImage(single)} className="img-fluid"/>
                                             </Link>
                                         </div>
                                         <div className="shopping-cart-title">

@@ -4,6 +4,8 @@ import "../../assets/scss/style.scss";
 import {Header} from "@/componants/header/header";
 import {Footer} from "@/componants/footer/footer";
 import {Store} from "@/types/store";
+import {baseServiceUrl, extractStoreContext, StoreContext} from "@/types/store-context";
+import {cookies, headers} from "next/headers";
 
 const inter = Inter({subsets: ["latin"]});
 
@@ -29,14 +31,15 @@ export default async function RootLayout({
     // }));
     // const bears = useBearStore((state) => state.bears)
     // console.log(bears);
-    const store: Store = await fetch('http://localhost:8080/api/v1/store/DEFAULT')
+    const storeContext: StoreContext = extractStoreContext(headers(), cookies());
+    const store: Store = await fetch(`${baseServiceUrl(storeContext,'store')}/api/v1/store/${storeContext.store}`)
         .then(it => it.json())
         .then(it => it as Store);
 
     return (
         <html lang={locale}>
         <body className={inter.className}>
-        <Header store={store}/>
+        <Header storeContext={storeContext} store={store}/>
         {children}
         <Footer store={store}/>
         </body>

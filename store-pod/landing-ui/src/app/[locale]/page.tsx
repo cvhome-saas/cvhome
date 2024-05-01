@@ -1,8 +1,10 @@
 import {NewsLetter} from "@/componants/news-letter/NewsLetter";
 import {TabProduct} from "@/wrappers/product/TabProduct";
-import Image from "next/image";
+import {cookies, headers} from "next/headers";
+import {extractStoreContext, StoreContext} from "@/types/store-context";
 
 export default async function Home() {
+    const storeContext: StoreContext = extractStoreContext(headers(), cookies());
 
     return (
         <>
@@ -15,8 +17,8 @@ export default async function Home() {
                                                                               className="btn btn-black rounded-0">Shop
                                 Now</a></p></div>
                         </div>
-                        <div className="col-md-8 order-1 align-self-end"><Image src="assets/img/banner/table.png"
-                                                                                alt="banner" className="img-fluid"/>
+                        <div className="col-md-8 order-1 align-self-end"><img src="assets/img/banner/table.png"
+                                                                              alt="banner" className="img-fluid"/>
                         </div>
                     </div>
                 </div>
@@ -26,13 +28,13 @@ export default async function Home() {
                 <div>
                     <div className="row">
                         <div className="col-lg-2"></div>
-                        <div className="col-lg-8"><Image src="/assets/img/promo/promo.png" alt="promo20" width="1200"/>
+                        <div className="col-lg-8"><img src="/assets/img/promo/promo.png" alt="promo20" width="1200"/>
                         </div>
                         <div className="col-lg-2"></div>
                     </div>
                 </div>
             </div>
-            <TabProduct/>
+            <TabProduct storeContext={storeContext}/>
             <NewsLetter/>
         </>
     );

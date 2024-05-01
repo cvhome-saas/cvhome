@@ -6,12 +6,13 @@ import {Cart} from "@/types/cart";
 import {Store} from "@/types/store";
 import {CartItems} from "@/componants/header/sub-components/CartItems";
 import {getTranslations} from "next-intl/server";
+import {baseServiceUrl, StoreContext} from "@/types/store-context";
 
-export const NavCart = async ({store}: { store: Store }) => {
-    const cookie: RequestCookie | undefined = cookies().get("store-ui-cart-id")
+export const NavCart = async ({storeContext,store}: { storeContext:StoreContext,store: Store }) => {
+    const cookie: RequestCookie | undefined = cookies().get("store-ui-cart-id" as any)
     var cart: Cart | undefined;
     if (cookie) {
-        cart = await fetch(`http://localhost:8080/api/v1/cart/${cookie.value}?store=${store.code}`)
+        cart = await fetch(`${baseServiceUrl(storeContext,'store')}/api/v1/cart/${cookie.value}?store=${store.code}`)
             .then(it => it.json())
             .then(it => it as Cart)
 
@@ -26,7 +27,7 @@ export const NavCart = async ({store}: { store: Store }) => {
     }
     return (
         <>
-            <CartItems store={store} cart={cart} t={x}/>
+            <CartItems storeContext={storeContext} store={store} cart={cart} t={x}/>
         </>
     )
 }

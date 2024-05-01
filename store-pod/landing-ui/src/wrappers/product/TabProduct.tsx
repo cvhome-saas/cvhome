@@ -1,13 +1,14 @@
 import {SectionTitle} from "@/componants/section-title/SectionTitle";
 import {Product, ProductGroupPage} from "@/types/product-groups";
 import Image from "next/image";
+import {baseServiceUrl, StoreContext} from "@/types/store-context";
+import {Link} from "@/navigation";
 
-export const TabProduct = async () => {
-    const response: ProductGroupPage = await fetch(`http://localhost:8080/api/v1/products/group/FEATURED_ITEM?store=DEFAULT&lang=en`)
+export const TabProduct = async ({storeContext}:{storeContext:StoreContext}) => {
+    const response: ProductGroupPage = await fetch(`${baseServiceUrl(storeContext,'store')}/api/v1/products/group/FEATURED_ITEMS?store=${storeContext.store}&lang=${storeContext.local}`)
         .then((it: Response) => {
             return it.json() as unknown as ProductGroupPage
         })
-
     return (
         <div
             className={"product-area pt-100 pb-100"}>
@@ -33,13 +34,13 @@ const ProductGrid = ({key, product}: { key: number, product: Product }) => {
         <div className="product-wrap-2 mb-25  ">
             <div className="product-img">
                 <a href="/[local]/product/iphone">
-                    <Image alt=""
+                    <img alt=""
                            src={product.images.length > 0 ? product.images[0].imageUrl : product.image.imageUrl}/>
                 </a>
                 <div className="product-action-2">
-                    <a title="Select options" href="/[local]/product/iphone">
+                    <Link title="Select options" href={`/product/${product.description.friendlyUrl}`}>
                         <i className="fa fa-cog"></i>
-                    </a>
+                    </Link>
                     <button className="active" title="Add to cart">
                         <i className="fa fa-shopping-cart"></i>
                     </button>

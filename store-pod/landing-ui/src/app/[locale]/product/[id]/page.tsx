@@ -39,7 +39,7 @@ export default async function Team() {
                                             <div className="react_lightgallery_item">
                                                 <button><i className="pe-7s-expand1"></i></button>
                                             </div>
-                                            <div className="single-image"><Image
+                                            <div className="single-image"><img
                                                 src="http://localhost:8080/static/products/DEFAULT/fiat/SMALL/500_333.jpeg"
                                                 className="img-fluid" alt=""/></div>
                                         </div>

@@ -1,0 +1,23 @@
+import {ReadonlyHeaders} from "next/dist/server/web/spec-extension/adapters/headers";
+import type {ReadonlyRequestCookies} from "next/dist/server/web/spec-extension/adapters/request-cookies";
+
+export interface StoreContext {
+    store: string,
+    host: string
+    schema: string,
+    local: string | undefined,
+    baseUrl: string,
+}
+
+export const extractStoreContext = (headers: ReadonlyHeaders, cookie: ReadonlyRequestCookies): StoreContext => {
+    return {
+        store: headers.get("store") || "",
+        host: headers.get("x-forwarded-host") || "",
+        schema: headers.get("x-forwarded-proto") || "",
+        local: cookie.get('NEXT_LOCALE' as any)?.value,
+        baseUrl: headers.get("x-forwarded-proto") || "" + "://" + headers.get("x-forwarded-host") || "",
+    }
+}
+export const baseServiceUrl = (storeContext: StoreContext, service: string): string => {
+    return storeContext.schema + "://" + storeContext.host + "/" + service;
+}

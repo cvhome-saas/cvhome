@@ -36,9 +36,6 @@
             "allowedCommonJsDependencies": [
               "file-saver",
               "moment",
-              "lodash",
-              "zrender/lib/svg/svg",
-              "zrender/lib/vml/vml",
               "eva-icons",
               "quill-delta",
               "quill"

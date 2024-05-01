@@ -2,7 +2,6 @@ package com.asrevo.cvhome.gateway.filters;
 
 import com.asrevo.cvhome.commons.domain.Domain;
 import com.asrevo.cvhome.commons.dto.PodReferenceDto;
-import com.asrevo.cvhome.commons.utils.Constants;
 import com.asrevo.cvhome.s2s.clients.RouterAllocationService;
 import com.asrevo.cvhome.s2s.model.ServiceDomainProperties;
 import lombok.Getter;
@@ -61,28 +60,32 @@ public class AddStoreParamGatewayFilterFactory extends AbstractGatewayFilterFact
 
                     return mapHostToStoreParam(hostName)
                             .flatMap(it -> {
-                                ServerHttpRequest newRequest = addStoreParamsForRequest(request, it);
+                                ServerHttpRequest newRequest = addStoreParamsForRequest(config, request, it);
                                 ServerWebExchange newExchange = exchange.mutate().request(newRequest).build();
                                 return chain.filter(newExchange)
-                                        .then(Mono.fromRunnable(() -> addStoreParamsForResponse(exchange.getRequest(), exchange.getResponse(), it)));
+                                        .then(Mono.fromRunnable(() -> addStoreParamsForResponse(config, exchange.getRequest(), exchange.getResponse(), it)));
                             });
                 }
 
             } else {
-                ServerHttpRequest newRequest = addStoreParamsForRequest(request, store);
+                ServerHttpRequest newRequest = addStoreParamsForRequest(config, request, store);
                 ServerWebExchange newExchange = exchange.mutate().request(newRequest).build();
                 return chain.filter(newExchange)
-                        .then(Mono.fromRunnable(() -> addStoreParamsForResponse(exchange.getRequest(), exchange.getResponse(), store)));
+                        .then(Mono.fromRunnable(() -> addStoreParamsForResponse(config, exchange.getRequest(), exchange.getResponse(), store)));
 
             }
             return chain.filter(exchange);
         };
     }
 
-    private void addStoreParamsForResponse(ServerHttpRequest request, ServerHttpResponse response, String store) {
+    private void addStoreParamsForResponse(Config config, ServerHttpRequest request, ServerHttpResponse response, String store) {
         if (!response.isCommitted()) {
-            addResponseHeader(response, store);
-            addResponseCookie(response, store);
+            if (config.getAddResponseHeader()) {
+                addResponseHeader(response, store);
+            }
+            if (config.getAddResponseCookie()) {
+                addResponseCookie(response, store);
+            }
         }
     }
 
@@ -94,15 +97,17 @@ public class AddStoreParamGatewayFilterFactory extends AbstractGatewayFilterFact
         response.getHeaders().set("Set-Cookie", STORE_ID_HEADER + "=" + store + "; Path=/;");
     }
 
-    private static ServerHttpRequest addStoreParamsForRequest(ServerHttpRequest request, String store) {
+    private static ServerHttpRequest addStoreParamsForRequest(Config config, ServerHttpRequest request, String store) {
         ServerHttpRequest.Builder builder = request.mutate();
-        if (extractStoreFromParams(request) == null) {
+        if (config.getAddRequestParam() && extractStoreFromParams(request) == null) {
             addRequestParam(request, store, builder);
         }
-        if (extractStoreFromHeaders(request) == null) {
+        if (config.getAddRequestHeader() && extractStoreFromHeaders(request) == null) {
             addRequestHeader(store, builder);
         }
-        addRequestCookie(store, builder);
+        if (config.getAddRequestCookie()) {
+            addRequestCookie(store, builder);
+        }
         return builder.build();
     }
 
@@ -178,6 +183,10 @@ public class AddStoreParamGatewayFilterFactory extends AbstractGatewayFilterFact
     @Getter
     @Setter
     public static class Config {
-        private String template;
+        private Boolean addRequestParam = false;
+        private Boolean addRequestHeader = false;
+        private Boolean addRequestCookie = false;
+        private Boolean addResponseHeader = false;
+        private Boolean addResponseCookie = false;
     }
 }

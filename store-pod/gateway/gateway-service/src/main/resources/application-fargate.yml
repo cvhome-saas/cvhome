@@ -29,3 +29,8 @@ spring:
           uri: lb://landing-ui
           predicates:
             - FHost={domain}.{x},{sub}.{domain}.{x}
+          filters:
+            - name: AddStoreParam
+              args:
+                addRequestHeader: true
+                addResponseHeader: true
