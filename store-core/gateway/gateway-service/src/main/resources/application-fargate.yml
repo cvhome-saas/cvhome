@@ -4,6 +4,8 @@ spring:
       eager-load:
         clients:
           - "store-core-gateway"
+          - "router"
+          - "auth"
           - "manager"
           - "wallet"
           - "store-ui"
@@ -15,6 +17,8 @@ spring:
         default-port: 8080
         service-ports:
           "store-core-gateway": 7000
+          "router": 8002
+          "auth": 9999
           "manager": 7001
           "wallet": 7002
           "store-ui": 4200
@@ -27,6 +31,13 @@ spring:
         - PreserveHostHeader
         - AddResponseHeader=X-Frame-Options, SAMEORIGIN
       routes:
+        - id: router
+          order: -4
+          uri: lb://router
+          predicates:
+            - Path=/router/**
+          filters:
+            - StripPrefix=1
         - id: store
           order: -3
           uri: ${com.asrevo.cvhome.services.store-pod-gateway.schema}://${com.asrevo.cvhome.services.store-pod-gateway.domain}:${com.asrevo.cvhome.services.store-pod-gateway.port}

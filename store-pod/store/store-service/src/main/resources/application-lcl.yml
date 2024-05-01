@@ -8,11 +8,6 @@ spring:
       discovery:
         enabled: true
         services:
-          dcm:
-            - url: "http://localhost:8001"
-              metadata:
-                service-name: dcm
-                instance: dcm-1
           router:
             - url: "http://localhost:8002"
               metadata:
@@ -23,11 +18,6 @@ spring:
               metadata:
                 service-name: auth
                 instance: auth-1
-          welcome-ui:
-            - url: "http://localhost:4400"
-              metadata:
-                service-name: welcome-ui
-                instance: welcome-ui-1
           manager:
             - url: "http://localhost:7001"
               metadata:
