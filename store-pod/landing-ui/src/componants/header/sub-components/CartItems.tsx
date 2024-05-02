@@ -5,6 +5,7 @@ import {Fragment, useState} from "react";
 import {StoreContext} from "@/types/store-context";
 import {Link} from "@/navigation";
 import {CartService} from "@/services/cart-service";
+import Cookies from "js-cookie";
 
 export const CartItems = ({storeContext, store, cart, t}: {
     storeContext: StoreContext,
@@ -15,11 +16,31 @@ export const CartItems = ({storeContext, store, cart, t}: {
     if (cart && typeof window !== "undefined") {
         localStorage.setItem("store-ui-cart-data", JSON.stringify(cart))
     }
+    const [cartCode, setCartCode] = useState(cart?.code)
+    const [displayTotal, setDisplayTotal] = useState(cart?.displayTotal)
+    const [quantity, setQuantity] = useState(cart?.quantity)
+    const [products, setProducts] = useState(cart?.products || [])
+
+
+    const deleteFromCart = async (p: Product) => {
+        await CartService.removeFromCart(storeContext, cartCode || "", p.sku);
+        if (typeof window !== "undefined") {
+            if (products.length == 1 || products.length == 0) {
+                localStorage.removeItem("store-ui-cart-data");
+                Cookies.remove('store-ui-cart-id')
+                setCartCode(undefined);
+                setDisplayTotal(undefined);
+                setQuantity(undefined);
+            } else if (products.length > 1) {
+                const newCart = await CartService.getCart(storeContext, cartCode || "");
+                setProducts(newCart.products);
+                setDisplayTotal(newCart.displayTotal)
+                setQuantity(newCart.quantity)
+            }
+        }
+    };
 
     const [active, setActive] = useState('shopping-cart-content');
-    const deleteFromCart = async (p: Product) => {
-        await CartService.removeFromCart(storeContext, cart?.code || "", p.id);
-    };
     const showOrHideCart = () => {
         if (active == 'shopping-cart-content') {
             setActive('shopping-cart-content active');
@@ -31,13 +52,13 @@ export const CartItems = ({storeContext, store, cart, t}: {
         <div className="same-style cart-wrap d-none d-lg-block">
             <button className="icon-cart" onClick={showOrHideCart}>
                 <i className="pe-7s-shopbag"></i>
-                <span className={cart?.quantity && cart?.quantity > 0 ? "count-style" : ""}>{cart?.quantity}</span>
+                <span className={quantity && quantity > 0 ? "count-style" : ""}>{quantity}</span>
             </button>
             <div className={active}>
-                {cart && cart.products && cart.products.length > 0 ? (
+                {products.length > 0 ? (
                     <Fragment>
                         <ul>
-                            {cart.products.map((single, key) => {
+                            {products.map((single, key) => {
                                 // const finalProductPrice = single.originalPrice;
                                 const finalDiscountedPrice = single.finalPrice;
                                 // cartTotalPrice += single.price;
@@ -83,7 +104,7 @@ export const CartItems = ({storeContext, store, cart, t}: {
                             <h4>
                                 {t['Total']} :
                                 <span className="shop-total">
-                                        {cart.displayTotal}
+                                        {displayTotal}
                                     </span>
                             </h4>
                         </div>

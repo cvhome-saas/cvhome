@@ -13,7 +13,7 @@ export const NavCart = async ({storeContext, store}: { storeContext: StoreContex
     const cookie: RequestCookie | undefined = cookies().get("store-ui-cart-id" as any)
     let cart: Cart | undefined;
     if (cookie) {
-        cart = await CartService.getCart(storeContext, cookie.value)
+        cart = await CartService.getCart(storeContext, cookie.value);
     }
     const t = await getTranslations('Cart');
     const x = {

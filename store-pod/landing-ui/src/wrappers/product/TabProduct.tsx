@@ -3,6 +3,7 @@ import {Product, ProductGroupPage} from "@/types/product-groups";
 import {StoreContext} from "@/types/store-context";
 import {Link} from "@/navigation";
 import {ProductService} from "@/services/product-service";
+import {ProductGridActions} from "@/componants/product/ProductGridActions";
 
 export const TabProduct = async ({storeContext}: { storeContext: StoreContext }) => {
     const featuredItemsGroup = await ProductService.getFeaturedItemsProductGroup(storeContext)
@@ -12,7 +13,7 @@ export const TabProduct = async ({storeContext}: { storeContext: StoreContext })
             <div className={"container"}>
                 <SectionTitle titleText="Featured Products" positionClass="text-center"/>
                 <div className="row">
-                    <TabProductContent group={featuredItemsGroup}/>
+                    <TabProductContent group={featuredItemsGroup} storeContext={storeContext}/>
                 </div>
             </div>
         </div>
@@ -20,13 +21,13 @@ export const TabProduct = async ({storeContext}: { storeContext: StoreContext })
 };
 
 
-const TabProductContent = ({group}: { group: ProductGroupPage }) => {
+const TabProductContent = ({storeContext, group}: { storeContext: StoreContext, group: ProductGroupPage }) => {
     return group.products.map((product, i) => {
-        return <ProductGrid key={product.id} product={product}/>
+        return <ProductGrid key={product.id} product={product} storeContext={storeContext}/>
     })
 }
 
-const ProductGrid = ({key, product}: { key: number, product: Product }) => {
+const ProductGrid = ({storeContext, key, product}: { storeContext: StoreContext, key: number, product: Product }) => {
     return <div className="col-xl-3 col-md-6 col-lg-4 col-sm-6 " key={key}>
         <div className="product-wrap-2 mb-25  ">
             <div className="product-img">
@@ -34,17 +35,7 @@ const ProductGrid = ({key, product}: { key: number, product: Product }) => {
                     <img alt=""
                          src={product.images.length > 0 ? product.images[0].imageUrl : product.image.imageUrl}/>
                 </Link>
-                <div className="product-action-2">
-                    <Link title="Select options" href={`/product/${product.description.friendlyUrl}`}>
-                        <i className="fa fa-cog"></i>
-                    </Link>
-                    <button className="active" title="Add to cart">
-                        <i className="fa fa-shopping-cart"></i>
-                    </button>
-                    <button title="Quick View">
-                        <i className="fa fa-eye"></i>
-                    </button>
-                </div>
+                <ProductGridActions storeContext={storeContext} product={product}/>
             </div>
             <div className="product-content-2">
                 <div className="title-price-wrap-2 ">
