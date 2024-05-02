@@ -22,11 +22,9 @@ export const ProductGridActions = ({storeContext, product}: { storeContext: Stor
                 return it.json() as unknown as Cart
             })
             .then(it => {
-
                 if (it && it.code && it.products && it.products.length > 0) {
-                    localStorage.setItem("store-ui-cart-data", JSON.stringify(it))
                     Cookies.set('store-ui-cart-id', it.code);
-                    console.log(localStorage.getItem("store-ui-cart-data"))
+                    location.reload();
                 }
                 return it;
             })

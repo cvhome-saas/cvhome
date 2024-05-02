@@ -1,7 +1,7 @@
 'use client'
 import {Store} from "@/types/store";
 import {Cart, Product} from "@/types/cart";
-import {Fragment, useEffect, useState} from "react";
+import {Fragment, useState} from "react";
 import {StoreContext} from "@/types/store-context";
 import {Link} from "@/navigation";
 import {CartService} from "@/services/cart-service";
@@ -23,7 +23,7 @@ export const CartItems = ({storeContext, store, cart, t}: {
     const [products, setProducts] = useState(cart?.products || [])
 
 
-    function updateCartItems (cart: Cart | undefined)  {
+    function updateCartItems(cart: Cart | undefined) {
         if (cart && cart.code) {
             console.log("will update")
             setProducts(cart.products);
@@ -37,18 +37,18 @@ export const CartItems = ({storeContext, store, cart, t}: {
         }
     }
 
-/*
-    useEffect(() => {
-        setInterval(function () {
-            console.log("ww")
-            const item: string | null = localStorage.getItem("store-ui-cart-data");
-            if (item) {
-                const cart: Cart | undefined = JSON.parse(item) as unknown as Cart | undefined;
-                updateCartItems(cart)
-            }
-        }, 2000);
-    });
-*/
+    /*
+        useEffect(() => {
+            setInterval(function () {
+                console.log("ww")
+                const item: string | null = localStorage.getItem("store-ui-cart-data");
+                if (item) {
+                    const cart: Cart | undefined = JSON.parse(item) as unknown as Cart | undefined;
+                    updateCartItems(cart)
+                }
+            }, 2000);
+        });
+    */
 
     const deleteFromCart = async (p: Product) => {
         await CartService.removeFromCart(storeContext, cartCode || "", p.sku);
@@ -57,10 +57,12 @@ export const CartItems = ({storeContext, store, cart, t}: {
                 localStorage.removeItem("store-ui-cart-data");
                 Cookies.remove('store-ui-cart-id')
                 updateCartItems(undefined)
+                location.reload()
             } else if (products.length > 1) {
+                localStorage.removeItem("store-ui-cart-data");
                 const cart = await CartService.getCart(storeContext, cartCode || "");
-                localStorage.setItem("store-ui-cart-data", JSON.stringify(cart))
                 updateCartItems(cart)
+                location.reload()
             }
         }
     };
