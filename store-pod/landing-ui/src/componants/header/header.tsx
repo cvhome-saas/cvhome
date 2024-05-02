@@ -9,6 +9,7 @@ import {CategoryPage} from "@/types/category";
 import {StoreContext} from "@/types/store-context";
 import {CategoryService} from "@/services/category-service";
 import {ContentService} from "@/services/content-service";
+import {Link} from "@/navigation";
 
 export const Header = async ({storeContext, store}: { storeContext: StoreContext, store: Store }) => {
 
@@ -29,9 +30,9 @@ export const Header = async ({storeContext, store}: { storeContext: StoreContext
                     <div className="row">
                         <div className="col-xl-2 col-lg-2 col-md-6 col-4">
                             <div className="logo">
-                                <a href="/">
+                                <Link href={"/"} >
                                     <img src={store.logo.path} alt={""}/>
-                                </a>
+                                </Link>
                             </div>
                         </div>
                         <div className="col-xl-8 col-lg-8 d-none d-lg-block">

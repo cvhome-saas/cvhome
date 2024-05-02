@@ -1,19 +1,25 @@
-export default async function Team() {
+import {ProductService} from "@/services/product-service";
+import {extractStoreContext, StoreContext} from "@/types/store-context";
+import {cookies, headers} from "next/headers";
+import {Link} from "@/navigation";
+import {Product} from "@/types/product-groups";
 
+export default async function Team({params}: { params: { locale: string, 'friendly-url': string } }) {
+    const storeContext: StoreContext = extractStoreContext(headers(), cookies());
+    const product: Product = await ProductService.getProductByFriendlyUrl(storeContext, params["friendly-url"]);
     return (
         <>
-
             <div className="breadcrumb-area pt-35 pb-35 bg-gray-3">
                 <div className="container">
                     <div className="breadcrumb-content text-center"><span>
                         <span>
-                            <a aria-current="page" className="active" href="/public">Home</a>
+                            <Link href={"/"} aria-current="page" className="active">Home</Link>
                             <span>/</span>
                         </span>
                         <span>
-                        <a href={"/product/fiat"}>
-                            fiat
-                        </a>
+                        <Link href={"/product/fiat"}>
+                            {product.description.name}
+                        </Link>
                         </span>
                     </span></div>
                 </div>

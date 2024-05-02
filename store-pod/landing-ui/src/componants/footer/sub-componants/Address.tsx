@@ -1,4 +1,5 @@
 import {Store} from "@/types/store";
+import {Link} from "@/navigation";
 
 export const Address = ({store, t}: { store: Store, t: (it: string) => string }) => {
     return (
@@ -6,9 +7,9 @@ export const Address = ({store, t}: { store: Store, t: (it: string) => string })
             <div className="footer-title"><h3>{t('Address')}</h3></div>
             <div className="footer-list">
                 <ul>
-                    <li><a href="/">{store.address.address} <br/>{store.address.postalCode}</a></li>
-                    <li><a href="/">{t('Tel')}: {store.phone}</a></li>
-                    <li><a href="/">{t('E-mail')} : {store.email}</a></li>
+                    <li><Link href={"/"}>{store.address.address} <br/>{store.address.postalCode}</Link></li>
+                    <li><Link href={"/"}>{t('Tel')}: {store.phone}</Link></li>
+                    <li><Link href={"/"}>{t('E-mail')} : {store.email}</Link></li>
                 </ul>
             </div>
         </>
