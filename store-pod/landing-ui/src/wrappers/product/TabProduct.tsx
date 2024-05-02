@@ -1,20 +1,18 @@
 import {SectionTitle} from "@/componants/section-title/SectionTitle";
 import {Product, ProductGroupPage} from "@/types/product-groups";
-import {baseServiceUrl, StoreContext} from "@/types/store-context";
+import {StoreContext} from "@/types/store-context";
 import {Link} from "@/navigation";
+import {ProductService} from "@/services/product-service";
 
 export const TabProduct = async ({storeContext}: { storeContext: StoreContext }) => {
-    const response: ProductGroupPage = await fetch(`${baseServiceUrl(storeContext, 'store')}/api/v1/products/group/FEATURED_ITEMS?store=${storeContext.store}&lang=${storeContext.local}`)
-        .then((it: Response) => {
-            return it.json() as unknown as ProductGroupPage
-        })
+    const featuredItemsGroup = await ProductService.getFeaturedItemsProductGroup(storeContext)
     return (
         <div
             className={"product-area pt-100 pb-100"}>
             <div className={"container"}>
                 <SectionTitle titleText="Featured Products" positionClass="text-center"/>
                 <div className="row">
-                    <TabProductContent group={response}/>
+                    <TabProductContent group={featuredItemsGroup}/>
                 </div>
             </div>
         </div>

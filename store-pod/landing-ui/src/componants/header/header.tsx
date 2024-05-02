@@ -6,15 +6,15 @@ import {Store} from "@/types/store";
 import {NavCart} from "@/componants/header/NavCart";
 import {ContentPage} from "@/types/content";
 import {CategoryPage} from "@/types/category";
-import {baseServiceUrl, StoreContext} from "@/types/store-context";
+import {StoreContext} from "@/types/store-context";
+import {CategoryService} from "@/services/category-service";
+import {ContentService} from "@/services/content-service";
 
 export const Header = async ({storeContext, store}: { storeContext: StoreContext, store: Store }) => {
 
-    const categoriesResult: CategoryPage = await fetch(`${baseServiceUrl(storeContext, 'store')}/api/v1/category?count=20&page=0&store=${storeContext.store}&lang=${storeContext.local}`)
-        .then(it => it.json())
+    const categoriesResult: CategoryPage = await CategoryService.getCategories(storeContext);
 
-    const contentResult: ContentPage = await fetch(`${baseServiceUrl(storeContext, 'store')}/api/v1/content/pages?page=0&count=20&store=${storeContext.store}&lang=${storeContext.local}`)
-        .then(it => it.json())
+    const contentResult: ContentPage = await ContentService.getContents(storeContext);
 
     const t = await getTranslations('Nav');
     return <>

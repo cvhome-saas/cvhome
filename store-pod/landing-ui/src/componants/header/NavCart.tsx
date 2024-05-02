@@ -6,16 +6,14 @@ import {Cart} from "@/types/cart";
 import {Store} from "@/types/store";
 import {CartItems} from "@/componants/header/sub-components/CartItems";
 import {getTranslations} from "next-intl/server";
-import {baseServiceUrl, StoreContext} from "@/types/store-context";
+import {StoreContext} from "@/types/store-context";
+import {CartService} from "@/services/cart-service";
 
 export const NavCart = async ({storeContext, store}: { storeContext: StoreContext, store: Store }) => {
     const cookie: RequestCookie | undefined = cookies().get("store-ui-cart-id" as any)
     let cart: Cart | undefined;
     if (cookie) {
-        cart = await fetch(`${baseServiceUrl(storeContext, 'store')}/api/v1/cart/${cookie.value}?store=${store.code}`)
-            .then(it => it.json())
-            .then(it => it as Cart)
-
+        cart = await CartService.getCart(storeContext, cookie.value)
     }
     const t = await getTranslations('Cart');
     const x = {

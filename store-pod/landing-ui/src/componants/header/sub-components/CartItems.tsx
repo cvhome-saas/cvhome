@@ -2,8 +2,9 @@
 import {Store} from "@/types/store";
 import {Cart, Product} from "@/types/cart";
 import {Fragment, useState} from "react";
-import {baseServiceUrl, StoreContext} from "@/types/store-context";
+import {StoreContext} from "@/types/store-context";
 import {Link} from "@/navigation";
+import {CartService} from "@/services/cart-service";
 
 export const CartItems = ({storeContext, store, cart, t}: {
     storeContext: StoreContext,
@@ -17,9 +18,7 @@ export const CartItems = ({storeContext, store, cart, t}: {
 
     const [active, setActive] = useState('shopping-cart-content');
     const deleteFromCart = async (p: Product) => {
-        await fetch(`${baseServiceUrl(storeContext, 'store')}/api/v1/cart/${cart?.code}/product/${p.id}?store=${store.code}`, {
-            method: 'DELETE',
-        });
+        await CartService.removeFromCart(storeContext, cart?.code || "", p.id);
     };
     const showOrHideCart = () => {
         if (active == 'shopping-cart-content') {
