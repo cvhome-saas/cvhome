@@ -33,6 +33,7 @@ export const CartItems = ({storeContext, store, cart, t}: {
                 setQuantity(undefined);
             } else if (products.length > 1) {
                 const newCart = await CartService.getCart(storeContext, cartCode || "");
+                localStorage.setItem("store-ui-cart-data", JSON.stringify(newCart))
                 setProducts(newCart.products);
                 setDisplayTotal(newCart.displayTotal)
                 setQuantity(newCart.quantity)
