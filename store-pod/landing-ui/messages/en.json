@@ -10,6 +10,11 @@
     "Home": "Home",
     "Call-Us": "Call Us"
   },
+  "Home": {
+    "Shop Now": "Shop Now",
+    "Pitch1": "#New Collection 2022",
+    "Pitch2": "Imports from the world"
+  },
   "Footer": {
     "Subscribe": "Subscribe",
     "Address": "Address",

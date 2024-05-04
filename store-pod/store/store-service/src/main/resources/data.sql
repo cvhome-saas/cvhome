@@ -2047,8 +2047,9 @@ INSERT INTO store.product_price_description (description_id, date_created, date_
 
 INSERT INTO store.product_relationship (product_relationship_id, active, code, product_id, related_product_id, merchant_id) VALUES (1, true, 'FEATURED_ITEMS', null, null, 1);
 INSERT INTO store.product_relationship (product_relationship_id, active, code, product_id, related_product_id, merchant_id) VALUES (2, true, 'FEATURED_ITEMS', null, 1, 1);
-INSERT INTO store.product_relationship (product_relationship_id, active, code, product_id, related_product_id, merchant_id) VALUES (3, true, 'RELATED_ITEM', null, null, 1);
-INSERT INTO store.product_relationship (product_relationship_id, active, code, product_id, related_product_id, merchant_id) VALUES (4, true, 'RELATED_ITEM', null, 1, 1);
+INSERT INTO store.product_relationship (product_relationship_id, active, code, product_id, related_product_id, merchant_id) VALUES (3, true, 'FEATURED_ITEMS', null, 2, 1);
+INSERT INTO store.product_relationship (product_relationship_id, active, code, product_id, related_product_id, merchant_id) VALUES (4, true, 'RELATED_ITEM', null, null, 1);
+INSERT INTO store.product_relationship (product_relationship_id, active, code, product_id, related_product_id, merchant_id) VALUES (5, true, 'RELATED_ITEM', null, 1, 1);
 
 INSERT INTO store.product_type (product_type_id, prd_type_add_to_cart, date_created, date_modified, updt_id, prd_type_code, prd_type_visible, merchant_id) VALUES (1, null, '2024-03-31 08:45:38.000000', '2024-03-31 08:45:38.000000', null, 'GENERAL', null, 1);
 
@@ -2199,7 +2200,7 @@ INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('product_descriptio
 INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('PRODUCT_IMG_SEQ_NEXT_VAL', 2);
 INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('product_price_description_seq', 2);
 INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('PRODUCT_PRICE_SEQ_NEXT_VAL', 2);
-INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('PRODUCT_RELATION_SEQ_NEXT_VAL', 4);
+INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('PRODUCT_RELATION_SEQ_NEXT_VAL', 5);
 INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('PRODUCT_SEQ_NEXT_VAL', 2);
 INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('STORE_SEQ_NEXT_VAL', 1);
 INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('TX_CLASS_SEQ_NEXT_VAL', 1);

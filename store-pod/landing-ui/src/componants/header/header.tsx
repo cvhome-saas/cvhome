@@ -30,7 +30,7 @@ export const Header = async ({storeContext, store}: { storeContext: StoreContext
                         <div className="col-xl-2 col-lg-2 col-md-6 col-4">
                             <div className="logo">
                                 <Link href={"/"}>
-                                    <img src={store.logo.path} alt={""}/>
+                                    <img src={store.logo.path} alt={store.name}/>
                                 </Link>
                             </div>
                         </div>

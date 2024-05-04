@@ -5,8 +5,14 @@ import {CartService} from "@/services/cart-service";
 import {StoreContext} from "@/types/store-context";
 import {Cart} from "@/types/cart";
 import Cookies from "js-cookie";
+import {useState} from 'react';
+import {ProductModal} from "@/componants/product/sub-componants/ProductModal";
 
-export const ProductGridActions = ({storeContext, product}: { storeContext: StoreContext, product: Product }) => {
+export const ProductGridActions = ({storeContext, product, t}: {
+    storeContext: StoreContext,
+    product: Product,
+    t: { [key: string]: string }
+}) => {
     const onClick = () => {
         const item: string | null = localStorage.getItem("store-ui-cart-data");
         let cartCode: string | undefined;
@@ -30,6 +36,9 @@ export const ProductGridActions = ({storeContext, product}: { storeContext: Stor
             })
 
     };
+    const [show, setShow] = useState(false);
+
+
     return <div className="product-action-2">
         <Link title="Select options" href={`/product/${product.description.friendlyUrl}`}>
             <i className="fa fa-cog"></i>
@@ -37,8 +46,10 @@ export const ProductGridActions = ({storeContext, product}: { storeContext: Stor
         <button className="active" title="Add to cart" onClick={onClick}>
             <i className="fa fa-shopping-cart"></i>
         </button>
-        <button title="Quick View">
+        <button title="Quick View" onClick={() => setShow(true)}>
             <i className="fa fa-eye"></i>
         </button>
+
+        <ProductModal product={product} show={show} setShow={setShow} t={t}/>
     </div>
 }
