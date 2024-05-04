@@ -44,7 +44,10 @@ export const AddToCart = ({storeContext, addToCartType, product, t}: {
             .then(it => {
                 if (it && it.code && it.products && it.products.length > 0) {
                     Cookies.set('store-ui-cart-id', it.code);
-                    location.reload();
+                    localStorage.setItem("store-ui-cart-data", JSON.stringify(it))
+                    const elementById = document.getElementById('shopbag-count');
+                    elementById.innerHTML = it.products.length + "";
+                    elementById.className = "count-style";
                 }
                 return it;
             })

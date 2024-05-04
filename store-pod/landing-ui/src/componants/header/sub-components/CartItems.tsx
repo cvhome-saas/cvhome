@@ -1,7 +1,7 @@
 'use client'
 import {Store} from "@/types/store";
 import {Cart, Product} from "@/types/cart";
-import {Fragment, useState} from "react";
+import {Fragment, useEffect, useState} from "react";
 import {StoreContext} from "@/types/store-context";
 import {Link} from "@/navigation";
 import {CartService} from "@/services/cart-service";
@@ -13,63 +13,63 @@ export const CartItems = ({storeContext, store, cart, t}: {
     cart: Cart | undefined,
     t: { [key: string]: string }
 }) => {
-    if (cart && typeof window !== "undefined") {
-        localStorage.setItem("store-ui-cart-data", JSON.stringify(cart))
-    }
 
     const [cartCode, setCartCode] = useState(cart?.code)
     const [displayTotal, setDisplayTotal] = useState(cart?.displayTotal)
     const [quantity, setQuantity] = useState(cart?.quantity)
     const [products, setProducts] = useState(cart?.products || [])
 
+    const addRemoveCartData = (newCart: Cart | undefined) => {
+        if (newCart && newCart.code && newCart.products && newCart.products.length > 0 && typeof window !== "undefined") {
+            Cookies.set('store-ui-cart-id', newCart.code);
+            localStorage.setItem("store-ui-cart-data", JSON.stringify(newCart));
 
-    function updateCartItems(cart: Cart | undefined) {
+        } else {
+            Cookies.remove('store-ui-cart-id');
+            localStorage.removeItem("store-ui-cart-data")
+        }
+
+    }
+
+    useEffect(() => addRemoveCartData(cart));
+
+
+    const updateCartItems = (cart: Cart | undefined) => {
         if (cart && cart.code) {
-            console.log("will update")
+            setCartCode(cart.code);
             setProducts(cart.products);
             setDisplayTotal(cart.displayTotal)
             setQuantity(cart.quantity)
         } else {
-            console.log("will update")
             setCartCode(undefined);
+            setProducts([]);
             setDisplayTotal(undefined);
             setQuantity(undefined);
         }
     }
 
-    /*
-        useEffect(() => {
-            setInterval(function () {
-                console.log("ww")
-                const item: string | null = localStorage.getItem("store-ui-cart-data");
-                if (item) {
-                    const cart: Cart | undefined = JSON.parse(item) as unknown as Cart | undefined;
-                    updateCartItems(cart)
-                }
-            }, 2000);
-        });
-    */
+
+    const refreshCartView = (newCart: Cart | undefined) => {
+        addRemoveCartData(newCart)
+        updateCartItems(newCart)
+    };
 
     const deleteFromCart = async (p: Product) => {
         await CartService.removeFromCart(storeContext, cartCode || "", p.sku);
-        if (typeof window !== "undefined") {
-            if (products.length == 1 || products.length == 0) {
-                localStorage.removeItem("store-ui-cart-data");
-                Cookies.remove('store-ui-cart-id')
-                updateCartItems(undefined)
-                location.reload()
-            } else if (products.length > 1) {
-                localStorage.removeItem("store-ui-cart-data");
-                const cart = await CartService.getCart(storeContext, cartCode || "");
-                updateCartItems(cart)
-                location.reload()
-            }
-        }
+        products.length <= 1 ? refreshCartView(undefined) : refreshCartView(await CartService.getCart(storeContext, cartCode || ""))
     };
 
     const [active, setActive] = useState('shopping-cart-content');
     const showOrHideCart = () => {
         if (active == 'shopping-cart-content') {
+            const itemStr: string | undefined = localStorage.getItem("store-ui-cart-data");
+            if (itemStr) {
+                try {
+                    updateCartItems(JSON.parse(itemStr) as Cart | undefined)
+                } catch (e) {
+                }
+            }
+
             setActive('shopping-cart-content active');
         } else {
             setActive('shopping-cart-content');
@@ -79,7 +79,7 @@ export const CartItems = ({storeContext, store, cart, t}: {
         <div className="same-style cart-wrap d-none d-lg-block">
             <button className="icon-cart" onClick={showOrHideCart}>
                 <i className="pe-7s-shopbag"></i>
-                <span className={quantity && quantity > 0 ? "count-style" : ""}>{quantity}</span>
+                <span className={quantity && quantity > 0 ? "count-style" : ""} id={"shopbag-count"}>{quantity}</span>
             </button>
             <div className={active}>
                 {products.length > 0 ? (
