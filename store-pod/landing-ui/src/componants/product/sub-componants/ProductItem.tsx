@@ -4,8 +4,10 @@ import {ProductRating} from "@/componants/product/sub-componants/ProductRating";
 import {Suspense} from "react";
 import {Link} from "@/navigation";
 import {useTranslations} from "next-intl";
+import {AddToCart} from "@/componants/product/sub-componants/AddToCart";
+import {StoreContext} from "@/types/store-context";
 
-export const ProductItem = ({product}: { product: Product }) => {
+export const ProductItem = ({storeContext, product}: { storeContext: StoreContext, product: Product }) => {
     const t = useTranslations('Product');
 
     return <div className="shop-area pt-100 pb-100">
@@ -35,17 +37,8 @@ export const ProductItem = ({product}: { product: Product }) => {
                                 <div dangerouslySetInnerHTML={{__html: product.description.description}}></div>
                             </Suspense>
                         </div>
-                        <div className="pro-details-size-color"></div>
-                        <div className="pro-details-quality">
-                            <div className="cart-plus-minus">
-                                <button className="dec qtybutton">-</button>
-                                <input className="cart-plus-minus-box" type="number"/>
-                                <button className="inc qtybutton">+</button>
-                            </div>
-                            <div className="pro-details-cart btn-hover">
-                                <button> {t('Add to cart')}</button>
-                            </div>
-                        </div>
+                        <AddToCart product={product} t={{'Add to cart': 'Add to cart'}}
+                                   addToCartType={"FULL"} storeContext={storeContext}/>
                         <div className="pro-details-meta"><span>{t('SKU')} :</span>
                             <ul>
                                 <li key={"friendlyUrl"}>
