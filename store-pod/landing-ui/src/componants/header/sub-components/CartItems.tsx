@@ -50,8 +50,8 @@ export const CartItems = ({storeContext, store, cart, t}: {
 
 
     const refreshCartView = (newCart: Cart | undefined) => {
-        addRemoveCartData(newCart)
-        updateCartItems(newCart)
+        addRemoveCartData(newCart);
+        updateCartItems(newCart);
     };
 
     const deleteFromCart = async (p: Product) => {
@@ -155,7 +155,7 @@ export const CartItems = ({storeContext, store, cart, t}: {
 function defaultImage(product: Product): string {
     if (product.images && product.images.length > 0) {
         return product.images[0].imageUrl;
-    } else if (product.image != null) {
+    } else if (product.image != undefined) {
         return product.image.imageUrl;
     } else {
         return '';

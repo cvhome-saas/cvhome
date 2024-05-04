@@ -41,8 +41,8 @@ export interface Product {
     productPrice: any
     finalPrice: string
     originalPrice: string
-    image: Image
-    images: Image2[]
+    image: Image|undefined
+    images: Image[]|undefined
     subTotal: number
     displaySubTotal: string
     cartItemattributes: any[]
@@ -51,10 +51,10 @@ export interface Product {
 }
 
 export interface ProductSpecifications {
-    height: any
-    weight: any
-    length: any
-    width: any
+    height: number
+    weight: number
+    length: number
+    width: number
     model: any
     manufacturer: any
     dimensionUnitOfMeasure: any
@@ -84,16 +84,6 @@ export interface Image {
     defaultImage: boolean
 }
 
-export interface Image2 {
-    id: number
-    imageName: string
-    imageUrl: string
-    externalUrl: any
-    videoUrl: any
-    imageType: number
-    order: number
-    defaultImage: boolean
-}
 
 export interface Total {
     id: number
