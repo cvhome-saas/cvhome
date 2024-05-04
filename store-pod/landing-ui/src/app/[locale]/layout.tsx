@@ -24,7 +24,7 @@ export default async function RootLayout({
     params: { locale: string };
 
 }>) {
-    const storeContext: StoreContext = extractStoreContext(headers(), cookies());
+    const storeContext: StoreContext = extractStoreContext(headers(), cookies(), locale);
     const store: Store = await StoreService.getStore(storeContext);
     return (
         <html lang={locale}>

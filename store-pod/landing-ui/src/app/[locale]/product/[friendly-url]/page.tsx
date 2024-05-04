@@ -9,7 +9,7 @@ import ProductImageGallery from "@/componants/product/sub-componants/ProductImag
 import {Suspense} from "react";
 
 export default async function ProductPage({params}: { params: { locale: string, 'friendly-url': string } }) {
-    const storeContext: StoreContext = extractStoreContext(headers(), cookies());
+    const storeContext: StoreContext = extractStoreContext(headers(), cookies(),params.locale);
     const product: Product = await ProductService.getProductByFriendlyUrl(storeContext, params["friendly-url"]);
     const t = await getTranslations('Product');
     return (

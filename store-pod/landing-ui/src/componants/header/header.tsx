@@ -12,7 +12,6 @@ import {ContentService} from "@/services/content-service";
 import {Link} from "@/navigation";
 
 export const Header = async ({storeContext, store}: { storeContext: StoreContext, store: Store }) => {
-
     const categoriesResult: CategoryPage = await CategoryService.getCategories(storeContext);
 
     const contentResult: ContentPage = await ContentService.getContents(storeContext);
@@ -30,7 +29,7 @@ export const Header = async ({storeContext, store}: { storeContext: StoreContext
                     <div className="row">
                         <div className="col-xl-2 col-lg-2 col-md-6 col-4">
                             <div className="logo">
-                                <Link href={"/"} >
+                                <Link href={"/"}>
                                     <img src={store.logo.path} alt={""}/>
                                 </Link>
                             </div>

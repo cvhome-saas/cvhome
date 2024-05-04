@@ -3,8 +3,8 @@ import {TabProduct} from "@/wrappers/product/TabProduct";
 import {cookies, headers} from "next/headers";
 import {extractStoreContext, StoreContext} from "@/types/store-context";
 
-export default async function Home() {
-    const storeContext: StoreContext = extractStoreContext(headers(), cookies());
+export default async function Home({params}: { params: { locale: string } }) {
+    const storeContext: StoreContext = extractStoreContext(headers(), cookies(),params.locale);
 
     return (
         <>
