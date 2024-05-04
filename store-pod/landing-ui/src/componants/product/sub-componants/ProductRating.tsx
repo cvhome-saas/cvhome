@@ -2,7 +2,7 @@
 import React from "react";
 import StarRatings from "react-star-ratings";
 
-export const ProductRating = ({ratingValue}) => {
+export const ProductRating = ({ratingValue}: { ratingValue: number }) => {
     return <StarRatings
         rating={ratingValue}
         starRatedColor="#ffa900"
