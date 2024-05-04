@@ -1,4 +1,3 @@
-import PropTypes from "prop-types";
 import {Link} from "@/navigation";
 import {Category} from "@/types/category";
 import {Page} from "@/types/content";
@@ -38,17 +37,13 @@ export const NavMenu = ({
                             return (
                                 item.visible &&
                                 <li key={index}>
-                                    <Link href={"/category/" + item.description.friendlyUrl}>{item.description.name}
-                                        {item.children && item.children.length > 0 &&
-                                        sidebarMenu ? (
+                                    <Link href={"/category/" + item.description.friendlyUrl}>
+                                        {item.description.name}
+                                        {item.children && item.children.length > 0 && sidebarMenu &&
                                             <span>
-                                                <i className="fa fa-angle-right"></i>
-                                                </span>
-                                        ) : (
-                                            <i className="fa fa-angle-down"/>
-                                        )
+                                                <i className="fa fa-angle-down"></i>
+                                            </span>
                                         }
-
                                     </Link>
                                     {
                                         item.children && item.children.length > 0 &&
@@ -73,8 +68,10 @@ export const NavMenu = ({
                         contents.map((content, index) => {
                             return (
                                 content.visible && content.description &&
-                                <li key={index}><Link
-                                    href={"/content/" + content.description.friendlyUrl}> {content.description.name}</Link>
+                                <li key={index}>
+                                    <Link href={"/content/" + content.description.friendlyUrl}>
+                                        {content.description.name}
+                                    </Link>
                                 </li>
                             )
                         })
@@ -83,10 +80,4 @@ export const NavMenu = ({
             </nav>
         </div>
     );
-};
-
-NavMenu.propTypes = {
-    menuWhiteClass: PropTypes.string,
-    sidebarMenu: PropTypes.bool,
-    strings: PropTypes.object
 };
