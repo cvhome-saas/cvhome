@@ -6,6 +6,9 @@ const withNextIntl = createNextIntlPlugin();
 const nextConfig = {
     output: "standalone",
     reactStrictMode: false,
+    compiler: {
+        styledComponents: true,
+    },
 };
 
 export default withNextIntl(nextConfig);

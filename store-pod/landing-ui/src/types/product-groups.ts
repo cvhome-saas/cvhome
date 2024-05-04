@@ -34,7 +34,7 @@ export interface Product {
     originalPrice: string
     discounted: boolean
     image: Image
-    images: Image2[]
+    images: Image[]
     manufacturer: Manufacturer
     attributes: any[]
     options: any[]
@@ -67,6 +67,7 @@ export interface Description {
     highlights: string
     metaDescription: string
     title: string
+    priceAppender: any
 }
 
 export interface ProductPrice {
@@ -74,20 +75,7 @@ export interface ProductPrice {
     originalPrice: string
     finalPrice: string
     discounted: boolean
-    description: Description2
-}
-
-export interface Description2 {
-    id: number
-    language: string
-    name: any
-    description: any
-    friendlyUrl: any
-    keyWords: any
-    highlights: any
-    metaDescription: any
-    title: any
-    priceAppender: any
+    description: Description
 }
 
 export interface Image {
@@ -101,35 +89,14 @@ export interface Image {
     defaultImage: boolean
 }
 
-export interface Image2 {
-    id: number
-    imageName: string
-    imageUrl: string
-    externalUrl: any
-    videoUrl: any
-    imageType: number
-    order: number
-    defaultImage: boolean
-}
 
 export interface Manufacturer {
     id: number
     code: string
     order: number
-    description: Description3
+    description: Description
 }
 
-export interface Description3 {
-    id: number
-    language: any
-    name: string
-    description: any
-    friendlyUrl: any
-    keyWords: any
-    highlights: any
-    metaDescription: any
-    title: any
-}
 
 export interface Category {
     id: number
@@ -140,7 +107,7 @@ export interface Category {
     lineage: string
     depth: number
     parent?: Parent
-    description: Description4
+    description: Description
     productCount: number
     store: any
     children: any[]
@@ -149,16 +116,4 @@ export interface Category {
 export interface Parent {
     id: number
     code: string
-}
-
-export interface Description4 {
-    id: number
-    language: any
-    name: string
-    description: string
-    friendlyUrl: string
-    keyWords: any
-    highlights: string
-    metaDescription: string
-    title: string
 }

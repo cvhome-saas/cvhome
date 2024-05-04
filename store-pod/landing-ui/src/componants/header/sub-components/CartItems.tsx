@@ -6,6 +6,7 @@ import {StoreContext} from "@/types/store-context";
 import {Link} from "@/navigation";
 import {CartService} from "@/services/cart-service";
 import Cookies from "js-cookie";
+import StarRatings from "react-star-ratings";
 
 export const CartItems = ({storeContext, store, cart, t}: {
     storeContext: StoreContext,

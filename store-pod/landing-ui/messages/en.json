@@ -33,6 +33,18 @@
     "Total": "Total",
     "Qty": "Qty"
   },
+  "Product": {
+    "Home": "Home",
+    "SKU": "SKU",
+    "Add to cart": "Add to cart",
+    "Categories": "Categories",
+    "Description": "Description",
+    "Reviews": "Reviews",
+    "Weight": "Weight",
+    "Add a Review": "Add a Review",
+    "No items found in reviews": "No items found in reviews",
+    "Returning customer ? Click here to login": "Returning customer ? Click here to login"
+  },
   "Metadata": {
     "Home": "Home",
     "Terms and Policy": "Terms and Policy",

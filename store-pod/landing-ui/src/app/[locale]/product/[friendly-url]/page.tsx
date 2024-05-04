@@ -3,21 +3,26 @@ import {extractStoreContext, StoreContext} from "@/types/store-context";
 import {cookies, headers} from "next/headers";
 import {Link} from "@/navigation";
 import {Product} from "@/types/product-groups";
+import {ProductRating} from "@/componants/product/sub-componants/ProductRating";
+import {getTranslations} from "next-intl/server";
+import ProductImageGallery from "@/componants/product/sub-componants/ProductImageGallery";
+import {Suspense} from "react";
 
-export default async function Team({params}: { params: { locale: string, 'friendly-url': string } }) {
+export default async function ProductPage({params}: { params: { locale: string, 'friendly-url': string } }) {
     const storeContext: StoreContext = extractStoreContext(headers(), cookies());
     const product: Product = await ProductService.getProductByFriendlyUrl(storeContext, params["friendly-url"]);
+    const t = await getTranslations('Product');
     return (
         <>
             <div className="breadcrumb-area pt-35 pb-35 bg-gray-3">
                 <div className="container">
                     <div className="breadcrumb-content text-center"><span>
                         <span>
-                            <Link href={"/"} aria-current="page" className="active">Home</Link>
+                            <Link href={"/"} aria-current="page" className="active">{t('Home')}</Link>
                             <span>/</span>
                         </span>
                         <span>
-                        <Link href={"/product/fiat"}>
+                        <Link href={`/product/${product.description.friendlyUrl}`}>
                             {product.description.name}
                         </Link>
                         </span>
@@ -30,186 +35,29 @@ export default async function Team({params}: { params: { locale: string, 'friend
                 <div className="container">
                     <div className="row">
                         <div className="col-lg-6 col-md-6">
-                            <div className="product-large-image-wrapper">
-                                <div
-                                    className="swiper-container swiper-container-fade swiper-container-initialized swiper-container-horizontal">
-                                    <div className="swiper-wrapper">
-                                        <div className="swiper-slide swiper-slide-active"
-                                             style={{
-                                                 width: '570px',
-                                                 opacity: '1',
-                                                 transform: 'translate3d(0px, 0px, 0px)'
-                                             }}>
-                                            <div className="react_lightgallery_item">
-                                                <button><i className="pe-7s-expand1"></i></button>
-                                            </div>
-                                            <div className="single-image"><img
-                                                src="http://localhost:8080/static/products/DEFAULT/fiat/SMALL/500_333.jpeg"
-                                                className="img-fluid" alt=""/></div>
-                                        </div>
-                                    </div>
-                                    <span className="swiper-notification" aria-live="assertive"
-                                          aria-atomic="true"></span></div>
-                            </div>
+                            <ProductImageGallery images={product.images}/>
                             <div className="product-small-image-wrapper mt-15"></div>
                         </div>
                         <div className="col-lg-6 col-md-6">
-                            <div className="product-details-content ml-70"><h2>fiat</h2>
-                                <div className="product-details-price"><span>CA$200.00 </span></div>
+                            <div className="product-details-content ml-70">
+                                <h2>
+                                    {product.description.name}
+                                </h2>
+                                <div className="product-details-price">
+                                    <span>
+                                        {product.productPrice.finalPrice}
+                                    </span>
+                                </div>
                                 <div className="pro-details-rating-wrap">
                                     <div className="pro-details-rating">
-                                        <div className="star-ratings" title="0 Stars"
-                                             style={{
-                                                 position: 'relative',
-                                                 'boxSizing': 'border-box',
-                                                 display: 'inline-block'
-                                             }}>
-                                            <svg className="star-grad"
-                                                 style={{
-                                                     position: 'absolute',
-                                                     'zIndex': '0',
-                                                     width: '0px',
-                                                     height: '0px',
-                                                     visibility: 'hidden'
-                                                 }}>
-                                                <defs>
-                                                    <linearGradient id="starGrad855087849839331" x1="0%" y1="0%"
-                                                                    x2="100%" y2="0%">
-                                                        <stop offset="0%" className="stop-color-first"
-                                                              style={{
-                                                                  'stopColor': 'rgb(255, 169, 0)',
-                                                                  'stopOpacity': '1'
-                                                              }}></stop>
-                                                        <stop offset="0%" className="stop-color-first"
-                                                              style={{
-                                                                  'stopColor': 'rgb(255, 169, 0)',
-                                                                  'stopOpacity': '1'
-                                                              }}></stop>
-                                                        <stop offset="0%" className="stop-color-final"
-                                                              style={{
-                                                                  'stopColor': 'rgb(203, 211, 227)',
-                                                                  'stopOpacity': '1'
-                                                              }}></stop>
-                                                        <stop offset="100%" className="stop-color-final"
-                                                              style={{
-                                                                  'stopColor': 'rgb(203, 211, 227)',
-                                                                  'stopOpacity': '1'
-                                                              }}></stop>
-                                                    </linearGradient>
-                                                </defs>
-                                            </svg>
-                                            <div className="star-container"
-                                                 style={{
-                                                     'position': 'relative',
-                                                     'display': 'inline-block',
-                                                     'verticalAlign': 'middle',
-                                                     'paddingRight': '1px'
-                                                 }}>
-                                                <svg viewBox="0 0 51 48" className="widget-svg"
-                                                     style={{
-                                                         'width': '17px',
-                                                         'height': '17px',
-                                                         'transition': 'transform 0.2s ease-in-out 0s'
-                                                     }}>
-                                                    <path className="star"
-                                                          d="m25,1 6,17h18l-14,11 5,17-15-10-15,10 5-17-14-11h18z"
-                                                          style={{
-                                                              'fill': 'rgb(203, 211, 227)',
-                                                              'transition': 'fill 0.2s ease-in-out 0s'
-                                                          }}></path>
-                                                </svg>
-                                            </div>
-                                            <div className="star-container"
-                                                 style={{
-                                                     'position': 'relative',
-                                                     'display': 'inline-block',
-                                                     'verticalAlign': 'middle',
-                                                     'paddingLeft': '1px',
-                                                     'paddingRight': '1px'
-                                                 }}>
-                                                <svg viewBox="0 0 51 48" className="widget-svg"
-                                                     style={{
-                                                         'width': '17px',
-                                                         'height': '17px',
-                                                         'transition': 'transform 0.2s ease-in-out 0s'
-                                                     }}>
-                                                    <path className="star"
-                                                          d="m25,1 6,17h18l-14,11 5,17-15-10-15,10 5-17-14-11h18z"
-                                                          style={{
-                                                              'fill': 'rgb(203, 211, 227)',
-                                                              'transition': 'fill 0.2s ease-in-out 0s'
-                                                          }}></path>
-                                                </svg>
-                                            </div>
-                                            <div className="star-container"
-                                                 style={{
-                                                     'position': 'relative',
-                                                     'display': 'inline-block',
-                                                     'verticalAlign': 'middle',
-                                                     'paddingLeft': '1px',
-                                                     'paddingRight': '1px'
-                                                 }}>
-                                                <svg viewBox="0 0 51 48" className="widget-svg"
-                                                     style={{
-                                                         'width': '17px',
-                                                         'height': '17px',
-                                                         'transition': 'transform 0.2s ease-in-out 0s'
-                                                     }}>
-                                                    <path className="star"
-                                                          d="m25,1 6,17h18l-14,11 5,17-15-10-15,10 5-17-14-11h18z"
-                                                          style={{
-                                                              'fill': 'rgb(203, 211, 227)',
-                                                              'transition': 'fill 0.2s ease-in-out 0s'
-                                                          }}></path>
-                                                </svg>
-                                            </div>
-                                            <div className="star-container"
-                                                 style={{
-                                                     'position': 'relative',
-                                                     'display': 'inline-block',
-                                                     'verticalAlign': 'middle',
-                                                     'paddingLeft': '1px',
-                                                     'paddingRight': '1px'
-                                                 }}>
-                                                <svg viewBox="0 0 51 48" className="widget-svg"
-                                                     style={{
-                                                         'width': '17px',
-                                                         'height': '17px',
-                                                         'transition': 'transform 0.2s ease-in-out 0s'
-                                                     }}>
-                                                    <path className="star"
-                                                          d="m25,1 6,17h18l-14,11 5,17-15-10-15,10 5-17-14-11h18z"
-                                                          style={{
-                                                              'fill': 'rgb(203, 211, 227)',
-                                                              'transition': 'fill 0.2s ease-in-out 0s'
-                                                          }}></path>
-                                                </svg>
-                                            </div>
-                                            <div className="star-container"
-                                                 style={{
-                                                     'position': 'relative',
-                                                     'display': 'inline-block',
-                                                     'verticalAlign': 'middle',
-                                                     'paddingLeft': '1px'
-                                                 }}>
-                                                <svg viewBox="0 0 51 48" className="widget-svg"
-                                                     style={{
-                                                         'width': '17px',
-                                                         'height': '17px',
-                                                         'transition': 'transform 0.2s ease-in-out 0s'
-                                                     }}>
-                                                    <path className="star"
-                                                          d="m25,1 6,17h18l-14,11 5,17-15-10-15,10 5-17-14-11h18z"
-                                                          style={{
-                                                              'fill': 'rgb(203, 211, 227)',
-                                                              'transition': 'fill 0.2s ease-in-out 0s'
-                                                          }}></path>
-                                                </svg>
-                                            </div>
-                                        </div>
+                                        <ProductRating ratingValue={product.rating}/>
                                     </div>
                                 </div>
-                                <div className="pro-details-list"><p></p></div>
+                                <div className="pro-details-list">
+                                    <Suspense>
+                                        <div dangerouslySetInnerHTML={{__html: product.description.description}}></div>
+                                    </Suspense>
+                                </div>
                                 <div className="pro-details-size-color"></div>
                                 <div className="pro-details-quality">
                                     <div className="cart-plus-minus">
@@ -218,17 +66,29 @@ export default async function Team({params}: { params: { locale: string, 'friend
                                         <button className="inc qtybutton">+</button>
                                     </div>
                                     <div className="pro-details-cart btn-hover">
-                                        <button> Add to cart</button>
+                                        <button> {t('Add to cart')}</button>
                                     </div>
                                 </div>
-                                <div className="pro-details-meta"><span>SKU :</span>
+                                <div className="pro-details-meta"><span>{t('SKU')} :</span>
                                     <ul>
-                                        <li><a href="/public">fiat</a></li>
+                                        <li key={"friendlyUrl"}>
+                                            <Link href={`/product/${product.description.friendlyUrl}`}>
+                                                {product.description.name}
+                                            </Link>
+                                        </li>
                                     </ul>
                                 </div>
-                                <div className="pro-details-meta"><span>Categories :</span>
+                                <div className="pro-details-meta"><span>{t('Categories')} :</span>
                                     <ul>
-                                        <li><a href="/category/cars">cars</a></li>
+                                        {
+                                            product.categories.map(it => {
+                                                return (<li key={it.id}>
+                                                    <Link href={`/category/${it.description.friendlyUrl}`}>
+                                                        {it.description.name}
+                                                    </Link>
+                                                </li>)
+                                            })
+                                        }
                                     </ul>
                                 </div>
                             </div>
@@ -241,13 +101,17 @@ export default async function Team({params}: { params: { locale: string, 'friend
                 <div className="container">
                     <div className="description-review-wrapper">
                         <div className="description-review-topbar nav nav-pills" role="tablist">
-                            <div className="nav-item"><a href="#" role="tab" data-rb-event-key="productDescription"
-                                                         aria-selected="true"
-                                                         className="nav-link active">Description</a></div>
                             <div className="nav-item">
-                                <a href="#" role="tab" data-rb-event-key="productReviews"
-                                   tabIndex={-1} aria-selected="false"
-                                   className="nav-link">Reviews(0)</a>
+                                <a href="#" role="tab" data-rb-event-key="productDescription" aria-selected="true"
+                                   className="nav-link active">
+                                    {t('Description')}
+                                </a>
+                            </div>
+                            <div className="nav-item">
+                                <a href="#" role="tab" data-rb-event-key="productReviews" tabIndex={-1}
+                                   aria-selected="false" className="nav-link">
+                                    {t('Reviews')}(0)
+                                </a>
                             </div>
                         </div>
                         <div className="description-review-bottom tab-content">
@@ -262,12 +126,14 @@ export default async function Team({params}: { params: { locale: string, 'friend
                                         <div className="item-empty-area text-center">
                                             <div className="item-empty-area__icon mb-30"><i className="pe-7s-star"></i>
                                             </div>
-                                            <div className="item-empty-area__text">No items found in reviews<br/></div>
+                                            <div className="item-empty-area__text">{t('No items found in reviews')}<br/>
+                                            </div>
                                         </div>
                                     </div>
                                     <div className="col-lg-5">
-                                        <div className="checkout-heading"><a href="/login">Returning customer ? Click
-                                            here to login</a></div>
+                                        <div className="checkout-heading">
+                                            <a href="/login">{t('Returning customer ? Click here to login')}</a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
