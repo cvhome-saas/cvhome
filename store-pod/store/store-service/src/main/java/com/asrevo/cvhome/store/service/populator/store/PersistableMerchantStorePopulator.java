@@ -66,6 +66,10 @@ public class PersistableMerchantStorePopulator extends AbstractDataPopulator<Per
             target.setStoreLogo(store.getStoreLogo());
         }
 
+        if (store.getStoreBanner() != null) {
+            target.setStoreBanner(store.getStoreBanner());
+        }
+
         if (!StringUtils.isEmpty(source.getInBusinessSince())) {
             try {
                 Date dt = DateUtil.getDate(source.getInBusinessSince());

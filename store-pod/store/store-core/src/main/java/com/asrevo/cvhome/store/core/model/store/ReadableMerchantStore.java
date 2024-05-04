@@ -25,6 +25,7 @@ public class ReadableMerchantStore extends MerchantStoreEntity implements Readab
     private String currentUserLanguage;
     private ReadableAddress address;
     private ReadableImage logo;
+    private ReadableImage banner;
     private ReadableAudit audit;
     private ReadableMerchantStore parent;
 

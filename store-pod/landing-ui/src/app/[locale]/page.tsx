@@ -4,9 +4,11 @@ import {cookies, headers} from "next/headers";
 import {extractStoreContext, StoreContext} from "@/types/store-context";
 import {getTranslations} from "next-intl/server";
 import {Link} from "@/navigation";
+import {StoreService} from "@/services/store-service";
 
 export default async function Home({params}: { params: { locale: string } }) {
     const storeContext: StoreContext = extractStoreContext(headers(), cookies(), params.locale);
+    const store = await StoreService.getStore(storeContext);
     const t = await getTranslations("Home");
     return (
         <>
@@ -31,22 +33,13 @@ export default async function Home({params}: { params: { locale: string } }) {
                             </div>
                         </div>
                         <div className="col-md-8 order-1 align-self-end">
-                            <img src="assets/img/banner/table.png" alt="banner" className="img-fluid"/>
+                            <img src={store.banner.path} alt={store.banner.path} className="img-fluid"/>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div className="support-area hm9-section-padding pt-50 pb-40 ">
-                <div>
-                    <div className="row">
-                        <div className="col-lg-2"></div>
-                        <div className="col-lg-8"><img src="/assets/img/promo/promo.png" alt="promo20" width="1200"/>
-                        </div>
-                        <div className="col-lg-2"></div>
-                    </div>
-                </div>
-            </div>
+
             <TabProduct storeContext={storeContext}/>
             <NewsLetter/>
         </>

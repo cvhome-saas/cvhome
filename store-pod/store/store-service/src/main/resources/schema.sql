@@ -159,6 +159,7 @@ create table if not exists store.merchant_store
     seizeunitcode            varchar(5),
     store_email              varchar(60)  not null,
     store_logo               varchar(100),
+    store_banner             varchar(100),
     store_template           varchar(25),
     store_address            varchar(255),
     store_city               varchar(100),

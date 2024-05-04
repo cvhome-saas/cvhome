@@ -115,6 +115,9 @@ public class MerchantStore extends SalesManagerEntity<Integer, MerchantStore> im
     @Column(name = "STORE_LOGO", length = 100)
     private String storeLogo;
     @JsonIgnore
+    @Column(name = "STORE_BANNER", length = 100)
+    private String storeBanner;
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY, targetEntity = Currency.class)
     @JoinColumn(name = "CURRENCY_ID", nullable = false)
     private Currency currency;

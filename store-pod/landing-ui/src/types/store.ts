@@ -16,6 +16,7 @@ export interface Store {
     currentUserLanguage: any
     address: Address
     logo: Logo
+    banner: Logo
     parent: any
     supportedLanguages: SupportedLanguage[]
     readableAudit: ReadableAudit

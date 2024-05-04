@@ -106,6 +106,10 @@ public interface StoreFacade {
      * Delete store logo
      */
     void deleteLogo(String code);
+    /**
+     * Delete store logo
+     */
+    void deleteBanner(String code);
 
     /**
      * Add MerchantStore logo
@@ -114,6 +118,14 @@ public interface StoreFacade {
      * @param cmsContentImage
      */
     void addStoreLogo(String code, InputContentFile cmsContentImage);
+
+    /**
+     * Add MerchantStore banner
+     *
+     * @param code
+     * @param cmsContentImage
+     */
+    void addStoreBanner(String code, InputContentFile cmsContentImage);
 
     /**
      * Returns store id, code and name only

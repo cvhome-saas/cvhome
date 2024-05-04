@@ -292,6 +292,11 @@ public class StoreFacadeImpl implements StoreFacade {
             ReadableImage image = createReadableImage(mStore.getStoreLogo(), imagePath);
             readableBrand.setLogo(image);
         }
+        if (!StringUtils.isEmpty(mStore.getStoreBanner())) {
+            String imagePath = imageUtils.buildStoreBannerFilePath(mStore);
+            ReadableImage image = createReadableImage(mStore.getStoreBanner(), imagePath);
+            readableBrand.setBanner(image);
+        }
         List<MerchantConfigEntity> merchantConfigTOs = getMerchantConfigEntities(mStore);
         readableBrand.getSocialNetworks().addAll(merchantConfigTOs);
         return readableBrand;
@@ -359,6 +364,22 @@ public class StoreFacadeImpl implements StoreFacade {
     }
 
     @Override
+    public void deleteBanner(String code) {
+        MerchantStore store = getByCode(code);
+        String image = store.getStoreBanner();
+        store.setStoreBanner(null);
+
+        try {
+            updateMerchantStore(store);
+            if (!StringUtils.isEmpty(image)) {
+                contentService.removeFile(store.getCode(), image);
+            }
+        } catch (ServiceException e) {
+            throw new ServiceRuntimeException(e.getMessage());
+        }
+    }
+
+    @Override
     public MerchantStore getByCode(String code) {
         return getMerchantStoreByCode(code);
     }
@@ -371,9 +392,25 @@ public class StoreFacadeImpl implements StoreFacade {
         addLogoToStore(code, cmsContentImage);
     }
 
+    @Override
+    public void addStoreBanner(String code, InputContentFile cmsContentImage) {
+        MerchantStore store = getByCode(code);
+        store.setStoreBanner(cmsContentImage.getFileName());
+        saveMerchantStore(store);
+        addBannerToStore(code, cmsContentImage);
+    }
+
     private void addLogoToStore(String code, InputContentFile cmsContentImage) {
         try {
             contentService.addLogo(code, cmsContentImage);
+        } catch (ServiceException e) {
+            throw new ServiceRuntimeException(e);
+        }
+    }
+
+    private void addBannerToStore(String code, InputContentFile cmsContentImage) {
+        try {
+            contentService.addBanner(code, cmsContentImage);
         } catch (ServiceException e) {
             throw new ServiceRuntimeException(e);
         }

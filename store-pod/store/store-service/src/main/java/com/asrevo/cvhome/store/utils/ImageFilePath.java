@@ -90,6 +90,14 @@ public interface ImageFilePath {
     String buildStoreLogoFilePath(MerchantStore store);
 
     /**
+     * Builds a merchant store logo path
+     *
+     * @param store
+     * @return
+     */
+    String buildStoreBannerFilePath(MerchantStore store);
+
+    /**
      * Builds product property image url path
      *
      * @param store

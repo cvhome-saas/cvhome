@@ -129,6 +129,15 @@ public class ReadableMerchantStorePopulator extends
             target.setLogo(image);
         }
 
+        if (!StringUtils.isBlank(source.getStoreBanner())) {
+            ReadableImage image = new ReadableImage();
+            image.setName(source.getStoreBanner());
+            if (filePath != null) {
+                image.setPath(filePath.buildStoreBannerFilePath(source));
+            }
+            target.setBanner(image);
+        }
+
         address.setPostalCode(source.getStorepostalcode());
 
         target.setAddress(address);

@@ -164,6 +164,17 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
     }
 
     @Override
+    public void addBanner(String merchantStoreCode, InputContentFile cmsContentImage) throws ServiceException {
+
+        Assert.notNull(merchantStoreCode, "Merchant store Id can not be null");
+        Assert.notNull(cmsContentImage, "CMSContent image can not be null");
+
+        cmsContentImage.setFileContentType(FileContentType.BANNER);
+        addImage(merchantStoreCode, cmsContentImage);
+
+    }
+
+    @Override
     public void addOptionImage(String merchantStoreCode, InputContentFile cmsContentImage) throws ServiceException {
 
         Assert.notNull(merchantStoreCode, "Merchant store Id can not be null");
