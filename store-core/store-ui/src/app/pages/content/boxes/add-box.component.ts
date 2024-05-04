@@ -54,13 +54,24 @@ export class AddBoxComponent implements OnInit {
   ) {
   }
 
+  get code() {
+    return this.form.get('code');
+  }
+
+  get descriptions(): FormArray {
+    return <FormArray>this.form.get('descriptions');
+  }
+
+  get selectedLanguage() {
+    return this.form.get('selectedLanguage');
+  }
+
   param() {
     return {
       store: this.store,
       lang: "_all"
     };
   }
-
 
   ngOnInit() {
     this.loader = true;
@@ -77,6 +88,47 @@ export class AddBoxComponent implements OnInit {
     this.createForm();
   }
 
+  public findInvalidControls() {
+    const invalid = [];
+    const controls = this.form.controls;
+    for (const name in controls) {
+      if (controls[name].invalid) {
+        invalid.push(name);
+      }
+    }
+    return invalid;
+  }
+
+  selectLanguage(lang) {
+    this.form.patchValue({
+      selectedLanguage: lang,
+    });
+    this.currentLanguage = lang;
+  }
+
+  goToBack() {
+    this.router.navigate(['/pages/content/boxes/list']);
+  }
+
+  customButton(context) {
+    const me = this;
+    const ui = $.summernote.ui;
+    const button = ui.button({
+      contents: '<i class="note-icon-picture"></i>',
+      tooltip: 'Gallery',
+      container: '.note-editor',
+      className: 'note-btn',
+      click: function () {
+        me.dialogService.open(ImageBrowserComponent, {
+          context: {
+            store: me.store
+          }
+        }).onClose.subscribe(name => name && context.invoke('editor.pasteHTML', '<img src="' + name + '">'));
+      }
+    });
+    return button.render();
+  }
+
   private getLanguages() {
     this.configService.getListOfSupportedLanguages(this.store)
       .subscribe({
@@ -91,8 +143,6 @@ export class AddBoxComponent implements OnInit {
         },
       });
   }
-
-
 
   private loadContent() {
     const box = this.crudService.get('/store/api/v1/private/content/boxes/' + this.uniqueCode, this.param()).subscribe(data => {
@@ -161,7 +211,7 @@ export class AddBoxComponent implements OnInit {
   private checkCode(event) {
     //check if box code already exists
     const code = event.target.value.trim();
-    this.crudService.get('/store/api/v1/private/content/box/' + code + '/exists?store='+this.store, this.param())
+    this.crudService.get('/store/api/v1/private/content/box/' + code + '/exists?store=' + this.store, this.param())
       .subscribe(res => {
         this.isCodeExists = res.exists;
       });
@@ -237,7 +287,7 @@ export class AddBoxComponent implements OnInit {
 
     if (object.id > 0) {//update
       //set content name required field
-      this.crudService.put('/store/api/v1/private/content/box/' + this.content.id+'?store='+this.store, object, this.param())
+      this.crudService.put('/store/api/v1/private/content/box/' + this.content.id + '?store=' + this.store, object, this.param())
         .subscribe(data => {
           this.loader = false;
           this.toastr.success(this.translate.instant('CONTENT.CONTENT_UPDATED'));
@@ -249,7 +299,7 @@ export class AddBoxComponent implements OnInit {
 
     } else {
 
-      this.crudService.post('/store/api/v1/private/content/box?store='+this.store, object)
+      this.crudService.post('/store/api/v1/private/content/box?store=' + this.store, object)
         .subscribe(data => {
           this.loader = false;
           this.toastr.success(this.translate.instant('PRODUCT.PRODUCT_UPDATED'));
@@ -261,61 +311,5 @@ export class AddBoxComponent implements OnInit {
 
     }
     this.loader = false;
-  }
-
-
-  public findInvalidControls() {
-    const invalid = [];
-    const controls = this.form.controls;
-    for (const name in controls) {
-      if (controls[name].invalid) {
-        invalid.push(name);
-      }
-    }
-    return invalid;
-  }
-
-  get code() {
-    return this.form.get('code');
-  }
-
-  get descriptions(): FormArray {
-    return <FormArray>this.form.get('descriptions');
-  }
-
-  get selectedLanguage() {
-    return this.form.get('selectedLanguage');
-  }
-
-
-  selectLanguage(lang) {
-    this.form.patchValue({
-      selectedLanguage: lang,
-    });
-    this.currentLanguage = lang;
-  }
-
-
-  goToBack() {
-    this.router.navigate(['/pages/content/boxes/list']);
-  }
-
-  customButton(context) {
-    const me = this;
-    const ui = $.summernote.ui;
-    const button = ui.button({
-      contents: '<i class="note-icon-picture"></i>',
-      tooltip: 'Gallery',
-      container: '.note-editor',
-      className: 'note-btn',
-      click: function () {
-        me.dialogService.open(ImageBrowserComponent, {
-          context: {
-            store: me.store
-          }
-        }).onClose.subscribe(name => name && context.invoke('editor.pasteHTML', '<img src="' + name + '">'));
-      }
-    });
-    return button.render();
   }
 }

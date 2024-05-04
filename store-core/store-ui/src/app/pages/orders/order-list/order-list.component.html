@@ -1,8 +1,8 @@
 <nb-card class="page-card inner_pages">
-  <nb-card-body [nbSpinner]="loadingList" nbSpinnerSize="large" nbSpinnerStatus="primary" class="orderList">
+  <nb-card-body [nbSpinner]="loadingList" class="orderList" nbSpinnerSize="large" nbSpinnerStatus="primary">
     <div class="inner_pages_legacy">
       <nb-card-header class="main_header">
-        <h1 class="page_title">{{ 'COMPONENTS.ORDERS' | translate}}</h1>
+        <h1 class="page_title">{{ 'COMPONENTS.ORDERS' | translate }}</h1>
         <div class="content_spacing_empty"></div>
       </nb-card-header>
 
@@ -15,76 +15,76 @@
         </div>
       </form>
       <ngx-datatable
-        class="material"
-        [rows]="rows"
+        (page)="setPage($event)"
         [columnMode]="ColumnMode.force"
-        [headerHeight]="50"
-        [footerHeight]="50"
-        rowHeight="auto"
-        [externalPaging]="true"
         [count]="page.totalElements"
-        [offset]="page.pageNumber"
+        [externalPaging]="true"
+        [footerHeight]="50"
+        [headerHeight]="50"
         [limit]="page.size"
-        (page)="setPage($event)">
+        [offset]="page.pageNumber"
+        [rows]="rows"
+        class="material"
+        rowHeight="auto">
 
 
         <ngx-datatable-column name="Id">
-          <ng-template let-column="column" ngx-datatable-header-template> {{'COMMON.ID' |translate}} </ng-template>
+          <ng-template let-column="column" ngx-datatable-header-template> {{ 'COMMON.ID' |translate }}</ng-template>
           <ng-template let-value="value" ngx-datatable-cell-template>
             <strong>{{ value }}</strong>
           </ng-template>
         </ngx-datatable-column>
         <ngx-datatable-column name="CustomerName">
-          <ng-template let-column="column"  ngx-datatable-header-template>
-            {{'ORDER.CUSTOMER_NAME' |translate}}
+          <ng-template let-column="column" ngx-datatable-header-template>
+            {{ 'ORDER.CUSTOMER_NAME' |translate }}
           </ng-template>
           <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-            {{row.billing.firstName +'   '+ row.billing.lastName}}
+            {{ row.billing.firstName + '   ' + row.billing.lastName }}
           </ng-template>
         </ngx-datatable-column>
         <ngx-datatable-column name="CustomerPhone">
-          <ng-template let-column="column"  ngx-datatable-header-template>
-            {{'ORDER.CUSTOMER_PHONE' |translate}}
+          <ng-template let-column="column" ngx-datatable-header-template>
+            {{ 'ORDER.CUSTOMER_PHONE' |translate }}
           </ng-template>
           <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-            {{row.billing.phone}}
+            {{ row.billing.phone }}
           </ng-template>
         </ngx-datatable-column>
         <ngx-datatable-column name="CustomerEmail">
-          <ng-template let-column="column"  ngx-datatable-header-template>
-            {{'ORDER.CUSTOMER_EMAIL' |translate}}
+          <ng-template let-column="column" ngx-datatable-header-template>
+            {{ 'ORDER.CUSTOMER_EMAIL' |translate }}
           </ng-template>
           <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-            {{row.billing.email}}
+            {{ row.billing.email }}
           </ng-template>
         </ngx-datatable-column>
         <ngx-datatable-column name="total">
-          <ng-template let-column="column"  ngx-datatable-header-template>
-            {{'ORDER.TOTAL' |translate}}
+          <ng-template let-column="column" ngx-datatable-header-template>
+            {{ 'ORDER.TOTAL' |translate }}
           </ng-template>
           <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-            {{row.total.value}}
+            {{ row.total.value }}
           </ng-template>
         </ngx-datatable-column>
         <ngx-datatable-column name="datePurchased">
-          <ng-template let-column="column"  ngx-datatable-header-template>
-            {{'ORDER.ORDER_DATE' |translate}}
+          <ng-template let-column="column" ngx-datatable-header-template>
+            {{ 'ORDER.ORDER_DATE' |translate }}
           </ng-template>
           <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-            {{row.datePurchased}}
+            {{ row.datePurchased }}
           </ng-template>
         </ngx-datatable-column>
         <ngx-datatable-column name="orderStatus">
-          <ng-template let-column="column"  ngx-datatable-header-template>
-            {{'ORDER.STATUS' |translate}}
+          <ng-template let-column="column" ngx-datatable-header-template>
+            {{ 'ORDER.STATUS' |translate }}
           </ng-template>
           <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-            {{row.orderStatus}}
+            {{ row.orderStatus }}
           </ng-template>
         </ngx-datatable-column>
         <ngx-datatable-column name="actions">
-          <ng-template let-column="column"  ngx-datatable-header-template>
-            {{'ORDER.ACTIONS' |translate}}
+          <ng-template let-column="column" ngx-datatable-header-template>
+            {{ 'ORDER.ACTIONS' |translate }}
           </ng-template>
           <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
             <a [routerLink]="['/pages/orders/order-details',params.store+'-'+row.id]"><i class="nb-edit"></i></a>

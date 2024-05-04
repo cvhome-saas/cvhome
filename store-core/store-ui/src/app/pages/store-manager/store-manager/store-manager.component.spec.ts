@@ -1,6 +1,6 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { StoreManagerComponent } from './store-manager.component';
+import {StoreManagerComponent} from './store-manager.component';
 
 describe('StoreManagerComponent', () => {
   let component: StoreManagerComponent;

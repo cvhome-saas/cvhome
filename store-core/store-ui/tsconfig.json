@@ -11,7 +11,6 @@
     "typeRoots": [
       "node_modules/@types"
     ],
-
     "target": "ES2022",
     "module": "ES2022",
     "useDefineForClassFields": false,
@@ -19,11 +18,10 @@
       "ES2022",
       "dom"
     ],
-
     "plugins": [
       {
         "name": "tslint-language-service"
       }
-    ],
+    ]
   }
 }

@@ -1,8 +1,8 @@
-import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
+import {NgModule} from '@angular/core';
+import {Routes, RouterModule} from '@angular/router';
 
-import { CustomersComponent } from './customer.component';
-import { ListComponent } from './customer/list.component';
+import {CustomersComponent} from './customer.component';
+import {ListComponent} from './customer/list.component';
 //import { AddComponent } from './customer/add.component';
 // import { SetCredentialsComponent } from './set-credentials/set-credentials.component';
 // import { OptionListComponent } from './options/list.component';
@@ -20,13 +20,13 @@ const routes: Routes = [{
       component: ListComponent,
     },
 //    {
- //     path: 'add',
-  //    component: AddComponent,
- //   },
- //   {
- //     path: 'set-credentials',
- //     component: SetCredentialsComponent,
- //   }
+    //     path: 'add',
+    //    component: AddComponent,
+    //   },
+    //   {
+    //     path: 'set-credentials',
+    //     component: SetCredentialsComponent,
+    //   }
     // {
     //   path: 'option/list',
     //   component: OptionListComponent,
@@ -58,7 +58,8 @@ const routes: Routes = [{
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule],
 })
-export class CustomersRoutingModule { }
+export class CustomersRoutingModule {
+}
 
 export const routedComponents = [
   CustomersComponent,

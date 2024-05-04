@@ -1,10 +1,10 @@
-import { Component, Input } from '@angular/core';
+import {Component, Input} from '@angular/core';
 
-import { TranslateService } from '@ngx-translate/core';
+import {TranslateService} from '@ngx-translate/core';
 import {NbToastrService} from '@nebular/theme';
-import { UserService } from '../../shared/services/user.service';
-import { StorageService } from '../../shared/services/storage.service';
-import { NbDialogService } from '@nebular/theme';
+import {UserService} from '../../shared/services/user.service';
+import {StorageService} from '../../shared/services/storage.service';
+import {NbDialogService} from '@nebular/theme';
 import {ShowcaseDialogComponent} from "../../store-manager/shared/showcase-dialog/showcase-dialog.component";
 
 @Component({
@@ -27,14 +27,14 @@ export class ButtonRenderUserComponent {
 
   clicked() {
     this.rowData.active = !this.value;
-    if(this.rowData.id ===  parseInt(this.storageService.getUserId())) {
+    if (this.rowData.id === parseInt(this.storageService.getUserId())) {
       this.dialogService.open(ShowcaseDialogComponent, {
         context: {
           title: '',
           text: '',
-          actionText : this.translate.instant('USER_FORM.CANT_UPDATE_YOUR_PROFILE')
-          }
-        })
+          actionText: this.translate.instant('USER_FORM.CANT_UPDATE_YOUR_PROFILE')
+        }
+      })
     } else {
       this.userService.updateUserEnabled(this.rowData)
         .subscribe(res => {

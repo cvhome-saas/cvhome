@@ -1,13 +1,13 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { DomSanitizer } from '@angular/platform-browser';
+import {Component, Input, OnInit} from '@angular/core';
+import {ActivatedRoute, Router} from '@angular/router';
+import {DomSanitizer} from '@angular/platform-browser';
 
-import { LocalDataSource } from 'ng2-smart-table';
-import { ProductService } from '../../services/product.service';
-import { NbDialogService } from '@nebular/theme';
-import { TranslateService } from '@ngx-translate/core';
-import { InventoryService } from '../../services/inventory.service';
-import { ShowcaseDialogComponent } from '../../../../shared/components/showcase-dialog/showcase-dialog.component';
+import {LocalDataSource} from 'ng2-smart-table';
+import {ProductService} from '../../services/product.service';
+import {NbDialogService} from '@nebular/theme';
+import {TranslateService} from '@ngx-translate/core';
+import {InventoryService} from '../../services/inventory.service';
+import {ShowcaseDialogComponent} from '../../../../shared/components/showcase-dialog/showcase-dialog.component';
 
 @Component({
   selector: 'ngx-prices-list',
@@ -67,11 +67,11 @@ export class PricesListComponent implements OnInit {
         position: 'right',
         sort: true,
         custom: [
-          { name: 'details', title: '<i class="nb-edit"></i>' },
-          { name: 'remove', title: '<i class="nb-trash"></i>' }
+          {name: 'details', title: '<i class="nb-edit"></i>'},
+          {name: 'remove', title: '<i class="nb-trash"></i>'}
         ],
       },
-      pager: { display: false },
+      pager: {display: false},
       columns: {
         store: {
           title: this.translate.instant('INVENTORY.INVENTORY_STORE'),
@@ -121,10 +121,10 @@ export class PricesListComponent implements OnInit {
       case 'remove':
         this.dialogService.open(ShowcaseDialogComponent, {})
           .onClose.subscribe(res => {
-            if (res) {
-              // todo remove price item from list
-            }
-          });
+          if (res) {
+            // todo remove price item from list
+          }
+        });
     }
   }
 

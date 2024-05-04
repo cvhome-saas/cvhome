@@ -4,8 +4,8 @@ import {
   HttpEvent,
   HttpEventType
 } from "@angular/common/http";
-import { catchError, map } from "rxjs/operators";
-import { Observable, of } from "rxjs";
+import {catchError, map} from "rxjs/operators";
+import {Observable, of} from "rxjs";
 import {
   FilePickerAdapter,
   UploadResponse,
@@ -24,6 +24,7 @@ export class ImageUploadingAdapter extends FilePickerAdapter {
     super();
     this.addImage = addImageUrl;
   }
+
   public uploadFile(fileItem: FilePreviewModel): Observable<UploadResponse> {
     /** add api */
     //must parent class
@@ -32,7 +33,7 @@ export class ImageUploadingAdapter extends FilePickerAdapter {
     form.append("file", fileItem.file);
     const api = this.addImage;
     console.log(api, '-----------')
-    const req = new HttpRequest("POST", api, form, { reportProgress: true });
+    const req = new HttpRequest("POST", api, form, {reportProgress: true});
     return this.http.request(req).pipe(
       map((res: HttpEvent<any>) => {
         console.log(JSON.stringify(res));
@@ -54,16 +55,17 @@ export class ImageUploadingAdapter extends FilePickerAdapter {
       }),
       catchError(er => {
         console.log(JSON.stringify(er));
-        return of({ status: UploadStatus.ERROR, body: er });
+        return of({status: UploadStatus.ERROR, body: er});
       })
     );
   }
+
   public removeFile(fileItem: FilePreviewModel): Observable<any> {
     /** remove api */
     const id = 50;
     const responseFromBackend = fileItem.uploadResponse;
     console.log(fileItem);
     const removeApi = '';
-    return this.http.post(removeApi, { id });
+    return this.http.post(removeApi, {id});
   }
 }

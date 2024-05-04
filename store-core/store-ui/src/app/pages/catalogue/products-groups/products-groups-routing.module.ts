@@ -1,10 +1,10 @@
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
+import {NgModule} from '@angular/core';
+import {RouterModule, Routes} from '@angular/router';
 
-import { ProductsGroupsListComponent } from './products-groups-list/products-groups-list.component';
-import { GroupsListComponent } from './groups-list/groups-list.component';
-import { ProductsGroupsComponent } from './products-groups.component';
-import { ProductGroupFormComponent } from './product-group-form/product-group-form.component';
+import {ProductsGroupsListComponent} from './products-groups-list/products-groups-list.component';
+import {GroupsListComponent} from './groups-list/groups-list.component';
+import {ProductsGroupsComponent} from './products-groups.component';
+import {ProductGroupFormComponent} from './product-group-form/product-group-form.component';
 
 const routes: Routes = [
   {

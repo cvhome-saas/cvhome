@@ -8,7 +8,7 @@ export class ProductService {
                 return it.json() as unknown as ProductGroupPage
             });
     }
-    public static getProductByFriendlyUrl = async (storeContext: StoreContext,friendlyUrl:string): Promise<Product> => {
+    public static getProductByFriendlyUrl = async (storeContext: StoreContext, friendlyUrl: string): Promise<Product> => {
         return fetch(`${storeBaseServiceUrl(storeContext)}/api/v2/product/name/${friendlyUrl}?store=${storeContext.store}&lang=${storeContext.local}`)
             .then((it: Response) => {
                 return it.json() as unknown as Product

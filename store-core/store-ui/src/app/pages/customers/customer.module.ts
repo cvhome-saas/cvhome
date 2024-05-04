@@ -1,7 +1,8 @@
-import { NgModule } from '@angular/core';
-import { CustomersRoutingModule, routedComponents } from './customer-routing.module';
-import { NbDialogModule } from '@nebular/theme';
+import {NgModule} from '@angular/core';
+import {CustomersRoutingModule, routedComponents} from './customer-routing.module';
+import {NbDialogModule} from '@nebular/theme';
 import {SharedModule} from "../store-manager/shared/shared.module";
+
 @NgModule({
   declarations: [
     ...routedComponents
@@ -13,4 +14,5 @@ import {SharedModule} from "../store-manager/shared/shared.module";
   ],
   exports: []
 })
-export class CustomersModule { }
+export class CustomersModule {
+}

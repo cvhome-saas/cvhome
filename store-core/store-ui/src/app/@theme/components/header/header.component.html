@@ -1,17 +1,17 @@
 <div class="header-container">
   <div class="logo-container">
-    <a (click)="toggleSidebar()" href="#" class="sidebar-toggle">
+    <a (click)="toggleSidebar()" class="sidebar-toggle" href="#">
       <nb-icon icon="menu-2-outline"></nb-icon>
     </a>
-    <a class="logo" href="" (click)="navigateHome()">store-ui</a>
+    <a (click)="navigateHome()" class="logo" href="">store-ui</a>
   </div>
-  <nb-select [selected]="currentTheme" (selectedChange)="changeTheme($event)" status="primary">
+  <nb-select (selectedChange)="changeTheme($event)" [selected]="currentTheme" status="primary">
     <nb-option *ngFor="let theme of themes" [value]="theme.value"> {{ theme.name }}</nb-option>
   </nb-select>
 </div>
 
 <div class="header-container">
-  <nb-select [selected]="currentLanguage" (selectedChange)="changeLanguage($event)" status="primary">
+  <nb-select (selectedChange)="changeLanguage($event)" [selected]="currentLanguage" status="primary">
     <nb-option *ngFor="let l of languages" [value]="l"> {{ l }}</nb-option>
   </nb-select>
   <nb-actions size="small">
@@ -21,10 +21,10 @@
     </nb-action>
     <nb-action class="control-item" icon="email-outline"></nb-action>
     <nb-action class="control-item" icon="bell-outline"></nb-action>
-    <nb-action class="user-action"  >
-      <nb-user [nbContextMenu]="userMenu"
+    <nb-action class="user-action">
+      <nb-user [name]="user?.preferred_username"
+               [nbContextMenu]="userMenu"
                [onlyPicture]="userPictureOnly"
-               [name]="user?.preferred_username"
                [picture]="user?.picture">
       </nb-user>
     </nb-action>

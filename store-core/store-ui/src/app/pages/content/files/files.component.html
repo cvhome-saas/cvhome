@@ -1,5 +1,5 @@
 <nb-card class="page-card inner_pages">
-  <nb-card-body [nbSpinner]="loadingList" nbSpinnerSize="large" nbSpinnerStatus="primary" class="image-content">
+  <nb-card-body [nbSpinner]="loadingList" class="image-content" nbSpinnerSize="large" nbSpinnerStatus="primary">
     <div class="inner_pages_legacy">
       <nb-card-header class="main_header">
         <h1 class="page_title">{{ 'filemanager.title' | translate }}</h1>
@@ -17,9 +17,10 @@
         <div class="filter_left_section">
         </div>
         <div class="filter_right_section">
-          <ngx-file-drop dropZoneLabel="Drop files here" (onFileDrop)="dropped($event)" accept="image/*">
-            <ng-template ngx-file-drop-content-tmp let-openFileSelector="openFileSelector">
-              <button nbButton status="primary" (click)="openFileSelector()">{{ 'COMMON.BROWSE_FILES' | translate }}</button>
+          <ngx-file-drop (onFileDrop)="dropped($event)" accept="image/*" dropZoneLabel="Drop files here">
+            <ng-template let-openFileSelector="openFileSelector" ngx-file-drop-content-tmp>
+              <button (click)="openFileSelector()" nbButton status="primary">{{ 'COMMON.BROWSE_FILES' | translate }}
+              </button>
             </ng-template>
           </ngx-file-drop>
         </div>
@@ -30,9 +31,9 @@
             <div class="file_listing_box">
               <div class="image-title-main">
                 <div class="close_main">
-                  <i class="fa fa-eye" (click)="openImage(files,i)"></i>
+                  <i (click)="openImage(files,i)" class="fa fa-eye"></i>
 
-                  <i class="fa fa-trash" (click)="unSelectImage(i)"></i>
+                  <i (click)="unSelectImage(i)" class="fa fa-trash"></i>
                 </div>
               </div>
               <div class="image_box">
@@ -41,7 +42,9 @@
             </div>
           </li>
         </ul>
-        <button nbButton status="success" (click)="upload()" [disabled]="files.length==0">{{ 'filemanager.upload' | translate }}</button>
+        <button (click)="upload()" [disabled]="files.length==0" nbButton
+                status="success">{{ 'filemanager.upload' | translate }}
+        </button>
       </div>
       <div class="file_listing_scroll">
         <ul class="file_listing_main">
@@ -49,12 +52,12 @@
             <div class="file_listing_box">
               <div class="image-title-main">
                 <div class="close_main">
-                  <i class="fa fa-eye" (click)="openImage(images,i)"></i>
-                  <i class="fa fa-trash" (click)="removeImage(image.name)"></i>
+                  <i (click)="openImage(images,i)" class="fa fa-eye"></i>
+                  <i (click)="removeImage(image.name)" class="fa fa-trash"></i>
                 </div>
               </div>
               <div class="image_box">
-                <img src="{{image.src}}" class="banner-image"/>
+                <img class="banner-image" src="{{image.src}}"/>
               </div>
             </div>
           </li>

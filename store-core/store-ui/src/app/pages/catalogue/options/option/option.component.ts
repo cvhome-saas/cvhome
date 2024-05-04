@@ -1,14 +1,14 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {Component, OnInit} from '@angular/core';
+import {ActivatedRoute, Router} from '@angular/router';
+import {FormArray, FormBuilder, FormGroup, Validators} from '@angular/forms';
 
-import { ConfigService } from '../../../shared/services/config.service';
-import { Option } from '../models/option';
-import { OptionService } from '../services/option.service';
+import {ConfigService} from '../../../shared/services/config.service';
+import {Option} from '../models/option';
+import {OptionService} from '../services/option.service';
 import {NbToastrService} from '@nebular/theme';
 
-import { TranslateService } from '@ngx-translate/core';
-import { validators } from '../../../shared/validation/validators';
+import {TranslateService} from '@ngx-translate/core';
+import {validators} from '../../../shared/validation/validators';
 
 @Component({
   selector: 'ngx-option',
@@ -47,20 +47,20 @@ export class OptionComponent implements OnInit {
     this.createForm();
 
     this.configService.getListOfSupportedLanguages(localStorage.getItem('merchant'))
-       .subscribe(res => {
+      .subscribe(res => {
         this.languages = [...res];
         this.addFormArray();
         if (optionId) {
           this.optionService.getOptionById(optionId).subscribe(res => {
             this.option = res;
             this.fillForm();//bind content to the form
-            this.loader=false;
-         });
+            this.loader = false;
+          });
         } else {
-          this.loader=false;
+          this.loader = false;
         }
 
-    });
+      });
   }
 
   get selectedLanguage() {
@@ -91,7 +91,7 @@ export class OptionComponent implements OnInit {
       control.push(
         this.fb.group({
           language: [lang.code, []],
-           name: ['', []]
+          name: ['', []]
         })
       );
     });
@@ -135,7 +135,7 @@ export class OptionComponent implements OnInit {
       return;
     }
     if (this.option.id) {
-      const optionObj = { ...this.form.value, id: this.option.id };
+      const optionObj = {...this.form.value, id: this.option.id};
       this.optionService.updateOption(this.option.id, optionObj).subscribe(res => {
         this.toastr.success(this.translate.instant('OPTION.OPTION_UPDATED'));
       });
@@ -146,6 +146,7 @@ export class OptionComponent implements OnInit {
       });
     }
   }
+
   goToBack() {
     this.router.navigate(['pages/catalogue/options/options-list']);
   }

@@ -86,19 +86,19 @@ export class BrandsListComponent implements OnInit {
   }
 
   onEdit(row: any) {
-    this.router.navigate(['pages/catalogue/brands/brand/', this.params.store+'-'+row.id]);
+    this.router.navigate(['pages/catalogue/brands/brand/', this.params.store + '-' + row.id]);
   }
 
   onDelete(row: any) {
     this.dialogService.open(ShowcaseDialogComponent, {
-      context:{
+      context: {
         title: 'Are you sure!',
         text: 'Do you really want to remove this entity?'
       }
     })
       .onClose.subscribe(res => {
       if (res) {
-        this.brandService.deleteBrand(this.params.store,row.id)
+        this.brandService.deleteBrand(this.params.store, row.id)
           .subscribe(data => {
             this.toastr.success(this.translate.instant('BRAND.BRAND_REMOVED'));
             this.getList();

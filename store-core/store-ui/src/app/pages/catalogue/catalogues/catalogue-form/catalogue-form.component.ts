@@ -1,11 +1,11 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {Component, OnInit, ViewChild} from '@angular/core';
+import {ActivatedRoute, Router} from '@angular/router';
+import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 
-import { validators } from '../../../shared/validation/validators';
-import { CatalogService } from '../services/catalog.service';
+import {validators} from '../../../shared/validation/validators';
+import {CatalogService} from '../services/catalog.service';
 import {NbDialogService, NbToastrService} from '@nebular/theme';
-import { TranslateService } from '@ngx-translate/core';
+import {TranslateService} from '@ngx-translate/core';
 import {ShowcaseDialogComponent} from "../../../store-manager/shared/showcase-dialog/showcase-dialog.component";
 
 @Component({
@@ -14,7 +14,7 @@ import {ShowcaseDialogComponent} from "../../../store-manager/shared/showcase-di
   styleUrls: ['./catalogue-form.component.scss']
 })
 export class CatalogueFormComponent implements OnInit {
-  @ViewChild('tree', { static: false }) tree;
+  @ViewChild('tree', {static: false}) tree;
   form: FormGroup;
   loader: boolean = false;
   isCodeUnique = true;
@@ -117,15 +117,16 @@ export class CatalogueFormComponent implements OnInit {
   remove() {
     this.dialogService.open(ShowcaseDialogComponent, {})
       .onClose.subscribe(res => {
-        if (res) {
-          this.catalogService.deleteCatalog(this.catalog.id)
-            .subscribe(data => {
-              this.toastr.success(this.translate.instant('CATALOG.CATALOG_REMOVED'));
-              this.router.navigate(['pages/catalogue/catalogues/catalogues-list']);
-            });
-        }
-      });
+      if (res) {
+        this.catalogService.deleteCatalog(this.catalog.id)
+          .subscribe(data => {
+            this.toastr.success(this.translate.instant('CATALOG.CATALOG_REMOVED'));
+            this.router.navigate(['pages/catalogue/catalogues/catalogues-list']);
+          });
+      }
+    });
   }
+
   goToBack() {
     this.router.navigate(['pages/catalogue/catalogues/catalogues-list']);
   }

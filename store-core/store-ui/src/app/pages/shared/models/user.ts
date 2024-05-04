@@ -4,11 +4,11 @@ export class User {
   defaultLanguage: string;
   emailAddress: string;
   firstName: string;
-  groups:	[];
+  groups: [];
   lastAccess: string;
   lastName: string;
   loginTime: string;
   merchant: string;
-  permissions:	[];
+  permissions: [];
   userName: string;
 }

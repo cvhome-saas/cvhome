@@ -1,5 +1,5 @@
 <nb-card class="page-card inner_pages">
-  <nb-card-body [nbSpinner]="loadingList" nbSpinnerSize="large" nbSpinnerStatus="primary" class="typesList">
+  <nb-card-body [nbSpinner]="loadingList" class="typesList" nbSpinnerSize="large" nbSpinnerStatus="primary">
     <div class="inner_pages_legacy">
       <nb-card-header class="main_header">
         <h1 class="page_title">{{ 'PRODUCT_TYPE.PRODUCT_TYPE_LIST' | translate }}</h1>
@@ -18,26 +18,26 @@
         </div>
         <div class="filter_right_section">
           <ngx-store-autocomplete (onStore)="onSelectStore($event)"></ngx-store-autocomplete>
-          <a class="createBtn" [routerLink]="['/pages/catalogue/types/create-type',params.store+'-']">
-            <img class="pointer sda" src="../../../../assets/img/plus.png"
-                 title="{{ 'COMPONENTS.PRODUCT_TYPES' | translate}}"
-                 alt="">
+          <a [routerLink]="['/pages/catalogue/types/create-type',params.store+'-']" class="createBtn">
+            <img alt="" class="pointer sda"
+                 src="../../../../assets/img/plus.png"
+                 title="{{ 'COMPONENTS.PRODUCT_TYPES' | translate}}">
             <label>{{ 'PRODUCT_TYPE.PRODUCT_TYPE_CREATE' | translate }}</label>
           </a>
         </div>
       </form>
       <ngx-datatable
-        class="material"
-        [rows]="rows"
+        (page)="setPage($event)"
         [columnMode]="ColumnMode.force"
-        [headerHeight]="50"
-        [footerHeight]="50"
-        rowHeight="auto"
-        [externalPaging]="true"
         [count]="page.totalElements"
-        [offset]="page.pageNumber"
+        [externalPaging]="true"
+        [footerHeight]="50"
+        [headerHeight]="50"
         [limit]="page.size"
-        (page)="setPage($event)">
+        [offset]="page.pageNumber"
+        [rows]="rows"
+        class="material"
+        rowHeight="auto">
 
         <ngx-datatable-column name="Id">
           <ng-template let-column="column" ngx-datatable-header-template> {{ 'COMMON.ID' |translate }}</ng-template>
@@ -58,9 +58,9 @@
             {{ 'ORDER.ACTIONS' |translate }}
           </ng-template>
           <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-            <button nbButton shape="round" size="small" status="primary" (click)="onEdit(row)"><i class="nb-edit"></i>
+            <button (click)="onEdit(row)" nbButton shape="round" size="small" status="primary"><i class="nb-edit"></i>
             </button>
-            <button nbButton shape="round" size="small" status="danger" (click)="onDelete(row)"><i class="nb-trash"></i>
+            <button (click)="onDelete(row)" nbButton shape="round" size="small" status="danger"><i class="nb-trash"></i>
             </button>
           </ng-template>
         </ngx-datatable-column>

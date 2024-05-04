@@ -1,7 +1,7 @@
-import { Component, Input } from '@angular/core';
+import {Component, Input} from '@angular/core';
 
-import { CategoryService } from '../services/category.service';
-import { TranslateService } from '@ngx-translate/core';
+import {CategoryService} from '../services/category.service';
+import {TranslateService} from '@ngx-translate/core';
 import {NbToastrService} from "@nebular/theme";
 
 @Component({
@@ -12,7 +12,7 @@ import {NbToastrService} from "@nebular/theme";
 })
 export class ButtonRenderComponent {
   @Input() value: boolean;
-  @Input() store: string ;
+  @Input() store: string;
   @Input() rowData: any;
 
   constructor(
@@ -24,7 +24,7 @@ export class ButtonRenderComponent {
 
   clicked() {
     this.rowData.visible = !this.value;
-    this.categoryService.updateCategoryVisibility(this.rowData,this.store)
+    this.categoryService.updateCategoryVisibility(this.rowData, this.store)
       .subscribe(res => {
         this.toastr.success(this.translate.instant('CATEGORY.CATEGORY_VISIBILITY'));
       });

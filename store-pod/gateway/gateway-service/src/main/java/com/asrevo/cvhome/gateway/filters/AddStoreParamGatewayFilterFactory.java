@@ -30,63 +30,17 @@ import static com.asrevo.cvhome.s2s.utils.StoreCallUtils.getPodReference;
 @Slf4j
 public class AddStoreParamGatewayFilterFactory extends AbstractGatewayFilterFactory<AddStoreParamGatewayFilterFactory.Config> {
     public static final String TEMPLATE_KEY = "template";
-    private final RouterAllocationService router;
-    private final ServiceDomainProperties serviceDomainProperties;
     private static final String STORE_ID_PARAM = "store";
     private static final String STORE_ID_HEADER = "store";
     private static final String STORE_ID_COOKIE = "store";
+    private final RouterAllocationService router;
+    private final ServiceDomainProperties serviceDomainProperties;
 
 
     public AddStoreParamGatewayFilterFactory(RouterAllocationService router, ServiceDomainProperties serviceDomainProperties) {
         super(AddStoreParamGatewayFilterFactory.Config.class);
         this.router = router;
         this.serviceDomainProperties = serviceDomainProperties;
-    }
-
-    public List<String> shortcutFieldOrder() {
-        return List.of(TEMPLATE_KEY);
-    }
-
-    @Override
-    public GatewayFilter apply(AddStoreParamGatewayFilterFactory.Config config) {
-        return (exchange, chain) -> {
-            ServerHttpRequest request = exchange.getRequest();
-
-            String store = getStore(request);
-
-            if (store == null) {
-                String hostName = Optional.ofNullable(request.getHeaders().getHost()).map(InetSocketAddress::getHostName).orElse(null);
-                if (canExtractStoreFromHost(hostName)) {
-
-                    return mapHostToStoreParam(hostName)
-                            .flatMap(it -> {
-                                ServerHttpRequest newRequest = addStoreParamsForRequest(config, request, it);
-                                ServerWebExchange newExchange = exchange.mutate().request(newRequest).build();
-                                return chain.filter(newExchange)
-                                        .then(Mono.fromRunnable(() -> addStoreParamsForResponse(config, exchange.getRequest(), exchange.getResponse(), it)));
-                            });
-                }
-
-            } else {
-                ServerHttpRequest newRequest = addStoreParamsForRequest(config, request, store);
-                ServerWebExchange newExchange = exchange.mutate().request(newRequest).build();
-                return chain.filter(newExchange)
-                        .then(Mono.fromRunnable(() -> addStoreParamsForResponse(config, exchange.getRequest(), exchange.getResponse(), store)));
-
-            }
-            return chain.filter(exchange);
-        };
-    }
-
-    private void addStoreParamsForResponse(Config config, ServerHttpRequest request, ServerHttpResponse response, String store) {
-        if (!response.isCommitted()) {
-            if (config.getAddResponseHeader()) {
-                addResponseHeader(response, store);
-            }
-            if (config.getAddResponseCookie()) {
-                addResponseCookie(response, store);
-            }
-        }
     }
 
     private static void addResponseHeader(ServerHttpResponse response, String store) {
@@ -137,22 +91,6 @@ public class AddStoreParamGatewayFilterFactory extends AbstractGatewayFilterFact
         builder.uri(newUri);
     }
 
-    private boolean canExtractStoreFromHost(String hostName) {
-        return true;
-    }
-
-    private Mono<String> mapHostToStoreParam(String host) {
-        Domain domain = new Domain(host);
-        return Mono
-                .defer(() ->
-                        getPodReference(serviceDomainProperties, router.getAllocation(domain), this::buildFallbackPodReference))
-                .map(PodReferenceDto::reference);
-    }
-
-    private PodReferenceDto buildFallbackPodReference() {
-        return PodReferenceDto.from(null, DEFAULT_STORE);
-    }
-
     private static String getStore(ServerHttpRequest request) {
         String store = extractStoreFromParams(request);
         if (store != null) {
@@ -178,6 +116,68 @@ public class AddStoreParamGatewayFilterFactory extends AbstractGatewayFilterFact
         } else {
             return null;
         }
+    }
+
+    public List<String> shortcutFieldOrder() {
+        return List.of(TEMPLATE_KEY);
+    }
+
+    @Override
+    public GatewayFilter apply(AddStoreParamGatewayFilterFactory.Config config) {
+        return (exchange, chain) -> {
+            ServerHttpRequest request = exchange.getRequest();
+
+            String store = getStore(request);
+
+            if (store == null) {
+                String hostName = Optional.ofNullable(request.getHeaders().getHost()).map(InetSocketAddress::getHostName).orElse(null);
+                if (canExtractStoreFromHost(hostName)) {
+
+                    return mapHostToStoreParam(hostName)
+                            .flatMap(it -> {
+                                ServerHttpRequest newRequest = addStoreParamsForRequest(config, request, it);
+                                ServerWebExchange newExchange = exchange.mutate().request(newRequest).build();
+                                return chain.filter(newExchange)
+                                        .then(Mono.fromRunnable(() -> addStoreParamsForResponse(config, exchange.getRequest(), exchange.getResponse(), it)));
+                            });
+                }
+
+            } else {
+                ServerHttpRequest newRequest = addStoreParamsForRequest(config, request, store);
+                ServerWebExchange newExchange = exchange.mutate().request(newRequest).build();
+                return chain.filter(newExchange)
+                        .then(Mono.fromRunnable(() -> addStoreParamsForResponse(config, exchange.getRequest(), exchange.getResponse(), store)));
+
+            }
+            return chain.filter(exchange);
+        };
+    }
+
+    private void addStoreParamsForResponse(Config config, ServerHttpRequest request, ServerHttpResponse response, String store) {
+        if (!response.isCommitted()) {
+            if (config.getAddResponseHeader()) {
+                addResponseHeader(response, store);
+            }
+            if (config.getAddResponseCookie()) {
+                addResponseCookie(response, store);
+            }
+        }
+    }
+
+    private boolean canExtractStoreFromHost(String hostName) {
+        return true;
+    }
+
+    private Mono<String> mapHostToStoreParam(String host) {
+        Domain domain = new Domain(host);
+        return Mono
+                .defer(() ->
+                        getPodReference(serviceDomainProperties, router.getAllocation(domain), this::buildFallbackPodReference))
+                .map(PodReferenceDto::reference);
+    }
+
+    private PodReferenceDto buildFallbackPodReference() {
+        return PodReferenceDto.from(null, DEFAULT_STORE);
     }
 
     @Getter

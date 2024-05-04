@@ -1,14 +1,14 @@
-import { Component, OnInit } from '@angular/core';
-import { DomSanitizer } from '@angular/platform-browser';
-import { ActivatedRoute, Router } from '@angular/router';
+import {Component, OnInit} from '@angular/core';
+import {DomSanitizer} from '@angular/platform-browser';
+import {ActivatedRoute, Router} from '@angular/router';
 
-import { LocalDataSource } from 'ng2-smart-table';
-import { ProductService } from '../../services/product.service';
-import { NbDialogService } from '@nebular/theme';
-import { TranslateService } from '@ngx-translate/core';
-import { InventoryService } from '../../services/inventory.service';
-import { ShowcaseDialogComponent } from '../../../../shared/components/showcase-dialog/showcase-dialog.component';
-import { StorageService } from '../../../../shared/services/storage.service';
+import {LocalDataSource} from 'ng2-smart-table';
+import {ProductService} from '../../services/product.service';
+import {NbDialogService} from '@nebular/theme';
+import {TranslateService} from '@ngx-translate/core';
+import {InventoryService} from '../../services/inventory.service';
+import {ShowcaseDialogComponent} from '../../../../shared/components/showcase-dialog/showcase-dialog.component';
+import {StorageService} from '../../../../shared/services/storage.service';
 import {NbToastrService} from '@nebular/theme';
 
 @Component({
@@ -91,11 +91,11 @@ export class ManageInventoryComponent implements OnInit {
         position: 'right',
         sort: true,
         custom: [
-          { name: 'details', title: '<i class="nb-edit"></i>' },
-          { name: 'remove', title: '<i class="nb-trash"></i>' }
+          {name: 'details', title: '<i class="nb-edit"></i>'},
+          {name: 'remove', title: '<i class="nb-trash"></i>'}
         ],
       },
-      pager: { display: false },
+      pager: {display: false},
       columns: {
         store: {
           title: this.translate.instant('INVENTORY.INVENTORY_STORE'),
@@ -143,14 +143,14 @@ export class ManageInventoryComponent implements OnInit {
       case 'remove':
         this.dialogService.open(ShowcaseDialogComponent, {})
           .onClose.subscribe(res => {
-            if (res) {
-              this.inventoryService.deleteProduct(event.data.id)
-                .subscribe((data) => {
-                  this.toastr.success(this.translate.instant('INVENTORY.INVENTORY_REMOVED'));
-                  this.getList();
-                });
-            }
-          });
+          if (res) {
+            this.inventoryService.deleteProduct(event.data.id)
+              .subscribe((data) => {
+                this.toastr.success(this.translate.instant('INVENTORY.INVENTORY_REMOVED'));
+                this.getList();
+              });
+          }
+        });
     }
   }
 

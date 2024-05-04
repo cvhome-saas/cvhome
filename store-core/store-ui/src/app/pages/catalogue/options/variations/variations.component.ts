@@ -1,12 +1,13 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { VariationService } from '../services/variation.service';
+import {Component, OnInit} from '@angular/core';
+import {Router} from '@angular/router';
+import {VariationService} from '../services/variation.service';
 // import { OptionService } from '../services/option.service';
-import { LocalDataSource } from 'ng2-smart-table';
-import { TranslateService } from '@ngx-translate/core';
-import { ShowcaseDialogComponent } from '../../../shared/components/showcase-dialog/showcase-dialog.component';
-import { NbDialogService } from '@nebular/theme';
+import {LocalDataSource} from 'ng2-smart-table';
+import {TranslateService} from '@ngx-translate/core';
+import {ShowcaseDialogComponent} from '../../../shared/components/showcase-dialog/showcase-dialog.component';
+import {NbDialogService} from '@nebular/theme';
 import {NbToastrService} from '@nebular/theme';
+
 @Component({
   selector: 'ngx-variations-list',
   templateUrl: './variations.component.html',
@@ -23,7 +24,6 @@ export class VariationsListComponent implements OnInit {
     private router: Router,
     private dialogService: NbDialogService,
     private toastr: NbToastrService,
-
   ) {
   }
 
@@ -145,6 +145,7 @@ export class VariationsListComponent implements OnInit {
         break
     }
   }
+
   onEdit(event) {
     // this.router.navigate(['/pages/catalogue/options/option-set/' + event.data.id]);
   }

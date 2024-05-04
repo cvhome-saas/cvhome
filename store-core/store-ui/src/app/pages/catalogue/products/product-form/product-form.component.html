@@ -1,8 +1,9 @@
 <div class="inner_pages product_create_page">
   <nb-card-header class="main_header">
-    <h1 class="page_title">{{_title | translate}}</h1>
+    <h1 class="page_title">{{ _title | translate }}</h1>
     <div class="content_spacing">
-      <button type="button" nbButton class="cancel_button" (click)="goToBack()">{{ 'ORDER_FORM.CANCEL'| translate}}</button>
+      <button (click)="goToBack()" class="cancel_button" nbButton type="button">{{ 'ORDER_FORM.CANCEL'| translate }}
+      </button>
     </div>
   </nb-card-header>
 
@@ -12,14 +13,14 @@
       <div class="row">
         <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
           <nb-card class="nb-card inline-form-card">
-            <nb-card-header class="nb-card-header">{{ 'PRODUCT.DEFINITION' | translate}}</nb-card-header>
+            <nb-card-header class="nb-card-header">{{ 'PRODUCT.DEFINITION' | translate }}</nb-card-header>
             <nb-card-body class="nb-card-body">
               <div class="row">
                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                   <div class="form-group">
                     <div>
                       <nb-checkbox formControlName='visible'>
-                        {{ 'CONTENT.VISIBLE' | translate}}
+                        {{ 'CONTENT.VISIBLE' | translate }}
                       </nb-checkbox>
                     </div>
                   </div>
@@ -28,20 +29,20 @@
               <div class="row">
                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                   <div class="form-group">
-                    <label for="sku" class="col-form-label inputLabel">{{ 'PRODUCT.UNIQUE_ID' | translate}}
+                    <label class="col-form-label inputLabel" for="sku">{{ 'PRODUCT.UNIQUE_ID' | translate }}
                       <span class="mandatory">*</span></label>
                     <div>
-                      <input type="text" class="form-control inputText" id="sku" formControlName='sku'
-                        placeholder="{{ 'Unique sku' | translate}}" (change)="checkSku($event)" required>
+                      <input (change)="checkSku($event)" class="form-control inputText" formControlName='sku' id="sku"
+                             placeholder="{{ 'Unique sku' | translate}}" required type="text">
                       <span *ngIf="(sku.dirty || sku.touched) && sku.invalid" class="err-message">
                         <span *ngIf="sku.errors.required">
                           {{ 'PRODUCT.ID_REQUIRED' | translate }}
                         </span>
                         <span *ngIf="sku.errors.pattern">
-                          {{ 'COMMON.ALPHA_DECIMAL_RULE' | translate}}
+                          {{ 'COMMON.ALPHA_DECIMAL_RULE' | translate }}
                         </span>
                         <span *ngIf="!isCodeUnique" class="err-message">
-                          {{ 'COMMON.SKU_EXISTS' | translate}}
+                          {{ 'COMMON.SKU_EXISTS' | translate }}
                         </span>
                       </span>
                     </div>
@@ -51,10 +52,10 @@
               <div class="row">
                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                   <div class="form-group">
-                    <label class="col-form-label inputLabel">{{ 'PRODUCT.DATE_AVAILABLE' | translate}}</label>
+                    <label class="col-form-label inputLabel">{{ 'PRODUCT.DATE_AVAILABLE' | translate }}</label>
                     <div>
-                      <input class="form-control has-person-icon inputText" placeholder="Form Picker"
-                        formControlName='dateAvailable' [nbDatepicker]="formpicker" [readOnly]="true">
+                      <input [nbDatepicker]="formpicker" [readOnly]="true"
+                             class="form-control has-person-icon inputText" formControlName='dateAvailable' placeholder="Form Picker">
                       <nb-datepicker #formpicker></nb-datepicker>
                     </div>
                   </div>
@@ -63,26 +64,26 @@
               <div class="row">
                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                   <div class="form-group">
-                    <label for="order" class="label col-form-label">{{ 'COMMON.ORDER' | translate}}</label>
-                    <input type="text" class="form-control inputText" id="order" formControlName='sortOrder'
-                      ngxValidateNumber placeholder="{{ 'COMMON.ORDER' | translate}}" required>
+                    <label class="label col-form-label" for="order">{{ 'COMMON.ORDER' | translate }}</label>
+                    <input class="form-control inputText" formControlName='sortOrder' id="order" ngxValidateNumber
+                           placeholder="{{ 'COMMON.ORDER' | translate}}" required type="text">
                   </div>
                 </div>
               </div>
               <div class="row">
                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                   <div class="form-group">
-                    <label class="col-form-label inputLabel">{{ 'PRODUCT.MANUFACTURER' | translate}} <span
-                        class="mandatory">*</span></label>
+                    <label class="col-form-label inputLabel">{{ 'PRODUCT.MANUFACTURER' | translate }} <span
+                      class="mandatory">*</span></label>
                     <div>
-                      <nb-select formControlName='manufacturer' placeholder="{{ 'PRODUCT.MANUFACTURER' | translate}}" >
-                        <nb-option [value]="item.value" *ngFor="let item of manufacturers">{{item.label}}</nb-option>
+                      <nb-select formControlName='manufacturer' placeholder="{{ 'PRODUCT.MANUFACTURER' | translate}}">
+                        <nb-option *ngFor="let item of manufacturers" [value]="item.value">{{ item.label }}</nb-option>
                       </nb-select>
                     </div>
                     <span *ngIf="(manufacturer.dirty || manufacturer.touched) && manufacturer.invalid"
-                      class="err-message">
+                          class="err-message">
                       <span *ngIf="manufacturer.errors.required">
-                        {{ 'PRODUCT.MANUFACTURER' | translate}} {{ 'COMMON.IS_REQUIRED' | translate}}
+                        {{ 'PRODUCT.MANUFACTURER' | translate }} {{ 'COMMON.IS_REQUIRED' | translate }}
                       </span>
                     </span>
                   </div>
@@ -92,10 +93,10 @@
               <div class="row" style="margin-bottom:125px;">
                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                   <div class="form-group">
-                    <label class=" col-form-label inputLabel">{{ 'PRODUCT.PRODUCT_TYPE' | translate}}</label>
+                    <label class=" col-form-label inputLabel">{{ 'PRODUCT.PRODUCT_TYPE' | translate }}</label>
                     <div>
-                      <nb-select formControlName='type' placeholder="{{ 'PRODUCT.PRODUCT_TYPE' | translate}}" >
-                        <nb-option [value]="item.value" *ngFor="let item of productTypes">{{item.label}}</nb-option>
+                      <nb-select formControlName='type' placeholder="{{ 'PRODUCT.PRODUCT_TYPE' | translate}}">
+                        <nb-option *ngFor="let item of productTypes" [value]="item.value">{{ item.label }}</nb-option>
                       </nb-select>
                     </div>
                   </div>
@@ -108,14 +109,16 @@
         <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
           <nb-card class="nb-card inline-form-card">
             <nb-card-header class="nb-card-header">
-              <nb-actions size="small" class="pull-right">
-                <nb-action class="card-header-title">{{'COMMON.SEO_DETAILS' | translate}}</nb-action>
+              <nb-actions class="pull-right" size="small">
+                <nb-action class="card-header-title">{{ 'COMMON.SEO_DETAILS' | translate }}</nb-action>
                 <nb-action>
-                  <nb-select *ngIf="languages.length" placeholder="{{ 'COMMON.LANGUAGE' | translate}}" outline
-                    shape="rectangle" name='selectedLanguage' [selected]="defaultLanguage">
+                  <nb-select *ngIf="languages.length" [selected]="defaultLanguage" name='selectedLanguage'
+                             outline placeholder="{{ 'COMMON.LANGUAGE' | translate}}" shape="rectangle">
                     <nb-option (click)="selectLanguage(language.code)" *ngFor="let language of languages"
-                      [value]="language.code">{{
-                      ('LANG.'+language.code) |translate }}</nb-option>
+                               [value]="language.code">{{
+                        ('LANG.' + language.code) |translate
+                      }}
+                    </nb-option>
                   </nb-select>
 
                 </nb-action>
@@ -128,48 +131,54 @@
                   <div *ngIf="descr.value.language === selectedLanguage.value">
                     <div [formGroupName]="j" class="description-block">
                       <div class="form-group">
-                        <label for="name" class="col-form-label inputLabel">{{ 'DESCRIPTION_FORM.NAME' | translate }} -
-                          {{('LANG.'+ currentLanguage) |translate }}
+                        <label class="col-form-label inputLabel" for="name">{{ 'DESCRIPTION_FORM.NAME' | translate }} -
+                          {{ ('LANG.' + currentLanguage) |translate }}
                           <span class="mandatory">*</span></label>
                         <div>
-                          <input type="text" class="form-control inputText" id="name" formControlName='name'
-                            placeholder="{{ 'DESCRIPTION_FORM.NAME' | translate }}"
-                            (ngModelChange)="changeName($event, j)" required>
+                          <input (ngModelChange)="changeName($event, j)" class="form-control inputText" formControlName='name' id="name"
+                                 placeholder="{{ 'DESCRIPTION_FORM.NAME' | translate }}"
+                                 required type="text">
                           <span
                             *ngIf="(descr.get('name').dirty || descr.get('name').touched) && descr.get('name').invalid && descr.get('name').errors.required"
                             class="err-message">
-                            {{ 'DESCRIPTION_FORM.NAME_REQUIRED' | translate }} - {{('LANG.'+ currentLanguage)
-                            |translate }}
+                            {{ 'DESCRIPTION_FORM.NAME_REQUIRED' | translate }} - {{
+                              ('LANG.' + currentLanguage)
+                                |translate
+                            }}
                           </span>
                         </div>
                       </div>
                       <div class="form-group">
-                        <label for="title" class=" col-form-label inputLabel">{{ 'DESCRIPTION_FORM.TITLE' | translate
-                          }} - {{('LANG.'+ currentLanguage) |translate }}</label>
+                        <label class=" col-form-label inputLabel" for="title">{{
+                            'DESCRIPTION_FORM.TITLE' | translate
+                          }} - {{ ('LANG.' + currentLanguage) |translate }}</label>
                         <div>
-                          <input type="text" class="form-control inputText" id="title" formControlName='title'
-                            placeholder="{{ 'DESCRIPTION_FORM.TITLE' | translate }}">
+                          <input class="form-control inputText" formControlName='title' id="title" placeholder="{{ 'DESCRIPTION_FORM.TITLE' | translate }}"
+                                 type="text">
                         </div>
                       </div>
                       <div class="form-group">
-                        <label for="highlight" class=" col-form-label inputLabel">{{
-                          'DESCRIPTION_FORM.HIGHLIGHT'
-                          |
-                          translate }} - {{('LANG.'+ currentLanguage) |translate }}</label>
+                        <label class=" col-form-label inputLabel" for="highlight">{{
+                            'DESCRIPTION_FORM.HIGHLIGHT'
+                              |
+                              translate
+                          }} - {{ ('LANG.' + currentLanguage) |translate }}</label>
                         <div>
-                          <input type="text" class="form-control inputText" id="highlight" formControlName='highlights'
-                            placeholder="{{ 'DESCRIPTION_FORM.HIGHLIGHT' | translate }}">
+                          <input class="form-control inputText" formControlName='highlights' id="highlight" placeholder="{{ 'DESCRIPTION_FORM.HIGHLIGHT' | translate }}"
+                                 type="text">
                         </div>
                       </div>
 
                       <div class="form-group">
-                        <label for="friendlyUrl" class=" col-form-label inputLabel">{{
-                          'DESCRIPTION_FORM.FRIENDLY_URL' | translate }} - {{('LANG.'+ currentLanguage) |translate
+                        <label class=" col-form-label inputLabel" for="friendlyUrl">{{
+                            'DESCRIPTION_FORM.FRIENDLY_URL' | translate
+                          }} - {{
+                            ('LANG.' + currentLanguage) |translate
                           }}<span class="mandatory">*</span></label>
                         <div>
-                          <input type="text" class="form-control inputText" id="friendlyUrl"
-                            formControlName='friendlyUrl'
-                            placeholder="{{ 'DESCRIPTION_FORM.FRIENDLY_URL' | translate }}" required>
+                          <input class="form-control inputText" formControlName='friendlyUrl' id="friendlyUrl"
+                                 placeholder="{{ 'DESCRIPTION_FORM.FRIENDLY_URL' | translate }}"
+                                 required type="text">
                           <span
                             *ngIf="(descr.get('friendlyUrl').dirty || descr.get('friendlyUrl').touched)
                                                         && descr.get('friendlyUrl').invalid && descr.get('friendlyUrl').errors.required"
@@ -181,22 +190,26 @@
 
 
                       <div class="form-group">
-                        <label for="keyWords" class=" col-form-label inputLabel">{{'DESCRIPTION_FORM.KEYWORDS' |
-                          translate }} - {{('LANG.'+ currentLanguage) |translate }}</label>
+                        <label class=" col-form-label inputLabel" for="keyWords">{{
+                            'DESCRIPTION_FORM.KEYWORDS' |
+                              translate
+                          }} - {{ ('LANG.' + currentLanguage) |translate }}</label>
                         <div>
-                          <input type="text" class="form-control inputText" id="keyWords" formControlName='keyWords'
-                            placeholder="{{ 'DESCRIPTION_FORM.KEYWORDS_PLACEHOLDER' | translate }}">
+                          <input class="form-control inputText" formControlName='keyWords' id="keyWords" placeholder="{{ 'DESCRIPTION_FORM.KEYWORDS_PLACEHOLDER' | translate }}"
+                                 type="text">
                         </div>
                       </div>
 
                       <div class="form-group">
-                        <label for="metaDescription" class="col-form-label inputLabel">{{
-                          'DESCRIPTION_FORM.META_DESCRIPTION' | translate }} - {{('LANG.'+ currentLanguage) |translate
+                        <label class="col-form-label inputLabel" for="metaDescription">{{
+                            'DESCRIPTION_FORM.META_DESCRIPTION' | translate
+                          }} - {{
+                            ('LANG.' + currentLanguage) |translate
                           }}</label>
                         <div>
-                          <input type="text" class="form-control inputText" id="metaDescription"
-                            formControlName='metaDescription'
-                            placeholder="{{ 'DESCRIPTION_FORM.DESCRIPTION' | translate }}">
+                          <input class="form-control inputText" formControlName='metaDescription' id="metaDescription"
+                                 placeholder="{{ 'DESCRIPTION_FORM.DESCRIPTION' | translate }}"
+                                 type="text">
                         </div>
                       </div>
                     </div>
@@ -211,8 +224,11 @@
       <div class="row">
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
           <nb-card class="nb-card inline-form-card">
-            <nb-card-header class="nb-card-header">{{ 'DESCRIPTION_FORM.DESCRIPTION' | translate}} - {{('LANG.'+
-              currentLanguage) |translate }}</nb-card-header>
+            <nb-card-header class="nb-card-header">{{ 'DESCRIPTION_FORM.DESCRIPTION' | translate }} - {{
+                ('LANG.' +
+                  currentLanguage) |translate
+              }}
+            </nb-card-header>
             <nb-card-body class="nb-card-body">
               <div *ngIf="selectedLanguage.value !== ''" formArrayName='descriptions'>
                 <div *ngFor="let descr of descriptions.controls; let j=index">
@@ -233,35 +249,35 @@
       <div class="row">
         <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
           <nb-card class="nb-card inline-form-card">
-            <nb-card-header class="nb-card-header">{{ 'Specifications' | translate}}</nb-card-header>
+            <nb-card-header class="nb-card-header">{{ 'Specifications' | translate }}</nb-card-header>
             <nb-card-body class="nb-card-body" formGroupName='productSpecifications'>
 
               <div class="form-group">
-                <label for="width" class=" col-form-label inputLabel">{{ 'COMMON.WIDTH' | translate}}</label>
+                <label class=" col-form-label inputLabel" for="width">{{ 'COMMON.WIDTH' | translate }}</label>
                 <div>
-                  <input type="number" class="form-control inputText" id="width" formControlName='width'
-                    ngxValidateNumber placeholder="{{ 'COMMON.WIDTH' | translate }}">
+                  <input class="form-control inputText" formControlName='width' id="width" ngxValidateNumber
+                         placeholder="{{ 'COMMON.WIDTH' | translate }}" type="number">
                 </div>
               </div>
               <div class="form-group">
-                <label for="height" class=" col-form-label inputLabel">{{ 'COMMON.HEIGHT' | translate}}</label>
+                <label class=" col-form-label inputLabel" for="height">{{ 'COMMON.HEIGHT' | translate }}</label>
                 <div>
-                  <input type="number" class="form-control inputText" id="height" formControlName='height'
-                    ngxValidateNumber placeholder="{{ 'COMMON.HEIGHT' | translate }}">
+                  <input class="form-control inputText" formControlName='height' id="height" ngxValidateNumber
+                         placeholder="{{ 'COMMON.HEIGHT' | translate }}" type="number">
                 </div>
               </div>
               <div class="form-group">
-                <label for="length" class=" col-form-label inputLabel">{{ 'COMMON.LENGTH' | translate}}</label>
+                <label class=" col-form-label inputLabel" for="length">{{ 'COMMON.LENGTH' | translate }}</label>
                 <div>
-                  <input type="number" class="form-control inputText" id="length" formControlName='length'
-                    ngxValidateNumber placeholder="{{ 'COMMON.LENGTH' | translate }}">
+                  <input class="form-control inputText" formControlName='length' id="length" ngxValidateNumber
+                         placeholder="{{ 'COMMON.LENGTH' | translate }}" type="number">
                 </div>
               </div>
               <div class="form-group">
-                <label for="weight" class=" col-form-label inputLabel">{{ 'COMMON.WEIGHT' | translate }}</label>
+                <label class=" col-form-label inputLabel" for="weight">{{ 'COMMON.WEIGHT' | translate }}</label>
                 <div>
-                  <input type="number" class="form-control inputText" id="weight" formControlName='weight'
-                    ngxValidateNumber placeholder="{{ 'COMMON.WEIGHT' | translate }} ">
+                  <input class="form-control inputText" formControlName='weight' id="weight" ngxValidateNumber
+                         placeholder="{{ 'COMMON.WEIGHT' | translate }} " type="number">
                 </div>
               </div>
             </nb-card-body>
@@ -270,7 +286,7 @@
 
         <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
           <nb-card class="nb-card inline-form-card">
-            <nb-card-header class="nb-card-header">{{ 'COMPONENTS.INVENTORY' | translate}}</nb-card-header>
+            <nb-card-header class="nb-card-header">{{ 'COMPONENTS.INVENTORY' | translate }}</nb-card-header>
             <nb-card-body class="nb-card-body">
               <!--
               <div class="form-group">
@@ -284,32 +300,32 @@
               <div class="form-group">
                 <div>
                   <nb-checkbox formControlName='canBePurchased'>
-                    {{ 'Available for purchase' | translate}}
+                    {{ 'Available for purchase' | translate }}
                   </nb-checkbox>
                 </div>
               </div>
               <div class="form-group">
-                <label class="col-form-label inputLabel">{{ 'PRICE.FINAL_PRICE' | translate}}<span
-                    class="mandatory">*</span></label>
+                <label class="col-form-label inputLabel">{{ 'PRICE.FINAL_PRICE' | translate }}<span
+                  class="mandatory">*</span></label>
                 <div>
-                  <input type="number" class="form-control inputText" formControlName='price'
-                    placeholder="{{ 'PRODUCT.PRICE' | translate}}">
+                  <input class="form-control inputText" formControlName='price' placeholder="{{ 'PRODUCT.PRICE' | translate}}"
+                         type="number">
                   <span *ngIf="(price.dirty || price.touched) && price.invalid" class="err-message">
                     <span *ngIf="price.errors.required">
-                      {{ 'PRODUCT.PRICE' | translate}} {{ 'COMMON.IS_REQUIRED' | translate}}
+                      {{ 'PRODUCT.PRICE' | translate }} {{ 'COMMON.IS_REQUIRED' | translate }}
                     </span>
                   </span>
                 </div>
               </div>
               <div class="form-group">
-                <label class="col-form-label inputLabel">{{ 'Quantity' | translate}}<span
-                    class="mandatory">*</span></label>
+                <label class="col-form-label inputLabel">{{ 'Quantity' | translate }}<span
+                  class="mandatory">*</span></label>
                 <div>
-                  <input type="number" class="form-control inputText" formControlName='quantity'
-                    placeholder="{{ 'PRODUCT.QUANTITY' | translate}}">
+                  <input class="form-control inputText" formControlName='quantity' placeholder="{{ 'PRODUCT.QUANTITY' | translate}}"
+                         type="number">
                   <span *ngIf="(quantity.dirty || quantity.touched) && quantity.invalid" class="err-message">
                     <span *ngIf="quantity.errors.required">
-                      {{ 'PRODUCT.QUANTITY' | translate}} {{ 'COMMON.IS_REQUIRED' | translate}}
+                      {{ 'PRODUCT.QUANTITY' | translate }} {{ 'COMMON.IS_REQUIRED' | translate }}
                     </span>
                   </span>
                 </div>
@@ -380,21 +396,21 @@
 
       <nb-card-header class="main_header">
         <div class="content_spacing">
-          <button type="button" nbButton class="success_button" [nbSpinner]="loading" nbSpinnerSize="large"
-            nbSpinnerStatus="control" (click)="save()">
-            {{(!loading?'COMMON.SAVE':'') | translate }} {{ (!loading?'PRODUCT.DEFINITION':'') | translate}}
+          <button (click)="save()" [nbSpinner]="loading" class="success_button" nbButton nbSpinnerSize="large"
+                  nbSpinnerStatus="control" type="button">
+            {{ (!loading ? 'COMMON.SAVE' : '') | translate }} {{ (!loading ? 'PRODUCT.DEFINITION' : '') | translate }}
           </button>
         </div>
       </nb-card-header>
 
       <!-- images, options, properties ... -->
-      <div class="row" *ngIf="product.id">
+      <div *ngIf="product.id" class="row">
 
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
           <div [nbSpinner]="tabLoader" nbSpinnerSize="large" nbSpinnerStatus="primary">
             <nb-card class="nb-card inline-form-card">
-                <!-- TABS -->
-               <nb-route-tabset id="tabs" [tabs]="tabs" fullWidth></nb-route-tabset>
+              <!-- TABS -->
+              <nb-route-tabset [tabs]="tabs" fullWidth id="tabs"></nb-route-tabset>
 
               <!--
               <nb-tabset>
@@ -417,8 +433,6 @@
                 </nb-tab>
               </nb-tabset>
               -->
-
-
 
 
             </nb-card>

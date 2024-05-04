@@ -28,7 +28,7 @@ import {StorageService} from "../../../shared/services/storage.service";
 })
 export class ProductAutoCompleteComponent implements AfterViewInit {
   @Input() store: string;
-  @Input() disabled: boolean=false;
+  @Input() disabled: boolean = false;
   filteredOptions$: Observable<any[]>;
   @Output()
   onProduct: EventEmitter<any> = new EventEmitter<any>()

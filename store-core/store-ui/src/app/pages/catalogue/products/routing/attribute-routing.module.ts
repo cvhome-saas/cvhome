@@ -1,8 +1,8 @@
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
+import {NgModule} from '@angular/core';
+import {RouterModule, Routes} from '@angular/router';
 
-import { ProductsComponent } from '../products.component';
-import { ProductAttributesComponent } from '../attribute/product-attributes/product-attributes.component';
+import {ProductsComponent} from '../products.component';
+import {ProductAttributesComponent} from '../attribute/product-attributes/product-attributes.component';
 // import { AttributeFormComponent } from '../attribute/attribute-form/attribute-form.component';
 
 const routes: Routes = [

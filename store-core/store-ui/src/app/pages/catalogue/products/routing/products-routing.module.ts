@@ -1,9 +1,9 @@
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
+import {NgModule} from '@angular/core';
+import {RouterModule, Routes} from '@angular/router';
 
-import { ProductsComponent } from '../products.component';
-import { ProductsListComponent } from '../products-list/products-list.component';
-import { ProductCreationComponent } from '../product-creation/product-creation.component';
+import {ProductsComponent} from '../products.component';
+import {ProductsListComponent} from '../products-list/products-list.component';
+import {ProductCreationComponent} from '../product-creation/product-creation.component';
 import {ProductDetailsComponent} from "../product-details/product-details.component";
 import {ProductsImagesComponent} from "../products-images/products-images.component";
 import {ProductToCategoryComponent} from "../product-to-category/product-to-category.component";
@@ -14,7 +14,6 @@ import {ProductToCategoryComponent} from "../product-to-category/product-to-cate
 // import { ProductOrderingComponent } from '../product-ordering/product-ordering.component';
 // import { ProductAttributesComponent } from '../attribute/product-attributes/product-attributes.component';
 // import { ProductProperties } from '../property/list/product-property.component';
-
 
 
 const routes: Routes = [
@@ -35,10 +34,10 @@ const routes: Routes = [
       //   path: 'product-ordering',
       //   component: ProductOrderingComponent
       // },
-       {
-         path: 'product/:code',
-         // canDeactivate: [ExitGuard],
-         component: ProductDetailsComponent,
+      {
+        path: 'product/:code',
+        // canDeactivate: [ExitGuard],
+        component: ProductDetailsComponent,
 
         children: [
           {
@@ -58,21 +57,21 @@ const routes: Routes = [
             path: 'category',
             component: ProductToCategoryComponent,
           },
-      //     {
-      //       path: 'options',
-      //       component: ProductAttributesComponent,
-      //     },
-      //     {
-      //       path: 'properties',
-      //       component: ProductProperties,
-      //     },
-      //     {
-      //       path: 'discount',
-      //       component: ProductDiscountComponent,
-      //     },
+          //     {
+          //       path: 'options',
+          //       component: ProductAttributesComponent,
+          //     },
+          //     {
+          //       path: 'properties',
+          //       component: ProductProperties,
+          //     },
+          //     {
+          //       path: 'discount',
+          //       component: ProductDiscountComponent,
+          //     },
         ],
-      //
-       },
+        //
+      },
       // {
       //   path: ':productId/category-association',
       //   component: ProductToCategoryComponent,

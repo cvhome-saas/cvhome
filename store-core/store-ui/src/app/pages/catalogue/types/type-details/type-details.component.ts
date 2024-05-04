@@ -69,7 +69,7 @@ export class TypeDetailsComponent implements OnInit {
       lang: "_all",
     })
       .subscribe({
-        next:(types)=>{
+        next: (types) => {
           this.type.id = types.id;
           this.type.code = types.code;
           this.type.allowAddToCart = types.allowAddToCart;

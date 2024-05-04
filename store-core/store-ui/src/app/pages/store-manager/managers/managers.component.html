@@ -8,9 +8,9 @@
       <nb-card-body>
         <form (ngSubmit)="onSubmit()" [formGroup]="userForm">
           <div class="form-group row">
-            <label for="inputUsername" class="label col-sm-3 col-form-label">Username</label>
+            <label class="label col-sm-3 col-form-label" for="inputUsername">Username</label>
             <div class="col-sm-9">
-              <input type="text" formControlName="username" nbInput fullWidth id="inputUsername" placeholder="Username">
+              <input formControlName="username" fullWidth id="inputUsername" nbInput placeholder="Username" type="text">
               <div class="help-block">
                 <div
                   *ngIf="userForm.controls['username'].invalid && (userForm.controls['username'].dirty || userForm.controls['username'].touched)"
@@ -31,9 +31,9 @@
 
           </div>
           <div class="form-group row">
-            <label for="inputPassword" class="label col-sm-3 col-form-label">Password</label>
+            <label class="label col-sm-3 col-form-label" for="inputPassword">Password</label>
             <div class="col-sm-9">
-              <input type="text" formControlName="password" nbInput fullWidth id="inputPassword" placeholder="Password">
+              <input formControlName="password" fullWidth id="inputPassword" nbInput placeholder="Password" type="text">
               <div class="help-block">
                 <div
                   *ngIf="userForm.controls['password'].invalid && (userForm.controls['password'].dirty || userForm.controls['password'].touched)"
@@ -56,7 +56,7 @@
           <div class="form-group row">
             <label class="col-sm-3 label">groups</label>
             <div class="col-sm-9">
-              <nb-select multiple formControlName="groups">
+              <nb-select formControlName="groups" multiple>
                 <nb-option *ngFor="let g of groups" [value]="g">{{ g }}</nb-option>
               </nb-select>
               <div class="help-block">
@@ -72,12 +72,10 @@
           </div>
           <div class="form-group row">
             <div class="offset-sm-3 col-sm-9">
-              <button type="submit" nbButton status="primary">Save</button>
+              <button nbButton status="primary" type="submit">Save</button>
             </div>
           </div>
         </form>
-
-
 
 
         <div>

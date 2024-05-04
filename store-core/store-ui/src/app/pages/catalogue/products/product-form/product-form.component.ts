@@ -43,7 +43,7 @@ export class ProductFormComponent implements OnInit {
   currentLanguage = localStorage.getItem('lang');
 
 
-  tabs:NbRouteTab[] = [
+  tabs: NbRouteTab[] = [
     {
       title: this.translate.instant('COMPONENTS.PRODUCTS_IMAGES'),
       route: 'images',

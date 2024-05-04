@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 
-import { ProductService } from '../../products/services/product.service';
-import { ProductGroupsService } from '../services/product-groups.service';
-import { StorageService } from '../../../shared/services/storage.service';
-import { forkJoin } from 'rxjs';
+import {ProductService} from '../../products/services/product.service';
+import {ProductGroupsService} from '../services/product-groups.service';
+import {StorageService} from '../../../shared/services/storage.service';
+import {forkJoin} from 'rxjs';
 
 @Component({
   selector: 'ngx-products-groups-list',
@@ -17,6 +17,7 @@ export class ProductsGroupsListComponent implements OnInit {
   selectedGroup;
   itemsParams = this.loadItemsParams();
   loading: boolean = false;
+
   constructor(
     private productService: ProductService,
     private productGroupsService: ProductGroupsService,
@@ -31,7 +32,7 @@ export class ProductsGroupsListComponent implements OnInit {
 
     forkJoin(
       this.productService.getListOfProducts(params),
-      this.productGroupsService.getListOfProductGroups({ store: this.storageService.getMerchant() }))
+      this.productGroupsService.getListOfProductGroups({store: this.storageService.getMerchant()}))
       .subscribe(([products, groups]) => {
         this.availableList = [...products.products];
         this.groups = [...groups];
@@ -59,7 +60,7 @@ export class ProductsGroupsListComponent implements OnInit {
       case 'allToTarget':
         const addArray = [];
         e.items.forEach((el) => {
-          const req = this.productGroupsService.addProductToGroup("this.store",el.id, this.selectedGroup);
+          const req = this.productGroupsService.addProductToGroup("this.store", el.id, this.selectedGroup);
           addArray.push(req);
         });
         forkJoin(addArray).subscribe(res => {
@@ -69,7 +70,7 @@ export class ProductsGroupsListComponent implements OnInit {
       case 'allToSource':
         const removeArr = [];
         e.items.forEach((el) => {
-          const req = this.productGroupsService.removeProductFromGroup("this.store",el.id, this.selectedGroup);
+          const req = this.productGroupsService.removeProductFromGroup("this.store", el.id, this.selectedGroup);
           removeArr.push(req);
         });
         forkJoin(removeArr).subscribe(res => {
@@ -80,14 +81,14 @@ export class ProductsGroupsListComponent implements OnInit {
   }
 
   addProductToGroup(productId, groupCode) {
-    this.productGroupsService.addProductToGroup("this.store",productId, groupCode)
+    this.productGroupsService.addProductToGroup("this.store", productId, groupCode)
       .subscribe(res => {
         //console.log(res);
       });
   }
 
   removeProductFromGroup(productId, groupCode) {
-    this.productGroupsService.removeProductFromGroup("this.store",productId, groupCode)
+    this.productGroupsService.removeProductFromGroup("this.store", productId, groupCode)
       .subscribe(res => {
         //console.log(res);
       });

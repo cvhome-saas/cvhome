@@ -1,6 +1,6 @@
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 
-import { CatalogueFormComponent } from './catalogue-form.component';
+import {CatalogueFormComponent} from './catalogue-form.component';
 
 describe('CatalogueFormComponent', () => {
   let component: CatalogueFormComponent;
@@ -8,9 +8,9 @@ describe('CatalogueFormComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ CatalogueFormComponent ]
+      declarations: [CatalogueFormComponent]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {

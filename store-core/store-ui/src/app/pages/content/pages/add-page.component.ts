@@ -46,6 +46,18 @@ export class AddPageComponent implements OnInit {
 
   }
 
+  get code() {
+    return this.form.get('code');
+  }
+
+  get descriptions(): FormArray {
+    return <FormArray>this.form.get('descriptions');
+  }
+
+  get selectedLanguage() {
+    return this.form.get('selectedLanguage');
+  }
+
   ngOnInit() {
     this.loader = true;
     this.activatedRoute.params.subscribe(it => {
@@ -62,47 +74,6 @@ export class AddPageComponent implements OnInit {
     this.createForm();
   }
 
-  private getLanguages() {
-    this.configService.getListOfSupportedLanguages(this.store)
-      .subscribe({
-        next: (languages) => {
-          this.languages = [...languages];
-          this.addFormArray();
-          this.loader = false;
-        },
-        error: (err) => {
-          this.toastr.danger(err.error.message);
-          this.loader = false;
-        },
-      });
-  }
-
-  private getPage() {
-    this.crudService.get('/store/api/v1/content/pages/' + this.uniqueCode + '?lang=_all&store=' + this.store)
-      .subscribe({
-        next: (data) => {
-          this.content = data;
-          this.fillForm();
-          this.loader = false;
-        },
-        error: (err) => {
-        }
-      });
-  }
-
-
-  private createForm() {
-    this.form = this.fb.group({
-      id: [''],
-      code: ['', [Validators.required, Validators.pattern(validators.alphanumeric)]],
-      visible: [false],
-      linkToMenu: [false],
-      order: [0],
-      selectedLanguage: [this.defaultLanguage, [Validators.required]],
-      descriptions: this.fb.array([]),
-    });
-  }
-
   addFormArray() {
     const control = <FormArray>this.form.controls.descriptions;
     this.languages.forEach(lang => {
@@ -117,20 +88,6 @@ export class AddPageComponent implements OnInit {
         })
       );
     });
-  }
-
-  private fillForm() {
-    this.form.patchValue({
-      id: this.content.id,
-      code: this.content.code,
-      visible: this.content.visible,
-      linkToMenu: this.content.linkToMenu,
-      selectedLanguage: this.defaultLanguage,
-      descriptions: [],
-    });
-    this.fillFormArray();
-    this.findInvalidControls();
-
   }
 
   fillFormArray() {
@@ -173,18 +130,6 @@ export class AddPageComponent implements OnInit {
     });
     this.currentLanguage = lang;
     this.fillFormArray();
-  }
-
-  get code() {
-    return this.form.get('code');
-  }
-
-  get descriptions(): FormArray {
-    return <FormArray>this.form.get('descriptions');
-  }
-
-  get selectedLanguage() {
-    return this.form.get('selectedLanguage');
   }
 
   focusOutFunction(event) {
@@ -239,7 +184,6 @@ export class AddPageComponent implements OnInit {
 
   }
 
-
   goToBack() {
     this.router.navigate(['/pages/content/pages/list']);
   }
@@ -262,5 +206,59 @@ export class AddPageComponent implements OnInit {
       }
     });
     return button.render();
+  }
+
+  private getLanguages() {
+    this.configService.getListOfSupportedLanguages(this.store)
+      .subscribe({
+        next: (languages) => {
+          this.languages = [...languages];
+          this.addFormArray();
+          this.loader = false;
+        },
+        error: (err) => {
+          this.toastr.danger(err.error.message);
+          this.loader = false;
+        },
+      });
+  }
+
+  private getPage() {
+    this.crudService.get('/store/api/v1/content/pages/' + this.uniqueCode + '?lang=_all&store=' + this.store)
+      .subscribe({
+        next: (data) => {
+          this.content = data;
+          this.fillForm();
+          this.loader = false;
+        },
+        error: (err) => {
+        }
+      });
+  }
+
+  private createForm() {
+    this.form = this.fb.group({
+      id: [''],
+      code: ['', [Validators.required, Validators.pattern(validators.alphanumeric)]],
+      visible: [false],
+      linkToMenu: [false],
+      order: [0],
+      selectedLanguage: [this.defaultLanguage, [Validators.required]],
+      descriptions: this.fb.array([]),
+    });
+  }
+
+  private fillForm() {
+    this.form.patchValue({
+      id: this.content.id,
+      code: this.content.code,
+      visible: this.content.visible,
+      linkToMenu: this.content.linkToMenu,
+      selectedLanguage: this.defaultLanguage,
+      descriptions: [],
+    });
+    this.fillFormArray();
+    this.findInvalidControls();
+
   }
 }

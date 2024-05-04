@@ -1,14 +1,14 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import {Component, OnInit} from '@angular/core';
+import {Router} from '@angular/router';
 
-import { OptionService } from '../services/option.service';
-import { LocalDataSource } from 'ng2-smart-table';
-import { TranslateService } from '@ngx-translate/core';
-import { ShowcaseDialogComponent } from '../../../shared/components/showcase-dialog/showcase-dialog.component';
-import { NbDialogService } from '@nebular/theme';
+import {OptionService} from '../services/option.service';
+import {LocalDataSource} from 'ng2-smart-table';
+import {TranslateService} from '@ngx-translate/core';
+import {ShowcaseDialogComponent} from '../../../shared/components/showcase-dialog/showcase-dialog.component';
+import {NbDialogService} from '@nebular/theme';
 import {NbToastrService} from '@nebular/theme';
-import { StorageService } from '../../../shared/services/storage.service';
-import { StoreService } from '../../../store-management/services/store.service';
+import {StorageService} from '../../../shared/services/storage.service';
+import {StoreService} from '../../../store-management/services/store.service';
 
 @Component({
   selector: 'ngx-options-list',
@@ -29,6 +29,7 @@ export class OptionsListComponent implements OnInit {
   stores: Array<any> = [];
   selectedStore: String = '';
   params = this.loadParams();
+
   constructor(
     private optionService: OptionService,
     private translate: TranslateService,
@@ -44,6 +45,7 @@ export class OptionsListComponent implements OnInit {
   ngOnInit() {
     this.getList();
   }
+
   loadParams() {
     return {
       store: this.storageService.getMerchant(),
@@ -52,14 +54,16 @@ export class OptionsListComponent implements OnInit {
       page: 0
     };
   }
+
   getStoreList() {
-    this.storeService.getListOfMerchantStoreNames({ 'store': '' })
+    this.storeService.getListOfMerchantStoreNames({'store': ''})
       .subscribe(res => {
         res.forEach((store) => {
-          this.stores.push({ value: store.code, label: store.code });
+          this.stores.push({value: store.code, label: store.code});
         });
       });
   }
+
   getList() {
     this.params.page = this.currentPage - 1;
     this.loadingList = true;
@@ -86,8 +90,8 @@ export class OptionsListComponent implements OnInit {
         position: 'right',
         sort: true,
         custom: [
-          { name: 'edit', title: '<i class="nb-edit"></i>' },
-          { name: 'remove', title: '<i class="nb-trash"></i>' }
+          {name: 'edit', title: '<i class="nb-edit"></i>'},
+          {name: 'remove', title: '<i class="nb-trash"></i>'}
         ],
       },
       pager: {
@@ -135,17 +139,17 @@ export class OptionsListComponent implements OnInit {
   deleteRecord(event) {
     this.dialogService.open(ShowcaseDialogComponent, {})
       .onClose.subscribe(res => {
-        if (res) {
-          // event.confirm.resolve();
-          this.optionService.deleteOption(event.data.id)
-            .subscribe(result => {
-              this.toastr.success(this.translate.instant('OPTION.OPTION_REMOVED'));
-              this.getList();
-            });
-        } else {
-          // event.confirm.reject();
-        }
-      });
+      if (res) {
+        // event.confirm.resolve();
+        this.optionService.deleteOption(event.data.id)
+          .subscribe(result => {
+            this.toastr.success(this.translate.instant('OPTION.OPTION_REMOVED'));
+            this.getList();
+          });
+      } else {
+        // event.confirm.reject();
+      }
+    });
   }
 
   // paginator
@@ -174,20 +178,24 @@ export class OptionsListComponent implements OnInit {
     }
     this.getList();
   }
+
   onSearch(value) {
     this.params["name"] = value;
     this.searchValue = value;
     this.getList()
   }
+
   resetSearch() {
     this.params = this.loadParams();
     this.searchValue = null;
     this.getList();
   }
+
   onSelectStore(e) {
     this.params["store"] = e;
     this.getList();
   }
+
   onClickAction(event) {
     switch (event.action) {
       case 'edit':
@@ -198,6 +206,7 @@ export class OptionsListComponent implements OnInit {
         break
     }
   }
+
   onEdit(event) {
     this.router.navigate(['/pages/catalogue/options/option/' + event.data.id]);
   }

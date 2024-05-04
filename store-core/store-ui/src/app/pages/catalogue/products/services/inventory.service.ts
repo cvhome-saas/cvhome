@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
-import { CrudService } from '../../../shared/services/crud.service';
-import { Observable } from 'rxjs';
+import {Injectable} from '@angular/core';
+import {CrudService} from '../../../shared/services/crud.service';
+import {Observable} from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +16,7 @@ export class InventoryService {
     return this.crudService.get(`/v1/private/product/${idProduct}/inventory`, params);
   }
 
-  createInventory (inventory): Observable<any> {
+  createInventory(inventory): Observable<any> {
     return this.crudService.post(`/v1/private/product/inventory`, inventory);
   }
 
@@ -28,7 +28,7 @@ export class InventoryService {
   }
 
   deleteProduct(id): Observable<any> {
-    return this.crudService.delete(`/v1/private/product/inventory/${ id }`);
+    return this.crudService.delete(`/v1/private/product/inventory/${id}`);
   }
 
   updateInventory(idProduct, idInventory, inventory): Observable<any> {

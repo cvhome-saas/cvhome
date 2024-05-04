@@ -1,6 +1,7 @@
-import { Component, } from '@angular/core';
-import { NbDialogRef } from '@nebular/theme';
+import {Component,} from '@angular/core';
+import {NbDialogRef} from '@nebular/theme';
 import * as moment from 'moment';
+
 @Component({
   selector: 'ngx-order-transaction',
   templateUrl: 'order-transaction.html',
@@ -9,6 +10,7 @@ import * as moment from 'moment';
 export class OrderTransactionComponent {
   transactionData: any;
   moment: any = moment;
+
   constructor(protected ref: NbDialogRef<OrderTransactionComponent>) {
     // console.log(this.historyData)
   }

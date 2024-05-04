@@ -1,11 +1,11 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import {Component, OnInit} from '@angular/core';
+import {ActivatedRoute} from '@angular/router';
 
-import { CatalogService } from '../services/catalog.service';
-import { StorageService } from '../../../shared/services/storage.service';
-import { forkJoin } from 'rxjs';
-import { ProductService } from '../../products/services/product.service';
-import { CategoryService } from '../../categories/services/category.service';
+import {CatalogService} from '../services/catalog.service';
+import {StorageService} from '../../../shared/services/storage.service';
+import {forkJoin} from 'rxjs';
+import {ProductService} from '../../products/services/product.service';
+import {CategoryService} from '../../categories/services/category.service';
 
 @Component({
   selector: 'ngx-product-to-catalogue',

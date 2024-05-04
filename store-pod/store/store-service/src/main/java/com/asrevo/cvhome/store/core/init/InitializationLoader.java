@@ -1,6 +1,5 @@
 package com.asrevo.cvhome.store.core.init;
 
-import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.system.MerchantConfig;
 import com.asrevo.cvhome.store.core.services.merchant.MerchantStoreService;

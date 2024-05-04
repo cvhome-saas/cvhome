@@ -1,13 +1,13 @@
 <nb-card class="page-card">
-  <div *ngIf="loading" class="loading-block" [nbSpinner]="loading" nbSpinnerSize="large" nbSpinnerStatus="primary">
+  <div *ngIf="loading" [nbSpinner]="loading" class="loading-block" nbSpinnerSize="large" nbSpinnerStatus="primary">
   </div>
   <nb-card-body *ngIf="!loading">
     <div class="inner_pages_legacy">
       <nb-card-header class="main_header">
-        <h1 class="page_title">{{ 'STORE.STORE_INFORMATION' | translate}}</h1>
+        <h1 class="page_title">{{ 'STORE.STORE_INFORMATION' | translate }}</h1>
         <div class="content_spacing">
           <nb-select [(selected)]="selectedItem" outline shape="rectangle">
-            <nb-option *ngFor="let item of sidemenuLinks" [value]="item.id" (click)="route(item.link)">{{ item.title }}
+            <nb-option (click)="route(item.link)" *ngFor="let item of sidemenuLinks" [value]="item.id">{{ item.title }}
             </nb-option>
           </nb-select>
         </div>
@@ -19,24 +19,26 @@
       </nb-card-header>
 
       <form [formGroup]="imageUpload">
-        <div class="wrapper" (click)='imageInput.click()' (drop)="drop($event)" (dragover)="allowDrop($event)">
-          <div id="imageDrop" #imageDrop>
+        <div (click)='imageInput.click()' (dragover)="allowDrop($event)" (drop)="drop($event)" class="wrapper">
+          <div #imageDrop id="imageDrop">
 
-            <img *ngIf="logo" [src]="logo?.path" style="max-height:200;" />
+            <img *ngIf="logo" [src]="logo?.path" style="max-height:200;"/>
 
           </div>
-          <div class="uploadingPhrase">{{ 'STORE_BRANDING.DROP_FILE' | translate}}</div>
+          <div class="uploadingPhrase">{{ 'STORE_BRANDING.DROP_FILE' | translate }}</div>
         </div>
 
-        <input type="file" formControlName="imageInput" required #imageInput id="imageInput"
-          (change)='imageChange($event)'>
+        <input #imageInput (change)='imageChange($event)' formControlName="imageInput" id="imageInput" required
+               type="file">
 
         <div class="form-group actions-button">
-          <button type="submit" class="btn btn-danger" *ngIf="showRemoveButton" (click)="removeLogo()">{{
-            'COMMON.REMOVE' | translate}}</button>
-          <button type="submit" class="btn btn-primary" (click)="saveLogo()" *ngIf="logoFile" nbButton
-            [nbSpinner]="loadingButton" nbSpinnerSize="large" nbSpinnerMessage="">
-            {{ ( !loadingButton ? 'COMMON.SAVE' : '' ) | translate }}
+          <button (click)="removeLogo()" *ngIf="showRemoveButton" class="btn btn-danger" type="submit">{{
+              'COMMON.REMOVE' | translate
+            }}
+          </button>
+          <button (click)="saveLogo()" *ngIf="logoFile" [nbSpinner]="loadingButton" class="btn btn-primary" nbButton
+                  nbSpinnerMessage="" nbSpinnerSize="large" type="submit">
+            {{ (!loadingButton ? 'COMMON.SAVE' : '') | translate }}
             <!-- {{ 'COMMON.SAVE' | translate}} -->
           </button>
         </div>

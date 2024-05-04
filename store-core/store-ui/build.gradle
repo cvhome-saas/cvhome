@@ -1,38 +1,38 @@
 task "clean" {
-    doLast {
-        delete files('dist/')
-    }
+  doLast {
+    delete files('dist/')
+  }
 }
 
 task "build" {
-    doLast {
-        exec {
-            workingDir '.'
-            commandLine "npm", "i"
-        }
-        exec {
-            workingDir '.'
-            commandLine "npm", "run", "ng", "build"
-        }
+  doLast {
+    exec {
+      workingDir '.'
+      commandLine "npm", "i"
     }
+    exec {
+      workingDir '.'
+      commandLine "npm", "run", "ng", "build"
+    }
+  }
 }
 
 tasks.register('bootBuildImage', BootBuildImageTask) {
-    dependsOn('build')
+  dependsOn('build')
 }
 
 
 abstract class BootBuildImageTask extends DefaultTask {
-    private Boolean publishImage = false
+  private Boolean publishImage = false
 
 
-    @Option(option = "publishImage", description = "Configures PublishImage.")
-    void setPublishImage(Boolean publishImage) {
-        this.publishImage = publishImage;
-    }
+  @Option(option = "publishImage", description = "Configures PublishImage.")
+  void setPublishImage(Boolean publishImage) {
+    this.publishImage = publishImage;
+  }
 
-    BootBuildImageTask() {
-    }
+  BootBuildImageTask() {
+  }
 
 /*  @TaskAction
   void bootBuildImage() {
@@ -54,19 +54,19 @@ abstract class BootBuildImageTask extends DefaultTask {
   }
 */
 
-    @TaskAction
-    void bootBuildImage() {
-        String image = "${System.getenv('REGISTRY')}/store-core/${project.name}"
-        project.exec {
-            workingDir '.'
-            commandLine "docker", "build", "-t", "${image}:${project.version}", "-t", "${image}:latest", "."
-        }
-        if (publishImage) {
-            project.exec {
-                workingDir '.'
-                commandLine "docker", "push", image, "--all-tags"
-            }
-        }
+  @TaskAction
+  void bootBuildImage() {
+    String image = "${System.getenv('REGISTRY')}/store-core/${project.name}"
+    project.exec {
+      workingDir '.'
+      commandLine "docker", "build", "-t", "${image}:${project.version}", "-t", "${image}:latest", "."
     }
+    if (publishImage) {
+      project.exec {
+        workingDir '.'
+        commandLine "docker", "push", image, "--all-tags"
+      }
+    }
+  }
 
 }

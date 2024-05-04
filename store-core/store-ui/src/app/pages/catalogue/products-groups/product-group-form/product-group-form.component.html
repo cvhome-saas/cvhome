@@ -3,17 +3,17 @@
     <nb-card-header class="main_header">
       <h1 class="page_title">{{ 'PRODUCT_GROUP.CREATE_PRODUCT_GROUP' | translate }}</h1>
       <div class="content_spacing">
-        <button type="button" nbButton class="cancel_button" (click)="goToBack()">
-          {{'COMMON.CANCEL'| translate }}
+        <button (click)="goToBack()" class="cancel_button" nbButton type="button">
+          {{ 'COMMON.CANCEL'| translate }}
         </button>
       </div>
       <div class="content_spacing">
-        <button type="submit" nbButton *ngIf="!uniqueCode" class="success_button" [nbSpinner]="loading"
-                nbSpinnerSize="large" nbSpinnerStatus="control" (click)="save()" [disabled]="!form.valid">
-          {{(!loading ? 'COMMON.SAVE' : '') | translate }}
+        <button (click)="save()" *ngIf="!uniqueCode" [disabled]="!form.valid" [nbSpinner]="loading" class="success_button"
+                nbButton nbSpinnerSize="large" nbSpinnerStatus="control" type="submit">
+          {{ (!loading ? 'COMMON.SAVE' : '') | translate }}
         </button>
-        <button type="button" nbButton *ngIf="uniqueCode" class="success_button" (click)="update()">
-          {{'COMMON.UPDATE'|translate }}
+        <button (click)="update()" *ngIf="uniqueCode" class="success_button" nbButton type="button">
+          {{ 'COMMON.UPDATE'|translate }}
         </button>
       </div>
     </nb-card-header>
@@ -32,12 +32,12 @@
         </div>
 
         <div class="form-group">
-          <label for="code" class="col-sm-10 col-form-label inputLabel">{{ 'COMMON.CODE' | translate }} *</label>
+          <label class="col-sm-10 col-form-label inputLabel" for="code">{{ 'COMMON.CODE' | translate }} *</label>
           <div class="col-sm-12">
-            <input type="text" class="form-control inputText" id="code" formControlName='code'
-                   (change)="checkCode($event)" placeholder="{{ 'COMMON.CODE' | translate}}" [readOnly]="uniqueCode"
-                   required>
-            <div class="err-message" *ngIf="(code.dirty || code.touched) && code.invalid && code">
+            <input (change)="checkCode($event)" [readOnly]="uniqueCode" class="form-control inputText" formControlName='code'
+                   id="code" placeholder="{{ 'COMMON.CODE' | translate}}" required
+                   type="text">
+            <div *ngIf="(code.dirty || code.touched) && code.invalid && code" class="err-message">
               <span *ngIf="code.errors.required">
                 {{ 'COMMON.CODE_REQUIRED' | translate }}
               </span>
@@ -51,21 +51,21 @@
           </div>
         </div>
         <div class="col-sm-12">
-          <ngx-product-auto-complete [store]="params.store" [disabled]="uniqueCode==undefined"
-                                     (onProduct)="onItemSelect($event,uniqueCode)"></ngx-product-auto-complete>
+          <ngx-product-auto-complete (onProduct)="onItemSelect($event,uniqueCode)" [disabled]="uniqueCode==undefined"
+                                     [store]="params.store"></ngx-product-auto-complete>
 
           <ngx-datatable
-            class="material"
-            [rows]="rows"
+            (page)="setPage($event)"
             [columnMode]="ColumnMode.force"
-            [headerHeight]="50"
-            [footerHeight]="50"
-            rowHeight="auto"
-            [externalPaging]="true"
             [count]="page.totalElements"
-            [offset]="page.pageNumber"
+            [externalPaging]="true"
+            [footerHeight]="50"
+            [headerHeight]="50"
             [limit]="page.size"
-            (page)="setPage($event)">
+            [offset]="page.pageNumber"
+            [rows]="rows"
+            class="material"
+            rowHeight="auto">
 
 
             <ngx-datatable-column name="name">
@@ -81,7 +81,7 @@
                 {{ 'ORDER.ACTIONS' |translate }}
               </ng-template>
               <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-                <button nbButton shape="round" size="small" status="danger" (click)="onItemDeSelect(row,uniqueCode)">
+                <button (click)="onItemDeSelect(row,uniqueCode)" nbButton shape="round" size="small" status="danger">
                   <i class="nb-trash"></i></button>
               </ng-template>
             </ngx-datatable-column>

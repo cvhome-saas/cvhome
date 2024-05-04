@@ -1,16 +1,20 @@
 <div class="inner_pages option_create_page">
 
   <nb-card-header class="main_header">
-    <h1 class="page_title">{{ 'COMPONENTS.SET_OPTION' | translate}}</h1>
+    <h1 class="page_title">{{ 'COMPONENTS.SET_OPTION' | translate }}</h1>
 
     <div class="content_spacing">
-      <button type="button" nbButton class="cancel_button" (click)="goToBack()">{{ 'ORDER_FORM.CANCEL'
-        | translate}}</button>
+      <button (click)="goToBack()" class="cancel_button" nbButton type="button">{{
+          'ORDER_FORM.CANCEL'
+            | translate
+        }}
+      </button>
     </div>
 
     <div class="content_spacing">
-      <button nbButton type="button" class="success_button" [nbSpinner]="loading" nbSpinnerSize="large"
-        nbSpinnerStatus="control" (click)="save()">{{ ( !loading ? 'COMMON.SAVE' : '' ) | translate }}</button>
+      <button (click)="save()" [nbSpinner]="loading" class="success_button" nbButton nbSpinnerSize="large"
+              nbSpinnerStatus="control" type="button">{{ (!loading ? 'COMMON.SAVE' : '') | translate }}
+      </button>
     </div>
   </nb-card-header>
 
@@ -24,49 +28,49 @@
         <div class="form-group">
           <label class="col-form-label inputLabel"></label>
           <nb-checkbox formControlName='readOnly' name="readOnly">
-            {{ 'COMMON.READ_ONLY' | translate}}
+            {{ 'COMMON.READ_ONLY' | translate }}
           </nb-checkbox>
         </div>
 
         <div class="form-group">
           <label class="col-form-label inputLabel">{{ 'COMMON.CODE' | translate }}
             *</label>
-          <input type="text" class="form-control inputText" id="code" formControlName='code' [readOnly]="isReadonlyCode"
-            (change)="checkCode($event)" required>
+          <input (change)="checkCode($event)" [readOnly]="isReadonlyCode" class="form-control inputText" formControlName='code' id="code"
+                 required type="text">
           <div *ngIf="(code.dirty || code.touched) && code.invalid && code" class="err-message"
-            style="margin-top:10px;">
+               style="margin-top:10px;">
             <span *ngIf="code.errors.required">
-              {{ 'COMMON.CODE_REQUIRED' | translate}}
+              {{ 'COMMON.CODE_REQUIRED' | translate }}
             </span>
             <span *ngIf="code.errors.pattern">
-              {{ 'COMMON.ALPHA_DECIMAL_RULE' | translate}}
+              {{ 'COMMON.ALPHA_DECIMAL_RULE' | translate }}
             </span>
           </div>
           <span *ngIf="isCodeExist" class="err-message">
-            {{ 'COMMON.CODE_EXISTS' | translate}}
+            {{ 'COMMON.CODE_EXISTS' | translate }}
           </span>
           <div *ngIf="!isValidCode" class="err-message" style="margin-top:10px;">
-            {{ 'COMMON.CODE_REQUIRED' | translate}}
+            {{ 'COMMON.CODE_REQUIRED' | translate }}
           </div>
         </div>
         <div class="form-group">
-          <label class="col-form-label inputLabel">{{ 'OPTION.OPTION_NAME' | translate}} *</label>
-          <nb-select (click)="clickOption()" placeholder="{{ 'OPTION_SET.SELECT_OPTION_NAME' | translate}}" outline
-            shape="rectangle" formControlName='option' name="option" class="fullWidth" required>
-            <nb-option *ngFor="let option of productOption" [value]="option.id">{{option.name}}</nb-option>
+          <label class="col-form-label inputLabel">{{ 'OPTION.OPTION_NAME' | translate }} *</label>
+          <nb-select (click)="clickOption()" class="fullWidth" formControlName='option'
+                     name="option" outline placeholder="{{ 'OPTION_SET.SELECT_OPTION_NAME' | translate}}" required shape="rectangle">
+            <nb-option *ngFor="let option of productOption" [value]="option.id">{{ option.name }}</nb-option>
           </nb-select>
           <div *ngIf="!isValidOption" class="err-message" style="margin-top:10px;">
-            {{ 'DESCRIPTION_FORM.NAME_REQUIRED' | translate}}
+            {{ 'DESCRIPTION_FORM.NAME_REQUIRED' | translate }}
           </div>
         </div>
 
         <div class="form-group">
-          <label class="col-form-label inputLabel">{{ 'OPTION_VALUE.OPTION_VALUE' | translate}}</label>
+          <label class="col-form-label inputLabel">{{ 'OPTION_VALUE.OPTION_VALUE' | translate }}</label>
 
-          <nb-select multiple placeholder="{{ 'OPTION_SET.ADD_OPTION_VALUE' | translate}}"
-            (selectedChange)="setSelected($event)" outline shape="rectangle" [(selected)]="option.optionValues"
-            class="fullWidth">
-            <nb-option *ngFor="let optionValue of productOptionValue" [value]="optionValue.id">{{optionValue.name}}
+          <nb-select (selectedChange)="setSelected($event)" [(selected)]="option.optionValues"
+                     class="fullWidth" multiple outline placeholder="{{ 'OPTION_SET.ADD_OPTION_VALUE' | translate}}"
+                     shape="rectangle">
+            <nb-option *ngFor="let optionValue of productOptionValue" [value]="optionValue.id">{{ optionValue.name }}
             </nb-option>
           </nb-select>
 
@@ -74,12 +78,12 @@
 
         <!-- ProductType -->
         <div class="form-group">
-          <label class="col-form-label inputLabel">{{ 'PRODUCT_TYPE.PRODUCT_TYPE' | translate}}</label>
+          <label class="col-form-label inputLabel">{{ 'PRODUCT_TYPE.PRODUCT_TYPE' | translate }}</label>
 
-          <nb-select multiple placeholder="{{ 'PRODUCT_TYPE.PRODUCT_TYPE_ADD' | translate}}"
-            (selectedChange)="setProductTypeSelected($event)" outline shape="rectangle"
-            [(selected)]="option.productTypes" class="fullWidth">
-            <nb-option *ngFor="let productType of productTypes" [value]="productType.id">{{productType.code}}
+          <nb-select (selectedChange)="setProductTypeSelected($event)" [(selected)]="option.productTypes"
+                     class="fullWidth" multiple outline
+                     placeholder="{{ 'PRODUCT_TYPE.PRODUCT_TYPE_ADD' | translate}}" shape="rectangle">
+            <nb-option *ngFor="let productType of productTypes" [value]="productType.id">{{ productType.code }}
             </nb-option>
           </nb-select>
 

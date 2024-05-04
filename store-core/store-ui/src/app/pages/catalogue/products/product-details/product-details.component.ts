@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { ProductService } from '../services/product.service';
+import {Component, OnInit} from '@angular/core';
+import {ActivatedRoute, Router} from '@angular/router';
+import {ProductService} from '../services/product.service';
 
 @Component({
   selector: 'ngx-product-details',
@@ -27,7 +27,7 @@ export class ProductDetailsComponent implements OnInit {
       if (split.length == 2 && split[1] != "") {
         this.uniqueCode = split[1];
 
-        this.productService.getProductDefinitionById(this.store,this.uniqueCode)
+        this.productService.getProductDefinitionById(this.store, this.uniqueCode)
           .subscribe(res => {
             this.product = res;
           });

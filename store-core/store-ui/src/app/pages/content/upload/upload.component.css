@@ -1,5 +1,5 @@
 .inline-block {
-    width: 100%;
+  width: 100%;
 
 }
 
@@ -16,30 +16,30 @@
 } */
 
 input {
-    height: 50%;
-    width: 100%;
+  height: 50%;
+  width: 100%;
 }
 
 .success,
 .error {
-    font-weight: 600;
+  font-weight: 600;
 }
 
 .success {
-    color: #78e5d5;
+  color: #78e5d5;
 }
 
 .error {
-    color: #e57878;
+  color: #e57878;
 }
 
 .dragActive {
-    border: 2px dashed #ddd;
-    border-radius: 4px;
-    /* opacity: 0.1; */
-    border-color: #78e5d5;
+  border: 2px dashed #ddd;
+  border-radius: 4px;
+  /* opacity: 0.1; */
+  border-color: #78e5d5;
 }
 
 .dragReject {
-    border-color: #e57878;
+  border-color: #e57878;
 }

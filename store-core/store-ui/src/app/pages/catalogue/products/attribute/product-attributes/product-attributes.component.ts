@@ -1,19 +1,19 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { LocalDataSource } from 'ng2-smart-table';
-import { ProductAttributesService } from '../../services/product-attributes.service';
-import { ProductService } from '../../services/product.service';
-import { AttributeFormComponent } from '../attribute-form/attribute-form.component';
-import { OptionService } from '../../../options/services/option.service';
-import { Attribute } from '../model/attribute';
+import {Component, OnInit, Input, Output, EventEmitter} from '@angular/core';
+import {ActivatedRoute, Router} from '@angular/router';
+import {LocalDataSource} from 'ng2-smart-table';
+import {ProductAttributesService} from '../../services/product-attributes.service';
+import {ProductService} from '../../services/product.service';
+import {AttributeFormComponent} from '../attribute-form/attribute-form.component';
+import {OptionService} from '../../../options/services/option.service';
+import {Attribute} from '../model/attribute';
 import {NbToastrService} from '@nebular/theme';
-import { TranslateService } from '@ngx-translate/core';
-import { StorageService } from '../../../../shared/services/storage.service';
-import { ShowcaseDialogComponent } from '../../../../shared/components/showcase-dialog/showcase-dialog.component';
-import { NbDialogService } from '@nebular/theme';
-import { DomSanitizer } from '@angular/platform-browser';
-import { Location } from '@angular/common';
-import { ListingService } from '../../../../shared/services/listing.service';
+import {TranslateService} from '@ngx-translate/core';
+import {StorageService} from '../../../../shared/services/storage.service';
+import {ShowcaseDialogComponent} from '../../../../shared/components/showcase-dialog/showcase-dialog.component';
+import {NbDialogService} from '@nebular/theme';
+import {DomSanitizer} from '@angular/platform-browser';
+import {Location} from '@angular/common';
+import {ListingService} from '../../../../shared/services/listing.service';
 
 export interface TreeNode {
   data?: Attribute;
@@ -29,7 +29,7 @@ export interface TreeNode {
 })
 export class ProductAttributesComponent implements OnInit {
 
-  id : any;
+  id: any;
   loaded = false;
   loading = false;
   loadingList = false;
@@ -49,6 +49,7 @@ export class ProductAttributesComponent implements OnInit {
 
   params = this.loadParams();
   public input: string = '<input type="checkbox"></input>';
+
   constructor(
     private productAttributesService: ProductAttributesService,
     private productService: ProductService,
@@ -62,11 +63,12 @@ export class ProductAttributesComponent implements OnInit {
     private router: Router,
     private _sanitizer: DomSanitizer
   ) {
-    this.optionService.getListOfOptions({ count: 1000 })
+    this.optionService.getListOfOptions({count: 1000})
       .subscribe(res => {
         this.options = [...res.options];
       });
   }
+
   loadParams() {
     return {
       store: this.storageService.getMerchant(),
@@ -77,10 +79,9 @@ export class ProductAttributesComponent implements OnInit {
   }
 
 
-
   ngOnInit() {
 
-    this.id = this.productService.getProductIdRoute(this.router,this.location);
+    this.id = this.productService.getProductIdRoute(this.router, this.location);
 
     //specify add image url to image component
     let el = document.getElementById('tabs');
@@ -101,9 +102,8 @@ export class ProductAttributesComponent implements OnInit {
   }
 
 
-
   getList() {
-    var page = this.currentPage -1;
+    var page = this.currentPage - 1;
     this.params.page = page;
     this.loading = true;
     this.productAttributesService.getListOfProductsAttributes(this.id, this.params)
@@ -121,6 +121,7 @@ export class ProductAttributesComponent implements OnInit {
       });
     this.setSettings();
   }
+
   setSettings() {
     this.settings = {
       hideSubHeader: true,
@@ -132,8 +133,8 @@ export class ProductAttributesComponent implements OnInit {
         position: 'right',
         sort: true,
         custom: [
-          { name: 'edit', title: '<i class="nb-edit"></i>' },
-          { name: 'remove', title: '<i class="nb-trash"></i>' }
+          {name: 'edit', title: '<i class="nb-edit"></i>'},
+          {name: 'remove', title: '<i class="nb-trash"></i>'}
         ],
       },
       pager: {
@@ -165,26 +166,26 @@ export class ProductAttributesComponent implements OnInit {
           }
         },
         /**
-        attributeDisplayOnly: {
-           filter: false,
-           title: this.translate.instant('PRODUCT_ATTRIBUTES.DISPLAY_ONLY'),
-           type: 'custom',
-           renderComponent: ActiveButtonComponent,
-           defaultValue: false,
-           editable: true,
-           editor: {
-             type: 'checkbox'
-           }
+         attributeDisplayOnly: {
+         filter: false,
+         title: this.translate.instant('PRODUCT_ATTRIBUTES.DISPLAY_ONLY'),
+         type: 'custom',
+         renderComponent: ActiveButtonComponent,
+         defaultValue: false,
+         editable: true,
+         editor: {
+         type: 'checkbox'
+         }
          },
-        **/
-       /**
-        attributeDisplayOnly: {
-          title: this.translate.instant('PRODUCT_ATTRIBUTES.DISPLAY_ONLY'),
-          type: 'html',
-          valuePrepareFunction: (value) => { return this._sanitizer.bypassSecurityTrustHtml(this.input) },
-          filter: false
-        },
-        **/
+         **/
+        /**
+         attributeDisplayOnly: {
+         title: this.translate.instant('PRODUCT_ATTRIBUTES.DISPLAY_ONLY'),
+         type: 'html',
+         valuePrepareFunction: (value) => { return this._sanitizer.bypassSecurityTrustHtml(this.input) },
+         filter: false
+         },
+         **/
         productAttributePrice: {
           title: this.translate.instant('PRODUCT_ATTRIBUTES.PRICE'),
           type: 'string',
@@ -247,6 +248,7 @@ export class ProductAttributesComponent implements OnInit {
 
     }
   }
+
   onClickAdd() {
     this.dialogService.open(AttributeFormComponent, {
       context: {
@@ -256,24 +258,24 @@ export class ProductAttributesComponent implements OnInit {
       this.getList()
     });
   }
+
   removeAttribute(id) {
-    this.loading=true;
+    this.loading = true;
     this.dialogService.open(ShowcaseDialogComponent, {})
       .onClose.subscribe(res => {
-        if (res) {
-          this.loading=false;
-                                                      //product id, attribute id
-          this.productAttributesService.deleteAttribute(this.id, id).subscribe(res => {
-            this.getList();
-            this.toastr.success(this.translate.instant('PRODUCT_ATTRIBUTES.PRODUCT_ATTRIBUTES_REMOVED'));
-          });
-          this.loading=false;
-        } else {
-          this.loading=false;
-        }
-      });
+      if (res) {
+        this.loading = false;
+        //product id, attribute id
+        this.productAttributesService.deleteAttribute(this.id, id).subscribe(res => {
+          this.getList();
+          this.toastr.success(this.translate.instant('PRODUCT_ATTRIBUTES.PRODUCT_ATTRIBUTES_REMOVED'));
+        });
+        this.loading = false;
+      } else {
+        this.loading = false;
+      }
+    });
   }
-
 
 
 }

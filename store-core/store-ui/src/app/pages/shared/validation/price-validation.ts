@@ -1,4 +1,4 @@
-import { CurrencyPipe } from '@angular/common';
+import {CurrencyPipe} from '@angular/common';
 
 export function formatMoney(value) {
   const temp = `${value}`.replace(/\,/g, '');

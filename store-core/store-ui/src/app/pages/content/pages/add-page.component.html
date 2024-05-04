@@ -1,23 +1,23 @@
 <div class="inner_pages create_page">
   <nb-card-header class="main_header">
-    <h1 class="page_title" *ngIf="action == 'save'">{{ 'CONTENT.ADD_PAGE_DETAILS' | translate }}</h1>
-    <h1 class="page_title" *ngIf="action == 'edit'">{{ 'CONTENT.UPDATE_PAGE_DETAILS' | translate }}</h1>
+    <h1 *ngIf="action == 'save'" class="page_title">{{ 'CONTENT.ADD_PAGE_DETAILS' | translate }}</h1>
+    <h1 *ngIf="action == 'edit'" class="page_title">{{ 'CONTENT.UPDATE_PAGE_DETAILS' | translate }}</h1>
     <div class="content_spacing">
-      <button type="button" nbButton class="cancel_button" (click)="goToBack()">
+      <button (click)="goToBack()" class="cancel_button" nbButton type="button">
         {{ 'COMMON.CANCEL'| translate }}
       </button>
     </div>
     <div class="content_spacing">
-      <button type="submit" nbButton class="success_button" *ngIf="action == 'save'" (click)="createPages()">
+      <button (click)="createPages()" *ngIf="action == 'save'" class="success_button" nbButton type="submit">
         {{ 'COMMON.SAVE'|translate }}
       </button>
-      <button type="submit" nbButton class="success_button" *ngIf="action == 'edit'" (click)="createPages()">
+      <button (click)="createPages()" *ngIf="action == 'edit'" class="success_button" nbButton type="submit">
         {{ 'COMMON.UPDATE'|translate }}
       </button>
     </div>
   </nb-card-header>
-  <div class="" [nbSpinner]="loadingList" nbSpinnerSize="large" nbSpinnerStatus="primary">
-    <form [formGroup]='form' *ngIf="!loader">
+  <div [nbSpinner]="loadingList" class="" nbSpinnerSize="large" nbSpinnerStatus="primary">
+    <form *ngIf="!loader" [formGroup]='form'>
       <div class="row">
         <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
           <nb-card class="nb-card inline-form-card">
@@ -42,12 +42,12 @@
               <div class="row">
                 <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                   <div class="form-group">
-                    <label for="inputCode" class="label inputLabel">{{ 'CONTENT.CODE' | translate }}
+                    <label class="label inputLabel" for="inputCode">{{ 'CONTENT.CODE' | translate }}
                       <span>*</span></label>
-                    <input id="inputCode" type="{{ 'CONTENT.CODE' | translate}}" formControlName='code'
-                           class="form-control inputText" placeholder="Code" (focusout)="focusOutFunction($event)"
-                           required>
-                    <div class="err-message" *ngIf="(code.dirty || code.touched) && code.invalid && code">
+                    <input (focusout)="focusOutFunction($event)" class="form-control inputText" formControlName='code'
+                           id="inputCode" placeholder="Code" required
+                           type="{{ 'CONTENT.CODE' | translate}}">
+                    <div *ngIf="(code.dirty || code.touched) && code.invalid && code" class="err-message">
                       <span *ngIf="code.errors.required">
                         {{ 'COMMON.CODE_REQUIRED' | translate }}
                       </span>
@@ -62,9 +62,9 @@
                 </div>
                 <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                   <div class="form-group">
-                    <label for="inputOrder" class="label inputLabel">{{ 'CONTENT.ORDER' | translate }}</label>
-                    <input id="inputOrder" type="number" formControlName='order' class="form-control inputText"
-                           placeholder="{{ 'CONTENT.ORDER' | translate}}">
+                    <label class="label inputLabel" for="inputOrder">{{ 'CONTENT.ORDER' | translate }}</label>
+                    <input class="form-control inputText" formControlName='order' id="inputOrder" placeholder="{{ 'CONTENT.ORDER' | translate}}"
+                           type="number">
                   </div>
                 </div>
               </div>
@@ -76,9 +76,9 @@
           <nb-card class="nb-card inline-form-card">
             <nb-card-header class="nb-card-header">
               {{ 'CONTENT.PAGE_CONTENT' | translate }} - {{ ('LANG.' + currentLanguage) |translate }}&nbsp;
-              <nb-select *ngIf="languages.length" placeholder="{{ 'COMMON.LANGUAGE' | translate}}" outline
-                         shape="rectangle"
-                         name='selectedLanguage' [selected]="defaultLanguage">
+              <nb-select *ngIf="languages.length" [selected]="defaultLanguage" name='selectedLanguage'
+                         outline
+                         placeholder="{{ 'COMMON.LANGUAGE' | translate}}" shape="rectangle">
                 <nb-option (click)="selectLanguage(language.code)" *ngFor="let language of languages"
                            [value]="language.code">
                   {{ ('LANG.' + language.code) |translate }}
@@ -89,37 +89,37 @@
               <div *ngIf="selectedLanguage.value !== ''" formArrayName='descriptions'>
                 <div *ngFor="let descr of descriptions.controls; let j=index">
                   <div *ngIf="descr.value.language === selectedLanguage.value">
-                    <div class="row" [formGroupName]="j">
+                    <div [formGroupName]="j" class="row">
                       <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                         <div class="form-group">
-                          <label for="title" class="label inputLabel">
+                          <label class="label inputLabel" for="title">
                             {{ 'CONTENT.TITLE' | translate }}
                           </label>
-                          <input type="text" formControlName="title" class="form-control inputText" id="title"
-                                 placeholder="{{ 'CONTENT.TITLE' | translate}}">
+                          <input class="form-control inputText" formControlName="title" id="title" placeholder="{{ 'CONTENT.TITLE' | translate}}"
+                                 type="text">
                         </div>
                       </div>
                       <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                         <div class="form-group">
-                          <label for="metaDescription" class="label inputLabel">
+                          <label class="label inputLabel" for="metaDescription">
                             {{ 'CONTENT.METATAG' |translate }}
                           </label>
-                          <input type="text" formControlName="metaDescription" class="form-control inputText"
-                                 id="metaDescription"
-                                 placeholder="{{ 'CONTENT.METATAG' | translate}}">
+                          <input class="form-control inputText" formControlName="metaDescription" id="metaDescription"
+                                 placeholder="{{ 'CONTENT.METATAG' | translate}}"
+                                 type="text">
                         </div>
                       </div>
                     </div>
-                    <div class="row" [formGroupName]="j">
+                    <div [formGroupName]="j" class="row">
                       <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                         <div class="form-group">
-                          <label for="name" class="label inputLabel">
+                          <label class="label inputLabel" for="name">
                             {{ 'CONTENT.PAGE_NAME' |translate }}
                             <span>*</span>
                           </label>
-                          <input type="text" formControlName="name" class="form-control inputText" id="name"
+                          <input (ngModelChange)="urlTitle($event, j)" class="form-control inputText" formControlName="name" id="name"
                                  placeholder="{{ 'CONTENT.PAGE_NAME' | translate}}"
-                                 (ngModelChange)="urlTitle($event, j)">
+                                 type="text">
                           <span
                             *ngIf="(descr.get('name').dirty || descr.get('name').touched) && descr.get('name').invalid && descr.get('name').errors.required"
                             class="err-message">
@@ -129,13 +129,13 @@
                       </div>
                       <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                         <div class="form-group">
-                          <label for="friendlyUrl" class="label inputLabel">
+                          <label class="label inputLabel" for="friendlyUrl">
                             {{ 'CONTENT.FRIENDLY_URL' |translate }}
                             <span>*</span>
                           </label>
-                          <input type="text" formControlName="friendlyUrl" class="form-control inputText"
-                                 id="friendlyUrl"
-                                 placeholder="{{ 'CONTENT.FRIENDLY_URL' | translate}}">
+                          <input class="form-control inputText" formControlName="friendlyUrl" id="friendlyUrl"
+                                 placeholder="{{ 'CONTENT.FRIENDLY_URL' | translate}}"
+                                 type="text">
                           <span *ngIf="(descr.get('friendlyUrl').dirty || descr.get('friendlyUrl').touched)
                             && descr.get('friendlyUrl').invalid && descr.get('friendlyUrl').errors.required"
                                 class="err-message">

@@ -1,11 +1,11 @@
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
+import {NgModule} from '@angular/core';
+import {RouterModule, Routes} from '@angular/router';
 
-import { CategoryCreationComponent } from './category-creation/category-creation.component';
-import { CategoriesComponent } from './categories.component';
-import { CategoriesListComponent } from './categories-list/categories-list.component';
-import { CategoriesHierarchyComponent } from './categories-hierarchy/categories-hierarchy.component';
-import { CategoryDetailComponent } from './category-detail/category-detail.component';
+import {CategoryCreationComponent} from './category-creation/category-creation.component';
+import {CategoriesComponent} from './categories.component';
+import {CategoriesListComponent} from './categories-list/categories-list.component';
+import {CategoriesHierarchyComponent} from './categories-hierarchy/categories-hierarchy.component';
+import {CategoryDetailComponent} from './category-detail/category-detail.component';
 
 const routes: Routes = [
   {

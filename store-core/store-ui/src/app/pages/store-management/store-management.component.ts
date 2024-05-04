@@ -1,7 +1,7 @@
-import { Component, DoCheck, OnInit, Input } from '@angular/core';
+import {Component, DoCheck, OnInit, Input} from '@angular/core';
 
-import { TranslateService } from '@ngx-translate/core';
-import { StorageService } from '../shared/services/storage.service';
+import {TranslateService} from '@ngx-translate/core';
+import {StorageService} from '../shared/services/storage.service';
 
 @Component({
   selector: 'ngx-store-management',
@@ -13,25 +13,26 @@ export class StoreManagementComponent implements OnInit, DoCheck {
   sidemenuTitle = 'Merchant store';
   sidemenuValue = 'DEFAULT';
   showSide = true;
+
   /**
-  sidemenuLinks = [
-    {
-      title: 'Store branding',
-      key: 'COMPONENTS.STORE_BRANDING',
-      link: 'store-branding'
-    },
-    {
-      title: 'Store home page',
-      key: 'COMPONENTS.STORE_LANDING',
-      link: 'store-landing'
-    },
-    {
-      title: 'Store details',
-      key: 'COMPONENTS.STORE_DETAILS',
-      link: 'store'
-    }
-  ];
-  **/
+   sidemenuLinks = [
+   {
+   title: 'Store branding',
+   key: 'COMPONENTS.STORE_BRANDING',
+   link: 'store-branding'
+   },
+   {
+   title: 'Store home page',
+   key: 'COMPONENTS.STORE_LANDING',
+   link: 'store-landing'
+   },
+   {
+   title: 'Store details',
+   key: 'COMPONENTS.STORE_DETAILS',
+   link: 'store'
+   }
+   ];
+   **/
 
 
   constructor(
@@ -50,12 +51,12 @@ export class StoreManagementComponent implements OnInit, DoCheck {
   }
 
   /**
-  translateArray(array) {
-    array.forEach((el) => {
-      el.title = this.translate.instant(el.key);
-    });
-  }
-  */
+   translateArray(array) {
+   array.forEach((el) => {
+   el.title = this.translate.instant(el.key);
+   });
+   }
+   */
 
   ngDoCheck() {
     this.showSide = window.location.hash.indexOf('stores-list') === -1 &&

@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import {Component, Input} from '@angular/core';
 
 @Component({
   selector: 'upload',
@@ -11,7 +11,8 @@ export class UploadComponent {
   validDrag: Boolean;
   @Input() multi: string
 
-  @Input() onUpload = (files: File[]) => { };
+  @Input() onUpload = (files: File[]) => {
+  };
 
   onFilesChange() {
 

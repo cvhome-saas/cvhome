@@ -1,8 +1,8 @@
-import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
-import { TypeDetailsComponent } from './type-details/type-details.component';
-import { TypesListComponent } from './types-list/types-list.component';
-import { TypesComponent } from './types.component';
+import {NgModule} from '@angular/core';
+import {Routes, RouterModule} from '@angular/router';
+import {TypeDetailsComponent} from './type-details/type-details.component';
+import {TypesListComponent} from './types-list/types-list.component';
+import {TypesComponent} from './types.component';
 
 
 const routes: Routes = [
@@ -33,4 +33,5 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule]
 })
-export class TypesRoutingModule { }
+export class TypesRoutingModule {
+}

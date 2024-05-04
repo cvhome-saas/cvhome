@@ -1,19 +1,20 @@
-import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
-import { Router } from '@angular/router';
-import { PropertiesService } from '../../services/product-properties';
-import { ProductAttributesService } from '../../services/product-attributes.service';
-import { TranslateService } from '@ngx-translate/core';
-import { StorageService } from '../../../../shared/services/storage.service';
-import { LocalDataSource } from 'ng2-smart-table';
-import { NbDialogService } from '@nebular/theme';
-import { ProductPropertyForm } from '../form/product-property-form.component';
-import { Location } from '@angular/common';
-import { forkJoin } from 'rxjs';
-import { ProductService } from '../../services/product.service';
+import {Component, OnInit, Input, EventEmitter, Output} from '@angular/core';
+import {Router} from '@angular/router';
+import {PropertiesService} from '../../services/product-properties';
+import {ProductAttributesService} from '../../services/product-attributes.service';
+import {TranslateService} from '@ngx-translate/core';
+import {StorageService} from '../../../../shared/services/storage.service';
+import {LocalDataSource} from 'ng2-smart-table';
+import {NbDialogService} from '@nebular/theme';
+import {ProductPropertyForm} from '../form/product-property-form.component';
+import {Location} from '@angular/common';
+import {forkJoin} from 'rxjs';
+import {ProductService} from '../../services/product.service';
 
 import {NbToastrService} from '@nebular/theme';
 
-import { ShowcaseDialogComponent } from '../../../../shared/components/showcase-dialog/showcase-dialog.component';
+import {ShowcaseDialogComponent} from '../../../../shared/components/showcase-dialog/showcase-dialog.component';
+
 @Component({
   selector: 'ngx-product-property',
   templateUrl: './product-property.component.html',
@@ -25,11 +26,10 @@ export class ProductProperties implements OnInit {
   attributeId: any;
   attribute: any = {};
 
-  id : any;
+  id: any;
   loaded = false;
   loading = false;
   loadingList = false;
-
 
 
   source: LocalDataSource = new LocalDataSource();
@@ -50,10 +50,10 @@ export class ProductProperties implements OnInit {
     private productService: ProductService,
     private dialogService: NbDialogService,
     private router: Router
-
   ) {
 
   }
+
   loadParams() {
     return {
       // store: this.storageService.getMerchant(),
@@ -62,10 +62,10 @@ export class ProductProperties implements OnInit {
       page: 0
     };
   }
+
   ngOnInit() {
 
-    this.id = this.productService.getProductIdRoute(this.router,this.location);
-
+    this.id = this.productService.getProductIdRoute(this.router, this.location);
 
 
     //specify add image url to image component
@@ -89,29 +89,30 @@ export class ProductProperties implements OnInit {
   }
 
   getList() {
-    this.loading=true;
+    this.loading = true;
 
     forkJoin([
       this.productService.getProductById(this.id),
       this.productAttributesService.getListOfProductsAttributes(this.id, this.params)])
-    .subscribe(([productRes, attrRes]) => {
+      .subscribe(([productRes, attrRes]) => {
 
 
-      var tempArray = attrRes.attributes.filter((value) => {
-        return value.attributeDisplayOnly === true;
+        var tempArray = attrRes.attributes.filter((value) => {
+          return value.attributeDisplayOnly === true;
+        });
+        if (tempArray.length !== 0) {
+          this.source.load(tempArray);
+        } else {
+          this.source.load([]);
+        }
+        this.totalCount = attrRes.recordsTotal;
+        this.product = productRes;
+
       });
-      if (tempArray.length !== 0) {
-        this.source.load(tempArray);
-      } else {
-        this.source.load([]);
-      }
-      this.totalCount = attrRes.recordsTotal;
-      this.product = productRes;
-
-    });
 
     this.setSettings();
   }
+
   setSettings() {
     this.settings = {
       hideSubHeader: true,
@@ -123,8 +124,8 @@ export class ProductProperties implements OnInit {
         position: 'right',
         sort: true,
         custom: [
-          { name: 'edit', title: '<i class="nb-edit"></i>' },
-          { name: 'remove', title: '<i class="nb-trash"></i>' }
+          {name: 'edit', title: '<i class="nb-edit"></i>'},
+          {name: 'remove', title: '<i class="nb-trash"></i>'}
         ],
       },
       pager: {
@@ -164,6 +165,7 @@ export class ProductProperties implements OnInit {
       }
     };
   }
+
   // paginator
   changePage(event) {
     console.log(JSON.stringify(event));
@@ -191,7 +193,6 @@ export class ProductProperties implements OnInit {
     }
     this.getList();
   }
-
 
 
   onClickAdd() {
@@ -224,22 +225,23 @@ export class ProductProperties implements OnInit {
 
     }
   }
+
   removeAttribute(id) {
 
     this.dialogService.open(ShowcaseDialogComponent, {})
       .onClose.subscribe(res => {
-        if (res) {
-          this.loading=true;
-                                                        //product id, attribute id
-          this.productAttributesService.deleteAttribute(this.id, id).subscribe(res => {
-            this.getList();
-            this.toastr.success(this.translate.instant('PROPERTY.PRODUCT_PROPERTY_REMOVED'));
-          });
-          this.loading=false;
-        } else {
-          this.loading=false;
-        }
-      });
+      if (res) {
+        this.loading = true;
+        //product id, attribute id
+        this.productAttributesService.deleteAttribute(this.id, id).subscribe(res => {
+          this.getList();
+          this.toastr.success(this.translate.instant('PROPERTY.PRODUCT_PROPERTY_REMOVED'));
+        });
+        this.loading = false;
+      } else {
+        this.loading = false;
+      }
+    });
 
   }
 

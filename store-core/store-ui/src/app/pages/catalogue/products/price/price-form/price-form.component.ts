@@ -1,16 +1,16 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { ActivatedRoute } from '@angular/router';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ProductService } from '../../services/product.service';
+import {Component, OnInit} from '@angular/core';
+import {Router} from '@angular/router';
+import {ActivatedRoute} from '@angular/router';
+import {FormArray, FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {ProductService} from '../../services/product.service';
 import {NbToastrService} from '@nebular/theme';
-import { TranslateService } from '@ngx-translate/core';
-import { ConfigService } from '../../../../shared/services/config.service';
+import {TranslateService} from '@ngx-translate/core';
+import {ConfigService} from '../../../../shared/services/config.service';
 import * as moment from 'moment';
-import { InventoryService } from '../../services/inventory.service';
-import { formatMoney } from '../../../../shared/validation/price-validation';
-import { slugify } from '../../../../shared/utils/slugifying';
-import { Location } from '@angular/common';
+import {InventoryService} from '../../services/inventory.service';
+import {formatMoney} from '../../../../shared/validation/price-validation';
+import {slugify} from '../../../../shared/utils/slugifying';
+import {Location} from '@angular/common';
 
 @Component({
   selector: 'ngx-price-form',
@@ -20,7 +20,7 @@ import { Location } from '@angular/common';
 export class PriceFormComponent implements OnInit {
   price;
   priceId;
-  id : any;
+  id: any;
   form: FormGroup;
   loader = false;
   languages = [];
@@ -46,7 +46,6 @@ export class PriceFormComponent implements OnInit {
   }
 
   ngOnInit() {
-
 
 
     this.params.productId = this.activatedRoute.snapshot.paramMap.get('productId');
@@ -75,7 +74,7 @@ export class PriceFormComponent implements OnInit {
     if (value !== '') {
       this.form.controls.productAttributePrice.setValue(
         formatMoney(value.replace(/,/g, '')),
-        { emitEvent: false }
+        {emitEvent: false}
       );
     }
   }

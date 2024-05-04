@@ -1,6 +1,6 @@
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 
-import { InventoryFormComponent } from './inventory-form.component';
+import {InventoryFormComponent} from './inventory-form.component';
 
 describe('InventoryFormComponent', () => {
   let component: InventoryFormComponent;
@@ -8,9 +8,9 @@ describe('InventoryFormComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ InventoryFormComponent ]
+      declarations: [InventoryFormComponent]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {

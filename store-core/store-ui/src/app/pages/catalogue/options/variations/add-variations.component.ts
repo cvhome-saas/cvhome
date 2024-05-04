@@ -1,15 +1,16 @@
-import { Component, OnInit } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { OptionService } from '../services/option.service';
-import { OptionValuesService } from '../services/option-values.service';
-import { VariationService } from '../services/variation.service';
+import {Component, OnInit} from '@angular/core';
+import {Router, ActivatedRoute} from '@angular/router';
+import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {OptionService} from '../services/option.service';
+import {OptionValuesService} from '../services/option-values.service';
+import {VariationService} from '../services/variation.service';
 import {NbToastrService} from '@nebular/theme';
-import { TranslateService } from '@ngx-translate/core';
-import { validators } from '../../../shared/validation/validators';
-import { StorageService } from '../../../shared/services/storage.service';
+import {TranslateService} from '@ngx-translate/core';
+import {validators} from '../../../shared/validation/validators';
+import {StorageService} from '../../../shared/services/storage.service';
 // import { TypesService } from '../../types/services/types.service';
-import { error } from '@angular/compiler/src/util';
+import {error} from '@angular/compiler/src/util';
+
 @Component({
   selector: 'ngx-variation-add',
   templateUrl: './add-variations.component.html',
@@ -22,8 +23,7 @@ export class AddVariationsComponent implements OnInit {
   // isValidCode = true;
   // isValidOption = true;
 
-  defaultParam = {
-  }
+  defaultParam = {}
 
   opt = {
     id: '',
@@ -35,6 +35,7 @@ export class AddVariationsComponent implements OnInit {
   form: FormGroup;
   productOption: Array<any> = [];
   productOptionValue: Array<any> = [];
+
   constructor(
     private fb: FormBuilder,
     private router: Router,
@@ -55,6 +56,7 @@ export class AddVariationsComponent implements OnInit {
       "store": this.storageService.getMerchant
     }
   }
+
   ngOnInit() {
     this.loadDefaultParam();
     this.createForm();
@@ -116,7 +118,7 @@ export class AddVariationsComponent implements OnInit {
 
   private createForm() {
     this.form = this.fb.group({
-      code: [{ value: '', disabled: false }, [Validators.required, Validators.pattern(validators.alphanumeric)]],
+      code: [{value: '', disabled: false}, [Validators.required, Validators.pattern(validators.alphanumeric)]],
       option: ['', [Validators.required]],
       optionValue: ['', [Validators.required]]
     });
@@ -133,7 +135,7 @@ export class AddVariationsComponent implements OnInit {
             return el.language === this.storageService.getLanguage();
           });
           const name = description && description.name ? description.name : '';
-          this.productOption.push({ id: value.id, code: value.code, name: name })
+          this.productOption.push({id: value.id, code: value.code, name: name})
         })
       }, error => {
         //TODO error
@@ -142,6 +144,7 @@ export class AddVariationsComponent implements OnInit {
     this.getOptionValue();
     this.loading = false;
   }
+
   getOptionValue() {
     this.productOptionValue = []
     this.optionValuesService.getListOfOptionValues({})
@@ -152,7 +155,7 @@ export class AddVariationsComponent implements OnInit {
             return el.language === this.storageService.getLanguage();
           });
           const name = description && description.name ? description.name : '';
-          this.productOptionValue.push({ id: value.id, code: value.code, name: name })
+          this.productOptionValue.push({id: value.id, code: value.code, name: name})
         })
       }, error => {
         //TODO error
@@ -219,8 +222,7 @@ export class AddVariationsComponent implements OnInit {
       //       this.loading = false;
       //     });
 
-    }
-    else {
+    } else {
       this.variationService.addVariations(this.form.value)
         .subscribe((res) => {
           this.toastr.success(this.translate.instant('OPTION.SET_OPTION_CREATED'));
@@ -231,14 +233,15 @@ export class AddVariationsComponent implements OnInit {
         });
     }
   }
+
   goToBack() {
     this.router.navigate(['pages/catalogue/options/varations/list']);
   }
+
   // setSelected(e) {
   //   //console.log(e)
   //   this.option.optionValues = e;
   // }
-
 
 
   // public findInvalidControls() {

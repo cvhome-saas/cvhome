@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {Component, OnInit} from '@angular/core';
+import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 
-import { OptionService } from '../../options/services/option.service';
-import { OptionValuesService } from '../../options/services/option-values.service';
+import {OptionService} from '../../options/services/option.service';
+import {OptionValuesService} from '../../options/services/option-values.service';
 
 @Component({
   selector: 'ngx-products-groups-creation',
@@ -20,15 +20,15 @@ export class ProductsGroupsCreationComponent implements OnInit {
     private fb: FormBuilder,
     private optionService: OptionService,
     private optionValuesService: OptionValuesService,
-    ) {
+  ) {
     this.optionService.getListOfOptions({}).subscribe(res => {
       res.options.forEach((option) => {
-        this.options.push({ value: option.code, label: option.code });
+        this.options.push({value: option.code, label: option.code});
       });
     });
     this.optionValuesService.getListOfOptionValues({}).subscribe(res => {
       res.optionValues.forEach((optionValue) => {
-        this.optionValues.push({ value: optionValue.code, label: optionValue.code });
+        this.optionValues.push({value: optionValue.code, label: optionValue.code});
       });
     });
   }

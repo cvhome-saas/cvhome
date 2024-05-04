@@ -1,8 +1,8 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 
-import { CrudService } from '../../../shared/services/crud.service';
-import { Observable } from 'rxjs';
-import { StorageService } from '../../../shared/services/storage.service';
+import {CrudService} from '../../../shared/services/crud.service';
+import {Observable} from 'rxjs';
+import {StorageService} from '../../../shared/services/storage.service';
 
 @Injectable({
   providedIn: 'root'
@@ -25,6 +25,7 @@ export class VariationService {
   addVariations(param): Observable<any> {
     return this.crudService.post(`/v2/private/product/variation`, param);
   }
+
   getListOfVariations(): Observable<any> {
     return this.crudService.get(`/v2/private/product/variation`);
   }

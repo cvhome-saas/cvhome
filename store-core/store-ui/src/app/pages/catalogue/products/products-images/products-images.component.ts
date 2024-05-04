@@ -11,7 +11,7 @@ import {Location} from '@angular/common';
   templateUrl: './products-images.component.html',
   styleUrls: ['./products-images.component.css']
 })
-export class ProductsImagesComponent implements OnInit ,AfterViewInit {
+export class ProductsImagesComponent implements OnInit, AfterViewInit {
 
   // product: any;
   images: any;
@@ -47,8 +47,8 @@ export class ProductsImagesComponent implements OnInit ,AfterViewInit {
       if (split.length == 2 && split[1] != "") {
         this.uniqueCode = split[1];
         this.load();
-        this.addImageUrl=this.productImageService.addImageUrl(this.store,this.uniqueCode)
-        this.removeImageUrl=this.productImageService.removeImageUrl(this.store,this.uniqueCode)
+        this.addImageUrl = this.productImageService.addImageUrl(this.store, this.uniqueCode)
+        this.removeImageUrl = this.productImageService.removeImageUrl(this.store, this.uniqueCode)
       }
     });
 
@@ -122,7 +122,7 @@ export class ProductsImagesComponent implements OnInit ,AfterViewInit {
 
   ngAfterViewInit(): void {
     if (this.location.path().includes('images')) {
-      const el:HTMLElement = document.getElementById('tabs');
+      const el: HTMLElement = document.getElementById('tabs');
       el.scrollIntoView();
     }
   }

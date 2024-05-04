@@ -1,17 +1,18 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {Component, OnInit} from '@angular/core';
+import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 
-import { OptionService } from '../../../options/services/option.service';
-import { OptionValuesService } from '../../../options/services/option-values.service';
-import { ProductAttributesService } from '../../services/product-attributes.service';
-import { ErrorService } from '../../../../shared/services/error.service';
-import { validators } from '../../../../shared/validation/validators';
-import { forkJoin } from 'rxjs';
-import { TranslateService } from '@ngx-translate/core';
-import { StorageService } from '../../../../shared/services/storage.service';
+import {OptionService} from '../../../options/services/option.service';
+import {OptionValuesService} from '../../../options/services/option-values.service';
+import {ProductAttributesService} from '../../services/product-attributes.service';
+import {ErrorService} from '../../../../shared/services/error.service';
+import {validators} from '../../../../shared/validation/validators';
+import {forkJoin} from 'rxjs';
+import {TranslateService} from '@ngx-translate/core';
+import {StorageService} from '../../../../shared/services/storage.service';
 import {NbToastrService} from '@nebular/theme';
-import { formatMoney } from '../../../../shared/validation/price-validation';
-import { NbDialogRef } from '@nebular/theme';
+import {formatMoney} from '../../../../shared/validation/price-validation';
+import {NbDialogRef} from '@nebular/theme';
+
 @Component({
   selector: 'ngx-attribute-form',
   templateUrl: './attribute-form.component.html',
@@ -48,25 +49,24 @@ export class AttributeFormComponent implements OnInit {
       this.optionValuesService.getListOfOptionValues({})])
       .subscribe(([optionRes, optionValueRes]) => {
         optionRes.options.forEach((option) => {
-          this.options.push({ value: option.code, label: option.code });
+          this.options.push({value: option.code, label: option.code});
         });
         optionValueRes.optionValues.forEach((optionValue) => {
-          this.optionValues.push({ value: optionValue.code, label: optionValue.code });
+          this.optionValues.push({value: optionValue.code, label: optionValue.code});
         });
-        this.options.push({ value: '', label: 'Please select options' });
-        this.optionValues.push({ value: '', label: 'Please select option values' });
+        this.options.push({value: '', label: 'Please select options'});
+        this.optionValues.push({value: '', label: 'Please select option values'});
       });
   };
 
 
-  params =  {
-      store: this.storageService.getMerchant(),
-      lang: "_all",
-      name: null,
-      count: this.perPage,
-      page: 0,
+  params = {
+    store: this.storageService.getMerchant(),
+    lang: "_all",
+    name: null,
+    count: this.perPage,
+    page: 0,
   }
-
 
 
   ngOnInit() {
@@ -83,7 +83,6 @@ export class AttributeFormComponent implements OnInit {
       });
     }
   }
-
 
 
   private createForm() {
@@ -105,7 +104,7 @@ export class AttributeFormComponent implements OnInit {
     if (value !== '') {
       this.form.controls.productAttributeUnformattedPrice.setValue(
         formatMoney(value.replace(/,/g, '')),
-        { emitEvent: false }
+        {emitEvent: false}
       );
     }
   }
@@ -113,7 +112,7 @@ export class AttributeFormComponent implements OnInit {
   fillForm() {
     let index = this.optionValues.findIndex((a) => a.value === this.attribute.optionValue.code);
     let value = null;
-    if(this.attribute.optionValue != null) {
+    if (this.attribute.optionValue != null) {
       value = this.attribute.optionValue.code;
     }
 
@@ -145,58 +144,58 @@ export class AttributeFormComponent implements OnInit {
   onSelectOptionValue(event) {
     this.loading = true;
     //console.log('----------Found value ' + event.query);
-    this.optionValues.push({ value: 'ABCD', label: 'ABCD' });
+    this.optionValues.push({value: 'ABCD', label: 'ABCD'});
     this.loading = true;
     this.params.name = event.query;
     this.optionValuesService.getListOfOptionValues(this.params)
-    .subscribe(res => {
-      if(res.recordsTotal === 0 ) {
-        //invalid selection
-        //this.form.controls['optionValue'].setErrors({'invalid': true});
-        //this.form.controls['optionValue'].markAsTouched();
-        this.loading = false;
-      } else {
-        //this.optionValues = new Array();
-        res.optionValues.forEach((optionValue) => {
-          this.optionValues.push({ value: optionValue.code, label: optionValue.code });
-        });
-        this.loading = false;
-      }
+      .subscribe(res => {
+        if (res.recordsTotal === 0) {
+          //invalid selection
+          //this.form.controls['optionValue'].setErrors({'invalid': true});
+          //this.form.controls['optionValue'].markAsTouched();
+          this.loading = false;
+        } else {
+          //this.optionValues = new Array();
+          res.optionValues.forEach((optionValue) => {
+            this.optionValues.push({value: optionValue.code, label: optionValue.code});
+          });
+          this.loading = false;
+        }
 
-    });
+      });
   }
 
   searchOptionValue(event) {
     //this.loading = true;
     this.params.name = event.query;
     this.optionValuesService.getListOfOptionValues(this.params)
-    .subscribe(res => {
-      if(res.recordsTotal === 0 ) {
-        //invalid selection, empty list
-        //this.optionValues = new Array();
-        this.form.controls['optionValue'].markAsTouched();
-        this.form.controls['optionValue'].setErrors({'invalid': true});
-        //this.loading = false;
-        //this.optionValues.push({ value: '', label: '' });
+      .subscribe(res => {
+        if (res.recordsTotal === 0) {
+          //invalid selection, empty list
+          //this.optionValues = new Array();
+          this.form.controls['optionValue'].markAsTouched();
+          this.form.controls['optionValue'].setErrors({'invalid': true});
+          //this.loading = false;
+          //this.optionValues.push({ value: '', label: '' });
 
-      } else {
-        //this.optionValues = new Array();
-        //this.loading = false;
-        res.optionValues.forEach((optionValue) => {
-          this.optionValues.push({ value: optionValue.code, label: optionValue.code });
-        });
+        } else {
+          //this.optionValues = new Array();
+          //this.loading = false;
+          res.optionValues.forEach((optionValue) => {
+            this.optionValues.push({value: optionValue.code, label: optionValue.code});
+          });
 
-      }
+        }
 
-    });
+      });
 
   }
 
   save() {
     this.loading = true;
     const optionObj = this.form.value;
-    optionObj.option = { code: optionObj.option };
-    optionObj.optionValue = { code: optionObj.optionValue };
+    optionObj.option = {code: optionObj.option};
+    optionObj.optionValue = {code: optionObj.optionValue};
     //optionObj.productAttributePrice = optionObj.productAttributeUnformattedPrice.replace(/,/g, '');
     optionObj.productAttributePrice = optionObj.productAttributeUnformattedPrice;
     if (this.attribute.id) {
@@ -209,7 +208,8 @@ export class AttributeFormComponent implements OnInit {
         }, error => {
           this.loading = false;
           this.errorService.error("ERROR.SYSTEM_ERROR_TEXT", 500);
-        });;
+        });
+      ;
     } else {
       this.productAttributesService.createAttribute(this.productId, this.form.value).subscribe(res => {
         this.loading = false;
@@ -223,6 +223,7 @@ export class AttributeFormComponent implements OnInit {
       });
     }
   }
+
   goToBack() {
     this.ref.close();
   }

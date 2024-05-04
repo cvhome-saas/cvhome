@@ -1,6 +1,6 @@
 export class Store {
-    id: number;
-    name: string;
-    code: string;
-    retailer: boolean;
-  }
+  id: number;
+  name: string;
+  code: string;
+  retailer: boolean;
+}

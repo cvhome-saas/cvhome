@@ -17,7 +17,7 @@ export class BrandService {
     return this.crudService.get(`/store/api/v1/private/manufacturers`, params);
   }
 
-  updateBrand(store,id, brand): Observable<any> {
+  updateBrand(store, id, brand): Observable<any> {
     return this.crudService.put(`/store/api/v1/private/manufacturer/${id}?store=${store}`, brand);
   }
 
@@ -29,7 +29,7 @@ export class BrandService {
     return this.crudService.get(`/store/api/v1/manufacturer/${id}`, params);
   }
 
-  createBrand(store,brand): Observable<any> {
+  createBrand(store, brand): Observable<any> {
     return this.crudService.post(`/store/api/v1/private/manufacturer?store=${store}`, brand);
   }
 

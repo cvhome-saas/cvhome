@@ -1,5 +1,5 @@
-import { ExtraOptions, RouterModule, Routes } from '@angular/router';
-import { NgModule } from '@angular/core';
+import {ExtraOptions, RouterModule, Routes} from '@angular/router';
+import {NgModule} from '@angular/core';
 import {environment} from "../environments/environment";
 
 export const routes: Routes = [
@@ -25,7 +25,7 @@ export const routes: Routes = [
     loadChildren: () => import('./welcome/welcome.module')
       .then(m => m.WelcomeModule),
   },
-  { path: '**', redirectTo: '' },
+  {path: '**', redirectTo: ''},
 ];
 
 const config: ExtraOptions = {

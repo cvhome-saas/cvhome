@@ -1,12 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 
-import { UserService } from '../shared/services/user.service';
-import { CrudService } from '../shared/services/crud.service';
-import { Country } from '../shared/models/country';
-import { forkJoin } from 'rxjs';
-import { StorageService } from '../shared/services/storage.service';
-import { TranslateService } from '@ngx-translate/core';
-import { environment } from '../../../environments/environment';
+import {UserService} from '../shared/services/user.service';
+import {CrudService} from '../shared/services/crud.service';
+import {Country} from '../shared/models/country';
+import {forkJoin} from 'rxjs';
+import {StorageService} from '../shared/services/storage.service';
+import {TranslateService} from '@ngx-translate/core';
+import {environment} from '../../../environments/environment';
 
 
 @Component({
@@ -77,7 +77,7 @@ export class HomeComponent implements OnInit {
   }
 
   setLanguage() {
-    if(this.user.defaultLanguage != null) {
+    if (this.user.defaultLanguage != null) {
       localStorage.setItem('lang', this.user.defaultLanguage);
       this.translate.setDefaultLang(localStorage.getItem('lang'));
       this.translate.use(localStorage.getItem('lang'));

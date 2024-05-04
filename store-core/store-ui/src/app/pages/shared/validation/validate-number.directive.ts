@@ -1,11 +1,12 @@
-import { Directive, HostListener } from '@angular/core';
+import {Directive, HostListener} from '@angular/core';
 
 @Directive({
   selector: '[ngxValidateNumber]'
 })
 export class ValidateNumberDirective {
 
-  constructor() { }
+  constructor() {
+  }
 
   @HostListener('keydown', ['$event']) onKeyDown(event) {
     const e = event;

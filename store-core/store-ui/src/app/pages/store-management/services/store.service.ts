@@ -1,8 +1,8 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 
-import { CrudService } from '../../shared/services/crud.service';
-import { Observable } from 'rxjs';
-import { StorageService } from '../../shared/services/storage.service';
+import {CrudService} from '../../shared/services/crud.service';
+import {Observable} from 'rxjs';
+import {StorageService} from '../../shared/services/storage.service';
 
 @Injectable({
   providedIn: 'root'
@@ -45,7 +45,7 @@ export class StoreService {
   }
 
   updateStore(store: any): Observable<any> {
-    return this.crudService.put(`/store/api/v1/private/store/${ store.code }?store=${store.code}`, store);
+    return this.crudService.put(`/store/api/v1/private/store/${store.code}?store=${store.code}`, store);
   }
 
   // PAGE CONTENT
@@ -58,11 +58,11 @@ export class StoreService {
     return this.crudService.getWithEmpty(`/store/api/v1/private/content/any/${pageCode}?store=${store}`, params);
   }
 
-  updatePageContent(store,id, content: any): Observable<any> {
+  updatePageContent(store, id, content: any): Observable<any> {
     return this.crudService.put(`/store/api/v1/private/content/${id}?store=${store}`, content);
   }
 
-  createPageContent(content: any, storeCode: string) : Observable<any> {
+  createPageContent(content: any, storeCode: string): Observable<any> {
 
     return this.crudService.postWithStoreParam(`/store/api/v1/private/content`, content, storeCode);
   }
@@ -80,7 +80,7 @@ export class StoreService {
     return this.crudService.post(`/v1/private/store/${code}/marketing`, body);
   }
 
-  addStoreLogo(store:string,file: any): Observable<any> {
+  addStoreLogo(store: string, file: any): Observable<any> {
     const uploadData = new FormData();
     uploadData.append('file', file, file.name);
     return this.crudService.post(`/store/api/v1/private/store/${store}/marketing/logo?store=${store}`, uploadData);

@@ -1,5 +1,5 @@
 <nb-card class="page-card inner_pages">
-  <nb-card-body [nbSpinner]="loader" nbSpinnerSize="large" nbSpinnerStatus="primary" class="category_hierarcy">
+  <nb-card-body [nbSpinner]="loader" class="category_hierarcy" nbSpinnerSize="large" nbSpinnerStatus="primary">
     <div class="inner_pages_legacy">
       <nb-card-header class="main_header">
         <h1 class="page_title">{{ 'COMPONENTS.CATEGORIES_HIERARCHY' | translate }}</h1>
@@ -14,8 +14,8 @@
         </div>
       </form>
       <div *ngIf="nodes.length !== 0">
-        <tree-root #tree [nodes]="nodes" [options]="options" (moveNode)="onMoveNode($event)">
-          <ng-template #treeNodeTemplate let-node let-index="index">
+        <tree-root #tree (moveNode)="onMoveNode($event)" [nodes]="nodes" [options]="options">
+          <ng-template #treeNodeTemplate let-index="index" let-node>
             <div>{{ node.data.name }}</div>
           </ng-template>
         </tree-root>

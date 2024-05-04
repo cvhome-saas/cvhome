@@ -48,13 +48,13 @@ export class ImageUploadingComponent implements OnInit {
   timer: any;
   uploadItemTemplate: any;
 
-/*
-  public target: CdkDropList=null;
-  public targetIndex: number;
-  public source: CdkDropList=null;
-  public sourceIndex: number;
-  public activeContainer;
-*/
+  /*
+    public target: CdkDropList=null;
+    public targetIndex: number;
+    public source: CdkDropList=null;
+    public sourceIndex: number;
+    public activeContainer;
+  */
   // public items: Array<number> = Array(10)
   //   .fill(0)
   //   .map((_, i) => i + 1);
@@ -78,103 +78,104 @@ export class ImageUploadingComponent implements OnInit {
   public itemTrackBy(item) {
     return item.id;
   }
-/*
 
-  ngAfterViewInit() {
-    const phElement = this.placeholder.element.nativeElement;
+  /*
 
-    phElement.style.display = 'none';
-    phElement.parentElement.removeChild(phElement);
-  }
+    ngAfterViewInit() {
+      const phElement = this.placeholder.element.nativeElement;
 
-  dropListDropped() {
-    if (!this.target) {
-      return;
+      phElement.style.display = 'none';
+      phElement.parentElement.removeChild(phElement);
     }
 
-    const phElement = this.placeholder.element.nativeElement;
-    const parent = phElement.parentElement;
+    dropListDropped() {
+      if (!this.target) {
+        return;
+      }
 
-    phElement.style.display = 'none';
+      const phElement = this.placeholder.element.nativeElement;
+      const parent = phElement.parentElement;
 
-    parent.removeChild(phElement);
-    parent.appendChild(phElement);
-    parent.insertBefore(
-      this.source.element.nativeElement,
-      parent.children[this.sourceIndex]
-    );
+      phElement.style.display = 'none';
 
-    this.target = null;
-    this.source = null;
-    this.activeContainer = null;
-
-    if (this.sourceIndex !== this.targetIndex) {
-      moveItemInArray(this.images, this.sourceIndex, this.targetIndex);
-    }
-  }
-
-  cdkDropListEntered(e: CdkDragEnter) {
-    const drag = e.item;
-    const drop = e.container;
-
-    if (drop === this.placeholder) {
-      return true;
-    }
-
-    const phElement = this.placeholder.element.nativeElement;
-    const sourceElement = drag.dropContainer.element.nativeElement;
-    const dropElement = drop.element.nativeElement;
-
-    sourceElement.style.backgroundColor = 'transparent';
-
-    console.log(phElement.getBoundingClientRect());
-    console.log(sourceElement.getBoundingClientRect());
-    console.log(dropElement.getBoundingClientRect());
-
-    const dragIndex = __indexOf(
-      dropElement.parentElement.children,
-      this.source ? phElement : sourceElement
-    );
-    const dropIndex = __indexOf(
-      dropElement.parentElement.children,
-      dropElement
-    );
-
-    console.log("drag::", dragIndex, dropIndex);
-    let newObj = {"id": this.images[dragIndex].id, "position": dropIndex + 1}
-    this.update.emit(newObj)
-
-
-    if (!this.source) {
-      this.sourceIndex = dragIndex;
-      this.source = drag.dropContainer;
-
-      phElement.style.width = dropElement.clientWidth / 2 + 'px';
-      phElement.style.height = dropElement.clientHeight + 'px';
-      console.log('dCont', sourceElement.clientWidth);
-      console.log('ph', phElement.style.width, phElement.style.height);
-
-      sourceElement.parentElement.removeChild(sourceElement);
-    }
-
-    this.targetIndex = dropIndex;
-    this.target = drop;
-
-    phElement.style.display = '';
-    dropElement.parentElement.insertBefore(
-      phElement,
-      dropIndex > dragIndex ? dropElement.nextSibling : dropElement
-    );
-
-    requestAnimationFrame(() => {
-      this.placeholder._dropListRef.enter(
-        drag._dragRef,
-        drag.element.nativeElement.offsetLeft,
-        drag.element.nativeElement.offsetTop
+      parent.removeChild(phElement);
+      parent.appendChild(phElement);
+      parent.insertBefore(
+        this.source.element.nativeElement,
+        parent.children[this.sourceIndex]
       );
-    });
-  }
-*/
+
+      this.target = null;
+      this.source = null;
+      this.activeContainer = null;
+
+      if (this.sourceIndex !== this.targetIndex) {
+        moveItemInArray(this.images, this.sourceIndex, this.targetIndex);
+      }
+    }
+
+    cdkDropListEntered(e: CdkDragEnter) {
+      const drag = e.item;
+      const drop = e.container;
+
+      if (drop === this.placeholder) {
+        return true;
+      }
+
+      const phElement = this.placeholder.element.nativeElement;
+      const sourceElement = drag.dropContainer.element.nativeElement;
+      const dropElement = drop.element.nativeElement;
+
+      sourceElement.style.backgroundColor = 'transparent';
+
+      console.log(phElement.getBoundingClientRect());
+      console.log(sourceElement.getBoundingClientRect());
+      console.log(dropElement.getBoundingClientRect());
+
+      const dragIndex = __indexOf(
+        dropElement.parentElement.children,
+        this.source ? phElement : sourceElement
+      );
+      const dropIndex = __indexOf(
+        dropElement.parentElement.children,
+        dropElement
+      );
+
+      console.log("drag::", dragIndex, dropIndex);
+      let newObj = {"id": this.images[dragIndex].id, "position": dropIndex + 1}
+      this.update.emit(newObj)
+
+
+      if (!this.source) {
+        this.sourceIndex = dragIndex;
+        this.source = drag.dropContainer;
+
+        phElement.style.width = dropElement.clientWidth / 2 + 'px';
+        phElement.style.height = dropElement.clientHeight + 'px';
+        console.log('dCont', sourceElement.clientWidth);
+        console.log('ph', phElement.style.width, phElement.style.height);
+
+        sourceElement.parentElement.removeChild(sourceElement);
+      }
+
+      this.targetIndex = dropIndex;
+      this.target = drop;
+
+      phElement.style.display = '';
+      dropElement.parentElement.insertBefore(
+        phElement,
+        dropIndex > dragIndex ? dropElement.nextSibling : dropElement
+      );
+
+      requestAnimationFrame(() => {
+        this.placeholder._dropListRef.enter(
+          drag._dragRef,
+          drag.element.nativeElement.offsetLeft,
+          drag.element.nativeElement.offsetTop
+        );
+      });
+    }
+  */
 
   // refreshGrid() {
   //   this.imageList = this.images;

@@ -1,6 +1,6 @@
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 
-import { AttributeFormComponent } from './attribute-form.component';
+import {AttributeFormComponent} from './attribute-form.component';
 
 describe('AttributeFormComponent', () => {
   let component: AttributeFormComponent;
@@ -8,9 +8,9 @@ describe('AttributeFormComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ AttributeFormComponent ]
+      declarations: [AttributeFormComponent]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {

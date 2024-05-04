@@ -1,15 +1,15 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import {Component, Input, OnInit} from '@angular/core';
+import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {ActivatedRoute} from '@angular/router';
 
-import { StoreService } from '../../../../store-management/services/store.service';
-import { ConfigService } from '../../../../shared/services/config.service';
+import {StoreService} from '../../../../store-management/services/store.service';
+import {ConfigService} from '../../../../shared/services/config.service';
 import {NbToastrService} from '@nebular/theme';
-import { TranslateService } from '@ngx-translate/core';
-import { InventoryService } from '../../services/inventory.service';
+import {TranslateService} from '@ngx-translate/core';
+import {InventoryService} from '../../services/inventory.service';
 import * as moment from 'moment';
-import { validators } from '../../../../shared/validation/validators';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import {validators} from '../../../../shared/validation/validators';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
 @Component({
   selector: 'ngx-inventory-form',
@@ -44,7 +44,7 @@ export class InventoryFormComponent implements OnInit {
     this.storeService.getListOfStores({})
       .subscribe(res => {
         res.data.forEach((store) => {
-          this.stores.push({ value: store.code, label: store.code });
+          this.stores.push({value: store.code, label: store.code});
         });
       });
     this.loader = true;
@@ -80,6 +80,7 @@ export class InventoryFormComponent implements OnInit {
       })
     });
   }
+
   // private createForm() {
   //   this.form = this.fb.group({
   //     store: ['DEFAULT', [Validators.required]],

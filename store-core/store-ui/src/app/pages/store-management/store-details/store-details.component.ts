@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { StoreService } from '../services/store.service';
+import {Component, OnInit} from '@angular/core';
+import {Router} from '@angular/router';
+import {StoreService} from '../services/store.service';
 
 @Component({
   selector: 'ngx-store-details',

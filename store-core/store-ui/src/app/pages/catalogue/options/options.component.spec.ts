@@ -1,6 +1,6 @@
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 
-import { OptionsComponent } from './options.component';
+import {OptionsComponent} from './options.component';
 
 describe('OptionsComponent', () => {
   let component: OptionsComponent;
@@ -8,9 +8,9 @@ describe('OptionsComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ OptionsComponent ]
+      declarations: [OptionsComponent]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {

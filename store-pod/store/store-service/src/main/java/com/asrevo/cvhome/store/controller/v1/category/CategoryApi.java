@@ -30,9 +30,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_STORE;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_STORE;
 
 @RestController
 @RequestMapping(value = "/api/v1")

@@ -1,15 +1,15 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import {Component, OnInit} from '@angular/core';
+import {Router} from '@angular/router';
 
-import { UserService } from '../../shared/services/user.service';
-import { TranslateService } from '@ngx-translate/core';
-import { NbDialogService } from '@nebular/theme';
-import { StorageService } from '../../shared/services/storage.service';
-import { SecurityService } from '../../shared/services/security.service';
-import { StoreService } from '../../store-management/services/store.service';
+import {UserService} from '../../shared/services/user.service';
+import {TranslateService} from '@ngx-translate/core';
+import {NbDialogService} from '@nebular/theme';
+import {StorageService} from '../../shared/services/storage.service';
+import {SecurityService} from '../../shared/services/security.service';
+import {StoreService} from '../../store-management/services/store.service';
 import {NbToastrService} from '@nebular/theme';
-import { ButtonRenderUserComponent } from './button-render-user.component'
-import { ListingService } from '../../shared/services/listing.service';
+import {ButtonRenderUserComponent} from './button-render-user.component'
+import {ListingService} from '../../shared/services/listing.service';
 import {ShowcaseDialogComponent} from "../../store-manager/shared/showcase-dialog/showcase-dialog.component";
 
 
@@ -111,20 +111,20 @@ export class UsersListComponent implements OnInit {
 
   ngOnInit() {
     this.isSuperadmin = this.securityService.isSuperAdmin();
-    this.storeService.getListOfStores({ start: 0 })
+    this.storeService.getListOfStores({start: 0})
       .subscribe(res => {
         res.data.forEach((store) => {
-          this.stores.push({ value: store.code, label: store.code });
+          this.stores.push({value: store.code, label: store.code});
         });
       });
 
     //ng2-smart-table server side filter
-/*    this.source.onChanged().subscribe((change) => {
+    /*    this.source.onChanged().subscribe((change) => {
 
-      if (!this.loadingList) {//listing service
-        this.listingService.filterDetect(this.params, change, this.loadList.bind(this), this.resetList.bind(this));
-      }
-    });*/
+          if (!this.loadingList) {//listing service
+            this.listingService.filterDetect(this.params, change, this.loadList.bind(this), this.resetList.bind(this));
+          }
+        });*/
   }
 
 
@@ -133,7 +133,7 @@ export class UsersListComponent implements OnInit {
     let customs = [];
     if (this.securityService.isAnAdmin()) {
       customs = [
-        { name: 'details', title: '<i class="nb-edit"></i>' },
+        {name: 'details', title: '<i class="nb-edit"></i>'},
       ]
     }
     this.settings = {
@@ -149,7 +149,7 @@ export class UsersListComponent implements OnInit {
         custom: customs
       },
 
-      pager: { display: false },
+      pager: {display: false},
       columns: {
         id: {
           filter: false,
@@ -204,14 +204,14 @@ export class UsersListComponent implements OnInit {
             }
           })
             .onClose.subscribe(res => {
-              if (res) {
-                this.userService.deleteUser(event.data.id, this.storageService.getMerchant())
-                  .subscribe(data => {
-                    this.toastr.success(this.translate.instant('USER_FORM.USER_REMOVED'));
-                    this.getList();
-                  });
-              }
-            });
+            if (res) {
+              this.userService.deleteUser(event.data.id, this.storageService.getMerchant())
+                .subscribe(data => {
+                  this.toastr.success(this.translate.instant('USER_FORM.USER_REMOVED'));
+                  this.getList();
+                });
+            }
+          });
         }
     }
   }
@@ -242,8 +242,6 @@ export class UsersListComponent implements OnInit {
     }
     this.getList();
   }
-
-
 
 
 }

@@ -1,14 +1,15 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import {Component, OnInit} from '@angular/core';
+import {Router} from '@angular/router';
 
-import { LocalDataSource } from 'ng2-smart-table';
-import { TranslateService } from '@ngx-translate/core';
-import { OptionValuesService } from '../services/option-values.service';
-import { ShowcaseDialogComponent } from '../../../shared/components/showcase-dialog/showcase-dialog.component';
-import { NbDialogService } from '@nebular/theme';
+import {LocalDataSource} from 'ng2-smart-table';
+import {TranslateService} from '@ngx-translate/core';
+import {OptionValuesService} from '../services/option-values.service';
+import {ShowcaseDialogComponent} from '../../../shared/components/showcase-dialog/showcase-dialog.component';
+import {NbDialogService} from '@nebular/theme';
 import {NbToastrService} from '@nebular/theme';
-import { StorageService } from '../../../shared/services/storage.service';
-import { StoreService } from '../../../store-management/services/store.service';
+import {StorageService} from '../../../shared/services/storage.service';
+import {StoreService} from '../../../store-management/services/store.service';
+
 @Component({
   selector: 'ngx-options-values-list',
   templateUrl: './options-values-list.component.html',
@@ -40,6 +41,7 @@ export class OptionsValuesListComponent implements OnInit {
   ) {
     this.getStoreList()
   }
+
   loadParams() {
     return {
       store: this.storageService.getMerchant(),
@@ -48,17 +50,20 @@ export class OptionsValuesListComponent implements OnInit {
       page: 0
     };
   }
+
   ngOnInit() {
     this.getList();
   }
+
   getStoreList() {
-    this.storeService.getListOfMerchantStoreNames({ 'store': '' })
+    this.storeService.getListOfMerchantStoreNames({'store': ''})
       .subscribe(res => {
         res.forEach((store) => {
-          this.stores.push({ value: store.code, label: store.code });
+          this.stores.push({value: store.code, label: store.code});
         });
       });
   }
+
   getList() {
 
     this.loadingList = true;
@@ -92,8 +97,8 @@ export class OptionsValuesListComponent implements OnInit {
         position: 'right',
         sort: true,
         custom: [
-          { name: 'edit', title: '<i class="nb-edit"></i>' },
-          { name: 'remove', title: '<i class="nb-trash"></i>' }
+          {name: 'edit', title: '<i class="nb-edit"></i>'},
+          {name: 'remove', title: '<i class="nb-trash"></i>'}
         ],
       },
       pager: {
@@ -136,17 +141,17 @@ export class OptionsValuesListComponent implements OnInit {
   deleteRecord(event) {
     this.dialogService.open(ShowcaseDialogComponent, {})
       .onClose.subscribe(res => {
-        if (res) {
-          // event.confirm.resolve();
-          this.optionValuesService.deleteOptionValue(event.data.id)
-            .subscribe(result => {
-              this.toastr.success(this.translate.instant('OPTION_VALUE.OPTION_VALUE_REMOVED'));
-              this.getList();
-            });
-        } else {
-          // event.confirm.reject();
-        }
-      });
+      if (res) {
+        // event.confirm.resolve();
+        this.optionValuesService.deleteOptionValue(event.data.id)
+          .subscribe(result => {
+            this.toastr.success(this.translate.instant('OPTION_VALUE.OPTION_VALUE_REMOVED'));
+            this.getList();
+          });
+      } else {
+        // event.confirm.reject();
+      }
+    });
   }
 
   // paginator
@@ -175,20 +180,24 @@ export class OptionsValuesListComponent implements OnInit {
     }
     this.getList();
   }
+
   onSearch(value) {
     this.params["name"] = value;
     this.searchValue = value;
     this.getList()
   }
+
   resetSearch() {
     this.params = this.loadParams();
     this.searchValue = null;
     this.getList();
   }
+
   onSelectStore(e) {
     this.params["store"] = e;
     this.getList();
   }
+
   onClickAction(event) {
     switch (event.action) {
       case 'edit':
@@ -199,6 +208,7 @@ export class OptionsValuesListComponent implements OnInit {
         break
     }
   }
+
   onEdit(event) {
     this.router.navigate(['/pages/catalogue/options/option-value/' + event.data.id]);
   }

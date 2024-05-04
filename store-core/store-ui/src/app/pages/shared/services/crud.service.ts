@@ -1,10 +1,10 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 
-import { Observable, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
-import { environment } from '../../../../environments/environment';
-import { HttpClient } from '@angular/common/http';
-import { Country } from '../models/country';
+import {Observable, of} from 'rxjs';
+import {catchError} from 'rxjs/operators';
+import {environment} from '../../../../environments/environment';
+import {HttpClient} from '@angular/common/http';
+import {Country} from '../models/country';
 
 @Injectable({
   providedIn: 'root'
@@ -13,22 +13,27 @@ export class CrudService {
   url = environment.apiUrl;
   shippingUrl = environment.shippingApi;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {
+  }
 
   getShipping(path, params?: { [param: string]: string | string[]; }): Observable<any> {
-    return this.http.get(`${this.shippingUrl}${path}`, { responseType: 'json', params });
+    return this.http.get(`${this.shippingUrl}${path}`, {responseType: 'json', params});
   }
+
   postShipping(path, body: any | null, options?: any): Observable<any> {
     return this.http.post(`${this.shippingUrl}${path}`, body, options);
   }
+
   deleteShipping(path, options?: any): Observable<any> {
     return this.http.delete(`${this.shippingUrl}${path}`, options);
   }
+
   putShipping(path, body: any | null, options?: any): Observable<any> {
     return this.http.put(`${this.shippingUrl}${path}`, body, options);
   }
+
   get(path, params?: any): Observable<any> {
-    return this.http.get(`${this.url}${path}`, { responseType: 'json', params });
+    return this.http.get(`${this.url}${path}`, {responseType: 'json', params});
   }
 
   getBaseUrl() {
@@ -36,7 +41,7 @@ export class CrudService {
   }
 
   getWithEmpty(path, params?: { [param: string]: string | string[]; }): Observable<any> {
-    return this.http.get(`${this.url}${path}`, { responseType: 'json', params }).pipe(catchError(error => of(error)))
+    return this.http.get(`${this.url}${path}`, {responseType: 'json', params}).pipe(catchError(error => of(error)))
   }
 
   post(path, body: any | null, options?: any): Observable<any> {

@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import {Component, OnInit} from '@angular/core';
+import {ActivatedRoute} from '@angular/router';
 
-import { UserService } from '../../shared/services/user.service';
+import {UserService} from '../../shared/services/user.service';
 
 @Component({
   selector: 'ngx-user-details',

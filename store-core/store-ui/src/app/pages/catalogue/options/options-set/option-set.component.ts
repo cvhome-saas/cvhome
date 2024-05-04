@@ -1,14 +1,15 @@
-import { Component, OnInit } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { OptionService } from '../services/option.service';
-import { OptionValuesService } from '../services/option-values.service';
+import {Component, OnInit} from '@angular/core';
+import {Router, ActivatedRoute} from '@angular/router';
+import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {OptionService} from '../services/option.service';
+import {OptionValuesService} from '../services/option-values.service';
 import {NbToastrService} from '@nebular/theme';
-import { TranslateService } from '@ngx-translate/core';
-import { validators } from '../../../shared/validation/validators';
-import { StorageService } from '../../../shared/services/storage.service';
-import { TypesService } from '../../types/services/types.service';
-import { error } from '@angular/compiler/src/util';
+import {TranslateService} from '@ngx-translate/core';
+import {validators} from '../../../shared/validation/validators';
+import {StorageService} from '../../../shared/services/storage.service';
+import {TypesService} from '../../types/services/types.service';
+import {error} from '@angular/compiler/src/util';
+
 @Component({
   selector: 'ngx-option-set',
   templateUrl: './option-set.component.html',
@@ -21,8 +22,7 @@ export class OptionSetComponent implements OnInit {
   isValidCode = true;
   isValidOption = true;
 
-  defaultParam = {
-  }
+  defaultParam = {}
 
   option = {
     id: '',
@@ -37,6 +37,7 @@ export class OptionSetComponent implements OnInit {
   productOption: Array<any> = [];
   productOptionValue: Array<any> = [];
   productTypes: Array<any> = [];
+
   constructor(
     private fb: FormBuilder,
     private router: Router,
@@ -53,10 +54,11 @@ export class OptionSetComponent implements OnInit {
 
   loadDefaultParam() {
     this.defaultParam = {
-      "lang":this.storageService.getLanguage,
-      "store":this.storageService.getMerchant
+      "lang": this.storageService.getLanguage,
+      "store": this.storageService.getMerchant
     }
   }
+
   ngOnInit() {
     this.loadDefaultParam();
     this.createForm();
@@ -77,12 +79,12 @@ export class OptionSetComponent implements OnInit {
           this.option.readOnly = res.readOnly;
           let value = []
           let types = []
-          if(res.values) {
+          if (res.values) {
             res.values.map((optionValue) => {
               value.push(optionValue.id)
             });
           }
-          if(res.productTypes) {
+          if (res.productTypes) {
             res.productTypes.map((productType) => {
               types.push(productType.id)
             });
@@ -120,8 +122,8 @@ export class OptionSetComponent implements OnInit {
   private createForm() {
     this.form = this.fb.group({
       readOnly: [false],
-      code: [{ value: '', disabled: false }, [Validators.required, Validators.pattern(validators.alphanumeric)]],
-      option: ['',[Validators.required]],
+      code: [{value: '', disabled: false}, [Validators.required, Validators.pattern(validators.alphanumeric)]],
+      option: ['', [Validators.required]],
       optionValues: this.fb.array([]),
       productTypes: this.fb.array([])
     });
@@ -138,7 +140,7 @@ export class OptionSetComponent implements OnInit {
             return el.language === this.storageService.getLanguage();
           });
           const name = description && description.name ? description.name : '';
-          this.productOption.push({ id: value.id, code: value.code, name: name })
+          this.productOption.push({id: value.id, code: value.code, name: name})
         })
       }, error => {
         //TODO error
@@ -148,6 +150,7 @@ export class OptionSetComponent implements OnInit {
     this.getProductTypes();
     this.loading = false;
   }
+
   getOptionValue() {
     this.productOptionValue = []
     this.optionValuesService.getListOfOptionValues({})
@@ -158,7 +161,7 @@ export class OptionSetComponent implements OnInit {
             return el.language === this.storageService.getLanguage();
           });
           const name = description && description.name ? description.name : '';
-          this.productOptionValue.push({ id: value.id, code: value.code, name: name })
+          this.productOptionValue.push({id: value.id, code: value.code, name: name})
         })
       }, error => {
         //TODO error
@@ -174,12 +177,12 @@ export class OptionSetComponent implements OnInit {
         console.log(JSON.stringify(res));
         //this.productTypes = [...res];
         res.list.map((value) => {
-          this.productTypes.push({ id: value.id, code: value.code});
+          this.productTypes.push({id: value.id, code: value.code});
         })
-    }, error => {
-      //TODO error
-      this.loading = false;
-    });
+      }, error => {
+        //TODO error
+        this.loading = false;
+      });
   }
 
   get code() {
@@ -218,11 +221,11 @@ export class OptionSetComponent implements OnInit {
 
     //console.log('From object values ' + JSON.stringify(optionObj));
 
-    if(this.form.invalid) {
-      if(this.code.invalid) {
+    if (this.form.invalid) {
+      if (this.code.invalid) {
         this.isValidCode = false;
       }
-      if(this.opt.invalid) {
+      if (this.opt.invalid) {
         this.isValidOption = false;
       }
       this.loading = false;
@@ -239,8 +242,7 @@ export class OptionSetComponent implements OnInit {
           this.loading = false;
         });
 
-    }
-    else {
+    } else {
       this.optionService.createSetOption(optionObj)
         .subscribe((res) => {
           this.toastr.success(this.translate.instant('OPTION.SET_OPTION_CREATED'));
@@ -251,9 +253,11 @@ export class OptionSetComponent implements OnInit {
         });
     }
   }
+
   goToBack() {
     this.router.navigate(['pages/catalogue/options/options-set-list']);
   }
+
   setSelected(e) {
     //console.log(e)
     this.option.optionValues = e;

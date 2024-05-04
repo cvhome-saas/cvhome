@@ -83,16 +83,16 @@ export class ProductsListComponent implements OnInit {
     this.page.pageNumber = pageInfo.offset;
     this.getList();
   }
-  updateValue(event,cell,rowIndex){
-    let newValue=undefined;
+
+  updateValue(event, cell, rowIndex) {
+    let newValue = undefined;
     console.log(event.target.type)
-    if (event.target.type=='checkbox'){
-      newValue=event.target.checked
+    if (event.target.type == 'checkbox') {
+      newValue = event.target.checked
+    } else if (event.target.type == 'number') {
+      newValue = event.target.value
     }
-    else if (event.target.type=='number'){
-      newValue=event.target.value
-    }
-    if (newValue!=undefined){
+    if (newValue != undefined) {
       this.rows[rowIndex][cell] = newValue;
       this.updateRecord(this.rows[rowIndex])
       this.rows = [...this.rows];
@@ -100,25 +100,26 @@ export class ProductsListComponent implements OnInit {
     this.editing[rowIndex + '-' + cell] = false;
 
   }
-   updateRecord(newData) {
-     const product = {
-       available: newData.available,
-       price: newData.price,
-       quantity: newData.quantity
-     };
-     this.productService.updateProductFromTable(this.params.store,newData.id, product)
-       .subscribe({
-         next:(data)=>{
-           this.toastr.success(this.translate.instant('PRODUCT.PRODUCT_UPDATED'));
-         },
-         error:(err)=>{
-           this.toastr.danger(this.translate.instant('PRODUCT.PRODUCT_UPDATED_ERROR'));
-         }
-       })
-   }
+
+  updateRecord(newData) {
+    const product = {
+      available: newData.available,
+      price: newData.price,
+      quantity: newData.quantity
+    };
+    this.productService.updateProductFromTable(this.params.store, newData.id, product)
+      .subscribe({
+        next: (data) => {
+          this.toastr.success(this.translate.instant('PRODUCT.PRODUCT_UPDATED'));
+        },
+        error: (err) => {
+          this.toastr.danger(this.translate.instant('PRODUCT.PRODUCT_UPDATED_ERROR'));
+        }
+      })
+  }
 
   onEdit(row: any) {
-    this.router.navigate(['pages/catalogue/products/product/'+ this.params.store+"-"+ row.id]);
+    this.router.navigate(['pages/catalogue/products/product/' + this.params.store + "-" + row.id]);
   }
 
   onDelete(row: any) {

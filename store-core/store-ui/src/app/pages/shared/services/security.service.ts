@@ -1,45 +1,46 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SecurityService {
 
-  constructor() { }
+  constructor() {
+  }
 
-  isSuperAdmin(): boolean { 
+  isSuperAdmin(): boolean {
     return (JSON.parse(localStorage.getItem('roles'))).isSuperadmin;
   }
 
   isRetailAdmin(): boolean {
     //console.log(JSON.stringify(localStorage.getItem('roles')));
-    if(
+    if (
       (JSON.parse(localStorage.getItem('roles'))).isSuperadmin || (JSON.parse(localStorage.getItem('roles'))).isAdminRetail
     ) {
       return true;
-    } else  {
+    } else {
       return false;
     }
   }
 
   hasRetailAdminRole(): boolean {
     //console.log(JSON.stringify(localStorage.getItem('roles')));
-    if(
+    if (
       (JSON.parse(localStorage.getItem('roles'))).isAdminRetail
     ) {
       return true;
-    } else  {
+    } else {
       return false;
     }
   }
 
   hasAdminRole(): boolean {
     //console.log(JSON.stringify(localStorage.getItem('roles')));
-    if(
+    if (
       (JSON.parse(localStorage.getItem('roles'))).isAdmin
     ) {
       return true;
-    } else  {
+    } else {
       return false;
     }
   }
@@ -55,13 +56,13 @@ export class SecurityService {
    */
   isAnAdmin(): boolean {
     //console.log(JSON.parse(localStorage.getItem('roles')));
-    if(
+    if (
       (JSON.parse(localStorage.getItem('roles'))).isSuperadmin ||
       (JSON.parse(localStorage.getItem('roles'))).isAdmin ||
       (JSON.parse(localStorage.getItem('roles'))).isAdminRetail
     ) {
       return true;
-    } else  {
+    } else {
       return false;
     }
   }

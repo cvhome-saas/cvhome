@@ -1,10 +1,11 @@
-import { Component, OnInit, ViewChild, Output, EventEmitter } from '@angular/core';
-import { ProductService } from '../services/product.service';
-import { TranslateService } from '@ngx-translate/core';
-import { Router } from '@angular/router';
-import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import { CategoryService } from '../../categories/services/category.service';
-import { StorageService } from '../../../shared/services/storage.service';
+import {Component, OnInit, ViewChild, Output, EventEmitter} from '@angular/core';
+import {ProductService} from '../services/product.service';
+import {TranslateService} from '@ngx-translate/core';
+import {Router} from '@angular/router';
+import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
+import {CategoryService} from '../../categories/services/category.service';
+import {StorageService} from '../../../shared/services/storage.service';
+
 @Component({
   selector: 'ngx-product-ordering',
   templateUrl: './product-ordering.component.html',
@@ -34,7 +35,8 @@ export class ProductOrderingComponent implements OnInit {
     private router: Router,
     private categoryService: CategoryService,
     private storageService: StorageService
-  ) { }
+  ) {
+  }
 
   loadParams() {
     return {
@@ -43,6 +45,7 @@ export class ProductOrderingComponent implements OnInit {
       lang: localStorage.getItem('lang')
     };
   }
+
   ngOnInit(): void {
     this.getList();
     this.getCategory();
@@ -55,6 +58,7 @@ export class ProductOrderingComponent implements OnInit {
   searchCategory() {
     this.getCategory()
   }
+
   onSelectCategory(event) {
     this.categoryTemp.map((item) => {
       if (event == item.name) {
@@ -62,8 +66,7 @@ export class ProductOrderingComponent implements OnInit {
         this.productService.getProductOrderById(item.id).subscribe(res => {
           if (res.products.length == 0) {
             this.data = []
-          }
-          else {
+          } else {
             res.products.map((item) => {
               this.data.push({
                 id: item.id,
@@ -101,6 +104,7 @@ export class ProductOrderingComponent implements OnInit {
         })
       });
   }
+
   getCategory() {
     this.categoryService.getListOfCategories(this.params)
       .subscribe(categories => {
@@ -108,7 +112,7 @@ export class ProductOrderingComponent implements OnInit {
         let tempValue = [];
         categories.categories.forEach((value) => {
           tempValue.push(value.code);
-          this.categoryTemp.push({ 'id': value.id, 'name': value.description.name.toLowerCase() })
+          this.categoryTemp.push({'id': value.id, 'name': value.description.name.toLowerCase()})
         })
         this.categoryData = tempValue
       });

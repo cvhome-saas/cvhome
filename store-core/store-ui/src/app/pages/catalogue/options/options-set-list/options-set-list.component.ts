@@ -1,12 +1,13 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import {Component, OnInit} from '@angular/core';
+import {Router} from '@angular/router';
 
-import { OptionService } from '../services/option.service';
-import { LocalDataSource } from 'ng2-smart-table';
-import { TranslateService } from '@ngx-translate/core';
-import { ShowcaseDialogComponent } from '../../../shared/components/showcase-dialog/showcase-dialog.component';
-import { NbDialogService } from '@nebular/theme';
+import {OptionService} from '../services/option.service';
+import {LocalDataSource} from 'ng2-smart-table';
+import {TranslateService} from '@ngx-translate/core';
+import {ShowcaseDialogComponent} from '../../../shared/components/showcase-dialog/showcase-dialog.component';
+import {NbDialogService} from '@nebular/theme';
 import {NbToastrService} from '@nebular/theme';
+
 @Component({
   selector: 'ngx-options-set-list',
   templateUrl: './options-set-list.component.html',
@@ -23,7 +24,6 @@ export class OptionsSetListComponent implements OnInit {
     private router: Router,
     private dialogService: NbDialogService,
     private toastr: NbToastrService,
-
   ) {
   }
 
@@ -55,8 +55,8 @@ export class OptionsSetListComponent implements OnInit {
         position: 'right',
         sort: true,
         custom: [
-          { name: 'edit', title: '<i class="nb-edit"></i>' },
-          { name: 'remove', title: '<i class="nb-trash"></i>' }
+          {name: 'edit', title: '<i class="nb-edit"></i>'},
+          {name: 'remove', title: '<i class="nb-trash"></i>'}
         ],
       },
       pager: {
@@ -87,7 +87,7 @@ export class OptionsSetListComponent implements OnInit {
           type: 'string',
           filter: false,
           valuePrepareFunction: (data) => {
-            if(data != null) {
+            if (data != null) {
               let value = data.map(a => a.name).join(", ");
               return value;
             }
@@ -98,7 +98,7 @@ export class OptionsSetListComponent implements OnInit {
           type: 'string',
           filter: false,
           valuePrepareFunction: (data) => {
-            if(data != null) {
+            if (data != null) {
               let value = data.map(a => a.name).join(", ");
               return value;
             }
@@ -112,18 +112,18 @@ export class OptionsSetListComponent implements OnInit {
     //console.log(event);
     this.dialogService.open(ShowcaseDialogComponent, {})
       .onClose.subscribe(res => {
-        if (res) {
-          // event.confirm.resolve();
-          this.optionService.deleteOptionSet(event.data.id)
-            .subscribe(result => {
-              this.toastr.success(this.translate.instant('OPTION.SET_OPTION_REMOVED'));
-              this.getList();
-            });
-        } else {
-          //TODO generic error page
-          // event.confirm.reject();
-        }
-      });
+      if (res) {
+        // event.confirm.resolve();
+        this.optionService.deleteOptionSet(event.data.id)
+          .subscribe(result => {
+            this.toastr.success(this.translate.instant('OPTION.SET_OPTION_REMOVED'));
+            this.getList();
+          });
+      } else {
+        //TODO generic error page
+        // event.confirm.reject();
+      }
+    });
   }
 
 
@@ -137,6 +137,7 @@ export class OptionsSetListComponent implements OnInit {
         break
     }
   }
+
   onEdit(event) {
     this.router.navigate(['/pages/catalogue/options/option-set/' + event.data.id]);
   }

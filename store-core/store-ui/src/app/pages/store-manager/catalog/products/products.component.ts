@@ -1,5 +1,5 @@
 import {Component} from '@angular/core';
-import { ManagerStoreId} from "../../../../shared/domain/commons";
+import {ManagerStoreId} from "../../../../shared/domain/commons";
 
 @Component({
   selector: 'ngx-products',

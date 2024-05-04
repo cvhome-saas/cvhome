@@ -1,10 +1,10 @@
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
+import {NgModule} from '@angular/core';
+import {RouterModule, Routes} from '@angular/router';
 
-import { ProductsComponent } from '../products.component';
-import { ManageInventoryComponent } from '../inventory/manage-inventory/manage-inventory.component';
-import { InventoryDetailsComponent } from '../inventory/inventory-details/inventory-details.component';
-import { InventoryCreationComponent } from '../inventory/inventory-creation/inventory-creation.component';
+import {ProductsComponent} from '../products.component';
+import {ManageInventoryComponent} from '../inventory/manage-inventory/manage-inventory.component';
+import {InventoryDetailsComponent} from '../inventory/inventory-details/inventory-details.component';
+import {InventoryCreationComponent} from '../inventory/inventory-creation/inventory-creation.component';
 
 
 const routes: Routes = [
@@ -32,4 +32,5 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule]
 })
-export class InventoryRoutingModule { }
+export class InventoryRoutingModule {
+}

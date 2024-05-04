@@ -1,13 +1,13 @@
-import { Component, OnInit } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import {Component, OnInit} from '@angular/core';
+import {FormArray, FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {ActivatedRoute, Router} from '@angular/router';
 
-import { ConfigService } from '../../../shared/services/config.service';
-import { OptionValuesService } from '../services/option-values.service';
-import { TranslateService } from '@ngx-translate/core';
-import { OptionValue } from '../models/optionValue';
-import { validators } from '../../../shared/validation/validators';
-import { OptionValueImageService } from '../services/option-value-image.service';
+import {ConfigService} from '../../../shared/services/config.service';
+import {OptionValuesService} from '../services/option-values.service';
+import {TranslateService} from '@ngx-translate/core';
+import {OptionValue} from '../models/optionValue';
+import {validators} from '../../../shared/validation/validators';
+import {OptionValueImageService} from '../services/option-value-image.service';
 import {NbToastrService} from "@nebular/theme";
 
 @Component({
@@ -135,7 +135,7 @@ export class OptionValuesComponent implements OnInit {
       return;
     }
     if (this.optionValue.id) {
-      const optionObj = { ...this.form.value, id: this.optionValue.id };
+      const optionObj = {...this.form.value, id: this.optionValue.id};
       this.optionValuesService.updateOptionValue(this.optionValue.id, optionObj).subscribe(res => {
         if (this.uploadImage.get('file')) {
           this.optionValueImageService.createImage(this.optionValue.id, this.uploadImage).subscribe(r => {
@@ -149,11 +149,11 @@ export class OptionValuesComponent implements OnInit {
       });
     } else {
       this.optionValuesService.createOptionValue(this.form.value).subscribe(res => {
-        if(this.uploadImage.has('file')) {
+        if (this.uploadImage.has('file')) {
           this.optionValueImageService.createImage(res.id, this.uploadImage).subscribe(r => {
             this.toastr.success(this.translate.instant('OPTION_VALUE.OPTION_VALUE_UPDATED'));
             this.router.navigate(['pages/catalogue/options/options-values-list']);
-        });
+          });
         } else {
           this.toastr.success(this.translate.instant('OPTION_VALUE.OPTION_VALUE_CREATED'));
           this.router.navigate(['pages/catalogue/options/options-values-list']);
@@ -161,6 +161,7 @@ export class OptionValuesComponent implements OnInit {
       });
     }
   }
+
   goToBack() {
     this.router.navigate(['pages/catalogue/options/options-values-list']);
   }

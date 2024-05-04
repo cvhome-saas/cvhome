@@ -21,8 +21,6 @@ export class PageComponent {
 
   perPage = 10;
   currentPage = 1;
-  protected readonly ColumnMode = ColumnMode;
-
   params = {
     lang: this.storageService.getLanguage(),
     store: "",
@@ -30,6 +28,7 @@ export class PageComponent {
     page: 0
   };
   loadingList = false;
+  protected readonly ColumnMode = ColumnMode;
 
   constructor(
     private crudService: CrudService,
@@ -94,14 +93,14 @@ export class PageComponent {
     }).onClose.subscribe(res => {
       if (res) {
         this.loadingList = true;
-        this.crudService.delete('/store/api/v1/private/content/' + event.id + '?id=' + event.id+"&store="+this.params.store)
+        this.crudService.delete('/store/api/v1/private/content/' + event.id + '?id=' + event.id + "&store=" + this.params.store)
           .subscribe({
-            next:(data)=>{
+            next: (data) => {
               this.loadingList = false;
               this.toastr.success('Content page deleted successfully');
               this.getPages();
             },
-            error:(err)=>{
+            error: (err) => {
               this.loadingList = false;
             },
           })

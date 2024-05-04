@@ -93,6 +93,7 @@ Authorization: Bearer {{access_token}}
   "useCache": true,
   "retailer": true
 }
+
 ### get my stores
 GET http://localhost:8083/api/v1/store/me
 Authorization: Bearer {{access_token}}

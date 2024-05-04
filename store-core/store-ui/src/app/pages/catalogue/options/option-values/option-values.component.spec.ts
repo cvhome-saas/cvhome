@@ -1,6 +1,6 @@
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 
-import { OptionValuesComponent } from './option-values.component';
+import {OptionValuesComponent} from './option-values.component';
 
 describe('OptionValuesComponent', () => {
   let component: OptionValuesComponent;
@@ -8,9 +8,9 @@ describe('OptionValuesComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ OptionValuesComponent ]
+      declarations: [OptionValuesComponent]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {

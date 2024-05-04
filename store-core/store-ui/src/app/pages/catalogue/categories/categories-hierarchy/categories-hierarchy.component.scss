@@ -83,6 +83,7 @@
 
   .filter_left_section {
     width: 50%;
+
     .content_spacing {
       .success_button {
         background-color: #36f;
@@ -93,6 +94,7 @@
         font-weight: 600;
         font-size: 0.875rem;
         height: 40px;
+
         &:disabled {
           background-color: #598bff96;
 

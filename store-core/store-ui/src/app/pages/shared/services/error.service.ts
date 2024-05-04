@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 
-import { TranslateService } from '@ngx-translate/core';
+import {TranslateService} from '@ngx-translate/core';
 import {NbToastrService} from "@nebular/theme";
 
 @Injectable({
@@ -20,7 +20,7 @@ export class ErrorService {
 
   error(errorCode, code) {
     this.toastrService.danger(this.translateService.instant(errorCode));
-    console.log('Application error [' + errorCode + ']' + code != null ? code:'');
+    console.log('Application error [' + errorCode + ']' + code != null ? code : '');
   }
 
 

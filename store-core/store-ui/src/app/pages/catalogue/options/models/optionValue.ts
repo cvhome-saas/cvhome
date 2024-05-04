@@ -1,4 +1,4 @@
-import { Description } from '../../../shared/models/description';
+import {Description} from '../../../shared/models/description';
 
 export class OptionValue {
   id?: number;

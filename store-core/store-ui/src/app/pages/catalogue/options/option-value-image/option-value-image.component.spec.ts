@@ -1,6 +1,6 @@
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 
-import { OptionValueImageComponent } from './option-value-image.component';
+import {OptionValueImageComponent} from './option-value-image.component';
 
 describe('OptionValueImageComponent', () => {
   let component: OptionValueImageComponent;
@@ -8,9 +8,9 @@ describe('OptionValueImageComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ OptionValueImageComponent ]
+      declarations: [OptionValueImageComponent]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {

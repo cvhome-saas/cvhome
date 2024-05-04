@@ -1,6 +1,6 @@
 <nb-card class="page-card inner_pages">
   <!-- <div *ngIf="loadingList" class="loading-block" [nbSpinner]="loadingList" nbSpinnerSize="large" nbSpinnerStatus="primary"></div> -->
-  <nb-card-body [nbSpinner]="loadingList" nbSpinnerSize="large" nbSpinnerStatus="primary" class="storeList">
+  <nb-card-body [nbSpinner]="loadingList" class="storeList" nbSpinnerSize="large" nbSpinnerStatus="primary">
     <div class="inner_pages_legacy">
       <nb-card-header class="main_header">
         <h1 class="page_title">{{ 'COMPONENTS.STORES' | translate }}</h1>
@@ -9,17 +9,17 @@
       </nb-card-header>
 
       <ngx-datatable
-        class="material"
-        [rows]="rows"
+        (page)="setPage($event)"
         [columnMode]="ColumnMode.force"
-        [headerHeight]="50"
-        [footerHeight]="50"
-        rowHeight="auto"
-        [externalPaging]="true"
         [count]="page.totalElements"
-        [offset]="page.pageNumber"
+        [externalPaging]="true"
+        [footerHeight]="50"
+        [headerHeight]="50"
         [limit]="page.size"
-        (page)="setPage($event)">
+        [offset]="page.pageNumber"
+        [rows]="rows"
+        class="material"
+        rowHeight="auto">
 
         <ngx-datatable-column name="Id">
           <ng-template let-column="column" ngx-datatable-header-template> {{ 'COMMON.ID' |translate }}</ng-template>
@@ -36,21 +36,24 @@
         </ngx-datatable-column>
 
         <ngx-datatable-column name="name">
-          <ng-template let-column="column" ngx-datatable-header-template> {{ 'COMMON.STORE_NAME' |translate }}</ng-template>
+          <ng-template let-column="column" ngx-datatable-header-template> {{ 'COMMON.STORE_NAME' |translate }}
+          </ng-template>
           <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
             {{ row.name }}
           </ng-template>
         </ngx-datatable-column>
 
         <ngx-datatable-column name="retailer">
-          <ng-template let-column="column" ngx-datatable-header-template> {{ 'COMPONENTS.RETAILER' |translate }}</ng-template>
+          <ng-template let-column="column" ngx-datatable-header-template> {{ 'COMPONENTS.RETAILER' |translate }}
+          </ng-template>
           <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
             {{ row.retailer }}
           </ng-template>
         </ngx-datatable-column>
 
         <ngx-datatable-column name="name">
-          <ng-template let-column="column" ngx-datatable-header-template> {{ 'COMMON.EMAIL_ADDRESS' |translate }}</ng-template>
+          <ng-template let-column="column" ngx-datatable-header-template> {{ 'COMMON.EMAIL_ADDRESS' |translate }}
+          </ng-template>
           <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
             {{ row.email }}
           </ng-template>
@@ -61,8 +64,10 @@
             {{ 'ORDER.ACTIONS' |translate }}
           </ng-template>
           <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-            <button nbButton shape="round" size="small" status="primary" (click)="onEdit(row)"><i class="nb-edit"></i></button>
-            <button nbButton shape="round" size="small" status="danger" (click)="onDelete(row)"><i class="nb-trash"></i></button>
+            <button (click)="onEdit(row)" nbButton shape="round" size="small" status="primary"><i class="nb-edit"></i>
+            </button>
+            <button (click)="onDelete(row)" nbButton shape="round" size="small" status="danger"><i class="nb-trash"></i>
+            </button>
           </ng-template>
         </ngx-datatable-column>
       </ngx-datatable>

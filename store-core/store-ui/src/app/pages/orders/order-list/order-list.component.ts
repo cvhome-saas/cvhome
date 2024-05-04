@@ -16,10 +16,7 @@ import {Page} from "../../shared/models/Page";
 export class OrderListComponent implements OnInit {
   rows = [];
   columns = [{name: 'Id'}];
-  protected readonly ColumnMode = ColumnMode;
   page: Page = new Page();
-
-
   // source: LocalDataSource = new LocalDataSource();
   loadingList = false;
   settings = {};
@@ -29,6 +26,7 @@ export class OrderListComponent implements OnInit {
   totalCount;
   roles;
   params = this.loadParams();
+  protected readonly ColumnMode = ColumnMode;
 
   constructor(
     private ordersService: OrdersService,

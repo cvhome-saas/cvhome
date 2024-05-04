@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges} from '@angular/core';
 
 @Component({
   selector: 'ngx-option-value-image',
@@ -31,14 +31,14 @@ export class OptionValueImageComponent implements OnInit, OnChanges {
         url: fileReader.result as string,
         file: event.target.files[0]
       };
-      this.imageChanged.emit({ type: 'add', data: event.target.files[0] });
+      this.imageChanged.emit({type: 'add', data: event.target.files[0]});
     };
     reader.readAsDataURL(event.target.files[0]);
   }
 
   removeImage() {
     this.image = {};
-    this.imageChanged.emit({ type: 'remove' });
+    this.imageChanged.emit({type: 'remove'});
   }
 
 }

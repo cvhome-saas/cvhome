@@ -1,63 +1,65 @@
 <!--<ngx-back-button></ngx-back-button>-->
-<nb-card size="small" class="page-card">
+<nb-card class="page-card" size="small">
   <nb-card-header>
-    {{ 'PRODUCT_ATTRIBUTES.OPTIONS_ATTRIBUTES' | translate}}
+    {{ 'PRODUCT_ATTRIBUTES.OPTIONS_ATTRIBUTES' | translate }}
   </nb-card-header>
   <nb-card-body>
     <!-- <div *ngIf="loader" [nbSpinner]="loader" nbSpinnerSize="large" nbSpinnerStatus="primary"></div> -->
     <form [formGroup]='form'>
       <div class="form-group">
-        <label class="col-sm-10 col-form-label">{{ 'PRODUCT_ATTRIBUTES.ATTRIBUTE_NAME' | translate}}</label>
+        <label class="col-sm-10 col-form-label">{{ 'PRODUCT_ATTRIBUTES.ATTRIBUTE_NAME' | translate }}</label>
         <div class="col-sm-12">
-          <p-dropdown *ngIf="options.length" [options]="options" formControlName='attributeName' filter="true">
-            <ng-template let-item pTemplate="selectedItem">{{item.label}}</ng-template>
-            <ng-template let-el pTemplate="item">{{el.label}}</ng-template>
+          <p-dropdown *ngIf="options.length" [options]="options" filter="true" formControlName='attributeName'>
+            <ng-template let-item pTemplate="selectedItem">{{ item.label }}</ng-template>
+            <ng-template let-el pTemplate="item">{{ el.label }}</ng-template>
           </p-dropdown>
         </div>
       </div>
 
       <div class="form-group">
         <div class="col-sm-12 group-block">
-          <nb-checkbox status="success" formControlName='displayOnly'>
-            {{ 'PRODUCT_ATTRIBUTES.DISPLAY_ONLY' | translate}}
+          <nb-checkbox formControlName='displayOnly' status="success">
+            {{ 'PRODUCT_ATTRIBUTES.DISPLAY_ONLY' | translate }}
           </nb-checkbox>
         </div>
       </div>
 
       <div class="form-group">
-        <label class="col-sm-10 col-form-label">{{ 'PRODUCT_ATTRIBUTES.PRODUCT_OPTION' | translate}}</label>
+        <label class="col-sm-10 col-form-label">{{ 'PRODUCT_ATTRIBUTES.PRODUCT_OPTION' | translate }}</label>
         <div class="col-sm-12">
-          <p-dropdown *ngIf="optionValues.length" [options]="optionValues" formControlName='optionValue' filter="true">
-            <ng-template let-item pTemplate="selectedItem">{{item.label}}</ng-template>
-            <ng-template let-el pTemplate="item">{{el.label}}</ng-template>
+          <p-dropdown *ngIf="optionValues.length" [options]="optionValues" filter="true" formControlName='optionValue'>
+            <ng-template let-item pTemplate="selectedItem">{{ item.label }}</ng-template>
+            <ng-template let-el pTemplate="item">{{ el.label }}</ng-template>
           </p-dropdown>
         </div>
       </div>
 
 
       <div class="form-group">
-        <label for="optionPrice" class="col-sm-10 col-form-label">{{ 'PRODUCT_ATTRIBUTES.OPTION_PRICE' |
-          translate}}</label>
+        <label class="col-sm-10 col-form-label" for="optionPrice">{{
+            'PRODUCT_ATTRIBUTES.OPTION_PRICE' |
+              translate
+          }}</label>
         <div class="col-sm-12">
-          <input type="number" class="form-control" id="optionPrice" formControlName='optionPrice'
-            placeholder="{{ 'PRODUCT.QUANTITY' | translate}}" required>
+          <input class="form-control" formControlName='optionPrice' id="optionPrice" placeholder="{{ 'PRODUCT.QUANTITY' | translate}}"
+                 required type="number">
         </div>
       </div>
 
 
       <div class="form-group">
-        <label for="order" class="col-sm-10 col-form-label">{{ 'COMMON.ORDER' | translate}}</label>
+        <label class="col-sm-10 col-form-label" for="order">{{ 'COMMON.ORDER' | translate }}</label>
         <div class="col-sm-12">
-          <input type="number" class="form-control" id="order" formControlName='order'
-            placeholder="{{ 'PRODUCT.QUANTITY' | translate}}" required>
+          <input class="form-control" formControlName='order' id="order" placeholder="{{ 'PRODUCT.QUANTITY' | translate}}"
+                 required type="number">
         </div>
       </div>
 
 
       <div class="form-group">
         <div class="col-sm-12 group-block">
-          <nb-checkbox status="success" formControlName='defaultOption'>
-            {{ 'PRODUCT_ATTRIBUTES.DEFAULT_OPTION' | translate}}
+          <nb-checkbox formControlName='defaultOption' status="success">
+            {{ 'PRODUCT_ATTRIBUTES.DEFAULT_OPTION' | translate }}
           </nb-checkbox>
         </div>
       </div>
@@ -65,26 +67,29 @@
 
       <div class="form-group">
         <div class="col-sm-12 group-block">
-          <nb-checkbox status="success" formControlName='requiredOption'>
-            {{ 'PRODUCT_ATTRIBUTES.REQUIRED_OPTION' | translate}}
+          <nb-checkbox formControlName='requiredOption' status="success">
+            {{ 'PRODUCT_ATTRIBUTES.REQUIRED_OPTION' | translate }}
           </nb-checkbox>
         </div>
       </div>
 
       <div class="form-group">
-        <label for="additionalWeight" class="col-sm-10 col-form-label">{{ 'PRODUCT_ATTRIBUTES.ADDITIONAL_WEIGHT' |
-          translate}}</label>
+        <label class="col-sm-10 col-form-label" for="additionalWeight">{{
+            'PRODUCT_ATTRIBUTES.ADDITIONAL_WEIGHT' |
+              translate
+          }}</label>
         <div class="col-sm-12">
-          <input type="number" class="form-control" id="additionalWeight" formControlName='additionalWeight'
-            placeholder="additionalWeight" required>
+          <input class="form-control" formControlName='additionalWeight' id="additionalWeight" placeholder="additionalWeight"
+                 required type="number">
         </div>
       </div>
 
-      <hr />
+      <hr/>
 
       <div class="form-group actions-button">
-        <button type="submit" class="btn btn-primary" [nbSpinner]="loader" nbSpinnerSize="large"
-          nbSpinnerStatus="control" (click)="save()">{{ ( !loader ? 'COMMON.SAVE' : '' ) | translate }}</button>
+        <button (click)="save()" [nbSpinner]="loader" class="btn btn-primary" nbSpinnerSize="large"
+                nbSpinnerStatus="control" type="submit">{{ (!loader ? 'COMMON.SAVE' : '') | translate }}
+        </button>
       </div>
 
     </form>

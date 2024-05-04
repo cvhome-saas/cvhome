@@ -1,8 +1,7 @@
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import {NgModule} from '@angular/core';
+import {CommonModule} from '@angular/common';
 import {WelcomeRoutingModule} from "./welcome-routing.module";
 import {WelcomeComponent} from "./welcome/welcome.component";
-
 
 
 @NgModule({
@@ -14,4 +13,5 @@ import {WelcomeComponent} from "./welcome/welcome.component";
     WelcomeRoutingModule
   ]
 })
-export class WelcomeModule { }
+export class WelcomeModule {
+}

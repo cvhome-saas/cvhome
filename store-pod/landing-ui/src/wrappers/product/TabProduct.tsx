@@ -42,7 +42,11 @@ const ProductGrid = ({storeContext, key, product}: {
                          src={product.images.length > 0 ? product.images[0].imageUrl : product.image.imageUrl}/>
                 </Link>
                 <ProductGridActions storeContext={storeContext} product={product}
-                                    t={{'SKU': t('SKU'), 'Add to cart': t('Add to cart'), 'Categories': t('Categories')}}/>
+                                    t={{
+                                        'SKU': t('SKU'),
+                                        'Add to cart': t('Add to cart'),
+                                        'Categories': t('Categories')
+                                    }}/>
             </div>
             <div className="product-content-2">
                 <div className="title-price-wrap-2 ">

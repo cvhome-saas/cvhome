@@ -136,7 +136,7 @@ export class BrandFormComponent implements OnInit {
 
   checkCode(event) {
     const code = event.target.value;
-    this.brandService.checkBrandCode(this.store,code)
+    this.brandService.checkBrandCode(this.store, code)
       .subscribe(res => {
         this.isCodeUnique = !(res.exists && (this.brand.code !== code));
       });
@@ -197,12 +197,12 @@ export class BrandFormComponent implements OnInit {
       }
 
       if (this.brand.id) {
-        this.brandService.updateBrand(this.store,this.brand.id, brandObject)
+        this.brandService.updateBrand(this.store, this.brand.id, brandObject)
           .subscribe(result => {
             this.toastr.success(this.translate.instant('BRAND.BRAND_UPDATED'));
           });
       } else {
-        this.brandService.createBrand(this.store,brandObject)
+        this.brandService.createBrand(this.store, brandObject)
           .subscribe(result => {
             this.toastr.success(this.translate.instant('BRAND.BRAND_CREATED'));
             this.router.navigate(['pages/catalogue/brands/brands-list']);

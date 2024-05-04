@@ -1,10 +1,10 @@
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
+import {NgModule} from '@angular/core';
+import {RouterModule, Routes} from '@angular/router';
 
-import { BrandsComponent } from './brands.component';
-import { BrandCreationComponent } from './brand-creation/brand-creation.component';
-import { BrandDetailsComponent } from './brand-details/brand-details.component';
-import { BrandsListComponent } from './brands-list/brands-list.component';
+import {BrandsComponent} from './brands.component';
+import {BrandCreationComponent} from './brand-creation/brand-creation.component';
+import {BrandDetailsComponent} from './brand-details/brand-details.component';
+import {BrandsListComponent} from './brands-list/brands-list.component';
 
 const routes: Routes = [
   {

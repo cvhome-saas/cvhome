@@ -1,6 +1,6 @@
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 
-import { PriceFormComponent } from './price-form.component';
+import {PriceFormComponent} from './price-form.component';
 
 describe('PriceFormComponent', () => {
   let component: PriceFormComponent;
@@ -8,9 +8,9 @@ describe('PriceFormComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ PriceFormComponent ]
+      declarations: [PriceFormComponent]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {

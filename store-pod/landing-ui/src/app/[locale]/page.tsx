@@ -4,8 +4,6 @@ import {cookies, headers} from "next/headers";
 import {extractStoreContext, StoreContext} from "@/types/store-context";
 import {getTranslations} from "next-intl/server";
 import {Link} from "@/navigation";
-import {StoreService} from "@/services/store-service";
-import {Store} from "@/types/store";
 
 export default async function Home({params}: { params: { locale: string } }) {
     const storeContext: StoreContext = extractStoreContext(headers(), cookies(), params.locale);

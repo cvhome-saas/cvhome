@@ -45,8 +45,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_STORE;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 /**
  * API to create, read, update and delete a Product API.

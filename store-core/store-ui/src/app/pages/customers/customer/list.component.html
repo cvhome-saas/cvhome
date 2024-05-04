@@ -1,8 +1,8 @@
 <nb-card class="page-card inner_pages">
-  <nb-card-body [nbSpinner]="loadingList" nbSpinnerSize="large" nbSpinnerStatus="primary" class="customerList">
+  <nb-card-body [nbSpinner]="loadingList" class="customerList" nbSpinnerSize="large" nbSpinnerStatus="primary">
     <div class="inner_pages_legacy">
       <nb-card-header class="main_header">
-        <h1 class="page_title">{{ 'CUSTOMERS.CUSTOMER_LIST' | translate}}</h1>
+        <h1 class="page_title">{{ 'CUSTOMERS.CUSTOMER_LIST' | translate }}</h1>
         <div class="content_spacing_empty"></div>
 
       </nb-card-header>
@@ -12,9 +12,9 @@
         </div>
         <div class="filter_right_section">
           <ngx-store-autocomplete (onStore)="onSelectStore($event)"></ngx-store-autocomplete>
-          <a class="createBtn" (click)="addCustomer()">
+          <a (click)="addCustomer()" class="createBtn">
             <img class="pointer sda" src="../../../../assets/img/plus.png" title="create_customer">
-            <label>{{ 'CUSTOMERS.CREATE_CUSTOMER' | translate}}</label>
+            <label>{{ 'CUSTOMERS.CREATE_CUSTOMER' | translate }}</label>
           </a>
         </div>
 
@@ -22,17 +22,17 @@
 
 
       <ngx-datatable
-        class="material"
-        [rows]="rows"
+        (page)="setPage($event)"
         [columnMode]="ColumnMode.force"
-        [headerHeight]="50"
-        [footerHeight]="50"
-        rowHeight="auto"
-        [externalPaging]="true"
         [count]="page.totalElements"
-        [offset]="page.pageNumber"
+        [externalPaging]="true"
+        [footerHeight]="50"
+        [headerHeight]="50"
         [limit]="page.size"
-        (page)="setPage($event)">
+        [offset]="page.pageNumber"
+        [rows]="rows"
+        class="material"
+        rowHeight="auto">
 
         <ngx-datatable-column name="Id">
           <ng-template let-column="column" ngx-datatable-header-template> {{ 'COMMON.ID' |translate }}</ng-template>
@@ -42,21 +42,24 @@
         </ngx-datatable-column>
 
         <ngx-datatable-column name="firstName">
-          <ng-template let-column="column" ngx-datatable-header-template> {{ 'ORDER_FORM.FIRST_NAME' |translate }}</ng-template>
+          <ng-template let-column="column" ngx-datatable-header-template> {{ 'ORDER_FORM.FIRST_NAME' |translate }}
+          </ng-template>
           <ng-template let-value="value" ngx-datatable-cell-template>
             <strong>{{ value }}</strong>
           </ng-template>
         </ngx-datatable-column>
 
         <ngx-datatable-column name="lastName">
-          <ng-template let-column="column" ngx-datatable-header-template> {{ 'ORDER_FORM.LAST_NAME' |translate }}</ng-template>
+          <ng-template let-column="column" ngx-datatable-header-template> {{ 'ORDER_FORM.LAST_NAME' |translate }}
+          </ng-template>
           <ng-template let-value="value" ngx-datatable-cell-template>
             <strong>{{ value }}</strong>
           </ng-template>
         </ngx-datatable-column>
 
         <ngx-datatable-column name="emailAddress">
-          <ng-template let-column="column" ngx-datatable-header-template> {{ 'USER_FORM.EMAIL_ADDRESS' |translate }}</ng-template>
+          <ng-template let-column="column" ngx-datatable-header-template> {{ 'USER_FORM.EMAIL_ADDRESS' |translate }}
+          </ng-template>
           <ng-template let-value="value" ngx-datatable-cell-template>
             <strong>{{ value }}</strong>
           </ng-template>
@@ -66,8 +69,8 @@
             {{ 'ORDER.ACTIONS' |translate }}
           </ng-template>
           <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-            <button nbButton shape="round" size="small" status="primary" ><i class="nb-edit"></i></button>
-            <button nbButton shape="round" size="small" status="danger" ><i class="nb-trash"></i></button>
+            <button nbButton shape="round" size="small" status="primary"><i class="nb-edit"></i></button>
+            <button nbButton shape="round" size="small" status="danger"><i class="nb-trash"></i></button>
           </ng-template>
         </ngx-datatable-column>
       </ngx-datatable>

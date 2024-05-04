@@ -1,34 +1,39 @@
 <div class="inner_pages create_box">
 
   <nb-card-header class="main_header">
-    <h1 class="page_title" *ngIf="action == 'save'">{{'CONTENT.ADD_BOX_DETAILS' | translate}}</h1>
-    <h1 class="page_title" *ngIf="action == 'edit'">{{'CONTENT.UPDATE_BOX_DETAILS' | translate}}</h1>
+    <h1 *ngIf="action == 'save'" class="page_title">{{ 'CONTENT.ADD_BOX_DETAILS' | translate }}</h1>
+    <h1 *ngIf="action == 'edit'" class="page_title">{{ 'CONTENT.UPDATE_BOX_DETAILS' | translate }}</h1>
     <div class="content_spacing">
-      <button type="button" nbButton class="cancel_button" (click)="goToBack()">{{ 'COMMON.CANCEL'
-        | translate}}</button>
+      <button (click)="goToBack()" class="cancel_button" nbButton type="button">{{
+          'COMMON.CANCEL'
+            | translate
+        }}
+      </button>
     </div>
     <div class="content_spacing">
-      <button type="button" nbButton *ngIf="action == 'edit'" class="success_button" [nbSpinner]="loader"
-        nbSpinnerSize="large" nbSpinnerStatus="control" (click)="save()">
-        {{ ( !loader ? 'COMMON.UPDATE' : '' ) | translate }}
+      <button (click)="save()" *ngIf="action == 'edit'" [nbSpinner]="loader" class="success_button" nbButton
+              nbSpinnerSize="large" nbSpinnerStatus="control" type="button">
+        {{ (!loader ? 'COMMON.UPDATE' : '') | translate }}
       </button>
-      <button type="button" nbButton *ngIf="action == 'save'" class="success_button" [nbSpinner]="loader"
-        nbSpinnerSize="large" nbSpinnerStatus="control" (click)="save()">{{ ( !loader ? 'COMMON.SAVE' : '' ) | translate
-        }}</button>
+      <button (click)="save()" *ngIf="action == 'save'" [nbSpinner]="loader" class="success_button" nbButton
+              nbSpinnerSize="large" nbSpinnerStatus="control" type="button">{{
+          (!loader ? 'COMMON.SAVE' : '') | translate
+        }}
+      </button>
     </div>
   </nb-card-header>
-  <div class="" [nbSpinner]="loader" nbSpinnerSize="large" nbSpinnerStatus="primary">
-    <form [formGroup]='form' #boxForm="ngForm" role="form" *ngIf="!loader">
+  <div [nbSpinner]="loader" class="" nbSpinnerSize="large" nbSpinnerStatus="primary">
+    <form #boxForm="ngForm" *ngIf="!loader" [formGroup]='form' role="form">
 
       <div class="row">
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
           <nb-card class="nb-card inline-form-card">
-            <nb-card-header class="nb-card-header">{{ 'CONTENT.BASIC_DETAILS' | translate}}</nb-card-header>
+            <nb-card-header class="nb-card-header">{{ 'CONTENT.BASIC_DETAILS' | translate }}</nb-card-header>
             <nb-card-body class="nb-card-body">
               <div class="row">
                 <div class="col-lg-12">
                   <div class="form-group">
-                    <nb-checkbox formControlName='visible'>{{ 'CONTENT.VISIBLE' | translate}}</nb-checkbox>
+                    <nb-checkbox formControlName='visible'>{{ 'CONTENT.VISIBLE' | translate }}</nb-checkbox>
                     <!--<nb-checkbox [(ngModel)]="page.mainmenu" name="mainmenu">{{ 'CONTENT.MAINMENU' | translate}}</nb-checkbox>-->
                   </div>
                 </div>
@@ -36,21 +41,21 @@
               <div class="row">
                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                   <div class="form-group">
-                    <label for="code" class="label inputLabel">{{ 'CONTENT.CODE' | translate}} <span>*</span></label>
+                    <label class="label inputLabel" for="code">{{ 'CONTENT.CODE' | translate }} <span>*</span></label>
                     <div>
-                      <input type="text" class="form-control inputText" id="code" formControlName='code'
-                        [readOnly]="uniqueCode" placeholder="{{ 'COMMON.CODE' | translate}}"
-                        (change)="checkCode($event)" required>
-                      <div class="err-message" *ngIf="(code.dirty || code.touched) && code.invalid && code">
+                      <input (change)="checkCode($event)" [readOnly]="uniqueCode" class="form-control inputText" formControlName='code'
+                             id="code" placeholder="{{ 'COMMON.CODE' | translate}}"
+                             required type="text">
+                      <div *ngIf="(code.dirty || code.touched) && code.invalid && code" class="err-message">
                         <span *ngIf="code.errors.required">
-                          {{ 'COMMON.CODE_REQUIRED' | translate}}
+                          {{ 'COMMON.CODE_REQUIRED' | translate }}
                         </span>
                         <span *ngIf="code.errors.pattern">
-                          {{ 'COMMON.ALPHA_DECIMAL_RULE' | translate}}
+                          {{ 'COMMON.ALPHA_DECIMAL_RULE' | translate }}
                         </span>
                       </div>
                       <span *ngIf="isCodeExists" class="err-message">
-                        {{ 'COMMON.CODE_EXISTS' | translate}}
+                        {{ 'COMMON.CODE_EXISTS' | translate }}
                       </span>
                     </div>
                   </div>
@@ -62,13 +67,17 @@
         </div>
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
           <nb-card class="nb-card inline-form-card">
-            <nb-card-header class="nb-card-header">{{ 'CONTENT.PAGE_CONTENT' | translate}} - {{('LANG.'+
-              currentLanguage) |translate }}&nbsp;
-              <nb-select *ngIf="languages.length" placeholder="{{ 'COMMON.LANGUAGE' | translate}}" outline
-                shape="rectangle" name='selectedLanguage' [selected]="defaultLanguage">
+            <nb-card-header class="nb-card-header">{{ 'CONTENT.PAGE_CONTENT' | translate }} - {{
+                ('LANG.' +
+                  currentLanguage) |translate
+              }}&nbsp;
+              <nb-select *ngIf="languages.length" [selected]="defaultLanguage" name='selectedLanguage'
+                         outline placeholder="{{ 'COMMON.LANGUAGE' | translate}}" shape="rectangle">
                 <nb-option (click)="selectLanguage(language.code)" *ngFor="let language of languages"
-                  [value]="language.code">{{
-                  ('LANG.'+language.code) |translate }}</nb-option>
+                           [value]="language.code">{{
+                    ('LANG.' + language.code) |translate
+                  }}
+                </nb-option>
               </nb-select>
             </nb-card-header>
             <nb-card-body class="nb-card-body">

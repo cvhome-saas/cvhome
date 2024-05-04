@@ -24,7 +24,7 @@ export class BrandDetailsComponent implements OnInit {
       let split: string[] = it["id"].split("-");
       let store = split[0];
       let id = split[1];
-      this.store=store;
+      this.store = store;
       this.brandService.getBrandById(store, id)
         .subscribe(brand => {
           this.brand = brand;

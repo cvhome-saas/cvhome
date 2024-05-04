@@ -1,8 +1,8 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 
-import { Observable } from 'rxjs';
-import { roles } from '../models/access-roles';
-import { CrudService } from './crud.service';
+import {Observable} from 'rxjs';
+import {roles} from '../models/access-roles';
+import {CrudService} from './crud.service';
 
 @Injectable({
   providedIn: 'root'
@@ -92,21 +92,21 @@ export class UserService {
     const params = {
       'store': store
     };
-    return this.crudService.post(`/v1/private/user/`, user, { params });
+    return this.crudService.post(`/v1/private/user/`, user, {params});
   }
 
   updateUser(id: any, user: any, store: any): Observable<any> {
     const params = {
       'store': store
     };
-    return this.crudService.put(`/v1/private/user/${id}`, user, { params });
+    return this.crudService.put(`/v1/private/user/${id}`, user, {params});
   }
 
   deleteUser(id: any, store: any): Observable<any> {
     const params = {
       'store': store
     };
-    return this.crudService.delete(`/v1/private/user/${id}`, { params });
+    return this.crudService.delete(`/v1/private/user/${id}`, {params});
   }
 
   updatePassword(id: any, passwords: any): Observable<any> {

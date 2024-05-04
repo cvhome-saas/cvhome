@@ -1,16 +1,16 @@
-import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router, UrlTree, UrlSegment, UrlSegmentGroup, PRIMARY_OUTLET } from '@angular/router';
+import {ChangeDetectorRef, Component, Input, OnInit} from '@angular/core';
+import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {Router, UrlTree, UrlSegment, UrlSegmentGroup, PRIMARY_OUTLET} from '@angular/router';
 
-import { ConfigService } from '../../shared/services/config.service';
-import { UserService } from '../../shared/services/user.service';
-import { User } from '../../shared/models/user';
+import {ConfigService} from '../../shared/services/config.service';
+import {UserService} from '../../shared/services/user.service';
+import {User} from '../../shared/models/user';
 import {NbToastrService} from '@nebular/theme';
-import { TranslateService } from '@ngx-translate/core';
-import { StoreService } from '../../store-management/services/store.service';
-import { SecurityService } from '../../shared/services/security.service';
-import { StorageService } from '../../shared/services/storage.service';
-import { forkJoin } from 'rxjs';
+import {TranslateService} from '@ngx-translate/core';
+import {StoreService} from '../../store-management/services/store.service';
+import {SecurityService} from '../../shared/services/security.service';
+import {StorageService} from '../../shared/services/storage.service';
+import {forkJoin} from 'rxjs';
 
 @Component({
   selector: 'ngx-user-form',
@@ -27,7 +27,9 @@ export class UserFormComponent implements OnInit {
     this._user = user;
   }
 
-  get user(): User { return this._user; }
+  get user(): User {
+    return this._user;
+  }
 
   languages = [];
   groups = [];
@@ -78,14 +80,14 @@ export class UserFormComponent implements OnInit {
   rules = {
     'ADMIN_RETAIL': {
       rules: [
-        { key: 'ADMIN_STORE', checked: false, disabled: true },
-        { key: 'ADMIN_RETAIL', checked: false, disabled: false }
+        {key: 'ADMIN_STORE', checked: false, disabled: true},
+        {key: 'ADMIN_RETAIL', checked: false, disabled: false}
       ]
     },
     'ADMIN_STORE': {
       rules: [
-        { key: 'ADMIN_STORE', checked: false, disabled: false },
-        { key: 'ADMIN_RETAIL', checked: false, disabled: true }
+        {key: 'ADMIN_STORE', checked: false, disabled: false},
+        {key: 'ADMIN_RETAIL', checked: false, disabled: true}
       ]
     }
   };
@@ -149,7 +151,7 @@ export class UserFormComponent implements OnInit {
     //const languages = this.configService.getMerchantListOfSupportedLanguages();
     const languages = this.configService.getListOfGlobalLanguages();
     const groups$ = this.configService.getListOfGroups();
-    const stores$ = this.storeService.getListOfMerchantStoreNames({ 'store': this.store });
+    const stores$ = this.storeService.getListOfMerchantStoreNames({'store': this.store});
     forkJoin([groups$, stores$]).subscribe(([groups, stores]) => {
       // fill languages
       this.languages = [...languages];
@@ -236,11 +238,13 @@ export class UserFormComponent implements OnInit {
       this.loader = false;
     });
   }
+
   checkPasswords(group: FormGroup) { // here we have the 'passwords' group
     const password = group.get('password').value;
     const confirmPassword = group.get('repeatPassword').value;
-    return password === confirmPassword ? null : { notSame: true }
+    return password === confirmPassword ? null : {notSame: true}
   }
+
   private createForm() {
     this.form = this.fb.group({
       firstName: ['', [Validators.required]],
@@ -253,7 +257,7 @@ export class UserFormComponent implements OnInit {
       active: [false],
       defaultLanguage: ['', [Validators.required]],
       groups: [[]],
-    }, { validators: this.checkPasswords });
+    }, {validators: this.checkPasswords});
   }
 
   get firstName() {
@@ -271,6 +275,7 @@ export class UserFormComponent implements OnInit {
   get password() {
     return this.form.get('password');
   }
+
   get repeatPassword() {
     return this.form.get('repeatPassword');
   }
@@ -327,11 +332,11 @@ export class UserFormComponent implements OnInit {
     const newGroups = [];
     this.groups.forEach((el) => {
       if (el.checked) {
-        newGroups.push({ id: el.id, name: el.name });
+        newGroups.push({id: el.id, name: el.name});
       }
     });
-    this.form.patchValue({ groups: newGroups });
-    this.form.patchValue({ userName: this.form.value.emailAddress });
+    this.form.patchValue({groups: newGroups});
+    this.form.patchValue({userName: this.form.value.emailAddress});
     if (this.form.value.groups.length === 0) {
       this.toastr.warning(this.translate.instant('COMMON.ADDING_USER_GROUPS_ERROR'));
       this.loader = false;
@@ -412,7 +417,7 @@ export class UserFormComponent implements OnInit {
     const email = event.target.value;
     const store = (this.form.value && this.form.value.store) || (this._user && this._user.merchant);
     if (email !== '') {
-      this.userService.checkIfUserExist({ unique: email, merchant: store })
+      this.userService.checkIfUserExist({unique: email, merchant: store})
         .subscribe(res => {
           if (this._user && this._user.emailAddress === email) {
             this.isEmaillUnique = true;
@@ -442,6 +447,7 @@ export class UserFormComponent implements OnInit {
       });
     }
   }
+
   goToBack() {
     this.router.navigate(['pages/user-management/users']);
   }

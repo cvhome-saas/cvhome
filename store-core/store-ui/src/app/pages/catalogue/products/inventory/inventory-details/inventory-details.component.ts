@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import {Component, OnInit} from '@angular/core';
+import {ActivatedRoute} from '@angular/router';
 
-import { InventoryService } from '../../services/inventory.service';
+import {InventoryService} from '../../services/inventory.service';
 
 @Component({
   selector: 'ngx-inventory-details',
@@ -18,7 +18,7 @@ export class InventoryDetailsComponent implements OnInit {
     const productId = this.activatedRoute.snapshot.paramMap.get('productId');
     const inventoryId = this.activatedRoute.snapshot.paramMap.get('inventoryId');
     this.inventoryService.getInventoryById(productId, inventoryId).subscribe((res) => {
-      this.inventory = { ...res };
+      this.inventory = {...res};
     });
   }
 

@@ -1,18 +1,18 @@
 export class ListState {
-    constructor(
-        fChange: boolean,
-        fReseatable: boolean,
-        fString: string
-      ) { 
+  filterChange: boolean;
+  filterResetable: boolean;
+  filterString: string;
 
-        this.filterChange = fChange,
-        this.filterResetable = fReseatable,
-        this.filterString = fString
+  constructor(
+    fChange: boolean,
+    fReseatable: boolean,
+    fString: string
+  ) {
 
-      }
-
-    filterChange: boolean;
-    filterResetable: boolean;
-    filterString: string;
+    this.filterChange = fChange,
+      this.filterResetable = fReseatable,
+      this.filterString = fString
 
   }
+
+}

@@ -1,7 +1,7 @@
-import { Component, Input, OnInit } from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 
-import { ProductService } from '../services/product.service';
-import { TranslateService } from '@ngx-translate/core';
+import {ProductService} from '../services/product.service';
+import {TranslateService} from '@ngx-translate/core';
 import {NbToastrService} from '@nebular/theme';
 
 @Component({

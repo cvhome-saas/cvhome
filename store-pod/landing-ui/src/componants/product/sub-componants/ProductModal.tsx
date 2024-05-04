@@ -3,7 +3,7 @@ import {Product} from "@/types/product-groups";
 import Modal from "react-bootstrap/Modal";
 import {MiniProductItem} from "@/componants/product/sub-componants/MiniProductItem";
 
-export const ProductModal = ({product,t, show, setShow}: {
+export const ProductModal = ({product, t, show, setShow}: {
     product: Product,
     t: { [key: string]: string },
     show: boolean,

@@ -1,11 +1,11 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { DomSanitizer } from '@angular/platform-browser';
+import {Component, OnInit} from '@angular/core';
+import {Router} from '@angular/router';
+import {DomSanitizer} from '@angular/platform-browser';
 import {NbDialogService, NbToastrService} from '@nebular/theme';
-import { TranslateService } from '@ngx-translate/core';
-import { StorageService } from '../../../shared/services/storage.service';
-import { CatalogService } from '../services/catalog.service';
-import { StoreService } from '../../../store-management/services/store.service';
+import {TranslateService} from '@ngx-translate/core';
+import {StorageService} from '../../../shared/services/storage.service';
+import {CatalogService} from '../services/catalog.service';
+import {StoreService} from '../../../store-management/services/store.service';
 import {ShowcaseDialogComponent} from "../../../store-manager/shared/showcase-dialog/showcase-dialog.component";
 
 @Component({
@@ -68,10 +68,10 @@ export class CataloguesListComponent implements OnInit {
   }
 
   getStoreList() {
-    this.storeService.getListOfMerchantStoreNames({ 'store': '' })
+    this.storeService.getListOfMerchantStoreNames({'store': ''})
       .subscribe(res => {
         res.forEach((store) => {
-          this.stores.push({ value: store.code, label: store.code });
+          this.stores.push({value: store.code, label: store.code});
         });
       });
   }
@@ -86,11 +86,11 @@ export class CataloguesListComponent implements OnInit {
         position: 'right',
         sort: true,
         custom: [
-          { name: 'edit', title: '<i class="nb-edit"></i>' },
-          { name: 'remove', title: this._sanitizer.bypassSecurityTrustHtml('<i class="nb-trash"></i>') }
+          {name: 'edit', title: '<i class="nb-edit"></i>'},
+          {name: 'remove', title: this._sanitizer.bypassSecurityTrustHtml('<i class="nb-trash"></i>')}
         ],
       },
-      pager: { display: false },
+      pager: {display: false},
       columns: {
         id: {
           filter: false,
@@ -159,6 +159,7 @@ export class CataloguesListComponent implements OnInit {
         break
     }
   }
+
   onEdit(event) {
     this.router.navigate(['/pages/catalogue/catalogues/catalogue/' + event.data.id]);
   }
@@ -166,18 +167,18 @@ export class CataloguesListComponent implements OnInit {
   deleteRecord(event) {
     this.dialogService.open(ShowcaseDialogComponent, {})
       .onClose.subscribe(res => {
-        if (res) {
-          this.catalogService.deleteCatalog(event.data.id)
-            .subscribe(result => {
-              this.toastr.success(this.translate.instant('CATALOG.CATALOG_REMOVED'));
-              this.getList();
-            });
+      if (res) {
+        this.catalogService.deleteCatalog(event.data.id)
+          .subscribe(result => {
+            this.toastr.success(this.translate.instant('CATALOG.CATALOG_REMOVED'));
+            this.getList();
+          });
 
-        } else {
-          // TODO navigate generic error
-          // event.confirm.reject();
-        }
-      });
+      } else {
+        // TODO navigate generic error
+        // event.confirm.reject();
+      }
+    });
   }
 
 }

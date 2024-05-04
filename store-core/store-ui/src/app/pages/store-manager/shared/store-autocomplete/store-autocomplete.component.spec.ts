@@ -1,6 +1,6 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { StoreAutocompleteComponent } from './store-autocomplete.component';
+import {StoreAutocompleteComponent} from './store-autocomplete.component';
 
 describe('StoreAutocompleteComponent', () => {
   let component: StoreAutocompleteComponent;

@@ -100,7 +100,7 @@ export class ProductGroupFormComponent implements OnInit {
 
   checkCode(event) {
     const code = event.target.value.trim();
-    this.uniqueCode=code;
+    this.uniqueCode = code;
     // this.productGroupsService.checkGroupCode(code)
     //   .subscribe(res => {
     //     this.isCodeUnique = !(res.exists && (this.option.code !== code));
@@ -131,7 +131,7 @@ export class ProductGroupFormComponent implements OnInit {
         next: (data) => {
           this.loading = false;
           this.rows.push(item)
-          this.rows=this.rows.map(it=>it);
+          this.rows = this.rows.map(it => it);
           this.page.totalPages = 1
           this.page.totalElements = this.rows.length
           this.page.size = this.rows.length
