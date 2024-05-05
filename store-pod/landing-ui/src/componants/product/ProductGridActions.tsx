@@ -23,6 +23,6 @@ export const ProductGridActions = ({storeContext, product, t}: {
         <button title="Quick View" onClick={() => setShow(true)}>
             <i className="fa fa-eye"></i>
         </button>
-        <ProductModal product={product} show={show} setShow={setShow} t={t}/>
+        <ProductModal storeContext={storeContext} product={product} show={show} setShow={setShow} t={t}/>
     </div>
 }

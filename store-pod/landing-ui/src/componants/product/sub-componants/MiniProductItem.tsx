@@ -5,8 +5,13 @@ import {ProductRating} from "@/componants/product/sub-componants/ProductRating";
 import {AddToCart} from "@/componants/product/sub-componants/AddToCart";
 import {Suspense} from "react";
 import {Link} from "@/navigation";
+import {StoreContext} from "@/types/store-context";
 
-export const MiniProductItem = ({product, t}: { product: Product, t: { [key: string]: string } }) => {
+export const MiniProductItem = ({storeContext, product, t}: {
+    storeContext: StoreContext,
+    product: Product,
+    t: { [key: string]: string }
+}) => {
     return <div className="container">
         <div className="row">
             <div className="col-lg-6 col-md-6">
@@ -33,7 +38,7 @@ export const MiniProductItem = ({product, t}: { product: Product, t: { [key: str
                             <div dangerouslySetInnerHTML={{__html: product.description.description}}></div>
                         </Suspense>
                     </div>
-                    <AddToCart product={product} t={t}/>
+                    <AddToCart product={product} t={t} addToCartType={"FULL"} storeContext={storeContext}/>
                     <div className="pro-details-meta"><span>{t['SKU']} :</span>
                         <ul>
                             <li key={"friendlyUrl"}>

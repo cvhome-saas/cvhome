@@ -62,7 +62,7 @@ export const CartItems = ({storeContext, store, cart, t}: {
     const [active, setActive] = useState('shopping-cart-content');
     const showOrHideCart = () => {
         if (active == 'shopping-cart-content') {
-            const itemStr: string | undefined = localStorage.getItem("store-ui-cart-data");
+            const itemStr: string | null = localStorage.getItem("store-ui-cart-data");
             if (itemStr) {
                 try {
                     updateCartItems(JSON.parse(itemStr) as Cart | undefined)
