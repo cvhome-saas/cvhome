@@ -4,11 +4,12 @@ import com.asrevo.cvhome.s2s.model.CdnStorageProperties;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutBucketPolicyRequest;
 
 @Configuration
-public class MinioInitializer implements ApplicationListener<ApplicationReadyEvent> {
+public class MinioInitializer implements ApplicationListener<ApplicationReadyEvent>, Ordered {
     private final S3Client s3Client;
     private final CdnStorageProperties cdnStorageProperties;
 
@@ -46,5 +47,10 @@ public class MinioInitializer implements ApplicationListener<ApplicationReadyEve
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
+    }
+
+    @Override
+    public int getOrder() {
+        return 0;
     }
 }

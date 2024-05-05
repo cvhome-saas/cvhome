@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.store.core.services.merchant;
 
+import com.asrevo.cvhome.commons.utils.Constants;
 import com.asrevo.cvhome.store.core.entity.common.GenericEntityList;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStoreCriteria;
@@ -49,6 +50,11 @@ public class MerchantStoreServiceImpl extends SalesManagerEntityServiceImpl<Inte
     //@Cacheable(value = "store")
     public MerchantStore getByCode(String code) throws ServiceException {
         return merchantRepository.findByCode(code);
+    }
+
+    @Override
+    public MerchantStore getDefaultStore() {
+        return merchantRepository.findByCode(Constants.DEFAULT_STORE);
     }
 
     @Override

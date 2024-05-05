@@ -33,7 +33,7 @@ export default async function Home({params}: { params: { locale: string } }) {
                             </div>
                         </div>
                         <div className="col-md-8 order-1 align-self-end">
-                            <img src={store.banner.path} alt={store.banner.path} className="img-fluid"/>
+                            <img src={store.banner.path} alt={store.banner.name} className="img-fluid"/>
                         </div>
                     </div>
                 </div>
