@@ -1,18 +1,14 @@
 import {BreadCrumb} from "@/componants/product/sub-componants/BreadCrumb";
 import React, {Fragment} from "react";
-import {RequestCookie} from "next/dist/compiled/@edge-runtime/cookies";
 import {cookies, headers} from "next/headers";
 import {Cart} from "@/types/cart";
-import {CartService} from "@/services/cart-service";
-import {getTranslations} from "next-intl/server";
 import {extractStoreContext, StoreContext} from "@/types/store-context";
 import {FullCartBox} from "@/componants/product/sub-componants/FullCartBox";
+import {useTranslations} from "next-intl";
 
-export default async function CartPage({params}: { params: { locale: string } }) {
+export default function CartPage({params}: { params: { locale: string } }) {
     const storeContext: StoreContext = extractStoreContext(headers(), cookies(), params.locale);
-
-    const t = await getTranslations('Cart');
-
+    const t = useTranslations('Cart');
     return <>
         <BreadCrumb name={t('Cart')} t={{'Home': 'Home'}}/>
         <FullCartBox storeContext={storeContext} t={{

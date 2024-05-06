@@ -136,7 +136,7 @@ public class ContentFacadeImpl implements ContentFacade {
         }
 
     }
-
+// @TODO ASHRAF CHECK IF WE CAN USE THIS IN THE NAV MENU
     private ReadableContentPage contentDescriptionToReadableContent(MerchantStore store, Content content,
                                                                     ContentDescription contentDescription) {
 
@@ -807,7 +807,7 @@ public class ContentFacadeImpl implements ContentFacade {
             ContentDescription contentDescription = Optional.ofNullable(contentService.getBySeUrl(store, name))
                     .orElseThrow(() -> new ResourceNotFoundException("No page found : " + name));
 
-            return this.contentDescriptionToReadableContent(store, contentDescription.getContent(), contentDescription);
+            return convertContentToReadableContentPage(store, language, contentDescription.getContent());
 
         } catch (Exception e) {
             throw new ServiceRuntimeException("Error while getting page " + e.getMessage(), e);
