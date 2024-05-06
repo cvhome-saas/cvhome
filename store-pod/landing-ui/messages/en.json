@@ -68,6 +68,30 @@
   "Contact": {
     "Contact": "Contact"
   },
+  "Checkout": {
+    "Checkout": "Checkout",
+    "Billing Details": "Billing Details",
+    "First Name": "First Name",
+    "Last Name": "Last Name",
+    "Company Name": "Company Name",
+    "Street Address": "Street Address",
+    "House number and street name": "House number and street name",
+    "Country": "Country",
+    "Town/City": "Town/City",
+    "State": "State",
+    "Postcode": "Postcode",
+    "Phone": "Phone",
+    "Email address": "Email address",
+    "Additional information": "Additional information",
+    "Order notes": "Order notes",
+    "Notes about your order, special notes for delivery": "Notes about your order, e.g. special notes for delivery.",
+    "I agree with the terms and conditions": "I agree with the terms and conditions",
+    "Place your order": "Place your order",
+    "Product":"Product",
+    "Total":"Total",
+    "No items found in checkout":"No items found in checkout",
+    "Shop now":"Shop now"
+  },
   "Metadata": {
     "Home": "Home",
     "Terms and Policy": "Terms and Policy",

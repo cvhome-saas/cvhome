@@ -16,16 +16,15 @@ export const NavCart = async ({storeContext, store}: { storeContext: StoreContex
         cart = await CartService.getCart(storeContext, cookie.value);
     }
     const t = await getTranslations('Cart');
-    const x = {
-        'No items added to cart': t('No items added to cart'),
-        'Checkout': t('Checkout'),
-        'View Cart': t('View Cart'),
-        'Total': t('Total'),
-        'Qty': t('Qty'),
-    }
     return (
         <>
-            <CartItems storeContext={storeContext} store={store} cart={cart} t={x}/>
+            <CartItems storeContext={storeContext} store={store} cart={cart} t={{
+                'No items added to cart': t('No items added to cart'),
+                'Checkout': t('Checkout'),
+                'View Cart': t('View Cart'),
+                'Total': t('Total'),
+                'Qty': t('Qty'),
+            }}/>
         </>
     )
 }

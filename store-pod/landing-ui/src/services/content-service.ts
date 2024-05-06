@@ -10,4 +10,9 @@ export class ContentService {
         return fetch(`${storeBaseServiceUrl(storeContext)}/api/v1/content/pages/name/${code}?store=${storeContext.store}&lang=${storeContext.local}`)
             .then(it => it.json() as unknown as Page)
     }
+
+    public static getBox = async (storeContext: StoreContext, code: string): Promise<Page> => {
+        return fetch(`${storeBaseServiceUrl(storeContext)}/api/v1/content/boxes/${code}?store=${storeContext.store}&lang=${storeContext.local}`)
+            .then(it => it.json() as unknown as Page)
+    }
 }
