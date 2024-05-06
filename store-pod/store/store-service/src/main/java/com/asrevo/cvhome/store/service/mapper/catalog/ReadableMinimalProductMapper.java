@@ -147,6 +147,9 @@ public class ReadableMinimalProductMapper implements Mapper<Product, ReadableMin
         desc.setName(description.getName());
         desc.setId(description.getId());
         desc.setLanguage(description.getLanguage().getCode());
+        desc.setFriendlyUrl(description.getSeUrl());
+        desc.setTitle(description.getTitle());
+        desc.setMetaDescription(description.getMetatagDescription());
         return desc;
     }
 

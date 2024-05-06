@@ -36,7 +36,22 @@
     "Checkout": "Checkout",
     "View Cart": "View Cart",
     "Total": "Total",
-    "Qty": "Qty"
+    "Qty": "Qty",
+    "Cart": "Cart",
+    "Your cart items": "Your cart items",
+    "Image": "Image",
+    "Product Name": "Product Name",
+    "Unit Price": "Unit Price",
+    "Subtotal": "Subtotal",
+    "Action": "Action",
+    "Clear Shopping Cart": "Clear Shopping Cart",
+    "Continue Shopping": "Continue Shopping",
+    "Cart Total": "Cart Total",
+    "Total products": "Total products",
+    "Grand Total": "Grand Total",
+    "Proceed to Checkout": "Proceed to Checkout",
+    "No items found in cart": "No items found in cart",
+    "Shop now": "Shop now"
   },
   "Product": {
     "Home": "Home",

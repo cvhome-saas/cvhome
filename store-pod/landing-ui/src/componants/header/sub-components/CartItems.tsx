@@ -13,11 +13,12 @@ export const CartItems = ({storeContext, store, cart, t}: {
     cart: Cart | undefined,
     t: { [key: string]: string }
 }) => {
-
-    const [cartCode, setCartCode] = useState(cart?.code)
-    const [displayTotal, setDisplayTotal] = useState(cart?.displayTotal)
-    const [quantity, setQuantity] = useState(cart?.quantity)
-    const [products, setProducts] = useState(cart?.products || [])
+    let [loaded, setLoaded] = useState(false);
+    let currentCart: Cart | undefined = cart;
+    const [cartCode, setCartCode] = useState(currentCart?.code)
+    const [displayTotal, setDisplayTotal] = useState(currentCart?.displayTotal)
+    const [quantity, setQuantity] = useState(currentCart?.quantity)
+    const [products, setProducts] = useState(currentCart?.products || [])
 
     const addRemoveCartData = (newCart: Cart | undefined) => {
         if (newCart && newCart.code && newCart.products && newCart.products.length > 0 && typeof window !== "undefined") {
@@ -26,12 +27,10 @@ export const CartItems = ({storeContext, store, cart, t}: {
 
         } else {
             Cookies.remove('store-ui-cart-id');
-            localStorage.removeItem("store-ui-cart-data")
+            localStorage.removeItem("store-ui-cart-data");
         }
 
     }
-
-    useEffect(() => addRemoveCartData(cart));
 
 
     const updateCartItems = (cart: Cart | undefined) => {
@@ -50,6 +49,7 @@ export const CartItems = ({storeContext, store, cart, t}: {
 
 
     const refreshCartView = (newCart: Cart | undefined) => {
+        currentCart = cart;
         addRemoveCartData(newCart);
         updateCartItems(newCart);
     };
@@ -75,6 +75,14 @@ export const CartItems = ({storeContext, store, cart, t}: {
             setActive('shopping-cart-content');
         }
     };
+
+    useEffect(() => {
+        if (!loaded) {
+            setLoaded(true);
+            addRemoveCartData(currentCart);
+        }
+    })
+
     return <div>
         <div className="same-style cart-wrap d-none d-lg-block">
             <button className="icon-cart" onClick={showOrHideCart}>

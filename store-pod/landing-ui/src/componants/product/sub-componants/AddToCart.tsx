@@ -3,8 +3,8 @@ import {Product} from "@/types/product-groups";
 import {useState} from "react";
 import {Cart} from "@/types/cart";
 import {CartService} from "@/services/cart-service";
-import Cookies from "js-cookie";
 import {StoreContext} from "@/types/store-context";
+import {updateLocalStorage} from "@/services/utils";
 
 
 export const AddToCart = ({storeContext, addToCartType, product, t}: {
@@ -42,18 +42,11 @@ export const AddToCart = ({storeContext, addToCartType, product, t}: {
                 return it.json() as unknown as Cart
             })
             .then(it => {
-                if (it && it.code && it.products && it.products.length > 0) {
-                    Cookies.set('store-ui-cart-id', it.code);
-                    localStorage.setItem("store-ui-cart-data", JSON.stringify(it))
-                    const elementById: HTMLElement | null = document.getElementById('shopbag-count');
-                    if (elementById) {
-                        elementById.innerHTML = it.products.length + "";
-                        elementById.className = "count-style";
-                    }
-
+                if (it && it.code) {
+                    updateLocalStorage(it);
                 }
                 return it;
-            })
+            });
 
     };
 
