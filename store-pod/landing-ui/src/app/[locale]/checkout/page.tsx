@@ -22,7 +22,7 @@ export default async function CheckoutPage({params}: { params: { locale: string 
     const t = await getTranslations('Checkout');
     return <>
         <BreadCrumb name={t('Checkout')} t={{'Home': 'Home'}}/>
-        <CheckoutBox agreement={box.description.description} cart={cart} t={{
+        <CheckoutBox storeContext={storeContext} agreement={box.description.description} cart={cart} t={{
             "Billing Details": t("Billing Details"),
             "First Name": t("First Name"),
             "Last Name": t("Last Name"),
