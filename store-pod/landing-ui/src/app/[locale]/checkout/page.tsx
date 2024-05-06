@@ -20,7 +20,6 @@ export default async function CheckoutPage({params}: { params: { locale: string 
     }
     const box = await ContentService.getBox(storeContext, 'agreement');
     const t = await getTranslations('Checkout');
-    console.log(box.description.description)
     return <>
         <BreadCrumb name={t('Checkout')} t={{'Home': 'Home'}}/>
         <CheckoutBox agreement={box.description.description} cart={cart} t={{
