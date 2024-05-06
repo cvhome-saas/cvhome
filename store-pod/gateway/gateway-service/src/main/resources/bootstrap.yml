@@ -20,21 +20,21 @@ com:
           gateway-service-name: store-core-gateway
         store-core-gateway:
           name: store-core-gateway
-          domain: "store-ui.gateway.com"
+          domain: "gateway.com"
           port: 7000
           schema: http
           namespace: store-core.cvhome.lcl
           gateway-service-name: store-core-gateway
         manager:
           name: manager
-          domain: "store-ui.gateway.com"
+          domain: "gateway.com"
           port: 7001
           schema: http
           namespace: store-core.cvhome.lcl
           gateway-service-name: store-core-gateway
         wallet:
           name: wallet
-          domain: "store-ui.gateway.com"
+          domain: "gateway.com"
           port: 7002
           schema: http
           namespace: store-core.cvhome.lcl
