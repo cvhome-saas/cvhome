@@ -8,7 +8,7 @@ export const CheckoutBox = ({cart, agreement, t}: {
     cart: Cart | undefined, agreement: string,
     t: { [key: string]: string }
 }) => {
-    const errors = {};
+    const errors:{ [key: string]: any } = {};
 
     return <div className="checkout-area pt-95 pb-100">
         <div className="container">
