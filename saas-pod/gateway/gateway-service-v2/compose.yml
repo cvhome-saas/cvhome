@@ -1,0 +1,10 @@
+version: '3'
+services:
+  gateway-service-v2:
+    image: gateway-service-v2
+    network_mode: "host"
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      STORE_GATEWAY: http://localhost:9999
