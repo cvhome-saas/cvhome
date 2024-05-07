@@ -23,22 +23,9 @@ springBoot {
     buildInfo()
 }
 
-/*bootBuildImage {
-    builder = "paketobuildpacks/builder:tiny"
-    imageName = "ghcr.io/ashraf-revo/wallet"
-    tags = ["ghcr.io/ashraf-revo/wallet:${project.version}", "ghcr.io/ashraf-revo/wallet:latest"]
-    docker {
-        publishRegistry {
-            url = "https://ghcr.io"
-            username = "ashraf-revo"
-            password = System.getenv("GHCR_TOKEN")
-        }
-    }
-}
-*/
 bootBuildImage {
     builder = "paketobuildpacks/builder:tiny"
-    imageName = "${System.getenv("REGISTRY")}/store-core/wallet"
+    imageName = "wallet"
     tags = ["${System.getenv("REGISTRY")}/store-core/wallet:${project.version}", "${System.getenv("REGISTRY")}/store-core/wallet:latest"]
     docker {
         publishRegistry {

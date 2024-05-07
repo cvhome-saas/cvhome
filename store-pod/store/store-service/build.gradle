@@ -23,21 +23,9 @@ springBoot {
     buildInfo()
 }
 
-/*bootBuildImage {
-    builder = "paketobuildpacks/builder:tiny"
-    imageName = "ghcr.io/ashraf-revo/store-core"
-    tags = ["ghcr.io/ashraf-revo/store-core:${project.version}", "ghcr.io/ashraf-revo/store-core:latest"]
-    docker {
-        publishRegistry {
-            url = "https://ghcr.io"
-            username = "ashraf-revo"
-            password = System.getenv("GHCR_TOKEN")
-        }
-    }
-}*/
 bootBuildImage {
     builder = "paketobuildpacks/builder:tiny"
-    imageName = "${System.getenv("REGISTRY")}/store-pod/store"
+    imageName = "store"
     tags = ["${System.getenv("REGISTRY")}/store-pod/store:${project.version}", "${System.getenv("REGISTRY")}/store-pod/store:latest"]
     docker {
         publishRegistry {
