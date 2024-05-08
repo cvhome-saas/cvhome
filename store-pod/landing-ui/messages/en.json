@@ -96,6 +96,12 @@
     "Your order id is": "Your order id is",
     "An email with you order details has been sent to": "An email with you order details has been sent to"
   },
+  "Category": {
+    "Styles": "Styles",
+    "Showing": "Showing",
+    "of": "of",
+    "result": "result"
+  },
   "Metadata": {
     "Home": "Home",
     "Terms and Policy": "Terms and Policy",
