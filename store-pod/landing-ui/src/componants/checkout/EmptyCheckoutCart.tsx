@@ -9,7 +9,7 @@ export const EmptyCheckoutCart = ({t}: { t: { [key: string]: string } }) => {
                 </div>
                 <div className="item-empty-area__text">
                     {t["No items found in checkout"]} <br/>{" "}
-                    <Link href={"/"}>
+                    <Link prefetch={false} href={"/"}>
                         {t["Shop now"]}
                     </Link>
                 </div>

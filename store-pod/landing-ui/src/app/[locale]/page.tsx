@@ -26,7 +26,7 @@ export default async function Home({params}: { params: { locale: string } }) {
 
                                 </h1>
                                 <p>
-                                    <Link href={"/"} className="btn btn-black rounded-0">
+                                    <Link prefetch={false} href={"/"} className="btn btn-black rounded-0">
                                         {t('Shop Now')}
                                     </Link>
                                 </p>

@@ -37,7 +37,7 @@ const ProductGrid = ({storeContext, key, product}: {
     return <div className="col-xl-3 col-md-6 col-lg-4 col-sm-6 " key={key}>
         <div className="product-wrap-2 mb-25  ">
             <div className="product-img">
-                <Link href={`/product/${product.description.friendlyUrl}`}>
+                <Link prefetch={false} href={`/product/${product.description.friendlyUrl}`}>
                     <img alt=""
                          src={product.images.length > 0 ? product.images[0].imageUrl : product.image.imageUrl}/>
                 </Link>
@@ -51,7 +51,7 @@ const ProductGrid = ({storeContext, key, product}: {
             <div className="product-content-2">
                 <div className="title-price-wrap-2 ">
                     <h3>
-                        <Link href={`/product/${product.description.friendlyUrl}`}>
+                        <Link prefetch={false} href={`/product/${product.description.friendlyUrl}`}>
                             {product.description.name}
                         </Link>
                     </h3>

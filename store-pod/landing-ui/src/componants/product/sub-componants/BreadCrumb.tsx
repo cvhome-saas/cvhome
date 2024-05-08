@@ -7,7 +7,7 @@ export const BreadCrumb = ({name, t}: { name: string, t: { [key: string]: string
             <div className="breadcrumb-content text-center">
                 <span>
                         <span>
-                            <Link href={"/"} aria-current="page" className="active">
+                            <Link prefetch={false} href={"/"} aria-current="page" className="active">
                                 {t['Home']}
                             </Link>
                             <span>/</span>

@@ -99,14 +99,14 @@ export const FullCartBox = ({storeContext, t}: {
                                             return (
                                                 <tr key={key}>
                                                     <td className="product-thumbnail">
-                                                        <Link href={"/product/" + product.description.friendlyUrl}>
+                                                        <Link prefetch={false} href={"/product/" + product.description.friendlyUrl}>
                                                             <img className="img-fluid" src={product.image?.imageUrl}
                                                                  alt=""/>
                                                         </Link>
                                                     </td>
 
                                                     <td className="product-name">
-                                                        <Link href={"/product/" + product.description.friendlyUrl}>
+                                                        <Link prefetch={false} href={"/product/" + product.description.friendlyUrl}>
                                                             {product.description.name}
                                                         </Link>
                                                     </td>
@@ -156,7 +156,7 @@ export const FullCartBox = ({storeContext, t}: {
                                         </button>
                                     </div>
                                     <div className="cart-shiping-update">
-                                        <Link href={"/"}>
+                                        <Link prefetch={false} href={"/"}>
                                             {t["Continue Shopping"]}
                                         </Link>
                                     </div>
@@ -187,7 +187,7 @@ export const FullCartBox = ({storeContext, t}: {
                                             {cart.displaySubTotal}
                                         </span>
                                         </h4>
-                                        <Link href={"/checkout"}>
+                                        <Link prefetch={false} href={"/checkout"}>
                                             {t["Proceed to Checkout"]}
                                         </Link>
                                     </div>
@@ -204,7 +204,7 @@ export const FullCartBox = ({storeContext, t}: {
                                 </div>
                                 <div className="item-empty-area__text">
                                     {t["No items found in cart"]} <br/>{" "}
-                                    <Link href={"/"}>
+                                    <Link prefetch={false} href={"/"}>
                                         {t["Shop now"]}
                                     </Link>
                                 </div>

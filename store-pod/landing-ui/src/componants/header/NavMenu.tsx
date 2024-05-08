@@ -28,7 +28,7 @@ export const NavMenu = ({
             <nav>
                 <ul>
                     <li>
-                        <Link href={"/"}>
+                        <Link prefetch={false} href={"/"}>
                             {home}
                         </Link>
                     </li>
@@ -37,7 +37,7 @@ export const NavMenu = ({
                             return (
                                 item.visible &&
                                 <li key={index}>
-                                    <Link href={"/category/" + item.description.friendlyUrl}>
+                                    <Link prefetch={false} href={"/category/" + item.description.friendlyUrl}>
                                         {item.description.name}
                                         {item.children && item.children.length > 0 && sidebarMenu &&
                                             <span>
@@ -51,7 +51,7 @@ export const NavMenu = ({
                                             {
                                                 item.children.map((submenu, index) => {
                                                     return (<li key={index}>
-                                                        <Link href={"/category/" + submenu.description.friendlyUrl}>
+                                                        <Link prefetch={false} href={"/category/" + submenu.description.friendlyUrl}>
                                                             {submenu.description.name}
                                                         </Link>
                                                     </li>)
@@ -69,7 +69,7 @@ export const NavMenu = ({
                             return (
                                 content.visible && content.description &&
                                 <li key={index}>
-                                    <Link href={"/content/" + content.description.friendlyUrl}>
+                                    <Link prefetch={false} href={"/content/" + content.description.friendlyUrl}>
                                         {content.description.name}
                                     </Link>
                                 </li>

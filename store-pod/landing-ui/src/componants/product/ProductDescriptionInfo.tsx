@@ -329,7 +329,7 @@
 //                 <span>{strings["SKU"]} :</span>
 //                 <ul>
 //                     <li >
-//                         <Link to="">
+//                         <Link prefetch={false} to="">
 //                             {product.sku}
 //                         </Link>
 //                     </li>
@@ -342,7 +342,7 @@
 //                         {product.categories.map((single, key) => {
 //                             return (
 //                                 <li key={key}>
-//                                     <Link to={"/category/" + single.description.friendlyUrl}>
+//                                     <Link prefetch={false} to={"/category/" + single.description.friendlyUrl}>
 //                                         {single.description.name}
 //                                     </Link>
 //                                 </li>
@@ -360,7 +360,7 @@
 //             {product.tag.map((single, key) => {
 //               return (
 //                 <li key={key}>
-//                   <Link to={process.env.PUBLIC_URL + "/shop-grid-standard"}>
+//                   <Link prefetch={false} to={process.env.PUBLIC_URL + "/shop-grid-standard"}>
 //                     {single}
 //                   </Link>
 //                 </li>

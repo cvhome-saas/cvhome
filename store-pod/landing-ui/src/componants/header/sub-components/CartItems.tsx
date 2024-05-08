@@ -100,13 +100,13 @@ export const CartItems = ({storeContext, store, cart, t}: {
                                 return (
                                     <li className="single-shopping-cart" key={key}>
                                         <div className="shopping-cart-img">
-                                            <Link href={"/product/" + single.id}>
+                                            <Link prefetch={false} href={"/product/" + single.id}>
                                                 <img alt="" src={defaultImage(single)} className="img-fluid"/>
                                             </Link>
                                         </div>
                                         <div className="shopping-cart-title">
                                             <h4>
-                                                <Link href={"/"}>
+                                                <Link prefetch={false} href={"/"}>
                                                     {single.description.name}
                                                 </Link>
                                             </h4>
@@ -144,10 +144,10 @@ export const CartItems = ({storeContext, store, cart, t}: {
                             </h4>
                         </div>
                         <div className="shopping-cart-btn btn-hover text-center">
-                            <Link className="default-btn" href={"/cart"}>
+                            <Link prefetch={false} className="default-btn" href={"/cart"}>
                                 {t['View Cart']}
                             </Link>
-                            <Link className="default-btn" href={"/checkout"}>
+                            <Link prefetch={false} className="default-btn" href={"/checkout"}>
                                 {t['Checkout']}
                             </Link>
                         </div>

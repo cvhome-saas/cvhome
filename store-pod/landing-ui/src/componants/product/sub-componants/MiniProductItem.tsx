@@ -42,7 +42,7 @@ export const MiniProductItem = ({storeContext, product, t}: {
                     <div className="pro-details-meta"><span>{t['SKU']} :</span>
                         <ul>
                             <li key={"friendlyUrl"}>
-                                <Link href={`/product/${product.description.friendlyUrl}`}>
+                                <Link prefetch={false} href={`/product/${product.description.friendlyUrl}`}>
                                     {product.description.name}
                                 </Link>
                             </li>
@@ -53,7 +53,7 @@ export const MiniProductItem = ({storeContext, product, t}: {
                             {
                                 product.categories.map(it => {
                                     return (<li key={it.id}>
-                                        <Link href={`/category/${it.description.friendlyUrl}`}>
+                                        <Link prefetch={false} href={`/category/${it.description.friendlyUrl}`}>
                                             {it.description.name}
                                         </Link>
                                     </li>)

@@ -6,13 +6,13 @@ export const Copyright = ({store, t}: { store: Store, t: (it: string) => string 
         <>
             <div className="copyright mb-30 ">
                 <div className="footer-logo">
-                    <Link href={"/"}>
+                    <Link prefetch={false} href={"/"}>
                         <img alt="" src={store.logo.path}/>
                     </Link>
                 </div>
                 <p>
                     Copyright © 2024-2024
-                    <Link href={"/"} rel="noopener noreferrer">
+                    <Link prefetch={false} href={"/"} rel="noopener noreferrer">
                         {store.name}
                     </Link>
                     .<br/>

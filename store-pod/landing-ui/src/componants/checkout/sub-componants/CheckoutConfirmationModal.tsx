@@ -25,7 +25,7 @@ export const CheckoutConfirmationModal = ({orderId, t, show, setShow}: {
                                             <br/>{t["An email with you order details has been sent to"]} {'wererere'}
                                         </p>
 
-                                        <Link href={"/"} className="error-btn">
+                                        <Link prefetch={false} href={"/"} className="error-btn">
                                             {t["Shop now"]}
                                         </Link>
                                     </div>

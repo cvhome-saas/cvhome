@@ -16,7 +16,7 @@ export const ProductGridActions = ({storeContext, product, t}: {
 
 
     return <div className="product-action-2">
-        <Link title="Select options" href={`/product/${product.description.friendlyUrl}`}>
+        <Link prefetch={false} title="Select options" href={`/product/${product.description.friendlyUrl}`}>
             <i className="fa fa-cog"></i>
         </Link>
         <AddToCart storeContext={storeContext} addToCartType={"MINI"} product={product} t={t}/>
