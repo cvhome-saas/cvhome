@@ -7,32 +7,36 @@ import {FieldValues, useForm} from "react-hook-form"
 import {CheckoutCart} from "@/types/checkout-cart";
 import {CartService} from "@/services/cart-service";
 import {StoreContext} from "@/types/store-context";
+import {updateLocalStorage} from "@/services/utils";
 
-export const CheckoutForm = ({storeContext, cart, agreement, t}: {
+export const CheckoutForm = ({storeContext, cart, setShow, setOrderId, setCart, agreement, t}: {
     storeContext: StoreContext,
-    cart: Cart, agreement: string,
+    cart: Cart | undefined,
+    setCart: (cx: Cart | undefined) => void,
+    setShow: (cx: boolean) => void,
+    setOrderId: (cx: number) => void,
+    agreement: string,
     t: { [key: string]: string }
 }) => {
-    // const errors: { [key: string]: any } = {};
+
     const {
         register,
         handleSubmit,
+        reset,
         watch,
         formState: {errors},
     } = useForm()
+
     return <form onSubmit={handleSubmit((data: FieldValues) => {
         let checkoutCart: CheckoutCart = {
-            currency: "CAD",
             payment: {
-                "paymentType": "CREDITCARD",
-                "transactionType": "CAPTURE",
-                "paymentModule": "stripe",
-                "amount": cart.total
+                paymentType: "COD",
+                transactionType: "INIT"
             },
             customer: {
                 emailAddress: data.email,
                 billing: {
-                    country:"CA",
+                    country: "CA",
                     address: data.address,
                     city: data.city,
                     company: data.company,
@@ -44,12 +48,15 @@ export const CheckoutForm = ({storeContext, cart, agreement, t}: {
                 }
             }
         }
-        CartService.checkout(storeContext, cart.code, checkoutCart).then(it => {
-            console.log(it)
+        CartService.checkout(storeContext, cart?.code || "", checkoutCart).then(it => {
+            setCart(undefined);
+            reset();
+            updateLocalStorage(undefined);
+            setOrderId(it.id);
+            setShow(true);
         })
     })}>
         <div className="row">
-
             <div className="col-lg-6">
                 <div className="billing-info-wrap">
                     <h3>{t["Billing Details"]}</h3>
@@ -107,7 +114,8 @@ export const CheckoutForm = ({storeContext, cart, agreement, t}: {
                         <div className="col-lg-12">
                             <div className="billing-info mb-20">
                                 <label>{t["Town/City"]}</label>
-                                <input type="text" {...register(checkoutForm.city.name, checkoutForm.city.validate)}/>
+                                <input
+                                    type="text" {...register(checkoutForm.city.name, checkoutForm.city.validate)}/>
                                 {errors[checkoutForm.city.name] &&
                                     <p className="error-msg">{`${errors[checkoutForm.city.name]?.message}`}</p>}
                             </div>
@@ -132,7 +140,8 @@ export const CheckoutForm = ({storeContext, cart, agreement, t}: {
                         <div className="col-lg-6 col-md-6">
                             <div className="billing-info mb-20">
                                 <label>{t["Phone"]}</label>
-                                <input type="text" {...register(checkoutForm.phone.name, checkoutForm.phone.validate)}/>
+                                <input
+                                    type="text" {...register(checkoutForm.phone.name, checkoutForm.phone.validate)}/>
                                 {errors[checkoutForm.phone.name] &&
                                     <p className="error-msg">{`${errors[checkoutForm.phone.name]?.message}`}</p>}
                             </div>
@@ -140,7 +149,8 @@ export const CheckoutForm = ({storeContext, cart, agreement, t}: {
                         <div className="col-lg-6 col-md-6">
                             <div className="billing-info mb-20">
                                 <label>{t["Email address"]}</label>
-                                <input type="text" {...register(checkoutForm.email.name, checkoutForm.email.validate)}/>
+                                <input
+                                    type="text" {...register(checkoutForm.email.name, checkoutForm.email.validate)}/>
                                 {errors[checkoutForm.email.name] &&
                                     <p className="error-msg">{`${errors[checkoutForm.email.name]?.message}`}</p>}
                             </div>
@@ -161,12 +171,12 @@ export const CheckoutForm = ({storeContext, cart, agreement, t}: {
                     </div>
                 </div>
             </div>
-
-
             <div className="col-lg-6">
                 <div className="your-order-area">
                     <h3>{t["Your order"]}</h3>
-                    <CheckoutCartDetails cart={cart} t={t}/>
+                    {cart &&
+                        <CheckoutCartDetails cart={cart} t={t}/>
+                    }
                     <div className="payment-method mt-25">
 
                         <div className="place-order mt-100">

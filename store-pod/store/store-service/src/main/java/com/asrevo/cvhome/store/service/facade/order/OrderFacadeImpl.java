@@ -31,6 +31,7 @@ import com.asrevo.cvhome.store.core.services.catalog.product.attribute.ProductAt
 import com.asrevo.cvhome.store.core.services.order.OrderService;
 import com.asrevo.cvhome.store.core.services.reference.language.LanguageService;
 import com.asrevo.cvhome.store.core.services.shipping.ShippingQuoteService;
+import com.asrevo.cvhome.store.core.services.shoppingcart.ShoppingCartCalculationServiceImpl;
 import com.asrevo.cvhome.store.core.services.shoppingcart.ShoppingCartService;
 import com.asrevo.cvhome.store.service.facade.cart.ShoppingCartFacade;
 import com.asrevo.cvhome.store.service.facade.customer.CustomerFacade;
@@ -78,8 +79,9 @@ public class OrderFacadeImpl implements OrderFacade {
     private final ReadableOrderPopulator readableOrderPopulator;
     private final ImageFilePath imageUtils;
     private final StoreProperties storeProperties;
+    private final ShoppingCartCalculationServiceImpl shoppingCartCalculationService;
 
-    public OrderFacadeImpl(ShoppingCartFacade shoppingCartFacade, ShoppingCartService shoppingCartService, OrderService orderService, ShippingQuoteService shippingQuoteService, ProductAttributeService productAttributeService, ProductService productService, PersistableOrderApiPopulator persistableOrderApiPopulator, ProductPriceUtils productPriceUtils, PricingService pricingService, ReadableOrderProductMapper readableOrderProductMapper, LabelUtils messages, CustomerFacade customerFacade, ReadableCustomerMapper readableCustomerMapper, ReadableOrderTotalMapper readableOrderTotalMapper, LanguageService languageService, ReadableOrderPopulator readableOrderPopulator, ImageFilePath imageUtils, StoreProperties storeProperties) {
+    public OrderFacadeImpl(ShoppingCartFacade shoppingCartFacade, ShoppingCartService shoppingCartService, OrderService orderService, ShippingQuoteService shippingQuoteService, ProductAttributeService productAttributeService, ProductService productService, PersistableOrderApiPopulator persistableOrderApiPopulator, ProductPriceUtils productPriceUtils, PricingService pricingService, ReadableOrderProductMapper readableOrderProductMapper, LabelUtils messages, CustomerFacade customerFacade, ReadableCustomerMapper readableCustomerMapper, ReadableOrderTotalMapper readableOrderTotalMapper, LanguageService languageService, ReadableOrderPopulator readableOrderPopulator, ImageFilePath imageUtils, StoreProperties storeProperties, ShoppingCartCalculationServiceImpl shoppingCartCalculationService) {
         this.shoppingCartFacade = shoppingCartFacade;
         this.shoppingCartService = shoppingCartService;
         this.orderService = orderService;
@@ -98,6 +100,7 @@ public class OrderFacadeImpl implements OrderFacade {
         this.readableOrderPopulator = readableOrderPopulator;
         this.imageUtils = imageUtils;
         this.storeProperties = storeProperties;
+        this.shoppingCartCalculationService = shoppingCartCalculationService;
     }
 
     @Override
@@ -122,7 +125,8 @@ public class OrderFacadeImpl implements OrderFacade {
             if (cart == null) {
                 throw new ServiceException("Shopping cart with id " + shoppingCartId + " does not exist");
             }
-
+            OrderTotalSummary calculate = shoppingCartCalculationService.calculate(cart, customer, store, language);
+            order.getPayment().setAmount(calculate .getTotal().toString());
             Set<ShoppingCartItem> shoppingCartItems = cart.getLineItems();
 
             List<ShoppingCartItem> items = new ArrayList<>(shoppingCartItems);

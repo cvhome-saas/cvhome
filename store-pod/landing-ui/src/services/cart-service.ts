@@ -1,6 +1,7 @@
 import {storeBaseServiceUrl, StoreContext} from "@/types/store-context";
 import {Cart} from "@/types/cart";
 import {CheckoutCart} from "@/types/checkout-cart";
+import {Order} from "@/types/order";
 
 export class CartService {
     public static getCart = (storeContext: StoreContext, cart: string): Promise<Cart> => {
@@ -70,18 +71,14 @@ export class CartService {
     }
     */
 
-    public static checkout = (storeContext: StoreContext, code: string, checkoutCart: CheckoutCart) => {
+    public static checkout = (storeContext: StoreContext, code: string, checkoutCart: CheckoutCart): Promise<Order> => {
         return fetch(`${storeBaseServiceUrl(storeContext)}/api/v1/cart/${code}/checkout?store=${storeContext.store}`, {
             method: 'POST',
             headers: {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify(checkoutCart)
-        })
-            .then(it => it.json())
-            .then(it => {
-                console.log(JSON.stringify(it))
-            });
+        }).then(it => it.json() as unknown as Order);
     }
 
 }

@@ -19,12 +19,9 @@ export interface Billing {
 export interface payment {
     paymentType: string
     transactionType: string
-    paymentModule: string
-    amount: number
 }
 
 export interface CheckoutCart {
-    currency: string
     payment: payment
     customer: Customer
 }

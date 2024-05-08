@@ -76,12 +76,9 @@ public class PersistableOrderApiPopulator extends AbstractDataPopulator<Persista
             target.setLocale(LocaleUtils.getLocale(store));
 
 
-            Currency currency = null;
-            try {
-                currency = currencyService.getByCode(source.getCurrency());
-            } catch (Exception e) {
-                throw new ConversionException("Currency not found for code " + source.getCurrency());
-            }
+
+            Currency currency = store.getCurrency();
+
 
             if (currency == null) {
                 throw new ConversionException("Currency not found for code " + source.getCurrency());

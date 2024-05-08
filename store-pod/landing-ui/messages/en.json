@@ -90,7 +90,11 @@
     "Product":"Product",
     "Total":"Total",
     "No items found in checkout":"No items found in checkout",
-    "Shop now":"Shop now"
+    "Shop now":"Shop now",
+    "Order Completed":"Order Completed",
+    "Thank you for ordering": "Thank you for ordering",
+    "Your order id is": "Your order id is",
+    "An email with you order details has been sent to": "An email with you order details has been sent to"
   },
   "Metadata": {
     "Home": "Home",
