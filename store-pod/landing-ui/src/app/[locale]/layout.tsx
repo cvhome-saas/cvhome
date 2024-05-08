@@ -28,7 +28,7 @@ export default async function RootLayout({
     const store: Store = await StoreService.getStore(storeContext);
     return (
         <html lang={locale}>
-        <body className={inter.className}>
+        <body className={inter.className} suppressHydrationWarning={true}>
         <Header storeContext={storeContext} store={store}/>
         {children}
         <Footer store={store}/>
