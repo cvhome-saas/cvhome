@@ -1,8 +1,7 @@
-package com.asrevo.cvhome.manager.commons.dto;
+package com.asrevo.cvhome.keycloak.domain.user;
 
 import com.asrevo.cvhome.commons.domain.IdentityId;
 import com.asrevo.cvhome.commons.domain.ManagerStoreId;
-import com.asrevo.cvhome.manager.commons.domain.KeyCloakQuery;
 
 import java.util.Map;
 import java.util.stream.Collectors;

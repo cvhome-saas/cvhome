@@ -11,6 +11,7 @@ import {NbDialogModule} from '@nebular/theme';
 import {UserDetailsComponent} from './user-details/user-details.component';
 import {ButtonRenderUserComponent} from './users-list/button-render-user.component';
 import {SharedModule} from "../store-manager/shared/shared.module";
+import {UserStatusComponent} from "./users-list/user-status.component";
 
 // import { EqualValidator } from '../shared/validation/equal-validator';
 @NgModule({
@@ -23,6 +24,7 @@ import {SharedModule} from "../store-manager/shared/shared.module";
     CreateNewUserComponent,
     ButtonRenderUserComponent,
     UserDetailsComponent,
+    UserStatusComponent
   ],
   imports: [
     UserManagementRoutingModule,

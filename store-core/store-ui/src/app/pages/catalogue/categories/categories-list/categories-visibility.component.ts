@@ -10,7 +10,7 @@ import {NbToastrService} from "@nebular/theme";
   template: `
     <nb-checkbox [checked]="value" (checkedChange)="clicked()"/>`,
 })
-export class ButtonRenderComponent {
+export class CategoriesVisibilityComponent {
   @Input() value: boolean;
   @Input() store: string;
   @Input() rowData: any;

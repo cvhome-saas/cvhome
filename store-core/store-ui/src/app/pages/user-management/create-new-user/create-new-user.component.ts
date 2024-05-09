@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 
 import {User} from '../../shared/models/user';
+import {ActivatedRoute} from "@angular/router";
 
 @Component({
   selector: 'ngx-create-new-user',
@@ -9,11 +10,15 @@ import {User} from '../../shared/models/user';
 })
 export class CreateNewUserComponent implements OnInit {
   user: User;
+  store: string = '';
 
-  constructor() {
+  constructor(private activatedRoute: ActivatedRoute) {
   }
 
   ngOnInit() {
+    this.activatedRoute.params.subscribe(it=>{
+      this.store=it['store']
+    })
   }
 
 }

@@ -6,23 +6,83 @@
         <div class="content_spacing_empty"></div>
       </nb-card-header>
 
-      <form *ngIf="isSuperadmin" class="form-inline filter_section">
+      <form class="form-inline filter_section">
         <div class="filter_left_section">
-          <!-- <p-dropdown *ngIf="stores.length> 0" [options]="stores" filter="true" (onChange)="choseStore($event)">
-            <ng-template let-item pTemplate="selectedItem">{{item.label}}</ng-template>
-            <ng-template let-car pTemplate="item">{{car.label}}</ng-template>
-          </p-dropdown> -->
         </div>
         <div class="filter_right_section">
-          <ngx-store-autocomplete (onStore)="choseStore($event)"></ngx-store-autocomplete>
+          <ngx-store-autocomplete (onStore)="onSelectStore($event)"></ngx-store-autocomplete>
+          <a (click)="createUser()" class="createBtn">
+            <img alt="" class="pointer sda"
+                 src="../../../../assets/img/plus.png"
+                 title="{{ 'COMPONENTS.CREATE_OPTION' | translate}}">
+            <label>{{ 'COMPONENTS.CREATE_USER' | translate }}</label>
+          </a>
         </div>
       </form>
 
-      <!--      <ng2-smart-table [settings]="settings" [source]="source" (custom)="route($event)" class="home-table"></ng2-smart-table>-->
+      <ngx-datatable
+        (page)="setPage($event)"
+        [columnMode]="ColumnMode.force"
+        [count]="page.totalElements"
+        [externalPaging]="true"
+        [footerHeight]="50"
+        [headerHeight]="50"
+        [limit]="page.size"
+        [offset]="page.pageNumber"
+        [rows]="rows"
+        class="material"
+        rowHeight="auto">
 
-      <!--      <ngx-paginator (changePage)="changePage($event)" [pagesToShow]="5" [currentPage]="currentPage" [perPage]="perPage"-->
-      <!--        [count]="totalCount">-->
-      <!--      </ngx-paginator>-->
+        <ngx-datatable-column name="userName">
+          <ng-template let-column="column" ngx-datatable-header-template> {{ 'USER_FORM.USER_NAME' |translate }}</ng-template>
+          <ng-template let-value="value" ngx-datatable-cell-template>
+            <strong>{{ value }}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="firstName">
+          <ng-template let-column="column" ngx-datatable-header-template> {{ 'USER_FORM.FIRST_NAME' |translate }}</ng-template>
+          <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+            {{ row.firstName }}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="lastName">
+          <ng-template let-column="column" ngx-datatable-header-template> {{ 'USER_FORM.LAST_NAME' |translate }}</ng-template>
+          <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+            {{ row.lastName }}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="emailAddress">
+          <ng-template let-column="column" ngx-datatable-header-template> {{ 'USER_FORM.EMAIL_ADDRESS' |translate }}</ng-template>
+          <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+            {{ row.emailAddress }}
+          </ng-template>
+        </ngx-datatable-column>
+
+
+        <ngx-datatable-column name="visible">
+          <ng-template let-column="column" ngx-datatable-header-template> {{ 'COMMON.VISIBLE' |translate }}
+          </ng-template>
+          <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+            <ngx-user-status [store]="params.store" [rowData]="row"/>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="actions">
+          <ng-template let-column="column" ngx-datatable-header-template>
+            {{ 'ORDER.ACTIONS' |translate }}
+          </ng-template>
+          <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+            <button (click)="onEdit(row)" nbButton shape="round" size="small" status="primary"><i class="nb-edit"></i>
+            </button>
+            <button (click)="onDelete(row)" nbButton shape="round" size="small" status="danger"><i class="nb-trash"></i>
+            </button>
+          </ng-template>
+        </ngx-datatable-column>
+      </ngx-datatable>
+
     </div>
   </nb-card-body>
 </nb-card>

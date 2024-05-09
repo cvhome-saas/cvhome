@@ -25,6 +25,7 @@ include(
         'commons:ecs-commons:fargate-task-info',
         'commons:ecs-commons:ecs-service-discoveryclient',
         'commons:cvhome-commons',
+        'commons:keycloak-users',
         'commons:s2sc-commons',
 
         'store-pod:commons',

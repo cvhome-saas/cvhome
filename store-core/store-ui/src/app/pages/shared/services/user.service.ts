@@ -27,9 +27,6 @@ export class UserService {
   ) {
   }
 
-  getUser(id: any): Observable<any> {
-    return this.crudService.get(`/v1/private/users/` + id);
-  }
 
   getUserProfile(): Observable<any> {
     return this.crudService.get(`/api/v1/auth/me`);
@@ -84,16 +81,6 @@ export class UserService {
     });
   }
 
-  getUsersList(store, params): Observable<any> {
-    return this.crudService.get(`/v1/private/users`, params);
-  }
-
-  createUser(user: any, store: any): Observable<any> {
-    const params = {
-      'store': store
-    };
-    return this.crudService.post(`/v1/private/user/`, user, {params});
-  }
 
   updateUser(id: any, user: any, store: any): Observable<any> {
     const params = {
@@ -102,12 +89,6 @@ export class UserService {
     return this.crudService.put(`/v1/private/user/${id}`, user, {params});
   }
 
-  deleteUser(id: any, store: any): Observable<any> {
-    const params = {
-      'store': store
-    };
-    return this.crudService.delete(`/v1/private/user/${id}`, {params});
-  }
 
   updatePassword(id: any, passwords: any): Observable<any> {
     return this.crudService.patch(`/v1/private/user/${id}/password`, passwords);
@@ -125,4 +106,32 @@ export class UserService {
     localStorage.removeItem(this.userIdString);
   }
 
+
+  createUser(user: any, store: any): Observable<any> {
+    return this.crudService.post(`/manager/api/v1/user-account/create?store=${store}`, user);
+  }
+
+  getUser(userId: any): Observable<any> {
+    return this.crudService.get(`/manager/api/v1/user-account/find-one?userId=${userId}`);
+  }
+
+  groups(): Observable<string[]> {
+    return this.crudService.get(`/manager/api/v1/user-account/groups`);
+  }
+
+  getUsersList(store, params): Observable<any> {
+    return this.crudService.get(`/manager/api/v1/user-account/list`, params);
+  }
+
+  deleteUser(userId: any, store: any): Observable<any> {
+    return this.crudService.delete(`/manager/api/v1/user-account/delete?store=${store}&userId=${userId}`, {});
+  }
+
+  disable(userId, store: string) {
+    return this.crudService.post(`/manager/api/v1/user-account/disable?store=${store}&userId=${userId}`, {});
+  }
+
+  enable(userId, store: string) {
+    return this.crudService.post(`/manager/api/v1/user-account/enable?store=${store}&userId=${userId}`, {});
+  }
 }

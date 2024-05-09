@@ -1,0 +1,24 @@
+package com.asrevo.cvhome.keycloak.domain.user;
+
+import lombok.Getter;
+import lombok.Setter;
+
+import java.io.Serial;
+
+@Getter
+@Setter
+public class UserEntity {
+
+    /**
+     *
+     */
+    @Serial
+    private static final long serialVersionUID = 1L;
+    private String id;
+    private String firstName;
+    private String lastName;
+    private String emailAddress;
+    private String defaultLanguage;
+    private String userName;
+    private boolean active;
+}

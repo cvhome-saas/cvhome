@@ -17,6 +17,7 @@ export class StoreService {
   }
 
   list(): Observable<Page<Store>> {
+/*
     return of({
       content: [{
         id: {
@@ -25,7 +26,8 @@ export class StoreService {
         name: "default"
       }]
     })
-    // return this.httpClient.post<Page<Store>>(`${this.STORE_MANAGER_BASE_URL}/list`, {})
+*/
+    return this.httpClient.post<Page<Store>>(`${this.STORE_MANAGER_BASE_URL}/list`, {})
   }
 
   getStoreInfo(param: ManagerStoreId): Observable<Store> {

@@ -25,7 +25,7 @@ const routes: Routes = [
         component: ChangePasswordComponent,
       },
       {
-        path: 'create-user',
+        path: 'create-user/:store',
         //     canActivate: [SuperuserAdminRetailGuard],
         component: CreateNewUserComponent,
       },

@@ -154,6 +154,8 @@
     "PASSWORDS_NOT_MATCH": "Les mots de passe ne correspondent pas."
   },
   "USER_FORM": {
+    "USER_NAME": "Nom d'utilisateur",
+    "USER_NAME_ERROR_REQUIRED": "Nom d'utilisateur est nécessaire",
     "FIRST_NAME": "Prénom",
     "FIRST_NAME_ERROR_REQUIRED": "Le prénom est obligatoire",
     "CANT_DELETE_YOUR_PROFILE": "Votre propre profil ne peut pas être supprimé",

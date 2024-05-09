@@ -1,14 +1,9 @@
 export class User {
-  id: number;
+  id: string;
   active: boolean;
-  defaultLanguage: string;
   emailAddress: string;
   firstName: string;
-  groups: [];
-  lastAccess: string;
+  groups: any[];
   lastName: string;
-  loginTime: string;
-  merchant: string;
-  permissions: [];
   userName: string;
 }

@@ -63,6 +63,7 @@ dependencies {
     implementation project(':store-core:manager:manager-events')
     implementation project(':store-pod:commons')
     implementation project(':commons:s2sc-commons')
+    implementation project(':commons:keycloak-users')
 
 //    developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
     compileOnly 'org.projectlombok:lombok'

@@ -1,0 +1,13 @@
+plugins {
+    id 'com.asrevo.java-library-conventions'
+}
+
+dependencies {
+    compileOnly project(":commons:cvhome-commons")
+    implementation 'org.keycloak:keycloak-admin-client:24.0.0'
+    implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+    compileOnly 'org.projectlombok:lombok:1.18.28'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+    annotationProcessor 'org.projectlombok:lombok:1.18.28'
+    annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+}

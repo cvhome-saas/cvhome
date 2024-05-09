@@ -373,13 +373,6 @@ export const MENU_ITEMS: MenuItem[] =
         //   hidden: false
         // },
         {
-          title: 'COMPONENTS.CREATE_USER',
-          key: 'COMPONENTS.CREATE_USER',
-          link: '/pages/user-management/create-user',
-          hidden: false,
-          guards: [IsAdmin]
-        },
-        {
           title: 'COMPONENTS.USER_LIST',
           key: 'COMPONENTS.USER_LIST',
           link: '/pages/user-management/users',

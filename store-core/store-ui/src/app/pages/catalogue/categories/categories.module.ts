@@ -5,12 +5,12 @@ import {CategoriesRoutingModule} from './categories-routing.module';
 import {CategoryCreationComponent} from './category-creation/category-creation.component';
 import {CategoriesListComponent} from './categories-list/categories-list.component';
 import {CategoriesHierarchyComponent} from './categories-hierarchy/categories-hierarchy.component';
-import {ButtonRenderComponent} from './categories-list/button-render.component';
 import {CategoryFormComponent} from './category-form/category-form.component';
 import {CategoryDetailComponent} from './category-detail/category-detail.component';
 import {NbDialogModule} from '@nebular/theme';
 import {SharedModule} from "../../store-manager/shared/shared.module";
 import {TreeModule} from "@odymaui/angular-tree-component";
+import {CategoriesVisibilityComponent} from "./categories-list/categories-visibility.component";
 
 
 @NgModule({
@@ -19,7 +19,7 @@ import {TreeModule} from "@odymaui/angular-tree-component";
     CategoryCreationComponent,
     CategoriesListComponent,
     CategoriesHierarchyComponent,
-    ButtonRenderComponent,
+    CategoriesVisibilityComponent,
     CategoryFormComponent,
     CategoryDetailComponent,
   ],
