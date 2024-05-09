@@ -11,7 +11,7 @@ import com.asrevo.cvhome.store.core.model.content.box.PersistableContentBox;
 import com.asrevo.cvhome.store.core.model.content.box.ReadableContentBox;
 import com.asrevo.cvhome.store.core.model.content.page.PersistableContentPage;
 import com.asrevo.cvhome.store.core.model.content.page.ReadableContentPage;
-import com.asrevo.cvhome.store.core.model.entity.Entity;
+import com.asrevo.cvhome.commons.domain.Entity;
 import com.asrevo.cvhome.store.core.model.entity.EntityExists;
 import com.asrevo.cvhome.store.core.model.entity.ReadableEntityList;
 import com.asrevo.cvhome.store.service.facade.content.ContentFacade;

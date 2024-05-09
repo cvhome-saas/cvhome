@@ -6,7 +6,7 @@ import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import com.asrevo.cvhome.store.core.model.catalog.product.PersistableProductPrice;
 import com.asrevo.cvhome.store.core.model.catalog.product.ReadableProductPrice;
-import com.asrevo.cvhome.store.core.model.entity.Entity;
+import com.asrevo.cvhome.commons.domain.Entity;
 import com.asrevo.cvhome.store.service.facade.product.ProductPriceFacade;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;

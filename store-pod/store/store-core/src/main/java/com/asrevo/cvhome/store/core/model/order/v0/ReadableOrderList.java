@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.store.core.model.order.v0;
 
 
-import com.asrevo.cvhome.store.core.model.entity.ReadableList;
+import com.asrevo.cvhome.commons.domain.ReadableList;
 import lombok.Getter;
 import lombok.Setter;
 

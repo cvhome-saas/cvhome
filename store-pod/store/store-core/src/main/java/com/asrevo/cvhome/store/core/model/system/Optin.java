@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.store.core.model.system;
 
 
-import com.asrevo.cvhome.store.core.model.entity.Entity;
+import com.asrevo.cvhome.commons.domain.Entity;
 
 import java.io.Serial;
 

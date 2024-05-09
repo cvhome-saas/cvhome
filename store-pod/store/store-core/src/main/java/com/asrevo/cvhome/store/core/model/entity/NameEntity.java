@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.store.core.model.entity;
 
+import com.asrevo.cvhome.commons.domain.Entity;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.Setter;

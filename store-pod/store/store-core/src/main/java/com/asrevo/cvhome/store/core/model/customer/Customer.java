@@ -1,6 +1,6 @@
 package com.asrevo.cvhome.store.core.model.customer;
 
-import com.asrevo.cvhome.store.core.model.entity.Entity;
+import com.asrevo.cvhome.commons.domain.Entity;
 
 import java.io.Serial;
 import java.io.Serializable;

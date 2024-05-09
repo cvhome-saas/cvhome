@@ -8,7 +8,7 @@ import com.asrevo.cvhome.store.core.model.catalog.product.attribute.PersistableP
 import com.asrevo.cvhome.store.core.model.catalog.product.attribute.PersistableProductOptionValue;
 import com.asrevo.cvhome.store.core.model.catalog.product.attribute.api.*;
 import com.asrevo.cvhome.store.core.model.entity.CodeEntity;
-import com.asrevo.cvhome.store.core.model.entity.Entity;
+import com.asrevo.cvhome.commons.domain.Entity;
 import com.asrevo.cvhome.store.core.model.entity.EntityExists;
 import com.asrevo.cvhome.store.service.facade.product.ProductOptionFacade;
 import io.swagger.v3.oas.annotations.Operation;

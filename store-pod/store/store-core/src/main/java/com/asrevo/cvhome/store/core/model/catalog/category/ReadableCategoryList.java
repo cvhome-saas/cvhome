@@ -1,6 +1,6 @@
 package com.asrevo.cvhome.store.core.model.catalog.category;
 
-import com.asrevo.cvhome.store.core.model.entity.ReadableList;
+import com.asrevo.cvhome.commons.domain.ReadableList;
 import lombok.Getter;
 import lombok.Setter;
 

@@ -14,7 +14,7 @@ import com.asrevo.cvhome.store.core.model.catalog.product.ReadableProductList;
 import com.asrevo.cvhome.store.core.model.catalog.product.product.PersistableProduct;
 import com.asrevo.cvhome.store.core.model.catalog.product.product.definition.PersistableProductDefinition;
 import com.asrevo.cvhome.store.core.model.catalog.product.product.definition.ReadableProductDefinition;
-import com.asrevo.cvhome.store.core.model.entity.Entity;
+import com.asrevo.cvhome.commons.domain.Entity;
 import com.asrevo.cvhome.store.service.facade.category.CategoryFacade;
 import com.asrevo.cvhome.store.service.facade.product.ProductCommonFacade;
 import com.asrevo.cvhome.store.service.facade.product.ProductDefinitionFacade;

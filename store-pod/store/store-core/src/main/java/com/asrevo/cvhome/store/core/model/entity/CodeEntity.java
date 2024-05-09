@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.store.core.model.entity;
 
+import com.asrevo.cvhome.commons.domain.Entity;
 import lombok.Getter;
 import lombok.Setter;
 
