@@ -7,8 +7,8 @@ export const TabProductContent = ({storeContext, group, t}: {
     storeContext: StoreContext, group: ProductGroupPage,
     t: { [key: string]: string }
 }) => {
-    return group.products.map((product, i) => {
-        return <ProductGrid product={product} storeContext={storeContext} t={t}/>
+    return group.products.map((product, index) => {
+        return <ProductGrid product={product} storeContext={storeContext} t={t} key={index}/>
     })
 }
 

@@ -79,8 +79,8 @@ const ManufacturerList = ({manufacturers, t}: { manufacturers: Manufacturer[], t
                     <li>
                         <div className="sidebar-widget-list-left">
                             {
-                                manufacturers.map(it =>
-                                    <label>
+                                manufacturers.map((it,index) =>
+                                    <label key={index}>
                                         <input type="checkbox" name="manufacture" value={it.id}/>
                                         <span className="checkmark"></span>
                                         {it.description.name}
@@ -98,19 +98,19 @@ const Paginator = () => {
     return <div className="pro-pagination-style text-center mt-30">
         <ul className="mb-0 mt-0">
             <li className="previous disabled">
-                <a tabIndex="0" role="button" aria-disabled="true" aria-label="Previous page"
+                <a tabIndex={0} role="button" aria-disabled="true" aria-label="Previous page"
                    rel="prev">
                     «
                 </a>
             </li>
             <li className="page-item active">
-                <a role="button" tabIndex="0" aria-label="Page 1 is your current page"
+                <a role="button" tabIndex={0} aria-label="Page 1 is your current page"
                    aria-current="page">
                     1
                 </a>
             </li>
             <li className="next disabled">
-                <a tabIndex="0" role="button" aria-disabled="true" aria-label="Next page"
+                <a tabIndex={0} role="button" aria-disabled="true" aria-label="Next page"
                    rel="next">
                     »
                 </a>
