@@ -2,7 +2,8 @@ import {RouterModule, Routes} from '@angular/router';
 import {NgModule} from '@angular/core';
 
 import {PagesComponent} from './pages.component';
-import {canActivateTeam, canActivateTeamu} from "../shared/service/auth-guard.service";
+import {canAccessSecuredPages} from "../shared/service/auth-guard.service";
+import {NotFoundComponent} from "./not-found/not-found.component";
 // import {DashboardComponent} from "./dashboard/dashboard.component";
 // import { DashboardComponent } from './dashboard/dashboard.component';
 // import { ECommerceComponent } from './e-commerce/e-commerce.component';
@@ -10,8 +11,7 @@ import {canActivateTeam, canActivateTeamu} from "../shared/service/auth-guard.se
 
 const routes: Routes = [{
   path: '',
-  canActivate: [canActivateTeam],
-  canActivateChild: [canActivateTeamu],
+  canActivate: [canAccessSecuredPages],
   component: PagesComponent,
   children: [
     // {
@@ -85,11 +85,11 @@ const routes: Routes = [{
     //   path: 'iot-dashboard',
     //   component: DashboardComponent,
     // },
-    {
-      path: 'store-manager',
-      loadChildren: () => import('./store-manager/store-manager.module')
-        .then(m => m.StoreManagerModule),
-    },
+    // {
+    //   path: 'store-manager',
+    //   loadChildren: () => import('./store-manager/store-manager.module')
+    //     .then(m => m.StoreManagerModule),
+    // },
     // {
     //   path: 'maps',
     //   loadChildren: () => import('./maps/maps.module')
@@ -100,7 +100,11 @@ const routes: Routes = [{
     //   loadChildren: () => import('./charts/charts.module')
     //     .then(m => m.ChartsModule),
     // },
-  ],
+    {
+      path: '**',
+      component: NotFoundComponent
+    }
+    ],
 }];
 
 @NgModule({
