@@ -11,6 +11,8 @@ import {StoreDetailInfoComponent} from './store-detail-info/store-detail-info.co
 import {StoreBrandingComponent} from './store-branding/store-branding.component';
 import {NbDialogModule} from '@nebular/theme';
 import {SharedModule} from "../store-manager/shared/shared.module";
+import {StoreBrandingBannerComponent} from "./store-branding/store-branding-banner.componants";
+import {StoreBrandingLogoComponent} from "./store-branding/store-branding-logo.componants";
 
 @NgModule({
   declarations: [
@@ -23,6 +25,8 @@ import {SharedModule} from "../store-manager/shared/shared.module";
     StoreFormComponent,
     StoreLandingPageComponent,
     StoreDetailInfoComponent,
+    StoreBrandingBannerComponent,
+    StoreBrandingLogoComponent
   ],
   imports: [
     StoreManagementRoutingModule,

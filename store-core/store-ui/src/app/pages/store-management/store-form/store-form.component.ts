@@ -190,8 +190,8 @@ export class StoreFormComponent implements OnInit {
 
 
     storeObj.supportedLanguages = this.supportedLanguagesSelected;
-    storeObj.code = this.store.code;
     if (this.store && this.store.id) {
+      storeObj.code = this.store.code;
       this.storeService.updateStore(storeObj)
         .subscribe(store => {
           this.toastr.success(this.translate.instant('STORE_FORM.STORE_UPDATED'));
