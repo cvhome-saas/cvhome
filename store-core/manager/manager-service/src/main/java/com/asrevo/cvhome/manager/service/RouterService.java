@@ -1,20 +1,12 @@
 package com.asrevo.cvhome.manager.service;
 
 
-import com.asrevo.cvhome.router.commons.dto.AddAlisDto;
-import com.asrevo.cvhome.router.commons.dto.CreateNewReferenceDto;
-import com.asrevo.cvhome.router.commons.dto.CreateReferenceResponse;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.service.annotation.HttpExchange;
-import org.springframework.web.service.annotation.PostExchange;
-import reactor.core.publisher.Mono;
+import com.asrevo.cvhome.commons.domain.Domain;
+import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 
-@HttpExchange("api/v1/router")
 public interface RouterService {
+    void create(Domain domain, ManagerStoreId managerStoreId);
 
-    @PostExchange("create")
-    Mono<CreateReferenceResponse> create(@RequestBody CreateNewReferenceDto dto);
+    ManagerStoreId getReferenceByDomain(Domain domain);
 
-    @PostExchange("add-alis")
-    Mono<CreateReferenceResponse> addAlis(@RequestBody AddAlisDto dto);
 }

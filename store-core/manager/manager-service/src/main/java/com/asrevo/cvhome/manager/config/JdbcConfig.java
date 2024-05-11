@@ -3,6 +3,7 @@ package com.asrevo.cvhome.manager.config;
 import com.asrevo.cvhome.commons.domain.BaseEntity;
 import com.asrevo.cvhome.commons.domain.Identifier;
 import com.asrevo.cvhome.commons.domain.ManagerStoreId;
+import com.asrevo.cvhome.manager.commons.domain.ReferenceAlisId;
 import com.asrevo.cvhome.s2s.config.internal.JacksonConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,12 @@ public class JdbcConfig extends AbstractJdbcConfiguration {
             @Override
             public ManagerStoreId convert(String source) {
                 return new ManagerStoreId(source);
+            }
+        });
+        converters.add(new Converter<String, ReferenceAlisId>() {
+            @Override
+            public ReferenceAlisId convert(String source) {
+                return new ReferenceAlisId(source);
             }
         });
 

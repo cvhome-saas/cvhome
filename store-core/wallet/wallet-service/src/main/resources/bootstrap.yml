@@ -4,13 +4,6 @@ com:
       saas:
         default-domain: "gateway.click"
       services:
-        router:
-          name: router
-          domain: "gateway.com"
-          port: 8002
-          schema: http
-          namespace: store-core.cvhome.lcl
-          gateway-service-name: store-core-gateway
         auth:
           name: auth
           domain: "auth.gateway.com"

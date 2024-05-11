@@ -4,11 +4,6 @@ spring:
       discovery:
         enabled: true
         services:
-          router:
-            - url: "http://localhost:8002"
-              metadata:
-                service-name: router
-                instance: router-1
           auth:
             - url: "http://localhost:9999"
               metadata:
@@ -48,13 +43,6 @@ spring:
         - PreserveHostHeader
         - AddResponseHeader=X-Frame-Options, SAMEORIGIN
       routes:
-        - id: router
-          order: -4
-          uri: lb://router
-          predicates:
-            - Path=/router/**
-          filters:
-            - StripPrefix=1
         - id: store
           order: -3
           uri: ${com.asrevo.cvhome.services.store-pod-gateway.schema}://${com.asrevo.cvhome.services.store-pod-gateway.domain}:${com.asrevo.cvhome.services.store-pod-gateway.port}
@@ -71,13 +59,5 @@ spring:
           order: -1
           uri: lb://store-ui
           predicates:
-            - FNotService=store,manager,wallet,dcm,router,wallet,auth
+            - FNotService=store,manager,wallet,auth
             - FHost=store-ui.${com.asrevo.cvhome.services.store-core-gateway.domain}
-com:
-  asrevo:
-    cvhome:
-      calls:
-#        store: GATEWAY
-#        router: DEFAULT
-        store: DIRECT
-        router: IGNORE
