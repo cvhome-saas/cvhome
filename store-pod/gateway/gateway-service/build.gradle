@@ -25,7 +25,7 @@ springBoot {
 
 bootBuildImage {
     builder = "paketobuildpacks/builder:tiny"
-    imageName = "store-pod-gateway"
+    imageName = "${System.getenv("REGISTRY")}/store-pod/store-pod-gateway"
     tags = ["${System.getenv("REGISTRY")}/store-pod/store-pod-gateway:${project.version}", "${System.getenv("REGISTRY")}/store-pod/store-pod-gateway:latest"]
     docker {
         publishRegistry {

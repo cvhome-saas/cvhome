@@ -37,7 +37,7 @@ abstract class BootBuildImageTask extends DefaultTask {
 
     @TaskAction
     void bootBuildImage() {
-        String image = "${project.name}"
+        String image = "${System.getenv('REGISTRY')}/store-pod/${project.name}"
         project.exec {
             workingDir '.'
             commandLine "docker", "build", "-t","${image}", "-t", "${System.getenv('REGISTRY')}/store-pod/${project.name}:${project.version}", "-t", "${System.getenv('REGISTRY')}/store-pod/${project.name}:latest", "."

@@ -25,7 +25,7 @@ springBoot {
 
 bootBuildImage {
     builder = "paketobuildpacks/builder:tiny"
-    imageName = "manager"
+    imageName = "${System.getenv("REGISTRY")}/store-core/manager"
     tags = ["${System.getenv("REGISTRY")}/store-core/manager:${project.version}", "${System.getenv("REGISTRY")}/store-core/manager:latest"]
     docker {
         publishRegistry {
