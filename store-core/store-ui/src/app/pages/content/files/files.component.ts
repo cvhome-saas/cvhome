@@ -3,7 +3,7 @@ import {CrudService} from '../../shared/services/crud.service';
 import {NbDialogService} from '@nebular/theme';
 import {Lightbox} from 'ngx-lightbox';
 import {IAlbum} from "ngx-lightbox/lightbox-event.service";
-import {ShowcaseDialogComponent} from "../../store-manager/shared/showcase-dialog/showcase-dialog.component";
+import {ShowcaseDialogComponent} from "../../shared/components/showcase-dialog/showcase-dialog.component";
 import {NgxFileDropEntry} from "ngx-file-drop";
 import {FileSystemFileEntry} from "ngx-file-drop/lib/dom.types";
 

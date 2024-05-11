@@ -9,11 +9,9 @@ import {StorageService} from '../../shared/services/storage.service';
 })
 export class StoreService {
 
-
   constructor(
     private crudService: CrudService,
-    private storageService: StorageService
-  ) {
+    private storageService: StorageService) {
   }
 
 

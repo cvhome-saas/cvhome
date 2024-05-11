@@ -6,7 +6,7 @@ import {validators} from '../../../shared/validation/validators';
 import {CatalogService} from '../services/catalog.service';
 import {NbDialogService, NbToastrService} from '@nebular/theme';
 import {TranslateService} from '@ngx-translate/core';
-import {ShowcaseDialogComponent} from "../../../store-manager/shared/showcase-dialog/showcase-dialog.component";
+import {ShowcaseDialogComponent} from "../../../shared/components/showcase-dialog/showcase-dialog.component";
 
 @Component({
   selector: 'ngx-catalogue-form',

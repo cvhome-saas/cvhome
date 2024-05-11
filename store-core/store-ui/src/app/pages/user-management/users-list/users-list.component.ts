@@ -6,7 +6,7 @@ import {TranslateService} from '@ngx-translate/core';
 import {StorageService} from '../../shared/services/storage.service';
 import {ColumnMode} from "@swimlane/ngx-datatable";
 import {Page} from "../../shared/models/Page";
-import {ShowcaseDialogComponent} from "../../store-manager/shared/showcase-dialog/showcase-dialog.component";
+import {ShowcaseDialogComponent} from "../../shared/components/showcase-dialog/showcase-dialog.component";
 import {NbDialogService, NbToastrService} from "@nebular/theme";
 
 

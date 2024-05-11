@@ -31,31 +31,3 @@ export enum Country {
 export interface Email {
   email: string;
 }
-
-export interface CreateUserRequest {
-  username: string;
-  password: string;
-  groups: Group[];
-}
-
-export interface User {
-  id: string;
-  username: string;
-  email: string;
-  firstname: string;
-  enabled: boolean,
-  groups: Group[]
-}
-
-export enum Group {
-  STORE_ADMIN = 'STORE_ADMIN', STORE_MODERATOR = 'STORE_MODERATOR',
-// ORG_ADMIN = 'ORG_ADMIN', CUSTOMER = 'CUSTOMER'
-}
-
-export interface ResetPassword {
-  password: string
-}
-
-export interface ChangeGroupRequest {
-  groups: Group[]
-}

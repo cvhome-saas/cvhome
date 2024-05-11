@@ -8,7 +8,7 @@ import {OrderInvoiceComponent} from './order-invoice/order-invoice';
 import {OrderHistoryComponent} from './order-history/order-history';
 import {OrderTransactionComponent} from './order-transaction/order-transaction';
 import {NbDialogModule} from '@nebular/theme';
-import {SharedModule} from "../store-manager/shared/shared.module";
+import {SharedModule} from "../shared/shared.module";
 
 @NgModule({
   declarations: [
