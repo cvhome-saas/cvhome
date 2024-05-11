@@ -32,7 +32,7 @@ export class ProductToCatalogueComponent implements OnInit {
       count: 100,
       page: 0
     };
-    forkJoin(this.productService.getListOfProducts(params), this.catalogService.getListOfCatalogues(params))
+    forkJoin([this.productService.getListOfProducts(params), this.catalogService.getListOfCatalogues(params)])
       .subscribe(([products, res]) => {
         this.availableList = [...products.products];
         this.catalogues = [...res.catalogs];

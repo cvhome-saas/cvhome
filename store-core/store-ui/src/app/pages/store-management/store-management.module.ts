@@ -30,19 +30,6 @@ import {StoreBrandingLogoComponent} from "./store-branding/store-branding-logo.c
   ],
   imports: [
     StoreManagementRoutingModule,
-
-    /**
-     * stop using AGM, incompatible with Angular 11
-     * look at @types/googlemaps@
-     */
-    /**
-     AgmCoreModule.forRoot({
-     apiKey: environment.googleApiKey,
-     libraries: ['places'],
-     language: 'en'
-     }),
-     **/
-
     SharedModule,
     NbDialogModule.forChild(),
   ]
