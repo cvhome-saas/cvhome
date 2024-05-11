@@ -1,35 +1,11 @@
 import {inject} from '@angular/core';
-import {
-  ActivatedRouteSnapshot,
-  CanActivateChildFn,
-  CanActivateFn,
-  Router,
-  RouterStateSnapshot,
-  UrlTree
-} from "@angular/router";
+import {ActivatedRouteSnapshot, CanActivateFn, Router, RouterStateSnapshot} from "@angular/router";
 import {AuthService} from "./auth.service";
-import {catchError, map, Observable, of} from "rxjs";
+import {catchError, map, of} from "rxjs";
 
-export function isLoggedInUser(): CanActivateFn {
-  return (route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree => {
-    const oauthService: AuthService = inject(AuthService);
-    const router: Router = inject(Router);
-    return oauthService.getAuthUser().pipe(map(it => true), catchError(
-      it => {
-        return of(router.parseUrl('external-login-link'));
-      })
-    );
-  };
-}
+const PREV_PAGE_KEY = "PREV_PAGE";
 
-export function isLoggedInUserChild(): CanActivateChildFn {
-  return (route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree => {
-    return this.isLoggedInUserChild()
-  };
-}
-
-
-export const canActivateTeam: CanActivateFn = (
+export const canAccessSecuredPages: CanActivateFn = (
   route: ActivatedRouteSnapshot,
   state: RouterStateSnapshot,
 ) => {
@@ -37,17 +13,25 @@ export const canActivateTeam: CanActivateFn = (
   const router: Router = inject(Router);
   return oauthService.getAuthUser().pipe(map(it => true), catchError(
     it => {
+      localStorage.setItem(PREV_PAGE_KEY, state.url);
       return of(router.parseUrl('external-login-link'));
     }));
 };
-export const canActivateTeamu: CanActivateChildFn = (
+
+export const canAccessWelcomePage: CanActivateFn = (
   route: ActivatedRouteSnapshot,
   state: RouterStateSnapshot,
 ) => {
   const oauthService: AuthService = inject(AuthService);
   const router: Router = inject(Router);
-  return oauthService.getAuthUser().pipe(map(it => true), catchError(
-    it => {
-      return of(router.parseUrl('external-login-link'));
-    }));
+  const prevPage = localStorage.getItem(PREV_PAGE_KEY);
+  if (prevPage != undefined) {
+    localStorage.removeItem(PREV_PAGE_KEY);
+    return of(router.parseUrl(prevPage));
+  } else {
+    return true;
+  }
+
+
 };
+

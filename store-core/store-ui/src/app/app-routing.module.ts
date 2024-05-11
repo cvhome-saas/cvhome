@@ -1,6 +1,7 @@
 import {ExtraOptions, RouterModule, Routes} from '@angular/router';
 import {NgModule} from '@angular/core';
 import {environment} from "../environments/environment";
+import {canAccessWelcomePage} from "./shared/service/auth-guard.service";
 
 export const routes: Routes = [
   {
@@ -22,6 +23,7 @@ export const routes: Routes = [
   },
   {
     path: '',
+    canActivate:[canAccessWelcomePage],
     loadChildren: () => import('./welcome/welcome.module')
       .then(m => m.WelcomeModule),
   },
