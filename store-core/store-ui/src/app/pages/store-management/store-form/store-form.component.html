@@ -9,7 +9,7 @@
         </nb-option>
       </nb-select>
     </div>
-    <div *ngIf="isCancel == '0'" class="content_spacing">
+    <div class="content_spacing">
       <button (click)="goToBack()" class="cancel_button" nbButton type="button">
         {{ 'ORDER_FORM.CANCEL'| translate }}
       </button>
@@ -30,7 +30,8 @@
             {{ 'STORE_FORM.STORE_NAME' |translate }}
             *</label>
           <div class="col-sm-12">
-            <input (change)="checkName($event)" [readOnly]="isReadonlyName" class="form-control inputText" formControlName='name'
+            <input (change)="checkName($event)" [readOnly]="isReadonlyName" class="form-control inputText"
+                   formControlName='name'
                    id="name" placeholder="{{ 'STORE_FORM.STORE_NAME' | translate }}"
                    required type="text">
             <span *ngIf="(name.dirty || name.touched) && name.invalid && name.errors.required" class="err-message">
@@ -50,7 +51,8 @@
             {{ 'STORE_FORM.STORE_PHONE'| translate }}
             *</label>
           <div class="col-sm-12">
-            <input class="form-control inputText" formControlName='phone' id="phone" placeholder="{{ 'STORE_FORM.STORE_PHONE' | translate }}"
+            <input class="form-control inputText" formControlName='phone' id="phone"
+                   placeholder="{{ 'STORE_FORM.STORE_PHONE' | translate }}"
                    required type="text">
             <span *ngIf="(phone.dirty || phone.touched) && phone.invalid && phone.errors.required" class="err-message">
               {{ 'STORE_FORM.PHONE_REQUIRED' | translate }}
@@ -65,7 +67,8 @@
             }}
             *</label>
           <div class="col-sm-12">
-            <input class="form-control inputText" formControlName='email' id="email" placeholder="{{ 'STORE_FORM.STORE_EMAIL' | translate }}"
+            <input class="form-control inputText" formControlName='email' id="email"
+                   placeholder="{{ 'STORE_FORM.STORE_EMAIL' | translate }}"
                    required type="text">
             <span *ngIf="(email.dirty || email.touched) && email.invalid && email" class="err-message">
               <span *ngIf="email.errors.email || email.errors.pattern">
@@ -84,7 +87,8 @@
               {{ 'STORE_FORM.ADDRESS' | translate }}
               *</label>
             <div class="col-sm-12">
-              <input class="form-control inputText" formControlName='address' id="address" placeholder="{{ 'STORE_FORM.ADDRESS' | translate }}"
+              <input class="form-control inputText" formControlName='address' id="address"
+                     placeholder="{{ 'STORE_FORM.ADDRESS' | translate }}"
                      required type="text">
               <span *ngIf="(address.dirty || address.touched) && address.invalid && address.errors.required"
                     class="err-message">
@@ -100,7 +104,8 @@
                 {{ 'STORE_FORM.CITY' | translate }}
                 *</label>
               <div class="col-sm-12">
-                <input class="form-control inputText" formControlName='city' id="city" placeholder="{{ 'STORE_FORM.CITY' | translate }}"
+                <input class="form-control inputText" formControlName='city' id="city"
+                       placeholder="{{ 'STORE_FORM.CITY' | translate }}"
                        required type="text">
                 <span *ngIf="(city.dirty || city.touched) && city.invalid && city.errors.required" class="err-message">
                   {{ 'STORE_FORM.CITY_CODE_REQUIRED' | translate }}
@@ -115,7 +120,8 @@
                 {{ 'STORE_FORM.POSTAL_CODE' |translate }}
                 *</label>
               <div class="col-sm-12">
-                <input class="form-control inputText" formControlName='postalCode' id="postalCode" placeholder="{{ 'STORE_FORM.POSTAL_CODE' | translate }}"
+                <input class="form-control inputText" formControlName='postalCode' id="postalCode"
+                       placeholder="{{ 'STORE_FORM.POSTAL_CODE' | translate }}"
                        required type="text">
                 <span
                   *ngIf="(postalCode.dirty || postalCode.touched) && postalCode.invalid && postalCode.errors.required"
@@ -145,7 +151,8 @@
               {{ 'STORE_FORM.STATE_PROVINCE' | translate }}
             </label>
             <div class="col-sm-12">
-              <input class="form-control inputText" formControlName='stateProvince' id="stateProvince" placeholder="{{ 'STORE_FORM.STATE_PROVINCE' | translate }}"
+              <input class="form-control inputText" formControlName='stateProvince' id="stateProvince"
+                     placeholder="{{ 'STORE_FORM.STATE_PROVINCE' | translate }}"
                      required type="text">
             </div>
           </div>
@@ -155,7 +162,8 @@
             {{ 'STORE_FORM.SUPPORTED_LANGUAGES' | translate }}
             *</label>
           <div class="col-sm-12 group-block">
-            <nb-checkbox (checkedChange)="addSupportedLanguage(language.code)" *ngFor="let language of supportedLanguages"
+            <nb-checkbox (checkedChange)="addSupportedLanguage(language.code)"
+                         *ngFor="let language of supportedLanguages"
                          [checked]="userHasSupportedLanguage(language)">
               {{ ('LANG.' + language.code) | translate }}
             </nb-checkbox>
@@ -169,7 +177,8 @@
           </label>
           <div class="col-sm-12">
             <nb-select *ngIf="supportedLanguages.length" class="fullWidth"
-                       formControlName='defaultLanguage' outline placeholder="{{ 'COMMON.DEFAULT_LANGUAGE' | translate }}" shape="rectangle">
+                       formControlName='defaultLanguage' outline
+                       placeholder="{{ 'COMMON.DEFAULT_LANGUAGE' | translate }}" shape="rectangle">
               <nb-option *ngFor="let language of supportedLanguages" [value]="language.code">
                 {{ ('LANG.' + language.code) | translate }}
               </nb-option>
@@ -183,7 +192,8 @@
           </label>
           <div class="col-sm-12">
             <nb-select *ngIf="supportedCurrency.length" class="fullWidth"
-                       formControlName='currency' outline placeholder="{{ 'STORE_FORM.CURRENCY' | translate }}" shape="rectangle">
+                       formControlName='currency' outline placeholder="{{ 'STORE_FORM.CURRENCY' | translate }}"
+                       shape="rectangle">
               <nb-option *ngFor="let currency of supportedCurrency" [value]="currency.code">{{ currency.code }}
               </nb-option>
             </nb-select>
@@ -205,7 +215,8 @@
           <label class="col-sm-10 col-form-label inputLabel">{{ 'STORE_FORM.WEIGHT_UNITS' | translate }} *</label>
           <div class="col-sm-12">
             <nb-select *ngIf="weightList.length" class="fullWidth"
-                       formControlName='weight' outline placeholder="{{ 'STORE_FORM.WEIGHT_UNITS' | translate }}" shape="rectangle">
+                       formControlName='weight' outline placeholder="{{ 'STORE_FORM.WEIGHT_UNITS' | translate }}"
+                       shape="rectangle">
               <nb-option *ngFor="let el of weightList" [value]="el">{{ el }}</nb-option>
             </nb-select>
           </div>
@@ -218,7 +229,8 @@
           </label>
           <div class="col-sm-12">
             <nb-select *ngIf="sizeList.length" class="fullWidth"
-                       formControlName='dimension' outline placeholder="{{ 'STORE_FORM.SIZE_UNITS' | translate }}" shape="rectangle">
+                       formControlName='dimension' outline placeholder="{{ 'STORE_FORM.SIZE_UNITS' | translate }}"
+                       shape="rectangle">
               <nb-option *ngFor="let el of sizeList" [value]="el">{{ el }}</nb-option>
             </nb-select>
           </div>

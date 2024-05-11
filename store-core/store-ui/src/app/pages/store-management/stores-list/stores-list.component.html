@@ -8,6 +8,19 @@
 
       </nb-card-header>
 
+      <form class="form-inline filter_section" style="height: 60px" >
+        <div class="filter_left_section">
+        </div>
+        <div class="filter_right_section" style="margin: 5px">
+          <a routerLink="/pages/store-management/create-store" class="createBtn" >
+            <img alt="" class="pointer sda"
+                 src="../../../../assets/img/plus.png"
+                 title="{{ 'COMPONENTS.CREATE_OPTION' | translate}}">
+            <label>{{ 'COMPONENTS.CREATE_STORE' | translate }}</label>
+          </a>
+        </div>
+      </form>
+
       <ngx-datatable
         (page)="setPage($event)"
         [columnMode]="ColumnMode.force"
