@@ -7,7 +7,7 @@ import {NbDialogService, NbToastrService} from '@nebular/theme';
 import {validators} from '../../shared/validation/validators';
 import {TranslateService} from '@ngx-translate/core';
 import {ConfigService} from '../../shared/services/config.service';
-import {ImageBrowserComponent} from "../../store-manager/shared/image-browser/image-browser.component";
+import {ImageBrowserComponent} from "../../shared/components/image-browser/image-browser.component";
 
 declare var $: any;
 

@@ -1,7 +1,4 @@
 import {Injectable} from '@angular/core';
-import {HttpClient, HttpParams} from '@angular/common/http';
-
-import {environment} from '../../../../environments/environment';
 import {Observable} from 'rxjs';
 import {CrudService} from '../../shared/services/crud.service';
 import {StorageService} from '../../shared/services/storage.service';

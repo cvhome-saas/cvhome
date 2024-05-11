@@ -64,10 +64,7 @@ export class StoreFormComponent implements OnInit {
 
   ngOnInit() {
     this.loading = true;
-    forkJoin(
-      this.configService.getListOfCountries(),
-      this.configService.getListOfSupportedCurrency(),
-      this.configService.getWeightAndSizes())
+    forkJoin([this.configService.getListOfCountries(), this.configService.getListOfSupportedCurrency(), this.configService.getWeightAndSizes()])
       .subscribe(([countries, currencies, measures]) => {
         this.countries = [...countries];
         this.supportedCurrency = [...currencies];

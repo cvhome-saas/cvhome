@@ -10,7 +10,7 @@ import {CreateNewUserComponent} from './create-new-user/create-new-user.componen
 import {NbDialogModule} from '@nebular/theme';
 import {UserDetailsComponent} from './user-details/user-details.component';
 import {ButtonRenderUserComponent} from './users-list/button-render-user.component';
-import {SharedModule} from "../store-manager/shared/shared.module";
+import {SharedModule} from "../shared/shared.module";
 import {UserStatusComponent} from "./users-list/user-status.component";
 
 // import { EqualValidator } from '../shared/validation/equal-validator';

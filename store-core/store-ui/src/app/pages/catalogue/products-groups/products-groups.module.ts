@@ -7,7 +7,7 @@ import {GroupsListComponent} from './groups-list/groups-list.component';
 import {ProductsGroupsCreationComponent} from './products-groups-creation/products-groups-creation.component';
 import {ProductGroupFormComponent} from './product-group-form/product-group-form.component';
 import {ActiveButtonComponent} from './groups-list/active-button.component';
-import {SharedModule} from "../../store-manager/shared/shared.module";
+import {SharedModule} from "../../shared/shared.module";
 import {ProductAutoCompleteComponent} from "./product-group-form/product-auto-complete.component";
 
 @NgModule({

@@ -28,7 +28,7 @@ import {NbDialogModule} from '@nebular/theme';
 // import { ProductOrderingComponent } from './product-ordering/product-ordering.component';
 
 
-import {SharedModule} from "../../store-manager/shared/shared.module";
+import {SharedModule} from "../../shared/shared.module";
 import {ProductDetailsComponent} from "./product-details/product-details.component";
 
 @NgModule({

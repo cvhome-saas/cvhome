@@ -31,7 +31,5 @@ export const canAccessWelcomePage: CanActivateFn = (
   } else {
     return true;
   }
-
-
 };
 

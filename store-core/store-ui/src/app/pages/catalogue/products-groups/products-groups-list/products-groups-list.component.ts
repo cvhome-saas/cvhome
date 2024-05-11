@@ -30,9 +30,7 @@ export class ProductsGroupsListComponent implements OnInit {
       start: 0
     };
 
-    forkJoin(
-      this.productService.getListOfProducts(params),
-      this.productGroupsService.getListOfProductGroups({store: this.storageService.getMerchant()}))
+    forkJoin([this.productService.getListOfProducts(params), this.productGroupsService.getListOfProductGroups({store: this.storageService.getMerchant()})])
       .subscribe(([products, groups]) => {
         this.availableList = [...products.products];
         this.groups = [...groups];

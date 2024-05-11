@@ -1,3 +1,4 @@
+/*
 package com.asrevo.cvhome.gateway.filter;
 
 import com.asrevo.cvhome.commons.domain.DomainReference;
@@ -96,4 +97,4 @@ public class PodRouterFilter implements GlobalFilter, Ordered {
     public int getOrder() {
         return Ordered.LOWEST_PRECEDENCE - 1;
     }
-}
+}*/

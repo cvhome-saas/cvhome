@@ -14,7 +14,7 @@ import {slugify} from '../../../shared/utils/slugifying';
 import {forkJoin} from 'rxjs';
 import {TypesService} from '../../types/services/types.service';
 import {StorageService} from '../../../shared/services/storage.service';
-import {ImageBrowserComponent} from "../../../store-manager/shared/image-browser/image-browser.component";
+import {ImageBrowserComponent} from "../../../shared/components/image-browser/image-browser.component";
 
 declare var $: any;
 

@@ -8,7 +8,7 @@ import {TranslateService} from '@ngx-translate/core';
 import {StorageService} from '../../../shared/services/storage.service';
 import {validators} from '../../../shared/validation/validators';
 import {slugify} from '../../../shared/utils/slugifying';
-import {ImageBrowserComponent} from "../../../store-manager/shared/image-browser/image-browser.component";
+import {ImageBrowserComponent} from "../../../shared/components/image-browser/image-browser.component";
 
 declare var $: any;
 

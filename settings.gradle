@@ -45,9 +45,6 @@ include(
         'store-core:wallet:wallet-commons',
         'store-core:wallet:wallet-events',
         'store-core:wallet:wallet-service',
-        'store-core:router:router-commons',
-        'store-core:router:router-events',
-        'store-core:router:router-service',
         'store-core:store-ui',
 
         'saas-pod:gateway:gateway-service-v2',

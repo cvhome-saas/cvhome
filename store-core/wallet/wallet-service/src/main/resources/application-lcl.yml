@@ -8,11 +8,6 @@ spring:
       discovery:
         enabled: true
         services:
-          router:
-            - url: "http://localhost:8002"
-              metadata:
-                service-name: router
-                instance: router-1
           auth:
             - url: "http://localhost:9999"
               metadata:
@@ -43,11 +38,3 @@ spring:
               metadata:
                 service-name: landing-ui
                 instance: landing-ui-1
-com:
-  asrevo:
-    cvhome:
-      calls:
-        #        store: GATEWAY
-        #        router: DEFAULT
-        store: DIRECT
-        router: IGNORE

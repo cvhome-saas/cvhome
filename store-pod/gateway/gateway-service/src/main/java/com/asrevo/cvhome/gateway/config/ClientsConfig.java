@@ -9,6 +9,6 @@ import org.springframework.context.annotation.Configuration;
 public class ClientsConfig {
     @Bean
     public RouterAllocationService routerAllocationService(WebClientBuilder webClientBuilder) {
-        return webClientBuilder.buildClient("router", RouterAllocationService.class);
+        return webClientBuilder.buildClient("manager", RouterAllocationService.class);
     }
 }

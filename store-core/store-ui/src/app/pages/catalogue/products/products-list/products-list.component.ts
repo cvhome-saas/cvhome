@@ -7,7 +7,7 @@ import {StorageService} from "../../../shared/services/storage.service";
 import {Router} from "@angular/router";
 import {Page} from "../../../shared/models/Page";
 import {ColumnMode} from "@swimlane/ngx-datatable";
-import {ShowcaseDialogComponent} from "../../../store-manager/shared/showcase-dialog/showcase-dialog.component";
+import {ShowcaseDialogComponent} from "../../../shared/components/showcase-dialog/showcase-dialog.component";
 
 @Component({
   selector: 'ngx-products-list',

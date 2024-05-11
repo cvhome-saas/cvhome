@@ -51,7 +51,7 @@ public class StoreManagerController {
 
     @GetMapping("private/store/{code}")
     public Mono<Object> getStoreDetailed(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @PathVariable("code") ManagerStoreId managerStoreId) {
-        return managerService.getStore(identity, managerStoreId);
+        return managerService.getStore( managerStoreId);
     }
 
     @GetMapping("store-info")

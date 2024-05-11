@@ -6,7 +6,7 @@ import {TranslateService} from '@ngx-translate/core';
 import {StorageService} from '../../../shared/services/storage.service';
 import {CatalogService} from '../services/catalog.service';
 import {StoreService} from '../../../store-management/services/store.service';
-import {ShowcaseDialogComponent} from "../../../store-manager/shared/showcase-dialog/showcase-dialog.component";
+import {ShowcaseDialogComponent} from "../../../shared/components/showcase-dialog/showcase-dialog.component";
 
 @Component({
   selector: 'ngx-catalogues-list',

@@ -5,7 +5,7 @@ import {TranslateService} from '@ngx-translate/core';
 import {ProductGroupsService} from '../services/product-groups.service';
 import {StorageService} from '../../../shared/services/storage.service';
 import {Router} from '@angular/router';
-import {ShowcaseDialogComponent} from "../../../store-manager/shared/showcase-dialog/showcase-dialog.component";
+import {ShowcaseDialogComponent} from "../../../shared/components/showcase-dialog/showcase-dialog.component";
 import {ColumnMode} from "@swimlane/ngx-datatable";
 import {Page} from "../../../shared/models/Page";
 

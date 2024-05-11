@@ -6,7 +6,6 @@ spring:
       eager-load:
         clients:
           - "store-core-gateway"
-          - "router"
           - "auth"
           - "manager"
           - "wallet"
@@ -19,7 +18,6 @@ spring:
         default-port: 8080
         service-ports:
           "store-core-gateway": 7000
-          "router": 8002
           "auth": 9999
           "manager": 7001
           "wallet": 7002

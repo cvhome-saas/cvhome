@@ -1,9 +1,7 @@
 package com.asrevo.cvhome.gateway.filters;
 
 import com.asrevo.cvhome.commons.domain.Domain;
-import com.asrevo.cvhome.commons.dto.PodReferenceDto;
-import com.asrevo.cvhome.s2s.clients.RouterAllocationService;
-import com.asrevo.cvhome.s2s.model.ServiceDomainProperties;
+import com.asrevo.cvhome.gateway.service.CachedRouterService;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -23,8 +21,6 @@ import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
-import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_STORE;
-import static com.asrevo.cvhome.s2s.utils.StoreCallUtils.getPodReference;
 
 @Component
 @Slf4j
@@ -33,14 +29,12 @@ public class AddStoreParamGatewayFilterFactory extends AbstractGatewayFilterFact
     private static final String STORE_ID_PARAM = "store";
     private static final String STORE_ID_HEADER = "store";
     private static final String STORE_ID_COOKIE = "store";
-    private final RouterAllocationService router;
-    private final ServiceDomainProperties serviceDomainProperties;
+    private final CachedRouterService router;
 
 
-    public AddStoreParamGatewayFilterFactory(RouterAllocationService router, ServiceDomainProperties serviceDomainProperties) {
+    public AddStoreParamGatewayFilterFactory(CachedRouterService router) {
         super(AddStoreParamGatewayFilterFactory.Config.class);
         this.router = router;
-        this.serviceDomainProperties = serviceDomainProperties;
     }
 
     private static void addResponseHeader(ServerHttpResponse response, String store) {
@@ -169,16 +163,9 @@ public class AddStoreParamGatewayFilterFactory extends AbstractGatewayFilterFact
     }
 
     private Mono<String> mapHostToStoreParam(String host) {
-        Domain domain = new Domain(host);
-        return Mono
-                .defer(() ->
-                        getPodReference(serviceDomainProperties, router.getAllocation(domain), this::buildFallbackPodReference))
-                .map(PodReferenceDto::reference);
+        return router.getAllocation(new Domain(host)).map(it -> it.getId().toString());
     }
 
-    private PodReferenceDto buildFallbackPodReference() {
-        return PodReferenceDto.from(null, DEFAULT_STORE);
-    }
 
     @Getter
     @Setter
