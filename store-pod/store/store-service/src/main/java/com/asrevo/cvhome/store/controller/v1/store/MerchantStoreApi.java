@@ -309,6 +309,25 @@ public class MerchantStoreApi {
         storeFacade.addStoreLogo(code, cmsContentImage);
     }
 
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping(value = {"/private/store/{code}/marketing/banner"})
+    @Operation(method = "POST", description = "Add store banner", summary = "")
+    public void addBanner(@PathVariable String code, @RequestParam("file") MultipartFile uploadfile,
+                        HttpServletRequest request) {
+
+        // user doing action must be attached to the store being modified
+        String userName = getUserFromRequest(request);
+
+        validateUserPermission(userName, code);
+
+        if (uploadfile.isEmpty()) {
+            throw new RestApiException("Upload file is empty");
+        }
+
+        InputContentFile cmsContentImage = createInputContentFile(uploadfile);
+        storeFacade.addStoreBanner(code, cmsContentImage);
+    }
+
     private InputContentFile createInputContentFile(MultipartFile image) {
 
         InputContentFile cmsContentImage = null;
@@ -340,6 +359,19 @@ public class MerchantStoreApi {
 
         // delete store logo
         storeFacade.deleteLogo(code);
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @DeleteMapping(value = {"/private/store/{code}/marketing/banner"})
+    @Operation(method = "DELETE", description = "Delete store banner", summary = "", responses = @ApiResponse(content = @Content(schema = @Schema(implementation = Void.class))))
+    public void deleteStoreBanner(@PathVariable String code, HttpServletRequest request) {
+
+        // user doing action must be attached to the store being modified
+        String userName = getUserFromRequest(request);
+        validateUserPermission(userName, code);
+
+        // delete store logo
+        storeFacade.deleteBanner(code);
     }
 
     @ResponseStatus(HttpStatus.OK)

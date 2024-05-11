@@ -17,34 +17,8 @@
         </div>
 
       </nb-card-header>
-
-      <form [formGroup]="imageUpload">
-        <div (click)='imageInput.click()' (dragover)="allowDrop($event)" (drop)="drop($event)" class="wrapper">
-          <div #imageDrop id="imageDrop">
-
-            <img *ngIf="logo" [src]="logo?.path" style="max-height:200;"/>
-
-          </div>
-          <div class="uploadingPhrase">{{ 'STORE_BRANDING.DROP_FILE' | translate }}</div>
-        </div>
-
-        <input #imageInput (change)='imageChange($event)' formControlName="imageInput" id="imageInput" required
-               type="file">
-
-        <div class="form-group actions-button">
-          <button (click)="removeLogo()" *ngIf="showRemoveButton" class="btn btn-danger" type="submit">{{
-              'COMMON.REMOVE' | translate
-            }}
-          </button>
-          <button (click)="saveLogo()" *ngIf="logoFile" [nbSpinner]="loadingButton" class="btn btn-primary" nbButton
-                  nbSpinnerMessage="" nbSpinnerSize="large" type="submit">
-            {{ (!loadingButton ? 'COMMON.SAVE' : '') | translate }}
-            <!-- {{ 'COMMON.SAVE' | translate}} -->
-          </button>
-        </div>
-
-      </form>
-
+      <ngx-store-branding-logo [store]="store" *ngIf="store"/>
+      <ngx-store-branding-banner [store]="store" *ngIf="store"/>
     </div>
   </nb-card-body>
 </nb-card>

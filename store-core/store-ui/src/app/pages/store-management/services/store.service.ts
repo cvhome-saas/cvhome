@@ -86,8 +86,18 @@ export class StoreService {
     return this.crudService.post(`/store/api/v1/private/store/${store}/marketing/logo?store=${store}`, uploadData);
   }
 
-  removeStoreLogo(code: string): Observable<any> {
-    return this.crudService.delete(`/v1/private/store/${code}/marketing/logo`);
+  removeStoreLogo(store: string): Observable<any> {
+    return this.crudService.delete(`/v1/private/store/${store}/marketing/logo?store=${store}`);
+  }
+
+  addStoreBanner(store: string, file: any): Observable<any> {
+    const uploadData = new FormData();
+    uploadData.append('file', file, file.name);
+    return this.crudService.post(`/store/api/v1/private/store/${store}/marketing/banner?store=${store}`, uploadData);
+  }
+
+  removeStoreBanner(store: string): Observable<any> {
+    return this.crudService.delete(`/v1/private/store/${store}/marketing/banner?store=${store}`);
   }
 
   // end BRANDING

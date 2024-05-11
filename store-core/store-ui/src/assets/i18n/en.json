@@ -198,6 +198,8 @@
     "ONLY_ONE_IMAGE": "Only one image/time",
     "LOGO_SAVED": "Logo saved.",
     "LOGO_REMOVED": "Logo removed.",
+    "BANNER_SAVED": "Banner saved.",
+    "BANNER_REMOVED": "Banner removed.",
     "NETWORKS_UPDATED": "Social networks updated."
   },
   "STORE_FORM": {
