@@ -3,13 +3,13 @@ task "clean" {
     }
 }
 
-task "bootJar" {
+task "build" {
     doLast {
     }
 }
 
 tasks.register('bootBuildImage', BootBuildImageTask) {
-    dependsOn('bootJar')
+    dependsOn('build')
 }
 
 
