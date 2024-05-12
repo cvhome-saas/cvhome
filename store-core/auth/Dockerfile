@@ -1,4 +1,4 @@
-FROM quay.io/keycloak/keycloak:21.0
+FROM quay.io/keycloak/keycloak:24.0
 
 COPY keycloak/imports /opt/keycloak/data/import
 COPY keycloak/providers /opt/keycloak/providers
