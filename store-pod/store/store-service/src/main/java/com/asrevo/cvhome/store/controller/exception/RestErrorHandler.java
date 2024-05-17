@@ -11,7 +11,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
-@ControllerAdvice({"com.asrevo.cvhome.store.store.api"})
+@ControllerAdvice({"com.asrevo.cvhome.store.controller"})
 @Slf4j
 public class RestErrorHandler {
 
