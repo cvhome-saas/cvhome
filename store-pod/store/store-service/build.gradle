@@ -24,7 +24,7 @@ springBoot {
 }
 
 bootBuildImage {
-    builder = "paketobuildpacks/builder:tiny"
+    builder = "paketobuildpacks/builder-jammy-tiny:latest"
     imageName = "${System.getenv("REGISTRY")}/store-pod/store"
     tags = ["${System.getenv("REGISTRY")}/store-pod/store:${project.version}", "${System.getenv("REGISTRY")}/store-pod/store:latest"]
     docker {

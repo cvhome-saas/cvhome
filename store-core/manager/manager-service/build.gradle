@@ -24,16 +24,10 @@ springBoot {
 }
 
 bootBuildImage {
-    builder = "paketobuildpacks/builder:tiny"
+    builder = "paketobuildpacks/builder-jammy-tiny:latest"
     imageName = "${System.getenv("REGISTRY")}/store-core/manager"
     tags = ["${System.getenv("REGISTRY")}/store-core/manager:${project.version}", "${System.getenv("REGISTRY")}/store-core/manager:latest"]
-    docker {
-        publishRegistry {
-            url = System.getenv("REGISTRY")
-            username = "AWS"
-            password = System.getenv("ECR_TOKEN")
-        }
-    }
+
 }
 
 ext {
