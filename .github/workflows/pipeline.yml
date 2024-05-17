@@ -20,7 +20,7 @@ jobs:
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
+          java-version: '21'
           distribution: 'corretto'
       - name: Use Node.js 20
         uses: actions/setup-node@v4
@@ -54,7 +54,7 @@ jobs:
 #        run: ./gradlew test
 
       - name: Build Docker with Gradle
-        run: ./gradlew bootBuildImage --publishImage -x test
+        run: ./gradlew bootBuildImage --publishImage -x test --stacktrace
         env: # Or as an environment variable
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_TOKEN: ${{ steps.login-ecr.outputs.docker_password_824591438121_dkr_ecr_eu_central_1_amazonaws_com }}

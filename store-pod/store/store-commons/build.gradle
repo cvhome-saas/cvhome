@@ -8,6 +8,6 @@ dependencies {
     compileOnly 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
     compileOnly 'com.fasterxml.jackson.core:jackson-annotations:2.15.2'
     compileOnly 'org.springframework.data:spring-data-relational:3.1.4'
-    compileOnly 'org.projectlombok:lombok:1.18.28'
-    annotationProcessor 'org.projectlombok:lombok:1.18.28'
+    compileOnly 'org.projectlombok:lombok:1.18.32'
+    annotationProcessor 'org.projectlombok:lombok:1.18.32'
 }
