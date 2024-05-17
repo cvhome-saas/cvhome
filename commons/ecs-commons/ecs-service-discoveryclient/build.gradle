@@ -6,6 +6,6 @@ dependencies {
     implementation 'org.springframework.cloud:spring-cloud-starter-loadbalancer:4.0.4'
     implementation 'org.springframework.cloud:spring-cloud-starter-bootstrap:4.0.4'
     implementation 'software.amazon.awssdk:servicediscovery:2.21.25'
-    compileOnly 'org.projectlombok:lombok:1.18.28'
-    annotationProcessor 'org.projectlombok:lombok:1.18.28'
+    compileOnly 'org.projectlombok:lombok:1.18.32'
+    annotationProcessor 'org.projectlombok:lombok:1.18.32'
 }

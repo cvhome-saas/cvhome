@@ -19,6 +19,6 @@ dependencies {
 //    compileOnly 'org.springdoc:springdoc-openapi-starter-common:2.5.0'
     compileOnly 'io.swagger.core.v3:swagger-models:2.2.8'
 
-    compileOnly 'org.projectlombok:lombok:1.18.28'
-    annotationProcessor 'org.projectlombok:lombok:1.18.28'
+    compileOnly 'org.projectlombok:lombok:1.18.32'
+    annotationProcessor 'org.projectlombok:lombok:1.18.32'
 }
