@@ -84,6 +84,19 @@ services:
     depends_on:
       - landing-ui
       - store
+  saas-pod-gateway-v2:
+    image: saas-pod/saas-pod-gateway-v2
+    network_mode: host
+    environment:
+      SPRING_PROFILES_ACTIVE: lcl
+      STORE_POD_GATEWAY: http://store-pod-1.gateway.com:7100
+      ASK_TLS_URL: http://gateway.com:7000/manager/api/v1/router/public/ask-for-tls
+    ports:
+      - "80:80"
+      - "443:443"
+      - "2019:2019"
+    depends_on:
+      - store-pod-gateway
 
   manager:
     image: store-core/manager
