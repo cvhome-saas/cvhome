@@ -6,6 +6,7 @@ services:
     ports:
       - "80:80"
       - "443:443"
+      - "2019:2019"
     environment:
       STORE_POD_GATEWAY: http://store-pod-1.gateway.com:7100
       ASK_TLS_URL: http://gateway.com:7000/manager/api/v1/router/public/ask-for-tls
