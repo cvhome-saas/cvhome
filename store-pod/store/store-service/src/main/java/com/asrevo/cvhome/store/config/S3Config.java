@@ -12,6 +12,7 @@ import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.PutBucketPolicyRequest;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -23,7 +24,7 @@ public class S3Config {
     @ConditionalOnMissingBean
     public S3Client s3Client(CdnStorageProperties properties) throws URISyntaxException {
         if (StorageProviderType.MINIO.equals(properties.provider())) {
-            return S3Client.builder().endpointOverride(new URI(properties.s3Url()))
+            S3Client s3Client = S3Client.builder().endpointOverride(new URI(properties.s3Url()))
                     .serviceConfiguration(e ->
                             e
                                     .pathStyleAccessEnabled(true)
@@ -34,7 +35,8 @@ public class S3Config {
                             .create(AwsBasicCredentials
                                     .create(properties.s3AccessKey(), properties.s3SecretKey())))
                     .build();
-
+            new MinioInitializer(s3Client, properties).configurePolicy();
+            return s3Client;
         } else {
             return S3Client.create();
         }
@@ -44,6 +46,39 @@ public class S3Config {
     @Bean
     public ContentAssetsManager staticContentFileManager(S3Client s3Client, CdnStorageProperties properties) {
         return new S3StaticContentAssetsManagerImpl(s3Client, properties);
+    }
+
+    private record MinioInitializer(S3Client s3Client, CdnStorageProperties cdnStorageProperties) {
+
+        public void configurePolicy() {
+            String policy = """
+                    {
+                        "Version": "2012-10-17",
+                        "Statement": [
+                            {
+                                "Principal": "*",
+                                "Action": "s3:GetObject",
+                                "Resource": [
+                                    "arn:aws:s3:::${BUCKET}/*"
+                                ],
+                                "Effect": "Allow"
+                            }
+                        ]
+                    }
+                    """;
+            String finalPolicy = policy
+                    .replace("${BUCKET}", cdnStorageProperties.bucket());
+            try {
+                s3Client.putBucketPolicy(PutBucketPolicyRequest.builder()
+                        .bucket(cdnStorageProperties.bucket())
+                        .policy(
+                                finalPolicy
+                        )
+                        .build());
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+        }
     }
 
 }
