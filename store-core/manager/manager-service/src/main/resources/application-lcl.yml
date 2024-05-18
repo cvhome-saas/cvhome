@@ -18,11 +18,6 @@ spring:
               metadata:
                 service-name: manager
                 instance: manager-1
-          wallet:
-            - url: "http://localhost:7002"
-              metadata:
-                service-name: wallet
-                instance: wallet-1
           store-ui:
             - url: "http://localhost:4200"
               metadata:

@@ -14,11 +14,6 @@ spring:
               metadata:
                 service-name: manager
                 instance: manager-1
-          wallet:
-            - url: "http://localhost:7002"
-              metadata:
-                service-name: wallet
-                instance: wallet-1
           store-ui:
             - url: "http://localhost:4200"
               metadata:
@@ -59,5 +54,5 @@ spring:
           order: -1
           uri: lb://store-ui
           predicates:
-            - FNotService=store,manager,wallet,auth
+            - FNotService=store,manager,auth
             - FHost=store-ui.${com.asrevo.cvhome.services.store-core-gateway.domain}
