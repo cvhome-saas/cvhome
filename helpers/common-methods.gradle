@@ -1,0 +1,33 @@
+static String createImageName(String repo) {
+    String registry = System.getenv("REGISTRY")
+    return registry ? "${registry}/${repo}" : repo
+}
+
+static List<String> createImageTags(String repo, String version) {
+    String image = createImageName(repo)
+    return ["${image}:latest", "${image}:${version}"]
+}
+
+static List<String> createBuildCmd(String repo, String version) {
+    String image = createImageName(repo)
+    List<String> tags = createImageTags(repo, version)
+    List<String> commands = ["docker", "build", "-t", image]
+    tags.forEach {
+        commands.add("-t")
+        commands.add(it)
+    }
+    tags.add(".")
+    return commands
+}
+
+static List<String> createPushCmd(String repo) {
+    String image = createImageName(repo)
+    return ["docker", "push", image, "--all-tags"]
+}
+
+ext {
+    createImageName = this.&createImageName
+    createImageTags = this.&createImageTags
+    createBuildCmd = this.&createBuildCmd
+    createPushCmd = this.&createPushCmd
+}

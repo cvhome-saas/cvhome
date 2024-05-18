@@ -4,6 +4,7 @@ plugins {
     id 'io.spring.dependency-management' version '1.1.4'
 //    id 'org.graalvm.buildtools.native' version '0.9.28'
 }
+apply from: "$rootDir/helpers/common-methods.gradle"
 group = 'com.asrevo.cvhome'
 
 java {
@@ -25,12 +26,12 @@ springBoot {
 
 bootBuildImage {
     builder = "paketobuildpacks/builder-jammy-tiny:latest"
-    imageName = "${System.getenv("REGISTRY")}/store-core/wallet"
-    tags = ["${System.getenv("REGISTRY")}/store-core/wallet:${project.version}", "${System.getenv("REGISTRY")}/store-core/wallet:latest"]
+    imageName = createImageName("store-core/wallet")
+    tags = createImageTags("store-core/wallet",project.version)
     docker {
         publishRegistry {
             url = System.getenv("REGISTRY")
-            username = "AWS"
+            username = System.getenv("ECR_TOKEN") ? 'AWS' : null
             password = System.getenv("ECR_TOKEN")
         }
     }
