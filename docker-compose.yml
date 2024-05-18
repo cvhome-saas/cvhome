@@ -1,67 +1,126 @@
----
+version: '3'
 services:
-  shopizer-db1:
-    container_name: shopizer-db1
-    image: bitnami/postgresql:12.5.0
-    environment:
-      POSTGRESQL_DATABASE: cvhome
-      POSTGRESQL_USERNAME: postgres
-      POSTGRESQL_PASSWORD: password
+  postgres:
+    image: postgres:13
+    network_mode: host
     ports:
       - "5432:5432"
-    restart: unless-stopped
-  shopizer-db:
     environment:
-      - MYSQL_ROOT_PASSWORD=shopizer123
-      - MYSQL_DATABASE=SALESMANAGER
-      - MYSQL_USER=shopizer_db_user
-      - MYSQL_PASSWORD=shopizer_db_password
-    image: mysql/mysql-server:8.0.28
-    container_name: shopizer-db
+      POSTGRES_DB: cvhome
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+  minio:
+    image: bitnami/minio
+    network_mode: host
     ports:
-      - "3307:3306"
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_API_PORT_NUMBER: "9000"
+      MINIO_CONSOLE_PORT_NUMBER: "9001"
+      MINIO_DEFAULT_BUCKETS: "d0dd4299-963a-4458-b31f-8efe31c35e8e"
+      MINIO_ROOT_USER: "minioadmin"
+      MINIO_ROOT_PASSWORD: "minioadmin"
+      MINIO_ACCESS_KEY: "minioadmin"
+      MINIO_SECRET_KEY: "minioadmin"
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0
+    network_mode: host
+    environment:
+      KC_HTTP_ENABLED: true
+      KC_HTTP_PORT: 9999
+      KC_HOSTNAME_STRICT_HTTPS: false
+
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://localhost:5432/cvhome
+      KC_DB_USERNAME: postgres
+      KC_DB_PASSWORD: password
+
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+
+    command: --verbose start --proxy=edge  --hostname-strict=false --import-realm
+    #    command:  --verbose start --proxy=edge --hostname-strict=false --hostname-path=/auth --import-realm
+    #    command:  --verbose start  --hostname-strict=false --import-realm
     volumes:
-      - $PWD/db:/var/lib/mysql
-  #Infinispan image management
-  shopizer:
+      - ./store-core/auth/keycloak/imports:/opt/keycloak/data/import
+      - ./store-core/auth/keycloak/providers:/opt/keycloak/providers
+    ports:
+      - "9999:9999"
     depends_on:
-      - shopizer-db
-    image: shopizerecomm/shopizer:latest
-    container_name: shopizer
+      - postgres
+  store:
+    image: store-pod/store
+    network_mode: host
     environment:
-      - "SPRING_PROFILES_ACTIVE=mysql"
-      - "db.jdbcUrl=jdbc:mysql://shopizer-db:3306/SALESMANAGER?autoReconnect=true&useUnicode=true&characterEncoding=UTF-8"
-      - "db.user=shopizer_db_user"
-      - "db.password=shopizer_db_password"
-      - "elasticsearch.security.password=NOTREQUIRED"
-      - "config.cms.contentUrl=http://localhost:8080"
-      - "config.cms.method=default"
-      - "elasticsearch.server.host=http://localhost"
-      - "elasticsearch.server.port=9200"
-    mem_limit: 2048m
-
-    links:
-      - shopizer-db
+      SPRING_PROFILES_ACTIVE: lcl
+      COM_ASREVO_CVHOME_CDN_STORAGE_PROVIDER: "MINIO"
+      COM_ASREVO_CVHOME_CDN_STORAGE_BUCKET: "d0dd4299-963a-4458-b31f-8efe31c35e8e"
+      COM_ASREVO_CVHOME_CDN_STORAGE_S3-URL: "http://localhost:9000"
+      COM_ASREVO_CVHOME_CDN_STORAGE_S3-ACCESS-KEY: "minioadmin"
+      COM_ASREVO_CVHOME_CDN_STORAGE_S3-SECRET-KEY: "minioadmin"
+      COM_ASREVO_CVHOME_CDN_STORAGE_REGION: "eu-central-1"
+      COM_ASREVO_CVHOME_CDN_BASE-PATH: "http://localhost:9000/d0dd4299-963a-4458-b31f-8efe31c35e8e"
     ports:
-      - "8080:8080"
-    volumes:
-      - $PWD/files:/files
-  shopizer-admin:
-    image: shopizerecomm/shopizer-admin:latest
-    container_name: shopizer-admin
-    environment:
-      - "APP_BASE_URL=http://localhost:8080/api"
+      - "7101:7101"
+    depends_on:
+      - postgres
+      - minio
 
+  landing-ui:
+    image: store-pod/landing-ui
+    network_mode: host
+    environment:
+      SPRING_PROFILES_ACTIVE: lcl
     ports:
-      - "4200:80"
-  shopizer-shop:
-    image: shopizerecomm/shopizer-shop-reactjs:latest
-    container_name: shopizer-shop
+      - "7102:7102"
+  store-pod-gateway:
+    image: store-pod/store-pod-gateway
+    network_mode: host
     environment:
-      - "APP_MERCHANT=DEFAULT"
-      - "APP_BASE_URL=http://localhost:8080"
-
+      SPRING_PROFILES_ACTIVE: lcl
+    ports:
+      - "7100:7100"
+    depends_on:
+      - landing-ui
+      - store
+  saas-pod-gateway-v2:
+    image: saas-pod/saas-pod-gateway-v2
+    network_mode: host
+    environment:
+      SPRING_PROFILES_ACTIVE: lcl
+      STORE_POD_GATEWAY: http://store-pod-1.gateway.com:7100
+      ASK_TLS_URL: http://gateway.com:7000/manager/api/v1/router/public/ask-for-tls
     ports:
       - "80:80"
-version: "2.2"
+      - "443:443"
+      - "2019:2019"
+    depends_on:
+      - store-pod-gateway
 
+  manager:
+    image: store-core/manager
+    network_mode: host
+    environment:
+      SPRING_PROFILES_ACTIVE: lcl
+    ports:
+      - "7001:7001"
+    depends_on:
+      - postgres
+  store-ui:
+    image: store-core/store-ui
+    network_mode: host
+    environment:
+      SPRING_PROFILES_ACTIVE: lcl
+    ports:
+      - "4200:4200"
+  store-core-gateway:
+    image: store-core/store-core-gateway
+    network_mode: host
+    environment:
+      SPRING_PROFILES_ACTIVE: lcl
+    ports:
+      - "7000:7000"
+    depends_on:
+      - manager
+      - store-ui
