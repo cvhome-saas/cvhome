@@ -1,4 +1,3 @@
-apply from: "$rootDir/helpers/common-methods.gradle"
 task "clean" {
     doLast {
     }
