@@ -2,20 +2,37 @@ version: '3'
 services:
   postgres:
     image: postgres:13
+    network_mode: host
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_DB: kc
+      POSTGRES_DB: cvhome
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
+  minio:
+    image: bitnami/minio
+    network_mode: host
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_API_PORT_NUMBER: "9000"
+      MINIO_CONSOLE_PORT_NUMBER: "9001"
+      MINIO_DEFAULT_BUCKETS: "d0dd4299-963a-4458-b31f-8efe31c35e8e"
+      MINIO_ROOT_USER: "minioadmin"
+      MINIO_ROOT_PASSWORD: "minioadmin"
+      MINIO_ACCESS_KEY: "minioadmin"
+      MINIO_SECRET_KEY: "minioadmin"
   keycloak:
     image: quay.io/keycloak/keycloak:24.0
+    network_mode: host
     environment:
       KC_HTTP_ENABLED: true
+      KC_HTTP_PORT: 9999
       KC_HOSTNAME_STRICT_HTTPS: false
 
       KC_DB: postgres
-      KC_DB_URL: jdbc:postgresql://postgres:5432/kc
+      KC_DB_URL: jdbc:postgresql://localhost:5432/cvhome
       KC_DB_USERNAME: postgres
       KC_DB_PASSWORD: password
 
@@ -29,6 +46,68 @@ services:
       - ./store-core/auth/keycloak/imports:/opt/keycloak/data/import
       - ./store-core/auth/keycloak/providers:/opt/keycloak/providers
     ports:
-      - "9999:8080"
+      - "9999:9999"
     depends_on:
       - postgres
+  store:
+    image: store-pod/store
+    network_mode: host
+    environment:
+      SPRING_PROFILES_ACTIVE: lcl
+      COM_ASREVO_CVHOME_CDN_STORAGE_PROVIDER: "MINIO"
+      COM_ASREVO_CVHOME_CDN_STORAGE_BUCKET: "d0dd4299-963a-4458-b31f-8efe31c35e8e"
+      COM_ASREVO_CVHOME_CDN_STORAGE_S3-URL: "http://localhost:9000"
+      COM_ASREVO_CVHOME_CDN_STORAGE_S3-ACCESS-KEY: "minioadmin"
+      COM_ASREVO_CVHOME_CDN_STORAGE_S3-SECRET-KEY: "minioadmin"
+      COM_ASREVO_CVHOME_CDN_STORAGE_REGION: "eu-central-1"
+      COM_ASREVO_CVHOME_CDN_BASE-PATH: "http://localhost:9000/d0dd4299-963a-4458-b31f-8efe31c35e8e"
+    ports:
+      - "7101:7101"
+    depends_on:
+      - postgres
+      - minio
+
+  landing-ui:
+    image: store-pod/landing-ui
+    network_mode: host
+    environment:
+      SPRING_PROFILES_ACTIVE: lcl
+    ports:
+      - "7102:7102"
+  store-pod-gateway:
+    image: store-pod/store-pod-gateway
+    network_mode: host
+    environment:
+      SPRING_PROFILES_ACTIVE: lcl
+    ports:
+      - "7100:7100"
+    depends_on:
+      - landing-ui
+      - store
+
+  manager:
+    image: store-core/manager
+    network_mode: host
+    environment:
+      SPRING_PROFILES_ACTIVE: lcl
+    ports:
+      - "7001:7001"
+    depends_on:
+      - postgres
+  store-ui:
+    image: store-core/store-ui
+    network_mode: host
+    environment:
+      SPRING_PROFILES_ACTIVE: lcl
+    ports:
+      - "4200:4200"
+  store-core-gateway:
+    image: store-core/store-core-gateway
+    network_mode: host
+    environment:
+      SPRING_PROFILES_ACTIVE: lcl
+    ports:
+      - "7000:7000"
+    depends_on:
+      - manager
+      - store-ui
