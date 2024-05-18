@@ -27,17 +27,43 @@ abstract class BootBuildImageTask extends DefaultTask {
 
     @TaskAction
     void bootBuildImage() {
-        String image = "${System.getenv('REGISTRY')}/store-core/${project.name}"
         project.exec {
             workingDir '.'
-            commandLine "docker", "build", "-t", "${image}", "-t", "${System.getenv('REGISTRY')}/store-core/${project.name}:${project.version}", "-t", "${System.getenv('REGISTRY')}/store-core/${project.name}:latest", "."
+            commandLine createBuildCmd("store-core/${project.name}", project.version as String) as List<String>
         }
         if (publishImage) {
             project.exec {
                 workingDir '.'
-                commandLine "docker", "push", image, "--all-tags"
+                commandLine createPushCmd("store-core/${project.name}") as List<String>
             }
         }
     }
+    static String createImageName(String repo) {
+        String registry = System.getenv("REGISTRY")
+        return registry ? "${registry}/${repo}" : repo
+    }
+
+    static List<String> createImageTags(String repo, String version) {
+        String image = createImageName(repo)
+        return ["${image}:latest", "${image}:${version}"]
+    }
+
+    static List<String> createBuildCmd(String repo, String version) {
+        String image = createImageName(repo)
+        List<String> tags = createImageTags(repo, version)
+        List<String> commands = ["docker", "build", "-t", image]
+        tags.forEach {
+            commands.add("-t")
+            commands.add(it)
+        }
+        commands.add(".")
+        return commands
+    }
+
+    static List<String> createPushCmd(String repo) {
+        String image = createImageName(repo)
+        return ["docker", "push", image, "--all-tags"]
+    }
+
 
 }
