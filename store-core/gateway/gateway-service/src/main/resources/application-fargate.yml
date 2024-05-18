@@ -6,7 +6,6 @@ spring:
           - "store-core-gateway"
           - "auth"
           - "manager"
-          - "wallet"
           - "store-ui"
     ecs:
       discovery:
@@ -18,7 +17,6 @@ spring:
           "store-core-gateway": 7000
           "auth": 9999
           "manager": 7001
-          "wallet": 7002
           "store-ui": 4200
     gateway:
       discovery:
@@ -45,5 +43,5 @@ spring:
           order: -1
           uri: lb://store-ui
           predicates:
-            - FNotService=store,manager,wallet,auth
+            - FNotService=store,manager,auth
             - FHost=store-ui.${com.asrevo.cvhome.services.store-core-gateway.domain}

@@ -42,9 +42,6 @@ include(
         'store-core:manager:manager-commons',
         'store-core:manager:manager-events',
         'store-core:manager:manager-service',
-        'store-core:wallet:wallet-commons',
-        'store-core:wallet:wallet-events',
-        'store-core:wallet:wallet-service',
         'store-core:store-ui',
 
         'saas-pod:gateway:gateway-service-v2',
