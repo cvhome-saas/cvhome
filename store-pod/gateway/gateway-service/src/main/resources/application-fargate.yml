@@ -28,7 +28,7 @@ spring:
           order: 10
           uri: lb://landing-ui
           predicates:
-            - FHost={domain}.{x},{sub}.{domain}.{x}
+            - FNotService=store,manager,auth
           filters:
             - name: AddStoreParam
               args:

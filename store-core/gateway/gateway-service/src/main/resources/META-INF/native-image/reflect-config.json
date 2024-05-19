@@ -40,13 +40,25 @@
     ]
   },
   {
-    "name": "com.asrevo.cvhome.gateway.predicates.FHostRoutePredicateFactory",
+    "name": "com.asrevo.cvhome.s2s.config.gateway.FHostRoutePredicateFactory",
     "allDeclaredFields": true,
     "allDeclaredConstructors": true,
     "allDeclaredMethods": true
   },
   {
-    "name": "com.asrevo.cvhome.gateway.predicates.FHostRoutePredicateFactory$Config",
+    "name": "com.asrevo.cvhome.s2s.config.gateway.FHostRoutePredicateFactory$Config",
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.asrevo.cvhome.s2s.config.gateway.FNotServiceRoutePredicateFactory",
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.asrevo.cvhome.s2s.config.gateway.FNotServiceRoutePredicateFactory$Config",
     "allDeclaredFields": true,
     "allDeclaredConstructors": true,
     "allDeclaredMethods": true
