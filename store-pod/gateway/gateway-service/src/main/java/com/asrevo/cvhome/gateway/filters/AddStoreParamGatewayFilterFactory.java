@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
+import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.http.HttpCookie;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -35,6 +36,35 @@ public class AddStoreParamGatewayFilterFactory extends AbstractGatewayFilterFact
     public AddStoreParamGatewayFilterFactory(CachedRouterService router) {
         super(AddStoreParamGatewayFilterFactory.Config.class);
         this.router = router;
+    }
+
+
+    @Override
+    public GatewayFilter apply(AddStoreParamGatewayFilterFactory.Config config) {
+        return (exchange, chain) -> {
+            ServerHttpRequest request = exchange.getRequest();
+            String store = getStore(request);
+            if (store == null) {
+                String hostName = extractHostName(request);
+                if (isValidHostName(hostName)) {
+                    return mapHostToStoreParam(hostName)
+                            .flatMap(it -> execute(config, exchange, chain, it));
+                }
+            } else {
+                return execute(config, exchange, chain, store);
+            }
+            return chain.filter(exchange);
+        };
+    }
+
+    @Getter
+    @Setter
+    public static class Config {
+        private Boolean addRequestParam = false;
+        private Boolean addRequestHeader = false;
+        private Boolean addRequestCookie = false;
+        private Boolean addResponseHeader = false;
+        private Boolean addResponseCookie = false;
     }
 
     private static void addResponseHeader(ServerHttpResponse response, String store) {
@@ -116,38 +146,21 @@ public class AddStoreParamGatewayFilterFactory extends AbstractGatewayFilterFact
         return List.of(TEMPLATE_KEY);
     }
 
-    @Override
-    public GatewayFilter apply(AddStoreParamGatewayFilterFactory.Config config) {
-        return (exchange, chain) -> {
-            ServerHttpRequest request = exchange.getRequest();
 
-            String store = getStore(request);
-
-            if (store == null) {
-                String hostName = Optional.ofNullable(request.getHeaders().getHost()).map(InetSocketAddress::getHostName).orElse(null);
-                if (canExtractStoreFromHost(hostName)) {
-
-                    return mapHostToStoreParam(hostName)
-                            .flatMap(it -> {
-                                ServerHttpRequest newRequest = addStoreParamsForRequest(config, request, it);
-                                ServerWebExchange newExchange = exchange.mutate().request(newRequest).build();
-                                return chain.filter(newExchange)
-                                        .then(Mono.fromRunnable(() -> addStoreParamsForResponse(config, exchange.getRequest(), exchange.getResponse(), it)));
-                            });
-                }
-
-            } else {
-                ServerHttpRequest newRequest = addStoreParamsForRequest(config, request, store);
-                ServerWebExchange newExchange = exchange.mutate().request(newRequest).build();
-                return chain.filter(newExchange)
-                        .then(Mono.fromRunnable(() -> addStoreParamsForResponse(config, exchange.getRequest(), exchange.getResponse(), store)));
-
-            }
-            return chain.filter(exchange);
-        };
+    private static String extractHostName(ServerHttpRequest request) {
+        return Optional.ofNullable(request.getHeaders().getHost()).map(InetSocketAddress::getHostName).orElse(null);
     }
 
-    private void addStoreParamsForResponse(Config config, ServerHttpRequest request, ServerHttpResponse response, String store) {
+    private Mono<Void> execute(Config config, ServerWebExchange exchange, GatewayFilterChain chain, String store) {
+        ServerHttpRequest request = exchange.getRequest();
+        ServerHttpRequest newRequest = addStoreParamsForRequest(config, request, store);
+        ServerWebExchange newExchange = exchange.mutate().request(newRequest).build();
+        return chain.filter(newExchange)
+                .then(Mono.fromRunnable(() -> addStoreParamsForResponse(config, exchange, store)));
+    }
+
+    private void addStoreParamsForResponse(Config config, ServerWebExchange exchange, String store) {
+        ServerHttpResponse response = exchange.getResponse();
         if (!response.isCommitted()) {
             if (config.getAddResponseHeader()) {
                 addResponseHeader(response, store);
@@ -158,7 +171,7 @@ public class AddStoreParamGatewayFilterFactory extends AbstractGatewayFilterFact
         }
     }
 
-    private boolean canExtractStoreFromHost(String hostName) {
+    private boolean isValidHostName(String hostName) {
         return true;
     }
 
@@ -166,14 +179,4 @@ public class AddStoreParamGatewayFilterFactory extends AbstractGatewayFilterFact
         return router.getAllocation(new Domain(host)).map(it -> it.getId().toString());
     }
 
-
-    @Getter
-    @Setter
-    public static class Config {
-        private Boolean addRequestParam = false;
-        private Boolean addRequestHeader = false;
-        private Boolean addRequestCookie = false;
-        private Boolean addResponseHeader = false;
-        private Boolean addResponseCookie = false;
-    }
 }
