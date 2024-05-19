@@ -74,5 +74,17 @@
     "allDeclaredFields": true,
     "allDeclaredConstructors": true,
     "allDeclaredMethods": true
+  },
+  {
+    "name": "com.asrevo.cvhome.gateway.filters.AddStoreParamGatewayFilterFactory",
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.asrevo.cvhome.gateway.filters.AddStoreParamGatewayFilterFactory$Config",
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
   }
 ]
