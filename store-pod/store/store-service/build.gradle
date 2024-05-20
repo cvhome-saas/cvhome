@@ -2,7 +2,8 @@ plugins {
     id 'com.asrevo.java-application-conventions'
     id 'org.springframework.boot' version '3.3.0'
     id 'io.spring.dependency-management' version '1.1.4'
-//    id 'org.graalvm.buildtools.native' version '0.10.2'
+    id 'org.hibernate.orm' version '6.4.4.Final'
+    id 'org.graalvm.buildtools.native' version '0.10.2'
 }
 apply from: "$rootDir/helpers/common-methods.gradle"
 group = 'com.asrevo.cvhome'
@@ -85,5 +86,15 @@ dependencies {
 dependencyManagement {
     imports {
         mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
+
+tasks.withType(org.springframework.boot.gradle.tasks.aot.ProcessAot).configureEach {
+    args('--spring.profiles.active=lcl')
+}
+
+hibernate {
+    enhancement {
+        enableAssociationManagement = true
     }
 }
