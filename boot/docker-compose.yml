@@ -50,9 +50,9 @@ services:
 #      - "14250:14250"
 #  otel-collector:
 #    image: otel/opentelemetry-collector-contrib:0.80.0
-#    command: ["--config=/etc/logging-otel-collector-config.yaml"]
+#    command: ["--config=/etc/logging-otel-collector-config.yml"]
 #    volumes:
-#      - ./logging-otel-collector-config.yaml:/etc/logging-otel-collector-config.yaml
+#      - ./logging-otel-collector-config.yml:/etc/logging-otel-collector-config.yml
 #    ports:
 #      - "4317:4317"
 #      - "4318:4318"
