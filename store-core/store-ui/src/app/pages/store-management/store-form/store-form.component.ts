@@ -45,6 +45,12 @@ export class StoreFormComponent implements OnInit {
     },
     {
       id: '2',
+      title: 'Store domain',
+      key: 'COMPONENTS.STORE_DOMAIN',
+      link: 'store-domain'
+    },
+    {
+      id: '3',
       title: 'Store details',
       key: 'COMPONENTS.STORE_DETAILS',
       link: 'store'

@@ -1,16 +1,16 @@
 package com.asrevo.cvhome.manager.controller;
 
+import com.asrevo.cvhome.commons.annotation.OrgStorePrincipalInfo;
 import com.asrevo.cvhome.commons.domain.Domain;
 import com.asrevo.cvhome.commons.domain.ManagerStoreId;
+import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
 import com.asrevo.cvhome.manager.service.RouterService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -31,4 +31,20 @@ public class RouterController {
     public ManagerStoreId getAllocationByDomain(@RequestParam Domain domain) {
         return routerService.getReferenceByDomain(domain);
     }
+
+    @GetMapping("allocates")
+    public List<Domain> allocates(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store) {
+        return routerService.allocations(store);
+    }
+
+    @PostMapping("allocate")
+    public void allocate(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store, Domain domain) {
+        routerService.create(domain,store);
+    }
+
+    @DeleteMapping("remove")
+    public void remove(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store, Domain domain) {
+        routerService.remove(domain, store);
+    }
+
 }

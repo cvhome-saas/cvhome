@@ -1,0 +1,124 @@
+<nb-card class="page-card">
+  <div *ngIf="loading" [nbSpinner]="loading" class="loading-block" nbSpinnerSize="large" nbSpinnerStatus="primary">
+  </div>
+  <nb-card-body *ngIf="!loading">
+    <div class="inner_pages_legacy">
+      <nb-card-header class="main_header">
+        <h1 class="page_title">{{ 'STORE.STORE_DOMAIN' | translate }}</h1>
+        <div class="content_spacing">
+          <nb-select [(selected)]="selectedItem" outline shape="rectangle">
+            <nb-option (click)="route(item.link)" *ngFor="let item of sidemenuLinks" [value]="item.id">{{ item.title }}
+            </nb-option>
+          </nb-select>
+        </div>
+
+        <div class="content_spacing">
+
+        </div>
+
+      </nb-card-header>
+      <ngx-datatable
+        (page)="setPage($event)"
+        [columnMode]="ColumnMode.force"
+        [count]="page.totalElements"
+        [externalPaging]="true"
+        [footerHeight]="50"
+        [headerHeight]="50"
+        [limit]="page.size"
+        [offset]="page.pageNumber"
+        [rows]="rows"
+        class="material"
+        rowHeight="auto">
+
+
+        <ngx-datatable-column name="domain">
+          <ng-template let-column="column" ngx-datatable-header-template> {{ 'CONTENT.DOMAIN' |translate }}
+          </ng-template>
+          <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+            {{ row.domain }}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="actions">
+          <ng-template let-column="column" ngx-datatable-header-template>
+            {{ 'ORDER.ACTIONS' |translate }}
+          </ng-template>
+          <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+            <button (click)="onDelete(row.domain)" nbButton shape="round" size="small" status="danger">
+              <i class="nb-trash"></i></button>
+          </ng-template>
+        </ngx-datatable-column>
+      </ngx-datatable>
+
+    </div>
+  </nb-card-body>
+</nb-card>
+
+
+
+
+
+
+<!--<div class="inner_pages product_group__create_page">
+  <form [formGroup]='form' class="productGroupForm">
+    <nb-card-header class="main_header">
+      <h1 class="page_title">{{ 'PRODUCT_GROUP.CREATE_PRODUCT_GROUP' | translate }}</h1>
+      <div class="content_spacing">
+        <button (click)="goToBack()" class="cancel_button" nbButton type="button">
+          {{ 'COMMON.CANCEL'| translate }}
+        </button>
+      </div>
+      <div class="content_spacing">
+        <button (click)="save()" *ngIf="!uniqueCode" [disabled]="!form.valid" [nbSpinner]="loading" class="success_button"
+                nbButton nbSpinnerSize="large" nbSpinnerStatus="control" type="submit">
+          {{ (!loading ? 'COMMON.SAVE' : '') | translate }}
+        </button>
+        <button (click)="update()" *ngIf="uniqueCode" class="success_button" nbButton type="button">
+          {{ 'COMMON.UPDATE'|translate }}
+        </button>
+      </div>
+    </nb-card-header>
+
+    &lt;!&ndash; <div [nbSpinner]="loading" nbSpinnerSize="large" nbSpinnerStatus="primary"> &ndash;&gt;
+
+
+    <nb-card class="nb-card inline-form-card">
+      <nb-card-body class="nb-card-body">
+        <div class="form-group">
+          <div class="col-sm-12">
+            <nb-checkbox formControlName='active'>
+              {{ 'COMMON.VISIBLE' | translate }}
+            </nb-checkbox>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="col-sm-10 col-form-label inputLabel" for="code">{{ 'COMMON.CODE' | translate }} *</label>
+          <div class="col-sm-12">
+            <input (change)="checkCode($event)" [readOnly]="uniqueCode" class="form-control inputText" formControlName='code'
+                   id="code" placeholder="{{ 'COMMON.CODE' | translate}}" required
+                   type="text">
+            <div *ngIf="(code.dirty || code.touched) && code.invalid && code" class="err-message">
+              <span *ngIf="code.errors.required">
+                {{ 'COMMON.CODE_REQUIRED' | translate }}
+              </span>
+              <span *ngIf="code.errors.pattern">
+                {{ 'COMMON.ALPHA_DECIMAL_RULE' | translate }}
+              </span>
+            </div>
+            <span *ngIf="!isCodeUnique" class="err-message">
+              {{ 'COMMON.CODE_EXISTS' | translate }}
+            </span>
+          </div>
+        </div>
+        <div class="col-sm-12">
+          <ngx-product-auto-complete (onProduct)="onItemSelect($event,uniqueCode)" [disabled]="uniqueCode==undefined"
+                                     [store]="params.store"></ngx-product-auto-complete>
+
+        </div>
+      </nb-card-body>
+    </nb-card>
+
+
+  </form>
+</div>-->

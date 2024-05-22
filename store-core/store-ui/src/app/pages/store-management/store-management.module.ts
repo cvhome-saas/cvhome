@@ -13,6 +13,7 @@ import {NbDialogModule} from '@nebular/theme';
 import {SharedModule} from "../shared/shared.module";
 import {StoreBrandingBannerComponent} from "./store-branding/store-branding-banner.componants";
 import {StoreBrandingLogoComponent} from "./store-branding/store-branding-logo.componants";
+import {StoreDomainComponent} from "./store-domain/store-domain.component";
 
 @NgModule({
   declarations: [
@@ -22,6 +23,7 @@ import {StoreBrandingLogoComponent} from "./store-branding/store-branding-logo.c
     StoresListComponent,
     StoreFormComponent,
     StoreBrandingComponent,
+    StoreDomainComponent,
     StoreFormComponent,
     StoreLandingPageComponent,
     StoreDetailInfoComponent,
