@@ -11,7 +11,7 @@ import {Router} from '@angular/router';
 export class StoreDetailInfoComponent implements OnInit {
   store;
   loadingInfo = false;
-  selectedItem = '2';
+  selectedItem = '3';
   sidemenuLinks = [
     {
       id: '0',
@@ -27,6 +27,12 @@ export class StoreDetailInfoComponent implements OnInit {
     },
     {
       id: '2',
+      title: 'Store domain',
+      key: 'COMPONENTS.STORE_DOMAIN',
+      link: 'store-domain'
+    },
+    {
+      id: '3',
       title: 'Store details',
       key: 'COMPONENTS.STORE_DETAILS',
       link: 'store'

@@ -9,6 +9,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @AllArgsConstructor
 public class RouterServiceImpl implements RouterService {
@@ -21,7 +23,18 @@ public class RouterServiceImpl implements RouterService {
     }
 
     @Override
-    public  ManagerStoreId getReferenceByDomain(Domain domain) {
+    public ManagerStoreId getReferenceByDomain(Domain domain) {
         return referenceAlisRepository.findByAlis(domain).map(ReferenceAlisEntity::getReference).orElseThrow(() -> new RuntimeException(domain.domain() + " not found"));
+    }
+
+    @Override
+    public List<Domain> allocations(ManagerStoreId store) {
+        return referenceAlisRepository.findByReference(store).stream().map(ReferenceAlisEntity::getAlis).toList();
+    }
+
+    @Transactional
+    @Override
+    public void remove(Domain domain, ManagerStoreId store) {
+        referenceAlisRepository.deleteDomain(domain.domain(), store.getId().toString());
     }
 }

@@ -32,9 +32,14 @@ export class StoreLandingPageComponent implements OnInit {
       title: 'Store home page',
       key: 'COMPONENTS.STORE_LANDING',
       link: 'store-landing'
+    },    {
+      id: '2',
+      title: 'Store domain',
+      key: 'COMPONENTS.STORE_DOMAIN',
+      link: 'store-domain'
     },
     {
-      id: '2',
+      id: '3',
       title: 'Store details',
       key: 'COMPONENTS.STORE_DETAILS',
       link: 'store'
