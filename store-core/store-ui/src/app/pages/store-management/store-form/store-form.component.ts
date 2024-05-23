@@ -29,7 +29,7 @@ export class StoreFormComponent implements OnInit {
   loading = false;
   isReadonlyName = false;
   isNameUnique = true;
-  selectedItem = '2';
+  selectedItem = '3';
   sidemenuLinks = [
     {
       id: '0',

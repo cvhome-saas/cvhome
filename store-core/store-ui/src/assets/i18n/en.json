@@ -181,7 +181,15 @@
     "STORE_INFORMATION": "Store information",
     "INFORMATION_TEXT": "Shop settings used for various functionality such us and store address. Various details also used for shipping costs and displayed in product details.",
     "MERCHANT_STORE": "Merchant store",
-    "SEARCH": "Search a store"
+    "SEARCH": "Search a store",
+    "STORE_DOMAIN": "Domain",
+    "ENTER_YOUR_DOMAIN": "Enter your domain",
+    "DOMAIN_PATTERN_INVALID": "Invalid domain",
+    "DOMAIN_REMOVED": "Domain removed successfully",
+    "ERROR_REMOVING_DOMAIN": "Error while removing domain",
+    "DOMAIN_CREATED": "Domain created successfully",
+    "ERROR_CREATING_DOMAIN": "Error while creating domain",
+    "SAVE": "Save"
   },
   "STORE_LANDING": {
     "LANDING_PAGE_TITLE": "Landing page title",

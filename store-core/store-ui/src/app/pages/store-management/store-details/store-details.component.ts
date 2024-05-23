@@ -10,7 +10,7 @@ import {StoreService} from '../services/store.service';
 export class StoreDetailsComponent implements OnInit {
   store: any;
   loading = false;
-  selectedItem = '2';
+  selectedItem = '3';
   sidemenuLinks = [
     {
       id: '0',

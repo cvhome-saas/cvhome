@@ -14,6 +14,7 @@ import {SharedModule} from "../shared/shared.module";
 import {StoreBrandingBannerComponent} from "./store-branding/store-branding-banner.componants";
 import {StoreBrandingLogoComponent} from "./store-branding/store-branding-logo.componants";
 import {StoreDomainComponent} from "./store-domain/store-domain.component";
+import {NgxFileDropModule} from "ngx-file-drop";
 
 @NgModule({
   declarations: [
@@ -34,6 +35,7 @@ import {StoreDomainComponent} from "./store-domain/store-domain.component";
     StoreManagementRoutingModule,
     SharedModule,
     NbDialogModule.forChild(),
+    NgxFileDropModule,
   ]
 })
 export class StoreManagementModule {

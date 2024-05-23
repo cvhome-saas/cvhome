@@ -1,11 +1,12 @@
 import {Component, OnInit} from '@angular/core';
-import {FormBuilder, FormGroup} from '@angular/forms';
+import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {ActivatedRoute, Router} from '@angular/router';
 import {StoreService} from '../services/store.service';
 import {NbToastrService} from "@nebular/theme";
 import {TranslateService} from '@ngx-translate/core';
 import {Page} from "../../shared/models/Page";
 import {ColumnMode} from "@swimlane/ngx-datatable";
+import {validators} from "../../shared/validation/validators";
 
 @Component({
   selector: 'ngx-store-domain',
@@ -13,15 +14,15 @@ import {ColumnMode} from "@swimlane/ngx-datatable";
   styleUrls: ['./store-domain.component.scss']
 })
 export class StoreDomainComponent implements OnInit {
+  isSubmited=false
   code;
   loading = false;
-  loadingButton = false;
   page: Page = new Page();
   rows = [];
   perPage = 10;
   currentPage = 2;
   protected readonly ColumnMode = ColumnMode;
-  selectedItem = '0';
+  selectedItem = '2';
   sidemenuLinks = [
     {
       id: '0',
@@ -55,7 +56,7 @@ export class StoreDomainComponent implements OnInit {
 
   constructor(
     private storeService: StoreService,
-    private formBuilder: FormBuilder,
+    private fb: FormBuilder,
     private toastr: NbToastrService,
     private translate: TranslateService,
     private router: Router,
@@ -64,12 +65,9 @@ export class StoreDomainComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.loading = true;
     this.code = this.activatedRoute.snapshot.paramMap.get('code');
+    this.createForm();
     this.getAllocations();
-    // this.storeService.allocateDomain(this.code,'another.com').subscribe(it => {
-    //   console.log(it);
-    // })
   }
 
   route(link) {
@@ -82,20 +80,77 @@ export class StoreDomainComponent implements OnInit {
   }
 
   getAllocations() {
-    this.storeService.getAllocations(this.code).subscribe(it => {
-      this.loading = false;
-      if (it && it.length > 0) {
-        this.rows = it
-        this.page.totalPages = 1
-        this.page.totalElements = it.length
-        this.page.size = it.length
+    this.loading = true;
+    this.storeService.getAllocations(this.code).subscribe({
+      next: (it) => {
+        this.loading = false;
+        if (it && it.length > 0) {
+          this.rows = it
+          this.page.totalPages = 1
+          this.page.totalElements = it.length
+          this.page.size = it.length
+        }
+      },
+      error: (err) => {
+        this.loading = false;
       }
     });
   }
 
-  onDelete(domain) {
-    this.storeService.removeDomain(this.code,domain).subscribe(it => {
-      console.log(it);
-    })
+  onDelete(domain: string) {
+    this.loading = true;
+    this.storeService.removeDomain(this.code, domain).subscribe({
+        next: (it) => {
+          this.loading = false;
+          this.toastr.success(this.translate.instant('STORE.DOMAIN_REMOVED'));
+          this.getAllocations();
+        },
+        error: (err) => {
+          this.loading = false;
+          this.toastr.success(this.translate.instant('STORE.ERROR_REMOVING_DOMAIN'));
+        }
+      }
+    )
   }
+
+  createDomain(domain: string) {
+    this.loading = true;
+    this.storeService.allocateDomain(this.code, domain).subscribe({
+        next: (it) => {
+          this.loading = false;
+          this.toastr.success(this.translate.instant('STORE.DOMAIN_CREATED'));
+          this.getAllocations();
+        },
+        error: (err) => {
+          this.loading = false;
+          this.toastr.success(this.translate.instant('STORE.ERROR_CREATING_DOMAIN'));
+        },
+        complete: () => {
+          this.form.reset();
+        }
+      }
+    )
+  }
+
+  private createForm() {
+    this.form = this.fb.group({
+      domain: ['', [Validators.required, Validators.pattern(validators.domainPattern)]],
+    });
+  }
+
+  save() {
+    this.isSubmited = true;
+    this.form.markAllAsTouched();
+    if (!this.form.valid) {
+      return;
+    }
+    const object = this.form.value;
+    this.createDomain(object.domain)
+  }
+
+
+  get domain() {
+    return this.form.get('domain');
+  }
+
 }

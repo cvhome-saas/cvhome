@@ -29,7 +29,7 @@ public class RouterServiceImpl implements RouterService {
 
     @Override
     public List<Domain> allocations(ManagerStoreId store) {
-        return referenceAlisRepository.findByReference(store).stream().map(it -> it.getAlis()).toList();
+        return referenceAlisRepository.findByReference(store).stream().map(ReferenceAlisEntity::getAlis).toList();
     }
 
     @Transactional

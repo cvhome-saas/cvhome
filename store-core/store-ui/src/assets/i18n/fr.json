@@ -181,7 +181,15 @@
     "STORE_INFORMATION": "Informations sur le magasin",
     "INFORMATION_TEXT": "Paramètres de boutique utilisés pour diverses fonctionnalités telles que nous et l'adresse du magasin. Différents détails sont également utilisés pour les frais d'expédition et affichés dans les détails du produit.",
     "MERCHANT_STORE": "Marchand",
-    "SEARCH": "Rechercher"
+    "SEARCH": "Rechercher",
+    "STORE_DOMAIN": "Domaine",
+    "ENTER_YOUR_DOMAIN": "Entrez votre domaine",
+    "DOMAIN_PATTERN_INVALID": "Domaine invalide",
+    "DOMAIN_REMOVED": "Domaine supprimé avec succès",
+    "ERROR_REMOVING_DOMAIN": "Erreur lors de la suppression du domaine",
+    "DOMAIN_CREATED": "Domaine créé avec succès",
+    "ERROR_CREATING_DOMAIN": "Erreur lors de la création du domaine",
+    "SAVE": "Sauvegarder"
   },
   "STORE_LANDING": {
     "LANDING_PAGE_TITLE": "Titre de la page de destination",
