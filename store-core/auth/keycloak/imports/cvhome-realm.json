@@ -47,24 +47,6 @@
   "roles": {
     "realm": [
       {
-        "id": "8f4501b1-48f1-4477-8a2f-2da69e09cddc",
-        "name": "ROLE_ADMIN",
-        "description": "",
-        "composite": false,
-        "clientRole": false,
-        "containerId": "c4e1ca23-4168-4488-88b3-dc009dea7b85",
-        "attributes": {}
-      },
-      {
-        "id": "b4b43bb1-a0eb-4127-a01d-6bb9516461e9",
-        "name": "ROLE_MICROSERVICE_USER",
-        "description": "",
-        "composite": false,
-        "clientRole": false,
-        "containerId": "c4e1ca23-4168-4488-88b3-dc009dea7b85",
-        "attributes": {}
-      },
-      {
         "id": "ebdff57e-a18f-45d2-bcb8-038e5ca2c20b",
         "name": "cvhome-admin",
         "description": "",
@@ -145,26 +127,8 @@
         "attributes": {}
       },
       {
-        "id": "e7dcc9b1-44e4-49e1-9278-620d73b17195",
-        "name": "ROLE_MICROSERVICE_CERTIFICATE_MANAGER",
-        "description": "",
-        "composite": false,
-        "clientRole": false,
-        "containerId": "c4e1ca23-4168-4488-88b3-dc009dea7b85",
-        "attributes": {}
-      },
-      {
         "id": "b86bc209-cec9-40fc-92fe-73866cb7a398",
         "name": "ROLE_ORG_ADMIN",
-        "description": "",
-        "composite": false,
-        "clientRole": false,
-        "containerId": "c4e1ca23-4168-4488-88b3-dc009dea7b85",
-        "attributes": {}
-      },
-      {
-        "id": "bf10d7a3-60e5-450b-93b8-e6c60ed041bf",
-        "name": "ROLE_MICROSERVICE_GATEWAY",
         "description": "",
         "composite": false,
         "clientRole": false,
@@ -228,15 +192,6 @@
       {
         "id": "720ead53-5e82-4ed4-b7c1-a0713b0f10c4",
         "name": "ROLE_CUSTOMER",
-        "description": "",
-        "composite": false,
-        "clientRole": false,
-        "containerId": "c4e1ca23-4168-4488-88b3-dc009dea7b85",
-        "attributes": {}
-      },
-      {
-        "id": "0c6c2622-4f22-4208-8de2-e2429353fecd",
-        "name": "ROLE_USER",
         "description": "",
         "composite": false,
         "clientRole": false,
@@ -640,36 +595,13 @@
       "clientRoles": {}
     },
     {
-      "id": "007fb261-3d1c-4e96-889b-0935495c5091",
-      "name": "admin",
-      "path": "/admin",
-      "subGroups": [],
-      "attributes": {},
-      "realmRoles": [
-        "ROLE_ADMIN",
-        "ROLE_USER"
-      ],
-      "clientRoles": {}
-    },
-    {
       "id": "cbc43d1f-54f9-4fb7-93c5-166780785f54",
-      "name": "microservice",
-      "path": "/microservice",
+      "name": "MICROSERVICE",
+      "path": "/MICROSERVICE",
       "subGroups": [],
       "attributes": {},
       "realmRoles": [
         "ROLE_MICROSERVICE"
-      ],
-      "clientRoles": {}
-    },
-    {
-      "id": "4b3f7a0e-59cf-4c9c-b52f-bc626cfc566f",
-      "name": "user",
-      "path": "/user",
-      "subGroups": [],
-      "attributes": {},
-      "realmRoles": [
-        "ROLE_USER"
       ],
       "clientRoles": {}
     }
@@ -755,66 +687,6 @@
       ]
     },
     {
-      "id": "4003ef66-915e-47f5-9e01-6eb8dbbee38c",
-      "username": "microservice-dcm",
-      "firstName": "",
-      "lastName": "",
-      "emailVerified": false,
-      "createdTimestamp": 1692367604799,
-      "enabled": true,
-      "totp": false,
-      "credentials": [
-        {
-          "id": "9175ec8f-3bae-4f4c-b1b5-0e431da3d012",
-          "type": "password",
-          "userLabel": "My password",
-          "createdDate": 1692367688110,
-          "secretData": "{\"value\":\"b4m6Qz9U7jEf9O/r5+cHSnpeFW+4QiMD/3Ll/ZgFlg8=\",\"salt\":\"lJKDqCti8FFXtNMEt8R6rQ==\",\"additionalParameters\":{}}",
-          "credentialData": "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}"
-        }
-      ],
-      "disableableCredentialTypes": [],
-      "requiredActions": [],
-      "realmRoles": [
-        "default-roles-cvhome",
-        "ROLE_MICROSERVICE_CERTIFICATE_MANAGER"
-      ],
-      "notBefore": 0,
-      "groups": [
-        "/microservice"
-      ]
-    },
-    {
-      "id": "9f9c63a1-cab9-4396-9be2-e52441eecb8b",
-      "username": "microservice-domain-ownership",
-      "firstName": "",
-      "lastName": "",
-      "emailVerified": false,
-      "createdTimestamp": 1692367580050,
-      "enabled": true,
-      "totp": false,
-      "credentials": [
-        {
-          "id": "20b337cd-f81d-4db4-b5f4-4d128acaf2ce",
-          "type": "password",
-          "userLabel": "My password",
-          "createdDate": 1692367664250,
-          "secretData": "{\"value\":\"X63n91+yjzBfHd82zHR/P5u2wyxYQ8foc42PdMdNBCw=\",\"salt\":\"xzjsIQOt7RgYrWjOiW7R6w==\",\"additionalParameters\":{}}",
-          "credentialData": "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}"
-        }
-      ],
-      "disableableCredentialTypes": [],
-      "requiredActions": [],
-      "realmRoles": [
-        "ROLE_MICROSERVICE_USER",
-        "default-roles-cvhome"
-      ],
-      "notBefore": 0,
-      "groups": [
-        "/microservice"
-      ]
-    },
-    {
       "id": "fcad941c-aea5-426f-8f17-428add82aeb1",
       "username": "microservice-gateway",
       "firstName": "",
@@ -836,12 +708,11 @@
       "disableableCredentialTypes": [],
       "requiredActions": [],
       "realmRoles": [
-        "default-roles-cvhome",
-        "ROLE_MICROSERVICE_GATEWAY"
+        "default-roles-cvhome"
       ],
       "notBefore": 0,
       "groups": [
-        "/microservice"
+        "/MICROSERVICE"
       ]
     },
     {
@@ -866,7 +737,6 @@
       "disableableCredentialTypes": [],
       "requiredActions": [],
       "realmRoles": [
-        "cvhome-admin",
         "default-roles-cvhome"
       ],
       "notBefore": 0,
@@ -1036,7 +906,6 @@
       "disableableCredentialTypes": [],
       "requiredActions": [],
       "realmRoles": [
-        "cvhome-admin",
         "default-roles-cvhome"
       ],
       "notBefore": 0,
