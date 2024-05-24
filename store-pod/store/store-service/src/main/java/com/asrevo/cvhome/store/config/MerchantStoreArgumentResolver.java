@@ -18,7 +18,7 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 
 import java.util.Optional;
 
-import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_STORE;
+import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1;
 
 
 @Component
@@ -43,7 +43,7 @@ public class MerchantStoreArgumentResolver implements HandlerMethodArgumentResol
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
                                   NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
         String storeCode = Optional.ofNullable(webRequest.getParameter(REQUEST_PARAMETER_STORE))
-                .filter(StringUtils::isNotBlank).orElse(DEFAULT_STORE);
+                .filter(StringUtils::isNotBlank).orElse(DEFAULT_ORG1_STORE1);
         // todo get from cache
 
         if (parameter.hasParameterAnnotation(SecuredResource.class)) {

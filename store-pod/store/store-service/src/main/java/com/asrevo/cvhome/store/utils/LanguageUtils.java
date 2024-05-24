@@ -24,7 +24,7 @@ import org.springframework.web.servlet.support.RequestContextUtils;
 import java.util.Locale;
 import java.util.Optional;
 
-import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_STORE;
+import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1;
 
 
 @Component
@@ -150,7 +150,7 @@ public class LanguageUtils {
             if (StringUtils.isBlank(lang)) {
                 if (language == null) {
                     String storeValue = Optional.ofNullable(webRequest.getParameter(REQUEST_PARAMATER_STORE))
-                            .filter(StringUtils::isNotBlank).orElse(DEFAULT_STORE);
+                            .filter(StringUtils::isNotBlank).orElse(DEFAULT_ORG1_STORE1);
                     if (!StringUtils.isBlank(storeValue)) {
                         try {
                             MerchantStore storeModel = storeFacade.get(storeValue);

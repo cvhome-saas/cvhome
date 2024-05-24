@@ -37,7 +37,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_STORE;
+import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1;
 
 @Controller
 @RequestMapping("/api/v1")
@@ -68,7 +68,7 @@ public class ProductImageApi {
     @RequestMapping(value = {"/private/product/{id}/image", "/auth/product/{id}/image"}, consumes = {
             MediaType.MULTIPART_FORM_DATA_VALUE}, method = RequestMethod.POST)
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_STORE)),
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public void uploadImage(
@@ -199,7 +199,7 @@ public class ProductImageApi {
             @ApiResponse(responseCode = "200", description = "List of ProductImage found")})
     @ResponseBody
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_STORE)),
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public List<ReadableImage> images(
@@ -257,7 +257,7 @@ public class ProductImageApi {
     @RequestMapping(value = {"/private/product/{id}/image/{imageId}",
             "/auth/product/{id}/image"}, method = RequestMethod.PATCH)
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_STORE)),
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public void imageDetails(@PathVariable Long id, @PathVariable Long imageId,

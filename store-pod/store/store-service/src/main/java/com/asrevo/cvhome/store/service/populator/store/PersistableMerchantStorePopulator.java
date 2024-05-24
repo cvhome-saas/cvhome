@@ -100,15 +100,12 @@ public class PersistableMerchantStorePopulator extends AbstractDataPopulator<Per
             if (source.getRetailerStore().equals(source.getCode())) {
                 throw new ConversionException("Parent store [" + source.getRetailerStore() + "] cannot be parent of current store");
             }
-            try {
-                MerchantStore parent = merchantStoreService.getByCode(source.getRetailerStore());
-                if (parent == null) {
-                    throw new ConversionException("Parent store [" + source.getRetailerStore() + "] does not exist");
-                }
-                target.setParent(parent);
-            } catch (ServiceException e) {
-                throw new ConversionException(e);
+            MerchantStore parent = merchantStoreService.getByCode(source.getRetailerStore());
+            if (parent == null) {
+                throw new ConversionException("Parent store [" + source.getRetailerStore() + "] does not exist");
             }
+            target.setParent(parent);
+
         }
 
 

@@ -48,13 +48,18 @@ public class MerchantStoreServiceImpl extends SalesManagerEntityServiceImpl<Inte
      * cache moved in facades
      */
     //@Cacheable(value = "store")
-    public MerchantStore getByCode(String code) throws ServiceException {
+    public MerchantStore getByCode(String code)  {
         return merchantRepository.findByCode(code);
     }
 
     @Override
     public MerchantStore getDefaultStore() {
-        return merchantRepository.findByCode(Constants.DEFAULT_STORE);
+        return merchantRepository.findByCode(Constants.DEFAULT_ORG1_STORE1);
+    }
+
+    @Override
+    public List<MerchantStore> getDefaultStores() {
+        return Constants.DEFAULT_STORES.stream().map(this::getByCode).toList();
     }
 
     @Override

@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_STORE;
+import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1;
 
 /**
  * Used for product grouping such as featured items
@@ -52,7 +52,7 @@ public class ProductGroupApi {
     @Operation(method = "POST", description = "Create product group", summary = "",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ProductGroup.class))))
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_STORE)),
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public @ResponseBody ProductGroup creteGroup(
@@ -71,7 +71,7 @@ public class ProductGroupApi {
     @Operation(method = "PATCH", description = "Update product group visible flag", summary = "",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ProductGroup.class))))
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_STORE)),
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public void updateGroup(
@@ -89,7 +89,7 @@ public class ProductGroupApi {
     @GetMapping("/private/product/groups")
     @Operation(method = "GET", description = "Get products groups for a given merchant", summary = "", responses = @ApiResponse(content = @Content(schema = @Schema(implementation = List.class))))
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_STORE)),
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public @ResponseBody java.util.List<ProductGroup> list(
@@ -121,7 +121,7 @@ public class ProductGroupApi {
     @Operation(method = "GET", description = "Get products by group code", summary = "",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ReadableProductList.class))))
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_STORE)),
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public @ResponseBody ReadableProductList getProductItemsByGroup(
@@ -151,7 +151,7 @@ public class ProductGroupApi {
     @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(value = "/private/products/{productId}/group/{code}", method = RequestMethod.POST)
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_STORE)),
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public @ResponseBody ReadableProductList addProductToGroup(
@@ -195,7 +195,7 @@ public class ProductGroupApi {
             value = "/private/products/{productId}/group/{code}",
             method = RequestMethod.DELETE)
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_STORE)),
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public @ResponseBody ReadableProductList removeProductFromGroup(
@@ -236,7 +236,7 @@ public class ProductGroupApi {
     @Operation(method = "DELETE", description = "Delete product group by group code", summary = "",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = EntityExists.class))))
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_STORE)),
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public void deleteGroup(

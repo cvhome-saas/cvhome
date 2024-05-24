@@ -37,7 +37,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_STORE;
+import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1;
 
 @Service("storeFacade")
 @Slf4j
@@ -67,21 +67,14 @@ public class StoreFacadeImpl implements StoreFacade {
     public MerchantStore getByCode(HttpServletRequest request) {
         String code = request.getParameter("store");
         if (StringUtils.isEmpty(code)) {
-            code = DEFAULT_STORE;
+            code = DEFAULT_ORG1_STORE1;
         }
         return get(code);
     }
 
     @Override
     public MerchantStore get(String code) {
-        try {
-            MerchantStore store = merchantStoreService.getByCode(code);
-            return store;
-        } catch (ServiceException e) {
-            log.error("Error while getting MerchantStore", e);
-            throw new ServiceRuntimeException(e);
-        }
-
+        return merchantStoreService.getByCode(code);
     }
 
     @Override
@@ -114,11 +107,7 @@ public class StoreFacadeImpl implements StoreFacade {
 
     @Override
     public boolean existByCode(String code) {
-        try {
-            return merchantStoreService.getByCode(code) != null;
-        } catch (ServiceException e) {
-            throw new ServiceRuntimeException(e);
-        }
+        return merchantStoreService.getByCode(code) != null;
     }
 
     private ReadableMerchantStore convertMerchantStoreToReadableMerchantStore(Language language, MerchantStore store) {
@@ -267,7 +256,7 @@ public class StoreFacadeImpl implements StoreFacade {
     @Override
     public void delete(String code) {
 
-        if (DEFAULT_STORE.equals(code.toUpperCase())) {
+        if (DEFAULT_ORG1_STORE1.equals(code.toUpperCase())) {
             throw new ServiceRuntimeException("Cannot remove default store");
         }
 
@@ -591,11 +580,7 @@ public class StoreFacadeImpl implements StoreFacade {
         }
 
         //refresh
-        try {
-            store = merchantStoreService.getByCode(store.getCode());
-        } catch (ServiceException e) {
-            throw new ServiceRuntimeException("An exception occured when getting store [" + store.getCode() + "]");
-        }
+        store = merchantStoreService.getByCode(store.getCode());
 
         if (store != null) {
             return store.getLanguages();

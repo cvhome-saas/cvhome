@@ -13,9 +13,11 @@ import java.util.Optional;
 public interface MerchantStoreService extends SalesManagerEntityService<Integer, MerchantStore> {
 
 
-    MerchantStore getByCode(String code) throws ServiceException;
+    MerchantStore getByCode(String code);
 
     MerchantStore getDefaultStore();
+
+    List<MerchantStore> getDefaultStores();
 
     MerchantStore getParent(String code) throws ServiceException;
 

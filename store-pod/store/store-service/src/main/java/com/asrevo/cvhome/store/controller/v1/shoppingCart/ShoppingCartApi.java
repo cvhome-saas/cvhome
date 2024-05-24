@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
 
-import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_STORE;
+import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Controller
@@ -57,7 +57,7 @@ public class ShoppingCartApi {
     @PostMapping(value = "/cart")
     @Operation(method = "POST", description = "Add product to shopping cart when no cart exists, this will create a new cart id", summary = "No customer ID in scope. Add to cart for non authenticated users, as simple as {\"product\":1232,\"quantity\":1}")
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_STORE)),
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public @ResponseBody ReadableShoppingCart addToCart(
@@ -70,7 +70,7 @@ public class ShoppingCartApi {
     @PutMapping(value = "/cart/{code}")
     @Operation(method = "PUT", description = "Add to an existing shopping cart or modify an item quantity", summary = "No customer ID in scope. Modify cart for non authenticated users, as simple as {\"product\":1232,\"quantity\":0} for instance will remove item 1234 from cart")
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_STORE)),
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public ResponseEntity<ReadableShoppingCart> modifyCart(
@@ -103,7 +103,7 @@ public class ShoppingCartApi {
     @PostMapping(value = "/cart/{code}/promo/{promo}")
     @Operation(method = "POST", description = "Add promo / coupon to an existing cart")
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_STORE)),
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public ResponseEntity<ReadableShoppingCart> modifyCart(
@@ -136,7 +136,7 @@ public class ShoppingCartApi {
     @PostMapping(value = "/cart/{code}/multi", consumes = {"application/json"}, produces = {"application/json"})
     @Operation(method = "POST", description = "Add to an existing shopping cart or modify an item quantity", summary = "No customer ID in scope. Modify cart for non authenticated users, as simple as {\"product\":1232,\"quantity\":0} for instance will remove item 1234 from cart")
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_STORE)),
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public ResponseEntity<ReadableShoppingCart> modifyCart(
@@ -165,7 +165,7 @@ public class ShoppingCartApi {
     @RequestMapping(value = "/cart/{code}", method = RequestMethod.GET)
     @Operation(method = "GET", description = "Get a chopping cart by code", summary = "")
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_STORE)),
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public @ResponseBody ReadableShoppingCart getByCode(@PathVariable String code,
@@ -197,7 +197,7 @@ public class ShoppingCartApi {
     @RequestMapping(value = "/customers/{id}/cart", method = RequestMethod.POST)
     @Operation(method = "POST", description = "Add product to a specific customer shopping cart", summary = "")
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_STORE)),
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public @ResponseBody ReadableShoppingCart addToCart(@PathVariable Long id,
@@ -211,7 +211,7 @@ public class ShoppingCartApi {
     @DeleteMapping(value = "/cart/{code}/product/{sku}", produces = {APPLICATION_JSON_VALUE})
     @Operation(method = "DELETE", description = "Remove a product from a specific cart", summary = "If body set to true returns remaining cart in body, empty cart gives empty body. If body set to false no body ")
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_STORE)),
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)),
             @Parameter(name = "body", schema = @Schema(name = "body", type = "boolean", defaultValue = "false"))
     })
