@@ -658,33 +658,26 @@
   "webAuthnPolicyPasswordlessExtraOrigins": [],
   "users": [
     {
-      "id": "4003ef66-915e-47f5-9e01-6eb8dbbee33c",
-      "username": "super-admin",
-      "firstName": "",
-      "lastName": "",
-      "emailVerified": false,
-      "createdTimestamp": 1692367604799,
-      "enabled": true,
-      "totp": false,
-      "credentials": [
-        {
-          "id": "9175ec8f-3bae-4f4c-b1b5-0e431da3d000",
-          "type": "password",
-          "userLabel": "My password",
-          "createdDate": 1692367688110,
-          "secretData": "{\"value\":\"el3B0tq1QlLD2tQEGqoWfdwtn+4DJzssQ5VpjK4S97XmbyZEOemcc3QLpdvPcyqgKTsSYiA9ZJBfzJdYymdoyQ==\",\"salt\":\"428W8AW/sBWsRHeGZdt3DA==\",\"additionalParameters\":{}}",
-          "credentialData": "{\"hashIterations\":210000,\"algorithm\":\"pbkdf2-sha512\",\"additionalParameters\":{}}"
-        }
-      ],
-      "disableableCredentialTypes": [],
-      "requiredActions": [],
-      "realmRoles": [
-        "default-roles-cvhome"
-      ],
-      "notBefore": 0,
-      "groups": [
-        "/SUPER_ADMIN"
-      ]
+      "id" : "4003ef66-915e-47f5-9e01-6eb8dbbee33c",
+      "username" : "super-admin",
+      "firstName" : "",
+      "lastName" : "",
+      "emailVerified" : false,
+      "createdTimestamp" : 1692367604799,
+      "enabled" : true,
+      "totp" : false,
+      "credentials" : [ {
+        "id" : "9175ec8f-3bae-4f4c-b1b5-0e431da3d000",
+        "type" : "password",
+        "createdDate" : 1716588521981,
+        "secretData" : "{\"value\":\"ZAc/MpJfs7AWto7hvlsB6nVOyYpD7OfUmvBF2AcAZKHB0NPt1XAn59wtq2h/HvpgESP4bY8PEfQ3B29az6Dwng==\",\"salt\":\"rGC0D+u8mL8PtBwJZDVq+g==\",\"additionalParameters\":{}}",
+        "credentialData" : "{\"hashIterations\":210000,\"algorithm\":\"pbkdf2-sha512\",\"additionalParameters\":{}}"
+      } ],
+      "disableableCredentialTypes" : [ ],
+      "requiredActions" : [ ],
+      "realmRoles" : [ "default-roles-cvhome" ],
+      "notBefore" : 0,
+      "groups" : [ "/SUPER_ADMIN" ]
     },
     {
       "id": "fcad941c-aea5-426f-8f17-428add82aeb1",
