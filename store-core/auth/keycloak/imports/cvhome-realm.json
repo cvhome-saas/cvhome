@@ -740,8 +740,8 @@
           "type": "password",
           "userLabel": "My password",
           "createdDate": 1692367688110,
-          "secretData": "{\"value\":\"b4m6Qz9U7jEf9O/r5+cHSnpeFW+4QiMD/3Ll/ZgFlg8=\",\"salt\":\"lJKDqCti8FFXtNMEt8R6rQ==\",\"additionalParameters\":{}}",
-          "credentialData": "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}"
+          "secretData": "{\"value\":\"el3B0tq1QlLD2tQEGqoWfdwtn+4DJzssQ5VpjK4S97XmbyZEOemcc3QLpdvPcyqgKTsSYiA9ZJBfzJdYymdoyQ==\",\"salt\":\"428W8AW/sBWsRHeGZdt3DA==\",\"additionalParameters\":{}}",
+          "credentialData": "{\"hashIterations\":210000,\"algorithm\":\"pbkdf2-sha512\",\"additionalParameters\":{}}"
         }
       ],
       "disableableCredentialTypes": [],
