@@ -75,7 +75,7 @@ public class ManufacturerServiceImpl extends SalesManagerEntityServiceImpl<Long,
 
 
         if (manufacturer.getDescriptions() == null) {
-            manufacturer.setDescriptions(new HashSet<ManufacturerDescription>());
+            manufacturer.setDescriptions(new HashSet<>());
         }
 
         manufacturer.getDescriptions().add(description);

@@ -168,7 +168,7 @@ public class CategoryServiceImpl extends SalesManagerEntityServiceImpl<Long, Cat
         }
 
         List<CategoryDescription> descriptions = categoryDescriptionRepository.listByCategoryId(id);
-        Set<CategoryDescription> desc = new HashSet<CategoryDescription>(descriptions);
+        Set<CategoryDescription> desc = new HashSet<>(descriptions);
         category.setDescriptions(desc);
 
         return category;
