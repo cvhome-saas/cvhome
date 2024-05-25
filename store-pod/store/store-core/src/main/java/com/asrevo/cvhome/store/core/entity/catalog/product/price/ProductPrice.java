@@ -32,14 +32,14 @@ public class ProductPrice extends SalesManagerEntity<Long, ProductPrice> {
     private Long id;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "productPrice", cascade = CascadeType.ALL)
-    private Set<ProductPriceDescription> descriptions = new HashSet<ProductPriceDescription>();
+    private Set<ProductPriceDescription> descriptions = new HashSet<>();
 
     @NotEmpty
     @Pattern(regexp = "^[a-zA-Z0-9_]*$")
     @Column(name = "PRODUCT_PRICE_CODE", nullable = false)
     private String code = DEFAULT_PRICE_CODE;
 
-    @Column(name = "PRODUCT_PRICE_AMOUNT", nullable = true)
+    @Column(name = "PRODUCT_PRICE_AMOUNT")
     private BigDecimal productPriceAmount = new BigDecimal(0);
 
     @Column(name = "PRODUCT_PRICE_TYPE", length = 20)
@@ -65,7 +65,7 @@ public class ProductPrice extends SalesManagerEntity<Long, ProductPrice> {
     @JoinColumn(name = "PRODUCT_AVAIL_ID", nullable = false)
     private ProductAvailability productAvailability;
 
-    @Column(name = "PRODUCT_IDENTIFIER_ID", nullable = true)
+    @Column(name = "PRODUCT_IDENTIFIER_ID")
     private Long productIdentifierId;
 
     public ProductPrice() {

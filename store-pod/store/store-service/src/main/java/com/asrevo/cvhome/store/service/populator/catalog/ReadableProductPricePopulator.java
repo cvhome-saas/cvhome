@@ -58,7 +58,7 @@ public class ReadableProductPricePopulator extends
             }
 
             if (source.getDescriptions() != null && !source.getDescriptions().isEmpty()) {
-                List<com.asrevo.cvhome.store.core.model.catalog.product.ProductPriceDescription> fulldescriptions = new ArrayList<com.asrevo.cvhome.store.core.model.catalog.product.ProductPriceDescription>();
+                List<com.asrevo.cvhome.store.core.model.catalog.product.ProductPriceDescription> fulldescriptions = new ArrayList<>();
 
                 Set<ProductPriceDescription> descriptions = source.getDescriptions();
                 ProductPriceDescription description = null;

@@ -50,20 +50,12 @@ public interface CategoryService extends SalesManagerEntityService<Long, Categor
     /**
      * Get root categories by store for a given language
      *
-     * @param store
-     * @param depth
-     * @param language
-     * @return
      */
     List<Category> getListByDepth(MerchantStore store, int depth, Language language);
 
     /**
      * Returns category hierarchy filter by featured
      *
-     * @param store
-     * @param depth
-     * @param language
-     * @return
      */
     List<Category> getListByDepthFilterByFeatured(MerchantStore store, int depth, Language language);
 
@@ -88,10 +80,6 @@ public interface CategoryService extends SalesManagerEntityService<Long, Categor
      * obj[1] = 35
      * ...
      *
-     * @param store
-     * @param categoryIds
-     * @return
-     * @throws ServiceException
      */
     List<Object[]> countProductsByCategories(MerchantStore store,
                                              List<Long> categoryIds) throws ServiceException;
@@ -101,10 +89,6 @@ public interface CategoryService extends SalesManagerEntityService<Long, Categor
     /**
      * Returns a list of Category by category code for a given language
      *
-     * @param store
-     * @param codes
-     * @param language
-     * @return
      */
     List<Category> listByCodes(MerchantStore store, List<String> codes,
                                Language language);
@@ -112,10 +96,6 @@ public interface CategoryService extends SalesManagerEntityService<Long, Categor
     /**
      * List of Category by id
      *
-     * @param store
-     * @param ids
-     * @param language
-     * @return
      */
     List<Category> listByIds(MerchantStore store, List<Long> ids,
                              Language language);
@@ -124,8 +104,6 @@ public interface CategoryService extends SalesManagerEntityService<Long, Categor
     /**
      * Returns Category with childs and descriptions
      *
-     * @param category
-     * @return
      */
     Category findById(Long category);
 

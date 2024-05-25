@@ -79,7 +79,7 @@ public class MerchantRepositoryImpl implements MerchantRepositoryCustom {
             return entityList;
 
 
-        } catch (jakarta.persistence.NoResultException ers) {
+        } catch (jakarta.persistence.NoResultException ignored) {
         } catch (Exception e) {
             log.error(e.getMessage());
             throw new ServiceException(e);

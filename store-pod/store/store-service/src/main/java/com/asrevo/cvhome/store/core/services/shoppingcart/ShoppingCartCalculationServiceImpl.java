@@ -53,11 +53,6 @@ public class ShoppingCartCalculationServiceImpl implements ShoppingCartCalculati
      * shopping cart.
      * </p>
      *
-     * @param cartModel
-     * @param customer
-     * @param store
-     * @param language
-     * @throws ServiceException
      * @see OrderServiceImpl
      */
     @Override
@@ -88,10 +83,6 @@ public class ShoppingCartCalculationServiceImpl implements ShoppingCartCalculati
      * shopping cart.
      * </p>
      *
-     * @param cartModel
-     * @param store
-     * @param language
-     * @throws ServiceException
      * @see OrderServiceImpl
      */
     @Override

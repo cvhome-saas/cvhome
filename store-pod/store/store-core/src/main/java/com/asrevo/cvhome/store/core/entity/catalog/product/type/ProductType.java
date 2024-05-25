@@ -34,7 +34,7 @@ public class ProductType extends SalesManagerEntity<Long, ProductType> implement
     private AuditSection auditSection = new AuditSection();
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "productType")
-    private Set<ProductTypeDescription> descriptions = new HashSet<ProductTypeDescription>();
+    private Set<ProductTypeDescription> descriptions = new HashSet<>();
 
     @Column(name = "PRD_TYPE_CODE")
     private String code;
@@ -46,7 +46,7 @@ public class ProductType extends SalesManagerEntity<Long, ProductType> implement
     private Boolean visible;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "MERCHANT_ID", nullable = true)
+    @JoinColumn(name = "MERCHANT_ID")
     private MerchantStore merchantStore;
 
     public ProductType() {

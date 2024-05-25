@@ -62,7 +62,7 @@ public class ProductItemsFacadeImpl implements ProductItemsFacade {
 
         ReadableProductPopulator populator = new ReadableProductPopulator();
         populator.setPricingService(pricingService);
-        populator.setimageUtils(imageUtils);
+        populator.setImageUtils(imageUtils);
 
 
         ReadableProductList productList = new ReadableProductList();
@@ -100,7 +100,7 @@ public class ProductItemsFacadeImpl implements ProductItemsFacade {
 
         ReadableProductPopulator populator = new ReadableProductPopulator();
         populator.setPricingService(pricingService);
-        populator.setimageUtils(imageUtils);
+        populator.setImageUtils(imageUtils);
 
 
         ReadableProductList productList = new ReadableProductList();
@@ -125,7 +125,7 @@ public class ProductItemsFacadeImpl implements ProductItemsFacade {
         List<ProductRelationship> groups = productRelationshipService.getByGroup(store, group, language);
 
         if (group != null) {
-            List<Long> ids = new ArrayList<Long>();
+            List<Long> ids = new ArrayList<>();
             for (ProductRelationship relationship : groups) {
                 Product product = relationship.getRelatedProduct();
                 ids.add(product.getId());
@@ -249,7 +249,7 @@ public class ProductItemsFacadeImpl implements ProductItemsFacade {
 
         List<ProductRelationship> relationships = productRelationshipService.getGroups(store);
 
-        List<ProductGroup> groups = new ArrayList<ProductGroup>();
+        List<ProductGroup> groups = new ArrayList<>();
 
         for (ProductRelationship relationship : relationships) {
 

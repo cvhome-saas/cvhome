@@ -48,11 +48,11 @@ public class ReadableInventoryMapper implements Mapper<ProductAvailability, Read
         Assert.notNull(source, "Source Product availability cannot be null");
 
         try {
-            destination.setQuantity(source.getProductQuantity() != null ? source.getProductQuantity().intValue() : 0);
+            destination.setQuantity(source.getProductQuantity() != null ? source.getProductQuantity() : 0);
             destination.setProductQuantityOrderMax(
-                    source.getProductQuantityOrderMax() != null ? source.getProductQuantityOrderMax().intValue() : 0);
+                    source.getProductQuantityOrderMax() != null ? source.getProductQuantityOrderMax() : 0);
             destination.setProductQuantityOrderMin(
-                    source.getProductQuantityOrderMin() != null ? source.getProductQuantityOrderMin().intValue() : 0);
+                    source.getProductQuantityOrderMin() != null ? source.getProductQuantityOrderMin() : 0);
             destination.setOwner(source.getOwner());
             destination.setId(source.getId());
             destination.setRegion(source.getRegion());
@@ -62,12 +62,12 @@ public class ReadableInventoryMapper implements Mapper<ProductAvailability, Read
                 if (source.getProductDateAvailable() != null) {
                     boolean isAfter = LocalDate.parse(DateUtil.getPresentDate())
                             .isAfter(LocalDate.parse(DateUtil.formatDate(source.getProductDateAvailable())));
-                    if (isAfter && source.getAvailable().booleanValue()) {
+                    if (isAfter && source.getAvailable()) {
                         destination.setAvailable(true);
                     }
                     destination.setDateAvailable(DateUtil.formatDate(source.getProductDateAvailable()));
                 } else {
-                    destination.setAvailable(source.getAvailable().booleanValue());
+                    destination.setAvailable(source.getAvailable());
                 }
             }
 
@@ -118,7 +118,7 @@ public class ReadableInventoryMapper implements Mapper<ProductAvailability, Read
             throws ConversionException {
 
         ReadableProductPricePopulator populator = null;
-        List<ReadableProductPrice> prices = new ArrayList<ReadableProductPrice>();
+        List<ReadableProductPrice> prices = new ArrayList<>();
 
         for (ProductPrice price : source.getPrices()) {
 

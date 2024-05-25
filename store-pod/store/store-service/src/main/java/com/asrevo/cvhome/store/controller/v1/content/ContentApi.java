@@ -54,24 +54,16 @@ public class ContentApi {
 
     private final ContentFacade contentFacade;
 
-    private final ImageFilePath imageUtils;
-
     public ContentApi(ContentFacade contentFacade, ImageFilePath imageUtils) {
         this.contentFacade = contentFacade;
-        this.imageUtils = imageUtils;
     }
 
     /**
      * List content pages
      *
-     * @param merchantStore
-     * @param language
-     * @param page
-     * @param count
-     * @return
      */
     @GetMapping(value = {"/private/content/pages", "/content/pages"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(method = "GET", description = "Get page names created for a given MerchantStore", summary = "", responses = @ApiResponse(content = @io.swagger.v3.oas.annotations.media.Content(schema = @Schema(implementation = List.class))))
+    @Operation(method = "GET", description = "Get page names created for a given MerchantStore", responses = @ApiResponse(content = @io.swagger.v3.oas.annotations.media.Content(schema = @Schema(implementation = List.class))))
     @Parameters({
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
@@ -87,7 +79,7 @@ public class ContentApi {
 
     @Deprecated
     @GetMapping(value = "/content/summary", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(method = "GET", description = "Get pages summary created for a given MerchantStore. Content summary is a content bux having code summary.", summary = "", responses = @ApiResponse(content = @Content(schema = @Schema(implementation = List.class))))
+    @Operation(method = "GET", description = "Get pages summary created for a given MerchantStore. Content summary is a content bux having code summary.", responses = @ApiResponse(content = @Content(schema = @Schema(implementation = List.class))))
     @Parameters({
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
@@ -102,12 +94,9 @@ public class ContentApi {
     /**
      * List all boxes
      *
-     * @param merchantStore
-     * @param language
-     * @return
      */
     @GetMapping(value = {"/content/boxes", "/private/content/boxes"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(method = "GET", description = "Get boxes for a given MerchantStore", summary = "", responses = @ApiResponse(content = @io.swagger.v3.oas.annotations.media.Content(schema = @Schema(implementation = List.class))))
+    @Operation(method = "GET", description = "Get boxes for a given MerchantStore", responses = @ApiResponse(content = @io.swagger.v3.oas.annotations.media.Content(schema = @Schema(implementation = List.class))))
     @Parameters({
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
@@ -124,13 +113,9 @@ public class ContentApi {
     /**
      * List specific content box
      *
-     * @param code
-     * @param merchantStore
-     * @param language
-     * @return
      */
     @GetMapping(value = "/content/pages/{code}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(method = "GET", description = "Get page content by code for a given MerchantStore", summary = "", responses = @ApiResponse(content = @io.swagger.v3.oas.annotations.media.Content(schema = @Schema(implementation = ReadableContentPage.class))))
+    @Operation(method = "GET", description = "Get page content by code for a given MerchantStore", responses = @ApiResponse(content = @io.swagger.v3.oas.annotations.media.Content(schema = @Schema(implementation = ReadableContentPage.class))))
     @Parameters({
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
@@ -145,13 +130,9 @@ public class ContentApi {
     /**
      * Get content page by name
      *
-     * @param name
-     * @param merchantStore
-     * @param language
-     * @return
      */
     @GetMapping(value = "/content/pages/name/{name}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(method = "GET", description = "Get page content by code for a given MerchantStore", summary = "", responses = @ApiResponse(content = @io.swagger.v3.oas.annotations.media.Content(schema = @Schema(implementation = ReadableContentPage.class))))
+    @Operation(method = "GET", description = "Get page content by code for a given MerchantStore", responses = @ApiResponse(content = @io.swagger.v3.oas.annotations.media.Content(schema = @Schema(implementation = ReadableContentPage.class))))
     @Parameters({
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
@@ -166,14 +147,10 @@ public class ContentApi {
     /**
      * Create content box
      *
-     * @param page
-     * @param merchantStore
-     * @param language
-     * @param pageCode
      */
     @PostMapping(value = "/private/content/box")
     @ResponseStatus(HttpStatus.CREATED)
-    @Operation(method = "POST", description = "Create content box", summary = "", responses = @ApiResponse(content = @io.swagger.v3.oas.annotations.media.Content(schema = @Schema(implementation = Entity.class))))
+    @Operation(method = "POST", description = "Create content box", responses = @ApiResponse(content = @io.swagger.v3.oas.annotations.media.Content(schema = @Schema(implementation = Entity.class))))
     @Parameters({
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
@@ -191,7 +168,7 @@ public class ContentApi {
 
     @GetMapping(value = "/private/content/box/{code}/exists")
     @ResponseStatus(HttpStatus.OK)
-    @Operation(method = "GET", description = "Check unique content box", summary = "", responses = @ApiResponse(content = @Content(schema = @Schema(implementation = EntityExists.class))))
+    @Operation(method = "GET", description = "Check unique content box", responses = @ApiResponse(content = @Content(schema = @Schema(implementation = EntityExists.class))))
     @Parameters({
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
@@ -208,7 +185,7 @@ public class ContentApi {
 
     @GetMapping(value = "/private/content/page/{code}/exists")
     @ResponseStatus(HttpStatus.OK)
-    @Operation(method = "GET", description = "Check unique content page", summary = "", responses = @ApiResponse(content = @io.swagger.v3.oas.annotations.media.Content(schema = @Schema(implementation = ResponseEntity.class))))
+    @Operation(method = "GET", description = "Check unique content page", responses = @ApiResponse(content = @io.swagger.v3.oas.annotations.media.Content(schema = @Schema(implementation = ResponseEntity.class))))
     @Parameters({
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
@@ -226,13 +203,10 @@ public class ContentApi {
     /**
      * Create content page
      *
-     * @param page
-     * @param merchantStore
-     * @param language
      */
     @PostMapping(value = "/private/content/page")
     @ResponseStatus(HttpStatus.CREATED)
-    @Operation(method = "POST", description = "Create content page", summary = "", responses = @ApiResponse(content = @io.swagger.v3.oas.annotations.media.Content(schema = @Schema(implementation = Entity.class))))
+    @Operation(method = "POST", description = "Create content page", responses = @ApiResponse(content = @io.swagger.v3.oas.annotations.media.Content(schema = @Schema(implementation = Entity.class))))
     @Parameters({
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
@@ -252,13 +226,10 @@ public class ContentApi {
     /**
      * Delete content page
      *
-     * @param id
-     * @param merchantStore
-     * @param language
      */
     @DeleteMapping(value = "/private/content/page/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @Operation(method = "DELETE", description = "Delete content page", summary = "", responses = @ApiResponse(content = @io.swagger.v3.oas.annotations.media.Content(schema = @Schema(implementation = Void.class))))
+    @Operation(method = "DELETE", description = "Delete content page", responses = @ApiResponse(content = @io.swagger.v3.oas.annotations.media.Content(schema = @Schema())))
     @Parameters({
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
@@ -275,13 +246,10 @@ public class ContentApi {
     /**
      * Delete content box
      *
-     * @param id
-     * @param merchantStore
-     * @param language
      */
     @DeleteMapping(value = "/private/content/box/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @Operation(method = "DELETE", description = "Delete content box", summary = "", responses = @ApiResponse(content = @io.swagger.v3.oas.annotations.media.Content(schema = @Schema(implementation = Void.class))))
+    @Operation(method = "DELETE", description = "Delete content box", responses = @ApiResponse(content = @io.swagger.v3.oas.annotations.media.Content(schema = @Schema())))
     @Parameters({
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
@@ -297,7 +265,7 @@ public class ContentApi {
 
     @PutMapping(value = "/private/content/page/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @Operation(method = "PUT", description = "Update content page", summary = "", responses = @ApiResponse(content = @io.swagger.v3.oas.annotations.media.Content(schema = @Schema(implementation = Void.class))))
+    @Operation(method = "PUT", description = "Update content page", responses = @ApiResponse(content = @io.swagger.v3.oas.annotations.media.Content(schema = @Schema())))
     @Parameters({
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
@@ -313,7 +281,7 @@ public class ContentApi {
 
     @PutMapping(value = "/private/content/box/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @Operation(method = "PUT", description = "Update content box", summary = "", responses = @ApiResponse(content = @io.swagger.v3.oas.annotations.media.Content(schema = @Schema(implementation = Void.class))))
+    @Operation(method = "PUT", description = "Update content box", responses = @ApiResponse(content = @io.swagger.v3.oas.annotations.media.Content(schema = @Schema())))
     @Parameters({
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
@@ -329,7 +297,7 @@ public class ContentApi {
 
     @Deprecated
     @GetMapping(value = "/private/content/any/{code}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(method = "GET", description = "Get page content by code for a given MerchantStore", summary = "", responses = @ApiResponse(content = @io.swagger.v3.oas.annotations.media.Content(schema = @Schema(implementation = ReadableContentPage.class))))
+    @Operation(method = "GET", description = "Get page content by code for a given MerchantStore", responses = @ApiResponse(content = @io.swagger.v3.oas.annotations.media.Content(schema = @Schema(implementation = ReadableContentPage.class))))
     @Parameters({
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
@@ -343,7 +311,7 @@ public class ContentApi {
 
     @Deprecated
     @GetMapping(value = "/private/contents/any", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(method = "GET", description = "Get contents (page and box) for a given MerchantStore", summary = "", responses = @ApiResponse(content = @io.swagger.v3.oas.annotations.media.Content(schema = @Schema(implementation = ReadableContentPage.class))))
+    @Operation(method = "GET", description = "Get contents (page and box) for a given MerchantStore", responses = @ApiResponse(content = @io.swagger.v3.oas.annotations.media.Content(schema = @Schema(implementation = ReadableContentPage.class))))
     @Parameters({
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
@@ -357,7 +325,7 @@ public class ContentApi {
 
 
     @GetMapping(value = "/private/content/boxes/{code}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(method = "GET", description = "Manage box content by code for a code and a given MerchantStore", summary = "", responses = @ApiResponse(content = @io.swagger.v3.oas.annotations.media.Content(schema = @Schema(implementation = List.class))))
+    @Operation(method = "GET", description = "Manage box content by code for a code and a given MerchantStore", responses = @ApiResponse(content = @io.swagger.v3.oas.annotations.media.Content(schema = @Schema(implementation = List.class))))
     @Parameters({
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
@@ -368,7 +336,7 @@ public class ContentApi {
     }
 
     @GetMapping(value = "/content/boxes/{code}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(method = "GET", description = "Get box content by code for a code and a given MerchantStore", summary = "", responses = @ApiResponse(content = @io.swagger.v3.oas.annotations.media.Content(schema = @Schema(implementation = List.class))))
+    @Operation(method = "GET", description = "Get box content by code for a code and a given MerchantStore", responses = @ApiResponse(content = @io.swagger.v3.oas.annotations.media.Content(schema = @Schema(implementation = List.class))))
     @Parameters({
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
@@ -380,10 +348,6 @@ public class ContentApi {
 
 
     /**
-     * @param parent
-     * @param folder
-     * @param merchantStore
-     * @param language
      */
     @DeleteMapping(value = "/content/folder", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
@@ -397,15 +361,9 @@ public class ContentApi {
     }
 
     /**
-     * @param code
-     * @param path
-     * @param request
-     * @param response
-     * @return
-     * @throws Exception
      */
     @GetMapping(value = "/content/images", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(method = "GET", description = "Get store content images", summary = "", responses = @ApiResponse(content = @io.swagger.v3.oas.annotations.media.Content(schema = @Schema(implementation = ContentFolder.class))))
+    @Operation(method = "GET", description = "Get store content images", responses = @ApiResponse(content = @io.swagger.v3.oas.annotations.media.Content(schema = @Schema(implementation = ContentFolder.class))))
     @Parameters({
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
@@ -423,7 +381,6 @@ public class ContentApi {
     /**
      * Need type, name and entity
      *
-     * @param file
      */
     @PostMapping(value = "/private/file")
     @ResponseStatus(HttpStatus.CREATED)
@@ -477,7 +434,7 @@ public class ContentApi {
     @ResponseStatus(HttpStatus.OK)
     @Operation(method = "PUT", description = "Update content page", summary = "Updates a content page",
 
-            responses = @ApiResponse(content = @io.swagger.v3.oas.annotations.media.Content(schema = @Schema(implementation = Void.class))))
+            responses = @ApiResponse(content = @io.swagger.v3.oas.annotations.media.Content(schema = @Schema())))
     @Parameters({
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
@@ -491,11 +448,10 @@ public class ContentApi {
     /**
      * Deletes a content from CMS
      *
-     * @param name
      */
     @Deprecated
     @DeleteMapping(value = "/private/content/{id}")
-    @Operation(method = "DELETE", description = "Deletes a content from CMS", summary = "Delete a content box or page", responses = @ApiResponse(content = @io.swagger.v3.oas.annotations.media.Content(schema = @Schema(implementation = Void.class))))
+    @Operation(method = "DELETE", description = "Deletes a content from CMS", summary = "Delete a content box or page", responses = @ApiResponse(content = @io.swagger.v3.oas.annotations.media.Content(schema = @Schema())))
     @Parameters({
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
     })
@@ -503,11 +459,7 @@ public class ContentApi {
         contentFacade.delete(merchantStore, id);
     }
 
-    /*  *//**
-     * Deletes a content from CMS
-     *
-     * @param name
-     *//*
+    /*  *//*
      * @DeleteMapping(value = "/private/content/page/{id}")
      *
      * @Operation(method = "DELETE", value =
@@ -526,10 +478,9 @@ public class ContentApi {
     /**
      * Deletes a file from CMS
      *
-     * @param name
      */
     @DeleteMapping(value = "/private/content/")
-    @Operation(method = "DELETE", description = "Deletes a file from CMS", summary = "Delete a file from server", responses = @ApiResponse(content = @Content(schema = @Schema(implementation = Void.class))))
+    @Operation(method = "DELETE", description = "Deletes a file from CMS", summary = "Delete a file from server", responses = @ApiResponse(content = @Content(schema = @Schema())))
     @Parameters({
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))

@@ -41,7 +41,7 @@ public class ProductVariantImage extends SalesManagerEntity<Long, ProductVariant
     private ProductVariantGroup productVariantGroup;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "productVariantImage", cascade = CascadeType.ALL)
-    private Set<ProductVariantImageDescription> descriptions = new HashSet<ProductVariantImageDescription>();
+    private Set<ProductVariantImageDescription> descriptions = new HashSet<>();
 
     public ProductVariantImage() {
     }

@@ -40,7 +40,7 @@ public class ReadableProductTypeMapper implements Mapper<ProductType, ReadablePr
             readableType = new ReadableProductType();
             if (!CollectionUtils.isEmpty(type.getDescriptions())) {
                 Optional<ProductTypeDescription> desc = type.getDescriptions().stream().filter(t -> t.getLanguage().getCode().equals(language.getCode()))
-                        .map(d -> typeDescription(d)).findFirst();
+                        .map(this::typeDescription).findFirst();
                 if (desc.isPresent()) {
                     readableType.setDescription(desc.get());
                 }
@@ -48,15 +48,15 @@ public class ReadableProductTypeMapper implements Mapper<ProductType, ReadablePr
         } else {
 
             readableType = new ReadableProductTypeFull();
-            List<ProductTypeDescription> descriptions = type.getDescriptions().stream().map(t -> this.typeDescription(t)).collect(Collectors.toList());
+            List<ProductTypeDescription> descriptions = type.getDescriptions().stream().map(this::typeDescription).collect(Collectors.toList());
             ((ReadableProductTypeFull) readableType).setDescriptions(descriptions);
 
         }
 
         readableType.setCode(type.getCode());
         readableType.setId(type.getId());
-        readableType.setVisible(type.getVisible() != null && type.getVisible().booleanValue() ? true : false);
-        readableType.setAllowAddToCart(type.getAllowAddToCart() != null && type.getAllowAddToCart().booleanValue() ? true : false);
+        readableType.setVisible(type.getVisible() != null && type.getVisible() ? true : false);
+        readableType.setAllowAddToCart(type.getAllowAddToCart() != null && type.getAllowAddToCart() ? true : false);
 
         return readableType;
     }

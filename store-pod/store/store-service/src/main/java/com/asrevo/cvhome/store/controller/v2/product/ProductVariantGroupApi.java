@@ -71,7 +71,7 @@ public class ProductVariantGroupApi {
 
     @ResponseStatus(HttpStatus.OK)
     @PutMapping(value = {"/private/product/productVariantGroup/{id}"})
-    @Operation(method = "PUT", description = "Update product instance group", summary = "", responses = @ApiResponse(content = @Content(mediaType = "application/json", schema = @Schema(implementation = Void.class))))
+    @Operation(method = "PUT", description = "Update product instance group", responses = @ApiResponse(content = @Content(mediaType = "application/json", schema = @Schema())))
     public @ResponseBody void update(@PathVariable Long id,
                                      @Valid @RequestBody PersistableProductVariantGroup instance,
                                      @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
@@ -90,7 +90,7 @@ public class ProductVariantGroupApi {
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping(value = {"/private/product/productVariantGroup/{id}"})
-    @Operation(method = "GET", description = "Get product instance group", summary = "", responses = @ApiResponse(content = @Content(mediaType = "application/json", schema = @Schema(implementation = Void.class))))
+    @Operation(method = "GET", description = "Get product instance group", responses = @ApiResponse(content = @Content(mediaType = "application/json", schema = @Schema())))
     public @ResponseBody ReadableProductVariantGroup get(
             @PathVariable Long id, @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language) {
@@ -110,7 +110,7 @@ public class ProductVariantGroupApi {
 
     @ResponseStatus(HttpStatus.OK)
     @DeleteMapping(value = {"/private/product/productVariantGroup/{id}"})
-    @Operation(method = "DELETE", description = "Delete product instance group", summary = "", responses = @ApiResponse(content = @Content(mediaType = "application/json", schema = @Schema(implementation = Void.class))))
+    @Operation(method = "DELETE", description = "Delete product instance group", responses = @ApiResponse(content = @Content(mediaType = "application/json", schema = @Schema())))
     public @ResponseBody void delete(@PathVariable Long id, @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
                                      @Parameter(hidden = true) Language language) {
 
@@ -128,7 +128,7 @@ public class ProductVariantGroupApi {
     // list
     @ResponseStatus(HttpStatus.OK)
     @GetMapping(value = {"/private/product/{id}/productVariantGroup"})
-    @Operation(method = "GET", description = "Delete product instance group", summary = "", responses = @ApiResponse(content = @Content(mediaType = "application/json", schema = @Schema(implementation = Void.class))))
+    @Operation(method = "GET", description = "Delete product instance group", responses = @ApiResponse(content = @Content(mediaType = "application/json", schema = @Schema())))
     public @ResponseBody ReadableEntityList<ReadableProductVariantGroup> list(
             @PathVariable final Long id,
             @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
@@ -157,7 +157,7 @@ public class ProductVariantGroupApi {
     })
     public void addImage(
             @PathVariable Long id,
-            @RequestParam(value = "file", required = true) MultipartFile file,
+            @RequestParam(value = "file") MultipartFile file,
             @RequestParam(value = "order", required = false, defaultValue = "0") Integer position,
             @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language) {

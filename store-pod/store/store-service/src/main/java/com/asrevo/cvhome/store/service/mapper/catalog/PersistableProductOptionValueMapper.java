@@ -34,7 +34,7 @@ public class PersistableProductOptionValueMapper
         if (StringUtils.isBlank(desc.getName())) {
             desc.setName(description.getDescription());
         }
-        if (description.getId() != null && description.getId().longValue() > 0) {
+        if (description.getId() != null && description.getId() > 0) {
             desc.setId(description.getId());
         }
         Language lang = languageService.getByCode(description.getLanguage());

@@ -28,7 +28,6 @@ public class ProductEntity extends Product implements Serializable {
      * -- GETTER --
      * End RENTAL fields
      *
-     * @return
      */
     private BigDecimal price;
     private int quantity = 0;
@@ -49,7 +48,6 @@ public class ProductEntity extends Product implements Serializable {
     /**
      * RENTAL additional fields
      *
-     * @return
      */
 
     private int rentalDuration;

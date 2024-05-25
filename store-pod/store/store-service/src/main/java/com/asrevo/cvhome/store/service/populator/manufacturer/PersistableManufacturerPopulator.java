@@ -43,10 +43,10 @@ public class PersistableManufacturerPopulator extends AbstractDataPopulator<Pers
 
 
             if (!CollectionUtils.isEmpty(source.getDescriptions())) {
-                Set<com.asrevo.cvhome.store.core.entity.catalog.product.manufacturer.ManufacturerDescription> descriptions = new HashSet<com.asrevo.cvhome.store.core.entity.catalog.product.manufacturer.ManufacturerDescription>();
+                Set<com.asrevo.cvhome.store.core.entity.catalog.product.manufacturer.ManufacturerDescription> descriptions = new HashSet<>();
                 for (ManufacturerDescription description : source.getDescriptions()) {
                     com.asrevo.cvhome.store.core.entity.catalog.product.manufacturer.ManufacturerDescription desc = new com.asrevo.cvhome.store.core.entity.catalog.product.manufacturer.ManufacturerDescription();
-                    if (desc.getId() != null && desc.getId().longValue() > 0) {
+                    if (desc.getId() != null && desc.getId() > 0) {
                         desc.setId(description.getId());
                     }
                     if (target.getDescriptions() != null) {

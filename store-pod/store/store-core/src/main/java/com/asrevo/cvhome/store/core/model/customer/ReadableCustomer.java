@@ -20,7 +20,7 @@ public class ReadableCustomer extends CustomerEntity implements Serializable {
      */
     @Serial
     private static final long serialVersionUID = 1L;
-    private List<ReadableCustomerAttribute> attributes = new ArrayList<ReadableCustomerAttribute>();
-    private List<ReadableGroup> groups = new ArrayList<ReadableGroup>();
+    private List<ReadableCustomerAttribute> attributes = new ArrayList<>();
+    private List<ReadableGroup> groups = new ArrayList<>();
 
 }

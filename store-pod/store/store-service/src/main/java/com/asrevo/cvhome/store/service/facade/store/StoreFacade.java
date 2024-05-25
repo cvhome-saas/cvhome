@@ -19,9 +19,6 @@ public interface StoreFacade {
     /**
      * Find MerchantStore model from store code
      *
-     * @param code
-     * @return
-     * @throws Exception
      */
     MerchantStore getByCode(HttpServletRequest request);
 
@@ -40,8 +37,6 @@ public interface StoreFacade {
     /**
      * List child stores
      *
-     * @param code
-     * @return
      */
     ReadableMerchantStoreList getChildStores(Language language, String code, int start, int count);
 
@@ -54,18 +49,12 @@ public interface StoreFacade {
     /**
      * List MerchantStore using various criterias
      *
-     * @param criteria
-     * @param lang
-     * @return
-     * @throws Exception
      */
     ReadableMerchantStoreList getByCriteria(MerchantStoreCriteria criteria, Language lang);
 
     /**
      * Creates a brand new MerchantStore
      *
-     * @param store
-     * @throws Exception
      */
     //ReadableMerchantStore create(PersistableMerchantStore store);
     void create(PersistableMerchantStore store);
@@ -73,8 +62,6 @@ public interface StoreFacade {
     /**
      * Updates an existing store
      *
-     * @param store
-     * @throws Exception
      */
     //ReadableMerchantStore update(PersistableMerchantStore store);
     void update(PersistableMerchantStore store);
@@ -82,23 +69,18 @@ public interface StoreFacade {
     /**
      * Deletes a MerchantStore based on store code
      *
-     * @param code
      */
     void delete(String code);
 
     /**
      * Get Logo, social networks and other brand configurations
      *
-     * @param code
-     * @return
      */
     ReadableBrand getBrand(String code);
 
     /**
      * Create store brand
      *
-     * @param merchantStoreCode
-     * @param brand
      */
     void createBrand(String merchantStoreCode, PersistableBrand brand);
 
@@ -115,23 +97,18 @@ public interface StoreFacade {
     /**
      * Add MerchantStore logo
      *
-     * @param code
-     * @param cmsContentImage
      */
     void addStoreLogo(String code, InputContentFile cmsContentImage);
 
     /**
      * Add MerchantStore banner
      *
-     * @param code
-     * @param cmsContentImage
      */
     void addStoreBanner(String code, InputContentFile cmsContentImage);
 
     /**
      * Returns store id, code and name only
      *
-     * @return
      */
     List<ReadableMerchantStore> getMerchantStoreNames(MerchantStoreCriteria criteria);
 

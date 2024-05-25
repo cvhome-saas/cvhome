@@ -22,11 +22,6 @@ import java.math.BigDecimal;
         }
 )
 
-/**
- * Attribute Size - Small and product
- * @author carlsamson
- *
- */
 @Getter
 @Setter
 

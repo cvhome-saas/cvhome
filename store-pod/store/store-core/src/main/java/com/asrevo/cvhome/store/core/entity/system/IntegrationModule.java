@@ -62,7 +62,7 @@ public class IntegrationModule extends SalesManagerEntity<Long, IntegrationModul
     private boolean customModule = false;
 
     @Transient
-    private Set<String> regionsSet = new HashSet<String>();
+    private Set<String> regionsSet = new HashSet<>();
 
     @Transient
     private String binaryImage = null;
@@ -71,10 +71,10 @@ public class IntegrationModule extends SalesManagerEntity<Long, IntegrationModul
      * Contains a map of module config by environment (DEV,PROD)
      */
     @Transient
-    private Map<String, ModuleConfig> moduleConfigs = new HashMap<String, ModuleConfig>();
+    private Map<String, ModuleConfig> moduleConfigs = new HashMap<>();
 
     @Transient
-    private Map<String, String> details = new HashMap<String, String>();
+    private Map<String, String> details = new HashMap<>();
 
     /**
      * A json tructure decribing how the module must be built

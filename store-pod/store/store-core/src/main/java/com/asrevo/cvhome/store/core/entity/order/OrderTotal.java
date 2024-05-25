@@ -34,16 +34,16 @@ public class OrderTotal extends SalesManagerEntity<Long, OrderTotal> {
     @Column(name = "CODE", nullable = false)
     private String orderTotalCode;//SHIPPING, TAX
 
-    @Column(name = "TITLE", nullable = true)
+    @Column(name = "TITLE")
     private String title;
 
-    @Column(name = "TEXT", nullable = true, columnDefinition = "text")
+    @Column(name = "TEXT", columnDefinition = "text")
     private String text;
 
     @Column(name = "VALUE", precision = 15, scale = 4, nullable = false)
     private BigDecimal value;
 
-    @Column(name = "MODULE", length = 60, nullable = true)
+    @Column(name = "MODULE", length = 60)
     private String module;
 
     @Column(name = "ORDER_VALUE_TYPE")

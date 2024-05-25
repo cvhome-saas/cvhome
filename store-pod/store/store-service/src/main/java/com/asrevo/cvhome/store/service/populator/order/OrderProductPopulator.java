@@ -114,7 +114,7 @@ public class OrderProductPopulator extends
             //OrderProductAttribute
             Set<ShoppingCartAttributeItem> attributeItems = source.getAttributes();
             if (!CollectionUtils.isEmpty(attributeItems)) {
-                Set<OrderProductAttribute> attributes = new HashSet<OrderProductAttribute>();
+                Set<OrderProductAttribute> attributes = new HashSet<>();
                 for (ShoppingCartAttributeItem attribute : attributeItems) {
                     OrderProductAttribute orderProductAttribute = new OrderProductAttribute();
                     orderProductAttribute.setOrderProduct(target);
@@ -129,8 +129,8 @@ public class OrderProductPopulator extends
                     }
 
                     orderProductAttribute.setProductAttributeIsFree(attr.isProductAttributeIsFree());
-                    orderProductAttribute.setProductAttributeName(attr.getProductOption().getDescriptionsSettoList().get(0).getName());
-                    orderProductAttribute.setProductAttributeValueName(attr.getProductOptionValue().getDescriptionsSettoList().get(0).getName());
+                    orderProductAttribute.setProductAttributeName(attr.getProductOption().getDescriptionsSettoList().getFirst().getName());
+                    orderProductAttribute.setProductAttributeValueName(attr.getProductOptionValue().getDescriptionsSettoList().getFirst().getName());
                     orderProductAttribute.setProductAttributePrice(attr.getProductAttributePrice());
                     orderProductAttribute.setProductAttributeWeight(attr.getProductAttributeWeight());
                     orderProductAttribute.setProductOptionId(attr.getProductOption().getId());

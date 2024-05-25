@@ -2,6 +2,7 @@ package com.asrevo.cvhome.store.core.entity.system;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
+import lombok.Setter;
 import org.json.simple.JSONAware;
 import org.json.simple.JSONObject;
 
@@ -26,9 +27,12 @@ public class IntegrationConfiguration implements JSONAware {
 
     private String moduleCode;
     private boolean active;
+    @Setter
     private boolean defaultSelected;
-    private Map<String, String> integrationKeys = new HashMap<String, String>();
-    private Map<String, List<String>> integrationOptions = new HashMap<String, List<String>>();
+    private Map<String, String> integrationKeys = new HashMap<>();
+    @Setter
+    private Map<String, List<String>> integrationOptions = new HashMap<>();
+    @Setter
     private String environment;
 
 
@@ -146,18 +150,6 @@ public class IntegrationConfiguration implements JSONAware {
 
         return returnString.toString();
 
-    }
-
-    public void setEnvironment(String environment) {
-        this.environment = environment;
-    }
-
-    public void setIntegrationOptions(Map<String, List<String>> integrationOptions) {
-        this.integrationOptions = integrationOptions;
-    }
-
-    public void setDefaultSelected(boolean defaultSelected) {
-        this.defaultSelected = defaultSelected;
     }
 
 

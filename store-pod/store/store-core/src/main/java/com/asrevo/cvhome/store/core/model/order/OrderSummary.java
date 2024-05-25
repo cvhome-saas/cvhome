@@ -31,6 +31,6 @@ public class OrderSummary implements Serializable {
     private OrderSummaryType orderSummaryType = OrderSummaryType.ORDERTOTAL;
     private ShippingSummary shippingSummary;
     private String promoCode;
-    private List<ShoppingCartItem> products = new ArrayList<ShoppingCartItem>();
+    private List<ShoppingCartItem> products = new ArrayList<>();
 
 }

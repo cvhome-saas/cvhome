@@ -45,7 +45,7 @@ public class ProductTypeApi {
     }
 
     @GetMapping(value = "/private/product/types", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(method = "GET", description = "Get product types list", summary = "", responses = @ApiResponse(content = @Content(schema = @Schema(implementation = List.class))))
+    @Operation(method = "GET", description = "Get product types list", responses = @ApiResponse(content = @Content(schema = @Schema(implementation = List.class))))
     @Parameters({
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
@@ -59,7 +59,7 @@ public class ProductTypeApi {
     }
 
     @GetMapping(value = "/private/product/type/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(method = "GET", description = "Get product type", summary = "",
+    @Operation(method = "GET", description = "Get product type",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ReadableProductType.class))))
     @Parameters({
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
@@ -73,7 +73,7 @@ public class ProductTypeApi {
     }
 
     @GetMapping(value = "/private/product/type/unique", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(method = "GET", description = "Verify if product type is unique", summary = "",
+    @Operation(method = "GET", description = "Verify if product type is unique",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = EntityExists.class))))
     @Parameters({
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
@@ -83,12 +83,12 @@ public class ProductTypeApi {
                                                @Parameter(hidden = true) Language language) {
 
         boolean exists = productTypeFacade.exists(code, merchantStore, language);
-        return new ResponseEntity<EntityExists>(new EntityExists(exists), HttpStatus.OK);
+        return new ResponseEntity<>(new EntityExists(exists), HttpStatus.OK);
 
     }
 
     @PostMapping(value = "/private/product/type", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(method = "POST", description = "Create product type", summary = "", responses = @ApiResponse(content = @Content(schema = @Schema(implementation = Entity.class))))
+    @Operation(method = "POST", description = "Create product type", responses = @ApiResponse(content = @Content(schema = @Schema(implementation = Entity.class))))
     @Parameters({
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
@@ -104,8 +104,8 @@ public class ProductTypeApi {
     }
 
     @PutMapping(value = "/private/product/type/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(method = "PUT", description = "Update product type", summary = "",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = Void.class))))
+    @Operation(method = "PUT", description = "Update product type",
+            responses = @ApiResponse(content = @Content(schema = @Schema())))
     @Parameters({
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
@@ -118,7 +118,7 @@ public class ProductTypeApi {
     }
 
     @DeleteMapping(value = "/private/product/type/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(method = "DELETE", description = "Delete product type", summary = "", responses = @ApiResponse(content = @Content(schema = @Schema(implementation = EntityExists.class))))
+    @Operation(method = "DELETE", description = "Delete product type", responses = @ApiResponse(content = @Content(schema = @Schema(implementation = EntityExists.class))))
     @Parameters({
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))

@@ -115,9 +115,6 @@ public class PersistableProductVariantMapper implements Mapper<PersistableProduc
         destination.setSortOrder(source.getSortOrder());
 
 
-        /**
-         * Inventory
-         */
         if (source.getInventory() != null) {
             ProductAvailability availability = persistableProductAvailabilityMapper.convert(source.getInventory(), store, language);
             availability.setProductVariant(destination);
@@ -127,14 +124,14 @@ public class PersistableProductVariantMapper implements Mapper<PersistableProduc
 
         Product product = null;
 
-        if (source.getProductId() != null && source.getProductId().longValue() > 0) {
+        if (source.getProductId() != null && source.getProductId() > 0) {
             product = productService.findOne(source.getProductId(), store);
 
             if (product == null) {
                 throw new ResourceNotFoundException("Product [" + source.getId() + "] + not found for store [" + store.getCode() + "]");
             }
 
-            if (product.getMerchantStore().getId() != store.getId()) {
+            if (!product.getMerchantStore().getId().equals(store.getId())) {
                 throw new ResourceNotFoundException("Product [" + source.getId() + "] + not found for store [" + store.getCode() + "]");
             }
 

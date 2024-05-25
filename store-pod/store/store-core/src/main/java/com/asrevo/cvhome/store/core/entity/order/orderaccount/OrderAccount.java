@@ -43,7 +43,7 @@ public class OrderAccount extends SalesManagerEntity<Long, OrderAccount> {
     private Integer orderAccountBillDay;
 
     @OneToMany(mappedBy = "orderAccount", cascade = CascadeType.ALL)
-    private Set<OrderAccountProduct> orderAccountProducts = new HashSet<OrderAccountProduct>();
+    private Set<OrderAccountProduct> orderAccountProducts = new HashSet<>();
 
     public OrderAccount() {
     }

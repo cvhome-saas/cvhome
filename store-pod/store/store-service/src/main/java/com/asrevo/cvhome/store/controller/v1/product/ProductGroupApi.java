@@ -49,7 +49,7 @@ public class ProductGroupApi {
 
     @ResponseStatus(HttpStatus.OK)
     @PostMapping("/private/products/group")
-    @Operation(method = "POST", description = "Create product group", summary = "",
+    @Operation(method = "POST", description = "Create product group",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ProductGroup.class))))
     @Parameters({
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
@@ -68,7 +68,7 @@ public class ProductGroupApi {
 
     @ResponseStatus(HttpStatus.OK)
     @PatchMapping("/private/products/group/{code}")
-    @Operation(method = "PATCH", description = "Update product group visible flag", summary = "",
+    @Operation(method = "PATCH", description = "Update product group visible flag",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ProductGroup.class))))
     @Parameters({
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
@@ -87,7 +87,7 @@ public class ProductGroupApi {
     }
 
     @GetMapping("/private/product/groups")
-    @Operation(method = "GET", description = "Get products groups for a given merchant", summary = "", responses = @ApiResponse(content = @Content(schema = @Schema(implementation = List.class))))
+    @Operation(method = "GET", description = "Get products groups for a given merchant", responses = @ApiResponse(content = @Content(schema = @Schema(implementation = List.class))))
     @Parameters({
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
@@ -108,17 +108,10 @@ public class ProductGroupApi {
      * lang or default store lang code can be any code used while creating product group, defeult
      * being FEATURED
      *
-     * @param store
-     * @param language
-     * @param groupCode
-     * @param request
-     * @param response
-     * @return
-     * @throws Exception
      */
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/products/group/{code}")
-    @Operation(method = "GET", description = "Get products by group code", summary = "",
+    @Operation(method = "GET", description = "Get products by group code",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ReadableProductList.class))))
     @Parameters({
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
@@ -233,7 +226,7 @@ public class ProductGroupApi {
 
     @ResponseStatus(HttpStatus.OK)
     @DeleteMapping("/products/group/{code}")
-    @Operation(method = "DELETE", description = "Delete product group by group code", summary = "",
+    @Operation(method = "DELETE", description = "Delete product group by group code",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = EntityExists.class))))
     @Parameters({
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),

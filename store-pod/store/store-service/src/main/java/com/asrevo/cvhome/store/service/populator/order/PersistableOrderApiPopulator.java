@@ -33,7 +33,7 @@ import java.util.Set;
 @Component
 public class PersistableOrderApiPopulator extends AbstractDataPopulator<PersistableOrder, Order> {
 
-    private final CurrencyService currencyService;
+  //  private final CurrencyService currencyService;
     private final CustomerService customerService;
     /*	@Autowired
         private ShoppingCartService shoppingCartService;
@@ -45,8 +45,7 @@ public class PersistableOrderApiPopulator extends AbstractDataPopulator<Persista
         private DigitalProductService digitalProductService;*/
     private final CustomerPopulator customerPopulator;
 
-    public PersistableOrderApiPopulator(CurrencyService currencyService, CustomerService customerService, CustomerPopulator customerPopulator) {
-        this.currencyService = currencyService;
+    public PersistableOrderApiPopulator(CustomerService customerService, CustomerPopulator customerPopulator) {
         this.customerService = customerService;
         this.customerPopulator = customerPopulator;
     }
@@ -85,7 +84,7 @@ public class PersistableOrderApiPopulator extends AbstractDataPopulator<Persista
 
             //Customer
             Customer customer = null;
-            if (source.getCustomerId() != null && source.getCustomerId().longValue() > 0) {
+            if (source.getCustomerId() != null && source.getCustomerId() > 0) {
                 Long customerId = source.getCustomerId();
                 customer = customerService.getById(customerId);
 

@@ -65,11 +65,9 @@ public class ReadableCatalogMapper implements Mapper<Catalog, ReadableCatalog> {
         if (CollectionUtils.isNotEmpty(source.getEntry())) {
 
             //hierarchy temp object
-            Map<Long, ReadableCategory> hierarchy = new HashMap<Long, ReadableCategory>();
+            Map<Long, ReadableCategory> hierarchy = new HashMap<>();
 
-            source.getEntry().forEach(entry -> {
-                processCategory(entry.getCategory(), store, language, hierarchy, new HashMap<>());
-            });
+            source.getEntry().forEach(entry -> processCategory(entry.getCategory(), store, language, hierarchy, new HashMap<>()));
 
             destination.setCategory(new ArrayList<>(hierarchy.values()));
         }
@@ -92,11 +90,6 @@ public class ReadableCatalogMapper implements Mapper<Catalog, ReadableCatalog> {
      * 4
      * A
      *
-     * @param parent
-     * @param c
-     * @param store
-     * @param language
-     * @param hierarchy
      */
 
     //TODO it needs to cover by unit tests

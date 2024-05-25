@@ -280,7 +280,7 @@ public class ContentFacadeImpl implements ContentFacade {
     private List<ContentDescriptionEntity> createContentDescriptionEntitys(MerchantStore store, Content contentModel,
                                                                            Language language) throws ServiceException {
 
-        List<ContentDescriptionEntity> descriptions = new ArrayList<ContentDescriptionEntity>();
+        List<ContentDescriptionEntity> descriptions = new ArrayList<>();
 
         if (!CollectionUtils.isEmpty(contentModel.getDescriptions())) {
             for (ContentDescription description : contentModel.getDescriptions()) {
@@ -305,7 +305,7 @@ public class ContentFacadeImpl implements ContentFacade {
         contentDescription.setName(description.getName());
         contentDescription.setFriendlyUrl(description.getSeUrl());
         contentDescription.setDescription(description.getDescription());
-        if (description.getId() != null && description.getId().longValue() > 0) {
+        if (description.getId() != null && description.getId() > 0) {
             contentDescription.setId(description.getId());
         }
 
@@ -337,7 +337,7 @@ public class ContentFacadeImpl implements ContentFacade {
     private List<ContentDescription> buildDescriptions(Content contentModel,
                                                        List<com.asrevo.cvhome.store.core.model.content.common.ContentDescription> persistableDescriptions)
             throws Exception {
-        List<ContentDescription> descriptions = new ArrayList<ContentDescription>();
+        List<ContentDescription> descriptions = new ArrayList<>();
         for (com.asrevo.cvhome.store.core.model.content.common.ContentDescription objectContent : persistableDescriptions) {
             Language lang = languageService.getByCode(objectContent.getLanguage());
             Assert.notNull(lang, "language cannot be null");
@@ -368,15 +368,6 @@ public class ContentFacadeImpl implements ContentFacade {
             contentDescription.setLanguage(lang);
             descriptions.add(contentDescription);
             //contentDescription.setId(objectContent.getId());
-            /**
-             contentDescription.setMetatagDescription(objectContent.getMetaDescription());
-             contentDescription.setTitle(objectContent.getTitle());
-             contentDescription.setName(objectContent.getName());
-             contentDescription.setSeUrl(objectContent.getFriendlyUrl());
-             contentDescription.setDescription(objectContent.getDescription());
-             contentDescription.setMetatagTitle(objectContent.getTitle());
-             descriptions.add(contentDescription);
-             **/
         }
         return descriptions;
     }
@@ -516,7 +507,7 @@ public class ContentFacadeImpl implements ContentFacade {
         } else {
             ReadableContentBoxFull box = new ReadableContentBoxFull();
             List<com.asrevo.cvhome.store.core.model.content.common.ContentDescription> descriptions = content.getDescriptions()
-                    .stream().map(d -> this.contentDescription(d)).collect(Collectors.toList());
+                    .stream().map(this::contentDescription).collect(Collectors.toList());
             this.setDescription(content, box, store.getDefaultLanguage());
             box.setDescriptions(descriptions);
             box.setCode(content.getCode());
@@ -644,18 +635,7 @@ public class ContentFacadeImpl implements ContentFacade {
                 ReadableContentBoxFull full = new ReadableContentBoxFull(); //all languages
 
                 List<com.asrevo.cvhome.store.core.model.content.common.ContentDescription> descriptions = content.getDescriptions()
-                        .stream().map(d -> this.contentDescription(d)).collect(Collectors.toList());
-
-                /**
-                 Optional<ContentDescription> contentDescription = findAppropriateContentDescription(
-                 content.getDescriptions(), store.getDefaultLanguage());
-
-                 if(contentDescription.isPresent()) {
-                 com.asrevo.cvhome.store.core.model.content.common.ContentDescription desc = this
-                 .contentDescription(contentDescription.get());
-                 full.setDescription(desc);
-                 }
-                 **/
+                        .stream().map(this::contentDescription).collect(Collectors.toList());
 
 
                 full.setDescriptions(descriptions);
@@ -777,10 +757,7 @@ public class ContentFacadeImpl implements ContentFacade {
     @Override
     public List<ReadableContentEntity> getContents(Optional<String> type, MerchantStore store, Language language) {
 
-        /**
-         * get all types
-         */
-        List<ContentType> types = new ArrayList<ContentType>();
+        List<ContentType> types = new ArrayList<>();
         types.add(ContentType.BOX);
         types.add(ContentType.PAGE);
         types.add(ContentType.SECTION);

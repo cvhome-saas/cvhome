@@ -20,12 +20,11 @@ import java.util.List;
 @Configuration
 public class JdbcConfig extends AbstractJdbcConfiguration {
 
-    private final ObjectMapper ployJson;
     @Autowired
     private ObjectMapper mapper;
 
     public JdbcConfig() {
-        this.ployJson = JacksonConfig.getPloyJson();
+        ObjectMapper ployJson = JacksonConfig.getPloyJson();
     }
 
     @Override

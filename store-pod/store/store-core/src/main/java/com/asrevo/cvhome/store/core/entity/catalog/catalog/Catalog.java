@@ -60,7 +60,7 @@ public class Catalog extends SalesManagerEntity<Long, Catalog> implements Audita
 
     @Valid
     @OneToMany(mappedBy = "catalog", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<CatalogCategoryEntry> entry = new HashSet<CatalogCategoryEntry>();
+    private Set<CatalogCategoryEntry> entry = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MERCHANT_ID", nullable = false)

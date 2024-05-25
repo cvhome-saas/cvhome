@@ -39,7 +39,7 @@ public class ShippingServiceImpl implements ShippingService {
 
         ShippingConfiguration shippingConfiguration = getShippingConfiguration(store);
         ShippingType shippingType = ShippingType.INTERNATIONAL;
-        List<String> supportedCountries = new ArrayList<String>();
+        List<String> supportedCountries = new ArrayList<>();
         if (shippingConfiguration == null) {
             shippingConfiguration = new ShippingConfiguration();
         }

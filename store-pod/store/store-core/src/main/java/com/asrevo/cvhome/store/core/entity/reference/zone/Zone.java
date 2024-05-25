@@ -29,7 +29,7 @@ public class Zone extends SalesManagerEntity<Long, Zone> {
 
     @JsonIgnore
     @OneToMany(mappedBy = "zone", cascade = CascadeType.ALL)
-    private List<ZoneDescription> descriptions = new ArrayList<ZoneDescription>();
+    private List<ZoneDescription> descriptions = new ArrayList<>();
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)

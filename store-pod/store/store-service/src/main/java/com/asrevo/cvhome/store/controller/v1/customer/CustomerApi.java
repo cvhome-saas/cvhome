@@ -33,9 +33,6 @@ public class CustomerApi {
     /**
      * Get all customers
      *
-     * @param count
-     * @return
-     * @throws Exception
      */
     @GetMapping("/private/customers")
     @Parameters({

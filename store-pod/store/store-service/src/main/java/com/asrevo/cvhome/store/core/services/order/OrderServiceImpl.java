@@ -141,7 +141,7 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
             }
         }
 
-        List<ShoppingCartItem> itemList = new ArrayList<ShoppingCartItem>(shoppingCart.getLineItems());
+        List<ShoppingCartItem> itemList = new ArrayList<>(shoppingCart.getLineItems());
         //filter out unavailable
         itemList = itemList.stream().filter(p -> p.getProduct().isAvailable()).collect(Collectors.toList());
         orderSummary.setProducts(itemList);
@@ -157,11 +157,7 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
      * line items.
      * </p>
      *
-     * @param shoppingCart
-     * @param store
-     * @param language
      * @return {@link OrderTotalSummary}
-     * @throws ServiceException
      */
     @Override
     public OrderTotalSummary calculateShoppingCartTotal(
@@ -318,9 +314,6 @@ if(processTransaction!=null) {
             }
         }*/
 
-        /**
-         * decrement inventory
-         */
         log.debug("Update inventory");
         Set<OrderProduct> products = order.getOrderProducts();
         for (OrderProduct orderProduct : products) {
@@ -347,8 +340,8 @@ if(processTransaction!=null) {
     private OrderTotalSummary caculateOrder(OrderSummary summary, Customer customer, final MerchantStore store, final Language language) throws Exception {
 
         OrderTotalSummary totalSummary = new OrderTotalSummary();
-        List<OrderTotal> orderTotals = new ArrayList<OrderTotal>();
-        Map<String, OrderTotal> otherPricesTotals = new HashMap<String, OrderTotal>();
+        List<OrderTotal> orderTotals = new ArrayList<>();
+        Map<String, OrderTotal> otherPricesTotals = new HashMap<>();
 
 //  @TODO ASHRAF
 //        ShippingConfiguration shippingConfiguration = null;
@@ -357,10 +350,6 @@ if(processTransaction!=null) {
         grandTotal.setScale(2, RoundingMode.HALF_UP);
 
         //price by item
-        /**
-         * qty * price
-         * subtotal
-         */
         BigDecimal subTotal = new BigDecimal(0);
         subTotal.setScale(2, RoundingMode.HALF_UP);
         for (ShoppingCartItem item : summary.getProducts()) {

@@ -20,7 +20,7 @@ public class ReadableProductVariant extends ProductVariant {
     private ReadableProductVariation variation;
     private ReadableProductVariation variationValue;
     private String code;
-    private List<ReadableImage> images = new ArrayList<ReadableImage>();
-    private List<ReadableInventory> inventory = new ArrayList<ReadableInventory>();
+    private List<ReadableImage> images = new ArrayList<>();
+    private List<ReadableInventory> inventory = new ArrayList<>();
 
 }

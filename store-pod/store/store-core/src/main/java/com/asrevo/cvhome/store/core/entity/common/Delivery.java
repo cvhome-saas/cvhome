@@ -36,12 +36,12 @@ public class Delivery {
     private String telephone;
 
     @ManyToOne(fetch = FetchType.LAZY, targetEntity = Country.class)
-    @JoinColumn(name = "DELIVERY_COUNTRY_ID", nullable = true)
+    @JoinColumn(name = "DELIVERY_COUNTRY_ID")
     private Country country;
 
 
     @ManyToOne(fetch = FetchType.LAZY, targetEntity = Zone.class)
-    @JoinColumn(name = "DELIVERY_ZONE_ID", nullable = true)
+    @JoinColumn(name = "DELIVERY_ZONE_ID")
     private Zone zone;
 
     @Transient

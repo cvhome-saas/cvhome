@@ -17,8 +17,6 @@ public class CatalogServiceHelper {
     /**
      * Filters descriptions and set the appropriate language
      *
-     * @param p
-     * @param language
      */
     public static void setToLanguage(Product p, int language) {
 
@@ -47,13 +45,11 @@ public class CatalogServiceHelper {
     /**
      * Overwrites the availability in order to return 1 price / region
      *
-     * @param product
-     * @param locale
      */
     public static void setToAvailability(Product product, Locale locale) {
 
         Set<ProductAvailability> availabilities = product.getAvailabilities();
-        Set<ProductAvailability> productAvailabilities = new HashSet<ProductAvailability>();
+        Set<ProductAvailability> productAvailabilities = new HashSet<>();
 
         Optional<ProductAvailability> defaultAvailability = availabilities.stream().filter(productAvailability -> productAvailability.getRegion().equals(Constants.ALL_REGIONS)).findFirst();
         Optional<ProductAvailability> localeAvailability = availabilities.stream().filter(productAvailability -> productAvailability.getRegion().equals(locale.getCountry())).findFirst();

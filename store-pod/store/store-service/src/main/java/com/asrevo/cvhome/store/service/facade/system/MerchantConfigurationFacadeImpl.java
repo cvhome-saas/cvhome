@@ -63,7 +63,7 @@ public class MerchantConfigurationFacadeImpl implements MerchantConfigurationFac
         readableConfig.setDisplayShipping(false);
         try {
             if (!StringUtils.isBlank(displayShipping)) {
-                readableConfig.setDisplayShipping(Boolean.valueOf(displayShipping));
+                readableConfig.setDisplayShipping(Boolean.parseBoolean(displayShipping));
             }
         } catch (Exception e) {
             log.error("Cannot parse value of {}", displayShipping);

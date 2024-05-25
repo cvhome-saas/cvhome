@@ -80,20 +80,12 @@ public class ProductVariationApi {
     /**
      * Calculates the price based on selected options if any
      *
-     * @param id
-     * @param options
-     * @param merchantStore
-     * @param language
-     * @param response
-     * @return
-     * @throws Exception
      */
     @RequestMapping(value = "/product/{id}/variation", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
     @Operation(
             method = "POST",
             description = "Get product price variation based on selected product",
-            summary = "",
             responses = @ApiResponse(content = @Content(mediaType = "application/json", schema = @Schema(implementation = ReadableProductPrice.class))))
     @ResponseBody
     @Parameters({
@@ -122,7 +114,7 @@ public class ProductVariationApi {
         }
 
         List<ReadableProductVariantValue> variants = options.getOptions();
-        List<ProductAttribute> attributes = new ArrayList<ProductAttribute>();
+        List<ProductAttribute> attributes = new ArrayList<>();
 
         Set<ProductAttribute> productAttributes = product.getAttributes();
         for (ProductAttribute attribute : productAttributes) {
@@ -151,7 +143,6 @@ public class ProductVariationApi {
     @Operation(
             method = "GET",
             description = "Get all variation for all items in a given category",
-            summary = "",
             responses = @ApiResponse(content = @Content(mediaType = "application/json", schema = @Schema(implementation = List.class))))
     @ResponseBody
     @Parameters({
@@ -174,8 +165,7 @@ public class ProductVariationApi {
     @Operation(
             method = "POST",
             description = "Creates a new product variant",
-            summary = "",
-            responses = @ApiResponse(content = @Content(mediaType = "application/json", schema = @Schema(implementation = Void.class))))
+            responses = @ApiResponse(content = @Content(mediaType = "application/json", schema = @Schema())))
     @Parameters({
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
@@ -196,14 +186,14 @@ public class ProductVariationApi {
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
-    @Operation(method = "GET", description = "Check if option set code already exists", summary = "", responses = {@ApiResponse(content = @Content(schema = @Schema(implementation = EntityExists.class)))})
+    @Operation(method = "GET", description = "Check if option set code already exists", responses = {@ApiResponse(content = @Content(schema = @Schema(implementation = EntityExists.class)))})
     public ResponseEntity<EntityExists> exists(
             @RequestParam(value = "code") String code,
             @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language) {
 
         boolean isOptionExist = productVariationFacade.exists(code, merchantStore);
-        return new ResponseEntity<EntityExists>(new EntityExists(isOptionExist), HttpStatus.OK);
+        return new ResponseEntity<>(new EntityExists(isOptionExist), HttpStatus.OK);
     }
 
 

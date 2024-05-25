@@ -31,13 +31,6 @@ public class ReadableCategoryMapper implements Mapper<Category, ReadableCategory
             fillReadableCategory(target, source, language);
             return target;
         } else {
-            /**
-             ReadableCategory target = new ReadableCategory();
-             Optional<com.asrevo.cvhome.store.model.catalog.category.CategoryDescription> description = source
-             .getDescriptions().stream().filter(d -> language.getId().equals(d.getLanguage().getId()))
-             .map(this::convertDescription).findAny();
-             description.ifPresent(target::setDescript;ion);
-             **/
             ReadableCategory target = createReadable(source, language);
             //fillReadableCategory(target, source, language);
             return target;

@@ -163,7 +163,7 @@ public class OrderFacadeImpl implements OrderFacade {
             ShippingSummary shippingSummary = null;
 
             // get shipping quote if asked for
-            if (order.getShippingQuote() != null && order.getShippingQuote().longValue() > 0) {
+            if (order.getShippingQuote() != null && order.getShippingQuote() > 0) {
                 shippingSummary = shippingQuoteService.getShippingSummary(order.getShippingQuote(), store);
                 if (shippingSummary != null) {
                     modelOrder.setShippingModuleCode(shippingSummary.getShippingModule());
@@ -207,7 +207,7 @@ public class OrderFacadeImpl implements OrderFacade {
 
             modelOrder.setTotal(calculatedAmount);
             List<OrderTotal> totals = orderTotalSummary.getTotals();
-            Set<OrderTotal> set = new HashSet<OrderTotal>();
+            Set<OrderTotal> set = new HashSet<>();
 
             if (!CollectionUtils.isEmpty(totals)) {
                 for (OrderTotal total : totals) {
@@ -226,7 +226,6 @@ public class OrderFacadeImpl implements OrderFacade {
 
             //lookup existing customer
             //if customer exist then do not set authentication for this customer and send an instructions email
-            /** **/
             if (!StringUtils.isBlank(customer.getNick()) && !customer.isAnonymous()) {
                 if (order.getCustomerId() == null && (customerFacade.checkIfUserExists(customer.getNick(), store))) {
                     customer.setAnonymous(true);
@@ -323,9 +322,6 @@ public class OrderFacadeImpl implements OrderFacade {
         }
 
 
-        /**
-         * Confirmation may be formatted
-         */
         orderConfirmation.setId(order.getId());
 
 
@@ -418,7 +414,7 @@ public class OrderFacadeImpl implements OrderFacade {
             return null;
         }
 
-        List<com.asrevo.cvhome.store.core.model.order.v0.ReadableOrder> readableOrders = new ArrayList<com.asrevo.cvhome.store.core.model.order.v0.ReadableOrder>();
+        List<com.asrevo.cvhome.store.core.model.order.v0.ReadableOrder> readableOrders = new ArrayList<>();
         for (Order order : orders) {
             com.asrevo.cvhome.store.core.model.order.v0.ReadableOrder readableOrder = new com.asrevo.cvhome.store.core.model.order.v0.ReadableOrder();
             readableOrderPopulator.populate(order, readableOrder, store, language);
@@ -446,7 +442,7 @@ public class OrderFacadeImpl implements OrderFacade {
         Locale locale = LocaleUtils.getLocale(language);
         readableOrderPopulator.setLocale(locale);
 
-        List<com.asrevo.cvhome.store.core.model.order.v0.ReadableOrder> readableOrders = new ArrayList<com.asrevo.cvhome.store.core.model.order.v0.ReadableOrder>();
+        List<com.asrevo.cvhome.store.core.model.order.v0.ReadableOrder> readableOrders = new ArrayList<>();
         for (Order order : orders) {
             com.asrevo.cvhome.store.core.model.order.v0.ReadableOrder readableOrder = new com.asrevo.cvhome.store.core.model.order.v0.ReadableOrder();
             try {
@@ -468,13 +464,13 @@ public class OrderFacadeImpl implements OrderFacade {
     private void setOrderProductList(final Order order, final Locale locale, final MerchantStore store,
                                      final Language language, final com.asrevo.cvhome.store.core.model.order.v0.ReadableOrder readableOrder)
             throws ConversionException {
-        List<ReadableOrderProduct> orderProducts = new ArrayList<ReadableOrderProduct>();
+        List<ReadableOrderProduct> orderProducts = new ArrayList<>();
         for (OrderProduct p : order.getOrderProducts()) {
             ReadableOrderProductPopulator orderProductPopulator = new ReadableOrderProductPopulator();
             orderProductPopulator.setLocale(locale);
             orderProductPopulator.setProductService(productService);
             orderProductPopulator.setPricingService(pricingService);
-            orderProductPopulator.setimageUtils(imageUtils);
+            orderProductPopulator.setImageUtils(imageUtils);
             ReadableOrderProduct orderProduct = new ReadableOrderProduct();
             orderProductPopulator.populate(p, orderProduct, store, language);
 
@@ -503,7 +499,7 @@ public class OrderFacadeImpl implements OrderFacade {
         if (customerId != null) {
             ReadableCustomer readableCustomer = customerFacade.getCustomerById(customerId, store, language);
             if (readableCustomer == null) {
-                log.warn("Customer id " + customerId + " not found in order " + orderId);
+                log.warn("Customer id {} not found in order {}", customerId, orderId);
             } else {
                 readableOrder.setCustomer(readableCustomer);
             }
@@ -513,12 +509,12 @@ public class OrderFacadeImpl implements OrderFacade {
             readableOrderPopulator.populate(modelOrder, readableOrder, store, language);
 
             // order products
-            List<ReadableOrderProduct> orderProducts = new ArrayList<ReadableOrderProduct>();
+            List<ReadableOrderProduct> orderProducts = new ArrayList<>();
             for (OrderProduct p : modelOrder.getOrderProducts()) {
                 ReadableOrderProductPopulator orderProductPopulator = new ReadableOrderProductPopulator();
                 orderProductPopulator.setProductService(productService);
                 orderProductPopulator.setPricingService(pricingService);
-                orderProductPopulator.setimageUtils(imageUtils);
+                orderProductPopulator.setImageUtils(imageUtils);
 
                 ReadableOrderProduct orderProduct = new ReadableOrderProduct();
                 orderProductPopulator.populate(p, orderProduct, store, language);
@@ -544,7 +540,7 @@ public class OrderFacadeImpl implements OrderFacade {
         }
 
         Set<OrderStatusHistory> historyList = order.getOrderHistory();
-        List<ReadableOrderStatusHistory> returnList = historyList.stream().map(f -> mapToReadbleOrderStatusHistory(f))
+        List<ReadableOrderStatusHistory> returnList = historyList.stream().map(this::mapToReadbleOrderStatusHistory)
                 .collect(Collectors.toList());
         return returnList;
     }

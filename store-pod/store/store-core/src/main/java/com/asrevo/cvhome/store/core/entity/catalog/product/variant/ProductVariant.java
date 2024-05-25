@@ -59,21 +59,21 @@ public class ProductVariant extends SalesManagerEntity<Long, ProductVariant> imp
     private boolean defaultSelection = true;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "PRODUCT_VARIATION_ID", nullable = true)
+    @JoinColumn(name = "PRODUCT_VARIATION_ID")
     private ProductVariation variation;
 
     @ManyToOne(targetEntity = Product.class)
     @JoinColumn(name = "PRODUCT_ID", nullable = false)
     private Product product;
 
-    @Column(name = "CODE", nullable = true)
+    @Column(name = "CODE")
     private String code;
 
     @Column(name = "SORT_ORDER")
     private Integer sortOrder = 0;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "PRODUCT_VARIATION_VALUE_ID", nullable = true)
+    @JoinColumn(name = "PRODUCT_VARIATION_VALUE_ID")
     private ProductVariation variationValue;
 
     @NotEmpty
@@ -82,10 +82,10 @@ public class ProductVariant extends SalesManagerEntity<Long, ProductVariant> imp
     private String sku;
 
     @ManyToOne(targetEntity = ProductVariantGroup.class)
-    @JoinColumn(name = "PRODUCT_VARIANT_GROUP_ID", nullable = true)
+    @JoinColumn(name = "PRODUCT_VARIANT_GROUP_ID")
     private ProductVariantGroup productVariantGroup;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "productVariant")
-    private Set<ProductAvailability> availabilities = new HashSet<ProductAvailability>();
+    private Set<ProductAvailability> availabilities = new HashSet<>();
 
 }

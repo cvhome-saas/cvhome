@@ -24,6 +24,6 @@ public class ReadableProductAttribute extends ProductAttributeEntity implements 
     private String code;
     private String type;
 
-    private List<ReadableProductAttributeValue> attributeValues = new ArrayList<ReadableProductAttributeValue>();
+    private List<ReadableProductAttributeValue> attributeValues = new ArrayList<>();
 
 }

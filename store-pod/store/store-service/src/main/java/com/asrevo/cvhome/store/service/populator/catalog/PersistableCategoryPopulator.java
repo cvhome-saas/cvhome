@@ -104,7 +104,7 @@ public class PersistableCategoryPopulator extends
 
 
             if (!CollectionUtils.isEmpty(source.getDescriptions())) {
-                Set<com.asrevo.cvhome.store.core.entity.catalog.category.CategoryDescription> descriptions = new HashSet<com.asrevo.cvhome.store.core.entity.catalog.category.CategoryDescription>();
+                Set<com.asrevo.cvhome.store.core.entity.catalog.category.CategoryDescription> descriptions = new HashSet<>();
                 if (CollectionUtils.isNotEmpty(target.getDescriptions())) {
                     for (com.asrevo.cvhome.store.core.entity.catalog.category.CategoryDescription description : target.getDescriptions()) {
                         for (CategoryDescription d : source.getDescriptions()) {

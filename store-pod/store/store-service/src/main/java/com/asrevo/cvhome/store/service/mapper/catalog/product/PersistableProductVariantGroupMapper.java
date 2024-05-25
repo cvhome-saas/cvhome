@@ -65,7 +65,7 @@ public class PersistableProductVariantGroupMapper implements Mapper<PersistableP
             destination.setImages(images);
         }
         destination.setMerchantStore(store);
-        destination.setProductVariants(new HashSet<ProductVariant>(productVariants));
+        destination.setProductVariants(new HashSet<>(productVariants));
         return destination;
     }
 

@@ -64,7 +64,7 @@ public class CustomerEntityPopulator
             }
 
             if (source.getCustomerReviewCount() != null) {
-                target.setRatingCount(source.getCustomerReviewCount().intValue());
+                target.setRatingCount(source.getCustomerReviewCount());
             }
 
             if (source.getDelivery() != null) {

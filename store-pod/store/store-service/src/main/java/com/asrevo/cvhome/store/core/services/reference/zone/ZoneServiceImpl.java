@@ -50,7 +50,7 @@ public class ZoneServiceImpl extends SalesManagerEntityServiceImpl<Long, Zone> i
                 update(zone);
             }
         } else {
-            List<ZoneDescription> descriptions = new ArrayList<ZoneDescription>();
+            List<ZoneDescription> descriptions = new ArrayList<>();
             descriptions.add(description);
             zone.setDescriptions(descriptions);
             update(zone);
@@ -83,7 +83,7 @@ public class ZoneServiceImpl extends SalesManagerEntityServiceImpl<Long, Zone> i
 
                 //set names
                 for (Zone zone : zones) {
-                    ZoneDescription description = zone.getDescriptions().get(0);
+                    ZoneDescription description = zone.getDescriptions().getFirst();
                     zone.setName(description.getName());
 
                 }
@@ -120,7 +120,7 @@ public class ZoneServiceImpl extends SalesManagerEntityServiceImpl<Long, Zone> i
 
                 //set names
                 for (Zone zone : zones) {
-                    ZoneDescription description = zone.getDescriptions().get(0);
+                    ZoneDescription description = zone.getDescriptions().getFirst();
                     zone.setName(description.getName());
 
                 }
@@ -148,12 +148,12 @@ public class ZoneServiceImpl extends SalesManagerEntityServiceImpl<Long, Zone> i
 
 
             if (zones == null) {
-                zones = new HashMap<String, Zone>();
+                zones = new HashMap<>();
                 List<Zone> zns = zoneRepository.listByLanguage(language.getId());
 
                 //set names
                 for (Zone zone : zns) {
-                    ZoneDescription description = zone.getDescriptions().get(0);
+                    ZoneDescription description = zone.getDescriptions().getFirst();
                     zone.setName(description.getName());
                     zones.put(zone.getCode(), zone);
 

@@ -6,7 +6,7 @@ import jakarta.validation.ConstraintValidatorContext;
 
 /**
  * Validates values of a String used as payload in REST service
- * Solution taken from https://funofprograming.wordpress.com/2016/09/29/java-enum-validator/
+ * Solution taken from <a href="https://funofprograming.wordpress.com/2016/09/29/java-enum-validator/">...</a>
  *
  * @author c.samson
  */

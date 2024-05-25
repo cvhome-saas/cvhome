@@ -30,6 +30,8 @@ import com.asrevo.cvhome.store.core.services.catalog.pricing.PricingService;
 import com.asrevo.cvhome.store.utils.AbstractDataPopulator;
 import com.asrevo.cvhome.store.utils.DateUtil;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.Assert;
@@ -38,28 +40,14 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 
+@Setter
+@Getter
 public class ReadableProductPopulator extends
         AbstractDataPopulator<Product, ReadableProduct> {
 
     private PricingService pricingService;
 
     private ImageFilePath imageUtils;
-
-    public ImageFilePath getimageUtils() {
-        return imageUtils;
-    }
-
-    public void setimageUtils(ImageFilePath imageUtils) {
-        this.imageUtils = imageUtils;
-    }
-
-    public PricingService getPricingService() {
-        return pricingService;
-    }
-
-    public void setPricingService(PricingService pricingService) {
-        this.pricingService = pricingService;
-    }
 
     @Override
     public ReadableProduct populate(Product source,
@@ -71,7 +59,7 @@ public class ReadableProductPopulator extends
 
         try {
 
-            List<com.asrevo.cvhome.store.core.model.catalog.product.ProductDescription> fulldescriptions = new ArrayList<com.asrevo.cvhome.store.core.model.catalog.product.ProductDescription>();
+            List<com.asrevo.cvhome.store.core.model.catalog.product.ProductDescription> fulldescriptions = new ArrayList<>();
             if (language == null) {
                 target = new ReadableProductFull();
             }
@@ -187,9 +175,6 @@ public class ReadableProductPopulator extends
 			  target.setType(type);
 			}*/
 
-            /**
-             * TODO use ProductImageMapper
-             */
             Set<ProductImage> images = source.getImages();
             if (images != null && !images.isEmpty()) {
                 List<ReadableImage> imageList = new ArrayList<>();
@@ -200,7 +185,7 @@ public class ReadableProductPopulator extends
                     ReadableImage prdImage = new ReadableImage();
                     prdImage.setImageName(img.getProductImage());
                     prdImage.setDefaultImage(img.isDefaultImage());
-                    prdImage.setOrder(img.getSortOrder() != null ? img.getSortOrder().intValue() : 0);
+                    prdImage.setOrder(img.getSortOrder() != null ? img.getSortOrder() : 0);
 
                     if (img.getImageType() == 1 && img.getProductImageUrl() != null) {
                         prdImage.setImageUrl(img.getProductImageUrl());
@@ -236,7 +221,7 @@ public class ReadableProductPopulator extends
             if (!CollectionUtils.isEmpty(source.getCategories())) {
 
                 ReadableCategoryPopulator categoryPopulator = new ReadableCategoryPopulator();
-                List<ReadableCategory> categoryList = new ArrayList<ReadableCategory>();
+                List<ReadableCategory> categoryList = new ArrayList<>();
 
                 for (Category category : source.getCategories()) {
 
@@ -393,7 +378,7 @@ public class ReadableProductPopulator extends
                         } else {//selectable option
 
                             if (selectableOptions == null) {
-                                selectableOptions = new TreeMap<Long, ReadableProductOption>();
+                                selectableOptions = new TreeMap<>();
                             }
                             opt = selectableOptions.get(attribute.getProductOption().getId());
                             if (opt == null) {
@@ -420,13 +405,13 @@ public class ReadableProductPopulator extends
                             }
                             optValue.setSortOrder(0);
                             if (attribute.getProductOptionSortOrder() != null) {
-                                optValue.setSortOrder(attribute.getProductOptionSortOrder().intValue());
+                                optValue.setSortOrder(attribute.getProductOptionSortOrder());
                             }
 
                             List<ProductOptionValueDescription> podescriptions = optionValue.getDescriptionsSettoList();
                             ProductOptionValueDescription podescription = null;
                             if (podescriptions != null && !podescriptions.isEmpty()) {
-                                podescription = podescriptions.get(0);
+                                podescription = podescriptions.getFirst();
                                 if (podescriptions.size() > 1) {
                                     for (ProductOptionValueDescription optionValueDescription : podescriptions) {
                                         if (optionValueDescription.getLanguage().getId().intValue() == language.getId().intValue()) {
@@ -450,7 +435,7 @@ public class ReadableProductPopulator extends
                 }
 
                 if (selectableOptions != null) {
-                    List<ReadableProductOption> options = new ArrayList<ReadableProductOption>(selectableOptions.values());
+                    List<ReadableProductOption> options = new ArrayList<>(selectableOptions.values());
                     target.setOptions(options);
                 }
 
@@ -483,7 +468,7 @@ public class ReadableProductPopulator extends
                 target.setQuantity(availability.getProductQuantity() == null ? 1 : availability.getProductQuantity());
                 target.setQuantityOrderMaximum(availability.getProductQuantityOrderMax() == null ? 1 : availability.getProductQuantityOrderMax());
                 target.setQuantityOrderMinimum(availability.getProductQuantityOrderMin() == null ? 1 : availability.getProductQuantityOrderMin());
-                if (availability.getProductQuantity().intValue() > 0 && target.isAvailable()) {
+                if (availability.getProductQuantity() > 0 && target.isAvailable()) {
                     target.setCanBePurchased(true);
                 }
                 //}
@@ -559,7 +544,7 @@ public class ReadableProductPopulator extends
         List<ProductOptionDescription> descriptions = productAttribute.getProductOption().getDescriptionsSettoList();
         ProductOptionDescription description = null;
         if (descriptions != null && !descriptions.isEmpty()) {
-            description = descriptions.get(0);
+            description = descriptions.getFirst();
             if (descriptions.size() > 1) {
                 for (ProductOptionDescription optionDescription : descriptions) {
                     if (optionDescription.getLanguage().getCode().equals(language.getCode())) {
@@ -590,7 +575,7 @@ public class ReadableProductPopulator extends
 
         if (!CollectionUtils.isEmpty(type.getDescriptions())) {
             Optional<ProductTypeDescription> desc = type.getDescriptions().stream().filter(t -> t.getLanguage().getCode().equals(language.getCode()))
-                    .map(d -> typeDescription(d)).findFirst();
+                    .map(this::typeDescription).findFirst();
             desc.ifPresent(readableType::setDescription);
         }
 
@@ -615,7 +600,7 @@ public class ReadableProductPopulator extends
         List<ProductOptionDescription> descriptions = productAttribute.getProductOption().getDescriptionsSettoList();
         ProductOptionDescription description = null;
         if (descriptions != null && !descriptions.isEmpty()) {
-            description = descriptions.get(0);
+            description = descriptions.getFirst();
             if (descriptions.size() > 1) {
                 for (ProductOptionDescription optionDescription : descriptions) {
                     if (optionDescription.getLanguage().getId().intValue() == language.getId().intValue()) {

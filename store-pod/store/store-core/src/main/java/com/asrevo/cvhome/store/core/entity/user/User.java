@@ -61,7 +61,7 @@ public class User extends SalesManagerEntity<Long, User> implements Auditable {
             org.hibernate.annotations.CascadeType.REPLICATE
 
     })
-    private List<Group> groups = new ArrayList<Group>();
+    private List<Group> groups = new ArrayList<>();
     @NotEmpty
     @Email
     @Column(name = "ADMIN_EMAIL")

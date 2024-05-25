@@ -19,9 +19,6 @@ public interface ShippingQuoteService extends SalesManagerEntityService<Long, Qu
      * in the table ShippingQuote. This method allows the creation of a ShippingSummary
      * object to work with in the services and in the api.
      *
-     * @param quoteId
-     * @return
-     * @throws ServiceException
      */
     ShippingSummary getShippingSummary(Long quoteId, MerchantStore store) throws ServiceException;
 

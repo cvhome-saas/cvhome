@@ -79,7 +79,7 @@ public class PersistableProductDefinitionMapper implements Mapper<PersistablePro
             destination.setRefSku(source.getIdentifier());
 
 
-            if (source.getId() != null && source.getId().longValue() == 0) {
+            if (source.getId() != null && source.getId() == 0) {
                 destination.setId(null);
             } else {
                 destination.setId(source.getId());
@@ -113,8 +113,8 @@ public class PersistableProductDefinitionMapper implements Mapper<PersistablePro
 
             destination.setMerchantStore(store);
 
-            List<Language> languages = new ArrayList<Language>();
-            Set<ProductDescription> descriptions = new HashSet<ProductDescription>();
+            List<Language> languages = new ArrayList<>();
+            Set<ProductDescription> descriptions = new HashSet<>();
             if (!CollectionUtils.isEmpty(source.getDescriptions())) {
                 for (com.asrevo.cvhome.store.core.model.catalog.product.ProductDescription description : source.getDescriptions()) {
 
@@ -153,9 +153,6 @@ public class PersistableProductDefinitionMapper implements Mapper<PersistablePro
                 destination.setDescriptions(descriptions);
             }
 
-            /**
-             * Product definition
-             */
             ProductAvailability productAvailability = null;
             ProductPrice defaultPrice = null;
             if (!CollectionUtils.isEmpty(destination.getAvailabilities())) {
@@ -184,7 +181,7 @@ public class PersistableProductDefinitionMapper implements Mapper<PersistablePro
                 productAvailability.setProductQuantityOrderMin(1);
                 productAvailability.setProductQuantityOrderMax(1);
                 productAvailability.setRegion(Constants.ALL_REGIONS);
-                productAvailability.setAvailable(Boolean.valueOf(destination.isAvailable()));
+                productAvailability.setAvailable(destination.isAvailable());
                 productAvailability.setProductStatus(source.isCanBePurchased());
             }
 

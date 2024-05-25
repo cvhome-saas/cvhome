@@ -36,13 +36,10 @@ public class ReadableOrderProductMapper implements Mapper<OrderProduct, Readable
     final
     ReadableProductMapper readableProductMapper;
 
-    private final ImageFilePath imageUtils;
-
     public ReadableOrderProductMapper(PricingService pricingService, ProductService productService, ReadableProductMapper readableProductMapper, ImageFilePath imageUtils) {
         this.pricingService = pricingService;
         this.productService = productService;
         this.readableProductMapper = readableProductMapper;
-        this.imageUtils = imageUtils;
     }
 
     @Override
@@ -82,7 +79,7 @@ public class ReadableOrderProductMapper implements Mapper<OrderProduct, Readable
         }
 
         if (source.getOrderAttributes() != null) {
-            List<ReadableOrderProductAttribute> attributes = new ArrayList<ReadableOrderProductAttribute>();
+            List<ReadableOrderProductAttribute> attributes = new ArrayList<>();
             for (OrderProductAttribute attr : source.getOrderAttributes()) {
                 ReadableOrderProductAttribute readableAttribute = new ReadableOrderProductAttribute();
                 try {
@@ -113,37 +110,6 @@ public class ReadableOrderProductMapper implements Mapper<OrderProduct, Readable
                 ReadableProduct productProxy = readableProductMapper.convert(product, store, language);
                 target.setProduct(productProxy);
 
-                /**
-
-                 // TODO autowired
-                 ReadableProductPopulator populator = new ReadableProductPopulator();
-                 populator.setPricingService(pricingService);
-                 populator.setimageUtils(imageUtils);
-
-                 ReadableProduct productProxy;
-                 try {
-                 productProxy = populator.populate(product, new ReadableProduct(), store, language);
-                 target.setProduct(productProxy);
-                 } catch (ConversionException e) {
-                 throw new ConversionRuntimeException("Cannot convert product", e);
-                 }
-
-                 Set<ProductImage> images = product.getImages();
-                 ProductImage defaultImage = null;
-                 if (images != null) {
-                 for (ProductImage image : images) {
-                 if (defaultImage == null) {
-                 defaultImage = image;
-                 }
-                 if (image.isDefaultImage()) {
-                 defaultImage = image;
-                 }
-                 }
-                 }
-                 if (defaultImage != null) {
-                 target.setImage(defaultImage.getProductImage());
-                 }
-                 **/
             }
         }
 

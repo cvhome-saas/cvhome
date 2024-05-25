@@ -16,7 +16,7 @@ import java.util.List;
 @Getter
 public class ContentFolder {
 
-    List<Content> content = new ArrayList<Content>();
+    List<Content> content = new ArrayList<>();
     private String path;
 
 }

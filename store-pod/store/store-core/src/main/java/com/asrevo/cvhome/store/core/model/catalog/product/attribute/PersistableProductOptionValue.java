@@ -19,6 +19,6 @@ public class PersistableProductOptionValue extends ProductOptionValueEntity
      */
     @Serial
     private static final long serialVersionUID = 1L;
-    private List<ProductOptionValueDescription> descriptions = new ArrayList<ProductOptionValueDescription>();
+    private List<ProductOptionValueDescription> descriptions = new ArrayList<>();
 
 }

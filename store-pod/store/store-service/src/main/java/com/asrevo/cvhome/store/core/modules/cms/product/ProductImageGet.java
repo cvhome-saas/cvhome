@@ -14,11 +14,6 @@ public interface ProductImageGet extends ImageGet {
     /**
      * Used for accessing the path directly
      *
-     * @param merchantStoreCode
-     * @param product
-     * @param imageName
-     * @return
-     * @throws ServiceException
      */
     OutputContentFile getProductImage(final String merchantStoreCode, final String productCode,
                                       final String imageName) throws ServiceException;

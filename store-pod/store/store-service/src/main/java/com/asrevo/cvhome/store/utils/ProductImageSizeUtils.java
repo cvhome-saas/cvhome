@@ -19,10 +19,6 @@ public class ProductImageSizeUtils {
     /**
      * Simple resize, does not maintain aspect ratio
      *
-     * @param image
-     * @param width
-     * @param height
-     * @return
      */
 
     public static BufferedImage resize(BufferedImage image, int width, int height) {
@@ -43,14 +39,9 @@ public class ProductImageSizeUtils {
     }
 
     /**
-     * @param img
-     * @param targetWidth
-     * @param targetHeight
      * @param hint          {@code RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR},
      *                      {@code RenderingHints.VALUE_INTERPOLATION_BILINEAR},
      *                      {@code RenderingHints.VALUE_INTERPOLATION_BICUBIC})
-     * @param higherQuality
-     * @return
      */
     public static BufferedImage resizeWithHint(BufferedImage img,
                                                int targetWidth, int targetHeight, Object hint,

@@ -21,7 +21,7 @@ public class IntegrationModulesLoader {
     public List<IntegrationModule> loadIntegrationModules(String jsonFilePath) throws Exception {
 
 
-        List<IntegrationModule> modules = new ArrayList<IntegrationModule>();
+        List<IntegrationModule> modules = new ArrayList<>();
 
         ObjectMapper mapper = new ObjectMapper();
 
@@ -110,7 +110,7 @@ public class IntegrationModulesLoader {
         if (confs != null) {
             StringBuilder configString = new StringBuilder();
             configString.append("[");
-            Map<String, ModuleConfig> moduleConfigs = new HashMap<String, ModuleConfig>();
+            Map<String, ModuleConfig> moduleConfigs = new HashMap<>();
             int count = 0;
             for (Object oo : confs) {
 

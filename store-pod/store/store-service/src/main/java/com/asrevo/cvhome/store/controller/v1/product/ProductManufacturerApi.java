@@ -57,11 +57,6 @@ public class ProductManufacturerApi {
     /**
      * Method for creating a manufacturer
      *
-     * @param manufacturer
-     * @param request
-     * @param response
-     * @return
-     * @throws Exception
      */
     @RequestMapping(value = "/private/manufacturer", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
@@ -169,13 +164,13 @@ public class ProductManufacturerApi {
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
-    @Operation(method = "GET", description = "Check if manufacturer code already exists", summary = "",
+    @Operation(method = "GET", description = "Check if manufacturer code already exists",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = EntityExists.class))))
     public ResponseEntity<EntityExists> exists(@RequestParam(value = "code") String code,
                                                @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore, @Parameter(hidden = true) Language language) {
 
         boolean exists = manufacturerFacade.manufacturerExist(merchantStore, code);
-        return new ResponseEntity<EntityExists>(new EntityExists(exists), HttpStatus.OK);
+        return new ResponseEntity<>(new EntityExists(exists), HttpStatus.OK);
 
     }
 
@@ -232,7 +227,7 @@ public class ProductManufacturerApi {
 
     @RequestMapping(value = "/category/{id}/manufacturer", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
-    @Operation(method = "GET", description = "Get all manufacturers for all items in a given category", summary = "",
+    @Operation(method = "GET", description = "Get all manufacturers for all items in a given category",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = List.class))))
     @ResponseBody
     @Parameters({

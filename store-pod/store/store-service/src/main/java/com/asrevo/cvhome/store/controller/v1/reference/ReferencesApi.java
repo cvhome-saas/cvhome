@@ -52,7 +52,6 @@ public class ReferencesApi {
     /**
      * Search languages by language code private/languages returns everything
      *
-     * @return
      */
     @GetMapping("/languages")
     public List<Language> getLanguages() {
@@ -63,8 +62,6 @@ public class ReferencesApi {
      * Returns a country with zones (provinces, states) supports language set in parameter
      * ?lang=en|fr|ru...
      *
-     * @param request
-     * @return
      */
     @GetMapping("/country")
     public List<ReadableCountry> getCountry(@Parameter(hidden = true) Language language, HttpServletRequest request) {
@@ -82,7 +79,6 @@ public class ReferencesApi {
     /**
      * Currency
      *
-     * @return
      */
     @GetMapping("/currency")
     public List<Currency> getCurrency() {

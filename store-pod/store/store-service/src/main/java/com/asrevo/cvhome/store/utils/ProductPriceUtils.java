@@ -43,10 +43,6 @@ public class ProductPriceUtils {
     /**
      * Get the price without discount
      *
-     * @param store
-     * @param product
-     * @param locale
-     * @return
      */
     // Pricer
     public BigDecimal getPrice(MerchantStore store, Product product, Locale locale) {
@@ -74,8 +70,6 @@ public class ProductPriceUtils {
      * the product object. The calculation is based on the default price. Attributes
      * may be null
      *
-     * @param Product
-     * @param List<ProductAttribute>
      * @return FinalPrice
      */
     // Pricer
@@ -122,10 +116,6 @@ public class ProductPriceUtils {
      * possibles discounts. This price does not calculate the attributes or other
      * prices than the default one
      *
-     * @param store
-     * @param product
-     * @param locale
-     * @return
      */
     // Pricer
     public FinalPrice getFinalPrice(Product product) throws ServiceException {
@@ -187,7 +177,7 @@ public class ProductPriceUtils {
                         finalPrice = p;
                     } else {
                         if (otherPrices == null) {
-                            otherPrices = new ArrayList<FinalPrice>();
+                            otherPrices = new ArrayList<>();
                         }
                         otherPrices.add(p);
                     }
@@ -199,7 +189,7 @@ public class ProductPriceUtils {
             finalPrice.setAdditionalPrices(otherPrices);
         } else {
             if (otherPrices != null) {
-                finalPrice = otherPrices.get(0);
+                finalPrice = otherPrices.getFirst();
             }
         }
 
@@ -235,10 +225,6 @@ public class ProductPriceUtils {
      * 1,299.99 The admin user will also be force to input the amount using that
      * format
      *
-     * @param store
-     * @param amount
-     * @return
-     * @throws Exception
      */
     @Deprecated
     public String getAdminFormatedAmount(MerchantStore store, BigDecimal amount) throws Exception {
@@ -275,10 +261,7 @@ public class ProductPriceUtils {
      * national format amount ex: $1,345.99 Rs.1.345.99 or international format
      * USD1,345.79 INR1,345.79
      *
-     * @param store
-     * @param amount
      * @return String
-     * @throws Exception
      */
     // Utility
     public String getStoreFormatedAmountWithCurrency(MerchantStore store, BigDecimal amount) throws Exception {
@@ -327,10 +310,6 @@ public class ProductPriceUtils {
      * This method will return the required formated amount with the appropriate
      * currency
      *
-     * @param store
-     * @param amount
-     * @return
-     * @throws Exception
      */
     @Deprecated
     public String getAdminFormatedAmountWithCurrency(MerchantStore store, BigDecimal amount) throws Exception {
@@ -353,10 +332,6 @@ public class ProductPriceUtils {
      * Returns a formatted amount using Shopizer Currency requires internal
      * java.util.Currency populated
      *
-     * @param currency
-     * @param amount
-     * @return
-     * @throws Exception
      */
     // Utility
     public String getFormatedAmountWithCurrency(com.asrevo.cvhome.store.core.entity.reference.currency.Currency currency,
@@ -380,11 +355,6 @@ public class ProductPriceUtils {
     /**
      * This amount will be displayed to the end user
      *
-     * @param store
-     * @param amount
-     * @param locale
-     * @return
-     * @throws Exception
      */
     // Utility
     public String getFormatedAmountWithCurrency(MerchantStore store, BigDecimal amount, Locale locale)
@@ -407,22 +377,11 @@ public class ProductPriceUtils {
      * Transformation of an amount of money submited by the admin user to be
      * inserted as a BigDecimal in the database
      *
-     * @param amount
-     * @param locale
-     * @return
-     * @throws Exception
      */
     // Utility
     public BigDecimal getAmount(String amount) throws Exception {
 
         // validations
-        /**
-         * 1) remove decimal and thousand
-         *
-         * String.replaceAll(decimalPoint, ""); String.replaceAll(thousandPoint, "");
-         *
-         * Should be able to parse to Integer
-         */
         StringBuilder newAmount = new StringBuilder();
         for (int i = 0; i < amount.length(); i++) {
             if (amount.charAt(i) != DECIMALPOINT && amount.charAt(i) != THOUSANDPOINT) {
@@ -493,8 +452,6 @@ public class ProductPriceUtils {
     /**
      * Determines if a ProductPrice has a discount
      *
-     * @param productPrice
-     * @return
      */
     // discounter
     public boolean hasDiscount(ProductPrice productPrice) {
@@ -542,16 +499,9 @@ public class ProductPriceUtils {
         FinalPrice finalPrice = null;
         List<FinalPrice> otherPrices = null;
 
-        /**
-         * Since 3.2.0 The rule is
-         *
-         * If product.variants contains exactly one variant If Variant has availability
-         * we use availability from variant Otherwise we use price
-         */
-
         Set<ProductAvailability> availabilities = null;
         if (!CollectionUtils.isEmpty(product.getVariants())) {
-            Optional<ProductVariant> variants = product.getVariants().stream().filter(i -> i.isDefaultSelection())
+            Optional<ProductVariant> variants = product.getVariants().stream().filter(ProductVariant::isDefaultSelection)
                     .findFirst();
             if (variants.isPresent()) {
                 availabilities = variants.get().getAvailabilities();
@@ -576,7 +526,7 @@ public class ProductPriceUtils {
                         finalPrice = p;
                     } else {
                         if (otherPrices == null) {
-                            otherPrices = new ArrayList<FinalPrice>();
+                            otherPrices = new ArrayList<>();
                         }
                         otherPrices.add(p);
                     }
@@ -588,7 +538,7 @@ public class ProductPriceUtils {
             finalPrice.setAdditionalPrices(otherPrices);
         } else {
             if (otherPrices != null) {
-                finalPrice = otherPrices.get(0);
+                finalPrice = otherPrices.getFirst();
             }
         }
 
@@ -614,7 +564,7 @@ public class ProductPriceUtils {
                 finalPrice = p;
             } else {
                 if (otherPrices == null) {
-                    otherPrices = new ArrayList<FinalPrice>();
+                    otherPrices = new ArrayList<>();
                 }
                 otherPrices.add(p);
             }
@@ -625,7 +575,7 @@ public class ProductPriceUtils {
             finalPrice.setAdditionalPrices(otherPrices);
         } else {
             if (otherPrices != null) {
-                finalPrice = otherPrices.get(0);
+                finalPrice = otherPrices.getFirst();
             }
         }
 

@@ -58,11 +58,6 @@ public class ProductImageApi {
     /**
      * To be used with MultipartFile
      *
-     * @param id
-     * @param uploadfiles
-     * @param request
-     * @param response
-     * @throws Exception
      */
     @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(value = {"/private/product/{id}/image", "/auth/product/{id}/image"}, consumes = {
@@ -73,7 +68,7 @@ public class ProductImageApi {
     })
     public void uploadImage(
             @PathVariable Long id,
-            @RequestParam(value = "file", required = true) MultipartFile[] files,
+            @RequestParam(value = "file") MultipartFile[] files,
             @RequestParam(value = "order", required = false, defaultValue = "0") Integer position,
             @RequestParam(value = "defaultImage", required = false, defaultValue = "false") boolean defaultImage,
             @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore, @Parameter(hidden = true) Language language) throws IOException {
@@ -104,7 +99,7 @@ public class ProductImageApi {
                 }
             }
 
-            List<ProductImage> contentImagesList = new ArrayList<ProductImage>();
+            List<ProductImage> contentImagesList = new ArrayList<>();
             int sortOrder = position;
             for (MultipartFile multipartFile : files) {
                 if (!multipartFile.isEmpty()) {
@@ -185,11 +180,6 @@ public class ProductImageApi {
     /**
      * Get product images
      *
-     * @param id
-     * @param imageId
-     * @param merchantStore
-     * @param language
-     * @return
      */
 
     @ResponseStatus(HttpStatus.OK)
@@ -215,7 +205,7 @@ public class ProductImageApi {
                     + "] and merchant [" + merchantStore.getCode() + "]");
         }
 
-        if (p.getMerchantStore().getId() != merchantStore.getId()) {
+        if (!p.getMerchantStore().getId().equals(merchantStore.getId())) {
             throw new ResourceNotFoundException("Product images not found for product id [" + productId
                     + "] and merchant [" + merchantStore.getCode() + "]");
         }
@@ -245,12 +235,6 @@ public class ProductImageApi {
     /**
      * Patch image (change position)
      *
-     * @param id
-     * @param files
-     * @param position
-     * @param merchantStore
-     * @param language
-     * @throws IOException
      */
 
     @ResponseStatus(HttpStatus.OK)
@@ -273,7 +257,7 @@ public class ProductImageApi {
                         + "] and merchant [" + merchantStore.getCode() + "]");
             }
 
-            if (p.getMerchantStore().getId() != merchantStore.getId()) {
+            if (!p.getMerchantStore().getId().equals(merchantStore.getId())) {
                 throw new ResourceNotFoundException("Product image [" + imageId + "] not found for product id [" + id
                         + "] and merchant [" + merchantStore.getCode() + "]");
             }

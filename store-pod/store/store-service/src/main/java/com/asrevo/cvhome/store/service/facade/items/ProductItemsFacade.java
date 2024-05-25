@@ -13,9 +13,6 @@ public interface ProductItemsFacade {
     /**
      * List items attached to a Manufacturer
      *
-     * @param store
-     * @param language
-     * @return
      */
     ReadableProductList listItemsByManufacturer(MerchantStore store, Language language, Long manufacturerId, int startCount, int maxCount) throws Exception;
 
@@ -28,22 +25,12 @@ public interface ProductItemsFacade {
     /**
      * Update product group visible flag
      *
-     * @param code
-     * @param group
-     * @param store
      */
     void updateProductGroup(String code, ProductGroup group, MerchantStore store);
 
     /**
      * List product items by id
      *
-     * @param store
-     * @param language
-     * @param ids
-     * @param startCount
-     * @param maxCount
-     * @return
-     * @throws Exception
      */
     ReadableProductList listItemsByIds(MerchantStore store, Language language, List<Long> ids, int startCount, int maxCount) throws Exception;
 
@@ -51,35 +38,18 @@ public interface ProductItemsFacade {
     /**
      * List products created in a group, for instance FEATURED group
      *
-     * @param group
-     * @param store
-     * @param language
-     * @return
-     * @throws Exception
      */
     ReadableProductList listItemsByGroup(String group, MerchantStore store, Language language) throws Exception;
 
     /**
      * Add product to a group
      *
-     * @param product
-     * @param group
-     * @param store
-     * @param language
-     * @return
-     * @throws Exception
      */
     ReadableProductList addItemToGroup(Product product, String group, MerchantStore store, Language language);
 
     /**
      * Removes a product from a group
      *
-     * @param product
-     * @param group
-     * @param store
-     * @param language
-     * @return
-     * @throws Exception
      */
     ReadableProductList removeItemFromGroup(Product product, String group, MerchantStore store, Language language) throws Exception;
 

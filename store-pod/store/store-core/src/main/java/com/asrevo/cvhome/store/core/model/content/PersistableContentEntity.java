@@ -17,6 +17,6 @@ public class PersistableContentEntity extends ContentEntity implements Serializa
      */
     @Serial
     private static final long serialVersionUID = 1L;
-    private List<ContentDescriptionEntity> descriptions = new ArrayList<ContentDescriptionEntity>();
+    private List<ContentDescriptionEntity> descriptions = new ArrayList<>();
 
 }

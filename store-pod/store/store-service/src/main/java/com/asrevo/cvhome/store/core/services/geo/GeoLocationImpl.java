@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 
 /**
  * Using Geolite2 City database
- * http://dev.maxmind.com/geoip/geoip2/geolite2/#Databases
+ * <a href="http://dev.maxmind.com/geoip/geoip2/geolite2/#Databases">...</a>
  *
  * @author c.samson
  */

@@ -54,7 +54,7 @@ public class OrderProductPrice implements Serializable {
     private Boolean defaultPrice;
 
 
-    @Column(name = "PRODUCT_PRICE_NAME", nullable = true)
+    @Column(name = "PRODUCT_PRICE_NAME")
     private String productPriceName;
 
 }

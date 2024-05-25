@@ -75,7 +75,7 @@ public class ShoppingCartServiceImpl extends SalesManagerEntityServiceImpl<Long,
             ShoppingCart shoppingCart = null;
 
             if (!CollectionUtils.isEmpty(validCart)) {
-                shoppingCart = validCart.get(0);
+                shoppingCart = validCart.getFirst();
                 getPopulatedShoppingCart(shoppingCart, store);
                 if (shoppingCart != null && shoppingCart.isObsolete()) {
                     delete(shoppingCart);
@@ -146,11 +146,6 @@ public class ShoppingCartServiceImpl extends SalesManagerEntityServiceImpl<Long,
 
     }
 
-    /**
-     * Get a {@link ShoppingCart} for a given id. Will update the shopping cart
-     * prices and items based on the actual inventory. This method will remove the
-     * shopping cart if no items are attached.
-     */
     /*
      * @Override
      *
@@ -304,8 +299,8 @@ public class ShoppingCartServiceImpl extends SalesManagerEntityServiceImpl<Long,
 
         Set<ShoppingCartAttributeItem> cartAttributes = item.getAttributes();
         Set<ProductAttribute> productAttributes = product.getAttributes();
-        List<ProductAttribute> attributesList = new ArrayList<ProductAttribute>();// attributes maintained
-        List<ShoppingCartAttributeItem> removeAttributesList = new ArrayList<ShoppingCartAttributeItem>();// attributes
+        List<ProductAttribute> attributesList = new ArrayList<>();// attributes maintained
+        List<ShoppingCartAttributeItem> removeAttributesList = new ArrayList<>();// attributes
         // to remove
         // DELETE ORPHEANS MANUALLY
         if ((productAttributes != null && !productAttributes.isEmpty())
@@ -354,16 +349,13 @@ public class ShoppingCartServiceImpl extends SalesManagerEntityServiceImpl<Long,
 
     @Override
     public List<ShippingProduct> createShippingProduct(final ShoppingCart cart) throws ServiceException {
-        /**
-         * Determines if products are virtual
-         */
         Set<ShoppingCartItem> items = cart.getLineItems();
         List<ShippingProduct> shippingProducts = null;
         for (ShoppingCartItem item : items) {
             Product product = item.getProduct();
             if (!product.isProductVirtual() && product.isProductShipeable()) {
                 if (shippingProducts == null) {
-                    shippingProducts = new ArrayList<ShippingProduct>();
+                    shippingProducts = new ArrayList<>();
                 }
                 ShippingProduct shippingProduct = new ShippingProduct(product);
                 shippingProduct.setQuantity(item.getQuantity());
@@ -437,7 +429,7 @@ public class ShoppingCartServiceImpl extends SalesManagerEntityServiceImpl<Long,
 
         Set<ShoppingCartItem> shoppingCartItemsSet = null;
         if (CollectionUtils.isNotEmpty(sessionCart.getLineItems())) {
-            shoppingCartItemsSet = new HashSet<ShoppingCartItem>();
+            shoppingCartItemsSet = new HashSet<>();
             for (ShoppingCartItem shoppingCartItem : sessionCart.getLineItems()) {
                 Product product = productService.getBySku(shoppingCartItem.getSku(), store, store.getDefaultLanguage());
                 //.getById(shoppingCartItem.getProductId());
@@ -455,7 +447,7 @@ public class ShoppingCartServiceImpl extends SalesManagerEntityServiceImpl<Long,
                 item.setShoppingCart(cartModel);
 
                 if (!CollectionUtils.isEmpty(shoppingCartItem.getAttributes())) {
-                    List<ShoppingCartAttributeItem> cartAttributes = new ArrayList<ShoppingCartAttributeItem>(shoppingCartItem.getAttributes());
+                    List<ShoppingCartAttributeItem> cartAttributes = new ArrayList<>(shoppingCartItem.getAttributes());
                     if (CollectionUtils.isNotEmpty(cartAttributes)) {
                         for (ShoppingCartAttributeItem shoppingCartAttributeItem : cartAttributes) {
                             ProductAttribute productAttribute = productAttributeService

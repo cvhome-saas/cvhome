@@ -17,6 +17,8 @@ import com.asrevo.cvhome.store.core.services.catalog.product.ProductService;
 import com.asrevo.cvhome.store.service.populator.catalog.ReadableProductPopulator;
 import com.asrevo.cvhome.store.utils.AbstractDataPopulator;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 
@@ -30,6 +32,8 @@ import java.util.Set;
  *
  * @author carlsamson
  */
+@Setter
+@Getter
 @Deprecated
 public class ReadableOrderProductPopulator extends
         AbstractDataPopulator<OrderProduct, ReadableOrderProduct> {
@@ -38,14 +42,6 @@ public class ReadableOrderProductPopulator extends
     private PricingService pricingService;
     private ImageFilePath imageUtils;
 
-
-    public ImageFilePath getimageUtils() {
-        return imageUtils;
-    }
-
-    public void setimageUtils(ImageFilePath imageUtils) {
-        this.imageUtils = imageUtils;
-    }
 
     @Override
     public ReadableOrderProduct populate(OrderProduct source,
@@ -77,7 +73,7 @@ public class ReadableOrderProductPopulator extends
         }
 
         if (source.getOrderAttributes() != null) {
-            List<ReadableOrderProductAttribute> attributes = new ArrayList<ReadableOrderProductAttribute>();
+            List<ReadableOrderProductAttribute> attributes = new ArrayList<>();
             for (OrderProductAttribute attr : source.getOrderAttributes()) {
                 ReadableOrderProductAttribute readableAttribute = new ReadableOrderProductAttribute();
                 try {
@@ -108,7 +104,7 @@ public class ReadableOrderProductPopulator extends
 
                 ReadableProductPopulator populator = new ReadableProductPopulator();
                 populator.setPricingService(pricingService);
-                populator.setimageUtils(imageUtils);
+                populator.setImageUtils(imageUtils);
 
                 ReadableProduct productProxy = populator.populate(product, new ReadableProduct(), store, language);
                 target.setProduct(productProxy);
@@ -139,22 +135,6 @@ public class ReadableOrderProductPopulator extends
     protected ReadableOrderProduct createTarget() {
 
         return null;
-    }
-
-    public ProductService getProductService() {
-        return productService;
-    }
-
-    public void setProductService(ProductService productService) {
-        this.productService = productService;
-    }
-
-    public PricingService getPricingService() {
-        return pricingService;
-    }
-
-    public void setPricingService(PricingService pricingService) {
-        this.pricingService = pricingService;
     }
 
 }

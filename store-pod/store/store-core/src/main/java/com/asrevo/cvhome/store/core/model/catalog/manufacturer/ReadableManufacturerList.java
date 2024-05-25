@@ -18,6 +18,6 @@ public class ReadableManufacturerList extends ReadableList {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private List<ReadableManufacturer> manufacturers = new ArrayList<ReadableManufacturer>();
+    private List<ReadableManufacturer> manufacturers = new ArrayList<>();
 
 }

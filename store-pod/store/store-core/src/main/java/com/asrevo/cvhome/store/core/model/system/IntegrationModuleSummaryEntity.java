@@ -20,7 +20,7 @@ public class IntegrationModuleSummaryEntity extends IntegrationModuleEntity {
     private boolean configured;
     private String image;
     private String binaryImage;
-    private List<String> requiredKeys = new ArrayList<String>();
+    private List<String> requiredKeys = new ArrayList<>();
     private String configurable = null;
 
 }

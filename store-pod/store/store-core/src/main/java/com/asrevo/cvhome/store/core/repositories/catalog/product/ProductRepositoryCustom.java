@@ -43,7 +43,7 @@ public interface ProductRepositoryCustom {
      * Get product by code
      *
      * @deprecated This method is no longer acceptable to get product by code.
-     * <p> Use {@link ProductService#getBySku(sku, store)} instead.
+     * <p> Use  instead.
      */
     @Deprecated
     Product getByCode(String productCode, Language language);
@@ -52,7 +52,7 @@ public interface ProductRepositoryCustom {
      * Get product by code
      *
      * @deprecated This method is no longer acceptable to get product by code.
-     * <p> Use {@link ProductService#getBySku(sku, store)} instead.
+     * <p> Use  instead.
      */
     @Deprecated
     Product getByCode(String productCode, MerchantStore store);

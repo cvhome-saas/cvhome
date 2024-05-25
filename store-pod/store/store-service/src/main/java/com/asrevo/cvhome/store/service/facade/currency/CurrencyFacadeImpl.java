@@ -24,7 +24,7 @@ public class CurrencyFacadeImpl implements CurrencyFacade {
         if (currencyList.isEmpty()) {
             throw new ResourceNotFoundException("No languages found");
         }
-        Collections.sort(currencyList, Comparator.comparing(Currency::getCode));
+        currencyList.sort(Comparator.comparing(Currency::getCode));
         return currencyList;
     }
 }

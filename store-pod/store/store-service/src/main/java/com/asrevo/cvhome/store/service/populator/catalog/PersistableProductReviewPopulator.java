@@ -89,7 +89,7 @@ public class PersistableProductReviewPopulator extends
             description.setName("-");
             description.setProductReview(target);
 
-            Set<ProductReviewDescription> descriptions = new HashSet<ProductReviewDescription>();
+            Set<ProductReviewDescription> descriptions = new HashSet<>();
             descriptions.add(description);
 
             target.setDescriptions(descriptions);

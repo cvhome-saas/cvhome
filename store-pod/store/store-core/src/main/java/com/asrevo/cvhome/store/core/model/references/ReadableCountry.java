@@ -18,6 +18,6 @@ public class ReadableCountry extends CountryEntity {
     private static final long serialVersionUID = 1L;
 
     private String name;
-    private List<ReadableZone> zones = new ArrayList<ReadableZone>();
+    private List<ReadableZone> zones = new ArrayList<>();
 
 }

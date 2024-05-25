@@ -35,7 +35,7 @@ public class MerchantLog extends SalesManagerEntity<Long, MerchantLog> implement
     @JoinColumn(name = "MERCHANT_ID", nullable = false)
     private MerchantStore store;
 
-    @Column(name = "MODULE", length = 25, nullable = true)
+    @Column(name = "MODULE", length = 25)
     private String module;
 
 

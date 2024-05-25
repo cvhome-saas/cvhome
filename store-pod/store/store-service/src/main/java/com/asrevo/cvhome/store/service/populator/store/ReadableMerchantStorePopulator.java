@@ -151,7 +151,7 @@ public class ReadableMerchantStorePopulator extends
         target.setUseCache(source.isUseCache());
 
         if (!CollectionUtils.isEmpty(source.getLanguages())) {
-            List<ReadableLanguage> supported = new ArrayList<ReadableLanguage>();
+            List<ReadableLanguage> supported = new ArrayList<>();
             for (Language lang : source.getLanguages()) {
                 try {
                     Language langObject = languageService.getLanguagesMap().get(lang.getCode());

@@ -27,7 +27,7 @@ public class ReadableShoppingCartItem extends ReadableMinimalProduct implements 
     private static final long serialVersionUID = 1L;
     private BigDecimal subTotal;
     private String displaySubTotal;
-    private List<ReadableShoppingCartAttribute> cartItemattributes = new ArrayList<ReadableShoppingCartAttribute>();
+    private List<ReadableShoppingCartAttribute> cartItemattributes = new ArrayList<>();
 
     private ReadableProductVariation variant = null;
     private ReadableProductVariation variantValue = null;

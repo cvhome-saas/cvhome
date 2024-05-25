@@ -17,8 +17,6 @@ public interface CustomerOptinService extends SalesManagerEntityService<Long, Cu
      * Optin a given customer. This has no reference to a specific Customer object but contains
      * only email, first name and lastname
      *
-     * @param optin
-     * @throws ServiceException
      */
     void optinCumtomer(CustomerOptin optin) throws ServiceException;
 
@@ -26,19 +24,12 @@ public interface CustomerOptinService extends SalesManagerEntityService<Long, Cu
     /**
      * Removes a specific CustomerOptin
      *
-     * @param optin
-     * @throws ServiceException
      */
     void optoutCumtomer(CustomerOptin optin) throws ServiceException;
 
     /**
      * Find an existing CustomerOptin
      *
-     * @param store
-     * @param emailAddress
-     * @param code
-     * @return
-     * @throws ServiceException
      */
     CustomerOptin findByEmailAddress(MerchantStore store, String emailAddress, String code) throws ServiceException;
 

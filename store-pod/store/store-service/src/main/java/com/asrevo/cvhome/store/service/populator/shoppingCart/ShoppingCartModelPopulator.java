@@ -18,6 +18,8 @@ import com.asrevo.cvhome.store.core.services.catalog.product.ProductService;
 import com.asrevo.cvhome.store.core.services.catalog.product.attribute.ProductAttributeService;
 import com.asrevo.cvhome.store.core.services.shoppingcart.ShoppingCartService;
 import com.asrevo.cvhome.store.utils.AbstractDataPopulator;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.ConversionException;
 import org.apache.commons.collections.CollectionUtils;
@@ -32,6 +34,8 @@ import java.util.Set;
  * @author Umesh A
  */
 
+@Setter
+@Getter
 @Service(value = "shoppingCartModelPopulator")
 @Slf4j
 public class ShoppingCartModelPopulator
@@ -43,32 +47,6 @@ public class ShoppingCartModelPopulator
     private Customer customer;
     private ProductService productService;
     private ProductAttributeService productAttributeService;
-
-    public ShoppingCartService getShoppingCartService() {
-        return shoppingCartService;
-    }
-
-    public void setShoppingCartService(ShoppingCartService shoppingCartService) {
-        this.shoppingCartService = shoppingCartService;
-    }
-
-    public ProductService getProductService() {
-        return productService;
-    }
-
-    public void setProductService(ProductService productService) {
-        this.productService = productService;
-    }
-
-    public ProductAttributeService getProductAttributeService() {
-        return productAttributeService;
-    }
-
-
-    public void setProductAttributeService(
-            ProductAttributeService productAttributeService) {
-        this.productAttributeService = productAttributeService;
-    }
 
 
     @Override
@@ -113,7 +91,7 @@ public class ShoppingCartModelPopulator
                                 Set<ShoppingCartAttributeItem> attributes =
                                         dbItem.getAttributes();
                                 Set<ShoppingCartAttributeItem> newAttributes =
-                                        new HashSet<ShoppingCartAttributeItem>();
+                                        new HashSet<>();
                                 List<ShoppingCartAttribute> cartAttributes = item.getShoppingCartAttributes();
                                 if (!CollectionUtils.isEmpty(cartAttributes)) {
                                     for (ShoppingCartAttribute attribute : cartAttributes) {
@@ -145,9 +123,6 @@ public class ShoppingCartModelPopulator
                     }
                 }// end for
             }// end if
-        } catch (ServiceException se) {
-            log.error("Error while converting cart data to cart model..{}", se);
-            throw new ConversionException("Unable to create cart model", se);
         } catch (Exception ex) {
             log.error("Error while converting cart data to cart model..{}", ex);
             throw new ConversionException("Unable to create cart model", ex);
@@ -185,7 +160,7 @@ public class ShoppingCartModelPopulator
         List<ShoppingCartAttribute> cartAttributes = shoppingCartItem.getShoppingCartAttributes();
         if (!CollectionUtils.isEmpty(cartAttributes)) {
             Set<ShoppingCartAttributeItem> newAttributes =
-                    new HashSet<ShoppingCartAttributeItem>();
+                    new HashSet<>();
             for (ShoppingCartAttribute attribute : cartAttributes) {
                 ProductAttribute productAttribute = productAttributeService.getById(attribute.getAttributeId());
                 if (productAttribute != null
@@ -214,16 +189,6 @@ public class ShoppingCartModelPopulator
     protected ShoppingCart createTarget() {
 
         return new ShoppingCart();
-    }
-
-
-    public Customer getCustomer() {
-        return customer;
-    }
-
-
-    public void setCustomer(Customer customer) {
-        this.customer = customer;
     }
 
 

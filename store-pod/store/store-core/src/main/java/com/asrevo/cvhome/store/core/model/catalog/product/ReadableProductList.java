@@ -22,6 +22,6 @@ public class ReadableProductList extends ReadableList {
 
     private ProductGroup productGroup;
 
-    private List<ReadableProduct> products = new ArrayList<ReadableProduct>();
+    private List<ReadableProduct> products = new ArrayList<>();
 
 }

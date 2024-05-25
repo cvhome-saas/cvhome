@@ -187,8 +187,8 @@ public class ReadableShoppingCartMapper implements Mapper<ShoppingCart, Readable
                             if (!CollectionUtils.isEmpty(optionDescriptions)
                                     && !CollectionUtils.isEmpty(optionValueDescriptions)) {
 
-                                optName = optionDescriptions.get(0).getName();
-                                optValue = optionValueDescriptions.get(0).getName();
+                                optName = optionDescriptions.getFirst().getName();
+                                optValue = optionValueDescriptions.getFirst().getName();
 
                                 for (ProductOptionDescription optionDescription : optionDescriptions) {
                                     if (optionDescription.getLanguage() != null && optionDescription.getLanguage()
@@ -250,7 +250,7 @@ public class ReadableShoppingCartMapper implements Mapper<ShoppingCart, Readable
 
                 }
 
-                List<ReadableOrderTotal> totals = new ArrayList<ReadableOrderTotal>();
+                List<ReadableOrderTotal> totals = new ArrayList<>();
                 for (OrderTotal t : orderSummary.getTotals()) {
                     ReadableOrderTotal total = new ReadableOrderTotal();
                     total.setCode(t.getOrderTotalCode());

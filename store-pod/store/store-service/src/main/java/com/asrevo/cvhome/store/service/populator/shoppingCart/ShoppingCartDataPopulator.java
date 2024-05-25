@@ -22,6 +22,8 @@ import com.asrevo.cvhome.store.core.services.catalog.pricing.PricingService;
 import com.asrevo.cvhome.store.core.services.shoppingcart.ShoppingCartCalculationService;
 import com.asrevo.cvhome.store.utils.AbstractDataPopulator;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.ConversionException;
 import org.apache.commons.collections.CollectionUtils;
@@ -38,25 +40,19 @@ import java.util.stream.Collectors;
  * @author Umesh A
  */
 
+@Setter
 @Deprecated
 @Slf4j
 public class ShoppingCartDataPopulator extends AbstractDataPopulator<ShoppingCart, ShoppingCartData> {
 
 
+    @Getter
     private PricingService pricingService;
 
     private ShoppingCartCalculationService shoppingCartCalculationService;
 
+    @Getter
     private ImageFilePath imageUtils;
-
-    public ImageFilePath getimageUtils() {
-        return imageUtils;
-    }
-
-
-    public void setimageUtils(ImageFilePath imageUtils) {
-        this.imageUtils = imageUtils;
-    }
 
 
     @Override
@@ -68,15 +64,6 @@ public class ShoppingCartDataPopulator extends AbstractDataPopulator<ShoppingCar
 
     public ShoppingCartCalculationService getOrderService() {
         return shoppingCartCalculationService;
-    }
-
-
-    public PricingService getPricingService() {
-        return pricingService;
-    }
-
-    public void setPricingService(final PricingService pricingService) {
-        this.pricingService = pricingService;
     }
 
 
@@ -92,7 +79,7 @@ public class ShoppingCartDataPopulator extends AbstractDataPopulator<ShoppingCar
         List<ShoppingCartItem> shoppingCartItemsList = Collections.emptyList();
         try {
             if (items != null) {
-                shoppingCartItemsList = new ArrayList<ShoppingCartItem>();
+                shoppingCartItemsList = new ArrayList<>();
                 for (com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem item : items) {
 
                     ShoppingCartItem shoppingCartItem = new ShoppingCartItem();
@@ -140,8 +127,8 @@ public class ShoppingCartDataPopulator extends AbstractDataPopulator<ShoppingCar
                             List<com.asrevo.cvhome.store.core.entity.catalog.product.attribute.ProductOptionValueDescription> optionValueDescriptions = attribute.getProductAttribute().getProductOptionValue().getDescriptionsSettoList();
                             if (!CollectionUtils.isEmpty(optionDescriptions) && !CollectionUtils.isEmpty(optionValueDescriptions)) {
 
-                                String optionName = optionDescriptions.get(0).getName();
-                                String optionValue = optionValueDescriptions.get(0).getName();
+                                String optionName = optionDescriptions.getFirst().getName();
+                                String optionValue = optionValueDescriptions.getFirst().getName();
 
                                 for (ProductOptionDescription optionDescription : optionDescriptions) {
                                     if (optionDescription.getLanguage() != null && optionDescription.getLanguage().getId().intValue() == language.getId().intValue()) {
@@ -202,10 +189,6 @@ public class ShoppingCartDataPopulator extends AbstractDataPopulator<ShoppingCar
         return cart;
 
 
-    }
-
-    public void setShoppingCartCalculationService(final ShoppingCartCalculationService shoppingCartCalculationService) {
-        this.shoppingCartCalculationService = shoppingCartCalculationService;
     }
 
 

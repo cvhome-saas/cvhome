@@ -22,10 +22,6 @@ public interface ManufacturerFacade {
     /**
      * Creates or saves a manufacturer
      *
-     * @param manufacturer
-     * @param store
-     * @param language
-     * @throws Exception
      */
     void saveOrUpdateManufacturer(PersistableManufacturer manufacturer, MerchantStore store,
                                   Language language) throws Exception;
@@ -33,10 +29,6 @@ public interface ManufacturerFacade {
     /**
      * Deletes a manufacturer
      *
-     * @param manufacturer
-     * @param store
-     * @param language
-     * @throws Exception
      */
     void deleteManufacturer(Manufacturer manufacturer, MerchantStore store, Language language)
             throws Exception;
@@ -44,11 +36,6 @@ public interface ManufacturerFacade {
     /**
      * Get a Manufacturer by id
      *
-     * @param id
-     * @param store
-     * @param language
-     * @return
-     * @throws Exception
      */
     ReadableManufacturer getManufacturer(Long id, MerchantStore store, Language language)
             throws Exception;
@@ -56,31 +43,18 @@ public interface ManufacturerFacade {
     /**
      * Get all Manufacturer
      *
-     * @param store
-     * @param language
-     * @return
-     * @throws Exception
      */
     ReadableManufacturerList getAllManufacturers(MerchantStore store, Language language, ListCriteria criteria, int page, int count);
 
     /**
      * List manufacturers by a specific store
      *
-     * @param store
-     * @param language
-     * @param criteria
-     * @param page
-     * @param count
-     * @return
      */
     ReadableManufacturerList listByStore(MerchantStore store, Language language, ListCriteria criteria, int page, int count);
 
     /**
      * Determines if manufacturer code already exists
      *
-     * @param store
-     * @param manufacturerCode
-     * @return
      */
     boolean manufacturerExist(MerchantStore store, String manufacturerCode);
 

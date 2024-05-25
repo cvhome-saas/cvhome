@@ -34,7 +34,7 @@ public class Catalog extends SalesManagerEntity<Long, Catalog> implements Audita
 
     private String code;
 
-    private List<CatalogDescription> descriptions = new ArrayList<CatalogDescription>();
+    private List<CatalogDescription> descriptions = new ArrayList<>();
 
     @Embedded
     private AuditSection auditSection = new AuditSection();

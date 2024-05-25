@@ -2,8 +2,8 @@ package com.asrevo.cvhome.commons.utils;
 
 import lombok.Getter;
 
+@Getter
 public class OperationExecution extends RuntimeException {
-    @Getter
     private final ErrorCode errorCode;
 
     public OperationExecution(ErrorCode errorCode) {

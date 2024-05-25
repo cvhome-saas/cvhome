@@ -113,7 +113,7 @@ public class ReadableOrderPopulator extends
             target.setDelivery(address);
         }
 
-        List<com.asrevo.cvhome.store.core.model.order.total.OrderTotal> totals = new ArrayList<com.asrevo.cvhome.store.core.model.order.total.OrderTotal>();
+        List<com.asrevo.cvhome.store.core.model.order.total.OrderTotal> totals = new ArrayList<>();
         for (OrderTotal t : source.getOrderTotal()) {
             if (t.getOrderTotalType() == null) {
                 continue;

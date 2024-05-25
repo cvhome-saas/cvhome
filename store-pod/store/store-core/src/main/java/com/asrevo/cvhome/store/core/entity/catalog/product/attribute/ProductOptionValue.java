@@ -48,10 +48,10 @@ public class ProductOptionValue extends SalesManagerEntity<Long, ProductOptionVa
     private String code;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "productOptionValue")
-    private Set<ProductOptionValueDescription> descriptions = new HashSet<ProductOptionValueDescription>();
+    private Set<ProductOptionValueDescription> descriptions = new HashSet<>();
 
     @Transient
-    private List<ProductOptionValueDescription> descriptionsList = new ArrayList<ProductOptionValueDescription>();
+    private List<ProductOptionValueDescription> descriptionsList = new ArrayList<>();
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MERCHANT_ID", nullable = false)
     private MerchantStore merchantStore;

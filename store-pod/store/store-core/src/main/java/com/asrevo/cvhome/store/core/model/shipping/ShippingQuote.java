@@ -58,7 +58,7 @@ public class ShippingQuote implements Serializable {
      */
     private Delivery deliveryAddress;
 
-    private List<String> warnings = new ArrayList<String>();
+    private List<String> warnings = new ArrayList<>();
 
     private ShippingOption selectedShippingOption = null;
 
@@ -69,7 +69,7 @@ public class ShippingQuote implements Serializable {
     /**
      * additinal shipping information
      **/
-    private Map<String, Object> quoteInformations = new HashMap<String, Object>();
+    private Map<String, Object> quoteInformations = new HashMap<>();
 
 
 }

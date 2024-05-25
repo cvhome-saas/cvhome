@@ -34,16 +34,9 @@ public interface ShoppingCartFacade {
     ShoppingCartData addItemsToShoppingCart(ShoppingCartData shoppingCart, final ShoppingCartItem item, final MerchantStore store, final Language language, final Customer customer) throws Exception;
 
     ShoppingCart createCartModel(final String shoppingCartCode, final MerchantStore store, final Customer customer) throws Exception;
+
     /**
-     * Method responsible for getting shopping cart from
-     * either session or from underlying DB.
-     */
-    /**
-     * @param supportPromoCode
-     * @param customer
      * @param store
-     * @param shoppingCartId
-     * @param language
      * @return
      * @throws Exception
      */

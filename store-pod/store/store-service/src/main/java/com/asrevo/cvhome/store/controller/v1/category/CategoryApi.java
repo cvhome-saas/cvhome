@@ -88,18 +88,17 @@ public class CategoryApi {
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
-    @Operation(method = "GET", description = "Check if category code already exists", summary = "", responses = @ApiResponse(content = @Content(schema = @Schema(implementation = EntityExists.class))))
+    @Operation(method = "GET", description = "Check if category code already exists", responses = @ApiResponse(content = @Content(schema = @Schema(implementation = EntityExists.class))))
     public ResponseEntity<EntityExists> exists(@RequestParam(value = "code") String code,
                                                @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore, @Parameter(hidden = true) Language language) {
         boolean isCategoryExist = categoryFacade.existByCode(merchantStore, code);
-        return new ResponseEntity<EntityExists>(new EntityExists(isCategoryExist), HttpStatus.OK);
+        return new ResponseEntity<>(new EntityExists(isCategoryExist), HttpStatus.OK);
     }
 
     /**
      * Get all category starting from root filter can be used for filtering on
      * fields only featured is supported
      *
-     * @return
      */
     @GetMapping(value = "private/category", produces = {APPLICATION_JSON_VALUE})
     @Operation(method = "GET", description = "Get category hierarchy from root. Supports filtering FEATURED_CATEGORIES and VISIBLE ONLY by adding ?filter=[featured] or ?filter=[visible] or ? filter=[featured,visible", summary = "Does not return any product attached")
@@ -126,7 +125,6 @@ public class CategoryApi {
      * Get all category starting from root filter can be used for filtering on
      * fields only featured is supported
      *
-     * @return
      */
     @GetMapping(value = "/category", produces = {APPLICATION_JSON_VALUE})
     @Operation(method = "GET", description = "Get category hierarchy from root. Supports filtering FEATURED_CATEGORIES and VISIBLE ONLY by adding ?filter=[featured] or ?filter=[visible] or ? filter=[featured,visible", summary = "Does not return any product attached")
@@ -151,7 +149,7 @@ public class CategoryApi {
 
 
     @GetMapping(value = "/category/product/{ProductId}", produces = {APPLICATION_JSON_VALUE})
-    @Operation(method = "GET", description = "Get category by product", summary = "")
+    @Operation(method = "GET", description = "Get category by product")
     @Parameters({
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))

@@ -10,7 +10,6 @@ import java.util.List;
 /**
  * <p>Service racine pour la gestion des entités.</p>
  *
- * @param <T> type d'entité
  */
 public interface SalesManagerEntityService<K extends Serializable & Comparable<K>, E extends SalesManagerEntity<K, ?>> extends TransactionalAspectAwareService {
 

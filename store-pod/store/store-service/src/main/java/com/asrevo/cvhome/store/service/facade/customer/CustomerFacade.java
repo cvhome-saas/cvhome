@@ -30,32 +30,18 @@ public interface CustomerFacade {
      * Method used to fetch customer based on the username and storecode.
      * Customer username is unique to each store.
      *
-     * @param userName
-     * @param store
-     * @param store
-     * @param language
-     * @throws Exception
      */
     CustomerEntity getCustomerDataByUserName(final String userName, final MerchantStore store, final Language language) throws Exception;
 
     /**
      * Creates a ReadableCustomer
      *
-     * @param id
-     * @param merchantStore
-     * @param language
-     * @return
      */
     ReadableCustomer getCustomerById(final Long id, final MerchantStore merchantStore, final Language language);
 
     /**
      * Get Customer using unique username
      *
-     * @param userName
-     * @param merchantStore
-     * @param language
-     * @return
-     * @throws Exception
      */
     ReadableCustomer getByUserName(String userName, MerchantStore merchantStore, Language language);
 
@@ -68,7 +54,6 @@ public interface CustomerFacade {
      *
      * @param customer              username of Customer
      * @param sessionShoppingCartId session shopping cart, if user already have few items in Cart.
-     * @throws Exception
      */
     ShoppingCart mergeCart(final Customer customer, final String sessionShoppingCartId, final MerchantStore store, final Language language) throws Exception;
 
@@ -101,9 +86,6 @@ public interface CustomerFacade {
     /**
      * Updates a Customer
      *
-     * @param customer
-     * @param store
-     * @throws Exception
      */
     PersistableCustomer update(PersistableCustomer customer, MerchantStore store);
 
@@ -112,9 +94,6 @@ public interface CustomerFacade {
     /**
      * Updates only shipping and billing addresses
      *
-     * @param customer
-     * @param store
-     * @return
      */
     void updateAddress(PersistableCustomer customer, MerchantStore store);
 
@@ -123,38 +102,24 @@ public interface CustomerFacade {
     /**
      * Save or update a CustomerReview
      *
-     * @param review
-     * @param store
-     * @param language
-     * @throws Exception
      */
     PersistableCustomerReview saveOrUpdateCustomerReview(PersistableCustomerReview review, MerchantStore store, Language language);
 
     /**
      * List all customer reviews by reviewed
      *
-     * @param customer
-     * @param store
-     * @param language
-     * @return
      */
     List<ReadableCustomerReview> getAllCustomerReviewsByReviewed(Long customerId, MerchantStore store, Language language);
 
     /**
      * Deletes a customer review
      *
-     * @param review
-     * @param store
-     * @param language
      */
     void deleteCustomerReview(Long customerId, Long reviewId, MerchantStore store, Language language);
 
     /**
      * Optin a customer to newsletter
      *
-     * @param optin
-     * @param store
-     * @throws Exception
      */
     void optinCustomer(PersistableCustomerOptin optin, MerchantStore store);
 

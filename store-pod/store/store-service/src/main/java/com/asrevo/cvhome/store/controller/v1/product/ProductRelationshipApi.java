@@ -32,17 +32,11 @@ import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1;
 public class ProductRelationshipApi {
 
     private final ProductFacade productFacade;
-    private final StoreFacade storeFacade;
-    private final LanguageUtils languageUtils;
     private final ProductService productService;
-    private final ProductReviewService productReviewService;
 
     public ProductRelationshipApi(ProductFacade productFacade, StoreFacade storeFacade, LanguageUtils languageUtils, ProductService productService, ProductReviewService productReviewService) {
         this.productFacade = productFacade;
-        this.storeFacade = storeFacade;
-        this.languageUtils = languageUtils;
         this.productService = productService;
-        this.productReviewService = productReviewService;
     }
 
   /*	@RequestMapping( value={"/private/products/{id}/related","/auth/products/{id}/related"}, method=RequestMethod.POST)
@@ -94,7 +88,6 @@ public class ProductRelationshipApi {
             method = "GET",
             description =
                     "Get product related items. This is used for doing cross-sell and up-sell functionality on a product details page",
-            summary = "",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = List.class))))
     @ResponseBody
     @Parameters({

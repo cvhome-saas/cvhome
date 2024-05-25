@@ -22,7 +22,7 @@ public class Order extends Entity {
     private boolean customerAgreement;
     private String comments;
     private String currency;
-    private List<OrderAttribute> attributes = new ArrayList<OrderAttribute>();
+    private List<OrderAttribute> attributes = new ArrayList<>();
 
 
 }

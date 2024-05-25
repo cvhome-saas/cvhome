@@ -24,11 +24,11 @@ public class ReadableProductDefinition extends ProductDefinition {
     @Serial
     private static final long serialVersionUID = 1L;
     private ReadableProductType type;
-    private List<ReadableCategory> categories = new ArrayList<ReadableCategory>();
+    private List<ReadableCategory> categories = new ArrayList<>();
     private ReadableManufacturer manufacturer;
     private ProductDescription description = null;
-    private List<PersistableProductAttribute> properties = new ArrayList<PersistableProductAttribute>();
-    private List<ReadableImage> images = new ArrayList<ReadableImage>();
+    private List<PersistableProductAttribute> properties = new ArrayList<>();
+    private List<ReadableImage> images = new ArrayList<>();
     private ReadableInventory inventory;
 
 

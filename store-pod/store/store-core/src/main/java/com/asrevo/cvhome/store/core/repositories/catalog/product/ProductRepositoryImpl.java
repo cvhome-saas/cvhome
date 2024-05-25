@@ -58,7 +58,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
 
             Integer merchantId = null;
             Integer parentId = null;
-            List<Integer> ids = new ArrayList<Integer>();
+            List<Integer> ids = new ArrayList<>();
 
             StringBuilder qs = new StringBuilder();
             qs.append(productQueryV2());
@@ -331,10 +331,6 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
         // regionList.add(locale.getCountry());
 
         // TODO Test performance
-        /**
-         * Testing in debug mode takes a long time with this query running in
-         * normal mode is fine
-         */
 
         StringBuilder qs = new StringBuilder();
         qs.append("select distinct p from Product as p ");
@@ -388,10 +384,6 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
         // regionList.add(locale.getCountry());
 
         // TODO Test performance
-        /**
-         * Testing in debug mode takes a long time with this query running in
-         * normal mode is fine
-         */
 
         StringBuilder qs = new StringBuilder();
         qs.append("select distinct p from Product as p ");
@@ -557,10 +549,6 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
      * Main query for getting product list based on input criteria
      * ze method
      *
-     * @param store
-     * @param first
-     * @param max
-     * @return
      */
     @Override
     public ProductList listByStore(MerchantStore store, Language language, ProductCriteria criteria) {
@@ -604,24 +592,8 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
         }
 
         // RENTAL
-        /**
-         if (!StringUtils.isBlank(criteria.getStatus())) {
-         countBuilderWhere.append(" and p.rentalStatus = :status");
-         }
-         **/
-
-        /**
-         if (criteria.getOwnerId() != null) {
-         countBuilderSelect.append(" INNER JOIN p.owner owner");
-         countBuilderWhere.append(" and owner.id = :ownerid");666
-         }
-         **/
 
 
-        /**
-         * attributes / options values
-         * origin allows skipping attributes join in admin
-         */
         //attribute or option values
         if (criteria.getOrigin().equals(ProductCriteria.ORIGIN_SHOP)
                 && CollectionUtils.isNotEmpty(criteria.getAttributeCriteria())
@@ -717,11 +689,6 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
         }
 
         // RENTAL
-        /**
-         if (!StringUtils.isBlank(criteria.getStatus())) {
-         countQ.setParameter("status", criteria.getStatus());
-         }
-         **/
 
         if (criteria.getOwnerId() != null) {
             countQ.setParameter("ownerid", criteria.getOwnerId());
@@ -769,15 +736,11 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
         } else if (criteria.getOrigin().equals(ProductCriteria.ORIGIN_SHOP)) {
             qs.append(" left join fetch p.attributes pattr");
             qs.append(" left join fetch pattr.productOption po");
-            /** prevent full table scan **/
             qs.append(" left join fetch po.descriptions pod");
             qs.append(" left join fetch pattr.productOptionValue pov");
             qs.append(" left join fetch pov.descriptions povd");
         }
 
-        /**
-         * variants
-         */
         if (criteria.getOrigin().equals(ProductCriteria.ORIGIN_SHOP)) {
             qs.append(" left join fetch p.variants pinst ");
             qs.append(" left join fetch pinst.variation pv ");
@@ -802,7 +765,6 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
             //end variants
         }
 
-        /** not required at list level **/
         //qs.append(" left join fetch p.relationships pr");
 
         qs.append(" where merch.id=:mId");
@@ -840,17 +802,6 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
         }
 
         // RENTAL
-        /**
-         if (!StringUtils.isBlank(criteria.getStatus())) {
-         qs.append(" and p.rentalStatus = :status");
-         }
-         **/
-
-        /**
-         if (criteria.getOwnerId() != null) {
-         qs.append(" and owner.id = :ownerid");
-         }
-         **/
 
         /**/
         if (criteria.getOrigin().equals(ProductCriteria.ORIGIN_SHOP)
@@ -924,17 +875,6 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
         }
 
         // RENTAL
-        /**
-         if (!StringUtils.isBlank(criteria.getStatus())) {
-         q.setParameter("status", criteria.getStatus());
-         }
-         **/
-
-        /**
-         if (criteria.getOwnerId() != null) {
-         q.setParameter("ownerid", criteria.getOwnerId());
-         }
-         **/
 
         if (!StringUtils.isBlank(criteria.getProductName())) {
             q.setParameter("nm", new StringBuilder().append("%").append(criteria.getProductName().toLowerCase())
@@ -958,11 +898,6 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
 
     @Override
     public List<Product> listByStore(MerchantStore store) {
-
-        /**
-         * Testing in debug mode takes a long time with this query running in
-         * normal mode is fine
-         */
 
         StringBuilder qs = new StringBuilder();
         qs.append("select p from Product as p ");
@@ -1011,11 +946,6 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
 
     @Override
     public List<Product> listByTaxClass(TaxClass taxClass) {
-
-        /**
-         * Testing in debug mode takes a long time with this query running in
-         * normal mode is fine
-         */
 
         StringBuilder qs = new StringBuilder();
         qs.append("select p from Product as p ");

@@ -9,7 +9,6 @@ import java.lang.reflect.ParameterizedType;
 import java.util.List;
 
 /**
- * @param <T> entity type
  */
 public abstract class SalesManagerEntityServiceImpl<K extends Serializable & Comparable<K>, E extends SalesManagerEntity<K, ?>>
         implements SalesManagerEntityService<K, E> {

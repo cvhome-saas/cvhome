@@ -48,7 +48,7 @@ public class ReadableProductOptionSetMapper implements Mapper<ProductOptionSet, 
 
         destination.setOption(this.option(source.getOption(), store, language));
 
-        List<Long> ids = new ArrayList<Long>();
+        List<Long> ids = new ArrayList<>();
 
         if (!CollectionUtils.isEmpty(source.getValues())) {
             List<ReadableProductOptionValue> values = source.getValues().stream().map(val -> optionValue(ids, val, store, language)).collect(Collectors.toList());

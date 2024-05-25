@@ -38,12 +38,12 @@ public class TaxClass extends SalesManagerEntity<Long, TaxClass> {
     @Column(name = "TAX_CLASS_TITLE", nullable = false, length = 32)
     private String title;
     @OneToMany(mappedBy = "taxClass", targetEntity = Product.class)
-    private List<Product> products = new ArrayList<Product>();
+    private List<Product> products = new ArrayList<>();
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "MERCHANT_ID", nullable = true)
+    @JoinColumn(name = "MERCHANT_ID")
     private MerchantStore merchantStore;
     @OneToMany(mappedBy = "taxClass")
-    private List<TaxRate> taxRates = new ArrayList<TaxRate>();
+    private List<TaxRate> taxRates = new ArrayList<>();
 
 
     public TaxClass(String code) {

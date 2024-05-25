@@ -18,6 +18,6 @@ public class ReadableProductAttributeList extends ReadableList {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private List<ReadableProductAttributeEntity> attributes = new ArrayList<ReadableProductAttributeEntity>();
+    private List<ReadableProductAttributeEntity> attributes = new ArrayList<>();
 
 }

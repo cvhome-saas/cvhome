@@ -80,7 +80,7 @@ public class ProductCommonFacadeImpl implements ProductCommonFacade {
         }
 
         Product target = null;
-        if (product.getId() != null && product.getId().longValue() > 0) {
+        if (product.getId() != null && product.getId() > 0) {
             target = productService.getById(product.getId());
         } else {
             target = new Product();
@@ -118,14 +118,14 @@ public class ProductCommonFacadeImpl implements ProductCommonFacade {
             throw new ResourceNotFoundException("Product [" + id + "] not found");
         }
 
-        if (product.getMerchantStore().getId() != store.getId()) {
+        if (!product.getMerchantStore().getId().equals(store.getId())) {
             throw new ResourceNotFoundException("Product [" + id + "] not found for store [" + store.getId() + "]");
         }
 
         ReadableProduct readableProduct = new ReadableProduct();
         ReadableProductPopulator populator = new ReadableProductPopulator();
         populator.setPricingService(pricingService);
-        populator.setimageUtils(imageUtils);
+        populator.setImageUtils(imageUtils);
         try {
             readableProduct = populator.populate(product, readableProduct, store, language);
         } catch (ConversionException e) {
@@ -171,7 +171,7 @@ public class ProductCommonFacadeImpl implements ProductCommonFacade {
         ReadableProductPopulator populator = new ReadableProductPopulator();
 
         populator.setPricingService(pricingService);
-        populator.setimageUtils(imageUtils);
+        populator.setImageUtils(imageUtils);
         populator.populate(persistable, readableProduct, persistable.getMerchantStore(), language);
 
         return readableProduct;
@@ -198,7 +198,7 @@ public class ProductCommonFacadeImpl implements ProductCommonFacade {
         ReadableProductPopulator populator = new ReadableProductPopulator();
 
         populator.setPricingService(pricingService);
-        populator.setimageUtils(imageUtils);
+        populator.setImageUtils(imageUtils);
         populator.populate(persistable, readableProduct, persistable.getMerchantStore(), language);
 
         return readableProduct;
@@ -236,7 +236,7 @@ public class ProductCommonFacadeImpl implements ProductCommonFacade {
             ReadableProductPopulator populator = new ReadableProductPopulator();
 
             populator.setPricingService(pricingService);
-            populator.setimageUtils(imageUtils);
+            populator.setImageUtils(imageUtils);
             populator.populate(product, readableProduct, product.getMerchantStore(), language);
 
         } catch (Exception e) {
@@ -262,7 +262,7 @@ public class ProductCommonFacadeImpl implements ProductCommonFacade {
         ReadableProductPopulator populator = new ReadableProductPopulator();
 
         populator.setPricingService(pricingService);
-        populator.setimageUtils(imageUtils);
+        populator.setImageUtils(imageUtils);
         populator.populate(product, readableProduct, product.getMerchantStore(), language);
 
         return readableProduct;
@@ -279,7 +279,7 @@ public class ProductCommonFacadeImpl implements ProductCommonFacade {
         ReadableProductPopulator populator = new ReadableProductPopulator();
 
         populator.setPricingService(pricingService);
-        populator.setimageUtils(imageUtils);
+        populator.setImageUtils(imageUtils);
         populator.populate(product, readableProduct, product.getMerchantStore(), language);
 
         return readableProduct;
@@ -320,7 +320,7 @@ public class ProductCommonFacadeImpl implements ProductCommonFacade {
 
         ReadableProductReviewPopulator populator = new ReadableProductReviewPopulator();
 
-        List<ReadableProductReview> productReviews = new ArrayList<ReadableProductReview>();
+        List<ReadableProductReview> productReviews = new ArrayList<>();
 
         for (ProductReview review : reviews) {
             ReadableProductReview readableReview = new ReadableProductReview();

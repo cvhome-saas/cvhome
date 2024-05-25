@@ -23,6 +23,6 @@ public class ReadableOrderTotalSummary implements Serializable {
     private String total;//final price
     private String taxTotal;//total of taxes
 
-    private List<ReadableOrderTotal> totals = new ArrayList<ReadableOrderTotal>();//all other fees (tax, shipping ....)
+    private List<ReadableOrderTotal> totals = new ArrayList<>();//all other fees (tax, shipping ....)
 
 }

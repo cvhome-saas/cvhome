@@ -22,7 +22,7 @@ public class ReadableContentFull extends Entity {
     private boolean visible;
     private String contentType;
     private boolean isDisplayedInMenu;
-    private List<ContentDescriptionEntity> descriptions = new ArrayList<ContentDescriptionEntity>();
+    private List<ContentDescriptionEntity> descriptions = new ArrayList<>();
 
 
 }

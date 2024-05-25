@@ -44,7 +44,7 @@ public class ZonesLoader {
     @SuppressWarnings({"rawtypes", "unchecked"})
     public List<Map<String, Zone>> loadIndividualZones() throws Exception {
 
-        List<Map<String, Zone>> loadedZones = new ArrayList<Map<String, Zone>>();
+        List<Map<String, Zone>> loadedZones = new ArrayList<>();
         try {
 
             List<Resource> files = geZoneFiles(PATH);
@@ -53,14 +53,14 @@ public class ZonesLoader {
             ObjectMapper mapper = new ObjectMapper();
 
             List<Country> countries = countryService.list();
-            Map<String, Country> countriesMap = new HashMap<String, Country>();
+            Map<String, Country> countriesMap = new HashMap<>();
             for (Country country : countries) {
                 countriesMap.put(country.getIsoCode(), country);
             }
 
-            Map<String, Zone> zonesMap = new LinkedHashMap<String, Zone>();
-            Map<String, List<ZoneDescription>> zonesDescriptionsMap = new LinkedHashMap<String, List<ZoneDescription>>();
-            Map<String, String> zonesMark = new LinkedHashMap<String, String>();
+            Map<String, Zone> zonesMap = new LinkedHashMap<>();
+            Map<String, List<ZoneDescription>> zonesDescriptionsMap = new LinkedHashMap<>();
+            Map<String, String> zonesMark = new LinkedHashMap<>();
 
             // load files individually
             for (Resource resource : files) {
@@ -76,9 +76,6 @@ public class ZonesLoader {
                             // language
                             List langList = (List) data.get(l.getCode());
                             if (langList != null) {
-                                /**
-                                 * submethod
-                                 */
                                 for (Object z : langList) {
                                     Map<String, String> e = (Map<String, String>) z;
                                     mapZone(l, zonesDescriptionsMap, countriesMap, zonesMap, zonesMark, e);
@@ -89,9 +86,6 @@ public class ZonesLoader {
                 } else {
                     List langList = (List) data.get(ALL_REGIONS);
                     if (langList != null) {
-                        /**
-                         * submethod
-                         */
                         for (Language l : languages) {
                             for (Object z : langList) {
                                 Map<String, String> e = (Map<String, String>) z;
@@ -132,7 +126,7 @@ public class ZonesLoader {
         List<Language> languages = languageService.list();
 
         List<Country> countries = countryService.list();
-        Map<String, Country> countriesMap = new HashMap<String, Country>();
+        Map<String, Country> countriesMap = new HashMap<>();
         for (Country country : countries) {
 
             countriesMap.put(country.getIsoCode(), country);
@@ -148,17 +142,14 @@ public class ZonesLoader {
             @SuppressWarnings("unchecked")
             Map<String, Object> data = mapper.readValue(in, Map.class);
 
-            Map<String, Zone> zonesMap = new HashMap<String, Zone>();
-            Map<String, List<ZoneDescription>> zonesDescriptionsMap = new HashMap<String, List<ZoneDescription>>();
-            Map<String, String> zonesMark = new HashMap<String, String>();
+            Map<String, Zone> zonesMap = new HashMap<>();
+            Map<String, List<ZoneDescription>> zonesDescriptionsMap = new HashMap<>();
+            Map<String, String> zonesMark = new HashMap<>();
 
             for (Language l : languages) {
                 @SuppressWarnings("rawtypes")
                 List langList = (List) data.get(l.getCode());
                 if (langList != null) {
-                    /**
-                     * submethod
-                     */
                     for (Object z : langList) {
                         @SuppressWarnings("unchecked")
                         Map<String, String> e = (Map<String, String>) z;
@@ -223,7 +214,7 @@ public class ZonesLoader {
         if (zonesDescriptionsMap.containsKey(zoneCode)) {
             descriptions = zonesDescriptionsMap.get(zoneCode);
         } else {
-            descriptions = new ArrayList<ZoneDescription>();
+            descriptions = new ArrayList<>();
             zonesDescriptionsMap.put(zoneCode, descriptions);
         }
 

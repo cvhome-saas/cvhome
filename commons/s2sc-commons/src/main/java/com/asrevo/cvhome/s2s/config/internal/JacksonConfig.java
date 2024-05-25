@@ -45,11 +45,6 @@ public class JacksonConfig {
     @Bean
     public Jackson2ObjectMapperBuilderCustomizer customizer() {
 
-        return new Jackson2ObjectMapperBuilderCustomizer() {
-            @Override
-            public void customize(Jackson2ObjectMapperBuilder jacksonObjectMapperBuilder) {
-                jacksonObjectMapperBuilder.deserializers(new ObjectIdDeserializer(ObjectId.class));
-            }
-        };
+        return jacksonObjectMapperBuilder -> jacksonObjectMapperBuilder.deserializers(new ObjectIdDeserializer(ObjectId.class));
     }
 }
