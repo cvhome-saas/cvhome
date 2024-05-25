@@ -24,7 +24,6 @@ import java.util.Map;
  * @author Carl Samson
  */
 @Setter
-@Setter
 @Getter
 public class ReadableCustomerDeliveryAddressPopulator extends AbstractDataPopulator<Delivery, ReadableDelivery> {
 
