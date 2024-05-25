@@ -790,7 +790,6 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
             qs.append(" left join fetch pvv.productOption pvvpo ");
             qs.append(" left join fetch pvv.productOptionValue pvvpov ");
             qs.append(" left join fetch pvvpo.descriptions povvpod ");
-            qs.append(" left join fetch pvpov.descriptions povvpovd ");
 
             //variant availability and price
             qs.append(" left join fetch pinst.availabilities pinsta ");
@@ -1130,7 +1129,6 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
         // other lefts
         qs.append("left join fetch p.manufacturer manuf ");
         qs.append("left join fetch manuf.descriptions manufd ");
-        qs.append("left join fetch p.type type2 ");
 
         //variants
         qs.append("left join fetch p.variants pinst ");
@@ -1144,7 +1142,6 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
         qs.append("left join fetch pvv.productOption pvvpo ");
         qs.append("left join fetch pvv.productOptionValue pvvpov ");
         qs.append("left join fetch pvvpo.descriptions povvpod ");
-        qs.append("left join fetch pvpov.descriptions povvpovd ");
 
         //variant availability and price
         qs.append("left join fetch pinst.availabilities pinsta ");
@@ -1186,7 +1183,6 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
             // other lefts
             qs.append("left join fetch p.manufacturer manuf ");
             qs.append("left join fetch manuf.descriptions manufd ");
-            qs.append("left join fetch p.type type2 ");
 
             //variants
             qs.append("left join fetch p.variants pinst ");
@@ -1200,7 +1196,6 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
             qs.append("left join fetch pvv.productOption pvvpo ");
             qs.append("left join fetch pvv.productOptionValue pvvpov ");
             qs.append("left join fetch pvvpo.descriptions povvpod ");
-            qs.append("left join fetch pvpov.descriptions povvpovd ");
 
             //variant availability and price
             qs.append("left join fetch pinst.availabilities pinsta ");
