@@ -16,7 +16,6 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
 
-import static com.asrevo.cvhome.s2s.utils.SecurityUtils.buildServletCorsConfiguration;
 
 @Configuration
 public class SecurityConfig {
@@ -30,12 +29,7 @@ public class SecurityConfig {
                         .anyRequest().permitAll()
                 )
                 .oauth2ResourceServer(it -> it.jwt(Customizer.withDefaults()))
-                .csrf(AbstractHttpConfigurer::disable)
-                .cors(httpSecurityCorsConfigurer ->
-                        httpSecurityCorsConfigurer.configurationSource(request ->
-                                buildServletCorsConfiguration()
-                        )
-                );
+                .csrf(AbstractHttpConfigurer::disable);
         return http.build();
     }
 

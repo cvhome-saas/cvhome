@@ -10,7 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_STORE;
+import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1;
 
 
 @Component
@@ -50,7 +50,7 @@ public class InitializationLoader {
 
                 initializationDatabase.populate("sm-shop");
 
-                MerchantStore store = merchantService.getByCode(DEFAULT_STORE);
+                MerchantStore store = merchantService.getByCode(DEFAULT_ORG1_STORE1);
 
                 MerchantConfig config = new MerchantConfig();
                 config.setAllowPurchaseItems(true);

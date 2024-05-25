@@ -13,7 +13,7 @@ import org.testcontainers.utility.DockerImageName;
 
 import java.util.List;
 
-import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_STORE;
+import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 
@@ -55,7 +55,7 @@ public class MockDomainCertificateManagerServerConfig {
                                                   "domain":"ashraf.gateway.me",
                                                   "reference":"{DEFAULT_STORE}"
                                                }
-                                            """.replace("{DEFAULT_STORE}", DEFAULT_STORE)
+                                            """.replace("{DEFAULT_STORE}", DEFAULT_ORG1_STORE1)
                                     ));
         };
     }

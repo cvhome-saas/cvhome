@@ -10,7 +10,7 @@ public record ListUsersQuery(IdentityId org, ManagerStoreId store) implements Ke
     @Override
     public String query() {
         return Map.of("org", org, "store", store).entrySet().stream()
-                .filter(it -> it.getValue() != null)
+                .filter(it -> it.getValue() != null && it.getValue().getId() != null && !"*".equals(it.getValue().getId().toString()))
                 .map(it -> it.getKey() + ":" + it.getValue().getId().toString())
                 .collect(Collectors.joining(" "));
     }

@@ -11,4 +11,6 @@ public interface StoreSecurityService {
     boolean isStoreAdmin(Authentication authentication, ManagerStoreId requestedStoreId);
 
     boolean isStoreModerator(Authentication authentication, ManagerStoreId requestedStoreId);
+
+    boolean isMicroService(Authentication authentication, ManagerStoreId requestedStoreId);
 }

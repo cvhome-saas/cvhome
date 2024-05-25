@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_STORE;
+import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1;
 
 // @TODO ASHRAF
 
@@ -47,7 +47,7 @@ public class CustomerNewsletterApi {
             description = "Creates a newsletter optin",
             summary = "")
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_STORE)),
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public void create(

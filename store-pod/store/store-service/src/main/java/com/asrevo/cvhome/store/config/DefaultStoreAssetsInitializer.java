@@ -47,33 +47,35 @@ public class DefaultStoreAssetsInitializer implements ApplicationListener<Applic
     @SneakyThrows
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {
-        MerchantStore defaultStore = merchantStoreService.getDefaultStore();
-        log.info("banner {}", defaultStore.getStoreBanner());
-        log.info("logo {}", defaultStore.getStoreLogo());
-        InputContentFile bannerFileInput = getStoreInputFile(defaultStore.getStoreBanner(), FileContentType.BANNER);
-        contentService.addBanner(defaultStore.getCode(), bannerFileInput);
-        InputContentFile logoFileInput = getStoreInputFile(defaultStore.getStoreLogo(), FileContentType.LOGO);
-        contentService.addLogo(defaultStore.getCode(), logoFileInput);
-        List<Product> products = productService.listByStore(defaultStore);
-        for (Product product : products) {
-            log.info("main image {} , for {} with id {}", product.getProductImage().getProductImage(), product.getId(), product.getProductImage().getId());
+        List<MerchantStore> defaultStores = merchantStoreService.getDefaultStores();
+        for (MerchantStore defaultStore : defaultStores) {
+            log.info("banner {}", defaultStore.getStoreBanner());
+            log.info("logo {}", defaultStore.getStoreLogo());
+            InputContentFile bannerFileInput = getStoreInputFile(defaultStore.getCode(), defaultStore.getStoreBanner(), FileContentType.BANNER);
+            contentService.addBanner(defaultStore.getCode(), bannerFileInput);
+            InputContentFile logoFileInput = getStoreInputFile(defaultStore.getCode(), defaultStore.getStoreLogo(), FileContentType.LOGO);
+            contentService.addLogo(defaultStore.getCode(), logoFileInput);
+            List<Product> products = productService.listByStore(defaultStore);
+            for (Product product : products) {
+                log.info("main image {} , for {} with id {}", product.getProductImage().getProductImage(), product.getId(), product.getProductImage().getId());
 
-            productFileManager.addProductImage(product.getProductImage(), getStoreProductInputImage(product.getProductImage()));
+                productFileManager.addProductImage(product.getProductImage(), getStoreProductInputImage(defaultStore.getCode(), product.getProductImage()));
 
-            Set<ProductImage> images = product.getImages();
-            for (ProductImage productImage : images) {
-                log.info("sub image {} , for {} with id {} ", productImage.getProductImage(), product.getId(), productImage.getId());
-                productFileManager.addProductImage(productImage, getStoreProductInputImage(productImage));
+                Set<ProductImage> images = product.getImages();
+                for (ProductImage productImage : images) {
+                    log.info("sub image {} , for {} with id {} ", productImage.getProductImage(), product.getId(), productImage.getId());
+                    productFileManager.addProductImage(productImage, getStoreProductInputImage(defaultStore.getCode(), productImage));
+                }
             }
-        }
 
-        log.info("will init DefaultStoreAssets {} {}", storageProperties.bucket(), storageProperties.provider());
+            log.info("will init DefaultStoreAssets {} {}", storageProperties.bucket(), storageProperties.provider());
+        }
     }
 
     @SneakyThrows
-    private ImageContentFile getStoreInputFile(String name, FileContentType contentType) {
+    private ImageContentFile getStoreInputFile(String storeCode, String name, FileContentType contentType) {
         ImageContentFile file = new ImageContentFile();
-        Resource resource = resourceLoader.getResource("classpath:/assets/default-store/" + name);
+        Resource resource = resourceLoader.getResource("classpath:/assets/"+storeCode+"/" + name);
         file.setFile(resource.getInputStream());
         file.setFileName(name);
         file.setMimeType(Files.probeContentType(Paths.get(name)));
@@ -82,8 +84,8 @@ public class DefaultStoreAssetsInitializer implements ApplicationListener<Applic
     }
 
     @SneakyThrows
-    private ImageContentFile getStoreProductInputImage(ProductImage productImage) {
-        return getStoreInputFile(productImage.getProductImage(), FileContentType.PRODUCT);
+    private ImageContentFile getStoreProductInputImage(String storeCode, ProductImage productImage) {
+        return getStoreInputFile(storeCode, productImage.getProductImage(), FileContentType.PRODUCT);
     }
 
 
