@@ -23,7 +23,6 @@ import org.keycloak.representations.idm.UserRepresentation;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static com.asrevo.cvhome.keycloak.utils.Constants.ORG_ATTR_KEY;
 import static com.asrevo.cvhome.keycloak.utils.Constants.STORE_ATTR_KEY;

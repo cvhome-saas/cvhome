@@ -31,6 +31,10 @@ public class StoreSecurityServiceImpl implements StoreSecurityService {
         return hasRole(authentication, Roles.ROLE_STORE_MODERATOR);
     }
 
+    private static boolean hasMicroServiceRole(Authentication authentication) {
+        return hasRole(authentication, Roles.ROLE_MICROSERVICE);
+    }
+
     private static boolean hasRole(Authentication authentication, Roles role) {
         return authentication.getAuthorities().stream().anyMatch(it -> it.getAuthority().contains(role.name()));
     }
@@ -71,6 +75,14 @@ public class StoreSecurityServiceImpl implements StoreSecurityService {
             return false;
         }
         return getOwnerForStore.apply((requestedStoreId)).equals(identity.org());
+    }
+
+    @Override
+    public boolean isMicroService(Authentication authentication, ManagerStoreId requestedStoreId) {
+        if (!hasMicroServiceRole(authentication)) {
+            return false;
+        }
+        return true;
     }
 
 

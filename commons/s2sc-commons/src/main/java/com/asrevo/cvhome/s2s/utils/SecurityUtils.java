@@ -16,6 +16,14 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class SecurityUtils {
+    private static boolean hasSuperAdminRole(Authentication authentication) {
+        return hasRole(authentication, Roles.ROLE_SUPER_ADMIN);
+    }
+
+    private static boolean hasMicroServiceRole(Authentication authentication) {
+        return hasRole(authentication, Roles.ROLE_MICROSERVICE);
+    }
+
     private static boolean hasOrgAdminRole(Authentication authentication) {
         return hasRole(authentication, Roles.ROLE_ORG_ADMIN);
     }
@@ -25,8 +33,16 @@ public class SecurityUtils {
     }
 
     public static UserOrgStoreIdentity getOrgStoreIdentity(Authentication authentication) {
-        Set<Roles> roles = authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).map(Roles::parse).filter(Objects::nonNull).collect(Collectors.toSet());
-        if (hasOrgAdminRole(authentication)) {
+        Set<Roles> roles = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .map(Roles::parse)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+        if (hasSuperAdminRole(authentication)) {
+            return new UserOrgStoreIdentity(IdentityId.of("*"), "*", roles);
+        } else if (hasMicroServiceRole(authentication)) {
+            return new UserOrgStoreIdentity(IdentityId.of("*"), "*", roles);
+        } else if (hasOrgAdminRole(authentication)) {
             return new UserOrgStoreIdentity(IdentityId.of(authentication.getName()), "*", roles);
         } else {
             Map<String, Object> claims = ((Jwt) authentication.getPrincipal()).getClaims();

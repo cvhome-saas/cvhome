@@ -15,4 +15,10 @@ public interface AccessEvaluator {
     boolean hasAccessOnStoreUsersDisable(Authentication authentication, ManagerStoreId requestedStoreId);
 
     boolean hasAccessOnStoreFindOne(Authentication authentication, ManagerStoreId requestedStoreId);
+
+    boolean hasAccessOnStoreDomainList(Authentication authentication, ManagerStoreId requestedStoreId);
+
+    boolean hasAccessOnStoreDomainCreate(Authentication authentication, ManagerStoreId requestedStoreId);
+
+    boolean hasAccessOnStoreDomainDelete(Authentication authentication, ManagerStoreId requestedStoreId);
 }

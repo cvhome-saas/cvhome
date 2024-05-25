@@ -8,7 +8,9 @@ import com.asrevo.cvhome.manager.service.RouterService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Optional;
@@ -33,18 +35,23 @@ public class RouterController {
     }
 
     @GetMapping("allocates")
-    public List<Domain> allocates(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store) {
-        return routerService.allocations(store);
+    @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE.DOMAIN.LIST')")
+    public Mono<List<Domain>> allocatedDomains(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store) {
+        return Mono.just(routerService.allocations(store));
     }
 
     @PostMapping("allocate")
-    public void allocate(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store, Domain domain) {
-        routerService.create(domain,store);
+    @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE.DOMAIN.CREATE')")
+    public Mono<Void> allocate(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store, Domain domain) {
+        routerService.create(domain, store);
+        return Mono.empty();
     }
 
     @DeleteMapping("remove")
-    public void remove(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store, Domain domain) {
+    @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE.DOMAIN.DELETE')")
+    public Mono<Void> remove(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store, Domain domain) {
         routerService.remove(domain, store);
+        return Mono.empty();
     }
 
 }
