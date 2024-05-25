@@ -24,6 +24,7 @@ import java.util.Map;
  * @author Carl Samson
  */
 @Setter
+@Setter
 @Getter
 public class ReadableCustomerDeliveryAddressPopulator extends AbstractDataPopulator<Delivery, ReadableDelivery> {
 
@@ -122,14 +123,6 @@ public class ReadableCustomerDeliveryAddressPopulator extends AbstractDataPopula
     protected ReadableDelivery createTarget() {
         // TODO Auto-generated method stub
         return null;
-    }
-
-    public void setCountryService(CountryService countryService) {
-        this.countryService = countryService;
-    }
-
-    public void setZoneService(ZoneService zoneService) {
-        this.zoneService = zoneService;
     }
 
 

@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.store.utils;
 
 import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.imageio.ImageIO;
@@ -15,6 +16,7 @@ import java.net.URLConnection;
 public class ProductImageCropUtils {
 
 
+    @Setter
     @Getter
     private boolean cropeable = true;
 
@@ -182,10 +184,6 @@ public class ProductImageCropUtils {
 
     public void setCropAreaHeight(int cropAreaHeight) {
         this.cropAreaHeight = cropAreaHeight;
-    }
-
-    public void setCropeable(boolean cropeable) {
-        this.cropeable = cropeable;
     }
 
 

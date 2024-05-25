@@ -10,7 +10,6 @@ import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCart;
 import com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartAttributeItem;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.shoppingcart.ShoppingCartAttribute;
 import com.asrevo.cvhome.store.core.model.shoppingcart.ShoppingCartData;
 import com.asrevo.cvhome.store.core.model.shoppingcart.ShoppingCartItem;

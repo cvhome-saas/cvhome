@@ -17,7 +17,6 @@ import com.asrevo.cvhome.store.core.model.customer.PersistableCustomer;
 import com.asrevo.cvhome.store.core.model.order.v1.PersistableAnonymousOrder;
 import com.asrevo.cvhome.store.core.model.order.v1.PersistableOrder;
 import com.asrevo.cvhome.store.core.services.customer.CustomerService;
-import com.asrevo.cvhome.store.core.services.reference.currency.CurrencyService;
 import com.asrevo.cvhome.store.service.populator.customer.CustomerPopulator;
 import com.asrevo.cvhome.store.utils.AbstractDataPopulator;
 import com.asrevo.cvhome.store.utils.LocaleUtils;
