@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.store.controller.v1.content;
 
 
+import com.asrevo.cvhome.commons.domain.Entity;
 import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.entity.content.ContentType;
@@ -11,7 +12,6 @@ import com.asrevo.cvhome.store.core.model.content.box.PersistableContentBox;
 import com.asrevo.cvhome.store.core.model.content.box.ReadableContentBox;
 import com.asrevo.cvhome.store.core.model.content.page.PersistableContentPage;
 import com.asrevo.cvhome.store.core.model.content.page.ReadableContentPage;
-import com.asrevo.cvhome.commons.domain.Entity;
 import com.asrevo.cvhome.store.core.model.entity.EntityExists;
 import com.asrevo.cvhome.store.core.model.entity.ReadableEntityList;
 import com.asrevo.cvhome.store.service.facade.content.ContentFacade;

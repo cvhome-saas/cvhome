@@ -12,15 +12,15 @@ import java.util.List;
 @Setter
 public class PersistableUser extends UserEntity {
 
-	/**
-	 *
-	 */
-	@Serial
-	private static final long serialVersionUID = 1L;
-	private String password;
-	private String repeatPassword;
-	private String store;
-	private String userName;
-	private boolean active;
-	private List<PersistableGroup> groups = new ArrayList<>();
+    /**
+     *
+     */
+    @Serial
+    private static final long serialVersionUID = 1L;
+    private String password;
+    private String repeatPassword;
+    private String store;
+    private String userName;
+    private boolean active;
+    private List<PersistableGroup> groups = new ArrayList<>();
 }

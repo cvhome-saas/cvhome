@@ -313,7 +313,7 @@ public class MerchantStoreApi {
     @PostMapping(value = {"/private/store/{code}/marketing/banner"})
     @Operation(method = "POST", description = "Add store banner", summary = "")
     public void addBanner(@PathVariable String code, @RequestParam("file") MultipartFile uploadfile,
-                        HttpServletRequest request) {
+                          HttpServletRequest request) {
 
         // user doing action must be attached to the store being modified
         String userName = getUserFromRequest(request);

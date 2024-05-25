@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.store.controller.v2.product;
 
 import com.asrevo.cvhome.commons.annotation.SecuredResource;
+import com.asrevo.cvhome.commons.domain.Entity;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.entity.catalog.product.Product;
 import com.asrevo.cvhome.store.core.entity.catalog.product.attribute.ProductAttribute;
@@ -13,7 +14,6 @@ import com.asrevo.cvhome.store.core.model.catalog.product.attribute.ReadableProd
 import com.asrevo.cvhome.store.core.model.catalog.product.attribute.ReadableSelectedProductVariant;
 import com.asrevo.cvhome.store.core.model.catalog.product.variation.PersistableProductVariation;
 import com.asrevo.cvhome.store.core.model.catalog.product.variation.ReadableProductVariation;
-import com.asrevo.cvhome.commons.domain.Entity;
 import com.asrevo.cvhome.store.core.model.entity.EntityExists;
 import com.asrevo.cvhome.store.core.model.entity.ReadableEntityList;
 import com.asrevo.cvhome.store.core.services.catalog.pricing.PricingService;

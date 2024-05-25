@@ -51,7 +51,7 @@ public class StoreManagerController {
     @GetMapping("private/store/{code}")
     @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE.FIND-ONE-DETAILED')")
     public Mono<Object> getStoreDetailed(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @PathVariable("code") ManagerStoreId store) {
-        return managerService.getStore( store);
+        return managerService.getStore(store);
     }
 
     @GetMapping("store-info")

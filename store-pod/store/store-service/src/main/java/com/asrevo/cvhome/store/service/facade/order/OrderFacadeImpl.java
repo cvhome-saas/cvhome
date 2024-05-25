@@ -126,7 +126,7 @@ public class OrderFacadeImpl implements OrderFacade {
                 throw new ServiceException("Shopping cart with id " + shoppingCartId + " does not exist");
             }
             OrderTotalSummary calculate = shoppingCartCalculationService.calculate(cart, customer, store, language);
-            order.getPayment().setAmount(calculate .getTotal().toString());
+            order.getPayment().setAmount(calculate.getTotal().toString());
             Set<ShoppingCartItem> shoppingCartItems = cart.getLineItems();
 
             List<ShoppingCartItem> items = new ArrayList<>(shoppingCartItems);

@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.store.core.model.order.v1;
 
-import com.asrevo.cvhome.store.core.model.customer.address.Address;
 import com.asrevo.cvhome.commons.domain.Entity;
+import com.asrevo.cvhome.store.core.model.customer.address.Address;
 import com.asrevo.cvhome.store.core.model.order.ReadableOrderProduct;
 import com.asrevo.cvhome.store.core.model.order.total.ReadableTotal;
 import lombok.Getter;

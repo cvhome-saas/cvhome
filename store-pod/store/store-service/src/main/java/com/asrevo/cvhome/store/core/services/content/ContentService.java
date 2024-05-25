@@ -146,6 +146,7 @@ public interface ContentService
      */
     void addLogo(String merchantStoreCode, InputContentFile cmsContentImage)
             throws ServiceException;
+
     /**
      * Add the store banner
      *

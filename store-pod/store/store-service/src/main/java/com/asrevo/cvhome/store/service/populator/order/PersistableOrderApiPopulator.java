@@ -76,7 +76,6 @@ public class PersistableOrderApiPopulator extends AbstractDataPopulator<Persista
             target.setLocale(LocaleUtils.getLocale(store));
 
 
-
             Currency currency = store.getCurrency();
 
 

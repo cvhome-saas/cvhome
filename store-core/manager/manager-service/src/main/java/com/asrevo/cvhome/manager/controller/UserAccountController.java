@@ -22,8 +22,8 @@ import java.net.URISyntaxException;
 @RequestMapping("api/v1/user-account")
 @Slf4j
 public class UserAccountController {
-    private final UserAccountService userAccountService;
     public final InternalStoreService internalStoreService;
+    private final UserAccountService userAccountService;
 
     public UserAccountController(OAuth2ResourceServerProperties properties, InternalStoreService internalStoreService) throws URISyntaxException {
         this.userAccountService = new KeycloakUserAccountServiceImpl(new URI(properties.getJwt().getJwkSetUri()));

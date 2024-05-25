@@ -116,6 +116,7 @@ public interface AbstractimageFilePath extends ImageFilePath {
         return new StringBuilder().append(getBasePath(store)).append(Constants.FILES_URI).append(Constants.SLASH).append(store.getCode()).append(Constants.SLASH).append(FileContentType.LOGO).append(Constants.SLASH)
                 .append(store.getStoreLogo()).toString();
     }
+
     /**
      * Builds a merchant store banner path
      *

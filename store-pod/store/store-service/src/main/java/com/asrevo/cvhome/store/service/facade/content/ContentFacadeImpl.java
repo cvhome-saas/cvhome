@@ -136,7 +136,8 @@ public class ContentFacadeImpl implements ContentFacade {
         }
 
     }
-// @TODO ASHRAF CHECK IF WE CAN USE THIS IN THE NAV MENU
+
+    // @TODO ASHRAF CHECK IF WE CAN USE THIS IN THE NAV MENU
     private ReadableContentPage contentDescriptionToReadableContent(MerchantStore store, Content content,
                                                                     ContentDescription contentDescription) {
 

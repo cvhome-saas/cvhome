@@ -106,6 +106,7 @@ public interface StoreFacade {
      * Delete store logo
      */
     void deleteLogo(String code);
+
     /**
      * Delete store logo
      */

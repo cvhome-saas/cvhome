@@ -39,8 +39,6 @@ public class KeycloakUserAccountServiceImpl implements UserAccountService {
     }
 
 
-
-
     @Override
     public ReadableUserList list(ListUsersQuery listUsers) {
         List<UserRepresentation> list = usersResource.searchByAttributes(listUsers.query());

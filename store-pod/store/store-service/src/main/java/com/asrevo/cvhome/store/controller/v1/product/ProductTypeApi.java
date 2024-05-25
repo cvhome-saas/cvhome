@@ -1,13 +1,13 @@
 package com.asrevo.cvhome.store.controller.v1.product;
 
 import com.asrevo.cvhome.commons.annotation.SecuredResource;
+import com.asrevo.cvhome.commons.domain.Entity;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import com.asrevo.cvhome.store.core.model.catalog.product.type.PersistableProductType;
 import com.asrevo.cvhome.store.core.model.catalog.product.type.ReadableProductType;
 import com.asrevo.cvhome.store.core.model.catalog.product.type.ReadableProductTypeList;
-import com.asrevo.cvhome.commons.domain.Entity;
 import com.asrevo.cvhome.store.core.model.entity.EntityExists;
 import com.asrevo.cvhome.store.service.facade.product.ProductTypeFacade;
 import io.swagger.v3.oas.annotations.Operation;

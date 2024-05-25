@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.store.controller.v1.product;
 
 import com.asrevo.cvhome.commons.annotation.SecuredResource;
+import com.asrevo.cvhome.commons.domain.Entity;
 import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
 import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
 import com.asrevo.cvhome.store.controller.exception.UnauthorizedException;
@@ -14,7 +15,6 @@ import com.asrevo.cvhome.store.core.model.catalog.product.LightPersistableProduc
 import com.asrevo.cvhome.store.core.model.catalog.product.ReadableProduct;
 import com.asrevo.cvhome.store.core.model.catalog.product.ReadableProductList;
 import com.asrevo.cvhome.store.core.model.catalog.product.product.PersistableProduct;
-import com.asrevo.cvhome.commons.domain.Entity;
 import com.asrevo.cvhome.store.core.model.entity.EntityExists;
 import com.asrevo.cvhome.store.core.services.catalog.category.CategoryService;
 import com.asrevo.cvhome.store.core.services.catalog.product.ProductService;

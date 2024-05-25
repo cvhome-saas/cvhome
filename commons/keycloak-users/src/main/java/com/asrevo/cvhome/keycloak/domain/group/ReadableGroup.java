@@ -7,20 +7,19 @@ import java.io.Serial;
 
 /**
  * Object used for reading a group
- * 
- * @author carlsamson
  *
+ * @author carlsamson
  */
 @Getter
 @Setter
 public class ReadableGroup extends GroupEntity {
 
-  /**
-   * 
-   */
-  @Serial
-  private static final long serialVersionUID = 1L;
+    /**
+     *
+     */
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-  private Long id = 0L;
+    private Long id = 0L;
 
 }
