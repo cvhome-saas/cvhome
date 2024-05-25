@@ -34,18 +34,11 @@ public class ProductPriceServiceImpl extends SalesManagerEntityServiceImpl<Long,
 
     @Override
     public ProductPrice saveOrUpdate(ProductPrice price) throws ServiceException {
-
-
-        ProductPrice returnEntity = productPriceRepository.save(price);
-
-        return returnEntity;
-
-
+        return productPriceRepository.save(price);
     }
 
     @Override
     public void delete(ProductPrice price) throws ServiceException {
-
         //override method, this allows the error that we try to remove a detached variant
         price = this.getById(price.getId());
         super.delete(price);
@@ -54,19 +47,16 @@ public class ProductPriceServiceImpl extends SalesManagerEntityServiceImpl<Long,
 
     @Override
     public List<ProductPrice> findByProductSku(String sku, MerchantStore store) {
-
         return productPriceRepository.findByProduct(sku, store.getCode());
     }
 
     @Override
     public ProductPrice findById(Long priceId, String sku, MerchantStore store) {
-
         return productPriceRepository.findByProduct(sku, priceId, store.getCode());
     }
 
     @Override
     public List<ProductPrice> findByInventoryId(Long productInventoryId, String sku, MerchantStore store) {
-
         return productPriceRepository.findByProductInventoty(sku, productInventoryId, store.getCode());
     }
 

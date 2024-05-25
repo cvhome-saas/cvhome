@@ -15,7 +15,6 @@ import java.io.Serializable;
 
 @MappedSuperclass
 @EntityListeners(value = AuditListener.class)
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 @Getter
 @Setter
 public class Description implements Auditable, Serializable {

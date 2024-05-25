@@ -58,7 +58,7 @@ public class ProductVariantServiceImpl extends SalesManagerEntityServiceImpl<Lon
     public boolean exist(String sku, Long productId) {
 
         ProductVariant instance = productVariantRepository.existsBySkuAndProduct(sku, productId);
-        return instance != null ? true : false;
+        return instance != null;
 
     }
 

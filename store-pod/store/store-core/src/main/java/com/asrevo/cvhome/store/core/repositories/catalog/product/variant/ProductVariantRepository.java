@@ -21,7 +21,6 @@ public interface ProductVariantRepository extends JpaRepository<ProductVariant, 
             left join fetch pvv.productOption pvvpo
             left join fetch pvv.productOptionValue pvvpov
             left join fetch pvvpo.descriptions povvpod
-            left join fetch pvpov.descriptions povvpovd
             left join fetch pv.merchantStore pvm
             where p.id = ?1 and pvm.id = ?2""")
     Optional<ProductVariant> findOne(Long id, Integer storeId);
@@ -37,7 +36,6 @@ public interface ProductVariantRepository extends JpaRepository<ProductVariant, 
             left join fetch pvv.productOption pvvpo
             left join fetch pvv.productOptionValue pvvpov
             left join fetch pvvpo.descriptions povvpod
-            left join fetch pvpov.descriptions povvpovd
             left join fetch pv.merchantStore pvm
             where p.id in (?1) and pvm.id = ?2""")
     List<ProductVariant> findByIds(List<Long> ids, Integer storeId);
@@ -54,7 +52,6 @@ public interface ProductVariantRepository extends JpaRepository<ProductVariant, 
             left join fetch pvv.productOption pvvpo
             left join fetch pvv.productOptionValue pvvpov
             left join fetch pvvpo.descriptions povvpod
-            left join fetch pvpov.descriptions povvpovd
             left join fetch pr.merchantStore prm
             where p.id = ?1 and pr.id = ?2 and prm.id = ?3""")
     Optional<ProductVariant> findById(Long id, Long productId, Integer storeId);
@@ -71,12 +68,10 @@ public interface ProductVariantRepository extends JpaRepository<ProductVariant, 
             left join fetch pvv.productOption pvvpo
             left join fetch pvv.productOptionValue pvvpov
             left join fetch pvvpo.descriptions povvpod
-            left join fetch pvpov.descriptions povvpovd
             left join fetch pr.merchantStore prm
             where pvpod.language.id = ?4
             and pvpovd.language.id = ?4
             and povvpod.language.id = ?4
-            and povvpovd.language.id = ?4
             and pr.id = ?2 and p.code = ?1 and prm.id = ?3""")
     Optional<ProductVariant> findBySku(String code, Long productId, Integer storeId, Integer languageId);
 
@@ -100,7 +95,6 @@ public interface ProductVariantRepository extends JpaRepository<ProductVariant, 
             left join fetch pvv.productOption pvvpo
             left join fetch pvv.productOptionValue pvvpov
             left join fetch pvvpo.descriptions povvpod
-            left join fetch pvpov.descriptions pvpovd
             left join fetch p.productVariantGroup pig
             left join fetch pig.images pigi
             left join fetch pigi.descriptions pigid

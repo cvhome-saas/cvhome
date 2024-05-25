@@ -90,7 +90,7 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
     public void addProductDescription(Product product, ProductDescription description) throws ServiceException {
 
         if (product.getDescriptions() == null) {
-            product.setDescriptions(new HashSet<ProductDescription>());
+            product.setDescriptions(new HashSet<>());
         }
 
         product.getDescriptions().add(description);
@@ -101,9 +101,7 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
 
     @Override
     public List<Product> getProducts(List<Long> categoryIds) throws ServiceException {
-
-        @SuppressWarnings({"unchecked", "rawtypes"})
-        Set ids = new HashSet(categoryIds);
+        Set<Long> ids = new HashSet<>(categoryIds);
         return productRepository.getProductsListByCategories(ids);
 
     }
@@ -121,9 +119,7 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
 
     @Override
     public List<Product> getProducts(List<Long> categoryIds, Language language) throws ServiceException {
-
-        @SuppressWarnings({"unchecked", "rawtypes"})
-        Set<Long> ids = new HashSet(categoryIds);
+        Set<Long> ids = new HashSet<>(categoryIds);
         return productRepository.getProductsListByCategories(ids, language);
 
     }
@@ -341,10 +337,7 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
 
         PageRequest pageRequest = PageRequest.of(page, count);
 
-        @SuppressWarnings({"rawtypes", "unchecked"})
-        Page<Product> p = new PageImpl(productList.getProducts(), pageRequest, productList.getTotalCount());
-
-        return p;
+        return new PageImpl<>(productList.getProducts(), pageRequest, productList.getTotalCount());
     }
 
     @Override
@@ -365,7 +358,7 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
             if (products.isEmpty()) {
                 throw new ServiceException("Cannot get product with sku [" + productCode + "]");
             }
-            Long id = products.get(0);
+            Long id = products.getFirst();
             return productRepository.getById(id, merchant, language);
         } catch (Exception e) {
             throw new ServiceException("Cannot get product with sku [" + productCode + "]", e);
@@ -381,7 +374,7 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
             if (products.isEmpty()) {
                 throw new ServiceException("Cannot get product with sku [" + productCode + "]");
             }
-            return this.findOne(products.get(0), merchant);
+            return this.findOne(products.getFirst(), merchant);
         } catch (Exception e) {
             throw new ServiceException("Cannot get product with sku [" + productCode + "]", e);
         }

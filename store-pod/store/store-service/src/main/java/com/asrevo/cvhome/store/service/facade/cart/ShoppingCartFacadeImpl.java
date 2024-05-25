@@ -863,8 +863,8 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
         // check if existing product
         Set<com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem> items = cartModel.getLineItems();
         if (!CollectionUtils.isEmpty(items)) {
-            Set<com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem> newItems = new HashSet<com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem>();
-            Set<com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem> removeItems = new HashSet<com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem>();
+            Set<com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem> newItems = new HashSet<>();
+            Set<com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem> removeItems = new HashSet<>();
             for (com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem anItem : items) {// take care of existing
                 // product
                 if (itemModel.getProduct().getId().longValue() == anItem.getProduct().getId()) {
