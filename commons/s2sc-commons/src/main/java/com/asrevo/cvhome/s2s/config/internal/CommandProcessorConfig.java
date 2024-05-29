@@ -11,6 +11,7 @@ import java.util.List;
 public class CommandProcessorConfig {
     @Bean
     public CommandProcessor commandProcessor(List<CommandImpl<?>> commandsImpl) {
+        //noinspection unchecked
         return new DefaultCommandProcessor(commandsImpl.stream().map(it -> ((CommandImpl<Command>) it)).toList());
     }
 

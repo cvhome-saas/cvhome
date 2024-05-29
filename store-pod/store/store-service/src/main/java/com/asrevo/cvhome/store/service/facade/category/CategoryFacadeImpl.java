@@ -385,8 +385,8 @@ public class CategoryFacadeImpl implements CategoryFacade {
             }
 
             // for each reference set Option
-            for (Entry pair : references.entrySet()) {
-                ProductOption option = (ProductOption) pair.getValue();
+            for (Entry<String,ProductOption> pair : references.entrySet()) {
+                ProductOption option = pair.getValue();
                 List<ProductOptionValue> values = rawFacet.get(option.getCode());
 
                 ReadableProductVariant productVariant = new ReadableProductVariant();

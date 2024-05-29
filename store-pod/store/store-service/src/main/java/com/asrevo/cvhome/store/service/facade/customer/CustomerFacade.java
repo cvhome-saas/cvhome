@@ -16,7 +16,7 @@ import com.asrevo.cvhome.store.core.model.customer.optin.PersistableCustomerOpti
 import java.util.List;
 
 /**
- * <p>Customer facade working as a bridge between {@link CustomerService} and Controller
+ * <p>Customer facade working as a bridge between {@link com.asrevo.cvhome.store.core.services.customer.CustomerService} and Controller
  * It will take care about interacting with Service API and doing any pre and post processing
  * </p>
  *

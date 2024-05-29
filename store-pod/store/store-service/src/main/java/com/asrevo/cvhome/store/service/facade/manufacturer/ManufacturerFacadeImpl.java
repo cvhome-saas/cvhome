@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -65,12 +66,10 @@ public class ManufacturerFacadeImpl implements ManufacturerFacade {
         try {
             List<Manufacturer> manufacturers = manufacturerService.listByProductsInCategory(store, category, language);
 
-            List<ReadableManufacturer> manufacturersList = manufacturers.stream()
-                    .sorted((object1, object2) -> object1.getCode().compareTo(object2.getCode()))
+            return manufacturers.stream()
+                    .sorted(Comparator.comparing(Manufacturer::getCode))
                     .map(manuf -> readableManufacturerConverter.convert(manuf, store, language))
                     .collect(Collectors.toList());
-
-            return manufacturersList;
         } catch (ServiceException e) {
             throw new ServiceRuntimeException(e);
         }

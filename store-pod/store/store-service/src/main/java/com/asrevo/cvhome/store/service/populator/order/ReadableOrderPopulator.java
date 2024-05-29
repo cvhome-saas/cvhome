@@ -85,7 +85,7 @@ public class ReadableOrderPopulator extends
             target.setBilling(address);
         }
 
-        if (source.getOrderAttributes() != null && source.getOrderAttributes().size() > 0) {
+        if (source.getOrderAttributes() != null && !source.getOrderAttributes().isEmpty()) {
             for (OrderAttribute attr : source.getOrderAttributes()) {
                 com.asrevo.cvhome.store.core.model.order.OrderAttribute a = new com.asrevo.cvhome.store.core.model.order.OrderAttribute();
                 a.setKey(attr.getKey());

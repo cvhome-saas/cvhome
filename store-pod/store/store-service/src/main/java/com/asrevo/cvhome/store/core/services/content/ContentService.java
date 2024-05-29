@@ -98,7 +98,7 @@ public interface ContentService
      * search in Infinispan tree cache and OutputContentImage will be sent, in case no image is found null will
      * returned.
      *
-     * @return {@link OutputContentImage}
+     * @return {@link OutputContentFile}
      */
     OutputContentFile getContentFile(String merchantStoreCode, FileContentType fileContentType, String fileName)
             throws ServiceException;
@@ -107,7 +107,7 @@ public interface ContentService
     /**
      * Method to get list of all images associated with a given merchant store.In case of no image method will return an empty list.
      *
-     * @return list of {@link OutputContentImage}
+     * @return list of {@link List<OutputContentFile>}
      */
     List<OutputContentFile> getContentFiles(String merchantStoreCode, FileContentType fileContentType)
             throws ServiceException;

@@ -242,6 +242,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
         Product p = null;
 
         try {
+            @SuppressWarnings("unchecked")
             List<Product> products = q.getResultList();
             if (products.size() > 1) {
                 log.error("Found multiple products for list of criterias with main criteria [{}]", seUrl);
@@ -268,8 +269,10 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
     @Override
     public Product getProductForLocale(long productId, Language language, Locale locale) {
 
-        List regionList = new ArrayList();
+        List<String> regionList = new ArrayList<>();
+        //noinspection unchecked
         regionList.add("*");
+        //noinspection unchecked
         regionList.add(locale.getCountry());
 
         StringBuilder qs = new StringBuilder();
@@ -436,7 +439,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
     }
 
     @Override
-    public List<Product> getProductsListByIds(Set<Long> productds) {
+    public List getProductsListByIds(Set<Long> productds) {
         StringBuilder qs = new StringBuilder();
         qs.append(productQueryV2());
         qs.append("where p.id in (:pid) ");

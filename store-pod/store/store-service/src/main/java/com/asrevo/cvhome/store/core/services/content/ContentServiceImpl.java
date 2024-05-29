@@ -333,7 +333,7 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
      * with given name found for requested Merchant Store in Infinispan tree
      * cache.
      *
-     * @return {@link OutputContentImage}
+     * @return {@link OutputContentFile}
      */
     @Override
     public OutputContentFile getContentFile(String merchantStoreCode, FileContentType fileContentType, String fileName)
@@ -355,7 +355,7 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
      * no image is associated with given Merchant Store in Infinispan tree
      * cache.
      *
-     * @return list of {@link OutputContentImage}
+     * @return list of {@link List<OutputContentFile>}
      */
     @Override
     public List<OutputContentFile> getContentFiles(String merchantStoreCode, FileContentType fileContentType)

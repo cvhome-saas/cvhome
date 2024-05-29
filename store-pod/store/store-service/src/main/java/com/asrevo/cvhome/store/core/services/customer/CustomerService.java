@@ -35,7 +35,7 @@ public interface CustomerService extends SalesManagerEntityService<Long, Custome
     Customer getByPasswordResetToken(String storeCode, String token);
 
     /**
-     * Return an {@link com.salesmanager.core.business.common.model.Address} object from the client IP address. Uses underlying GeoLocation module
+     * Return an {@link Address} object from the client IP address. Uses underlying GeoLocation module
      *
      */
     Address getCustomerAddress(MerchantStore store, String ipAddress)

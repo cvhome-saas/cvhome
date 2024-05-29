@@ -199,7 +199,7 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
 
         //object query
         Query objectQ = em.createQuery(
-                objectBuilderSelect.toString() + objectBuilderWhere.toString());
+                objectBuilderSelect + objectBuilderWhere.toString());
 
         //customer name
         if (!StringUtils.isEmpty(criteria.getCustomerName())) {
@@ -252,6 +252,7 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
         orderList.setTotalCount(entityList.getTotalCount());
         orderList.setTotalPages(entityList.getTotalPages());
 
+        //noinspection unchecked
         orderList.setOrders(objectQ.getResultList());
 
         return orderList;

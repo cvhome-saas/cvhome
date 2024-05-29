@@ -34,7 +34,7 @@ public class IntegrationModulesLoader {
             @SuppressWarnings("rawtypes")
             Map[] objects = mapper.readValue(in, Map[].class);
 
-            for (Map object : objects) {
+            for (Map<?,?> object : objects) {
 
                 modules.add(this.loadModule(object));
             }
