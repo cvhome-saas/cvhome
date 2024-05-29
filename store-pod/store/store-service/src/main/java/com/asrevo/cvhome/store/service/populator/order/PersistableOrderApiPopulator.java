@@ -17,7 +17,6 @@ import com.asrevo.cvhome.store.core.model.customer.PersistableCustomer;
 import com.asrevo.cvhome.store.core.model.order.v1.PersistableAnonymousOrder;
 import com.asrevo.cvhome.store.core.model.order.v1.PersistableOrder;
 import com.asrevo.cvhome.store.core.services.customer.CustomerService;
-import com.asrevo.cvhome.store.core.services.reference.currency.CurrencyService;
 import com.asrevo.cvhome.store.service.populator.customer.CustomerPopulator;
 import com.asrevo.cvhome.store.utils.AbstractDataPopulator;
 import com.asrevo.cvhome.store.utils.LocaleUtils;
@@ -33,7 +32,7 @@ import java.util.Set;
 @Component
 public class PersistableOrderApiPopulator extends AbstractDataPopulator<PersistableOrder, Order> {
 
-    private final CurrencyService currencyService;
+  //  private final CurrencyService currencyService;
     private final CustomerService customerService;
     /*	@Autowired
         private ShoppingCartService shoppingCartService;
@@ -45,8 +44,7 @@ public class PersistableOrderApiPopulator extends AbstractDataPopulator<Persista
         private DigitalProductService digitalProductService;*/
     private final CustomerPopulator customerPopulator;
 
-    public PersistableOrderApiPopulator(CurrencyService currencyService, CustomerService customerService, CustomerPopulator customerPopulator) {
-        this.currencyService = currencyService;
+    public PersistableOrderApiPopulator(CustomerService customerService, CustomerPopulator customerPopulator) {
         this.customerService = customerService;
         this.customerPopulator = customerPopulator;
     }
@@ -76,7 +74,6 @@ public class PersistableOrderApiPopulator extends AbstractDataPopulator<Persista
             target.setLocale(LocaleUtils.getLocale(store));
 
 
-
             Currency currency = store.getCurrency();
 
 
@@ -86,7 +83,7 @@ public class PersistableOrderApiPopulator extends AbstractDataPopulator<Persista
 
             //Customer
             Customer customer = null;
-            if (source.getCustomerId() != null && source.getCustomerId().longValue() > 0) {
+            if (source.getCustomerId() != null && source.getCustomerId() > 0) {
                 Long customerId = source.getCustomerId();
                 customer = customerService.getById(customerId);
 

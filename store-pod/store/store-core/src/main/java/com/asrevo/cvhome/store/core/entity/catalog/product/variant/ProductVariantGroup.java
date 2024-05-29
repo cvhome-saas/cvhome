@@ -41,10 +41,10 @@ public class ProductVariantGroup extends SalesManagerEntity<Long, ProductVariant
 
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "productVariantGroup")
-    private List<ProductVariantImage> images = new ArrayList<ProductVariantImage>();
+    private List<ProductVariantImage> images = new ArrayList<>();
 
     @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.DETACH}, mappedBy = "productVariantGroup")
-    private Set<ProductVariant> productVariants = new HashSet<ProductVariant>();
+    private Set<ProductVariant> productVariants = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MERCHANT_ID", nullable = false)

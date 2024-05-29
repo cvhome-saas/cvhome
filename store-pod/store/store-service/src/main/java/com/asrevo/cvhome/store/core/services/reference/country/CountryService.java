@@ -27,9 +27,6 @@ public interface CountryService extends SalesManagerEntityService<Integer, Count
     /**
      * List country - zone objects by language
      *
-     * @param language
-     * @return
-     * @throws ServiceException
      */
     List<Country> listCountryZones(Language language) throws ServiceException;
 }

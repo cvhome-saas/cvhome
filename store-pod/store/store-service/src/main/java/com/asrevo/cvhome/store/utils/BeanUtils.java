@@ -45,8 +45,7 @@ public class BeanUtils {
         BeanInfo beanInfo = Introspector.getBeanInfo(beanClass);
         PropertyDescriptor[] propertyDescriptors = beanInfo.getPropertyDescriptors();
         PropertyDescriptor propertyDescriptor = null;
-        for (int i = 0; i < propertyDescriptors.length; i++) {
-            PropertyDescriptor currentPropertyDescriptor = propertyDescriptors[i];
+        for (PropertyDescriptor currentPropertyDescriptor : propertyDescriptors) {
             if (currentPropertyDescriptor.getName().equals(propertyname)) {
                 propertyDescriptor = currentPropertyDescriptor;
             }

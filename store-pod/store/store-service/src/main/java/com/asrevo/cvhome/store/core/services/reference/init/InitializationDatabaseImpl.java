@@ -51,8 +51,6 @@ public class InitializationDatabaseImpl implements InitializationDatabase {
     */
     private final ZonesLoader zonesLoader;
 
-    private final IntegrationModulesLoader modulesLoader;
-
     private final ManufacturerService manufacturerService;
 
 /*
@@ -73,7 +71,6 @@ public class InitializationDatabaseImpl implements InitializationDatabase {
         this.countryService = countryService;
         this.currencyService = currencyService;
         this.zonesLoader = zonesLoader;
-        this.modulesLoader = modulesLoader;
         this.manufacturerService = manufacturerService;
         this.optinService = optinService;
     }
@@ -148,7 +145,7 @@ public class InitializationDatabaseImpl implements InitializationDatabase {
         log.info(String.format("%s : Populating Zones ", name));
         try {
 
-            Map<String, Zone> zonesMap = new HashMap<String, Zone>();
+            Map<String, Zone> zonesMap = new HashMap<>();
             zonesMap = zonesLoader.loadZones("reference/zoneconfig.json");
 
             this.addZonesToDb(zonesMap);
@@ -240,7 +237,7 @@ public class InitializationDatabaseImpl implements InitializationDatabase {
         Currency currency = currencyService.getByCode("CAD");
         Zone qc = zoneService.getByCode("QC");
 
-        List<Language> supportedLanguages = new ArrayList<Language>();
+        List<Language> supportedLanguages = new ArrayList<>();
         supportedLanguages.add(en);
 
         //create a merchant

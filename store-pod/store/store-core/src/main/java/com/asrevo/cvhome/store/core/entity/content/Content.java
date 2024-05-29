@@ -41,7 +41,7 @@ public class Content extends SalesManagerEntity<Long, Content> implements Serial
 
     @Valid
     @OneToMany(mappedBy = "content", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<ContentDescription> descriptions = new ArrayList<ContentDescription>();
+    private List<ContentDescription> descriptions = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MERCHANT_ID", nullable = false)
@@ -57,13 +57,13 @@ public class Content extends SalesManagerEntity<Long, Content> implements Serial
     @Column(name = "LINK_TO_MENU")
     private boolean linkToMenu;
 
-    @Column(name = "CONTENT_POSITION", length = 10, nullable = true)
+    @Column(name = "CONTENT_POSITION", length = 10)
     @Enumerated(value = EnumType.STRING)
     private ContentPosition contentPosition;
 
     //Used for grouping
     //BOX, SECTION, PAGE
-    @Column(name = "CONTENT_TYPE", length = 10, nullable = true)
+    @Column(name = "CONTENT_TYPE", length = 10)
     @Enumerated(value = EnumType.STRING)
     private ContentType contentType;
 
@@ -71,7 +71,7 @@ public class Content extends SalesManagerEntity<Long, Content> implements Serial
     private Integer sortOrder = 0;
 
     //A page can contain one product listing
-    @Column(name = "PRODUCT_GROUP", nullable = true)
+    @Column(name = "PRODUCT_GROUP")
     private String productGroup;
 
     public ContentDescription getDescription() {

@@ -52,10 +52,10 @@ public class CustomerOption extends SalesManagerEntity<Long, CustomerOption> {
 
     @Valid
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "customerOption")
-    private Set<CustomerOptionDescription> descriptions = new HashSet<CustomerOptionDescription>();
+    private Set<CustomerOptionDescription> descriptions = new HashSet<>();
 
     @Transient
-    private List<CustomerOptionDescription> descriptionsList = new ArrayList<CustomerOptionDescription>();
+    private List<CustomerOptionDescription> descriptionsList = new ArrayList<>();
 
 
     @ManyToOne(fetch = FetchType.LAZY)

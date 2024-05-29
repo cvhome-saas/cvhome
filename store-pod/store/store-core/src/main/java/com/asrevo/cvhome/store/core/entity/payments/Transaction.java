@@ -46,7 +46,7 @@ public class Transaction extends SalesManagerEntity<Long, Transaction> implement
 
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ORDER_ID", nullable = true)
+    @JoinColumn(name = "ORDER_ID")
     private Order order;
 
     @Column(name = "AMOUNT")
@@ -68,7 +68,7 @@ public class Transaction extends SalesManagerEntity<Long, Transaction> implement
     private String details;
 
     @Transient
-    private Map<String, String> transactionDetails = new HashMap<String, String>();
+    private Map<String, String> transactionDetails = new HashMap<>();
 
     @Override
     public String toJSONString() {

@@ -57,33 +57,33 @@ public class Product extends SalesManagerEntity<Long, Product> implements Audita
     private AuditSection auditSection = new AuditSection();
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "product")
-    private Set<ProductDescription> descriptions = new HashSet<ProductDescription>();
+    private Set<ProductDescription> descriptions = new HashSet<>();
 
     /**
      * Inventory
      */
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "product")
-    private Set<ProductAvailability> availabilities = new HashSet<ProductAvailability>();
+    private Set<ProductAvailability> availabilities = new HashSet<>();
 
     /**
      * Attributes of a product
      * Decorates the product with additional properties
      */
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "product")
-    private Set<ProductAttribute> attributes = new HashSet<ProductAttribute>();
+    private Set<ProductAttribute> attributes = new HashSet<>();
 
     /**
      * Default product images
      */
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, mappedBy = "product")
 //cascade is set to remove because product save requires logic to create physical image first and then save the image id in the database, cannot be done in cascade
-    private Set<ProductImage> images = new HashSet<ProductImage>();
+    private Set<ProductImage> images = new HashSet<>();
 
     /**
      * Related items / product groups
      */
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "product")
-    private Set<ProductRelationship> relationships = new HashSet<ProductRelationship>();
+    private Set<ProductRelationship> relationships = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MERCHANT_ID", nullable = false)
@@ -106,14 +106,14 @@ public class Product extends SalesManagerEntity<Long, Product> implements Audita
             org.hibernate.annotations.CascadeType.REPLICATE
 
     })
-    private Set<Category> categories = new HashSet<Category>();
+    private Set<Category> categories = new HashSet<>();
 
     /**
      * Product variants
      * Decorates the product with variants
      */
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "product")
-    private Set<ProductVariant> variants = new HashSet<ProductVariant>();
+    private Set<ProductVariant> variants = new HashSet<>();
 
     @Column(name = "DATE_AVAILABLE")
     @Temporal(TemporalType.TIMESTAMP)
@@ -129,15 +129,15 @@ public class Product extends SalesManagerEntity<Long, Product> implements Audita
 
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.REFRESH})
-    @JoinColumn(name = "MANUFACTURER_ID", nullable = true)
+    @JoinColumn(name = "MANUFACTURER_ID")
     private Manufacturer manufacturer;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.REFRESH})
-    @JoinColumn(name = "PRODUCT_TYPE_ID", nullable = true)
+    @JoinColumn(name = "PRODUCT_TYPE_ID")
     private ProductType type;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.REFRESH})
-    @JoinColumn(name = "TAX_CLASS_ID", nullable = true)
+    @JoinColumn(name = "TAX_CLASS_ID")
     private TaxClass taxClass;
 
     @Column(name = "PRODUCT_VIRTUAL")
@@ -184,28 +184,28 @@ public class Product extends SalesManagerEntity<Long, Product> implements Audita
     @Column(name = "REF_SKU")
     private String refSku;
 
-    @Column(name = "COND", nullable = true)
+    @Column(name = "COND")
     private ProductCondition condition;
 
     /**
      * RENTAL ADDITIONAL FIELDS
      */
 
-    @Column(name = "RENTAL_STATUS", nullable = true)
+    @Column(name = "RENTAL_STATUS")
     private RentalStatus rentalStatus;
 
 
-    @Column(name = "RENTAL_DURATION", nullable = true)
+    @Column(name = "RENTAL_DURATION")
     private Integer rentalDuration;
 
-    @Column(name = "RENTAL_PERIOD", nullable = true)
+    @Column(name = "RENTAL_PERIOD")
     private Integer rentalPeriod;
     /**
      * End rental fields
      */
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "CUSTOMER_ID", nullable = true)
+    @JoinColumn(name = "CUSTOMER_ID")
     private Customer owner;
 
     public Product() {

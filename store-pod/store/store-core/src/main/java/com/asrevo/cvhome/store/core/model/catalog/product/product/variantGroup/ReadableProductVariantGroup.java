@@ -16,8 +16,8 @@ public class ReadableProductVariantGroup extends ProductVariantGroup {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    List<ReadableImage> images = new ArrayList<ReadableImage>();
+    List<ReadableImage> images = new ArrayList<>();
 
-    private List<ReadableProductVariant> productVariants = new ArrayList<ReadableProductVariant>();
+    private List<ReadableProductVariant> productVariants = new ArrayList<>();
 
 }

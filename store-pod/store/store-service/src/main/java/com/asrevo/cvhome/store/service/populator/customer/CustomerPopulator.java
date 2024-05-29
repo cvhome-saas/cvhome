@@ -181,7 +181,7 @@ public class CustomerPopulator extends
                 target.setDelivery(delivery);
             }
 
-            if (source.getRating() != null && source.getRating().doubleValue() > 0) {
+            if (source.getRating() != null && source.getRating() > 0) {
                 target.setCustomerReviewAvg(BigDecimal.valueOf(source.getRating()));
             }
 

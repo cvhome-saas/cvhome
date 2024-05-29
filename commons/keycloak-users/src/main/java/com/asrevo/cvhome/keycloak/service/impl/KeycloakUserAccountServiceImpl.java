@@ -39,8 +39,6 @@ public class KeycloakUserAccountServiceImpl implements UserAccountService {
     }
 
 
-
-
     @Override
     public ReadableUserList list(ListUsersQuery listUsers) {
         List<UserRepresentation> list = usersResource.searchByAttributes(listUsers.query());
@@ -78,22 +76,22 @@ public class KeycloakUserAccountServiceImpl implements UserAccountService {
     @Override
     public ReadableUser createUser(UserOrgStoreIdentity identity, ManagerStoreId store, PersistableUser create) {
         if (create.getGroups() == null || create.getGroups().isEmpty()) {
-            throw new OperationExecution(ErrorCodes.groups_should_not_be_empty);
+            throw new OperationExecution(ErrorCodes.GROUPS_SHOULD_NOT_BE_EMPTY);
         }
         if (create.getGroups().stream().anyMatch(it -> it.getName().equals(Groups.CUSTOMER.name()))) {
-            throw new OperationExecution(ErrorCodes.create_customer_not_allowed);
+            throw new OperationExecution(ErrorCodes.CREATE_CUSTOMER_NOT_ALLOWED);
         }
         if (create.getGroups().stream().anyMatch(it -> it.getName().equals(Groups.ORG_ADMIN.name()))) {
-            throw new OperationExecution(ErrorCodes.create_org_admin_not_allowed);
+            throw new OperationExecution(ErrorCodes.CREATE_ORG_ADMIN_NOT_ALLOWED);
         }
         if (create.getGroups().stream().anyMatch(it -> it.getName().equals(Groups.SUPER_ADMIN.name()))) {
-            throw new OperationExecution(ErrorCodes.create_super_admin_not_allowed);
+            throw new OperationExecution(ErrorCodes.CREATE_SUPER_ADMIN_NOT_ALLOWED);
         }
         if (usernameExist(create.getUserName())) {
-            throw new OperationExecution(ErrorCodes.username_already_taken);
+            throw new OperationExecution(ErrorCodes.USERNAME_ALREADY_TAKEN);
         }
         if (emailExist(create.getEmailAddress())) {
-            throw new OperationExecution(ErrorCodes.email_already_taken);
+            throw new OperationExecution(ErrorCodes.EMAIL_ALREADY_TAKEN);
         }
         return createUser(identity.org(), store, create);
     }

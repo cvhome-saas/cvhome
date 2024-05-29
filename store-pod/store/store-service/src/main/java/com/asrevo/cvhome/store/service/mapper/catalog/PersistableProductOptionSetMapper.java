@@ -70,7 +70,7 @@ public class PersistableProductOptionSetMapper implements Mapper<PersistableProd
         if (!CollectionUtils.isEmpty(source.getProductTypes())) {
             try {
                 List<ProductType> types = productTypeService.listProductTypes(source.getProductTypes(), store, language);
-                Set<ProductType> typesSet = new HashSet<ProductType>(types);
+                Set<ProductType> typesSet = new HashSet<>(types);
                 destination.setProductTypes(typesSet);
             } catch (ServiceException e) {
                 throw new ConversionRuntimeException("Error while mpping ProductOptionSet", e);

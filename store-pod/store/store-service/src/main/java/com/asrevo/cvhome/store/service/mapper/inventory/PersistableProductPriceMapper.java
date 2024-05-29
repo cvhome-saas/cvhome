@@ -57,13 +57,6 @@ public class PersistableProductPriceMapper implements Mapper<PersistableProductP
 
             destination.setId(source.getId());
 
-            /**
-             * Get product availability and verify the existing br-pa-1.0.0
-             *
-             * Cannot have multiple default price for the same product availability Default
-             * price can be edited but cannot create new default price
-             */
-
             ProductAvailability availability = null;
 
             if (isPositive(source.getProductAvailabilityId())) {
@@ -91,7 +84,7 @@ public class PersistableProductPriceMapper implements Mapper<PersistableProductP
                         // if default price exist for sku exit
                         if (source.isDefaultPrice()) {
                             Optional<ProductPrice> defaultPrice = availability.getPrices().stream()
-                                    .filter(p -> p.isDefaultPrice()).findAny();
+                                    .filter(ProductPrice::isDefaultPrice).findAny();
                             if (defaultPrice.isPresent()) {
                                 //throw new ConversionRuntimeException(
                                 //		"Default Price already exist for product with sku [" + source.getSku() + "]");
@@ -152,7 +145,7 @@ public class PersistableProductPriceMapper implements Mapper<PersistableProductP
         if (CollectionUtils.isEmpty(descriptions)) {
             return Collections.emptySet();
         }
-        Set<ProductPriceDescription> descs = new HashSet<ProductPriceDescription>();
+        Set<ProductPriceDescription> descs = new HashSet<>();
         for (com.asrevo.cvhome.store.core.model.catalog.product.ProductPriceDescription desc : descriptions) {
             ProductPriceDescription description = null;
             if (CollectionUtils.isNotEmpty(price.getDescriptions())) {

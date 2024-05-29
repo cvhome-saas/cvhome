@@ -63,7 +63,7 @@ public class PersistableProductAttributeMapper implements Mapper<PersistableProd
 
         if (!StringUtils.isBlank(source.getOptionValue().getCode())) {
             productOptionValue = productOptionValueService.getByCode(store, source.getOptionValue().getCode());
-        } else if (source.getProductId() != null && source.getOptionValue().getId().longValue() > 0) {
+        } else if (source.getProductId() != null && source.getOptionValue().getId() > 0) {
             productOptionValue = productOptionValueService.getById(source.getOptionValue().getId());
         } else {
             //ProductOption value is text
@@ -87,13 +87,6 @@ public class PersistableProductAttributeMapper implements Mapper<PersistableProd
         }
 
 
-        /**
-         productOptionValue
-         .getDescriptions().stream()
-         .map(val -> this.persistableProductOptionValueMapper.convert(val, store, language)).collect(Collectors.toList());
-
-         }**/
-
         if (productOption.getMerchantStore().getId().intValue() != store.getId().intValue()) {
             throw new ConversionRuntimeException("Invalid product option id ");
         }
@@ -102,7 +95,7 @@ public class PersistableProductAttributeMapper implements Mapper<PersistableProd
             throw new ConversionRuntimeException("Invalid product option value id ");
         }
 
-        if (source.getProductId() != null && source.getProductId().longValue() > 0) {
+        if (source.getProductId() != null && source.getProductId() > 0) {
             Product p = productService.getById(source.getProductId());
             if (p == null) {
                 throw new ConversionRuntimeException("Invalid product id ");
@@ -111,7 +104,7 @@ public class PersistableProductAttributeMapper implements Mapper<PersistableProd
         }
 
 
-        if (destination.getId() != null && destination.getId().longValue() > 0) {
+        if (destination.getId() != null && destination.getId() > 0) {
             destination.setId(destination.getId());
         } else {
             destination.setId(null);

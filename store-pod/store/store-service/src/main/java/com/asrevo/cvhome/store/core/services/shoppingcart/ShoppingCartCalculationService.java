@@ -24,10 +24,6 @@ public interface ShoppingCartCalculationService {
      * Total and Sub-total for {@link ShoppingCart}.
      *
      * @param cartModel ShoopingCart mode representing underlying DB object
-     * @param customer
-     * @param store
-     * @param language
-     * @throws ServiceException
      */
     OrderTotalSummary calculate(final ShoppingCart cartModel, final Customer customer, final MerchantStore store,
                                 final Language language) throws ServiceException;
@@ -37,9 +33,6 @@ public interface ShoppingCartCalculationService {
      * Total and Sub-total for {@link ShoppingCart}.
      *
      * @param cartModel ShoopingCart mode representing underlying DB object
-     * @param store
-     * @param language
-     * @throws ServiceException
      */
     OrderTotalSummary calculate(final ShoppingCart cartModel, final MerchantStore store, final Language language)
             throws ServiceException;

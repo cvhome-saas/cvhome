@@ -58,22 +58,14 @@ public class PersistableInventoryMapper implements Mapper<PersistableInventory, 
 
         try {
             Product product = null;
-            if (source.getProductId() != null && source.getProductId().longValue() > 0) {
-                product = productService.findOne(source.getProductId().longValue(), store);
+            if (source.getProductId() != null && source.getProductId() > 0) {
+                product = productService.findOne(source.getProductId(), store);
                 if (product == null) {
                     throw new ResourceNotFoundException("Product with id [" + source.getProductId() + "] not found for store [" + store.getCode() + "]");
                 }
                 destination.setProduct(product);
             }
 
-            /**
-             * Merging rules
-             *
-             * Create vs update
-             * - existing product availability
-             *   match product id, instance id, merchant id and region then set exiting id
-             *
-             */
             Set<ProductAvailability> existingAvailability = product.getAvailabilities();
             ProductAvailability existing = null;
             //determine product availability to be used
@@ -85,7 +77,7 @@ public class PersistableInventoryMapper implements Mapper<PersistableInventory, 
                                 (
                                         source.getProductId() != null && (a.getProduct().getId().longValue() == source.getProductId().longValue())
                                                 &&
-                                                a.getMerchantStore().getId() == store.getId()
+                                                a.getMerchantStore().getId().equals(store.getId())
                                                 &&
                                                 (source.getVariant() == null && a.getProductVariant() == null) || (a.getProductVariant() != null && source.getVariant() != null && a.getProductVariant().getId().longValue() == source.getVariant().longValue())
                                                 &&
@@ -93,7 +85,7 @@ public class PersistableInventoryMapper implements Mapper<PersistableInventory, 
                                 )).findAny().orElse(null);
             }
             if (existing != null) {
-                if (existing.getMerchantStore().getId() != store.getId()) {
+                if (!existing.getMerchantStore().getId().equals(store.getId())) {
                     throw new ResourceNotFoundException("Product Inventory with id [" + source.getId() + "] not found for store [" + store.getCode() + "]");
                 }
                 destination = existing;
@@ -113,7 +105,7 @@ public class PersistableInventoryMapper implements Mapper<PersistableInventory, 
                 destination.setProductDateAvailable(DateUtil.getDate(source.getDateAvailable()));
             }
 
-            if (source.getVariant() != null && source.getVariant().longValue() > 0) {
+            if (source.getVariant() != null && source.getVariant() > 0) {
                 Optional<ProductVariant> instance = productVariantService.getById(source.getVariant(), store);
                 if (instance.get() == null) {
                     throw new ResourceNotFoundException("productVariant with id [" + source.getVariant() + "] not found for store [" + store.getCode() + "]");
@@ -123,17 +115,10 @@ public class PersistableInventoryMapper implements Mapper<PersistableInventory, 
             }
 
             //merge with existing or replace
-            List<ProductPrice> prices = new ArrayList<ProductPrice>();
+            List<ProductPrice> prices = new ArrayList<>();
             for (PersistableProductPrice priceEntity : source.getPrices()) {
 
                 ProductPrice price = null;
-
-                /**
-                 if (isPositive(priceEntity.getId())) {
-                 price = new ProductPrice();
-                 price.setId(priceEntity.getId());
-                 }
-                 **/
 
 
                 if (destination.getPrices() != null) {
@@ -179,7 +164,7 @@ public class PersistableInventoryMapper implements Mapper<PersistableInventory, 
                 Set<ProductPriceDescription> descs = getProductPriceDescriptions(price, priceEntity.getDescriptions());
                 price.setDescriptions(descs);
 
-                destination.setPrices(new HashSet<ProductPrice>(prices));
+                destination.setPrices(new HashSet<>(prices));
             }
 
             return destination;
@@ -198,7 +183,7 @@ public class PersistableInventoryMapper implements Mapper<PersistableInventory, 
         if (CollectionUtils.isEmpty(descriptions)) {
             return Collections.emptySet();
         }
-        Set<ProductPriceDescription> descs = new HashSet<ProductPriceDescription>();
+        Set<ProductPriceDescription> descs = new HashSet<>();
         for (com.asrevo.cvhome.store.core.model.catalog.product.ProductPriceDescription desc : descriptions) {
             ProductPriceDescription description = null;
             if (CollectionUtils.isNotEmpty(price.getDescriptions())) {

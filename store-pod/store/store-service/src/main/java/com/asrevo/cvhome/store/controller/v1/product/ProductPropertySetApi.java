@@ -59,7 +59,7 @@ public class ProductPropertySetApi {
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
-    @Operation(method = "GET", description = "Check if option set code already exists", summary = "",
+    @Operation(method = "GET", description = "Check if option set code already exists",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = EntityExists.class))))
     public ResponseEntity<EntityExists> exists(
             @RequestParam(value = "code") String code,
@@ -67,7 +67,7 @@ public class ProductPropertySetApi {
             @Parameter(hidden = true) Language language) {
 
         boolean isOptionExist = productOptionSetFacade.exists(code, merchantStore);
-        return new ResponseEntity<EntityExists>(new EntityExists(isOptionExist), HttpStatus.OK);
+        return new ResponseEntity<>(new EntityExists(isOptionExist), HttpStatus.OK);
     }
 
 
@@ -125,9 +125,6 @@ public class ProductPropertySetApi {
      * Get property set by store
      * filter by product type
      *
-     * @param merchantStore
-     * @param language
-     * @return
      */
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(value = {"/private/product/property/set"}, method = RequestMethod.GET)

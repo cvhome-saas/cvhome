@@ -14,6 +14,8 @@ import com.asrevo.cvhome.store.core.model.customer.ReadableDelivery;
 import com.asrevo.cvhome.store.core.services.reference.country.CountryService;
 import com.asrevo.cvhome.store.core.services.reference.zone.ZoneService;
 import com.asrevo.cvhome.store.utils.AbstractDataPopulator;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Map;
@@ -21,6 +23,8 @@ import java.util.Map;
 /**
  * @author Carl Samson
  */
+@Setter
+@Getter
 public class ReadableCustomerDeliveryAddressPopulator extends AbstractDataPopulator<Delivery, ReadableDelivery> {
 
 
@@ -118,22 +122,6 @@ public class ReadableCustomerDeliveryAddressPopulator extends AbstractDataPopula
     protected ReadableDelivery createTarget() {
         // TODO Auto-generated method stub
         return null;
-    }
-
-    public CountryService getCountryService() {
-        return countryService;
-    }
-
-    public void setCountryService(CountryService countryService) {
-        this.countryService = countryService;
-    }
-
-    public ZoneService getZoneService() {
-        return zoneService;
-    }
-
-    public void setZoneService(ZoneService zoneService) {
-        this.zoneService = zoneService;
     }
 
 

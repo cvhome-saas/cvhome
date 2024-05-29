@@ -1,13 +1,13 @@
 package com.asrevo.cvhome.store.controller.v2.product;
 
 import com.asrevo.cvhome.commons.annotation.SecuredResource;
+import com.asrevo.cvhome.commons.domain.Entity;
 import com.asrevo.cvhome.store.controller.exception.UnauthorizedException;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import com.asrevo.cvhome.store.core.model.catalog.product.product.variant.PersistableProductVariant;
 import com.asrevo.cvhome.store.core.model.catalog.product.product.variant.ReadableProductVariant;
-import com.asrevo.cvhome.commons.domain.Entity;
 import com.asrevo.cvhome.store.core.model.entity.EntityExists;
 import com.asrevo.cvhome.store.core.model.entity.ReadableEntityList;
 import com.asrevo.cvhome.store.service.facade.product.ProductVariantFacade;
@@ -84,7 +84,7 @@ public class ProductVariantApi {
 
     @ResponseStatus(HttpStatus.OK)
     @PutMapping(value = {"/private/product/{id}/variant/{variantId}"})
-    @Operation(method = "PUT", description = "Update product variant", summary = "", responses = @ApiResponse(content = @Content(mediaType = "application/json", schema = @Schema(implementation = Void.class))))
+    @Operation(method = "PUT", description = "Update product variant", responses = @ApiResponse(content = @Content(mediaType = "application/json", schema = @Schema())))
     public @ResponseBody void update(@PathVariable Long id, @PathVariable Long variantId,
                                      @Valid @RequestBody PersistableProductVariant variant, @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
                                      @Parameter(hidden = true) Language language) {
@@ -106,7 +106,7 @@ public class ProductVariantApi {
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
-    @Operation(method = "GET", description = "Check if option set code already exists", summary = "", responses = {@ApiResponse(content = @Content(schema = @Schema(implementation = EntityExists.class)))})
+    @Operation(method = "GET", description = "Check if option set code already exists", responses = {@ApiResponse(content = @Content(schema = @Schema(implementation = EntityExists.class)))})
     public @ResponseBody ResponseEntity<EntityExists> exists(
             @PathVariable Long id,
             @PathVariable String sku,
@@ -122,7 +122,7 @@ public class ProductVariantApi {
                 Constants.GROUP_ADMIN_CATALOGUE, Constants.GROUP_ADMIN_RETAIL).collect(Collectors.toList()));
 
         boolean exist = productVariantFacade.exists(sku, merchantStore, id, language);
-        return new ResponseEntity<EntityExists>(new EntityExists(exist), HttpStatus.OK);
+        return new ResponseEntity<>(new EntityExists(exist), HttpStatus.OK);
 
     }
 
@@ -175,29 +175,6 @@ public class ProductVariantApi {
 
 
     }
-
-
-    /**
-
-     @ResponseStatus(HttpStatus.CREATED)
-     @RequestMapping(value = { "/private/product/{id}/{variantId}/image" }, method = RequestMethod.POST)
-     @Parameters({
-     @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_STORE)),
-     @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
-     })
-     public void addvariantImage(
-     @PathVariable Long id,
-     @RequestParam(name = "file", required = true) MultipartFile file,
-     @Parameter(hidden = true) MerchantStore merchantStore,
-     @Parameter(hidden = true) Language language,
-     HttpServletRequest request,
-     HttpServletResponse response) {
-
-     //productOptionFacade.addOptionValueImage(file, id, merchantStore, language);
-
-
-     }
-     **/
 
 
 }

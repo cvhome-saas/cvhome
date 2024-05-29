@@ -41,33 +41,23 @@ public class OrderApi {
 
 
     private static final String DEFAULT_ORDER_LIST_COUNT = "25";
-    private final CustomerService customerService;
     private final OrderFacade orderFacade;
 
-    /*	@Autowired
-        private com.salesmanager.shop.store.controller.order.facade.v1.OrderFacade orderFacadeV1;*/
-    private final OrderService orderService;
     private final ShoppingCartService shoppingCartService;
     private final CustomerFacade customerFacade;
-    private final CustomerFacade customerFacadev1; //v1 version
 
     public OrderApi(CustomerService customerService, OrderFacade orderFacade, OrderService orderService, ShoppingCartService shoppingCartService, CustomerFacade customerFacade, CustomerFacade customerFacadev1) {
-        this.customerService = customerService;
         this.orderFacade = orderFacade;
-        this.orderService = orderService;
+        /*	@Autowired
+        private com.salesmanager.shop.store.controller.order.facade.v1.OrderFacade orderFacadeV1;*/
         this.shoppingCartService = shoppingCartService;
         this.customerFacade = customerFacade;
-        this.customerFacadev1 = customerFacadev1;
+        //v1 version
     }
 
     /**
      * Main checkout resource that will complete the order flow
      *
-     * @param code
-     * @param order
-     * @param merchantStore
-     * @param language
-     * @return
      */
     @RequestMapping(value = {"/cart/{code}/checkout"}, method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)

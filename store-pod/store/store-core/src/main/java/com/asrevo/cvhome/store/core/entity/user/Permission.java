@@ -34,7 +34,7 @@ public class Permission extends SalesManagerEntity<Integer, Permission> implemen
     @Column(name = "PERMISSION_NAME", unique = true)
     private String permissionName;
     @ManyToMany(mappedBy = "permissions")
-    private List<Group> groups = new ArrayList<Group>();
+    private List<Group> groups = new ArrayList<>();
     @Embedded
     private AuditSection auditSection = new AuditSection();
 

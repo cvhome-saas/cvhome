@@ -31,11 +31,11 @@ public class Country extends SalesManagerEntity<Integer, Country> {
 
     @JsonIgnore
     @OneToMany(mappedBy = "country", cascade = CascadeType.ALL)
-    private Set<CountryDescription> descriptions = new HashSet<CountryDescription>();
+    private Set<CountryDescription> descriptions = new HashSet<>();
 
     @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "country")
-    private Set<Zone> zones = new HashSet<Zone>();
+    private Set<Zone> zones = new HashSet<>();
 
     @ManyToOne(targetEntity = GeoZone.class)
     @JoinColumn(name = "GEOZONE_ID")

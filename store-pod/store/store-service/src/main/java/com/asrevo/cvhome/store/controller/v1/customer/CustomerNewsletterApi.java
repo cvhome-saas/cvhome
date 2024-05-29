@@ -44,8 +44,8 @@ public class CustomerNewsletterApi {
     @PostMapping("/newsletter")
     @Operation(
             method = "POST",
-            description = "Creates a newsletter optin",
-            summary = "")
+            description = "Creates a newsletter optin"
+    )
     @Parameters({
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))

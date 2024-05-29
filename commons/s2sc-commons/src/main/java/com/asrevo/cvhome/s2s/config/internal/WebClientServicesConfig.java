@@ -45,7 +45,6 @@ public class WebClientServicesConfig {
         /**
          * used for inside and outside cluster call for secured c-2-s calls without client load balancing
          *
-         * @return
          */
         @Bean("webBuilder")
         @LoadBalanced
@@ -58,7 +57,6 @@ public class WebClientServicesConfig {
         /**
          * used for inside cluster call for secured c-2-s calls with client load balancing
          *
-         * @return
          */
         @Bean("defaultWebBuilder")
         @LoadBalanced
@@ -71,7 +69,6 @@ public class WebClientServicesConfig {
         /**
          * used for inside and outside cluster call for secured s-2-s calls without client load balancing
          *
-         * @return
          */
         @Bean("defaultWebMicroServiceBuilder")
         public WebClient.Builder defaultWebMicroServiceBuilder(WebClientReactivePasswordTokenResponseClient tokenClient, WebClientReactiveRefreshTokenTokenResponseClient refreshTokenClient, ReactiveClientRegistrationRepository repository) {
@@ -82,7 +79,6 @@ public class WebClientServicesConfig {
         /**
          * used for inside cluster call for secured s-2-s calls with client load balancing
          *
-         * @return
          */
         @Bean("defaultMicroServiceBuilder")
         @LoadBalanced
@@ -94,7 +90,6 @@ public class WebClientServicesConfig {
         /**
          * used for inside and outside cluster call for non-secured calls without client load balancing
          *
-         * @return
          */
         @Bean("defaultBuilder")
         public WebClient.Builder defaultBuilder() {
@@ -104,7 +99,6 @@ public class WebClientServicesConfig {
         /**
          * used for inside cluster call for non-secured calls with client load balancing
          *
-         * @return
          */
         @Bean("defaultBalancedBuilder")
         @LoadBalanced

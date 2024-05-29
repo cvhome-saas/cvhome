@@ -22,7 +22,7 @@ public class ReadableInventory extends InventoryEntity {
 
     private ReadableMerchantStore store;
     private String sku;
-    private List<ReadableProductPrice> prices = new ArrayList<ReadableProductPrice>();
+    private List<ReadableProductPrice> prices = new ArrayList<>();
     private String price;
 
 

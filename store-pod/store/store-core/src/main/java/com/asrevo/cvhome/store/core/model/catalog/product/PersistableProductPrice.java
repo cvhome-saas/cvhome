@@ -20,6 +20,6 @@ public class PersistableProductPrice extends ProductPriceEntity {
     private String sku;
     private Long productAvailabilityId;
 
-    private List<ProductPriceDescription> descriptions = new ArrayList<ProductPriceDescription>();
+    private List<ProductPriceDescription> descriptions = new ArrayList<>();
 
 }

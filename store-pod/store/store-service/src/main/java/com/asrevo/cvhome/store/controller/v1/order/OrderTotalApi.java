@@ -58,11 +58,6 @@ public class OrderTotalApi {
     /**
      * Public api
      *
-     * @param quote
-     * @param merchantStore
-     * @param language
-     * @param response
-     * @return
      */
     @RequestMapping(
             value = {"/cart/{code}/total"},
@@ -101,7 +96,7 @@ public class OrderTotalApi {
             OrderSummary orderSummary = new OrderSummary();
             orderSummary.setShippingSummary(shippingSummary);
             List<ShoppingCartItem> itemsSet =
-                    new ArrayList<ShoppingCartItem>(shoppingCart.getLineItems());
+                    new ArrayList<>(shoppingCart.getLineItems());
             orderSummary.setProducts(itemsSet);
 
             orderTotalSummary = orderService.caculateOrderTotal(orderSummary, merchantStore, language);

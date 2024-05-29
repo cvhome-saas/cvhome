@@ -48,9 +48,9 @@ public class Customer extends SalesManagerEntity<Long, Customer> implements Audi
     private AuditSection auditSection = new AuditSection();
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "customer")
-    private Set<CustomerAttribute> attributes = new HashSet<CustomerAttribute>();
+    private Set<CustomerAttribute> attributes = new HashSet<>();
 
-    @Column(name = "CUSTOMER_GENDER", length = 1, nullable = true)
+    @Column(name = "CUSTOMER_GENDER", length = 1)
     @Enumerated(value = EnumType.STRING)
     private CustomerGender gender;
 
@@ -93,7 +93,7 @@ public class Customer extends SalesManagerEntity<Long, Customer> implements Audi
 
 
     @OneToMany(mappedBy = "customer", targetEntity = ProductReview.class)
-    private List<ProductReview> reviews = new ArrayList<ProductReview>();
+    private List<ProductReview> reviews = new ArrayList<>();
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
@@ -123,7 +123,7 @@ public class Customer extends SalesManagerEntity<Long, Customer> implements Audi
             org.hibernate.annotations.CascadeType.REPLICATE
 
     })
-    private List<Group> groups = new ArrayList<Group>();
+    private List<Group> groups = new ArrayList<>();
 
     @JsonIgnore
     @Transient

@@ -23,7 +23,7 @@ public class ProductList implements Serializable {
     private int productCount;
     private BigDecimal minPrice;
     private BigDecimal maxPrice;
-    private List<ReadableProduct> products = new ArrayList<ReadableProduct>();
+    private List<ReadableProduct> products = new ArrayList<>();
 
 
 }

@@ -19,11 +19,6 @@ public class ServiceRequestCriteriaBuilderUtils {
     /**
      * Binds request parameter values to specific request criterias
      *
-     * @param criteria
-     * @param mappingFields
-     * @param request
-     * @return
-     * @throws Exception
      */
     public static Criteria buildRequestCriterias(Criteria criteria, Map<String, String> mappingFields, HttpServletRequest request) throws RestApiException {
 
@@ -70,9 +65,6 @@ public class ServiceRequestCriteriaBuilderUtils {
      **/
     public static Criteria buildRequest(Map<String, String> mappingFields, HttpServletRequest request) {
 
-        /**
-         * Works assuming datatable sends query data
-         */
         MerchantStoreCriteria criteria = new MerchantStoreCriteria();
 
         String searchParam = request.getParameter("search[value]");
@@ -96,8 +88,8 @@ public class ServiceRequestCriteriaBuilderUtils {
         String stores = request.getParameter("stores");
 
         try {
-            boolean retail = Boolean.valueOf(retailers);
-            boolean sto = Boolean.valueOf(stores);
+            boolean retail = Boolean.parseBoolean(retailers);
+            boolean sto = Boolean.parseBoolean(stores);
 
             criteria.setRetailers(retail);
             criteria.setStores(sto);

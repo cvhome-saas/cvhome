@@ -42,7 +42,7 @@ public class MerchantStore extends SalesManagerEntity<Integer, MerchantStore> im
     private MerchantStore parent;
     @JsonIgnore
     @OneToMany(mappedBy = "parent", cascade = CascadeType.REMOVE)
-    private Set<MerchantStore> stores = new HashSet<MerchantStore>();
+    private Set<MerchantStore> stores = new HashSet<>();
     @Column(name = "IS_RETAILER")
     private boolean retailer = false;
     @NotEmpty
@@ -70,11 +70,11 @@ public class MerchantStore extends SalesManagerEntity<Integer, MerchantStore> im
     private String storepostalcode;
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY, targetEntity = Country.class)
-    @JoinColumn(name = "COUNTRY_ID", nullable = false, updatable = true)
+    @JoinColumn(name = "COUNTRY_ID", nullable = false)
     private Country country;
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY, targetEntity = Zone.class)
-    @JoinColumn(name = "ZONE_ID", nullable = true, updatable = true)
+    @JoinColumn(name = "ZONE_ID")
     private Zone zone;
     @Column(name = "STORE_STATE_PROV", length = 100)
     private String storestateprovince;
@@ -95,7 +95,7 @@ public class MerchantStore extends SalesManagerEntity<Integer, MerchantStore> im
     @NotEmpty
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "MERCHANT_LANGUAGE")
-    private List<Language> languages = new ArrayList<Language>();
+    private List<Language> languages = new ArrayList<>();
     @Column(name = "USE_CACHE")
     private boolean useCache = false;
     @Column(name = "STORE_TEMPLATE", length = 25)

@@ -54,7 +54,7 @@ public class PersistableProductTypeMapper implements Mapper<PersistableProductTy
         destination.setVisible(type.isVisible());
         //destination.set
 
-        List<com.asrevo.cvhome.store.core.entity.catalog.product.type.ProductTypeDescription> descriptions = new ArrayList<com.asrevo.cvhome.store.core.entity.catalog.product.type.ProductTypeDescription>();
+        List<com.asrevo.cvhome.store.core.entity.catalog.product.type.ProductTypeDescription> descriptions = new ArrayList<>();
         if (!CollectionUtils.isEmpty(type.getDescriptions())) {
 
             for (ProductTypeDescription d : type.getDescriptions()) {
@@ -64,7 +64,7 @@ public class PersistableProductTypeMapper implements Mapper<PersistableProductTy
 
             }
 
-            destination.setDescriptions(new HashSet<com.asrevo.cvhome.store.core.entity.catalog.product.type.ProductTypeDescription>(descriptions));
+            destination.setDescriptions(new HashSet<>(descriptions));
 
         }
 

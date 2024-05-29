@@ -17,6 +17,6 @@ public class ReadableProductOptionValueFull extends ReadableProductOptionValue {
      */
     @Serial
     private static final long serialVersionUID = 1L;
-    private List<ProductOptionValueDescription> descriptions = new ArrayList<ProductOptionValueDescription>();
+    private List<ProductOptionValueDescription> descriptions = new ArrayList<>();
 
 }

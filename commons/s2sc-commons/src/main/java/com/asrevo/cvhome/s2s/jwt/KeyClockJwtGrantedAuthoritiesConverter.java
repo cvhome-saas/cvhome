@@ -18,8 +18,6 @@ public final class KeyClockJwtGrantedAuthoritiesConverter implements Converter<J
     private static final String DEFAULT_AUTHORITIES_CLAIM_DELIMITER = " ";
 
 
-    private final String authoritiesClaimDelimiter = DEFAULT_AUTHORITIES_CLAIM_DELIMITER;
-
     @Override
     public Collection<GrantedAuthority> convert(Jwt jwt) {
         Collection<GrantedAuthority> grantedAuthorities = new ArrayList<>();
@@ -36,7 +34,7 @@ public final class KeyClockJwtGrantedAuthoritiesConverter implements Converter<J
         Object authorities = jwt.getClaim("scope");
         if (authorities instanceof String) {
             if (StringUtils.hasText((String) authorities)) {
-                return Arrays.asList(((String) authorities).split(this.authoritiesClaimDelimiter));
+                return Arrays.asList(((String) authorities).split(DEFAULT_AUTHORITIES_CLAIM_DELIMITER));
             }
             return Collections.emptyList();
         }

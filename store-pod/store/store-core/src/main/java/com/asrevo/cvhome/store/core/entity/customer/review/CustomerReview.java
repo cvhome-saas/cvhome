@@ -62,7 +62,7 @@ public class CustomerReview extends SalesManagerEntity<Long, CustomerReview> imp
     @JoinColumn(name = "REVIEWED_CUSTOMER_ID")
     private Customer reviewedCustomer;
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "customerReview")
-    private Set<CustomerReviewDescription> descriptions = new HashSet<CustomerReviewDescription>();
+    private Set<CustomerReviewDescription> descriptions = new HashSet<>();
 
 
 }

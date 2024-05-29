@@ -32,13 +32,13 @@ public class ReadableProduct extends ProductEntity implements Serializable {
     private String originalPrice = null;
     private boolean discounted = false;
     private ReadableImage image;
-    private List<ReadableImage> images = new ArrayList<ReadableImage>();
+    private List<ReadableImage> images = new ArrayList<>();
     private ReadableManufacturer manufacturer;
-    private List<ReadableProductAttribute> attributes = new ArrayList<ReadableProductAttribute>();
-    private List<ReadableProductOption> options = new ArrayList<ReadableProductOption>();
-    private List<ReadableProductVariant> variants = new ArrayList<ReadableProductVariant>();
-    private List<ReadableProductProperty> properties = new ArrayList<ReadableProductProperty>();
-    private List<ReadableCategory> categories = new ArrayList<ReadableCategory>();
+    private List<ReadableProductAttribute> attributes = new ArrayList<>();
+    private List<ReadableProductOption> options = new ArrayList<>();
+    private List<ReadableProductVariant> variants = new ArrayList<>();
+    private List<ReadableProductProperty> properties = new ArrayList<>();
+    private List<ReadableCategory> categories = new ArrayList<>();
     private ReadableProductType type;
     private boolean canBePurchased = false;
 

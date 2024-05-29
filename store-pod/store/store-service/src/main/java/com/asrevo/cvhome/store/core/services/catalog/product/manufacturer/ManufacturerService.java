@@ -35,11 +35,6 @@ public interface ManufacturerService extends SalesManagerEntityService<Long, Man
     /**
      * List manufacturers by products from a given list of categories
      *
-     * @param store
-     * @param ids
-     * @param language
-     * @return
-     * @throws ServiceException
      */
     List<Manufacturer> listByProductsByCategoriesId(MerchantStore store,
                                                     List<Long> ids, Language language) throws ServiceException;
@@ -47,11 +42,6 @@ public interface ManufacturerService extends SalesManagerEntityService<Long, Man
     /**
      * List by product in category lineage
      *
-     * @param store
-     * @param category
-     * @param language
-     * @return
-     * @throws ServiceException
      */
     List<Manufacturer> listByProductsInCategory(MerchantStore store,
                                                 Category category, Language language) throws ServiceException;

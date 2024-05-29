@@ -9,8 +9,7 @@ public class AuditListener {
 
     @PrePersist
     public void onSave(Object o) {
-        if (o instanceof Auditable) {
-            Auditable audit = (Auditable) o;
+        if (o instanceof Auditable audit) {
             AuditSection auditSection = audit.getAuditSection();
 
             auditSection.setDateModified(new Date());
@@ -23,8 +22,7 @@ public class AuditListener {
 
     @PreUpdate
     public void onUpdate(Object o) {
-        if (o instanceof Auditable) {
-            Auditable audit = (Auditable) o;
+        if (o instanceof Auditable audit) {
             AuditSection auditSection = audit.getAuditSection();
 
             auditSection.setDateModified(new Date());

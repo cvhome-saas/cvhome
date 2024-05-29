@@ -163,7 +163,7 @@ public class ShoppingCartApi {
 
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(value = "/cart/{code}", method = RequestMethod.GET)
-    @Operation(method = "GET", description = "Get a chopping cart by code", summary = "")
+    @Operation(method = "GET", description = "Get a chopping cart by code")
     @Parameters({
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
@@ -195,7 +195,7 @@ public class ShoppingCartApi {
     @Deprecated
     @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(value = "/customers/{id}/cart", method = RequestMethod.POST)
-    @Operation(method = "POST", description = "Add product to a specific customer shopping cart", summary = "")
+    @Operation(method = "POST", description = "Add product to a specific customer shopping cart")
     @Parameters({
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))

@@ -25,7 +25,7 @@ public class ReadableShoppingCart extends ShoppingCartEntity {
      */
     @Serial
     private static final long serialVersionUID = 1L;
-    List<ReadableShoppingCartItem> products = new ArrayList<ReadableShoppingCartItem>();
+    List<ReadableShoppingCartItem> products = new ArrayList<>();
     List<ReadableOrderTotal> totals;
     private String code;
     private BigDecimal subtotal;

@@ -15,9 +15,6 @@ public interface TransactionService extends SalesManagerEntityService<Long, Tran
     /**
      * Obtain a previous transaction that has type authorize for a give order
      *
-     * @param order
-     * @return
-     * @throws ServiceException
      */
     Transaction getCapturableTransaction(Order order) throws ServiceException;
 

@@ -26,8 +26,8 @@ public interface CustomerRepository extends JpaRepository<Customer, Long>, Custo
             left join fetch ca.customerOption cao
             left join fetch ca.customerOptionValue cav
             left join fetch cao.descriptions caod
-            left join fetch cav.descriptions 
-            left join fetch c.groups 
+            left join fetch cav.descriptions
+            left join fetch c.groups
             left join fetch c.delivery cd
             left join fetch c.billing cb
             left join fetch cd.country
@@ -45,8 +45,8 @@ public interface CustomerRepository extends JpaRepository<Customer, Long>, Custo
             left join fetch ca.customerOption cao
             left join fetch ca.customerOptionValue cav
             left join fetch cao.descriptions caod
-            left join fetch cav.descriptions 
-            left join fetch c.groups 
+            left join fetch cav.descriptions
+            left join fetch c.groups
             left join fetch c.delivery cd
             left join fetch c.billing cb
             left join fetch cd.country
@@ -64,8 +64,8 @@ public interface CustomerRepository extends JpaRepository<Customer, Long>, Custo
             left join fetch ca.customerOption cao
             left join fetch ca.customerOptionValue cav
             left join fetch cao.descriptions caod
-            left join fetch cav.descriptions 
-            left join fetch c.groups 
+            left join fetch cav.descriptions
+            left join fetch c.groups
             left join fetch c.delivery cd
             left join fetch c.billing cb
             left join fetch cd.country

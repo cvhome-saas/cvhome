@@ -32,18 +32,6 @@ import java.util.Set;
                 }
 )
 
-/**
- * Default availability
- *
- * store
- * product id
- *
- * variant null
- * regionVariant null
- *
- * @author carlsamson
- *
- */
 @Getter
 @Setter
 public class ProductAvailability extends SalesManagerEntity<Long, ProductAvailability> implements Auditable {
@@ -72,18 +60,18 @@ public class ProductAvailability extends SalesManagerEntity<Long, ProductAvailab
      * Specific retailer store
      **/
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "MERCHANT_ID", nullable = true)
+    @JoinColumn(name = "MERCHANT_ID")
     private MerchantStore merchantStore;
 
     /**
      * This describes the availability of a product variant
      */
     @ManyToOne(targetEntity = ProductVariant.class)
-    @JoinColumn(name = "PRODUCT_VARIANT", nullable = true)
+    @JoinColumn(name = "PRODUCT_VARIANT")
     private ProductVariant productVariant;
 
     @Pattern(regexp = "^[a-zA-Z0-9_]*$")
-    @Column(name = "SKU", nullable = true)
+    @Column(name = "SKU")
     private String sku;
 
     @Embedded
@@ -122,7 +110,7 @@ public class ProductAvailability extends SalesManagerEntity<Long, ProductAvailab
     private Integer productQuantityOrderMax = 0;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "productAvailability", cascade = CascadeType.ALL)
-    private Set<ProductPrice> prices = new HashSet<ProductPrice>();
+    private Set<ProductPrice> prices = new HashSet<>();
 
 
     public ProductAvailability() {

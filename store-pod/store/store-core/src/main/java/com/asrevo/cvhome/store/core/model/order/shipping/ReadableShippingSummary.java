@@ -34,7 +34,7 @@ public class ReadableShippingSummary implements Serializable {
     private ReadableDelivery delivery;
     private ShippingOption selectedShippingOption = null;//Default selected option
     private List<ShippingOption> shippingOptions = null;
-    private Map<String, String> quoteInformations = new HashMap<String, String>();
+    private Map<String, String> quoteInformations = new HashMap<>();
 
 
 }

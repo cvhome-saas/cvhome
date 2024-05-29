@@ -90,25 +90,18 @@ public class PersistableProductMapper implements Mapper<PersistableProduct, Prod
             destination.setRefSku(source.getRefSku());
 
 
-            if (source.getId() != null && source.getId().longValue() == 0) {
+            if (source.getId() != null && source.getId() == 0) {
                 destination.setId(null);
             } else {
                 destination.setId(source.getId());
             }
 
 
-            /**
-             * SPEIFICATIONS
-             */
             if (source.getProductSpecifications() != null) {
                 destination.setProductHeight(source.getProductSpecifications().getHeight());
                 destination.setProductLength(source.getProductSpecifications().getLength());
                 destination.setProductWeight(source.getProductSpecifications().getWeight());
                 destination.setProductWidth(source.getProductSpecifications().getWidth());
-
-                /**
-                 * BRANDING
-                 */
 
                 if (source.getProductSpecifications().getManufacturer() != null) {
 
@@ -137,11 +130,8 @@ public class PersistableProductMapper implements Mapper<PersistableProduct, Prod
 
             destination.setMerchantStore(store);
 
-            /**
-             * descriptions
-             */
-            List<Language> languages = new ArrayList<Language>();
-            Set<ProductDescription> descriptions = new HashSet<ProductDescription>();
+            List<Language> languages = new ArrayList<>();
+            Set<ProductDescription> descriptions = new HashSet<>();
             if (!CollectionUtils.isEmpty(source.getDescriptions())) {
                 for (com.asrevo.cvhome.store.core.model.catalog.product.ProductDescription description : source.getDescriptions()) {
 
@@ -189,10 +179,6 @@ public class PersistableProductMapper implements Mapper<PersistableProduct, Prod
             destination.setProductReviewCount(source.getRatingCount());
 
 
-            /**
-             * Category
-             */
-
             if (!CollectionUtils.isEmpty(source.getCategories())) {
                 for (com.asrevo.cvhome.store.core.model.catalog.category.Category categ : source.getCategories()) {
 
@@ -218,18 +204,11 @@ public class PersistableProductMapper implements Mapper<PersistableProduct, Prod
                 }
             }
 
-            /**
-             * Variants
-             */
             if (!CollectionUtils.isEmpty(source.getVariants())) {
                 Set<ProductVariant> variants = source.getVariants().stream().map(v -> this.variant(destination, v, store, language)).collect(Collectors.toSet());
 
                 destination.setVariants(variants);
             }
-
-            /**
-             * Default inventory
-             */
 
             if (source.getInventory() != null) {
                 ProductAvailability productAvailability = persistableProductAvailabilityMapper.convert(source.getInventory(), store, language);

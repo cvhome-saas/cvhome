@@ -18,11 +18,8 @@ public class ReadableCatalogCategoryEntryMapper implements Mapper<CatalogCategor
 
     private final ReadableCategoryMapper readableCategoryMapper;
 
-    private final ImageFilePath imageUtils;
-
     public ReadableCatalogCategoryEntryMapper(ReadableCategoryMapper readableCategoryMapper, ImageFilePath imageUtils) {
         this.readableCategoryMapper = readableCategoryMapper;
-        this.imageUtils = imageUtils;
     }
 
     @Override
@@ -39,7 +36,7 @@ public class ReadableCatalogCategoryEntryMapper implements Mapper<CatalogCategor
 
         try {
             //ReadableProductPopulator readableProductPopulator = new ReadableProductPopulator();
-            //readableProductPopulator.setimageUtils(imageUtils);
+            //readableProductPopulator.setImageUtils(imageUtils);
             //readableProductPopulator.setPricingService(pricingService);
 
             //ReadableProduct readableProduct = readableProductPopulator.populate(source.getProduct(), store, language);

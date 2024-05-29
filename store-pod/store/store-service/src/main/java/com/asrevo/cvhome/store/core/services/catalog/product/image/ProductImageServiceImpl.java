@@ -113,7 +113,7 @@ public class ProductImageServiceImpl extends SalesManagerEntityServiceImpl<Long,
             throws ServiceException {
 
         if (productImage.getDescriptions() == null) {
-            productImage.setDescriptions(new ArrayList<ProductImageDescription>());
+            productImage.setDescriptions(new ArrayList<>());
         }
 
         productImage.getDescriptions().add(description);
@@ -168,9 +168,6 @@ public class ProductImageServiceImpl extends SalesManagerEntityServiceImpl<Long,
 
 
         delete(p);
-        /**
-         * workaround for aspect
-         */
         eventPublisher.publishEvent(new DeleteProductImageEvent(eventPublisher, p, product));
 
 

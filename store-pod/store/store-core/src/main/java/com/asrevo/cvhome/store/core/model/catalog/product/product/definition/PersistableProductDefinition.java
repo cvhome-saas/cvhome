@@ -21,9 +21,9 @@ public class PersistableProductDefinition extends ProductDefinition {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private List<ProductDescription> descriptions = new ArrayList<ProductDescription>();
-    private List<PersistableProductAttribute> properties = new ArrayList<PersistableProductAttribute>();
-    private List<Category> categories = new ArrayList<Category>();
+    private List<ProductDescription> descriptions = new ArrayList<>();
+    private List<PersistableProductAttribute> properties = new ArrayList<>();
+    private List<Category> categories = new ArrayList<>();
     private String type;
     private String manufacturer;
     private BigDecimal price;

@@ -48,7 +48,7 @@ public class Group extends SalesManagerEntity<Integer, Group> implements Auditab
             joinColumns = @JoinColumn(name = "GROUP_ID"),
             inverseJoinColumns = @JoinColumn(name = "PERMISSION_ID")
     )
-    private Set<Permission> permissions = new HashSet<Permission>();
+    private Set<Permission> permissions = new HashSet<>();
     @Embedded
     private AuditSection auditSection = new AuditSection();
 

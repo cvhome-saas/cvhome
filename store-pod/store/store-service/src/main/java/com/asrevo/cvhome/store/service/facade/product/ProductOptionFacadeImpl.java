@@ -77,7 +77,7 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
         Assert.notNull(store, "MerchantStore cannot be null");
 
         ProductOption optionModel = new ProductOption();
-        if (option.getId() != null && option.getId().longValue() > 0) {
+        if (option.getId() != null && option.getId() > 0) {
             optionModel = productOptionService.getById(store, option.getId());
             if (optionModel == null) {
                 throw new ResourceNotFoundException(
@@ -212,7 +212,7 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
         Assert.notNull(store, "Store code must not be null");
 
         ProductOptionValue value = new ProductOptionValue();
-        if (optionValue.getId() != null && optionValue.getId().longValue() > 0) {
+        if (optionValue.getId() != null && optionValue.getId() > 0) {
             value = productOptionValueService.getById(store, optionValue.getId());
             if (value == null) {
                 throw new ResourceNotFoundException("ProductOptionValue [" + optionValue.getId()
@@ -265,7 +265,7 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
 
         attribute.setProductId(productId);
         ProductAttribute attr = new ProductAttribute();
-        if (attribute.getId() != null && attribute.getId().longValue() > 0) {
+        if (attribute.getId() != null && attribute.getId() > 0) {
             attr = productAttributeService.getById(attribute.getId());
             if (attr == null) {
                 throw new ResourceNotFoundException("Product attribute [" + attribute.getId() + "] not found");
@@ -476,7 +476,7 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
             throw new ServiceRuntimeException("Exception while saving product with attributes", e);
         }
 
-        return modelAttributes.stream().map(e -> codeEntity(e)).collect(Collectors.toList());
+        return modelAttributes.stream().map(this::codeEntity).collect(Collectors.toList());
 
     }
 

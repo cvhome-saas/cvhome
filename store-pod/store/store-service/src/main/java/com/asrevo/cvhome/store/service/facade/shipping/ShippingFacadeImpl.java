@@ -36,7 +36,7 @@ public class ShippingFacadeImpl implements ShippingFacade {
         try {
             List<Country> countries = shippingService.getShipToCountryList(store, language);
 
-            List<ReadableCountry> countryList = new ArrayList<ReadableCountry>();
+            List<ReadableCountry> countryList = new ArrayList<>();
 
             if (!CollectionUtils.isEmpty(countries)) {
 

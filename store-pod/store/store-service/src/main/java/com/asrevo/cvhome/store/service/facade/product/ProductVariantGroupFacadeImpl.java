@@ -204,7 +204,7 @@ public class ProductVariantGroupFacadeImpl implements ProductVariantGroupFacade 
 
         try {
             contentService.removeFile(Constants.SLASH + store.getCode() + Constants.SLASH + productVariantGroupId, FileContentType.VARIANT, image.getProductImage());
-            group.getImages().removeIf(i -> (i.getId() == image.getId()));
+            group.getImages().removeIf(i -> (i.getId().equals(image.getId())));
             //update productVariantroup
             productVariantGroupService.update(group);
         } catch (ServiceException e) {

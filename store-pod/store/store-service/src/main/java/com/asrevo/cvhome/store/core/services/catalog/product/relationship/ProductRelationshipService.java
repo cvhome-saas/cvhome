@@ -19,12 +19,6 @@ public interface ProductRelationshipService extends
      * Get product relationship List for a given type (RELATED, FEATURED...) and language allows
      * to return the product description in the appropriate language
      *
-     * @param store
-     * @param product
-     * @param type
-     * @param language
-     * @return
-     * @throws ServiceException
      */
     List<ProductRelationship> getByType(MerchantStore store, Product product,
                                         ProductRelationshipType type, Language language) throws ServiceException;
@@ -32,11 +26,6 @@ public interface ProductRelationshipService extends
     /**
      * Find by product and group name
      *
-     * @param store
-     * @param product
-     * @param name
-     * @return
-     * @throws ServiceException
      */
     List<ProductRelationship> getByType(MerchantStore store, Product product,
                                         String name) throws ServiceException;
@@ -44,11 +33,6 @@ public interface ProductRelationshipService extends
     /**
      * Get product relationship List for a given type (RELATED, FEATURED...) and a given base product
      *
-     * @param store
-     * @param product
-     * @param type
-     * @return
-     * @throws ServiceException
      */
     List<ProductRelationship> getByType(MerchantStore store, Product product,
                                         ProductRelationshipType type)
@@ -57,10 +41,6 @@ public interface ProductRelationshipService extends
     /**
      * Get product relationship List for a given type (RELATED, FEATURED...)
      *
-     * @param store
-     * @param type
-     * @return
-     * @throws ServiceException
      */
     List<ProductRelationship> getByType(MerchantStore store,
                                         ProductRelationshipType type) throws ServiceException;
@@ -75,33 +55,24 @@ public interface ProductRelationshipService extends
     /**
      * Get a list of relationship acting as groups of products
      *
-     * @param store
-     * @return
      */
     List<ProductRelationship> getGroups(MerchantStore store);
 
     /**
      * Get a list of relationship acting as groups of products
      *
-     * @param store
-     * @return
      */
     ProductRelationship getGroup(MerchantStore store, String code);
 
     /**
      * Get group by store and group name (code)
      *
-     * @param store
-     * @param name
-     * @return
      */
     List<ProductRelationship> getGroupDefinition(MerchantStore store, String name);
 
     /**
      * Creates a product group
      *
-     * @param groupName
-     * @throws ServiceException
      */
     void addGroup(MerchantStore store, String groupName) throws ServiceException;
 

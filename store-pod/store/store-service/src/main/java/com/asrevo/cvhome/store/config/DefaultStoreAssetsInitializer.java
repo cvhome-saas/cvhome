@@ -75,7 +75,7 @@ public class DefaultStoreAssetsInitializer implements ApplicationListener<Applic
     @SneakyThrows
     private ImageContentFile getStoreInputFile(String storeCode, String name, FileContentType contentType) {
         ImageContentFile file = new ImageContentFile();
-        Resource resource = resourceLoader.getResource("classpath:/assets/"+storeCode+"/" + name);
+        Resource resource = resourceLoader.getResource("classpath:/assets/" + storeCode + "/" + name);
         file.setFile(resource.getInputStream());
         file.setFileName(name);
         file.setMimeType(Files.probeContentType(Paths.get(name)));

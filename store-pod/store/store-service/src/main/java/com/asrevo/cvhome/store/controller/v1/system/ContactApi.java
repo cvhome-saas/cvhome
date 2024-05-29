@@ -41,8 +41,8 @@ public class ContactApi {
     @PostMapping("/contact")
     @Operation(
             method = "POST",
-            description = "Sends an email contact us to store owner",
-            summary = "")
+            description = "Sends an email contact us to store owner"
+    )
     @Parameters({
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
@@ -55,6 +55,6 @@ public class ContactApi {
         Locale locale = languageService.toLocale(language, merchantStore);
         // @TODO ASHRAF
 //    emailTemplatesUtils.sendContactEmail(contact, merchantStore, locale, request.getContextPath());
-        return new ResponseEntity<Void>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

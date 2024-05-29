@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * Aspect class that will trigger an event once a product is created Code
- * inspired from http://www.discoversdk.com/blog/spring-event-handling-and-aop
+ * inspired from <a href="http://www.discoversdk.com/blog/spring-event-handling-and-aop">...</a>
  * <p>
  * create product
  * update product

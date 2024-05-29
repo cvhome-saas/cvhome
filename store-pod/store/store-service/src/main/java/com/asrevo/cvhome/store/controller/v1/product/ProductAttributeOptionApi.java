@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.store.controller.v1.product;
 
 import com.asrevo.cvhome.commons.annotation.SecuredResource;
+import com.asrevo.cvhome.commons.domain.Entity;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
@@ -8,7 +9,6 @@ import com.asrevo.cvhome.store.core.model.catalog.product.attribute.PersistableP
 import com.asrevo.cvhome.store.core.model.catalog.product.attribute.PersistableProductOptionValue;
 import com.asrevo.cvhome.store.core.model.catalog.product.attribute.api.*;
 import com.asrevo.cvhome.store.core.model.entity.CodeEntity;
-import com.asrevo.cvhome.commons.domain.Entity;
 import com.asrevo.cvhome.store.core.model.entity.EntityExists;
 import com.asrevo.cvhome.store.service.facade.product.ProductOptionFacade;
 import io.swagger.v3.oas.annotations.Operation;
@@ -64,14 +64,14 @@ public class ProductAttributeOptionApi {
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
-    @Operation(method = "GET", description = "Check if option code already exists", summary = "",
+    @Operation(method = "GET", description = "Check if option code already exists",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = EntityExists.class)))
     )
     public ResponseEntity<EntityExists> optionExists(@RequestParam(value = "code") String code,
                                                      @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore, @Parameter(hidden = true) Language language) {
 
         boolean isOptionExist = productOptionFacade.optionExists(code, merchantStore);
-        return new ResponseEntity<EntityExists>(new EntityExists(isOptionExist), HttpStatus.OK);
+        return new ResponseEntity<>(new EntityExists(isOptionExist), HttpStatus.OK);
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -80,13 +80,13 @@ public class ProductAttributeOptionApi {
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
-    @Operation(method = "GET", description = "Check if option value code already exists", summary = "",
+    @Operation(method = "GET", description = "Check if option value code already exists",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = EntityExists.class)))
     )
     public ResponseEntity<EntityExists> optionValueExists(@RequestParam(value = "code") String code,
                                                           @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore, @Parameter(hidden = true) Language language) {
         boolean isOptionExist = productOptionFacade.optionValueExists(code, merchantStore);
-        return new ResponseEntity<EntityExists>(new EntityExists(isOptionExist), HttpStatus.OK);
+        return new ResponseEntity<>(new EntityExists(isOptionExist), HttpStatus.OK);
     }
 
     @ResponseStatus(HttpStatus.CREATED)
@@ -117,7 +117,7 @@ public class ProductAttributeOptionApi {
     })
     public void addOptionValueImage(
             @PathVariable Long id,
-            @RequestParam(name = "file", required = true) MultipartFile file,
+            @RequestParam(name = "file") MultipartFile file,
             @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language,
             HttpServletRequest request,
@@ -270,12 +270,6 @@ public class ProductAttributeOptionApi {
     /**
      * Product attributes
      *
-     * @param id
-     * @param merchantStore
-     * @param language
-     * @param request
-     * @param response
-     * @return
      */
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(value = {"/private/product/{id}/attributes"}, method = RequestMethod.GET)
@@ -283,7 +277,7 @@ public class ProductAttributeOptionApi {
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
-    @Operation(method = "GET", description = "Get product attributes", summary = "",
+    @Operation(method = "GET", description = "Get product attributes",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ReadableProductAttributeList.class))))
     public @ResponseBody ReadableProductAttributeList attributes(
             @PathVariable Long id,
@@ -302,7 +296,7 @@ public class ProductAttributeOptionApi {
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
-    @Operation(method = "GET", description = "Get product attributes", summary = "",
+    @Operation(method = "GET", description = "Get product attributes",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = EntityExists.class))))
     public @ResponseBody ReadableProductAttributeEntity getAttribute(
             @PathVariable Long id,
@@ -341,12 +335,6 @@ public class ProductAttributeOptionApi {
     /**
      * Create multiple attributes
      *
-     * @param id
-     * @param attributeId
-     * @param merchantStore
-     * @param language
-     * @param request
-     * @param response
      */
     @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(value = {"/private/product/{id}/attributes"}, method = RequestMethod.POST)

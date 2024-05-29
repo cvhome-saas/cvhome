@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.store.controller.v2.product;
 
 import com.asrevo.cvhome.commons.annotation.SecuredResource;
+import com.asrevo.cvhome.commons.domain.Entity;
 import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
 import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
 import com.asrevo.cvhome.store.core.constants.Constants;
@@ -14,7 +15,6 @@ import com.asrevo.cvhome.store.core.model.catalog.product.ReadableProductList;
 import com.asrevo.cvhome.store.core.model.catalog.product.product.PersistableProduct;
 import com.asrevo.cvhome.store.core.model.catalog.product.product.definition.PersistableProductDefinition;
 import com.asrevo.cvhome.store.core.model.catalog.product.product.definition.ReadableProductDefinition;
-import com.asrevo.cvhome.commons.domain.Entity;
 import com.asrevo.cvhome.store.service.facade.category.CategoryFacade;
 import com.asrevo.cvhome.store.service.facade.product.ProductCommonFacade;
 import com.asrevo.cvhome.store.service.facade.product.ProductDefinitionFacade;
@@ -69,10 +69,6 @@ public class ProductApiV2 {
     /**
      * Create product inventory with variants, quantity and prices
      *
-     * @param product
-     * @param merchantStore
-     * @param language
-     * @return
      */
     @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(value = {"/private/product/inventory"},
@@ -162,9 +158,7 @@ public class ProductApiV2 {
     /**
      * API for getting a product
      *
-     * @param friendlyUrl
      * @param lang        ?lang=fr|en
-     * @param response
      * @return ReadableProduct
      * @throws Exception <p>
      *                   /api/product/123
@@ -199,10 +193,6 @@ public class ProductApiV2 {
      * List products by category
      * count and page are supported. Default values are set when not specified
      *
-     * @param request
-     * @param response
-     * @return
-     * @throws Exception
      */
     @RequestMapping(value = "/products/category/{friendlyUrl}", method = RequestMethod.GET)
     @ResponseBody
@@ -222,7 +212,7 @@ public class ProductApiV2 {
             ReadableCategory category = categoryFacade.getCategoryByFriendlyUrl(merchantStore, friendlyUrl, language);
             ProductCriteria criterias = new ProductCriteria();
 
-            List<Long> listOfIds = new ArrayList<Long>();
+            List<Long> listOfIds = new ArrayList<>();
             listOfIds.add(category.getId());
 
 
@@ -253,10 +243,6 @@ public class ProductApiV2 {
      * &start=0 NOT REQUIRED, can be used for pagination &count=10 NOT REQUIRED, can
      * be used to limit item count
      *
-     * @param request
-     * @param response
-     * @return
-     * @throws Exception
      */
     @RequestMapping(value = "/products", method = RequestMethod.GET)
     @ResponseBody
@@ -306,7 +292,7 @@ public class ProductApiV2 {
      **/
     @ResponseStatus(HttpStatus.OK)
     @PatchMapping(value = "/private/product/{sku}", produces = {APPLICATION_JSON_VALUE})
-    @Operation(method = "PATCH", description = "Update product inventory", summary = "Updates product inventory", responses = @ApiResponse(content = @Content(mediaType = "application/json", schema = @Schema(implementation = Void.class))))
+    @Operation(method = "PATCH", description = "Update product inventory", summary = "Updates product inventory", responses = @ApiResponse(content = @Content(mediaType = "application/json", schema = @Schema())))
     @Parameters({
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
@@ -325,12 +311,7 @@ public class ProductApiV2 {
     /**
      * API for getting a product using sku in v2
      *
-     * @param id
-     * @param lang     ?lang=fr|en|...
-     * @param response
      * @return ReadableProduct
-     * @throws Exception <p>
-     *                   /api/products/123
      */
     @RequestMapping(value = "/product/{sku}", method = RequestMethod.GET)
     @Operation(method = "GET", description = "Get a product by sku", summary = "For Shop purpose. Specifying ?merchant is required otherwise it falls back to DEFAULT")

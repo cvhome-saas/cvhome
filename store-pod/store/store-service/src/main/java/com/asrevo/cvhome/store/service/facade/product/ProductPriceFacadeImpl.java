@@ -30,15 +30,12 @@ public class ProductPriceFacadeImpl implements ProductPriceFacade {
 
     private final PricingService pricingService;
 
-    private final ProductAvailabilityService productAvailabilityService;
-
 
     private final PersistableProductPriceMapper persistableProductPriceMapper;
 
     public ProductPriceFacadeImpl(ProductPriceService productPriceService, PricingService pricingService, ProductAvailabilityService productAvailabilityService, PersistableProductPriceMapper persistableProductPriceMapper) {
         this.productPriceService = productPriceService;
         this.pricingService = pricingService;
-        this.productAvailabilityService = productAvailabilityService;
         this.persistableProductPriceMapper = persistableProductPriceMapper;
     }
 

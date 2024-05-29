@@ -38,8 +38,6 @@ public class ProductFacadeImpl implements ProductFacade {
 
     private final CategoryService categoryService;
 
-    private final ProductAttributeService productAttributeService;
-
     private final ProductService productService;
 
     private final PricingService pricingService;
@@ -51,7 +49,6 @@ public class ProductFacadeImpl implements ProductFacade {
 
     public ProductFacadeImpl(CategoryService categoryService, ProductAttributeService productAttributeService, ProductService productService, PricingService pricingService, ProductRelationshipService productRelationshipService, ImageFilePath imageUtils) {
         this.categoryService = categoryService;
-        this.productAttributeService = productAttributeService;
         this.productService = productService;
         this.pricingService = pricingService;
         this.productRelationshipService = productRelationshipService;
@@ -82,7 +79,7 @@ public class ProductFacadeImpl implements ProductFacade {
         ReadableProductPopulator populator = new ReadableProductPopulator();
 
         populator.setPricingService(pricingService);
-        populator.setimageUtils(imageUtils);
+        populator.setImageUtils(imageUtils);
         populator.populate(product, readableProduct, store, language);
 
         return readableProduct;
@@ -94,13 +91,12 @@ public class ProductFacadeImpl implements ProductFacade {
 
         Assert.notNull(criterias, "ProductCriteria must be set for this product");
 
-        /** This is for category **/
         if (CollectionUtils.isNotEmpty(criterias.getCategoryIds())) {
 
             if (criterias.getCategoryIds().size() == 1) {
 
                 Category category = categoryService
-                        .getById(criterias.getCategoryIds().get(0));
+                        .getById(criterias.getCategoryIds().getFirst());
 
                 if (category != null) {
                     String lineage = category.getLineage();
@@ -130,7 +126,7 @@ public class ProductFacadeImpl implements ProductFacade {
 
         ReadableProductPopulator populator = new ReadableProductPopulator();
         populator.setPricingService(pricingService);
-        populator.setimageUtils(imageUtils);
+        populator.setImageUtils(imageUtils);
 
         ReadableProductList productList = new ReadableProductList();
         for (Product product : products) {
@@ -165,7 +161,7 @@ public class ProductFacadeImpl implements ProductFacade {
         ReadableProductPopulator populator = new ReadableProductPopulator();
 
         populator.setPricingService(pricingService);
-        populator.setimageUtils(imageUtils);
+        populator.setImageUtils(imageUtils);
         try {
             populator.populate(product, readableProduct, product.getMerchantStore(), language);
         } catch (ConversionException e) {
@@ -180,12 +176,12 @@ public class ProductFacadeImpl implements ProductFacade {
             throws Exception {
         ReadableProductPopulator populator = new ReadableProductPopulator();
         populator.setPricingService(pricingService);
-        populator.setimageUtils(imageUtils);
+        populator.setImageUtils(imageUtils);
 
         List<ProductRelationship> relatedItems = productRelationshipService.getByType(store, product,
                 ProductRelationshipType.RELATED_ITEM);
         if (relatedItems != null && !relatedItems.isEmpty()) {
-            List<ReadableProduct> items = new ArrayList<ReadableProduct>();
+            List<ReadableProduct> items = new ArrayList<>();
             for (ProductRelationship relationship : relatedItems) {
                 Product relatedProduct = relationship.getRelatedProduct();
                 ReadableProduct proxyProduct = populator.populate(relatedProduct, new ReadableProduct(), store,
@@ -212,7 +208,7 @@ public class ProductFacadeImpl implements ProductFacade {
         ReadableProductPopulator populator = new ReadableProductPopulator();
 
         populator.setPricingService(pricingService);
-        populator.setimageUtils(imageUtils);
+        populator.setImageUtils(imageUtils);
         populator.populate(product, readableProduct, store, language);
 
         return readableProduct;

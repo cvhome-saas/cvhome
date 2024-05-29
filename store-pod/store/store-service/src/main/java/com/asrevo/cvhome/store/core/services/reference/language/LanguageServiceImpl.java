@@ -18,7 +18,7 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * https://samerabdelkafi.wordpress.com/2014/05/29/spring-data-jpa/
+ * <a href="https://samerabdelkafi.wordpress.com/2014/05/29/spring-data-jpa/">...</a>
  *
  * @author c.samson
  */
@@ -81,7 +81,7 @@ public class LanguageServiceImpl extends SalesManagerEntityServiceImpl<Integer, 
     public Map<String, Language> getLanguagesMap() throws ServiceException {
 
         List<Language> langs = this.getLanguages();
-        Map<String, Language> returnMap = new LinkedHashMap<String, Language>();
+        Map<String, Language> returnMap = new LinkedHashMap<>();
 
         for (Language lang : langs) {
             returnMap.put(lang.getCode(), lang);

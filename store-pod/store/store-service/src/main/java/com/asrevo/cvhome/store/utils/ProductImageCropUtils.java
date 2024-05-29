@@ -1,5 +1,7 @@
 package com.asrevo.cvhome.store.utils;
 
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.imageio.ImageIO;
@@ -14,10 +16,14 @@ import java.net.URLConnection;
 public class ProductImageCropUtils {
 
 
+    @Setter
+    @Getter
     private boolean cropeable = true;
 
-    private int cropeBaseline = 0;// o is width, 1 is height
+    private final int cropeBaseline = 0;// o is width, 1 is height
+    @Getter
     private double cropAreaWidth = 0;
+    @Getter
     private double cropAreaHeight = 0;
     //private InputStream originalFile = null;
     private BufferedImage originalFile = null;
@@ -30,16 +36,13 @@ public class ProductImageCropUtils {
 
             this.originalFile = file;
 
-            /** Original Image **/
             // get original image size
 
             int width = originalFile.getWidth();
             int height = originalFile.getHeight();
 
-            /*** determine if image can be cropped ***/
             determineCropeable(width, largeImageWidth, height, largeImageHeight);
 
-            /*** determine crop area calculation baseline ***/
             //this.determineBaseline(width, height);
 
             determineCropArea(width, largeImageWidth, height, largeImageHeight);
@@ -57,7 +60,6 @@ public class ProductImageCropUtils {
 
     private void determineCropeable(int width, int specificationsWidth,
                                     int height, int specificationsHeight) {
-        /*** determine if image can be cropped ***/
         // height
         int y = height - specificationsHeight;
         // width
@@ -90,11 +92,7 @@ public class ProductImageCropUtils {
         double factorWidth = Integer.valueOf(width).doubleValue() / Integer.valueOf(specificationsWidth).doubleValue();
         double factorHeight = Integer.valueOf(height).doubleValue() / Integer.valueOf(specificationsHeight).doubleValue();
 
-        double factor = factorWidth;
-
-        if (factorWidth > factorHeight) {
-            factor = factorHeight;
-        }
+        double factor = Math.min(factorWidth, factorHeight);
 
 
         // crop factor
@@ -180,28 +178,12 @@ public class ProductImageCropUtils {
     }
 
 
-    public double getCropAreaWidth() {
-        return cropAreaWidth;
-    }
-
     public void setCropAreaWidth(int cropAreaWidth) {
         this.cropAreaWidth = cropAreaWidth;
     }
 
-    public double getCropAreaHeight() {
-        return cropAreaHeight;
-    }
-
     public void setCropAreaHeight(int cropAreaHeight) {
         this.cropAreaHeight = cropAreaHeight;
-    }
-
-    public boolean isCropeable() {
-        return cropeable;
-    }
-
-    public void setCropeable(boolean cropeable) {
-        this.cropeable = cropeable;
     }
 
 

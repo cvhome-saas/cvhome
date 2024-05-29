@@ -27,18 +27,12 @@ public interface ShoppingCartService extends SalesManagerEntityService<Long, Sho
      * Creates a list of ShippingProduct based on the ShoppingCart if items are
      * virtual return list will be null
      *
-     * @param cart
-     * @return
-     * @throws ServiceException
      */
     List<ShippingProduct> createShippingProduct(ShoppingCart cart) throws ServiceException;
 
     /**
      * Populates a ShoppingCartItem from a Product and attributes if any. Calculate price based on availability
      *
-     * @param product
-     * @return
-     * @throws ServiceException
      */
     ShoppingCartItem populateShoppingCartItem(Product product, MerchantStore store) throws ServiceException;
 
@@ -47,11 +41,7 @@ public interface ShoppingCartService extends SalesManagerEntityService<Long, Sho
     void removeShoppingCart(ShoppingCart cart) throws ServiceException;
 
     /**
-     * @param userShoppingModel
-     * @param sessionCart
-     * @param store
      * @return {@link ShoppingCart} merged Shopping Cart
-     * @throws Exception
      */
     ShoppingCart mergeShoppingCarts(final ShoppingCart userShoppingCart, final ShoppingCart sessionCart,
                                     final MerchantStore store) throws Exception;
@@ -60,7 +50,6 @@ public interface ShoppingCartService extends SalesManagerEntityService<Long, Sho
     /**
      * Removes a shopping cart item
      *
-     * @param item
      */
     void deleteShoppingCartItem(Long id);
 

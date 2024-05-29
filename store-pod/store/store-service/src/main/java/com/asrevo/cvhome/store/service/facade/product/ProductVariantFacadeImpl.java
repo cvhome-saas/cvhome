@@ -96,8 +96,8 @@ public class ProductVariantFacadeImpl implements ProductVariantFacade {
 
         //variation and variation value should not be of same product option code
         if (
-                productVariant.getVariation() != null && productVariant.getVariation().longValue() > 0 &&
-                        productVariant.getVariationValue() != null && productVariant.getVariationValue().longValue() > 0) {
+                productVariant.getVariation() != null && productVariant.getVariation() > 0 &&
+                        productVariant.getVariationValue() != null && productVariant.getVariationValue() > 0) {
 
             List<ProductVariation> variations = productVariationService.getByIds(Arrays.asList(productVariant.getVariation(), productVariant.getVariationValue()), store);
 

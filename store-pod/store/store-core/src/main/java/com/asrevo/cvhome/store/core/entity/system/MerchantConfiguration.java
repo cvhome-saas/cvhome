@@ -41,7 +41,7 @@ public class MerchantConfiguration extends SalesManagerEntity<Long, MerchantConf
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "MERCHANT_ID", nullable = true)
+    @JoinColumn(name = "MERCHANT_ID")
     private MerchantStore merchantStore;
 
     @Embedded
@@ -53,7 +53,7 @@ public class MerchantConfiguration extends SalesManagerEntity<Long, MerchantConf
     /**
      * activate and deactivate configuration
      */
-    @Column(name = "ACTIVE", nullable = true)
+    @Column(name = "ACTIVE")
     private Boolean active = Boolean.FALSE;
 
 

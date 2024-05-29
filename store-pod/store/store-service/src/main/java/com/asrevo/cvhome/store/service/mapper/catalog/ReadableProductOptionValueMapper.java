@@ -30,7 +30,7 @@ public class ReadableProductOptionValueMapper implements Mapper<ProductOptionVal
         ReadableProductOptionValue readableProductOptionValue = new ReadableProductOptionValue();
         if (language == null) {
             readableProductOptionValue = new ReadableProductOptionValueFull();
-            List<com.asrevo.cvhome.store.core.model.catalog.product.attribute.ProductOptionValueDescription> descriptions = new ArrayList<com.asrevo.cvhome.store.core.model.catalog.product.attribute.ProductOptionValueDescription>();
+            List<com.asrevo.cvhome.store.core.model.catalog.product.attribute.ProductOptionValueDescription> descriptions = new ArrayList<>();
             for (ProductOptionValueDescription desc : source.getDescriptions()) {
                 com.asrevo.cvhome.store.core.model.catalog.product.attribute.ProductOptionValueDescription d = this.description(desc);
                 descriptions.add(d);
@@ -40,7 +40,7 @@ public class ReadableProductOptionValueMapper implements Mapper<ProductOptionVal
             readableProductOptionValue = new ReadableProductOptionValue();
             if (!CollectionUtils.isEmpty(source.getDescriptions())) {
                 for (ProductOptionValueDescription desc : source.getDescriptions()) {
-                    if (desc != null && desc.getLanguage() != null && desc.getLanguage().getId() == language.getId()) {
+                    if (desc != null && desc.getLanguage() != null && desc.getLanguage().getId().equals(language.getId())) {
                         com.asrevo.cvhome.store.core.model.catalog.product.attribute.ProductOptionValueDescription d = this.description(desc);
                         readableProductOptionValue.setDescription(d);
                     }
@@ -50,10 +50,10 @@ public class ReadableProductOptionValueMapper implements Mapper<ProductOptionVal
 
         readableProductOptionValue.setCode(source.getCode());
         if (source.getId() != null) {
-            readableProductOptionValue.setId(source.getId().longValue());
+            readableProductOptionValue.setId(source.getId());
         }
         if (source.getProductOptionValueSortOrder() != null) {
-            readableProductOptionValue.setOrder(source.getProductOptionValueSortOrder().intValue());
+            readableProductOptionValue.setOrder(source.getProductOptionValueSortOrder());
         }
         if (!StringUtils.isBlank(source.getProductOptionValueImage())) {
             readableProductOptionValue.setImage(imageUtils.buildProductPropertyImageUtils(store, source.getProductOptionValueImage()));

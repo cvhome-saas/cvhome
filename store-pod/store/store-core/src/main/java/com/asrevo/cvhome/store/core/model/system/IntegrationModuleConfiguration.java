@@ -19,9 +19,9 @@ public class IntegrationModuleConfiguration extends IntegrationModuleEntity {
     @Serial
     private static final long serialVersionUID = 1L;
     private boolean defaultSelected;
-    private Map<String, String> integrationKeys = new HashMap<String, String>();
-    private Map<String, List<String>> integrationOptions = new HashMap<String, List<String>>();
-    private List<String> requiredKeys = new ArrayList<String>();
+    private Map<String, String> integrationKeys = new HashMap<>();
+    private Map<String, List<String>> integrationOptions = new HashMap<>();
+    private List<String> requiredKeys = new ArrayList<>();
     private String configurable = null;
 
 

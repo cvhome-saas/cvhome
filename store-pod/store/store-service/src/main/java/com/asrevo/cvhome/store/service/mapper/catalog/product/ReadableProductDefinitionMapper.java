@@ -72,7 +72,7 @@ public class ReadableProductDefinitionMapper implements Mapper<Product, Readable
             returnDestination = new ReadableProductDefinitionFull();
         }
 
-        List<com.asrevo.cvhome.store.core.model.catalog.product.ProductDescription> fulldescriptions = new ArrayList<com.asrevo.cvhome.store.core.model.catalog.product.ProductDescription>();
+        List<com.asrevo.cvhome.store.core.model.catalog.product.ProductDescription> fulldescriptions = new ArrayList<>();
 
         returnDestination.setIdentifier(source.getSku());
         returnDestination.setId(source.getId());
@@ -116,7 +116,7 @@ public class ReadableProductDefinitionMapper implements Mapper<Product, Readable
         }
 
         if (!CollectionUtils.isEmpty(source.getCategories())) {
-            List<ReadableCategory> categoryList = new ArrayList<ReadableCategory>();
+            List<ReadableCategory> categoryList = new ArrayList<>();
             for (Category category : source.getCategories()) {
                 ReadableCategory readableCategory = readableCategoryMapper.convert(category, store, language);
                 categoryList.add(readableCategory);

@@ -44,11 +44,8 @@ public class MerchantStoreServiceImpl extends SalesManagerEntityServiceImpl<Inte
     }
 
     @Override
-    /**
-     * cache moved in facades
-     */
     //@Cacheable(value = "store")
-    public MerchantStore getByCode(String code)  {
+    public MerchantStore getByCode(String code) {
         return merchantRepository.findByCode(code);
     }
 

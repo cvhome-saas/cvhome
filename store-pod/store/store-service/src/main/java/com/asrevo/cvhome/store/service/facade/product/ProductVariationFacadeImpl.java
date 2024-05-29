@@ -57,7 +57,7 @@ public class ProductVariationFacadeImpl implements ProductVariationFacade {
 
         Page<ProductVariation> vars = productVariationService.getByMerchant(store, language, null, page, count);
         List<ReadableProductVariation> variations = vars.stream().map(opt -> this.convert(opt, store, language)).collect(Collectors.toList());
-        ReadableEntityList<ReadableProductVariation> returnList = new ReadableEntityList<ReadableProductVariation>();
+        ReadableEntityList<ReadableProductVariation> returnList = new ReadableEntityList<>();
         returnList.setItems(variations);
         returnList.setNumber(variations.size());
         returnList.setRecordsTotal(vars.getTotalElements());

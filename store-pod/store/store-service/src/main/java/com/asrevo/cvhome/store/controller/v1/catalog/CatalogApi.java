@@ -47,7 +47,7 @@ public class CatalogApi {
 
     @GetMapping(value = "/private/catalogs")
     @ResponseStatus(HttpStatus.OK)
-    @Operation(method = "GET", description = "Get catalogs by merchant", summary = "",
+    @Operation(method = "GET", description = "Get catalogs by merchant",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ReadableEntityList.class))))
     @Parameters({
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
@@ -70,21 +70,21 @@ public class CatalogApi {
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
-    @Operation(method = "GET", description = "Check if catalog code already exists", summary = "",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = Void.class))))
+    @Operation(method = "GET", description = "Check if catalog code already exists",
+            responses = @ApiResponse(content = @Content(schema = @Schema())))
     public ResponseEntity<EntityExists> exists(
             @RequestParam(value = "code") String code,
             @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language) {
         boolean existByCode = catalogFacade.uniqueCatalog(code, merchantStore);
-        return new ResponseEntity<EntityExists>(new EntityExists(existByCode), HttpStatus.OK);
+        return new ResponseEntity<>(new EntityExists(existByCode), HttpStatus.OK);
     }
 
 
     @PostMapping(value = "/private/catalog")
     @ResponseStatus(HttpStatus.OK)
-    @Operation(method = "POST", description = "Create catalog", summary = "",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = Void.class))))
+    @Operation(method = "POST", description = "Create catalog",
+            responses = @ApiResponse(content = @Content(schema = @Schema())))
     @Parameters({
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
@@ -99,8 +99,8 @@ public class CatalogApi {
 
     @PatchMapping(value = "/private/catalog/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @Operation(method = "PATCH", description = "Update catalog", summary = "",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = Void.class))))
+    @Operation(method = "PATCH", description = "Update catalog",
+            responses = @ApiResponse(content = @Content(schema = @Schema())))
     @Parameters({
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
@@ -117,8 +117,8 @@ public class CatalogApi {
 
     @GetMapping(value = "/private/catalog/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @Operation(method = "GET", description = "Get catalog", summary = "",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = Void.class))))
+    @Operation(method = "GET", description = "Get catalog",
+            responses = @ApiResponse(content = @Content(schema = @Schema())))
     @Parameters({
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
@@ -133,8 +133,8 @@ public class CatalogApi {
 
 
     @DeleteMapping(value = "/private/catalog/{id}")
-    @Operation(method = "DELETE", description = "Deletes a catalog", summary = "",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = Void.class))))
+    @Operation(method = "DELETE", description = "Deletes a catalog",
+            responses = @ApiResponse(content = @Content(schema = @Schema())))
 
     @Parameters({
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
@@ -150,7 +150,7 @@ public class CatalogApi {
 
     @PostMapping(value = "/private/catalog/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @Operation(method = "POST", description = "Add catalog entry to catalog", summary = "",
+    @Operation(method = "POST", description = "Add catalog entry to catalog",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ReadableCatalogCategoryEntry.class))))
     @Parameters({
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
@@ -176,8 +176,8 @@ public class CatalogApi {
 
     @DeleteMapping(value = "/private/catalog/{id}/entry/{entryId}")
     @ResponseStatus(HttpStatus.OK)
-    @Operation(method = "DELETE", description = "Remove catalog entry from catalog", summary = "",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = Void.class))))
+    @Operation(method = "DELETE", description = "Remove catalog entry from catalog",
+            responses = @ApiResponse(content = @Content(schema = @Schema())))
 
     @Parameters({
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
@@ -196,7 +196,7 @@ public class CatalogApi {
 
     @GetMapping(value = "/private/catalog/{id}/entry")
     @ResponseStatus(HttpStatus.OK)
-    @Operation(method = "GET", description = "Get catalog entry by catalog", summary = "", responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ReadableEntityList.class))))
+    @Operation(method = "GET", description = "Get catalog entry by catalog", responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ReadableEntityList.class))))
     @Parameters({
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))

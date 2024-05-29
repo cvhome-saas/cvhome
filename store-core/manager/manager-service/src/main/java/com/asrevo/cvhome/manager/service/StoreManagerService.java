@@ -15,5 +15,5 @@ public interface StoreManagerService {
 
     Mono<PageImpl<Object>> findAll(UserOrgStoreIdentity identity, ListManagerStoreQuery listManagerStoreQuery, Pageable pageable);
 
-    Mono<Object> getStore( ManagerStoreId managerStoreId);
+    Mono<Object> getStore(ManagerStoreId managerStoreId);
 }

@@ -19,10 +19,6 @@ public interface ProductImageService extends SalesManagerEntityService<Long, Pro
     /**
      * Add a ProductImage to the persistence and an entry to the CMS
      *
-     * @param product
-     * @param productImage
-     * @param file
-     * @throws ServiceException
      */
     void addProductImage(Product product, ProductImage productImage, ImageContentFile inputImage)
             throws ServiceException;
@@ -30,9 +26,6 @@ public interface ProductImageService extends SalesManagerEntityService<Long, Pro
     /**
      * Get the image ByteArrayOutputStream and content description from CMS
      *
-     * @param productImage
-     * @return
-     * @throws ServiceException
      */
     OutputContentFile getProductImage(ProductImage productImage, ProductImageSize size)
             throws ServiceException;
@@ -40,9 +33,6 @@ public interface ProductImageService extends SalesManagerEntityService<Long, Pro
     /**
      * Returns all Images for a given product
      *
-     * @param product
-     * @return
-     * @throws ServiceException
      */
     List<OutputContentFile> getProductImages(Product product)
             throws ServiceException;
@@ -50,10 +40,6 @@ public interface ProductImageService extends SalesManagerEntityService<Long, Pro
     /**
      * Get a product image by name for a given product id
      *
-     * @param imageName
-     * @param productId
-     * @param store
-     * @return
      */
     Optional<ProductImage> getProductImage(Long imageId, Long productId, MerchantStore store);
 
@@ -65,12 +51,6 @@ public interface ProductImageService extends SalesManagerEntityService<Long, Pro
      * Returns an image file from required identifier. This method is
      * used by the image servlet
      *
-     * @param store
-     * @param product
-     * @param fileName
-     * @param size
-     * @return
-     * @throws ServiceException
      */
     OutputContentFile getProductImage(String storeCode, String productCode,
                                       String fileName, final ProductImageSize size) throws ServiceException;

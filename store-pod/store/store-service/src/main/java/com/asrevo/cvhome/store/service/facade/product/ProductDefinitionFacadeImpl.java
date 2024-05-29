@@ -28,16 +28,10 @@ public class ProductDefinitionFacadeImpl implements ProductDefinitionFacade {
 
     private final ReadableProductDefinitionMapper readableProductDefinitionMapper;
 
-    private final ProductVariantFacade productVariantFacade;
-
-    private final ImageFilePath imageUtils;
-
     public ProductDefinitionFacadeImpl(ProductService productService, PersistableProductDefinitionMapper persistableProductDefinitionMapper, ReadableProductDefinitionMapper readableProductDefinitionMapper, ProductVariantFacade productVariantFacade, ImageFilePath imageUtils) {
         this.productService = productService;
         this.persistableProductDefinitionMapper = persistableProductDefinitionMapper;
         this.readableProductDefinitionMapper = readableProductDefinitionMapper;
-        this.productVariantFacade = productVariantFacade;
-        this.imageUtils = imageUtils;
     }
 
     @Override
@@ -45,7 +39,7 @@ public class ProductDefinitionFacadeImpl implements ProductDefinitionFacade {
 
 
         Product target = null;
-        if (product.getId() != null && product.getId().longValue() > 0) {
+        if (product.getId() != null && product.getId() > 0) {
             Optional<Product> p = productService.retrieveById(product.getId(), store);
             if (p.isEmpty()) {
                 throw new ResourceNotFoundException("Product with id [" + product.getId() + "] not found for store [" + store.getCode() + "]");

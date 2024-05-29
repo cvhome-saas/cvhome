@@ -7,7 +7,7 @@ package com.asrevo.cvhome.store.core.modules.cms.impl;
  */
 public interface CMSManager {
 
-    String getRootName();
+    String rootName();
 
     String getLocation();
 

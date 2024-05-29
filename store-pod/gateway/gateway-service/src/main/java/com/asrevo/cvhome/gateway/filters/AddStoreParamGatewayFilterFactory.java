@@ -38,35 +38,6 @@ public class AddStoreParamGatewayFilterFactory extends AbstractGatewayFilterFact
         this.router = router;
     }
 
-
-    @Override
-    public GatewayFilter apply(AddStoreParamGatewayFilterFactory.Config config) {
-        return (exchange, chain) -> {
-            ServerHttpRequest request = exchange.getRequest();
-            String store = getStore(request);
-            if (store == null) {
-                String hostName = extractHostName(request);
-                if (isValidHostName(hostName)) {
-                    return mapHostToStoreParam(hostName)
-                            .flatMap(it -> execute(config, exchange, chain, it));
-                }
-            } else {
-                return execute(config, exchange, chain, store);
-            }
-            return chain.filter(exchange);
-        };
-    }
-
-    @Getter
-    @Setter
-    public static class Config {
-        private Boolean addRequestParam = false;
-        private Boolean addRequestHeader = false;
-        private Boolean addRequestCookie = false;
-        private Boolean addResponseHeader = false;
-        private Boolean addResponseCookie = false;
-    }
-
     private static void addResponseHeader(ServerHttpResponse response, String store) {
         response.getHeaders().add(STORE_ID_HEADER, store);
     }
@@ -142,13 +113,30 @@ public class AddStoreParamGatewayFilterFactory extends AbstractGatewayFilterFact
         }
     }
 
-    public List<String> shortcutFieldOrder() {
-        return List.of(TEMPLATE_KEY);
-    }
-
-
     private static String extractHostName(ServerHttpRequest request) {
         return Optional.ofNullable(request.getHeaders().getHost()).map(InetSocketAddress::getHostName).orElse(null);
+    }
+
+    @Override
+    public GatewayFilter apply(AddStoreParamGatewayFilterFactory.Config config) {
+        return (exchange, chain) -> {
+            ServerHttpRequest request = exchange.getRequest();
+            String store = getStore(request);
+            if (store == null) {
+                String hostName = extractHostName(request);
+                if (isValidHostName(hostName)) {
+                    return mapHostToStoreParam(hostName)
+                            .flatMap(it -> execute(config, exchange, chain, it));
+                }
+            } else {
+                return execute(config, exchange, chain, store);
+            }
+            return chain.filter(exchange);
+        };
+    }
+
+    public List<String> shortcutFieldOrder() {
+        return List.of(TEMPLATE_KEY);
     }
 
     private Mono<Void> execute(Config config, ServerWebExchange exchange, GatewayFilterChain chain, String store) {
@@ -177,6 +165,16 @@ public class AddStoreParamGatewayFilterFactory extends AbstractGatewayFilterFact
 
     private Mono<String> mapHostToStoreParam(String host) {
         return router.getAllocation(new Domain(host)).map(it -> it.getId().toString());
+    }
+
+    @Getter
+    @Setter
+    public static class Config {
+        private Boolean addRequestParam = false;
+        private Boolean addRequestHeader = false;
+        private Boolean addRequestCookie = false;
+        private Boolean addResponseHeader = false;
+        private Boolean addResponseCookie = false;
     }
 
 }

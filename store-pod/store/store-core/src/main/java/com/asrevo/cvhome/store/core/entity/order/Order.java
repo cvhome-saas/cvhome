@@ -78,7 +78,7 @@ public class Order extends SalesManagerEntity<Long, Order> {
     @Column(name = "IP_ADDRESS")
     private String ipAddress;
 
-    @Column(name = "CART_CODE", nullable = true)
+    @Column(name = "CART_CODE")
     private String shoppingCartCode;
 
     @Column(name = "CHANNEL")
@@ -135,18 +135,18 @@ public class Order extends SalesManagerEntity<Long, Order> {
     //private Set<OrderAccount> orderAccounts = new HashSet<OrderAccount>();
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
-    private Set<OrderProduct> orderProducts = new LinkedHashSet<OrderProduct>();
+    private Set<OrderProduct> orderProducts = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     @SQLOrder(value = "sort_order asc")
-    private Set<OrderTotal> orderTotal = new LinkedHashSet<OrderTotal>();
+    private Set<OrderTotal> orderTotal = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     @SQLOrder(value = "ORDER_STATUS_HISTORY_ID asc")
-    private Set<OrderStatusHistory> orderHistory = new LinkedHashSet<OrderStatusHistory>();
+    private Set<OrderStatusHistory> orderHistory = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
-    private Set<OrderAttribute> orderAttributes = new LinkedHashSet<OrderAttribute>();
+    private Set<OrderAttribute> orderAttributes = new LinkedHashSet<>();
     @Column(name = "CUSTOMER_EMAIL_ADDRESS", length = 50, nullable = false)
     private String customerEmailAddress;
 

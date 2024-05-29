@@ -18,6 +18,6 @@ public class PersistableManufacturer extends ManufacturerEntity implements
      */
     @Serial
     private static final long serialVersionUID = 1L;
-    private List<ManufacturerDescription> descriptions = new ArrayList<ManufacturerDescription>();
+    private List<ManufacturerDescription> descriptions = new ArrayList<>();
 
 }

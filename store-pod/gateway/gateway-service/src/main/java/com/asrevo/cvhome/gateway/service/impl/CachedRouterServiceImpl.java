@@ -21,11 +21,6 @@ public class CachedRouterServiceImpl implements CachedRouterService {
         this.cache = ofMono(Duration.ofMinutes(10), routerAllocationService::getAllocation);
     }
 
-    @Override
-    public Mono<ManagerStoreId> getAllocation(Domain domain) {
-        return cache.apply(domain);
-    }
-
     public static <T> Function<Domain, Mono<T>> ofMono(Duration duration, Function<Domain, Mono<T>> fn) {
         final AsyncLoadingCache<Domain, T> cache = Caffeine.newBuilder()
                 .expireAfterWrite(duration.multipliedBy(2))
@@ -36,5 +31,10 @@ public class CachedRouterServiceImpl implements CachedRouterService {
                                 .toFuture());
 
         return (k) -> Mono.fromFuture(cache.get(k));
+    }
+
+    @Override
+    public Mono<ManagerStoreId> getAllocation(Domain domain) {
+        return cache.apply(domain);
     }
 }

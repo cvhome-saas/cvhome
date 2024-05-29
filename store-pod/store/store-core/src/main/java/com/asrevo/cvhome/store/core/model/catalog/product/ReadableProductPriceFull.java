@@ -17,7 +17,7 @@ public class ReadableProductPriceFull extends ReadableProductPrice {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private List<ProductPriceDescription> descriptions = new ArrayList<ProductPriceDescription>();
+    private List<ProductPriceDescription> descriptions = new ArrayList<>();
 
 
 }

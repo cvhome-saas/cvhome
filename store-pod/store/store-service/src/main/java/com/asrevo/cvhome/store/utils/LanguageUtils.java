@@ -60,8 +60,6 @@ public class LanguageUtils {
     /**
      * Determines request language based on store rules
      *
-     * @param request
-     * @return
      */
     public Language getRequestLanguage(HttpServletRequest request, HttpServletResponse response) {
 
@@ -133,10 +131,6 @@ public class LanguageUtils {
     /**
      * Should be used by rest web services
      *
-     * @param request
-     * @param store
-     * @return
-     * @throws Exception
      */
     public Language getRESTLanguage(HttpServletRequest request, NativeWebRequest webRequest) {
 

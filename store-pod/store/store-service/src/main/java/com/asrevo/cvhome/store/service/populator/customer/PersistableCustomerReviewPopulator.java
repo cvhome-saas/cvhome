@@ -47,7 +47,7 @@ public class PersistableCustomerReviewPopulator extends AbstractDataPopulator<Pe
             }
             target.setReviewDate(DateUtil.getDate(source.getDate()));
 
-            if (source.getId() != null && source.getId().longValue() == 0) {
+            if (source.getId() != null && source.getId() == 0) {
                 source.setId(null);
             } else {
                 target.setId(source.getId());
@@ -73,7 +73,7 @@ public class PersistableCustomerReviewPopulator extends AbstractDataPopulator<Pe
             description.setName("-");
             description.setCustomerReview(target);
 
-            Set<CustomerReviewDescription> descriptions = new HashSet<CustomerReviewDescription>();
+            Set<CustomerReviewDescription> descriptions = new HashSet<>();
             descriptions.add(description);
 
             target.setDescriptions(descriptions);

@@ -53,7 +53,7 @@ public class Billing {
 
 
     @ManyToOne(fetch = FetchType.LAZY, targetEntity = Zone.class)
-    @JoinColumn(name = "BILLING_ZONE_ID", nullable = true)
+    @JoinColumn(name = "BILLING_ZONE_ID")
     private Zone zone;
 
 

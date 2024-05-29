@@ -40,8 +40,6 @@ public interface MerchantStoreService extends SalesManagerEntityService<Integer,
     /**
      * Is parent or child and part of a specific group
      *
-     * @param code
-     * @return
      */
     boolean isStoreInGroup(String code) throws ServiceException;
 

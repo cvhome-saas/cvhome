@@ -75,14 +75,7 @@ public class LocalDiscoveryConfig {
             return new LocalDiscoveryClient(localDiscoveryProperties);
         }
 
-        /**
-         * used to define bean for ReactiveDiscoveryClientHealthIndicator
-         *
-         * @param client     use client to do health check
-         * @param properties used to get current properties
-         * @return ReactiveDiscoveryClientHealthIndicator bean
-         */
-/*
+        /*
         @Bean
         @ConditionalOnClass(name = "org.springframework.boot.actuate.health.HealthIndicator")
         @ConditionalOnDiscoveryHealthIndicatorEnabled

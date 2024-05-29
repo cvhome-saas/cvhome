@@ -32,10 +32,8 @@ public interface PaymentService {
     /**
      * Get a specific Payment module by payment type CREDITCART, MONEYORDER ...
      *
-     * @param store
      * @param type  (payment type)
      * @return IntegrationModule
-     * @throws ServiceException
      */
     IntegrationModule getPaymentMethodByType(MerchantStore store, String type)
             throws ServiceException;
@@ -43,10 +41,7 @@ public interface PaymentService {
     /**
      * Get a specific Payment module by payment code (defined in integrationmoduel.json) paypal, authorizenet ..
      *
-     * @param store
-     * @param name
      * @return IntegrationModule
-     * @throws ServiceException
      */
     IntegrationModule getPaymentMethodByCode(MerchantStore store, String name)
             throws ServiceException;
@@ -54,9 +49,6 @@ public interface PaymentService {
     /**
      * Saves a payment module configuration
      *
-     * @param configuration
-     * @param store
-     * @throws ServiceException
      */
     void savePaymentModuleConfiguration(IntegrationConfiguration configuration,
                                         MerchantStore store) throws ServiceException;
@@ -64,11 +56,6 @@ public interface PaymentService {
     /**
      * Validates if the credit card input information are correct
      *
-     * @param number
-     * @param type
-     * @param month
-     * @param date
-     * @throws ServiceException
      */
     void validateCreditCard(String number, CreditCardType creditCard, String month, String date)
             throws ServiceException;
@@ -77,10 +64,7 @@ public interface PaymentService {
      * Get the integration configuration
      * for a specific payment module
      *
-     * @param moduleCode
-     * @param store
      * @return IntegrationConfiguration
-     * @throws ServiceException
      */
     IntegrationConfiguration getPaymentConfiguration(String moduleCode,
                                                      MerchantStore store) throws ServiceException;
@@ -95,10 +79,6 @@ public interface PaymentService {
     /**
      * Initializes a transaction
      *
-     * @param order
-     * @param customer
-     * @param payment
-     * @param store
      * @return Transaction
      */
     Transaction initTransaction(Order order, Customer customer, Payment payment, MerchantStore store) throws ServiceException;
@@ -106,10 +86,6 @@ public interface PaymentService {
     /**
      * Initializes a transaction without an order
      *
-     * @param order
-     * @param customer
-     * @param payment
-     * @param store
      * @return Transaction
      */
     Transaction initTransaction(Customer customer, Payment payment, MerchantStore store) throws ServiceException;
@@ -120,9 +96,7 @@ public interface PaymentService {
     /**
      * Returns a PaymentModule based on the payment code
      *
-     * @param paymentModuleCode
      * @return PaymentModule
-     * @throws ServiceException
      */
     PaymentModule getPaymentModule(String paymentModuleCode)
             throws ServiceException;

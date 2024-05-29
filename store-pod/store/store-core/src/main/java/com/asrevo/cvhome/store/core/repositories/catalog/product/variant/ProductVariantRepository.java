@@ -79,9 +79,6 @@ public interface ProductVariantRepository extends JpaRepository<ProductVariant, 
     /**
      * Gets the whole graph
      *
-     * @param storeId
-     * @param productId
-     * @return
      */
     @Query(value = """
             select distinct p from ProductVariant as p

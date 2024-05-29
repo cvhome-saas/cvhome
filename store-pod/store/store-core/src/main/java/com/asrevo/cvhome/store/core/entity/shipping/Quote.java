@@ -35,22 +35,22 @@ public class Quote extends SalesManagerEntity<Long, Quote> {
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
     Long id;
 
-    @Column(name = "ORDER_ID", nullable = true)
+    @Column(name = "ORDER_ID")
     private Long orderId;
 
-    @Column(name = "CUSTOMER_ID", nullable = true)
+    @Column(name = "CUSTOMER_ID")
     private Long customerId;
 
-    @Column(name = "CART_ID", nullable = true)
+    @Column(name = "CART_ID")
     private Long cartId;
 
     @Column(name = "MODULE", nullable = false)
     private String module;
 
-    @Column(name = "OPTION_NAME", nullable = true)
+    @Column(name = "OPTION_NAME")
     private String optionName = null;
 
-    @Column(name = "OPTION_CODE", nullable = true)
+    @Column(name = "OPTION_CODE")
     private String optionCode = null;
 
     @Temporal(TemporalType.TIMESTAMP)

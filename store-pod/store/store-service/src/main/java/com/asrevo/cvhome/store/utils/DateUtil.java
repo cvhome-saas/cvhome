@@ -37,7 +37,6 @@ public class DateUtil {
      * Generates a time stamp
      * yyyymmddhhmmss
      *
-     * @return
      */
     public static String generateTimeStamp() {
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmSS");
@@ -47,8 +46,6 @@ public class DateUtil {
     /**
      * yyyy-MM-dd
      *
-     * @param dt
-     * @return
      */
     public static String formatDate(Date dt) {
 
@@ -80,8 +77,6 @@ public class DateUtil {
     /**
      * yy-MMM-dd
      *
-     * @param dt
-     * @return
      */
     public static String formatDateMonthString(Date dt) {
 

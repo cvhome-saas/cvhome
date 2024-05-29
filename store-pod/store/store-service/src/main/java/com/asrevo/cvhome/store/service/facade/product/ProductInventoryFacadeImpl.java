@@ -63,7 +63,7 @@ public class ProductInventoryFacadeImpl implements ProductInventoryFacade {
         Optional<ProductAvailability> availability = productAvailabilityService.getById(inventoryId, store);
         try {
             if (availability.isPresent()) {
-                if (availability.get().getProduct().getId() == productId) {
+                if (availability.get().getProduct().getId().equals(productId)) {
                     productAvailabilityService.delete(availability.get());
                 } else {
                     throw new ResourceNotFoundException("Product with id [" + productId + "] and inventory id [" + inventoryId + "] not found for store id [" + store.getId() + "]");
@@ -178,11 +178,11 @@ public class ProductInventoryFacadeImpl implements ProductInventoryFacade {
         Set<ProductAvailability> originAvailability = null;
         Product product = null;
 
-        if (inventory.getProductId() != null && inventory.getProductId().longValue() > 0) {
+        if (inventory.getProductId() != null && inventory.getProductId() > 0) {
             product = this.getProductById(inventory.getProductId(), store);
             originAvailability = product.getAvailabilities();
         } else {
-            if (inventory.getVariant() != null && inventory.getId().longValue() > 0) {
+            if (inventory.getVariant() != null && inventory.getId() > 0) {
                 ProductVariant instance = this.getProductByInstance(inventory.getVariant(), store);
                 originAvailability = instance.getAvailabilities();
                 product = instance.getProduct();
@@ -217,18 +217,12 @@ public class ProductInventoryFacadeImpl implements ProductInventoryFacade {
 
         Page<ProductAvailability> availabilities = productAvailabilityService.getBySku(sku, page, count);
 
-        /**
-         * br -> if availabilities is null, it may be bcz a variant is a decorated product with no specific inventory.
-         * in this case it should display the parent product inventory
-         *
-         */
-
         if (availabilities.isEmpty()) {
             //get parent product
             try {
                 Product singleProduct = productService.getBySku(sku, store);
                 if (singleProduct != null) {
-                    availabilities = new PageImpl<ProductAvailability>(new ArrayList<ProductAvailability>(singleProduct.getAvailabilities()));
+                    availabilities = new PageImpl<>(new ArrayList<>(singleProduct.getAvailabilities()));
                 }
             } catch (ServiceException e) {
                 throw new ServiceRuntimeException("An error occured while getting product with sku " + sku, e);

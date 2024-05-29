@@ -18,10 +18,6 @@ public interface ShippingService {
      * If the merchant configured shipping International, then the list of accepted country is returned
      * from the list
      *
-     * @param store
-     * @param language
-     * @return
-     * @throws ServiceException
      */
     List<Country> getShipToCountryList(MerchantStore store, Language language)
             throws ServiceException;

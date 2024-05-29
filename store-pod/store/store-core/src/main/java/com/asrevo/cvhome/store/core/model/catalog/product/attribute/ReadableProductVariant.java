@@ -21,7 +21,7 @@ public class ReadableProductVariant extends Entity implements Serializable {
     //option name
     private String name;
     private String code;
-    private List<ReadableProductVariantValue> options = new ArrayList<ReadableProductVariantValue>();
+    private List<ReadableProductVariantValue> options = new ArrayList<>();
 
 
 }

@@ -36,17 +36,12 @@ public interface ProductService extends SalesManagerEntityService<Long, Product>
     /**
      * The method to be used
      *
-     * @param product
-     * @return
-     * @throws ServiceException
      */
     Product saveProduct(Product product) throws ServiceException;
 
     /**
      * Get a product with only MerchantStore object
      *
-     * @param productId
-     * @return
      */
     Product getProductWithOnlyMerchantStoreById(Long productId);
 
@@ -59,12 +54,6 @@ public interface ProductService extends SalesManagerEntityService<Long, Product>
     /**
      * List using Page interface in order to unify all page requests (since 2.16.0)
      *
-     * @param store
-     * @param language
-     * @param criteria
-     * @param page
-     * @param count
-     * @return
      */
     Page<Product> listByStore(MerchantStore store, Language language,
                               ProductCriteria criteria, int page, int count);
@@ -81,9 +70,6 @@ public interface ProductService extends SalesManagerEntityService<Long, Product>
     /**
      * Product and or product variant
      *
-     * @param productCode
-     * @param merchant
-     * @return
      */
     Product getBySku(String productCode, MerchantStore merchant, Language language) throws ServiceException;
 
@@ -93,9 +79,6 @@ public interface ProductService extends SalesManagerEntityService<Long, Product>
     /**
      * Find a product for a specific merchant
      *
-     * @param id
-     * @param merchant
-     * @return
      */
     Product findOne(Long id, MerchantStore merchant);
 

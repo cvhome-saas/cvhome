@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.store.core.model.store;
 
-import com.asrevo.cvhome.store.core.entity.system.MerchantConfigurationType;
 import com.asrevo.cvhome.commons.domain.Entity;
+import com.asrevo.cvhome.store.core.entity.system.MerchantConfigurationType;
 import lombok.Getter;
 import lombok.Setter;
 

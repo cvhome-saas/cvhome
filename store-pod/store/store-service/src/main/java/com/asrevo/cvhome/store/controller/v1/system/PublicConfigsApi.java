@@ -32,7 +32,6 @@ public class PublicConfigsApi {
     /**
      * Get public set of merchant configuration --- allow online purchase --- social links
      *
-     * @return
      */
     @GetMapping("/config")
     @Operation(

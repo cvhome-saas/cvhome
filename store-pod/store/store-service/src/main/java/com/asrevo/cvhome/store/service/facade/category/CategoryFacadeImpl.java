@@ -179,17 +179,6 @@ public class CategoryFacadeImpl implements CategoryFacade {
 
     private void saveCategory(MerchantStore store, Category category, Category parent) throws ServiceException {
 
-        /**
-         * c.children1
-         *
-         * <p>
-         * children1.children1.children2
-         *
-         * <p>
-         * children1.children2.children1
-         */
-
-        /** set lineage * */
         if (parent != null) {
             category.setParent(category);
 
@@ -207,11 +196,10 @@ public class CategoryFacadeImpl implements CategoryFacade {
 
         // remove children
         List<Category> children = category.getCategories();
-        List<Category> saveAfter = children.stream().filter(c -> c.getId() == null || c.getId().longValue() == 0).collect(Collectors.toList());
-        List<Category> saveNow = children.stream().filter(c -> c.getId() != null && c.getId().longValue() > 0).collect(Collectors.toList());
+        List<Category> saveAfter = children.stream().filter(c -> c.getId() == null || c.getId() == 0).collect(Collectors.toList());
+        List<Category> saveNow = children.stream().filter(c -> c.getId() != null && c.getId() > 0).collect(Collectors.toList());
         category.setCategories(saveNow);
 
-        /** set parent * */
         if (parent != null) {
             category.setParent(parent);
         }
@@ -221,7 +209,7 @@ public class CategoryFacadeImpl implements CategoryFacade {
         if (!CollectionUtils.isEmpty(saveAfter)) {
             parent = category;
             for (Category c : saveAfter) {
-                if (c.getId() == null || c.getId().longValue() == 0) {
+                if (c.getId() == null || c.getId() == 0) {
                     for (Category sub : children) {
                         saveCategory(store, sub, parent);
                     }
@@ -363,7 +351,7 @@ public class CategoryFacadeImpl implements CategoryFacade {
                                                                 Language language) {
         Category category = categoryService.getById(categoryId, store.getId());
 
-        List<ReadableProductVariant> variants = new ArrayList<ReadableProductVariant>();
+        List<ReadableProductVariant> variants = new ArrayList<>();
 
         if (category == null) {
             throw new ResourceNotFoundException("Category [" + categoryId + "] not found");
@@ -373,22 +361,15 @@ public class CategoryFacadeImpl implements CategoryFacade {
             List<ProductAttribute> attributes = productAttributeService.getProductAttributesByCategoryLineage(store,
                     category.getLineage(), language);
 
-            /**
-             * Option NAME OptionValueName OptionValueName
-             **/
-            Map<String, List<ProductOptionValue>> rawFacet = new HashMap<String, List<ProductOptionValue>>();
-            Map<String, ProductOption> references = new HashMap<String, ProductOption>();
+            Map<String, List<ProductOptionValue>> rawFacet = new HashMap<>();
+            Map<String, ProductOption> references = new HashMap<>();
             for (ProductAttribute attr : attributes) {
                 references.put(attr.getProductOption().getCode(), attr.getProductOption());
-                List<ProductOptionValue> values = rawFacet.get(attr.getProductOption().getCode());
-                if (values == null) {
-                    values = new ArrayList<ProductOptionValue>();
-                    rawFacet.put(attr.getProductOption().getCode(), values);
-                }
+                List<ProductOptionValue> values = rawFacet.computeIfAbsent(attr.getProductOption().getCode(), k -> new ArrayList<>());
 
                 if (attr.getProductOptionValue() != null) {
                     Optional<ProductOptionValueDescription> desc = attr.getProductOptionValue().getDescriptions()
-                            .stream().filter(o -> o.getLanguage().getId() == language.getId()).findFirst();
+                            .stream().filter(o -> o.getLanguage().getId().equals(language.getId())).findFirst();
 
                     ProductOptionValue val = new ProductOptionValue();
                     val.setCode(attr.getProductOption().getCode());
@@ -404,20 +385,17 @@ public class CategoryFacadeImpl implements CategoryFacade {
             }
 
             // for each reference set Option
-            Iterator<Entry<String, ProductOption>> it = references.entrySet().iterator();
-            while (it.hasNext()) {
-                @SuppressWarnings("rawtypes")
-                Map.Entry pair = it.next();
-                ProductOption option = (ProductOption) pair.getValue();
+            for (Entry<String,ProductOption> pair : references.entrySet()) {
+                ProductOption option = pair.getValue();
                 List<ProductOptionValue> values = rawFacet.get(option.getCode());
 
                 ReadableProductVariant productVariant = new ReadableProductVariant();
-                Optional<ProductOptionDescription> optionDescription = option.getDescriptions().stream().filter(o -> o.getLanguage().getId() == language.getId()).findFirst();
+                Optional<ProductOptionDescription> optionDescription = option.getDescriptions().stream().filter(o -> o.getLanguage().getId().equals(language.getId())).findFirst();
                 if (optionDescription.isPresent()) {
                     productVariant.setName(optionDescription.get().getName());
                     productVariant.setId(optionDescription.get().getId());
                     productVariant.setCode(optionDescription.get().getProductOption().getCode());
-                    List<ReadableProductVariantValue> optionValues = new ArrayList<ReadableProductVariantValue>();
+                    List<ReadableProductVariantValue> optionValues = new ArrayList<>();
                     for (ProductOptionValue value : values) {
                         ReadableProductVariantValue v = new ReadableProductVariantValue();
                         v.setCode(value.getCode());
@@ -472,7 +450,7 @@ public class CategoryFacadeImpl implements CategoryFacade {
                 throw new ResourceNotFoundException("Category with id [" + child + "] for store [" + store.getCode() + "]");
             }
 
-            if (parent.longValue() == -1) {
+            if (parent == -1) {
                 categoryService.addChild(null, c);
                 return;
 
@@ -484,7 +462,7 @@ public class CategoryFacadeImpl implements CategoryFacade {
                 throw new ResourceNotFoundException("Category with id [" + parent + "] for store [" + store.getCode() + "]");
             }
 
-            if (c.getParent() != null && c.getParent().getId() == parent) {
+            if (c.getParent() != null && c.getParent().getId().equals(parent)) {
                 return;
             }
 
@@ -500,10 +478,8 @@ public class CategoryFacadeImpl implements CategoryFacade {
 
             p.getAuditSection().setModifiedBy("Api");
             categoryService.addChild(p, c);
-        } catch (ResourceNotFoundException re) {
+        } catch (ResourceNotFoundException | OperationNotAllowedException re) {
             throw re;
-        } catch (OperationNotAllowedException oe) {
-            throw oe;
         } catch (Exception e) {
             throw new ServiceRuntimeException(e);
         }
@@ -537,7 +513,7 @@ public class CategoryFacadeImpl implements CategoryFacade {
         Assert.notNull(product, "Product id must not be null");
         Assert.notNull(store, "Store must not be null");
 
-        List<ReadableCategory> readableCategories = new ArrayList<ReadableCategory>();
+        List<ReadableCategory> readableCategories = new ArrayList<>();
 
         List<Category> categories = categoryService.getByProductId(product, store);
 

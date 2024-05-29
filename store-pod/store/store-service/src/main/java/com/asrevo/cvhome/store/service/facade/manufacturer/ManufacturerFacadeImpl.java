@@ -66,17 +66,10 @@ public class ManufacturerFacadeImpl implements ManufacturerFacade {
         try {
             List<Manufacturer> manufacturers = manufacturerService.listByProductsInCategory(store, category, language);
 
-            List<ReadableManufacturer> manufacturersList = manufacturers.stream()
-                    .sorted(new Comparator<Manufacturer>() {
-                        @Override
-                        public int compare(final Manufacturer object1, final Manufacturer object2) {
-                            return object1.getCode().compareTo(object2.getCode());
-                        }
-                    })
+            return manufacturers.stream()
+                    .sorted(Comparator.comparing(Manufacturer::getCode))
                     .map(manuf -> readableManufacturerConverter.convert(manuf, store, language))
                     .collect(Collectors.toList());
-
-            return manufacturersList;
         } catch (ServiceException e) {
             throw new ServiceRuntimeException(e);
         }
@@ -93,7 +86,7 @@ public class ManufacturerFacadeImpl implements ManufacturerFacade {
 
         Manufacturer manuf = new Manufacturer();
 
-        if (manufacturer.getId() != null && manufacturer.getId().longValue() > 0) {
+        if (manufacturer.getId() != null && manufacturer.getId() > 0) {
             manuf = manufacturerService.getById(manufacturer.getId());
             if (manuf == null) {
                 throw new ResourceNotFoundException("Manufacturer with id [" + manufacturer.getId() + "] not found");
@@ -129,7 +122,7 @@ public class ManufacturerFacadeImpl implements ManufacturerFacade {
             throw new ResourceNotFoundException("Manufacturer [" + id + "] not found");
         }
 
-        if (manufacturer.getMerchantStore().getId() != store.getId()) {
+        if (!manufacturer.getMerchantStore().getId().equals(store.getId())) {
             throw new ResourceNotFoundException("Manufacturer [" + id + "] not found for store [" + store.getId() + "]");
         }
 
@@ -147,9 +140,6 @@ public class ManufacturerFacadeImpl implements ManufacturerFacade {
 
         ReadableManufacturerList readableList = new ReadableManufacturerList();
         try {
-            /**
-             * Is this a pageable request
-             */
 
             List<Manufacturer> manufacturers = null;
             if (page == 0 && count == 0) {
@@ -179,7 +169,7 @@ public class ManufacturerFacadeImpl implements ManufacturerFacade {
 
 
             ReadableManufacturerPopulator populator = new ReadableManufacturerPopulator();
-            List<ReadableManufacturer> returnList = new ArrayList<ReadableManufacturer>();
+            List<ReadableManufacturer> returnList = new ArrayList<>();
 
             for (Manufacturer m : manufacturers) {
                 ReadableManufacturer readableManufacturer = new ReadableManufacturer();
@@ -215,9 +205,6 @@ public class ManufacturerFacadeImpl implements ManufacturerFacade {
         ReadableManufacturerList readableList = new ReadableManufacturerList();
 
         try {
-            /**
-             * Is this a pageable request
-             */
 
             List<Manufacturer> manufacturers = null;
 
@@ -235,7 +222,7 @@ public class ManufacturerFacadeImpl implements ManufacturerFacade {
 
 
             ReadableManufacturerPopulator populator = new ReadableManufacturerPopulator();
-            List<ReadableManufacturer> returnList = new ArrayList<ReadableManufacturer>();
+            List<ReadableManufacturer> returnList = new ArrayList<>();
 
             for (Manufacturer mf : manufacturers) {
                 ReadableManufacturer readableManufacturer = new ReadableManufacturer();

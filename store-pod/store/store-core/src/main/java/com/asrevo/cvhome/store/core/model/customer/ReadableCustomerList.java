@@ -19,6 +19,6 @@ public class ReadableCustomerList extends ReadableList implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private List<ReadableCustomer> customers = new ArrayList<ReadableCustomer>();
+    private List<ReadableCustomer> customers = new ArrayList<>();
 
 }

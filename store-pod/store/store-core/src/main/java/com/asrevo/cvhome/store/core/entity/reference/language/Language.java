@@ -50,7 +50,7 @@ public class Language extends SalesManagerEntity<Integer, Language> implements A
 
     @JsonIgnore
     @ManyToMany(mappedBy = "languages", targetEntity = MerchantStore.class, fetch = FetchType.LAZY)
-    private List<MerchantStore> stores = new ArrayList<MerchantStore>();
+    private List<MerchantStore> stores = new ArrayList<>();
 
     public Language() {
     }
@@ -64,11 +64,10 @@ public class Language extends SalesManagerEntity<Integer, Language> implements A
     public boolean equals(Object obj) {
         if (null == obj)
             return false;
-        if (!(obj instanceof Language)) {
+        if (!(obj instanceof Language language)) {
             return false;
         } else {
-            Language language = (Language) obj;
-            return (this.id == language.getId());
+            return (this.id.equals(language.getId()));
         }
     }
 }

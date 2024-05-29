@@ -58,7 +58,7 @@ public class ReadableProductVariantMapper implements Mapper<ProductVariant, Read
             destination = new ReadableProductVariant();
         }
 
-        destination.setSortOrder(source.getSortOrder() != null ? source.getSortOrder().intValue() : 0);
+        destination.setSortOrder(source.getSortOrder() != null ? source.getSortOrder() : 0);
         destination.setAvailable(source.isAvailable());
         destination.setDateAvailable(DateUtil.formatDate(source.getDateAvailable()));
         destination.setId(source.getId());

@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.store.core.model.catalog.product.product.definition;
 
-import com.asrevo.cvhome.store.core.model.catalog.product.product.ProductSpecification;
 import com.asrevo.cvhome.commons.domain.Entity;
+import com.asrevo.cvhome.store.core.model.catalog.product.product.ProductSpecification;
 import lombok.Getter;
 import lombok.Setter;
 

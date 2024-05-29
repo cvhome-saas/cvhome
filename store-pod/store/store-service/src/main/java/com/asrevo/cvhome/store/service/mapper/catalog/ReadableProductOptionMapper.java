@@ -30,7 +30,7 @@ public class ReadableProductOptionMapper implements Mapper<ProductOption, Readab
         ReadableProductOptionEntity readableProductOption = new ReadableProductOptionEntity();
         if (language == null) {
             readableProductOption = new ReadableProductOptionFull();
-            List<com.asrevo.cvhome.store.core.model.catalog.product.attribute.ProductOptionDescription> descriptions = new ArrayList<com.asrevo.cvhome.store.core.model.catalog.product.attribute.ProductOptionDescription>();
+            List<com.asrevo.cvhome.store.core.model.catalog.product.attribute.ProductOptionDescription> descriptions = new ArrayList<>();
             for (ProductOptionDescription desc : source.getDescriptions()) {
                 com.asrevo.cvhome.store.core.model.catalog.product.attribute.ProductOptionDescription d = this.description(desc);
                 descriptions.add(d);
@@ -40,7 +40,7 @@ public class ReadableProductOptionMapper implements Mapper<ProductOption, Readab
             readableProductOption = new ReadableProductOptionEntity();
             if (!CollectionUtils.isEmpty(source.getDescriptions())) {
                 for (ProductOptionDescription desc : source.getDescriptions()) {
-                    if (desc != null && desc.getLanguage() != null && desc.getLanguage().getId() == language.getId()) {
+                    if (desc != null && desc.getLanguage() != null && desc.getLanguage().getId().equals(language.getId())) {
                         com.asrevo.cvhome.store.core.model.catalog.product.attribute.ProductOptionDescription d = this.description(desc);
                         readableProductOption.setDescription(d);
                     }

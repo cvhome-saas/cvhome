@@ -5,22 +5,23 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serial;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 @Setter
-public class PersistableUser extends UserEntity {
+public class PersistableUser extends UserEntity implements Serializable {
 
-	/**
-	 *
-	 */
-	@Serial
-	private static final long serialVersionUID = 1L;
-	private String password;
-	private String repeatPassword;
-	private String store;
-	private String userName;
-	private boolean active;
-	private List<PersistableGroup> groups = new ArrayList<>();
+    /**
+     *
+     */
+    @Serial
+    private static final long serialVersionUID = 1L;
+    private String password;
+    private String repeatPassword;
+    private String store;
+    private String userName;
+    private boolean active;
+    private List<PersistableGroup> groups = new ArrayList<>();
 }

@@ -44,7 +44,7 @@ public class ContentRepositoryImpl implements ContentRepositoryCustom {
         @SuppressWarnings("unchecked")
         List<Content> contents = q.getResultList();
 
-        List<ContentDescription> descriptions = new ArrayList<ContentDescription>();
+        List<ContentDescription> descriptions = new ArrayList<>();
         for (Content c : contents) {
             String name = c.getDescription().getName();
             String url = c.getDescription().getSeUrl();

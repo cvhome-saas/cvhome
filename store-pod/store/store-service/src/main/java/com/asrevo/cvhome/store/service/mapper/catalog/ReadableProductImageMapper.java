@@ -31,7 +31,7 @@ public class ReadableProductImageMapper implements Mapper<ProductImage, Readable
 
         destination.setImageName(source.getProductImage());
         destination.setDefaultImage(source.isDefaultImage());
-        destination.setOrder(source.getSortOrder() != null ? source.getSortOrder().intValue() : 0);
+        destination.setOrder(source.getSortOrder() != null ? source.getSortOrder() : 0);
 
         if (source.getImageType() == 1 && source.getProductImageUrl() != null) {
             destination.setImageUrl(source.getProductImageUrl());

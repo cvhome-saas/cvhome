@@ -113,9 +113,6 @@ public class StoreFacadeImpl implements StoreFacade {
     private ReadableMerchantStore convertMerchantStoreToReadableMerchantStore(Language language, MerchantStore store) {
         ReadableMerchantStore readable = new ReadableMerchantStore();
 
-        /**
-         * Language is not important for this conversion using default language
-         */
         try {
             readableMerchantStorePopulator.populate(store, readable, store, language);
         } catch (Exception e) {
@@ -128,9 +125,6 @@ public class StoreFacadeImpl implements StoreFacade {
         ReadableMerchantStore readable = new ReadableMerchantStore();
 
 
-        /**
-         * Language is not important for this conversion using default language
-         */
         try {
             readableMerchantStorePopulator.populate(store, readable, store, language);
         } catch (Exception e) {
@@ -295,7 +289,7 @@ public class StoreFacadeImpl implements StoreFacade {
         List<MerchantConfiguration> configurations = getMergeConfigurationsByStore(MerchantConfigurationType.SOCIAL,
                 mStore);
 
-        return configurations.stream().map(config -> convertToMerchantConfigEntity(config))
+        return configurations.stream().map(this::convertToMerchantConfigEntity)
                 .collect(Collectors.toList());
     }
 
@@ -314,7 +308,7 @@ public class StoreFacadeImpl implements StoreFacade {
         configTO.setKey(config.getKey());
         configTO.setType(config.getMerchantConfigurationType());
         configTO.setValue(config.getValue());
-        configTO.setActive(config.getActive() != null ? config.getActive().booleanValue() : false);
+        configTO.setActive(config.getActive() != null ? config.getActive() : false);
         return configTO;
     }
 
@@ -325,7 +319,7 @@ public class StoreFacadeImpl implements StoreFacade {
         configTO.setKey(config.getKey());
         configTO.setMerchantConfigurationType(configurationType);
         configTO.setValue(config.getValue());
-        configTO.setActive(Boolean.valueOf(config.isActive()));
+        configTO.setActive(config.isActive());
         return configTO;
     }
 
@@ -422,7 +416,7 @@ public class StoreFacadeImpl implements StoreFacade {
 
         List<MerchantConfiguration> configurations = createdConfigs.stream()
                 .map(config -> convertToMerchantConfiguration(config, MerchantConfigurationType.SOCIAL))
-                .collect(Collectors.toList());
+                .toList();
         try {
             for (MerchantConfiguration mConfigs : configurations) {
                 mConfigs.setMerchantStore(mStore);
@@ -459,7 +453,7 @@ public class StoreFacadeImpl implements StoreFacade {
 
 
             Page<MerchantStore> children = merchantStoreService.listChildren(code, page, count);
-            List<ReadableMerchantStore> readableStores = new ArrayList<ReadableMerchantStore>();
+            List<ReadableMerchantStore> readableStores = new ArrayList<>();
             ReadableMerchantStoreList readableList = new ReadableMerchantStoreList();
             if (!CollectionUtils.isEmpty(children.getContent())) {
                 for (MerchantStore store : children)
@@ -493,7 +487,7 @@ public class StoreFacadeImpl implements StoreFacade {
 
         try {
             Page<MerchantStore> stores = null;
-            List<ReadableMerchantStore> readableStores = new ArrayList<ReadableMerchantStore>();
+            List<ReadableMerchantStore> readableStores = new ArrayList<>();
             ReadableMerchantStoreList readableList = new ReadableMerchantStoreList();
 
             Optional<String> code = Optional.ofNullable(criteria.getStoreCode());
@@ -552,11 +546,11 @@ public class StoreFacadeImpl implements StoreFacade {
             if (code.isPresent()) {
 
                 stores = merchantStoreService.findAllStoreNames(code.get()).stream()
-                        .map(s -> convertStoreName(s))
+                        .map(this::convertStoreName)
                         .collect(Collectors.toList());
             } else {
                 stores = merchantStoreService.findAllStoreNames().stream()
-                        .map(s -> convertStoreName(s))
+                        .map(this::convertStoreName)
                         .collect(Collectors.toList());
             }
 

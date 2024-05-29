@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.store.core.model.catalog.product;
 
-import com.asrevo.cvhome.store.core.model.catalog.product.group.ProductGroup;
 import com.asrevo.cvhome.commons.domain.ReadableList;
+import com.asrevo.cvhome.store.core.model.catalog.product.group.ProductGroup;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,6 +22,6 @@ public class ReadableProductList extends ReadableList {
 
     private ProductGroup productGroup;
 
-    private List<ReadableProduct> products = new ArrayList<ReadableProduct>();
+    private List<ReadableProduct> products = new ArrayList<>();
 
 }

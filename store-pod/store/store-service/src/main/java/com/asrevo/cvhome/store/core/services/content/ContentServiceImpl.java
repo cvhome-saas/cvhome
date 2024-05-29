@@ -244,7 +244,6 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
      * {@link CMSContentImage} and will store them for given merchant store.
      *
      * @param merchantStoreCode Merchant store
-     * @param contentImagesList list of {@link CMSContentImage} being stored
      * @throws ServiceException service exception
      */
     @Override
@@ -280,9 +279,6 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
      * system based on there name. Name will be used to search given image for
      * removal
      *
-     * @param contentImage
-     * @param merchantStoreCode merchant store
-     * @throws ServiceException
      */
     @Override
     public void removeFile(String merchantStoreCode, FileContentType fileContentType, String fileName)
@@ -319,8 +315,6 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
      * store as an input and will remove all images associated with given
      * merchant store.
      *
-     * @param merchantStoreCode
-     * @throws ServiceException
      */
     @Override
     public void removeFiles(String merchantStoreCode) throws ServiceException {
@@ -339,10 +333,7 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
      * with given name found for requested Merchant Store in Infinispan tree
      * cache.
      *
-     * @param store     Merchant merchantStoreCode
-     * @param imageName name of requested image
-     * @return {@link OutputContentImage}
-     * @throws ServiceException
+     * @return {@link OutputContentFile}
      */
     @Override
     public OutputContentFile getContentFile(String merchantStoreCode, FileContentType fileContentType, String fileName)
@@ -364,9 +355,7 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
      * no image is associated with given Merchant Store in Infinispan tree
      * cache.
      *
-     * @param merchantStoreId Merchant store
-     * @return list of {@link OutputContentImage}
-     * @throws ServiceException
+     * @return list of {@link List<OutputContentFile>}
      */
     @Override
     public List<OutputContentFile> getContentFiles(String merchantStoreCode, FileContentType fileContentType)
@@ -382,10 +371,7 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
     /**
      * Returns the image names for a given merchant and store
      *
-     * @param merchantStoreCode
-     * @param imageContentType
      * @return images name list
-     * @throws ServiceException
      */
     @Override
     public List<String> getContentFilesNames(String merchantStoreCode, FileContentType fileContentType)

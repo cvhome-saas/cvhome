@@ -141,7 +141,7 @@ public class TransactionServiceImpl extends SalesManagerEntityServiceImpl<Long, 
     public Transaction getRefundableTransaction(Order order)
             throws ServiceException {
         List<Transaction> transactions = transactionRepository.findByOrder(order.getId());
-        Map<String, Transaction> finalTransactions = new HashMap<String, Transaction>();
+        Map<String, Transaction> finalTransactions = new HashMap<>();
         Transaction finalTransaction = null;
         for (Transaction transaction : transactions) {
             if (transaction.getTransactionType().name().equals(TransactionType.AUTHORIZECAPTURE.name())) {

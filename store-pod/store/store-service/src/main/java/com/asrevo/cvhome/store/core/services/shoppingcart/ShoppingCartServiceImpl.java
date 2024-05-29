@@ -146,11 +146,6 @@ public class ShoppingCartServiceImpl extends SalesManagerEntityServiceImpl<Long,
 
     }
 
-    /**
-     * Get a {@link ShoppingCart} for a given id. Will update the shopping cart
-     * prices and items based on the actual inventory. This method will remove the
-     * shopping cart if no items are attached.
-     */
     /*
      * @Override
      *
@@ -354,9 +349,6 @@ public class ShoppingCartServiceImpl extends SalesManagerEntityServiceImpl<Long,
 
     @Override
     public List<ShippingProduct> createShippingProduct(final ShoppingCart cart) throws ServiceException {
-        /**
-         * Determines if products are virtual
-         */
         Set<ShoppingCartItem> items = cart.getLineItems();
         List<ShippingProduct> shippingProducts = null;
         for (ShoppingCartItem item : items) {

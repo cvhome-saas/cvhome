@@ -15,7 +15,7 @@ public class CacheUtils {
     //	@TODO ASHRAF
 //    @Autowired
 //    @Qualifier("serviceCache")
-    private Cache cache = new ConcurrentMapCache("ashraf-checks");
+    private final Cache cache = new ConcurrentMapCache("ashraf-checks");
 
     public void putInCache(Object object, String keyName) throws Exception {
 

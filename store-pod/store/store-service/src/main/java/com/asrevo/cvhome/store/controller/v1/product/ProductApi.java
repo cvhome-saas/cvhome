@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.store.controller.v1.product;
 
 import com.asrevo.cvhome.commons.annotation.SecuredResource;
+import com.asrevo.cvhome.commons.domain.Entity;
 import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
 import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
 import com.asrevo.cvhome.store.controller.exception.UnauthorizedException;
@@ -14,7 +15,6 @@ import com.asrevo.cvhome.store.core.model.catalog.product.LightPersistableProduc
 import com.asrevo.cvhome.store.core.model.catalog.product.ReadableProduct;
 import com.asrevo.cvhome.store.core.model.catalog.product.ReadableProductList;
 import com.asrevo.cvhome.store.core.model.catalog.product.product.PersistableProduct;
-import com.asrevo.cvhome.commons.domain.Entity;
 import com.asrevo.cvhome.store.core.model.entity.EntityExists;
 import com.asrevo.cvhome.store.core.services.catalog.category.CategoryService;
 import com.asrevo.cvhome.store.core.services.catalog.product.ProductService;
@@ -64,22 +64,17 @@ public class ProductApi {
     private final ProductService productService;
     private final ProductFacade productFacade;
     private final ProductCommonFacade productCommonFacade;
-    private final ImageFilePath imageUtils;
 
     public ProductApi(CategoryService categoryService, ProductService productService, ProductFacade productFacade, ProductCommonFacade productCommonFacade, ImageFilePath imageUtils) {
         this.categoryService = categoryService;
         this.productService = productService;
         this.productFacade = productFacade;
         this.productCommonFacade = productCommonFacade;
-        this.imageUtils = imageUtils;
     }
 
     /**
      * Create product
      *
-     * @param product
-     * @param merchantStore
-     * @param language
      * @return Entity
      */
     @ResponseStatus(HttpStatus.CREATED)
@@ -108,7 +103,7 @@ public class ProductApi {
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
-    @Operation(method = "PUT", description = "Update product", summary = "",
+    @Operation(method = "PUT", description = "Update product",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = PersistableProduct.class)))
     )
     public void update(@PathVariable Long id,
@@ -139,7 +134,7 @@ public class ProductApi {
     @ResponseStatus(HttpStatus.OK)
     @PatchMapping(value = "/private/product/{id}", produces = {APPLICATION_JSON_VALUE})
     @Operation(method = "PATCH", description = "Update product inventory", summary = "Updates product inventory",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = Void.class)))
+            responses = @ApiResponse(content = @Content(schema = @Schema()))
     )
     @Parameters({
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
@@ -173,10 +168,6 @@ public class ProductApi {
      * &start=0 NOT REQUIRED, can be used for pagination &count=10 NOT REQUIRED, can
      * be used to limit item count
      *
-     * @param request
-     * @param response
-     * @return
-     * @throws Exception
      */
     @RequestMapping(value = "/products", method = RequestMethod.GET)
     @ResponseBody
@@ -223,7 +214,7 @@ public class ProductApi {
             criteria.setStatus(status);
         }
         // Start Category handling
-        List<Long> categoryIds = new ArrayList<Long>();
+        List<Long> categoryIds = new ArrayList<>();
         if (slug != null) {
             Category categoryBySlug = categoryService.getBySeUrl(merchantStore, slug, language);
             categoryIds.add(categoryBySlug.getId());
@@ -289,73 +280,8 @@ public class ProductApi {
 
     /**
      * API for getting a product
-     * Removed in 3.2.5 in favor of /product/sku
      *
-     * @param id
-     * @param lang     ?lang=fr|en|...
-     * @param response
-     * @return ReadableProduct
-     * @throws Exception
-     *                   <p>
-     *                   /api/product/123
-     */
-    /**
-     @RequestMapping(value = {"/product/{id}","/products/{id}"}, method = RequestMethod.GET)
-     @Operation(method = "GET", value = "Get a product by id", notes = "For administration and shop purpose. Specifying ?merchant is required otherwise it falls back to DEFAULT")
-     @ApiResponses(value = {
-     @ApiResponse(code = 200, message = "Single product found", response = ReadableProduct.class) })
-     @ResponseBody
-     @Parameters({
-     @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_STORE)),
-     @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
-     })
-     public ReadableProduct get(@PathVariable final Long id, @RequestParam(value = "lang", required = false) String lang,
-     @Parameter(hidden = true) MerchantStore merchantStore, @Parameter(hidden = true) Language language, HttpServletResponse response)
-     throws Exception {
-     ReadableProduct product = productCommonFacade.getProduct(merchantStore, id, language);
-
-     if (product == null) {
-     response.sendError(404, "Product not fount for id " + id);
-     return null;
-     }
-
-     return product;
-     }
-     **/
-
-    /**
-     * Price calculation
-     * @param id
-     * @param variants
-     * @param merchantStore
-     * @param language
-     * @return
-     */
-    /**
-     @RequestMapping(value = "/product/{id}/price", method = RequestMethod.POST)
-     @Operation(method = "POST", value = "Calculate product price with variants", notes = "Product price calculation from variants")
-     @ApiResponses(value = {
-     @ApiResponse(code = 200, message = "Price calculated", response = ReadableProductPrice.class) })
-     @ResponseBody
-     @Parameters({
-     @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_STORE)),
-     @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
-     })
-     public ReadableProductPrice price(@PathVariable final Long id,
-     @RequestBody ProductPriceRequest variants,
-     @Parameter(hidden = true) MerchantStore merchantStore, @Parameter(hidden = true) Language language) {
-
-     return productFacade.getProductPrice(id, variants, merchantStore, language);
-
-     }
-     **/
-
-    /**
-     * API for getting a product
-     *
-     * @param friendlyUrl
      * @param lang        ?lang=fr|en
-     * @param response
      * @return ReadableProduct
      * @throws Exception <p>
      *                   /api/product/123
@@ -390,14 +316,14 @@ public class ProductApi {
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
-    @Operation(method = "GET", description = "Check if product code already exists", summary = "",
+    @Operation(method = "GET", description = "Check if product code already exists",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = EntityExists.class)))
     )
     public ResponseEntity<EntityExists> exists(@RequestParam(value = "code") String code,
                                                @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore, @Parameter(hidden = true) Language language) {
 
         boolean exists = productCommonFacade.exists(code, merchantStore);
-        return new ResponseEntity<EntityExists>(new EntityExists(exists), HttpStatus.OK);
+        return new ResponseEntity<>(new EntityExists(exists), HttpStatus.OK);
 
     }
 
@@ -484,11 +410,6 @@ public class ProductApi {
     /**
      * Change product sort order
      *
-     * @param id
-     * @param position
-     * @param merchantStore
-     * @param language
-     * @throws IOException
      */
 
     @ResponseStatus(HttpStatus.OK)
@@ -511,14 +432,11 @@ public class ProductApi {
                         "Product [" + id + "] not found for merchant [" + merchantStore.getCode() + "]");
             }
 
-            if (p.getMerchantStore().getId() != merchantStore.getId()) {
+            if (!p.getMerchantStore().getId().equals(merchantStore.getId())) {
                 throw new ResourceNotFoundException(
                         "Product [" + id + "] not found for merchant [" + merchantStore.getCode() + "]");
             }
 
-            /**
-             * Change order
-             */
             p.setSortOrder(position);
 
         } catch (Exception e) {

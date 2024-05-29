@@ -29,7 +29,7 @@ public class PersistableProductOptionMapper implements Mapper<PersistableProduct
         desc.setId(null);
         desc.setDescription(description.getDescription());
         desc.setName(description.getName());
-        if (description.getId() != null && description.getId().longValue() > 0) {
+        if (description.getId() != null && description.getId() > 0) {
             desc.setId(description.getId());
         }
         Language lang = languageService.getByCode(description.getLanguage());

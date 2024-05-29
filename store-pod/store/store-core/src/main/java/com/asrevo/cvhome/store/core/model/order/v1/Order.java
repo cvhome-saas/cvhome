@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.store.core.model.order.v1;
 
-import com.asrevo.cvhome.store.core.entity.order.attributes.OrderAttribute;
 import com.asrevo.cvhome.commons.domain.Entity;
+import com.asrevo.cvhome.store.core.entity.order.attributes.OrderAttribute;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,7 +22,7 @@ public class Order extends Entity {
     private boolean customerAgreement;
     private String comments;
     private String currency;
-    private List<OrderAttribute> attributes = new ArrayList<OrderAttribute>();
+    private List<OrderAttribute> attributes = new ArrayList<>();
 
 
 }

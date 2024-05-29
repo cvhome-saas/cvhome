@@ -22,15 +22,12 @@ public class LocaleUtils {
      * Creates a Locale object for currency format only with country code
      * This method ignoes the language
      *
-     * @param store
-     * @return
      */
     public static Locale getLocale(MerchantStore store) {
 
         Locale defaultLocale = Constants.DEFAULT_LOCALE;
         Locale[] locales = Locale.getAvailableLocales();
-        for (int i = 0; i < locales.length; i++) {
-            Locale l = locales[i];
+        for (Locale l : locales) {
             try {
                 if (l.toLanguageTag().equals(store.getDefaultLanguage().getCode())) {
                     defaultLocale = l;

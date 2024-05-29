@@ -21,7 +21,7 @@ public class ReadableProductOption extends ProductPropertyOption {
     private String name;
     private String lang;
     private boolean variant;
-    private List<ReadableProductOptionValue> optionValues = new ArrayList<ReadableProductOptionValue>();
+    private List<ReadableProductOptionValue> optionValues = new ArrayList<>();
 
 
 }

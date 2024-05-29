@@ -53,7 +53,7 @@ public class ShoppingCartItem extends SalesManagerEntity<Long, ShoppingCartItem>
     private Long productId;
 
     //SKU
-    @Column(name = "SKU", nullable = true)
+    @Column(name = "SKU")
     private String sku;
 
     @JsonIgnore
@@ -61,9 +61,9 @@ public class ShoppingCartItem extends SalesManagerEntity<Long, ShoppingCartItem>
     private boolean productVirtual;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "shoppingCartItem")
-    private Set<ShoppingCartAttributeItem> attributes = new HashSet<ShoppingCartAttributeItem>();
+    private Set<ShoppingCartAttributeItem> attributes = new HashSet<>();
 
-    @Column(name = "PRODUCT_VARIANT", nullable = true)
+    @Column(name = "PRODUCT_VARIANT")
     private Long variant;
 
     @JsonIgnore

@@ -52,7 +52,6 @@ public interface ContentService
      *
      * @param merchantStoreCode merchant store whose content images are being saved.
      * @param contentFile       content image being stored
-     * @throws ServiceException
      */
     void addContentFile(String merchantStoreCode, InputContentFile contentFile)
             throws ServiceException;
@@ -63,8 +62,6 @@ public interface ContentService
      * Infinispan.
      *
      * @param merchantStoreCode merchant store whose content images are being saved.
-     * @param contentImagesList list of content images being stored.
-     * @throws ServiceException
      */
     void addContentFiles(String merchantStoreCode, List<InputContentFile> contentFilesList) throws ServiceException;
 
@@ -73,10 +70,6 @@ public interface ContentService
      * Method to remove given content image.Images are stored in underlying system based on there name.
      * Name will be used to search given image for removal
      *
-     * @param imageContentType
-     * @param imageName
-     * @param merchantStoreCode merchant store code
-     * @throws ServiceException
      */
     void removeFile(String merchantStoreCode, FileContentType fileContentType, String fileName) throws ServiceException;
 
@@ -84,8 +77,6 @@ public interface ContentService
      * Removes static file
      * FileType is no more important
      *
-     * @param storeCode
-     * @param filename
      */
     void removeFile(String storeCode, String filename) throws ServiceException;
 
@@ -93,18 +84,12 @@ public interface ContentService
      * Method to remove all images for a given merchant.It will take merchant store as an input and will
      * remove all images associated with given merchant store.
      *
-     * @param merchantStoreCode
-     * @throws ServiceException
      */
     void removeFiles(String merchantStoreCode) throws ServiceException;
 
     /**
      * Rename file
      *
-     * @param merchantStoreCode
-     * @param path
-     * @param originalName
-     * @param newName
      */
     void renameFile(String merchantStoreCode, FileContentType fileContentType, Optional<String> path, String originalName, String newName) throws ServiceException;
 
@@ -113,10 +98,7 @@ public interface ContentService
      * search in Infinispan tree cache and OutputContentImage will be sent, in case no image is found null will
      * returned.
      *
-     * @param merchantStoreCode
-     * @param imageName
-     * @return {@link OutputContentImage}
-     * @throws ServiceException
+     * @return {@link OutputContentFile}
      */
     OutputContentFile getContentFile(String merchantStoreCode, FileContentType fileContentType, String fileName)
             throws ServiceException;
@@ -125,10 +107,7 @@ public interface ContentService
     /**
      * Method to get list of all images associated with a given merchant store.In case of no image method will return an empty list.
      *
-     * @param merchantStoreCode
-     * @param imageContentType
-     * @return list of {@link OutputContentImage}
-     * @throws ServiceException
+     * @return list of {@link List<OutputContentFile>}
      */
     List<OutputContentFile> getContentFiles(String merchantStoreCode, FileContentType fileContentType)
             throws ServiceException;
@@ -140,18 +119,13 @@ public interface ContentService
     /**
      * Add the store logo
      *
-     * @param merchantStoreCode
-     * @param cmsContentImage
-     * @throws ServiceException
      */
     void addLogo(String merchantStoreCode, InputContentFile cmsContentImage)
             throws ServiceException;
+
     /**
      * Add the store banner
      *
-     * @param merchantStoreCode
-     * @param cmsContentImage
-     * @throws ServiceException
      */
     void addBanner(String merchantStoreCode, InputContentFile cmsContentImage)
             throws ServiceException;
@@ -159,9 +133,6 @@ public interface ContentService
     /**
      * Adds a property (option) image
      *
-     * @param merchantStoreId
-     * @param cmsContentImage
-     * @throws ServiceException
      */
     void addOptionImage(String merchantStoreCode, InputContentFile cmsContentImage)
             throws ServiceException;
@@ -187,11 +158,6 @@ public interface ContentService
      * Finds content for a specific Merchant for a specific ContentType where content
      * code is like a given prefix in a specific language
      *
-     * @param type
-     * @param codeLike
-     * @param store
-     * @param lamguage
-     * @return
      */
     List<Content> getByCodeLike(ContentType type, String codeLike, MerchantStore store, Language language);
 
