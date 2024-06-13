@@ -6,7 +6,10 @@ import {Store} from "@/types/store";
 export const LanguageListSelector = ({store, languages}: { store: Store, languages: Language[] }) => {
     const router = useRouter();
     const pathname = usePathname();
-    const switchLanguage = (it: Language) => router.push(pathname, {locale: it.lang});
+    const switchLanguage = (it: Language) => {
+
+        router.push(pathname, {locale: it.lang as any});
+    };
     return <ul>
         {
             languages.map(it => {
