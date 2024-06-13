@@ -34,6 +34,7 @@ include(
         'store-pod:store:store-core',
         'store-pod:store:store-events',
         'store-pod:store:store-service',
+        'store-pod:store:store-service-2',
         'store-pod:landing-ui',
 
         'store-core:commons',
