@@ -92,9 +92,9 @@ dependencyManagement {
 //tasks.withType(org.springframework.boot.gradle.tasks.aot.ProcessAot).configureEach {
 //    args('--spring.profiles.active=lcl')
 //}
-
-hibernate {
-    enhancement {
-        enableAssociationManagement = true
-    }
-}
+//
+//hibernate {
+//    enhancement {
+//        enableAssociationManagement = true
+//    }
+//}
