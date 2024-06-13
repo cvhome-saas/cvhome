@@ -32,6 +32,8 @@ public class Container {
     private String createdAt;
     @JsonProperty("StartedAt")
     private String startedAt;
+    @JsonProperty("LastRestartAt")
+    private String lastRestartAt;
     @JsonProperty("Type")
     private String type;
     @JsonProperty("LogDriver")
