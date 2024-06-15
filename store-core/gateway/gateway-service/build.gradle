@@ -58,6 +58,10 @@ dependencies {
     testImplementation 'org.testcontainers:junit-jupiter'
 }
 
+//tasks.withType(org.springframework.boot.gradle.tasks.aot.ProcessAot).configureEach {
+//    args('--spring.profiles.active=lcl')
+//}
+
 dependencyManagement {
     imports {
         mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
