@@ -24,17 +24,19 @@ public class EcsDiscoveryClient implements DiscoveryClient {
                                                                    EcsDiscoveryProperties properties,
                                                                    String serviceId) {
         log.info("getting services for {}", serviceId);
+        String extractedServiceId = extractServiceName(serviceId).orElse(serviceId);
+        String extractedNamespace = extractNamespace(serviceId).orElse(properties.getNamespace());
         DiscoverInstancesRequest request = DiscoverInstancesRequest
                 .builder()
-                .namespaceName(extractNamespace(serviceId).orElse(properties.getNamespace()))
-                .serviceName(extractServiceName(serviceId).orElse(serviceId)).build();
+                .namespaceName(extractedNamespace)
+                .serviceName(extractedServiceId).build();
         DiscoverInstancesResponse discoverInstancesResponse = discovery.discoverInstances(request);
         List<HttpInstanceSummary> instances = discoverInstancesResponse.instances();
-        log.info("getting {} services for {}", instances.size(), serviceId);
+        log.info("getting {} services for {} in namespace {}", instances.size(), extractedServiceId, extractedNamespace);
         return instances
                 .stream()
                 .map(instance -> {
-                    Integer defaultPort = properties.getServicePorts().getOrDefault(serviceId, properties.getDefaultPort());
+                    Integer defaultPort = properties.getServicePorts().getOrDefault(extractedServiceId, properties.getDefaultPort());
                     return (ServiceInstance) new CloudMapServiceInstance(instance, defaultPort);
                 })
                 .toList();
