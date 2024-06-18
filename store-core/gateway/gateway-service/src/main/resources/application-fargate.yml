@@ -19,6 +19,8 @@ spring:
           "manager": 7001
           "store-ui": 4200
     gateway:
+      x-forwarded:
+        for-append: false
       discovery:
         locator:
           enabled: true
