@@ -20,11 +20,11 @@ spring:
           "store-ui": 4200
     gateway:
       x-forwarded:
-        for-append: false
-        host-append: false
-        proto-append: false
-        port-append: false
-        prefix-append: false
+        for-enabled: false
+        host-enabled: false
+        proto-enabled: false
+        port-enabled: false
+        prefix-enabled: false
       discovery:
         locator:
           enabled: true
