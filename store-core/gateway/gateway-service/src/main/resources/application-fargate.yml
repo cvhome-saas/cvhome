@@ -23,11 +23,6 @@ spring:
       forwarded:
         enabled: false
       x-forwarded:
-        for-enabled: false
-        host-enabled: false
-        proto-enabled: false
-        port-enabled: false
-        prefix-enabled: false
         for-append: false
         host-append: false
         proto-append: false
