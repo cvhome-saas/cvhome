@@ -1,3 +1,4 @@
+
 spring:
   cloud:
     loadbalancer:
@@ -32,7 +33,6 @@ spring:
         proto-append: false
         port-append: false
         prefix-append: false
-        enabled: false
       discovery:
         locator:
           enabled: true
