@@ -27,15 +27,18 @@ public class EcsReactiveDiscoveryClient implements ReactiveDiscoveryClient {
                                                                    EcsDiscoveryProperties properties,
                                                                    String serviceId) {
         log.info("getting services for {}", serviceId);
+        String extractedServiceId = extractServiceName(serviceId).orElse(serviceId);
+        String extractedNamespace = extractNamespace(serviceId).orElse(properties.getNamespace());
         DiscoverInstancesRequest request = DiscoverInstancesRequest
                 .builder()
-                .namespaceName(extractNamespace(serviceId).orElse(properties.getNamespace()))
-                .serviceName(extractServiceName(serviceId).orElse(serviceId)).build();
+                .namespaceName(extractedNamespace)
+                .serviceName(extractedServiceId).build();
+
         return Mono.fromFuture(discoveryAsync.discoverInstances(request))
                 .map(DiscoverInstancesResponse::instances)
                 .doOnEach(it -> {
                     if (it.hasValue() && it.get() != null) {
-                        log.info("getting {} services for {}", it.get().size(), serviceId);
+                        log.info("getting {} services for {} in namespace {}", it.get().size(), extractedServiceId, extractedNamespace);
                     }
                 })
                 .flatMapMany(Flux::fromIterable)
