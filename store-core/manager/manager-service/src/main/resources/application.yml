@@ -4,7 +4,7 @@ com:
       app:
         domain: "gateway.com"
       saas:
-        domain: "gateway.click"
+        domain: saas.${com.asrevo.cvhome.app.domain}
       services:
         auth:
           name: auth
