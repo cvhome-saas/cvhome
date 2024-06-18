@@ -18,16 +18,9 @@ spring:
           "store-core-gateway": 7000
           "auth": 9999
           "manager": 7001
+          "store": 7101
           "store-ui": 4200
     gateway:
-      forwarded:
-        enabled: false
-      x-forwarded:
-        for-append: false
-        host-append: false
-        proto-append: false
-        port-append: false
-        prefix-append: false
       discovery:
         locator:
           enabled: true
@@ -38,7 +31,9 @@ spring:
       routes:
         - id: store
           order: -3
-          uri: ${com.asrevo.cvhome.services.store-pod-gateway.schema}://${com.asrevo.cvhome.services.store-pod-gateway.domain}:${com.asrevo.cvhome.services.store-pod-gateway.port}
+          uri: lb://store.store-pod.cvhome.lcl
+          filters:
+            - StripPrefix=1
           predicates:
             - Path=/store/**
         - id: manager
