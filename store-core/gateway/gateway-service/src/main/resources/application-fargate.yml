@@ -22,6 +22,11 @@ spring:
       forwarded:
         enabled: false
       x-forwarded:
+        for-enabled: false
+        host-enabled: false
+        proto-enabled: false
+        port-enabled: false
+        prefix-enabled: false
         enabled: false
       discovery:
         locator:
