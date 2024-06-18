@@ -21,6 +21,7 @@ spring:
     gateway:
       x-forwarded:
         for-append: false
+        host-append: false
       discovery:
         locator:
           enabled: true
