@@ -22,6 +22,9 @@ spring:
       x-forwarded:
         for-append: false
         host-append: false
+        proto-append: false
+        port-append: false
+        prefix-append: false
       discovery:
         locator:
           enabled: true
