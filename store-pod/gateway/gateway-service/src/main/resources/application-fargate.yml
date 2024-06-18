@@ -8,7 +8,7 @@ spring:
           - "landing-ui"
     ecs:
       discovery:
-        namespace: "store-pod.cvhome.lcl"
+        namespace: "store-pod-1.cvhome.lcl"
         namespace-id: "ns-je7qri6wn7fbsrpn"
         enabled: true
         default-port: 8080

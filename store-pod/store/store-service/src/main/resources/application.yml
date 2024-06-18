@@ -39,28 +39,28 @@ com:
           domain: ${com.asrevo.cvhome.saas.domain}
           port: 8443
           schema: https
-          namespace: saas-pod.cvhome.lcl
+          namespace: saas-pod-1.cvhome.lcl
           gateway-service-name: saas-pod-gateway
         store-pod-gateway:
           name: store-pod-gateway
           domain: store-pod-1.${com.asrevo.cvhome.app.domain}
           port: 7100
           schema: http
-          namespace: store-pod.cvhome.lcl
+          namespace: store-pod-1.cvhome.lcl
           gateway-service-name: store-pod-gateway
         store:
           name: store
           domain: store-pod-1.${com.asrevo.cvhome.app.domain}
           port: 7101
           schema: http
-          namespace: store-pod.cvhome.lcl
+          namespace: store-pod-1.cvhome.lcl
           gateway-service-name: store-pod-gateway
         landing-ui:
           name: landing-ui
           domain: store-pod-1.${com.asrevo.cvhome.app.domain}
           port: 7102
           schema: http
-          namespace: store-pod.cvhome.lcl
+          namespace: store-pod-1.cvhome.lcl
           gateway-service-name: store-pod-gateway
 spring:
   security:

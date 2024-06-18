@@ -31,7 +31,7 @@ spring:
       routes:
         - id: store
           order: -3
-          uri: lb://store.store-pod.cvhome.lcl
+          uri: lb://store.store-pod-1.cvhome.lcl
           filters:
             - StripPrefix=1
           predicates:
