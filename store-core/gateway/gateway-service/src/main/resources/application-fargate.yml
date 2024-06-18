@@ -19,12 +19,10 @@ spring:
           "manager": 7001
           "store-ui": 4200
     gateway:
+      forwarded:
+        enabled: false
       x-forwarded:
-        for-enabled: false
-        host-enabled: false
-        proto-enabled: false
-        port-enabled: false
-        prefix-enabled: false
+        enabled: false
       discovery:
         locator:
           enabled: true
