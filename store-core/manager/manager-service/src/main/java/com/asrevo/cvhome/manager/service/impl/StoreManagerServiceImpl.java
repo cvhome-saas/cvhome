@@ -43,7 +43,7 @@ public class StoreManagerServiceImpl implements StoreManagerService {
     public Mono<Void> createStore(IdentityId identityId, Map<Object, Object> request) {
         CreateManagerStoreRequest storeRequest = managerStoreMappers.toCreateStoreRequest(request);
         ManagerStoreDto store = internalStoreService.createStore(storeRequest, identityId);
-        Domain suggestedSubDomain = new Domain(storeRequest.name() + "." + saasProperties.getDefaultDomain());
+        Domain suggestedSubDomain = new Domain(storeRequest.name() + "." + saasProperties.domain());
         routerService.create(suggestedSubDomain, store.id());
         internalStoreService.syncInRouter(store.id());
         Map<Object, Object> newRequest = managerStoreMappers.toExternalCreateRequest(request, store.id().getId().toString());

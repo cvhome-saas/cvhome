@@ -8,6 +8,6 @@ import org.springframework.context.annotation.Import;
 
 @Configuration
 @Import({EventProcessorConfig.class, CommandProcessorConfig.class, EcsInfoConfig.class, JacksonConfig.class, SwaggerConfig.class, WebConfig.class, WebClientServicesConfig.class, ReactiveGatewayConfig.class})
-@EnableConfigurationProperties({ServiceDomainProperties.class, SaasProperties.class, CdnProperties.class, StoreProperties.class, StoreProductImageProperties.class, CdnStorageProperties.class})
+@EnableConfigurationProperties({ServiceDomainProperties.class, SaasProperties.class,AppProperties.class, CdnProperties.class, StoreProperties.class, StoreProductImageProperties.class, CdnStorageProperties.class})
 public class CvhomeSharedConfig {
 }

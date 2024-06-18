@@ -6,6 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @Getter
 @Setter
-@ConfigurationProperties("com.asrevo.cvhome.saas")
-public record SaasProperties(String domain) {
+@ConfigurationProperties("com.asrevo.cvhome.app")
+public class AppProperties {
+    private String domain;
 }
