@@ -1,24 +1,17 @@
-https:// {
-	respond "Goodbye, world! https"
-}
-http:// {
-	respond "Goodbye, world! http"
-}
+ {
+ 		on_demand_tls {
+ 			ask {$ASK_TLS_URL}
 
-# {
-# 		on_demand_tls {
-# 			ask {$ASK_TLS_URL}
-#
-# 			burst 5
-# 			interval 2m
-# 		}
-# }
-#
-#
-# https:// {
-# 	tls {
-# 		on_demand
-# 	}
-#     reverse_proxy {$STORE_POD_GATEWAY}
-#
-# }
+ 			burst 5
+ 			interval 2m
+ 		}
+ }
+
+
+ https:// {
+ 	tls {
+ 		on_demand
+ 	}
+     reverse_proxy {$STORE_POD_GATEWAY}
+
+ }
