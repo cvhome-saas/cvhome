@@ -39,9 +39,9 @@ include(
         'store-core:commons',
 //        'store-core:auth',
 //        'store-core:gateway:gateway-service',
-        'store-core:manager:manager-commons',
-        'store-core:manager:manager-events',
-        'store-core:manager:manager-service',
+//        'store-core:manager:manager-commons',
+//        'store-core:manager:manager-events',
+//        'store-core:manager:manager-service',
 //        'store-core:store-ui',
 
         'saas-pod:gateway:gateway-service-v2',
