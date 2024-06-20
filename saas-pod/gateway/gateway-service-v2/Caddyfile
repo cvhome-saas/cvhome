@@ -1,7 +1,7 @@
-log {
-	output stderr
-	level DEBUG
-	format console
+{
+        log {
+                format json
+        }
 }
 
  {
