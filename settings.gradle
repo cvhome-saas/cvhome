@@ -44,6 +44,6 @@ include(
 //        'store-core:manager:manager-service',
 //        'store-core:store-ui',
 
-        'saas-pod:gateway:gateway-service-v2',
+//        'saas-pod:gateway:gateway-service-v2',
 
 )
