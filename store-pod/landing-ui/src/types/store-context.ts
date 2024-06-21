@@ -10,13 +10,16 @@ export interface StoreContext {
 }
 
 export const extractStoreContext = (headers: ReadonlyHeaders, cookie: ReadonlyRequestCookies, local: string): StoreContext => {
-    return {
+    const sc:StoreContext = {
         store: headers.get("store") || "",
         host: headers.get("x-forwarded-host") || "",
         schema: headers.get("x-forwarded-proto") || "",
         local: local ? local : cookie.get('NEXT_LOCALE' as any)?.value,
         baseUrl: headers.get("x-forwarded-proto") || "" + "://" + headers.get("x-forwarded-host") || "",
-    }
+    };
+    console.log("********************** headers *****************")
+    console.log(JSON.stringify(sc))
+    return sc
 }
 export const baseServiceUrl = (storeContext: StoreContext, service: string): string => {
     return  "https://store-pod-1.asrevo.com/" + service;
