@@ -114,7 +114,7 @@ public class AddStoreParamGatewayFilterFactory extends AbstractGatewayFilterFact
     }
 
     private static String extractHostName(ServerHttpRequest request) {
-        return Optional.ofNullable(request.getHeaders().getHost()).map(InetSocketAddress::getHostName).orElse(null);
+        return request.getHeaders().getFirst("Store-Host");
     }
 
     @Override
