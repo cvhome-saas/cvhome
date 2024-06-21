@@ -35,6 +35,5 @@ spring:
                 addRequestHeader: true
                 addResponseHeader: true
       x-forwarded:
-        proto-append: false
         host-append: false
         for-append: false
