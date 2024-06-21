@@ -12,7 +12,6 @@
 }
 
 http:// {
-	log
 	respond "welcome http" 200
 }
 
