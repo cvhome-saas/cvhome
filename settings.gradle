@@ -34,7 +34,7 @@ include(
 //        'store-pod:store:store-core',
 //        'store-pod:store:store-events',
 //        'store-pod:store:store-service',
-//        'store-pod:landing-ui',
+        'store-pod:landing-ui',
 //
         'store-core:commons',
 //        'store-core:auth',

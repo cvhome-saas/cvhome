@@ -20,6 +20,7 @@ import reactor.core.publisher.Mono;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 
@@ -30,6 +31,7 @@ public class AddStoreParamGatewayFilterFactory extends AbstractGatewayFilterFact
     private static final String STORE_ID_PARAM = "store";
     private static final String STORE_ID_HEADER = "store";
     private static final String STORE_ID_COOKIE = "store";
+    public static final String CADDY_STORE_HOST_KEY = "Store-Host";
     private final CachedRouterService router;
 
 
@@ -114,7 +116,7 @@ public class AddStoreParamGatewayFilterFactory extends AbstractGatewayFilterFact
     }
 
     private static String extractHostName(ServerHttpRequest request) {
-        return Optional.ofNullable(request.getHeaders().getFirst("Store-Host"))
+        return Optional.ofNullable(request.getHeaders().getFirst(CADDY_STORE_HOST_KEY))
                 .orElseGet(() ->
                         Optional.ofNullable(request.getHeaders().getHost())
                                 .map(InetSocketAddress::getHostName)
@@ -126,8 +128,10 @@ public class AddStoreParamGatewayFilterFactory extends AbstractGatewayFilterFact
         return (exchange, chain) -> {
             ServerHttpRequest request = exchange.getRequest();
             String store = getStore(request);
+            log.info("get store {} is null {}", store, Objects.isNull(store));
             if (store == null) {
                 String hostName = extractHostName(request);
+                log.info("get hostName {} is null {} is valid {}", hostName, Objects.isNull(hostName), isValidHostName(hostName));
                 if (isValidHostName(hostName)) {
                     return mapHostToStoreParam(hostName)
                             .flatMap(it -> execute(config, exchange, chain, it));
@@ -168,7 +172,12 @@ public class AddStoreParamGatewayFilterFactory extends AbstractGatewayFilterFact
     }
 
     private Mono<String> mapHostToStoreParam(String host) {
-        return router.getAllocation(new Domain(host)).map(it -> it.getId().toString());
+        log.info("will get store param for host {}", host);
+        return router.getAllocation(new Domain(host)).map(it -> {
+            String storeId = it.getId().toString();
+            log.info("get store id {} for host {}", storeId, host);
+            return storeId;
+        });
     }
 
     @Getter

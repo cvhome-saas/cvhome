@@ -19,7 +19,7 @@ export const extractStoreContext = (headers: ReadonlyHeaders, cookie: ReadonlyRe
     }
 }
 export const baseServiceUrl = (storeContext: StoreContext, service: string): string => {
-    return storeContext.schema + "://" + storeContext.host + "/" + service;
+    return  "https://store-pod-1.asrevo.com/" + service;
 }
 
 export const storeBaseServiceUrl = (storeContext: StoreContext): string => {
