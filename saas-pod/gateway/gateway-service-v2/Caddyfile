@@ -22,7 +22,6 @@ https:// {
 		on_demand
 	}
 	reverse_proxy {$STORE_POD_GATEWAY} {
-    header_up Host store-pod-1.asrevo.com
     header_up Store-Host {http.request.host}
 	}
 }

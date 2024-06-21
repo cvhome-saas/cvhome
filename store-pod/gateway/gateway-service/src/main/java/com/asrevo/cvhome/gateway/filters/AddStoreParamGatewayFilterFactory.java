@@ -31,7 +31,6 @@ public class AddStoreParamGatewayFilterFactory extends AbstractGatewayFilterFact
     private static final String STORE_ID_PARAM = "store";
     private static final String STORE_ID_HEADER = "store";
     private static final String STORE_ID_COOKIE = "store";
-    public static final String CADDY_STORE_HOST_KEY = "Store-Host";
     private final CachedRouterService router;
 
 
@@ -116,11 +115,9 @@ public class AddStoreParamGatewayFilterFactory extends AbstractGatewayFilterFact
     }
 
     private static String extractHostName(ServerHttpRequest request) {
-        return Optional.ofNullable(request.getHeaders().getFirst(CADDY_STORE_HOST_KEY))
-                .orElseGet(() ->
-                        Optional.ofNullable(request.getHeaders().getHost())
+        return Optional.ofNullable(request.getHeaders().getHost())
                                 .map(InetSocketAddress::getHostName)
-                                .orElse(null));
+                                .orElse(null);
     }
 
     @Override
