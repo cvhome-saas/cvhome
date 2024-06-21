@@ -1,6 +1,7 @@
 {
 	log {
 		format json
+		level ERROR
 	}
 
 	on_demand_tls {
@@ -20,5 +21,8 @@ https:// {
 	tls {
 		on_demand
 	}
-	reverse_proxy {$STORE_POD_GATEWAY}
+	reverse_proxy {$STORE_POD_GATEWAY} {
+    header_up Host {$STORE_POD_GATEWAY}
+    header_up Store-Host {http.request.host}
+	}
 }
