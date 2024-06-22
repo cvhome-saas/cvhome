@@ -43,10 +43,13 @@ export class FilesComponent {
               thumb: src,
             }
           });
+          this.loadingList = false;
+        },
+        error:(e)=>{
+          this.loadingList = false;
         },
         complete: () => {
           this.images = [];
-          this.loadingList = false;
         }
       })
 
