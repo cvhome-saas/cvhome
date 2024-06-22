@@ -1,4 +1,7 @@
 {
+    debug
+    admin 0.0.0.0:2019
+
 	log {
 		format json
 		level ERROR
