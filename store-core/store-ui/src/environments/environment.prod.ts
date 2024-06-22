@@ -5,4 +5,25 @@
  */
 export const environment = {
   production: true,
+  //MARKETPLACE | BTB | STANDARD
+  mode: 'STANDARD',
+  //API URL
+  //apiUrl: "http://localhost:8080/api/api",
+  apiUrl: '',
+  shippingApi: '',
+  client: {
+    language: {
+      default: 'en',
+      array: [
+        'en',
+        'fr',
+        'ar',
+        'es',
+        'ru',
+      ],
+    },
+  },
+  LOGIN_URL: "/oauth2/authorization/keycloak",
+  LOGOUT_URL: "/logout"
+
 };

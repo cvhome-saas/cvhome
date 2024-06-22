@@ -12,7 +12,7 @@ task "build" {
     }
     exec {
       workingDir '.'
-      commandLine "npm", "run", "ng", "build"
+      commandLine "npm", "run", "ng", "build","--configuration", "production"
     }
   }
 }
