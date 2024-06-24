@@ -24,6 +24,7 @@ rootProject.name = 'cvhome'
 include(
         'commons:ecs-commons:fargate-task-info',
         'commons:ecs-commons:ecs-service-discoveryclient',
+        'commons:ecs-commons:dynamodb-session',
         'commons:cvhome-commons',
         'commons:keycloak-users',
         'commons:s2sc-commons',

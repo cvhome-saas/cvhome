@@ -1,0 +1,3 @@
+org.springframework.cloud.bootstrap.BootstrapConfiguration=\
+com.asrevo.cloud.ecs.discovery.EcsDiscoveryProperties ,\
+com.asrevo.cloud.local.discovery.LocalDiscoveryProperties
