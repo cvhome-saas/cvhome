@@ -1,8 +1,8 @@
 plugins {
     id 'com.asrevo.java-application-conventions'
-    id 'org.springframework.boot' version '3.3.0'
-    id 'io.spring.dependency-management' version '1.1.4'
-//    id 'org.hibernate.orm' version '6.4.4.Final'
+    id 'org.springframework.boot' version '3.3.1'
+    id 'io.spring.dependency-management' version '1.1.5'
+//    id 'org.hibernate.orm' version '6.5.2.Final'
 //    id 'org.graalvm.buildtools.native' version '0.10.2'
 }
 apply from: "$rootDir/helpers/common-methods.gradle"
@@ -39,7 +39,7 @@ bootBuildImage {
 }
 
 ext {
-    set('springCloudVersion', "2023.0.1")
+    set('springCloudVersion', "2023.0.2")
 }
 dependencies {
     implementation 'org.springframework.cloud:spring-cloud-starter-loadbalancer'
