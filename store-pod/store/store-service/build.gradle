@@ -55,8 +55,8 @@ dependencies {
 
     implementation 'software.amazon.awssdk:s3:2.25.31'
 
-    implementation 'commons-validator:commons-validator:1.8.0'
-    implementation 'commons-io:commons-io:2.15.1'
+    implementation 'commons-validator:commons-validator:1.9.0'
+    implementation 'commons-io:commons-io:2.16.1'
     implementation 'com.googlecode.json-simple:json-simple:1.1.1'
 
     implementation project(':commons:ecs-commons:fargate-task-info')
@@ -64,7 +64,7 @@ dependencies {
 
     implementation 'org.mapstruct:mapstruct:1.5.5.Final'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.4.0'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
 
     implementation project(':store-pod:store:store-core')
     implementation project(':store-pod:store:store-events')

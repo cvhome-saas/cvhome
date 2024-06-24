@@ -55,7 +55,7 @@ dependencies {
     implementation project(':commons:ecs-commons:fargate-task-info')
     implementation project(':commons:ecs-commons:ecs-service-discoveryclient')
 
-    implementation 'org.keycloak:keycloak-admin-client:24.0.0'
+    implementation 'org.keycloak:keycloak-admin-client:25.0.1'
 
     implementation 'org.mapstruct:mapstruct:1.5.5.Final'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
