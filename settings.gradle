@@ -30,20 +30,20 @@ include(
         'commons:s2sc-commons',
 
         'store-pod:commons',
-//        'store-pod:gateway:gateway-service',
+        'store-pod:gateway:gateway-service',
         'store-pod:store:store-commons',
         'store-pod:store:store-core',
         'store-pod:store:store-events',
-//        'store-pod:store:store-service',
-//        'store-pod:landing-ui',
-//
-//        'store-core:commons',
-//        'store-core:auth',
+        'store-pod:store:store-service',
+        'store-pod:landing-ui',
+
+        'store-core:commons',
+        'store-core:auth',
         'store-core:gateway:gateway-service',
         'store-core:manager:manager-commons',
         'store-core:manager:manager-events',
-//        'store-core:manager:manager-service',
-//        'store-core:store-ui',
+        'store-core:manager:manager-service',
+        'store-core:store-ui',
 
         'saas-pod:gateway:gateway-service-v2',
 
