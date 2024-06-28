@@ -172,9 +172,8 @@ public class WebClientServicesConfig {
         @Bean
         public WebClientBuilder webClientBuilder(Environment environment,
                                                  @Qualifier("defaultMicroServiceBuilder") WebClient.Builder defaultMicroServiceBuilder,
-                                                 @Qualifier("defaultWebMicroServiceBuilder") WebClient.Builder defaultWebMicroServiceBuilder,
                                                  ServiceDomainProperties serviceDomainProperties) {
-            return new WebClientBuilder(environment, defaultMicroServiceBuilder, defaultWebMicroServiceBuilder, serviceDomainProperties);
+            return new WebClientBuilder(environment, defaultMicroServiceBuilder, serviceDomainProperties);
         }
 
 
@@ -187,7 +186,7 @@ public class WebClientServicesConfig {
         public RestClientBuilder restClientBuilder(Environment environment,
                                                    @Qualifier("restBClientBuilder") RestClient.Builder restBClientBuilder,
                                                    ServiceDomainProperties serviceDomainProperties) {
-            return new RestClientBuilder(environment, restBClientBuilder, restBClientBuilder, serviceDomainProperties);
+            return new RestClientBuilder(environment, restBClientBuilder, serviceDomainProperties);
         }
 
 

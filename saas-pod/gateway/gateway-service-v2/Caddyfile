@@ -25,6 +25,5 @@ https:// {
 		on_demand
 	}
 	reverse_proxy {$STORE_POD_GATEWAY} {
-		header_up store {http.request.host}
 	}
 }

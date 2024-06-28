@@ -13,6 +13,7 @@ spring:
         enabled: true
         default-port: 8080
         service-ports:
+          "manager": 7001
           "store": 7101
           "landing-ui": 7102
     gateway:

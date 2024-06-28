@@ -10,16 +10,13 @@ import static com.asrevo.cvhome.s2s.utils.WebClientsUtils.build;
 public class RestClientBuilder {
     private final Environment environment;
     private final RestClient.Builder defaultMicroServiceBuilder;
-    private final RestClient.Builder defaultWebMicroServiceBuilder;
     private final ServiceDomainProperties serviceDomainProperties;
 
     public RestClientBuilder(Environment environment,
                              RestClient.Builder defaultMicroServiceBuilder,
-                             RestClient.Builder defaultWebMicroServiceBuilder,
                              ServiceDomainProperties serviceDomainProperties) {
         this.environment = environment;
         this.defaultMicroServiceBuilder = defaultMicroServiceBuilder;
-        this.defaultWebMicroServiceBuilder = defaultWebMicroServiceBuilder;
         this.serviceDomainProperties = serviceDomainProperties;
     }
 
@@ -31,18 +28,12 @@ public class RestClientBuilder {
             ServiceDomain requestedService = serviceDomainProperties.services().get(serviceName);
             ServiceDomain currentService = serviceDomainProperties.services().get(environment.getProperty("spring.application.name"));
 
-            if (requestedService.gatewayServiceName().equals(currentService.name())) {
+            if (requestedService.gatewayServiceName().equals(currentService.gatewayServiceName())) {
                 return buildInternalClient(serviceName, tClass);
             } else {
-                ServiceDomain gatewayService = serviceDomainProperties.services().get(requestedService.gatewayServiceName());
-                return buildExternalClient(serviceName, tClass, gatewayService);
+                return buildInternalClient(serviceName + "." + requestedService.namespace(), tClass);
             }
         }
-
-    }
-
-    private <T> T buildExternalClient(String serviceName, Class<T> tClass, ServiceDomain gatewayService) {
-        return build(defaultWebMicroServiceBuilder, gatewayService.getServiceHost(serviceName), tClass);
     }
 
     private <T> T buildInternalClient(String serviceName, Class<T> tClass) {
