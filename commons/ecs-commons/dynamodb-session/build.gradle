@@ -3,7 +3,10 @@ plugins {
 }
 
 dependencies {
+    compileOnly 'org.springframework.boot:spring-boot:3.3.1'
     implementation 'org.springframework.session:spring-session-core:3.3.1'
+    implementation 'software.amazon.awssdk:dynamodb:2.26.7'
+    implementation 'org.springframework:spring-context:6.1.8'
     compileOnly 'io.projectreactor:reactor-core:3.6.6'
     compileOnly 'org.projectlombok:lombok:1.18.32'
     annotationProcessor 'org.projectlombok:lombok:1.18.32'
