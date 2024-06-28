@@ -19,4 +19,5 @@ spring:
           "store-core-gateway": 7000
           "auth": 9999
           "manager": 7001
+          "store": 7101
           "store-ui": 4200

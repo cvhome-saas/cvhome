@@ -10,16 +10,13 @@ import static com.asrevo.cvhome.s2s.utils.WebClientsUtils.build;
 public class WebClientBuilder {
     private final Environment environment;
     private final WebClient.Builder defaultMicroServiceBuilder;
-    private final WebClient.Builder defaultWebMicroServiceBuilder;
     private final ServiceDomainProperties serviceDomainProperties;
 
     public WebClientBuilder(Environment environment,
                             WebClient.Builder defaultMicroServiceBuilder,
-                            WebClient.Builder defaultWebMicroServiceBuilder,
                             ServiceDomainProperties serviceDomainProperties) {
         this.environment = environment;
         this.defaultMicroServiceBuilder = defaultMicroServiceBuilder;
-        this.defaultWebMicroServiceBuilder = defaultWebMicroServiceBuilder;
         this.serviceDomainProperties = serviceDomainProperties;
     }
 
@@ -34,15 +31,9 @@ public class WebClientBuilder {
             if (requestedService.gatewayServiceName().equals(currentService.gatewayServiceName())) {
                 return buildInternalClient(serviceName, tClass);
             } else {
-                ServiceDomain gatewayService = serviceDomainProperties.services().get(requestedService.gatewayServiceName());
-                return buildExternalClient(serviceName, tClass, gatewayService);
+                return buildInternalClient(serviceName + "." + requestedService.namespace(), tClass);
             }
         }
-
-    }
-
-    private <T> T buildExternalClient(String serviceName, Class<T> tClass, ServiceDomain gatewayService) {
-        return build(defaultWebMicroServiceBuilder, gatewayService.getServiceHost(serviceName), tClass);
     }
 
     private <T> T buildInternalClient(String serviceName, Class<T> tClass) {
