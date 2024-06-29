@@ -23,7 +23,7 @@ export class CategoryFormComponent implements OnInit {
   roots = [];
   perPage = 100;
   languages = [];
-  defaultLanguage = localStorage.getItem('lang');
+  defaultLanguage :string;
 
   //loader image
   loader = false;
@@ -53,6 +53,7 @@ export class CategoryFormComponent implements OnInit {
     private translate: TranslateService,
     private dialogService: NbDialogService
   ) {
+    this.defaultLanguage = this.translate.defaultLang;
   }
 
   ngOnInit() {

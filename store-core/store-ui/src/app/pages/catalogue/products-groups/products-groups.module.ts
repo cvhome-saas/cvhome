@@ -2,7 +2,6 @@ import {NgModule} from '@angular/core';
 
 import {ProductsGroupsRoutingModule} from './products-groups-routing.module';
 import {ProductsGroupsComponent} from './products-groups.component';
-import {ProductsGroupsListComponent} from './products-groups-list/products-groups-list.component';
 import {GroupsListComponent} from './groups-list/groups-list.component';
 import {ProductsGroupsCreationComponent} from './products-groups-creation/products-groups-creation.component';
 import {ProductGroupFormComponent} from './product-group-form/product-group-form.component';
@@ -14,7 +13,6 @@ import {ProductAutoCompleteComponent} from "./product-group-form/product-auto-co
   declarations: [
     ProductsGroupsComponent,
     ProductsGroupsCreationComponent,
-    ProductsGroupsListComponent,
     GroupsListComponent,
     ProductGroupFormComponent,
     ActiveButtonComponent,

@@ -33,6 +33,8 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
                     rolesEvaluator.hasAccessOnStoreUsersList(authentication, ((ManagerStoreId) targetId));
             case "STORE.USERS.CREATE" ->
                     rolesEvaluator.hasAccessOnStoreUsersCreate(authentication, ((ManagerStoreId) targetId));
+            case "STORE.USERS.UPDATE" ->
+                    rolesEvaluator.hasAccessOnStoreUsersUpdate(authentication, ((ManagerStoreId) targetId));
             case "STORE.USERS.DELETE" ->
                     rolesEvaluator.hasAccessOnStoreUsersDelete(authentication, ((ManagerStoreId) targetId));
             case "STORE.USERS.ENABLE" ->

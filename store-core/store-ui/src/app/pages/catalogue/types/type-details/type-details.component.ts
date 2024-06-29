@@ -23,7 +23,7 @@ export class TypeDetailsComponent implements OnInit {
   isReadonlyCode = false;
   isCodeExist = false;
   isValidCode = true;
-  defaultLanguage = localStorage.getItem('lang');
+  defaultLanguage:string;
   languages = [];
   type = {
     id: '',
@@ -48,6 +48,7 @@ export class TypeDetailsComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private configService: ConfigService
   ) {
+    this.defaultLanguage = this.translate.defaultLang;
   }
 
   ngOnInit(): void {

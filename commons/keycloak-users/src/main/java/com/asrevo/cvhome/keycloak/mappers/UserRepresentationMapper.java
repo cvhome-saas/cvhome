@@ -44,7 +44,7 @@ public interface UserRepresentationMapper {
     }
 
     default Optional<String> extractKey(Map<String, List<String>> attributes, String key) {
-        List<String> strings = attributes.get(key);
+        List<String> strings = Optional.ofNullable(attributes).orElse(Map.of()).getOrDefault(key,List.of());
         if (strings.size() == 1) {
             return Optional.ofNullable(strings.get(0));
         } else {

@@ -29,9 +29,9 @@ export class AddBoxComponent implements OnInit {
   action: any = 'save'
 
   //default selected lang
-  defaultLanguage = localStorage.getItem('lang');
+  defaultLanguage :string;
   //changed from seo section
-  currentLanguage = localStorage.getItem('lang');
+  currentLanguage :string;
   uploadData = new FormData();
   description: Array<any> = []
   page = {
@@ -52,6 +52,8 @@ export class AddBoxComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private translate: TranslateService
   ) {
+    this.defaultLanguage=this.translate.defaultLang
+    this.currentLanguage=this.translate.currentLang
   }
 
   get code() {

@@ -1,9 +1,6 @@
 package com.asrevo.cvhome.keycloak.service.impl;
 
-import com.asrevo.cvhome.commons.domain.Groups;
-import com.asrevo.cvhome.commons.domain.IdentityId;
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
-import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
+import com.asrevo.cvhome.commons.domain.*;
 import com.asrevo.cvhome.commons.utils.OperationExecution;
 import com.asrevo.cvhome.keycloak.domain.group.GroupEntity;
 import com.asrevo.cvhome.keycloak.domain.user.*;
@@ -21,6 +18,8 @@ import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 
 import java.net.URI;
+import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -40,9 +39,22 @@ public class KeycloakUserAccountServiceImpl implements UserAccountService {
 
 
     @Override
-    public ReadableUserList list(ListUsersQuery listUsers) {
-        List<UserRepresentation> list = usersResource.searchByAttributes(listUsers.query());
-        return userRepresentationMapper.toDto(list, (it) -> usersResource.get(it.getId()).groups());
+    public ReadableUser current(String id) {
+        UserResource userResource = usersResource.get(id);
+        UserRepresentation userRepresentation = userResource.toRepresentation();
+        return userRepresentationMapper.toDto(userRepresentation, usersResource.get(id).groups());
+    }
+
+    @Override
+    public ReadableUserList list(Principal principal, UserOrgStoreIdentity identity, ManagerStoreId store) {
+
+        List<UserRepresentation> allUsers = new ArrayList<>(usersResource.searchByAttributes(new ListUsersQuery(identity.org(), store).query()));
+
+        if (isSupperAdmin(identity)) allUsers.add(0, usersResource.get(identity.org().id()).toRepresentation());
+
+        List<UserRepresentation> usersExceptMe = allUsers.stream().filter(it -> !it.getId().equals(principal.getName())).toList();
+
+        return userRepresentationMapper.toDto(usersExceptMe, (it) -> usersResource.get(it.getId()).groups());
     }
 
     private ReadableUser createUser(IdentityId identityId, ManagerStoreId managerStoreId,
@@ -94,6 +106,11 @@ public class KeycloakUserAccountServiceImpl implements UserAccountService {
             throw new OperationExecution(ErrorCodes.EMAIL_ALREADY_TAKEN);
         }
         return createUser(identity.org(), store, create);
+    }
+
+    @Override
+    public ReadableUser updateUser(UserOrgStoreIdentity identity, ManagerStoreId store, PersistableUser user) {
+        return null;
     }
 
     @Override
@@ -174,6 +191,7 @@ public class KeycloakUserAccountServiceImpl implements UserAccountService {
     private boolean attrMatch(UserRepresentation representation,
                               UserOrgStoreIdentity userOrgStoreInfo,
                               ManagerStoreId store) {
+        if (isSupperAdmin(userOrgStoreInfo)) return true;
         String orgAttr = userRepresentationMapper.extractKey(representation.getAttributes(), ORG_ATTR_KEY)
                 .orElseThrow(() -> new OperationExecution(ErrorCodes.KEYCLOAK_USER_ATTR_NOT_CONTAIN_ORG));
         if (!orgAttr.equals(userOrgStoreInfo.org().id())) {
@@ -189,6 +207,13 @@ public class KeycloakUserAccountServiceImpl implements UserAccountService {
         } else {
             return storeAttr.equals(store.getId().toString());
         }
+    }
+
+    private static boolean isSupperAdmin(UserOrgStoreIdentity userOrgStoreInfo) {
+        if (userOrgStoreInfo.roles().contains(Roles.ROLE_SUPER_ADMIN)) {
+            return true;
+        }
+        return false;
     }
 
     public Keycloak createKeycloak(URI jwkSetUri) {

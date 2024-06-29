@@ -2,7 +2,6 @@ import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
 
 import {StoreManagementComponent} from './store-management.component';
-import {StoreDetailsComponent} from './store-details/store-details.component';
 import {StoreCreationComponent} from './store-creation/store-creation.component';
 import {StoresListComponent} from './stores-list/stores-list.component';
 import {StoreLandingPageComponent} from './store-landing-page/store-landing-page.component';
@@ -13,11 +12,6 @@ import {StoreDomainComponent} from "./store-domain/store-domain.component";
 const routes: Routes = [
   {
     path: '', component: StoreManagementComponent, children: [
-      {
-        path: 'store',
-        component: StoreDetailsComponent,
-        // canActivate: [SuperuserAdminRetailStoreGuard]
-      },
       {
         path: 'create-store',
         component: StoreCreationComponent,

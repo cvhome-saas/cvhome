@@ -28,6 +28,11 @@ spring:
               metadata:
                 service-name: store
                 instance: store-1
+          'store.store-pod-1.cvhome.lcl':
+            - url: "http://localhost:7101"
+              metadata:
+                service-name: store
+                instance: store-1
           landing-ui:
             - url: "http://localhost:7102"
               metadata:

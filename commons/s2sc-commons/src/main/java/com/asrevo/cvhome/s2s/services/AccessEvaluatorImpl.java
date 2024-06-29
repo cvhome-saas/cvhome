@@ -19,6 +19,11 @@ public class AccessEvaluatorImpl implements AccessEvaluator {
     }
 
     @Override
+    public boolean hasAccessOnStoreUsersUpdate(Authentication authentication, ManagerStoreId requestedStoreId) {
+        return hasMaintainAccessOnUsers(authentication, requestedStoreId);
+    }
+
+    @Override
     public boolean hasAccessOnStoreUsersDelete(Authentication authentication, ManagerStoreId requestedStoreId) {
         return hasMaintainAccessOnUsers(authentication, requestedStoreId);
     }

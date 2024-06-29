@@ -20,7 +20,7 @@ export class BrandFormComponent implements OnInit {
   @Input() store: string;
   form: FormGroup;
   loader = false;
-  defaultLanguage = localStorage.getItem('lang');
+  defaultLanguage:string;
   languages = [];
   isCodeUnique = true;
 
@@ -32,6 +32,7 @@ export class BrandFormComponent implements OnInit {
     private translate: TranslateService,
     private router: Router,
   ) {
+    this.defaultLanguage = this.translate.defaultLang;
   }
 
   ngOnInit() {

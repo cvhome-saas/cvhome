@@ -40,12 +40,6 @@ export class UserFormComponent implements OnInit {
   sidemenuLinks = [
     {
       id: '0',
-      title: 'COMPONENTS.MY_PROFILE',
-      key: 'COMPONENTS.MY_PROFILE',
-      link: '/pages/user-management/profile',
-    },
-    {
-      id: '1',
       title: 'COMPONENTS.CHANGE_PASSWORD',
       key: 'COMPONENTS.CHANGE_PASSWORD',
       link: '/pages/user-management/change-password',
@@ -167,13 +161,15 @@ export class UserFormComponent implements OnInit {
       }
     });
     this.form.patchValue({groups: newGroups});
-    if (this.form.value.groups.length === 0) {
+    const userData = this.form.value;
+    if (userData.groups.length === 0) {
       this.toastr.warning(this.translate.instant('COMMON.ADDING_USER_GROUPS_ERROR'));
       this.loader = false;
       return;
     }
     if (this._user && this._user.id) {
-      this.userService.updateUser(+this._user.id, this.form.value, this.store)
+      userData.id=this._user.id;
+      this.userService.updateUser( userData, this.store)
         .subscribe({
           next: (res) => {
             this.toastr.success(this.translate.instant('USER_FORM.USER_UPDATED'));
@@ -185,7 +181,7 @@ export class UserFormComponent implements OnInit {
           },
         });
     } else {
-      this.userService.createUser(this.form.value, this.store).subscribe({
+      this.userService.createUser(userData, this.store).subscribe({
         next: (res) => {
           this.loader = false;
           this.toastr.success(this.translate.instant('USER_FORM.USER_CREATED'));

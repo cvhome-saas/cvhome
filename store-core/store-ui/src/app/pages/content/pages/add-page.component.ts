@@ -28,8 +28,8 @@ export class AddPageComponent implements OnInit {
   action: string = 'save';
   languages = [];
 
-  defaultLanguage = localStorage.getItem('lang');
-  currentLanguage = localStorage.getItem('lang');
+  defaultLanguage: string;
+  currentLanguage: string;
 
   isCodeExists = false;
 
@@ -43,7 +43,8 @@ export class AddPageComponent implements OnInit {
     private fb: FormBuilder,
     private translate: TranslateService
   ) {
-
+    this.defaultLanguage = this.translate.defaultLang;
+    this.currentLanguage = this.translate.currentLang;
   }
 
   get code() {
@@ -209,6 +210,7 @@ export class AddPageComponent implements OnInit {
   }
 
   private getLanguages() {
+    console.log("will get lang")
     this.configService.getListOfSupportedLanguages(this.store)
       .subscribe({
         next: (languages) => {

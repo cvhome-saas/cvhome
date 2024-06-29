@@ -82,12 +82,6 @@ export class UserService {
   }
 
 
-  updateUser(id: any, user: any, store: any): Observable<any> {
-    const params = {
-      'store': store
-    };
-    return this.crudService.put(`/v1/private/user/${id}`, user, {params});
-  }
 
 
   updatePassword(id: any, passwords: any): Observable<any> {
@@ -98,17 +92,21 @@ export class UserService {
     return localStorage.getItem(this.userIdString);
   }
 
-  saveUserId(id: string) {
-    localStorage.setItem(this.userIdString, id);
-  }
 
-  destroyUserId() {
-    localStorage.removeItem(this.userIdString);
-  }
 
+
+
+
+  getCurrentAccount(): Observable<any> {
+    return this.crudService.get(`/manager/api/v1/user-account/current`);
+  }
 
   createUser(user: any, store: any): Observable<any> {
     return this.crudService.post(`/manager/api/v1/user-account/create?store=${store}`, user);
+  }
+
+  updateUser(user: any, store: any): Observable<any> {
+    return this.crudService.put(`/manager/api/v1/user-account/update?store=${store}`, user);
   }
 
   getUser(userId: any): Observable<any> {

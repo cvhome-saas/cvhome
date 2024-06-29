@@ -14,6 +14,11 @@ spring:
               metadata:
                 service-name: manager
                 instance: manager-1
+          'manager.store-core.cvhome.lcl':
+            - url: "http://localhost:7001"
+              metadata:
+                service-name: manager
+                instance: manager-1
           store-ui:
             - url: "http://localhost:4200"
               metadata:

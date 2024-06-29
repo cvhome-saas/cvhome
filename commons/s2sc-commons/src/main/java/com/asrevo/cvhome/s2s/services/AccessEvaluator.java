@@ -8,6 +8,8 @@ public interface AccessEvaluator {
 
     boolean hasAccessOnStoreUsersCreate(Authentication authentication, ManagerStoreId requestedStoreId);
 
+    boolean hasAccessOnStoreUsersUpdate(Authentication authentication, ManagerStoreId requestedStoreId);
+
     boolean hasAccessOnStoreUsersDelete(Authentication authentication, ManagerStoreId requestedStoreId);
 
     boolean hasAccessOnStoreUsersEnable(Authentication authentication, ManagerStoreId requestedStoreId);

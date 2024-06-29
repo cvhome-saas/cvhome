@@ -38,9 +38,9 @@ export class ProductFormComponent implements OnInit {
   languages = [];
   productTypes = [];
   selectedItem = '0';
-  defaultLanguage = localStorage.getItem('lang');
+  defaultLanguage :string;
   //changed from seo section
-  currentLanguage = localStorage.getItem('lang');
+  currentLanguage:string;
 
 
   tabs: NbRouteTab[] = [
@@ -83,6 +83,8 @@ export class ProductFormComponent implements OnInit {
     private storageService: StorageService,
     private activatedRoute: ActivatedRoute,
   ) {
+    this.defaultLanguage=this.translate.defaultLang
+    this.currentLanguage=this.translate.currentLang
   }
 
   ngOnInit() {

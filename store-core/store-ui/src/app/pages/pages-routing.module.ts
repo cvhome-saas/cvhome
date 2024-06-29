@@ -14,10 +14,11 @@ const routes: Routes = [{
   canActivate: [canAccessSecuredPages],
   component: PagesComponent,
   children: [
-    // {
-    //   path: 'home',
-    //   loadChildren: 'app/pages/home/home.module#HomeModule'
-    // },
+    {
+      path: 'home',
+      loadChildren: () => import('./home/home.module')
+        .then(m => m.HomeModule)
+    },
     {
       path: 'orders',
       loadChildren: () => import('./orders/orders.module')

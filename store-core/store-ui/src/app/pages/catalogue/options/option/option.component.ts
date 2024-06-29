@@ -21,7 +21,7 @@ export class OptionComponent implements OnInit {
   loadingInfo: boolean = false;
   option = new Option();
   languages = [];
-  defaultLanguage = localStorage.getItem('lang');
+  defaultLanguage:string;
   types = [
     'select', 'radio', 'checkbox', 'text'
   ];
@@ -38,6 +38,7 @@ export class OptionComponent implements OnInit {
   ) {
     //this.languages = [...this.configService.languages];
     //const config = this.configService.getListOfSupportedLanguages(localStorage.getItem('merchant'));
+    this.defaultLanguage=this.translate.defaultLang
   }
 
   ngOnInit() {

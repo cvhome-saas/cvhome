@@ -25,7 +25,6 @@ public class ServerCallBearerExchangeFilterFunction implements ExchangeFilterFun
     private final String username;
     private final String password;
     private OAuth2AccessTokenResponse accessToken;
-    private ClientRegistration registration;
 
     public ServerCallBearerExchangeFilterFunction(WebClientReactivePasswordTokenResponseClient tokenClient,
                                                   WebClientReactiveRefreshTokenTokenResponseClient refreshTokenClient,
@@ -44,25 +43,42 @@ public class ServerCallBearerExchangeFilterFunction implements ExchangeFilterFun
             Instant expiresAt = accessToken.getAccessToken().getExpiresAt();
             if (expiresAt == null || !expiresAt.isBefore(Instant.now())) {
                 return next.exchange(bearer(request));
-            } else if (this.accessToken.getRefreshToken() != null) {
-                log.info("will re generate access token using refresh token");
-                return this.generateNewAccessToken().flatMap(accessToken -> {
-                    this.accessToken = accessToken;
-                    return next.exchange(bearer(request));
-                });
             } else {
-                log.error("token expired and refresh token not exist");
-                return next.exchange(bearer(request));
+                log.info("will re generate access token using refresh token because token expired");
+                return generateAccessTokenWithRefreshToken()
+                        .flatMap(it -> next.exchange(bearer(request)));
             }
         } else {
             log.info("wil generate access token");
-            return getClientRegistration().flatMap(registration -> {
-                this.registration = registration;
-                return generateAccessToken(registration);
-            }).flatMap(accessToken -> {
-                this.accessToken = accessToken;
-                return next.exchange(bearer(request));
-            });
+            return getNewAccessToken()
+                    .flatMap(it -> next.exchange(bearer(request)));
+        }
+    }
+
+    private Mono<OAuth2AccessTokenResponse> getNewAccessToken() {
+        return getClientRegistration().flatMap(this::doGenerateAccessToken)
+                .map(accessToken -> {
+                    this.accessToken = accessToken;
+                    return accessToken;
+                });
+    }
+
+    private Mono<OAuth2AccessTokenResponse> generateAccessTokenWithRefreshToken() {
+        if (this.accessToken.getRefreshToken() != null) {
+            Instant expiresAt = this.accessToken.getRefreshToken().getExpiresAt();
+            if (expiresAt != null && expiresAt.isBefore(Instant.now())) {
+                return getClientRegistration().flatMap(this::doGenerateNewAccessToken).map(accessToken -> {
+                    this.accessToken = accessToken;
+                    return accessToken;
+                });
+            } else {
+                log.error("token expired so will generate new token");
+                return getNewAccessToken();
+            }
+        } else {
+            log.error("token expired and refresh token not exist so will generate new token");
+            return getNewAccessToken();
+
         }
     }
 
@@ -70,14 +86,14 @@ public class ServerCallBearerExchangeFilterFunction implements ExchangeFilterFun
         return this.registrationRepository.findByRegistrationId(this.registrationId).switchIfEmpty(Mono.error(() -> new Exception("ClientRegistration not found")));
     }
 
-    Mono<OAuth2AccessTokenResponse> generateAccessToken(ClientRegistration registration) {
+    Mono<OAuth2AccessTokenResponse> doGenerateAccessToken(ClientRegistration registration) {
         log.info("will generate access token using password Grant type");
         return tokenClient.getTokenResponse(new OAuth2PasswordGrantRequest(registration, username, password));
     }
 
-    Mono<OAuth2AccessTokenResponse> generateNewAccessToken() {
+    Mono<OAuth2AccessTokenResponse> doGenerateNewAccessToken(ClientRegistration registration) {
         log.info("will generate access token using refresh Grant type");
-        return refreshTokenClient.getTokenResponse(new OAuth2RefreshTokenGrantRequest(this.registration, this.accessToken.getAccessToken(), this.accessToken.getRefreshToken()));
+        return refreshTokenClient.getTokenResponse(new OAuth2RefreshTokenGrantRequest(registration, this.accessToken.getAccessToken(), this.accessToken.getRefreshToken()));
     }
 
     private ClientRequest bearer(ClientRequest request) {

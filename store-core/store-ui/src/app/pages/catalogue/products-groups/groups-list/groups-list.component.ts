@@ -71,7 +71,7 @@ export class GroupsListComponent implements OnInit {
   protected readonly ColumnMode = ColumnMode;
 
   onEdit(row: any) {
-    this.router.navigate([`/pages/catalogue/products-groups/create-products-group/${this.params.store}-${row.code}`]);
+    this.router.navigate([`/pages/catalogue/products-groups/update-products-group/${this.params.store}-${row.code}`]);
   }
 
   onDelete(row: any) {

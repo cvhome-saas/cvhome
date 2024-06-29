@@ -30,12 +30,6 @@ export class ChangePasswordComponent implements OnInit {
   sidemenuLinks = [
     {
       id: '0',
-      title: 'COMPONENTS.MY_PROFILE',
-      key: 'COMPONENTS.MY_PROFILE',
-      link: '/pages/user-management/profile',
-    },
-    {
-      id: '1',
       title: 'COMPONENTS.CHANGE_PASSWORD',
       key: 'COMPONENTS.CHANGE_PASSWORD',
       link: '/pages/user-management/change-password',

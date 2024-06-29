@@ -4,7 +4,10 @@ import com.asrevo.cvhome.commons.annotation.OrgStorePrincipalInfo;
 import com.asrevo.cvhome.commons.domain.Groups;
 import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
-import com.asrevo.cvhome.keycloak.domain.user.*;
+import com.asrevo.cvhome.keycloak.domain.user.PersistableUser;
+import com.asrevo.cvhome.keycloak.domain.user.ReadableUser;
+import com.asrevo.cvhome.keycloak.domain.user.ReadableUserList;
+import com.asrevo.cvhome.keycloak.domain.user.UserPassword;
 import com.asrevo.cvhome.keycloak.service.UserAccountService;
 import com.asrevo.cvhome.keycloak.service.impl.KeycloakUserAccountServiceImpl;
 import com.asrevo.cvhome.manager.commons.dto.ManagerStoreDto;
@@ -12,11 +15,13 @@ import com.asrevo.cvhome.manager.service.InternalStoreService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.Principal;
 
 @RestController
 @RequestMapping("api/v1/user-account")
@@ -30,10 +35,16 @@ public class UserAccountController {
         this.internalStoreService = internalStoreService;
     }
 
+    @GetMapping("current")
+    public Mono<ReadableUser> current(@AuthenticationPrincipal Principal principal) {
+        return Mono.just(userAccountService.current(principal.getName()));
+    }
+
     @GetMapping("list")
     @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE.USERS.LIST')")
-    public Mono<ReadableUserList> list(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store) {
-        return Mono.just(userAccountService.list(new ListUsersQuery(identity.org(), store)));
+    public Mono<ReadableUserList> list(@AuthenticationPrincipal Principal principal, @OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store) {
+        UserOrgStoreIdentity impersonateIdentity = createImpersonateIdentity(identity, store, "list-users");
+        return Mono.just(userAccountService.list(principal, impersonateIdentity, store));
     }
 
     @GetMapping("find-one")
@@ -49,12 +60,19 @@ public class UserAccountController {
 
     @PostMapping("create")
     @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE.USERS.CREATE')")
-    public Mono<ReadableUser> create(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store, @RequestBody PersistableUser create) {
+    public Mono<ReadableUser> create(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store, @RequestBody PersistableUser user) {
         identity = createImpersonateIdentity(identity, store, "create-user");
-        return Mono.just(userAccountService.createUser(identity, store, create));
+        return Mono.just(userAccountService.createUser(identity, store, user));
 
     }
 
+    @PutMapping("update")
+    @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE.USERS.UPDATE')")
+    public Mono<ReadableUser> update(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store, @RequestBody PersistableUser user) {
+        UserOrgStoreIdentity impersonateIdentity = createImpersonateIdentity(identity, store, "update-user");
+        return Mono.just(userAccountService.updateUser(impersonateIdentity, store, user));
+//        {"firstName":"12313","lastName":"55555","userName":"org1-store1-moderator","emailAddress":"sfds@dfsf.vv","password":"","repeatPassword":"","active":true,"groups":[{"name":"STORE_MODERATOR"}],"id":"3dea29fd-f6b2-48b1-8231-f4b5f1c68715"}
+    }
 
     @PostMapping("reset")
     @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE.USERS.RESET_PASSWORD')")
