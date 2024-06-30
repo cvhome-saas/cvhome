@@ -51,7 +51,8 @@ export const NavMenu = ({
                                             {
                                                 item.children.map((submenu, index) => {
                                                     return (<li key={index}>
-                                                        <Link prefetch={false} href={"/category/" + submenu.description.friendlyUrl}>
+                                                        <Link prefetch={false}
+                                                              href={"/category/" + submenu.description.friendlyUrl}>
                                                             {submenu.description.name}
                                                         </Link>
                                                     </li>)

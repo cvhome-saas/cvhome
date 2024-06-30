@@ -17,11 +17,12 @@ export const CheckoutBox = ({storeContext, c, agreement, t}: {
     const [orderId, setOrderId] = useState(0);
 
     return <div className="checkout-area pt-95 pb-100">
-        <CheckoutConfirmationModal show={show} setShow={setShow} orderId={orderId} t={t} />
+        <CheckoutConfirmationModal show={show} setShow={setShow} orderId={orderId} t={t}/>
 
         <div className="container">
             {cart && cart.code && cart.products.length > 0 ?
-                <CheckoutForm storeContext={storeContext} cart={cart} setCart={setCart}  setShow={setShow} setOrderId={setOrderId} t={t} agreement={agreement}/>
+                <CheckoutForm storeContext={storeContext} cart={cart} setCart={setCart} setShow={setShow}
+                              setOrderId={setOrderId} t={t} agreement={agreement}/>
                 : <EmptyCheckoutCart t={t}/>
             }
         </div>

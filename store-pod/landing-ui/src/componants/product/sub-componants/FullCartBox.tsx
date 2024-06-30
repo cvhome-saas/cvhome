@@ -99,14 +99,16 @@ export const FullCartBox = ({storeContext, t}: {
                                             return (
                                                 <tr key={key}>
                                                     <td className="product-thumbnail">
-                                                        <Link prefetch={false} href={"/product/" + product.description.friendlyUrl}>
+                                                        <Link prefetch={false}
+                                                              href={"/product/" + product.description.friendlyUrl}>
                                                             <img className="img-fluid" src={product.image?.imageUrl}
                                                                  alt=""/>
                                                         </Link>
                                                     </td>
 
                                                     <td className="product-name">
-                                                        <Link prefetch={false} href={"/product/" + product.description.friendlyUrl}>
+                                                        <Link prefetch={false}
+                                                              href={"/product/" + product.description.friendlyUrl}>
                                                             {product.description.name}
                                                         </Link>
                                                     </td>

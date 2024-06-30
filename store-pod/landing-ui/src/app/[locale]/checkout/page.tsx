@@ -44,7 +44,7 @@ export default async function CheckoutPage({params}: { params: { locale: string 
             "Total": t("Total"),
             "No items found in checkout": t("No items found in checkout"),
             "Shop now": t("Shop now"),
-            "Order Completed":t("Order Completed"),
+            "Order Completed": t("Order Completed"),
             "Thank you for ordering": t("Thank you for ordering"),
             "Your order id is": t("Your order id is"),
             "An email with you order details has been sent to": t("An email with you order details has been sent to"),

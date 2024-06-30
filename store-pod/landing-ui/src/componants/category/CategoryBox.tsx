@@ -79,7 +79,7 @@ const ManufacturerList = ({manufacturers, t}: { manufacturers: Manufacturer[], t
                     <li>
                         <div className="sidebar-widget-list-left">
                             {
-                                manufacturers.map((it,index) =>
+                                manufacturers.map((it, index) =>
                                     <label key={index}>
                                         <input type="checkbox" name="manufacture" value={it.id}/>
                                         <span className="checkmark"></span>
