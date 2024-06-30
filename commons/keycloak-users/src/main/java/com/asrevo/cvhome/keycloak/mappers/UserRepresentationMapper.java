@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.keycloak.mappers;
 
 import com.asrevo.cvhome.keycloak.domain.group.ReadableGroup;
+import com.asrevo.cvhome.keycloak.domain.user.PersistableUser;
 import com.asrevo.cvhome.keycloak.domain.user.ReadableUser;
 import com.asrevo.cvhome.keycloak.domain.user.ReadableUserList;
 import org.keycloak.representations.idm.GroupRepresentation;
@@ -51,4 +52,14 @@ public interface UserRepresentationMapper {
             return Optional.empty();
         }
     }
+    default UserRepresentation copyPersistableUser(PersistableUser persistableUser) {
+        UserRepresentation user = new UserRepresentation();
+        user.setEnabled(persistableUser.isActive());
+        user.setUsername(persistableUser.getUserName());
+        user.setFirstName(persistableUser.getFirstName());
+        user.setLastName(persistableUser.getLastName());
+        user.setEmail(persistableUser.getEmailAddress());
+        return user;
+    }
+
 }

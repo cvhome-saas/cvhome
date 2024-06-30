@@ -8,6 +8,7 @@ spring:
           - "auth"
           - "manager"
           - "store-ui"
+          - "welcome-ui"
     ecs:
       discovery:
         namespace: "store-core.cvhome.lcl"
@@ -20,6 +21,7 @@ spring:
           "manager": 7001
           "store": 7101
           "store-ui": 4200
+          "welcome-ui": 4300
     gateway:
       discovery:
         locator:
@@ -43,6 +45,12 @@ spring:
             - Path=/manager/**
           filters:
             - StripPrefix=1
+        - id: welcome-ui
+          order: -1
+          uri: lb://welcome-ui
+          predicates:
+            - FNotService=store,manager,auth
+            - FHost=${com.asrevo.cvhome.services.store-core-gateway.domain},www.${com.asrevo.cvhome.services.store-core-gateway.domain}
         - id: store-ui
           order: -1
           uri: lb://store-ui

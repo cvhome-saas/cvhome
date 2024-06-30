@@ -2,6 +2,7 @@ package com.asrevo.cvhome.manager.mappers;
 
 import com.asrevo.cvhome.commons.domain.Country;
 import com.asrevo.cvhome.commons.domain.Email;
+import com.asrevo.cvhome.commons.domain.IdentityId;
 import com.asrevo.cvhome.commons.domain.Phone;
 import com.asrevo.cvhome.manager.commons.dto.CreateManagerStoreRequest;
 import com.asrevo.cvhome.manager.commons.dto.ListManagerStoreQuery;
@@ -43,9 +44,10 @@ public interface ManagerStoreMappers {
         return new CreateManagerStoreRequest(name, new Phone(phone), Country.valueOf(country), new Email(email));
     }
 
-    default Map<Object, Object> toExternalCreateRequest(Map<Object, Object> request, String reference) {
+    default Map<Object, Object> toExternalCreateRequest(Map<Object, Object> request, IdentityId identityId, String reference) {
         HashMap<Object, Object> newRequest = new HashMap<>(request);
         newRequest.put("code", reference);
+        newRequest.put("org", identityId.id());
         return newRequest;
     }
 

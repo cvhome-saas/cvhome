@@ -46,7 +46,7 @@ public class StoreManagerServiceImpl implements StoreManagerService {
         Domain suggestedSubDomain = new Domain(storeRequest.name() + "." + saasProperties.domain());
         routerService.create(suggestedSubDomain, store.id());
         internalStoreService.syncInRouter(store.id());
-        Map<Object, Object> newRequest = managerStoreMappers.toExternalCreateRequest(request, store.id().getId().toString());
+        Map<Object, Object> newRequest = managerStoreMappers.toExternalCreateRequest(request,identityId, store.id().getId().toString());
         return storePodClient.create(newRequest).map(it -> {
             internalStoreService.syncInStore(store.id());
             return it;

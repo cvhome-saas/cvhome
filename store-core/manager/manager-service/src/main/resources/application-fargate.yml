@@ -9,6 +9,7 @@ spring:
           - "auth"
           - "manager"
           - "store-ui"
+          - "welcome-ui"
     ecs:
       discovery:
         namespace: "store-core.cvhome.lcl"
@@ -21,3 +22,4 @@ spring:
           "manager": 7001
           "store": 7101
           "store-ui": 4200
+          "welcome-ui": 4200
