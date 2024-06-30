@@ -57,11 +57,15 @@ export class StoreBrandingComponent implements OnInit {
     this.createForm();
   }
 
+  get socialNetworks(): FormArray {
+    return <FormArray>this.form.get('socialNetworks');
+  }
+
   ngOnInit() {
     this.loading = true;
     const code = this.activatedRoute.snapshot.paramMap.get('code');
-    this.storeService.getStore(code).subscribe(it=>{
-      this.store=it;
+    this.storeService.getStore(code).subscribe(it => {
+      this.store = it;
       this.loading = false;
     })
 
@@ -70,13 +74,6 @@ export class StoreBrandingComponent implements OnInit {
 
   route(link) {
     this.router.navigate(['pages/store-management/' + link + "/", this.store.code]);
-  }
-
-  private createForm() {
-    this.form = this.formBuilder.group({
-      socialNetworks: this.formBuilder.array([])
-    });
-
   }
 
   fillForm(socialNetworksArray) {
@@ -94,14 +91,17 @@ export class StoreBrandingComponent implements OnInit {
     });
   }
 
-  get socialNetworks(): FormArray {
-    return <FormArray>this.form.get('socialNetworks');
-  }
-
   saveNetworks() {
     this.storeService.updateSocialNetworks(this.form.value)
       .subscribe(res => {
         this.toastr.success(this.translate.instant('STORE_BRANDING.NETWORKS_UPDATED'));
       });
+  }
+
+  private createForm() {
+    this.form = this.formBuilder.group({
+      socialNetworks: this.formBuilder.array([])
+    });
+
   }
 }

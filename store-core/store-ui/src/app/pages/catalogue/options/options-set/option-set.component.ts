@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {Router, ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {OptionService} from '../services/option.service';
 import {OptionValuesService} from '../services/option-values.service';
@@ -8,7 +8,6 @@ import {TranslateService} from '@ngx-translate/core';
 import {validators} from '../../../shared/validation/validators';
 import {StorageService} from '../../../shared/services/storage.service';
 import {TypesService} from '../../types/services/types.service';
-import {error} from '@angular/compiler/src/util';
 
 @Component({
   selector: 'ngx-option-set',
@@ -52,9 +51,17 @@ export class OptionSetComponent implements OnInit {
     this.getOption()
   }
 
+  get code() {
+    return this.form.get('code');
+  }
+
+  get opt() {
+    return this.form.get('option');
+  }
+
   loadDefaultParam() {
     this.defaultParam = {
-      "lang": this.storageService.getLanguage,
+      "lang": this.translate.currentLang,
       "store": this.storageService.getMerchant
     }
   }
@@ -65,7 +72,7 @@ export class OptionSetComponent implements OnInit {
     const optionId = this.activatedRoute.snapshot.paramMap.get('optionId');
     if (optionId) {
       let param = {
-        lang: this.storageService.getLanguage(),
+        lang: this.translate.currentLang,
         store: this.storageService.getMerchant()
       }
       this.optionService.getOptionSetById(optionId, param)
@@ -105,31 +112,6 @@ export class OptionSetComponent implements OnInit {
 
   }
 
-  private adjustForm() {
-    this.form.patchValue({
-      readOnly: this.option.readOnly,
-      code: this.option.code,
-      option: this.option.option,
-      optionValues: this.option.optionValues
-    });
-
-    if (this.option.id) {
-      this.form.controls['code'].disable();
-    }
-  }
-
-
-  private createForm() {
-    this.form = this.fb.group({
-      readOnly: [false],
-      code: [{value: '', disabled: false}, [Validators.required, Validators.pattern(validators.alphanumeric)]],
-      option: ['', [Validators.required]],
-      optionValues: this.fb.array([]),
-      productTypes: this.fb.array([])
-    });
-  }
-
-
   getOption() {
     this.productOption = []
     this.loading = true
@@ -137,7 +119,7 @@ export class OptionSetComponent implements OnInit {
       .subscribe((res) => {
         res.options.map((value) => {
           const description = value.descriptions.find(el => {
-            return el.language === this.storageService.getLanguage();
+            return el.language === this.translate.currentLang;
           });
           const name = description && description.name ? description.name : '';
           this.productOption.push({id: value.id, code: value.code, name: name})
@@ -158,7 +140,7 @@ export class OptionSetComponent implements OnInit {
         // console.log(res);
         res.optionValues.map((value) => {
           const description = value.descriptions.find(el => {
-            return el.language === this.storageService.getLanguage();
+            return el.language === this.translate.currentLang;
           });
           const name = description && description.name ? description.name : '';
           this.productOptionValue.push({id: value.id, code: value.code, name: name})
@@ -184,15 +166,6 @@ export class OptionSetComponent implements OnInit {
         this.loading = false;
       });
   }
-
-  get code() {
-    return this.form.get('code');
-  }
-
-  get opt() {
-    return this.form.get('option');
-  }
-
 
   checkCode(event) {
     this.isValidCode = true;
@@ -277,5 +250,28 @@ export class OptionSetComponent implements OnInit {
     }
     //console.log('Invalid fields ' + invalid);
     //console.log('Form invalid ' + this.form.invalid);
+  }
+
+  private adjustForm() {
+    this.form.patchValue({
+      readOnly: this.option.readOnly,
+      code: this.option.code,
+      option: this.option.option,
+      optionValues: this.option.optionValues
+    });
+
+    if (this.option.id) {
+      this.form.controls['code'].disable();
+    }
+  }
+
+  private createForm() {
+    this.form = this.fb.group({
+      readOnly: [false],
+      code: [{value: '', disabled: false}, [Validators.required, Validators.pattern(validators.alphanumeric)]],
+      option: ['', [Validators.required]],
+      optionValues: this.fb.array([]),
+      productTypes: this.fb.array([])
+    });
   }
 }

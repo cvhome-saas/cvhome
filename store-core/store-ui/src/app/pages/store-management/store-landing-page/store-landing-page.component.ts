@@ -1,13 +1,12 @@
 import {Component, OnInit} from '@angular/core';
 import {FormArray, FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {Router} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {ConfigService} from '../../shared/services/config.service';
 import {StoreService} from '../services/store.service';
 import {NbToastrService} from "@nebular/theme";
 import {TranslateService} from '@ngx-translate/core';
 import {StorageService} from '../../shared/services/storage.service';
 import {forkJoin} from 'rxjs';
-import {ActivatedRoute} from '@angular/router';
 
 
 @Component({
@@ -32,7 +31,7 @@ export class StoreLandingPageComponent implements OnInit {
       title: 'Store home page',
       key: 'COMPONENTS.STORE_LANDING',
       link: 'store-landing'
-    },    {
+    }, {
       id: '2',
       title: 'Store domain',
       key: 'COMPONENTS.STORE_DOMAIN',
@@ -60,6 +59,14 @@ export class StoreLandingPageComponent implements OnInit {
   ) {
   }
 
+  get selectedLanguage() {
+    return this.form.get('selectedLanguage');
+  }
+
+  get descriptions(): FormArray {
+    return <FormArray>this.form.get('descriptions');
+  }
+
   ngOnInit() {
     this.createForm();
     const code = this.activatedRoute.snapshot.paramMap.get('code');
@@ -78,16 +85,6 @@ export class StoreLandingPageComponent implements OnInit {
 
   route(link) {
     this.router.navigate(['pages/store-management/' + link + "/", this.store.code]);
-  }
-
-  private createForm() {
-    this.form = this.fb.group({
-      selectedLanguage: ['en', [Validators.required]],
-      code: [''],
-      id: '',
-      descriptions: this.fb.array([]),
-    });
-    this.addFormArray();
   }
 
   addFormArray() {
@@ -135,14 +132,6 @@ export class StoreLandingPageComponent implements OnInit {
     });
   }
 
-  get selectedLanguage() {
-    return this.form.get('selectedLanguage');
-  }
-
-  get descriptions(): FormArray {
-    return <FormArray>this.form.get('descriptions');
-  }
-
   save() {
     this.form.patchValue({name: this.store.name});
     this.form.patchValue({code: 'LANDING_PAGE'});
@@ -160,6 +149,16 @@ export class StoreLandingPageComponent implements OnInit {
           this.router.navigate(['pages/store-management/store/', this.store.code]);
         });
     }
+  }
+
+  private createForm() {
+    this.form = this.fb.group({
+      selectedLanguage: ['en', [Validators.required]],
+      code: [''],
+      id: '',
+      descriptions: this.fb.array([]),
+    });
+    this.addFormArray();
   }
 
 }

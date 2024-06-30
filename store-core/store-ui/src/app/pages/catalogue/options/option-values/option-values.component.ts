@@ -40,19 +40,6 @@ export class OptionValuesComponent implements OnInit {
     this.languages = [...this.configService.languages];
   }
 
-  ngOnInit() {
-    const optionValueId = this.activatedRoute.snapshot.paramMap.get('optionValueId');
-    this.createForm();
-    if (optionValueId) {
-      this.loader = true;
-      this.optionValuesService.getOptionValueById(optionValueId).subscribe(res => {
-        this.optionValue = res;
-        this.fillForm();
-        this.loader = false;
-      });
-    }
-  }
-
   get selectedLanguage() {
     return this.form.get('selectedLanguage');
   }
@@ -65,13 +52,17 @@ export class OptionValuesComponent implements OnInit {
     return this.form.get('code');
   }
 
-  private createForm() {
-    this.form = this.fb.group({
-      code: ['', [Validators.required, Validators.pattern(validators.alphanumeric)]],
-      selectedLanguage: ['en'],
-      descriptions: this.fb.array([])
-    });
-    this.addFormArray();
+  ngOnInit() {
+    const optionValueId = this.activatedRoute.snapshot.paramMap.get('optionValueId');
+    this.createForm();
+    if (optionValueId) {
+      this.loader = true;
+      this.optionValuesService.getOptionValueById(optionValueId).subscribe(res => {
+        this.optionValue = res;
+        this.fillForm();
+        this.loader = false;
+      });
+    }
   }
 
   addFormArray() {
@@ -164,5 +155,14 @@ export class OptionValuesComponent implements OnInit {
 
   goToBack() {
     this.router.navigate(['pages/catalogue/options/options-values-list']);
+  }
+
+  private createForm() {
+    this.form = this.fb.group({
+      code: ['', [Validators.required, Validators.pattern(validators.alphanumeric)]],
+      selectedLanguage: ['en'],
+      descriptions: this.fb.array([])
+    });
+    this.addFormArray();
   }
 }

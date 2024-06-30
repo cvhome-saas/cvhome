@@ -58,27 +58,6 @@ export class ProductToCategoryComponent implements OnInit, AfterViewInit {
     });
   }
 
-  private load() {
-    this.loading = true;
-
-    const p$ = this.categoryService.getCategoryByProductId(this.uniqueCode, this.params.store)
-    const c$ = this.categoryService.getListOfCategories0(this.params)
-
-    forkJoin([p$, c$])
-      .subscribe(([p$, c$]) => {
-        this.selectedItems = [];
-        this.categories = [];
-        p$.categories.forEach((data) => {
-          this.selectedItems.push(data.id)
-        });
-        c$.categories.forEach((value) => {
-          this.categories.push({'id': value.id, 'name': value.description.name})
-        })
-        this.loading = false;
-      });
-
-  }
-
   change($event: string[]) {
     const oldItems = this.selectedItems;
     const newItems = $event;
@@ -131,6 +110,27 @@ export class ProductToCategoryComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
     const el: HTMLElement = document.getElementById('tabs');
     el.scrollIntoView();
+  }
+
+  private load() {
+    this.loading = true;
+
+    const p$ = this.categoryService.getCategoryByProductId(this.uniqueCode, this.params.store, this.translate.currentLang)
+    const c$ = this.categoryService.getListOfCategories0(this.params)
+
+    forkJoin([p$, c$])
+      .subscribe(([p$, c$]) => {
+        this.selectedItems = [];
+        this.categories = [];
+        p$.categories.forEach((data) => {
+          this.selectedItems.push(data.id)
+        });
+        c$.categories.forEach((value) => {
+          this.categories.push({'id': value.id, 'name': value.description.name})
+        })
+        this.loading = false;
+      });
+
   }
 
 }

@@ -5,8 +5,7 @@ import {LocalDataSource} from 'ng2-smart-table';
 import {TranslateService} from '@ngx-translate/core';
 import {OptionValuesService} from '../services/option-values.service';
 import {ShowcaseDialogComponent} from '../../../shared/components/showcase-dialog/showcase-dialog.component';
-import {NbDialogService} from '@nebular/theme';
-import {NbToastrService} from '@nebular/theme';
+import {NbDialogService, NbToastrService} from '@nebular/theme';
 import {StorageService} from '../../../shared/services/storage.service';
 import {StoreService} from '../../../store-management/services/store.service';
 
@@ -45,7 +44,7 @@ export class OptionsValuesListComponent implements OnInit {
   loadParams() {
     return {
       store: this.storageService.getMerchant(),
-      lang: this.storageService.getLanguage(),
+      lang: this.translate.currentLang,
       count: this.perPage,
       page: 0
     };
@@ -128,7 +127,7 @@ export class OptionsValuesListComponent implements OnInit {
               if (parent_id === -1 && el) {
                 parent_id = el.parent_id;
               }
-              return el.language === this.storageService.getLanguage();
+              return el.language === this.translate.currentLang;
             });
             const name = description && description.name ? description.name : '';
             return name;

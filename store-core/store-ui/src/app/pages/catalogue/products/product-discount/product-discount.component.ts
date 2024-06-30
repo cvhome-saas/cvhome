@@ -3,7 +3,6 @@ import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {Router} from '@angular/router';
 import {validators} from '../../../shared/validation/validators';
 import {Location} from '@angular/common';
-import {ActivatedRoute} from '@angular/router';
 import {ProductService} from '../services/product.service';
 
 

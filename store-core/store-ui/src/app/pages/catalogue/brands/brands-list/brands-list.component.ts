@@ -16,7 +16,6 @@ import {ColumnMode} from "@swimlane/ngx-datatable";
   styleUrls: ['./brands-list.component.scss']
 })
 export class BrandsListComponent implements OnInit {
-  protected readonly ColumnMode = ColumnMode;
   page: Page = new Page();
   rows = [];
   loadingList = false;
@@ -25,14 +24,14 @@ export class BrandsListComponent implements OnInit {
   // paginator
   perPage = 25;
   currentPage = 1;
-
   // request params
   params = {
-    lang: this.storageService.getLanguage(),
+    lang: this.translate.currentLang,
     store: "",
     count: this.perPage,
     page: 0
   };
+  protected readonly ColumnMode = ColumnMode;
 
   constructor(
     private brandService: BrandService,
@@ -47,7 +46,7 @@ export class BrandsListComponent implements OnInit {
 
   ngOnInit() {
     this.translate.onLangChange.subscribe((lang) => {
-      this.params.lang = this.storageService.getLanguage();
+      this.params.lang = lang.lang;
       this.getList();
     });
   }

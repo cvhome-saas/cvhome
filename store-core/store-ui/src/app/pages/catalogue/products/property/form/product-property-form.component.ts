@@ -1,10 +1,9 @@
-import {Component, OnInit, Input, ChangeDetectorRef, EventEmitter, Output} from '@angular/core';
+import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
 import {FormArray, FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {NbDialogRef} from '@nebular/theme';
+import {NbDialogRef, NbToastrService} from '@nebular/theme';
 import {PropertiesService} from '../../services/product-properties';
 import {ConfigService} from '../../../../shared/services/config.service';
 import {ProductAttributesService} from '../../services/product-attributes.service';
-import {NbToastrService} from '@nebular/theme';
 import {TranslateService} from '@ngx-translate/core';
 
 @Component({
@@ -42,6 +41,18 @@ export class ProductPropertyForm implements OnInit {
     this.getLanguages();
   }
 
+  get option() {
+    return this.form.get('option');
+  }
+
+  get optionValue() {
+    return this.form.get('optionValue');
+  }
+
+  get descriptions(): FormArray {
+    return <FormArray>this.form.get('descriptions');
+  }
+
   getLanguages() {
     this.configService.getListOfSupportedLanguages(localStorage.getItem('merchant'))
       .subscribe(data => {
@@ -51,7 +62,6 @@ export class ProductPropertyForm implements OnInit {
 
       });
   }
-
 
   ngAfterViewChecked() {
     //your code to update the model
@@ -86,18 +96,6 @@ export class ProductPropertyForm implements OnInit {
         this.options = temp;
       });
   }
-
-
-  private createForm() {
-    this.form = this.fb.group({
-      option: ['', [Validators.required]],
-      optionValue: ['', []],
-      descriptions: this.fb.array([]),
-    });
-
-
-  }
-
 
   addFormArray() {
     const control = <FormArray>this.form.controls.descriptions;
@@ -167,18 +165,6 @@ export class ProductPropertyForm implements OnInit {
     });
   }
 
-  get option() {
-    return this.form.get('option');
-  }
-
-  get optionValue() {
-    return this.form.get('optionValue');
-  }
-
-  get descriptions(): FormArray {
-    return <FormArray>this.form.get('descriptions');
-  }
-
   save() {
     console.log(this.form.value);
     let param = {};
@@ -230,6 +216,16 @@ export class ProductPropertyForm implements OnInit {
 
   goToBack() {
     this.ref.close();
+  }
+
+  private createForm() {
+    this.form = this.fb.group({
+      option: ['', [Validators.required]],
+      optionValue: ['', []],
+      descriptions: this.fb.array([]),
+    });
+
+
   }
 
 }

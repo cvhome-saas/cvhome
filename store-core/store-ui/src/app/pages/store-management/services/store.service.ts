@@ -23,10 +23,11 @@ export class StoreService {
     return this.crudService.get(`/manager/api/v1/router/allocates?store=${code}`);
   }
 
-  allocateDomain(store,domain): Observable<any> {
-    return this.crudService.post(`/manager/api/v1/router/allocate?domain=${domain}&store=${store}`,{});
+  allocateDomain(store, domain): Observable<any> {
+    return this.crudService.post(`/manager/api/v1/router/allocate?domain=${domain}&store=${store}`, {});
   }
-  removeDomain(store,domain): Observable<any> {
+
+  removeDomain(store, domain): Observable<any> {
     return this.crudService.delete(`/manager/api/v1/router/remove?domain=${domain}&store=${store}`);
   }
 

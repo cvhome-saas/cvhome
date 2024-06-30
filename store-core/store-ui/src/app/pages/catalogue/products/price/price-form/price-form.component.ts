@@ -1,6 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {Router} from '@angular/router';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {FormArray, FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {ProductService} from '../../services/product.service';
 import {NbToastrService} from '@nebular/theme';
@@ -45,6 +44,14 @@ export class PriceFormComponent implements OnInit {
   ) {
   }
 
+  get selectedLanguage() {
+    return this.form.get('selectedLanguage');
+  }
+
+  get descriptions(): FormArray {
+    return <FormArray>this.form.get('descriptions');
+  }
+
   ngOnInit() {
 
 
@@ -77,17 +84,6 @@ export class PriceFormComponent implements OnInit {
         {emitEvent: false}
       );
     }
-  }
-
-  private createForm() {
-    this.form = this.fb.group({
-      finalPrice: ['', [Validators.required]],
-      originalPrice: ['', [Validators.required]],
-      discountedPrice: [''],
-      discounted: ['', [Validators.required]],
-      selectedLanguage: ['', [Validators.required]],
-      descriptions: this.fb.array([]),
-    });
   }
 
   addFormArray() {
@@ -137,14 +133,6 @@ export class PriceFormComponent implements OnInit {
         }
       });
     });
-  }
-
-  get selectedLanguage() {
-    return this.form.get('selectedLanguage');
-  }
-
-  get descriptions(): FormArray {
-    return <FormArray>this.form.get('descriptions');
   }
 
   changeName(event, index) {
@@ -214,6 +202,17 @@ export class PriceFormComponent implements OnInit {
         .subscribe((res) => {
         });
     }
+  }
+
+  private createForm() {
+    this.form = this.fb.group({
+      finalPrice: ['', [Validators.required]],
+      originalPrice: ['', [Validators.required]],
+      discountedPrice: [''],
+      discounted: ['', [Validators.required]],
+      selectedLanguage: ['', [Validators.required]],
+      descriptions: this.fb.array([]),
+    });
   }
 
 }

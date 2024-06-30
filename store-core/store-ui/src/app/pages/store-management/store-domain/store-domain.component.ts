@@ -14,14 +14,13 @@ import {validators} from "../../shared/validation/validators";
   styleUrls: ['./store-domain.component.scss']
 })
 export class StoreDomainComponent implements OnInit {
-  isSubmited=false
+  isSubmited = false
   code;
   loading = false;
   page: Page = new Page();
   rows = [];
   perPage = 10;
   currentPage = 2;
-  protected readonly ColumnMode = ColumnMode;
   selectedItem = '2';
   sidemenuLinks = [
     {
@@ -49,10 +48,8 @@ export class StoreDomainComponent implements OnInit {
       link: 'store'
     }
   ];
-
-
   form: FormGroup;
-
+  protected readonly ColumnMode = ColumnMode;
 
   constructor(
     private storeService: StoreService,
@@ -62,6 +59,10 @@ export class StoreDomainComponent implements OnInit {
     private router: Router,
     private activatedRoute: ActivatedRoute,
   ) {
+  }
+
+  get domain() {
+    return this.form.get('domain');
   }
 
   ngOnInit() {
@@ -132,12 +133,6 @@ export class StoreDomainComponent implements OnInit {
     )
   }
 
-  private createForm() {
-    this.form = this.fb.group({
-      domain: ['', [Validators.required, Validators.pattern(validators.domainPattern)]],
-    });
-  }
-
   save() {
     this.isSubmited = true;
     this.form.markAllAsTouched();
@@ -148,9 +143,10 @@ export class StoreDomainComponent implements OnInit {
     this.createDomain(object.domain)
   }
 
-
-  get domain() {
-    return this.form.get('domain');
+  private createForm() {
+    this.form = this.fb.group({
+      domain: ['', [Validators.required, Validators.pattern(validators.domainPattern)]],
+    });
   }
 
 }

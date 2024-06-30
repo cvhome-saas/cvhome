@@ -68,82 +68,6 @@ export class StoreFormComponent implements OnInit {
     private translate: TranslateService) {
   }
 
-  ngOnInit() {
-    this.loading = true;
-    forkJoin([this.configService.getListOfCountries(), this.configService.getListOfSupportedCurrency(), this.configService.getWeightAndSizes()])
-      .subscribe(([countries, currencies, measures]) => {
-        this.countries = [...countries];
-        this.supportedCurrency = [...currencies];
-        this.weightList = [...measures.weights];
-        this.sizeList = [...measures.measures];
-        this.supportedLanguages = this.configService.getListOfGlobalLanguages();
-        this.loading = false;
-      });
-
-
-    this.createForm();
-  }
-
-  private createForm() {
-    this.form = this.fb.group({
-      name: ['', [Validators.required, Validators.pattern(validators.alphanumeric)]],
-      phone: ['', [Validators.required]],
-      email: ['', [Validators.required, Validators.pattern(validators.emailPattern)]],
-      address: this.fb.group({
-        searchControl: [''],
-        stateProvince: [{value: '', disabled: false}],
-        country: ['', [Validators.required]],
-        address: ['', [Validators.required]],
-        postalCode: ['', [Validators.required]],
-        city: ['', [Validators.required]]
-      }),
-      supportedLanguages: [[], [Validators.required]],
-      defaultLanguage: ['', [Validators.required]],
-      currency: [''],
-      currencyFormatNational: [true],
-      weight: ['', [Validators.required]],
-      dimension: ['', [Validators.required]],
-      inBusinessSince: [new Date()],
-      useCache: [false],
-    });
-
-    if (this.store && this.store.id > 0) {
-      this.fillForm();
-    }
-
-  }
-
-
-  fillForm() {
-
-    this.store.supportedLanguages.forEach(lang => {
-      this.supportedLanguagesSelected.push(lang.code);
-    });
-    this.form.patchValue({
-      name: this.store.name,
-      code: this.store.code,
-      phone: this.store.phone,
-      email: this.store.email,
-      supportedLanguages: this.store.supportedLanguages,
-      defaultLanguage: this.store.defaultLanguage,
-      currency: this.store.currency,
-      currencyFormatNational: this.store.currencyFormatNational,
-      weight: this.store.weight,
-      dimension: this.store.dimension,
-      inBusinessSince: new Date(this.store.inBusinessSince),
-      useCache: this.store.useCache,
-    });
-    this.form.controls['address'].patchValue({searchControl: ''});
-    this.form.controls['address'].patchValue({stateProvince: this.store.address.stateProvince}, {disabled: false});
-    this.form.controls['address'].patchValue({country: this.store.address.country});
-    this.form.controls['address'].patchValue({address: this.store.address.address});
-    this.form.controls['address'].patchValue({postalCode: this.store.address.postalCode});
-    this.form.controls['address'].patchValue({city: this.store.address.city});
-    this.isReadonlyName = true;
-    this.cdr.markForCheck();
-
-  }
-
   get name() {
     return this.form.get('name');
   }
@@ -184,6 +108,51 @@ export class StoreFormComponent implements OnInit {
     return this.form.get('inBusinessSince');
   }
 
+  ngOnInit() {
+    this.loading = true;
+    forkJoin([this.configService.getListOfCountries(), this.configService.getListOfSupportedCurrency(), this.configService.getWeightAndSizes()])
+      .subscribe(([countries, currencies, measures]) => {
+        this.countries = [...countries];
+        this.supportedCurrency = [...currencies];
+        this.weightList = [...measures.weights];
+        this.sizeList = [...measures.measures];
+        this.supportedLanguages = this.configService.getListOfGlobalLanguages();
+        this.loading = false;
+      });
+
+
+    this.createForm();
+  }
+
+  fillForm() {
+
+    this.store.supportedLanguages.forEach(lang => {
+      this.supportedLanguagesSelected.push(lang.code);
+    });
+    this.form.patchValue({
+      name: this.store.name,
+      code: this.store.code,
+      phone: this.store.phone,
+      email: this.store.email,
+      supportedLanguages: this.store.supportedLanguages,
+      defaultLanguage: this.store.defaultLanguage,
+      currency: this.store.currency,
+      currencyFormatNational: this.store.currencyFormatNational,
+      weight: this.store.weight,
+      dimension: this.store.dimension,
+      inBusinessSince: new Date(this.store.inBusinessSince),
+      useCache: this.store.useCache,
+    });
+    this.form.controls['address'].patchValue({searchControl: ''});
+    this.form.controls['address'].patchValue({stateProvince: this.store.address.stateProvince}, {disabled: false});
+    this.form.controls['address'].patchValue({country: this.store.address.country});
+    this.form.controls['address'].patchValue({address: this.store.address.address});
+    this.form.controls['address'].patchValue({postalCode: this.store.address.postalCode});
+    this.form.controls['address'].patchValue({city: this.store.address.city});
+    this.isReadonlyName = true;
+    this.cdr.markForCheck();
+
+  }
 
   save() {
     //this.findInvalidControls();
@@ -216,7 +185,6 @@ export class StoreFormComponent implements OnInit {
     }
   }
 
-
   addSupportedLanguage(languageCode) {
     let newLanguages = this.form.value.supportedLanguages ? [...this.form.value.supportedLanguages] : [];
     // check if element is exist in array
@@ -234,13 +202,11 @@ export class StoreFormComponent implements OnInit {
 
   }
 
-
   userHasSupportedLanguage(language) {
     if (!this.store || !this.store.supportedLanguages)
       return false;
     return this.store.supportedLanguages.find((l: any) => l.code === language.code) != undefined;
   }
-
 
   checkName(event) {
     this.storeService.checkIfStoreExist(this.form.value.name)
@@ -255,6 +221,35 @@ export class StoreFormComponent implements OnInit {
 
   goToBack() {
     this.router.navigate(['pages/store-management/stores-list']);
+  }
+
+  private createForm() {
+    this.form = this.fb.group({
+      name: ['', [Validators.required, Validators.pattern(validators.alphanumeric)]],
+      phone: ['', [Validators.required]],
+      email: ['', [Validators.required, Validators.pattern(validators.emailPattern)]],
+      address: this.fb.group({
+        searchControl: [''],
+        stateProvince: [{value: '', disabled: false}],
+        country: ['', [Validators.required]],
+        address: ['', [Validators.required]],
+        postalCode: ['', [Validators.required]],
+        city: ['', [Validators.required]]
+      }),
+      supportedLanguages: [[], [Validators.required]],
+      defaultLanguage: ['', [Validators.required]],
+      currency: [''],
+      currencyFormatNational: [true],
+      weight: ['', [Validators.required]],
+      dimension: ['', [Validators.required]],
+      inBusinessSince: [new Date()],
+      useCache: [false],
+    });
+
+    if (this.store && this.store.id > 0) {
+      this.fillForm();
+    }
+
   }
 
 }

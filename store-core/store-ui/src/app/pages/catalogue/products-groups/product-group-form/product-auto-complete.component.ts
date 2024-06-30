@@ -38,7 +38,7 @@ export class ProductAutoCompleteComponent implements AfterViewInit {
   params = {
     "store": "",
     "name": "",
-    "lang": this.storageService.getLanguage()
+    "lang": this.translate.currentLang
   };
 
   constructor(

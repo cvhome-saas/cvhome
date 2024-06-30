@@ -9,7 +9,6 @@ import {TranslateService} from '@ngx-translate/core';
 import {InventoryService} from '../../services/inventory.service';
 import * as moment from 'moment';
 import {validators} from '../../../../shared/validation/validators';
-import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
 @Component({
   selector: 'ngx-inventory-form',
@@ -59,6 +58,43 @@ export class InventoryFormComponent implements OnInit {
       });
   }
 
+  fillForm() {
+    // this.form.patchValue({
+    //   store: this.inventory.store.code,
+    //   owner: this.inventory.owner,
+    //   dateAvailable: this.inventory.dateAvailable,
+    //   quantity: this.inventory.quantity,
+    // });
+  }
+
+  // private createForm() {
+  //   this.form = this.fb.group({
+  //     store: ['DEFAULT', [Validators.required]],
+  //     owner: ['', [Validators.required]],
+  //     dateAvailable: [new Date()],
+  //     quantity: [0, [Validators.required]]
+  //   });
+  // }
+
+  save() {
+    const inventoryObj = this.form.value;
+    inventoryObj.dateAvailable =
+      inventoryObj.dateAvailable ? moment(inventoryObj.dateAvailable).format('yyyy-MM-DD') : '';
+    inventoryObj.prices = [...this.prices];
+    inventoryObj.productId = this.productId;
+    if (this.inventory.id) {
+      inventoryObj.id = this.inventory.id;
+      this.inventoryService.updateInventory(this.productId, this.inventory.id, inventoryObj).subscribe((res) => {
+        this.toastr.success(this.translate.instant('INVENTORY.INVENTORY_UPDATED'));
+      });
+    } else {
+      this.inventoryService.createInventory(inventoryObj).subscribe((res) => {
+        this.toastr.success(this.translate.instant('INVENTORY.INVENTORY_CREATED'));
+        this.inventory = res;
+      });
+    }
+  }
+
   private createForm() {
     this.form = this.fb.group({
       available: [false],
@@ -79,44 +115,6 @@ export class InventoryFormComponent implements OnInit {
         endDate: [new Date()],
       })
     });
-  }
-
-  // private createForm() {
-  //   this.form = this.fb.group({
-  //     store: ['DEFAULT', [Validators.required]],
-  //     owner: ['', [Validators.required]],
-  //     dateAvailable: [new Date()],
-  //     quantity: [0, [Validators.required]]
-  //   });
-  // }
-
-  fillForm() {
-    // this.form.patchValue({
-    //   store: this.inventory.store.code,
-    //   owner: this.inventory.owner,
-    //   dateAvailable: this.inventory.dateAvailable,
-    //   quantity: this.inventory.quantity,
-    // });
-  }
-
-
-  save() {
-    const inventoryObj = this.form.value;
-    inventoryObj.dateAvailable =
-      inventoryObj.dateAvailable ? moment(inventoryObj.dateAvailable).format('yyyy-MM-DD') : '';
-    inventoryObj.prices = [...this.prices];
-    inventoryObj.productId = this.productId;
-    if (this.inventory.id) {
-      inventoryObj.id = this.inventory.id;
-      this.inventoryService.updateInventory(this.productId, this.inventory.id, inventoryObj).subscribe((res) => {
-        this.toastr.success(this.translate.instant('INVENTORY.INVENTORY_UPDATED'));
-      });
-    } else {
-      this.inventoryService.createInventory(inventoryObj).subscribe((res) => {
-        this.toastr.success(this.translate.instant('INVENTORY.INVENTORY_CREATED'));
-        this.inventory = res;
-      });
-    }
   }
 
 }

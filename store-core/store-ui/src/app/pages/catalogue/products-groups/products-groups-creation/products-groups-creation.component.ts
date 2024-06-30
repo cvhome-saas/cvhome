@@ -37,6 +37,10 @@ export class ProductsGroupsCreationComponent implements OnInit {
     this.createForm();
   }
 
+  save() {
+    console.log(this.form.value);
+  }
+
   private createForm() {
     this.form = this.fb.group({
       attributeName: ['', [Validators.required]],
@@ -48,10 +52,6 @@ export class ProductsGroupsCreationComponent implements OnInit {
       requiredOption: [false, [Validators.required]],
       additionalWeight: [0, [Validators.required]]
     });
-  }
-
-  save() {
-    console.log(this.form.value);
   }
 
 }

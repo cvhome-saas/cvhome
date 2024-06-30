@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {Router, ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {OptionService} from '../services/option.service';
 import {OptionValuesService} from '../services/option-values.service';
@@ -8,8 +8,8 @@ import {NbToastrService} from '@nebular/theme';
 import {TranslateService} from '@ngx-translate/core';
 import {validators} from '../../../shared/validation/validators';
 import {StorageService} from '../../../shared/services/storage.service';
+
 // import { TypesService } from '../../types/services/types.service';
-import {error} from '@angular/compiler/src/util';
 
 @Component({
   selector: 'ngx-variation-add',
@@ -50,9 +50,21 @@ export class AddVariationsComponent implements OnInit {
     this.getOption()
   }
 
+  get code() {
+    return this.form.get('code');
+  }
+
+  get option() {
+    return this.form.get('option');
+  }
+
+  get optionValue() {
+    return this.form.get('optionValue');
+  }
+
   loadDefaultParam() {
     this.defaultParam = {
-      "lang": this.storageService.getLanguage,
+      "lang": this.translate.currentLang,
       "store": this.storageService.getMerchant
     }
   }
@@ -103,28 +115,6 @@ export class AddVariationsComponent implements OnInit {
 
   }
 
-  private adjustForm() {
-    this.form.patchValue({
-      code: this.opt.code,
-      option: this.opt.option,
-      optionValue: this.opt.optionValue
-    });
-
-    if (this.opt.id) {
-      this.form.controls['code'].disable();
-    }
-  }
-
-
-  private createForm() {
-    this.form = this.fb.group({
-      code: [{value: '', disabled: false}, [Validators.required, Validators.pattern(validators.alphanumeric)]],
-      option: ['', [Validators.required]],
-      optionValue: ['', [Validators.required]]
-    });
-  }
-
-
   getOption() {
     this.productOption = []
     this.loading = true
@@ -132,7 +122,7 @@ export class AddVariationsComponent implements OnInit {
       .subscribe((res) => {
         res.options.map((value) => {
           const description = value.descriptions.find(el => {
-            return el.language === this.storageService.getLanguage();
+            return el.language === this.translate.currentLang;
           });
           const name = description && description.name ? description.name : '';
           this.productOption.push({id: value.id, code: value.code, name: name})
@@ -152,7 +142,7 @@ export class AddVariationsComponent implements OnInit {
         // console.log(res);
         res.optionValues.map((value) => {
           const description = value.descriptions.find(el => {
-            return el.language === this.storageService.getLanguage();
+            return el.language === this.translate.currentLang;
           });
           const name = description && description.name ? description.name : '';
           this.productOptionValue.push({id: value.id, code: value.code, name: name})
@@ -163,20 +153,6 @@ export class AddVariationsComponent implements OnInit {
       });
   }
 
-
-  get code() {
-    return this.form.get('code');
-  }
-
-  get option() {
-    return this.form.get('option');
-  }
-
-  get optionValue() {
-    return this.form.get('optionValue');
-  }
-
-
   checkCode(event) {
     // this.isValidCode = true;
     this.variationService.checkCode(event.target.value)
@@ -185,7 +161,6 @@ export class AddVariationsComponent implements OnInit {
         this.isCodeExist = res.exists;
       });
   }
-
 
   save() {
     console.log(this.form.value);
@@ -236,6 +211,26 @@ export class AddVariationsComponent implements OnInit {
 
   goToBack() {
     this.router.navigate(['pages/catalogue/options/varations/list']);
+  }
+
+  private adjustForm() {
+    this.form.patchValue({
+      code: this.opt.code,
+      option: this.opt.option,
+      optionValue: this.opt.optionValue
+    });
+
+    if (this.opt.id) {
+      this.form.controls['code'].disable();
+    }
+  }
+
+  private createForm() {
+    this.form = this.fb.group({
+      code: [{value: '', disabled: false}, [Validators.required, Validators.pattern(validators.alphanumeric)]],
+      option: ['', [Validators.required]],
+      optionValue: ['', [Validators.required]]
+    });
   }
 
   // setSelected(e) {

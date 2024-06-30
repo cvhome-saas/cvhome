@@ -1,7 +1,6 @@
-import {Component, ViewChild} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {CategoryService} from '../services/category.service';
 import {TranslateService} from '@ngx-translate/core';
-import {StorageService} from '../../../shared/services/storage.service';
 import {NbToastrService} from "@nebular/theme";
 
 @Component({
@@ -9,7 +8,7 @@ import {NbToastrService} from "@nebular/theme";
   templateUrl: './categories-hierarchy.component.html',
   styleUrls: ['./categories-hierarchy.component.scss']
 })
-export class CategoriesHierarchyComponent {
+export class CategoriesHierarchyComponent implements OnInit {
   @ViewChild('tree', {static: false}) tree;
   nodes: TreeNode[] = [];
   options = {
@@ -21,13 +20,12 @@ export class CategoriesHierarchyComponent {
   constructor(
     private categoryService: CategoryService,
     private toastr: NbToastrService,
-    private translate: TranslateService,
-    private storageService: StorageService) {
+    private translate: TranslateService) {
   }
 
   loadParams() {
     return {
-      lang: this.storageService.getLanguage(),
+      lang: this.translate.currentLang,
       store: "",
       page: 0
     };
@@ -83,6 +81,12 @@ export class CategoriesHierarchyComponent {
   onSelectStore($event) {
     this.params.store = $event.id
     this.getList();
+  }
+
+  ngOnInit(): void {
+    this.translate.onLangChange.subscribe(lang => {
+      this.params.lang = lang.lang;
+    })
   }
 }
 

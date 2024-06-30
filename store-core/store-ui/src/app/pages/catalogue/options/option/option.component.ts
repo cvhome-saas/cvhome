@@ -21,7 +21,7 @@ export class OptionComponent implements OnInit {
   loadingInfo: boolean = false;
   option = new Option();
   languages = [];
-  defaultLanguage:string;
+  defaultLanguage: string;
   types = [
     'select', 'radio', 'checkbox', 'text'
   ];
@@ -38,7 +38,19 @@ export class OptionComponent implements OnInit {
   ) {
     //this.languages = [...this.configService.languages];
     //const config = this.configService.getListOfSupportedLanguages(localStorage.getItem('merchant'));
-    this.defaultLanguage=this.translate.defaultLang
+    this.defaultLanguage = this.translate.defaultLang
+  }
+
+  get selectedLanguage() {
+    return this.form.get('selectedLanguage');
+  }
+
+  get descriptions(): FormArray {
+    return <FormArray>this.form.get('descriptions');
+  }
+
+  get code() {
+    return this.form.get('code');
   }
 
   ngOnInit() {
@@ -62,27 +74,6 @@ export class OptionComponent implements OnInit {
         }
 
       });
-  }
-
-  get selectedLanguage() {
-    return this.form.get('selectedLanguage');
-  }
-
-  get descriptions(): FormArray {
-    return <FormArray>this.form.get('descriptions');
-  }
-
-  get code() {
-    return this.form.get('code');
-  }
-
-  private createForm() {
-    this.form = this.fb.group({
-      code: ['', [Validators.required, Validators.pattern(validators.alphanumeric)]],
-      type: ['', [Validators.required]],
-      selectedLanguage: [this.defaultLanguage, [Validators.required]],
-      descriptions: this.fb.array([])
-    });
   }
 
   addFormArray() {
@@ -150,5 +141,14 @@ export class OptionComponent implements OnInit {
 
   goToBack() {
     this.router.navigate(['pages/catalogue/options/options-list']);
+  }
+
+  private createForm() {
+    this.form = this.fb.group({
+      code: ['', [Validators.required, Validators.pattern(validators.alphanumeric)]],
+      type: ['', [Validators.required]],
+      selectedLanguage: [this.defaultLanguage, [Validators.required]],
+      descriptions: this.fb.array([])
+    });
   }
 }

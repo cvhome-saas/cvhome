@@ -5,8 +5,6 @@ import {DomSanitizer} from '@angular/platform-browser';
 import {CategoryService} from '../services/category.service';
 import {NbDialogService, NbToastrService} from '@nebular/theme';
 import {TranslateService} from '@ngx-translate/core';
-import {ProductService} from '../../products/services/product.service';
-import {StorageService} from '../../../shared/services/storage.service';
 import {ShowcaseDialogComponent} from "../../../shared/components/showcase-dialog/showcase-dialog.component";
 import {Page} from "../../../shared/models/Page";
 import {ColumnMode} from "@swimlane/ngx-datatable";
@@ -32,6 +30,7 @@ export class CategoriesListComponent implements OnInit {
 
   // request params
   params = this.loadParams();
+  page: Page = new Page();
   protected readonly ColumnMode = ColumnMode;
 
   constructor(
@@ -40,34 +39,32 @@ export class CategoriesListComponent implements OnInit {
     private _sanitizer: DomSanitizer,
     private dialogService: NbDialogService,
     private translate: TranslateService,
-    private toastr: NbToastrService,
-    private productService: ProductService,
-    private storageService: StorageService,
+    private toastr: NbToastrService
   ) {
     this.roles = JSON.parse(localStorage.getItem('roles'));
   }
 
   loadParams() {
     return {
-      lang: this.storageService.getLanguage(),
+      lang: this.translate.currentLang,
       store: "",
       count: this.perPage,
       page: 1
     };
   }
 
+  // creating array of categories include children
 
   /** */
 
 
   ngOnInit() {
     this.translate.onLangChange.subscribe((lang) => {
-      this.params.lang = this.storageService.getLanguage();
+      this.params.lang = lang.lang;
       this.getCategories();
     });
   }
 
-  // creating array of categories include children
   //specific to category
   getChildren(node) {
     node.name = node.description.name;
@@ -80,7 +77,6 @@ export class CategoriesListComponent implements OnInit {
       this.categories.push(node);
     }
   }
-
 
   getCategories() {
     this.loadingList = true;
@@ -132,9 +128,6 @@ export class CategoriesListComponent implements OnInit {
   createCategory() {
     this.router.navigate(['pages/catalogue/categories/create-category']);
   }
-
-
-  page: Page = new Page();
 
   onSelectStore(e) {
     this.params.store = e.id;

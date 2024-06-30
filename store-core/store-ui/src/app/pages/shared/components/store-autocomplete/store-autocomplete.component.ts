@@ -17,17 +17,17 @@ export class StoreAutocompleteComponent implements AfterViewInit {
   selectedItem: ManagerStoreId | undefined;
   @Input()
   selectable: boolean = true
-  private lastStore: ManagerStoreId | undefined;
   stores: Store[] | undefined;
+  private lastStore: ManagerStoreId | undefined;
+
+  constructor(private cdr: ChangeDetectorRef, private storeService: StoreService) {
+  }
 
   changed($event: ManagerStoreId) {
     if ($event != undefined && $event.id != undefined && (this.lastStore == undefined || this.lastStore.id != $event.id)) {
       this.onStore.emit($event)
     }
     this.lastStore = $event
-  }
-
-  constructor(private cdr: ChangeDetectorRef, private storeService: StoreService) {
   }
 
   ngAfterViewInit(): void {

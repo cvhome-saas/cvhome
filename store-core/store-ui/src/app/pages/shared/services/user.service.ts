@@ -82,8 +82,6 @@ export class UserService {
   }
 
 
-
-
   updatePassword(id: any, passwords: any): Observable<any> {
     return this.crudService.patch(`/v1/private/user/${id}/password`, passwords);
   }
@@ -91,10 +89,6 @@ export class UserService {
   getUserId(): string {
     return localStorage.getItem(this.userIdString);
   }
-
-
-
-
 
 
   getCurrentAccount(): Observable<any> {

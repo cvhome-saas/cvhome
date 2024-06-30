@@ -10,10 +10,8 @@ export class HomeComponent implements OnInit {
   loadingList: boolean = false;
 
   constructor() {
-    console.log("in home")
   }
 
   ngOnInit() {
-    console.log("isn home")
   }
 }

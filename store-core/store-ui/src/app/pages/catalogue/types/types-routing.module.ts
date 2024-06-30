@@ -1,5 +1,5 @@
 import {NgModule} from '@angular/core';
-import {Routes, RouterModule} from '@angular/router';
+import {RouterModule, Routes} from '@angular/router';
 import {TypeDetailsComponent} from './type-details/type-details.component';
 import {TypesListComponent} from './types-list/types-list.component';
 import {TypesComponent} from './types.component';

@@ -26,8 +26,6 @@ import {ProductsImagesComponent} from './products-images/products-images.compone
 import {NbDialogModule} from '@nebular/theme';
 // import { ProductDiscountComponent } from './product-discount/product-discount.component';
 // import { ProductOrderingComponent } from './product-ordering/product-ordering.component';
-
-
 import {SharedModule} from "../../shared/shared.module";
 import {ProductDetailsComponent} from "./product-details/product-details.component";
 

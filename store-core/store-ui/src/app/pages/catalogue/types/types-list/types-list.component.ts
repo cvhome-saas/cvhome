@@ -19,12 +19,12 @@ export class TypesListComponent implements OnInit {
 
   rows: any[] = [];
   page: Page = new Page();
-  protected readonly ColumnMode = ColumnMode;
   perPage = 15;
   loadingList = false;
   settings = {};
   params = this.loadParams();
   currentPage = 1;
+  protected readonly ColumnMode = ColumnMode;
 
   constructor(
     private _sanitizer: DomSanitizer,
@@ -40,7 +40,7 @@ export class TypesListComponent implements OnInit {
   loadParams() {
     return {
       store: "",
-      lang: this.storageService.getLanguage(),
+      lang: this.translate.currentLang,
       count: this.perPage,
       page: 0
     };
@@ -48,7 +48,7 @@ export class TypesListComponent implements OnInit {
 
   ngOnInit(): void {
     this.translate.onLangChange.subscribe((lang) => {
-      this.params.lang = this.storageService.getLanguage();
+      this.params.lang = lang.lang;
       this.getList();
     });
   }

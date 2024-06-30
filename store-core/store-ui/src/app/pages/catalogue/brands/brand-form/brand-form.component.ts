@@ -20,7 +20,7 @@ export class BrandFormComponent implements OnInit {
   @Input() store: string;
   form: FormGroup;
   loader = false;
-  defaultLanguage:string;
+  defaultLanguage: string;
   languages = [];
   isCodeUnique = true;
 
@@ -33,6 +33,18 @@ export class BrandFormComponent implements OnInit {
     private router: Router,
   ) {
     this.defaultLanguage = this.translate.defaultLang;
+  }
+
+  get code() {
+    return this.form.get('code');
+  }
+
+  get selectedLanguage() {
+    return this.form.get('selectedLanguage');
+  }
+
+  get descriptions(): FormArray {
+    return <FormArray>this.form.get('descriptions');
   }
 
   ngOnInit() {
@@ -114,19 +126,6 @@ export class BrandFormComponent implements OnInit {
       selectedLanguage: lang,
     });
     //this.fillFormArray();
-  }
-
-
-  get code() {
-    return this.form.get('code');
-  }
-
-  get selectedLanguage() {
-    return this.form.get('selectedLanguage');
-  }
-
-  get descriptions(): FormArray {
-    return <FormArray>this.form.get('descriptions');
   }
 
   changeName(event, index) {

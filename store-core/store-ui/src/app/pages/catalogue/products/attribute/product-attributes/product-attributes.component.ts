@@ -1,4 +1,4 @@
-import {Component, OnInit, Input, Output, EventEmitter} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {LocalDataSource} from 'ng2-smart-table';
 import {ProductAttributesService} from '../../services/product-attributes.service';
@@ -6,11 +6,10 @@ import {ProductService} from '../../services/product.service';
 import {AttributeFormComponent} from '../attribute-form/attribute-form.component';
 import {OptionService} from '../../../options/services/option.service';
 import {Attribute} from '../model/attribute';
-import {NbToastrService} from '@nebular/theme';
+import {NbDialogService, NbToastrService} from '@nebular/theme';
 import {TranslateService} from '@ngx-translate/core';
 import {StorageService} from '../../../../shared/services/storage.service';
 import {ShowcaseDialogComponent} from '../../../../shared/components/showcase-dialog/showcase-dialog.component';
-import {NbDialogService} from '@nebular/theme';
 import {DomSanitizer} from '@angular/platform-browser';
 import {Location} from '@angular/common';
 import {ListingService} from '../../../../shared/services/listing.service';
@@ -89,7 +88,7 @@ export class ProductAttributesComponent implements OnInit {
     this.getList();
 
     this.translate.onLangChange.subscribe((lang) => {
-      this.params.lang = this.storageService.getLanguage();
+      this.params.lang = lang.lang;
       this.getList();
     });
 

@@ -3,6 +3,7 @@ import {Injectable} from '@angular/core';
 import {CrudService} from '../../../shared/services/crud.service';
 import {Observable} from 'rxjs';
 import {StorageService} from '../../../shared/services/storage.service';
+import {TranslateService} from "@ngx-translate/core";
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +12,8 @@ export class OptionService {
 
   constructor(
     private crudService: CrudService,
-    private storageService: StorageService
+    private storageService: StorageService,
+    private translate: TranslateService
   ) {
   }
 
@@ -49,7 +51,7 @@ export class OptionService {
   getListOfOptionsSet(): Observable<any> {
     const params = {
       store: this.storageService.getMerchant(),
-      lang: this.storageService.getLanguage()
+      lang: this.translate.currentLang
     };
     return this.crudService.get('/v1/private/product/property/set', params);
   }
@@ -57,7 +59,7 @@ export class OptionService {
   deleteOptionSet(id): Observable<any> {
     const reqparams = {
       store: this.storageService.getMerchant(),
-      lang: this.storageService.getLanguage()
+      lang: this.translate.currentLang
     };
     return this.crudService.delete(`/v1/private/product/property/set/${id}`, reqparams);
   }
@@ -69,7 +71,7 @@ export class OptionService {
   createSetOption(req): Observable<any> {
     const reqparams = {
       store: this.storageService.getMerchant(),
-      lang: this.storageService.getLanguage()
+      lang: this.translate.currentLang
     };
     return this.crudService.post('/v1/private/product/property/set', req, reqparams);
   }
@@ -81,7 +83,7 @@ export class OptionService {
   updateSetOption(id, param): Observable<any> {
     const reqparams = {
       store: this.storageService.getMerchant(),
-      lang: this.storageService.getLanguage()
+      lang: this.translate.currentLang
     };
     return this.crudService.put(`/v1/private/product/property/set/${id}`, param, reqparams);
   }

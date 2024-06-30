@@ -4,12 +4,11 @@ import {ActivatedRoute, Router} from '@angular/router';
 
 import {LocalDataSource} from 'ng2-smart-table';
 import {ProductService} from '../../services/product.service';
-import {NbDialogService} from '@nebular/theme';
+import {NbDialogService, NbToastrService} from '@nebular/theme';
 import {TranslateService} from '@ngx-translate/core';
 import {InventoryService} from '../../services/inventory.service';
 import {ShowcaseDialogComponent} from '../../../../shared/components/showcase-dialog/showcase-dialog.component';
 import {StorageService} from '../../../../shared/services/storage.service';
-import {NbToastrService} from '@nebular/theme';
 
 @Component({
   selector: 'ngx-manage-inventory',
@@ -32,7 +31,7 @@ export class ManageInventoryComponent implements OnInit {
   params = {
     count: this.perPage,
     page: 0,
-    lang: this.storageService.getLanguage(),
+    lang: this.translate.currentLang,
   };
   settings = {};
 
@@ -60,7 +59,7 @@ export class ManageInventoryComponent implements OnInit {
     });
     this.getList();
     this.translate.onLangChange.subscribe((lang) => {
-      this.params.lang = this.storageService.getLanguage();
+      this.params.lang = lang.lang;
       this.getList();
     });
   }

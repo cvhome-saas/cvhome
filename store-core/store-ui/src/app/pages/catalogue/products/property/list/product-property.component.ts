@@ -1,17 +1,15 @@
-import {Component, OnInit, Input, EventEmitter, Output} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
 import {PropertiesService} from '../../services/product-properties';
 import {ProductAttributesService} from '../../services/product-attributes.service';
 import {TranslateService} from '@ngx-translate/core';
 import {StorageService} from '../../../../shared/services/storage.service';
 import {LocalDataSource} from 'ng2-smart-table';
-import {NbDialogService} from '@nebular/theme';
+import {NbDialogService, NbToastrService} from '@nebular/theme';
 import {ProductPropertyForm} from '../form/product-property-form.component';
 import {Location} from '@angular/common';
 import {forkJoin} from 'rxjs';
 import {ProductService} from '../../services/product.service';
-
-import {NbToastrService} from '@nebular/theme';
 
 import {ShowcaseDialogComponent} from '../../../../shared/components/showcase-dialog/showcase-dialog.component';
 
@@ -57,7 +55,7 @@ export class ProductProperties implements OnInit {
   loadParams() {
     return {
       // store: this.storageService.getMerchant(),
-      lang: this.storageService.getLanguage(),
+      lang: this.translate.currentLang,
       count: this.perPage,
       page: 0
     };
@@ -75,7 +73,7 @@ export class ProductProperties implements OnInit {
 
 
     this.translate.onLangChange.subscribe((lang) => {
-      this.params.lang = this.storageService.getLanguage();
+      this.params.lang = lang.lang;
       this.getList();
     });
 

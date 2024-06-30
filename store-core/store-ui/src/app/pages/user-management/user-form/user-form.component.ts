@@ -20,18 +20,7 @@ export class UserFormComponent implements OnInit {
   form: FormGroup;
   @Input() title: string;
   @Input() action: string = 'CREATE';
-  private _user: User;
   @Input() store: string = '';
-
-  @Input()
-  set user(user: User) {
-    this._user = user;
-  }
-
-  get user(): User {
-    return this._user;
-  }
-
   allGroups: string[] = [];
   groups = [];
   pwdPattern = '^(?=[^A-Z]*[A-Z])(?=[^a-z]*[a-z])(?=[^0-9]*[0-9]).{6,12}$';
@@ -45,7 +34,6 @@ export class UserFormComponent implements OnInit {
       link: '/pages/user-management/change-password',
     }
   ];
-
   loader = false;
 
   constructor(
@@ -59,6 +47,45 @@ export class UserFormComponent implements OnInit {
     private cdr: ChangeDetectorRef,
     private toastr: NbToastrService,
     private translate: TranslateService) {
+  }
+
+  private _user: User;
+
+  get user(): User {
+    return this._user;
+  }
+
+  @Input()
+  set user(user: User) {
+    this._user = user;
+  }
+
+  get userName() {
+    return this.form.get('userName');
+  }
+
+  get firstName() {
+    return this.form.get('firstName');
+  }
+
+  get lastName() {
+    return this.form.get('lastName');
+  }
+
+  get emailAddress() {
+    return this.form.get('emailAddress');
+  }
+
+  get password() {
+    return this.form.get('password');
+  }
+
+  get repeatPassword() {
+    return this.form.get('repeatPassword');
+  }
+
+  get userGroups() {
+    return this.form.get('groups');
   }
 
   ngOnInit() {
@@ -93,49 +120,6 @@ export class UserFormComponent implements OnInit {
     return password === confirmPassword ? null : {notSame: true}
   }
 
-  private createForm() {
-    const emailValidators = [Validators.required, Validators.email, Validators.pattern(this.emailPattern)];
-    const disabled = this.action == 'VIEW';
-    this.form = this.fb.group({
-      firstName: new FormControl({value: '', disabled: disabled}, Validators.required),
-      lastName: new FormControl({value: '', disabled: disabled}, Validators.required),
-      userName: new FormControl({value: '', disabled: disabled}, Validators.required),
-      emailAddress: new FormControl({value: '', disabled: disabled}, emailValidators),
-      password: new FormControl({value: '', disabled: disabled}),
-      repeatPassword: new FormControl({value: '', disabled: disabled}),
-      active: new FormControl({value: false, disabled: disabled}),
-      groups: new FormControl({value: [], disabled: disabled}),
-    }, {validators: this.checkPasswords});
-  }
-
-  get userName() {
-    return this.form.get('userName');
-  }
-
-  get firstName() {
-    return this.form.get('firstName');
-  }
-
-  get lastName() {
-    return this.form.get('lastName');
-  }
-
-  get emailAddress() {
-    return this.form.get('emailAddress');
-  }
-
-  get password() {
-    return this.form.get('password');
-  }
-
-  get repeatPassword() {
-    return this.form.get('repeatPassword');
-  }
-
-  get userGroups() {
-    return this.form.get('groups');
-  }
-
   fillForm() {
     this.form.get('password').clearValidators();
     this.form.patchValue({
@@ -168,8 +152,8 @@ export class UserFormComponent implements OnInit {
       return;
     }
     if (this._user && this._user.id) {
-      userData.id=this._user.id;
-      this.userService.updateUser( userData, this.store)
+      userData.id = this._user.id;
+      this.userService.updateUser(userData, this.store)
         .subscribe({
           next: (res) => {
             this.toastr.success(this.translate.instant('USER_FORM.USER_UPDATED'));
@@ -220,5 +204,20 @@ export class UserFormComponent implements OnInit {
       }
     });
 
+  }
+
+  private createForm() {
+    const emailValidators = [Validators.required, Validators.email, Validators.pattern(this.emailPattern)];
+    const disabled = this.action == 'VIEW';
+    this.form = this.fb.group({
+      firstName: new FormControl({value: '', disabled: disabled}, Validators.required),
+      lastName: new FormControl({value: '', disabled: disabled}, Validators.required),
+      userName: new FormControl({value: '', disabled: disabled}, Validators.required),
+      emailAddress: new FormControl({value: '', disabled: disabled}, emailValidators),
+      password: new FormControl({value: '', disabled: disabled}),
+      repeatPassword: new FormControl({value: '', disabled: disabled}),
+      active: new FormControl({value: false, disabled: disabled}),
+      groups: new FormControl({value: [], disabled: disabled}),
+    }, {validators: this.checkPasswords});
   }
 }

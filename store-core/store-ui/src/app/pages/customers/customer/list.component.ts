@@ -17,13 +17,13 @@ import {ColumnMode} from "@swimlane/ngx-datatable";
 export class ListComponent implements OnInit {
   page: Page = new Page();
   rows = [];
-  protected readonly ColumnMode = ColumnMode;
   settings = {};
   loadingList = false;
   perPage = 10;
   currentPage = 0;
   totalCount;
   params = this.loadParams();
+  protected readonly ColumnMode = ColumnMode;
 
   constructor(
     private customersService: CustomersService,
@@ -35,7 +35,7 @@ export class ListComponent implements OnInit {
     private errorService: ErrorService
   ) {
     this.translate.onLangChange.subscribe((lang) => {
-      this.params.lang = this.storageService.getLanguage();
+      this.params.lang = lang.lang;
       this.getCustomers();
     });
   }
@@ -47,7 +47,7 @@ export class ListComponent implements OnInit {
   loadParams() {
     return {
       store: "",
-      lang: this.storageService.getLanguage(),
+      lang: this.translate.currentLang,
       count: this.perPage,
       page: 0
     };

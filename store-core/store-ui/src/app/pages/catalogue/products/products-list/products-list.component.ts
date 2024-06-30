@@ -40,7 +40,7 @@ export class ProductsListComponent implements OnInit {
   loadParams() {
     return {
       store: "",
-      lang: this.storageService.getLanguage(),
+      lang: this.translate.currentLang,
       count: this.perPage,
       origin: "admin", //does not load attributes in listing
       page: 0
@@ -49,7 +49,7 @@ export class ProductsListComponent implements OnInit {
 
   ngOnInit() {
     this.translate.onLangChange.subscribe((lang) => {
-      this.params.lang = this.storageService.getLanguage();
+      this.params.lang = lang.lang;
       this.getList();
     });
   }

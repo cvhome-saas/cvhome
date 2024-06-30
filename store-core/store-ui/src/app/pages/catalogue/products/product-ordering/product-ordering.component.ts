@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild, Output, EventEmitter} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {ProductService} from '../services/product.service';
 import {TranslateService} from '@ngx-translate/core';
 import {Router} from '@angular/router';
@@ -50,7 +50,7 @@ export class ProductOrderingComponent implements OnInit {
     this.getList();
     this.getCategory();
     this.translate.onLangChange.subscribe((lang) => {
-      this.params.lang = this.storageService.getLanguage();
+      this.params.lang = lang.lang;
       this.getList();
     });
   }

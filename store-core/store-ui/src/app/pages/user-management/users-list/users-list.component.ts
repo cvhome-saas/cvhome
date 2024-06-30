@@ -40,7 +40,7 @@ export class UsersListComponent implements OnInit {
   //object
   loadParams() {
     return {
-      lang: this.storageService.getLanguage(),
+      lang: this.translate.currentLang,
       store: "",
       count: this.perPage,
       page: 0,
@@ -76,7 +76,7 @@ export class UsersListComponent implements OnInit {
 
   ngOnInit() {
     this.translate.onLangChange.subscribe((lang) => {
-      this.params.lang = this.storageService.getLanguage();
+      this.params.lang = lang.lang;
     });
   }
 

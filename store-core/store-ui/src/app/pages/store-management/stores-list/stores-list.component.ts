@@ -21,12 +21,10 @@ export class StoresListComponent implements OnInit {
   loadingList = false;
   page: Page = new Page();
   rows = [];
-  protected readonly ColumnMode = ColumnMode;
-
   perPage = 10;
   currentPage = 1;
-
   params = this.loadParams();
+  protected readonly ColumnMode = ColumnMode;
 
   constructor(
     private storeService: StoreService,
@@ -43,14 +41,14 @@ export class StoresListComponent implements OnInit {
   ngOnInit() {
     this.getList();
     this.translate.onLangChange.subscribe((lang) => {
-      this.params.lang = this.storageService.getLanguage();
+      this.params.lang = lang.lang;
       this.getList();
     });
   }
 
   loadParams() {
     return {
-      lang: this.storageService.getLanguage(),
+      lang: this.translate.currentLang,
       count: this.perPage,
       page: 0
     };

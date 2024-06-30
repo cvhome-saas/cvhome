@@ -16,8 +16,8 @@ export class CreateNewUserComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.activatedRoute.params.subscribe(it=>{
-      this.store=it['store']
+    this.activatedRoute.params.subscribe(it => {
+      this.store = it['store']
     })
   }
 

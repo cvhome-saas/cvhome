@@ -23,7 +23,7 @@ export const routes: Routes = [
   },
   {
     path: '',
-    canActivate:[canAccessWelcomePage],
+    canActivate: [canAccessWelcomePage],
     loadChildren: () => import('./welcome/welcome.module')
       .then(m => m.WelcomeModule),
   },

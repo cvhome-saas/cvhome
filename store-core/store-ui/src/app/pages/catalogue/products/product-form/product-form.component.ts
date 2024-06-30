@@ -38,9 +38,9 @@ export class ProductFormComponent implements OnInit {
   languages = [];
   productTypes = [];
   selectedItem = '0';
-  defaultLanguage :string;
+  defaultLanguage: string;
   //changed from seo section
-  currentLanguage:string;
+  currentLanguage: string;
 
 
   tabs: NbRouteTab[] = [
@@ -83,8 +83,32 @@ export class ProductFormComponent implements OnInit {
     private storageService: StorageService,
     private activatedRoute: ActivatedRoute,
   ) {
-    this.defaultLanguage=this.translate.defaultLang
-    this.currentLanguage=this.translate.currentLang
+    this.defaultLanguage = this.translate.defaultLang
+    this.currentLanguage = this.translate.currentLang
+  }
+
+  get sku() {
+    return this.form.get('sku');
+  }
+
+  get manufacturer() {
+    return this.form.get('manufacturer');
+  }
+
+  get price() {
+    return this.form.get('price');
+  }
+
+  get quantity() {
+    return this.form.get('quantity');
+  }
+
+  get selectedLanguage() {
+    return this.form.get('selectedLanguage');
+  }
+
+  get descriptions(): FormArray {
+    return <FormArray>this.form.get('descriptions');
   }
 
   ngOnInit() {
@@ -101,48 +125,6 @@ export class ProductFormComponent implements OnInit {
     });
 
 
-  }
-
-  private loadEvent() {
-    this.loading = true;
-    this.loaded = false;
-  }
-
-  private loadedEvent() {
-    this.loading = false;
-    this.loaded = true;
-  }
-
-  private createForm() {
-    this.form = this.fb.group({
-      sku: ['', [Validators.required, Validators.pattern(validators.alphanumeric)]],
-      visible: [false],
-      dateAvailable: [new Date()],
-      manufacturer: ['', [Validators.required]],
-      type: [''],
-      display: [true],
-      canBePurchased: [true],
-      timeBound: [false],
-      price: ['', [Validators.required]],
-      quantity: ['', [Validators.required, Validators.pattern(validators.number)]],
-      // discountedPrice: [Validators.pattern(validators.number)],
-      // percentageOff: [Validators.pattern(validators.number)],
-      // rebatePrice: [Validators.required, Validators.pattern(validators.number)],
-      // startDate: [new Date()],
-      // endDate: [new Date()],
-      sortOrder: ['', [Validators.required, Validators.pattern(validators.number)]],
-      // productShipeable: [false, [Validators.required]],
-      productSpecifications: this.fb.group({
-        weight: [''],
-        height: [''],
-        width: [''],
-        length: ['']
-      }),
-      // placementOrder: [0, [Validators.required]],  // ???
-      // taxClass: [0, [Validators.required]], // ???
-      selectedLanguage: [this.defaultLanguage, [Validators.required]],
-      descriptions: this.fb.array([]),
-    });
   }
 
   addFormArray() {
@@ -162,7 +144,6 @@ export class ProductFormComponent implements OnInit {
       );
     });
   }
-
 
   fillForm() {
     this.form.patchValue({
@@ -219,30 +200,6 @@ export class ProductFormComponent implements OnInit {
         });
       }
     });
-  }
-
-  get sku() {
-    return this.form.get('sku');
-  }
-
-  get manufacturer() {
-    return this.form.get('manufacturer');
-  }
-
-  get price() {
-    return this.form.get('price');
-  }
-
-  get quantity() {
-    return this.form.get('quantity');
-  }
-
-  get selectedLanguage() {
-    return this.form.get('selectedLanguage');
-  }
-
-  get descriptions(): FormArray {
-    return <FormArray>this.form.get('descriptions');
   }
 
   selectLanguage(lang) {
@@ -388,7 +345,6 @@ export class ProductFormComponent implements OnInit {
     return invalid;
   }
 
-
   customButton(context) {
     const me = this;
     const ui = $.summernote.ui;
@@ -410,6 +366,47 @@ export class ProductFormComponent implements OnInit {
     return button.render();
   }
 
+  private loadEvent() {
+    this.loading = true;
+    this.loaded = false;
+  }
+
+  private loadedEvent() {
+    this.loading = false;
+    this.loaded = true;
+  }
+
+  private createForm() {
+    this.form = this.fb.group({
+      sku: ['', [Validators.required, Validators.pattern(validators.alphanumeric)]],
+      visible: [false],
+      dateAvailable: [new Date()],
+      manufacturer: ['', [Validators.required]],
+      type: [''],
+      display: [true],
+      canBePurchased: [true],
+      timeBound: [false],
+      price: ['', [Validators.required]],
+      quantity: ['', [Validators.required, Validators.pattern(validators.number)]],
+      // discountedPrice: [Validators.pattern(validators.number)],
+      // percentageOff: [Validators.pattern(validators.number)],
+      // rebatePrice: [Validators.required, Validators.pattern(validators.number)],
+      // startDate: [new Date()],
+      // endDate: [new Date()],
+      sortOrder: ['', [Validators.required, Validators.pattern(validators.number)]],
+      // productShipeable: [false, [Validators.required]],
+      productSpecifications: this.fb.group({
+        weight: [''],
+        height: [''],
+        width: [''],
+        length: ['']
+      }),
+      // placementOrder: [0, [Validators.required]],  // ???
+      // taxClass: [0, [Validators.required]], // ???
+      selectedLanguage: [this.defaultLanguage, [Validators.required]],
+      descriptions: this.fb.array([]),
+    });
+  }
 
   private loadssss() {
     this.loadEvent();

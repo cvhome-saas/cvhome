@@ -9,9 +9,8 @@ import {validators} from '../../../../shared/validation/validators';
 import {forkJoin} from 'rxjs';
 import {TranslateService} from '@ngx-translate/core';
 import {StorageService} from '../../../../shared/services/storage.service';
-import {NbToastrService} from '@nebular/theme';
+import {NbDialogRef, NbToastrService} from '@nebular/theme';
 import {formatMoney} from '../../../../shared/validation/price-validation';
-import {NbDialogRef} from '@nebular/theme';
 
 @Component({
   selector: 'ngx-attribute-form',
@@ -32,6 +31,13 @@ export class AttributeFormComponent implements OnInit {
   currency = '';
 
   perPage = 50;
+  params = {
+    store: this.storageService.getMerchant(),
+    lang: "_all",
+    name: null,
+    count: this.perPage,
+    page: 0,
+  }
 
   constructor(
     private fb: FormBuilder,
@@ -59,15 +65,17 @@ export class AttributeFormComponent implements OnInit {
       });
   };
 
-
-  params = {
-    store: this.storageService.getMerchant(),
-    lang: "_all",
-    name: null,
-    count: this.perPage,
-    page: 0,
+  get option() {
+    return this.form.get('option');
   }
 
+  get optionValue() {
+    return this.form.get('optionValue');
+  }
+
+  get productAttributeUnformattedPrice() {
+    return this.form.get('productAttributeUnformattedPrice');
+  }
 
   ngOnInit() {
 
@@ -82,21 +90,6 @@ export class AttributeFormComponent implements OnInit {
         this.loading = false;
       });
     }
-  }
-
-
-  private createForm() {
-    this.form = this.fb.group({
-      option: ['', [Validators.required]],
-      attributeDisplayOnly: [false],
-      optionValue: ['', [Validators.required]],
-      //optionValue: [''],
-      productAttributeUnformattedPrice: [0, [Validators.required]],
-      sortOrder: [0, [Validators.pattern(validators.number)]],
-      attributeDefault: [false],
-      requiredOption: [false],
-      productAttributeWeight: [0, [Validators.required]]
-    });
   }
 
   transformTotal() {
@@ -127,18 +120,6 @@ export class AttributeFormComponent implements OnInit {
       requiredOption: this.attribute.requiredOption,
       productAttributeWeight: this.attribute.productAttributeWeight,
     });
-  }
-
-  get option() {
-    return this.form.get('option');
-  }
-
-  get optionValue() {
-    return this.form.get('optionValue');
-  }
-
-  get productAttributeUnformattedPrice() {
-    return this.form.get('productAttributeUnformattedPrice');
   }
 
   onSelectOptionValue(event) {
@@ -226,6 +207,20 @@ export class AttributeFormComponent implements OnInit {
 
   goToBack() {
     this.ref.close();
+  }
+
+  private createForm() {
+    this.form = this.fb.group({
+      option: ['', [Validators.required]],
+      attributeDisplayOnly: [false],
+      optionValue: ['', [Validators.required]],
+      //optionValue: [''],
+      productAttributeUnformattedPrice: [0, [Validators.required]],
+      sortOrder: [0, [Validators.pattern(validators.number)]],
+      attributeDefault: [false],
+      requiredOption: [false],
+      productAttributeWeight: [0, [Validators.required]]
+    });
   }
 
 }

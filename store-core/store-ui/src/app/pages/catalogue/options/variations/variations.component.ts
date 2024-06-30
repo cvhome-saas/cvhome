@@ -4,9 +4,7 @@ import {VariationService} from '../services/variation.service';
 // import { OptionService } from '../services/option.service';
 import {LocalDataSource} from 'ng2-smart-table';
 import {TranslateService} from '@ngx-translate/core';
-import {ShowcaseDialogComponent} from '../../../shared/components/showcase-dialog/showcase-dialog.component';
-import {NbDialogService} from '@nebular/theme';
-import {NbToastrService} from '@nebular/theme';
+import {NbDialogService, NbToastrService} from '@nebular/theme';
 
 @Component({
   selector: 'ngx-variations-list',

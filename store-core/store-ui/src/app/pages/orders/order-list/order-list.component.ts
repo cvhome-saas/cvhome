@@ -40,14 +40,14 @@ export class OrderListComponent implements OnInit {
 
   ngOnInit() {
     this.translate.onLangChange.subscribe((lang) => {
-      this.params.lang = this.storageService.getLanguage();
+      this.params.lang = lang.lang;
     });
   }
 
   loadParams() {
     return {
       store: "",
-      lang: this.storageService.getLanguage(),
+      lang: this.translate.currentLang,
       count: this.perPage,
       page: 0
     };

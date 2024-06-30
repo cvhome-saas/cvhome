@@ -1,17 +1,7 @@
-import {
-  HttpRequest,
-  HttpClient,
-  HttpEvent,
-  HttpEventType
-} from "@angular/common/http";
+import {HttpClient, HttpEvent, HttpEventType, HttpRequest} from "@angular/common/http";
 import {catchError, map} from "rxjs/operators";
 import {Observable, of} from "rxjs";
-import {
-  FilePickerAdapter,
-  UploadResponse,
-  UploadStatus,
-  FilePreviewModel
-} from "ngx-awesome-uploader";
+import {FilePickerAdapter, FilePreviewModel, UploadResponse, UploadStatus} from "ngx-awesome-uploader";
 
 export class ImageUploadingAdapter extends FilePickerAdapter {
 

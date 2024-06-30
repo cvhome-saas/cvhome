@@ -45,7 +45,7 @@ export class FilesComponent {
           });
           this.loadingList = false;
         },
-        error:(e)=>{
+        error: (e) => {
           this.loadingList = false;
         },
         complete: () => {

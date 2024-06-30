@@ -1,4 +1,4 @@
-import {Component, OnInit, Input} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {Router} from '@angular/router';
 
@@ -13,12 +13,6 @@ import {TranslateService} from '@ngx-translate/core';
   styleUrls: ['./change-password.component.scss']
 })
 export class ChangePasswordComponent implements OnInit {
-
-  private _user: User;
-
-  get user(): User {
-    return this._user;
-  }
 
   form: FormGroup;
   loader = false;
@@ -46,19 +40,10 @@ export class ChangePasswordComponent implements OnInit {
     this.createForm();
   }
 
-  ngOnInit() {
-    this.userService.getUserProfile()
-      .subscribe(user => {
-        this._user = user;
-      });
-  }
+  private _user: User;
 
-  private createForm() {
-    this.form = this.fb.group({
-      password: ['', [Validators.required]],
-      newPassword: ['', [Validators.required, Validators.pattern(this.pwdPattern)]],
-      confirmNewPassword: ['', [Validators.required]],
-    }, {validator: this.checkPasswords});
+  get user(): User {
+    return this._user;
   }
 
   get password(): any {
@@ -71,6 +56,13 @@ export class ChangePasswordComponent implements OnInit {
 
   get confirmNewPassword(): any {
     return this.form.get('confirmNewPassword');
+  }
+
+  ngOnInit() {
+    this.userService.getUserProfile()
+      .subscribe(user => {
+        this._user = user;
+      });
   }
 
   checkPasswords(group: FormGroup) {
@@ -101,6 +93,14 @@ export class ChangePasswordComponent implements OnInit {
       }, err => {
         this.errorMessage = this.translate.instant('USER.PASSWORD_NOT_MATCH');
       });
+  }
+
+  private createForm() {
+    this.form = this.fb.group({
+      password: ['', [Validators.required]],
+      newPassword: ['', [Validators.required, Validators.pattern(this.pwdPattern)]],
+      confirmNewPassword: ['', [Validators.required]],
+    }, {validator: this.checkPasswords});
   }
 
 }

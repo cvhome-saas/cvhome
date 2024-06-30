@@ -160,51 +160,55 @@ export const MENU_ITEMS: MenuItem[] =
               hidden: false,
               guards: [IsAdminRetail]
             },
-            {
-              title: 'COMPONENTS.PRODUCT_ORDERING',
-              key: 'COMPONENTS.PRODUCT_ORDERING',
-              link: '/pages/catalogue/products/product-ordering',
-              hidden: false,
-              guards: [IsAdminRetail]
-            }
+            /*
+                        {
+                          title: 'COMPONENTS.PRODUCT_ORDERING',
+                          key: 'COMPONENTS.PRODUCT_ORDERING',
+                          link: '/pages/catalogue/products/product-ordering',
+                          hidden: false,
+                          guards: [IsAdminRetail]
+                        }
+            */
           ],
         },
-        {
-          title: 'COMPONENTS.OPTIONS',
-          key: 'COMPONENTS.OPTIONS',
-          hidden: false,
-          guards: [IsSuperadmin, IsAdmin, IsAdminRetail, IsAdminCatalogue],
-          children: [
-            {
-              title: 'COMPONENTS.OPTIONS_LIST',
-              key: 'COMPONENTS.OPTIONS_LIST',
-              link: '/pages/catalogue/options/options-list',
-              hidden: false,
-              guards: [IsSuperadmin, IsAdmin, IsAdminRetail, IsAdminCatalogue],
-            },
-            {
-              title: 'COMPONENTS.OPTIONS_VALUES_LIST',
-              key: 'COMPONENTS.OPTIONS_VALUES_LIST',
-              link: '/pages/catalogue/options/options-values-list',
-              hidden: false,
-              guards: [IsSuperadmin, IsAdmin, IsAdminRetail, IsAdminCatalogue],
-            },
-            {
-              title: 'COMPONENTS.OPTION_SET_LIST',
-              key: 'COMPONENTS.OPTION_SET_LIST',
-              link: '/pages/catalogue/options/options-set-list',
-              hidden: false,
-              guards: [IsSuperadmin, IsAdmin, IsAdminRetail, IsAdminCatalogue],
-            },
-            {
-              title: 'COMPONENTS.VARIATIONS_LIST',
-              key: 'COMPONENTS.VARIATIONS_LIST',
-              link: '/pages/catalogue/options/variations/list',
-              hidden: false,
-              guards: [IsSuperadmin, IsAdmin, IsAdminRetail, IsAdminCatalogue],
-            },
-          ]
-        },
+        /*
+                {
+                  title: 'COMPONENTS.OPTIONS',
+                  key: 'COMPONENTS.OPTIONS',
+                  hidden: false,
+                  guards: [IsSuperadmin, IsAdmin, IsAdminRetail, IsAdminCatalogue],
+                  children: [
+                    {
+                      title: 'COMPONENTS.OPTIONS_LIST',
+                      key: 'COMPONENTS.OPTIONS_LIST',
+                      link: '/pages/catalogue/options/options-list',
+                      hidden: false,
+                      guards: [IsSuperadmin, IsAdmin, IsAdminRetail, IsAdminCatalogue],
+                    },
+                    {
+                      title: 'COMPONENTS.OPTIONS_VALUES_LIST',
+                      key: 'COMPONENTS.OPTIONS_VALUES_LIST',
+                      link: '/pages/catalogue/options/options-values-list',
+                      hidden: false,
+                      guards: [IsSuperadmin, IsAdmin, IsAdminRetail, IsAdminCatalogue],
+                    },
+                    {
+                      title: 'COMPONENTS.OPTION_SET_LIST',
+                      key: 'COMPONENTS.OPTION_SET_LIST',
+                      link: '/pages/catalogue/options/options-set-list',
+                      hidden: false,
+                      guards: [IsSuperadmin, IsAdmin, IsAdminRetail, IsAdminCatalogue],
+                    },
+                    {
+                      title: 'COMPONENTS.VARIATIONS_LIST',
+                      key: 'COMPONENTS.VARIATIONS_LIST',
+                      link: '/pages/catalogue/options/variations/list',
+                      hidden: false,
+                      guards: [IsSuperadmin, IsAdmin, IsAdminRetail, IsAdminCatalogue],
+                    },
+                  ]
+                },
+        */
         {
           title: 'COMPONENTS.BRANDS',
           key: 'COMPONENTS.BRANDS',
@@ -276,56 +280,58 @@ export const MENU_ITEMS: MenuItem[] =
         }
       ],
     },
-    {
-      title: 'COMPONENTS.SHIPPING_MANAGEMENT',
-      key: 'COMPONENTS.SHIPPING_MANAGEMENT',
-      icon: 'car',
-      children: [
+    /*
         {
-          title: 'SHIPPING.EXPEDITION',
-          key: 'SHIPPING.EXPEDITION',
-          link: '/pages/shipping/config',
+          title: 'COMPONENTS.SHIPPING_MANAGEMENT',
+          key: 'COMPONENTS.SHIPPING_MANAGEMENT',
+          icon: 'car',
+          children: [
+            {
+              title: 'SHIPPING.EXPEDITION',
+              key: 'SHIPPING.EXPEDITION',
+              link: '/pages/shipping/config',
+            },
+            {
+              title: 'COMPONENTS.METHODS',
+              key: 'COMPONENTS.METHODS',
+              link: '/pages/shipping/methods',
+            },
+            {
+              title: 'SHIPPING.ORIGIN',
+              key: 'SHIPPING.ORIGIN',
+              link: '/pages/shipping/origin',
+            },
+            {
+              title: 'SHIPPING.PACKAGING',
+              key: 'SHIPPING.PACKAGING',
+              link: '/pages/shipping/packaging',
+            }
+          ]
         },
         {
-          title: 'COMPONENTS.METHODS',
-          key: 'COMPONENTS.METHODS',
-          link: '/pages/shipping/methods',
+          title: 'COMPONENTS.PAYMENT',
+          key: 'COMPONENTS.PAYMENT',
+          icon: 'credit-card',
+          link: '/pages/payment/methods'
         },
         {
-          title: 'SHIPPING.ORIGIN',
-          key: 'SHIPPING.ORIGIN',
-          link: '/pages/shipping/origin',
+          title: 'COMPONENTS.TAX_MANAGEMENT',
+          key: 'COMPONENTS.TAX_MANAGEMENT',
+          icon: 'file-text',
+          children: [
+            {
+              title: 'COMPONENTS.TAX_CLASS',
+              key: 'COMPONENTS.TAX_CLASS',
+              link: '/pages/tax-management/classes-list'
+            },
+            {
+              title: 'COMPONENTS.TAX_RATE',
+              key: 'COMPONENTS.TAX_RATE',
+              link: '/pages/tax-management/rate-list'
+            }
+          ]
         },
-        {
-          title: 'SHIPPING.PACKAGING',
-          key: 'SHIPPING.PACKAGING',
-          link: '/pages/shipping/packaging',
-        }
-      ]
-    },
-    {
-      title: 'COMPONENTS.PAYMENT',
-      key: 'COMPONENTS.PAYMENT',
-      icon: 'credit-card',
-      link: '/pages/payment/methods'
-    },
-    {
-      title: 'COMPONENTS.TAX_MANAGEMENT',
-      key: 'COMPONENTS.TAX_MANAGEMENT',
-      icon: 'file-text',
-      children: [
-        {
-          title: 'COMPONENTS.TAX_CLASS',
-          key: 'COMPONENTS.TAX_CLASS',
-          link: '/pages/tax-management/classes-list'
-        },
-        {
-          title: 'COMPONENTS.TAX_RATE',
-          key: 'COMPONENTS.TAX_RATE',
-          link: '/pages/tax-management/rate-list'
-        }
-      ]
-    },
+    */
     {
       title: 'COMPONENTS.CUSTOMER_MANAGEMENT',
       key: 'COMPONENTS.CUSTOMER_MANAGEMENT',

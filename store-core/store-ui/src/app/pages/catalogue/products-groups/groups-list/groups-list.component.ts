@@ -19,6 +19,7 @@ export class GroupsListComponent implements OnInit {
   rows = [];
   loadingList = false;
   params = this.loadParams();
+  protected readonly ColumnMode = ColumnMode;
 
   constructor(
     private dialogService: NbDialogService,
@@ -31,14 +32,14 @@ export class GroupsListComponent implements OnInit {
 
   loadParams() {
     return {
-      lang: this.storageService.getLanguage(),
+      lang: this.translate.currentLang,
       store: ""
     };
   }
 
   ngOnInit() {
     this.translate.onLangChange.subscribe((lang) => {
-      this.params.lang = this.storageService.getLanguage();
+      this.params.lang = lang.lang;
       this.getList();
     });
   }
@@ -61,14 +62,10 @@ export class GroupsListComponent implements OnInit {
 
   }
 
-
   onSelectStore(e) {
     this.params.store = e.id;
     this.getList();
   }
-
-
-  protected readonly ColumnMode = ColumnMode;
 
   onEdit(row: any) {
     this.router.navigate([`/pages/catalogue/products-groups/update-products-group/${this.params.store}-${row.code}`]);

@@ -16,10 +16,8 @@ import {ConfigService} from "../../../pages/shared/services/config.service";
 })
 export class HeaderComponent implements OnInit, OnDestroy {
 
-  private destroy$: Subject<void> = new Subject<void>();
   userPictureOnly: boolean = false;
   user: any;
-
   themes: any[] = [
     {
       value: 'default',
@@ -41,8 +39,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
   languages: string[];
   currentLanguage: string;
   currentTheme = 'default';
-
   userMenu = [{title: 'Profile'}, {title: 'Log out'}];
+  private destroy$: Subject<void> = new Subject<void>();
 
   constructor(private sidebarService: NbSidebarService,
               private menuService: NbMenuService,

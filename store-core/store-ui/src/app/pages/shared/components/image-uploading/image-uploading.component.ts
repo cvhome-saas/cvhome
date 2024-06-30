@@ -1,9 +1,8 @@
-import {Component, EventEmitter, Input, OnInit, Output, ViewChild,} from "@angular/core";
+import {Component, EventEmitter, Input, OnInit, Output,} from "@angular/core";
 
 // import {CdkDragEnter, CdkDropList, CdkDropListGroup, moveItemInArray} from "@angular/cdk/drag-drop";
 // import {ViewportRuler} from '@angular/cdk/overlay';
 // import {UserService} from "../../../../@core/mock/users.service";
-
 import {TranslateService} from "@ngx-translate/core";
 import {HttpClient, HttpErrorResponse} from "@angular/common/http";
 import {ImageUploadingAdapter} from "./image-uploading-adapter";

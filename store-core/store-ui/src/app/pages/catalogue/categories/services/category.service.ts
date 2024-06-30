@@ -30,10 +30,10 @@ export class CategoryService {
     return this.crudService.get(`/store/api/v1/private/category/${id}?store=${store}`, params);
   }
 
-  getCategoryByProductId(id, store): Observable<any> {
+  getCategoryByProductId(id, store, lang): Observable<any> {
     const params = {
       store: store,
-      lang: this.storageService.getLanguage()
+      lang
     };
     return this.crudService.get(`/store/api/v1/category/product/${id}`, params);
   }

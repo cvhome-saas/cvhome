@@ -5,7 +5,6 @@ import {validators} from '../../../shared/validation/validators';
 import {TypesService} from '../services/types.service';
 import {StorageService} from '../../../shared/services/storage.service';
 import {NbDialogService, NbToastrService} from '@nebular/theme';
-import {forkJoin} from 'rxjs';
 import {ActivatedRoute, Router} from '@angular/router';
 import {DomSanitizer} from '@angular/platform-browser';
 import {ConfigService} from '../../../shared/services/config.service';
@@ -23,7 +22,7 @@ export class TypeDetailsComponent implements OnInit {
   isReadonlyCode = false;
   isCodeExist = false;
   isValidCode = true;
-  defaultLanguage:string;
+  defaultLanguage: string;
   languages = [];
   type = {
     id: '',
@@ -49,6 +48,18 @@ export class TypeDetailsComponent implements OnInit {
     private configService: ConfigService
   ) {
     this.defaultLanguage = this.translate.defaultLang;
+  }
+
+  get code() {
+    return this.form.get('code');
+  }
+
+  get selectedLanguage() {
+    return this.form.get('selectedLanguage');
+  }
+
+  get descriptions(): FormArray {
+    return <FormArray>this.form.get('descriptions');
   }
 
   ngOnInit(): void {
@@ -103,16 +114,6 @@ export class TypeDetailsComponent implements OnInit {
 
   }
 
-  private createForm() {
-    this.form = this.fb.group({
-      allowAddToCart: [true],
-      visible: [false],
-      code: [{value: '', disabled: false}, [Validators.required, Validators.pattern(validators.alphanumeric)]],
-      selectedLanguage: this.defaultLanguage,
-      descriptions: this.fb.array([]),
-    });
-  }
-
   addFormArray() {
     const control = <FormArray>this.form.controls.descriptions;
     this.languages.forEach(lang => {
@@ -123,21 +124,6 @@ export class TypeDetailsComponent implements OnInit {
         })
       );
     });
-  }
-
-  private fillForm() {
-    this.form.patchValue({
-      allowAddToCart: this.type.allowAddToCart,
-      visible: this.type.visible,
-      code: this.type.code,
-      selectedLanguage: this.defaultLanguage
-    });
-    if (this.type.id) {
-      this.form.controls['code'].disable();
-    }
-    if (this.type.descriptions) {
-      this.fillFormArray();
-    }
   }
 
   fillFormArray() {
@@ -203,24 +189,10 @@ export class TypeDetailsComponent implements OnInit {
     this.router.navigate(['pages/catalogue/types/types-list']);
   }
 
-
-  get code() {
-    return this.form.get('code');
-  }
-
-  get selectedLanguage() {
-    return this.form.get('selectedLanguage');
-  }
-
-
   selectLanguage(lang) {
     this.form.patchValue({
       selectedLanguage: lang,
     });
-  }
-
-  get descriptions(): FormArray {
-    return <FormArray>this.form.get('descriptions');
   }
 
   checkCode(event) {
@@ -230,6 +202,31 @@ export class TypeDetailsComponent implements OnInit {
       .subscribe(res => {
         this.isCodeExist = res.exists;
       });
+  }
+
+  private createForm() {
+    this.form = this.fb.group({
+      allowAddToCart: [true],
+      visible: [false],
+      code: [{value: '', disabled: false}, [Validators.required, Validators.pattern(validators.alphanumeric)]],
+      selectedLanguage: this.defaultLanguage,
+      descriptions: this.fb.array([]),
+    });
+  }
+
+  private fillForm() {
+    this.form.patchValue({
+      allowAddToCart: this.type.allowAddToCart,
+      visible: this.type.visible,
+      code: this.type.code,
+      selectedLanguage: this.defaultLanguage
+    });
+    if (this.type.id) {
+      this.form.controls['code'].disable();
+    }
+    if (this.type.descriptions) {
+      this.fillFormArray();
+    }
   }
 
 }

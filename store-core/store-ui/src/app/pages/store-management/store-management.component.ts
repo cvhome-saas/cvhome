@@ -1,7 +1,4 @@
-import {Component, DoCheck, OnInit, Input} from '@angular/core';
-
-import {TranslateService} from '@ngx-translate/core';
-import {StorageService} from '../shared/services/storage.service';
+import {Component, DoCheck, OnInit} from '@angular/core';
 
 @Component({
   selector: 'ngx-store-management',

@@ -2,7 +2,6 @@ import {Component} from '@angular/core';
 import {CrudService} from '../../shared/services/crud.service';
 import {Router} from '@angular/router';
 import {NbDialogService, NbToastrService} from '@nebular/theme';
-// import { ShowcaseDialogComponent } from '../../shared/components/showcase-dialog/showcase-dialog.component';
 import {StoreService} from '../../store-management/services/store.service';
 import {StorageService} from '../../shared/services/storage.service';
 import {TranslateService} from '@ngx-translate/core';
@@ -22,7 +21,7 @@ export class PageComponent {
   perPage = 10;
   currentPage = 1;
   params = {
-    lang: this.storageService.getLanguage(),
+    lang: this.translate.currentLang,
     store: "",
     count: this.perPage,
     page: 0
@@ -41,7 +40,7 @@ export class PageComponent {
   ) {
 
     this.translate.onLangChange.subscribe((lang) => {
-      this.params.lang = this.storageService.getLanguage();
+      this.params.lang = lang.lang;
       this.getPages()
     });
   }

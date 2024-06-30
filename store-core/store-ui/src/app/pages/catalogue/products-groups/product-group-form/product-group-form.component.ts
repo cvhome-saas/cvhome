@@ -43,10 +43,14 @@ export class ProductGroupFormComponent implements OnInit {
     private translate: TranslateService) {
   }
 
+  get code() {
+    return this.form.get('code');
+  }
+
   loadParams() {
     return {
       store: "",
-      lang: this.storageService.getLanguage(),
+      lang: this.translate.currentLang,
       count: this.perPage,
       page: 0
     };
@@ -75,27 +79,6 @@ export class ProductGroupFormComponent implements OnInit {
         this.createForm();
         this.fillForm(res.productGroup);
       });
-  }
-
-
-  get code() {
-    return this.form.get('code');
-  }
-
-  private createForm() {
-    this.form = this.fb.group({
-      code: ['', [Validators.required, Validators.pattern(validators.alphanumericwithhyphen)]],
-      active: [true],
-      product: [this.rows]
-    });
-  }
-
-  private fillForm(data) {
-    this.form.patchValue({
-      code: data.code,
-      active: data.active,
-    });
-
   }
 
   checkCode(event) {
@@ -166,5 +149,21 @@ export class ProductGroupFormComponent implements OnInit {
   setPage(pageInfo) {
     this.page.pageNumber = pageInfo.offset;
     this.getProductByCode();
+  }
+
+  private createForm() {
+    this.form = this.fb.group({
+      code: ['', [Validators.required, Validators.pattern(validators.alphanumericwithhyphen)]],
+      active: [true],
+      product: [this.rows]
+    });
+  }
+
+  private fillForm(data) {
+    this.form.patchValue({
+      code: data.code,
+      active: data.active,
+    });
+
   }
 }

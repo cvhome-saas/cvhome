@@ -23,7 +23,7 @@ export class CategoryFormComponent implements OnInit {
   roots = [];
   perPage = 100;
   languages = [];
-  defaultLanguage :string;
+  defaultLanguage: string;
 
   //loader image
   loader = false;
@@ -33,15 +33,6 @@ export class CategoryFormComponent implements OnInit {
   isCodeUnique = true;
 
   params = this.loadParams();
-
-  loadParams() {
-    return {
-      lang: this.storageService.getLanguage(),
-      store: "",
-      count: this.perPage,
-      page: 0
-    };
-  }
 
   constructor(
     private fb: FormBuilder,
@@ -54,6 +45,35 @@ export class CategoryFormComponent implements OnInit {
     private dialogService: NbDialogService
   ) {
     this.defaultLanguage = this.translate.defaultLang;
+  }
+
+  get code() {
+    return this.form.get('code');
+  }
+
+  get selectedLanguage() {
+    return this.form.get('selectedLanguage');
+  }
+
+  get descriptions(): FormArray {
+    return <FormArray>this.form.get('descriptions');
+  }
+
+  get titles(): FormArray {
+    return <FormArray>this.form.get('titles');
+  }
+
+  get names(): FormArray {
+    return <FormArray>this.form.get('names');
+  }
+
+  loadParams() {
+    return {
+      lang: this.translate.currentLang,
+      store: "",
+      count: this.perPage,
+      page: 0
+    };
   }
 
   ngOnInit() {
@@ -102,18 +122,6 @@ export class CategoryFormComponent implements OnInit {
     } else {
       this.roots.push(node);
     }
-  }
-
-  private createForm() {
-    this.form = this.fb.group({
-      parent: ['root', [Validators.required]],
-      store: [this.params.store],
-      visible: [false],
-      code: ['', [Validators.required, Validators.pattern(validators.alphanumericwithhyphen)]],
-      sortOrder: [0, [Validators.required, Validators.pattern(validators.number)]],
-      selectedLanguage: ['', [Validators.required]],
-      descriptions: this.fb.array([]),
-    });
   }
 
   addFormArray() {
@@ -178,26 +186,6 @@ export class CategoryFormComponent implements OnInit {
     });
   }
 
-  get code() {
-    return this.form.get('code');
-  }
-
-  get selectedLanguage() {
-    return this.form.get('selectedLanguage');
-  }
-
-  get descriptions(): FormArray {
-    return <FormArray>this.form.get('descriptions');
-  }
-
-  get titles(): FormArray {
-    return <FormArray>this.form.get('titles');
-  }
-
-  get names(): FormArray {
-    return <FormArray>this.form.get('names');
-  }
-
   selectLanguage(lang) {
     this.form.patchValue({
       selectedLanguage: lang,
@@ -217,13 +205,6 @@ export class CategoryFormComponent implements OnInit {
       .subscribe(res => {
         this.isCodeUnique = !(res.exists && (this.category.code !== code));
       });
-  }
-
-  private prepareSaveData() {
-    const data = this.form.value;
-    const category = this.roots.find((el) => el.code === data.parent);
-    data.parent = {id: category.id, code: category.code};
-    return data;
   }
 
   save() {
@@ -351,6 +332,25 @@ export class CategoryFormComponent implements OnInit {
   onSelectStore(e) {
     this.params.store = e.id
     this.init()
+  }
+
+  private createForm() {
+    this.form = this.fb.group({
+      parent: ['root', [Validators.required]],
+      store: [this.params.store],
+      visible: [false],
+      code: ['', [Validators.required, Validators.pattern(validators.alphanumericwithhyphen)]],
+      sortOrder: [0, [Validators.required, Validators.pattern(validators.number)]],
+      selectedLanguage: ['', [Validators.required]],
+      descriptions: this.fb.array([]),
+    });
+  }
+
+  private prepareSaveData() {
+    const data = this.form.value;
+    const category = this.roots.find((el) => el.code === data.parent);
+    data.parent = {id: category.id, code: category.code};
+    return data;
   }
 
 }
