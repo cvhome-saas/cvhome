@@ -1548,7 +1548,7 @@ INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('OPTIN_SEQ_NEXT_VAL
 INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('PERMISSION_SEQ_NEXT_VAL', 1);
 INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('PRD_TYPE_SEQ_NEXT_VAL', 1);
 INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('PRODUCT_AVAIL_SEQ_NEXT_VAL', 2);
-INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('product_description_seq', 2);
+INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('product_description_seq', 8);
 INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('PRODUCT_IMG_SEQ_NEXT_VAL', 2);
 INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('product_price_description_seq', 2);
 INSERT INTO store.sm_sequencer (seq_name, seq_count) VALUES ('PRODUCT_PRICE_SEQ_NEXT_VAL', 2);
