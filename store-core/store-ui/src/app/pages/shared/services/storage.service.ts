@@ -1,7 +1,6 @@
 import {Injectable} from '@angular/core';
 
 import {UserService} from './user.service';
-import {environment} from '../../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -36,21 +35,5 @@ export class StorageService {
     }
     return merchant;
   }
-
-  getMerchantName() {
-    return localStorage.getItem('merchant');
-  }
-
-  getMerchantCountry() {
-    return localStorage.getItem('defaultCountry');
-  }
-
-  getLanguage() {
-    return localStorage.getItem('lang') || environment.client.language.default;
-  }
-
-  getUserRoles() {
-    return JSON.parse(localStorage.getItem('roles'));
-  }
-
 }
+

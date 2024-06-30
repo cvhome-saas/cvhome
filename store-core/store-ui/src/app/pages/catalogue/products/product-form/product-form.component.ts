@@ -251,7 +251,7 @@ export class ProductFormComponent implements OnInit {
         tmpObj.title = el.title;
       }
       if (tmpObj.title === '' && el.title === '') {
-        tmpObj.title = this.storageService.getMerchantName + ' | ' + el.name;
+        tmpObj.title =  el.name;
       }
       for (const elKey in el) {
         if (el.hasOwnProperty(elKey)) {
