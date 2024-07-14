@@ -34,6 +34,13 @@ com:
           schema: http
           namespace: store-core.cvhome.lcl
           gateway-service-name: store-core-gateway
+        welcome-ui:
+          name: welcome-ui
+          domain: welcome-ui.${com.asrevo.cvhome.app.domain}
+          port: 4300
+          schema: http
+          namespace: store-core.cvhome.lcl
+          gateway-service-name: store-core-gateway
         saas-pod-gateway:
           name: saas-pod-gateway
           domain: ${com.asrevo.cvhome.saas.domain}

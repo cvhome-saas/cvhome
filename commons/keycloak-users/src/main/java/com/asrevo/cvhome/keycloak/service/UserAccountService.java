@@ -11,15 +11,17 @@ import java.security.Principal;
 
 
 public interface UserAccountService {
+    ReadableUser createOrgUser(PersistableUser user);
+
     ReadableUser current(String id);
 
     ReadableUserList list(Principal principal, UserOrgStoreIdentity identity, ManagerStoreId store);
 
-    ReadableUser createUser(UserOrgStoreIdentity identity, ManagerStoreId store, PersistableUser create);
+    ReadableUser createManagedUser(UserOrgStoreIdentity identity, ManagerStoreId store, PersistableUser create);
 
-    ReadableUser updateUser(UserOrgStoreIdentity identity, ManagerStoreId store, PersistableUser user);
+    ReadableUser updateManagedUser(UserOrgStoreIdentity identity, ManagerStoreId store, PersistableUser user);
 
-    void resetPassword(UserOrgStoreIdentity userOrgStoreInfo, ManagerStoreId store, UserPassword passwordRequestDto, String userId);
+    void resetPassword(UserOrgStoreIdentity userOrgStoreInfo, ManagerStoreId store, UserPassword passwordRequestDto, String userId,boolean temporary);
 
     boolean usernameExist(String username);
 

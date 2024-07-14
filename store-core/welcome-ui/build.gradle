@@ -1,0 +1,80 @@
+task "clean" {
+  doLast {
+    delete files('dist/')
+  }
+}
+
+task "build" {
+  doLast {
+    exec {
+      workingDir '.'
+      commandLine "npm", "i"
+    }
+    exec {
+      workingDir '.'
+      commandLine "npm", "run", "build","--","--configuration","production"
+    }
+  }
+}
+
+tasks.register('bootBuildImage', BootBuildImageTask) {
+  dependsOn('build')
+}
+
+
+abstract class BootBuildImageTask extends DefaultTask {
+  private Boolean publishImage = false
+
+
+  @Option(option = "publishImage", description = "Configures PublishImage.")
+  void setPublishImage(Boolean publishImage) {
+    this.publishImage = publishImage;
+  }
+
+  BootBuildImageTask() {
+  }
+
+
+  @TaskAction
+  void bootBuildImage() {
+    project.exec {
+      workingDir '.'
+      commandLine createBuildCmd("store-core/${project.name}",project.version as String) as List<String>
+    }
+    if (publishImage) {
+      project.exec {
+        workingDir '.'
+        commandLine createPushCmd("store-core/${project.name}") as List<String>
+      }
+    }
+  }
+
+  static String createImageName(String repo) {
+    String registry = System.getenv("REGISTRY")
+    return registry ? "${registry}/${repo}" : repo
+  }
+
+  static List<String> createImageTags(String repo, String version) {
+    String image = createImageName(repo)
+    return ["${image}:latest", "${image}:${version}"]
+  }
+
+  static List<String> createBuildCmd(String repo, String version) {
+    String image = createImageName(repo)
+    List<String> tags = createImageTags(repo, version)
+    List<String> commands = ["docker", "build", "-t", image]
+    tags.forEach {
+      commands.add("-t")
+      commands.add(it)
+    }
+    commands.add(".")
+    return commands
+  }
+
+  static List<String> createPushCmd(String repo) {
+    String image = createImageName(repo)
+    return ["docker", "push", image, "--all-tags"]
+  }
+
+
+}

@@ -7,6 +7,7 @@ import com.asrevo.cvhome.keycloak.domain.user.*;
 import com.asrevo.cvhome.keycloak.mappers.UserRepresentationMapper;
 import com.asrevo.cvhome.keycloak.service.UserAccountService;
 import com.asrevo.cvhome.keycloak.utils.ErrorCodes;
+import com.asrevo.cvhome.keycloak.utils.KCUserType;
 import jakarta.ws.rs.core.Response;
 import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.CreatedResponseUtil;
@@ -23,8 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static com.asrevo.cvhome.keycloak.utils.Constants.ORG_ATTR_KEY;
-import static com.asrevo.cvhome.keycloak.utils.Constants.STORE_ATTR_KEY;
+import static com.asrevo.cvhome.keycloak.utils.Constants.*;
 
 public class KeycloakUserAccountServiceImpl implements UserAccountService {
     private final UserRepresentationMapper userRepresentationMapper;
@@ -37,6 +37,33 @@ public class KeycloakUserAccountServiceImpl implements UserAccountService {
         };
     }
 
+
+    @Override
+    public ReadableUser createOrgUser(PersistableUser persistableUser) {
+        try {
+            UserRepresentation user = userRepresentationMapper.copyPersistableUser(persistableUser);
+            Map<String, List<String>> attributes = Map.of(
+                    USER_TYPE_ATTR_KEY, List.of(KCUserType.ORG_USER.name())
+            );
+            user.setAttributes(attributes);
+            user.setGroups(List.of(Groups.ORG_ADMIN.name()));
+
+            return doCreateKCUser(persistableUser, user, false);
+        } catch (Exception e) {
+            throw new OperationExecution(ErrorCodes.CREATE_ORG_USER_FAIL);
+        }
+
+    }
+
+
+    private ReadableUser doCreateKCUser(PersistableUser persistableUser, UserRepresentation user, boolean temporary) {
+        Response response = usersResource.create(user);
+        String userId = CreatedResponseUtil.getCreatedId(response);
+        UserRepresentation representation = usersResource.get(userId).toRepresentation();
+        UserPassword passwordRequestDto = new UserPassword(persistableUser.getPassword(), persistableUser.getRepeatPassword());
+        doResetPassword(passwordRequestDto, userId, temporary);
+        return userRepresentationMapper.toDto(representation, usersResource.get(userId).groups());
+    }
 
     @Override
     public ReadableUser current(String id) {
@@ -57,28 +84,19 @@ public class KeycloakUserAccountServiceImpl implements UserAccountService {
         return userRepresentationMapper.toDto(usersExceptMe, (it) -> usersResource.get(it.getId()).groups());
     }
 
-    private ReadableUser createUser(IdentityId identityId, ManagerStoreId managerStoreId,
-                                    PersistableUser persistableUser) {
+    private ReadableUser createManagedUser(IdentityId identityId, ManagerStoreId managerStoreId,
+                                           PersistableUser persistableUser) {
         try {
-            UserRepresentation user = new UserRepresentation();
-            user.setEnabled(persistableUser.isActive());
-            user.setUsername(persistableUser.getUserName());
-            user.setFirstName(persistableUser.getFirstName());
-            user.setLastName(persistableUser.getLastName());
-            user.setEmail(persistableUser.getEmailAddress());
+            UserRepresentation user = userRepresentationMapper.copyPersistableUser(persistableUser);
             Map<String, List<String>> attributes = Map.of(
+                    USER_TYPE_ATTR_KEY, List.of(KCUserType.MANAGED_USER.name()),
                     ORG_ATTR_KEY, List.of(identityId.id()),
                     STORE_ATTR_KEY, List.of(managerStoreId.getId().toString())
             );
             user.setAttributes(attributes);
             user.setGroups(persistableUser.getGroups().stream().map(GroupEntity::getName).toList());
 
-            Response response = usersResource.create(user);
-            String userId = CreatedResponseUtil.getCreatedId(response);
-            UserRepresentation representation = usersResource.get(userId).toRepresentation();
-            UserPassword passwordRequestDto = new UserPassword(persistableUser.getPassword(), persistableUser.getRepeatPassword());
-            doResetPassword(passwordRequestDto, userId);
-            return userRepresentationMapper.toDto(representation, usersResource.get(userId).groups());
+            return doCreateKCUser(persistableUser, user, true);
         } catch (Exception e) {
             throw new OperationExecution(ErrorCodes.CREATE_USER_FAIL);
         }
@@ -86,7 +104,7 @@ public class KeycloakUserAccountServiceImpl implements UserAccountService {
 
 
     @Override
-    public ReadableUser createUser(UserOrgStoreIdentity identity, ManagerStoreId store, PersistableUser create) {
+    public ReadableUser createManagedUser(UserOrgStoreIdentity identity, ManagerStoreId store, PersistableUser create) {
         if (create.getGroups() == null || create.getGroups().isEmpty()) {
             throw new OperationExecution(ErrorCodes.GROUPS_SHOULD_NOT_BE_EMPTY);
         }
@@ -105,11 +123,11 @@ public class KeycloakUserAccountServiceImpl implements UserAccountService {
         if (emailExist(create.getEmailAddress())) {
             throw new OperationExecution(ErrorCodes.EMAIL_ALREADY_TAKEN);
         }
-        return createUser(identity.org(), store, create);
+        return createManagedUser(identity.org(), store, create);
     }
 
     @Override
-    public ReadableUser updateUser(UserOrgStoreIdentity identity, ManagerStoreId store, PersistableUser user) {
+    public ReadableUser updateManagedUser(UserOrgStoreIdentity identity, ManagerStoreId store, PersistableUser user) {
         return null;
     }
 
@@ -117,16 +135,17 @@ public class KeycloakUserAccountServiceImpl implements UserAccountService {
     public void resetPassword(UserOrgStoreIdentity userOrgStoreInfo,
                               ManagerStoreId store,
                               UserPassword passwordRequestDto,
-                              String userId) {
+                              String userId,
+                              boolean temporary) {
         UserResource userResource = usersResource.get(userId);
         UserRepresentation representation = userResource.toRepresentation();
         checkAttrAndValidate(userOrgStoreInfo, store, representation,
-                () -> doResetPassword(passwordRequestDto, userId));
+                () -> doResetPassword(passwordRequestDto, userId, temporary));
     }
 
-    private void doResetPassword(UserPassword passwordRequestDto, String userId) {
+    private void doResetPassword(UserPassword passwordRequestDto, String userId, boolean temporary) {
         CredentialRepresentation passwordCred = new CredentialRepresentation();
-        passwordCred.setTemporary(true);
+        passwordCred.setTemporary(temporary);
         passwordCred.setType(CredentialRepresentation.PASSWORD);
         passwordCred.setValue(passwordRequestDto.getPassword());
 
@@ -210,10 +229,7 @@ public class KeycloakUserAccountServiceImpl implements UserAccountService {
     }
 
     private static boolean isSupperAdmin(UserOrgStoreIdentity userOrgStoreInfo) {
-        if (userOrgStoreInfo.roles().contains(Roles.ROLE_SUPER_ADMIN)) {
-            return true;
-        }
-        return false;
+        return userOrgStoreInfo.roles().contains(Roles.ROLE_SUPER_ADMIN);
     }
 
     public Keycloak createKeycloak(URI jwkSetUri) {

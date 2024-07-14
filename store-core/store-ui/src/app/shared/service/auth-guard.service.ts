@@ -17,19 +17,3 @@ export const canAccessSecuredPages: CanActivateFn = (
       return of(router.parseUrl('external-login-link'));
     }));
 };
-
-export const canAccessWelcomePage: CanActivateFn = (
-  route: ActivatedRouteSnapshot,
-  state: RouterStateSnapshot,
-) => {
-  const oauthService: AuthService = inject(AuthService);
-  const router: Router = inject(Router);
-  const prevPage = localStorage.getItem(PREV_PAGE_KEY);
-  if (prevPage != undefined) {
-    localStorage.removeItem(PREV_PAGE_KEY);
-    return of(router.parseUrl(prevPage));
-  } else {
-    return true;
-  }
-};
-
