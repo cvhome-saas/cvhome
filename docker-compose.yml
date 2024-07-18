@@ -24,7 +24,7 @@ services:
       MINIO_ACCESS_KEY: "minioadmin"
       MINIO_SECRET_KEY: "minioadmin"
   keycloak:
-    image: quay.io/keycloak/keycloak:24.0
+    image: quay.io/keycloak/keycloak:25.0.0
     network_mode: host
     environment:
       KC_HTTP_ENABLED: true
