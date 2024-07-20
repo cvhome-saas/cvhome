@@ -29,6 +29,7 @@ services:
     environment:
       KC_HTTP_ENABLED: true
       KC_HTTP_PORT: 9999
+      KC_HTTP_MANAGEMENT_PORT: 9998
       KC_HOSTNAME_STRICT_HTTPS: false
 
       KC_DB: postgres
@@ -47,6 +48,7 @@ services:
       - ./store-core/auth/keycloak/providers:/opt/keycloak/providers
     ports:
       - "9999:9999"
+      - "9998:9998"
     depends_on:
       - postgres
   store:
@@ -114,6 +116,13 @@ services:
       SPRING_PROFILES_ACTIVE: lcl
     ports:
       - "4200:4200"
+  welcome-ui:
+    image: store-core/welcome-ui
+    network_mode: host
+    environment:
+      SPRING_PROFILES_ACTIVE: lcl
+    ports:
+      - "4300:4300"
   store-core-gateway:
     image: store-core/store-core-gateway
     network_mode: host
