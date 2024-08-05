@@ -1,11 +1,12 @@
-fix issue with renew token************
+copy auth with providers customize login
+remove current impersonate for super admin
+add mail communication service
+add support role
+log impersonate sessions and events
+make s2s call use service account client id with client_credentials not password
+"add ui for super admin and support with some features like impersonate , list org , metrics"
 central dynamodb session store
-hide un-used endpoint from store-ui**************
 build landing page and signup page for org admin
-fix multi language issue in store-ui********
 fix product price issue in store-ui
-fix customer list issue in store-ui********
 update user profile in store-ui
-mantain org admin user
-change status in orders**********
-fix home page for store-ui********
+maintain org admin user
