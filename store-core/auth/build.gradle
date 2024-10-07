@@ -71,7 +71,7 @@ abstract class BootBuildImageTask extends DefaultTask {
 
         }
 
-        return [gradleCmd, "clean", "build", "jar", "-Dorg.gradle.project.version=${version}","--stacktrace"]
+        return [gradleCmd, "clean", "build", "jar", "-Dorg.gradle.project.version=${version}"]
     }
 
     void copyBuildProviders(String version) {
