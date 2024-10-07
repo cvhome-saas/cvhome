@@ -14,8 +14,8 @@ public class KeycloakConfig {
 
     @SneakyThrows
     @Bean
-    public UserAccountService userAccountService(OAuth2ResourceServerProperties properties) {
-        return new KeycloakUserAccountServiceImpl(new URI(properties.getJwt().getJwkSetUri()));
+    public UserAccountService userAccountService(OAuth2ResourceServerProperties properties, KeycloakCredentialsProperties credentialsProperties) {
+        return new KeycloakUserAccountServiceImpl(new URI(properties.getJwt().getJwkSetUri()),credentialsProperties.credentials());
     }
 
 }

@@ -16,7 +16,7 @@ public class TestManagerApplication {
     @Bean
     @ServiceConnection
     static PostgreSQLContainer<?> postgresContainer() {
-        return new PostgreSQLContainer<>(DockerImageName.parse("postgres:13"));
+        return new PostgreSQLContainer<>(DockerImageName.parse("postgres:15-alpine"));
     }
 
     public static void main(String[] args) {

@@ -1,0 +1,37 @@
+plugins {
+    id 'application'
+    id 'java'
+    id("com.github.johnrengelman.shadow") version "8.1.1"
+}
+
+group = 'com.asrevo.cvhome.kc'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven { url 'https://repo.spring.io/milestone' }
+}
+
+dependencies {
+    compileOnly 'org.keycloak:keycloak-core:25.0.0'
+    compileOnly 'org.keycloak:keycloak-server-spi:25.0.0'
+    compileOnly 'org.keycloak:keycloak-server-spi-private:25.0.0'
+    compileOnly 'org.keycloak:keycloak-services:25.0.0'
+    compileOnly 'org.keycloak:keycloak-saml-core-public:25.0.0'
+    compileOnly 'org.projectlombok:lombok:1.18.34'
+
+    annotationProcessor 'org.projectlombok:lombok:1.18.34'
+
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+}
+
+mainClassName = "com.asrevo.cvhome.kc.Main"
+
+tasks.jar {
+    manifest.attributes["Main-Class"] = mainClassName
+}
+
+test {
+    useJUnitPlatform()
+}

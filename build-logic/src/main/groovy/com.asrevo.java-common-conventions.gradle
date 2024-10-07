@@ -9,6 +9,12 @@ plugins {
     id 'java'
 }
 
+java {
+    sourceCompatibility = '21'
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
 
 repositories {
     mavenLocal()

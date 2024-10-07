@@ -5,6 +5,10 @@ com:
         domain: "gateway.com"
       saas:
         domain: saas.${com.asrevo.cvhome.app.domain}
+      kc:
+        credentials:
+          client-id: internal-client
+          client-secret: aKl0AKjjQ6zp2bnWhKOsnTOzl3J8Vqd0
       services:
         auth:
           name: auth
@@ -74,11 +78,11 @@ spring:
     oauth2:
       client:
         registration:
-          microservice:
+          s2s:
             provider: keycloak
-            client-id: microservice-app
-            client-secret: r1nuVn4HefusLGwHIeRxbdOzdTZLEMvQ
-            authorization-grant-type: password
+            client-id: manager@service.store-core.internal
+            client-secret: VobDxIhAGZz8hyhzz7p9G7QpfixjFjzW
+            authorization-grant-type: client_credentials
           keycloak:
             client-id: web-app
             client-authentication-method: client_secret_basic

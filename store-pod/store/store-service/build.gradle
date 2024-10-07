@@ -8,13 +8,6 @@ plugins {
 apply from: "$rootDir/helpers/common-methods.gradle"
 group = 'com.asrevo.cvhome'
 
-java {
-    sourceCompatibility = '21'
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
-    }
-}
-
 repositories {
     mavenLocal()
     mavenCentral()
