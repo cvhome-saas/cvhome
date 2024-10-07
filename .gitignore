@@ -39,3 +39,4 @@ bin/
 /store-core/store-ui/package-lock.json
 /store-core/store-ui/src/app/pages/learn/
 /store-pod/landing-ui/package-lock.json
+/store-core/auth/keycloak/providers/*

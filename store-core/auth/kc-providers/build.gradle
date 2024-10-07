@@ -6,6 +6,13 @@ plugins {
 
 group = 'com.asrevo.cvhome.kc'
 
+java {
+    sourceCompatibility = '21'
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
 repositories {
     mavenLocal()
     mavenCentral()

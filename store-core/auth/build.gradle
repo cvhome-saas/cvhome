@@ -71,16 +71,16 @@ abstract class BootBuildImageTask extends DefaultTask {
 
         }
 
-        return [gradleCmd, "clean", "build", "jar", "-Dorg.gradle.project.version=${version}"]
+        return [gradleCmd, "clean", "build", "jar", "-Dorg.gradle.project.version=${version}","--stacktrace"]
     }
 
     void copyBuildProviders(String version) {
         String providersProjectName = "kc-providers";
         String providersJarName = "${providersProjectName}-${version}-all.jar";
+        def sourceJar = Paths.get("store-core/${project.name}/${providersProjectName}/build/libs/${providersJarName}")
 
-        def sourceJar = Paths.get("${project.name}/${providersProjectName}/build/libs/${providersJarName}")
-
-        def distJar = Paths.get("${project.name}/keycloak/providers/${providersJarName}")
+        def distJar = Paths.get("store-core/${project.name}/keycloak/providers/${providersJarName}")
+        println "will try to copy artifacts from ${sourceJar} to ${distJar}"
 
         if (Files.exists(sourceJar)) {
             if (Files.exists(distJar)) {
