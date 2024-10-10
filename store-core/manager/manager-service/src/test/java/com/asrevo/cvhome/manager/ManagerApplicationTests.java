@@ -14,7 +14,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 class ManagerApplicationTests {
     @Container
     @ServiceConnection
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:13");
+    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15-alpine");
 
     @Test
     void contextLoads() {

@@ -2,12 +2,20 @@
 POST http://localhost:9999/realms/cvhome/protocol/openid-connect/token
 Content-Type: application/x-www-form-urlencoded
 
-client_id = microservice-app &
+client_id = s2s &
 client_secret = r1nuVn4HefusLGwHIeRxbdOzdTZLEMvQ &
 grant_type = password &
-username = microservice-gateway
+username = auth@service.internal
     &
-password = microservice-gateway
+password = password
+
+### get token for microservice with client
+POST http://localhost:9999/realms/cvhome/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+client_id = communication@service.internal &
+client_secret = c27HPNwTPMRI1wstTx9f6EAxFB9J4Ba7 &
+grant_type = client_credentials
 
 
 
@@ -27,7 +35,7 @@ scope = roles
 POST http://localhost:9999/realms/cvhome/protocol/openid-connect/token
 Content-Type: application/x-www-form-urlencoded
 
-client_id = microservice-app &
+client_id = s2s &
 client_secret = r1nuVn4HefusLGwHIeRxbdOzdTZLEMvQ &
 grant_type = password &
 username = microservice-domain-ownership
@@ -39,7 +47,7 @@ password = microservice-domain-ownership
 POST http://localhost:9999/realms/cvhome/protocol/openid-connect/token
 Content-Type: application/x-www-form-urlencoded
 
-client_id = microservice-app &
+client_id = s2s &
 client_secret = r1nuVn4HefusLGwHIeRxbdOzdTZLEMvQ &
 grant_type = password &
 username = microservice-dcm

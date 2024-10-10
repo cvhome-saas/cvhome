@@ -15,8 +15,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.env.Environment;
-import org.springframework.security.oauth2.client.endpoint.WebClientReactivePasswordTokenResponseClient;
-import org.springframework.security.oauth2.client.endpoint.WebClientReactiveRefreshTokenTokenResponseClient;
+import org.springframework.security.oauth2.client.endpoint.WebClientReactiveClientCredentialsTokenResponseClient;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
@@ -71,8 +70,8 @@ public class WebClientServicesConfig {
          *
          */
         @Bean("defaultWebMicroServiceBuilder")
-        public WebClient.Builder defaultWebMicroServiceBuilder(WebClientReactivePasswordTokenResponseClient tokenClient, WebClientReactiveRefreshTokenTokenResponseClient refreshTokenClient, ReactiveClientRegistrationRepository repository) {
-            ServerCallBearerExchangeFilterFunction filter = new ServerCallBearerExchangeFilterFunction(tokenClient, refreshTokenClient, repository, "microservice", "microservice-gateway", "microservice-gateway");
+        public WebClient.Builder defaultWebMicroServiceBuilder(WebClientReactiveClientCredentialsTokenResponseClient tokenClient, ReactiveClientRegistrationRepository repository) {
+            ServerCallBearerExchangeFilterFunction filter = new ServerCallBearerExchangeFilterFunction(tokenClient, repository, "s2s");
             return WebClient.builder().filter(filter);
         }
 
@@ -82,8 +81,8 @@ public class WebClientServicesConfig {
          */
         @Bean("defaultMicroServiceBuilder")
         @LoadBalanced
-        public WebClient.Builder defaultMicroServiceBuilder(WebClientReactivePasswordTokenResponseClient tokenClient, WebClientReactiveRefreshTokenTokenResponseClient refreshTokenClient, ReactiveClientRegistrationRepository repository) {
-            ServerCallBearerExchangeFilterFunction filter = new ServerCallBearerExchangeFilterFunction(tokenClient, refreshTokenClient, repository, "microservice", "microservice-gateway", "microservice-gateway");
+        public WebClient.Builder defaultMicroServiceBuilder(WebClientReactiveClientCredentialsTokenResponseClient tokenClient, ReactiveClientRegistrationRepository repository) {
+            ServerCallBearerExchangeFilterFunction filter = new ServerCallBearerExchangeFilterFunction(tokenClient, repository, "s2s");
             return WebClient.builder().filter(filter);
         }
 
@@ -140,17 +139,10 @@ public class WebClientServicesConfig {
         }
 
         @Bean
-        public WebClientReactivePasswordTokenResponseClient reactivePasswordTokenResponseClient(@Qualifier("defaultBuilder") WebClient.Builder defaultBuilder) {
-            WebClientReactivePasswordTokenResponseClient client = new WebClientReactivePasswordTokenResponseClient();
+        public WebClientReactiveClientCredentialsTokenResponseClient reactivePasswordTokenResponseClient(@Qualifier("defaultBuilder") WebClient.Builder defaultBuilder) {
+            WebClientReactiveClientCredentialsTokenResponseClient client = new WebClientReactiveClientCredentialsTokenResponseClient();
             client.setWebClient(defaultBuilder.build());
             return client;
-        }
-
-        @Bean
-        public WebClientReactiveRefreshTokenTokenResponseClient reactiveRefreshTokenTokenResponseClient(@Qualifier("defaultBuilder") WebClient.Builder defaultBuilder) {
-            WebClientReactiveRefreshTokenTokenResponseClient refreshTokenClient = new WebClientReactiveRefreshTokenTokenResponseClient();
-            refreshTokenClient.setWebClient(defaultBuilder.build());
-            return refreshTokenClient;
         }
 
 /*   issue with this i cant disable https validation and the validation fail

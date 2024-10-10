@@ -30,8 +30,8 @@ public class KeycloakUserAccountServiceImpl implements UserAccountService {
     private final UserRepresentationMapper userRepresentationMapper;
     private final UsersResource usersResource;
 
-    public KeycloakUserAccountServiceImpl(URI jwkSetUri) {
-        Keycloak keycloak = createKeycloak(jwkSetUri);
+    public KeycloakUserAccountServiceImpl(URI jwkSetUri, KeycloakCredentials credentials) {
+        Keycloak keycloak = createKeycloak(jwkSetUri, credentials);
         this.usersResource = keycloak.realm(jwkSetUri.getPath().split("/")[2]).users();
         this.userRepresentationMapper = new UserRepresentationMapper() {
         };
@@ -232,15 +232,15 @@ public class KeycloakUserAccountServiceImpl implements UserAccountService {
         return userOrgStoreInfo.roles().contains(Roles.ROLE_SUPER_ADMIN);
     }
 
-    public Keycloak createKeycloak(URI jwkSetUri) {
+
+    public Keycloak createKeycloak(URI jwkSetUri, KeycloakCredentials credentials) {
         String serverUrl = jwkSetUri.getScheme() + "://" + jwkSetUri.getAuthority();
         return KeycloakBuilder.builder()
                 .serverUrl(serverUrl)
-                .realm("master")
-                .grantType(OAuth2Constants.PASSWORD)
-                .clientId("admin-cli")
-                .password("admin")
-                .username("admin")
+                .realm("cvhome")
+                .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
+                .clientId(credentials.clientId())
+                .clientSecret(credentials.clientSecret())
                 .build();
     }
 
