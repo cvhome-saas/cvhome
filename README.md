@@ -8,13 +8,13 @@
    https certificate
 3. every store can be served under many domains like example1.com , example2.net
 4. with all e-commerce features (Catalog ,Shopping cart ,Checkout ,Merchant ,Order ,Customer ,User)
-5. seo friendly with nestjs server side rendering for your store
+5. seo friendly with next-js server side rendering for your store
 6. every store data is totally separated and not shared to other stores
-7. support many user level access  (SUPER_ADMIN,ORG_ADMIN,STORE_ADMIN,STORE_MODERATOR,CUSTOMER)
+7. support many user level access  ( SUPER_ADMIN , ORG_ADMIN , STORE_ADMIN , STORE_MODERATOR , CUSTOMER )
 
 ### Technologies Used
 
-1. java 23
+1. java 21
 2. spring boot 3.3
 3. spring cloud 2023.0.2
 4. caddy
@@ -87,11 +87,12 @@ you still can scale every cluster services horizontal autoscale as normal by sca
    domain then forward every request to `store-pod:gateway:gateway-service`
 
 ### Installation
+
 1. we require you hava `java 21` , `gradle-8.9` , `node v20` , `docker && docker compose`
 
 ### Demo and Deployment
 
-there are 3 options to run cvhome saas project
+there are 4 options to run cvhome saas project
 
 1. AWS ECS FARGATE --> check here
 2. AWS EKS --> check here
@@ -100,31 +101,34 @@ there are 3 options to run cvhome saas project
 
 ##### but before we start to deploy keep in mind we are populating with some test data (org, stores , users , catalog)
 
-1. keycloak system user sys-admin@mail.com   admin
+1. keycloak system user sys-admin@mail.com admin
 
-2. 
-| org                                           | store                                                                                                      | username                       | password | role                  |
-|-----------------------------------------------|------------------------------------------------------------------------------------------------------------|--------------------------------|----------|-----------------------|
-| manage all org                                | manage all stores                                                                                          | super-admin@mail.com           | admin    | ROLE_SUPER_ADMIN      |
-| ----------------org1------------------------- | -----------------------------                                                                              | org1-admin@mail.com            | admin    | ROLE_ORG_ADMIN        |
-| id = d1952c95-312e-4bb9-9a2d-b703d031276f     | -------------store1----------------<br/>id = 65f023632bc46470c104b76f<br/>domain = org1-store1.gateway.com | org1-store1-admin@mail.com     | admin    | ROLE_STORE_ADMIN      |
-|                                               |                                                                                                            | org1-store1-moderator@mail.com | admin    | ROLE_STORE_MODERATOR  |
-|                                               | -------------store2----------------<br/>id = 65f023632bc46470c104b75f<br/>domain = org1-store2.gateway.com | org1-store2-admin@mail.com     | admin    | ROLE_STORE_ADMIN      |
-|                                               |                                                                                                            | org1-store2-moderator@mail.com | admin    | ROLE_STORE_MODERATOR  |
-| ----------------org2------------------------- | -----------------------------                                                                              | org2-admin@mail.com            | admin    | ROLE_ORG_ADMIN        |
-| id = d1952c95-312e-4bb6-9a2d-b703d031276f     | -------------store1----------------<br/>id = 65f020632bc46470c104b76f<br/>domain = org2-store1.gateway.com | org2-store1-admin@mail.com     | admin    | ROLE_STORE_ADMIN      |
-|                                               |                                                                                                            | org2-store1-moderator@mail.com | admin    | ROLE_STORE_MODERATOR  |
-|                                               | -------------store2----------------<br/>id = 65f023632bc26470c104b75f<br/>domain = org2-store2.gateway.com | org2-store2-admin@mail.com     | admin    | ROLE_STORE_ADMIN      |
-|                                               |                                                                                                            | org2-store2-moderator@mail.com | admin    | ROLE_STORE_MODERATOR  |
+2.
+
+| org                                         | store                                                                                    | username                       | pass  | role            |
+|---------------------------------------------|------------------------------------------------------------------------------------------|--------------------------------|-------|-----------------|
+| all                                         | all                                                                                      | super-admin@mail.com           | admin | SUPER_ADMIN     |
+| ---org1---                                  |                                                                                          | org1-admin@mail.com            | admin | ORG_ADMIN       |
+| `id = d1952c95-312e-4bb9-9a2d-b703d031276f` | ---store1---<br/>`id = 65f023632bc46470c104b76f`<br/>`domain = org1-store1.gateway.com`  | org1-store1-admin@mail.com     | admin | STORE_ADMIN     |
+|                                             |                                                                                          | org1-store1-moderator@mail.com | admin | STORE_MODERATOR |
+|                                             | ---store2--- <br/>`id = 65f023632bc46470c104b75f`<br/>`domain = org1-store2.gateway.com` | org1-store2-admin@mail.com     | admin | STORE_ADMIN     |
+|                                             |                                                                                          | org1-store2-moderator@mail.com | admin | STORE_MODERATOR |
+| ---org2---                                  |                                                                                          | org2-admin@mail.com            | admin | ORG_ADMIN       |
+| `id = d1952c95-312e-4bb6-9a2d-b703d031276f` | ---store1---<br/>`id = 65f020632bc46470c104b76f`<br/>`domain = org2-store1.gateway.com`  | org2-store1-admin@mail.com     | admin | STORE_ADMIN     |
+|                                             |                                                                                          | org2-store1-moderator@mail.com | admin | STORE_MODERATOR |
+|                                             | ---store2---<br/>`id = 65f023632bc26470c104b75f`<br/>`domain = org2-store2.gateway.com`  | org2-store2-admin@mail.com     | admin | STORE_ADMIN     |
+|                                             |                                                                                          | org2-store2-moderator@mail.com | admin | STORE_MODERATOR |
 
 ### DOCKER COMPOSE deployment options
+
 #### Steps to run on linux
+
 1. configure hosts in `/etc/hosts` by running `bash scripts/configure-domain.sh`
 2. run `docker compose -f docker-compose.yml up`
-3. access the application 
-   - http://gateway.com:7000    access the welcome page 
-   - http://store-ui.gateway.com:7000    access the dashboard
-   - http://org1-store1.gateway.com:7100    access org1-store1 store
-   - http://org1-store2.gateway.com:7100    access org1-store2 store
-   - http://org2-store1.gateway.com:7100    access org2-store1 store
-   - http://org2-store2.gateway.com:7100    access org2-store2 store
+3. access the application
+    - http://gateway.com:7000    access the welcome page
+    - http://store-ui.gateway.com:7000    access the dashboard
+    - http://org1-store1.gateway.com:7100    access org1-store1 store
+    - http://org1-store2.gateway.com:7100    access org1-store2 store
+    - http://org2-store1.gateway.com:7100    access org2-store1 store
+    - http://org2-store2.gateway.com:7100    access org2-store2 store
