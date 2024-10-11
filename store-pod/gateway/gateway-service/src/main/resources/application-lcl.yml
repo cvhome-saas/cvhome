@@ -53,3 +53,6 @@ spring:
               args:
                 addRequestHeader: true
                 addResponseHeader: true
+      x-forwarded:
+        host-append: false
+        for-append: false

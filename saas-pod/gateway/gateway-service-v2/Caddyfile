@@ -16,7 +16,8 @@
 }
 
 http:// {
-	respond "welcome http" 200
+	reverse_proxy {$STORE_POD_GATEWAY} {
+	}
 }
 
 https:// {
