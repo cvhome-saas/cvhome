@@ -1,6 +1,7 @@
 task "clean" {
     doLast {
         delete files('dist/')
+        delete files('package-lock.json')
     }
 }
 

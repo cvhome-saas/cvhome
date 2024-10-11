@@ -37,7 +37,7 @@ services:
       KC_DB_USERNAME: postgres
       KC_DB_PASSWORD: password
 
-      KEYCLOAK_ADMIN: admin@mail.com
+      KEYCLOAK_ADMIN: sys-admin@mail.com
       KEYCLOAK_ADMIN_PASSWORD: admin
 
     command: --verbose start --proxy=edge  --hostname-strict=false --import-realm

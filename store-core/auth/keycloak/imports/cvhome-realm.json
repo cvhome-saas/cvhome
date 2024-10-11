@@ -647,7 +647,7 @@
   "users": [
     {
       "id": "d1952c95-312e-4bb9-9a2d-b703d031276f",
-      "username": "org1-admin",
+      "username": "org1-admin@mail.com",
       "emailVerified": false,
       "attributes": {
         "user_type": [
@@ -679,7 +679,7 @@
     },
     {
       "id": "3dea29fd-f6b2-48b1-8231-f4b5f1c68714",
-      "username": "org1-store1-admin",
+      "username": "org1-store1-admin@mail.com",
       "emailVerified": false,
       "attributes": {
         "org": [
@@ -717,7 +717,7 @@
     },
     {
       "id": "3dea29fd-f6b2-48b1-8231-f4b5f1c68715",
-      "username": "org1-store1-moderator",
+      "username": "org1-store1-moderator@mail.com",
       "emailVerified": false,
       "attributes": {
         "org": [
@@ -755,7 +755,7 @@
     },
     {
       "id": "3dea29fd-f6b2-48b1-8231-f4b5f1c68713",
-      "username": "org1-store2-admin",
+      "username": "org1-store2-admin@mail.com",
       "emailVerified": false,
       "attributes": {
         "org": [
@@ -793,7 +793,7 @@
     },
     {
       "id": "3dea29fd-f6b2-48b1-8231-f4b5f1c68712",
-      "username": "org1-store2-moderator",
+      "username": "org1-store2-moderator@mail.com",
       "emailVerified": false,
       "attributes": {
         "org": [
@@ -831,7 +831,7 @@
     },
     {
       "id": "d1952c95-312e-4bb6-9a2d-b703d031276f",
-      "username": "org2-admin",
+      "username": "org2-admin@mail.com",
       "emailVerified": false,
       "attributes": {
         "user_type": [
@@ -863,7 +863,7 @@
     },
     {
       "id": "3dea29fd-f6b2-48b1-8231-f4b5f1c68014",
-      "username": "org2-store1-admin",
+      "username": "org2-store1-admin@mail.com",
       "emailVerified": false,
       "attributes": {
         "org": [
@@ -901,7 +901,7 @@
     },
     {
       "id": "3dea29fd-f6b2-48b1-8231-f4b5f1c68015",
-      "username": "org2-store1-moderator",
+      "username": "org2-store1-moderator@mail.com",
       "emailVerified": false,
       "attributes": {
         "org": [
@@ -939,7 +939,7 @@
     },
     {
       "id": "3dea29fd-f6b2-48b1-8231-f4b5f1c68013",
-      "username": "org2-store2-admin",
+      "username": "org2-store2-admin@mail.com",
       "emailVerified": false,
       "attributes": {
         "org": [
@@ -977,7 +977,7 @@
     },
     {
       "id": "3dea29fd-f6b2-48b1-8231-f4b5f1c68012",
-      "username": "org2-store2-moderator",
+      "username": "org2-store2-moderator@mail.com",
       "emailVerified": false,
       "attributes": {
         "org": [
@@ -1015,7 +1015,7 @@
     },
     {
       "id": "4003ef66-915e-47f5-9e01-6eb8dbbee33c",
-      "username": "super-admin",
+      "username": "super-admin@mail.com",
       "emailVerified": false,
       "attributes": {
         "user_type": [
