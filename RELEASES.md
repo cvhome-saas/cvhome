@@ -8,6 +8,7 @@
 2. remove old impersonate functions 
 3. add support role
 4. update user profile in store-ui
+5. central session store (redis) for store-core-gateway
 
 ### missing for releasing 0.0.3
 1. iac for deploy in AWS Fargate Cluster
