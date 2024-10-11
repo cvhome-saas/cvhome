@@ -11,7 +11,6 @@ import {ShapeComponent} from "../../components/shape/shape.component";
   styleUrl: './welcome.component.css'
 })
 export class WelcomeComponent {
-  title: string = 'Make cool Landing pages with sApp';
-  desc: string = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Impedit nihil tenetur minus quidem est deserunt molestias accusamus harum ullam tempore debitis et, expedita, repellat delectus aspernatur neque itaque qui quod.';
-  banner: string = 'img/welcome/welcome-mockup.png'
+  title: string = 'Make cool store easily with Cvhome';
+  desc: string = 'Join our clients and try create your store with few clicks for free.';
 }

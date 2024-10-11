@@ -12,20 +12,23 @@ import {RouterLink} from "@angular/router";
   styleUrl: './pricing.component.css'
 })
 export class PricingComponent {
-  title: string = 'Unlock Full Power Of sApp';
-  desc: string = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Laborum obcaecati dignissimos quae quo ad iste ipsum officiis deleniti asperiores sit.';
+  title: string = 'Unlock Full Power Of Cvhome';
+  desc: string = 'Choose your Plan that fit your business.';
   prices: Pricing[] = [
     {
-      name: "Basic",
+      name: "Free",
       fade: "fadeInLeft",
-      cost: "49",
+      cost: "0",
       icon: "img/pricing/basic.png",
       pricingFeatures: [
         {
-          desc: "5GB Linux Web Space"
+          desc: "50 order"
         },
         {
-          desc: "5 MySQL Databases"
+          desc: "25 product"
+        },
+        {
+          desc: "2k visitor"
         },
         {
           desc: "24/7 Tech Support"
@@ -34,16 +37,40 @@ export class PricingComponent {
       url: "signup"
     },
     {
-      name: "Pro",
+      name: "Basic",
+      fade: "fadeInDown",
+      cost: "9",
+      icon: "img/pricing/basic.png",
+      pricingFeatures: [
+        {
+          desc: "200 order"
+        },
+        {
+          desc: "100 product"
+        },
+        {
+          desc: "20k visitor"
+        },
+        {
+          desc: "24/7 Tech Support"
+        }
+      ],
+      url: "signup"
+    },
+    {
+      name: "Performance",
       fade: "fadeInRight",
       cost: "49",
       icon: "img/pricing/premium.png",
       pricingFeatures: [
         {
-          desc: "5GB Linux Web Space"
+          desc: "2k order"
         },
         {
-          desc: "5 MySQL Databases"
+          desc: "1k product"
+        },
+        {
+          desc: "200k visitor"
         },
         {
           desc: "24/7 Tech Support"

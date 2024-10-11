@@ -12,7 +12,7 @@ import {FormsModule} from "@angular/forms";
 })
 export class SubscribeComponent {
   title: string = 'Subscribe to get updates';
-  message: string = 'By subscribing you will get newsleter, promotions adipisicing elit. Architecto beatae, asperiores tempore repudiandae saepe aspernatur unde voluptate sapiente quia ex.';
+  message: string = 'By subscribing you will get newsleter, promotions';
   email: string = '';
 
   public sub() {

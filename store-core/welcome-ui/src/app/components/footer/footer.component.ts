@@ -90,10 +90,10 @@ export class FooterComponent {
     }
   ];
   creator: Creator = {
-    name: "ashraf",
+    name: "me@asrevo.com",
     link: "#"
   }
-  copyrights:string='Copyrights 2022 sApp All rights reserved.'
+  copyrights:string='Copyrights 2024 Cvhome All rights reserved.'
 }
 
 interface SocialLink {

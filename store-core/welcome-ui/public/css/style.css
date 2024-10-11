@@ -1,12 +1,12 @@
 /* ************************************************************
-:: Template Name: sApp - App Landing Page Template
-:: Template URI: https://theme-land.com/sapp/
+:: Template Name: Cvhome - App Landing Page Template
+:: Template URI: https://theme-land.com/Cvhome/
 :: Template Author Name: theme_land
 :: Template Author URI: hridoy1272@gmail.com
 :: Version: 1.0.0
 :: Created: 31 January 2020
 :: Updated: 14 October 2020
-************************************************************ 
+************************************************************
 *
 *
 ******* :: INDEX OF CSS :: *******
@@ -464,22 +464,22 @@ img {
           box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
 }
 
-.btn.sApp-btn {
+.btn.Cvhome-btn {
   background: transparent none repeat scroll 0 0;
   color: var(--nav-item-color);
   border-radius: 100px;
   letter-spacing: 1px;
 }
 
-.btn.sApp-btn:hover, .btn.sApp-btn:focus {
+.btn.Cvhome-btn:hover, .btn.Cvhome-btn:focus {
   color: var(--white-color);
 }
 
-.btn.sApp-btn:hover:after, .btn.sApp-btn:focus:after {
+.btn.Cvhome-btn:hover:after, .btn.Cvhome-btn:focus:after {
   opacity: 0;
 }
 
-.btn.sApp-btn:before {
+.btn.Cvhome-btn:before {
   position: absolute;
   content: "";
   height: calc(100% + 4px);
@@ -492,7 +492,7 @@ img {
   z-index: -2;
 }
 
-.btn.sApp-btn:after {
+.btn.Cvhome-btn:after {
   position: absolute;
   content: "";
   height: 100%;
@@ -682,7 +682,7 @@ img {
 
 .btn,
 .btn:active,
-.btn.sApp-btn:before,
+.btn.Cvhome-btn:before,
 .benifits-item:after {
   background: var(--primary-bg-color-2);
 }

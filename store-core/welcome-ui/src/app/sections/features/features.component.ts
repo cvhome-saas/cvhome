@@ -12,7 +12,7 @@ import {NgClass, NgForOf} from "@angular/common";
   styleUrl: './features.component.css'
 })
 export class FeaturesComponent {
-  title: string = 'What Makes sApp Different?'
+  title: string = 'What Makes Cvhome Different?'
   desc: string = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Laborum obcaecati dignissimos quae quo ad iste ipsum officiis deleniti asperiores sit.'
   features: Feature[] = [
     {

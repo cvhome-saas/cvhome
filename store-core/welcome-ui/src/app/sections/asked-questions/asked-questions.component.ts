@@ -13,7 +13,7 @@ export class AskedQuestionsComponent {
   desc: string = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Laborum obcaecati dignissimos quae quo ad iste ipsum officiis deleniti asperiores sit.';
   questions: Question[] = [
     {
-      question: "How to install sApp?",
+      question: "How to install Cvhome?",
       answer: "The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text.",
       location: Location.LEFT
     },

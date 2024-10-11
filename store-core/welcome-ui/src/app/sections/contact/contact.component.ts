@@ -12,11 +12,11 @@ import {FormControl, FormGroup, ReactiveFormsModule} from "@angular/forms";
 })
 export class ContactComponent {
   title: string = 'Stay Tuned';
-  d1: string = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Laborum obcaecati dignissimos quae quo ad iste ipsum officiis deleniti asperiores sit.';
-  d2: string = 'Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old.';
-  address: string = 'Vestibulum nulla libero, convallis, tincidunt suscipit diam, DC 2002';
-  phone: string = '+1 230 456 789-012 345 6789';
-  email: string = 'email@email.com';
+  d1: string = 'Contact us';
+  d2: string = 'We are happy to help you';
+  address: string = 'cairo festival city podium 1 New Cairo egypt';
+  phone: string = '+20**********';
+  email: string = 'me@asrevo.com';
   contactForm = new FormGroup({
     name: new FormControl(''),
     email: new FormControl(''),
