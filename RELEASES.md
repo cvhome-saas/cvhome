@@ -1,6 +1,6 @@
 ### missing for releasing 0.0.1
 1. finish welcome-ui design , pricing, registration , login pages
-2. change default logo,banner,product images for every store
+2. customize login page
 3. release docker image to public aws ecr
 
 ### missing for releasing 0.0.2
@@ -12,7 +12,7 @@
 
 ### missing for releasing 0.0.3
 1. iac for deploy in AWS Fargate Cluster
-2. iac for deploy in k8s Kind Cluster
+2. iac for deploy in K8S Kind Cluster
 3. add communication service
 4. log impersonate sessions and events
 5. fix product price issue in store-ui
