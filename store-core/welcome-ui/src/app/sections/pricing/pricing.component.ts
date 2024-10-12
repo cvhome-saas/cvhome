@@ -28,6 +28,9 @@ export class PricingComponent {
           desc: "25 product"
         },
         {
+          desc: "2 stores"
+        },
+        {
           desc: "2k visitor"
         },
         {
@@ -49,6 +52,9 @@ export class PricingComponent {
           desc: "100 product"
         },
         {
+          desc: "5 stores"
+        },
+        {
           desc: "20k visitor"
         },
         {
@@ -68,6 +74,9 @@ export class PricingComponent {
         },
         {
           desc: "1k product"
+        },
+        {
+          desc: "10 stores"
         },
         {
           desc: "200k visitor"

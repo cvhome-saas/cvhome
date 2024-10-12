@@ -1,10 +1,10 @@
 <div class="contact-box bg-white text-center rounded p-4 p-sm-5 mt-5 mt-lg-0 shadow-lg">
   <!-- Contact Form -->
-  <form id="contact-form">
+  <form id="contact-form" [formGroup]="userForm" (ngSubmit)="signUp()">
     <div class="contact-top">
-      <h3 class="contact-title">{{title}}</h3>
+      <h3 class="contact-title">{{ title }}</h3>
       <h5 class="text-secondary fw-3 py-2">
-        {{desc}}
+        {{ desc }}
       </h5>
     </div>
     <div class="row">
@@ -14,7 +14,17 @@
             <div class="input-group-prepend">
               <span class="input-group-text"><i class="fas fa-user-alt"></i></span>
             </div>
-            <input type="text" class="form-control" name="name" placeholder="Name" required="required">
+            <input type="text" class="form-control" formControlName="firstName" name="firstName" placeholder="firstName"
+                   required="required">
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text"><i class="fas fa-user-alt"></i></span>
+            </div>
+            <input type="text" class="form-control" formControlName="lastName" name="lastName" placeholder="lastName"
+                   required="required">
           </div>
         </div>
         <div class="form-group">
@@ -22,7 +32,8 @@
             <div class="input-group-prepend">
               <span class="input-group-text"><i class="fas fa-envelope-open"></i></span>
             </div>
-            <input type="email" class="form-control" name="email" placeholder="Email" required="required">
+            <input type="email" class="form-control" formControlName="emailAddress" name="emailAddress"
+                   placeholder="Email" required="required">
           </div>
         </div>
         <div class="form-group">
@@ -30,33 +41,18 @@
             <div class="input-group-prepend">
               <span class="input-group-text"><i class="fas fa-unlock-alt"></i></span>
             </div>
-            <input type="password" class="form-control" name="password" placeholder="Password"
+            <input type="password" class="form-control" formControlName="password" name="password"
+                   placeholder="Password"
                    required="required">
           </div>
         </div>
-        <div class="form-group">
-          <div class="input-group">
-            <div class="input-group-prepend">
-              <span class="input-group-text"><i class="fas fa-phone"></i></span>
-            </div>
-            <input type="text" class="form-control" name="phone" placeholder="Phone" required="required">
-          </div>
-        </div>
-        <div class="form-group form-check">
-          <input type="checkbox" class="form-check-input" id="exampleCheck1">
-          <label class="form-check-label contact-bottom" for="exampleCheck1">
-            <span class="d-inline-block mt-3">
-              By signing up, you accept our
-              <a [routerLink]="['/terms']">Terms</a> &amp; <a [routerLink]="['/privacy-policy']">Privacy Policy</a>
-            </span>
-          </label>
-        </div>
       </div>
       <div class="col-12">
-        <button class="btn btn-bordered w-100 mt-3" type="submit" (click)="signUp()">Sign Up</button>
+        <button class="btn btn-bordered w-100 mt-3" type="submit">Sign Up</button>
       </div>
       <div class="col-12">
-        <span class="d-block pt-2 mt-4 border-top">Already have an account? <a href="/redirect/internal?serviceName=store-ui&path=/oauth2/authorization/keycloak">Sign In</a></span>
+        <span class="d-block pt-2 mt-4 border-top">Already have an account? <a
+          href="/redirect/internal?serviceName=store-ui&path=/oauth2/authorization/keycloak">Sign In</a></span>
       </div>
     </div>
   </form>

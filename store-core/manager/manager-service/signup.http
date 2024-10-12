@@ -1,0 +1,10 @@
+### Register new Org user
+POST http://localhost:7001/api/v1/user-account/public/create
+Content-Type: application/json
+
+{
+  "firstName": "ashraf",
+  "lastName": "ashraf",
+  "emailAddress": "new-user@mail.com",
+  "password": "admin"
+}

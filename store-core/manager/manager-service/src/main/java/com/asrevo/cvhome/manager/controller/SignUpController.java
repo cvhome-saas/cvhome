@@ -21,6 +21,7 @@ public class SignUpController {
     @PostMapping("public/create")
     public Mono<ReadableUser> create(@RequestBody PersistableUser user) {
         user.setActive(true);
+        user.setUserName(user.getEmailAddress());
         return Mono.just(userAccountService.createOrgUser(user));
 
     }
