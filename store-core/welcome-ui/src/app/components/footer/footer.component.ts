@@ -12,7 +12,7 @@ import {NgClass, NgForOf} from "@angular/common";
   styleUrl: './footer.component.css'
 })
 export class FooterComponent {
-  message: string = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quis non, fugit totam vel laboriosam vitae.'
+  message: string = 'Follow us.'
   socialLinks: SocialLink[] = [
     {
       class: "facebook",
@@ -54,7 +54,7 @@ export class FooterComponent {
     },
     {
       name: "Contact",
-      url: "#"
+      url: "#contact"
     },
   ];
   productHelp: UsefulLink[] = [
@@ -71,12 +71,12 @@ export class FooterComponent {
       url: "#"
     },
     {
-      name: "Terms &amp; Conditions",
+      name: "Terms & Conditions",
       url: "#"
     },
     {
       name: "Contact",
-      url: "#"
+      url: "#contact"
     },
   ];
   downloadLinks: DownloadLink[] = [
