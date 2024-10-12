@@ -14,5 +14,5 @@ import {SignUpFormComponent} from "../../components/sign-up-form/sign-up-form.co
 })
 export class SignUpComponent {
   title: string = 'Create an account!';
-  desc: string = 'There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don\'t look even slightly believable. If you are going to use a passage of Lorem Ipsum.';
+  desc: string = 'Its just a few steps and you will be one of our amazing clients.';
 }

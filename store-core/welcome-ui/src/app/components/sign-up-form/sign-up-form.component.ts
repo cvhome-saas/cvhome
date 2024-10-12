@@ -1,6 +1,7 @@
-import {Component, Inject, makeStateKey, PLATFORM_ID, TransferState} from '@angular/core';
+import {Component, makeStateKey} from '@angular/core';
 import {RouterLink} from "@angular/router";
-import {isPlatformBrowser, isPlatformServer} from "@angular/common";
+import {EvnLoaderService} from "../../service/evn-loader.service";
+import {SignUpService} from "../../service/sign-up.service";
 
 const DOMAIN_KEY = makeStateKey<{ data: string }>("data")
 
@@ -16,16 +17,20 @@ const DOMAIN_KEY = makeStateKey<{ data: string }>("data")
 export class SignUpFormComponent {
   title: string = 'Sign Up';
   desc: string = 'Fill all fields so we can get required info';
-  storeSignIn: string|undefined;
+  signInUrl: string | undefined;
 
-  constructor(@Inject(PLATFORM_ID) private platformID: Object) {
-    if (isPlatformServer(this.platformID)) { //<--- this block run on server
-      console.log("this block runs only on server");
-      const APP_SIGNIN_DOMAIN_ENV_VALUE = process.env['COM_ASREVO_CVHOME_APP_SIGNIN_DOMAIN'];
-      if (APP_SIGNIN_DOMAIN_ENV_VALUE) {
-        this.storeSignIn = APP_SIGNIN_DOMAIN_ENV_VALUE;
-        console.log(this.storeSignIn)
-      }
-    }
+  constructor(private evnLoaderService: EvnLoaderService, private signUpService: SignUpService) {
+    this.signInUrl = evnLoaderService.signInUrl;
+  }
+
+  signUp() {
+    this.signUpService.signUp({
+      name: "ashraf",
+      email: "ashraf@mail.com",
+      password: "admin",
+      phone: "+20*********",
+    }).subscribe(it => {
+      console.log(it.status)
+    })
   }
 }
