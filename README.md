@@ -33,11 +33,12 @@
 ### Structure of project
 
 1. this project is a mono repo which is kind for splitting small microservice in one repo
-2. we are using gradle subprojects
-3. we are using gradle for every thing for example we are building docker images for keycloak and angular and next-js
-   and all java modules using gradle
-4. in `settings.gradle` every project that end with `-service` is a java microservice and `auth` microservice
-5. in `settings.gradle` every project that end with `-ui` is a frontend microservice
+   - it's a small project and will help us in fast development
+   - will easily share common lib
+  
+2. we are using gradle for every thing for example we are building docker images for keycloak and angular and next-js using gradle
+3. in `settings.gradle` every project that end with `-service` is a java microservice and `auth` microservice
+4. in `settings.gradle` every project that end with `-ui` is a frontend microservice
 
 ### Clusters
 
