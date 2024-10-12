@@ -1,6 +1,5 @@
 import {Component, makeStateKey} from '@angular/core';
 import {RouterLink} from "@angular/router";
-import {EvnLoaderService} from "../../service/evn-loader.service";
 import {SignUpService} from "../../service/sign-up.service";
 
 const DOMAIN_KEY = makeStateKey<{ data: string }>("data")
@@ -19,8 +18,7 @@ export class SignUpFormComponent {
   desc: string = 'Fill all fields so we can get required info';
   signInUrl: string | undefined;
 
-  constructor(private evnLoaderService: EvnLoaderService, private signUpService: SignUpService) {
-    this.signInUrl = evnLoaderService.signInUrl;
+  constructor(private signUpService: SignUpService) {
   }
 
   signUp() {

@@ -1,5 +1,4 @@
 import {Injectable} from '@angular/core';
-import {EvnLoaderService} from "./evn-loader.service";
 import {HttpClient} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {SignUpForm, SignUpResponse} from "../domain/types";
@@ -8,10 +7,8 @@ import {SignUpForm, SignUpResponse} from "../domain/types";
   providedIn: 'root'
 })
 export class SignUpService {
-  private readonly backendUrl: string | undefined;
 
-  constructor(private eventLoaderService: EvnLoaderService, private httpClient: HttpClient) {
-    this.backendUrl = this.eventLoaderService.backendUrl
+  constructor(private httpClient: HttpClient) {
   }
 
   signUp(signUpForm: SignUpForm): Observable<SignUpResponse> {
