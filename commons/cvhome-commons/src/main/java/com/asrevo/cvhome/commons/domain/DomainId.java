@@ -10,10 +10,6 @@ public record DomainId(@JsonSerialize(using = ToStringSerializer.class) ObjectId
         this(new ObjectId(id));
     }
 
-    public static DomainId newId() {
-        return new DomainId(new ObjectId());
-    }
-
     @JsonSerialize(using = ToStringSerializer.class)
     @Override
     public ObjectId getId() {

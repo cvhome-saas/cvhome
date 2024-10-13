@@ -9,9 +9,9 @@ public interface ProductVariantImageRepository extends JpaRepository<ProductVari
 
     @Query(
             """
-            select p from ProductVariantImage p\
-             left join fetch p.descriptions pd\
-             join fetch p.productVariantGroup pg\
+            select p from ProductVariantImage p
+             left join fetch p.descriptions pd
+             join fetch p.productVariantGroup pg
              where p.id = ?1""")
     ProductVariantImage findOne(Long id);
 

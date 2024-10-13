@@ -15,8 +15,7 @@ public class OrderTotalServiceImpl implements OrderTotalService {
 
     @Override
     public OrderTotalVariation findOrderTotalVariation(
-            OrderSummary summary, Customer customer, MerchantStore store, Language language)
-            throws Exception {
+            OrderSummary summary, Customer customer, MerchantStore store, Language language) {
 
         RebatesOrderTotalVariation variation = new RebatesOrderTotalVariation();
 

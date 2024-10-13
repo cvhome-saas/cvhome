@@ -20,27 +20,4 @@ public class IntegrationException extends ServiceException {
     private List<String> errorFields;
 
     private int errorCode = 0;
-
-    public IntegrationException(Exception e) {
-        super(e);
-    }
-
-    public IntegrationException(String message, Exception e) {
-        super(message, e);
-    }
-
-    public IntegrationException(int code, String message) {
-
-        super(message);
-        this.errorCode = code;
-    }
-
-    public IntegrationException(int code) {
-
-        this.errorCode = code;
-    }
-
-    public IntegrationException(String message) {
-        super(message);
-    }
 }

@@ -10,8 +10,4 @@ public record ServiceDomain(
     public String getServiceHost() {
         return schema() + "://" + domain() + ":" + port();
     }
-
-    public String getServiceHost(String service) {
-        return schema() + "://" + domain() + ":" + port() + "/" + service + "/";
-    }
 }
