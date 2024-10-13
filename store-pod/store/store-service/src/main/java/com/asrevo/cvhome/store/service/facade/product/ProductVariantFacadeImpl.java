@@ -83,7 +83,7 @@ public class ProductVariantFacadeImpl implements ProductVariantFacade {
 
     @Override
     public boolean exists(String sku, MerchantStore store, Long productId, Language language) {
-        ReadableProduct product = null;
+        ReadableProduct product;
         try {
             product = productCommonFacade.getProduct(store, productId, language);
         } catch (Exception e) {

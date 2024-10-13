@@ -253,7 +253,7 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
     }
 
     @Override
-    public boolean hasDownloadFiles(Order order) throws ServiceException {
+    public boolean hasDownloadFiles(Order order) {
 
         Validate.notNull(order, "Order cannot be null");
         Validate.notNull(order.getOrderProducts(), "Order products cannot be null");

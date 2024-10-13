@@ -155,7 +155,7 @@ public class ProductItemsFacadeImpl implements ProductItemsFacade {
         Assert.notNull(group, "group must not be null");
 
         // check if product is already in group
-        List<ProductRelationship> existList = null;
+        List<ProductRelationship> existList;
         try {
             existList =
                     productRelationshipService.getByGroup(store, group).stream()

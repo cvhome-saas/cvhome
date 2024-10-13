@@ -107,8 +107,7 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
         }
 
         optionModel = productOptionService.getById(store, optionModel.getId());
-        ReadableProductOptionEntity readable = readableMapper.convert(optionModel, store, language);
-        return readable;
+        return readableMapper.convert(optionModel, store, language);
     }
 
     @Override
@@ -372,10 +371,7 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
                             + "]");
         }
 
-        ReadableProductAttributeEntity readable =
-                readableProductAttributeMapper.convert(attr, store, language);
-
-        return readable;
+        return readableProductAttributeMapper.convert(attr, store, language);
     }
 
     private Product product(long id, MerchantStore store) {
@@ -402,7 +398,7 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
             Product product = this.product(productId, store);
 
             ReadableProductAttributeList attrList = new ReadableProductAttributeList();
-            Page<ProductAttribute> attr = null;
+            Page<ProductAttribute> attr;
 
             if (language != null) { // all entry
                 // attributes = productAttributeService.getByProductId(store, product, language);

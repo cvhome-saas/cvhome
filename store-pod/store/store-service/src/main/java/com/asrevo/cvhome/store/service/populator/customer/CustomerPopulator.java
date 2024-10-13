@@ -196,7 +196,7 @@ public class CustomerPopulator extends AbstractDataPopulator<PersistableCustomer
             if (target.getDelivery() == null && source.getDelivery() != null) {
                 log.info("Setting default value for delivery");
                 Delivery delivery = new Delivery();
-                Country deliveryCountry = null;
+                Country deliveryCountry;
                 if (StringUtils.isNotBlank(source.getDelivery().getCountry())) {
                     deliveryCountry = countries.get(source.getDelivery().getCountry());
                     if (deliveryCountry == null) {

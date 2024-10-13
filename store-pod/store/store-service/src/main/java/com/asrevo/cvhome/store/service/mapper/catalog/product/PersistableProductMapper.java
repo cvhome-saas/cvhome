@@ -190,7 +190,7 @@ public class PersistableProductMapper implements Mapper<PersistableProduct, Prod
                 for (com.asrevo.cvhome.store.core.model.catalog.category.Category categ :
                         source.getCategories()) {
 
-                    Category c = null;
+                    Category c;
                     if (!StringUtils.isBlank(categ.getCode())) {
                         c = categoryService.getByCode(store, categ.getCode());
                     } else {

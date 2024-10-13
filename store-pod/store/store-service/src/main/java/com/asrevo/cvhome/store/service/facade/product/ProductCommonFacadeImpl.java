@@ -83,7 +83,7 @@ public class ProductCommonFacadeImpl implements ProductCommonFacade {
             specifications.setManufacturer(manufacturer);
         }
 
-        Product target = null;
+        Product target;
         if (product.getId() != null && product.getId() > 0) {
             target = productService.getById(product.getId());
         } else {

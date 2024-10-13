@@ -199,7 +199,7 @@ public class OrderFacadeImpl implements OrderFacade {
             // of process order request. If totals does not match, an error
             // should be thrown.
 
-            OrderTotalSummary orderTotalSummary = null;
+            OrderTotalSummary orderTotalSummary;
 
             OrderSummary orderSummary = new OrderSummary();
             orderSummary.setShippingSummary(shippingSummary);

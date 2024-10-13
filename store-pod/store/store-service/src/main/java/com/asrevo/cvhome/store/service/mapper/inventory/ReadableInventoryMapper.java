@@ -102,7 +102,7 @@ public class ReadableInventoryMapper implements Mapper<ProductAvailability, Read
                 destination.setSku(source.getProduct().getSku());
             }
 
-            FinalPrice price = null;
+            FinalPrice price;
             // try {
             price = pricingService.calculateProductPrice(source);
             destination.setPrice(price.getStringPrice());
@@ -136,7 +136,7 @@ public class ReadableInventoryMapper implements Mapper<ProductAvailability, Read
             ProductAvailability source, MerchantStore store, Language language)
             throws ConversionException {
 
-        ReadableProductPricePopulator populator = null;
+        ReadableProductPricePopulator populator;
         List<ReadableProductPrice> prices = new ArrayList<>();
 
         for (ProductPrice price : source.getPrices()) {

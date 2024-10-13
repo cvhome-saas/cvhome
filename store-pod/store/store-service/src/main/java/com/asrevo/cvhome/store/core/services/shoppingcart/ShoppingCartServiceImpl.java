@@ -353,8 +353,7 @@ public class ShoppingCartServiceImpl extends SalesManagerEntityServiceImpl<Long,
     }
 
     @Override
-    public List<ShippingProduct> createShippingProduct(final ShoppingCart cart)
-            throws ServiceException {
+    public List<ShippingProduct> createShippingProduct(final ShoppingCart cart) {
         Set<ShoppingCartItem> items = cart.getLineItems();
         List<ShippingProduct> shippingProducts = null;
         for (ShoppingCartItem item : items) {
@@ -374,7 +373,7 @@ public class ShoppingCartServiceImpl extends SalesManagerEntityServiceImpl<Long,
     }
 
     @Override
-    public void removeShoppingCart(final ShoppingCart cart) throws ServiceException {
+    public void removeShoppingCart(final ShoppingCart cart) {
         shoppingCartRepository.delete(cart);
     }
 

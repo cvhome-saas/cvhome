@@ -80,7 +80,7 @@ public class PersistableOrderApiPopulator extends AbstractDataPopulator<Persista
             }
 
             // Customer
-            Customer customer = null;
+            Customer customer;
             if (source.getCustomerId() != null && source.getCustomerId() > 0) {
                 Long customerId = source.getCustomerId();
                 customer = customerService.getById(customerId);

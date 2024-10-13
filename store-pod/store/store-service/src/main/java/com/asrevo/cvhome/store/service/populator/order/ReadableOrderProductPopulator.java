@@ -95,7 +95,7 @@ public class ReadableOrderProductPopulator
 
         String productSku = source.getSku();
         if (!StringUtils.isBlank(productSku)) {
-            Product product = null;
+            Product product;
             try {
                 product = productService.getBySku(productSku, store, language);
             } catch (ServiceException e) {

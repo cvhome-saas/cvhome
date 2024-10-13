@@ -110,7 +110,7 @@ public class ReadableCatalogMapper implements Mapper<Catalog, ReadableCatalog> {
 
         // build category hierarchy
 
-        ReadableCategory rc = null;
+        ReadableCategory rc;
         ReadableCategory rp = null;
 
         if (CollectionUtils.isNotEmpty(c.getCategories())) {

@@ -171,7 +171,7 @@ public class PersistableProductPriceMapper
         Set<ProductPriceDescription> descs = new HashSet<>();
         for (com.asrevo.cvhome.store.core.model.catalog.product.ProductPriceDescription desc :
                 descriptions) {
-            ProductPriceDescription description = null;
+            ProductPriceDescription description;
             if (CollectionUtils.isNotEmpty(price.getDescriptions())) {
                 for (ProductPriceDescription d : price.getDescriptions()) {
                     if (isPositive(desc.getId()) && desc.getId().equals(d.getId())) {

@@ -148,7 +148,7 @@ public class ManufacturerFacadeImpl implements ManufacturerFacade {
         ReadableManufacturerList readableList = new ReadableManufacturerList();
         try {
 
-            List<Manufacturer> manufacturers = null;
+            List<Manufacturer> manufacturers;
             if (page == 0 && count == 0) {
                 // need total count
                 int total = manufacturerService.count(store);
@@ -162,7 +162,7 @@ public class ManufacturerFacadeImpl implements ManufacturerFacade {
                 readableList.setNumber(manufacturers.size());
             } else {
 
-                Page<Manufacturer> m = null;
+                Page<Manufacturer> m;
                 if (language != null) {
                     m =
                             manufacturerService.listByStore(
@@ -213,9 +213,9 @@ public class ManufacturerFacadeImpl implements ManufacturerFacade {
 
         try {
 
-            List<Manufacturer> manufacturers = null;
+            List<Manufacturer> manufacturers;
 
-            Page<Manufacturer> m = null;
+            Page<Manufacturer> m;
             if (language != null) {
                 m =
                         manufacturerService.listByStore(

@@ -251,9 +251,9 @@ public class ReadableProductPopulator extends AbstractDataPopulator<Product, Rea
                 if (!CollectionUtils.isEmpty(attributes)) {
 
                     for (ProductAttribute attribute : attributes) {
-                        ReadableProductOption opt = null;
+                        ReadableProductOption opt;
                         ReadableProductAttribute attr = null;
-                        ReadableProductProperty property = null;
+                        ReadableProductProperty property;
                         ReadableProductPropertyValue propertyValue = null;
                         ReadableProductOptionValue optValue = new ReadableProductOptionValue();
                         ReadableProductAttributeValue attrValue =

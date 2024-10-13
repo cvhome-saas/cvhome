@@ -44,8 +44,7 @@ public class ReadableProductVariantValue implements Serializable {
             if (other.name != null) return false;
         } else if (!name.equals(other.name)) return false;
         if (option == null) {
-            if (other.option != null) return false;
-        } else if (!option.equals(other.option)) return false;
-        return true;
+            return other.option == null;
+        } else return option.equals(other.option);
     }
 }

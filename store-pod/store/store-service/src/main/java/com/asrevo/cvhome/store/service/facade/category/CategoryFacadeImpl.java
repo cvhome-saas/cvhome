@@ -257,7 +257,7 @@ public class CategoryFacadeImpl implements CategoryFacade {
     @Override
     public ReadableCategory getById(MerchantStore store, Long id, Language language) {
 
-        Category categoryModel = null;
+        Category categoryModel;
         if (language != null) {
             categoryModel = getCategoryById(id, language);
         } else { // all langs

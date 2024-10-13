@@ -237,13 +237,11 @@ public class PersistableProductDefinitionMapper
                     if (manuf == null) {
                         throw new ConversionException("Invalid manufacturer id");
                     }
-                    if (manuf != null) {
-                        if (manuf.getMerchantStore().getId().intValue()
-                                != store.getId().intValue()) {
-                            throw new ConversionException("Invalid manufacturer id");
-                        }
-                        destination.setManufacturer(manuf);
+                    if (manuf.getMerchantStore().getId().intValue()
+                            != store.getId().intValue()) {
+                        throw new ConversionException("Invalid manufacturer id");
                     }
+                    destination.setManufacturer(manuf);
                 }
             }
             destination.setSortOrder(source.getSortOrder());

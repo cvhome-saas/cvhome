@@ -101,44 +101,39 @@ public class ProductRelationshipServiceImpl
 
     @Override
     public List<ProductRelationship> getByType(
-            MerchantStore store, Product product, ProductRelationshipType type, Language language)
-            throws ServiceException {
+            MerchantStore store, Product product, ProductRelationshipType type, Language language) {
 
         return productRelationshipRepository.getByType(store, type.name(), product, language);
     }
 
     @Override
     public List<ProductRelationship> getByType(
-            MerchantStore store, ProductRelationshipType type, Language language)
-            throws ServiceException {
+            MerchantStore store, ProductRelationshipType type, Language language) {
         return productRelationshipRepository.getByType(store, type.name(), language);
     }
 
     @Override
-    public List<ProductRelationship> getByType(MerchantStore store, ProductRelationshipType type)
-            throws ServiceException {
+    public List<ProductRelationship> getByType(MerchantStore store, ProductRelationshipType type) {
 
         return productRelationshipRepository.getByType(store, type.name());
     }
 
     @Override
-    public List<ProductRelationship> getByGroup(MerchantStore store, String groupName)
-            throws ServiceException {
+    public List<ProductRelationship> getByGroup(MerchantStore store, String groupName) {
 
         return productRelationshipRepository.getByType(store, groupName);
     }
 
     @Override
     public List<ProductRelationship> getByGroup(
-            MerchantStore store, String groupName, Language language) throws ServiceException {
+            MerchantStore store, String groupName, Language language) {
 
         return productRelationshipRepository.getByType(store, groupName, language);
     }
 
     @Override
     public List<ProductRelationship> getByType(
-            MerchantStore store, Product product, ProductRelationshipType type)
-            throws ServiceException {
+            MerchantStore store, Product product, ProductRelationshipType type) {
 
         return productRelationshipRepository.getByType(store, type.name(), product);
     }
@@ -149,8 +144,7 @@ public class ProductRelationshipServiceImpl
     }
 
     @Override
-    public List<ProductRelationship> getByType(MerchantStore store, Product product, String name)
-            throws ServiceException {
+    public List<ProductRelationship> getByType(MerchantStore store, Product product, String name) {
         return productRelationshipRepository.getByTypeAndRelatedProduct(store, name, product);
     }
 }
