@@ -10,28 +10,24 @@ import com.asrevo.cvhome.store.core.services.catalog.pricing.PricingService;
 import com.asrevo.cvhome.store.utils.AbstractDataPopulator;
 import com.asrevo.cvhome.store.utils.LabelUtils;
 import com.asrevo.cvhome.store.utils.LocaleUtils;
+import java.util.Locale;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.Assert;
 
-import java.util.Locale;
-
 @Setter
 @Getter
-public class ReadableOrderTotalPopulator extends
-        AbstractDataPopulator<OrderTotal, ReadableOrderTotal> {
-
+public class ReadableOrderTotalPopulator
+        extends AbstractDataPopulator<OrderTotal, ReadableOrderTotal> {
 
     private PricingService pricingService;
 
-
     private LabelUtils messages;
 
-
     @Override
-    public ReadableOrderTotal populate(OrderTotal source,
-                                       ReadableOrderTotal target, MerchantStore store, Language language)
+    public ReadableOrderTotal populate(
+            OrderTotal source, ReadableOrderTotal target, MerchantStore store, Language language)
             throws ConversionException {
 
         Assert.notNull(pricingService, "PricingService must be set");
@@ -46,8 +42,9 @@ public class ReadableOrderTotalPopulator extends
             target.setModule(source.getModule());
             target.setOrder(source.getSortOrder());
 
-
-            target.setTitle(messages.getMessage(source.getOrderTotalCode(), locale, source.getOrderTotalCode()));
+            target.setTitle(
+                    messages.getMessage(
+                            source.getOrderTotalCode(), locale, source.getOrderTotalCode()));
             target.setText(source.getText());
 
             target.setValue(source.getValue());
@@ -64,12 +61,10 @@ public class ReadableOrderTotalPopulator extends
         }
 
         return target;
-
     }
 
     @Override
     protected ReadableOrderTotal createTarget() {
         return new ReadableOrderTotal();
     }
-
 }

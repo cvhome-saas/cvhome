@@ -26,37 +26,37 @@ import com.asrevo.cvhome.store.core.entity.tax.taxclass.TaxClass;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.io.Serial;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @EntityListeners(value = AuditListener.class)
-@Table(name = "TAX_RATE", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {
-                "TAX_CODE",
-                "MERCHANT_ID"
-        })
-}
-)
+@Table(
+        name = "TAX_RATE",
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"TAX_CODE", "MERCHANT_ID"})})
 @Getter
 @Setter
 public class TaxRate extends SalesManagerEntity<Long, TaxRate> implements Auditable {
-    @Serial
-    private static final long serialVersionUID = 3356827741612925066L;
+    @Serial private static final long serialVersionUID = 3356827741612925066L;
 
     @Id
     @Column(name = "TAX_RATE_ID")
-    @TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME", valueColumnName = "SEQ_COUNT", pkColumnValue = "TAX_RATE_ID_NEXT_VALUE", allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE, initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
+    @TableGenerator(
+            name = "TABLE_GEN",
+            table = "SM_SEQUENCER",
+            pkColumnName = "SEQ_NAME",
+            valueColumnName = "SEQ_COUNT",
+            pkColumnValue = "TAX_RATE_ID_NEXT_VALUE",
+            allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
+            initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
     private Long id;
 
-    @Embedded
-    private AuditSection auditSection = new AuditSection();
+    @Embedded private AuditSection auditSection = new AuditSection();
 
     @Column(name = "TAX_PRIORITY")
     private Integer taxPriority = 0;
@@ -68,14 +68,12 @@ public class TaxRate extends SalesManagerEntity<Long, TaxRate> implements Audita
     @Column(name = "TAX_CODE")
     private String code;
 
-
     @Column(name = "PIGGYBACK")
     private boolean piggyback;
 
     @ManyToOne
     @JoinColumn(name = "TAX_CLASS_ID", nullable = false)
     private TaxClass taxClass;
-
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MERCHANT_ID", nullable = false)
@@ -103,10 +101,7 @@ public class TaxRate extends SalesManagerEntity<Long, TaxRate> implements Audita
     @OneToMany(mappedBy = "parent", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<TaxRate> taxRates = new ArrayList<>();
 
-    @Transient
-    private String rateText;
+    @Transient private String rateText;
 
-
-    public TaxRate() {
-    }
+    public TaxRate() {}
 }

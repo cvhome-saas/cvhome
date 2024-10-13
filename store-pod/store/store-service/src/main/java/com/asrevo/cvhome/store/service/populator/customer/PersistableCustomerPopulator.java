@@ -1,6 +1,5 @@
 package com.asrevo.cvhome.store.service.populator.customer;
 
-
 import com.asrevo.cvhome.store.controller.exception.ConversionException;
 import com.asrevo.cvhome.store.core.entity.customer.Customer;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
@@ -9,17 +8,15 @@ import com.asrevo.cvhome.store.core.model.customer.PersistableCustomer;
 import com.asrevo.cvhome.store.core.model.customer.address.Address;
 import com.asrevo.cvhome.store.utils.AbstractDataPopulator;
 
-public class PersistableCustomerPopulator extends
-        AbstractDataPopulator<Customer, PersistableCustomer> {
+public class PersistableCustomerPopulator
+        extends AbstractDataPopulator<Customer, PersistableCustomer> {
 
     @Override
-    public PersistableCustomer populate(Customer source,
-                                        PersistableCustomer target, MerchantStore store, Language language)
+    public PersistableCustomer populate(
+            Customer source, PersistableCustomer target, MerchantStore store, Language language)
             throws ConversionException {
 
-
         try {
-
 
             if (source.getBilling() != null) {
                 Address address = new Address();
@@ -94,13 +91,11 @@ public class PersistableCustomerPopulator extends
                 target.setLanguage(store.getDefaultLanguage().getCode());
             }
 
-
         } catch (Exception e) {
             throw new ConversionException(e);
         }
 
         return target;
-
     }
 
     @Override
@@ -108,5 +103,4 @@ public class PersistableCustomerPopulator extends
         // TODO Auto-generated method stub
         return null;
     }
-
 }

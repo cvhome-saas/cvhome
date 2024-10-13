@@ -9,6 +9,7 @@ import lombok.Setter;
 public class Limits {
     @JsonProperty("CPU")
     private double cpu;
+
     @JsonProperty("Memory")
     private int memory;
 }

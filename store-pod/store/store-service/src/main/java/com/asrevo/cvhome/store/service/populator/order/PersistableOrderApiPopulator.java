@@ -20,47 +20,46 @@ import com.asrevo.cvhome.store.core.services.customer.CustomerService;
 import com.asrevo.cvhome.store.service.populator.customer.CustomerPopulator;
 import com.asrevo.cvhome.store.utils.AbstractDataPopulator;
 import com.asrevo.cvhome.store.utils.LocaleUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
-import org.springframework.stereotype.Component;
-
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
+import org.springframework.stereotype.Component;
 
 @Component
 public class PersistableOrderApiPopulator extends AbstractDataPopulator<PersistableOrder, Order> {
 
-  //  private final CurrencyService currencyService;
+    //  private final CurrencyService currencyService;
     private final CustomerService customerService;
     /*	@Autowired
-        private ShoppingCartService shoppingCartService;
-        @Autowired
-        private ProductService productService;
-        @Autowired
-        private ProductAttributeService productAttributeService;
-        @Autowired
-        private DigitalProductService digitalProductService;*/
+    private ShoppingCartService shoppingCartService;
+    @Autowired
+    private ProductService productService;
+    @Autowired
+    private ProductAttributeService productAttributeService;
+    @Autowired
+    private DigitalProductService digitalProductService;*/
     private final CustomerPopulator customerPopulator;
 
-    public PersistableOrderApiPopulator(CustomerService customerService, CustomerPopulator customerPopulator) {
+    public PersistableOrderApiPopulator(
+            CustomerService customerService, CustomerPopulator customerPopulator) {
         this.customerService = customerService;
         this.customerPopulator = customerPopulator;
     }
 
-
     @Override
-    public Order populate(PersistableOrder source, Order target, MerchantStore store, Language language)
+    public Order populate(
+            PersistableOrder source, Order target, MerchantStore store, Language language)
             throws ConversionException {
-		
 
-/*		Validate.notNull(currencyService,"currencyService must be set");
-		Validate.notNull(customerService,"customerService must be set");
-		Validate.notNull(shoppingCartService,"shoppingCartService must be set");
-		Validate.notNull(productService,"productService must be set");
-		Validate.notNull(productAttributeService,"productAttributeService must be set");
-		Validate.notNull(digitalProductService,"digitalProductService must be set");*/
+        /*		Validate.notNull(currencyService,"currencyService must be set");
+        Validate.notNull(customerService,"customerService must be set");
+        Validate.notNull(shoppingCartService,"shoppingCartService must be set");
+        Validate.notNull(productService,"productService must be set");
+        Validate.notNull(productAttributeService,"productAttributeService must be set");
+        Validate.notNull(digitalProductService,"digitalProductService must be set");*/
         Validate.notNull(source.getPayment(), "Payment cannot be null");
 
         try {
@@ -69,39 +68,41 @@ public class PersistableOrderApiPopulator extends AbstractDataPopulator<Persista
                 target = new Order();
             }
 
-            //target.setLocale(LocaleUtils.getLocale(store));
+            // target.setLocale(LocaleUtils.getLocale(store));
 
             target.setLocale(LocaleUtils.getLocale(store));
 
-
             Currency currency = store.getCurrency();
 
-
             if (currency == null) {
-                throw new ConversionException("Currency not found for code " + source.getCurrency());
+                throw new ConversionException(
+                        "Currency not found for code " + source.getCurrency());
             }
 
-            //Customer
+            // Customer
             Customer customer = null;
             if (source.getCustomerId() != null && source.getCustomerId() > 0) {
                 Long customerId = source.getCustomerId();
                 customer = customerService.getById(customerId);
 
                 if (customer == null) {
-                    throw new ConversionException("Curstomer with id " + source.getCustomerId() + " does not exist");
+                    throw new ConversionException(
+                            "Curstomer with id " + source.getCustomerId() + " does not exist");
                 }
                 target.setCustomerId(customerId);
 
             } else {
                 if (source instanceof PersistableAnonymousOrder) {
-                    PersistableCustomer persistableCustomer = ((PersistableAnonymousOrder) source).getCustomer();
+                    PersistableCustomer persistableCustomer =
+                            ((PersistableAnonymousOrder) source).getCustomer();
                     customer = new Customer();
-                    customer = customerPopulator.populate(persistableCustomer, customer, store, language);
+                    customer =
+                            customerPopulator.populate(
+                                    persistableCustomer, customer, store, language);
                 } else {
                     throw new ConversionException("Curstomer details or id not set in request");
                 }
             }
-
 
             target.setCustomerEmailAddress(customer.getEmailAddress());
 
@@ -128,14 +129,14 @@ public class PersistableOrderApiPopulator extends AbstractDataPopulator<Persista
             target.setCurrencyValue(new BigDecimal(0));
             target.setMerchant(store);
             target.setChannel(OrderChannel.API);
-            //need this
+            // need this
             target.setStatus(OrderStatus.ORDERED);
             target.setPaymentModuleCode(source.getPayment().getPaymentModule());
             target.setPaymentType(PaymentType.valueOf(source.getPayment().getPaymentType()));
 
             target.setCustomerAgreement(source.isCustomerAgreement());
-            target.setConfirmedAddress(true);//force this to true, cannot perform this activity from the API
-
+            target.setConfirmedAddress(
+                    true); // force this to true, cannot perform this activity from the API
 
             if (!StringUtils.isBlank(source.getComments())) {
                 OrderStatusHistory statusHistory = new OrderStatusHistory();
@@ -158,54 +159,52 @@ public class PersistableOrderApiPopulator extends AbstractDataPopulator<Persista
         return null;
     }
 
+    /*	public CurrencyService getCurrencyService() {
+    	return currencyService;
+    }
 
-/*	public CurrencyService getCurrencyService() {
-		return currencyService;
-	}
+    public void setCurrencyService(CurrencyService currencyService) {
+    	this.currencyService = currencyService;
+    }
 
-	public void setCurrencyService(CurrencyService currencyService) {
-		this.currencyService = currencyService;
-	}
+    public CustomerService getCustomerService() {
+    	return customerService;
+    }
 
-	public CustomerService getCustomerService() {
-		return customerService;
-	}
+    public void setCustomerService(CustomerService customerService) {
+    	this.customerService = customerService;
+    }
 
-	public void setCustomerService(CustomerService customerService) {
-		this.customerService = customerService;
-	}
+    public ShoppingCartService getShoppingCartService() {
+    	return shoppingCartService;
+    }
 
-	public ShoppingCartService getShoppingCartService() {
-		return shoppingCartService;
-	}
+    public void setShoppingCartService(ShoppingCartService shoppingCartService) {
+    	this.shoppingCartService = shoppingCartService;
+    }
 
-	public void setShoppingCartService(ShoppingCartService shoppingCartService) {
-		this.shoppingCartService = shoppingCartService;
-	}
+    public ProductService getProductService() {
+    	return productService;
+    }
 
-	public ProductService getProductService() {
-		return productService;
-	}
+    public void setProductService(ProductService productService) {
+    	this.productService = productService;
+    }
 
-	public void setProductService(ProductService productService) {
-		this.productService = productService;
-	}
+    public ProductAttributeService getProductAttributeService() {
+    	return productAttributeService;
+    }
 
-	public ProductAttributeService getProductAttributeService() {
-		return productAttributeService;
-	}
+    public void setProductAttributeService(ProductAttributeService productAttributeService) {
+    	this.productAttributeService = productAttributeService;
+    }
 
-	public void setProductAttributeService(ProductAttributeService productAttributeService) {
-		this.productAttributeService = productAttributeService;
-	}
+    public DigitalProductService getDigitalProductService() {
+    	return digitalProductService;
+    }
 
-	public DigitalProductService getDigitalProductService() {
-		return digitalProductService;
-	}
-
-	public void setDigitalProductService(DigitalProductService digitalProductService) {
-		this.digitalProductService = digitalProductService;
-	}*/
-
+    public void setDigitalProductService(DigitalProductService digitalProductService) {
+    	this.digitalProductService = digitalProductService;
+    }*/
 
 }

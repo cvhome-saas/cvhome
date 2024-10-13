@@ -9,11 +9,16 @@ public interface ProductDefinitionFacade {
 
     /**
      */
-    Long saveProductDefinition(MerchantStore store, PersistableProductDefinition product, Language language);
+    Long saveProductDefinition(
+            MerchantStore store, PersistableProductDefinition product, Language language);
 
     /**
      */
-    void update(Long productId, PersistableProductDefinition product, MerchantStore merchant, Language language);
+    void update(
+            Long productId,
+            PersistableProductDefinition product,
+            MerchantStore merchant,
+            Language language);
 
     /**
      */
@@ -21,6 +26,6 @@ public interface ProductDefinitionFacade {
 
     /**
      */
-    ReadableProductDefinition getProductBySku(MerchantStore store, String uniqueCode, Language language);
-
+    ReadableProductDefinition getProductBySku(
+            MerchantStore store, String uniqueCode, Language language);
 }

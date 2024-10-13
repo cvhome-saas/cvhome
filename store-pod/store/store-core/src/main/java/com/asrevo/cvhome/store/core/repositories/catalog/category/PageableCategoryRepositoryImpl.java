@@ -8,15 +8,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
-
 public class PageableCategoryRepositoryImpl implements PageableCategoryRepositoryCustom {
 
-    @PersistenceContext
-    private EntityManager em;
+    @PersistenceContext private EntityManager em;
 
     @SuppressWarnings("unchecked")
     @Override
-    public Page<Category> listByStore(Integer storeId, Integer languageId, String name, Pageable pageable) {
+    public Page<Category> listByStore(
+            Integer storeId, Integer languageId, String name, Pageable pageable) {
         Query query = em.createNamedQuery("CATEGORY.listByStore");
         Query countQueryResult = em.createNamedQuery("CATEGORY.listByStore.count");
         query.setParameter(1, storeId);
@@ -25,9 +24,6 @@ public class PageableCategoryRepositoryImpl implements PageableCategoryRepositor
         query.setMaxResults(pageable.getPageSize());
         query.setFirstResult(pageable.getPageNumber() * pageable.getPageSize());
         return new PageImpl<Category>(
-                query.getResultList(),
-                pageable,
-                countQueryResult.getMaxResults());
+                query.getResultList(), pageable, countQueryResult.getMaxResults());
     }
-
 }

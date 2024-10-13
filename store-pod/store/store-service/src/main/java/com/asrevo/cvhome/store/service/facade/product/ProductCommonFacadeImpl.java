@@ -25,14 +25,12 @@ import com.asrevo.cvhome.store.service.populator.catalog.ReadableProductPopulato
 import com.asrevo.cvhome.store.service.populator.catalog.ReadableProductReviewPopulator;
 import com.asrevo.cvhome.store.utils.DateUtil;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 /**
  * Version 1 Product management
@@ -42,7 +40,6 @@ import java.util.List;
  */
 @Service("productCommonFacade")
 public class ProductCommonFacadeImpl implements ProductCommonFacade {
-
 
     private final LanguageService languageService;
 
@@ -58,7 +55,14 @@ public class ProductCommonFacadeImpl implements ProductCommonFacade {
 
     private final ImageFilePath imageUtils;
 
-    public ProductCommonFacadeImpl(LanguageService languageService, ProductService productService, PricingService pricingService, CustomerService customerService, ProductReviewService productReviewService, PersistableProductMapper persistableProductMapper, ImageFilePath imageUtils) {
+    public ProductCommonFacadeImpl(
+            LanguageService languageService,
+            ProductService productService,
+            PricingService pricingService,
+            CustomerService customerService,
+            ProductReviewService productReviewService,
+            PersistableProductMapper persistableProductMapper,
+            ImageFilePath imageUtils) {
         this.languageService = languageService;
         this.productService = productService;
         this.pricingService = pricingService;
@@ -91,12 +95,10 @@ public class ProductCommonFacadeImpl implements ProductCommonFacade {
             target = persistableProductMapper.merge(product, target, store, language);
             target = productService.saveProduct(target);
 
-
             return target.getId();
         } catch (Exception e) {
             throw new ServiceRuntimeException(e);
         }
-
     }
 
     public void updateProduct(MerchantStore store, PersistableProduct product, Language language) {
@@ -106,8 +108,6 @@ public class ProductCommonFacadeImpl implements ProductCommonFacade {
 
         // get original product
         Product productModel = productService.getById(product.getId());
-
-
     }
 
     @Override
@@ -119,7 +119,8 @@ public class ProductCommonFacadeImpl implements ProductCommonFacade {
         }
 
         if (!product.getMerchantStore().getId().equals(store.getId())) {
-            throw new ResourceNotFoundException("Product [" + id + "] not found for store [" + store.getId() + "]");
+            throw new ResourceNotFoundException(
+                    "Product [" + id + "] not found for store [" + store.getId() + "]");
         }
 
         ReadableProduct readableProduct = new ReadableProduct();
@@ -135,10 +136,9 @@ public class ProductCommonFacadeImpl implements ProductCommonFacade {
         return readableProduct;
     }
 
-
     @Override
-    public ReadableProduct updateProductPrice(ReadableProduct product, ProductPriceEntity price, Language language)
-            throws Exception {
+    public ReadableProduct updateProductPrice(
+            ReadableProduct product, ProductPriceEntity price, Language language) throws Exception {
 
         Product persistable = productService.getById(product.getId());
 
@@ -161,7 +161,6 @@ public class ProductCommonFacadeImpl implements ProductCommonFacade {
                     productPrice.setProductPriceSpecialEndDate(endDate);
                 }
             }
-
         }
 
         productService.update(persistable);
@@ -178,8 +177,8 @@ public class ProductCommonFacadeImpl implements ProductCommonFacade {
     }
 
     @Override
-    public ReadableProduct updateProductQuantity(ReadableProduct product, int quantity, Language language)
-            throws Exception {
+    public ReadableProduct updateProductQuantity(
+            ReadableProduct product, int quantity, Language language) throws Exception {
         Product persistable = productService.getById(product.getId());
 
         if (persistable == null) {
@@ -207,23 +206,28 @@ public class ProductCommonFacadeImpl implements ProductCommonFacade {
     @Override
     public void deleteProduct(Product product) throws Exception {
         productService.delete(product);
-
     }
 
-
     @Override
-    public ReadableProduct addProductToCategory(Category category, Product product, Language language) {
+    public ReadableProduct addProductToCategory(
+            Category category, Product product, Language language) {
 
         Assert.notNull(category, "Category cannot be null");
         Assert.notNull(product, "Product cannot be null");
 
         // not alloweed if category already attached
-        List<Category> assigned = product.getCategories().stream()
-                .filter(cat -> cat.getId().longValue() == category.getId().longValue()).toList();
+        List<Category> assigned =
+                product.getCategories().stream()
+                        .filter(cat -> cat.getId().longValue() == category.getId().longValue())
+                        .toList();
 
         if (!assigned.isEmpty()) {
-            throw new OperationNotAllowedException("Category with id [" + category.getId()
-                    + "] already attached to product [" + product.getId() + "]");
+            throw new OperationNotAllowedException(
+                    "Category with id ["
+                            + category.getId()
+                            + "] already attached to product ["
+                            + product.getId()
+                            + "]");
         }
 
         product.getCategories().add(category);
@@ -240,16 +244,21 @@ public class ProductCommonFacadeImpl implements ProductCommonFacade {
             populator.populate(product, readableProduct, product.getMerchantStore(), language);
 
         } catch (Exception e) {
-            throw new RuntimeException("Exception when adding product [" + product.getId() + "] to category [" + category.getId() + "]", e);
+            throw new RuntimeException(
+                    "Exception when adding product ["
+                            + product.getId()
+                            + "] to category ["
+                            + category.getId()
+                            + "]",
+                    e);
         }
 
         return readableProduct;
-
     }
 
     @Override
-    public ReadableProduct removeProductFromCategory(Category category, Product product, Language language)
-            throws Exception {
+    public ReadableProduct removeProductFromCategory(
+            Category category, Product product, Language language) throws Exception {
 
         Assert.notNull(category, "Category cannot be null");
         Assert.notNull(product, "Product cannot be null");
@@ -269,8 +278,8 @@ public class ProductCommonFacadeImpl implements ProductCommonFacade {
     }
 
     @Override
-    public ReadableProduct getProductByCode(MerchantStore store, String uniqueCode, Language language)
-            throws Exception {
+    public ReadableProduct getProductByCode(
+            MerchantStore store, String uniqueCode, Language language) throws Exception {
 
         Product product = productService.getBySku(uniqueCode, store, language);
 
@@ -286,7 +295,8 @@ public class ProductCommonFacadeImpl implements ProductCommonFacade {
     }
 
     @Override
-    public void saveOrUpdateReview(PersistableProductReview review, MerchantStore store, Language language)
+    public void saveOrUpdateReview(
+            PersistableProductReview review, MerchantStore store, Language language)
             throws Exception {
         PersistableProductReviewPopulator populator = new PersistableProductReviewPopulator();
         populator.setLanguageService(languageService);
@@ -303,18 +313,17 @@ public class ProductCommonFacadeImpl implements ProductCommonFacade {
         }
 
         review.setId(rev.getId());
-
     }
 
     @Override
-    public void deleteReview(ProductReview review, MerchantStore store, Language language) throws Exception {
-        productReviewService.delete(review);
-
-    }
-
-    @Override
-    public List<ReadableProductReview> getProductReviews(Product product, MerchantStore store, Language language)
+    public void deleteReview(ProductReview review, MerchantStore store, Language language)
             throws Exception {
+        productReviewService.delete(review);
+    }
+
+    @Override
+    public List<ReadableProductReview> getProductReviews(
+            Product product, MerchantStore store, Language language) throws Exception {
 
         List<ProductReview> reviews = productReviewService.getByProduct(product);
 
@@ -331,9 +340,12 @@ public class ProductCommonFacadeImpl implements ProductCommonFacade {
         return productReviews;
     }
 
-
     @Override
-    public void update(Long productId, LightPersistableProduct product, MerchantStore merchant, Language language) {
+    public void update(
+            Long productId,
+            LightPersistableProduct product,
+            MerchantStore merchant,
+            Language language) {
         // Get product
         Product modified = productService.findOne(productId, merchant);
 
@@ -347,7 +359,8 @@ public class ProductCommonFacadeImpl implements ProductCommonFacade {
                 for (ProductPrice price : availability.getPrices()) {
                     if (price.isDefaultPrice()) {
                         try {
-                            price.setProductPriceAmount(pricingService.getAmount(product.getPrice()));
+                            price.setProductPriceAmount(
+                                    pricingService.getAmount(product.getPrice()));
                         } catch (ServiceException e) {
                             throw new ServiceRuntimeException("Invalid product price format");
                         }
@@ -361,7 +374,6 @@ public class ProductCommonFacadeImpl implements ProductCommonFacade {
         } catch (ServiceException e) {
             throw new ServiceRuntimeException("Cannot update product ", e);
         }
-
     }
 
     @Override
@@ -369,7 +381,6 @@ public class ProductCommonFacadeImpl implements ProductCommonFacade {
 
         return productService.exists(sku, store);
     }
-
 
     @Override
     public void deleteProduct(Long id, MerchantStore store) {
@@ -391,11 +402,10 @@ public class ProductCommonFacadeImpl implements ProductCommonFacade {
         try {
             productService.delete(p);
         } catch (ServiceException e) {
-            throw new ServiceRuntimeException("Error while deleting ptoduct with id [" + id + "]", e);
+            throw new ServiceRuntimeException(
+                    "Error while deleting ptoduct with id [" + id + "]", e);
         }
-
     }
-
 
     @Override
     public Product getProduct(Long id, MerchantStore store) {
@@ -403,7 +413,11 @@ public class ProductCommonFacadeImpl implements ProductCommonFacade {
     }
 
     @Override
-    public void update(String sku, LightPersistableProduct product, MerchantStore merchant, Language language) {
+    public void update(
+            String sku,
+            LightPersistableProduct product,
+            MerchantStore merchant,
+            Language language) {
         // Get product
         Product modified = null;
         try {
@@ -412,10 +426,11 @@ public class ProductCommonFacadeImpl implements ProductCommonFacade {
             throw new ServiceRuntimeException(e);
         }
 
-        ProductVariant instance = modified.getVariants().stream()
-                .filter(inst -> sku.equals(inst.getSku()))
-                .findAny()
-                .orElse(null);
+        ProductVariant instance =
+                modified.getVariants().stream()
+                        .filter(inst -> sku.equals(inst.getSku()))
+                        .findAny()
+                        .orElse(null);
 
         if (instance != null) {
             instance.setAvailable(product.isAvailable());
@@ -437,13 +452,13 @@ public class ProductCommonFacadeImpl implements ProductCommonFacade {
         } catch (ServiceException e) {
             throw new ServiceRuntimeException("Cannot update product ", e);
         }
-
     }
 
     /**
      * edit availability
      */
-    private void setAvailability(ProductAvailability availability, LightPersistableProduct product) {
+    private void setAvailability(
+            ProductAvailability availability, LightPersistableProduct product) {
         availability.setProductQuantity(product.getQuantity());
         if (!StringUtils.isBlank(product.getPrice())) {
             // set default price
@@ -458,6 +473,4 @@ public class ProductCommonFacadeImpl implements ProductCommonFacade {
             }
         }
     }
-
-
 }

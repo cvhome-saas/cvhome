@@ -20,26 +20,24 @@ import com.asrevo.cvhome.store.core.entity.tax.taxclass.TaxClass;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
-import lombok.Getter;
-import lombok.Setter;
-import org.hibernate.annotations.Cascade;
-
 import java.io.Serial;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
-
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.Cascade;
 
 @Entity
 @EntityListeners(value = AuditListener.class)
-@Table(name = "PRODUCT", uniqueConstraints =
-@UniqueConstraint(columnNames = {"MERCHANT_ID", "SKU"}))
+@Table(
+        name = "PRODUCT",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"MERCHANT_ID", "SKU"}))
 @Getter
 @Setter
 public class Product extends SalesManagerEntity<Long, Product> implements Auditable {
-    @Serial
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
 
     @Id
     @Column(name = "PRODUCT_ID", unique = true, nullable = false)
@@ -48,13 +46,13 @@ public class Product extends SalesManagerEntity<Long, Product> implements Audita
             table = "SM_SEQUENCER",
             pkColumnName = "SEQ_NAME",
             valueColumnName = "SEQ_COUNT",
-            pkColumnValue = "PRODUCT_SEQ_NEXT_VAL"
-            , allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE, initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
+            pkColumnValue = "PRODUCT_SEQ_NEXT_VAL",
+            allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
+            initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
     private Long id;
 
-    @Embedded
-    private AuditSection auditSection = new AuditSection();
+    @Embedded private AuditSection auditSection = new AuditSection();
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "product")
     private Set<ProductDescription> descriptions = new HashSet<>();
@@ -76,7 +74,8 @@ public class Product extends SalesManagerEntity<Long, Product> implements Audita
      * Default product images
      */
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, mappedBy = "product")
-//cascade is set to remove because product save requires logic to create physical image first and then save the image id in the database, cannot be done in cascade
+    // cascade is set to remove because product save requires logic to create physical image first
+    // and then save the image id in the database, cannot be done in cascade
     private Set<ProductImage> images = new HashSet<>();
 
     /**
@@ -92,19 +91,30 @@ public class Product extends SalesManagerEntity<Long, Product> implements Audita
     /**
      * Product to category
      */
-    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.REFRESH})
-    @JoinTable(name = "PRODUCT_CATEGORY", joinColumns = {
-            @JoinColumn(name = "PRODUCT_ID", nullable = false, updatable = false, insertable = false)}
-            ,
-            inverseJoinColumns = {@JoinColumn(name = "CATEGORY_ID",
-                    nullable = false, updatable = false, insertable = false)}
-    )
+    @ManyToMany(
+            fetch = FetchType.LAZY,
+            cascade = {CascadeType.REFRESH})
+    @JoinTable(
+            name = "PRODUCT_CATEGORY",
+            joinColumns = {
+                @JoinColumn(
+                        name = "PRODUCT_ID",
+                        nullable = false,
+                        updatable = false,
+                        insertable = false)
+            },
+            inverseJoinColumns = {
+                @JoinColumn(
+                        name = "CATEGORY_ID",
+                        nullable = false,
+                        updatable = false,
+                        insertable = false)
+            })
     @Cascade({
-            org.hibernate.annotations.CascadeType.DETACH,
-            org.hibernate.annotations.CascadeType.LOCK,
-            org.hibernate.annotations.CascadeType.REFRESH,
-            org.hibernate.annotations.CascadeType.REPLICATE
-
+        org.hibernate.annotations.CascadeType.DETACH,
+        org.hibernate.annotations.CascadeType.LOCK,
+        org.hibernate.annotations.CascadeType.REFRESH,
+        org.hibernate.annotations.CascadeType.REPLICATE
     })
     private Set<Category> categories = new HashSet<>();
 
@@ -119,24 +129,27 @@ public class Product extends SalesManagerEntity<Long, Product> implements Audita
     @Temporal(TemporalType.TIMESTAMP)
     private Date dateAvailable = new Date();
 
-
     @Column(name = "AVAILABLE")
     private boolean available = true;
-
 
     @Column(name = "PREORDER")
     private boolean preOrder = false;
 
-
-    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.REFRESH})
+    @ManyToOne(
+            fetch = FetchType.LAZY,
+            cascade = {CascadeType.REFRESH})
     @JoinColumn(name = "MANUFACTURER_ID")
     private Manufacturer manufacturer;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.REFRESH})
+    @ManyToOne(
+            fetch = FetchType.LAZY,
+            cascade = {CascadeType.REFRESH})
     @JoinColumn(name = "PRODUCT_TYPE_ID")
     private ProductType type;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.REFRESH})
+    @ManyToOne(
+            fetch = FetchType.LAZY,
+            cascade = {CascadeType.REFRESH})
     @JoinColumn(name = "TAX_CLASS_ID")
     private TaxClass taxClass;
 
@@ -190,27 +203,23 @@ public class Product extends SalesManagerEntity<Long, Product> implements Audita
     /**
      * RENTAL ADDITIONAL FIELDS
      */
-
     @Column(name = "RENTAL_STATUS")
     private RentalStatus rentalStatus;
-
 
     @Column(name = "RENTAL_DURATION")
     private Integer rentalDuration;
 
     @Column(name = "RENTAL_PERIOD")
     private Integer rentalPeriod;
+
     /**
      * End rental fields
      */
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CUSTOMER_ID")
     private Customer owner;
 
-    public Product() {
-    }
-
+    public Product() {}
 
     public ProductDescription getProductDescription() {
         if (this.getDescriptions() != null && !this.getDescriptions().isEmpty()) {
@@ -231,5 +240,4 @@ public class Product extends SalesManagerEntity<Long, Product> implements Audita
         }
         return productImage;
     }
-
 }

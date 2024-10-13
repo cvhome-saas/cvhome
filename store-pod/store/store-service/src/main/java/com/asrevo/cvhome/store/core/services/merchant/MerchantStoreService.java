@@ -5,13 +5,11 @@ import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStoreCriteria;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
-import org.springframework.data.domain.Page;
-
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
 
 public interface MerchantStoreService extends SalesManagerEntityService<Integer, MerchantStore> {
-
 
     MerchantStore getByCode(String code);
 
@@ -27,11 +25,14 @@ public interface MerchantStoreService extends SalesManagerEntityService<Integer,
 
     List<MerchantStore> findAllStoreCodeNameEmail() throws ServiceException;
 
-    Page<MerchantStore> listAll(Optional<String> storeName, int page, int count) throws ServiceException;
+    Page<MerchantStore> listAll(Optional<String> storeName, int page, int count)
+            throws ServiceException;
 
-    Page<MerchantStore> listByGroup(Optional<String> storeName, String code, int page, int count) throws ServiceException;
+    Page<MerchantStore> listByGroup(Optional<String> storeName, String code, int page, int count)
+            throws ServiceException;
 
-    Page<MerchantStore> listAllRetailers(Optional<String> storeName, int page, int count) throws ServiceException;
+    Page<MerchantStore> listAllRetailers(Optional<String> storeName, int page, int count)
+            throws ServiceException;
 
     Page<MerchantStore> listChildren(String code, int page, int count) throws ServiceException;
 
@@ -45,6 +46,6 @@ public interface MerchantStoreService extends SalesManagerEntityService<Integer,
 
     void saveOrUpdate(MerchantStore store) throws ServiceException;
 
-    GenericEntityList<MerchantStore> getByCriteria(MerchantStoreCriteria criteria) throws ServiceException;
-
+    GenericEntityList<MerchantStore> getByCriteria(MerchantStoreCriteria criteria)
+            throws ServiceException;
 }

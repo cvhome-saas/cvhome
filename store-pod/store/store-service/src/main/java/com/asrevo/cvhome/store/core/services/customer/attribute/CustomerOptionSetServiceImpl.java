@@ -8,31 +8,27 @@ import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.repositories.customer.attribute.CustomerOptionSetRepository;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import java.util.List;
-
-
 @Service("customerOptionSetService")
-public class CustomerOptionSetServiceImpl extends
-        SalesManagerEntityServiceImpl<Long, CustomerOptionSet> implements CustomerOptionSetService {
-
+public class CustomerOptionSetServiceImpl
+        extends SalesManagerEntityServiceImpl<Long, CustomerOptionSet>
+        implements CustomerOptionSetService {
 
     private final CustomerOptionSetRepository customerOptionSetRepository;
 
-
     @Autowired
-    public CustomerOptionSetServiceImpl(
-            CustomerOptionSetRepository customerOptionSetRepository) {
+    public CustomerOptionSetServiceImpl(CustomerOptionSetRepository customerOptionSetRepository) {
         super(customerOptionSetRepository);
         this.customerOptionSetRepository = customerOptionSetRepository;
     }
 
-
     @Override
-    public List<CustomerOptionSet> listByOption(CustomerOption option, MerchantStore store) throws ServiceException {
+    public List<CustomerOptionSet> listByOption(CustomerOption option, MerchantStore store)
+            throws ServiceException {
         Assert.notNull(store, "merchant store cannot be null");
         Assert.notNull(option, "option cannot be null");
 
@@ -46,13 +42,12 @@ public class CustomerOptionSetServiceImpl extends
     }
 
     @Override
-    public List<CustomerOptionSet> listByStore(MerchantStore store, Language language) throws ServiceException {
+    public List<CustomerOptionSet> listByStore(MerchantStore store, Language language)
+            throws ServiceException {
         Assert.notNull(store, "merchant store cannot be null");
-
 
         return customerOptionSetRepository.findByStore(store.getId(), language.getId());
     }
-
 
     @Override
     public void saveOrUpdate(CustomerOptionSet entity) throws ServiceException {
@@ -63,16 +58,11 @@ public class CustomerOptionSetServiceImpl extends
         } else {
             super.create(entity);
         }
-
     }
-
 
     @Override
     public List<CustomerOptionSet> listByOptionValue(
-            CustomerOptionValue optionValue, MerchantStore store)
-            throws ServiceException {
+            CustomerOptionValue optionValue, MerchantStore store) throws ServiceException {
         return customerOptionSetRepository.findByOptionValueId(store.getId(), optionValue.getId());
     }
-
-
 }

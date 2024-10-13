@@ -2,7 +2,6 @@ package com.asrevo.cvhome.storepod.commons.domain;
 
 import com.asrevo.cvhome.commons.utils.ErrorCodes;
 import com.asrevo.cvhome.commons.utils.OperationExecution;
-
 import java.net.MalformedURLException;
 import java.net.URL;
 

@@ -5,12 +5,9 @@ import com.asrevo.cvhome.store.core.entity.catalog.product.review.ProductReview;
 import com.asrevo.cvhome.store.core.entity.customer.Customer;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
-
 import java.util.List;
 
-public interface ProductReviewService extends
-        SalesManagerEntityService<Long, ProductReview> {
-
+public interface ProductReviewService extends SalesManagerEntityService<Long, ProductReview> {
 
     List<ProductReview> getByCustomer(Customer customer);
 
@@ -23,6 +20,4 @@ public interface ProductReviewService extends
     /**
      */
     List<ProductReview> getByProductNoCustomers(Product product);
-
-
 }

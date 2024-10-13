@@ -13,11 +13,10 @@ import com.asrevo.cvhome.store.core.model.catalog.product.type.ReadableProductTy
 import com.asrevo.cvhome.store.core.services.catalog.product.attribute.ProductOptionSetService;
 import com.asrevo.cvhome.store.service.mapper.catalog.PersistableProductOptionSetMapper;
 import com.asrevo.cvhome.store.service.mapper.catalog.ReadableProductOptionSetMapper;
-import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
-
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 @Service
 public class ProductOptionSetFacadeImpl implements ProductOptionSetFacade {
@@ -30,7 +29,11 @@ public class ProductOptionSetFacadeImpl implements ProductOptionSetFacade {
 
     private final ProductTypeFacade productTypeFacade;
 
-    public ProductOptionSetFacadeImpl(PersistableProductOptionSetMapper persistableProductOptionSetMapper, ReadableProductOptionSetMapper readableProductOptionSetMapper, ProductOptionSetService productOptionSetService, ProductTypeFacade productTypeFacade) {
+    public ProductOptionSetFacadeImpl(
+            PersistableProductOptionSetMapper persistableProductOptionSetMapper,
+            ReadableProductOptionSetMapper readableProductOptionSetMapper,
+            ProductOptionSetService productOptionSetService,
+            ProductTypeFacade productTypeFacade) {
         this.persistableProductOptionSetMapper = persistableProductOptionSetMapper;
         this.readableProductOptionSetMapper = readableProductOptionSetMapper;
         this.productOptionSetService = productOptionSetService;
@@ -44,7 +47,11 @@ public class ProductOptionSetFacadeImpl implements ProductOptionSetFacade {
         ProductOptionSet optionSet = productOptionSetService.getById(store, id, language);
         if (optionSet == null) {
             throw new ResourceNotFoundException(
-                    "ProductOptionSet not found for id [" + id + "] and store [" + store.getCode() + "]");
+                    "ProductOptionSet not found for id ["
+                            + id
+                            + "] and store ["
+                            + store.getCode()
+                            + "]");
         }
 
         return readableProductOptionSetMapper.convert(optionSet, store, language);
@@ -56,40 +63,49 @@ public class ProductOptionSetFacadeImpl implements ProductOptionSetFacade {
         Assert.notNull(language, "Language cannot be null");
 
         try {
-            List<ProductOptionSet> optionSets = productOptionSetService.listByStore(store, language);
-            return optionSets.stream().map(opt -> this.convert(opt, store, language)).collect(Collectors.toList());
+            List<ProductOptionSet> optionSets =
+                    productOptionSetService.listByStore(store, language);
+            return optionSets.stream()
+                    .map(opt -> this.convert(opt, store, language))
+                    .collect(Collectors.toList());
         } catch (ServiceException e) {
             throw new ServiceRuntimeException("Exception while listing ProductOptionSet", e);
         }
-
     }
 
-    private ReadableProductOptionSet convert(ProductOptionSet optionSet, MerchantStore store, Language language) {
+    private ReadableProductOptionSet convert(
+            ProductOptionSet optionSet, MerchantStore store, Language language) {
         return readableProductOptionSetMapper.convert(optionSet, store, language);
     }
 
     @Override
-    public void create(PersistableProductOptionSet optionSet, MerchantStore store, Language language) {
+    public void create(
+            PersistableProductOptionSet optionSet, MerchantStore store, Language language) {
         Assert.notNull(store, "MerchantStore cannot be null");
         Assert.notNull(language, "Language cannot be null");
         Assert.notNull(optionSet, "PersistableProductOptionSet cannot be null");
 
         if (this.exists(optionSet.getCode(), store)) {
-            throw new OperationNotAllowedException("Option set with code [" + optionSet.getCode() + "] already exist");
+            throw new OperationNotAllowedException(
+                    "Option set with code [" + optionSet.getCode() + "] already exist");
         }
 
-        ProductOptionSet opt = persistableProductOptionSetMapper.convert(optionSet, store, language);
+        ProductOptionSet opt =
+                persistableProductOptionSetMapper.convert(optionSet, store, language);
         try {
             opt.setStore(store);
             productOptionSetService.create(opt);
         } catch (ServiceException e) {
             throw new ServiceRuntimeException("Exception while creating ProductOptionSet", e);
         }
-
     }
 
     @Override
-    public void update(Long id, PersistableProductOptionSet optionSet, MerchantStore store, Language language) {
+    public void update(
+            Long id,
+            PersistableProductOptionSet optionSet,
+            MerchantStore store,
+            Language language) {
         Assert.notNull(store, "MerchantStore cannot be null");
         Assert.notNull(language, "Language cannot be null");
         Assert.notNull(optionSet, "PersistableProductOptionSet cannot be null");
@@ -97,19 +113,23 @@ public class ProductOptionSetFacadeImpl implements ProductOptionSetFacade {
         ProductOptionSet opt = productOptionSetService.getById(store, id, language);
         if (opt == null) {
             throw new ResourceNotFoundException(
-                    "ProductOptionSet not found for id [" + id + "] and store [" + store.getCode() + "]");
+                    "ProductOptionSet not found for id ["
+                            + id
+                            + "] and store ["
+                            + store.getCode()
+                            + "]");
         }
 
         optionSet.setId(id);
         optionSet.setCode(opt.getCode());
-        ProductOptionSet model = persistableProductOptionSetMapper.convert(optionSet, store, language);
+        ProductOptionSet model =
+                persistableProductOptionSetMapper.convert(optionSet, store, language);
         try {
             model.setStore(store);
             productOptionSetService.save(model);
         } catch (ServiceException e) {
             throw new ServiceRuntimeException("Exception while creating ProductOptionSet", e);
         }
-
     }
 
     @Override
@@ -119,18 +139,25 @@ public class ProductOptionSetFacadeImpl implements ProductOptionSetFacade {
         ProductOptionSet opt = productOptionSetService.getById(id);
         if (opt == null) {
             throw new ResourceNotFoundException(
-                    "ProductOptionSet not found for id [" + id + "] and store [" + store.getCode() + "]");
+                    "ProductOptionSet not found for id ["
+                            + id
+                            + "] and store ["
+                            + store.getCode()
+                            + "]");
         }
         if (!opt.getStore().getCode().equals(store.getCode())) {
             throw new ResourceNotFoundException(
-                    "ProductOptionSet not found for id [" + id + "] and store [" + store.getCode() + "]");
+                    "ProductOptionSet not found for id ["
+                            + id
+                            + "] and store ["
+                            + store.getCode()
+                            + "]");
         }
         try {
             productOptionSetService.delete(opt);
         } catch (ServiceException e) {
             throw new ServiceRuntimeException("Exception while deleting ProductOptionSet", e);
         }
-
     }
 
     @Override
@@ -142,7 +169,8 @@ public class ProductOptionSetFacadeImpl implements ProductOptionSetFacade {
     }
 
     @Override
-    public List<ReadableProductOptionSet> list(MerchantStore store, Language language, String type) {
+    public List<ReadableProductOptionSet> list(
+            MerchantStore store, Language language, String type) {
         Assert.notNull(store, "MerchantStore cannot be null");
         Assert.notNull(language, "Language cannot be null");
         Assert.notNull(type, "Product type cannot be null");
@@ -151,12 +179,18 @@ public class ProductOptionSetFacadeImpl implements ProductOptionSetFacade {
         ReadableProductType readable = productTypeFacade.get(store, type, language);
 
         if (readable == null) {
-            throw new ResourceNotFoundException("Can't fing product type [" + type + "] fpr merchand [" + store.getCode() + "]");
+            throw new ResourceNotFoundException(
+                    "Can't fing product type ["
+                            + type
+                            + "] fpr merchand ["
+                            + store.getCode()
+                            + "]");
         }
 
-        List<ProductOptionSet> optionSets = productOptionSetService.getByProductType(readable.getId(), store, language);
-        return optionSets.stream().map(opt -> this.convert(opt, store, language)).collect(Collectors.toList());
-
+        List<ProductOptionSet> optionSets =
+                productOptionSetService.getByProductType(readable.getId(), store, language);
+        return optionSets.stream()
+                .map(opt -> this.convert(opt, store, language))
+                .collect(Collectors.toList());
     }
-
 }

@@ -8,18 +8,16 @@ import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
 import com.asrevo.cvhome.store.core.entity.order.Order;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
-import org.json.simple.JSONAware;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+import org.json.simple.JSONAware;
 
 @Entity
 @EntityListeners(value = AuditListener.class)
@@ -27,23 +25,28 @@ import java.util.Map;
 @Getter
 @Setter
 @Slf4j
-public class Transaction extends SalesManagerEntity<Long, Transaction> implements Serializable, Auditable, JSONAware {
+public class Transaction extends SalesManagerEntity<Long, Transaction>
+        implements Serializable, Auditable, JSONAware {
 
     /**
      *
      */
-    @Serial
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
 
     @Id
     @Column(name = "TRANSACTION_ID")
-    @TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME", valueColumnName = "SEQ_COUNT", pkColumnValue = "TRANSACT_SEQ_NEXT_VAL", allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE, initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
+    @TableGenerator(
+            name = "TABLE_GEN",
+            table = "SM_SEQUENCER",
+            pkColumnName = "SEQ_NAME",
+            valueColumnName = "SEQ_COUNT",
+            pkColumnValue = "TRANSACT_SEQ_NEXT_VAL",
+            allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
+            initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
     private Long id;
 
-    @Embedded
-    private AuditSection auditSection = new AuditSection();
-
+    @Embedded private AuditSection auditSection = new AuditSection();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ORDER_ID")
@@ -67,8 +70,7 @@ public class Transaction extends SalesManagerEntity<Long, Transaction> implement
     @Column(name = "DETAILS", columnDefinition = "text")
     private String details;
 
-    @Transient
-    private Map<String, String> transactionDetails = new HashMap<>();
+    @Transient private Map<String, String> transactionDetails = new HashMap<>();
 
     @Override
     public String toJSONString() {
@@ -80,7 +82,6 @@ public class Transaction extends SalesManagerEntity<Long, Transaction> implement
             } catch (Exception e) {
                 log.error("Cannot parse transactions map", e);
             }
-
         }
 
         return null;

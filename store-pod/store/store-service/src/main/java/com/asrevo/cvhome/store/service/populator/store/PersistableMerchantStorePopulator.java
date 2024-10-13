@@ -17,6 +17,8 @@ import com.asrevo.cvhome.store.core.services.reference.language.LanguageService;
 import com.asrevo.cvhome.store.core.services.reference.zone.ZoneService;
 import com.asrevo.cvhome.store.utils.AbstractDataPopulator;
 import com.asrevo.cvhome.store.utils.DateUtil;
+import java.util.Date;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
@@ -24,13 +26,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
-import java.util.Date;
-import java.util.List;
-
 @Component
 @Getter
 @Setter
-public class PersistableMerchantStorePopulator extends AbstractDataPopulator<PersistableMerchantStore, MerchantStore> {
+public class PersistableMerchantStorePopulator
+        extends AbstractDataPopulator<PersistableMerchantStore, MerchantStore> {
 
     private final CountryService countryService;
     private final ZoneService zoneService;
@@ -38,7 +38,12 @@ public class PersistableMerchantStorePopulator extends AbstractDataPopulator<Per
     private final CurrencyService currencyService;
     private final MerchantStoreService merchantStoreService;
 
-    public PersistableMerchantStorePopulator(CountryService countryService, ZoneService zoneService, LanguageService languageService, CurrencyService currencyService, MerchantStoreService merchantStoreService) {
+    public PersistableMerchantStorePopulator(
+            CountryService countryService,
+            ZoneService zoneService,
+            LanguageService languageService,
+            CurrencyService currencyService,
+            MerchantStoreService merchantStoreService) {
         this.countryService = countryService;
         this.zoneService = zoneService;
         this.languageService = languageService;
@@ -46,10 +51,13 @@ public class PersistableMerchantStorePopulator extends AbstractDataPopulator<Per
         this.merchantStoreService = merchantStoreService;
     }
 
-
     @Override
-    public MerchantStore populate(PersistableMerchantStore source, MerchantStore target, MerchantStore store,
-                                  Language language) throws ConversionException {
+    public MerchantStore populate(
+            PersistableMerchantStore source,
+            MerchantStore target,
+            MerchantStore store,
+            Language language)
+            throws ConversionException {
 
         Assert.notNull(source, "PersistableMerchantStore mst not be null");
 
@@ -75,7 +83,8 @@ public class PersistableMerchantStorePopulator extends AbstractDataPopulator<Per
                 Date dt = DateUtil.getDate(source.getInBusinessSince());
                 target.setInBusinessSince(dt);
             } catch (Exception e) {
-                throw new ConversionException("Cannot parse date [" + source.getInBusinessSince() + "]", e);
+                throw new ConversionException(
+                        "Cannot parse date [" + source.getInBusinessSince() + "]", e);
             }
         }
 
@@ -95,19 +104,21 @@ public class PersistableMerchantStorePopulator extends AbstractDataPopulator<Per
         target.setUseCache(source.isUseCache());
         target.setRetailer(source.isRetailer());
 
-        //get parent store
+        // get parent store
         if (!StringUtils.isBlank(source.getRetailerStore())) {
             if (source.getRetailerStore().equals(source.getCode())) {
-                throw new ConversionException("Parent store [" + source.getRetailerStore() + "] cannot be parent of current store");
+                throw new ConversionException(
+                        "Parent store ["
+                                + source.getRetailerStore()
+                                + "] cannot be parent of current store");
             }
             MerchantStore parent = merchantStoreService.getByCode(source.getRetailerStore());
             if (parent == null) {
-                throw new ConversionException("Parent store [" + source.getRetailerStore() + "] does not exist");
+                throw new ConversionException(
+                        "Parent store [" + source.getRetailerStore() + "] does not exist");
             }
             target.setParent(parent);
-
         }
-
 
         try {
 
@@ -120,7 +131,8 @@ public class PersistableMerchantStorePopulator extends AbstractDataPopulator<Per
                 Currency c = currencyService.getByCode(source.getCurrency());
                 target.setCurrency(c);
             } else {
-                target.setCurrency(currencyService.getByCode(Constants.DEFAULT_CURRENCY.getCurrencyCode()));
+                target.setCurrency(
+                        currencyService.getByCode(Constants.DEFAULT_CURRENCY.getCurrencyCode()));
             }
 
             List<String> languages = source.getSupportedLanguages();
@@ -135,7 +147,7 @@ public class PersistableMerchantStorePopulator extends AbstractDataPopulator<Per
             throw new ConversionException(e);
         }
 
-        //address population
+        // address population
         PersistableAddress address = source.getAddress();
         if (address != null) {
             Country country;
@@ -170,5 +182,4 @@ public class PersistableMerchantStorePopulator extends AbstractDataPopulator<Per
         // TODO Auto-generated method stub
         return null;
     }
-
 }

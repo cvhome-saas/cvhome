@@ -14,8 +14,4 @@ package com.asrevo.cvhome.store.service.facade.shoppingCart;
  * @version 1.0
  * @since1.0
  */
-
-
-public interface ShoppingCartFacade {
-
-}
+public interface ShoppingCartFacade {}

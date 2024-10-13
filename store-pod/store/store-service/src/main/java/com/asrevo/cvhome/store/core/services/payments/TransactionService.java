@@ -5,10 +5,8 @@ import com.asrevo.cvhome.store.core.entity.order.Order;
 import com.asrevo.cvhome.store.core.entity.payments.Transaction;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
-
 import java.util.Date;
 import java.util.List;
-
 
 public interface TransactionService extends SalesManagerEntityService<Long, Transaction> {
 
@@ -25,6 +23,4 @@ public interface TransactionService extends SalesManagerEntityService<Long, Tran
     List<Transaction> listTransactions(Date startDate, Date endDate) throws ServiceException;
 
     Transaction lastTransaction(Order order, MerchantStore store) throws ServiceException;
-
-
 }

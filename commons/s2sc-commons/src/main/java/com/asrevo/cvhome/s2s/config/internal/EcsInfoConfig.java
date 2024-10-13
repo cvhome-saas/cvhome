@@ -16,7 +16,8 @@ public class EcsInfoConfig {
     }
 
     @Bean
-    public EcsTaskHealthIndicator ecsTaskHealthIndicator(EcsTask ecsTask, ObjectMapper objectMapper) {
+    public EcsTaskHealthIndicator ecsTaskHealthIndicator(
+            EcsTask ecsTask, ObjectMapper objectMapper) {
         return new EcsTaskHealthIndicator(ecsTask, objectMapper);
     }
 }

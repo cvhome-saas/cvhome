@@ -2,14 +2,13 @@ package com.asrevo.cvhome.store.core.model.shoppingcart;
 
 import com.asrevo.cvhome.store.core.model.catalog.product.ReadableMinimalProduct;
 import com.asrevo.cvhome.store.core.model.catalog.product.variation.ReadableProductVariation;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * compatible with v1 version
@@ -23,14 +22,12 @@ public class ReadableShoppingCartItem extends ReadableMinimalProduct implements 
     /**
      *
      */
-    @Serial
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
+
     private BigDecimal subTotal;
     private String displaySubTotal;
     private List<ReadableShoppingCartAttribute> cartItemattributes = new ArrayList<>();
 
     private ReadableProductVariation variant = null;
     private ReadableProductVariation variantValue = null;
-
-
 }

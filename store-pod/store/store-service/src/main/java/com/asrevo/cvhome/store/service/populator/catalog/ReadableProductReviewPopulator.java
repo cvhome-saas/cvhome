@@ -10,17 +10,18 @@ import com.asrevo.cvhome.store.core.model.customer.ReadableCustomer;
 import com.asrevo.cvhome.store.service.populator.customer.ReadableCustomerPopulator;
 import com.asrevo.cvhome.store.utils.AbstractDataPopulator;
 import com.asrevo.cvhome.store.utils.DateUtil;
-
 import java.util.Set;
 
-public class ReadableProductReviewPopulator extends
-        AbstractDataPopulator<ProductReview, ReadableProductReview> {
+public class ReadableProductReviewPopulator
+        extends AbstractDataPopulator<ProductReview, ReadableProductReview> {
 
     @Override
-    public ReadableProductReview populate(ProductReview source,
-                                          ReadableProductReview target, MerchantStore store, Language language)
+    public ReadableProductReview populate(
+            ProductReview source,
+            ReadableProductReview target,
+            MerchantStore store,
+            Language language)
             throws ConversionException {
-
 
         try {
             ReadableCustomerPopulator populator = new ReadableCustomerPopulator();
@@ -47,13 +48,10 @@ public class ReadableProductReviewPopulator extends
         } catch (Exception e) {
             throw new ConversionException("Cannot populate ProductReview", e);
         }
-
-
     }
 
     @Override
     protected ReadableProductReview createTarget() {
         return null;
     }
-
 }

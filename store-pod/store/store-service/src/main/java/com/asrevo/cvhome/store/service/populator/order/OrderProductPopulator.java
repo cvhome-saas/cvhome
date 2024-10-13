@@ -15,20 +15,17 @@ import com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem;
 import com.asrevo.cvhome.store.core.services.catalog.product.ProductService;
 import com.asrevo.cvhome.store.core.services.catalog.product.attribute.ProductAttributeService;
 import com.asrevo.cvhome.store.utils.AbstractDataPopulator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-
 @Setter
 @Getter
-public class OrderProductPopulator extends
-        AbstractDataPopulator<ShoppingCartItem, OrderProduct> {
+public class OrderProductPopulator extends AbstractDataPopulator<ShoppingCartItem, OrderProduct> {
 
     private ProductService productService;
     /*
@@ -36,29 +33,28 @@ public class OrderProductPopulator extends
     */
     private ProductAttributeService productAttributeService;
 
-
     /*
-	public DigitalProductService getDigitalProductService() {
-		return digitalProductService;
-	}
+    	public DigitalProductService getDigitalProductService() {
+    		return digitalProductService;
+    	}
 
-	public void setDigitalProductService(DigitalProductService digitalProductService) {
-		this.digitalProductService = digitalProductService;
-	}
-*/
+    	public void setDigitalProductService(DigitalProductService digitalProductService) {
+    		this.digitalProductService = digitalProductService;
+    	}
+    */
 
     /**
      * Converts a ShoppingCartItem carried in the ShoppingCart to an OrderProduct
      * that will be saved in the system
      */
     @Override
-    public OrderProduct populate(ShoppingCartItem source, OrderProduct target,
-                                 MerchantStore store, Language language) throws ConversionException {
+    public OrderProduct populate(
+            ShoppingCartItem source, OrderProduct target, MerchantStore store, Language language)
+            throws ConversionException {
 
         Assert.notNull(productService, "productService must be set");
-//		Assert.notNull(digitalProductService,"digitalProductService must be set");
+        //		Assert.notNull(digitalProductService,"digitalProductService must be set");
         Assert.notNull(productAttributeService, "productAttributeService must be set");
-
 
         try {
             Product modelProduct = productService.getBySku(source.getSku(), store, language);
@@ -70,36 +66,38 @@ public class OrderProductPopulator extends
                 throw new ConversionException("Invalid product with sku " + source.getSku());
             }
 
-/*@TODO ASHRAF
+            /*@TODO ASHRAF
 
-			DigitalProduct digitalProduct = digitalProductService.getByProduct(store, modelProduct);
-			
-			if(digitalProduct!=null) {
-				OrderProductDownload orderProductDownload = new OrderProductDownload();
-				orderProductDownload.setOrderProductFilename(digitalProduct.getProductFileName());
-				orderProductDownload.setOrderProduct(target);
-				orderProductDownload.setDownloadCount(0);
-				orderProductDownload.setMaxdays(Constants.MAX_DOWNLOAD_DAYS);
-				target.getDownloads().add(orderProductDownload);
-			}
-*/
+            			DigitalProduct digitalProduct = digitalProductService.getByProduct(store, modelProduct);
+
+            			if(digitalProduct!=null) {
+            				OrderProductDownload orderProductDownload = new OrderProductDownload();
+            				orderProductDownload.setOrderProductFilename(digitalProduct.getProductFileName());
+            				orderProductDownload.setOrderProduct(target);
+            				orderProductDownload.setDownloadCount(0);
+            				orderProductDownload.setMaxdays(Constants.MAX_DOWNLOAD_DAYS);
+            				target.getDownloads().add(orderProductDownload);
+            			}
+            */
             target.setOneTimeCharge(source.getItemPrice());
-            target.setProductName(source.getProduct().getDescriptions().iterator().next().getName());
+            target.setProductName(
+                    source.getProduct().getDescriptions().iterator().next().getName());
             target.setProductQuantity(source.getQuantity());
             target.setSku(source.getProduct().getSku());
 
             FinalPrice finalPrice = source.getFinalPrice();
             if (finalPrice == null) {
-                throw new ConversionException("Object final price not populated in shoppingCartItem (source)");
+                throw new ConversionException(
+                        "Object final price not populated in shoppingCartItem (source)");
             }
-            //Default price
+            // Default price
             OrderProductPrice orderProductPrice = orderProductPrice(finalPrice);
             orderProductPrice.setOrderProduct(target);
 
             Set<OrderProductPrice> prices = new HashSet<>();
             prices.add(orderProductPrice);
 
-            //Other prices
+            // Other prices
             List<FinalPrice> otherPrices = finalPrice.getAdditionalPrices();
             if (otherPrices != null) {
                 for (FinalPrice otherPrice : otherPrices) {
@@ -111,7 +109,7 @@ public class OrderProductPopulator extends
 
             target.setPrices(prices);
 
-            //OrderProductAttribute
+            // OrderProductAttribute
             Set<ShoppingCartAttributeItem> attributeItems = source.getAttributes();
             if (!CollectionUtils.isEmpty(attributeItems)) {
                 Set<OrderProductAttribute> attributes = new HashSet<>();
@@ -124,27 +122,38 @@ public class OrderProductPopulator extends
                         throw new ConversionException("Attribute id " + id + " does not exists");
                     }
 
-                    if (attr.getProduct().getMerchantStore().getId().intValue() != store.getId().intValue()) {
-                        throw new ConversionException("Attribute id " + id + " invalid for this store");
+                    if (attr.getProduct().getMerchantStore().getId().intValue()
+                            != store.getId().intValue()) {
+                        throw new ConversionException(
+                                "Attribute id " + id + " invalid for this store");
                     }
 
-                    orderProductAttribute.setProductAttributeIsFree(attr.isProductAttributeIsFree());
-                    orderProductAttribute.setProductAttributeName(attr.getProductOption().getDescriptionsSettoList().getFirst().getName());
-                    orderProductAttribute.setProductAttributeValueName(attr.getProductOptionValue().getDescriptionsSettoList().getFirst().getName());
+                    orderProductAttribute.setProductAttributeIsFree(
+                            attr.isProductAttributeIsFree());
+                    orderProductAttribute.setProductAttributeName(
+                            attr.getProductOption()
+                                    .getDescriptionsSettoList()
+                                    .getFirst()
+                                    .getName());
+                    orderProductAttribute.setProductAttributeValueName(
+                            attr.getProductOptionValue()
+                                    .getDescriptionsSettoList()
+                                    .getFirst()
+                                    .getName());
                     orderProductAttribute.setProductAttributePrice(attr.getProductAttributePrice());
-                    orderProductAttribute.setProductAttributeWeight(attr.getProductAttributeWeight());
+                    orderProductAttribute.setProductAttributeWeight(
+                            attr.getProductAttributeWeight());
                     orderProductAttribute.setProductOptionId(attr.getProductOption().getId());
-                    orderProductAttribute.setProductOptionValueId(attr.getProductOptionValue().getId());
+                    orderProductAttribute.setProductOptionValueId(
+                            attr.getProductOptionValue().getId());
                     attributes.add(orderProductAttribute);
                 }
                 target.setOrderAttributes(attributes);
             }
 
-
         } catch (Exception e) {
             throw new ConversionException(e);
         }
-
 
         return target;
     }
@@ -165,16 +174,17 @@ public class OrderProductPopulator extends
         orderProductPrice.setProductPrice(price.getFinalPrice());
         orderProductPrice.setProductPriceCode(productPrice.getCode());
         if (productPrice.getDescriptions() != null && !productPrice.getDescriptions().isEmpty()) {
-            orderProductPrice.setProductPriceName(productPrice.getDescriptions().iterator().next().getName());
+            orderProductPrice.setProductPriceName(
+                    productPrice.getDescriptions().iterator().next().getName());
         }
         if (price.isDiscounted()) {
             orderProductPrice.setProductPriceSpecial(productPrice.getProductPriceSpecialAmount());
-            orderProductPrice.setProductPriceSpecialStartDate(productPrice.getProductPriceSpecialStartDate());
-            orderProductPrice.setProductPriceSpecialEndDate(productPrice.getProductPriceSpecialEndDate());
+            orderProductPrice.setProductPriceSpecialStartDate(
+                    productPrice.getProductPriceSpecialStartDate());
+            orderProductPrice.setProductPriceSpecialEndDate(
+                    productPrice.getProductPriceSpecialEndDate());
         }
 
         return orderProductPrice;
     }
-
-
 }

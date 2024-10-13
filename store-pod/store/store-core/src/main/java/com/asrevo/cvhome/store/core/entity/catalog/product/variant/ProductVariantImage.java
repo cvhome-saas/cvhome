@@ -3,12 +3,11 @@ package com.asrevo.cvhome.store.core.entity.catalog.product.variant;
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
 import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.io.Serial;
 import java.util.HashSet;
 import java.util.Set;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name = "PRODUCT_VAR_IMAGE")
@@ -16,17 +15,18 @@ import java.util.Set;
 @Setter
 public class ProductVariantImage extends SalesManagerEntity<Long, ProductVariantImage> {
 
-
-    @Serial
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
 
     @Id
     @Column(name = "PRODUCT_VAR_IMAGE_ID")
-    @TableGenerator(name = "TABLE_GEN",
+    @TableGenerator(
+            name = "TABLE_GEN",
             table = "SM_SEQUENCER",
             pkColumnName = "SEQ_NAME",
             valueColumnName = "SEQ_COUNT",
-            pkColumnValue = "PRD_VAR_IMG_SEQ_NEXT_VAL", allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE, initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
+            pkColumnValue = "PRD_VAR_IMG_SEQ_NEXT_VAL",
+            allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
+            initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
     private Long id;
 
@@ -43,7 +43,5 @@ public class ProductVariantImage extends SalesManagerEntity<Long, ProductVariant
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "productVariantImage", cascade = CascadeType.ALL)
     private Set<ProductVariantImageDescription> descriptions = new HashSet<>();
 
-    public ProductVariantImage() {
-    }
-
+    public ProductVariantImage() {}
 }

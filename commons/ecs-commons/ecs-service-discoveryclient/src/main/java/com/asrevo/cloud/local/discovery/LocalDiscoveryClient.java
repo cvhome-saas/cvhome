@@ -1,11 +1,10 @@
 package com.asrevo.cloud.local.discovery;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author ashraf
@@ -31,10 +30,11 @@ public class LocalDiscoveryClient implements DiscoveryClient {
      * @param serviceId The serviceId to query.
      * @return available services
      */
-
     @Override
     public List<ServiceInstance> getInstances(String serviceId) {
-        return properties.getServices().get(serviceId).stream().map(it -> new LocalServiceInstance(serviceId, it)).collect(Collectors.toList());
+        return properties.getServices().get(serviceId).stream()
+                .map(it -> new LocalServiceInstance(serviceId, it))
+                .collect(Collectors.toList());
     }
 
     @Override

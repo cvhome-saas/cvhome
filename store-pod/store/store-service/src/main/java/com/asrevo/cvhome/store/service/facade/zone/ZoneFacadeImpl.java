@@ -10,11 +10,10 @@ import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.references.ReadableZone;
 import com.asrevo.cvhome.store.core.services.reference.zone.ZoneService;
 import com.asrevo.cvhome.store.service.populator.references.ReadableZonePopulator;
-import org.springframework.stereotype.Service;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.stereotype.Service;
 
 @Service
 public class ZoneFacadeImpl implements ZoneFacade {
@@ -26,18 +25,20 @@ public class ZoneFacadeImpl implements ZoneFacade {
     }
 
     @Override
-    public List<ReadableZone> getZones(String countryCode, Language language, MerchantStore merchantStore) {
+    public List<ReadableZone> getZones(
+            String countryCode, Language language, MerchantStore merchantStore) {
         List<Zone> listZones = getListZones(countryCode, language);
         if (listZones.isEmpty()) {
             return Collections.emptyList();
-            //throw new ResourceNotFoundException("No zones found");
+            // throw new ResourceNotFoundException("No zones found");
         }
         return listZones.stream()
                 .map(zone -> convertToReadableZone(zone, language, merchantStore))
                 .collect(Collectors.toList());
     }
 
-    private ReadableZone convertToReadableZone(Zone zone, Language language, MerchantStore merchantStore) {
+    private ReadableZone convertToReadableZone(
+            Zone zone, Language language, MerchantStore merchantStore) {
         try {
             ReadableZonePopulator populator = new ReadableZonePopulator();
             return populator.populate(zone, new ReadableZone(), merchantStore, language);

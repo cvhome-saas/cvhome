@@ -8,24 +8,26 @@ import com.asrevo.cvhome.store.core.utils.RepositoryHelper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-
-import java.util.List;
 
 @Slf4j
 public class MerchantRepositoryImpl implements MerchantRepositoryCustom {
 
-    @PersistenceContext
-    private EntityManager em;
+    @PersistenceContext private EntityManager em;
 
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Override
-    public GenericEntityList listByCriteria(MerchantStoreCriteria criteria) throws ServiceException {
+    public GenericEntityList listByCriteria(MerchantStoreCriteria criteria)
+            throws ServiceException {
         try {
             StringBuilder req = new StringBuilder();
             req.append(
-                    "select distinct m from MerchantStore m left join fetch m.country mc left join fetch m.parent cp left join fetch m.currency mc left join fetch m.zone mz left join fetch m.defaultLanguage md left join fetch m.languages mls");
+                    "select distinct m from MerchantStore m left join fetch m.country mc left join"
+                        + " fetch m.parent cp left join fetch m.currency mc left join fetch m.zone"
+                        + " mz left join fetch m.defaultLanguage md left join fetch m.languages"
+                        + " mls");
             StringBuilder countBuilder = new StringBuilder();
             countBuilder.append("select count(distinct m) from MerchantStore m");
             if (criteria.getCode() != null) {
@@ -45,7 +47,9 @@ public class MerchantRepositoryImpl implements MerchantRepositoryCustom {
             }
 
             if (!StringUtils.isBlank(criteria.getCriteriaOrderByField())) {
-                req.append(" order by m.").append(criteria.getCriteriaOrderByField()).append(" ")
+                req.append(" order by m.")
+                        .append(criteria.getCriteriaOrderByField())
+                        .append(" ")
                         .append(criteria.getOrderBy().name().toLowerCase());
             }
 
@@ -63,7 +67,6 @@ public class MerchantRepositoryImpl implements MerchantRepositoryCustom {
                 q.setParameter("name", "%" + criteria.getCode().toLowerCase() + "%");
             }
 
-
             Number count = (Number) countQ.getSingleResult();
 
             GenericEntityList entityList = new GenericEntityList();
@@ -71,13 +74,10 @@ public class MerchantRepositoryImpl implements MerchantRepositoryCustom {
 
             q = RepositoryHelper.paginateQuery(q, count, entityList, criteria);
 
-
             List<MerchantStore> stores = q.getResultList();
             entityList.setList(stores);
 
-
             return entityList;
-
 
         } catch (jakarta.persistence.NoResultException ignored) {
         } catch (Exception e) {
@@ -86,5 +86,4 @@ public class MerchantRepositoryImpl implements MerchantRepositoryCustom {
         }
         return null;
     }
-
 }

@@ -9,12 +9,13 @@ import com.asrevo.cvhome.store.core.model.customer.address.Address;
 import com.asrevo.cvhome.store.utils.AbstractDataPopulator;
 import org.apache.commons.lang3.StringUtils;
 
-public class PersistableCustomerShippingAddressPopulator extends AbstractDataPopulator<Address, Customer> {
+public class PersistableCustomerShippingAddressPopulator
+        extends AbstractDataPopulator<Address, Customer> {
 
     @Override
-    public Customer populate(Address source, Customer target, MerchantStore store, Language language)
+    public Customer populate(
+            Address source, Customer target, MerchantStore store, Language language)
             throws ConversionException {
-
 
         if (target.getDelivery() == null) {
 
@@ -79,13 +80,10 @@ public class PersistableCustomerShippingAddressPopulator extends AbstractDataPop
         }
 
         return target;
-
     }
 
     @Override
     protected Customer createTarget() {
         return null;
     }
-
-
 }

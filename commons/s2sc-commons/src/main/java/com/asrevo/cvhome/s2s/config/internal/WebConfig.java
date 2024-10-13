@@ -8,6 +8,4 @@ import org.springframework.data.domain.Pageable;
 @Configuration
 @ConditionalOnClass(Pageable.class)
 @Import(value = {ReactiveWebConfig.class, ServletWebConfig.class})
-public class WebConfig {
-}
-
+public class WebConfig {}

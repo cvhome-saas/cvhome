@@ -1,7 +1,6 @@
 package com.asrevo.cvhome.store.core.converter;
 
 import jakarta.persistence.AttributeConverter;
-
 import java.util.Locale;
 
 public class LocaleConverter implements AttributeConverter<Locale, String> {

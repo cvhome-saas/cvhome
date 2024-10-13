@@ -1,9 +1,8 @@
 package com.asrevo.cvhome.store.service.facade.user;
 
+import java.util.List;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class UserFacadeImpl implements UserFacade {

@@ -5,12 +5,13 @@ import java.util.Locale;
 
 public class SchemaConstant {
 
-
     @Deprecated
-    public static final String[] LANGUAGE_ISO_CODE = {"en", "fr", "es"}; //which descriptions will ve used for reference data
+    public static final String[] LANGUAGE_ISO_CODE = {
+        "en", "fr", "es"
+    }; // which descriptions will ve used for reference data
 
-    public final static int DESCRIPTION_ID_ALLOCATION_SIZE = 0;
-    public final static int DESCRIPTION_ID_START_VALUE = 1;
+    public static final int DESCRIPTION_ID_ALLOCATION_SIZE = 0;
+    public static final int DESCRIPTION_ID_START_VALUE = 1;
 
     /**
      * All regions
@@ -20,30 +21,31 @@ public class SchemaConstant {
     /**
      * Country iso codes
      */
-    public static final String[] COUNTRY_ISO_CODE = {"AF", "AX", "AL", "DZ",
-            "AS", "AD", "AO", "AI", "AQ", "AG", "AR", "AM", "AW", "AU", "AT", "AZ", "BS", "BH",
-            "BD", "BB", "BY", "BE", "BZ", "BJ", "BM", "BT", "BO", "BA", "BW", "BV", "BR", "IO",
-            "BN", "BG", "BF", "BI", "KH", "CM", "CA", "CV", "KY", "CF", "TD", "CL", "CN", "CX",
-            "CC", "CO", "KM", "CG", "CD", "CK", "CR", "CI", "HR", "CU", "CY", "CZ", "DK", "DJ",
-            "DM", "DO", "EC", "EG", "SV", "GQ", "ER", "EE", "ET", "FK", "FO", "FJ", "FI", "FR",
-            "GF", "PF", "TF", "GA", "GM", "GE", "DE", "GH", "GI", "GR", "GL", "GD", "GP", "GU",
-            "GT", "GG", "GN", "GW", "GY", "HT", "HM", "VA", "HN", "HK", "HU", "IS", "IN", "ID",
-            "IR", "IQ", "IE", "IM", "IL", "IT", "JM", "JP", "JE", "JO", "KZ", "KE", "KI", "KP",
-            "KR", "KW", "KG", "LA", "LV", "LB", "LS", "LR", "LY", "LI", "LT", "LU", "MO", "MK",
-            "MG", "MW", "MY", "MV", "ML", "MT", "MH", "MQ", "MR", "MU", "YT", "MX", "FM", "MD",
-            "MC", "MN", "ME", "MS", "MA", "MZ", "MM", "NA", "NR", "NP", "NL", "AN", "NC", "NZ",
-            "NI", "NE", "NG", "NU", "NF", "MP", "NO", "OM", "PK", "PW", "PS", "PA", "PG", "PY",
-            "PE", "PH", "PN", "PL", "PT", "PR", "QA", "RE", "RO", "RU", "RW", "SH", "KN", "LC",
-            "PM", "VC", "WS", "SM", "ST", "SA", "SN", "RS", "SC", "SL", "SG", "SK", "SI", "SB",
-            "SO", "ZA", "GS", "ES", "LK", "SD", "SR", "SJ", "SZ", "SE", "CH", "SY", "TW", "TJ",
-            "TZ", "TH", "TL", "TG", "TK", "TO", "TT", "TN", "TR", "TM", "TC", "TV", "UG", "UA",
-            "AE", "GB", "US", "UM", "UY", "UZ", "VU", "VE", "VN", "VG", "VI", "WF", "EH",
-            "YE", "ZM", "ZW"};
+    public static final String[] COUNTRY_ISO_CODE = {
+        "AF", "AX", "AL", "DZ", "AS", "AD", "AO", "AI", "AQ", "AG", "AR", "AM", "AW", "AU", "AT",
+        "AZ", "BS", "BH", "BD", "BB", "BY", "BE", "BZ", "BJ", "BM", "BT", "BO", "BA", "BW", "BV",
+        "BR", "IO", "BN", "BG", "BF", "BI", "KH", "CM", "CA", "CV", "KY", "CF", "TD", "CL", "CN",
+        "CX", "CC", "CO", "KM", "CG", "CD", "CK", "CR", "CI", "HR", "CU", "CY", "CZ", "DK", "DJ",
+        "DM", "DO", "EC", "EG", "SV", "GQ", "ER", "EE", "ET", "FK", "FO", "FJ", "FI", "FR", "GF",
+        "PF", "TF", "GA", "GM", "GE", "DE", "GH", "GI", "GR", "GL", "GD", "GP", "GU", "GT", "GG",
+        "GN", "GW", "GY", "HT", "HM", "VA", "HN", "HK", "HU", "IS", "IN", "ID", "IR", "IQ", "IE",
+        "IM", "IL", "IT", "JM", "JP", "JE", "JO", "KZ", "KE", "KI", "KP", "KR", "KW", "KG", "LA",
+        "LV", "LB", "LS", "LR", "LY", "LI", "LT", "LU", "MO", "MK", "MG", "MW", "MY", "MV", "ML",
+        "MT", "MH", "MQ", "MR", "MU", "YT", "MX", "FM", "MD", "MC", "MN", "ME", "MS", "MA", "MZ",
+        "MM", "NA", "NR", "NP", "NL", "AN", "NC", "NZ", "NI", "NE", "NG", "NU", "NF", "MP", "NO",
+        "OM", "PK", "PW", "PS", "PA", "PG", "PY", "PE", "PH", "PN", "PL", "PT", "PR", "QA", "RE",
+        "RO", "RU", "RW", "SH", "KN", "LC", "PM", "VC", "WS", "SM", "ST", "SA", "SN", "RS", "SC",
+        "SL", "SG", "SK", "SI", "SB", "SO", "ZA", "GS", "ES", "LK", "SD", "SR", "SJ", "SZ", "SE",
+        "CH", "SY", "TW", "TJ", "TZ", "TH", "TL", "TG", "TK", "TO", "TT", "TN", "TR", "TM", "TC",
+        "TV", "UG", "UA", "AE", "GB", "US", "UM", "UY", "UZ", "VU", "VE", "VN", "VG", "VI", "WF",
+        "EH", "YE", "ZM", "ZW"
+    };
 
     /**
      * Locale per country iso codes
      */
     public static final HashMap<String, Locale> LOCALES = new HashMap<>();
+
     /**
      * Currency codes with name
      */
@@ -97,7 +99,7 @@ public class SchemaConstant {
         CURRENCY_MAP.put("CLP", "Chilean Peso");
         CURRENCY_MAP.put("CNY", "Yuan Renminbi");
         CURRENCY_MAP.put("COP", "Colombian Peso");
-        //CURRENCY_MAP.put("COU", "Unidad de Valor Real");
+        // CURRENCY_MAP.put("COU", "Unidad de Valor Real");
         CURRENCY_MAP.put("KMF", "Comoro Franc");
         CURRENCY_MAP.put("XAF", "CFA Franc BEAC");
         CURRENCY_MAP.put("CDF", "Congolese Franc");
@@ -105,7 +107,7 @@ public class SchemaConstant {
         CURRENCY_MAP.put("CRC", "Costa Rican Colon");
         CURRENCY_MAP.put("XOF", "CFA Franc BCEAO");
         CURRENCY_MAP.put("HRK", "Croatian Kuna");
-        //CURRENCY_MAP.put("CUC", "Peso Convertible");
+        // CURRENCY_MAP.put("CUC", "Peso Convertible");
         CURRENCY_MAP.put("CUP", "Cuban Peso");
         CURRENCY_MAP.put("ANG", "Netherlands Antillean Guilder");
         CURRENCY_MAP.put("CZK", "Czech Koruna");
@@ -176,7 +178,7 @@ public class SchemaConstant {
         CURRENCY_MAP.put("XOF", "CFA Franc BCEAO");
         CURRENCY_MAP.put("MRO", "Ouguiya");
         CURRENCY_MAP.put("MUR", "Mauritius Rupee");
-        //CURRENCY_MAP.put("XUA", "ADB Unit of Account");
+        // CURRENCY_MAP.put("XUA", "ADB Unit of Account");
         CURRENCY_MAP.put("MXN", "Mexican Peso");
         CURRENCY_MAP.put("MXV", "Mexican Unidad de Inversion (UDI)");
         CURRENCY_MAP.put("MDL", "Moldovan Leu");
@@ -221,20 +223,20 @@ public class SchemaConstant {
         CURRENCY_MAP.put("SLL", "Leone");
         CURRENCY_MAP.put("SGD", "Singapore Dollar");
         CURRENCY_MAP.put("ANG", "Netherlands Antillean Guilder");
-        //CURRENCY_MAP.put("XSU", "Sucre");
+        // CURRENCY_MAP.put("XSU", "Sucre");
         CURRENCY_MAP.put("SBD", "Solomon Islands Dollar");
         CURRENCY_MAP.put("SOS", "Somali Shilling");
         CURRENCY_MAP.put("ZAR", "Rand");
-        //CURRENCY_MAP.put("SSP", "South Sudanese Pound");
+        // CURRENCY_MAP.put("SSP", "South Sudanese Pound");
         CURRENCY_MAP.put("LKR", "Sri Lanka Rupee");
         CURRENCY_MAP.put("SDG", "Sudanese Pound");
         CURRENCY_MAP.put("SRD", "Surinam Dollar");
         CURRENCY_MAP.put("NOK", "Norwegian Krone");
         CURRENCY_MAP.put("SZL", "Lilangeni");
         CURRENCY_MAP.put("SEK", "Swedish Krona");
-        //CURRENCY_MAP.put("CHE", "WIR Euro");
+        // CURRENCY_MAP.put("CHE", "WIR Euro");
         CURRENCY_MAP.put("CHF", "Swiss Franc");
-        //CURRENCY_MAP.put("CHW", "WIR Franc");
+        // CURRENCY_MAP.put("CHW", "WIR Franc");
         CURRENCY_MAP.put("SYP", "Syrian Pound");
         CURRENCY_MAP.put("TWD", "New Taiwan Dollar");
         CURRENCY_MAP.put("TJS", "Somoni");
@@ -246,13 +248,13 @@ public class SchemaConstant {
         CURRENCY_MAP.put("TTD", "Trinidad and Tobago Dollar");
         CURRENCY_MAP.put("TND", "Tunisian Dinar");
         CURRENCY_MAP.put("TRY", "Turkish Lira");
-        //CURRENCY_MAP.put("TMT", "Turkmenistan New Manat");
+        // CURRENCY_MAP.put("TMT", "Turkmenistan New Manat");
         CURRENCY_MAP.put("AUD", "Australian Dollar");
         CURRENCY_MAP.put("UGX", "Uganda Shilling");
         CURRENCY_MAP.put("UAH", "Hryvnia");
         CURRENCY_MAP.put("AED", "UAE Dirham");
         CURRENCY_MAP.put("GBP", "Pound Sterling");
-        //CURRENCY_MAP.put("UYI", "Uruguay Peso en Unidades Indexadas (URUIURUI)");
+        // CURRENCY_MAP.put("UYI", "Uruguay Peso en Unidades Indexadas (URUIURUI)");
         CURRENCY_MAP.put("UYU", "Peso Uruguayo");
         CURRENCY_MAP.put("UZS", "Uzbekistan Sum");
         CURRENCY_MAP.put("VUV", "Vatu");
@@ -263,7 +265,7 @@ public class SchemaConstant {
         CURRENCY_MAP.put("MAD", "Moroccan Dirham");
         CURRENCY_MAP.put("YER", "Yemeni Rial");
         CURRENCY_MAP.put("ZMK", "Zambian Kwacha");
-        //CURRENCY_MAP.put("ZWL", "Zimbabwe Dollar");
+        // CURRENCY_MAP.put("ZWL", "Zimbabwe Dollar");
 
     }
 }

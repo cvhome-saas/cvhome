@@ -6,11 +6,9 @@ import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import com.asrevo.cvhome.store.core.model.catalog.product.ReadableProduct;
 import com.asrevo.cvhome.store.core.model.catalog.product.ReadableProductList;
-
 import java.util.List;
 
 public interface ProductFacade {
-
 
     /**
      */
@@ -32,14 +30,15 @@ public interface ProductFacade {
      * Get a Product by friendlyUrl (slug), store and language
      *
      */
-    ReadableProduct getProductBySeUrl(MerchantStore store, String friendlyUrl, Language language) throws Exception;
+    ReadableProduct getProductBySeUrl(MerchantStore store, String friendlyUrl, Language language)
+            throws Exception;
 
     /**
      * Filters a list of product based on criteria
      *
      */
-    ReadableProductList getProductListsByCriterias(MerchantStore store, Language language,
-                                                   ProductCriteria criterias) throws Exception;
+    ReadableProductList getProductListsByCriterias(
+            MerchantStore store, Language language, ProductCriteria criterias) throws Exception;
 
     /**
      * Get related items
@@ -47,6 +46,4 @@ public interface ProductFacade {
      */
     List<ReadableProduct> relatedItems(MerchantStore store, Product product, Language language)
             throws Exception;
-
-
 }

@@ -9,6 +9,7 @@ import lombok.Setter;
 public class EphemeralStorageMetrics {
     @JsonProperty("Utilized")
     private int utilized;
+
     @JsonProperty("Reserved")
     private int reserved;
 }

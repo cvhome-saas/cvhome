@@ -10,12 +10,11 @@ import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.currency.Currency;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.utils.ProductPriceUtils;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Locale;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 /**
  * Contains all the logic required to calculate product price
@@ -25,7 +24,6 @@ import java.util.Locale;
 @Service("pricingService")
 @Slf4j
 public class PricingServiceImpl implements PricingService {
-
 
     private final ProductPriceUtils priceUtil;
 
@@ -39,17 +37,21 @@ public class PricingServiceImpl implements PricingService {
     }
 
     @Override
-    public FinalPrice calculateProductPrice(Product product, Customer customer) throws ServiceException {
+    public FinalPrice calculateProductPrice(Product product, Customer customer)
+            throws ServiceException {
         return priceUtil.getFinalPrice(product);
     }
 
     @Override
-    public FinalPrice calculateProductPrice(Product product, List<ProductAttribute> attributes) throws ServiceException {
+    public FinalPrice calculateProductPrice(Product product, List<ProductAttribute> attributes)
+            throws ServiceException {
         return priceUtil.getFinalPrice(product, attributes);
     }
 
     @Override
-    public FinalPrice calculateProductPrice(Product product, List<ProductAttribute> attributes, Customer customer) throws ServiceException {
+    public FinalPrice calculateProductPrice(
+            Product product, List<ProductAttribute> attributes, Customer customer)
+            throws ServiceException {
         return priceUtil.getFinalPrice(product, attributes);
     }
 
@@ -69,19 +71,24 @@ public class PricingServiceImpl implements PricingService {
     }
 
     @Override
-    public String getDisplayAmount(BigDecimal amount, Locale locale,
-                                   Currency currency, MerchantStore store) throws ServiceException {
+    public String getDisplayAmount(
+            BigDecimal amount, Locale locale, Currency currency, MerchantStore store)
+            throws ServiceException {
         try {
             return priceUtil.getFormatedAmountWithCurrency(locale, currency, amount);
         } catch (Exception e) {
-            log.error("An error occured when trying to format an amunt {} using locale {} and currency {}", amount.toString(), locale.toString(), currency.toString());
+            log.error(
+                    "An error occured when trying to format an amunt {} using locale {} and"
+                            + " currency {}",
+                    amount.toString(),
+                    locale.toString(),
+                    currency.toString());
             throw new ServiceException(e);
         }
     }
 
     @Override
-    public String getStringAmount(BigDecimal amount, MerchantStore store)
-            throws ServiceException {
+    public String getStringAmount(BigDecimal amount, MerchantStore store) throws ServiceException {
         try {
             return priceUtil.getAdminFormatedAmount(store, amount);
         } catch (Exception e) {
@@ -99,11 +106,11 @@ public class PricingServiceImpl implements PricingService {
             log.error("An error occured when trying to format an amount {}", amount);
             throw new ServiceException(e);
         }
-
     }
 
     @Override
-    public FinalPrice calculateProductPrice(ProductAvailability availability) throws ServiceException {
+    public FinalPrice calculateProductPrice(ProductAvailability availability)
+            throws ServiceException {
 
         return priceUtil.getFinalPrice(availability);
     }
@@ -113,6 +120,4 @@ public class PricingServiceImpl implements PricingService {
         // TODO Auto-generated method stub
         return null;
     }
-
-
 }

@@ -1,16 +1,15 @@
 package com.asrevo.cvhome.store.core.repositories.catalog.product.variant;
 
 import com.asrevo.cvhome.store.core.entity.catalog.product.variant.ProductVariant;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import java.util.List;
-import java.util.Optional;
-
 public interface ProductVariantRepository extends JpaRepository<ProductVariant, Long> {
 
-
-    @Query("""
+    @Query(
+            """
             select p from ProductVariant p join fetch p.product pr
             left join fetch p.variation pv
             left join fetch pv.productOption pvpo
@@ -25,7 +24,8 @@ public interface ProductVariantRepository extends JpaRepository<ProductVariant, 
             where p.id = ?1 and pvm.id = ?2""")
     Optional<ProductVariant> findOne(Long id, Integer storeId);
 
-    @Query("""
+    @Query(
+            """
             select p from ProductVariant p join fetch p.product pr
             left join fetch p.variation pv
             left join fetch pv.productOption pvpo
@@ -40,8 +40,8 @@ public interface ProductVariantRepository extends JpaRepository<ProductVariant, 
             where p.id in (?1) and pvm.id = ?2""")
     List<ProductVariant> findByIds(List<Long> ids, Integer storeId);
 
-
-    @Query("""
+    @Query(
+            """
             select p from ProductVariant p join fetch p.product pr
             left join fetch p.variation pv
             left join fetch pv.productOption pvpo
@@ -56,8 +56,8 @@ public interface ProductVariantRepository extends JpaRepository<ProductVariant, 
             where p.id = ?1 and pr.id = ?2 and prm.id = ?3""")
     Optional<ProductVariant> findById(Long id, Long productId, Integer storeId);
 
-
-    @Query("""
+    @Query(
+            """
             select p from ProductVariant p join fetch p.product pr
             left join fetch p.variation pv
             left join fetch pv.productOption pvpo
@@ -73,14 +73,16 @@ public interface ProductVariantRepository extends JpaRepository<ProductVariant, 
             and pvpovd.language.id = ?4
             and povvpod.language.id = ?4
             and pr.id = ?2 and p.code = ?1 and prm.id = ?3""")
-    Optional<ProductVariant> findBySku(String code, Long productId, Integer storeId, Integer languageId);
-
+    Optional<ProductVariant> findBySku(
+            String code, Long productId, Integer storeId, Integer languageId);
 
     /**
      * Gets the whole graph
      *
      */
-    @Query(value = """
+    @Query(
+            value =
+                    """
             select distinct p from ProductVariant as p
             join fetch p.product pr
             left join fetch p.variation pv
@@ -99,9 +101,6 @@ public interface ProductVariantRepository extends JpaRepository<ProductVariant, 
             where pr.id = ?2 and pvm.id = ?1""")
     List<ProductVariant> findByProductId(Integer storeId, Long productId);
 
-
     @Query("select p from ProductVariant p join fetch p.product pr where p.sku = ?1 and pr.id = ?2")
     ProductVariant existsBySkuAndProduct(String sku, Long productId);
-
-
 }

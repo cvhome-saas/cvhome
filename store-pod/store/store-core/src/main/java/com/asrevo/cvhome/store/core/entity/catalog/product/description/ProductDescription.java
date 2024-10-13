@@ -5,22 +5,27 @@ import com.asrevo.cvhome.store.core.entity.catalog.product.Product;
 import com.asrevo.cvhome.store.core.entity.common.description.Description;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import java.io.Serial;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.io.Serial;
-
 @Entity
-@Table(name = "PRODUCT_DESCRIPTION",
+@Table(
+        name = "PRODUCT_DESCRIPTION",
         uniqueConstraints = {@UniqueConstraint(columnNames = {"PRODUCT_ID", "LANGUAGE_ID"})},
         indexes = {@Index(name = "PRODUCT_DESCRIPTION_SEF_URL", columnList = "SEF_URL")})
-
-@TableGenerator(name = "description_gen", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME", valueColumnName = "SEQ_COUNT", pkColumnValue = "product_description_seq", allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE, initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
+@TableGenerator(
+        name = "description_gen",
+        table = "SM_SEQUENCER",
+        pkColumnName = "SEQ_NAME",
+        valueColumnName = "SEQ_COUNT",
+        pkColumnValue = "product_description_seq",
+        allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
+        initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
 @Getter
 @Setter
 public class ProductDescription extends Description {
-    @Serial
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
 
     @JsonIgnore
     @ManyToOne(targetEntity = Product.class)
@@ -45,8 +50,5 @@ public class ProductDescription extends Description {
     @Column(name = "META_DESCRIPTION")
     private String metatagDescription;
 
-    public ProductDescription() {
-    }
-
-
+    public ProductDescription() {}
 }

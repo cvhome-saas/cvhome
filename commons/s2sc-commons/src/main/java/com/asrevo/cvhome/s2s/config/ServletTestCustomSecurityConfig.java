@@ -10,6 +10,11 @@ import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+import java.security.PrivateKey;
+import java.time.Instant;
+import java.util.Date;
+import java.util.Map;
+import java.util.UUID;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -19,12 +24,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.security.PrivateKey;
-import java.time.Instant;
-import java.util.Date;
-import java.util.Map;
-import java.util.UUID;
 
 @Configuration
 @Profile("signer")
@@ -58,14 +57,13 @@ public class ServletTestCustomSecurityConfig {
         }
 
         public String createJwt(Map<String, Object> claims) throws JOSEException {
-            JWSHeader header = new JWSHeader
-                    .Builder(JWSAlgorithm.RS256)
-                    .type(JOSEObjectType.JWT)
-                    .keyID(rsaKey.getKeyID())
-                    .build();
-            JWTClaimsSet.Builder builder = new JWTClaimsSet
-                    .Builder()
-                    .issueTime(Date.from(Instant.now()));
+            JWSHeader header =
+                    new JWSHeader.Builder(JWSAlgorithm.RS256)
+                            .type(JOSEObjectType.JWT)
+                            .keyID(rsaKey.getKeyID())
+                            .build();
+            JWTClaimsSet.Builder builder =
+                    new JWTClaimsSet.Builder().issueTime(Date.from(Instant.now()));
 
             claims.forEach(builder::claim);
 
@@ -73,8 +71,6 @@ public class ServletTestCustomSecurityConfig {
             signedJWT.sign(new RSASSASigner(rsaPrivateKey));
             return signedJWT.serialize();
         }
-
-
     }
 
     @RestController
@@ -82,15 +78,14 @@ public class ServletTestCustomSecurityConfig {
     public static class SignerController {
         private final JwtSigner jwtSigner;
 
-
         public SignerController(JwtSigner jwtSigner) {
             this.jwtSigner = jwtSigner;
         }
 
         @PostMapping("api/v1/test/sign")
-        public Map<String, String> sign(@RequestBody Map<String, Object> claims) throws JOSEException {
+        public Map<String, String> sign(@RequestBody Map<String, Object> claims)
+                throws JOSEException {
             return Map.of("access_token", jwtSigner.createJwt(claims));
         }
     }
-
 }

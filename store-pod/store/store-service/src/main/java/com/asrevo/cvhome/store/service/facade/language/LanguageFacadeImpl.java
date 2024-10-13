@@ -5,9 +5,8 @@ import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.services.reference.language.LanguageService;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
+import org.springframework.stereotype.Service;
 
 @Service
 public class LanguageFacadeImpl implements LanguageFacade {
@@ -29,6 +28,5 @@ public class LanguageFacadeImpl implements LanguageFacade {
         } catch (ServiceException e) {
             throw new ServiceRuntimeException(e);
         }
-
     }
 }

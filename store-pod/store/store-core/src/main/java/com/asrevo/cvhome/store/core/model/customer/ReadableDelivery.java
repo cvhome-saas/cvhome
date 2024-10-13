@@ -7,7 +7,5 @@ public class ReadableDelivery extends DeliveryEntity {
     /**
      *
      */
-    @Serial
-    private static final long serialVersionUID = 1L;
-
+    @Serial private static final long serialVersionUID = 1L;
 }

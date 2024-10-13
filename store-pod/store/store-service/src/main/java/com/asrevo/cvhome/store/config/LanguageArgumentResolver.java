@@ -14,9 +14,7 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 @Component
 public class LanguageArgumentResolver implements HandlerMethodArgumentResolver {
 
-
-    @Autowired
-    private LanguageUtils languageUtils;
+    @Autowired private LanguageUtils languageUtils;
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
@@ -24,12 +22,15 @@ public class LanguageArgumentResolver implements HandlerMethodArgumentResolver {
     }
 
     @Override
-    public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
-                                  NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
+    public Object resolveArgument(
+            MethodParameter parameter,
+            ModelAndViewContainer mavContainer,
+            NativeWebRequest webRequest,
+            WebDataBinderFactory binderFactory)
+            throws Exception {
 
         HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
 
         return languageUtils.getRESTLanguage(request, webRequest);
     }
-
 }

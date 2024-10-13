@@ -1,5 +1,7 @@
 package com.asrevo.cvhome.store.service.mapper.inventory;
 
+import static com.asrevo.cvhome.store.utils.NumberUtils.isPositive;
+
 import com.asrevo.cvhome.store.controller.exception.ConversionRuntimeException;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.entity.catalog.product.Product;
@@ -15,16 +17,14 @@ import com.asrevo.cvhome.store.core.services.catalog.product.availability.Produc
 import com.asrevo.cvhome.store.core.services.reference.language.LanguageService;
 import com.asrevo.cvhome.store.service.mapper.Mapper;
 import com.asrevo.cvhome.store.utils.DateUtil;
+import java.util.*;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
-import java.util.*;
-
-import static com.asrevo.cvhome.store.utils.NumberUtils.isPositive;
-
 @Component
-public class PersistableProductPriceMapper implements Mapper<PersistableProductPrice, ProductPrice> {
+public class PersistableProductPriceMapper
+        implements Mapper<PersistableProductPrice, ProductPrice> {
 
     private final LanguageService languageService;
 
@@ -32,20 +32,27 @@ public class PersistableProductPriceMapper implements Mapper<PersistableProductP
 
     private final ProductAvailabilityService productAvailabilityService;
 
-    public PersistableProductPriceMapper(LanguageService languageService, ProductService productService, ProductAvailabilityService productAvailabilityService) {
+    public PersistableProductPriceMapper(
+            LanguageService languageService,
+            ProductService productService,
+            ProductAvailabilityService productAvailabilityService) {
         this.languageService = languageService;
         this.productService = productService;
         this.productAvailabilityService = productAvailabilityService;
     }
 
     @Override
-    public ProductPrice convert(PersistableProductPrice source, MerchantStore store, Language language) {
+    public ProductPrice convert(
+            PersistableProductPrice source, MerchantStore store, Language language) {
         return merge(source, new ProductPrice(), store, language);
     }
 
     @Override
-    public ProductPrice merge(PersistableProductPrice source, ProductPrice destination, MerchantStore store,
-                              Language language) {
+    public ProductPrice merge(
+            PersistableProductPrice source,
+            ProductPrice destination,
+            MerchantStore store,
+            Language language) {
 
         Assert.notNull(source, "PersistableProductPrice cannot be null");
         Assert.notNull(source.getSku(), "Product sku cannot be null");
@@ -60,49 +67,63 @@ public class PersistableProductPriceMapper implements Mapper<PersistableProductP
             ProductAvailability availability = null;
 
             if (isPositive(source.getProductAvailabilityId())) {
-                Optional<ProductAvailability> avail = productAvailabilityService
-                        .getById(source.getProductAvailabilityId(), store);
+                Optional<ProductAvailability> avail =
+                        productAvailabilityService.getById(
+                                source.getProductAvailabilityId(), store);
                 if (avail.isEmpty()) {
                     throw new ConversionRuntimeException(
-                            "Product availability with id [" + source.getProductAvailabilityId() + "] was not found");
+                            "Product availability with id ["
+                                    + source.getProductAvailabilityId()
+                                    + "] was not found");
                 }
                 availability = avail.get();
 
             } else {
 
                 // get an existing product availability
-                List<ProductAvailability> existing = productAvailabilityService.getBySku(source.getSku(), store);
+                List<ProductAvailability> existing =
+                        productAvailabilityService.getBySku(source.getSku(), store);
 
                 if (!CollectionUtils.isEmpty(existing)) {
                     // find default availability
-                    Optional<ProductAvailability> avail = existing.stream()
-                            .filter(a -> a.getRegion() != null && a.getRegion().equals(Constants.ALL_REGIONS))
-                            .findAny();
+                    Optional<ProductAvailability> avail =
+                            existing.stream()
+                                    .filter(
+                                            a ->
+                                                    a.getRegion() != null
+                                                            && a.getRegion()
+                                                                    .equals(Constants.ALL_REGIONS))
+                                    .findAny();
                     if (avail.isPresent()) {
                         availability = avail.get();
 
                         // if default price exist for sku exit
                         if (source.isDefaultPrice()) {
-                            Optional<ProductPrice> defaultPrice = availability.getPrices().stream()
-                                    .filter(ProductPrice::isDefaultPrice).findAny();
+                            Optional<ProductPrice> defaultPrice =
+                                    availability.getPrices().stream()
+                                            .filter(ProductPrice::isDefaultPrice)
+                                            .findAny();
                             if (defaultPrice.isPresent()) {
-                                //throw new ConversionRuntimeException(
-                                //		"Default Price already exist for product with sku [" + source.getSku() + "]");
+                                // throw new ConversionRuntimeException(
+                                //		"Default Price already exist for product with sku [" +
+                                // source.getSku() + "]");
                                 destination = defaultPrice.get();
                             }
                         }
                     }
                 }
-
             }
 
             if (availability == null) {
 
-                Product product = productService.getBySku(source.getSku(),
-                        store, language);
+                Product product = productService.getBySku(source.getSku(), store, language);
                 if (product == null) {
-                    throw new ConversionRuntimeException("Product with sku [" + source.getSku()
-                            + "] not found for MerchantStore [" + store.getCode() + "]");
+                    throw new ConversionRuntimeException(
+                            "Product with sku ["
+                                    + source.getSku()
+                                    + "] not found for MerchantStore ["
+                                    + store.getCode()
+                                    + "]");
                 }
 
                 availability = new ProductAvailability();
@@ -127,8 +148,8 @@ public class PersistableProductPriceMapper implements Mapper<PersistableProductP
             }
             availability.getPrices().add(destination);
             destination.setProductAvailability(availability);
-            destination.setDescriptions(this.getProductPriceDescriptions(destination, source.getDescriptions(), store));
-
+            destination.setDescriptions(
+                    this.getProductPriceDescriptions(destination, source.getDescriptions(), store));
 
             destination.setDefaultPrice(source.isDefaultPrice());
 
@@ -139,14 +160,17 @@ public class PersistableProductPriceMapper implements Mapper<PersistableProductP
         return destination;
     }
 
-    private Set<ProductPriceDescription> getProductPriceDescriptions(ProductPrice price,
-                                                                     List<com.asrevo.cvhome.store.core.model.catalog.product.ProductPriceDescription> descriptions,
-                                                                     MerchantStore store) {
+    private Set<ProductPriceDescription> getProductPriceDescriptions(
+            ProductPrice price,
+            List<com.asrevo.cvhome.store.core.model.catalog.product.ProductPriceDescription>
+                    descriptions,
+            MerchantStore store) {
         if (CollectionUtils.isEmpty(descriptions)) {
             return Collections.emptySet();
         }
         Set<ProductPriceDescription> descs = new HashSet<>();
-        for (com.asrevo.cvhome.store.core.model.catalog.product.ProductPriceDescription desc : descriptions) {
+        for (com.asrevo.cvhome.store.core.model.catalog.product.ProductPriceDescription desc :
+                descriptions) {
             ProductPriceDescription description = null;
             if (CollectionUtils.isNotEmpty(price.getDescriptions())) {
                 for (ProductPriceDescription d : price.getDescriptions()) {
@@ -175,17 +199,20 @@ public class PersistableProductPriceMapper implements Mapper<PersistableProductP
         Language lang = getLanguage(desc);
         target.setLanguage(lang);
         return target;
-
     }
 
-    private Language getLanguage(com.asrevo.cvhome.store.core.model.catalog.product.ProductPriceDescription desc) {
+    private Language getLanguage(
+            com.asrevo.cvhome.store.core.model.catalog.product.ProductPriceDescription desc) {
         try {
             return Optional.ofNullable(languageService.getByCode(desc.getLanguage()))
-                    .orElseThrow(() -> new ConversionRuntimeException(
-                            "Language is null for code " + desc.getLanguage() + " use language ISO code [en, fr ...]"));
+                    .orElseThrow(
+                            () ->
+                                    new ConversionRuntimeException(
+                                            "Language is null for code "
+                                                    + desc.getLanguage()
+                                                    + " use language ISO code [en, fr ...]"));
         } catch (ServiceException e) {
             throw new ConversionRuntimeException(e);
         }
     }
-
 }

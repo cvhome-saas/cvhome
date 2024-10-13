@@ -3,14 +3,13 @@ package com.asrevo.cvhome.s2s.utils;
 import com.asrevo.cvhome.commons.domain.IdentityId;
 import com.asrevo.cvhome.commons.domain.Roles;
 import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.oauth2.jwt.Jwt;
-
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.oauth2.jwt.Jwt;
 
 public class SecurityUtils {
     private static boolean hasSuperAdminRole(Authentication authentication) {
@@ -26,15 +25,17 @@ public class SecurityUtils {
     }
 
     private static boolean hasRole(Authentication authentication, Roles role) {
-        return authentication.getAuthorities().stream().anyMatch(it -> it.getAuthority().contains(role.name()));
+        return authentication.getAuthorities().stream()
+                .anyMatch(it -> it.getAuthority().contains(role.name()));
     }
 
     public static UserOrgStoreIdentity getOrgStoreIdentity(Authentication authentication) {
-        Set<Roles> roles = authentication.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .map(Roles::parse)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
+        Set<Roles> roles =
+                authentication.getAuthorities().stream()
+                        .map(GrantedAuthority::getAuthority)
+                        .map(Roles::parse)
+                        .filter(Objects::nonNull)
+                        .collect(Collectors.toSet());
         if (hasSuperAdminRole(authentication)) {
             return new UserOrgStoreIdentity(IdentityId.of("*"), "*", roles);
         } else if (hasMicroServiceRole(authentication)) {
@@ -48,5 +49,4 @@ public class SecurityUtils {
             return new UserOrgStoreIdentity(IdentityId.of(adminOrg), adminStore, roles);
         }
     }
-
 }

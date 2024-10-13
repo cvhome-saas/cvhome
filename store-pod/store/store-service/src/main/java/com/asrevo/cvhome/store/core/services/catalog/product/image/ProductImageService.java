@@ -8,13 +8,10 @@ import com.asrevo.cvhome.store.core.entity.content.OutputContentFile;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
-
 import java.util.List;
 import java.util.Optional;
 
-
 public interface ProductImageService extends SalesManagerEntityService<Long, ProductImage> {
-
 
     /**
      * Add a ProductImage to the persistence and an entry to the CMS
@@ -34,8 +31,7 @@ public interface ProductImageService extends SalesManagerEntityService<Long, Pro
      * Returns all Images for a given product
      *
      */
-    List<OutputContentFile> getProductImages(Product product)
-            throws ServiceException;
+    List<OutputContentFile> getProductImages(Product product) throws ServiceException;
 
     /**
      * Get a product image by name for a given product id
@@ -52,12 +48,12 @@ public interface ProductImageService extends SalesManagerEntityService<Long, Pro
      * used by the image servlet
      *
      */
-    OutputContentFile getProductImage(String storeCode, String productCode,
-                                      String fileName, final ProductImageSize size) throws ServiceException;
+    OutputContentFile getProductImage(
+            String storeCode, String productCode, String fileName, final ProductImageSize size)
+            throws ServiceException;
 
     void addProductImages(Product product, List<ProductImage> productImages)
             throws ServiceException;
 
     void updateProductImage(Product product, ProductImage productImage);
-
 }

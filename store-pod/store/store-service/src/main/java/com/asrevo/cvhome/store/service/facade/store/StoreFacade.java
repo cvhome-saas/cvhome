@@ -6,7 +6,6 @@ import com.asrevo.cvhome.store.core.entity.merchant.MerchantStoreCriteria;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import com.asrevo.cvhome.store.core.model.store.*;
 import jakarta.servlet.http.HttpServletRequest;
-
 import java.util.List;
 
 /**
@@ -32,7 +31,8 @@ public interface StoreFacade {
 
     ReadableMerchantStore getFullByCode(String code, String lang);
 
-    ReadableMerchantStoreList findAll(MerchantStoreCriteria criteria, Language language, int page, int count);
+    ReadableMerchantStoreList findAll(
+            MerchantStoreCriteria criteria, Language language, int page, int count);
 
     /**
      * List child stores
@@ -56,14 +56,14 @@ public interface StoreFacade {
      * Creates a brand new MerchantStore
      *
      */
-    //ReadableMerchantStore create(PersistableMerchantStore store);
+    // ReadableMerchantStore create(PersistableMerchantStore store);
     void create(PersistableMerchantStore store);
 
     /**
      * Updates an existing store
      *
      */
-    //ReadableMerchantStore update(PersistableMerchantStore store);
+    // ReadableMerchantStore update(PersistableMerchantStore store);
     void update(PersistableMerchantStore store);
 
     /**
@@ -111,5 +111,4 @@ public interface StoreFacade {
      *
      */
     List<ReadableMerchantStore> getMerchantStoreNames(MerchantStoreCriteria criteria);
-
 }

@@ -2,10 +2,9 @@ package com.asrevo.cvhome.store.config;
 
 import com.asrevo.cvhome.commons.domain.IdentityId;
 import com.asrevo.cvhome.commons.event.EventId;
+import java.util.Currency;
 import org.springdoc.core.utils.SpringDocUtils;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.Currency;
 
 @Configuration
 public class SwaggerConfig {

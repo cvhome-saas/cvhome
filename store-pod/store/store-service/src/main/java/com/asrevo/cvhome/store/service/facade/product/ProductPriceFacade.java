@@ -4,9 +4,7 @@ import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import com.asrevo.cvhome.store.core.model.catalog.product.PersistableProductPrice;
 import com.asrevo.cvhome.store.core.model.catalog.product.ReadableProductPrice;
-
 import java.util.List;
-
 
 /**
  * Product price management api
@@ -31,7 +29,8 @@ public interface ProductPriceFacade {
      * List product prices by product and inventory (product and variants)
      *
      */
-    List<ReadableProductPrice> list(String sku, Long inventoryId, MerchantStore store, Language language);
+    List<ReadableProductPrice> list(
+            String sku, Long inventoryId, MerchantStore store, Language language);
 
     /**
      * List product prices by product
@@ -43,5 +42,6 @@ public interface ProductPriceFacade {
      * Get ProductPrice
      *
      */
-    ReadableProductPrice get(String sku, Long productPriceId, MerchantStore store, Language language);
+    ReadableProductPrice get(
+            String sku, Long productPriceId, MerchantStore store, Language language);
 }

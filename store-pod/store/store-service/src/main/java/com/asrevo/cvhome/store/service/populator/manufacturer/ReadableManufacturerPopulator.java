@@ -8,21 +8,20 @@ import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import com.asrevo.cvhome.store.core.model.catalog.manufacturer.ReadableManufacturer;
 import com.asrevo.cvhome.store.core.model.catalog.manufacturer.ReadableManufacturerFull;
 import com.asrevo.cvhome.store.utils.AbstractDataPopulator;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-public class ReadableManufacturerPopulator extends
-        AbstractDataPopulator<Manufacturer, ReadableManufacturer> {
-
+public class ReadableManufacturerPopulator
+        extends AbstractDataPopulator<Manufacturer, ReadableManufacturer> {
 
     @Override
     public ReadableManufacturer populate(
             Manufacturer source,
-            ReadableManufacturer target, MerchantStore store, Language language)
+            ReadableManufacturer target,
+            MerchantStore store,
+            Language language)
             throws ConversionException {
-
 
         if (language == null) {
             target = new ReadableManufacturerFull();
@@ -32,8 +31,8 @@ public class ReadableManufacturerPopulator extends
         target.setCode(source.getCode());
         if (source.getDescriptions() != null && !source.getDescriptions().isEmpty()) {
 
-            List<com.asrevo.cvhome.store.core.model.catalog.manufacturer.ManufacturerDescription> fulldescriptions =
-                    new ArrayList<>();
+            List<com.asrevo.cvhome.store.core.model.catalog.manufacturer.ManufacturerDescription>
+                    fulldescriptions = new ArrayList<>();
 
             Set<ManufacturerDescription> descriptions = source.getDescriptions();
             ManufacturerDescription description = null;
@@ -46,7 +45,6 @@ public class ReadableManufacturerPopulator extends
                 }
             }
 
-
             if (description != null) {
                 com.asrevo.cvhome.store.core.model.catalog.manufacturer.ManufacturerDescription d =
                         populateDescription(description);
@@ -56,9 +54,7 @@ public class ReadableManufacturerPopulator extends
             if (target instanceof ReadableManufacturerFull) {
                 ((ReadableManufacturerFull) target).setDescriptions(fulldescriptions);
             }
-
         }
-
 
         return target;
     }
@@ -68,13 +64,14 @@ public class ReadableManufacturerPopulator extends
         return null;
     }
 
-    com.asrevo.cvhome.store.core.model.catalog.manufacturer.ManufacturerDescription populateDescription(
-            ManufacturerDescription description) {
+    com.asrevo.cvhome.store.core.model.catalog.manufacturer.ManufacturerDescription
+            populateDescription(ManufacturerDescription description) {
         if (description == null) {
             return null;
         }
         com.asrevo.cvhome.store.core.model.catalog.manufacturer.ManufacturerDescription d =
-                new com.asrevo.cvhome.store.core.model.catalog.manufacturer.ManufacturerDescription();
+                new com.asrevo.cvhome.store.core.model.catalog.manufacturer
+                        .ManufacturerDescription();
         d.setName(description.getName());
         d.setDescription(description.getDescription());
         d.setId(description.getId());
@@ -84,5 +81,4 @@ public class ReadableManufacturerPopulator extends
         }
         return d;
     }
-
 }

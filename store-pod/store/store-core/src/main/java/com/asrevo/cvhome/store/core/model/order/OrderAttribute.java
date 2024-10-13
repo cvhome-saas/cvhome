@@ -9,5 +9,4 @@ public class OrderAttribute {
 
     private String key;
     private String value;
-
 }

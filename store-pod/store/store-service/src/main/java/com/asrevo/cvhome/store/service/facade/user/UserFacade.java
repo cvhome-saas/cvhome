@@ -9,13 +9,11 @@ import java.util.List;
  */
 public interface UserFacade {
 
-
     /**
      * Determines if a user is authorized to perform an action on a specific store
      *
      */
     boolean authorizedStore(String userName, String merchantStoreCode);
-
 
     /**
      * Determines if a user is in a specific group
@@ -28,7 +26,6 @@ public interface UserFacade {
      *
      */
     boolean userInRoles(String userName, List<String> groupNames);
-
 
     /**
      * Retrieve authenticated user

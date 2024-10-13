@@ -12,6 +12,4 @@ public record LocalCacheManagerImpl(String rootName) implements CMSManager {
     public String getLocation() {
         return "";
     }
-
-
 }

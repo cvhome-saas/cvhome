@@ -1,12 +1,11 @@
 package com.asrevo.cvhome.store.core.model.catalog.product;
 
-import lombok.Getter;
-import lombok.Setter;
-import org.apache.commons.lang3.StringUtils;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * A product entity is used by services API
@@ -21,8 +20,8 @@ public class ProductPriceEntity extends ProductPrice implements Serializable {
     /**
      *
      */
-    @Serial
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
+
     private String code;
     private boolean discounted = false;
     private String discountStartDate;
@@ -37,6 +36,4 @@ public class ProductPriceEntity extends ProductPrice implements Serializable {
         }
         return code;
     }
-
-
 }

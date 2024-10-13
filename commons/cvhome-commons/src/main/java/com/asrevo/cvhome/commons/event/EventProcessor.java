@@ -10,5 +10,4 @@ public interface EventProcessor {
     List<EventImpl<Event>> getProcessors(Class<? extends Event> tClass);
 
     List<EventImpl<Event>> getAllProcessors();
-
 }

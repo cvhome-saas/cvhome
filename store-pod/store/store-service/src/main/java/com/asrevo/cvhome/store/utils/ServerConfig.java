@@ -1,14 +1,12 @@
 package com.asrevo.cvhome.store.utils;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.web.context.WebServerInitializedEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
-
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-
 
 @Setter
 @Getter
@@ -22,7 +20,6 @@ public class ServerConfig implements ApplicationListener<WebServerInitializedEve
         int port = event.getWebServer().getPort();
         final String host = getHost();
         setApplicationHost(String.join(":", host, String.valueOf(port)));
-
     }
 
     private String getHost() {
@@ -33,5 +30,4 @@ public class ServerConfig implements ApplicationListener<WebServerInitializedEve
             return "127.0.0.1";
         }
     }
-
 }

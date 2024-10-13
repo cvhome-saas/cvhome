@@ -28,6 +28,11 @@ import com.asrevo.cvhome.store.service.populator.shoppingCart.ShoppingCartDataPo
 import com.asrevo.cvhome.store.utils.DateUtil;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
 import jakarta.persistence.NoResultException;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -36,12 +41,6 @@ import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.util.*;
 
 /**
  * @author Umesh Awasthi
@@ -53,11 +52,9 @@ import java.util.*;
 @Slf4j
 public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
 
-
     private final ShoppingCartService shoppingCartService;
 
     private final ShoppingCartCalculationService shoppingCartCalculationService;
-
 
     private final ProductService productService;
 
@@ -69,7 +66,14 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
 
     private final ReadableShoppingCartMapper readableShoppingCartMapper;
 
-    public ShoppingCartFacadeImpl(ShoppingCartService shoppingCartService, ShoppingCartCalculationService shoppingCartCalculationService, ProductService productService, PricingService pricingService, ProductAttributeService productAttributeService, ImageFilePath imageUtils, ReadableShoppingCartMapper readableShoppingCartMapper) {
+    public ShoppingCartFacadeImpl(
+            ShoppingCartService shoppingCartService,
+            ShoppingCartCalculationService shoppingCartCalculationService,
+            ProductService productService,
+            PricingService pricingService,
+            ProductAttributeService productAttributeService,
+            ImageFilePath imageUtils,
+            ReadableShoppingCartMapper readableShoppingCartMapper) {
         this.shoppingCartService = shoppingCartService;
         this.shoppingCartCalculationService = shoppingCartCalculationService;
         this.productService = productService;
@@ -96,8 +100,13 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
 
     // @Override
     // REMOVE
-    public ShoppingCartData addItemsToShoppingCart(final ShoppingCartData shoppingCartData, final ShoppingCartItem item,
-                                                   final MerchantStore store, final Language language, final Customer customer) throws Exception {
+    public ShoppingCartData addItemsToShoppingCart(
+            final ShoppingCartData shoppingCartData,
+            final ShoppingCartItem item,
+            final MerchantStore store,
+            final Language language,
+            final Customer customer)
+            throws Exception {
 
         ShoppingCart cartModel = null;
 
@@ -111,30 +120,33 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
             if (cartModel == null) {
                 cartModel = createCartModel(shoppingCartData.getCode(), store, customer);
             }
-
         }
 
         if (cartModel == null) {
 
-            final String shoppingCartCode = StringUtils.isNotBlank(shoppingCartData.getCode())
-                    ? shoppingCartData.getCode()
-                    : null;
+            final String shoppingCartCode =
+                    StringUtils.isNotBlank(shoppingCartData.getCode())
+                            ? shoppingCartData.getCode()
+                            : null;
             cartModel = createCartModel(shoppingCartCode, store, customer);
-
         }
-        com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem shoppingCartItem = createCartItem(cartModel, item,
-                store);
+        com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem shoppingCartItem =
+                createCartItem(cartModel, item, store);
 
         boolean duplicateFound = false;
-        if (CollectionUtils.isEmpty(item.getShoppingCartAttributes())) {// increment quantity
+        if (CollectionUtils.isEmpty(item.getShoppingCartAttributes())) { // increment quantity
             // get duplicate item from the cart
-            Set<com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem> cartModelItems = cartModel.getLineItems();
-            for (com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem cartItem : cartModelItems) {
-                if (cartItem.getProduct().getId().longValue() == shoppingCartItem.getProduct().getId().longValue()) {
+            Set<com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem> cartModelItems =
+                    cartModel.getLineItems();
+            for (com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem cartItem :
+                    cartModelItems) {
+                if (cartItem.getProduct().getId().longValue()
+                        == shoppingCartItem.getProduct().getId().longValue()) {
                     if (CollectionUtils.isEmpty(cartItem.getAttributes())) {
                         if (!duplicateFound) {
                             if (!shoppingCartItem.isProductVirtual()) {
-                                cartItem.setQuantity(cartItem.getQuantity() + shoppingCartItem.getQuantity());
+                                cartItem.setQuantity(
+                                        cartItem.getQuantity() + shoppingCartItem.getQuantity());
                             }
                             duplicateFound = true;
                             break;
@@ -163,10 +175,15 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
         return shoppingCartDataPopulator.populate(cartModel, store, language);
     }
 
-    private com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem createCartItem(final ShoppingCart cartModel,
-                                                                                             final ShoppingCartItem shoppingCartItem, final MerchantStore store) throws Exception {
+    private com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem createCartItem(
+            final ShoppingCart cartModel,
+            final ShoppingCartItem shoppingCartItem,
+            final MerchantStore store)
+            throws Exception {
 
-        Product product = productService.getBySku(shoppingCartItem.getSku(), store, store.getDefaultLanguage());
+        Product product =
+                productService.getBySku(
+                        shoppingCartItem.getSku(), store, store.getDefaultLanguage());
 
         if (product == null) {
             throw new Exception("Item with sku " + shoppingCartItem.getSku() + " does not exist");
@@ -174,18 +191,21 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
 
         if (product.getMerchantStore().getId().intValue() != store.getId().intValue()) {
             throw new Exception(
-                    "Item with sku " + shoppingCartItem.getSku() + " does not belong to merchant " + store.getId());
+                    "Item with sku "
+                            + shoppingCartItem.getSku()
+                            + " does not belong to merchant "
+                            + store.getId());
         }
 
         Set<ProductAvailability> availabilities = product.getAvailabilities();
         if (availabilities == null) {
 
             throw new Exception("Item with id " + product.getId() + " is not properly configured");
-
         }
 
         for (ProductAvailability availability : availabilities) {
-            if (availability.getProductQuantity() == null || availability.getProductQuantity() == 0) {
+            if (availability.getProductQuantity() == null
+                    || availability.getProductQuantity() == 0) {
                 throw new Exception("Item with id " + product.getId() + " is not available");
             }
         }
@@ -198,8 +218,8 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
             throw new Exception("Item with id " + product.getId() + " is not available");
         }
 
-        com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem item = shoppingCartService
-                .populateShoppingCartItem(product, store);
+        com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem item =
+                shoppingCartService.populateShoppingCartItem(product, store);
 
         item.setQuantity(shoppingCartItem.getQuantity());
         item.setShoppingCart(cartModel);
@@ -208,28 +228,36 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
         List<ShoppingCartAttribute> cartAttributes = shoppingCartItem.getShoppingCartAttributes();
         if (!CollectionUtils.isEmpty(cartAttributes)) {
             for (ShoppingCartAttribute attribute : cartAttributes) {
-                ProductAttribute productAttribute = productAttributeService.getById(attribute.getAttributeId());
+                ProductAttribute productAttribute =
+                        productAttributeService.getById(attribute.getAttributeId());
                 if (productAttribute != null
-                        && productAttribute.getProduct().getId().longValue() == product.getId().longValue()) {
-                    ShoppingCartAttributeItem attributeItem = new ShoppingCartAttributeItem(
-                            item, productAttribute);
+                        && productAttribute.getProduct().getId().longValue()
+                                == product.getId().longValue()) {
+                    ShoppingCartAttributeItem attributeItem =
+                            new ShoppingCartAttributeItem(item, productAttribute);
 
                     item.addAttributes(attributeItem);
                 }
             }
         }
         return item;
-
     }
 
     // KEEP -- ENTRY
-    private com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem createCartItem(ShoppingCart cartModel,
-                                                                                             PersistableShoppingCartItem shoppingCartItem, MerchantStore store) throws Exception {
+    private com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem createCartItem(
+            ShoppingCart cartModel,
+            PersistableShoppingCartItem shoppingCartItem,
+            MerchantStore store)
+            throws Exception {
 
         // USE Product sku
         Product product = null;
 
-        product = productService.getBySku(shoppingCartItem.getProduct(), store, store.getDefaultLanguage());// todo use
+        product =
+                productService.getBySku(
+                        shoppingCartItem.getProduct(),
+                        store,
+                        store.getDefaultLanguage()); // todo use
         // language
         // from api
         // request
@@ -240,7 +268,10 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
 
         if (product.getMerchantStore().getId().intValue() != store.getId().intValue()) {
             throw new ResourceNotFoundException(
-                    "Item with id " + shoppingCartItem.getProduct() + " does not belong to merchant " + store.getId());
+                    "Item with id "
+                            + shoppingCartItem.getProduct()
+                            + " does not belong to merchant "
+                            + store.getId());
         }
 
         if (!product.isAvailable()) {
@@ -260,24 +291,26 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
             if (!CollectionUtils.isEmpty(instanceAvailabilities)) {
                 availabilities = instanceAvailabilities;
             }
-
         }
 
         if (CollectionUtils.isEmpty(availabilities)) {
             throw new Exception(
-                    "Item with id " + product.getId() + " is not properly configured. It contains no inventory");
+                    "Item with id "
+                            + product.getId()
+                            + " is not properly configured. It contains no inventory");
         }
 
-        //todo filter sku and store
+        // todo filter sku and store
         for (ProductAvailability availability : availabilities) {
-            if (availability.getProductQuantity() == null || availability.getProductQuantity() == 0) {
+            if (availability.getProductQuantity() == null
+                    || availability.getProductQuantity() == 0) {
                 throw new Exception("Product with id " + product.getId() + " is not available");
             }
         }
 
         // use a mapper
-        com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem item = shoppingCartService
-                .populateShoppingCartItem(product, store);
+        com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem item =
+                shoppingCartService.populateShoppingCartItem(product, store);
 
         item.setQuantity(shoppingCartItem.getQuantity());
         item.setShoppingCart(cartModel);
@@ -288,18 +321,21 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
         }
 
         // set attributes
-        List<com.asrevo.cvhome.store.core.model.catalog.product.attribute.ProductAttribute> attributes = shoppingCartItem
-                .getAttributes();
+        List<com.asrevo.cvhome.store.core.model.catalog.product.attribute.ProductAttribute>
+                attributes = shoppingCartItem.getAttributes();
         if (!CollectionUtils.isEmpty(attributes)) {
-            for (com.asrevo.cvhome.store.core.model.catalog.product.attribute.ProductAttribute attribute : attributes) {
+            for (com.asrevo.cvhome.store.core.model.catalog.product.attribute.ProductAttribute
+                    attribute : attributes) {
 
-                ProductAttribute productAttribute = productAttributeService.getById(attribute.getId());
+                ProductAttribute productAttribute =
+                        productAttributeService.getById(attribute.getId());
 
                 if (productAttribute != null
-                        && productAttribute.getProduct().getId().longValue() == product.getId().longValue()) {
+                        && productAttribute.getProduct().getId().longValue()
+                                == product.getId().longValue()) {
 
-                    ShoppingCartAttributeItem attributeItem = new ShoppingCartAttributeItem(
-                            item, productAttribute);
+                    ShoppingCartAttributeItem attributeItem =
+                            new ShoppingCartAttributeItem(item, productAttribute);
 
                     item.addAttributes(attributeItem);
                 }
@@ -310,34 +346,49 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
     }
 
     // used for api
-    private List<com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem> createCartItems(ShoppingCart cartModel,
-                                                                                                    List<PersistableShoppingCartItem> shoppingCartItems, MerchantStore store) throws Exception {
+    private List<com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem> createCartItems(
+            ShoppingCart cartModel,
+            List<PersistableShoppingCartItem> shoppingCartItems,
+            MerchantStore store)
+            throws Exception {
 
-        List<String> productSkus = shoppingCartItems.stream().map(PersistableShoppingCartItem::getProduct).toList();
+        List<String> productSkus =
+                shoppingCartItems.stream().map(PersistableShoppingCartItem::getProduct).toList();
 
-        List<Product> products = productSkus.stream().map(p -> this.fetchProduct(p, store, store.getDefaultLanguage()))
-                .toList();
+        List<Product> products =
+                productSkus.stream()
+                        .map(p -> this.fetchProduct(p, store, store.getDefaultLanguage()))
+                        .toList();
 
         if (products.size() != shoppingCartItems.size()) {
-            log.warn("----------------------- Items with in id-list {} does not exist", productSkus);
-            throw new ResourceNotFoundException("Item with skus " + productSkus + " does not exist");
+            log.warn(
+                    "----------------------- Items with in id-list {} does not exist", productSkus);
+            throw new ResourceNotFoundException(
+                    "Item with skus " + productSkus + " does not exist");
         }
 
-        List<Product> wrongStoreProducts = products.stream().filter(p -> !Objects.equals(p.getMerchantStore().getId(), store.getId()))
-                .toList();
+        List<Product> wrongStoreProducts =
+                products.stream()
+                        .filter(p -> !Objects.equals(p.getMerchantStore().getId(), store.getId()))
+                        .toList();
         if (!wrongStoreProducts.isEmpty()) {
-            throw new ResourceNotFoundException("One or more of the items with id's "
-                    + wrongStoreProducts.stream().map(Product::getId).toList()
-                    + " does not belong to merchant " + store.getId());
+            throw new ResourceNotFoundException(
+                    "One or more of the items with id's "
+                            + wrongStoreProducts.stream().map(Product::getId).toList()
+                            + " does not belong to merchant "
+                            + store.getId());
         }
 
-        List<com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem> items = new ArrayList<>();
+        List<com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem> items =
+                new ArrayList<>();
 
         for (Product p : products) {
-            com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem item = shoppingCartService
-                    .populateShoppingCartItem(p, store);
-            Optional<PersistableShoppingCartItem> oShoppingCartItem = shoppingCartItems.stream()
-                    .filter(i -> i.getProduct().equals(p.getSku())).findFirst();
+            com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem item =
+                    shoppingCartService.populateShoppingCartItem(p, store);
+            Optional<PersistableShoppingCartItem> oShoppingCartItem =
+                    shoppingCartItems.stream()
+                            .filter(i -> i.getProduct().equals(p.getSku()))
+                            .findFirst();
             if (oShoppingCartItem.isEmpty()) {
                 // Should never happen if not something is updated in realtime or user has item
                 // in local storage and add it long time after to cart!
@@ -358,7 +409,8 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
             }
 
             for (ProductAvailability availability : availabilities) {
-                if (shoppingCartItem.getQuantity() > 0 && availability.getProductQuantity() == null || availability.getProductQuantity() == 0) {
+                if (shoppingCartItem.getQuantity() > 0 && availability.getProductQuantity() == null
+                        || availability.getProductQuantity() == 0) {
                     throw new Exception("Item with id " + p.getId() + " is not available");
                 }
             }
@@ -369,18 +421,21 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
             // end qty & availablility checks
 
             // set attributes
-            List<com.asrevo.cvhome.store.core.model.catalog.product.attribute.ProductAttribute> attributes = shoppingCartItem
-                    .getAttributes();
+            List<com.asrevo.cvhome.store.core.model.catalog.product.attribute.ProductAttribute>
+                    attributes = shoppingCartItem.getAttributes();
             if (!CollectionUtils.isEmpty(attributes)) {
-                for (com.asrevo.cvhome.store.core.model.catalog.product.attribute.ProductAttribute attribute : attributes) {
+                for (com.asrevo.cvhome.store.core.model.catalog.product.attribute.ProductAttribute
+                        attribute : attributes) {
 
-                    ProductAttribute productAttribute = productAttributeService.getById(attribute.getId());
+                    ProductAttribute productAttribute =
+                            productAttributeService.getById(attribute.getId());
 
                     if (productAttribute != null
-                            && productAttribute.getProduct().getId().longValue() == p.getId().longValue()) {
+                            && productAttribute.getProduct().getId().longValue()
+                                    == p.getId().longValue()) {
 
-                        ShoppingCartAttributeItem attributeItem = new ShoppingCartAttributeItem(
-                                item, productAttribute);
+                        ShoppingCartAttributeItem attributeItem =
+                                new ShoppingCartAttributeItem(item, productAttribute);
 
                         item.addAttributes(attributeItem);
                     }
@@ -401,8 +456,9 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
     }
 
     @Override
-    public ShoppingCart createCartModel(final String shoppingCartCode, final MerchantStore store,
-                                        final Customer customer) throws Exception {
+    public ShoppingCart createCartModel(
+            final String shoppingCartCode, final MerchantStore store, final Customer customer)
+            throws Exception {
         final Long CustomerId = customer != null ? customer.getId() : null;
         ShoppingCart cartModel = new ShoppingCart();
         if (StringUtils.isNotBlank(shoppingCartCode)) {
@@ -419,15 +475,14 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
         return cartModel;
     }
 
-    private com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem getEntryToUpdate(final long entryId,
-                                                                                               final ShoppingCart cartModel) {
+    private com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem getEntryToUpdate(
+            final long entryId, final ShoppingCart cartModel) {
         if (CollectionUtils.isNotEmpty(cartModel.getLineItems())) {
-            for (com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem shoppingCartItem : cartModel
-                    .getLineItems()) {
+            for (com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem
+                    shoppingCartItem : cartModel.getLineItems()) {
                 if (shoppingCartItem.getId() == entryId) {
                     log.info("Found line item  for given entry id: {}", entryId);
                     return shoppingCartItem;
-
                 }
             }
         }
@@ -436,14 +491,19 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
     }
 
     private Object getKeyValue(final String key) {
-        ServletRequestAttributes reqAttr = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+        ServletRequestAttributes reqAttr =
+                (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
         return reqAttr.getRequest().getAttribute(key);
     }
 
     // @Override
     // DELETE
-    public ShoppingCartData getShoppingCartData(final Customer customer, final MerchantStore store,
-                                                final String shoppingCartId, Language language) throws Exception {
+    public ShoppingCartData getShoppingCartData(
+            final Customer customer,
+            final MerchantStore store,
+            final String shoppingCartId,
+            Language language)
+            throws Exception {
 
         ShoppingCart cart = null;
         try {
@@ -455,7 +515,6 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
                 if (StringUtils.isNotBlank(shoppingCartId)) {
                     cart = shoppingCartService.getByCode(shoppingCartId, store);
                 }
-
             }
 
         } catch (ServiceException ex) {
@@ -470,7 +529,8 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
 
         // if cart has been completed return null
         if (cart.getOrderId() != null && cart.getOrderId() > 0) {
-            if (StringUtils.isNotBlank(shoppingCartId) && !(shoppingCartId.equals(cart.getShoppingCartCode()))) {
+            if (StringUtils.isNotBlank(shoppingCartId)
+                    && !(shoppingCartId.equals(cart.getShoppingCartCode()))) {
                 cart = shoppingCartService.getByCode(shoppingCartId, store);
             } else {
                 return null;
@@ -486,14 +546,15 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
 
         MerchantStore merchantStore = (MerchantStore) getKeyValue(Constants.MERCHANT_STORE);
 
-        ShoppingCartData shoppingCartData = shoppingCartDataPopulator.populate(cart, merchantStore, language);
+        ShoppingCartData shoppingCartData =
+                shoppingCartDataPopulator.populate(cart, merchantStore, language);
 
         return shoppingCartData;
-
     }
 
     // @Override
-    public ShoppingCartData getShoppingCartData(ShoppingCart shoppingCartModel, Language language) throws Exception {
+    public ShoppingCartData getShoppingCartData(ShoppingCart shoppingCartModel, Language language)
+            throws Exception {
 
         Validate.notNull(shoppingCartModel, "Shopping Cart cannot be null");
 
@@ -508,16 +569,22 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
 
     // @Override
     // DELETE
-    public ShoppingCartData removeCartItem(final Long itemID, final String cartId, final MerchantStore store,
-                                           final Language language) throws Exception {
+    public ShoppingCartData removeCartItem(
+            final Long itemID,
+            final String cartId,
+            final MerchantStore store,
+            final Language language)
+            throws Exception {
         if (StringUtils.isNotBlank(cartId)) {
 
             ShoppingCart cartModel = getCartModel(cartId, store);
             if (cartModel != null) {
-                if (org.apache.commons.collections.CollectionUtils.isNotEmpty(cartModel.getLineItems())) {
-                    Set<com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem> shoppingCartItemSet = new HashSet<>();
-                    for (com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem shoppingCartItem : cartModel
-                            .getLineItems()) {
+                if (org.apache.commons.collections.CollectionUtils.isNotEmpty(
+                        cartModel.getLineItems())) {
+                    Set<com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem>
+                            shoppingCartItemSet = new HashSet<>();
+                    for (com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem
+                            shoppingCartItem : cartModel.getLineItems()) {
                         if (shoppingCartItem.getId().longValue() == itemID.longValue()) {
                             shoppingCartService.deleteShoppingCartItem(itemID);
                         } else {
@@ -527,12 +594,13 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
 
                     cartModel.setLineItems(shoppingCartItemSet);
 
-                    ShoppingCartDataPopulator shoppingCartDataPopulator = new ShoppingCartDataPopulator();
-                    shoppingCartDataPopulator.setShoppingCartCalculationService(shoppingCartCalculationService);
+                    ShoppingCartDataPopulator shoppingCartDataPopulator =
+                            new ShoppingCartDataPopulator();
+                    shoppingCartDataPopulator.setShoppingCartCalculationService(
+                            shoppingCartCalculationService);
                     shoppingCartDataPopulator.setPricingService(pricingService);
                     shoppingCartDataPopulator.setImageUtils(imageUtils);
                     return shoppingCartDataPopulator.populate(cartModel, store, language);
-
                 }
             }
         }
@@ -541,16 +609,21 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
 
     // @Override
     // DELETE
-    public ShoppingCartData updateCartItem(final Long itemID, final String cartId, final long newQuantity,
-                                           final MerchantStore store, final Language language) throws Exception {
+    public ShoppingCartData updateCartItem(
+            final Long itemID,
+            final String cartId,
+            final long newQuantity,
+            final MerchantStore store,
+            final Language language)
+            throws Exception {
         if (newQuantity < 1) {
             throw new CartModificationException("Quantity must not be less than one");
         }
         if (StringUtils.isNotBlank(cartId)) {
             ShoppingCart cartModel = getCartModel(cartId, store);
             if (cartModel != null) {
-                com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem entryToUpdate = getEntryToUpdate(
-                        itemID, cartModel);
+                com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem entryToUpdate =
+                        getEntryToUpdate(itemID, cartModel);
 
                 if (entryToUpdate == null) {
                     throw new CartModificationException("Unknown entry number.");
@@ -560,19 +633,22 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
 
                 log.info("Updating cart entry quantity to{}", newQuantity);
                 entryToUpdate.setQuantity((int) newQuantity);
-                List<ProductAttribute> productAttributes = new ArrayList<>(entryToUpdate.getProduct().getAttributes());
-                final FinalPrice finalPrice = pricingService.calculateProductPrice(entryToUpdate.getProduct(),
-                        productAttributes);
+                List<ProductAttribute> productAttributes =
+                        new ArrayList<>(entryToUpdate.getProduct().getAttributes());
+                final FinalPrice finalPrice =
+                        pricingService.calculateProductPrice(
+                                entryToUpdate.getProduct(), productAttributes);
                 entryToUpdate.setItemPrice(finalPrice.getFinalPrice());
                 shoppingCartService.saveOrUpdate(cartModel);
 
                 log.info("Cart entry updated with desired quantity");
-                ShoppingCartDataPopulator shoppingCartDataPopulator = new ShoppingCartDataPopulator();
-                shoppingCartDataPopulator.setShoppingCartCalculationService(shoppingCartCalculationService);
+                ShoppingCartDataPopulator shoppingCartDataPopulator =
+                        new ShoppingCartDataPopulator();
+                shoppingCartDataPopulator.setShoppingCartCalculationService(
+                        shoppingCartCalculationService);
                 shoppingCartDataPopulator.setPricingService(pricingService);
                 shoppingCartDataPopulator.setImageUtils(imageUtils);
                 return shoppingCartDataPopulator.populate(cartModel, store, language);
-
             }
         }
         return null;
@@ -581,12 +657,17 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
     // TODO promoCode request parameter
     // @Override
     // DELETE
-    public ShoppingCartData updateCartItems(Optional<String> promoCode, final List<ShoppingCartItem> shoppingCartItems,
-                                            final MerchantStore store, final Language language) throws Exception {
+    public ShoppingCartData updateCartItems(
+            Optional<String> promoCode,
+            final List<ShoppingCartItem> shoppingCartItems,
+            final MerchantStore store,
+            final Language language)
+            throws Exception {
 
         Validate.notEmpty(shoppingCartItems, "shoppingCartItems null or empty");
         ShoppingCart cartModel = null;
-        Set<com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem> cartItems = new HashSet<>();
+        Set<com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem> cartItems =
+                new HashSet<>();
         for (ShoppingCartItem item : shoppingCartItems) {
 
             if (item.getQuantity() < 1) {
@@ -597,8 +678,8 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
                 cartModel = getCartModel(item.getCode(), store);
             }
 
-            com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem entryToUpdate = getEntryToUpdate(item.getId(),
-                    cartModel);
+            com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem entryToUpdate =
+                    getEntryToUpdate(item.getId(), cartModel);
 
             if (entryToUpdate == null) {
                 throw new CartModificationException("Unknown entry number.");
@@ -609,14 +690,15 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
             log.info("Updating cart entry quantity to{}", item.getQuantity());
             entryToUpdate.setQuantity(item.getQuantity());
 
-            List<ProductAttribute> productAttributes = new ArrayList<>(entryToUpdate.getProduct().getAttributes());
+            List<ProductAttribute> productAttributes =
+                    new ArrayList<>(entryToUpdate.getProduct().getAttributes());
 
-            final FinalPrice finalPrice = pricingService.calculateProductPrice(entryToUpdate.getProduct(),
-                    productAttributes);
+            final FinalPrice finalPrice =
+                    pricingService.calculateProductPrice(
+                            entryToUpdate.getProduct(), productAttributes);
             entryToUpdate.setItemPrice(finalPrice.getFinalPrice());
 
             cartItems.add(entryToUpdate);
-
         }
 
         cartModel.setPromoCode(null);
@@ -634,7 +716,6 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
         shoppingCartDataPopulator.setPricingService(pricingService);
         shoppingCartDataPopulator.setImageUtils(imageUtils);
         return shoppingCartDataPopulator.populate(cartModel, store, language);
-
     }
 
     private ShoppingCart getCartModel(final String cartId, final MerchantStore store) {
@@ -648,14 +729,14 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
             } catch (NoResultException nre) {
                 // nothing
             }
-
         }
         return null;
     }
 
     // @Override
     // DELETE
-    public ShoppingCartData getShoppingCartData(String code, MerchantStore store, Language language) {
+    public ShoppingCartData getShoppingCartData(
+            String code, MerchantStore store, Language language) {
         try {
             ShoppingCart cartModel = shoppingCartService.getByCode(code, store);
             if (cartModel != null) {
@@ -674,23 +755,25 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
     }
 
     @Override
-    public ShoppingCart getShoppingCartModel(String shoppingCartCode, MerchantStore store) throws Exception {
+    public ShoppingCart getShoppingCartModel(String shoppingCartCode, MerchantStore store)
+            throws Exception {
         return shoppingCartService.getByCode(shoppingCartCode, store);
     }
 
     @Override
-    public ShoppingCart getShoppingCartModel(Customer customer, MerchantStore store) throws Exception {
+    public ShoppingCart getShoppingCartModel(Customer customer, MerchantStore store)
+            throws Exception {
         return shoppingCartService.getShoppingCart(customer, store);
     }
 
     @Override
     public void saveOrUpdateShoppingCart(ShoppingCart cart) throws Exception {
         shoppingCartService.saveOrUpdate(cart);
-
     }
 
     @Override
-    public ReadableShoppingCart getCart(Customer customer, MerchantStore store, Language language) throws Exception {
+    public ReadableShoppingCart getCart(Customer customer, MerchantStore store, Language language)
+            throws Exception {
 
         Validate.notNull(customer, "Customer cannot be null");
         Validate.notNull(customer.getId(), "Customer.id cannot be null or empty");
@@ -712,7 +795,8 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
 
     @Override
     // KEEP ** ENTRY POINT **
-    public ReadableShoppingCart addToCart(PersistableShoppingCartItem item, MerchantStore store, Language language) {
+    public ReadableShoppingCart addToCart(
+            PersistableShoppingCartItem item, MerchantStore store, Language language) {
 
         Validate.notNull(item, "PersistableShoppingCartItem cannot be null");
 
@@ -740,8 +824,13 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
 
     @Override
     // KEEP
-    public @Nullable ReadableShoppingCart removeShoppingCartItem(String cartCode, String sku,
-                                                                 MerchantStore merchant, Language language, boolean returnCart) throws Exception {
+    public @Nullable ReadableShoppingCart removeShoppingCartItem(
+            String cartCode,
+            String sku,
+            MerchantStore merchant,
+            Language language,
+            boolean returnCart)
+            throws Exception {
         Validate.notNull(cartCode, "Shopping cart code must not be null");
         Validate.notNull(sku, "product sku must not be null");
         Validate.notNull(merchant, "MerchantStore must not be null");
@@ -753,9 +842,11 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
             throw new ResourceNotFoundException("Cart code [ " + cartCode + " ] not found");
         }
 
-        Set<com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem> items = new HashSet<>();
+        Set<com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem> items =
+                new HashSet<>();
         com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem itemToDelete = null;
-        for (com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem shoppingCartItem : cart.getLineItems()) {
+        for (com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem shoppingCartItem :
+                cart.getLineItems()) {
             if (shoppingCartItem.getProduct().getSku().equals(sku)) {
                 // get cart item
                 itemToDelete = getEntryToUpdate(shoppingCartItem.getId(), cart);
@@ -778,7 +869,7 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
             cart.getLineItems().clear();
         }
 
-        shoppingCartService.saveOrUpdate(cart);// update cart with remaining items
+        shoppingCartService.saveOrUpdate(cart); // update cart with remaining items
         if (!items.isEmpty() & returnCart) {
             return this.getByCode(cartCode, merchant, language);
         }
@@ -786,18 +877,25 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
     }
 
     // KEEP
-    private ReadableShoppingCart readableShoppingCart(ShoppingCart cartModel, PersistableShoppingCartItem item,
-                                                      MerchantStore store, Language language) throws Exception {
+    private ReadableShoppingCart readableShoppingCart(
+            ShoppingCart cartModel,
+            PersistableShoppingCartItem item,
+            MerchantStore store,
+            Language language)
+            throws Exception {
 
-        com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem itemModel = createCartItem(cartModel, item, store);
+        com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem itemModel =
+                createCartItem(cartModel, item, store);
 
         // need to check if the item is already in the cart
         boolean duplicateFound = false;
         // only if item has no attributes
-        if (CollectionUtils.isEmpty(item.getAttributes())) {// increment quantity
+        if (CollectionUtils.isEmpty(item.getAttributes())) { // increment quantity
             // get duplicate item from the cart
-            Set<com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem> cartModelItems = cartModel.getLineItems();
-            for (com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem cartItem : cartModelItems) {
+            Set<com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem> cartModelItems =
+                    cartModel.getLineItems();
+            for (com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem cartItem :
+                    cartModelItems) {
                 if (cartItem.getProduct().getSku().equals(item.getProduct())) {
                     if (CollectionUtils.isEmpty(cartItem.getAttributes())) {
                         if (!duplicateFound) {
@@ -823,28 +921,36 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
 
         shoppingCartCalculationService.calculate(cartModel, store, language);
         return readableShoppingCartMapper.convert(cartModel, store, language);
-
     }
 
     @Override
     // KEEP
-    public ReadableShoppingCart readableCart(ShoppingCart cart, MerchantStore store, Language language) {
+    public ReadableShoppingCart readableCart(
+            ShoppingCart cart, MerchantStore store, Language language) {
         return readableShoppingCartMapper.convert(cart, store, language);
-
     }
 
-    private ReadableShoppingCart modifyCart(ShoppingCart cartModel, PersistableShoppingCartItem item,
-                                            MerchantStore store, Language language) throws Exception {
+    private ReadableShoppingCart modifyCart(
+            ShoppingCart cartModel,
+            PersistableShoppingCartItem item,
+            MerchantStore store,
+            Language language)
+            throws Exception {
 
-        com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem itemModel = createCartItem(cartModel, item, store);
+        com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem itemModel =
+                createCartItem(cartModel, item, store);
 
         boolean itemModified = false;
         // check if existing product
-        Set<com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem> items = cartModel.getLineItems();
+        Set<com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem> items =
+                cartModel.getLineItems();
         if (!CollectionUtils.isEmpty(items)) {
-            Set<com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem> newItems = new HashSet<>();
-            Set<com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem> removeItems = new HashSet<>();
-            for (com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem anItem : items) {// take care of existing
+            Set<com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem> newItems =
+                    new HashSet<>();
+            Set<com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem> removeItems =
+                    new HashSet<>();
+            for (com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem anItem :
+                    items) { // take care of existing
                 // product
                 if (itemModel.getProduct().getId().longValue() == anItem.getProduct().getId()) {
                     if (item.getQuantity() == 0) {
@@ -863,10 +969,10 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
             }
 
             if (!removeItems.isEmpty()) {
-                for (com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem emptyItem : removeItems) {
+                for (com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem emptyItem :
+                        removeItems) {
                     shoppingCartService.deleteShoppingCartItem(emptyItem.getId());
                 }
-
             }
 
             if (!itemModified) {
@@ -888,7 +994,8 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
         // if cart items are null just return cart with no items
 
         // promo code added to the cart but no promo cart exists
-        if (!StringUtils.isBlank(item.getPromoCode()) && StringUtils.isBlank(cartModel.getPromoCode())) {
+        if (!StringUtils.isBlank(item.getPromoCode())
+                && StringUtils.isBlank(cartModel.getPromoCode())) {
             cartModel.setPromoCode(item.getPromoCode());
             cartModel.setPromoAdded(new Date());
         }
@@ -908,7 +1015,6 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
         readableCart = readableShoppingCartMapper.convert(cartModel, store, language);
 
         return readableCart;
-
     }
 
     /**
@@ -918,25 +1024,32 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
      *
      */
     // KEEP
-    private ReadableShoppingCart modifyCartMulti(ShoppingCart cartModel, List<PersistableShoppingCartItem> cartItems,
-                                                 MerchantStore store, Language language) throws Exception {
+    private ReadableShoppingCart modifyCartMulti(
+            ShoppingCart cartModel,
+            List<PersistableShoppingCartItem> cartItems,
+            MerchantStore store,
+            Language language)
+            throws Exception {
         int itemUpdatedCnt = 0;
-        List<com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem> inCartItemList = createCartItems(cartModel,
-                cartItems, store);
+        List<com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem> inCartItemList =
+                createCartItems(cartModel, cartItems, store);
 
-        Set<com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem> existingItems = cartModel.getLineItems();
+        Set<com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem> existingItems =
+                cartModel.getLineItems();
         // loop over incoming items since they drive changes
-        for (com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem newItemValue : inCartItemList) {
+        for (com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem newItemValue :
+                inCartItemList) {
 
             // check that item exist in persisted cart
-            Optional<com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem> oOldItem = existingItems.stream()
-                    .filter(i -> i.getSku().equals(newItemValue.getSku())
-
-                    ).findFirst();
+            Optional<com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem> oOldItem =
+                    existingItems.stream()
+                            .filter(i -> i.getSku().equals(newItemValue.getSku()))
+                            .findFirst();
 
             if (oOldItem.isPresent()) {
                 // update of existing cartItem
-                com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem oldCartItem = oOldItem.get();
+                com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCartItem oldCartItem =
+                        oOldItem.get();
                 if (oldCartItem.getQuantity().intValue() == newItemValue.getQuantity()) {
                     // this is unchanged
                     continue;
@@ -970,13 +1083,16 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
         shoppingCartCalculationService.calculate(cartModel, store, language);
 
         return readableShoppingCartMapper.convert(cartModel, store, language);
-
     }
 
     @Override
     // KEEP
-    public ReadableShoppingCart addToCart(Customer customer, PersistableShoppingCartItem item, MerchantStore store,
-                                          Language language) throws Exception {
+    public ReadableShoppingCart addToCart(
+            Customer customer,
+            PersistableShoppingCartItem item,
+            MerchantStore store,
+            Language language)
+            throws Exception {
 
         Validate.notNull(customer, "Customer cannot be null");
         Validate.notNull(customer.getId(), "Customer.id cannot be null or empty");
@@ -996,8 +1112,12 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
 
     @Override
     // KEEP
-    public ReadableShoppingCart modifyCart(String cartCode, PersistableShoppingCartItem item, MerchantStore store,
-                                           Language language) throws Exception {
+    public ReadableShoppingCart modifyCart(
+            String cartCode,
+            PersistableShoppingCartItem item,
+            MerchantStore store,
+            Language language)
+            throws Exception {
 
         Validate.notNull(cartCode, "String cart code cannot be null");
         Validate.notNull(item, "PersistableShoppingCartItem cannot be null");
@@ -1012,8 +1132,12 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
 
     @Override
     // KEEP
-    public ReadableShoppingCart modifyCartMulti(String cartCode, List<PersistableShoppingCartItem> items,
-                                                MerchantStore store, Language language) throws Exception {
+    public ReadableShoppingCart modifyCartMulti(
+            String cartCode,
+            List<PersistableShoppingCartItem> items,
+            MerchantStore store,
+            Language language)
+            throws Exception {
         Validate.notNull(cartCode, "String cart code cannot be null");
         Validate.notNull(items, "PersistableShoppingCartItem cannot be null");
 
@@ -1034,7 +1158,8 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
     }
 
     @Override
-    public ReadableShoppingCart getById(Long shoppingCartId, MerchantStore store, Language language) throws Exception {
+    public ReadableShoppingCart getById(Long shoppingCartId, MerchantStore store, Language language)
+            throws Exception {
 
         ShoppingCart cart = shoppingCartService.getById(shoppingCartId);
 
@@ -1043,7 +1168,6 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
         if (cart != null) {
 
             readableCart = readableShoppingCartMapper.convert(cart, store, language);
-
         }
 
         return readableCart;
@@ -1056,7 +1180,8 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
 
     @Override
     // KEEP
-    public ReadableShoppingCart getByCode(String code, MerchantStore store, Language language) throws Exception {
+    public ReadableShoppingCart getByCode(String code, MerchantStore store, Language language)
+            throws Exception {
 
         ShoppingCart cart = shoppingCartService.getByCode(code, store);
         ReadableShoppingCart readableCart = null;
@@ -1066,7 +1191,7 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
             readableCart = readableShoppingCartMapper.convert(cart, store, language);
 
             if (!StringUtils.isBlank(cart.getPromoCode())) {
-                Date promoDateAdded = cart.getPromoAdded();// promo valid 1 day
+                Date promoDateAdded = cart.getPromoAdded(); // promo valid 1 day
                 if (promoDateAdded == null) {
                     promoDateAdded = new Date();
                 }
@@ -1082,23 +1207,26 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
         }
 
         return readableCart;
-
     }
 
     @Override
     public void setOrderId(String code, Long orderId, MerchantStore store) throws Exception {
         ShoppingCart cart = this.getShoppingCartModel(code, store);
         if (cart == null) {
-            log.warn("Shopping cart with code [{}] not found, expected to find a cart to set order id [{}]", code, orderId);
+            log.warn(
+                    "Shopping cart with code [{}] not found, expected to find a cart to set order"
+                            + " id [{}]",
+                    code,
+                    orderId);
         } else {
             cart.setOrderId(orderId);
         }
         saveOrUpdateShoppingCart(cart);
-
     }
 
     @Override
-    public ReadableShoppingCart modifyCart(String cartCode, String promo, MerchantStore store, Language language)
+    public ReadableShoppingCart modifyCart(
+            String cartCode, String promo, MerchantStore store, Language language)
             throws Exception {
 
         ShoppingCart cart = shoppingCartService.getByCode(cartCode, store);
@@ -1109,7 +1237,5 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
         shoppingCartService.save(cart);
 
         return readableShoppingCartMapper.convert(cart, store, language);
-
     }
-
 }

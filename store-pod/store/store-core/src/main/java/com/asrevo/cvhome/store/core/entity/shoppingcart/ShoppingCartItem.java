@@ -9,31 +9,35 @@ import com.asrevo.cvhome.store.core.entity.common.audit.Auditable;
 import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @EntityListeners(value = AuditListener.class)
 @Table(name = "SHOPPING_CART_ITEM")
 @Getter
 @Setter
-public class ShoppingCartItem extends SalesManagerEntity<Long, ShoppingCartItem> implements Auditable, Serializable {
+public class ShoppingCartItem extends SalesManagerEntity<Long, ShoppingCartItem>
+        implements Auditable, Serializable {
 
-
-    @Serial
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
 
     @Id
     @Column(name = "SHP_CART_ITEM_ID", unique = true, nullable = false)
-    @TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME", valueColumnName = "SEQ_COUNT", pkColumnValue = "SHP_CRT_ITM_SEQ_NEXT_VAL", allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE, initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
+    @TableGenerator(
+            name = "TABLE_GEN",
+            table = "SM_SEQUENCER",
+            pkColumnName = "SEQ_NAME",
+            valueColumnName = "SEQ_COUNT",
+            pkColumnValue = "SHP_CRT_ITM_SEQ_NEXT_VAL",
+            allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
+            initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
     private Long id;
 
@@ -45,20 +49,17 @@ public class ShoppingCartItem extends SalesManagerEntity<Long, ShoppingCartItem>
     @Column(name = "QUANTITY")
     private Integer quantity = 1;
 
-    @Embedded
-    private AuditSection auditSection = new AuditSection();
+    @Embedded private AuditSection auditSection = new AuditSection();
 
-    @Deprecated //Use sku
+    @Deprecated // Use sku
     @Column(name = "PRODUCT_ID", nullable = false)
     private Long productId;
 
-    //SKU
+    // SKU
     @Column(name = "SKU")
     private String sku;
 
-    @JsonIgnore
-    @Transient
-    private boolean productVirtual;
+    @JsonIgnore @Transient private boolean productVirtual;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "shoppingCartItem")
     private Set<ShoppingCartAttributeItem> attributes = new HashSet<>();
@@ -66,26 +67,15 @@ public class ShoppingCartItem extends SalesManagerEntity<Long, ShoppingCartItem>
     @Column(name = "PRODUCT_VARIANT")
     private Long variant;
 
-    @JsonIgnore
-    @Transient
-    private BigDecimal itemPrice;//item final price including all rebates
+    @JsonIgnore @Transient private BigDecimal itemPrice; // item final price including all rebates
 
-    @JsonIgnore
-    @Transient
-    private BigDecimal subTotal;//item final price * quantity
+    @JsonIgnore @Transient private BigDecimal subTotal; // item final price * quantity
 
-    @JsonIgnore
-    @Transient
-    private FinalPrice finalPrice;//contains price details (raw prices)
+    @JsonIgnore @Transient private FinalPrice finalPrice; // contains price details (raw prices)
 
-    @JsonIgnore
-    @Transient
-    private Product product;
+    @JsonIgnore @Transient private Product product;
 
-    @JsonIgnore
-    @Transient
-    private boolean obsolete = false;
-
+    @JsonIgnore @Transient private boolean obsolete = false;
 
     public ShoppingCartItem(ShoppingCart shoppingCart, Product product) {
         this(product);
@@ -100,8 +90,7 @@ public class ShoppingCartItem extends SalesManagerEntity<Long, ShoppingCartItem>
         this.productVirtual = product.isProductVirtual();
     }
 
-    public ShoppingCartItem() {
-    }
+    public ShoppingCartItem() {}
 
     public void addAttributes(ShoppingCartAttributeItem shoppingCartAttributeItem) {
         this.attributes.add(shoppingCartAttributeItem);

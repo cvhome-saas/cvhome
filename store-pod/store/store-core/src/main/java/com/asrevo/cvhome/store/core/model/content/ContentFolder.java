@@ -1,10 +1,9 @@
 package com.asrevo.cvhome.store.core.model.content;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Folder containing content
@@ -18,5 +17,4 @@ public class ContentFolder {
 
     List<Content> content = new ArrayList<>();
     private String path;
-
 }

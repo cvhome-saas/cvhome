@@ -10,6 +10,12 @@ import com.asrevo.cvhome.store.core.entity.catalog.product.variant.ProductVarian
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.order.orderproduct.OrderProduct;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
+import java.math.BigDecimal;
+import java.text.NumberFormat;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -17,13 +23,6 @@ import org.apache.commons.validator.routines.BigDecimalValidator;
 import org.apache.commons.validator.routines.CurrencyValidator;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
-
-import java.math.BigDecimal;
-import java.text.NumberFormat;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 /**
  * This class determines the price that is displayed in the catalogue for a
@@ -35,10 +34,9 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ProductPriceUtils {
 
-    private final static char DECIMALCOUNT = '2';
-    private final static char DECIMALPOINT = '.';
-    private final static char THOUSANDPOINT = ',';
-
+    private static final char DECIMALCOUNT = '2';
+    private static final char DECIMALPOINT = '.';
+    private static final char THOUSANDPOINT = ',';
 
     /**
      * Get the price without discount
@@ -73,7 +71,8 @@ public class ProductPriceUtils {
      * @return FinalPrice
      */
     // Pricer
-    public FinalPrice getFinalPrice(Product product, List<ProductAttribute> attributes) throws ServiceException {
+    public FinalPrice getFinalPrice(Product product, List<ProductAttribute> attributes)
+            throws ServiceException {
 
         FinalPrice finalPrice = calculateFinalPrice(product);
 
@@ -104,7 +103,6 @@ public class ProductPriceUtils {
                     dp = dp.add(attributePrice);
                     finalPrice.setDiscountedPrice(dp);
                 }
-
             }
         }
 
@@ -153,7 +151,6 @@ public class ProductPriceUtils {
             finalPrice.setStringDiscountedPrice(getStringAmount(finalPrice.getDiscountedPrice()));
         }
         return finalPrice;
-
     }
 
     // Pricer
@@ -161,14 +158,17 @@ public class ProductPriceUtils {
 
         Assert.notNull(variant, "ProductVariant must not be null");
         Assert.notNull(variant.getProduct(), "variant.product must not be null");
-        Assert.notNull(variant.getAuditSection(), "variant.availabilities must not be null or empty");
+        Assert.notNull(
+                variant.getAuditSection(), "variant.availabilities must not be null or empty");
 
         FinalPrice finalPrice = null;
         List<FinalPrice> otherPrices = null;
 
         for (ProductAvailability availability : variant.getAvailabilities()) {
             if (!StringUtils.isEmpty(availability.getRegion())
-                    && availability.getRegion().equals(Constants.ALL_REGIONS)) {// TODO REL 2.1 accept a region
+                    && availability
+                            .getRegion()
+                            .equals(Constants.ALL_REGIONS)) { // TODO REL 2.1 accept a region
                 Set<ProductPrice> prices = availability.getPrices();
                 for (ProductPrice price : prices) {
 
@@ -194,12 +194,13 @@ public class ProductPriceUtils {
         }
 
         if (finalPrice == null) {
-            throw new ServiceException(ServiceException.EXCEPTION_ERROR,
-                    "No inventory available to calculate the price. Availability should contain at least a region set to *");
+            throw new ServiceException(
+                    ServiceException.EXCEPTION_ERROR,
+                    "No inventory available to calculate the price. Availability should contain at"
+                            + " least a region set to *");
         }
 
         return finalPrice;
-
     }
 
     public FinalPrice getFinalPrice(ProductAvailability availability) throws ServiceException {
@@ -207,8 +208,10 @@ public class ProductPriceUtils {
         FinalPrice finalPrice = calculateFinalPrice(availability);
 
         if (finalPrice == null) {
-            throw new ServiceException(ServiceException.EXCEPTION_ERROR,
-                    "No inventory available to calculate the price. Availability should contain at least a region set to *");
+            throw new ServiceException(
+                    ServiceException.EXCEPTION_ERROR,
+                    "No inventory available to calculate the price. Availability should contain at"
+                            + " least a region set to *");
         }
 
         finalPrice.setStringPrice(getStringAmount(finalPrice.getFinalPrice()));
@@ -216,7 +219,6 @@ public class ProductPriceUtils {
             finalPrice.setStringDiscountedPrice(getStringAmount(finalPrice.getDiscountedPrice()));
         }
         return finalPrice;
-
     }
 
     /**
@@ -264,7 +266,8 @@ public class ProductPriceUtils {
      * @return String
      */
     // Utility
-    public String getStoreFormatedAmountWithCurrency(MerchantStore store, BigDecimal amount) throws Exception {
+    public String getStoreFormatedAmountWithCurrency(MerchantStore store, BigDecimal amount)
+            throws Exception {
         if (amount == null) {
             return "";
         }
@@ -274,7 +277,9 @@ public class ProductPriceUtils {
 
         try {
             currency = store.getCurrency().getCurrency();
-            locale = new Locale(store.getDefaultLanguage().getCode(), store.getCountry().getIsoCode());
+            locale =
+                    new Locale(
+                            store.getDefaultLanguage().getCode(), store.getCountry().getIsoCode());
         } catch (Exception e) {
             log.error("Cannot create currency or locale instance for store {}", store.getCode());
         }
@@ -282,19 +287,21 @@ public class ProductPriceUtils {
         NumberFormat currencyInstance = null;
 
         if (store.isCurrencyFormatNational()) {
-            currencyInstance = NumberFormat.getCurrencyInstance(locale);// national
+            currencyInstance = NumberFormat.getCurrencyInstance(locale); // national
         } else {
-            currencyInstance = NumberFormat.getCurrencyInstance();// international
+            currencyInstance = NumberFormat.getCurrencyInstance(); // international
         }
         currencyInstance.setCurrency(currency);
 
         return currencyInstance.format(amount.doubleValue());
-
     }
 
     // Utility
-    public String getFormatedAmountWithCurrency(Locale locale,
-                                                com.asrevo.cvhome.store.core.entity.reference.currency.Currency currency, BigDecimal amount) throws Exception {
+    public String getFormatedAmountWithCurrency(
+            Locale locale,
+            com.asrevo.cvhome.store.core.entity.reference.currency.Currency currency,
+            BigDecimal amount)
+            throws Exception {
         if (amount == null) {
             return "";
         }
@@ -303,7 +310,6 @@ public class ProductPriceUtils {
         NumberFormat currencyInstance = NumberFormat.getCurrencyInstance(locale);
         currencyInstance.setCurrency(curr);
         return currencyInstance.format(amount.doubleValue());
-
     }
 
     /**
@@ -312,7 +318,8 @@ public class ProductPriceUtils {
      *
      */
     @Deprecated
-    public String getAdminFormatedAmountWithCurrency(MerchantStore store, BigDecimal amount) throws Exception {
+    public String getAdminFormatedAmountWithCurrency(MerchantStore store, BigDecimal amount)
+            throws Exception {
         if (amount == null) {
             return "";
         }
@@ -334,13 +341,16 @@ public class ProductPriceUtils {
      *
      */
     // Utility
-    public String getFormatedAmountWithCurrency(com.asrevo.cvhome.store.core.entity.reference.currency.Currency currency,
-                                                BigDecimal amount) throws Exception {
+    public String getFormatedAmountWithCurrency(
+            com.asrevo.cvhome.store.core.entity.reference.currency.Currency currency,
+            BigDecimal amount)
+            throws Exception {
         if (amount == null) {
             return "";
         }
 
-        Assert.notNull(currency.getCurrency(), "Currency must be populated with java.util.Currency");
+        Assert.notNull(
+                currency.getCurrency(), "Currency must be populated with java.util.Currency");
         NumberFormat nf = null;
 
         Currency curr = currency.getCurrency();
@@ -357,8 +367,8 @@ public class ProductPriceUtils {
      *
      */
     // Utility
-    public String getFormatedAmountWithCurrency(MerchantStore store, BigDecimal amount, Locale locale)
-            throws Exception {
+    public String getFormatedAmountWithCurrency(
+            MerchantStore store, BigDecimal amount, Locale locale) throws Exception {
 
         NumberFormat nf = null;
 
@@ -370,7 +380,6 @@ public class ProductPriceUtils {
         nf.setMinimumFractionDigits(Integer.parseInt(Character.toString(DECIMALCOUNT)));
 
         return nf.format(amount);
-
     }
 
     /**
@@ -395,7 +404,8 @@ public class ProductPriceUtils {
             throw new Exception("Cannot parse " + amount);
         }
 
-        if (!amount.contains(Character.toString(DECIMALPOINT)) && !amount.contains(Character.toString(THOUSANDPOINT))
+        if (!amount.contains(Character.toString(DECIMALPOINT))
+                && !amount.contains(Character.toString(THOUSANDPOINT))
                 && !amount.contains(" ")) {
 
             if (matchPositiveInteger(amount)) {
@@ -438,7 +448,6 @@ public class ProductPriceUtils {
                 throw new Exception("Cannot parse " + amount);
             }
         }
-
     }
 
     // Move to OrderTotalService
@@ -483,15 +492,17 @@ public class ProductPriceUtils {
         return matcher.matches();
     }
 
-    private Set<ProductAvailability> applicableAvailabilities(Set<ProductAvailability> availabilities)
-            throws ServiceException {
+    private Set<ProductAvailability> applicableAvailabilities(
+            Set<ProductAvailability> availabilities) throws ServiceException {
         if (CollectionUtils.isEmpty(availabilities)) {
-            throw new ServiceException(ServiceException.EXCEPTION_ERROR,
+            throw new ServiceException(
+                    ServiceException.EXCEPTION_ERROR,
                     "No applicable inventory to calculate the price.");
         }
 
         return availabilities.stream()
-                .filter(a -> !CollectionUtils.isEmpty(a.getPrices())).collect(Collectors.toSet());
+                .filter(a -> !CollectionUtils.isEmpty(a.getPrices()))
+                .collect(Collectors.toSet());
     }
 
     private FinalPrice calculateFinalPrice(Product product) throws ServiceException {
@@ -501,12 +512,13 @@ public class ProductPriceUtils {
 
         Set<ProductAvailability> availabilities = null;
         if (!CollectionUtils.isEmpty(product.getVariants())) {
-            Optional<ProductVariant> variants = product.getVariants().stream().filter(ProductVariant::isDefaultSelection)
-                    .findFirst();
+            Optional<ProductVariant> variants =
+                    product.getVariants().stream()
+                            .filter(ProductVariant::isDefaultSelection)
+                            .findFirst();
             if (variants.isPresent()) {
                 availabilities = variants.get().getAvailabilities();
                 availabilities = this.applicableAvailabilities(availabilities);
-
             }
         }
 
@@ -517,7 +529,9 @@ public class ProductPriceUtils {
 
         for (ProductAvailability availability : availabilities) {
             if (!StringUtils.isEmpty(availability.getRegion())
-                    && availability.getRegion().equals(Constants.ALL_REGIONS)) {// TODO REL 2.1 accept a region
+                    && availability
+                            .getRegion()
+                            .equals(Constants.ALL_REGIONS)) { // TODO REL 2.1 accept a region
                 Set<ProductPrice> prices = availability.getPrices();
                 for (ProductPrice price : prices) {
 
@@ -543,15 +557,17 @@ public class ProductPriceUtils {
         }
 
         if (finalPrice == null) {
-            throw new ServiceException(ServiceException.EXCEPTION_ERROR,
-                    "No inventory available to calculate the price. Availability should contain at least a region set to *");
+            throw new ServiceException(
+                    ServiceException.EXCEPTION_ERROR,
+                    "No inventory available to calculate the price. Availability should contain at"
+                            + " least a region set to *");
         }
 
         return finalPrice;
-
     }
 
-    private FinalPrice calculateFinalPrice(ProductAvailability availability) throws ServiceException {
+    private FinalPrice calculateFinalPrice(ProductAvailability availability)
+            throws ServiceException {
 
         FinalPrice finalPrice = null;
         List<FinalPrice> otherPrices = null;
@@ -568,7 +584,6 @@ public class ProductPriceUtils {
                 }
                 otherPrices.add(p);
             }
-
         }
 
         if (finalPrice != null) {
@@ -580,12 +595,13 @@ public class ProductPriceUtils {
         }
 
         if (finalPrice == null) {
-            throw new ServiceException(ServiceException.EXCEPTION_ERROR,
-                    "No inventory available to calculate the price. Availability should contain at least a region set to *");
+            throw new ServiceException(
+                    ServiceException.EXCEPTION_ERROR,
+                    "No inventory available to calculate the price. Availability should contain at"
+                            + " least a region set to *");
         }
 
         return finalPrice;
-
     }
 
     private FinalPrice finalPrice(ProductPrice price) {
@@ -597,7 +613,8 @@ public class ProductPriceUtils {
         Date today = new Date();
         // calculate discount price
         boolean hasDiscount = false;
-        if (price.getProductPriceSpecialStartDate() != null || price.getProductPriceSpecialEndDate() != null) {
+        if (price.getProductPriceSpecialStartDate() != null
+                || price.getProductPriceSpecialEndDate() != null) {
 
             if (price.getProductPriceSpecialStartDate() != null) {
                 if (price.getProductPriceSpecialStartDate().before(today)) {
@@ -608,11 +625,11 @@ public class ProductPriceUtils {
                             finalPrice.setDiscountEndDate(price.getProductPriceSpecialEndDate());
                         }
                     }
-
                 }
             }
 
-            if (!hasDiscount && price.getProductPriceSpecialStartDate() == null
+            if (!hasDiscount
+                    && price.getProductPriceSpecialStartDate() == null
                     && price.getProductPriceSpecialEndDate() != null) {
                 if (price.getProductPriceSpecialEndDate().after(today)) {
                     hasDiscount = true;
@@ -647,8 +664,9 @@ public class ProductPriceUtils {
 
         finalPrice.setDiscounted(true);
 
-        double arith = finalPrice.getProductPrice().getProductPriceSpecialAmount().doubleValue()
-                / finalPrice.getProductPrice().getProductPriceAmount().doubleValue();
+        double arith =
+                finalPrice.getProductPrice().getProductPriceSpecialAmount().doubleValue()
+                        / finalPrice.getProductPrice().getProductPriceAmount().doubleValue();
         double fsdiscount = 100 - (arith * 100);
         float percentagediscount = Double.valueOf(fsdiscount).floatValue();
         int percent = (int) percentagediscount;
@@ -658,5 +676,4 @@ public class ProductPriceUtils {
         BigDecimal price = finalPrice.getOriginalPrice();
         finalPrice.setDiscountedPrice(finalPrice.getProductPrice().getProductPriceSpecialAmount());
     }
-
 }

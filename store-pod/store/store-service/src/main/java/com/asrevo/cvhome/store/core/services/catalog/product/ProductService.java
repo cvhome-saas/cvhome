@@ -10,24 +10,25 @@ import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import com.asrevo.cvhome.store.core.entity.tax.taxclass.TaxClass;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
-import org.springframework.data.domain.Page;
-
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-
+import org.springframework.data.domain.Page;
 
 public interface ProductService extends SalesManagerEntityService<Long, Product> {
 
     Optional<Product> retrieveById(Long id, MerchantStore store);
 
-    void addProductDescription(Product product, ProductDescription description) throws ServiceException;
+    void addProductDescription(Product product, ProductDescription description)
+            throws ServiceException;
 
     ProductDescription getProductDescription(Product product, Language language);
 
-    Product getProductForLocale(long productId, Language language, Locale locale) throws ServiceException;
+    Product getProductForLocale(long productId, Language language, Locale locale)
+            throws ServiceException;
 
-    List<Product> getProductsForLocale(Category category, Language language, Locale locale) throws ServiceException;
+    List<Product> getProductsForLocale(Category category, Language language, Locale locale)
+            throws ServiceException;
 
     List<Product> getProducts(List<Long> categoryIds) throws ServiceException;
 
@@ -45,25 +46,22 @@ public interface ProductService extends SalesManagerEntityService<Long, Product>
      */
     Product getProductWithOnlyMerchantStoreById(Long productId);
 
-    ProductList listByStore(MerchantStore store, Language language,
-                            ProductCriteria criteria);
+    ProductList listByStore(MerchantStore store, Language language, ProductCriteria criteria);
 
     boolean exists(String sku, MerchantStore store);
-
 
     /**
      * List using Page interface in order to unify all page requests (since 2.16.0)
      *
      */
-    Page<Product> listByStore(MerchantStore store, Language language,
-                              ProductCriteria criteria, int page, int count);
+    Page<Product> listByStore(
+            MerchantStore store, Language language, ProductCriteria criteria, int page, int count);
 
     List<Product> listByStore(MerchantStore store);
 
     List<Product> listByTaxClass(TaxClass taxClass);
 
-    List<Product> getProducts(List<Long> categoryIds, Language language)
-            throws ServiceException;
+    List<Product> getProducts(List<Long> categoryIds, Language language) throws ServiceException;
 
     Product getBySeUrl(MerchantStore store, String seUrl, Locale locale);
 
@@ -71,8 +69,8 @@ public interface ProductService extends SalesManagerEntityService<Long, Product>
      * Product and or product variant
      *
      */
-    Product getBySku(String productCode, MerchantStore merchant, Language language) throws ServiceException;
-
+    Product getBySku(String productCode, MerchantStore merchant, Language language)
+            throws ServiceException;
 
     Product getBySku(String productCode, MerchantStore merchant) throws ServiceException;
 
@@ -81,7 +79,4 @@ public interface ProductService extends SalesManagerEntityService<Long, Product>
      *
      */
     Product findOne(Long id, MerchantStore merchant);
-
-
 }
-

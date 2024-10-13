@@ -1,6 +1,5 @@
 package com.asrevo.cvhome.store.service.populator.references;
 
-
 import com.asrevo.cvhome.store.controller.exception.ConversionException;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.country.Country;
@@ -10,14 +9,14 @@ import com.asrevo.cvhome.store.core.entity.reference.zone.ZoneDescription;
 import com.asrevo.cvhome.store.core.model.references.ReadableCountry;
 import com.asrevo.cvhome.store.core.model.references.ReadableZone;
 import com.asrevo.cvhome.store.utils.AbstractDataPopulator;
-import org.apache.commons.collections.CollectionUtils;
-
 import java.util.Objects;
+import org.apache.commons.collections.CollectionUtils;
 
 public class ReadableCountryPopulator extends AbstractDataPopulator<Country, ReadableCountry> {
 
     @Override
-    public ReadableCountry populate(Country source, ReadableCountry target, MerchantStore store, Language language)
+    public ReadableCountry populate(
+            Country source, ReadableCountry target, MerchantStore store, Language language)
             throws ConversionException {
 
         if (target == null) {
@@ -55,5 +54,4 @@ public class ReadableCountryPopulator extends AbstractDataPopulator<Country, Rea
         // TODO Auto-generated method stub
         return null;
     }
-
 }

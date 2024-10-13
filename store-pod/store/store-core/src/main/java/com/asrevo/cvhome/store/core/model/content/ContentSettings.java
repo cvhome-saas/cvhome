@@ -1,11 +1,9 @@
 package com.asrevo.cvhome.store.core.model.content;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import java.io.Serial;
 import java.io.Serializable;
-
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * System configuration settings for content management
@@ -19,9 +17,7 @@ public class ContentSettings implements Serializable {
     /**
      *
      */
-    @Serial
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
 
     private String httpBasePath;
-
 }

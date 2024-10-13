@@ -1,5 +1,7 @@
 package com.asrevo.cvhome.store.service.mapper.inventory;
 
+import static com.asrevo.cvhome.store.utils.NumberUtils.isPositive;
+
 import com.asrevo.cvhome.store.controller.exception.ConversionException;
 import com.asrevo.cvhome.store.controller.exception.ConversionRuntimeException;
 import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
@@ -19,17 +21,15 @@ import com.asrevo.cvhome.store.core.services.catalog.product.variant.ProductVari
 import com.asrevo.cvhome.store.core.services.reference.language.LanguageService;
 import com.asrevo.cvhome.store.service.mapper.Mapper;
 import com.asrevo.cvhome.store.utils.DateUtil;
+import java.util.*;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
-import java.util.*;
-
-import static com.asrevo.cvhome.store.utils.NumberUtils.isPositive;
-
 @Component
-public class PersistableInventoryMapper implements Mapper<PersistableInventory, ProductAvailability> {
+public class PersistableInventoryMapper
+        implements Mapper<PersistableInventory, ProductAvailability> {
 
     private final LanguageService languageService;
 
@@ -37,23 +37,29 @@ public class PersistableInventoryMapper implements Mapper<PersistableInventory, 
 
     private final ProductService productService;
 
-    public PersistableInventoryMapper(LanguageService languageService, ProductVariantService productVariantService, ProductService productService) {
+    public PersistableInventoryMapper(
+            LanguageService languageService,
+            ProductVariantService productVariantService,
+            ProductService productService) {
         this.languageService = languageService;
         this.productVariantService = productVariantService;
         this.productService = productService;
     }
 
     @Override
-    public ProductAvailability convert(PersistableInventory source, MerchantStore store, Language language) {
+    public ProductAvailability convert(
+            PersistableInventory source, MerchantStore store, Language language) {
         ProductAvailability availability = new ProductAvailability();
         availability.setMerchantStore(store);
         return merge(source, availability, store, language);
-
     }
 
     @Override
-    public ProductAvailability merge(PersistableInventory source, ProductAvailability destination, MerchantStore store,
-                                     Language language) {
+    public ProductAvailability merge(
+            PersistableInventory source,
+            ProductAvailability destination,
+            MerchantStore store,
+            Language language) {
         Assert.notNull(destination, "Product availability cannot be null");
 
         try {
@@ -61,32 +67,67 @@ public class PersistableInventoryMapper implements Mapper<PersistableInventory, 
             if (source.getProductId() != null && source.getProductId() > 0) {
                 product = productService.findOne(source.getProductId(), store);
                 if (product == null) {
-                    throw new ResourceNotFoundException("Product with id [" + source.getProductId() + "] not found for store [" + store.getCode() + "]");
+                    throw new ResourceNotFoundException(
+                            "Product with id ["
+                                    + source.getProductId()
+                                    + "] not found for store ["
+                                    + store.getCode()
+                                    + "]");
                 }
                 destination.setProduct(product);
             }
 
             Set<ProductAvailability> existingAvailability = product.getAvailabilities();
             ProductAvailability existing = null;
-            //determine product availability to be used
+            // determine product availability to be used
             if (source.getId() != null && source.getId() > 0) {
                 existing = destination;
             } else {
-                existing = existingAvailability.stream()
-                        .filter(a ->
-                                (
-                                        source.getProductId() != null && (a.getProduct().getId().longValue() == source.getProductId().longValue())
-                                                &&
-                                                a.getMerchantStore().getId().equals(store.getId())
-                                                &&
-                                                (source.getVariant() == null && a.getProductVariant() == null) || (a.getProductVariant() != null && source.getVariant() != null && a.getProductVariant().getId().longValue() == source.getVariant().longValue())
-                                                &&
-                                                (source.getRegionVariant() == null && a.getRegionVariant() == null) || (a.getRegionVariant() != null && source.getRegionVariant() != null && a.getRegionVariant().equals(source.getRegionVariant()))
-                                )).findAny().orElse(null);
+                existing =
+                        existingAvailability.stream()
+                                .filter(
+                                        a ->
+                                                (source.getProductId() != null
+                                                                && (a.getProduct()
+                                                                                .getId()
+                                                                                .longValue()
+                                                                        == source.getProductId()
+                                                                                .longValue())
+                                                                && a.getMerchantStore()
+                                                                        .getId()
+                                                                        .equals(store.getId())
+                                                                && (source.getVariant() == null
+                                                                        && a.getProductVariant()
+                                                                                == null)
+                                                        || (a.getProductVariant() != null
+                                                                        && source.getVariant()
+                                                                                != null
+                                                                        && a.getProductVariant()
+                                                                                        .getId()
+                                                                                        .longValue()
+                                                                                == source.getVariant()
+                                                                                        .longValue())
+                                                                && (source.getRegionVariant()
+                                                                                == null
+                                                                        && a.getRegionVariant()
+                                                                                == null)
+                                                        || (a.getRegionVariant() != null
+                                                                && source.getRegionVariant() != null
+                                                                && a.getRegionVariant()
+                                                                        .equals(
+                                                                                source
+                                                                                        .getRegionVariant()))))
+                                .findAny()
+                                .orElse(null);
             }
             if (existing != null) {
                 if (!existing.getMerchantStore().getId().equals(store.getId())) {
-                    throw new ResourceNotFoundException("Product Inventory with id [" + source.getId() + "] not found for store [" + store.getCode() + "]");
+                    throw new ResourceNotFoundException(
+                            "Product Inventory with id ["
+                                    + source.getId()
+                                    + "] not found for store ["
+                                    + store.getCode()
+                                    + "]");
                 }
                 destination = existing;
             }
@@ -106,24 +147,30 @@ public class PersistableInventoryMapper implements Mapper<PersistableInventory, 
             }
 
             if (source.getVariant() != null && source.getVariant() > 0) {
-                Optional<ProductVariant> instance = productVariantService.getById(source.getVariant(), store);
+                Optional<ProductVariant> instance =
+                        productVariantService.getById(source.getVariant(), store);
                 if (instance.get() == null) {
-                    throw new ResourceNotFoundException("productVariant with id [" + source.getVariant() + "] not found for store [" + store.getCode() + "]");
+                    throw new ResourceNotFoundException(
+                            "productVariant with id ["
+                                    + source.getVariant()
+                                    + "] not found for store ["
+                                    + store.getCode()
+                                    + "]");
                 }
                 destination.setSku(instance.get().getSku());
                 destination.setProductVariant(instance.get());
             }
 
-            //merge with existing or replace
+            // merge with existing or replace
             List<ProductPrice> prices = new ArrayList<>();
             for (PersistableProductPrice priceEntity : source.getPrices()) {
 
                 ProductPrice price = null;
 
-
                 if (destination.getPrices() != null) {
                     for (ProductPrice pp : destination.getPrices()) {
-                        if (isPositive(priceEntity.getId()) && priceEntity.getId().longValue() == pp.getId().longValue()) {
+                        if (isPositive(priceEntity.getId())
+                                && priceEntity.getId().longValue() == pp.getId().longValue()) {
                             price = pp;
                             prices.add(pp);
                         } else if (pp.isDefaultPrice() && priceEntity.isDefaultPrice()) {
@@ -135,7 +182,6 @@ public class PersistableInventoryMapper implements Mapper<PersistableInventory, 
                         } else {
                             prices.add(pp);
                         }
-
                     }
                 }
 
@@ -161,7 +207,8 @@ public class PersistableInventoryMapper implements Mapper<PersistableInventory, 
                     price.setProductPriceSpecialEndDate(endDate);
                 }
 
-                Set<ProductPriceDescription> descs = getProductPriceDescriptions(price, priceEntity.getDescriptions());
+                Set<ProductPriceDescription> descs =
+                        getProductPriceDescriptions(price, priceEntity.getDescriptions());
                 price.setDescriptions(descs);
 
                 destination.setPrices(new HashSet<>(prices));
@@ -174,17 +221,19 @@ public class PersistableInventoryMapper implements Mapper<PersistableInventory, 
         } catch (Exception e) {
             throw new ConversionRuntimeException(e);
         }
-
     }
 
-    private Set<ProductPriceDescription> getProductPriceDescriptions(ProductPrice price,
-                                                                     List<com.asrevo.cvhome.store.core.model.catalog.product.ProductPriceDescription> descriptions)
+    private Set<ProductPriceDescription> getProductPriceDescriptions(
+            ProductPrice price,
+            List<com.asrevo.cvhome.store.core.model.catalog.product.ProductPriceDescription>
+                    descriptions)
             throws ConversionException {
         if (CollectionUtils.isEmpty(descriptions)) {
             return Collections.emptySet();
         }
         Set<ProductPriceDescription> descs = new HashSet<>();
-        for (com.asrevo.cvhome.store.core.model.catalog.product.ProductPriceDescription desc : descriptions) {
+        for (com.asrevo.cvhome.store.core.model.catalog.product.ProductPriceDescription desc :
+                descriptions) {
             ProductPriceDescription description = null;
             if (CollectionUtils.isNotEmpty(price.getDescriptions())) {
                 for (ProductPriceDescription d : price.getDescriptions()) {
@@ -201,11 +250,14 @@ public class PersistableInventoryMapper implements Mapper<PersistableInventory, 
     }
 
     private String getRegion(PersistableInventory source) {
-        return Optional.ofNullable(source.getRegion()).filter(StringUtils::isNotBlank).orElse(Constants.ALL_REGIONS);
+        return Optional.ofNullable(source.getRegion())
+                .filter(StringUtils::isNotBlank)
+                .orElse(Constants.ALL_REGIONS);
     }
 
     private ProductPriceDescription getDescription(
-            com.asrevo.cvhome.store.core.model.catalog.product.ProductPriceDescription desc) throws ConversionException {
+            com.asrevo.cvhome.store.core.model.catalog.product.ProductPriceDescription desc)
+            throws ConversionException {
         ProductPriceDescription target = new ProductPriceDescription();
         target.setDescription(desc.getDescription());
         target.setName(desc.getName());
@@ -217,17 +269,20 @@ public class PersistableInventoryMapper implements Mapper<PersistableInventory, 
         Language lang = getLanguage(desc);
         target.setLanguage(lang);
         return target;
-
     }
 
-    private Language getLanguage(com.asrevo.cvhome.store.core.model.catalog.product.ProductPriceDescription desc) {
+    private Language getLanguage(
+            com.asrevo.cvhome.store.core.model.catalog.product.ProductPriceDescription desc) {
         try {
             return Optional.ofNullable(languageService.getByCode(desc.getLanguage()))
-                    .orElseThrow(() -> new ConversionRuntimeException(
-                            "Language is null for code " + desc.getLanguage() + " use language ISO code [en, fr ...]"));
+                    .orElseThrow(
+                            () ->
+                                    new ConversionRuntimeException(
+                                            "Language is null for code "
+                                                    + desc.getLanguage()
+                                                    + " use language ISO code [en, fr ...]"));
         } catch (ServiceException e) {
             throw new ConversionRuntimeException(e);
         }
     }
-
 }

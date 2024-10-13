@@ -28,5 +28,4 @@ public class CreditCard {
 
     @Column(name = "CC_CVV")
     private String ccCvv;
-
 }

@@ -13,12 +13,11 @@ import lombok.Setter;
 @Getter
 public class PaypalPayment extends Payment {
 
-    //express checkout
+    // express checkout
     private String payerId;
     private String paymentToken;
 
     public PaypalPayment() {
         super.setPaymentType(PaymentType.PAYPAL);
     }
-
 }

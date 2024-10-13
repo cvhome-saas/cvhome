@@ -1,6 +1,5 @@
 package com.asrevo.cvhome.store.core.services.customer.optin;
 
-
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.system.optin.CustomerOptin;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
@@ -10,13 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-
 @Service
-public class CustomerOptinServiceImpl extends SalesManagerEntityServiceImpl<Long, CustomerOptin> implements CustomerOptinService {
-
+public class CustomerOptinServiceImpl extends SalesManagerEntityServiceImpl<Long, CustomerOptin>
+        implements CustomerOptinService {
 
     private final CustomerOptinRepository customerOptinRepository;
-
 
     @Autowired
     public CustomerOptinServiceImpl(CustomerOptinRepository customerOptinRepository) {
@@ -29,8 +26,6 @@ public class CustomerOptinServiceImpl extends SalesManagerEntityServiceImpl<Long
         Assert.notNull(optin, "CustomerOptin must not be null");
 
         customerOptinRepository.save(optin);
-
-
     }
 
     @Override
@@ -38,12 +33,12 @@ public class CustomerOptinServiceImpl extends SalesManagerEntityServiceImpl<Long
         Assert.notNull(optin, "CustomerOptin must not be null");
 
         customerOptinRepository.delete(optin);
-
     }
 
     @Override
-    public CustomerOptin findByEmailAddress(MerchantStore store, String emailAddress, String code) throws ServiceException {
-        return customerOptinRepository.findByMerchantAndCodeAndEmail(store.getId(), code, emailAddress);
+    public CustomerOptin findByEmailAddress(MerchantStore store, String emailAddress, String code)
+            throws ServiceException {
+        return customerOptinRepository.findByMerchantAndCodeAndEmail(
+                store.getId(), code, emailAddress);
     }
-
 }

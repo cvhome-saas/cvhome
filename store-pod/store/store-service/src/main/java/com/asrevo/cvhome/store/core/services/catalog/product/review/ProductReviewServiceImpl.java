@@ -8,18 +8,15 @@ import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.repositories.catalog.product.review.ProductReviewRepository;
 import com.asrevo.cvhome.store.core.services.catalog.product.ProductService;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
+import java.math.BigDecimal;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import java.math.BigDecimal;
-import java.util.List;
-
 @Service("productReviewService")
-public class ProductReviewServiceImpl extends
-        SalesManagerEntityServiceImpl<Long, ProductReview> implements
-        ProductReviewService {
-
+public class ProductReviewServiceImpl extends SalesManagerEntityServiceImpl<Long, ProductReview>
+        implements ProductReviewService {
 
     private final ProductReviewRepository productReviewRepository;
 
@@ -55,28 +52,24 @@ public class ProductReviewServiceImpl extends
 
     private void saveOrUpdate(ProductReview review) throws ServiceException {
 
-
         Assert.notNull(review, "ProductReview cannot be null");
         Assert.notNull(review.getProduct(), "ProductReview.product cannot be null");
         Assert.notNull(review.getCustomer(), "ProductReview.customer cannot be null");
 
-
-        //refresh product
+        // refresh product
         Product product = productService.getById(review.getProduct().getId());
 
-        //ajust product rating
+        // ajust product rating
         int count = 0;
         if (product.getProductReviewCount() != null) {
             count = product.getProductReviewCount();
         }
 
-
         BigDecimal averageRating = product.getProductReviewAvg();
         if (averageRating == null) {
             averageRating = new BigDecimal(0);
         }
-        //get reviews
-
+        // get reviews
 
         BigDecimal totalRating = averageRating.multiply(new BigDecimal(count));
         totalRating = totalRating.add(BigDecimal.valueOf(review.getReviewRating()));
@@ -91,7 +84,6 @@ public class ProductReviewServiceImpl extends
         productService.update(product);
 
         review.setProduct(product);
-
     }
 
     public void update(ProductReview review) throws ServiceException {
@@ -109,6 +101,4 @@ public class ProductReviewServiceImpl extends
     public List<ProductReview> getByProductNoCustomers(Product product) {
         return productReviewRepository.findByProductNoCustomers(product.getId());
     }
-
-
 }

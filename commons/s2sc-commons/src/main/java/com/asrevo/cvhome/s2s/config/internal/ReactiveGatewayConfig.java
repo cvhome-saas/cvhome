@@ -25,5 +25,4 @@ public class ReactiveGatewayConfig {
     public FNotServiceRoutePredicateFactory fPathNotApiRoutePredicateFactory() {
         return new FNotServiceRoutePredicateFactory();
     }
-
 }

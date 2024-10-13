@@ -6,7 +6,6 @@ import com.asrevo.cvhome.store.core.entity.reference.zone.Zone;
 import com.asrevo.cvhome.store.core.entity.reference.zone.ZoneDescription;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
-
 import java.util.List;
 import java.util.Map;
 
@@ -16,12 +15,9 @@ public interface ZoneService extends SalesManagerEntityService<Long, Zone> {
 
     void addDescription(Zone zone, ZoneDescription description) throws ServiceException;
 
-    List<Zone> getZones(Country country, Language language)
-            throws ServiceException;
+    List<Zone> getZones(Country country, Language language) throws ServiceException;
 
     Map<String, Zone> getZones(Language language) throws ServiceException;
 
     List<Zone> getZones(String countryCode, Language language) throws ServiceException;
-
-
 }

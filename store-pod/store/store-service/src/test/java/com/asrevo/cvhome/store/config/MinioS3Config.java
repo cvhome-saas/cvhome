@@ -2,20 +2,19 @@ package com.asrevo.cvhome.store.config;
 
 import com.asrevo.cvhome.s2s.model.StorageProviderType;
 import com.asrevo.cvhome.store.MinIOContainer;
+import java.util.UUID;
+import java.util.function.Supplier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.DynamicPropertyRegistry;
-
-import java.util.UUID;
-import java.util.function.Supplier;
 
 @Configuration
 public class MinioS3Config {
     @Bean
     public MinIOContainer minIOContainer(DynamicPropertyRegistry properties) {
         String bucket = UUID.randomUUID().toString();
-        MinIOContainer container = new MinIOContainer("bitnami/minio")
-                .withEnv("MINIO_DEFAULT_BUCKETS", bucket);
+        MinIOContainer container =
+                new MinIOContainer("bitnami/minio").withEnv("MINIO_DEFAULT_BUCKETS", bucket);
         container.start();
         Supplier<Object> getUiURL = () -> container.getUiURL() + "/" + bucket;
         properties.add("com.asrevo.cvhome.cdn.basePath", getUiURL);
@@ -27,5 +26,4 @@ public class MinioS3Config {
         properties.add("com.asrevo.cvhome.cdn.storage.s3-secret-key", container::getSecretKey);
         return container;
     }
-
 }

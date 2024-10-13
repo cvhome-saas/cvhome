@@ -1,11 +1,10 @@
 package com.asrevo.cvhome.store.core.model.order.transaction;
 
 import com.asrevo.cvhome.commons.domain.Entity;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.io.Serial;
 import java.io.Serializable;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Readable version of Transaction entity object
@@ -19,12 +18,10 @@ public class TransactionEntity extends Entity implements Serializable {
     /**
      *
      */
-    @Serial
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
+
     private Long orderId;
     private String details;
     private String transactionDate;
     private String amount;
-
-
 }

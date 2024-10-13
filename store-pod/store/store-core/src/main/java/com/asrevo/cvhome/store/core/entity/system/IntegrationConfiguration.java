@@ -1,15 +1,14 @@
 package com.asrevo.cvhome.store.core.entity.system;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Getter;
-import lombok.Setter;
-import org.json.simple.JSONAware;
-import org.json.simple.JSONObject;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import lombok.Getter;
+import lombok.Setter;
+import org.json.simple.JSONAware;
+import org.json.simple.JSONObject;
 
 /**
  * Object used to contain the integration information with an external gateway Uses simple JSON to
@@ -21,20 +20,15 @@ import java.util.Set;
 @Getter
 public class IntegrationConfiguration implements JSONAware {
 
-
-    public final static String TEST_ENVIRONMENT = "TEST";
-    public final static String PRODUCTION_ENVIRONMENT = "PRODUCTION";
+    public static final String TEST_ENVIRONMENT = "TEST";
+    public static final String PRODUCTION_ENVIRONMENT = "PRODUCTION";
 
     private String moduleCode;
     private boolean active;
-    @Setter
-    private boolean defaultSelected;
+    @Setter private boolean defaultSelected;
     private Map<String, String> integrationKeys = new HashMap<>();
-    @Setter
-    private Map<String, List<String>> integrationOptions = new HashMap<>();
-    @Setter
-    private String environment;
-
+    @Setter private Map<String, List<String>> integrationOptions = new HashMap<>();
+    @Setter private String environment;
 
     @JsonProperty("moduleCode")
     public void setModuleCode(String moduleCode) {
@@ -51,27 +45,31 @@ public class IntegrationConfiguration implements JSONAware {
         this.integrationKeys = integrationKeys;
     }
 
-
     protected String getJsonInfo() {
 
         StringBuilder returnString = new StringBuilder();
         returnString.append("{");
-        returnString.append("\"moduleCode\"").append(":\"").append(this.getModuleCode()).append("\"");
+        returnString
+                .append("\"moduleCode\"")
+                .append(":\"")
+                .append(this.getModuleCode())
+                .append("\"");
         returnString.append(",");
         returnString.append("\"active\"").append(":").append(this.isActive());
         returnString.append(",");
         returnString.append("\"defaultSelected\"").append(":").append(this.isDefaultSelected());
         returnString.append(",");
-        returnString.append("\"environment\"").append(":\"").append(this.getEnvironment()).append("\"");
+        returnString
+                .append("\"environment\"")
+                .append(":\"")
+                .append(this.getEnvironment())
+                .append("\"");
         return returnString.toString();
-
     }
-
 
     @SuppressWarnings("unchecked")
     @Override
     public String toJSONString() {
-
 
         StringBuilder returnString = new StringBuilder();
         returnString.append(getJsonInfo());
@@ -87,10 +85,7 @@ public class IntegrationConfiguration implements JSONAware {
 
             returnString.append(",").append("\"integrationKeys\"").append(":");
             returnString.append(dataField);
-
-
         }
-
 
         if (this.getIntegrationOptions() != null && !this.getIntegrationOptions().isEmpty()) {
 
@@ -134,23 +129,16 @@ public class IntegrationConfiguration implements JSONAware {
                     optionDataEntries.append(",");
                 }
                 countOptions++;
-
             }
             String dataField = optionDataEntries.toString();
 
             returnString.append(",").append("\"integrationOptions\"").append(":{");
             returnString.append(dataField);
             returnString.append("}");
-
         }
-
 
         returnString.append("}");
 
-
         return returnString.toString();
-
     }
-
-
 }

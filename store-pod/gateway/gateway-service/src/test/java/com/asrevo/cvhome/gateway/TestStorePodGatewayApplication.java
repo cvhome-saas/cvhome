@@ -9,7 +9,8 @@ import org.springframework.context.annotation.Import;
 @Import(ReactiveTestCustomSecurityConfig.class)
 public class TestStorePodGatewayApplication {
     public static void main(String[] args) {
-        SpringApplication.from(StorePodGatewayApplication::main).with(TestStorePodGatewayApplication.class).run(args);
+        SpringApplication.from(StorePodGatewayApplication::main)
+                .with(TestStorePodGatewayApplication.class)
+                .run(args);
     }
-
 }

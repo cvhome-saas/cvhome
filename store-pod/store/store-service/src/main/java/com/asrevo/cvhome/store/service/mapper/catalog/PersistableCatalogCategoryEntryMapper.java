@@ -16,40 +16,37 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 @Component
-public class PersistableCatalogCategoryEntryMapper implements Mapper<PersistableCatalogCategoryEntry, CatalogCategoryEntry> {
+public class PersistableCatalogCategoryEntryMapper
+        implements Mapper<PersistableCatalogCategoryEntry, CatalogCategoryEntry> {
 
+    @Autowired private CategoryFacade categoryFacade;
 
-    @Autowired
-    private CategoryFacade categoryFacade;
-
-    @Autowired
-    @Lazy
-    private CatalogFacade catalogFacade;
-
+    @Autowired @Lazy private CatalogFacade catalogFacade;
 
     @Override
-    public CatalogCategoryEntry convert(PersistableCatalogCategoryEntry source, MerchantStore store, Language language) {
+    public CatalogCategoryEntry convert(
+            PersistableCatalogCategoryEntry source, MerchantStore store, Language language) {
         CatalogCategoryEntry destination = new CatalogCategoryEntry();
         return this.merge(source, destination, store, language);
     }
 
     @Override
-    public CatalogCategoryEntry merge(PersistableCatalogCategoryEntry source, CatalogCategoryEntry destination, MerchantStore store,
-                                      Language language) {
+    public CatalogCategoryEntry merge(
+            PersistableCatalogCategoryEntry source,
+            CatalogCategoryEntry destination,
+            MerchantStore store,
+            Language language) {
         Assert.notNull(source, "CatalogEntry must not be null");
         Assert.notNull(store, "MerchantStore must not be null");
         Assert.notNull(source.getProductCode(), "ProductCode must not be null");
         Assert.notNull(source.getCategoryCode(), "CategoryCode must not be null");
         Assert.notNull(source.getCatalog(), "Catalog must not be null");
 
-
         if (destination == null) {
             destination = new CatalogCategoryEntry();
-
         }
         destination.setId(source.getId());
         destination.setVisible(source.isVisible());
-
 
         try {
 
@@ -57,21 +54,27 @@ public class PersistableCatalogCategoryEntryMapper implements Mapper<Persistable
 
             Catalog catalogModel = catalogFacade.getCatalog(catalog, store);
             if (catalogModel == null) {
-                throw new ConversionRuntimeException("Error while converting CatalogEntry product [" + source.getCatalog() + "] not found");
+                throw new ConversionRuntimeException(
+                        "Error while converting CatalogEntry product ["
+                                + source.getCatalog()
+                                + "] not found");
             }
 
             destination.setCatalog(catalogModel);
 
-/*			Product productModel = productFacade.getProduct(source.getProductCode(), store);
-			if(productModel == null) {
-				throw new ConversionRuntimeException("Error while converting CatalogEntry product [" + source.getProductCode() + "] not found");
-			}*/
+            /*			Product productModel = productFacade.getProduct(source.getProductCode(), store);
+            if(productModel == null) {
+            	throw new ConversionRuntimeException("Error while converting CatalogEntry product [" + source.getProductCode() + "] not found");
+            }*/
 
-            //destination.setProduct(productModel);
+            // destination.setProduct(productModel);
 
             Category categoryModel = categoryFacade.getByCode(source.getCategoryCode(), store);
             if (categoryModel == null) {
-                throw new ConversionRuntimeException("Error while converting CatalogEntry category [" + source.getCategoryCode() + "] not found");
+                throw new ConversionRuntimeException(
+                        "Error while converting CatalogEntry category ["
+                                + source.getCategoryCode()
+                                + "] not found");
             }
 
             destination.setCategory(categoryModel);
@@ -82,5 +85,4 @@ public class PersistableCatalogCategoryEntryMapper implements Mapper<Persistable
 
         return destination;
     }
-
 }

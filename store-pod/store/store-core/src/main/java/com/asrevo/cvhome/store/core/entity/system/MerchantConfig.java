@@ -1,29 +1,26 @@
 package com.asrevo.cvhome.store.core.entity.system;
 
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONAware;
 import org.json.simple.JSONObject;
 
-import java.io.Serial;
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
-
 @Setter
 @Getter
 public class MerchantConfig implements Serializable, JSONAware {
-
 
     /**
      * TODO
      * Add a generic key value in order to allow the creation of configuration
      * on the fly from the client application and read from a key value map
      */
+    @Serial private static final long serialVersionUID = 1L;
 
-    @Serial
-    private static final long serialVersionUID = 1L;
     private boolean displayCustomerSection = false;
     private boolean displayContactUs = false;
     private boolean displayStoreAddress = false;
@@ -38,8 +35,11 @@ public class MerchantConfig implements Serializable, JSONAware {
     /**
      * Store default search json config
      **/
-    private Map<String, Boolean> useDefaultSearchConfig = new HashMap<>();//language code | true or false
-    private Map<String, String> defaultSearchConfigPath = new HashMap<>();//language code | file path
+    private Map<String, Boolean> useDefaultSearchConfig =
+            new HashMap<>(); // language code | true or false
+
+    private Map<String, String> defaultSearchConfigPath =
+            new HashMap<>(); // language code | file path
 
     @SuppressWarnings("unchecked")
     @Override
@@ -78,8 +78,6 @@ public class MerchantConfig implements Serializable, JSONAware {
             data.put("defaultSearchConfigPath", obj);
         }
 
-
         return data.toJSONString();
     }
-
 }

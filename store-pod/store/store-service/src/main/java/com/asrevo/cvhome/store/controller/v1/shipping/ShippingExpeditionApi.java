@@ -6,11 +6,10 @@ import com.asrevo.cvhome.store.core.model.references.ReadableCountry;
 import com.asrevo.cvhome.store.service.facade.shipping.ShippingFacade;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 // @TODO ASHRAF
 @RestController
@@ -18,13 +17,11 @@ import java.util.List;
 @Tag(name = "Shipping - Expedition management resource (Shipping Management Api) - ship to country")
 public class ShippingExpeditionApi {
 
-
     private final ShippingFacade shippingFacade;
 
     public ShippingExpeditionApi(ShippingFacade shippingFacade) {
         this.shippingFacade = shippingFacade;
     }
-
 
     @GetMapping("/shipping/country")
     public List<ReadableCountry> getCountry(
@@ -32,6 +29,4 @@ public class ShippingExpeditionApi {
             @Parameter(hidden = true) Language language) {
         return shippingFacade.shipToCountry(merchantStore, language);
     }
-
-
 }

@@ -1,7 +1,6 @@
 package com.asrevo.cvhome.commons.event;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import java.util.List;
 import java.util.Map;
 
@@ -15,4 +14,3 @@ public interface Event {
         return List.of();
     }
 }
-

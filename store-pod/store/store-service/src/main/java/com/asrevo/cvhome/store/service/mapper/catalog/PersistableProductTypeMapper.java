@@ -9,14 +9,12 @@ import com.asrevo.cvhome.store.core.model.catalog.product.type.PersistableProduc
 import com.asrevo.cvhome.store.core.model.catalog.product.type.ProductTypeDescription;
 import com.asrevo.cvhome.store.core.services.reference.language.LanguageService;
 import com.asrevo.cvhome.store.service.mapper.Mapper;
-import org.apache.commons.collections.CollectionUtils;
-import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-
+import org.apache.commons.collections.CollectionUtils;
+import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
 @Component
 public class PersistableProductTypeMapper implements Mapper<PersistableProductType, ProductType> {
@@ -28,14 +26,18 @@ public class PersistableProductTypeMapper implements Mapper<PersistableProductTy
     }
 
     @Override
-    public ProductType convert(PersistableProductType source, MerchantStore store, Language language) {
+    public ProductType convert(
+            PersistableProductType source, MerchantStore store, Language language) {
         ProductType type = new ProductType();
         return this.merge(source, type, store, language);
     }
 
     @Override
-    public ProductType merge(PersistableProductType source, ProductType destination, MerchantStore store,
-                             Language language) {
+    public ProductType merge(
+            PersistableProductType source,
+            ProductType destination,
+            MerchantStore store,
+            Language language) {
         Assert.notNull(destination, "ReadableProductType cannot be null");
         try {
             return type(source, destination);
@@ -44,7 +46,8 @@ public class PersistableProductTypeMapper implements Mapper<PersistableProductTy
         }
     }
 
-    private ProductType type(PersistableProductType type, ProductType destination) throws ServiceException {
+    private ProductType type(PersistableProductType type, ProductType destination)
+            throws ServiceException {
         if (destination == null) {
             destination = new ProductType();
         }
@@ -52,26 +55,27 @@ public class PersistableProductTypeMapper implements Mapper<PersistableProductTy
         destination.setId(type.getId());
         destination.setAllowAddToCart(type.isAllowAddToCart());
         destination.setVisible(type.isVisible());
-        //destination.set
+        // destination.set
 
-        List<com.asrevo.cvhome.store.core.entity.catalog.product.type.ProductTypeDescription> descriptions = new ArrayList<>();
+        List<com.asrevo.cvhome.store.core.entity.catalog.product.type.ProductTypeDescription>
+                descriptions = new ArrayList<>();
         if (!CollectionUtils.isEmpty(type.getDescriptions())) {
 
             for (ProductTypeDescription d : type.getDescriptions()) {
-                com.asrevo.cvhome.store.core.entity.catalog.product.type.ProductTypeDescription desc = typeDescription(d, destination, d.getLanguage());
+                com.asrevo.cvhome.store.core.entity.catalog.product.type.ProductTypeDescription
+                        desc = typeDescription(d, destination, d.getLanguage());
                 descriptions.add(desc);
-
-
             }
 
             destination.setDescriptions(new HashSet<>(descriptions));
-
         }
 
         return destination;
     }
 
-    private com.asrevo.cvhome.store.core.entity.catalog.product.type.ProductTypeDescription typeDescription(ProductTypeDescription description, ProductType typeModel, String lang) throws ServiceException {
+    private com.asrevo.cvhome.store.core.entity.catalog.product.type.ProductTypeDescription
+            typeDescription(ProductTypeDescription description, ProductType typeModel, String lang)
+                    throws ServiceException {
 
         com.asrevo.cvhome.store.core.entity.catalog.product.type.ProductTypeDescription desc = null;
         if (!CollectionUtils.isEmpty(typeModel.getDescriptions())) {
@@ -79,7 +83,9 @@ public class PersistableProductTypeMapper implements Mapper<PersistableProductTy
         }
 
         if (desc == null) {
-            desc = new com.asrevo.cvhome.store.core.entity.catalog.product.type.ProductTypeDescription();
+            desc =
+                    new com.asrevo.cvhome.store.core.entity.catalog.product.type
+                            .ProductTypeDescription();
         }
 
         desc.setName(description.getName());
@@ -89,9 +95,15 @@ public class PersistableProductTypeMapper implements Mapper<PersistableProductTy
         return desc;
     }
 
-    private com.asrevo.cvhome.store.core.entity.catalog.product.type.ProductTypeDescription findAppropriateDescription(ProductType typeModel, String lang) {
-        java.util.Optional<com.asrevo.cvhome.store.core.entity.catalog.product.type.ProductTypeDescription> d = typeModel.getDescriptions().stream().filter(t -> t.getLanguage().getCode().equals(lang)).findFirst();
+    private com.asrevo.cvhome.store.core.entity.catalog.product.type.ProductTypeDescription
+            findAppropriateDescription(ProductType typeModel, String lang) {
+        java.util.Optional<
+                        com.asrevo.cvhome.store.core.entity.catalog.product.type
+                                .ProductTypeDescription>
+                d =
+                        typeModel.getDescriptions().stream()
+                                .filter(t -> t.getLanguage().getCode().equals(lang))
+                                .findFirst();
         return d.orElse(null);
     }
-
 }

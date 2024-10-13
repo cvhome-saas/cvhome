@@ -1,5 +1,8 @@
 package com.asrevo.cvhome.store.controller.v2.product;
 
+import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+
 import com.asrevo.cvhome.commons.annotation.SecuredResource;
 import com.asrevo.cvhome.commons.domain.Entity;
 import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
@@ -29,17 +32,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 /**
  * API to create, read, update and delete a Product API.
@@ -48,18 +47,26 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
  */
 @Controller
 @RequestMapping("/api/v2")
-@Tags(value = @Tag(name =
-        "Product display and management resource (Product display and Management Api such as adding a product to category. Serves api v1 and v2 with backward compatibility)"))
+@Tags(
+        value =
+                @Tag(
+                        name =
+                                "Product display and management resource (Product display and"
+                                    + " Management Api such as adding a product to category. Serves"
+                                    + " api v1 and v2 with backward compatibility)"))
 @Slf4j
 public class ProductApiV2 {
-
 
     private final ProductDefinitionFacade productDefinitionFacade;
     private final ProductFacade productFacadeV2;
     private final ProductCommonFacade productCommonFacade;
     private final CategoryFacade categoryFacade;
 
-    public ProductApiV2(ProductDefinitionFacade productDefinitionFacade, ProductFacade productFacadeV2, ProductCommonFacade productCommonFacade, CategoryFacade categoryFacade) {
+    public ProductApiV2(
+            ProductDefinitionFacade productDefinitionFacade,
+            ProductFacade productFacadeV2,
+            ProductCommonFacade productCommonFacade,
+            CategoryFacade categoryFacade) {
         this.productDefinitionFacade = productDefinitionFacade;
         this.productFacadeV2 = productFacadeV2;
         this.productCommonFacade = productCommonFacade;
@@ -71,11 +78,24 @@ public class ProductApiV2 {
      *
      */
     @ResponseStatus(HttpStatus.CREATED)
-    @RequestMapping(value = {"/private/product/inventory"},
+    @RequestMapping(
+            value = {"/private/product/inventory"},
             method = RequestMethod.POST)
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
+        @Parameter(
+                name = "store",
+                schema =
+                        @Schema(
+                                name = "store",
+                                type = "string",
+                                defaultValue = DEFAULT_ORG1_STORE1)),
+        @Parameter(
+                name = "lang",
+                schema =
+                        @Schema(
+                                name = "lang",
+                                type = "string",
+                                defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public @ResponseBody Entity create(
             @Valid @RequestBody PersistableProduct product,
@@ -86,24 +106,35 @@ public class ProductApiV2 {
         Entity returnEntity = new Entity();
         returnEntity.setId(id);
         return returnEntity;
-
     }
-
 
     /**
      * ------------ V2
      * <p>
      * --- product definition
      */
-
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(value = {"/private/product"})
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
+        @Parameter(
+                name = "store",
+                schema =
+                        @Schema(
+                                name = "store",
+                                type = "string",
+                                defaultValue = DEFAULT_ORG1_STORE1)),
+        @Parameter(
+                name = "lang",
+                schema =
+                        @Schema(
+                                name = "lang",
+                                type = "string",
+                                defaultValue = Constants.DEFAULT_LANGUAGE))
     })
-    public @ResponseBody Entity createV2(@Valid @RequestBody PersistableProductDefinition product,
-                                         @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore, @Parameter(hidden = true) Language language) {
+    public @ResponseBody Entity createV2(
+            @Valid @RequestBody PersistableProductDefinition product,
+            @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
+            @Parameter(hidden = true) Language language) {
 
         // make sure product id is null
         product.setId(null);
@@ -111,46 +142,87 @@ public class ProductApiV2 {
         Entity returnEntity = new Entity();
         returnEntity.setId(id);
         return returnEntity;
-
     }
 
     @ResponseStatus(HttpStatus.OK)
     @PutMapping(value = {"/private/product/{id}"})
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
+        @Parameter(
+                name = "store",
+                schema =
+                        @Schema(
+                                name = "store",
+                                type = "string",
+                                defaultValue = DEFAULT_ORG1_STORE1)),
+        @Parameter(
+                name = "lang",
+                schema =
+                        @Schema(
+                                name = "lang",
+                                type = "string",
+                                defaultValue = Constants.DEFAULT_LANGUAGE))
     })
-    public void updateV2(@PathVariable Long id,
-                         @Valid @RequestBody PersistableProductDefinition product,
-                         @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore, @Parameter(hidden = true) Language language) {
+    public void updateV2(
+            @PathVariable Long id,
+            @Valid @RequestBody PersistableProductDefinition product,
+            @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
+            @Parameter(hidden = true) Language language) {
 
         productDefinitionFacade.update(id, product, merchantStore, language);
-
     }
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping(value = {"/private/product/{id}"})
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
+        @Parameter(
+                name = "store",
+                schema =
+                        @Schema(
+                                name = "store",
+                                type = "string",
+                                defaultValue = DEFAULT_ORG1_STORE1)),
+        @Parameter(
+                name = "lang",
+                schema =
+                        @Schema(
+                                name = "lang",
+                                type = "string",
+                                defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public @ResponseBody ReadableProductDefinition getV2(
             @PathVariable Long id,
             @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language) {
 
-        ReadableProductDefinition def = productDefinitionFacade.getProduct(merchantStore, id, language);
+        ReadableProductDefinition def =
+                productDefinitionFacade.getProduct(merchantStore, id, language);
         return def;
-
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @RequestMapping(value = {"/private/product/{id}"}, method = RequestMethod.DELETE)
+    @RequestMapping(
+            value = {"/private/product/{id}"},
+            method = RequestMethod.DELETE)
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
+        @Parameter(
+                name = "store",
+                schema =
+                        @Schema(
+                                name = "store",
+                                type = "string",
+                                defaultValue = DEFAULT_ORG1_STORE1)),
+        @Parameter(
+                name = "lang",
+                schema =
+                        @Schema(
+                                name = "lang",
+                                type = "string",
+                                defaultValue = Constants.DEFAULT_LANGUAGE))
     })
-    public void deleteV2(@PathVariable Long id, @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore, @Parameter(hidden = true) Language language) {
+    public void deleteV2(
+            @PathVariable Long id,
+            @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
+            @Parameter(hidden = true) Language language) {
 
         productCommonFacade.deleteProduct(id, merchantStore);
     }
@@ -163,22 +235,46 @@ public class ProductApiV2 {
      * @throws Exception <p>
      *                   /api/product/123
      */
-    @RequestMapping(value = {"/product/name/{friendlyUrl}",
-            "/product/friendly/{friendlyUrl}"}, method = RequestMethod.GET)
-    @Operation(method = "GET", description = "Get a product by friendlyUrl (slug) version 2", summary = "For shop purpose. Specifying ?merchant is "
-            + "required otherwise it falls back to DEFAULT")
-    @ApiResponse(responseCode = "200", description = "Single product found", content = @Content(schema = @Schema(implementation = ReadableProduct.class)))
+    @RequestMapping(
+            value = {"/product/name/{friendlyUrl}", "/product/friendly/{friendlyUrl}"},
+            method = RequestMethod.GET)
+    @Operation(
+            method = "GET",
+            description = "Get a product by friendlyUrl (slug) version 2",
+            summary =
+                    "For shop purpose. Specifying ?merchant is "
+                            + "required otherwise it falls back to DEFAULT")
+    @ApiResponse(
+            responseCode = "200",
+            description = "Single product found",
+            content = @Content(schema = @Schema(implementation = ReadableProduct.class)))
     @ResponseBody
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
+        @Parameter(
+                name = "store",
+                schema =
+                        @Schema(
+                                name = "store",
+                                type = "string",
+                                defaultValue = DEFAULT_ORG1_STORE1)),
+        @Parameter(
+                name = "lang",
+                schema =
+                        @Schema(
+                                name = "lang",
+                                type = "string",
+                                defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public ReadableProduct getByfriendlyUrl(
             @PathVariable final String friendlyUrl,
-            @RequestParam(value = "lang", required = false) String lang, @Parameter(hidden = true) MerchantStore merchantStore,
-            @Parameter(hidden = true) Language language, HttpServletResponse response) throws Exception {
+            @RequestParam(value = "lang", required = false) String lang,
+            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) Language language,
+            HttpServletResponse response)
+            throws Exception {
 
-        ReadableProduct product = productFacadeV2.getProductBySeUrl(merchantStore, friendlyUrl, language);
+        ReadableProduct product =
+                productFacadeV2.getProductBySeUrl(merchantStore, friendlyUrl, language);
 
         if (product == null) {
             response.sendError(404, "Product not fount for id " + friendlyUrl);
@@ -188,7 +284,6 @@ public class ProductApiV2 {
         return product;
     }
 
-
     /**
      * List products by category
      * count and page are supported. Default values are set when not specified
@@ -197,24 +292,38 @@ public class ProductApiV2 {
     @RequestMapping(value = "/products/category/{friendlyUrl}", method = RequestMethod.GET)
     @ResponseBody
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
+        @Parameter(
+                name = "store",
+                schema =
+                        @Schema(
+                                name = "store",
+                                type = "string",
+                                defaultValue = DEFAULT_ORG1_STORE1)),
+        @Parameter(
+                name = "lang",
+                schema =
+                        @Schema(
+                                name = "lang",
+                                type = "string",
+                                defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public ReadableProductList list(
             @RequestParam(value = "lang", required = false) String lang,
             @PathVariable String friendlyUrl,
-            @RequestParam(value = "page", required = false, defaultValue = "0") Integer page, // count
-            @RequestParam(value = "count", required = false, defaultValue = "25") Integer count, // count
-            @Parameter(hidden = true) MerchantStore merchantStore, @Parameter(hidden = true) Language language) {
-
+            @RequestParam(value = "page", required = false, defaultValue = "0")
+                    Integer page, // count
+            @RequestParam(value = "count", required = false, defaultValue = "25")
+                    Integer count, // count
+            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) Language language) {
 
         try {
-            ReadableCategory category = categoryFacade.getCategoryByFriendlyUrl(merchantStore, friendlyUrl, language);
+            ReadableCategory category =
+                    categoryFacade.getCategoryByFriendlyUrl(merchantStore, friendlyUrl, language);
             ProductCriteria criterias = new ProductCriteria();
 
             List<Long> listOfIds = new ArrayList<>();
             listOfIds.add(category.getId());
-
 
             criterias.setCategoryIds(listOfIds);
 
@@ -224,7 +333,6 @@ public class ProductApiV2 {
 
             return productFacadeV2.getProductListsByCriterias(merchantStore, language, criterias);
 
-
         } catch (ResourceNotFoundException rnf) {
             throw rnf;
         } catch (Exception e) {
@@ -232,9 +340,7 @@ public class ProductApiV2 {
             log.error("Error while getting category by friendlyUrl", e);
             throw new ServiceRuntimeException(e);
         }
-
     }
-
 
     /**
      * List products
@@ -247,8 +353,20 @@ public class ProductApiV2 {
     @RequestMapping(value = "/products", method = RequestMethod.GET)
     @ResponseBody
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
+        @Parameter(
+                name = "store",
+                schema =
+                        @Schema(
+                                name = "store",
+                                type = "string",
+                                defaultValue = DEFAULT_ORG1_STORE1)),
+        @Parameter(
+                name = "lang",
+                schema =
+                        @Schema(
+                                name = "lang",
+                                type = "string",
+                                defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public ReadableProductList list(
             @RequestParam(value = "lang", required = false) String lang,
@@ -260,11 +378,12 @@ public class ProductApiV2 {
             // n
             // allowing
             // navigation
-            @RequestParam(value = "count", required = false, defaultValue = "100") Integer count, // count
+            @RequestParam(value = "count", required = false, defaultValue = "100")
+                    Integer count, // count
             // per
             // page
-            @Parameter(hidden = true) MerchantStore merchantStore, @Parameter(hidden = true) Language language) {
-
+            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) Language language) {
 
         if (!StringUtils.isBlank(searchCriterias.getSku())) {
             searchCriterias.setCode(searchCriterias.getSku());
@@ -278,12 +397,12 @@ public class ProductApiV2 {
         searchCriterias.setLanguage(language.getCode());
 
         try {
-            return productFacadeV2.getProductListsByCriterias(merchantStore, language, searchCriterias);
+            return productFacadeV2.getProductListsByCriterias(
+                    merchantStore, language, searchCriterias);
 
         } catch (Exception e) {
             log.error("Error while filtering products product", e);
             throw new ServiceRuntimeException(e);
-
         }
     }
 
@@ -291,22 +410,39 @@ public class ProductApiV2 {
      * updates price quantity
      **/
     @ResponseStatus(HttpStatus.OK)
-    @PatchMapping(value = "/private/product/{sku}", produces = {APPLICATION_JSON_VALUE})
-    @Operation(method = "PATCH", description = "Update product inventory", summary = "Updates product inventory", responses = @ApiResponse(content = @Content(mediaType = "application/json", schema = @Schema())))
+    @PatchMapping(
+            value = "/private/product/{sku}",
+            produces = {APPLICATION_JSON_VALUE})
+    @Operation(
+            method = "PATCH",
+            description = "Update product inventory",
+            summary = "Updates product inventory",
+            responses =
+                    @ApiResponse(
+                            content = @Content(mediaType = "application/json", schema = @Schema())))
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
+        @Parameter(
+                name = "store",
+                schema =
+                        @Schema(
+                                name = "store",
+                                type = "string",
+                                defaultValue = DEFAULT_ORG1_STORE1)),
+        @Parameter(
+                name = "lang",
+                schema =
+                        @Schema(
+                                name = "lang",
+                                type = "string",
+                                defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public void update(
             @PathVariable String sku,
-            @Valid @RequestBody
-            LightPersistableProduct product,
+            @Valid @RequestBody LightPersistableProduct product,
             @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language) {
         productCommonFacade.update(sku, product, merchantStore, language);
-
     }
-
 
     /**
      * API for getting a product using sku in v2
@@ -314,19 +450,39 @@ public class ProductApiV2 {
      * @return ReadableProduct
      */
     @RequestMapping(value = "/product/{sku}", method = RequestMethod.GET)
-    @Operation(method = "GET", description = "Get a product by sku", summary = "For Shop purpose. Specifying ?merchant is required otherwise it falls back to DEFAULT")
-    @ApiResponse(responseCode = "200", description = "Single product found", content = @Content(schema = @Schema(implementation = ReadableProduct.class)))
+    @Operation(
+            method = "GET",
+            description = "Get a product by sku",
+            summary =
+                    "For Shop purpose. Specifying ?merchant is required otherwise it falls back to"
+                            + " DEFAULT")
+    @ApiResponse(
+            responseCode = "200",
+            description = "Single product found",
+            content = @Content(schema = @Schema(implementation = ReadableProduct.class)))
     @ResponseBody
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
+        @Parameter(
+                name = "store",
+                schema =
+                        @Schema(
+                                name = "store",
+                                type = "string",
+                                defaultValue = DEFAULT_ORG1_STORE1)),
+        @Parameter(
+                name = "lang",
+                schema =
+                        @Schema(
+                                name = "lang",
+                                type = "string",
+                                defaultValue = Constants.DEFAULT_LANGUAGE))
     })
-    public ReadableProduct get(@PathVariable final String sku,
-                               @RequestParam(value = "lang", required = false) String lang,
-                               @Parameter(hidden = true) MerchantStore merchantStore,
-                               @Parameter(hidden = true) Language language) {
+    public ReadableProduct get(
+            @PathVariable final String sku,
+            @RequestParam(value = "lang", required = false) String lang,
+            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) Language language) {
         ReadableProduct product = productFacadeV2.getProductByCode(merchantStore, sku, language);
-
 
         return product;
     }

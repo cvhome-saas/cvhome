@@ -11,6 +11,10 @@ import com.asrevo.cvhome.store.core.modules.cms.product.ProductFileManager;
 import com.asrevo.cvhome.store.core.services.catalog.product.ProductService;
 import com.asrevo.cvhome.store.core.services.content.ContentService;
 import com.asrevo.cvhome.store.core.services.merchant.MerchantStoreService;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Set;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -20,14 +24,10 @@ import org.springframework.core.Ordered;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.Set;
-
 @Configuration
 @Slf4j
-public class DefaultStoreAssetsInitializer implements ApplicationListener<ApplicationReadyEvent>, Ordered {
+public class DefaultStoreAssetsInitializer
+        implements ApplicationListener<ApplicationReadyEvent>, Ordered {
     private final CdnStorageProperties storageProperties;
     private final MerchantStoreService merchantStoreService;
     private final ProductService productService;
@@ -35,7 +35,13 @@ public class DefaultStoreAssetsInitializer implements ApplicationListener<Applic
     private final ContentService contentService;
     private final ProductFileManager productFileManager;
 
-    public DefaultStoreAssetsInitializer(CdnStorageProperties storageProperties, MerchantStoreService merchantStoreService, ProductService productService, ResourceLoader resourceLoader, ContentService contentService, ProductFileManager productFileManager) {
+    public DefaultStoreAssetsInitializer(
+            CdnStorageProperties storageProperties,
+            MerchantStoreService merchantStoreService,
+            ProductService productService,
+            ResourceLoader resourceLoader,
+            ContentService contentService,
+            ProductFileManager productFileManager) {
         this.storageProperties = storageProperties;
         this.merchantStoreService = merchantStoreService;
         this.productService = productService;
@@ -51,31 +57,57 @@ public class DefaultStoreAssetsInitializer implements ApplicationListener<Applic
         for (MerchantStore defaultStore : defaultStores) {
             log.info("banner {}", defaultStore.getStoreBanner());
             log.info("logo {}", defaultStore.getStoreLogo());
-            InputContentFile bannerFileInput = getStoreInputFile(defaultStore.getCode(), defaultStore.getStoreBanner(), FileContentType.BANNER);
+            InputContentFile bannerFileInput =
+                    getStoreInputFile(
+                            defaultStore.getCode(),
+                            defaultStore.getStoreBanner(),
+                            FileContentType.BANNER);
             contentService.addBanner(defaultStore.getCode(), bannerFileInput);
-            InputContentFile logoFileInput = getStoreInputFile(defaultStore.getCode(), defaultStore.getStoreLogo(), FileContentType.LOGO);
+            InputContentFile logoFileInput =
+                    getStoreInputFile(
+                            defaultStore.getCode(),
+                            defaultStore.getStoreLogo(),
+                            FileContentType.LOGO);
             contentService.addLogo(defaultStore.getCode(), logoFileInput);
             List<Product> products = productService.listByStore(defaultStore);
             for (Product product : products) {
-                log.info("main image {} , for {} with id {}", product.getProductImage().getProductImage(), product.getId(), product.getProductImage().getId());
+                log.info(
+                        "main image {} , for {} with id {}",
+                        product.getProductImage().getProductImage(),
+                        product.getId(),
+                        product.getProductImage().getId());
 
-                productFileManager.addProductImage(product.getProductImage(), getStoreProductInputImage(defaultStore.getCode(), product.getProductImage()));
+                productFileManager.addProductImage(
+                        product.getProductImage(),
+                        getStoreProductInputImage(
+                                defaultStore.getCode(), product.getProductImage()));
 
                 Set<ProductImage> images = product.getImages();
                 for (ProductImage productImage : images) {
-                    log.info("sub image {} , for {} with id {} ", productImage.getProductImage(), product.getId(), productImage.getId());
-                    productFileManager.addProductImage(productImage, getStoreProductInputImage(defaultStore.getCode(), productImage));
+                    log.info(
+                            "sub image {} , for {} with id {} ",
+                            productImage.getProductImage(),
+                            product.getId(),
+                            productImage.getId());
+                    productFileManager.addProductImage(
+                            productImage,
+                            getStoreProductInputImage(defaultStore.getCode(), productImage));
                 }
             }
 
-            log.info("will init DefaultStoreAssets {} {}", storageProperties.bucket(), storageProperties.provider());
+            log.info(
+                    "will init DefaultStoreAssets {} {}",
+                    storageProperties.bucket(),
+                    storageProperties.provider());
         }
     }
 
     @SneakyThrows
-    private ImageContentFile getStoreInputFile(String storeCode, String name, FileContentType contentType) {
+    private ImageContentFile getStoreInputFile(
+            String storeCode, String name, FileContentType contentType) {
         ImageContentFile file = new ImageContentFile();
-        Resource resource = resourceLoader.getResource("classpath:/assets/" + storeCode + "/" + name);
+        Resource resource =
+                resourceLoader.getResource("classpath:/assets/" + storeCode + "/" + name);
         file.setFile(resource.getInputStream());
         file.setFileName(name);
         file.setMimeType(Files.probeContentType(Paths.get(name)));
@@ -84,10 +116,11 @@ public class DefaultStoreAssetsInitializer implements ApplicationListener<Applic
     }
 
     @SneakyThrows
-    private ImageContentFile getStoreProductInputImage(String storeCode, ProductImage productImage) {
-        return getStoreInputFile(storeCode, productImage.getProductImage(), FileContentType.PRODUCT);
+    private ImageContentFile getStoreProductInputImage(
+            String storeCode, ProductImage productImage) {
+        return getStoreInputFile(
+                storeCode, productImage.getProductImage(), FileContentType.PRODUCT);
     }
-
 
     @Override
     public int getOrder() {

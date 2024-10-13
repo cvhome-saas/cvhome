@@ -13,32 +13,33 @@ import org.springframework.util.Assert;
 
 @Setter
 @Getter
-public class ReadableFinalPricePopulator extends
-        AbstractDataPopulator<FinalPrice, ReadableProductPrice> {
-
+public class ReadableFinalPricePopulator
+        extends AbstractDataPopulator<FinalPrice, ReadableProductPrice> {
 
     private PricingService pricingService;
 
     @Override
-    public ReadableProductPrice populate(FinalPrice source,
-                                         ReadableProductPrice target, MerchantStore store, Language language)
+    public ReadableProductPrice populate(
+            FinalPrice source, ReadableProductPrice target, MerchantStore store, Language language)
             throws ConversionException {
         Assert.notNull(pricingService, "pricingService must be set");
 
         try {
 
-            target.setOriginalPrice(pricingService.getDisplayAmount(source.getOriginalPrice(), store));
+            target.setOriginalPrice(
+                    pricingService.getDisplayAmount(source.getOriginalPrice(), store));
             if (source.isDiscounted()) {
                 target.setDiscounted(true);
-                target.setFinalPrice(pricingService.getDisplayAmount(source.getDiscountedPrice(), store));
+                target.setFinalPrice(
+                        pricingService.getDisplayAmount(source.getDiscountedPrice(), store));
             } else {
-                target.setFinalPrice(pricingService.getDisplayAmount(source.getFinalPrice(), store));
+                target.setFinalPrice(
+                        pricingService.getDisplayAmount(source.getFinalPrice(), store));
             }
 
         } catch (Exception e) {
             throw new ConversionException("Exception while converting to ReadableProductPrice", e);
         }
-
 
         return target;
     }
@@ -48,5 +49,4 @@ public class ReadableFinalPricePopulator extends
         // TODO Auto-generated method stub
         return null;
     }
-
 }

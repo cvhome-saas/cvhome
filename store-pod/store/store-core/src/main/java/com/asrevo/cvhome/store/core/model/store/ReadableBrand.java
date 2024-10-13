@@ -10,5 +10,4 @@ public class ReadableBrand extends MerchantStoreBrand {
 
     private ReadableImage logo;
     private ReadableImage banner;
-
 }

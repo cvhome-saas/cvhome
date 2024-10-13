@@ -1,13 +1,12 @@
 package com.asrevo.cvhome.store.core.entity.catalog.product.price;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Transient entity used to display
@@ -22,12 +21,12 @@ public class FinalPrice implements Serializable {
     /**
      *
      */
-    @Serial
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
+
     List<FinalPrice> additionalPrices;
-    private BigDecimal discountedPrice = null;//final price if a discount is applied
-    private BigDecimal originalPrice = null;//original price
-    private BigDecimal finalPrice = null;//final price discount or not
+    private BigDecimal discountedPrice = null; // final price if a discount is applied
+    private BigDecimal originalPrice = null; // original price
+    private BigDecimal finalPrice = null; // final price discount or not
     private boolean discounted = false;
     private int discountPercent = 0;
     private String stringPrice;
@@ -35,6 +34,4 @@ public class FinalPrice implements Serializable {
     private Date discountEndDate = null;
     private boolean defaultPrice;
     private ProductPrice productPrice;
-
-
 }

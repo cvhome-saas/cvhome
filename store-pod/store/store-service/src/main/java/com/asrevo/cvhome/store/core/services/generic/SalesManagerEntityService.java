@@ -2,16 +2,16 @@ package com.asrevo.cvhome.store.core.services.generic;
 
 import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
-
 import java.io.Serializable;
 import java.util.List;
-
 
 /**
  * <p>Service racine pour la gestion des entités.</p>
  *
  */
-public interface SalesManagerEntityService<K extends Serializable & Comparable<K>, E extends SalesManagerEntity<K, ?>> extends TransactionalAspectAwareService {
+public interface SalesManagerEntityService<
+                K extends Serializable & Comparable<K>, E extends SalesManagerEntity<K, ?>>
+        extends TransactionalAspectAwareService {
 
     /**
      * Crée l'entité dans la base de données. Mis à part dans les tests pour faire des sauvegardes simples, utiliser
@@ -40,14 +40,12 @@ public interface SalesManagerEntityService<K extends Serializable & Comparable<K
      */
     void create(E entity) throws ServiceException;
 
-
     /**
      * Supprime l'entité de la base de données
      *
      * @param entity entité
      */
     void delete(E entity) throws ServiceException;
-
 
     /**
      * Retourne une entité à partir de son id.
@@ -64,7 +62,6 @@ public interface SalesManagerEntityService<K extends Serializable & Comparable<K
      */
     List<E> list();
 
-
     /**
      * Compte le nombre d'entités de ce type présentes dans la base.
      *
@@ -76,6 +73,4 @@ public interface SalesManagerEntityService<K extends Serializable & Comparable<K
      * Flushe la session.
      */
     void flush();
-
-
 }

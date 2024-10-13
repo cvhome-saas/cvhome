@@ -1,6 +1,5 @@
 package com.asrevo.cvhome.store.core.model.order;
 
-
 import com.asrevo.cvhome.store.core.entity.common.Criteria;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,6 +15,4 @@ public class OrderCriteria extends Criteria {
     private String paymentMethod;
     private Long customerId;
     private String email;
-
-
 }

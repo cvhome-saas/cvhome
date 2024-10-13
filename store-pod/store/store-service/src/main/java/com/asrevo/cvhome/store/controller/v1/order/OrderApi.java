@@ -1,5 +1,7 @@
 package com.asrevo.cvhome.store.controller.v1.order;
 
+import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1;
+
 import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
 import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
 import com.asrevo.cvhome.store.core.constants.Constants;
@@ -31,14 +33,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
-import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1;
-
 @RestController
 @RequestMapping("/api/v1")
 @Tag(name = "Order flow resource", description = "Manage orders (create, list, get)")
 @Slf4j
 public class OrderApi {
-
 
     private static final String DEFAULT_ORDER_LIST_COUNT = "25";
     private final OrderFacade orderFacade;
@@ -46,35 +45,53 @@ public class OrderApi {
     private final ShoppingCartService shoppingCartService;
     private final CustomerFacade customerFacade;
 
-    public OrderApi(CustomerService customerService, OrderFacade orderFacade, OrderService orderService, ShoppingCartService shoppingCartService, CustomerFacade customerFacade, CustomerFacade customerFacadev1) {
+    public OrderApi(
+            CustomerService customerService,
+            OrderFacade orderFacade,
+            OrderService orderService,
+            ShoppingCartService shoppingCartService,
+            CustomerFacade customerFacade,
+            CustomerFacade customerFacadev1) {
         this.orderFacade = orderFacade;
         /*	@Autowired
         private com.salesmanager.shop.store.controller.order.facade.v1.OrderFacade orderFacadeV1;*/
         this.shoppingCartService = shoppingCartService;
         this.customerFacade = customerFacade;
-        //v1 version
+        // v1 version
     }
 
     /**
      * Main checkout resource that will complete the order flow
      *
      */
-    @RequestMapping(value = {"/cart/{code}/checkout"}, method = RequestMethod.POST)
+    @RequestMapping(
+            value = {"/cart/{code}/checkout"},
+            method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
+        @Parameter(
+                name = "store",
+                schema =
+                        @Schema(
+                                name = "store",
+                                type = "string",
+                                defaultValue = DEFAULT_ORG1_STORE1)),
+        @Parameter(
+                name = "lang",
+                schema =
+                        @Schema(
+                                name = "lang",
+                                type = "string",
+                                defaultValue = Constants.DEFAULT_LANGUAGE))
     })
-
     public ReadableOrderConfirmation checkout(
-            @PathVariable final String code,//shopping cart
-            @Valid @RequestBody PersistableAnonymousOrder order,//order
+            @PathVariable final String code, // shopping cart
+            @Valid @RequestBody PersistableAnonymousOrder order, // order
             @Parameter(hidden = true) MerchantStore merchantStore,
             @Parameter(hidden = true) Language language) {
 
         Assert.notNull(order.getCustomer(), "Customer must not be null");
-
 
         ShoppingCart cart;
         try {
@@ -84,17 +101,22 @@ public class OrderApi {
                 throw new ResourceNotFoundException("Cart code " + code + " does not exist");
             }
 
-
             Customer customer = new Customer();
-            customer = customerFacade.populateCustomerModel(customer, order.getCustomer(), merchantStore, language);
-
+            customer =
+                    customerFacade.populateCustomerModel(
+                            customer, order.getCustomer(), merchantStore, language);
 
             order.setShoppingCartId(cart.getId());
 
-            Order modelOrder = orderFacade.processOrder(order, customer, merchantStore, language,
-                    LocaleUtils.getLocale(language));
+            Order modelOrder =
+                    orderFacade.processOrder(
+                            order,
+                            customer,
+                            merchantStore,
+                            language,
+                            LocaleUtils.getLocale(language));
             Long orderId = modelOrder.getId();
-            //populate order confirmation
+            // populate order confirmation
             order.setId(orderId);
             // set customer id
             order.getCustomer().setId(modelOrder.getCustomerId());
@@ -104,7 +126,7 @@ public class OrderApi {
         } catch (Exception e) {
 
             String message = e.getMessage();
-            if (StringUtils.isBlank(message)) {//exception type
+            if (StringUtils.isBlank(message)) { // exception type
                 message = "APP-BACKEND";
                 if (e.getCause() instanceof IntegrationException) {
                     message = "Integration problen occured to complete order";
@@ -112,14 +134,19 @@ public class OrderApi {
             }
             throw new ServiceRuntimeException("Error during checkout [" + message + "]", e);
         }
-
     }
 
-    @RequestMapping(value = {"/private/orders"}, method = RequestMethod.GET)
+    @RequestMapping(
+            value = {"/private/orders"},
+            method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public ReadableOrderList list(
-            @RequestParam(value = "count", required = false, defaultValue = DEFAULT_ORDER_LIST_COUNT) Integer count,
+            @RequestParam(
+                            value = "count",
+                            required = false,
+                            defaultValue = DEFAULT_ORDER_LIST_COUNT)
+                    Integer count,
             @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
             @RequestParam(value = "name", required = false) String name,
             @RequestParam(value = "id", required = false) Long id,
@@ -139,32 +166,47 @@ public class OrderApi {
         orderCriteria.setEmail(email);
         orderCriteria.setId(id);
 
-
-//        String user = authorizationUtils.authenticatedUser();
-//        authorizationUtils.authorizeUser(user, Stream.of(Constants.GROUP_SUPERADMIN, Constants.GROUP_ADMIN,
-//                Constants.GROUP_ADMIN_ORDER, Constants.GROUP_ADMIN_RETAIL).collect(Collectors.toList()), merchantStore);
-//
+        //        String user = authorizationUtils.authenticatedUser();
+        //        authorizationUtils.authorizeUser(user, Stream.of(Constants.GROUP_SUPERADMIN,
+        // Constants.GROUP_ADMIN,
+        //                Constants.GROUP_ADMIN_ORDER,
+        // Constants.GROUP_ADMIN_RETAIL).collect(Collectors.toList()), merchantStore);
+        //
 
         return orderFacade.getReadableOrderList(orderCriteria, merchantStore);
-
     }
 
-    @RequestMapping(value = {"/private/orders/{id}"}, method = RequestMethod.GET)
+    @RequestMapping(
+            value = {"/private/orders/{id}"},
+            method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
+        @Parameter(
+                name = "store",
+                schema =
+                        @Schema(
+                                name = "store",
+                                type = "string",
+                                defaultValue = DEFAULT_ORG1_STORE1)),
+        @Parameter(
+                name = "lang",
+                schema =
+                        @Schema(
+                                name = "lang",
+                                type = "string",
+                                defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public ReadableOrder get(
             @PathVariable final Long id,
             @Parameter(hidden = true) MerchantStore merchantStore,
             @Parameter(hidden = true) Language language) {
 
-//        String user = authorizationUtils.authenticatedUser();
-//        authorizationUtils.authorizeUser(user, Stream.of(Constants.GROUP_SUPERADMIN, Constants.GROUP_ADMIN,
-//                Constants.GROUP_ADMIN_ORDER, Constants.GROUP_ADMIN_RETAIL).collect(Collectors.toList()), merchantStore);
-
+        //        String user = authorizationUtils.authenticatedUser();
+        //        authorizationUtils.authorizeUser(user, Stream.of(Constants.GROUP_SUPERADMIN,
+        // Constants.GROUP_ADMIN,
+        //                Constants.GROUP_ADMIN_ORDER,
+        // Constants.GROUP_ADMIN_RETAIL).collect(Collectors.toList()), merchantStore);
 
         return orderFacade.getReadableOrder(id, merchantStore, language);
     }

@@ -7,10 +7,9 @@ import com.asrevo.cvhome.store.core.entity.reference.country.Country;
 import com.asrevo.cvhome.store.core.entity.reference.zone.Zone;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
+import java.io.Serial;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.io.Serial;
 
 @Entity
 @Table(name = "SHIPING_ORIGIN")
@@ -18,24 +17,26 @@ import java.io.Serial;
 @Setter
 public class ShippingOrigin extends SalesManagerEntity<Long, ShippingOrigin> {
 
-
     /**
      *
      */
-    @Serial
-    private static final long serialVersionUID = 1172536723717691214L;
-
+    @Serial private static final long serialVersionUID = 1172536723717691214L;
 
     @Id
     @Column(name = "SHIP_ORIGIN_ID", unique = true, nullable = false)
-    @TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME", valueColumnName = "SEQ_COUNT",
-            pkColumnValue = "SHP_ORIG_SEQ_NEXT_VAL", allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE, initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
+    @TableGenerator(
+            name = "TABLE_GEN",
+            table = "SM_SEQUENCER",
+            pkColumnName = "SEQ_NAME",
+            valueColumnName = "SEQ_COUNT",
+            pkColumnValue = "SHP_ORIG_SEQ_NEXT_VAL",
+            allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
+            initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
     private Long id;
 
     @Column(name = "ACTIVE")
     private boolean active;
-
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MERCHANT_ID", nullable = false)
@@ -44,7 +45,6 @@ public class ShippingOrigin extends SalesManagerEntity<Long, ShippingOrigin> {
     @NotEmpty
     @Column(name = "STREET_ADDRESS", length = 256)
     private String address;
-
 
     @NotEmpty
     @Column(name = "CITY", length = 100)
@@ -64,5 +64,4 @@ public class ShippingOrigin extends SalesManagerEntity<Long, ShippingOrigin> {
     @ManyToOne(fetch = FetchType.EAGER, targetEntity = Zone.class)
     @JoinColumn(name = "ZONE_ID")
     private Zone zone;
-
 }

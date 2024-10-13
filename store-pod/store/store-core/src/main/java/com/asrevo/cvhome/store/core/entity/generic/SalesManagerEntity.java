@@ -1,24 +1,22 @@
 package com.asrevo.cvhome.store.core.entity.generic;
 
-import org.hibernate.Hibernate;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.text.Collator;
 import java.util.Locale;
-
+import org.hibernate.Hibernate;
 
 /**
  * <p>Entité racine pour la persistence des objets via JPA.</p>
  *
  * @param <E> type de l'entité
  */
-public abstract class SalesManagerEntity<K extends Serializable & Comparable<K>, E extends SalesManagerEntity<K, ?>>
+public abstract class SalesManagerEntity<
+                K extends Serializable & Comparable<K>, E extends SalesManagerEntity<K, ?>>
         implements Serializable, Comparable<E> {
 
     public static final Collator DEFAULT_STRING_COLLATOR = Collator.getInstance(Locale.FRENCH);
-    @Serial
-    private static final long serialVersionUID = -3988499137919577054L;
+    @Serial private static final long serialVersionUID = -3988499137919577054L;
 
     static {
         DEFAULT_STRING_COLLATOR.setStrength(Collator.PRIMARY);
@@ -47,7 +45,6 @@ public abstract class SalesManagerEntity<K extends Serializable & Comparable<K>,
         return getId() == null;
     }
 
-
     @SuppressWarnings("unchecked")
     @Override
     public boolean equals(Object object) {
@@ -58,12 +55,15 @@ public abstract class SalesManagerEntity<K extends Serializable & Comparable<K>,
             return true;
         }
 
-        // l'objet peut être proxyfié donc on utilise Hibernate.getClass() pour sortir la vraie classe
+        // l'objet peut être proxyfié donc on utilise Hibernate.getClass() pour sortir la vraie
+        // classe
         if (Hibernate.getClass(object) != Hibernate.getClass(this)) {
             return false;
         }
 
-        SalesManagerEntity<K, E> entity = (SalesManagerEntity<K, E>) object; // NOSONAR : traité au-dessus mais wrapper Hibernate
+        SalesManagerEntity<K, E> entity =
+                (SalesManagerEntity<K, E>)
+                        object; // NOSONAR : traité au-dessus mais wrapper Hibernate
         K id = getId();
 
         if (id == null) {

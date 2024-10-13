@@ -5,25 +5,30 @@ import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
 import com.asrevo.cvhome.store.core.entity.order.Order;
 import com.asrevo.cvhome.store.core.utils.CloneUtils;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.io.Serial;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name = "ORDER_ACCOUNT")
 @Getter
 @Setter
 public class OrderAccount extends SalesManagerEntity<Long, OrderAccount> {
-    @Serial
-    private static final long serialVersionUID = -2429388347536330540L;
+    @Serial private static final long serialVersionUID = -2429388347536330540L;
 
     @Id
     @Column(name = "ORDER_ACCOUNT_ID", unique = true, nullable = false)
-    @TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME", valueColumnName = "SEQ_COUNT", pkColumnValue = "ORDER_ACCOUNT_ID_NEXT_VALUE", allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE, initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
+    @TableGenerator(
+            name = "TABLE_GEN",
+            table = "SM_SEQUENCER",
+            pkColumnName = "SEQ_NAME",
+            valueColumnName = "SEQ_COUNT",
+            pkColumnValue = "ORDER_ACCOUNT_ID_NEXT_VALUE",
+            allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
+            initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
     private Long id;
 
@@ -45,9 +50,7 @@ public class OrderAccount extends SalesManagerEntity<Long, OrderAccount> {
     @OneToMany(mappedBy = "orderAccount", cascade = CascadeType.ALL)
     private Set<OrderAccountProduct> orderAccountProducts = new HashSet<>();
 
-    public OrderAccount() {
-    }
-
+    public OrderAccount() {}
 
     public Date getOrderAccountStartDate() {
         return CloneUtils.clone(orderAccountStartDate);
@@ -64,5 +67,4 @@ public class OrderAccount extends SalesManagerEntity<Long, OrderAccount> {
     public void setOrderAccountEndDate(Date orderAccountEndDate) {
         this.orderAccountEndDate = CloneUtils.clone(orderAccountEndDate);
     }
-
 }

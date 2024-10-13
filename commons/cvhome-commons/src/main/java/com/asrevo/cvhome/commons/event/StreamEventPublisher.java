@@ -1,8 +1,7 @@
 package com.asrevo.cvhome.commons.event;
 
-import org.springframework.cloud.stream.function.StreamBridge;
-
 import java.util.List;
+import org.springframework.cloud.stream.function.StreamBridge;
 
 public class StreamEventPublisher implements EventPublisher {
     private final StreamBridge streamBridge;

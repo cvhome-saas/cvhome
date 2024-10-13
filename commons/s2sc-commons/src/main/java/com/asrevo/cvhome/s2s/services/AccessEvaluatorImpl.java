@@ -9,57 +9,67 @@ public class AccessEvaluatorImpl implements AccessEvaluator {
     private final StoreSecurityService securityRoleCheckService;
 
     @Override
-    public boolean hasAccessOnStoreUsersList(Authentication authentication, ManagerStoreId requestedStoreId) {
+    public boolean hasAccessOnStoreUsersList(
+            Authentication authentication, ManagerStoreId requestedStoreId) {
         return hasReadAccessOnStore(authentication, requestedStoreId);
     }
 
     @Override
-    public boolean hasAccessOnStoreUsersCreate(Authentication authentication, ManagerStoreId requestedStoreId) {
+    public boolean hasAccessOnStoreUsersCreate(
+            Authentication authentication, ManagerStoreId requestedStoreId) {
         return hasMaintainAccessOnUsers(authentication, requestedStoreId);
     }
 
     @Override
-    public boolean hasAccessOnStoreUsersUpdate(Authentication authentication, ManagerStoreId requestedStoreId) {
+    public boolean hasAccessOnStoreUsersUpdate(
+            Authentication authentication, ManagerStoreId requestedStoreId) {
         return hasMaintainAccessOnUsers(authentication, requestedStoreId);
     }
 
     @Override
-    public boolean hasAccessOnStoreUsersDelete(Authentication authentication, ManagerStoreId requestedStoreId) {
+    public boolean hasAccessOnStoreUsersDelete(
+            Authentication authentication, ManagerStoreId requestedStoreId) {
         return hasMaintainAccessOnUsers(authentication, requestedStoreId);
     }
 
     @Override
-    public boolean hasAccessOnStoreUsersEnable(Authentication authentication, ManagerStoreId requestedStoreId) {
-        return hasMaintainAccessOnUsers(authentication, requestedStoreId);
-    }
-
-
-    @Override
-    public boolean hasAccessOnStoreUsersDisable(Authentication authentication, ManagerStoreId requestedStoreId) {
+    public boolean hasAccessOnStoreUsersEnable(
+            Authentication authentication, ManagerStoreId requestedStoreId) {
         return hasMaintainAccessOnUsers(authentication, requestedStoreId);
     }
 
     @Override
-    public boolean hasAccessOnStoreFindOne(Authentication authentication, ManagerStoreId requestedStoreId) {
+    public boolean hasAccessOnStoreUsersDisable(
+            Authentication authentication, ManagerStoreId requestedStoreId) {
+        return hasMaintainAccessOnUsers(authentication, requestedStoreId);
+    }
+
+    @Override
+    public boolean hasAccessOnStoreFindOne(
+            Authentication authentication, ManagerStoreId requestedStoreId) {
         return hasReadAccessOnStore(authentication, requestedStoreId);
     }
 
     @Override
-    public boolean hasAccessOnStoreDomainList(Authentication authentication, ManagerStoreId requestedStoreId) {
+    public boolean hasAccessOnStoreDomainList(
+            Authentication authentication, ManagerStoreId requestedStoreId) {
         return hasReadAccessOnStore(authentication, requestedStoreId);
     }
 
     @Override
-    public boolean hasAccessOnStoreDomainCreate(Authentication authentication, ManagerStoreId requestedStoreId) {
+    public boolean hasAccessOnStoreDomainCreate(
+            Authentication authentication, ManagerStoreId requestedStoreId) {
         return hasMaintainAccessOnStoreDomain(authentication, requestedStoreId);
     }
 
     @Override
-    public boolean hasAccessOnStoreDomainDelete(Authentication authentication, ManagerStoreId requestedStoreId) {
+    public boolean hasAccessOnStoreDomainDelete(
+            Authentication authentication, ManagerStoreId requestedStoreId) {
         return hasMaintainAccessOnStoreDomain(authentication, requestedStoreId);
     }
 
-    private boolean hasReadAccessOnStore(Authentication authentication, ManagerStoreId requestedStoreId) {
+    private boolean hasReadAccessOnStore(
+            Authentication authentication, ManagerStoreId requestedStoreId) {
         if (securityRoleCheckService.isSuperAdmin(authentication, requestedStoreId)) {
             return true;
         } else if (securityRoleCheckService.isOrgAdmin(authentication, requestedStoreId)) {
@@ -75,7 +85,8 @@ public class AccessEvaluatorImpl implements AccessEvaluator {
         }
     }
 
-    private boolean hasMaintainAccessOnUsers(Authentication authentication, ManagerStoreId requestedStoreId) {
+    private boolean hasMaintainAccessOnUsers(
+            Authentication authentication, ManagerStoreId requestedStoreId) {
         if (securityRoleCheckService.isSuperAdmin(authentication, requestedStoreId)) {
             return true;
         } else if (securityRoleCheckService.isOrgAdmin(authentication, requestedStoreId)) {
@@ -87,7 +98,8 @@ public class AccessEvaluatorImpl implements AccessEvaluator {
         }
     }
 
-    private boolean hasMaintainAccessOnStoreDomain(Authentication authentication, ManagerStoreId requestedStoreId) {
+    private boolean hasMaintainAccessOnStoreDomain(
+            Authentication authentication, ManagerStoreId requestedStoreId) {
         if (securityRoleCheckService.isSuperAdmin(authentication, requestedStoreId)) {
             return true;
         } else if (securityRoleCheckService.isOrgAdmin(authentication, requestedStoreId)) {
@@ -98,5 +110,4 @@ public class AccessEvaluatorImpl implements AccessEvaluator {
             return false;
         }
     }
-
 }

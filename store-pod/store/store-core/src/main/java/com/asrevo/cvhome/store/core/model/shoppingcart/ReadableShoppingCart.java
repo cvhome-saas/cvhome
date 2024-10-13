@@ -2,14 +2,12 @@ package com.asrevo.cvhome.store.core.model.shoppingcart;
 
 import com.asrevo.cvhome.store.core.model.catalog.product.attribute.ReadableProductVariant;
 import com.asrevo.cvhome.store.core.model.order.total.ReadableOrderTotal;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.io.Serial;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Compatible with v1 + v2
@@ -23,8 +21,8 @@ public class ReadableShoppingCart extends ShoppingCartEntity {
     /**
      *
      */
-    @Serial
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
+
     List<ReadableShoppingCartItem> products = new ArrayList<>();
     List<ReadableOrderTotal> totals;
     private String code;
@@ -37,6 +35,4 @@ public class ReadableShoppingCart extends ShoppingCartEntity {
     private String promoCode;
     private ReadableProductVariant variant;
     private Long customer;
-
-
 }

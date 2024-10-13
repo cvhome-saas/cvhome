@@ -4,35 +4,38 @@ import com.asrevo.cvhome.store.core.constants.SchemaConstant;
 import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.io.Serial;
 import java.math.BigDecimal;
-
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Order line items related to an order.
  *
  * @author casams1
  */
-
 @Setter
 @Getter
 @Entity
 @Table(name = "ORDER_TOTAL")
 public class OrderTotal extends SalesManagerEntity<Long, OrderTotal> {
-    @Serial
-    private static final long serialVersionUID = -5885315557404081674L;
+    @Serial private static final long serialVersionUID = -5885315557404081674L;
 
     @Id
     @Column(name = "ORDER_ACCOUNT_ID", unique = true, nullable = false)
-    @TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME", valueColumnName = "SEQ_COUNT", pkColumnValue = "ORDER_TOTAL_ID_NEXT_VALUE", allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE, initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
+    @TableGenerator(
+            name = "TABLE_GEN",
+            table = "SM_SEQUENCER",
+            pkColumnName = "SEQ_NAME",
+            valueColumnName = "SEQ_COUNT",
+            pkColumnValue = "ORDER_TOTAL_ID_NEXT_VALUE",
+            allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
+            initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
     private Long id;
 
     @Column(name = "CODE", nullable = false)
-    private String orderTotalCode;//SHIPPING, TAX
+    private String orderTotalCode; // SHIPPING, TAX
 
     @Column(name = "TITLE")
     private String title;
@@ -62,8 +65,5 @@ public class OrderTotal extends SalesManagerEntity<Long, OrderTotal> {
     @JoinColumn(name = "ORDER_ID", nullable = false)
     private Order order;
 
-    public OrderTotal() {
-    }
-
-
+    public OrderTotal() {}
 }

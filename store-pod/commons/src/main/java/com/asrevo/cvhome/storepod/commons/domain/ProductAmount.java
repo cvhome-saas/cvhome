@@ -1,5 +1,3 @@
 package com.asrevo.cvhome.storepod.commons.domain;
 
-public record ProductAmount(Integer amount) {
-
-}
+public record ProductAmount(Integer amount) {}

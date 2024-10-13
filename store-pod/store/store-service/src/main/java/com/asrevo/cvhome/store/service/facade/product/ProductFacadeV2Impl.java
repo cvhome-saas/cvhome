@@ -26,21 +26,18 @@ import com.asrevo.cvhome.store.service.mapper.catalog.product.ReadableProductVar
 import com.asrevo.cvhome.store.service.populator.catalog.ReadableProductPopulator;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
 import com.asrevo.cvhome.store.utils.LocaleUtils;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
-
-
 @Service("productFacadeV2")
-//@Profile({"default", "cloud", "gcp", "aws", "mysql", "local"})
+// @Profile({"default", "cloud", "gcp", "aws", "mysql", "local"})
 public class ProductFacadeV2Impl implements ProductFacade {
-
 
     private final ProductService productService;
 
@@ -58,7 +55,17 @@ public class ProductFacadeV2Impl implements ProductFacade {
 
     private final ImageFilePath imageUtils;
 
-    public ProductFacadeV2Impl(ProductService productService, CategoryService categoryService, ProductRelationshipService productRelationshipService, ReadableProductMapper readableProductMapper, ProductVariantService productVariantService, ReadableProductVariantMapper readableProductVariantMapper, ProductAvailabilityService productAvailabilityService, ProductAttributeService productAttributeService, PricingService pricingService, ImageFilePath imageUtils) {
+    public ProductFacadeV2Impl(
+            ProductService productService,
+            CategoryService categoryService,
+            ProductRelationshipService productRelationshipService,
+            ReadableProductMapper readableProductMapper,
+            ProductVariantService productVariantService,
+            ReadableProductVariantMapper readableProductVariantMapper,
+            ProductAvailabilityService productAvailabilityService,
+            ProductAttributeService productAttributeService,
+            PricingService pricingService,
+            ImageFilePath imageUtils) {
         this.productService = productService;
         this.categoryService = categoryService;
         this.productRelationshipService = productRelationshipService;
@@ -69,16 +76,14 @@ public class ProductFacadeV2Impl implements ProductFacade {
         this.imageUtils = imageUtils;
     }
 
-
     @Override
     public Product getProduct(Long id, MerchantStore store) {
-        //same as v1
+        // same as v1
         return productService.findOne(id, store);
     }
 
     @Override
     public ReadableProduct getProductByCode(MerchantStore store, String sku, Language language) {
-
 
         Product product = null;
         try {
@@ -88,76 +93,83 @@ public class ProductFacadeV2Impl implements ProductFacade {
         }
 
         if (product == null) {
-            throw new ResourceNotFoundException("Product [" + sku + "] not found for merchant [" + store.getCode() + "]");
+            throw new ResourceNotFoundException(
+                    "Product [" + sku + "] not found for merchant [" + store.getCode() + "]");
         }
 
         if (!product.getMerchantStore().getId().equals(store.getId())) {
-            throw new ResourceNotFoundException("Product [" + sku + "] not found for merchant [" + store.getCode() + "]");
+            throw new ResourceNotFoundException(
+                    "Product [" + sku + "] not found for merchant [" + store.getCode() + "]");
         }
-
 
         ReadableProduct readableProduct = readableProductMapper.convert(product, store, language);
 
         return readableProduct;
-
     }
 
-    private ReadableProductVariant productVariant(ProductVariant instance, MerchantStore store, Language language) {
+    private ReadableProductVariant productVariant(
+            ProductVariant instance, MerchantStore store, Language language) {
 
         return readableProductVariantMapper.convert(instance, store, language);
-
     }
 
     @Override
-    public ReadableProduct getProduct(MerchantStore store, String sku, Language language) throws Exception {
+    public ReadableProduct getProduct(MerchantStore store, String sku, Language language)
+            throws Exception {
         return this.getProductByCode(store, sku, language);
     }
 
     @Override
-    public ReadableProduct getProductBySeUrl(MerchantStore store, String friendlyUrl, Language language)
-            throws Exception {
+    public ReadableProduct getProductBySeUrl(
+            MerchantStore store, String friendlyUrl, Language language) throws Exception {
 
-        Product product = productService.getBySeUrl(store, friendlyUrl, LocaleUtils.getLocale(language));
+        Product product =
+                productService.getBySeUrl(store, friendlyUrl, LocaleUtils.getLocale(language));
 
         if (product == null) {
-            throw new ResourceNotFoundException("Product [" + friendlyUrl + "] not found for merchant [" + store.getCode() + "]");
+            throw new ResourceNotFoundException(
+                    "Product ["
+                            + friendlyUrl
+                            + "] not found for merchant ["
+                            + store.getCode()
+                            + "]");
         }
 
         ReadableProduct readableProduct = readableProductMapper.convert(product, store, language);
 
-        //get all instances for this product group by option
-        //limit to 15 searches
-        List<ProductVariant> instances = productVariantService.getByProductId(store, product, language);
+        // get all instances for this product group by option
+        // limit to 15 searches
+        List<ProductVariant> instances =
+                productVariantService.getByProductId(store, product, language);
 
-        //the above get all possible images
-        List<ReadableProductVariant> readableInstances = instances.stream().map(p -> this.productVariant(p, store, language)).collect(Collectors.toList());
+        // the above get all possible images
+        List<ReadableProductVariant> readableInstances =
+                instances.stream()
+                        .map(p -> this.productVariant(p, store, language))
+                        .collect(Collectors.toList());
         readableProduct.setVariants(readableInstances);
 
         return readableProduct;
-
     }
 
     /**
      * Filters on otion, optionValues and other criterias
      */
-
     @Override
-    public ReadableProductList getProductListsByCriterias(MerchantStore store, Language language,
-                                                          ProductCriteria criterias) throws Exception {
+    public ReadableProductList getProductListsByCriterias(
+            MerchantStore store, Language language, ProductCriteria criterias) throws Exception {
         Assert.notNull(criterias, "ProductCriteria must be set for this product");
 
         if (CollectionUtils.isNotEmpty(criterias.getCategoryIds())) {
 
             if (criterias.getCategoryIds().size() == 1) {
 
-                Category category = categoryService
-                        .getById(criterias.getCategoryIds().getFirst());
+                Category category = categoryService.getById(criterias.getCategoryIds().getFirst());
 
                 if (category != null) {
                     String lineage = category.getLineage();
 
-                    List<Category> categories = categoryService
-                            .getListByLineage(store, lineage);
+                    List<Category> categories = categoryService.getListByLineage(store, lineage);
 
                     List<Long> ids = new ArrayList<>();
                     if (categories != null && !categories.isEmpty()) {
@@ -171,16 +183,22 @@ public class ProductFacadeV2Impl implements ProductFacade {
             }
         }
 
-
-        Page<Product> modelProductList = productService.listByStore(store, language, criterias, criterias.getStartPage(), criterias.getMaxCount());
+        Page<Product> modelProductList =
+                productService.listByStore(
+                        store,
+                        language,
+                        criterias,
+                        criterias.getStartPage(),
+                        criterias.getMaxCount());
 
         List<Product> products = modelProductList.getContent();
         ReadableProductList productList = new ReadableProductList();
 
-
-        List<ReadableProduct> readableProducts = products.stream().map(p -> readableProductMapper.convert(p, store, language))
-                .sorted(Comparator.comparing(ReadableProduct::getSortOrder)).collect(Collectors.toList());
-
+        List<ReadableProduct> readableProducts =
+                products.stream()
+                        .map(p -> readableProductMapper.convert(p, store, language))
+                        .sorted(Comparator.comparing(ReadableProduct::getSortOrder))
+                        .collect(Collectors.toList());
 
         productList.setRecordsTotal(modelProductList.getTotalElements());
         productList.setNumber(modelProductList.getNumberOfElements());
@@ -191,27 +209,26 @@ public class ProductFacadeV2Impl implements ProductFacade {
     }
 
     @Override
-    public List<ReadableProduct> relatedItems(MerchantStore store, Product product, Language language)
-            throws Exception {
-        //same as v1
+    public List<ReadableProduct> relatedItems(
+            MerchantStore store, Product product, Language language) throws Exception {
+        // same as v1
         ReadableProductPopulator populator = new ReadableProductPopulator();
         populator.setPricingService(pricingService);
         populator.setImageUtils(imageUtils);
 
-        List<ProductRelationship> relatedItems = productRelationshipService.getByType(store, product,
-                ProductRelationshipType.RELATED_ITEM);
+        List<ProductRelationship> relatedItems =
+                productRelationshipService.getByType(
+                        store, product, ProductRelationshipType.RELATED_ITEM);
         if (relatedItems != null && !relatedItems.isEmpty()) {
             List<ReadableProduct> items = new ArrayList<>();
             for (ProductRelationship relationship : relatedItems) {
                 Product relatedProduct = relationship.getRelatedProduct();
-                ReadableProduct proxyProduct = populator.populate(relatedProduct, new ReadableProduct(), store,
-                        language);
+                ReadableProduct proxyProduct =
+                        populator.populate(relatedProduct, new ReadableProduct(), store, language);
                 items.add(proxyProduct);
             }
             return items;
         }
         return null;
     }
-
-
 }

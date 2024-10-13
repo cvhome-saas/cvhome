@@ -7,5 +7,4 @@ public interface InitializationDatabase {
     boolean isEmpty();
 
     void populate(String name) throws ServiceException;
-
 }

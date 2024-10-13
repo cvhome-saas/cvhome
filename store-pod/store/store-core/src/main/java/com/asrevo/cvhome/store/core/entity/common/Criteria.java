@@ -1,9 +1,8 @@
 package com.asrevo.cvhome.store.core.entity.common;
 
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.List;
 
 @Setter
 @Getter
@@ -26,6 +25,4 @@ public class Criteria {
     private CriteriaOrderBy orderBy = CriteriaOrderBy.DESC;
     private String criteriaOrderByField;
     private String search;
-
-
 }

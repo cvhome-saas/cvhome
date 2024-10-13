@@ -26,8 +26,7 @@ public class LocalReactiveDiscoveryClient implements ReactiveDiscoveryClient {
      * @return available services
      */
     public static Flux<ServiceInstance> getDefaultServiceInstances(
-            LocalDiscoveryProperties properties,
-            String serviceId) {
+            LocalDiscoveryProperties properties, String serviceId) {
 
         return Flux.fromIterable(properties.getServices().get(serviceId))
                 .map(it -> new LocalServiceInstance(serviceId, it));
@@ -51,7 +50,4 @@ public class LocalReactiveDiscoveryClient implements ReactiveDiscoveryClient {
     public Flux<String> getServices() {
         return Flux.fromIterable(properties.getServices().keySet());
     }
-
-
 }
-

@@ -8,24 +8,23 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import org.apache.commons.lang3.StringUtils;
 
-
 public class CustomerRepositoryImpl implements CustomerRepositoryCustom {
 
-
-    @PersistenceContext
-    private EntityManager em;
+    @PersistenceContext private EntityManager em;
 
     @SuppressWarnings("unchecked")
     @Override
     public CustomerList listByStore(MerchantStore store, CustomerCriteria criteria) {
-
 
         CustomerList customerList = new CustomerList();
         StringBuilder countBuilderSelect = new StringBuilder();
         StringBuilder objectBuilderSelect = new StringBuilder();
 
         String baseCountQuery = "select count(c) from Customer as c";
-        String baseQuery = "select c from Customer as c  left join fetch c.delivery.country left join fetch c.delivery.zone left join fetch c.billing.country left join fetch c.billing.zone";
+        String baseQuery =
+                "select c from Customer as c  left join fetch c.delivery.country left join fetch"
+                        + " c.delivery.zone left join fetch c.billing.country left join fetch"
+                        + " c.billing.zone";
         countBuilderSelect.append(baseCountQuery);
         objectBuilderSelect.append(baseQuery);
 
@@ -65,64 +64,86 @@ public class CustomerRepositoryImpl implements CustomerRepositoryCustom {
             objectBuilderWhere.append(countryQuery);
         }
 
-        objectBuilderSelect.append(" left join fetch c.attributes ca left join fetch ca.customerOption cao left join fetch ca.customerOptionValue cav left join fetch cao.descriptions caod left join fetch cav.descriptions  left join fetch c.groups");
+        objectBuilderSelect.append(
+                " left join fetch c.attributes ca left join fetch ca.customerOption cao left join"
+                    + " fetch ca.customerOptionValue cav left join fetch cao.descriptions caod left"
+                    + " join fetch cav.descriptions  left join fetch c.groups");
 
-        //count query
-        Query countQ = em.createQuery(
-                countBuilderSelect + countBuilderWhere.toString());
+        // count query
+        Query countQ = em.createQuery(countBuilderSelect + countBuilderWhere.toString());
 
-        //object query
-        Query objectQ = em.createQuery(
-                objectBuilderSelect + objectBuilderWhere.toString());
+        // object query
+        Query objectQ = em.createQuery(objectBuilderSelect + objectBuilderWhere.toString());
 
         countQ.setParameter("mId", store.getId());
         objectQ.setParameter("mId", store.getId());
 
-
         if (!StringUtils.isBlank(criteria.getName())) {
-            String nameParam = new StringBuilder().append("%").append(criteria.getName()).append("%").toString();
+            String nameParam =
+                    new StringBuilder()
+                            .append("%")
+                            .append(criteria.getName())
+                            .append("%")
+                            .toString();
             countQ.setParameter("nm", nameParam);
             objectQ.setParameter("nm", nameParam);
         }
 
         if (!StringUtils.isBlank(criteria.getFirstName())) {
-            String nameParam = new StringBuilder().append("%").append(criteria.getFirstName()).append("%").toString();
+            String nameParam =
+                    new StringBuilder()
+                            .append("%")
+                            .append(criteria.getFirstName())
+                            .append("%")
+                            .toString();
             countQ.setParameter("fn", nameParam);
             objectQ.setParameter("fn", nameParam);
         }
 
         if (!StringUtils.isBlank(criteria.getLastName())) {
-            String nameParam = new StringBuilder().append("%").append(criteria.getLastName()).append("%").toString();
+            String nameParam =
+                    new StringBuilder()
+                            .append("%")
+                            .append(criteria.getLastName())
+                            .append("%")
+                            .toString();
             countQ.setParameter("ln", nameParam);
             objectQ.setParameter("ln", nameParam);
         }
 
         if (!StringUtils.isBlank(criteria.getEmail())) {
-            String email = new StringBuilder().append("%").append(criteria.getEmail()).append("%").toString();
+            String email =
+                    new StringBuilder()
+                            .append("%")
+                            .append(criteria.getEmail())
+                            .append("%")
+                            .toString();
             countQ.setParameter("email", email);
             objectQ.setParameter("email", email);
         }
 
         if (!StringUtils.isBlank(criteria.getCountry())) {
-            String country = new StringBuilder().append("%").append(criteria.getCountry()).append("%").toString();
+            String country =
+                    new StringBuilder()
+                            .append("%")
+                            .append(criteria.getCountry())
+                            .append("%")
+                            .toString();
             countQ.setParameter("country", country);
             objectQ.setParameter("country", country);
         }
-
 
         Number count = (Number) countQ.getSingleResult();
 
         customerList.setTotalCount(count.intValue());
 
-        if (count.intValue() == 0)
-            return customerList;
+        if (count.intValue() == 0) return customerList;
 
-        //TO BE USED
+        // TO BE USED
         int max = criteria.getMaxCount();
         int first = criteria.getStartIndex();
 
         objectQ.setFirstResult(first);
-
 
         if (max > 0) {
             int maxCount = first + max;
@@ -133,9 +154,5 @@ public class CustomerRepositoryImpl implements CustomerRepositoryCustom {
         customerList.setCustomers(objectQ.getResultList());
 
         return customerList;
-
-
     }
-
-
 }

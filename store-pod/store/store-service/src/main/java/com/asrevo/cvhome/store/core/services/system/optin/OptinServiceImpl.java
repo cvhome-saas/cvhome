@@ -10,8 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class OptinServiceImpl extends SalesManagerEntityServiceImpl<Long, Optin> implements OptinService {
-
+public class OptinServiceImpl extends SalesManagerEntityServiceImpl<Long, Optin>
+        implements OptinService {
 
     private final OptinRepository optinRepository;
 
@@ -21,15 +21,14 @@ public class OptinServiceImpl extends SalesManagerEntityServiceImpl<Long, Optin>
         this.optinRepository = optinRepository;
     }
 
-
     @Override
     public Optin getOptinByCode(MerchantStore store, String code) throws ServiceException {
         return optinRepository.findByMerchantAndCode(store.getId(), code);
     }
 
     @Override
-    public Optin getOptinByMerchantAndType(MerchantStore store, OptinType type) throws ServiceException {
+    public Optin getOptinByMerchantAndType(MerchantStore store, OptinType type)
+            throws ServiceException {
         return optinRepository.findByMerchantAndType(store.getId(), type);
     }
-
 }

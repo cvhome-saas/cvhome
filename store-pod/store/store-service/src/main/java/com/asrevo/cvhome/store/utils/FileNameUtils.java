@@ -21,17 +21,16 @@ public class FileNameUtils {
 
         boolean validName = true;
 
-        //has an extention
+        // has an extention
         if (StringUtils.isEmpty(FilenameUtils.getExtension(fileName))) {
             validName = false;
         }
 
-        //has a filename
+        // has a filename
         if (StringUtils.isEmpty(FilenameUtils.getBaseName(fileName))) {
             validName = false;
         }
 
         return validName;
     }
-
 }

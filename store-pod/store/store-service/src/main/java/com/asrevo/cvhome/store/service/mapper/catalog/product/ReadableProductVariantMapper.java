@@ -1,6 +1,5 @@
 package com.asrevo.cvhome.store.service.mapper.catalog.product;
 
-
 import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
 import com.asrevo.cvhome.store.core.entity.catalog.product.Product;
 import com.asrevo.cvhome.store.core.entity.catalog.product.variant.ProductVariant;
@@ -16,18 +15,17 @@ import com.asrevo.cvhome.store.service.mapper.catalog.ReadableProductVariationMa
 import com.asrevo.cvhome.store.service.mapper.inventory.ReadableInventoryMapper;
 import com.asrevo.cvhome.store.utils.DateUtil;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
-import org.apache.commons.collections.CollectionUtils;
-import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.apache.commons.collections.CollectionUtils;
+import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
 @Component
-public class ReadableProductVariantMapper implements Mapper<ProductVariant, ReadableProductVariant> {
-
+public class ReadableProductVariantMapper
+        implements Mapper<ProductVariant, ReadableProductVariant> {
 
     private final ReadableProductVariationMapper readableProductVariationMapper;
 
@@ -35,21 +33,28 @@ public class ReadableProductVariantMapper implements Mapper<ProductVariant, Read
 
     private final ImageFilePath imagUtils;
 
-    public ReadableProductVariantMapper(ReadableProductVariationMapper readableProductVariationMapper, ReadableInventoryMapper readableInventoryMapper, ImageFilePath imagUtils) {
+    public ReadableProductVariantMapper(
+            ReadableProductVariationMapper readableProductVariationMapper,
+            ReadableInventoryMapper readableInventoryMapper,
+            ImageFilePath imagUtils) {
         this.readableProductVariationMapper = readableProductVariationMapper;
         this.readableInventoryMapper = readableInventoryMapper;
         this.imagUtils = imagUtils;
     }
 
     @Override
-    public ReadableProductVariant convert(ProductVariant source, MerchantStore store, Language language) {
+    public ReadableProductVariant convert(
+            ProductVariant source, MerchantStore store, Language language) {
         ReadableProductVariant readableproductVariant = new ReadableProductVariant();
         return this.merge(source, readableproductVariant, store, language);
     }
 
     @Override
-    public ReadableProductVariant merge(ProductVariant source, ReadableProductVariant destination,
-                                        MerchantStore store, Language language) {
+    public ReadableProductVariant merge(
+            ProductVariant source,
+            ReadableProductVariant destination,
+            MerchantStore store,
+            Language language) {
 
         Assert.notNull(source, "Product instance cannot be null");
         Assert.notNull(source.getProduct(), "Product cannot be null");
@@ -68,45 +73,57 @@ public class ReadableProductVariantMapper implements Mapper<ProductVariant, Read
         destination.setSortOrder(source.getSortOrder());
         destination.setCode(source.getCode());
 
-        //get product
+        // get product
         Product baseProduct = source.getProduct();
         if (baseProduct == null) {
-            throw new ResourceNotFoundException("Product instances do not include the parent product [" + destination.getSku() + "]");
+            throw new ResourceNotFoundException(
+                    "Product instances do not include the parent product ["
+                            + destination.getSku()
+                            + "]");
         }
 
         destination.setProductShipeable(baseProduct.isProductShipeable());
 
-        //destination.setStore(null);
+        // destination.setStore(null);
         destination.setStore(store.getCode());
-        destination.setVariation(readableProductVariationMapper.convert(source.getVariation(), store, language));
+        destination.setVariation(
+                readableProductVariationMapper.convert(source.getVariation(), store, language));
         if (source.getVariationValue() != null) {
-            destination.setVariationValue(readableProductVariationMapper.convert(source.getVariationValue(), store, language));
+            destination.setVariationValue(
+                    readableProductVariationMapper.convert(
+                            source.getVariationValue(), store, language));
         }
 
         if (source.getProductVariantGroup() != null) {
             Set<String> nameSet = new HashSet<>();
-            List<ReadableImage> instanceImages = source.getProductVariantGroup().getImages().stream().map(i -> this.image(i, store, language))
-                    .filter(e -> nameSet.add(e.getImageUrl()))
-                    .collect(Collectors.toList());
+            List<ReadableImage> instanceImages =
+                    source.getProductVariantGroup().getImages().stream()
+                            .map(i -> this.image(i, store, language))
+                            .filter(e -> nameSet.add(e.getImageUrl()))
+                            .collect(Collectors.toList());
             destination.setImages(instanceImages);
         }
 
         if (!CollectionUtils.isEmpty(source.getAvailabilities())) {
-            List<ReadableInventory> inventories = source.getAvailabilities().stream().map(i -> readableInventoryMapper.convert(i, store, language)).collect(Collectors.toList());
+            List<ReadableInventory> inventories =
+                    source.getAvailabilities().stream()
+                            .map(i -> readableInventoryMapper.convert(i, store, language))
+                            .collect(Collectors.toList());
             destination.setInventory(inventories);
         }
 
         return destination;
     }
 
-    private ReadableImage image(ProductVariantImage instanceImage, MerchantStore store, Language language) {
+    private ReadableImage image(
+            ProductVariantImage instanceImage, MerchantStore store, Language language) {
         ReadableImage img = new ReadableImage();
         img.setDefaultImage(instanceImage.isDefaultImage());
         img.setId(instanceImage.getId());
         img.setImageName(instanceImage.getProductImage());
-        img.setImageUrl(imagUtils.buildCustomTypeImageUtils(store, img.getImageName(), FileContentType.VARIANT));
+        img.setImageUrl(
+                imagUtils.buildCustomTypeImageUtils(
+                        store, img.getImageName(), FileContentType.VARIANT));
         return img;
     }
-
-
 }

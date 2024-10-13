@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.store.controller.v1.customer;
 
+import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1;
 
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.entity.customer.CustomerCriteria;
@@ -11,24 +12,19 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Optional;
-
-import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1;
-
 @RestController
 @RequestMapping(value = "/api/v1")
 @Tag(name = "Customer management resource", description = "Manage customers")
 public class CustomerApi {
 
-    @Autowired
-    private CustomerFacade customerFacade;
-
+    @Autowired private CustomerFacade customerFacade;
 
     /**
      * Get all customers
@@ -36,13 +32,26 @@ public class CustomerApi {
      */
     @GetMapping("/private/customers")
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
+        @Parameter(
+                name = "store",
+                schema =
+                        @Schema(
+                                name = "store",
+                                type = "string",
+                                defaultValue = DEFAULT_ORG1_STORE1)),
+        @Parameter(
+                name = "lang",
+                schema =
+                        @Schema(
+                                name = "lang",
+                                type = "string",
+                                defaultValue = Constants.DEFAULT_LANGUAGE))
     })
-    public ReadableCustomerList list(@RequestParam(value = "page", required = false) Integer page,
-                                     @RequestParam(value = "count", required = false) Integer count,
-                                     @Parameter(hidden = true) MerchantStore merchantStore,
-                                     @Parameter(hidden = true) Language language) {
+    public ReadableCustomerList list(
+            @RequestParam(value = "page", required = false) Integer page,
+            @RequestParam(value = "count", required = false) Integer count,
+            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) Language language) {
         CustomerCriteria customerCriteria = createCustomerCriteria(page, count);
         return customerFacade.getListByStore(merchantStore, customerCriteria, language);
     }
@@ -53,6 +62,4 @@ public class CustomerApi {
         Optional.ofNullable(count).ifPresent(customerCriteria::setMaxCount);
         return customerCriteria;
     }
-
-
 }

@@ -11,11 +11,9 @@ import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
+import java.io.Serial;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.io.Serial;
-
 
 /**
  * Product configuration pre 3.0
@@ -28,24 +26,33 @@ import java.io.Serial;
  */
 @Entity
 @EntityListeners(value = AuditListener.class)
-@Table(name = "PRODUCT_VARIATION", uniqueConstraints =
-@UniqueConstraint(columnNames = {"MERCHANT_ID", "PRODUCT_OPTION_ID", "OPTION_VALUE_ID"}))
+@Table(
+        name = "PRODUCT_VARIATION",
+        uniqueConstraints =
+                @UniqueConstraint(
+                        columnNames = {"MERCHANT_ID", "PRODUCT_OPTION_ID", "OPTION_VALUE_ID"}))
 @Getter
 @Setter
-public class ProductVariation extends SalesManagerEntity<Long, ProductVariation> implements Optionable, Auditable {
+public class ProductVariation extends SalesManagerEntity<Long, ProductVariation>
+        implements Optionable, Auditable {
 
     /**
      *
      */
-    @Serial
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
 
-    @Embedded
-    private AuditSection auditSection = new AuditSection();
+    @Embedded private AuditSection auditSection = new AuditSection();
 
     @Id
     @Column(name = "PRODUCT_VARIATION_ID", unique = true, nullable = false)
-    @TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME", valueColumnName = "SEQ_COUNT", pkColumnValue = "PRODUCT_VARIN_SEQ_NEXT_VAL", allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE, initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
+    @TableGenerator(
+            name = "TABLE_GEN",
+            table = "SM_SEQUENCER",
+            pkColumnName = "SEQ_NAME",
+            valueColumnName = "SEQ_COUNT",
+            pkColumnValue = "PRODUCT_VARIN_SEQ_NEXT_VAL",
+            allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
+            initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
     private Long id;
 
@@ -73,5 +80,4 @@ public class ProductVariation extends SalesManagerEntity<Long, ProductVariation>
 
     @Column(name = "VARIANT_DEFAULT")
     private boolean variantDefault = false;
-
 }

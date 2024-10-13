@@ -15,33 +15,45 @@ import com.asrevo.cvhome.store.core.model.order.OrderSummary;
 import com.asrevo.cvhome.store.core.model.order.OrderTotalSummary;
 import com.asrevo.cvhome.store.core.model.payments.Payment;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
-
 import java.util.List;
 
 // @TODO ASHRAF
 
 public interface OrderService extends SalesManagerEntityService<Long, Order> {
-    void addOrderStatusHistory(Order order, OrderStatusHistory history)
+    void addOrderStatusHistory(Order order, OrderStatusHistory history) throws ServiceException;
+
+    OrderTotalSummary caculateOrderTotal(
+            OrderSummary orderSummary, Customer customer, MerchantStore store, Language language)
             throws ServiceException;
 
-    OrderTotalSummary caculateOrderTotal(OrderSummary orderSummary,
-                                         Customer customer, MerchantStore store, Language language)
+    OrderTotalSummary caculateOrderTotal(
+            OrderSummary orderSummary, MerchantStore store, Language language)
             throws ServiceException;
 
-    OrderTotalSummary caculateOrderTotal(OrderSummary orderSummary,
-                                         MerchantStore store, Language language) throws ServiceException;
+    OrderTotalSummary calculateShoppingCartTotal(
+            ShoppingCart cartModel, Customer customer, MerchantStore store, Language language)
+            throws ServiceException;
 
-    OrderTotalSummary calculateShoppingCartTotal(ShoppingCart cartModel, Customer customer, MerchantStore store, Language language) throws ServiceException;
+    OrderTotalSummary calculateShoppingCartTotal(
+            ShoppingCart cartModel, MerchantStore store, Language language) throws ServiceException;
 
-    OrderTotalSummary calculateShoppingCartTotal(ShoppingCart cartModel, MerchantStore store, Language language) throws ServiceException;
+    Order processOrder(
+            Order order,
+            Customer customer,
+            List<ShoppingCartItem> items,
+            OrderTotalSummary summary,
+            Payment payment,
+            MerchantStore store)
+            throws ServiceException;
 
-    Order processOrder(Order order, Customer customer,
-                       List<ShoppingCartItem> items, OrderTotalSummary summary,
-                       Payment payment, MerchantStore store) throws ServiceException;
-
-    Order processOrder(Order order, Customer customer,
-                       List<ShoppingCartItem> items, OrderTotalSummary summary,
-                       Payment payment, Transaction transaction, MerchantStore store)
+    Order processOrder(
+            Order order,
+            Customer customer,
+            List<ShoppingCartItem> items,
+            OrderTotalSummary summary,
+            Payment payment,
+            Transaction transaction,
+            MerchantStore store)
             throws ServiceException;
 
     Order getOrder(final Long orderId, MerchantStore store);

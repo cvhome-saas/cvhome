@@ -10,5 +10,4 @@ public class ProductGroup {
     private String code;
     private boolean active;
     private Long id;
-
 }

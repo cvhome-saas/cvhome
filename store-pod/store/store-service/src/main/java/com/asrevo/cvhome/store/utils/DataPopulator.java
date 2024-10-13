@@ -12,8 +12,9 @@ import com.asrevo.cvhome.store.core.entity.reference.language.Language;
  */
 public interface DataPopulator<Source, Target> {
 
-    Target populate(Source source, Target target, MerchantStore store, Language language) throws ConversionException;
+    Target populate(Source source, Target target, MerchantStore store, Language language)
+            throws ConversionException;
 
-    Target populate(Source source, MerchantStore store, Language language) throws ConversionException;
-
+    Target populate(Source source, MerchantStore store, Language language)
+            throws ConversionException;
 }

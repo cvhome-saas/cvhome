@@ -1,9 +1,7 @@
 package com.asrevo.cvhome.manager.service;
 
-
 import com.asrevo.cvhome.commons.domain.Domain;
 import com.asrevo.cvhome.commons.domain.ManagerStoreId;
-
 import java.util.List;
 
 public interface RouterService {

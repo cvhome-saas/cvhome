@@ -10,10 +10,9 @@ import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.references.ReadableCountry;
 import com.asrevo.cvhome.store.core.services.reference.country.CountryService;
 import com.asrevo.cvhome.store.service.populator.references.ReadableCountryPopulator;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.stereotype.Service;
 
 @Service
 public class CountryFacadeImpl implements CountryFacade {
@@ -25,14 +24,15 @@ public class CountryFacadeImpl implements CountryFacade {
     }
 
     @Override
-    public List<ReadableCountry> getListCountryZones(Language language, MerchantStore merchantStore) {
-        return getListOfCountryZones(language)
-                .stream()
+    public List<ReadableCountry> getListCountryZones(
+            Language language, MerchantStore merchantStore) {
+        return getListOfCountryZones(language).stream()
                 .map(country -> convertToReadableCountry(country, language, merchantStore))
                 .collect(Collectors.toList());
     }
 
-    private ReadableCountry convertToReadableCountry(Country country, Language language, MerchantStore merchantStore) {
+    private ReadableCountry convertToReadableCountry(
+            Country country, Language language, MerchantStore merchantStore) {
         try {
             ReadableCountryPopulator populator = new ReadableCountryPopulator();
             return populator.populate(country, new ReadableCountry(), merchantStore, language);

@@ -1,5 +1,7 @@
 package com.asrevo.cvhome.store.service.facade.product;
 
+import static com.asrevo.cvhome.store.utils.ReadableEntityUtil.createReadableList;
+
 import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
 import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
 import com.asrevo.cvhome.store.core.constants.Constants;
@@ -20,18 +22,14 @@ import com.asrevo.cvhome.store.core.services.catalog.product.variant.ProductVari
 import com.asrevo.cvhome.store.core.services.content.ContentService;
 import com.asrevo.cvhome.store.service.mapper.catalog.product.PersistableProductVariantGroupMapper;
 import com.asrevo.cvhome.store.service.mapper.catalog.product.ReadableProductVariantGroupMapper;
-import org.springframework.data.domain.Page;
-import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
-import org.springframework.web.multipart.MultipartFile;
-
 import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import static com.asrevo.cvhome.store.utils.ReadableEntityUtil.createReadableList;
-
+import org.springframework.data.domain.Page;
+import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
+import org.springframework.web.multipart.MultipartFile;
 
 @Component
 public class ProductVariantGroupFacadeImpl implements ProductVariantGroupFacade {
@@ -46,9 +44,15 @@ public class ProductVariantGroupFacadeImpl implements ProductVariantGroupFacade 
 
     private final ReadableProductVariantGroupMapper readableProductVariantGroupMapper;
 
-    private final ContentService contentService; //file management
+    private final ContentService contentService; // file management
 
-    public ProductVariantGroupFacadeImpl(ProductVariantGroupService productVariantGroupService, ProductVariantService productVariantService, ProductVariantImageService productVariantImageService, PersistableProductVariantGroupMapper persistableProductIntanceGroupMapper, ReadableProductVariantGroupMapper readableProductVariantGroupMapper, ContentService contentService) {
+    public ProductVariantGroupFacadeImpl(
+            ProductVariantGroupService productVariantGroupService,
+            ProductVariantService productVariantService,
+            ProductVariantImageService productVariantImageService,
+            PersistableProductVariantGroupMapper persistableProductIntanceGroupMapper,
+            ReadableProductVariantGroupMapper readableProductVariantGroupMapper,
+            ContentService contentService) {
         this.productVariantGroupService = productVariantGroupService;
         this.productVariantService = productVariantService;
         this.productVariantImageService = productVariantImageService;
@@ -58,28 +62,41 @@ public class ProductVariantGroupFacadeImpl implements ProductVariantGroupFacade 
     }
 
     @Override
-    public ReadableProductVariantGroup get(Long instanceGroupId, MerchantStore store, Language language) {
+    public ReadableProductVariantGroup get(
+            Long instanceGroupId, MerchantStore store, Language language) {
 
         ProductVariantGroup group = this.group(instanceGroupId, store);
         return readableProductVariantGroupMapper.convert(group, store, language);
     }
 
     @Override
-    public Long create(PersistableProductVariantGroup productVariantGroup, MerchantStore store, Language language) {
+    public Long create(
+            PersistableProductVariantGroup productVariantGroup,
+            MerchantStore store,
+            Language language) {
 
-        ProductVariantGroup group = persistableProductIntanceGroupMapper.convert(productVariantGroup, store, language);
+        ProductVariantGroup group =
+                persistableProductIntanceGroupMapper.convert(productVariantGroup, store, language);
         try {
             group = productVariantGroupService.saveOrUpdate(group);
         } catch (ServiceException e) {
-            throw new ServiceRuntimeException("Cannot save product instance group [" + productVariantGroup + "] for store [" + store.getCode() + "]");
+            throw new ServiceRuntimeException(
+                    "Cannot save product instance group ["
+                            + productVariantGroup
+                            + "] for store ["
+                            + store.getCode()
+                            + "]");
         }
 
         return group.getId();
     }
 
     @Override
-    public void update(Long productVariantGroup, PersistableProductVariantGroup instance, MerchantStore store,
-                       Language language) {
+    public void update(
+            Long productVariantGroup,
+            PersistableProductVariantGroup instance,
+            MerchantStore store,
+            Language language) {
         ProductVariantGroup group = this.group(productVariantGroup, store);
         instance.setId(productVariantGroup);
 
@@ -88,9 +105,13 @@ public class ProductVariantGroupFacadeImpl implements ProductVariantGroupFacade 
         try {
             productVariantGroupService.saveOrUpdate(group);
         } catch (ServiceException e) {
-            throw new ServiceRuntimeException("Cannot save product instance group [" + productVariantGroup + "] for store [" + store.getCode() + "]");
+            throw new ServiceRuntimeException(
+                    "Cannot save product instance group ["
+                            + productVariantGroup
+                            + "] for store ["
+                            + store.getCode()
+                            + "]");
         }
-
     }
 
     @Override
@@ -99,62 +120,80 @@ public class ProductVariantGroupFacadeImpl implements ProductVariantGroupFacade 
         ProductVariantGroup group = this.group(productVariantGroup, store);
 
         if (group == null) {
-            throw new ResourceNotFoundException("Product instance group [" + group.getId() + " not found for store [" + store.getCode() + "]");
+            throw new ResourceNotFoundException(
+                    "Product instance group ["
+                            + group.getId()
+                            + " not found for store ["
+                            + store.getCode()
+                            + "]");
         }
 
         try {
 
-            //null all group from instances
+            // null all group from instances
             for (ProductVariant instance : group.getProductVariants()) {
                 Optional<ProductVariant> p = productVariantService.getById(instance.getId(), store);
                 if (p.isEmpty()) {
-                    throw new ResourceNotFoundException("Product instance [" + instance.getId() + " not found for store [" + store.getCode() + "]");
+                    throw new ResourceNotFoundException(
+                            "Product instance ["
+                                    + instance.getId()
+                                    + " not found for store ["
+                                    + store.getCode()
+                                    + "]");
                 }
                 instance.setProductVariantGroup(null);
                 productVariantService.save(instance);
             }
 
-            //now delete
+            // now delete
             productVariantGroupService.delete(group);
         } catch (ServiceException e) {
-            throw new ServiceRuntimeException("Cannot remove product instance group [" + productVariantGroup + "] for store [" + store.getCode() + "]");
+            throw new ServiceRuntimeException(
+                    "Cannot remove product instance group ["
+                            + productVariantGroup
+                            + "] for store ["
+                            + store.getCode()
+                            + "]");
         }
-
     }
 
     @Override
-    public ReadableEntityList<ReadableProductVariantGroup> list(Long productId, MerchantStore store, Language language,
-                                                                int page, int count) {
+    public ReadableEntityList<ReadableProductVariantGroup> list(
+            Long productId, MerchantStore store, Language language, int page, int count) {
 
+        Page<ProductVariantGroup> groups =
+                productVariantGroupService.getByProductId(store, productId, language, page, count);
 
-        Page<ProductVariantGroup> groups = productVariantGroupService.getByProductId(store, productId, language, page, count);
-
-        List<ReadableProductVariantGroup> readableInstances = groups.stream()
-                .map(rp -> this.readableProductVariantGroupMapper.convert(rp, store, language)).collect(Collectors.toList());
+        List<ReadableProductVariantGroup> readableInstances =
+                groups.stream()
+                        .map(
+                                rp ->
+                                        this.readableProductVariantGroupMapper.convert(
+                                                rp, store, language))
+                        .collect(Collectors.toList());
 
         return createReadableList(groups, readableInstances);
-
     }
 
-
     private ProductVariantGroup group(Long productOptionGroupId, MerchantStore store) {
-        Optional<ProductVariantGroup> group = productVariantGroupService.getById(productOptionGroupId, store);
+        Optional<ProductVariantGroup> group =
+                productVariantGroupService.getById(productOptionGroupId, store);
         if (group.isEmpty()) {
-            throw new ResourceNotFoundException("Product instance group [" + productOptionGroupId + "] not found");
+            throw new ResourceNotFoundException(
+                    "Product instance group [" + productOptionGroupId + "] not found");
         }
 
         return group.get();
     }
 
     @Override
-    public void addImage(MultipartFile image, Long instanceGroupId,
-                         MerchantStore store, Language language) {
-
+    public void addImage(
+            MultipartFile image, Long instanceGroupId, MerchantStore store, Language language) {
 
         Assert.notNull(instanceGroupId, "productVariantGroupId must not be null");
         Assert.notNull(image, "Image must not be null");
         Assert.notNull(store, "MerchantStore must not be null");
-        //get option group
+        // get option group
 
         ProductVariantGroup group = this.group(instanceGroupId, store);
         ProductVariantImage instanceImage = new ProductVariantImage();
@@ -162,7 +201,6 @@ public class ProductVariantGroupFacadeImpl implements ProductVariantGroupFacade 
         try {
 
             String path = "group" + Constants.SLASH + instanceGroupId;
-
 
             instanceImage.setProductImage(image.getOriginalFilename());
             instanceImage.setProductVariantGroup(group);
@@ -183,8 +221,6 @@ public class ProductVariantGroupFacadeImpl implements ProductVariantGroupFacade 
         } catch (Exception e) {
             throw new ServiceRuntimeException("Exception while adding instance group image", e);
         }
-
-
     }
 
     @Override
@@ -196,21 +232,23 @@ public class ProductVariantGroupFacadeImpl implements ProductVariantGroupFacade 
         ProductVariantImage image = productVariantImageService.getById(imageId);
 
         if (image == null) {
-            throw new ResourceNotFoundException("productVariantImage [" + imageId + "] was not found");
+            throw new ResourceNotFoundException(
+                    "productVariantImage [" + imageId + "] was not found");
         }
 
         ProductVariantGroup group = this.group(productVariantGroupId, store);
 
-
         try {
-            contentService.removeFile(Constants.SLASH + store.getCode() + Constants.SLASH + productVariantGroupId, FileContentType.VARIANT, image.getProductImage());
+            contentService.removeFile(
+                    Constants.SLASH + store.getCode() + Constants.SLASH + productVariantGroupId,
+                    FileContentType.VARIANT,
+                    image.getProductImage());
             group.getImages().removeIf(i -> (i.getId().equals(image.getId())));
-            //update productVariantroup
+            // update productVariantroup
             productVariantGroupService.update(group);
         } catch (ServiceException e) {
-            throw new ServiceRuntimeException("An exception occured while removing instance image [" + imageId + "]", e);
+            throw new ServiceRuntimeException(
+                    "An exception occured while removing instance image [" + imageId + "]", e);
         }
-
     }
-
 }

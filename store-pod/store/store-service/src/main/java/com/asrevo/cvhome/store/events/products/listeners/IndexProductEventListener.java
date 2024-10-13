@@ -1,35 +1,35 @@
 package com.asrevo.cvhome.store.events.products.listeners;
 
 //	@TODO ASHRAF
-//import java.util.HashSet;
-//import java.util.List;
-//import java.util.Set;
-//import java.util.stream.Collectors;
+// import java.util.HashSet;
+// import java.util.List;
+// import java.util.Set;
+// import java.util.stream.Collectors;
 //
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.beans.factory.annotation.Value;
-//import org.springframework.context.ApplicationListener;
-//import org.springframework.stereotype.Component;
+// import org.springframework.beans.factory.annotation.Autowired;
+// import org.springframework.beans.factory.annotation.Value;
+// import org.springframework.context.ApplicationListener;
+// import org.springframework.stereotype.Component;
 //
-//import com.asrevo.cvhome.store.config.events.products.DeleteProductAttributeEvent;
-//import com.asrevo.cvhome.store.config.events.products.DeleteProductEvent;
-//import com.asrevo.cvhome.store.config.events.products.DeleteProductImageEvent;
-//import com.asrevo.cvhome.store.config.events.products.DeleteProductVariantEvent;
-//import com.asrevo.cvhome.store.config.events.products.ProductEvent;
-//import com.asrevo.cvhome.store.config.events.products.SaveProductAttributeEvent;
-//import com.asrevo.cvhome.store.config.events.products.SaveProductEvent;
-//import com.asrevo.cvhome.store.config.events.products.SaveProductImageEvent;
-//import com.asrevo.cvhome.store.config.events.products.SaveProductVariantEvent;
-//import com.asrevo.cvhome.store.core.exception.ServiceException;
-//import com.asrevo.cvhome.store.core.services.catalog.product.ProductService;
-//import com.asrevo.cvhome.store.core.services.search.SearchService;
-//import com.salesmanager.core.model.catalog.product.Product;
-//import com.salesmanager.core.model.catalog.product.attribute.ProductAttribute;
-//import com.salesmanager.core.model.catalog.product.image.ProductImage;
-//import com.salesmanager.core.model.catalog.product.variant.ProductVariant;
-//import com.salesmanager.core.model.merchant.MerchantStore;
+// import com.asrevo.cvhome.store.config.events.products.DeleteProductAttributeEvent;
+// import com.asrevo.cvhome.store.config.events.products.DeleteProductEvent;
+// import com.asrevo.cvhome.store.config.events.products.DeleteProductImageEvent;
+// import com.asrevo.cvhome.store.config.events.products.DeleteProductVariantEvent;
+// import com.asrevo.cvhome.store.config.events.products.ProductEvent;
+// import com.asrevo.cvhome.store.config.events.products.SaveProductAttributeEvent;
+// import com.asrevo.cvhome.store.config.events.products.SaveProductEvent;
+// import com.asrevo.cvhome.store.config.events.products.SaveProductImageEvent;
+// import com.asrevo.cvhome.store.config.events.products.SaveProductVariantEvent;
+// import com.asrevo.cvhome.store.core.exception.ServiceException;
+// import com.asrevo.cvhome.store.core.services.catalog.product.ProductService;
+// import com.asrevo.cvhome.store.core.services.search.SearchService;
+// import com.salesmanager.core.model.catalog.product.Product;
+// import com.salesmanager.core.model.catalog.product.attribute.ProductAttribute;
+// import com.salesmanager.core.model.catalog.product.image.ProductImage;
+// import com.salesmanager.core.model.catalog.product.variant.ProductVariant;
+// import com.salesmanager.core.model.merchant.MerchantStore;
 //
-///**
+/// **
 // * Index product in search module if it is configured to do so !
 // *
 // * Should receive events that a product was created or updated or deleted
@@ -37,8 +37,8 @@ package com.asrevo.cvhome.store.events.products.listeners;
 // * @author carlsamson
 // *
 // */
-//@Component
-//public class IndexProductEventListener implements ApplicationListener<ProductEvent> {
+// @Component
+// public class IndexProductEventListener implements ApplicationListener<ProductEvent> {
 //
 //	@Autowired
 //	private SearchService searchService;
@@ -159,7 +159,8 @@ package com.asrevo.cvhome.store.events.products.listeners;
 //		 **/
 //
 //		List<ProductVariant> filteredVariants = product.getVariants().stream()
-//				.filter(i -> variant.getId().longValue() != i.getId().longValue()).collect(Collectors.toList());
+//				.filter(i -> variant.getId().longValue() !=
+// i.getId().longValue()).collect(Collectors.toList());
 //
 //		filteredVariants.add(variant);
 //
@@ -187,7 +188,8 @@ package com.asrevo.cvhome.store.events.products.listeners;
 //		 **/
 //
 //		List<ProductVariant> filteredVariants = product.getVariants().stream()
-//				.filter(i -> variant.getId().longValue() != i.getId().longValue()).collect(Collectors.toList());
+//				.filter(i -> variant.getId().longValue() !=
+// i.getId().longValue()).collect(Collectors.toList());
 //
 //		Set<ProductVariant> allVariants = new HashSet<ProductVariant>(filteredVariants);
 //		product.setVariants(allVariants);
@@ -317,4 +319,4 @@ package com.asrevo.cvhome.store.events.products.listeners;
 //	 * replace variant
 //	 */
 //
-//}
+// }

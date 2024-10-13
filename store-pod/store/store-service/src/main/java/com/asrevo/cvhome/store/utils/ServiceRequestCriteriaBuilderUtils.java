@@ -5,65 +5,72 @@ import com.asrevo.cvhome.store.core.entity.common.Criteria;
 import com.asrevo.cvhome.store.core.entity.common.CriteriaOrderBy;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStoreCriteria;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.PropertyAccessor;
 import org.springframework.beans.PropertyAccessorFactory;
 
-import java.util.Map;
-
 @Slf4j
 public class ServiceRequestCriteriaBuilderUtils {
-
 
     /**
      * Binds request parameter values to specific request criterias
      *
      */
-    public static Criteria buildRequestCriterias(Criteria criteria, Map<String, String> mappingFields, HttpServletRequest request) throws RestApiException {
+    public static Criteria buildRequestCriterias(
+            Criteria criteria, Map<String, String> mappingFields, HttpServletRequest request)
+            throws RestApiException {
 
         if (criteria == null)
             throw new RestApiException("A criteria class type must be instantiated");
 
-        mappingFields.keySet().forEach(p -> {
-            try {
-                setValue(criteria, request, p, mappingFields.get(p));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
+        mappingFields
+                .keySet()
+                .forEach(
+                        p -> {
+                            try {
+                                setValue(criteria, request, p, mappingFields.get(p));
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        });
         return criteria;
-
-
     }
 
-    private static void setValue(Criteria criteria, HttpServletRequest request, String parameterName, String setterValue) throws Exception {
-
+    private static void setValue(
+            Criteria criteria, HttpServletRequest request, String parameterName, String setterValue)
+            throws Exception {
 
         try {
 
-            PropertyAccessor criteriaAccessor = PropertyAccessorFactory.forDirectFieldAccess(criteria);
-
+            PropertyAccessor criteriaAccessor =
+                    PropertyAccessorFactory.forDirectFieldAccess(criteria);
 
             String parameterValue = request.getParameter(parameterName);
             if (parameterValue == null) return;
             // set the property directly, bypassing the mutator (if any)
-            //String setterName = "set" + WordUtils.capitalize(setterValue);
+            // String setterName = "set" + WordUtils.capitalize(setterValue);
             String setterName = setterValue;
-            System.out.println("Trying to do this binding " + setterName + "('" + parameterValue + "') on " + criteria.getClass());
+            System.out.println(
+                    "Trying to do this binding "
+                            + setterName
+                            + "('"
+                            + parameterValue
+                            + "') on "
+                            + criteria.getClass());
             criteriaAccessor.setPropertyValue(setterName, parameterValue);
 
         } catch (Exception e) {
             throw new Exception("An error occured while parameter bindding", e);
         }
-
-
     }
 
     /**
      * deprecated
      **/
-    public static Criteria buildRequest(Map<String, String> mappingFields, HttpServletRequest request) {
+    public static Criteria buildRequest(
+            Map<String, String> mappingFields, HttpServletRequest request) {
 
         MerchantStoreCriteria criteria = new MerchantStoreCriteria();
 
@@ -100,7 +107,5 @@ public class ServiceRequestCriteriaBuilderUtils {
         criteria.setSearch(searchParam);
 
         return criteria;
-
     }
-
 }

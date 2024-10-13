@@ -1,6 +1,5 @@
 package com.asrevo.cvhome.store.service.populator.store;
 
-
 import com.asrevo.cvhome.store.controller.exception.ConversionException;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.country.Country;
@@ -20,6 +19,8 @@ import com.asrevo.cvhome.store.core.services.reference.zone.ZoneService;
 import com.asrevo.cvhome.store.utils.AbstractDataPopulator;
 import com.asrevo.cvhome.store.utils.DateUtil;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
@@ -27,17 +28,14 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Populates MerchantStore core entity model object
  *
  * @author carlsamson
  */
 @Component
-public class ReadableMerchantStorePopulator extends
-        AbstractDataPopulator<MerchantStore, ReadableMerchantStore> {
+public class ReadableMerchantStorePopulator
+        extends AbstractDataPopulator<MerchantStore, ReadableMerchantStore> {
 
     protected final Log logger = LogFactory.getLog(getClass());
 
@@ -46,17 +44,23 @@ public class ReadableMerchantStorePopulator extends
     private final ImageFilePath filePath;
     private final LanguageService languageService;
 
-    public ReadableMerchantStorePopulator(CountryService countryService, ZoneService zoneService, ImageFilePath filePath, LanguageService languageService) {
+    public ReadableMerchantStorePopulator(
+            CountryService countryService,
+            ZoneService zoneService,
+            ImageFilePath filePath,
+            LanguageService languageService) {
         this.countryService = countryService;
         this.zoneService = zoneService;
         this.filePath = filePath;
         this.languageService = languageService;
     }
 
-
     @Override
-    public ReadableMerchantStore populate(MerchantStore source,
-                                          ReadableMerchantStore target, MerchantStore store, Language language)
+    public ReadableMerchantStore populate(
+            MerchantStore source,
+            ReadableMerchantStore target,
+            MerchantStore store,
+            Language language)
             throws ConversionException {
         Assert.notNull(countryService, "Must use setter for countryService");
         Assert.notNull(zoneService, "Must use setter for zoneService");
@@ -80,7 +84,10 @@ public class ReadableMerchantStorePopulator extends
         if (source.getCountry() != null) {
             try {
                 address.setCountry(source.getCountry().getIsoCode());
-                Country c = countryService.getCountriesMap(language).get(source.getCountry().getIsoCode());
+                Country c =
+                        countryService
+                                .getCountriesMap(language)
+                                .get(source.getCountry().getIsoCode());
                 if (c != null) {
                     address.setCountry(c.getIsoCode());
                 }
@@ -90,8 +97,8 @@ public class ReadableMerchantStorePopulator extends
         }
 
         if (source.getParent() != null) {
-            ReadableMerchantStore parent = populate(source.getParent(),
-                    new ReadableMerchantStore(), source, language);
+            ReadableMerchantStore parent =
+                    populate(source.getParent(), new ReadableMerchantStore(), source, language);
             target.setParent(parent);
         }
 
@@ -100,7 +107,6 @@ public class ReadableMerchantStorePopulator extends
         } else {
             target.setRetailer(source.isRetailer());
         }
-
 
         target.setDimension(MeasureUnit.valueOf(source.getSeizeunitcode()));
         target.setWeight(WeightUnit.valueOf(source.getWeightunitcode()));
@@ -114,7 +120,6 @@ public class ReadableMerchantStorePopulator extends
                 logger.error("Cannot get Zone", e);
             }
         }
-
 
         if (!StringUtils.isBlank(source.getStorestateprovince())) {
             address.setStateProvince(source.getStorestateprovince());
@@ -165,7 +170,6 @@ public class ReadableMerchantStorePopulator extends
                 } catch (ServiceException e) {
                     logger.error("Cannot get Language [" + lang.getId() + "]");
                 }
-
             }
             target.setSupportedLanguages(supported);
         }
@@ -190,6 +194,4 @@ public class ReadableMerchantStorePopulator extends
         // TODO Auto-generated method stub
         return null;
     }
-
-
 }

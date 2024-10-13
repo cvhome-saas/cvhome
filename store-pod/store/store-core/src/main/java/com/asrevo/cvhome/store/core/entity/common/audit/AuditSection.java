@@ -5,20 +5,16 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
-import lombok.Getter;
-import org.apache.commons.lang3.StringUtils;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
-
+import lombok.Getter;
+import org.apache.commons.lang3.StringUtils;
 
 @Embeddable
 public class AuditSection implements Serializable {
 
-
-    @Serial
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "DATE_CREATED")
@@ -32,8 +28,7 @@ public class AuditSection implements Serializable {
     @Column(name = "UPDT_ID", length = 60)
     private String modifiedBy;
 
-    public AuditSection() {
-    }
+    public AuditSection() {}
 
     public Date getDateCreated() {
         return CloneUtils.clone(dateCreated);
@@ -52,7 +47,7 @@ public class AuditSection implements Serializable {
     }
 
     public void setModifiedBy(String modifiedBy) {
-        if (!StringUtils.isBlank(modifiedBy)) {//TODO
+        if (!StringUtils.isBlank(modifiedBy)) { // TODO
             if (modifiedBy.length() > 20) {
                 modifiedBy = modifiedBy.substring(0, 20);
             }

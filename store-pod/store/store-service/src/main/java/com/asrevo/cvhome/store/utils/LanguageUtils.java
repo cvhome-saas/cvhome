@@ -1,5 +1,7 @@
 package com.asrevo.cvhome.store.utils;
 
+import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1;
+
 import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
@@ -9,6 +11,8 @@ import com.asrevo.cvhome.store.core.services.reference.language.LanguageService;
 import com.asrevo.cvhome.store.service.facade.store.StoreFacade;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.Locale;
+import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -21,24 +25,15 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.support.RequestContextUtils;
 
-import java.util.Locale;
-import java.util.Optional;
-
-import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1;
-
-
 @Component
 public class LanguageUtils {
 
     public static final String REQUEST_PARAMATER_STORE = "store";
     private static final String ALL_LANGUALES = "_all";
     protected final Log logger = LogFactory.getLog(getClass());
-    @Autowired
-    LanguageService languageService;
+    @Autowired LanguageService languageService;
 
-    @Autowired
-    @Lazy
-    private StoreFacade storeFacade;
+    @Autowired @Lazy private StoreFacade storeFacade;
 
     public Language getServiceLanguage(String lang) {
         Language l = null;
@@ -69,12 +64,10 @@ public class LanguageUtils {
         MerchantStore store =
                 (MerchantStore) request.getSession().getAttribute(Constants.MERCHANT_STORE);
 
-
         if (language == null) {
             try {
 
-                locale = LocaleContextHolder.getLocale();// should be browser locale
-
+                locale = LocaleContextHolder.getLocale(); // should be browser locale
 
                 if (store != null) {
                     language = store.getDefaultLanguage();
@@ -90,7 +83,6 @@ public class LanguageUtils {
                         language = languageService.toLanguage(locale);
                         request.getSession().setAttribute(Constants.LANGUAGE, language);
                     }
-
                 }
 
             } catch (Exception e) {
@@ -103,13 +95,11 @@ public class LanguageUtils {
             }
         } else {
 
-
-            Locale localeFromContext = LocaleContextHolder.getLocale();// should be browser locale
+            Locale localeFromContext = LocaleContextHolder.getLocale(); // should be browser locale
             if (!language.getCode().equals(localeFromContext.getLanguage())) {
                 // get locale context
                 language = languageService.toLanguage(localeFromContext);
             }
-
         }
 
         if (language != null) {
@@ -143,8 +133,10 @@ public class LanguageUtils {
 
             if (StringUtils.isBlank(lang)) {
                 if (language == null) {
-                    String storeValue = Optional.ofNullable(webRequest.getParameter(REQUEST_PARAMATER_STORE))
-                            .filter(StringUtils::isNotBlank).orElse(DEFAULT_ORG1_STORE1);
+                    String storeValue =
+                            Optional.ofNullable(webRequest.getParameter(REQUEST_PARAMATER_STORE))
+                                    .filter(StringUtils::isNotBlank)
+                                    .orElse(DEFAULT_ORG1_STORE1);
                     if (!StringUtils.isBlank(storeValue)) {
                         try {
                             MerchantStore storeModel = storeFacade.get(storeValue);
@@ -156,7 +148,6 @@ public class LanguageUtils {
                     } else {
                         language = languageService.defaultLanguage();
                     }
-
                 }
             } else {
                 if (!ALL_LANGUALES.equals(lang)) {
@@ -167,12 +158,11 @@ public class LanguageUtils {
                 }
             }
 
-            //if language is null then underlying facade must load all languages
+            // if language is null then underlying facade must load all languages
             return language;
 
         } catch (ServiceException e) {
             throw new ServiceRuntimeException(e);
         }
     }
-
 }

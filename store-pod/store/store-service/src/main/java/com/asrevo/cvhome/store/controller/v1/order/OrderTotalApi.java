@@ -1,5 +1,7 @@
 package com.asrevo.cvhome.store.controller.v1.order;
 
+import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1;
+
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
@@ -20,18 +22,17 @@ import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1;
-
 @Controller
 @RequestMapping("/api/v1")
-@Tag(name = "Order Total resource", description = "Calculates order total for a giben shopping cart")
+@Tag(
+        name = "Order Total resource",
+        description = "Calculates order total for a giben shopping cart")
 @Slf4j
 public class OrderTotalApi {
 
@@ -41,19 +42,22 @@ public class OrderTotalApi {
 
     private final PricingService pricingService;
 
-
     private final ShippingQuoteService shippingQuoteService;
 
     private final OrderService orderService;
 
-    public OrderTotalApi(ShoppingCartFacade shoppingCartFacade, LabelUtils messages, PricingService pricingService, ShippingQuoteService shippingQuoteService, OrderService orderService) {
+    public OrderTotalApi(
+            ShoppingCartFacade shoppingCartFacade,
+            LabelUtils messages,
+            PricingService pricingService,
+            ShippingQuoteService shippingQuoteService,
+            OrderService orderService) {
         this.shoppingCartFacade = shoppingCartFacade;
         this.messages = messages;
         this.pricingService = pricingService;
         this.shippingQuoteService = shippingQuoteService;
         this.orderService = orderService;
     }
-
 
     /**
      * Public api
@@ -64,18 +68,32 @@ public class OrderTotalApi {
             method = RequestMethod.GET)
     @ResponseBody
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
+        @Parameter(
+                name = "store",
+                schema =
+                        @Schema(
+                                name = "store",
+                                type = "string",
+                                defaultValue = DEFAULT_ORG1_STORE1)),
+        @Parameter(
+                name = "lang",
+                schema =
+                        @Schema(
+                                name = "lang",
+                                type = "string",
+                                defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public ReadableOrderTotalSummary calculateTotal(
             @PathVariable final String code,
             @RequestParam(value = "quote", required = false) Long quote,
             @Parameter(hidden = true) MerchantStore merchantStore,
-            @Parameter(hidden = true) Language language,//possible postal code, province and country
+            @Parameter(hidden = true)
+                    Language language, // possible postal code, province and country
             HttpServletResponse response) {
 
         try {
-            ShoppingCart shoppingCart = shoppingCartFacade.getShoppingCartModel(code, merchantStore);
+            ShoppingCart shoppingCart =
+                    shoppingCartFacade.getShoppingCartModel(code, merchantStore);
 
             if (shoppingCart == null) {
 
@@ -95,11 +113,11 @@ public class OrderTotalApi {
 
             OrderSummary orderSummary = new OrderSummary();
             orderSummary.setShippingSummary(shippingSummary);
-            List<ShoppingCartItem> itemsSet =
-                    new ArrayList<>(shoppingCart.getLineItems());
+            List<ShoppingCartItem> itemsSet = new ArrayList<>(shoppingCart.getLineItems());
             orderSummary.setProducts(itemsSet);
 
-            orderTotalSummary = orderService.caculateOrderTotal(orderSummary, merchantStore, language);
+            orderTotalSummary =
+                    orderService.caculateOrderTotal(orderSummary, merchantStore, language);
 
             ReadableOrderTotalSummary returnSummary = new ReadableOrderTotalSummary();
             ReadableOrderSummaryPopulator populator = new ReadableOrderSummaryPopulator();

@@ -1,12 +1,11 @@
 package com.asrevo.cvhome.keycloak.domain.user;
 
+import java.io.Serial;
+import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.io.Serial;
-import java.io.Serializable;
 
 /**
  * Object containing password information
@@ -23,8 +22,8 @@ public class UserPassword implements Serializable {
     /**
      *
      */
-    @Serial
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
+
     private String password = null;
     private String changePassword = null;
 }

@@ -18,20 +18,18 @@ import com.asrevo.cvhome.store.core.services.reference.language.LanguageService;
 import com.asrevo.cvhome.store.service.mapper.Mapper;
 import com.asrevo.cvhome.store.service.populator.manufacturer.PersistableManufacturerPopulator;
 import com.asrevo.cvhome.store.service.populator.manufacturer.ReadableManufacturerPopulator;
-import org.springframework.data.domain.Page;
-import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
-
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.data.domain.Page;
+import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 @Service("manufacturerFacade")
 public class ManufacturerFacadeImpl implements ManufacturerFacade {
 
     private final Mapper<Manufacturer, ReadableManufacturer> readableManufacturerConverter;
-
 
     private final ManufacturerService manufacturerService;
 
@@ -39,7 +37,11 @@ public class ManufacturerFacadeImpl implements ManufacturerFacade {
 
     private final LanguageService languageService;
 
-    public ManufacturerFacadeImpl(Mapper<Manufacturer, ReadableManufacturer> readableManufacturerConverter, ManufacturerService manufacturerService, CategoryService categoryService, LanguageService languageService) {
+    public ManufacturerFacadeImpl(
+            Mapper<Manufacturer, ReadableManufacturer> readableManufacturerConverter,
+            ManufacturerService manufacturerService,
+            CategoryService categoryService,
+            LanguageService languageService) {
         this.readableManufacturerConverter = readableManufacturerConverter;
         this.manufacturerService = manufacturerService;
         this.categoryService = categoryService;
@@ -47,8 +49,8 @@ public class ManufacturerFacadeImpl implements ManufacturerFacade {
     }
 
     @Override
-    public List<ReadableManufacturer> getByProductInCategory(MerchantStore store, Language language,
-                                                             Long categoryId) {
+    public List<ReadableManufacturer> getByProductInCategory(
+            MerchantStore store, Language language, Long categoryId) {
         Assert.notNull(store, "MerchantStore cannot be null");
         Assert.notNull(language, "Language cannot be null");
         Assert.notNull(categoryId, "Category id cannot be null");
@@ -64,7 +66,8 @@ public class ManufacturerFacadeImpl implements ManufacturerFacade {
         }
 
         try {
-            List<Manufacturer> manufacturers = manufacturerService.listByProductsInCategory(store, category, language);
+            List<Manufacturer> manufacturers =
+                    manufacturerService.listByProductsInCategory(store, category, language);
 
             return manufacturers.stream()
                     .sorted(Comparator.comparing(Manufacturer::getCode))
@@ -73,27 +76,32 @@ public class ManufacturerFacadeImpl implements ManufacturerFacade {
         } catch (ServiceException e) {
             throw new ServiceRuntimeException(e);
         }
-
     }
 
     @Override
-    public void saveOrUpdateManufacturer(PersistableManufacturer manufacturer, MerchantStore store,
-                                         Language language) throws Exception {
+    public void saveOrUpdateManufacturer(
+            PersistableManufacturer manufacturer, MerchantStore store, Language language)
+            throws Exception {
 
         PersistableManufacturerPopulator populator = new PersistableManufacturerPopulator();
         populator.setLanguageService(languageService);
-
 
         Manufacturer manuf = new Manufacturer();
 
         if (manufacturer.getId() != null && manufacturer.getId() > 0) {
             manuf = manufacturerService.getById(manufacturer.getId());
             if (manuf == null) {
-                throw new ResourceNotFoundException("Manufacturer with id [" + manufacturer.getId() + "] not found");
+                throw new ResourceNotFoundException(
+                        "Manufacturer with id [" + manufacturer.getId() + "] not found");
             }
 
             if (manuf.getMerchantStore().getId().intValue() != store.getId().intValue()) {
-                throw new ResourceNotFoundException("Manufacturer with id [" + manufacturer.getId() + "] not found for store [" + store.getId() + "]");
+                throw new ResourceNotFoundException(
+                        "Manufacturer with id ["
+                                + manufacturer.getId()
+                                + "] not found for store ["
+                                + store.getId()
+                                + "]");
             }
         }
 
@@ -102,14 +110,12 @@ public class ManufacturerFacadeImpl implements ManufacturerFacade {
         manufacturerService.saveOrUpdate(manuf);
 
         manufacturer.setId(manuf.getId());
-
     }
 
     @Override
-    public void deleteManufacturer(Manufacturer manufacturer, MerchantStore store, Language language)
-            throws Exception {
+    public void deleteManufacturer(
+            Manufacturer manufacturer, MerchantStore store, Language language) throws Exception {
         manufacturerService.delete(manufacturer);
-
     }
 
     @Override
@@ -117,33 +123,34 @@ public class ManufacturerFacadeImpl implements ManufacturerFacade {
             throws Exception {
         Manufacturer manufacturer = manufacturerService.getById(id);
 
-
         if (manufacturer == null) {
             throw new ResourceNotFoundException("Manufacturer [" + id + "] not found");
         }
 
         if (!manufacturer.getMerchantStore().getId().equals(store.getId())) {
-            throw new ResourceNotFoundException("Manufacturer [" + id + "] not found for store [" + store.getId() + "]");
+            throw new ResourceNotFoundException(
+                    "Manufacturer [" + id + "] not found for store [" + store.getId() + "]");
         }
 
         ReadableManufacturer readableManufacturer = new ReadableManufacturer();
 
         ReadableManufacturerPopulator populator = new ReadableManufacturerPopulator();
-        readableManufacturer = populator.populate(manufacturer, readableManufacturer, store, language);
-
+        readableManufacturer =
+                populator.populate(manufacturer, readableManufacturer, store, language);
 
         return readableManufacturer;
     }
 
     @Override
-    public ReadableManufacturerList getAllManufacturers(MerchantStore store, Language language, ListCriteria criteria, int page, int count) {
+    public ReadableManufacturerList getAllManufacturers(
+            MerchantStore store, Language language, ListCriteria criteria, int page, int count) {
 
         ReadableManufacturerList readableList = new ReadableManufacturerList();
         try {
 
             List<Manufacturer> manufacturers = null;
             if (page == 0 && count == 0) {
-                //need total count
+                // need total count
                 int total = manufacturerService.count(store);
 
                 if (language != null) {
@@ -157,7 +164,9 @@ public class ManufacturerFacadeImpl implements ManufacturerFacade {
 
                 Page<Manufacturer> m = null;
                 if (language != null) {
-                    m = manufacturerService.listByStore(store, language, criteria.getName(), page, count);
+                    m =
+                            manufacturerService.listByStore(
+                                    store, language, criteria.getName(), page, count);
                 } else {
                     m = manufacturerService.listByStore(store, criteria.getName(), page, count);
                 }
@@ -166,7 +175,6 @@ public class ManufacturerFacadeImpl implements ManufacturerFacade {
                 readableList.setRecordsTotal(m.getTotalElements());
                 readableList.setNumber(m.getNumber());
             }
-
 
             ReadableManufacturerPopulator populator = new ReadableManufacturerPopulator();
             List<ReadableManufacturer> returnList = new ArrayList<>();
@@ -185,7 +193,6 @@ public class ManufacturerFacadeImpl implements ManufacturerFacade {
         }
     }
 
-
     @Override
     public boolean manufacturerExist(MerchantStore store, String manufacturerCode) {
         Assert.notNull(store, "Store must not be null");
@@ -199,8 +206,8 @@ public class ManufacturerFacadeImpl implements ManufacturerFacade {
     }
 
     @Override
-    public ReadableManufacturerList listByStore(MerchantStore store, Language language, ListCriteria criteria, int page,
-                                                int count) {
+    public ReadableManufacturerList listByStore(
+            MerchantStore store, Language language, ListCriteria criteria, int page, int count) {
 
         ReadableManufacturerList readableList = new ReadableManufacturerList();
 
@@ -210,7 +217,9 @@ public class ManufacturerFacadeImpl implements ManufacturerFacade {
 
             Page<Manufacturer> m = null;
             if (language != null) {
-                m = manufacturerService.listByStore(store, language, criteria.getName(), page, count);
+                m =
+                        manufacturerService.listByStore(
+                                store, language, criteria.getName(), page, count);
             } else {
                 m = manufacturerService.listByStore(store, criteria.getName(), page, count);
             }
@@ -219,7 +228,6 @@ public class ManufacturerFacadeImpl implements ManufacturerFacade {
             readableList.setTotalPages(m.getTotalPages());
             readableList.setRecordsTotal(m.getTotalElements());
             readableList.setNumber(m.getContent().size());
-
 
             ReadableManufacturerPopulator populator = new ReadableManufacturerPopulator();
             List<ReadableManufacturer> returnList = new ArrayList<>();
@@ -236,8 +244,5 @@ public class ManufacturerFacadeImpl implements ManufacturerFacade {
         } catch (Exception e) {
             throw new ServiceRuntimeException("Error while get manufacturers", e);
         }
-
     }
-
-
 }

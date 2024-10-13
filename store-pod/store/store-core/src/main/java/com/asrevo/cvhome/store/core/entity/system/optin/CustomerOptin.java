@@ -5,13 +5,11 @@ import com.asrevo.cvhome.store.core.entity.common.audit.AuditListener;
 import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
-
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Optin defines optin campaigns for the system.
@@ -20,29 +18,34 @@ import java.util.Date;
  */
 @Entity
 @EntityListeners(value = AuditListener.class)
-@Table(name = "CUSTOMER_OPTIN", uniqueConstraints =
-@UniqueConstraint(columnNames = {"EMAIL", "OPTIN_ID"}))
+@Table(
+        name = "CUSTOMER_OPTIN",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"EMAIL", "OPTIN_ID"}))
 @Getter
 @Setter
 public class CustomerOptin extends SalesManagerEntity<Long, CustomerOptin> implements Serializable {
 
-
     /**
      *
      */
-    @Serial
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
 
     @Id
     @Column(name = "CUSTOMER_OPTIN_ID")
-    @TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME", valueColumnName = "SEQ_COUNT", pkColumnValue = "CUST_OPT_SEQ_NEXT_VAL", allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE, initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
+    @TableGenerator(
+            name = "TABLE_GEN",
+            table = "SM_SEQUENCER",
+            pkColumnName = "SEQ_NAME",
+            valueColumnName = "SEQ_COUNT",
+            pkColumnValue = "CUST_OPT_SEQ_NEXT_VAL",
+            allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
+            initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
     private Long id;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "OPTIN_DATE")
     private Date optinDate;
-
 
     @ManyToOne(targetEntity = Optin.class)
     @JoinColumn(name = "OPTIN_ID")
@@ -63,5 +66,4 @@ public class CustomerOptin extends SalesManagerEntity<Long, CustomerOptin> imple
 
     @Column(name = "VALUE", columnDefinition = "text")
     private String value;
-
 }

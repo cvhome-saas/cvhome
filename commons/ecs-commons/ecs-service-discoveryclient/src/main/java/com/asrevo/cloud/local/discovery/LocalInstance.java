@@ -1,11 +1,10 @@
 package com.asrevo.cloud.local.discovery;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author ashraf

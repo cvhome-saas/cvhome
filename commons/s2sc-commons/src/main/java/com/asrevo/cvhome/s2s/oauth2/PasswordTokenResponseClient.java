@@ -7,7 +7,8 @@ import org.springframework.security.oauth2.client.endpoint.OAuth2PasswordGrantRe
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-public class PasswordTokenResponseClient extends OAuth2AccessTokenResponseClient<OAuth2PasswordGrantRequest> {
+public class PasswordTokenResponseClient
+        extends OAuth2AccessTokenResponseClient<OAuth2PasswordGrantRequest> {
 
     @Override
     HttpEntity<?> getRequestEntity(OAuth2PasswordGrantRequest request) {

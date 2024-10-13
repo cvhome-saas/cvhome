@@ -11,18 +11,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-
 @Service("shippingQuoteService")
 @Slf4j
-public class ShippingQuoteServiceImpl extends SalesManagerEntityServiceImpl<Long, Quote> implements ShippingQuoteService {
-
+public class ShippingQuoteServiceImpl extends SalesManagerEntityServiceImpl<Long, Quote>
+        implements ShippingQuoteService {
 
     private final ShippingQuoteRepository shippingQuoteRepository;
 
     private final ShippingService shippingService;
 
     @Autowired
-    public ShippingQuoteServiceImpl(ShippingQuoteRepository repository, ShippingService shippingService) {
+    public ShippingQuoteServiceImpl(
+            ShippingQuoteRepository repository, ShippingService shippingService) {
         super(repository);
         this.shippingQuoteRepository = repository;
         // TODO Auto-generated constructor stub
@@ -30,12 +30,12 @@ public class ShippingQuoteServiceImpl extends SalesManagerEntityServiceImpl<Long
     }
 
     @Override
-    public ShippingSummary getShippingSummary(Long quoteId, MerchantStore store) throws ServiceException {
+    public ShippingSummary getShippingSummary(Long quoteId, MerchantStore store)
+            throws ServiceException {
 
         Assert.notNull(quoteId, "quoteId must not be null");
 
         Quote q = shippingQuoteRepository.getOne(quoteId);
-
 
         ShippingSummary quote = null;
 
@@ -52,14 +52,8 @@ public class ShippingQuoteServiceImpl extends SalesManagerEntityServiceImpl<Long
             if (shippingService.hasTaxOnShipping(store)) {
                 quote.setTaxOnShipping(true);
             }
-
-
         }
 
-
         return quote;
-
     }
-
-
 }

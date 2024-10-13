@@ -22,18 +22,17 @@ import com.asrevo.cvhome.store.core.services.catalog.product.relationship.Produc
 import com.asrevo.cvhome.store.service.populator.catalog.ReadableProductPopulator;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
 import com.asrevo.cvhome.store.utils.LocaleUtils;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Service("productFacade")
-//@Profile({"default", "cloud", "gcp", "aws", "mysql", "local"})
+// @Profile({"default", "cloud", "gcp", "aws", "mysql", "local"})
 public class ProductFacadeImpl implements ProductFacade {
 
     private final CategoryService categoryService;
@@ -44,10 +43,15 @@ public class ProductFacadeImpl implements ProductFacade {
 
     private final ProductRelationshipService productRelationshipService;
 
-
     private final ImageFilePath imageUtils;
 
-    public ProductFacadeImpl(CategoryService categoryService, ProductAttributeService productAttributeService, ProductService productService, PricingService pricingService, ProductRelationshipService productRelationshipService, ImageFilePath imageUtils) {
+    public ProductFacadeImpl(
+            CategoryService categoryService,
+            ProductAttributeService productAttributeService,
+            ProductService productService,
+            PricingService pricingService,
+            ProductRelationshipService productRelationshipService,
+            ImageFilePath imageUtils) {
         this.categoryService = categoryService;
         this.productService = productService;
         this.pricingService = pricingService;
@@ -62,11 +66,11 @@ public class ProductFacadeImpl implements ProductFacade {
 
         // get original product
         productService.getById(product.getId());
-
     }
 
     @Override
-    public ReadableProduct getProduct(MerchantStore store, String sku, Language language) throws Exception {
+    public ReadableProduct getProduct(MerchantStore store, String sku, Language language)
+            throws Exception {
 
         Product product = productService.getBySku(sku, store, language);
 
@@ -86,8 +90,8 @@ public class ProductFacadeImpl implements ProductFacade {
     }
 
     @Override
-    public ReadableProductList getProductListsByCriterias(MerchantStore store, Language language,
-                                                          ProductCriteria criterias) throws Exception {
+    public ReadableProductList getProductListsByCriterias(
+            MerchantStore store, Language language, ProductCriteria criterias) throws Exception {
 
         Assert.notNull(criterias, "ProductCriteria must be set for this product");
 
@@ -95,14 +99,12 @@ public class ProductFacadeImpl implements ProductFacade {
 
             if (criterias.getCategoryIds().size() == 1) {
 
-                Category category = categoryService
-                        .getById(criterias.getCategoryIds().getFirst());
+                Category category = categoryService.getById(criterias.getCategoryIds().getFirst());
 
                 if (category != null) {
                     String lineage = category.getLineage();
 
-                    List<Category> categories = categoryService
-                            .getListByLineage(store, lineage);
+                    List<Category> categories = categoryService.getListByLineage(store, lineage);
 
                     List<Long> ids = new ArrayList<>();
                     if (categories != null && !categories.isEmpty()) {
@@ -116,12 +118,20 @@ public class ProductFacadeImpl implements ProductFacade {
             }
         }
 
-
-        Page<Product> modelProductList = productService.listByStore(store, language, criterias, criterias.getStartPage(), criterias.getMaxCount());
+        Page<Product> modelProductList =
+                productService.listByStore(
+                        store,
+                        language,
+                        criterias,
+                        criterias.getStartPage(),
+                        criterias.getMaxCount());
 
         List<Product> products = modelProductList.getContent();
 
-        List<Product> prds = products.stream().sorted(Comparator.comparing(Product::getSortOrder)).collect(Collectors.toList());
+        List<Product> prds =
+                products.stream()
+                        .sorted(Comparator.comparing(Product::getSortOrder))
+                        .collect(Collectors.toList());
         products = prds;
 
         ReadableProductPopulator populator = new ReadableProductPopulator();
@@ -132,9 +142,9 @@ public class ProductFacadeImpl implements ProductFacade {
         for (Product product : products) {
 
             // create new proxy product
-            ReadableProduct readProduct = populator.populate(product, new ReadableProduct(), store, language);
+            ReadableProduct readProduct =
+                    populator.populate(product, new ReadableProduct(), store, language);
             productList.getProducts().add(readProduct);
-
         }
 
         // productList.setTotalPages(products.getTotalCount());
@@ -147,7 +157,8 @@ public class ProductFacadeImpl implements ProductFacade {
     }
 
     @Override
-    public ReadableProduct getProductByCode(MerchantStore store, String uniqueCode, Language language) {
+    public ReadableProduct getProductByCode(
+            MerchantStore store, String uniqueCode, Language language) {
 
         Product product = null;
         try {
@@ -165,27 +176,29 @@ public class ProductFacadeImpl implements ProductFacade {
         try {
             populator.populate(product, readableProduct, product.getMerchantStore(), language);
         } catch (ConversionException e) {
-            throw new ConversionRuntimeException("Product with code [" + uniqueCode + "] cannot be converted", e);
+            throw new ConversionRuntimeException(
+                    "Product with code [" + uniqueCode + "] cannot be converted", e);
         }
 
         return readableProduct;
     }
 
     @Override
-    public List<ReadableProduct> relatedItems(MerchantStore store, Product product, Language language)
-            throws Exception {
+    public List<ReadableProduct> relatedItems(
+            MerchantStore store, Product product, Language language) throws Exception {
         ReadableProductPopulator populator = new ReadableProductPopulator();
         populator.setPricingService(pricingService);
         populator.setImageUtils(imageUtils);
 
-        List<ProductRelationship> relatedItems = productRelationshipService.getByType(store, product,
-                ProductRelationshipType.RELATED_ITEM);
+        List<ProductRelationship> relatedItems =
+                productRelationshipService.getByType(
+                        store, product, ProductRelationshipType.RELATED_ITEM);
         if (relatedItems != null && !relatedItems.isEmpty()) {
             List<ReadableProduct> items = new ArrayList<>();
             for (ProductRelationship relationship : relatedItems) {
                 Product relatedProduct = relationship.getRelatedProduct();
-                ReadableProduct proxyProduct = populator.populate(relatedProduct, new ReadableProduct(), store,
-                        language);
+                ReadableProduct proxyProduct =
+                        populator.populate(relatedProduct, new ReadableProduct(), store, language);
                 items.add(proxyProduct);
             }
             return items;
@@ -193,11 +206,12 @@ public class ProductFacadeImpl implements ProductFacade {
         return null;
     }
 
-
     @Override
-    public ReadableProduct getProductBySeUrl(MerchantStore store, String friendlyUrl, Language language) throws Exception {
+    public ReadableProduct getProductBySeUrl(
+            MerchantStore store, String friendlyUrl, Language language) throws Exception {
 
-        Product product = productService.getBySeUrl(store, friendlyUrl, LocaleUtils.getLocale(language));
+        Product product =
+                productService.getBySeUrl(store, friendlyUrl, LocaleUtils.getLocale(language));
 
         if (product == null) {
             return null;
@@ -252,11 +266,8 @@ public class ProductFacadeImpl implements ProductFacade {
      * <p>
      * }
      **/
-
     @Override
     public Product getProduct(Long id, MerchantStore store) {
         return productService.findOne(id, store);
     }
-
-
 }

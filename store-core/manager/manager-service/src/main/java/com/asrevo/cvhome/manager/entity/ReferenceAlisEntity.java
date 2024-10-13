@@ -16,6 +16,7 @@ import org.springframework.data.relational.core.mapping.Table;
 public class ReferenceAlisEntity extends BaseEntity<ReferenceAlisEntity, ReferenceAlisId> {
     @Embedded(onEmpty = Embedded.OnEmpty.USE_NULL)
     private Domain alis;
+
     @Column("reference_id")
     private ManagerStoreId reference;
 
@@ -32,4 +33,3 @@ public class ReferenceAlisEntity extends BaseEntity<ReferenceAlisEntity, Referen
         return ReferenceAlisId.newId();
     }
 }
-

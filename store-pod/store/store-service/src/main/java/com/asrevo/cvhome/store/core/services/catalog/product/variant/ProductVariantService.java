@@ -6,10 +6,9 @@ import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
-import org.springframework.data.domain.Page;
-
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
 
 public interface ProductVariantService extends SalesManagerEntityService<Long, ProductVariant> {
 
@@ -19,17 +18,15 @@ public interface ProductVariantService extends SalesManagerEntityService<Long, P
 
     Optional<ProductVariant> getById(Long id, MerchantStore store);
 
-    Optional<ProductVariant> getBySku(String sku, Long productId, MerchantStore store, Language language);
+    Optional<ProductVariant> getBySku(
+            String sku, Long productId, MerchantStore store, Language language);
 
     List<ProductVariant> getByProductId(MerchantStore store, Product product, Language language);
 
-
-    Page<ProductVariant> getByProductId(MerchantStore store, Product product, Language language, int page, int count);
-
+    Page<ProductVariant> getByProductId(
+            MerchantStore store, Product product, Language language, int page, int count);
 
     boolean exist(String sku, Long productId);
 
     ProductVariant saveProductVariant(ProductVariant variant) throws ServiceException;
-
-
 }

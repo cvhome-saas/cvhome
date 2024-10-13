@@ -19,5 +19,4 @@ public class CreditCardPayment extends Payment {
     private String expirationYear;
     private String cardOwner;
     private CreditCardType creditCard;
-
 }

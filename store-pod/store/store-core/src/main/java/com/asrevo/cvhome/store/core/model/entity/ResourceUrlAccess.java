@@ -10,5 +10,4 @@ public interface ResourceUrlAccess {
     String getSlug();
 
     void setSlug(String slug);
-
 }

@@ -10,5 +10,4 @@ public interface CMSManager {
     String rootName();
 
     String getLocation();
-
 }

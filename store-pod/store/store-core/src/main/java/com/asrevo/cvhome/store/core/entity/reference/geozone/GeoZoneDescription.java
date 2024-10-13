@@ -3,31 +3,30 @@ package com.asrevo.cvhome.store.core.entity.reference.geozone;
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
 import com.asrevo.cvhome.store.core.entity.common.description.Description;
 import jakarta.persistence.*;
+import java.io.Serial;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.io.Serial;
-
 @Entity
-@Table(name = "GEOZONE_DESCRIPTION", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {
-                "GEOZONE_ID",
-                "LANGUAGE_ID"
-        })
-}
-)
-
-@TableGenerator(name = "description_gen", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME", valueColumnName = "SEQ_COUNT", pkColumnValue = "geozone_description_seq", allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE, initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
-//@SequenceGenerator(name = "description_gen", sequenceName = "geozone_description_seq", allocationSize = SchemaConstant.DESCRIPTION_ID_SEQUENCE_START)
+@Table(
+        name = "GEOZONE_DESCRIPTION",
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"GEOZONE_ID", "LANGUAGE_ID"})})
+@TableGenerator(
+        name = "description_gen",
+        table = "SM_SEQUENCER",
+        pkColumnName = "SEQ_NAME",
+        valueColumnName = "SEQ_COUNT",
+        pkColumnValue = "geozone_description_seq",
+        allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
+        initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
+// @SequenceGenerator(name = "description_gen", sequenceName = "geozone_description_seq",
+// allocationSize = SchemaConstant.DESCRIPTION_ID_SEQUENCE_START)
 @Getter
 @Setter
 public class GeoZoneDescription extends Description {
-    @Serial
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
 
     @ManyToOne(targetEntity = GeoZone.class)
     @JoinColumn(name = "GEOZONE_ID")
     private GeoZone geoZone;
-
-
 }

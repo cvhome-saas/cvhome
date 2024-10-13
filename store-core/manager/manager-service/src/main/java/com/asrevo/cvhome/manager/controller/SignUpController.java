@@ -23,7 +23,5 @@ public class SignUpController {
         user.setActive(true);
         user.setUserName(user.getEmailAddress());
         return Mono.just(userAccountService.createOrgUser(user));
-
     }
-
 }

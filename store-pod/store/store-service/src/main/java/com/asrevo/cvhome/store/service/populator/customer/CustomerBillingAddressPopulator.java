@@ -3,7 +3,6 @@
  */
 package com.asrevo.cvhome.store.service.populator.customer;
 
-
 import com.asrevo.cvhome.store.controller.exception.ConversionException;
 import com.asrevo.cvhome.store.core.entity.customer.Customer;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
@@ -45,5 +44,4 @@ public class CustomerBillingAddressPopulator extends AbstractDataPopulator<Custo
     protected Address createTarget() {
         return new Address();
     }
-
 }

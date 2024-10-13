@@ -9,16 +9,11 @@ import org.springframework.stereotype.Service;
 
 @Service("merchantLogService")
 @Slf4j
-public class MerchantLogServiceImpl extends
-        SalesManagerEntityServiceImpl<Long, MerchantLog> implements
-        MerchantLogService {
-
+public class MerchantLogServiceImpl extends SalesManagerEntityServiceImpl<Long, MerchantLog>
+        implements MerchantLogService {
 
     @Autowired
-    public MerchantLogServiceImpl(
-            MerchantLogRepository merchantLogRepository) {
+    public MerchantLogServiceImpl(MerchantLogRepository merchantLogRepository) {
         super(merchantLogRepository);
     }
-
-
 }

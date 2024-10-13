@@ -7,8 +7,7 @@ public class ConversionRuntimeException extends GenericRuntimeException {
     /**
      *
      */
-    @Serial
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
 
     public ConversionRuntimeException(String errorCode, String message) {
         super(errorCode, message);

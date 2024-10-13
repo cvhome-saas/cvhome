@@ -1,15 +1,14 @@
 package com.asrevo.cvhome.s2s.services;
 
+import static com.asrevo.cvhome.s2s.utils.SecurityUtils.getOrgStoreIdentity;
+
 import com.asrevo.cvhome.commons.domain.IdentityId;
 import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.commons.domain.Roles;
 import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
+import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
-
-import java.util.function.Function;
-
-import static com.asrevo.cvhome.s2s.utils.SecurityUtils.getOrgStoreIdentity;
 
 @AllArgsConstructor
 public class StoreSecurityServiceImpl implements StoreSecurityService {
@@ -36,7 +35,8 @@ public class StoreSecurityServiceImpl implements StoreSecurityService {
     }
 
     private static boolean hasRole(Authentication authentication, Roles role) {
-        return authentication.getAuthorities().stream().anyMatch(it -> it.getAuthority().contains(role.name()));
+        return authentication.getAuthorities().stream()
+                .anyMatch(it -> it.getAuthority().contains(role.name()));
     }
 
     @Override
@@ -66,7 +66,8 @@ public class StoreSecurityServiceImpl implements StoreSecurityService {
     }
 
     @Override
-    public boolean isStoreModerator(Authentication authentication, ManagerStoreId requestedStoreId) {
+    public boolean isStoreModerator(
+            Authentication authentication, ManagerStoreId requestedStoreId) {
         if (!hasStoreModeratorRole(authentication)) {
             return false;
         }
@@ -84,6 +85,4 @@ public class StoreSecurityServiceImpl implements StoreSecurityService {
         }
         return true;
     }
-
-
 }

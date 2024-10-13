@@ -6,16 +6,15 @@ import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.repositories.customer.review.CustomerReviewRepository;
 import com.asrevo.cvhome.store.core.services.customer.CustomerService;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
+import java.math.BigDecimal;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import java.math.BigDecimal;
-import java.util.List;
-
 @Service("customerReviewService")
-public class CustomerReviewServiceImpl extends
-        SalesManagerEntityServiceImpl<Long, CustomerReview> implements CustomerReviewService {
+public class CustomerReviewServiceImpl extends SalesManagerEntityServiceImpl<Long, CustomerReview>
+        implements CustomerReviewService {
 
     private final CustomerReviewRepository customerReviewRepository;
 
@@ -29,31 +28,27 @@ public class CustomerReviewServiceImpl extends
         this.customerService = customerService;
     }
 
-
     private void saveOrUpdate(CustomerReview review) throws ServiceException {
-
 
         Assert.notNull(review, "CustomerReview cannot be null");
         Assert.notNull(review.getCustomer(), "CustomerReview.customer cannot be null");
-        Assert.notNull(review.getReviewedCustomer(), "CustomerReview.reviewedCustomer cannot be null");
+        Assert.notNull(
+                review.getReviewedCustomer(), "CustomerReview.reviewedCustomer cannot be null");
 
-
-        //refresh customer
+        // refresh customer
         Customer customer = customerService.getById(review.getReviewedCustomer().getId());
 
-        //ajust product rating
+        // ajust product rating
         int count = 0;
         if (customer.getCustomerReviewCount() != null) {
             count = customer.getCustomerReviewCount();
         }
 
-
         BigDecimal averageRating = customer.getCustomerReviewAvg();
         if (averageRating == null) {
             averageRating = new BigDecimal(0);
         }
-        //get reviews
-
+        // get reviews
 
         BigDecimal totalRating = averageRating.multiply(new BigDecimal(count));
         totalRating = totalRating.add(BigDecimal.valueOf(review.getReviewRating()));
@@ -68,8 +63,6 @@ public class CustomerReviewServiceImpl extends
         customerService.update(customer);
 
         review.setReviewedCustomer(customer);
-
-
     }
 
     public void update(CustomerReview review) throws ServiceException {
@@ -79,7 +72,6 @@ public class CustomerReviewServiceImpl extends
     public void create(CustomerReview review) throws ServiceException {
         this.saveOrUpdate(review);
     }
-
 
     @Override
     public List<CustomerReview> getByCustomer(Customer customer) {
@@ -93,12 +85,10 @@ public class CustomerReviewServiceImpl extends
         return customerReviewRepository.findByReviewed(customer.getId());
     }
 
-
     @Override
     public CustomerReview getByReviewerAndReviewed(Long reviewer, Long reviewed) {
         Assert.notNull(reviewer, "Reviewer customer cannot be null");
         Assert.notNull(reviewed, "Reviewer customer cannot be null");
         return customerReviewRepository.findByRevieweAndReviewed(reviewer, reviewed);
     }
-
 }

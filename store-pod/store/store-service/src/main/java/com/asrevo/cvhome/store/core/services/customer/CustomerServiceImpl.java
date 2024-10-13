@@ -11,17 +11,15 @@ import com.asrevo.cvhome.store.core.repositories.customer.CustomerRepository;
 import com.asrevo.cvhome.store.core.services.customer.attribute.CustomerAttributeService;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
 import com.asrevo.cvhome.store.core.services.geo.GeoLocation;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
-
 @Service("customerService")
 @Slf4j
-public class CustomerServiceImpl extends SalesManagerEntityServiceImpl<Long, Customer> implements CustomerService {
-
+public class CustomerServiceImpl extends SalesManagerEntityServiceImpl<Long, Customer>
+        implements CustomerService {
 
     private final CustomerRepository customerRepository;
 
@@ -29,9 +27,11 @@ public class CustomerServiceImpl extends SalesManagerEntityServiceImpl<Long, Cus
 
     private final GeoLocation geoLocation;
 
-
     @Autowired
-    public CustomerServiceImpl(CustomerRepository customerRepository, CustomerAttributeService customerAttributeService, GeoLocation geoLocation) {
+    public CustomerServiceImpl(
+            CustomerRepository customerRepository,
+            CustomerAttributeService customerAttributeService,
+            GeoLocation geoLocation) {
         super(customerRepository);
         this.customerRepository = customerRepository;
         this.customerAttributeService = customerAttributeService;
@@ -69,14 +69,14 @@ public class CustomerServiceImpl extends SalesManagerEntityServiceImpl<Long, Cus
     }
 
     @Override
-    public Address getCustomerAddress(MerchantStore store, String ipAddress) throws ServiceException {
+    public Address getCustomerAddress(MerchantStore store, String ipAddress)
+            throws ServiceException {
 
         try {
             return geoLocation.getAddress(ipAddress);
         } catch (Exception e) {
             throw new ServiceException(e);
         }
-
     }
 
     @Override
@@ -89,22 +89,21 @@ public class CustomerServiceImpl extends SalesManagerEntityServiceImpl<Long, Cus
         } else {
 
             super.create(customer);
-
         }
     }
 
     public void delete(Customer customer) throws ServiceException {
         customer = getById(customer.getId());
 
-        //delete attributes
-        List<CustomerAttribute> attributes = customerAttributeService.getByCustomer(customer.getMerchantStore(), customer);
+        // delete attributes
+        List<CustomerAttribute> attributes =
+                customerAttributeService.getByCustomer(customer.getMerchantStore(), customer);
         if (attributes != null) {
             for (CustomerAttribute attribute : attributes) {
                 customerAttributeService.delete(attribute);
             }
         }
         customerRepository.delete(customer);
-
     }
 
     @Override
@@ -116,6 +115,4 @@ public class CustomerServiceImpl extends SalesManagerEntityServiceImpl<Long, Cus
     public Customer getByPasswordResetToken(String storeCode, String token) {
         return customerRepository.findByResetPasswordToken(token, storeCode);
     }
-
-
 }

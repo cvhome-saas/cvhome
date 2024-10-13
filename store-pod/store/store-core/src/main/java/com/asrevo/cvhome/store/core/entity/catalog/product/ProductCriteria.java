@@ -2,10 +2,9 @@ package com.asrevo.cvhome.store.core.entity.catalog.product;
 
 import com.asrevo.cvhome.store.core.entity.catalog.product.attribute.AttributeCriteria;
 import com.asrevo.cvhome.store.core.entity.common.Criteria;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.List;
 
 @Setter
 @Getter
@@ -18,7 +17,6 @@ public class ProductCriteria extends Criteria {
     private List<AttributeCriteria> attributeCriteria;
     private String origin = ORIGIN_SHOP;
 
-
     private Boolean available = null;
 
     private List<Long> categoryIds;
@@ -27,7 +25,7 @@ public class ProductCriteria extends Criteria {
     private List<Long> optionValueIds;
     private String sku;
 
-    //V2
+    // V2
     private List<String> optionValueCodes;
     private String option;
 
@@ -36,6 +34,4 @@ public class ProductCriteria extends Criteria {
     private Long manufacturerId = null;
 
     private Long ownerId = null;
-
-
 }

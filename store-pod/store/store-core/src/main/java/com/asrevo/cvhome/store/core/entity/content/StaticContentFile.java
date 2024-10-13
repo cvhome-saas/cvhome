@@ -8,6 +8,4 @@ import lombok.Setter;
 public abstract class StaticContentFile extends ContentFile {
 
     private FileContentType fileContentType;
-
-
 }

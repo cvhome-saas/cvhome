@@ -23,13 +23,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,6 +31,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -45,8 +44,8 @@ import java.util.stream.Stream;
 @Slf4j
 public class MerchantStoreApi {
 
-
-    private static final Map<String, String> MAPPING_FIELDS = Map.of("name", "name", "readableAudit.user", "auditSection.modifiedBy");
+    private static final Map<String, String> MAPPING_FIELDS =
+            Map.of("name", "name", "readableAudit.user", "auditSection.modifiedBy");
 
     private final StoreFacade storeFacade;
 
@@ -57,64 +56,134 @@ public class MerchantStoreApi {
         this.userFacade = userFacade;
     }
 
-    @GetMapping(value = {"/store/{code}"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(method = "GET", description = "Get merchant store",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ReadableMerchantStore.class))))
-    public ReadableMerchantStore store(@PathVariable String code,
-                                       @RequestParam(value = "lang", required = false) String lang) {
-        //return storeFacade.getByCode(code, lang);
+    @GetMapping(
+            value = {"/store/{code}"},
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(
+            method = "GET",
+            description = "Get merchant store",
+            responses =
+                    @ApiResponse(
+                            content =
+                                    @Content(
+                                            schema =
+                                                    @Schema(
+                                                            implementation =
+                                                                    ReadableMerchantStore.class))))
+    public ReadableMerchantStore store(
+            @PathVariable String code,
+            @RequestParam(value = "lang", required = false) String lang) {
+        // return storeFacade.getByCode(code, lang);
         ReadableMerchantStore readable = storeFacade.getByCode(code, lang);
         return readable;
     }
 
-    @GetMapping(value = {"/private/store/{code}"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(method = "GET", description = "Get merchant store full details",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ReadableMerchantStore.class))))
+    @GetMapping(
+            value = {"/private/store/{code}"},
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(
+            method = "GET",
+            description = "Get merchant store full details",
+            responses =
+                    @ApiResponse(
+                            content =
+                                    @Content(
+                                            schema =
+                                                    @Schema(
+                                                            implementation =
+                                                                    ReadableMerchantStore.class))))
     @Parameters({
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
+        @Parameter(
+                name = "lang",
+                schema =
+                        @Schema(
+                                name = "lang",
+                                type = "string",
+                                defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public ReadableMerchantStore storeFull(
-            @PathVariable String code,
-            @Parameter(hidden = true) Language language) {
+            @PathVariable String code, @Parameter(hidden = true) Language language) {
 
         String authenticatedUser = userFacade.authenticatedUser();
         if (authenticatedUser == null) {
             throw new UnauthorizedException();
         }
 
-        userFacade.authorizedGroup(authenticatedUser, Stream.of("SUPERADMIN", "ADMIN_RETAILER").collect(Collectors.toList()));
+        userFacade.authorizedGroup(
+                authenticatedUser,
+                Stream.of("SUPERADMIN", "ADMIN_RETAILER").collect(Collectors.toList()));
         return storeFacade.getFullByCode(code, language);
     }
 
-    @GetMapping(value = {"/private/merchant/{code}/stores"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(method = "GET", description = "Get retailer child stores", summary = "Merchant (retailer) can have multiple stores",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ReadableMerchantStore.class))))
+    @GetMapping(
+            value = {"/private/merchant/{code}/stores"},
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(
+            method = "GET",
+            description = "Get retailer child stores",
+            summary = "Merchant (retailer) can have multiple stores",
+            responses =
+                    @ApiResponse(
+                            content =
+                                    @Content(
+                                            schema =
+                                                    @Schema(
+                                                            implementation =
+                                                                    ReadableMerchantStore.class))))
     @Parameters({
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
+        @Parameter(
+                name = "lang",
+                schema =
+                        @Schema(
+                                name = "lang",
+                                type = "string",
+                                defaultValue = Constants.DEFAULT_LANGUAGE))
     })
-    public ReadableMerchantStoreList list(@PathVariable String code, @Parameter(hidden = true) Language language,
-                                          @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
-                                          @RequestParam(value = "count", required = false, defaultValue = "10") Integer count) {
+    public ReadableMerchantStoreList list(
+            @PathVariable String code,
+            @Parameter(hidden = true) Language language,
+            @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
+            @RequestParam(value = "count", required = false, defaultValue = "10") Integer count) {
 
         String authenticatedUser = userFacade.authenticatedUser();
         if (authenticatedUser == null) {
             throw new UnauthorizedException();
         }
 
-        userFacade.authorizedGroup(authenticatedUser, Stream.of("SUPERADMIN", "ADMIN_RETAILER").collect(Collectors.toList()));
+        userFacade.authorizedGroup(
+                authenticatedUser,
+                Stream.of("SUPERADMIN", "ADMIN_RETAILER").collect(Collectors.toList()));
 
-        //ADMIN_RETAILER only see pertaining stores
-
+        // ADMIN_RETAILER only see pertaining stores
 
         return storeFacade.getChildStores(language, code, page, count);
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @GetMapping(value = {"/private/stores"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(method = "GET", description = "Get list of stores. Returns all retailers and stores. If superadmin everything is returned, else only retailer and child stores.",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ReadableMerchantStore.class))))
+    @GetMapping(
+            value = {"/private/stores"},
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(
+            method = "GET",
+            description =
+                    "Get list of stores. Returns all retailers and stores. If superadmin everything"
+                            + " is returned, else only retailer and child stores.",
+            responses =
+                    @ApiResponse(
+                            content =
+                                    @Content(
+                                            schema =
+                                                    @Schema(
+                                                            implementation =
+                                                                    ReadableMerchantStore.class))))
     @Parameters({
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
+        @Parameter(
+                name = "lang",
+                schema =
+                        @Schema(
+                                name = "lang",
+                                type = "string",
+                                defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public ReadableMerchantStoreList get(
             @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
@@ -129,8 +198,12 @@ public class MerchantStoreApi {
         }
 
         // requires superadmin, admin and admin retail to see all
-        userFacade.authorizedGroup(authenticatedUser,
-                Stream.of(Constants.GROUP_SUPER_ADMIN, Constants.GROUP_ADMIN, Constants.GROUP_ADMIN_RETAIL)
+        userFacade.authorizedGroup(
+                authenticatedUser,
+                Stream.of(
+                                Constants.GROUP_SUPER_ADMIN,
+                                Constants.GROUP_ADMIN,
+                                Constants.GROUP_ADMIN_RETAIL)
                         .collect(Collectors.toList()));
 
         MerchantStoreCriteria criteria = createMerchantStoreCriteria(request);
@@ -141,27 +214,36 @@ public class MerchantStoreApi {
             criteria.setStoreCode(merchantStore.getCode());
         }
 
-        //return storeFacade.findAll(criteria, language, page, count);
+        // return storeFacade.findAll(criteria, language, page, count);
         ReadableMerchantStoreList readable = storeFacade.findAll(criteria, language, page, count);
         return readable;
     }
-
 
     /**
      * List of store names
      *
      */
     @ResponseStatus(HttpStatus.OK)
-    @GetMapping(value = {"/private/stores/names"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(method = "GET", description = "Get list of store names. Returns all retailers and stores",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ReadableMerchantStore.class))))
+    @GetMapping(
+            value = {"/private/stores/names"},
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(
+            method = "GET",
+            description = "Get list of store names. Returns all retailers and stores",
+            responses =
+                    @ApiResponse(
+                            content =
+                                    @Content(
+                                            schema =
+                                                    @Schema(
+                                                            implementation =
+                                                                    ReadableMerchantStore.class))))
     public List<ReadableMerchantStore> list(
             @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language,
             @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
             @RequestParam(value = "count", required = false, defaultValue = "10") Integer count,
-            HttpServletRequest request
-    ) {
+            HttpServletRequest request) {
 
         String authenticatedUser = userFacade.authenticatedUser();
         if (authenticatedUser == null) {
@@ -169,8 +251,12 @@ public class MerchantStoreApi {
         }
 
         // requires superadmin, admin and admin retail to see all
-        userFacade.authorizedGroup(authenticatedUser,
-                Stream.of(Constants.GROUP_SUPER_ADMIN, Constants.GROUP_ADMIN, Constants.GROUP_ADMIN_RETAIL)
+        userFacade.authorizedGroup(
+                authenticatedUser,
+                Stream.of(
+                                Constants.GROUP_SUPER_ADMIN,
+                                Constants.GROUP_ADMIN,
+                                Constants.GROUP_ADMIN_RETAIL)
                         .collect(Collectors.toList()));
 
         MerchantStoreCriteria criteria = createMerchantStoreCriteria(request);
@@ -183,43 +269,77 @@ public class MerchantStoreApi {
 
         ReadableMerchantStoreList list = storeFacade.findAll(criteria, language, page, count);
         return list.getData();
-
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @GetMapping(value = {"/store/languages"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(method = "GET", description = "Get list of store supported languages.",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ReadableMerchantStore.class))))
+    @GetMapping(
+            value = {"/store/languages"},
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(
+            method = "GET",
+            description = "Get list of store supported languages.",
+            responses =
+                    @ApiResponse(
+                            content =
+                                    @Content(
+                                            schema =
+                                                    @Schema(
+                                                            implementation =
+                                                                    ReadableMerchantStore.class))))
     public List<Language> supportedLanguages(
-            @Parameter(hidden = true) MerchantStore merchantStore,
-            HttpServletRequest request) {
+            @Parameter(hidden = true) MerchantStore merchantStore, HttpServletRequest request) {
 
         return storeFacade.supportedLanguages(merchantStore);
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @PostMapping(value = {"/private/store"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(method = "POST", description = "Creates a new store",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ReadableMerchantStore.class))))
+    @PostMapping(
+            value = {"/private/store"},
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(
+            method = "POST",
+            description = "Creates a new store",
+            responses =
+                    @ApiResponse(
+                            content =
+                                    @Content(
+                                            schema =
+                                                    @Schema(
+                                                            implementation =
+                                                                    ReadableMerchantStore.class))))
     public void create(@Valid @RequestBody PersistableMerchantStore store) {
-
 
         String authenticatedUser = userFacade.authenticatedUser();
         if (authenticatedUser == null) {
             throw new UnauthorizedException();
         }
 
-        userFacade.authorizedGroup(authenticatedUser, Stream.of("SUPERADMIN", "ADMIN_RETAILER").collect(Collectors.toList()));
+        userFacade.authorizedGroup(
+                authenticatedUser,
+                Stream.of("SUPERADMIN", "ADMIN_RETAILER").collect(Collectors.toList()));
 
         storeFacade.create(store);
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @PutMapping(value = {"/private/store/{code}"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(method = "PUT", description = "Updates a store",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ReadableMerchantStore.class))))
-    public void update(@PathVariable String code, @Valid @RequestBody PersistableMerchantStore store,
-                       HttpServletRequest request) {
+    @PutMapping(
+            value = {"/private/store/{code}"},
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(
+            method = "PUT",
+            description = "Updates a store",
+            responses =
+                    @ApiResponse(
+                            content =
+                                    @Content(
+                                            schema =
+                                                    @Schema(
+                                                            implementation =
+                                                                    ReadableMerchantStore.class))))
+    public void update(
+            @PathVariable String code,
+            @Valid @RequestBody PersistableMerchantStore store,
+            HttpServletRequest request) {
 
         String userName = getUserFromRequest(request);
         validateUserPermission(userName, code);
@@ -241,9 +361,18 @@ public class MerchantStoreApi {
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @GetMapping(value = {"/private/store/{code}/marketing"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(method = "GET", description = "Get store branding and marketing details",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ReadableBrand.class))))
+    @GetMapping(
+            value = {"/private/store/{code}/marketing"},
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(
+            method = "GET",
+            description = "Get store branding and marketing details",
+            responses =
+                    @ApiResponse(
+                            content =
+                                    @Content(
+                                            schema =
+                                                    @Schema(implementation = ReadableBrand.class))))
     public ReadableBrand getStoreMarketing(@PathVariable String code, HttpServletRequest request) {
         String userName = getUserFromRequest(request);
         validateUserPermission(userName, code);
@@ -255,29 +384,54 @@ public class MerchantStoreApi {
      *
      */
     @ResponseStatus(HttpStatus.OK)
-    @GetMapping(value = {"/private/merchant/{code}/children"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(method = "GET", description = "Get child stores",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ReadableMerchantStore.class))))
+    @GetMapping(
+            value = {"/private/merchant/{code}/children"},
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(
+            method = "GET",
+            description = "Get child stores",
+            responses =
+                    @ApiResponse(
+                            content =
+                                    @Content(
+                                            schema =
+                                                    @Schema(
+                                                            implementation =
+                                                                    ReadableMerchantStore.class))))
     @Parameters({
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
+        @Parameter(
+                name = "lang",
+                schema =
+                        @Schema(
+                                name = "lang",
+                                type = "string",
+                                defaultValue = Constants.DEFAULT_LANGUAGE))
     })
-    public ReadableMerchantStoreList children(@PathVariable String code, @Parameter(hidden = true) Language language,
-                                              @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
-                                              @RequestParam(value = "count", required = false, defaultValue = "10") Integer count,
-                                              HttpServletRequest request) {
+    public ReadableMerchantStoreList children(
+            @PathVariable String code,
+            @Parameter(hidden = true) Language language,
+            @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
+            @RequestParam(value = "count", required = false, defaultValue = "10") Integer count,
+            HttpServletRequest request) {
 
         String userName = getUserFromRequest(request);
         validateUserPermission(userName, code);
         return storeFacade.getChildStores(language, code, page, count);
-
     }
 
     @Deprecated
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping(value = {"/private/store/{code}/marketing"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(method = "POST", description = "Create or save store branding and marketing details", responses = @ApiResponse(content = @Content(schema = @Schema())))
-    public void saveStoreMarketing(@PathVariable String code, @RequestBody PersistableBrand brand,
-                                   HttpServletRequest request) {
+    @PostMapping(
+            value = {"/private/store/{code}/marketing"},
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(
+            method = "POST",
+            description = "Create or save store branding and marketing details",
+            responses = @ApiResponse(content = @Content(schema = @Schema())))
+    public void saveStoreMarketing(
+            @PathVariable String code,
+            @RequestBody PersistableBrand brand,
+            HttpServletRequest request) {
         String userName = getUserFromRequest(request);
         validateUserPermission(userName, code);
         storeFacade.createBrand(code, brand);
@@ -286,8 +440,10 @@ public class MerchantStoreApi {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(value = {"/private/store/{code}/marketing/logo"})
     @Operation(method = "POST", description = "Add store logo")
-    public void addLogo(@PathVariable String code, @RequestParam("file") MultipartFile uploadfile,
-                        HttpServletRequest request) {
+    public void addLogo(
+            @PathVariable String code,
+            @RequestParam("file") MultipartFile uploadfile,
+            HttpServletRequest request) {
 
         // user doing action must be attached to the store being modified
         String userName = getUserFromRequest(request);
@@ -305,8 +461,10 @@ public class MerchantStoreApi {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(value = {"/private/store/{code}/marketing/banner"})
     @Operation(method = "POST", description = "Add store banner")
-    public void addBanner(@PathVariable String code, @RequestParam("file") MultipartFile uploadfile,
-                          HttpServletRequest request) {
+    public void addBanner(
+            @PathVariable String code,
+            @RequestParam("file") MultipartFile uploadfile,
+            HttpServletRequest request) {
 
         // user doing action must be attached to the store being modified
         String userName = getUserFromRequest(request);
@@ -343,7 +501,10 @@ public class MerchantStoreApi {
 
     @ResponseStatus(HttpStatus.OK)
     @DeleteMapping(value = {"/private/store/{code}/marketing/logo"})
-    @Operation(method = "DELETE", description = "Delete store logo", responses = @ApiResponse(content = @Content(schema = @Schema())))
+    @Operation(
+            method = "DELETE",
+            description = "Delete store logo",
+            responses = @ApiResponse(content = @Content(schema = @Schema())))
     public void deleteStoreLogo(@PathVariable String code, HttpServletRequest request) {
 
         // user doing action must be attached to the store being modified
@@ -356,7 +517,10 @@ public class MerchantStoreApi {
 
     @ResponseStatus(HttpStatus.OK)
     @DeleteMapping(value = {"/private/store/{code}/marketing/banner"})
-    @Operation(method = "DELETE", description = "Delete store banner", responses = @ApiResponse(content = @Content(schema = @Schema())))
+    @Operation(
+            method = "DELETE",
+            description = "Delete store banner",
+            responses = @ApiResponse(content = @Content(schema = @Schema())))
     public void deleteStoreBanner(@PathVariable String code, HttpServletRequest request) {
 
         // user doing action must be attached to the store being modified
@@ -368,33 +532,41 @@ public class MerchantStoreApi {
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @GetMapping(value = {"/store/unique", "/private/store/unique"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(method = "GET", description = "Check if store code already exists", responses = @ApiResponse(content = @Content(schema = @Schema(implementation = EntityExists.class))))
+    @GetMapping(
+            value = {"/store/unique", "/private/store/unique"},
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(
+            method = "GET",
+            description = "Check if store code already exists",
+            responses =
+                    @ApiResponse(
+                            content =
+                                    @Content(
+                                            schema = @Schema(implementation = EntityExists.class))))
     public ResponseEntity<EntityExists> exists(@RequestParam(value = "code") String code) {
         boolean isStoreExist = storeFacade.existByCode(code);
         return new ResponseEntity<>(new EntityExists(isStoreExist), HttpStatus.OK);
     }
 
-
     @ResponseStatus(HttpStatus.OK)
     @DeleteMapping(value = {"/private/store/{code}"})
-    @Operation(method = "DELETE", description = "Deletes a store", responses = @ApiResponse(content = @Content(schema = @Schema())))
+    @Operation(
+            method = "DELETE",
+            description = "Deletes a store",
+            responses = @ApiResponse(content = @Content(schema = @Schema())))
     public void delete(@PathVariable String code, HttpServletRequest request) {
         String userName = getUserFromRequest(request);
         validateUserPermission(userName, code);
         storeFacade.delete(code);
     }
 
-
     private MerchantStoreCriteria createMerchantStoreCriteria(HttpServletRequest request) {
         try {
-            return (MerchantStoreCriteria) ServiceRequestCriteriaBuilderUtils.buildRequestCriterias(new MerchantStoreCriteria(), MAPPING_FIELDS,
-                    request);
+            return (MerchantStoreCriteria)
+                    ServiceRequestCriteriaBuilderUtils.buildRequestCriterias(
+                            new MerchantStoreCriteria(), MAPPING_FIELDS, request);
         } catch (Exception e) {
             throw new RestApiException("Error while binding request parameters");
         }
-
     }
-
-
 }

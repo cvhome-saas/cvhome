@@ -8,7 +8,8 @@ import com.asrevo.cvhome.store.core.model.catalog.product.type.ReadableProductTy
 
 public interface ProductTypeFacade {
 
-    ReadableProductTypeList getByMerchant(MerchantStore store, Language language, int count, int page);
+    ReadableProductTypeList getByMerchant(
+            MerchantStore store, Language language, int count, int page);
 
     ReadableProductType get(MerchantStore store, Long id, Language language);
 
@@ -21,5 +22,4 @@ public interface ProductTypeFacade {
     void delete(Long id, MerchantStore store, Language language);
 
     boolean exists(String code, MerchantStore store, Language language);
-
 }

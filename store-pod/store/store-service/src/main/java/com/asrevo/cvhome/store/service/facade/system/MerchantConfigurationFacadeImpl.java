@@ -1,5 +1,7 @@
 package com.asrevo.cvhome.store.service.facade.system;
 
+import static com.asrevo.cvhome.store.core.constants.Constants.*;
+
 import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
@@ -8,27 +10,23 @@ import com.asrevo.cvhome.store.core.entity.system.MerchantConfiguration;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.system.Configs;
 import com.asrevo.cvhome.store.core.services.system.MerchantConfigurationService;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
-import static com.asrevo.cvhome.store.core.constants.Constants.*;
-
-
 @Service
 @Slf4j
 public class MerchantConfigurationFacadeImpl implements MerchantConfigurationFacade {
-
 
     private final MerchantConfigurationService merchantConfigurationService;
 
     @Value("${config.displayShipping:false}")
     private String displayShipping;
 
-    public MerchantConfigurationFacadeImpl(MerchantConfigurationService merchantConfigurationService) {
+    public MerchantConfigurationFacadeImpl(
+            MerchantConfigurationService merchantConfigurationService) {
         this.merchantConfigurationService = merchantConfigurationService;
     }
 
@@ -43,21 +41,23 @@ public class MerchantConfigurationFacadeImpl implements MerchantConfigurationFac
         readableConfig.setDisplayContactUs(configs.isDisplayContactUs());
 
         readableConfig.setDisplayCustomerSection(configs.isDisplayCustomerSection());
-        readableConfig.setDisplayAddToCartOnFeaturedItems(configs.isDisplayAddToCartOnFeaturedItems());
+        readableConfig.setDisplayAddToCartOnFeaturedItems(
+                configs.isDisplayAddToCartOnFeaturedItems());
         readableConfig.setDisplayCustomerAgreement(configs.isDisplayCustomerAgreement());
         readableConfig.setDisplayPagesMenu(configs.isDisplayPagesMenu());
 
         Optional<String> facebookConfigValue = getConfigValue(KEY_FACEBOOK_PAGE_URL, merchantStore);
         facebookConfigValue.ifPresent(readableConfig::setFacebook);
 
-        Optional<String> googleConfigValue = getConfigValue(KEY_GOOGLE_ANALYTICS_URL, merchantStore);
+        Optional<String> googleConfigValue =
+                getConfigValue(KEY_GOOGLE_ANALYTICS_URL, merchantStore);
         googleConfigValue.ifPresent(readableConfig::setGa);
 
         Optional<String> instagramConfigValue = getConfigValue(KEY_INSTAGRAM_URL, merchantStore);
         instagramConfigValue.ifPresent(readableConfig::setInstagram);
 
-
-        Optional<String> pinterestConfigValue = getConfigValue(KEY_PINTEREST_PAGE_URL, merchantStore);
+        Optional<String> pinterestConfigValue =
+                getConfigValue(KEY_PINTEREST_PAGE_URL, merchantStore);
         pinterestConfigValue.ifPresent(readableConfig::setPinterest);
 
         readableConfig.setDisplayShipping(false);
@@ -85,12 +85,13 @@ public class MerchantConfigurationFacadeImpl implements MerchantConfigurationFac
                 .map(MerchantConfiguration::getValue);
     }
 
-    private Optional<MerchantConfiguration> getMerchantConfiguration(String key, MerchantStore merchantStore) {
+    private Optional<MerchantConfiguration> getMerchantConfiguration(
+            String key, MerchantStore merchantStore) {
         try {
-            return Optional.ofNullable(merchantConfigurationService.getMerchantConfiguration(key, merchantStore));
+            return Optional.ofNullable(
+                    merchantConfigurationService.getMerchantConfiguration(key, merchantStore));
         } catch (ServiceException e) {
             throw new ServiceRuntimeException(e);
         }
-
     }
 }

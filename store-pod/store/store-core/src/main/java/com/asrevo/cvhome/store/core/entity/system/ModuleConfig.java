@@ -7,7 +7,6 @@ import lombok.Setter;
 @Getter
 public class ModuleConfig {
 
-
     private String scheme;
     private String host;
     private String port;
@@ -15,5 +14,4 @@ public class ModuleConfig {
     private String env;
     private String config1;
     private String config2;
-
 }

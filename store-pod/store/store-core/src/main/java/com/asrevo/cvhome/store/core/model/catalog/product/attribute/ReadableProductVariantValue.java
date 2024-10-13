@@ -1,10 +1,9 @@
 package com.asrevo.cvhome.store.core.model.catalog.product.attribute;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import java.io.Serial;
 import java.io.Serializable;
+import lombok.Getter;
+import lombok.Setter;
 
 @Setter
 @Getter
@@ -13,14 +12,14 @@ public class ReadableProductVariantValue implements Serializable {
     /**
      *
      */
-    @Serial
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
+
     private String name;
     private String code;
     private int order;
     private String description;
-    private Long option;// option id
-    private Long value;// option value id
+    private Long option; // option id
+    private Long value; // option value id
 
     @Override
     public int hashCode() {
@@ -34,29 +33,19 @@ public class ReadableProductVariantValue implements Serializable {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
+        if (this == obj) return true;
+        if (obj == null) return false;
+        if (getClass() != obj.getClass()) return false;
         ReadableProductVariantValue other = (ReadableProductVariantValue) obj;
         if (code == null) {
-            if (other.code != null)
-                return false;
-        } else if (!code.equals(other.code))
-            return false;
+            if (other.code != null) return false;
+        } else if (!code.equals(other.code)) return false;
         if (name == null) {
-            if (other.name != null)
-                return false;
-        } else if (!name.equals(other.name))
-            return false;
+            if (other.name != null) return false;
+        } else if (!name.equals(other.name)) return false;
         if (option == null) {
-            if (other.option != null)
-                return false;
-        } else if (!option.equals(other.option))
-            return false;
+            if (other.option != null) return false;
+        } else if (!option.equals(other.option)) return false;
         return true;
     }
-
 }

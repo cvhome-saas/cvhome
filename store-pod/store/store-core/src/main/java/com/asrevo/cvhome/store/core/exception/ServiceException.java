@@ -1,9 +1,8 @@
 package com.asrevo.cvhome.store.core.exception;
 
+import java.io.Serial;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.io.Serial;
 
 /**
  * <p>Exception générée par les services de l'application.</p>
@@ -12,16 +11,14 @@ import java.io.Serial;
 @Getter
 public class ServiceException extends Exception {
 
-    public final static int EXCEPTION_ERROR = 500;
-    public final static int EXCEPTION_VALIDATION = 99;
-    public final static int EXCEPTION_PAYMENT_DECLINED = 100;
-    public final static int EXCEPTION_TRANSACTION_DECLINED = 101;
-    public final static int EXCEPTION_INVENTORY_MISMATCH = 120;
-    @Serial
-    private static final long serialVersionUID = -6854945379036729034L;
-    private int exceptionType = 0;//regular error
+    public static final int EXCEPTION_ERROR = 500;
+    public static final int EXCEPTION_VALIDATION = 99;
+    public static final int EXCEPTION_PAYMENT_DECLINED = 100;
+    public static final int EXCEPTION_TRANSACTION_DECLINED = 101;
+    public static final int EXCEPTION_INVENTORY_MISMATCH = 120;
+    @Serial private static final long serialVersionUID = -6854945379036729034L;
+    private int exceptionType = 0; // regular error
     private String messageCode = null;
-
 
     public ServiceException() {
         super();
@@ -55,5 +52,4 @@ public class ServiceException extends Exception {
         this.messageCode = messageCode;
         this.exceptionType = exceptionType;
     }
-
 }

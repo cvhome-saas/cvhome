@@ -1,16 +1,14 @@
 package com.asrevo.cvhome.store.controller.exception;
 
-import org.apache.commons.lang3.StringUtils;
-
 import java.io.Serial;
+import org.apache.commons.lang3.StringUtils;
 
 public class ServiceRuntimeException extends GenericRuntimeException {
 
     /**
      *
      */
-    @Serial
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
 
     public ServiceRuntimeException(String errorCode, String message) {
         super(errorCode, message);
@@ -31,6 +29,4 @@ public class ServiceRuntimeException extends GenericRuntimeException {
     public ServiceRuntimeException(String errorCode, String message, Throwable exception) {
         super(StringUtils.isBlank(errorCode) ? "500" : errorCode, message, exception);
     }
-
-
 }

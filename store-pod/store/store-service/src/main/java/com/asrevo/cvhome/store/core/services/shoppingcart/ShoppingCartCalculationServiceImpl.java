@@ -3,7 +3,6 @@
  */
 package com.asrevo.cvhome.store.core.services.shoppingcart;
 
-
 import com.asrevo.cvhome.store.core.entity.customer.Customer;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
@@ -14,7 +13,6 @@ import com.asrevo.cvhome.store.core.services.order.OrderService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-
 
 /**
  * <p>
@@ -30,12 +28,12 @@ import org.springframework.util.Assert;
 @Slf4j
 public class ShoppingCartCalculationServiceImpl implements ShoppingCartCalculationService {
 
-
     private final ShoppingCartService shoppingCartService;
 
     private final OrderService orderService;
 
-    public ShoppingCartCalculationServiceImpl(ShoppingCartService shoppingCartService, OrderService orderService) {
+    public ShoppingCartCalculationServiceImpl(
+            ShoppingCartService shoppingCartService, OrderService orderService) {
         this.shoppingCartService = shoppingCartService;
         this.orderService = orderService;
     }
@@ -56,18 +54,21 @@ public class ShoppingCartCalculationServiceImpl implements ShoppingCartCalculati
      * @see OrderServiceImpl
      */
     @Override
-    public OrderTotalSummary calculate(final ShoppingCart cartModel, final Customer customer, final MerchantStore store,
-                                       final Language language) throws ServiceException {
+    public OrderTotalSummary calculate(
+            final ShoppingCart cartModel,
+            final Customer customer,
+            final MerchantStore store,
+            final Language language)
+            throws ServiceException {
 
         Assert.notNull(cartModel, "cart cannot be null");
         Assert.notNull(cartModel.getLineItems(), "Cart should have line items.");
         Assert.notNull(store, "MerchantStore cannot be null");
         Assert.notNull(customer, "Customer cannot be null");
-        OrderTotalSummary orderTotalSummary = orderService.calculateShoppingCartTotal(cartModel, customer, store,
-                language);
+        OrderTotalSummary orderTotalSummary =
+                orderService.calculateShoppingCartTotal(cartModel, customer, store, language);
         updateCartModel(cartModel);
         return orderTotalSummary;
-
     }
 
     /**
@@ -86,20 +87,20 @@ public class ShoppingCartCalculationServiceImpl implements ShoppingCartCalculati
      * @see OrderServiceImpl
      */
     @Override
-    public OrderTotalSummary calculate(final ShoppingCart cartModel, final MerchantStore store, final Language language)
+    public OrderTotalSummary calculate(
+            final ShoppingCart cartModel, final MerchantStore store, final Language language)
             throws ServiceException {
 
         Assert.notNull(cartModel, "cart cannot be null");
         Assert.notNull(cartModel.getLineItems(), "Cart should have line items.");
         Assert.notNull(store, "MerchantStore cannot be null");
-        OrderTotalSummary orderTotalSummary = orderService.calculateShoppingCartTotal(cartModel, store, language);
+        OrderTotalSummary orderTotalSummary =
+                orderService.calculateShoppingCartTotal(cartModel, store, language);
         updateCartModel(cartModel);
         return orderTotalSummary;
-
     }
 
     private void updateCartModel(final ShoppingCart cartModel) throws ServiceException {
         shoppingCartService.saveOrUpdate(cartModel);
     }
-
 }

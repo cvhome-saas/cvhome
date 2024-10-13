@@ -1,10 +1,9 @@
 package com.asrevo.cvhome.store.core.model.customer;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import java.io.Serial;
 import java.io.Serializable;
+import lombok.Getter;
+import lombok.Setter;
 
 @Setter
 @Getter
@@ -13,8 +12,7 @@ public class PersistableCustomerReview extends CustomerReviewEntity implements S
     /**
      *
      */
-    @Serial
-    private static final long serialVersionUID = 1L;
-    private Long reviewedCustomer;
+    @Serial private static final long serialVersionUID = 1L;
 
+    private Long reviewedCustomer;
 }

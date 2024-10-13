@@ -12,5 +12,3 @@ public interface EventImpl<T extends Event> {
         return 0;
     }
 }
-
-

@@ -1,10 +1,9 @@
 package com.asrevo.cvhome.keycloak.domain.user;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import java.io.Serial;
 import java.io.Serializable;
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -13,8 +12,8 @@ public class UserEntity implements Serializable {
     /**
      *
      */
-    @Serial
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
+
     private String id;
     private String firstName;
     private String lastName;

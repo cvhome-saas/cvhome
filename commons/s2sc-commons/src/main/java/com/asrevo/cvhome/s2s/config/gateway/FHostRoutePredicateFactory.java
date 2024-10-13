@@ -16,22 +16,21 @@
 
 package com.asrevo.cvhome.s2s.config.gateway;
 
-import org.springframework.cloud.gateway.handler.predicate.AbstractRoutePredicateFactory;
-import org.springframework.cloud.gateway.handler.predicate.GatewayPredicate;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.server.ServerWebExchange;
-
 import java.net.InetSocketAddress;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
+import org.springframework.cloud.gateway.handler.predicate.AbstractRoutePredicateFactory;
+import org.springframework.cloud.gateway.handler.predicate.GatewayPredicate;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.server.ServerWebExchange;
 
 /**
  * @author Spencer Gibb
  */
-public class FHostRoutePredicateFactory extends AbstractRoutePredicateFactory<FHostRoutePredicateFactory.Config> {
-
+public class FHostRoutePredicateFactory
+        extends AbstractRoutePredicateFactory<FHostRoutePredicateFactory.Config> {
 
     public FHostRoutePredicateFactory() {
         super(Config.class);
@@ -72,7 +71,5 @@ public class FHostRoutePredicateFactory extends AbstractRoutePredicateFactory<FH
     }
 
     @Validated
-    public record Config(Set<String> host) {
-    }
-
+    public record Config(Set<String> host) {}
 }

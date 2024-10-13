@@ -1,10 +1,9 @@
 package com.asrevo.cvhome.store.core.model.catalog.product.inventory;
 
 import com.asrevo.cvhome.commons.domain.Entity;
+import java.io.Serial;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.io.Serial;
 
 @Setter
 @Getter
@@ -13,8 +12,8 @@ public class InventoryEntity extends Entity {
     /**
      *
      */
-    @Serial
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
+
     private int quantity;
     private String region;
     private String regionVariant;
@@ -23,6 +22,4 @@ public class InventoryEntity extends Entity {
     private boolean available;
     private int productQuantityOrderMin = 0;
     private int productQuantityOrderMax = 0;
-
-
 }

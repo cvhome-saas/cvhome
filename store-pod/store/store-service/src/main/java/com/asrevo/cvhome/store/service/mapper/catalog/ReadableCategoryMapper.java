@@ -7,39 +7,40 @@ import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import com.asrevo.cvhome.store.core.model.catalog.category.ReadableCategory;
 import com.asrevo.cvhome.store.core.model.catalog.category.ReadableCategoryFull;
 import com.asrevo.cvhome.store.service.mapper.Mapper;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
-
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
 public class ReadableCategoryMapper implements Mapper<Category, ReadableCategory> {
-
 
     @Override
     public ReadableCategory convert(Category source, MerchantStore store, Language language) {
 
         if (Objects.isNull(language)) {
             ReadableCategoryFull target = new ReadableCategoryFull();
-            List<com.asrevo.cvhome.store.core.model.catalog.category.CategoryDescription> descriptions = source
-                    .getDescriptions().stream().map(this::convertDescription).collect(Collectors.toList());
+            List<com.asrevo.cvhome.store.core.model.catalog.category.CategoryDescription>
+                    descriptions =
+                            source.getDescriptions().stream()
+                                    .map(this::convertDescription)
+                                    .collect(Collectors.toList());
             target.setDescriptions(descriptions);
             fillReadableCategory(target, source, language);
             return target;
         } else {
             ReadableCategory target = createReadable(source, language);
-            //fillReadableCategory(target, source, language);
+            // fillReadableCategory(target, source, language);
             return target;
         }
     }
 
     private void fillReadableCategory(ReadableCategory target, Category source, Language language) {
-        Optional<com.asrevo.cvhome.store.core.model.catalog.category.Category> parentCategory = createParentCategory(source,
-                language);
+        Optional<com.asrevo.cvhome.store.core.model.catalog.category.Category> parentCategory =
+                createParentCategory(source, language);
         parentCategory.ifPresent(target::setParent);
 
         Optional.ofNullable(source.getDepth()).ifPresent(target::setDepth);
@@ -53,9 +54,10 @@ public class ReadableCategoryMapper implements Mapper<Category, ReadableCategory
         target.setFeatured(source.isFeatured());
     }
 
-    private com.asrevo.cvhome.store.core.model.catalog.category.CategoryDescription convertDescription(
-            CategoryDescription description) {
-        final com.asrevo.cvhome.store.core.model.catalog.category.CategoryDescription desc = new com.asrevo.cvhome.store.core.model.catalog.category.CategoryDescription();
+    private com.asrevo.cvhome.store.core.model.catalog.category.CategoryDescription
+            convertDescription(CategoryDescription description) {
+        final com.asrevo.cvhome.store.core.model.catalog.category.CategoryDescription desc =
+                new com.asrevo.cvhome.store.core.model.catalog.category.CategoryDescription();
 
         desc.setFriendlyUrl(description.getSeUrl());
         desc.setName(description.getName());
@@ -69,29 +71,43 @@ public class ReadableCategoryMapper implements Mapper<Category, ReadableCategory
         return desc;
     }
 
-    private Optional<com.asrevo.cvhome.store.core.model.catalog.category.Category> createParentCategory(Category source,
-                                                                                                        Language language) {
+    private Optional<com.asrevo.cvhome.store.core.model.catalog.category.Category>
+            createParentCategory(Category source, Language language) {
 
-        return Optional.ofNullable(source.getParent()).map(parentValue -> {
-            final com.asrevo.cvhome.store.core.model.catalog.category.Category parent = new com.asrevo.cvhome.store.core.model.catalog.category.Category();
+        return Optional.ofNullable(source.getParent())
+                .map(
+                        parentValue -> {
+                            final com.asrevo.cvhome.store.core.model.catalog.category.Category
+                                    parent =
+                                            new com.asrevo.cvhome.store.core.model.catalog.category
+                                                    .Category();
 
-            if (source.getParent() != null) {
+                            if (source.getParent() != null) {}
 
-            }
-            Optional<com.asrevo.cvhome.store.core.model.catalog.category.CategoryDescription> description = source
-                    .getDescriptions().stream().filter(d -> language.getId().equals(d.getLanguage().getId()))
-                    .map(this::convertDescription).findAny();
+                            Optional<
+                                            com.asrevo.cvhome.store.core.model.catalog.category
+                                                    .CategoryDescription>
+                                    description =
+                                            source.getDescriptions().stream()
+                                                    .filter(
+                                                            d ->
+                                                                    language.getId()
+                                                                            .equals(
+                                                                                    d.getLanguage()
+                                                                                            .getId()))
+                                                    .map(this::convertDescription)
+                                                    .findAny();
 
-            parent.setCode(source.getParent().getCode());
-            parent.setId(source.getParent().getId());
-            description.ifPresent(parent::setDescription);
-            return parent;
-        });
+                            parent.setCode(source.getParent().getCode());
+                            parent.setId(source.getParent().getId());
+                            description.ifPresent(parent::setDescription);
+                            return parent;
+                        });
     }
 
     @Override
-    public ReadableCategory merge(Category source, ReadableCategory destination, MerchantStore store,
-                                  Language language) {
+    public ReadableCategory merge(
+            Category source, ReadableCategory destination, MerchantStore store, Language language) {
         return destination;
     }
 
@@ -99,9 +115,12 @@ public class ReadableCategoryMapper implements Mapper<Category, ReadableCategory
 
         ReadableCategory current = new ReadableCategory();
         this.fillReadableCategory(current, category, language);
-        Optional<com.asrevo.cvhome.store.core.model.catalog.category.CategoryDescription> description = category
-                .getDescriptions().stream().filter(d -> language.getId().equals(d.getLanguage().getId()))
-                .map(this::convertDescription).findAny();
+        Optional<com.asrevo.cvhome.store.core.model.catalog.category.CategoryDescription>
+                description =
+                        category.getDescriptions().stream()
+                                .filter(d -> language.getId().equals(d.getLanguage().getId()))
+                                .map(this::convertDescription)
+                                .findAny();
 
         description.ifPresent(current::setDescription);
 
@@ -110,7 +129,5 @@ public class ReadableCategoryMapper implements Mapper<Category, ReadableCategory
         }
 
         return current;
-
     }
-
 }

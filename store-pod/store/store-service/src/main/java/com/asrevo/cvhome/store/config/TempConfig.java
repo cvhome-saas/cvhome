@@ -11,8 +11,14 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class TempConfig {
     @Bean
-    public ProductFileManager productFileManager(S3ProductContentFileManager s3ProductContentFileManager, StoreProductImageProperties imageProperties) {
-        return new ProductFileManagerImpl(s3ProductContentFileManager, s3ProductContentFileManager, s3ProductContentFileManager, imageProperties);
+    public ProductFileManager productFileManager(
+            S3ProductContentFileManager s3ProductContentFileManager,
+            StoreProductImageProperties imageProperties) {
+        return new ProductFileManagerImpl(
+                s3ProductContentFileManager,
+                s3ProductContentFileManager,
+                s3ProductContentFileManager,
+                imageProperties);
     }
 
     @Bean

@@ -1,10 +1,9 @@
 package com.asrevo.cvhome.store.core.model.order;
 
 import com.asrevo.cvhome.store.core.entity.order.OrderTotal;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.List;
 
 /**
  * Contains a list of negative OrderTotal variation
@@ -17,5 +16,4 @@ import java.util.List;
 public abstract class OrderTotalVariation {
 
     List<OrderTotal> variations = null;
-
 }

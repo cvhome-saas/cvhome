@@ -9,15 +9,19 @@ import com.asrevo.cvhome.store.core.model.customer.ReadableCustomer;
 import com.asrevo.cvhome.store.core.model.customer.ReadableCustomerReview;
 import com.asrevo.cvhome.store.utils.AbstractDataPopulator;
 import com.asrevo.cvhome.store.utils.DateUtil;
+import java.util.Set;
 import org.apache.commons.collections.CollectionUtils;
 
-import java.util.Set;
-
-public class ReadableCustomerReviewPopulator extends AbstractDataPopulator<CustomerReview, ReadableCustomerReview> {
+public class ReadableCustomerReviewPopulator
+        extends AbstractDataPopulator<CustomerReview, ReadableCustomerReview> {
 
     @Override
-    public ReadableCustomerReview populate(CustomerReview source, ReadableCustomerReview target, MerchantStore store,
-                                           Language language) throws ConversionException {
+    public ReadableCustomerReview populate(
+            CustomerReview source,
+            ReadableCustomerReview target,
+            MerchantStore store,
+            Language language)
+            throws ConversionException {
 
         try {
 
@@ -29,12 +33,10 @@ public class ReadableCustomerReviewPopulator extends AbstractDataPopulator<Custo
                 target.setDate(DateUtil.formatDate(source.getReviewDate()));
             }
 
-
             ReadableCustomer reviewed = new ReadableCustomer();
             reviewed.setId(source.getReviewedCustomer().getId());
             reviewed.setFirstName(source.getReviewedCustomer().getBilling().getFirstName());
             reviewed.setLastName(source.getReviewedCustomer().getBilling().getLastName());
-
 
             target.setId(source.getId());
             target.setCustomerId(source.getCustomer().getId());
@@ -61,17 +63,13 @@ public class ReadableCustomerReviewPopulator extends AbstractDataPopulator<Custo
                     target.setDescription(description.getDescription());
                     target.setLanguage(description.getLanguage().getCode());
                 }
-
             }
-
 
         } catch (Exception e) {
             throw new ConversionException("Cannot populate ReadableCustomerReview", e);
         }
 
-
         return target;
-
     }
 
     @Override
@@ -79,5 +77,4 @@ public class ReadableCustomerReviewPopulator extends AbstractDataPopulator<Custo
         // TODO Auto-generated method stub
         return null;
     }
-
 }

@@ -1,14 +1,13 @@
 package com.asrevo.cloud.ecs.discovery;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import software.amazon.awssdk.services.servicediscovery.ServiceDiscoveryClient;
 import software.amazon.awssdk.services.servicediscovery.model.*;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 public class EcsDiscoveryClient implements DiscoveryClient {
@@ -20,25 +19,35 @@ public class EcsDiscoveryClient implements DiscoveryClient {
         this.discovery = discovery;
     }
 
-    public static List<ServiceInstance> getDefaultServiceInstances(ServiceDiscoveryClient discovery,
-                                                                   EcsDiscoveryProperties properties,
-                                                                   String serviceId) {
+    public static List<ServiceInstance> getDefaultServiceInstances(
+            ServiceDiscoveryClient discovery, EcsDiscoveryProperties properties, String serviceId) {
         log.info("getting services for {}", serviceId);
         String extractedServiceId = extractServiceName(serviceId).orElse(serviceId);
         String extractedNamespace = extractNamespace(serviceId).orElse(properties.getNamespace());
-        DiscoverInstancesRequest request = DiscoverInstancesRequest
-                .builder()
-                .namespaceName(extractedNamespace)
-                .serviceName(extractedServiceId).build();
+        DiscoverInstancesRequest request =
+                DiscoverInstancesRequest.builder()
+                        .namespaceName(extractedNamespace)
+                        .serviceName(extractedServiceId)
+                        .build();
         DiscoverInstancesResponse discoverInstancesResponse = discovery.discoverInstances(request);
         List<HttpInstanceSummary> instances = discoverInstancesResponse.instances();
-        log.info("getting {} services for {} in namespace {}", instances.size(), extractedServiceId, extractedNamespace);
-        return instances
-                .stream()
-                .map(instance -> {
-                    Integer defaultPort = properties.getServicePorts().getOrDefault(extractedServiceId, properties.getDefaultPort());
-                    return (ServiceInstance) new CloudMapServiceInstance(instance, defaultPort);
-                })
+        log.info(
+                "getting {} services for {} in namespace {}",
+                instances.size(),
+                extractedServiceId,
+                extractedNamespace);
+        return instances.stream()
+                .map(
+                        instance -> {
+                            Integer defaultPort =
+                                    properties
+                                            .getServicePorts()
+                                            .getOrDefault(
+                                                    extractedServiceId,
+                                                    properties.getDefaultPort());
+                            return (ServiceInstance)
+                                    new CloudMapServiceInstance(instance, defaultPort);
+                        })
                 .toList();
     }
 
@@ -60,15 +69,20 @@ public class EcsDiscoveryClient implements DiscoveryClient {
         }
     }
 
-    public static List<String> getEcsServices(ServiceDiscoveryClient discovery,
-                                              EcsDiscoveryProperties properties) {
+    public static List<String> getEcsServices(
+            ServiceDiscoveryClient discovery, EcsDiscoveryProperties properties) {
         log.info("getting all services");
         List<ServiceFilter> filters = new ArrayList<>();
         if (properties.getNamespaceId() != null) {
             log.info("will apply namespace id filter for {}", properties.getNamespaceId());
-            filters.add(ServiceFilter.builder().name("NAMESPACE_ID").values(properties.getNamespaceId()).build());
+            filters.add(
+                    ServiceFilter.builder()
+                            .name("NAMESPACE_ID")
+                            .values(properties.getNamespaceId())
+                            .build());
         }
-        ListServicesRequest servicesRequest = ListServicesRequest.builder().filters(filters).build();
+        ListServicesRequest servicesRequest =
+                ListServicesRequest.builder().filters(filters).build();
         ListServicesResponse listServicesResponse = discovery.listServices(servicesRequest);
         List<ServiceSummary> services = listServicesResponse.services();
         List<String> list = services.stream().map(ServiceSummary::name).toList();
@@ -92,4 +106,3 @@ public class EcsDiscoveryClient implements DiscoveryClient {
         return getEcsServices(this.discovery, this.properties);
     }
 }
-

@@ -10,22 +10,26 @@ import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import com.asrevo.cvhome.store.core.model.catalog.product.product.PersistableProductInventory;
 import com.asrevo.cvhome.store.service.mapper.Mapper;
 import com.asrevo.cvhome.store.utils.DateUtil;
-import org.springframework.stereotype.Component;
-
 import java.util.Date;
 import java.util.Optional;
+import org.springframework.stereotype.Component;
 
 @Component
-public class PersistableProductAvailabilityMapper implements Mapper<PersistableProductInventory, ProductAvailability> {
+public class PersistableProductAvailabilityMapper
+        implements Mapper<PersistableProductInventory, ProductAvailability> {
 
     @Override
-    public ProductAvailability convert(PersistableProductInventory source, MerchantStore store, Language language) {
+    public ProductAvailability convert(
+            PersistableProductInventory source, MerchantStore store, Language language) {
         return this.merge(source, new ProductAvailability(), store, language);
     }
 
     @Override
-    public ProductAvailability merge(PersistableProductInventory source, ProductAvailability destination,
-                                     MerchantStore store, Language language) {
+    public ProductAvailability merge(
+            PersistableProductInventory source,
+            ProductAvailability destination,
+            MerchantStore store,
+            Language language) {
 
         try {
 
@@ -62,21 +66,30 @@ public class PersistableProductAvailabilityMapper implements Mapper<PersistableP
                     ppd.setName(Constants.DEFAULT_PRICE_DESCRIPTION);
 
                     // price appender
-                    Optional<com.asrevo.cvhome.store.core.model.catalog.product.ProductPriceDescription> description = source
-                            .getPrice().getDescriptions().stream()
-                            .filter(d -> d.getLanguage() != null && d.getLanguage().equals(lang.getCode())).findFirst();
-                    description.ifPresent(productPriceDescription -> ppd.setPriceAppender(productPriceDescription.getPriceAppender()));
+                    Optional<
+                                    com.asrevo.cvhome.store.core.model.catalog.product
+                                            .ProductPriceDescription>
+                            description =
+                                    source.getPrice().getDescriptions().stream()
+                                            .filter(
+                                                    d ->
+                                                            d.getLanguage() != null
+                                                                    && d.getLanguage()
+                                                                            .equals(lang.getCode()))
+                                            .findFirst();
+                    description.ifPresent(
+                            productPriceDescription ->
+                                    ppd.setPriceAppender(
+                                            productPriceDescription.getPriceAppender()));
                     price.getDescriptions().add(ppd);
                 }
-
             }
 
-
         } catch (Exception e) {
-            throw new ServiceRuntimeException("An error occured while mapping product availability", e);
+            throw new ServiceRuntimeException(
+                    "An error occured while mapping product availability", e);
         }
 
         return destination;
     }
-
 }

@@ -2,6 +2,11 @@ package com.asrevo.cvhome.gateway.filters;
 
 import com.asrevo.cvhome.commons.domain.Domain;
 import com.asrevo.cvhome.gateway.service.CachedRouterService;
+import java.net.InetSocketAddress;
+import java.net.URI;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -17,22 +22,15 @@ import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 
-import java.net.InetSocketAddress;
-import java.net.URI;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-
-
 @Component
 @Slf4j
-public class AddStoreParamGatewayFilterFactory extends AbstractGatewayFilterFactory<AddStoreParamGatewayFilterFactory.Config> {
+public class AddStoreParamGatewayFilterFactory
+        extends AbstractGatewayFilterFactory<AddStoreParamGatewayFilterFactory.Config> {
     public static final String TEMPLATE_KEY = "template";
     private static final String STORE_ID_PARAM = "store";
     private static final String STORE_ID_HEADER = "store";
     private static final String STORE_ID_COOKIE = "store";
     private final CachedRouterService router;
-
 
     public AddStoreParamGatewayFilterFactory(CachedRouterService router) {
         super(AddStoreParamGatewayFilterFactory.Config.class);
@@ -47,7 +45,8 @@ public class AddStoreParamGatewayFilterFactory extends AbstractGatewayFilterFact
         response.getHeaders().set("Set-Cookie", STORE_ID_HEADER + "=" + store + "; Path=/;");
     }
 
-    private static ServerHttpRequest addStoreParamsForRequest(Config config, ServerHttpRequest request, String store) {
+    private static ServerHttpRequest addStoreParamsForRequest(
+            Config config, ServerHttpRequest request, String store) {
         ServerHttpRequest.Builder builder = request.mutate();
         if (config.getAddRequestParam() && extractStoreFromParams(request) == null) {
             addRequestParam(request, store, builder);
@@ -62,14 +61,18 @@ public class AddStoreParamGatewayFilterFactory extends AbstractGatewayFilterFact
     }
 
     private static void addRequestCookie(String store, ServerHttpRequest.Builder builder) {
-        builder.headers(httpHeaders -> httpHeaders.set("Cookie", new HttpCookie(STORE_ID_COOKIE, store).toString()));
+        builder.headers(
+                httpHeaders ->
+                        httpHeaders.set(
+                                "Cookie", new HttpCookie(STORE_ID_COOKIE, store).toString()));
     }
 
     private static void addRequestHeader(String store, ServerHttpRequest.Builder builder) {
         builder.header(STORE_ID_HEADER, store);
     }
 
-    private static void addRequestParam(ServerHttpRequest request, String store, ServerHttpRequest.Builder builder) {
+    private static void addRequestParam(
+            ServerHttpRequest request, String store, ServerHttpRequest.Builder builder) {
         URI uri = request.getURI();
         StringBuilder query = new StringBuilder();
         String originalQuery = uri.getRawQuery();
@@ -83,7 +86,11 @@ public class AddStoreParamGatewayFilterFactory extends AbstractGatewayFilterFact
         query.append('=');
         query.append(store);
 
-        URI newUri = UriComponentsBuilder.fromUri(uri).replaceQuery(query.toString()).build(true).toUri();
+        URI newUri =
+                UriComponentsBuilder.fromUri(uri)
+                        .replaceQuery(query.toString())
+                        .build(true)
+                        .toUri();
         builder.uri(newUri);
     }
 
@@ -116,8 +123,8 @@ public class AddStoreParamGatewayFilterFactory extends AbstractGatewayFilterFact
 
     private static String extractHostName(ServerHttpRequest request) {
         return Optional.ofNullable(request.getHeaders().getHost())
-                                .map(InetSocketAddress::getHostName)
-                                .orElse(null);
+                .map(InetSocketAddress::getHostName)
+                .orElse(null);
     }
 
     @Override
@@ -128,7 +135,11 @@ public class AddStoreParamGatewayFilterFactory extends AbstractGatewayFilterFact
             log.info("get store {} is null {}", store, Objects.isNull(store));
             if (store == null) {
                 String hostName = extractHostName(request);
-                log.info("get hostName {} is null {} is valid {}", hostName, Objects.isNull(hostName), isValidHostName(hostName));
+                log.info(
+                        "get hostName {} is null {} is valid {}",
+                        hostName,
+                        Objects.isNull(hostName),
+                        isValidHostName(hostName));
                 if (isValidHostName(hostName)) {
                     return mapHostToStoreParam(hostName)
                             .flatMap(it -> execute(config, exchange, chain, it));
@@ -144,7 +155,8 @@ public class AddStoreParamGatewayFilterFactory extends AbstractGatewayFilterFact
         return List.of(TEMPLATE_KEY);
     }
 
-    private Mono<Void> execute(Config config, ServerWebExchange exchange, GatewayFilterChain chain, String store) {
+    private Mono<Void> execute(
+            Config config, ServerWebExchange exchange, GatewayFilterChain chain, String store) {
         ServerHttpRequest request = exchange.getRequest();
         ServerHttpRequest newRequest = addStoreParamsForRequest(config, request, store);
         ServerWebExchange newExchange = exchange.mutate().request(newRequest).build();
@@ -152,7 +164,8 @@ public class AddStoreParamGatewayFilterFactory extends AbstractGatewayFilterFact
                 .then(Mono.fromRunnable(() -> addStoreParamsForResponse(config, exchange, store)));
     }
 
-    private void addStoreParamsForResponse(Config config, ServerWebExchange exchange, String store) {
+    private void addStoreParamsForResponse(
+            Config config, ServerWebExchange exchange, String store) {
         ServerHttpResponse response = exchange.getResponse();
         if (!response.isCommitted()) {
             if (config.getAddResponseHeader()) {
@@ -170,11 +183,13 @@ public class AddStoreParamGatewayFilterFactory extends AbstractGatewayFilterFact
 
     private Mono<String> mapHostToStoreParam(String host) {
         log.info("will get store param for host {}", host);
-        return router.getAllocation(new Domain(host)).map(it -> {
-            String storeId = it.getId().toString();
-            log.info("get store id {} for host {}", storeId, host);
-            return storeId;
-        });
+        return router.getAllocation(new Domain(host))
+                .map(
+                        it -> {
+                            String storeId = it.getId().toString();
+                            log.info("get store id {} for host {}", storeId, host);
+                            return storeId;
+                        });
     }
 
     @Getter
@@ -186,5 +201,4 @@ public class AddStoreParamGatewayFilterFactory extends AbstractGatewayFilterFact
         private Boolean addResponseHeader = false;
         private Boolean addResponseCookie = false;
     }
-
 }

@@ -12,7 +12,6 @@ import com.asrevo.cvhome.store.core.model.customer.address.Address;
 import com.asrevo.cvhome.store.utils.AbstractDataPopulator;
 import org.apache.commons.lang3.StringUtils;
 
-
 /**
  * <p>
  * CustomerEntityPopulator will help to populate {@link CustomerEntity} from {@link Customer} CustomerEntity will be
@@ -22,21 +21,21 @@ import org.apache.commons.lang3.StringUtils;
  * @author Umesh Awasthi
  * @version 1.2
  */
-public class CustomerEntityPopulator
-        extends AbstractDataPopulator<Customer, CustomerEntity> {
+public class CustomerEntityPopulator extends AbstractDataPopulator<Customer, CustomerEntity> {
 
     @Override
-    public CustomerEntity populate(final Customer source, final CustomerEntity target,
-                                   final MerchantStore merchantStore, final Language language)
+    public CustomerEntity populate(
+            final Customer source,
+            final CustomerEntity target,
+            final MerchantStore merchantStore,
+            final Language language)
             throws ConversionException {
         try {
-
 
             target.setId(source.getId());
             if (StringUtils.isNotBlank(source.getEmailAddress())) {
                 target.setEmailAddress(source.getEmailAddress());
             }
-
 
             if (source.getBilling() != null) {
                 Address address = new Address();
@@ -99,5 +98,4 @@ public class CustomerEntityPopulator
     protected CustomerEntity createTarget() {
         return new CustomerEntity();
     }
-
 }

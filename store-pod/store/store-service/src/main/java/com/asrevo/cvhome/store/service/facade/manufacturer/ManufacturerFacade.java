@@ -7,7 +7,6 @@ import com.asrevo.cvhome.store.core.model.catalog.manufacturer.PersistableManufa
 import com.asrevo.cvhome.store.core.model.catalog.manufacturer.ReadableManufacturer;
 import com.asrevo.cvhome.store.core.model.catalog.manufacturer.ReadableManufacturerList;
 import com.asrevo.cvhome.store.core.model.entity.ListCriteria;
-
 import java.util.List;
 
 /**
@@ -17,14 +16,16 @@ import java.util.List;
  */
 public interface ManufacturerFacade {
 
-    List<ReadableManufacturer> getByProductInCategory(MerchantStore store, Language language, Long categoryId);
+    List<ReadableManufacturer> getByProductInCategory(
+            MerchantStore store, Language language, Long categoryId);
 
     /**
      * Creates or saves a manufacturer
      *
      */
-    void saveOrUpdateManufacturer(PersistableManufacturer manufacturer, MerchantStore store,
-                                  Language language) throws Exception;
+    void saveOrUpdateManufacturer(
+            PersistableManufacturer manufacturer, MerchantStore store, Language language)
+            throws Exception;
 
     /**
      * Deletes a manufacturer
@@ -44,18 +45,19 @@ public interface ManufacturerFacade {
      * Get all Manufacturer
      *
      */
-    ReadableManufacturerList getAllManufacturers(MerchantStore store, Language language, ListCriteria criteria, int page, int count);
+    ReadableManufacturerList getAllManufacturers(
+            MerchantStore store, Language language, ListCriteria criteria, int page, int count);
 
     /**
      * List manufacturers by a specific store
      *
      */
-    ReadableManufacturerList listByStore(MerchantStore store, Language language, ListCriteria criteria, int page, int count);
+    ReadableManufacturerList listByStore(
+            MerchantStore store, Language language, ListCriteria criteria, int page, int count);
 
     /**
      * Determines if manufacturer code already exists
      *
      */
     boolean manufacturerExist(MerchantStore store, String manufacturerCode);
-
 }

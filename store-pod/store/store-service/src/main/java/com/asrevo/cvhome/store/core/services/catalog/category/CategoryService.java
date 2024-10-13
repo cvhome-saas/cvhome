@@ -6,9 +6,8 @@ import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
-import org.springframework.data.domain.Page;
-
 import java.util.List;
+import org.springframework.data.domain.Page;
 
 public interface CategoryService extends SalesManagerEntityService<Long, Category> {
 
@@ -16,26 +15,27 @@ public interface CategoryService extends SalesManagerEntityService<Long, Categor
 
     List<Category> listBySeUrl(MerchantStore store, String seUrl) throws ServiceException;
 
-    CategoryDescription getDescription(Category category, Language language) throws ServiceException;
+    CategoryDescription getDescription(Category category, Language language)
+            throws ServiceException;
 
-    void addCategoryDescription(Category category, CategoryDescription description) throws ServiceException;
+    void addCategoryDescription(Category category, CategoryDescription description)
+            throws ServiceException;
 
     void addChild(Category parent, Category child) throws ServiceException;
 
     List<Category> listByParent(Category category) throws ServiceException;
 
-    List<Category> listByStoreAndParent(MerchantStore store, Category category) throws ServiceException;
+    List<Category> listByStoreAndParent(MerchantStore store, Category category)
+            throws ServiceException;
 
-
-    List<Category> getByName(MerchantStore store, String name, Language language) throws ServiceException;
+    List<Category> getByName(MerchantStore store, String name, Language language)
+            throws ServiceException;
 
     List<Category> listByStore(MerchantStore store) throws ServiceException;
 
-    Category getByCode(MerchantStore store, String code)
-            throws ServiceException;
+    Category getByCode(MerchantStore store, String code) throws ServiceException;
 
-    List<Category> listByStore(MerchantStore store, Language language)
-            throws ServiceException;
+    List<Category> listByStore(MerchantStore store, Language language) throws ServiceException;
 
     void saveOrUpdate(Category category) throws ServiceException;
 
@@ -45,7 +45,8 @@ public interface CategoryService extends SalesManagerEntityService<Long, Categor
 
     Category getById(Long categoryid, int merchantId, int language);
 
-    Page<Category> getListByDepth(MerchantStore store, Language language, String name, int depth, int page, int count);
+    Page<Category> getListByDepth(
+            MerchantStore store, Language language, String name, int depth, int page, int count);
 
     /**
      * Get root categories by store for a given language
@@ -57,10 +58,10 @@ public interface CategoryService extends SalesManagerEntityService<Long, Categor
      * Returns category hierarchy filter by featured
      *
      */
-    List<Category> getListByDepthFilterByFeatured(MerchantStore store, int depth, Language language);
+    List<Category> getListByDepthFilterByFeatured(
+            MerchantStore store, int depth, Language language);
 
-    List<Category> getListByLineage(String storeCode, String lineage)
-            throws ServiceException;
+    List<Category> getListByLineage(String storeCode, String lineage) throws ServiceException;
 
     Category getByCode(String storeCode, String code) throws ServiceException;
 
@@ -81,8 +82,8 @@ public interface CategoryService extends SalesManagerEntityService<Long, Categor
      * ...
      *
      */
-    List<Object[]> countProductsByCategories(MerchantStore store,
-                                             List<Long> categoryIds) throws ServiceException;
+    List<Object[]> countProductsByCategories(MerchantStore store, List<Long> categoryIds)
+            throws ServiceException;
 
     List<Category> getByProductId(Long productId, MerchantStore store);
 
@@ -90,16 +91,13 @@ public interface CategoryService extends SalesManagerEntityService<Long, Categor
      * Returns a list of Category by category code for a given language
      *
      */
-    List<Category> listByCodes(MerchantStore store, List<String> codes,
-                               Language language);
+    List<Category> listByCodes(MerchantStore store, List<String> codes, Language language);
 
     /**
      * List of Category by id
      *
      */
-    List<Category> listByIds(MerchantStore store, List<Long> ids,
-                             Language language);
-
+    List<Category> listByIds(MerchantStore store, List<Long> ids, Language language);
 
     /**
      * Returns Category with childs and descriptions
@@ -108,6 +106,4 @@ public interface CategoryService extends SalesManagerEntityService<Long, Categor
     Category findById(Long category);
 
     int count(MerchantStore store);
-
-
 }

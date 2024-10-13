@@ -14,27 +14,26 @@ import com.asrevo.cvhome.store.core.model.customer.ReadableDelivery;
 import com.asrevo.cvhome.store.core.services.reference.country.CountryService;
 import com.asrevo.cvhome.store.core.services.reference.zone.ZoneService;
 import com.asrevo.cvhome.store.utils.AbstractDataPopulator;
+import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
-
-import java.util.Map;
 
 /**
  * @author Carl Samson
  */
 @Setter
 @Getter
-public class ReadableCustomerDeliveryAddressPopulator extends AbstractDataPopulator<Delivery, ReadableDelivery> {
-
+public class ReadableCustomerDeliveryAddressPopulator
+        extends AbstractDataPopulator<Delivery, ReadableDelivery> {
 
     private CountryService countryService;
     private ZoneService zoneService;
 
     @Override
-    public ReadableDelivery populate(Delivery source, ReadableDelivery target, MerchantStore store, Language language)
+    public ReadableDelivery populate(
+            Delivery source, ReadableDelivery target, MerchantStore store, Language language)
             throws ConversionException {
-
 
         if (countryService == null) {
             throw new ConversionException("countryService must be set");
@@ -44,10 +43,8 @@ public class ReadableCustomerDeliveryAddressPopulator extends AbstractDataPopula
             throw new ConversionException("zoneService must be set");
         }
 
-
         target.setLatitude(source.getLatitude());
         target.setLongitude(source.getLongitude());
-
 
         if (StringUtils.isNotBlank(source.getCity())) {
             target.setCity(source.getCity());
@@ -86,7 +83,7 @@ public class ReadableCustomerDeliveryAddressPopulator extends AbstractDataPopula
         if (source.getCountry() != null) {
             target.setCountry(source.getCountry().getIsoCode());
 
-            //resolve country name
+            // resolve country name
             try {
                 Map<String, Country> countries = countryService.getCountriesMap(language);
                 Country c = countries.get(source.getCountry().getIsoCode());
@@ -101,7 +98,7 @@ public class ReadableCustomerDeliveryAddressPopulator extends AbstractDataPopula
         if (source.getZone() != null) {
             target.setZone(source.getZone().getCode());
 
-            //resolve zone name
+            // resolve zone name
             try {
                 Map<String, Zone> zones = zoneService.getZones(language);
                 Zone z = zones.get(source.getZone().getCode());
@@ -114,7 +111,6 @@ public class ReadableCustomerDeliveryAddressPopulator extends AbstractDataPopula
             }
         }
 
-
         return target;
     }
 
@@ -123,6 +119,4 @@ public class ReadableCustomerDeliveryAddressPopulator extends AbstractDataPopula
         // TODO Auto-generated method stub
         return null;
     }
-
-
 }

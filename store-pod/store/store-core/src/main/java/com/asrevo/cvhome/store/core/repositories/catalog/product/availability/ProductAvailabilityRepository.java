@@ -1,15 +1,15 @@
 package com.asrevo.cvhome.store.core.repositories.catalog.product.availability;
 
 import com.asrevo.cvhome.store.core.entity.catalog.product.availability.ProductAvailability;
+import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import java.util.List;
-
 public interface ProductAvailabilityRepository extends JpaRepository<ProductAvailability, Long> {
 
-
-    @Query(value = """
+    @Query(
+            value =
+                    """
             select distinct p from ProductAvailability p
             left join fetch p.merchantStore pm
             left join fetch p.prices pp
@@ -19,7 +19,9 @@ public interface ProductAvailabilityRepository extends JpaRepository<ProductAvai
             where p.id=?1\s""")
     ProductAvailability getById(Long availabilityId);
 
-    @Query(value = """
+    @Query(
+            value =
+                    """
             select distinct p from ProductAvailability p
             left join fetch p.merchantStore pm
             left join fetch p.prices pp
@@ -30,8 +32,9 @@ public interface ProductAvailabilityRepository extends JpaRepository<ProductAvai
             and pprm.id=?2""")
     ProductAvailability getById(Long availabilityId, int merchantId);
 
-
-    @Query(value = """
+    @Query(
+            value =
+                    """
             select distinct p from ProductAvailability p
             left join fetch p.merchantStore pm
             left join fetch p.prices pp
@@ -43,7 +46,9 @@ public interface ProductAvailabilityRepository extends JpaRepository<ProductAvai
             and pm.code=?2""")
     List<ProductAvailability> getBySku(String productCode, String store);
 
-    @Query(value = """
+    @Query(
+            value =
+                    """
             select distinct p from ProductAvailability p
             left join fetch p.merchantStore pm
             left join fetch p.prices pp
@@ -53,5 +58,4 @@ public interface ProductAvailabilityRepository extends JpaRepository<ProductAvai
             left join fetch p.productVariant ppi
             where ppr.sku=?1 or ppi.sku=?1""")
     List<ProductAvailability> getBySku(String sku);
-
 }

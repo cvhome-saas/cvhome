@@ -8,6 +8,9 @@ public enum DimensionUnitOfMeasure {
      * in = inch
      * m = meter
      */
-    cm, cu, ft, in, m
-
+    cm,
+    cu,
+    ft,
+    in,
+    m
 }

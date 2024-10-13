@@ -3,26 +3,28 @@ package com.asrevo.cvhome.store.core.entity.customer.attribute;
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
 import com.asrevo.cvhome.store.core.entity.common.description.Description;
 import jakarta.persistence.*;
+import java.io.Serial;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.io.Serial;
-
 @Entity
-@Table(name = "CUSTOMER_OPTION_DESC", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {
-                "CUSTOMER_OPTION_ID",
-                "LANGUAGE_ID"
+@Table(
+        name = "CUSTOMER_OPTION_DESC",
+        uniqueConstraints = {
+            @UniqueConstraint(columnNames = {"CUSTOMER_OPTION_ID", "LANGUAGE_ID"})
         })
-}
-)
-
-@TableGenerator(name = "description_gen", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME", valueColumnName = "SEQ_COUNT", pkColumnValue = "customer_option_description_seq", allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE, initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
+@TableGenerator(
+        name = "description_gen",
+        table = "SM_SEQUENCER",
+        pkColumnName = "SEQ_NAME",
+        valueColumnName = "SEQ_COUNT",
+        pkColumnValue = "customer_option_description_seq",
+        allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
+        initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
 @Getter
 @Setter
 public class CustomerOptionDescription extends Description {
-    @Serial
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
 
     @ManyToOne(targetEntity = CustomerOption.class)
     @JoinColumn(name = "CUSTOMER_OPTION_ID", nullable = false)
@@ -31,7 +33,5 @@ public class CustomerOptionDescription extends Description {
     @Column(name = "CUSTOMER_OPTION_COMMENT", length = 4000)
     private String customerOptionComment;
 
-    public CustomerOptionDescription() {
-    }
-
+    public CustomerOptionDescription() {}
 }

@@ -7,9 +7,7 @@ import com.asrevo.cvhome.store.core.exception.ServiceException;
 
 public interface ProductInventoryService {
 
-
     ProductInventory inventory(Product product) throws ServiceException;
 
     ProductInventory inventory(ProductVariant variant) throws ServiceException;
-
 }

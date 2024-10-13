@@ -8,15 +8,14 @@ import com.asrevo.cvhome.manager.commons.dto.CreateManagerStoreRequest;
 import com.asrevo.cvhome.manager.commons.dto.ListManagerStoreQuery;
 import com.asrevo.cvhome.manager.commons.dto.ManagerStoreDto;
 import com.asrevo.cvhome.manager.entity.ManagerStoreEntity;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 
 @Mapper(componentModel = "spring")
 public interface ManagerStoreMappers {
@@ -37,14 +36,17 @@ public interface ManagerStoreMappers {
         String email = (String) request.get("email");
         String phone = (String) request.get("phone");
         Object address = request.get("address");
-        String country = Optional.ofNullable(address)
-                .map(it -> ((Map<String, String>) it))
-                .map(it -> it.get("country"))
-                .orElse(null);
-        return new CreateManagerStoreRequest(name, new Phone(phone), Country.valueOf(country), new Email(email));
+        String country =
+                Optional.ofNullable(address)
+                        .map(it -> ((Map<String, String>) it))
+                        .map(it -> it.get("country"))
+                        .orElse(null);
+        return new CreateManagerStoreRequest(
+                name, new Phone(phone), Country.valueOf(country), new Email(email));
     }
 
-    default Map<Object, Object> toExternalCreateRequest(Map<Object, Object> request, IdentityId identityId, String reference) {
+    default Map<Object, Object> toExternalCreateRequest(
+            Map<Object, Object> request, IdentityId identityId, String reference) {
         HashMap<Object, Object> newRequest = new HashMap<>(request);
         newRequest.put("code", reference);
         newRequest.put("org", identityId.id());
@@ -54,5 +56,4 @@ public interface ManagerStoreMappers {
     default PageImpl<Object> toPage(List<Object> it, Page<ManagerStoreDto> internalStores) {
         return new PageImpl<>(it, internalStores.getPageable(), internalStores.getTotalElements());
     }
-
 }

@@ -7,11 +7,9 @@ public class UserAlreadyExistException extends Exception {
     /**
      *
      */
-    @Serial
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
 
     public UserAlreadyExistException(String message) {
         super(message, null);
     }
-
 }

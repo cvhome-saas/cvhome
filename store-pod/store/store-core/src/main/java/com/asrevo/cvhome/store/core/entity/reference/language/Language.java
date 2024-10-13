@@ -8,34 +8,37 @@ import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @EntityListeners(value = AuditListener.class)
-@Table(name = "LANGUAGE", indexes = {@Index(name = "CODE_IDX2", columnList = "CODE")})
+@Table(
+        name = "LANGUAGE",
+        indexes = {@Index(name = "CODE_IDX2", columnList = "CODE")})
 @Cacheable
 @Getter
 @Setter
 public class Language extends SalesManagerEntity<Integer, Language> implements Auditable {
-    @Serial
-    private static final long serialVersionUID = 1L;
-
+    @Serial private static final long serialVersionUID = 1L;
 
     @Id
     @Column(name = "LANGUAGE_ID")
-    @TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME",
-            valueColumnName = "SEQ_COUNT", pkColumnValue = "LANG_SEQ_NEXT_VAL", allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE, initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
+    @TableGenerator(
+            name = "TABLE_GEN",
+            table = "SM_SEQUENCER",
+            pkColumnName = "SEQ_NAME",
+            valueColumnName = "SEQ_COUNT",
+            pkColumnValue = "LANG_SEQ_NEXT_VAL",
+            allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
+            initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
     private Integer id;
 
-    @JsonIgnore
-    @Embedded
-    private AuditSection auditSection = new AuditSection();
+    @JsonIgnore @Embedded private AuditSection auditSection = new AuditSection();
 
     @Column(name = "CODE", nullable = false)
     private String code;
@@ -52,18 +55,15 @@ public class Language extends SalesManagerEntity<Integer, Language> implements A
     @ManyToMany(mappedBy = "languages", targetEntity = MerchantStore.class, fetch = FetchType.LAZY)
     private List<MerchantStore> stores = new ArrayList<>();
 
-    public Language() {
-    }
+    public Language() {}
 
     public Language(String code) {
         this.setCode(code);
     }
 
-
     @Override
     public boolean equals(Object obj) {
-        if (null == obj)
-            return false;
+        if (null == obj) return false;
         if (!(obj instanceof Language language)) {
             return false;
         } else {

@@ -16,23 +16,22 @@
 
 package com.asrevo.cvhome.s2s.config.gateway;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 import org.springframework.cloud.gateway.handler.predicate.AbstractRoutePredicateFactory;
 import org.springframework.cloud.gateway.handler.predicate.GatewayPredicate;
 import org.springframework.http.server.RequestPath;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.server.ServerWebExchange;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
-
 /**
  * @author Spencer Gibb
  */
-public class FNotServiceRoutePredicateFactory extends AbstractRoutePredicateFactory<FNotServiceRoutePredicateFactory.Config> {
-
+public class FNotServiceRoutePredicateFactory
+        extends AbstractRoutePredicateFactory<FNotServiceRoutePredicateFactory.Config> {
 
     public FNotServiceRoutePredicateFactory() {
         super(Config.class);
@@ -55,26 +54,22 @@ public class FNotServiceRoutePredicateFactory extends AbstractRoutePredicateFact
             public boolean test(ServerWebExchange exchange) {
                 RequestPath path = exchange.getRequest().getPath();
                 String[] splits = path.toString().split("/");
-                String[] parts = Stream.of(splits).filter(it -> !it.isEmpty()).toArray(String[]::new);
+                String[] parts =
+                        Stream.of(splits).filter(it -> !it.isEmpty()).toArray(String[]::new);
                 if (parts.length > 0) {
                     return !config.services.contains(parts[0]);
                 } else {
                     return true;
                 }
-
             }
 
             @Override
             public Object getConfig() {
                 return config;
             }
-
-
         };
     }
 
     @Validated
-    public record Config(Set<String> services) {
-    }
-
+    public record Config(Set<String> services) {}
 }

@@ -2,22 +2,21 @@ package com.asrevo.cvhome.store.core.services.generic;
 
 import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
-import org.springframework.data.jpa.repository.JpaRepository;
-
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
  */
-public abstract class SalesManagerEntityServiceImpl<K extends Serializable & Comparable<K>, E extends SalesManagerEntity<K, ?>>
+public abstract class SalesManagerEntityServiceImpl<
+                K extends Serializable & Comparable<K>, E extends SalesManagerEntity<K, ?>>
         implements SalesManagerEntityService<K, E> {
 
     /**
      * Classe de l'entité, déterminé à partir des paramètres generics.
      */
     private final Class<E> objectClass;
-
 
     private final JpaRepository<E, K> repository;
 
@@ -32,11 +31,9 @@ public abstract class SalesManagerEntityServiceImpl<K extends Serializable & Com
         return objectClass;
     }
 
-
     public E getById(K id) {
         return repository.getOne(id);
     }
-
 
     public void save(E entity) throws ServiceException {
         repository.saveAndFlush(entity);
@@ -46,31 +43,25 @@ public abstract class SalesManagerEntityServiceImpl<K extends Serializable & Com
         repository.saveAll(entities);
     }
 
-
     public void create(E entity) throws ServiceException {
         save(entity);
     }
-
 
     public void update(E entity) throws ServiceException {
         save(entity);
     }
 
-
     public void delete(E entity) throws ServiceException {
         repository.delete(entity);
     }
-
 
     public void flush() {
         repository.flush();
     }
 
-
     public List<E> list() {
         return repository.findAll();
     }
-
 
     public Long count() {
         return repository.count();
@@ -79,5 +70,4 @@ public abstract class SalesManagerEntityServiceImpl<K extends Serializable & Com
     protected E saveAndFlush(E entity) {
         return repository.saveAndFlush(entity);
     }
-
 }

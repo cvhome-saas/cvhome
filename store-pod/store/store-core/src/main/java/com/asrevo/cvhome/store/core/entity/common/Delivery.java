@@ -39,16 +39,11 @@ public class Delivery {
     @JoinColumn(name = "DELIVERY_COUNTRY_ID")
     private Country country;
 
-
     @ManyToOne(fetch = FetchType.LAZY, targetEntity = Zone.class)
     @JoinColumn(name = "DELIVERY_ZONE_ID")
     private Zone zone;
 
-    @Transient
-    private String latitude = null;
+    @Transient private String latitude = null;
 
-    @Transient
-    private String longitude = null;
-
-
+    @Transient private String longitude = null;
 }

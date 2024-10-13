@@ -13,15 +13,14 @@ import com.asrevo.cvhome.manager.service.RouterService;
 import com.asrevo.cvhome.manager.service.StoreManagerService;
 import com.asrevo.cvhome.manager.service.StorePodClient;
 import com.asrevo.cvhome.s2s.model.SaasProperties;
+import java.util.List;
+import java.util.Map;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.util.List;
-import java.util.Map;
 
 @Service
 public class StoreManagerServiceImpl implements StoreManagerService {
@@ -31,7 +30,12 @@ public class StoreManagerServiceImpl implements StoreManagerService {
     private final ManagerStoreMappers managerStoreMappers;
     private final StorePodClient storePodClient;
 
-    public StoreManagerServiceImpl(SaasProperties saasProperties, RouterService routerService, InternalStoreService internalStoreService, ManagerStoreMappers managerStoreMappers, StorePodClient storePodClient) {
+    public StoreManagerServiceImpl(
+            SaasProperties saasProperties,
+            RouterService routerService,
+            InternalStoreService internalStoreService,
+            ManagerStoreMappers managerStoreMappers,
+            StorePodClient storePodClient) {
         this.saasProperties = saasProperties;
         this.routerService = routerService;
         this.internalStoreService = internalStoreService;
@@ -46,19 +50,30 @@ public class StoreManagerServiceImpl implements StoreManagerService {
         Domain suggestedSubDomain = new Domain(storeRequest.name() + "." + saasProperties.domain());
         routerService.create(suggestedSubDomain, store.id());
         internalStoreService.syncInRouter(store.id());
-        Map<Object, Object> newRequest = managerStoreMappers.toExternalCreateRequest(request,identityId, store.id().getId().toString());
-        return storePodClient.create(newRequest).map(it -> {
-            internalStoreService.syncInStore(store.id());
-            return it;
-        }).then();
+        Map<Object, Object> newRequest =
+                managerStoreMappers.toExternalCreateRequest(
+                        request, identityId, store.id().getId().toString());
+        return storePodClient
+                .create(newRequest)
+                .map(
+                        it -> {
+                            internalStoreService.syncInStore(store.id());
+                            return it;
+                        })
+                .then();
     }
 
     @Override
-    public Mono<PageImpl<Object>> findAll(UserOrgStoreIdentity identity, ListManagerStoreQuery listManagerStoreQuery, Pageable pageable) {
-        Page<ManagerStoreDto> internalStores = internalStoreService.findAll(identity, listManagerStoreQuery, pageable);
-        Mono<List<Object>> listMono = Flux.fromIterable(internalStores.getContent())
-                .flatMap(it ->
-                        getStore(it.id())).collectList();
+    public Mono<PageImpl<Object>> findAll(
+            UserOrgStoreIdentity identity,
+            ListManagerStoreQuery listManagerStoreQuery,
+            Pageable pageable) {
+        Page<ManagerStoreDto> internalStores =
+                internalStoreService.findAll(identity, listManagerStoreQuery, pageable);
+        Mono<List<Object>> listMono =
+                Flux.fromIterable(internalStores.getContent())
+                        .flatMap(it -> getStore(it.id()))
+                        .collectList();
         return listMono.map(it -> managerStoreMappers.toPage(it, internalStores));
     }
 

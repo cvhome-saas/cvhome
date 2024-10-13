@@ -14,7 +14,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 @Component
-public class PersistableProductOptionMapper implements Mapper<PersistableProductOptionEntity, ProductOption> {
+public class PersistableProductOptionMapper
+        implements Mapper<PersistableProductOptionEntity, ProductOption> {
 
     private final LanguageService languageService;
 
@@ -22,8 +23,10 @@ public class PersistableProductOptionMapper implements Mapper<PersistableProduct
         this.languageService = languageService;
     }
 
-
-    ProductOptionDescription description(com.asrevo.cvhome.store.core.model.catalog.product.attribute.ProductOptionDescription description) throws Exception {
+    ProductOptionDescription description(
+            com.asrevo.cvhome.store.core.model.catalog.product.attribute.ProductOptionDescription
+                    description)
+            throws Exception {
         Assert.notNull(description.getLanguage(), "description.language should not be null");
         ProductOptionDescription desc = new ProductOptionDescription();
         desc.setId(null);
@@ -37,18 +40,19 @@ public class PersistableProductOptionMapper implements Mapper<PersistableProduct
         return desc;
     }
 
-
     @Override
-    public ProductOption convert(PersistableProductOptionEntity source, MerchantStore store,
-                                 Language language) {
+    public ProductOption convert(
+            PersistableProductOptionEntity source, MerchantStore store, Language language) {
         ProductOption destination = new ProductOption();
         return merge(source, destination, store, language);
     }
 
-
     @Override
-    public ProductOption merge(PersistableProductOptionEntity source, ProductOption destination,
-                               MerchantStore store, Language language) {
+    public ProductOption merge(
+            PersistableProductOptionEntity source,
+            ProductOption destination,
+            MerchantStore store,
+            Language language) {
         if (destination == null) {
             destination = new ProductOption();
         }
@@ -56,11 +60,14 @@ public class PersistableProductOptionMapper implements Mapper<PersistableProduct
         try {
 
             if (!CollectionUtils.isEmpty(source.getDescriptions())) {
-                for (com.asrevo.cvhome.store.core.model.catalog.product.attribute.ProductOptionDescription desc : source.getDescriptions()) {
+                for (com.asrevo.cvhome.store.core.model.catalog.product.attribute
+                                .ProductOptionDescription
+                        desc : source.getDescriptions()) {
                     ProductOptionDescription description = null;
                     if (!CollectionUtils.isEmpty(destination.getDescriptions())) {
                         for (ProductOptionDescription d : destination.getDescriptions()) {
-                            if (!StringUtils.isBlank(desc.getLanguage()) && desc.getLanguage().equals(d.getLanguage().getCode())) {
+                            if (!StringUtils.isBlank(desc.getLanguage())
+                                    && desc.getLanguage().equals(d.getLanguage().getCode())) {
                                 d.setDescription(desc.getDescription());
                                 d.setName(desc.getName());
                                 d.setTitle(desc.getTitle());
@@ -83,11 +90,9 @@ public class PersistableProductOptionMapper implements Mapper<PersistableProduct
             destination.setProductOptionType(source.getType());
             destination.setReadOnly(source.isReadOnly());
 
-
             return destination;
         } catch (Exception e) {
             throw new ServiceRuntimeException("Error while converting product option", e);
         }
     }
-
 }

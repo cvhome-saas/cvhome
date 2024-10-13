@@ -7,9 +7,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
-public interface PageableProductAttributeRepository extends PagingAndSortingRepository<Category, Long> {
+public interface PageableProductAttributeRepository
+        extends PagingAndSortingRepository<Category, Long> {
 
-    @Query(value = """
+    @Query(
+            value =
+                    """
             select distinct p from ProductAttribute p
             join fetch p.product pr
             left join fetch p.productOption po
@@ -18,15 +21,19 @@ public interface PageableProductAttributeRepository extends PagingAndSortingRepo
             left join fetch pov.descriptions povd
             left join fetch po.merchantStore pom
             where pom.id = ?1 and pr.id = ?2 and povd.language.id = ?3""",
-            countQuery = """
+            countQuery =
+                    """
                     select  count(p)
                     from ProductAttribute p
                     join p.product pr
                     join pr.merchantStore pm
                     where pm.id = ?1 and pr.id = ?2""")
-    Page<ProductAttribute> findByProductId(Integer storeId, Long productId, Integer languageId, Pageable pageable);
+    Page<ProductAttribute> findByProductId(
+            Integer storeId, Long productId, Integer languageId, Pageable pageable);
 
-    @Query(value = """
+    @Query(
+            value =
+                    """
             select distinct p from ProductAttribute p
             join fetch p.product pr
             left join fetch p.productOption po
@@ -35,12 +42,12 @@ public interface PageableProductAttributeRepository extends PagingAndSortingRepo
             left join fetch pov.descriptions povd
             left join fetch po.merchantStore pom
             where pom.id = ?1 and pr.id = ?2""",
-            countQuery = """
+            countQuery =
+                    """
                     select  count(p)
                     from ProductAttribute p
                     join p.product pr
                     join pr.merchantStore pm
                     where pm.id = ?1 and pr.id = ?2""")
     Page<ProductAttribute> findByProductId(Integer storeId, Long productId, Pageable pageable);
-
 }

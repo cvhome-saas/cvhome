@@ -13,46 +13,45 @@ import com.asrevo.cvhome.store.core.model.order.v0.ReadableOrder;
 import com.asrevo.cvhome.store.core.model.store.ReadableMerchantStore;
 import com.asrevo.cvhome.store.service.populator.store.ReadableMerchantStorePopulator;
 import com.asrevo.cvhome.store.utils.AbstractDataPopulator;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 @Component
-public class ReadableOrderPopulator extends
-        AbstractDataPopulator<Order, ReadableOrder> {
+public class ReadableOrderPopulator extends AbstractDataPopulator<Order, ReadableOrder> {
 
-    @Autowired
-    private ReadableMerchantStorePopulator readableMerchantStorePopulator;
-
+    @Autowired private ReadableMerchantStorePopulator readableMerchantStorePopulator;
 
     @Override
-    public ReadableOrder populate(Order source, ReadableOrder target,
-                                  MerchantStore store, Language language) throws ConversionException {
-
+    public ReadableOrder populate(
+            Order source, ReadableOrder target, MerchantStore store, Language language)
+            throws ConversionException {
 
         target.setId(source.getId());
         target.setDatePurchased(source.getDatePurchased());
         target.setOrderStatus(source.getStatus());
         target.setCurrency(source.getCurrency().getCode());
-        //target.setCurrencyModel(source.getCurrency());
+        // target.setCurrencyModel(source.getCurrency());
 
         target.setPaymentType(source.getPaymentType());
         target.setPaymentModule(source.getPaymentModuleCode());
         target.setShippingModule(source.getShippingModuleCode());
 
         if (source.getMerchant() != null) {
-/*			ReadableMerchantStorePopulator merchantPopulator = new ReadableMerchantStorePopulator();
-			merchantPopulator.setCountryService(countryService);
-			merchantPopulator.setFilePath(filePath);
-			merchantPopulator.setZoneService(zoneService);*/
+            /*			ReadableMerchantStorePopulator merchantPopulator = new ReadableMerchantStorePopulator();
+            merchantPopulator.setCountryService(countryService);
+            merchantPopulator.setFilePath(filePath);
+            merchantPopulator.setZoneService(zoneService);*/
             ReadableMerchantStore readableStore =
-                    readableMerchantStorePopulator.populate(source.getMerchant(), null, store, source.getMerchant().getDefaultLanguage());
+                    readableMerchantStorePopulator.populate(
+                            source.getMerchant(),
+                            null,
+                            store,
+                            source.getMerchant().getDefaultLanguage());
             target.setStore(readableStore);
         }
-
 
         if (source.getCustomerAgreement() != null) {
             target.setCustomerAgreed(source.getCustomerAgreement());
@@ -63,7 +62,6 @@ public class ReadableOrderPopulator extends
 
         com.asrevo.cvhome.store.core.model.order.total.OrderTotal taxTotal = null;
         com.asrevo.cvhome.store.core.model.order.total.OrderTotal shippingTotal = null;
-
 
         if (source.getBilling() != null) {
             ReadableBilling address = new ReadableBilling();
@@ -87,7 +85,8 @@ public class ReadableOrderPopulator extends
 
         if (source.getOrderAttributes() != null && !source.getOrderAttributes().isEmpty()) {
             for (OrderAttribute attr : source.getOrderAttributes()) {
-                com.asrevo.cvhome.store.core.model.order.OrderAttribute a = new com.asrevo.cvhome.store.core.model.order.OrderAttribute();
+                com.asrevo.cvhome.store.core.model.order.OrderAttribute a =
+                        new com.asrevo.cvhome.store.core.model.order.OrderAttribute();
                 a.setKey(attr.getKey());
                 a.setValue(attr.getValue());
                 target.getAttributes().add(a);
@@ -119,11 +118,13 @@ public class ReadableOrderPopulator extends
                 continue;
             }
             if (t.getOrderTotalType().name().equals(OrderTotalType.TOTAL.name())) {
-                com.asrevo.cvhome.store.core.model.order.total.OrderTotal totalTotal = createTotal(t);
+                com.asrevo.cvhome.store.core.model.order.total.OrderTotal totalTotal =
+                        createTotal(t);
                 target.setTotal(totalTotal);
                 totals.add(totalTotal);
             } else if (t.getOrderTotalType().name().equals(OrderTotalType.TAX.name())) {
-                com.asrevo.cvhome.store.core.model.order.total.OrderTotal totalTotal = createTotal(t);
+                com.asrevo.cvhome.store.core.model.order.total.OrderTotal totalTotal =
+                        createTotal(t);
                 if (taxTotal == null) {
                     taxTotal = totalTotal;
                 } else {
@@ -134,7 +135,8 @@ public class ReadableOrderPopulator extends
                 target.setTax(totalTotal);
                 totals.add(totalTotal);
             } else if (t.getOrderTotalType().name().equals(OrderTotalType.SHIPPING.name())) {
-                com.asrevo.cvhome.store.core.model.order.total.OrderTotal totalTotal = createTotal(t);
+                com.asrevo.cvhome.store.core.model.order.total.OrderTotal totalTotal =
+                        createTotal(t);
                 if (shippingTotal == null) {
                     shippingTotal = totalTotal;
                 } else {
@@ -145,7 +147,8 @@ public class ReadableOrderPopulator extends
                 target.setShipping(totalTotal);
                 totals.add(totalTotal);
             } else if (t.getOrderTotalType().name().equals(OrderTotalType.HANDLING.name())) {
-                com.asrevo.cvhome.store.core.model.order.total.OrderTotal totalTotal = createTotal(t);
+                com.asrevo.cvhome.store.core.model.order.total.OrderTotal totalTotal =
+                        createTotal(t);
                 if (shippingTotal == null) {
                     shippingTotal = totalTotal;
                 } else {
@@ -160,7 +163,8 @@ public class ReadableOrderPopulator extends
                 totals.add(subTotal);
 
             } else {
-                com.asrevo.cvhome.store.core.model.order.total.OrderTotal otherTotal = createTotal(t);
+                com.asrevo.cvhome.store.core.model.order.total.OrderTotal otherTotal =
+                        createTotal(t);
                 totals.add(otherTotal);
             }
         }
@@ -171,7 +175,8 @@ public class ReadableOrderPopulator extends
     }
 
     private com.asrevo.cvhome.store.core.model.order.total.OrderTotal createTotal(OrderTotal t) {
-        com.asrevo.cvhome.store.core.model.order.total.OrderTotal totalTotal = new com.asrevo.cvhome.store.core.model.order.total.OrderTotal();
+        com.asrevo.cvhome.store.core.model.order.total.OrderTotal totalTotal =
+                new com.asrevo.cvhome.store.core.model.order.total.OrderTotal();
         totalTotal.setCode(t.getOrderTotalCode());
         totalTotal.setId(t.getId());
         totalTotal.setModule(t.getModule());
@@ -185,5 +190,4 @@ public class ReadableOrderPopulator extends
 
         return null;
     }
-
 }

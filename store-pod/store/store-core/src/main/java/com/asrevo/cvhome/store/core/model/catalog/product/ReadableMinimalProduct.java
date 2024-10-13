@@ -2,12 +2,11 @@ package com.asrevo.cvhome.store.core.model.catalog.product;
 
 import com.asrevo.cvhome.store.core.model.catalog.product.product.ProductEntity;
 import com.asrevo.cvhome.store.core.model.entity.ReadableDescription;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
 
 @Setter
 @Getter
@@ -16,8 +15,7 @@ public class ReadableMinimalProduct extends ProductEntity implements Serializabl
     /**
      *
      */
-    @Serial
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
 
     private ReadableDescription description;
     private ReadableProductPrice productPrice;
@@ -25,6 +23,4 @@ public class ReadableMinimalProduct extends ProductEntity implements Serializabl
     private String originalPrice = null;
     private ReadableImage image;
     private List<ReadableImage> images;
-
-
 }

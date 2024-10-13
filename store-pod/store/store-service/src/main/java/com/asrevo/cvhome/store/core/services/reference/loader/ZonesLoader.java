@@ -8,14 +8,13 @@ import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.services.reference.country.CountryService;
 import com.asrevo.cvhome.store.core.services.reference.language.LanguageService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Component;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.*;
 
 /**
  * Drop files in reference/zones with following format
@@ -34,7 +33,10 @@ public class ZonesLoader {
     private final CountryService countryService;
     private final ResourcePatternResolver resourceResolver;
 
-    public ZonesLoader(LanguageService languageService, CountryService countryService, ResourcePatternResolver resourceResolver) {
+    public ZonesLoader(
+            LanguageService languageService,
+            CountryService countryService,
+            ResourcePatternResolver resourceResolver) {
         this.languageService = languageService;
         this.countryService = countryService;
         this.resourceResolver = resourceResolver;
@@ -72,13 +74,19 @@ public class ZonesLoader {
 
                 if (resource.getFilename().contains("_")) {
                     for (Language l : languages) {
-                        if (resource.getFilename().contains("_" + l.getCode())) {// lead for this
+                        if (resource.getFilename().contains("_" + l.getCode())) { // lead for this
                             // language
                             List langList = (List) data.get(l.getCode());
                             if (langList != null) {
                                 for (Object z : langList) {
                                     Map<String, String> e = (Map<String, String>) z;
-                                    mapZone(l, zonesDescriptionsMap, countriesMap, zonesMap, zonesMark, e);
+                                    mapZone(
+                                            l,
+                                            zonesDescriptionsMap,
+                                            countriesMap,
+                                            zonesMap,
+                                            zonesMark,
+                                            e);
                                 }
                             }
                         }
@@ -89,7 +97,13 @@ public class ZonesLoader {
                         for (Language l : languages) {
                             for (Object z : langList) {
                                 Map<String, String> e = (Map<String, String>) z;
-                                mapZone(l, zonesDescriptionsMap, countriesMap, zonesMap, zonesMark, e);
+                                mapZone(
+                                        l,
+                                        zonesDescriptionsMap,
+                                        countriesMap,
+                                        zonesMap,
+                                        zonesMark,
+                                        e);
                             }
                         }
                     }
@@ -113,12 +127,12 @@ public class ZonesLoader {
         } catch (Exception e) {
             throw new ServiceException(e);
         }
-
     }
 
-
     private InputStream loadFileContent(String fileName) throws Exception {
-        return this.getClass().getClassLoader().getResourceAsStream("classpath:/reference/zones/" + fileName);
+        return this.getClass()
+                .getClassLoader()
+                .getResourceAsStream("classpath:/reference/zones/" + fileName);
     }
 
     public Map<String, Zone> loadZones(String jsonFilePath) throws Exception {
@@ -130,7 +144,6 @@ public class ZonesLoader {
         for (Country country : countries) {
 
             countriesMap.put(country.getIsoCode(), country);
-
         }
 
         ObjectMapper mapper = new ObjectMapper();
@@ -154,10 +167,8 @@ public class ZonesLoader {
                         @SuppressWarnings("unchecked")
                         Map<String, String> e = (Map<String, String>) z;
                         this.mapZone(l, zonesDescriptionsMap, countriesMap, zonesMap, zonesMark, e);
-
                     }
                 }
-
             }
 
             for (Map.Entry<String, Zone> entry : zonesMap.entrySet()) {
@@ -176,13 +187,16 @@ public class ZonesLoader {
         } catch (Exception e) {
             throw new ServiceException(e);
         }
-
     }
 
     // internal complex mapping stuff, don't try this at home ...
-    private void mapZone(Language l, Map<String, List<ZoneDescription>> zonesDescriptionsMap,
-                         Map<String, Country> countriesMap, Map<String, Zone> zonesMap, Map<String, String> zonesMark,
-                         Map<String, String> list) {
+    private void mapZone(
+            Language l,
+            Map<String, List<ZoneDescription>> zonesDescriptionsMap,
+            Map<String, Country> countriesMap,
+            Map<String, Zone> zonesMap,
+            Map<String, String> zonesMark,
+            Map<String, String> list) {
 
         String zoneCode = list.get("zoneCode");
         ZoneDescription zoneDescription = new ZoneDescription();
@@ -194,18 +208,22 @@ public class ZonesLoader {
             zone = new Zone();
             Country country = countriesMap.get(list.get("countryCode"));
             if (country == null) {
-                log.warn("Country is null for {} and country code {}", zoneCode, list.get("countryCode"));
+                log.warn(
+                        "Country is null for {} and country code {}",
+                        zoneCode,
+                        list.get("countryCode"));
                 return;
             }
             zone.setCountry(country);
             zone.setCode(zoneCode);
             zonesMap.put(zoneCode, zone);
-
-
         }
 
         if (zonesMark.containsKey(l.getCode() + "_" + zoneCode)) {
-            log.warn("This zone seems to be a duplicate !  {} and language code {}", zoneCode, l.getCode());
+            log.warn(
+                    "This zone seems to be a duplicate !  {} and language code {}",
+                    zoneCode,
+                    l.getCode());
             return;
         }
 
@@ -219,7 +237,6 @@ public class ZonesLoader {
         }
 
         descriptions.add(zoneDescription);
-
     }
 
     private List<Resource> geZoneFiles(String path) throws IOException {
@@ -228,9 +245,5 @@ public class ZonesLoader {
         List<Resource> files = new ArrayList<>();
         Collections.addAll(files, resources);
         return files;
-
     }
-
-
 }
-

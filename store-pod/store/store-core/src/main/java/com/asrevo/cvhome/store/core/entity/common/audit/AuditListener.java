@@ -2,7 +2,6 @@ package com.asrevo.cvhome.store.core.entity.common.audit;
 
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
-
 import java.util.Date;
 
 public class AuditListener {

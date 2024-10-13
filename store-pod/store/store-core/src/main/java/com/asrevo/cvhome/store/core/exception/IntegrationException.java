@@ -1,23 +1,22 @@
 package com.asrevo.cvhome.store.core.exception;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import java.io.Serial;
 import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
 
 @Setter
 @Getter
 public class IntegrationException extends ServiceException {
 
-
     public static final int ERROR_VALIDATION_SAVE = 100;
     public static final int TRANSACTION_EXCEPTION = 99;
+
     /**
      *
      */
-    @Serial
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
+
     private List<String> errorFields;
 
     private int errorCode = 0;
@@ -44,5 +43,4 @@ public class IntegrationException extends ServiceException {
     public IntegrationException(String message) {
         super(message);
     }
-
 }

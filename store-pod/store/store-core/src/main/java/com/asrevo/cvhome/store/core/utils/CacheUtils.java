@@ -10,19 +10,17 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class CacheUtils {
 
-    public final static String REFERENCE_CACHE = "REF";
-    private final static String KEY_DELIMITER = "_";
+    public static final String REFERENCE_CACHE = "REF";
+    private static final String KEY_DELIMITER = "_";
     //	@TODO ASHRAF
-//    @Autowired
-//    @Qualifier("serviceCache")
+    //    @Autowired
+    //    @Qualifier("serviceCache")
     private final Cache cache = new ConcurrentMapCache("ashraf-checks");
 
     public void putInCache(Object object, String keyName) throws Exception {
 
         cache.put(keyName, object);
-
     }
-
 
     public Object getFromCache(String keyName) throws Exception {
 
@@ -32,8 +30,5 @@ public class CacheUtils {
         }
 
         return null;
-
     }
-
-
 }
