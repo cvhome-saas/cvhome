@@ -13,11 +13,10 @@ import com.asrevo.cvhome.store.core.model.catalog.product.type.ReadableProductTy
 import com.asrevo.cvhome.store.core.services.catalog.product.type.ProductTypeService;
 import com.asrevo.cvhome.store.service.mapper.catalog.PersistableProductTypeMapper;
 import com.asrevo.cvhome.store.service.mapper.catalog.ReadableProductTypeMapper;
+import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-
-import java.util.stream.Collectors;
 
 @Service("productTypeFacade")
 public class ProductTypeFacadeImpl implements ProductTypeFacade {
@@ -28,24 +27,32 @@ public class ProductTypeFacadeImpl implements ProductTypeFacade {
 
     private final PersistableProductTypeMapper persistableProductTypeMapper;
 
-    public ProductTypeFacadeImpl(ProductTypeService productTypeService, ReadableProductTypeMapper readableProductTypeMapper, PersistableProductTypeMapper persistableProductTypeMapper) {
+    public ProductTypeFacadeImpl(
+            ProductTypeService productTypeService,
+            ReadableProductTypeMapper readableProductTypeMapper,
+            PersistableProductTypeMapper persistableProductTypeMapper) {
         this.productTypeService = productTypeService;
         this.readableProductTypeMapper = readableProductTypeMapper;
         this.persistableProductTypeMapper = persistableProductTypeMapper;
     }
 
     @Override
-    public ReadableProductTypeList getByMerchant(MerchantStore store, Language language, int count, int page) {
+    public ReadableProductTypeList getByMerchant(
+            MerchantStore store, Language language, int count, int page) {
 
         Assert.notNull(store, "MerchantStore cannot be null");
         ReadableProductTypeList returnList = new ReadableProductTypeList();
 
         try {
 
-            Page<ProductType> types = productTypeService.getByMerchant(store, language, page, count);
+            Page<ProductType> types =
+                    productTypeService.getByMerchant(store, language, page, count);
 
             if (types != null) {
-                returnList.setList(types.getContent().stream().map(t -> readableProductTypeMapper.convert(t, store, language)).collect(Collectors.toList()));
+                returnList.setList(
+                        types.getContent().stream()
+                                .map(t -> readableProductTypeMapper.convert(t, store, language))
+                                .collect(Collectors.toList()));
                 returnList.setTotalPages(types.getTotalPages());
                 returnList.setRecordsTotal(types.getTotalElements());
                 returnList.setRecordsFiltered(types.getSize());
@@ -54,9 +61,11 @@ public class ProductTypeFacadeImpl implements ProductTypeFacade {
             return returnList;
         } catch (Exception e) {
             throw new ServiceRuntimeException(
-                    "An exception occured while getting product types for merchant[ " + store.getCode() + "]", e);
+                    "An exception occured while getting product types for merchant[ "
+                            + store.getCode()
+                            + "]",
+                    e);
         }
-
     }
 
     @Override
@@ -74,19 +83,24 @@ public class ProductTypeFacadeImpl implements ProductTypeFacade {
             }
 
             if (type == null) {
-                throw new ResourceNotFoundException("Product type [" + id + "] not found for store [" + store.getCode() + "]");
+                throw new ResourceNotFoundException(
+                        "Product type [" + id + "] not found for store [" + store.getCode() + "]");
             }
 
-            ReadableProductType readableType = readableProductTypeMapper.convert(type, store, language);
-
+            ReadableProductType readableType =
+                    readableProductTypeMapper.convert(type, store, language);
 
             return readableType;
 
         } catch (Exception e) {
             throw new ServiceRuntimeException(
-                    "An exception occured while getting product type [" + id + "] not found for store [" + store.getCode() + "]", e);
+                    "An exception occured while getting product type ["
+                            + id
+                            + "] not found for store ["
+                            + store.getCode()
+                            + "]",
+                    e);
         }
-
     }
 
     @Override
@@ -100,7 +114,11 @@ public class ProductTypeFacadeImpl implements ProductTypeFacade {
 
             if (this.exists(type.getCode(), store, language)) {
                 throw new OperationNotAllowedException(
-                        "Product type [" + type.getCode() + "] already exist for store [" + store.getCode() + "]");
+                        "Product type ["
+                                + type.getCode()
+                                + "] already exist for store ["
+                                + store.getCode()
+                                + "]");
             }
 
             ProductType model = persistableProductTypeMapper.convert(type, store, language);
@@ -109,14 +127,13 @@ public class ProductTypeFacadeImpl implements ProductTypeFacade {
             return saved.getId();
 
         } catch (Exception e) {
-            throw new ServiceRuntimeException(
-                    "An exception occured while saving product type", e);
+            throw new ServiceRuntimeException("An exception occured while saving product type", e);
         }
-
     }
 
     @Override
-    public void update(PersistableProductType type, Long id, MerchantStore store, Language language) {
+    public void update(
+            PersistableProductType type, Long id, MerchantStore store, Language language) {
         Assert.notNull(type, "ProductType cannot be null");
         Assert.notNull(store, "MerchantStore cannot be null");
         Assert.notNull(id, "id cannot be empty");
@@ -126,7 +143,11 @@ public class ProductTypeFacadeImpl implements ProductTypeFacade {
             ProductType t = productTypeService.getById(id, store, language);
             if (t == null) {
                 throw new ResourceNotFoundException(
-                        "Product type [" + type.getCode() + "] does not exist for store [" + store.getCode() + "]");
+                        "Product type ["
+                                + type.getCode()
+                                + "] does not exist for store ["
+                                + store.getCode()
+                                + "]");
             }
 
             type.setId(t.getId());
@@ -137,10 +158,8 @@ public class ProductTypeFacadeImpl implements ProductTypeFacade {
             productTypeService.saveOrUpdate(model);
 
         } catch (Exception e) {
-            throw new ServiceRuntimeException(
-                    "An exception occured while saving product type", e);
+            throw new ServiceRuntimeException("An exception occured while saving product type", e);
         }
-
     }
 
     @Override
@@ -153,17 +172,18 @@ public class ProductTypeFacadeImpl implements ProductTypeFacade {
             ProductType t = productTypeService.getById(id, store, language);
             if (t == null) {
                 throw new ResourceNotFoundException(
-                        "Product type [" + id + "] does not exist for store [" + store.getCode() + "]");
+                        "Product type ["
+                                + id
+                                + "] does not exist for store ["
+                                + store.getCode()
+                                + "]");
             }
 
             productTypeService.delete(t);
 
-
         } catch (Exception e) {
-            throw new ServiceRuntimeException(
-                    "An exception occured while saving product type", e);
+            throw new ServiceRuntimeException("An exception occured while saving product type", e);
         }
-
     }
 
     @Override
@@ -172,7 +192,13 @@ public class ProductTypeFacadeImpl implements ProductTypeFacade {
         try {
             t = productTypeService.getByCode(code, store, language);
         } catch (ServiceException e) {
-            throw new RuntimeException("An exception occured while getting product type [" + code + "] for merchant store [" + store.getCode() + "]", e);
+            throw new RuntimeException(
+                    "An exception occured while getting product type ["
+                            + code
+                            + "] for merchant store ["
+                            + store.getCode()
+                            + "]",
+                    e);
         }
         return t != null;
     }
@@ -183,17 +209,21 @@ public class ProductTypeFacadeImpl implements ProductTypeFacade {
         try {
             t = productTypeService.getByCode(code, store, language);
         } catch (ServiceException e) {
-            throw new RuntimeException("An exception occured while getting product type [" + code + "] for merchant store [" + store.getCode() + "]", e);
+            throw new RuntimeException(
+                    "An exception occured while getting product type ["
+                            + code
+                            + "] for merchant store ["
+                            + store.getCode()
+                            + "]",
+                    e);
         }
 
         if (t == null) {
-            throw new ResourceNotFoundException("Product type [" + code + "] not found for merchant [" + store.getCode() + "]");
+            throw new ResourceNotFoundException(
+                    "Product type [" + code + "] not found for merchant [" + store.getCode() + "]");
         }
 
         ReadableProductType readableType = readableProductTypeMapper.convert(t, store, language);
         return readableType;
-
     }
-
-
 }

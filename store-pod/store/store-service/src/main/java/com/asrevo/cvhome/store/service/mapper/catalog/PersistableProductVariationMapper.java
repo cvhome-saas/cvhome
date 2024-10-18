@@ -14,28 +14,34 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 @Component
-public class PersistableProductVariationMapper implements Mapper<PersistableProductVariation, ProductVariation> {
+public class PersistableProductVariationMapper
+        implements Mapper<PersistableProductVariation, ProductVariation> {
 
     private final ProductOptionService productOptionService;
 
     private final ProductOptionValueService productOptionValueService;
 
-    public PersistableProductVariationMapper(ProductOptionService productOptionService, ProductOptionValueService productOptionValueService) {
+    public PersistableProductVariationMapper(
+            ProductOptionService productOptionService,
+            ProductOptionValueService productOptionValueService) {
         this.productOptionService = productOptionService;
         this.productOptionValueService = productOptionValueService;
     }
 
     @Override
-    public ProductVariation convert(PersistableProductVariation source, MerchantStore store, Language language) {
+    public ProductVariation convert(
+            PersistableProductVariation source, MerchantStore store, Language language) {
 
         ProductVariation variation = new ProductVariation();
         return this.merge(source, variation, store, language);
-
     }
 
     @Override
-    public ProductVariation merge(PersistableProductVariation source, ProductVariation destination, MerchantStore store,
-                                  Language language) {
+    public ProductVariation merge(
+            PersistableProductVariation source,
+            ProductVariation destination,
+            MerchantStore store,
+            Language language) {
         Assert.notNull(destination, "ProductVariation cannot be null");
 
         destination.setId(source.getId());
@@ -44,20 +50,19 @@ public class PersistableProductVariationMapper implements Mapper<PersistableProd
 
         ProductOption option = productOptionService.getById(store, source.getOption());
         if (option == null) {
-            throw new ConversionRuntimeException("ProductOption [" + source.getOption() + "] does not exists");
+            throw new ConversionRuntimeException(
+                    "ProductOption [" + source.getOption() + "] does not exists");
         }
         destination.setProductOption(option);
 
-        ProductOptionValue optionValue = productOptionValueService.getById(store, source.getOptionValue());
+        ProductOptionValue optionValue =
+                productOptionValueService.getById(store, source.getOptionValue());
         if (optionValue == null) {
-            throw new ConversionRuntimeException("ProductOptionValue [" + source.getOptionValue() + "] does not exists");
+            throw new ConversionRuntimeException(
+                    "ProductOptionValue [" + source.getOptionValue() + "] does not exists");
         }
         destination.setProductOptionValue(optionValue);
 
-
         return destination;
-
-
     }
-
 }

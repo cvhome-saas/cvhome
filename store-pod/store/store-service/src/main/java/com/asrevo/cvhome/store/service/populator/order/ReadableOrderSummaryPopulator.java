@@ -18,17 +18,20 @@ import org.springframework.util.CollectionUtils;
 @Setter
 @Getter
 @Slf4j
-public class ReadableOrderSummaryPopulator extends AbstractDataPopulator<OrderTotalSummary, ReadableOrderTotalSummary> {
-
+public class ReadableOrderSummaryPopulator
+        extends AbstractDataPopulator<OrderTotalSummary, ReadableOrderTotalSummary> {
 
     private PricingService pricingService;
 
     private LabelUtils messages;
 
-
     @Override
-    public ReadableOrderTotalSummary populate(OrderTotalSummary source, ReadableOrderTotalSummary target,
-                                              MerchantStore store, Language language) throws ConversionException {
+    public ReadableOrderTotalSummary populate(
+            OrderTotalSummary source,
+            ReadableOrderTotalSummary target,
+            MerchantStore store,
+            Language language)
+            throws ConversionException {
 
         Assert.notNull(pricingService, "PricingService must be set");
         Assert.notNull(messages, "LabelUtils must be set");
@@ -53,13 +56,13 @@ public class ReadableOrderSummaryPopulator extends AbstractDataPopulator<OrderTo
                 ReadableOrderTotalPopulator orderTotalPopulator = new ReadableOrderTotalPopulator();
                 orderTotalPopulator.setMessages(messages);
                 orderTotalPopulator.setPricingService(pricingService);
-                for (com.asrevo.cvhome.store.core.entity.order.OrderTotal orderTotal : source.getTotals()) {
+                for (com.asrevo.cvhome.store.core.entity.order.OrderTotal orderTotal :
+                        source.getTotals()) {
                     ReadableOrderTotal t = new ReadableOrderTotal();
                     orderTotalPopulator.populate(orderTotal, t, store, language);
                     target.getTotals().add(t);
                 }
             }
-
 
         } catch (Exception e) {
             log.error("Error during amount formatting {}", e.getMessage());
@@ -67,7 +70,6 @@ public class ReadableOrderSummaryPopulator extends AbstractDataPopulator<OrderTo
         }
 
         return target;
-
     }
 
     @Override
@@ -75,6 +77,4 @@ public class ReadableOrderSummaryPopulator extends AbstractDataPopulator<OrderTo
         // TODO Auto-generated method stub
         return null;
     }
-
-
 }

@@ -1,5 +1,8 @@
 package com.asrevo.cloud.local.discovery;
 
+import static org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication.Type.REACTIVE;
+import static org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication.Type.SERVLET;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -11,9 +14,6 @@ import org.springframework.cloud.client.discovery.health.DiscoveryClientHealthIn
 import org.springframework.cloud.client.discovery.health.reactive.ReactiveDiscoveryClientHealthIndicator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import static org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication.Type.REACTIVE;
-import static org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication.Type.SERVLET;
 
 /**
  * @author ashraf
@@ -39,7 +39,8 @@ public class LocalDiscoveryConfig {
          */
         @Bean
         @ConditionalOnMissingBean
-        public ReactiveDiscoveryClient reactiveDiscoveryClient(LocalDiscoveryProperties localDiscoveryProperties) {
+        public ReactiveDiscoveryClient reactiveDiscoveryClient(
+                LocalDiscoveryProperties localDiscoveryProperties) {
             return new LocalReactiveDiscoveryClient(localDiscoveryProperties);
         }
 
@@ -51,9 +52,12 @@ public class LocalDiscoveryConfig {
          * @return ReactiveDiscoveryClientHealthIndicator bean
          */
         @Bean
-        @ConditionalOnClass(name = "org.springframework.boot.actuate.health.ReactiveHealthIndicator")
+        @ConditionalOnClass(
+                name = "org.springframework.boot.actuate.health.ReactiveHealthIndicator")
         @ConditionalOnDiscoveryHealthIndicatorEnabled
-        public ReactiveDiscoveryClientHealthIndicator localReactiveDiscoveryClientHealthIndicator(ReactiveDiscoveryClient client, DiscoveryClientHealthIndicatorProperties properties) {
+        public ReactiveDiscoveryClientHealthIndicator localReactiveDiscoveryClientHealthIndicator(
+                ReactiveDiscoveryClient client,
+                DiscoveryClientHealthIndicatorProperties properties) {
             return new ReactiveDiscoveryClientHealthIndicator(client, properties);
         }
     }
@@ -76,13 +80,12 @@ public class LocalDiscoveryConfig {
         }
 
         /*
-        @Bean
-        @ConditionalOnClass(name = "org.springframework.boot.actuate.health.HealthIndicator")
-        @ConditionalOnDiscoveryHealthIndicatorEnabled
-        public DiscoveryClientHealthIndicator localReactiveDiscoveryClientHealthIndicator(ObjectProvider<DiscoveryClient> client, DiscoveryClientHealthIndicatorProperties properties) {
-            return new DiscoveryClientHealthIndicator(client, properties);
-        }
-*/
+                @Bean
+                @ConditionalOnClass(name = "org.springframework.boot.actuate.health.HealthIndicator")
+                @ConditionalOnDiscoveryHealthIndicatorEnabled
+                public DiscoveryClientHealthIndicator localReactiveDiscoveryClientHealthIndicator(ObjectProvider<DiscoveryClient> client, DiscoveryClientHealthIndicatorProperties properties) {
+                    return new DiscoveryClientHealthIndicator(client, properties);
+                }
+        */
     }
-
 }

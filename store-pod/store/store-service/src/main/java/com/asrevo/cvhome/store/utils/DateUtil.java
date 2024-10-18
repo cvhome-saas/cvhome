@@ -16,20 +16,18 @@ package com.asrevo.cvhome.store.utils;
 
 import com.asrevo.cvhome.store.core.constants.Constants;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 @Getter
 @Slf4j
 public class DateUtil {
 
-    private final static String LONGDATE_FORMAT = "EEE, d MMM yyyy HH:mm:ss Z";
+    private static final String LONGDATE_FORMAT = "EEE, d MMM yyyy HH:mm:ss Z";
     private Date startDate = new Date(new Date().getTime());
     private Date endDate = new Date(new Date().getTime());
 
@@ -49,29 +47,23 @@ public class DateUtil {
      */
     public static String formatDate(Date dt) {
 
-        if (dt == null)
-            dt = new Date();
+        if (dt == null) dt = new Date();
         SimpleDateFormat format = new SimpleDateFormat(Constants.DEFAULT_DATE_FORMAT);
         return format.format(dt);
-
     }
 
     public static String formatYear(Date dt) {
 
-        if (dt == null)
-            return null;
+        if (dt == null) return null;
         SimpleDateFormat format = new SimpleDateFormat(Constants.DEFAULT_DATE_FORMAT_YEAR);
         return format.format(dt);
-
     }
 
     public static String formatLongDate(Date date) {
 
-        if (date == null)
-            return null;
+        if (date == null) return null;
         SimpleDateFormat format = new SimpleDateFormat(LONGDATE_FORMAT);
         return format.format(date);
-
     }
 
     /**
@@ -80,11 +72,9 @@ public class DateUtil {
      */
     public static String formatDateMonthString(Date dt) {
 
-        if (dt == null)
-            return null;
+        if (dt == null) return null;
         SimpleDateFormat format = new SimpleDateFormat(Constants.DEFAULT_DATE_FORMAT);
         return format.format(dt);
-
     }
 
     public static Date getDate(String date) throws Exception {
@@ -97,13 +87,11 @@ public class DateUtil {
         c.setTime(new Date());
         c.add(Calendar.DATE, days);
         return c.getTime();
-
     }
 
     public static Date getDate() {
 
         return new Date(new Date().getTime());
-
     }
 
     public static String getPresentDate() {
@@ -124,7 +112,6 @@ public class DateUtil {
 
     public static boolean dateBeforeEqualsDate(Date firstDate, Date compareDate) {
 
-
         if (firstDate == null || compareDate == null) {
             return true;
         }
@@ -138,7 +125,6 @@ public class DateUtil {
         } else {
             return false;
         }
-
     }
 
     public void processPostedDates(HttpServletRequest request) {
@@ -161,5 +147,4 @@ public class DateUtil {
             this.endDate = new Date(dt.getTime());
         }
     }
-
 }

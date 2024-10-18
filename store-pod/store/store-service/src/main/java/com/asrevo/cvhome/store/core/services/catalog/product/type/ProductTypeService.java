@@ -5,17 +5,18 @@ import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
-import org.springframework.data.domain.Page;
-
 import java.util.List;
+import org.springframework.data.domain.Page;
 
 public interface ProductTypeService extends SalesManagerEntityService<Long, ProductType> {
 
     ProductType getProductType(String productTypeCode);
 
-    Page<ProductType> getByMerchant(MerchantStore store, Language language, int page, int count) throws ServiceException;
+    Page<ProductType> getByMerchant(MerchantStore store, Language language, int page, int count)
+            throws ServiceException;
 
-    ProductType getByCode(String code, MerchantStore store, Language language) throws ServiceException;
+    ProductType getByCode(String code, MerchantStore store, Language language)
+            throws ServiceException;
 
     ProductType getById(Long id, MerchantStore store, Language language) throws ServiceException;
 
@@ -25,7 +26,6 @@ public interface ProductTypeService extends SalesManagerEntityService<Long, Prod
 
     ProductType saveOrUpdate(ProductType productType) throws ServiceException;
 
-    List<ProductType> listProductTypes(List<Long> ids, MerchantStore store, Language language) throws ServiceException;
-
-
+    List<ProductType> listProductTypes(List<Long> ids, MerchantStore store, Language language)
+            throws ServiceException;
 }

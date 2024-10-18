@@ -15,13 +15,12 @@ import com.asrevo.cvhome.store.service.mapper.Mapper;
 import com.asrevo.cvhome.store.service.populator.catalog.ReadableProductPricePopulator;
 import com.asrevo.cvhome.store.service.populator.store.ReadableMerchantStorePopulator;
 import com.asrevo.cvhome.store.utils.DateUtil;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
 @Component
 public class ReadableInventoryMapper implements Mapper<ProductAvailability, ReadableInventory> {
@@ -30,29 +29,40 @@ public class ReadableInventoryMapper implements Mapper<ProductAvailability, Read
 
     private final ReadableMerchantStorePopulator readableMerchantStorePopulator;
 
-    public ReadableInventoryMapper(PricingService pricingService, ReadableMerchantStorePopulator readableMerchantStorePopulator) {
+    public ReadableInventoryMapper(
+            PricingService pricingService,
+            ReadableMerchantStorePopulator readableMerchantStorePopulator) {
         this.pricingService = pricingService;
         this.readableMerchantStorePopulator = readableMerchantStorePopulator;
     }
 
     @Override
-    public ReadableInventory convert(ProductAvailability source, MerchantStore store, Language language) {
+    public ReadableInventory convert(
+            ProductAvailability source, MerchantStore store, Language language) {
         ReadableInventory availability = new ReadableInventory();
         return merge(source, availability, store, language);
     }
 
     @Override
-    public ReadableInventory merge(ProductAvailability source, ReadableInventory destination, MerchantStore store,
-                                   Language language) {
+    public ReadableInventory merge(
+            ProductAvailability source,
+            ReadableInventory destination,
+            MerchantStore store,
+            Language language) {
         Assert.notNull(destination, "Destination Product availability cannot be null");
         Assert.notNull(source, "Source Product availability cannot be null");
 
         try {
-            destination.setQuantity(source.getProductQuantity() != null ? source.getProductQuantity() : 0);
+            destination.setQuantity(
+                    source.getProductQuantity() != null ? source.getProductQuantity() : 0);
             destination.setProductQuantityOrderMax(
-                    source.getProductQuantityOrderMax() != null ? source.getProductQuantityOrderMax() : 0);
+                    source.getProductQuantityOrderMax() != null
+                            ? source.getProductQuantityOrderMax()
+                            : 0);
             destination.setProductQuantityOrderMin(
-                    source.getProductQuantityOrderMin() != null ? source.getProductQuantityOrderMin() : 0);
+                    source.getProductQuantityOrderMin() != null
+                            ? source.getProductQuantityOrderMin()
+                            : 0);
             destination.setOwner(source.getOwner());
             destination.setId(source.getId());
             destination.setRegion(source.getRegion());
@@ -60,12 +70,17 @@ public class ReadableInventoryMapper implements Mapper<ProductAvailability, Read
             destination.setStore(store(store, language));
             if (source.getAvailable() != null) {
                 if (source.getProductDateAvailable() != null) {
-                    boolean isAfter = LocalDate.parse(DateUtil.getPresentDate())
-                            .isAfter(LocalDate.parse(DateUtil.formatDate(source.getProductDateAvailable())));
+                    boolean isAfter =
+                            LocalDate.parse(DateUtil.getPresentDate())
+                                    .isAfter(
+                                            LocalDate.parse(
+                                                    DateUtil.formatDate(
+                                                            source.getProductDateAvailable())));
                     if (isAfter && source.getAvailable()) {
                         destination.setAvailable(true);
                     }
-                    destination.setDateAvailable(DateUtil.formatDate(source.getProductDateAvailable()));
+                    destination.setDateAvailable(
+                            DateUtil.formatDate(source.getProductDateAvailable()));
                 } else {
                     destination.setAvailable(source.getAvailable());
                 }
@@ -73,7 +88,8 @@ public class ReadableInventoryMapper implements Mapper<ProductAvailability, Read
 
             if (source.getAuditSection() != null) {
                 if (source.getAuditSection().getDateCreated() != null) {
-                    destination.setCreationDate(DateUtil.formatDate(source.getAuditSection().getDateCreated()));
+                    destination.setCreationDate(
+                            DateUtil.formatDate(source.getAuditSection().getDateCreated()));
                 }
             }
 
@@ -86,13 +102,13 @@ public class ReadableInventoryMapper implements Mapper<ProductAvailability, Read
                 destination.setSku(source.getProduct().getSku());
             }
 
-            FinalPrice price = null;
-            //try {
+            FinalPrice price;
+            // try {
             price = pricingService.calculateProductPrice(source);
             destination.setPrice(price.getStringPrice());
-            //} catch (ServiceException e) {
+            // } catch (ServiceException e) {
             //	throw new ConversionRuntimeException("Unable to get product price", e);
-            //}
+            // }
 
         } catch (Exception e) {
             throw new ConversionRuntimeException("Error while converting Inventory", e);
@@ -101,7 +117,8 @@ public class ReadableInventoryMapper implements Mapper<ProductAvailability, Read
         return destination;
     }
 
-    private ReadableMerchantStore store(MerchantStore store, Language language) throws ConversionException {
+    private ReadableMerchantStore store(MerchantStore store, Language language)
+            throws ConversionException {
         if (language == null) {
             language = store.getDefaultLanguage();
         }
@@ -111,24 +128,25 @@ public class ReadableInventoryMapper implements Mapper<ProductAvailability, Read
          * populator.setCountryService(countryService);
          * populator.setZoneService(zoneService);
          */
-        return readableMerchantStorePopulator.populate(store, new ReadableMerchantStore(), store, language);
+        return readableMerchantStorePopulator.populate(
+                store, new ReadableMerchantStore(), store, language);
     }
 
-    private List<ReadableProductPrice> prices(ProductAvailability source, MerchantStore store, Language language)
+    private List<ReadableProductPrice> prices(
+            ProductAvailability source, MerchantStore store, Language language)
             throws ConversionException {
 
-        ReadableProductPricePopulator populator = null;
+        ReadableProductPricePopulator populator;
         List<ReadableProductPrice> prices = new ArrayList<>();
 
         for (ProductPrice price : source.getPrices()) {
 
             populator = new ReadableProductPricePopulator();
             populator.setPricingService(pricingService);
-            ReadableProductPrice p = populator.populate(price, new ReadableProductPrice(), store, language);
+            ReadableProductPrice p =
+                    populator.populate(price, new ReadableProductPrice(), store, language);
             prices.add(p);
-
         }
         return prices;
     }
-
 }

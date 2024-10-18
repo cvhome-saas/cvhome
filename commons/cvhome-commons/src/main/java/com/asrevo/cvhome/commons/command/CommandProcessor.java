@@ -10,5 +10,4 @@ public interface CommandProcessor {
     List<CommandImpl<Command>> getProcessors(Class<? extends Command> tClass);
 
     List<CommandImpl<Command>> getAllProcessors();
-
 }

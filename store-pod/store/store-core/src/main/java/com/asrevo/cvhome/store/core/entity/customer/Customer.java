@@ -18,34 +18,36 @@ import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
+import java.io.Serial;
+import java.math.BigDecimal;
+import java.util.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Cascade;
 
-import java.io.Serial;
-import java.math.BigDecimal;
-import java.util.*;
-
 @Entity
-@Table(name = "CUSTOMER",
-        uniqueConstraints =
-        @UniqueConstraint(columnNames = {"MERCHANT_ID", "CUSTOMER_NICK"}))
+@Table(
+        name = "CUSTOMER",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"MERCHANT_ID", "CUSTOMER_NICK"}))
 @Getter
 @Setter
 public class Customer extends SalesManagerEntity<Long, Customer> implements Auditable {
-    @Serial
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
 
     @Id
     @Column(name = "CUSTOMER_ID", unique = true, nullable = false)
-    @TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME", valueColumnName = "SEQ_COUNT",
-            pkColumnValue = "CUSTOMER_SEQ_NEXT_VAL", allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE, initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
+    @TableGenerator(
+            name = "TABLE_GEN",
+            table = "SM_SEQUENCER",
+            pkColumnName = "SEQ_NAME",
+            valueColumnName = "SEQ_COUNT",
+            pkColumnValue = "CUSTOMER_SEQ_NEXT_VAL",
+            allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
+            initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
     private Long id;
 
-    @JsonIgnore
-    @Embedded
-    private AuditSection auditSection = new AuditSection();
+    @JsonIgnore @Embedded private AuditSection auditSection = new AuditSection();
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "customer")
     private Set<CustomerAttribute> attributes = new HashSet<>();
@@ -53,7 +55,6 @@ public class Customer extends SalesManagerEntity<Long, Customer> implements Audi
     @Column(name = "CUSTOMER_GENDER", length = 1)
     @Enumerated(value = EnumType.STRING)
     private CustomerGender gender;
-
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "CUSTOMER_DOB")
@@ -65,7 +66,7 @@ public class Customer extends SalesManagerEntity<Long, Customer> implements Audi
     private String emailAddress;
 
     @Column(name = "CUSTOMER_NICK", length = 96)
-    private String nick;// unique username per store
+    private String nick; // unique username per store
 
     @Column(name = "CUSTOMER_COMPANY", length = 100)
     private String company;
@@ -86,11 +87,9 @@ public class Customer extends SalesManagerEntity<Long, Customer> implements Audi
     @Column(name = "PROVIDER")
     private String provider;
 
-
     @ManyToOne(fetch = FetchType.LAZY, targetEntity = Language.class)
     @JoinColumn(name = "LANGUAGE_ID", nullable = false)
     private Language defaultLanguage;
-
 
     @OneToMany(mappedBy = "customer", targetEntity = ProductReview.class)
     private List<ProductReview> reviews = new ArrayList<>();
@@ -100,48 +99,47 @@ public class Customer extends SalesManagerEntity<Long, Customer> implements Audi
     @JoinColumn(name = "MERCHANT_ID", nullable = false)
     private MerchantStore merchantStore;
 
+    @Embedded private Delivery delivery = null;
 
-    @Embedded
-    private Delivery delivery = null;
-
-    @Valid
-    @Embedded
-    private Billing billing = null;
+    @Valid @Embedded private Billing billing = null;
 
     @JsonIgnore
-    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.REFRESH})
-    @JoinTable(name = "CUSTOMER_GROUP", joinColumns = {
-            @JoinColumn(name = "CUSTOMER_ID", nullable = false, updatable = false, insertable = false)}
-            ,
-            inverseJoinColumns = {@JoinColumn(name = "GROUP_ID",
-                    nullable = false, updatable = false, insertable = false)}
-    )
+    @ManyToMany(
+            fetch = FetchType.LAZY,
+            cascade = {CascadeType.REFRESH})
+    @JoinTable(
+            name = "CUSTOMER_GROUP",
+            joinColumns = {
+                @JoinColumn(
+                        name = "CUSTOMER_ID",
+                        nullable = false,
+                        updatable = false,
+                        insertable = false)
+            },
+            inverseJoinColumns = {
+                @JoinColumn(
+                        name = "GROUP_ID",
+                        nullable = false,
+                        updatable = false,
+                        insertable = false)
+            })
     @Cascade({
-            org.hibernate.annotations.CascadeType.DETACH,
-            org.hibernate.annotations.CascadeType.LOCK,
-            org.hibernate.annotations.CascadeType.REFRESH,
-            org.hibernate.annotations.CascadeType.REPLICATE
-
+        org.hibernate.annotations.CascadeType.DETACH,
+        org.hibernate.annotations.CascadeType.LOCK,
+        org.hibernate.annotations.CascadeType.REFRESH,
+        org.hibernate.annotations.CascadeType.REPLICATE
     })
     private List<Group> groups = new ArrayList<>();
 
-    @JsonIgnore
-    @Transient
-    private String showCustomerStateList;
+    @JsonIgnore @Transient private String showCustomerStateList;
 
-    @JsonIgnore
-    @Transient
-    private String showBillingStateList;
+    @JsonIgnore @Transient private String showBillingStateList;
 
-    @JsonIgnore
-    @Transient
-    private String showDeliveryStateList;
+    @JsonIgnore @Transient private String showDeliveryStateList;
 
-    @Embedded
-    private CredentialsReset credentialsResetRequest = null;
+    @Embedded private CredentialsReset credentialsResetRequest = null;
 
-    public Customer() {
-    }
+    public Customer() {}
 
     public Date getDateOfBirth() {
         return CloneUtils.clone(dateOfBirth);

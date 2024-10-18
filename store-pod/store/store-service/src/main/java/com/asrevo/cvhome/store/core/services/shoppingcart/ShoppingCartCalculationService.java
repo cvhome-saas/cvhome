@@ -3,7 +3,6 @@
  */
 package com.asrevo.cvhome.store.core.services.shoppingcart;
 
-
 import com.asrevo.cvhome.store.core.entity.customer.Customer;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
@@ -25,8 +24,12 @@ public interface ShoppingCartCalculationService {
      *
      * @param cartModel ShoopingCart mode representing underlying DB object
      */
-    OrderTotalSummary calculate(final ShoppingCart cartModel, final Customer customer, final MerchantStore store,
-                                final Language language) throws ServiceException;
+    OrderTotalSummary calculate(
+            final ShoppingCart cartModel,
+            final Customer customer,
+            final MerchantStore store,
+            final Language language)
+            throws ServiceException;
 
     /**
      * Method which will be used to calculate price for each line items as well
@@ -34,6 +37,7 @@ public interface ShoppingCartCalculationService {
      *
      * @param cartModel ShoopingCart mode representing underlying DB object
      */
-    OrderTotalSummary calculate(final ShoppingCart cartModel, final MerchantStore store, final Language language)
+    OrderTotalSummary calculate(
+            final ShoppingCart cartModel, final MerchantStore store, final Language language)
             throws ServiceException;
 }

@@ -16,18 +16,16 @@ import com.asrevo.cvhome.store.core.services.catalog.pricing.PricingService;
 import com.asrevo.cvhome.store.service.mapper.Mapper;
 import com.asrevo.cvhome.store.utils.DateUtil;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
-import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
 @Component
 public class ReadableMinimalProductMapper implements Mapper<Product, ReadableMinimalProduct> {
 
     private final PricingService pricingService;
-
 
     private final ImageFilePath imageUtils;
 
@@ -44,14 +42,17 @@ public class ReadableMinimalProductMapper implements Mapper<Product, ReadableMin
     }
 
     @Override
-    public ReadableMinimalProduct merge(Product source, ReadableMinimalProduct destination, MerchantStore store,
-                                        Language language) {
+    public ReadableMinimalProduct merge(
+            Product source,
+            ReadableMinimalProduct destination,
+            MerchantStore store,
+            Language language) {
         Assert.notNull(source, "Product cannot be null");
         Assert.notNull(destination, "ReadableMinimalProduct cannot be null");
 
-
         for (ProductDescription desc : source.getDescriptions()) {
-            if (language != null && desc.getLanguage() != null
+            if (language != null
+                    && desc.getLanguage() != null
                     && desc.getLanguage().getId().intValue() == language.getId().intValue()) {
                 destination.setDescription(this.description(desc));
                 break;
@@ -89,23 +90,23 @@ public class ReadableMinimalProductMapper implements Mapper<Product, ReadableMin
             destination.setRatingCount(source.getProductReviewCount());
         }
 
-        //price
+        // price
 
         try {
             FinalPrice price = pricingService.calculateProductPrice(source);
             if (price != null) {
 
-                destination.setFinalPrice(pricingService.getDisplayAmount(price.getFinalPrice(), store));
+                destination.setFinalPrice(
+                        pricingService.getDisplayAmount(price.getFinalPrice(), store));
                 destination.setPrice(price.getFinalPrice());
-                destination.setOriginalPrice(pricingService.getDisplayAmount(price.getOriginalPrice(), store));
-
+                destination.setOriginalPrice(
+                        pricingService.getDisplayAmount(price.getOriginalPrice(), store));
             }
         } catch (ServiceException e) {
             throw new ConversionRuntimeException("An error occured during price calculation", e);
         }
 
-
-        //image
+        // image
         Set<ProductImage> images = source.getImages();
         if (images != null && !images.isEmpty()) {
             List<ReadableImage> imageList = new ArrayList<>();
@@ -117,13 +118,16 @@ public class ReadableMinimalProductMapper implements Mapper<Product, ReadableMin
                 prdImage.setImageName(img.getProductImage());
                 prdImage.setDefaultImage(img.isDefaultImage());
 
-                prdImage.setImageUrl(contextPath + imageUtils.buildProductImageUtils(store, source.getSku(), img.getProductImage()));
+                prdImage.setImageUrl(
+                        contextPath
+                                + imageUtils.buildProductImageUtils(
+                                        store, source.getSku(), img.getProductImage()));
                 prdImage.setId(img.getId());
                 prdImage.setImageType(img.getImageType());
                 if (img.getProductImageUrl() != null) {
                     prdImage.setExternalUrl(img.getProductImageUrl());
                 }
-                if (img.getImageType() == 1 && img.getProductImageUrl() != null) {//video
+                if (img.getImageType() == 1 && img.getProductImageUrl() != null) { // video
                     prdImage.setVideoUrl(img.getProductImageUrl());
                 }
 
@@ -133,10 +137,8 @@ public class ReadableMinimalProductMapper implements Mapper<Product, ReadableMin
 
                 imageList.add(prdImage);
             }
-            destination
-                    .setImages(imageList);
+            destination.setImages(imageList);
         }
-
 
         return null;
     }
@@ -152,5 +154,4 @@ public class ReadableMinimalProductMapper implements Mapper<Product, ReadableMin
         desc.setMetaDescription(description.getMetatagDescription());
         return desc;
     }
-
 }

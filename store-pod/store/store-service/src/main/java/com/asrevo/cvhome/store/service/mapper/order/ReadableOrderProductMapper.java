@@ -16,41 +16,45 @@ import com.asrevo.cvhome.store.core.services.catalog.product.ProductService;
 import com.asrevo.cvhome.store.service.mapper.Mapper;
 import com.asrevo.cvhome.store.service.mapper.catalog.product.ReadableProductMapper;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-
 @Component
 public class ReadableOrderProductMapper implements Mapper<OrderProduct, ReadableOrderProduct> {
 
-    final
-    PricingService pricingService;
+    final PricingService pricingService;
 
-    final
-    ProductService productService;
+    final ProductService productService;
 
-    final
-    ReadableProductMapper readableProductMapper;
+    final ReadableProductMapper readableProductMapper;
 
-    public ReadableOrderProductMapper(PricingService pricingService, ProductService productService, ReadableProductMapper readableProductMapper, ImageFilePath imageUtils) {
+    public ReadableOrderProductMapper(
+            PricingService pricingService,
+            ProductService productService,
+            ReadableProductMapper readableProductMapper,
+            ImageFilePath imageUtils) {
         this.pricingService = pricingService;
         this.productService = productService;
         this.readableProductMapper = readableProductMapper;
     }
 
     @Override
-    public ReadableOrderProduct convert(OrderProduct source, MerchantStore store, Language language) {
+    public ReadableOrderProduct convert(
+            OrderProduct source, MerchantStore store, Language language) {
         ReadableOrderProduct orderProduct = new ReadableOrderProduct();
         return this.merge(source, orderProduct, store, language);
     }
 
     @Override
-    public ReadableOrderProduct merge(OrderProduct source, ReadableOrderProduct target, MerchantStore store,
-                                      Language language) {
+    public ReadableOrderProduct merge(
+            OrderProduct source,
+            ReadableOrderProduct target,
+            MerchantStore store,
+            Language language) {
 
         Validate.notNull(source, "OrderProduct cannot be null");
         Validate.notNull(target, "ReadableOrderProduct cannot be null");
@@ -81,9 +85,11 @@ public class ReadableOrderProductMapper implements Mapper<OrderProduct, Readable
         if (source.getOrderAttributes() != null) {
             List<ReadableOrderProductAttribute> attributes = new ArrayList<>();
             for (OrderProductAttribute attr : source.getOrderAttributes()) {
-                ReadableOrderProductAttribute readableAttribute = new ReadableOrderProductAttribute();
+                ReadableOrderProductAttribute readableAttribute =
+                        new ReadableOrderProductAttribute();
                 try {
-                    String price = pricingService.getDisplayAmount(attr.getProductAttributePrice(), store);
+                    String price =
+                            pricingService.getDisplayAmount(attr.getProductAttributePrice(), store);
                     readableAttribute.setAttributePrice(price);
                 } catch (ServiceException e) {
                     throw new ConversionRuntimeException("Cannot format price", e);
@@ -106,14 +112,12 @@ public class ReadableOrderProductMapper implements Mapper<OrderProduct, Readable
             }
             if (product != null) {
 
-
-                ReadableProduct productProxy = readableProductMapper.convert(product, store, language);
+                ReadableProduct productProxy =
+                        readableProductMapper.convert(product, store, language);
                 target.setProduct(productProxy);
-
             }
         }
 
         return target;
     }
-
 }

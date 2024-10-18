@@ -18,12 +18,14 @@ import reactor.core.publisher.Mono;
 @AllArgsConstructor
 public class RedirectionController {
     private final ServiceDomainProperties serviceDomainProperties;
-    private final static int HTTP_PORT = 80;
-    private final static int HTTPS_PORT = 443;
-    private final static String SCHEMA_SPLITTER = "://";
-    private final static String URL_SPLITTER = "/";
+    private static final int HTTP_PORT = 80;
+    private static final int HTTPS_PORT = 443;
+    private static final String SCHEMA_SPLITTER = "://";
+    private static final String URL_SPLITTER = "/";
 
-    @GetMapping(value = "internal", params = {"serviceName"})
+    @GetMapping(
+            value = "internal",
+            params = {"serviceName"})
     public Mono<Void> redirect(
             @RequestParam() String serviceName,
             @RequestParam(required = false, defaultValue = "") String path,
@@ -44,7 +46,8 @@ public class RedirectionController {
         return response.setComplete();
     }
 
-    private static String buildRedirectionUrl(String path, ServerHttpRequest request, ServiceDomain serviceDomain) {
+    private static String buildRedirectionUrl(
+            String path, ServerHttpRequest request, ServiceDomain serviceDomain) {
         String scheme = request.getURI().getScheme();
         int port = request.getURI().getPort();
         boolean ignorePort = port == HTTP_PORT || port == HTTPS_PORT;

@@ -10,13 +10,12 @@ import com.asrevo.cvhome.store.core.entity.common.audit.Auditable;
 import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.io.Serial;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * <p>Shopping cart is responsible for storing and carrying
@@ -28,21 +27,30 @@ import java.util.Set;
  */
 @Entity
 @EntityListeners(value = AuditListener.class)
-@Table(name = "SHOPPING_CART", indexes = {@Index(name = "SHP_CART_CODE_IDX", columnList = "SHP_CART_CODE"), @Index(name = "SHP_CART_CUSTOMER_IDX", columnList = "CUSTOMER_ID")})
+@Table(
+        name = "SHOPPING_CART",
+        indexes = {
+            @Index(name = "SHP_CART_CODE_IDX", columnList = "SHP_CART_CODE"),
+            @Index(name = "SHP_CART_CUSTOMER_IDX", columnList = "CUSTOMER_ID")
+        })
 @Getter
 @Setter
 public class ShoppingCart extends SalesManagerEntity<Long, ShoppingCart> implements Auditable {
 
+    @Serial private static final long serialVersionUID = 1L;
 
-    @Serial
-    private static final long serialVersionUID = 1L;
-
-    @Embedded
-    private AuditSection auditSection = new AuditSection();
+    @Embedded private AuditSection auditSection = new AuditSection();
 
     @Id
     @Column(name = "SHP_CART_ID", unique = true, nullable = false)
-    @TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME", valueColumnName = "SEQ_COUNT", pkColumnValue = "SHP_CRT_SEQ_NEXT_VAL", allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE, initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
+    @TableGenerator(
+            name = "TABLE_GEN",
+            table = "SM_SEQUENCER",
+            pkColumnName = "SEQ_NAME",
+            valueColumnName = "SEQ_COUNT",
+            pkColumnValue = "SHP_CRT_SEQ_NEXT_VAL",
+            allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
+            initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
     private Long id;
 
@@ -76,8 +84,5 @@ public class ShoppingCart extends SalesManagerEntity<Long, ShoppingCart> impleme
     @Column(name = "PROMO_ADDED")
     private Date promoAdded;
 
-    @Transient
-    private boolean obsolete = false;//when all items are obsolete
-
-
+    @Transient private boolean obsolete = false; // when all items are obsolete
 }

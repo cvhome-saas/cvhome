@@ -3,19 +3,15 @@ package com.asrevo.cvhome.store.utils;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
-import lombok.extern.slf4j.Slf4j;
-
 import java.util.Locale;
-
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class LocaleUtils {
 
-
     public static Locale getLocale(Language language) {
 
         return new Locale(language.getCode());
-
     }
 
     /**
@@ -39,8 +35,5 @@ public class LocaleUtils {
         }
 
         return defaultLocale;
-
     }
-
-
 }

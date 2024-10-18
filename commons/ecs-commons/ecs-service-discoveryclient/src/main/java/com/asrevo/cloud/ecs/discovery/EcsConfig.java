@@ -30,15 +30,19 @@ public class EcsConfig {
 
         @Bean
         @ConditionalOnMissingBean
-        public EcsReactiveDiscoveryClient reactiveDiscoveryClient(EcsDiscoveryProperties ecsDiscoveryProperties,
-                                                                  ServiceDiscoveryAsyncClient discoveryAsync) {
+        public EcsReactiveDiscoveryClient reactiveDiscoveryClient(
+                EcsDiscoveryProperties ecsDiscoveryProperties,
+                ServiceDiscoveryAsyncClient discoveryAsync) {
             return new EcsReactiveDiscoveryClient(ecsDiscoveryProperties, discoveryAsync);
         }
 
         @Bean
-        @ConditionalOnClass(name = "org.springframework.boot.actuate.health.ReactiveHealthIndicator")
+        @ConditionalOnClass(
+                name = "org.springframework.boot.actuate.health.ReactiveHealthIndicator")
         @ConditionalOnDiscoveryHealthIndicatorEnabled
-        public ReactiveDiscoveryClientHealthIndicator ecsReactiveDiscoveryClientHealthIndicator(EcsReactiveDiscoveryClient client, DiscoveryClientHealthIndicatorProperties properties) {
+        public ReactiveDiscoveryClientHealthIndicator ecsReactiveDiscoveryClientHealthIndicator(
+                EcsReactiveDiscoveryClient client,
+                DiscoveryClientHealthIndicatorProperties properties) {
             return new ReactiveDiscoveryClientHealthIndicator(client, properties);
         }
     }
@@ -56,19 +60,18 @@ public class EcsConfig {
 
         @Bean
         @ConditionalOnMissingBean
-        public EcsDiscoveryClient reactiveDiscoveryClient(EcsDiscoveryProperties ecsDiscoveryProperties,
-                                                          ServiceDiscoveryClient discovery) {
+        public EcsDiscoveryClient reactiveDiscoveryClient(
+                EcsDiscoveryProperties ecsDiscoveryProperties, ServiceDiscoveryClient discovery) {
             return new EcsDiscoveryClient(ecsDiscoveryProperties, discovery);
         }
 
-/*
-        @Bean
-        @ConditionalOnClass(name = "org.springframework.boot.actuate.health.HealthIndicator")
-        @ConditionalOnDiscoveryHealthIndicatorEnabled
-        public DiscoveryClientHealthIndicator ecsReactiveDiscoveryClientHealthIndicator(ObjectProvider<DiscoveryClient> client, DiscoveryClientHealthIndicatorProperties properties) {
-            return new DiscoveryClientHealthIndicator(client, properties);
-        }
-*/
+        /*
+                @Bean
+                @ConditionalOnClass(name = "org.springframework.boot.actuate.health.HealthIndicator")
+                @ConditionalOnDiscoveryHealthIndicatorEnabled
+                public DiscoveryClientHealthIndicator ecsReactiveDiscoveryClientHealthIndicator(ObjectProvider<DiscoveryClient> client, DiscoveryClientHealthIndicatorProperties properties) {
+                    return new DiscoveryClientHealthIndicator(client, properties);
+                }
+        */
     }
-
 }

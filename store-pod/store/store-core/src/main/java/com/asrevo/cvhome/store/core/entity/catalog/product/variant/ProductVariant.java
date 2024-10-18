@@ -11,42 +11,38 @@ import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.io.Serial;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
-
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @EntityListeners(value = AuditListener.class)
-@Table(name = "PRODUCT_VARIANT",
+@Table(
+        name = "PRODUCT_VARIANT",
         indexes = @Index(columnList = "PRODUCT_ID"),
-        uniqueConstraints =
-        @UniqueConstraint(columnNames = {
-                "PRODUCT_ID",
-                "SKU"}))
+        uniqueConstraints = @UniqueConstraint(columnNames = {"PRODUCT_ID", "SKU"}))
 @Getter
 @Setter
 public class ProductVariant extends SalesManagerEntity<Long, ProductVariant> implements Auditable {
-    @Serial
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
 
     @Id
     @Column(name = "PRODUCT_VARIANT_ID", unique = true, nullable = false)
-    @TableGenerator(name = "TABLE_GEN",
+    @TableGenerator(
+            name = "TABLE_GEN",
             table = "SM_SEQUENCER",
             pkColumnName = "SEQ_NAME",
             valueColumnName = "SEQ_COUNT",
-            pkColumnValue = "PRODUCT_VAR_SEQ_NEXT_VAL", allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE, initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
+            pkColumnValue = "PRODUCT_VAR_SEQ_NEXT_VAL",
+            allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
+            initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
     private Long id;
 
-
-    @Embedded
-    private AuditSection auditSection = new AuditSection();
+    @Embedded private AuditSection auditSection = new AuditSection();
 
     @Column(name = "DATE_AVAILABLE")
     @Temporal(TemporalType.TIMESTAMP)
@@ -87,5 +83,4 @@ public class ProductVariant extends SalesManagerEntity<Long, ProductVariant> imp
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "productVariant")
     private Set<ProductAvailability> availabilities = new HashSet<>();
-
 }

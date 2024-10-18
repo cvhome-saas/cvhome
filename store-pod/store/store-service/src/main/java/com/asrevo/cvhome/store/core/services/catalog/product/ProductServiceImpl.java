@@ -1,6 +1,5 @@
 package com.asrevo.cvhome.store.core.services.catalog.product;
 
-
 import com.asrevo.cvhome.store.core.entity.catalog.category.Category;
 import com.asrevo.cvhome.store.core.entity.catalog.product.Product;
 import com.asrevo.cvhome.store.core.entity.catalog.product.ProductCriteria;
@@ -27,6 +26,8 @@ import com.asrevo.cvhome.store.core.services.catalog.product.relationship.Produc
 import com.asrevo.cvhome.store.core.services.catalog.product.review.ProductReviewService;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
 import com.asrevo.cvhome.store.utils.CatalogServiceHelper;
+import java.io.InputStream;
+import java.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -36,44 +37,30 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import java.io.InputStream;
-import java.util.*;
-
 @Service("productService")
 @Slf4j
-public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Product> implements ProductService {
-
+public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Product>
+        implements ProductService {
 
     private final ProductRepository productRepository;
 
-    @Autowired
-    @Lazy
-    CategoryService categoryService;
+    @Autowired @Lazy CategoryService categoryService;
 
-    @Autowired
-    ProductAvailabilityService productAvailabilityService;
+    @Autowired ProductAvailabilityService productAvailabilityService;
 
-    @Autowired
-    ProductPriceService productPriceService;
+    @Autowired ProductPriceService productPriceService;
 
-    @Autowired
-    ProductOptionService productOptionService;
+    @Autowired ProductOptionService productOptionService;
 
-    @Autowired
-    ProductOptionValueService productOptionValueService;
+    @Autowired ProductOptionValueService productOptionValueService;
 
-    @Autowired
-    ProductAttributeService productAttributeService;
+    @Autowired ProductAttributeService productAttributeService;
 
-    @Autowired
-    ProductRelationshipService productRelationshipService;
+    @Autowired ProductRelationshipService productRelationshipService;
 
-    @Autowired
-    ProductImageService productImageService;
+    @Autowired ProductImageService productImageService;
 
-    @Autowired
-    @Lazy
-    ProductReviewService productReviewService;
+    @Autowired @Lazy ProductReviewService productReviewService;
 
     @Autowired
     public ProductServiceImpl(ProductRepository productRepository) {
@@ -87,7 +74,8 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
     }
 
     @Override
-    public void addProductDescription(Product product, ProductDescription description) throws ServiceException {
+    public void addProductDescription(Product product, ProductDescription description)
+            throws ServiceException {
 
         if (product.getDescriptions() == null) {
             product.setDescriptions(new HashSet<>());
@@ -96,14 +84,12 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
         product.getDescriptions().add(description);
         description.setProduct(product);
         update(product);
-
     }
 
     @Override
     public List<Product> getProducts(List<Long> categoryIds) throws ServiceException {
         Set<Long> ids = new HashSet<>(categoryIds);
         return productRepository.getProductsListByCategories(ids);
-
     }
 
     @Override
@@ -118,10 +104,10 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
     }
 
     @Override
-    public List<Product> getProducts(List<Long> categoryIds, Language language) throws ServiceException {
+    public List<Product> getProducts(List<Long> categoryIds, Language language)
+            throws ServiceException {
         Set<Long> ids = new HashSet<>(categoryIds);
         return productRepository.getProductsListByCategories(ids, language);
-
     }
 
     @Override
@@ -140,7 +126,8 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
     }
 
     @Override
-    public Product getProductForLocale(long productId, Language language, Locale locale) throws ServiceException {
+    public Product getProductForLocale(long productId, Language language, Locale locale)
+            throws ServiceException {
         Product product = productRepository.getProductForLocale(productId, language, locale);
         if (product == null) {
             return null;
@@ -160,13 +147,17 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
         }
 
         // Get the category list
-        StringBuilder lineage = new StringBuilder().append(category.getLineage()).append(category.getId()).append("/");
-        List<Category> categories = categoryService.getListByLineage(category.getMerchantStore(), lineage.toString());
+        StringBuilder lineage =
+                new StringBuilder()
+                        .append(category.getLineage())
+                        .append(category.getId())
+                        .append("/");
+        List<Category> categories =
+                categoryService.getListByLineage(category.getMerchantStore(), lineage.toString());
         Set<Long> categoryIds = new HashSet<>();
         for (Category c : categories) {
 
             categoryIds.add(c.getId());
-
         }
 
         categoryIds.add(category.getId());
@@ -175,11 +166,13 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
 
         // Filter availability
 
-        return productRepository.getProductsForLocale(category.getMerchantStore(), categoryIds, language, locale);
+        return productRepository.getProductsForLocale(
+                category.getMerchantStore(), categoryIds, language, locale);
     }
 
     @Override
-    public ProductList listByStore(MerchantStore store, Language language, ProductCriteria criteria) {
+    public ProductList listByStore(
+            MerchantStore store, Language language, ProductCriteria criteria) {
 
         return productRepository.listByStore(store, language, criteria);
     }
@@ -195,12 +188,11 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
         return productRepository.listByTaxClass(taxClass);
     }
 
-
     @Override
     public void delete(Product product) throws ServiceException {
         Assert.notNull(product, "Product cannot be null");
         Assert.notNull(product.getMerchantStore(), "MerchantStore cannot be null in product");
-        product = this.getById(product.getId());// Prevents detached entity
+        product = this.getById(product.getId()); // Prevents detached entity
         // error
         product.setCategories(null);
 
@@ -225,7 +217,7 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
         }
 
         super.delete(product);
-        //searchService.deleteIndex(product.getMerchantStore(), product);
+        // searchService.deleteIndex(product.getMerchantStore(), product);
 
     }
 
@@ -238,7 +230,6 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
     public void update(Product product) throws ServiceException {
         saveOrUpdate(product);
     }
-
 
     private Product saveOrUpdate(Product product) throws ServiceException {
         Assert.notNull(product, "product cannot be null");
@@ -261,7 +252,8 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
 
             if (images != null && !images.isEmpty()) {
                 for (ProductImage image : images) {
-                    if (image.getImage() != null && (image.getId() == null || image.getId() == 0L)) {
+                    if (image.getImage() != null
+                            && (image.getId() == null || image.getId() == 0L)) {
                         image.setProduct(product);
 
                         InputStream inputStream = image.getImage();
@@ -304,13 +296,11 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
                 }
             }
 
-
         } catch (Exception e) {
             log.error("Cannot save images {}", e.getMessage());
         }
 
         return product;
-
     }
 
     @Override
@@ -321,8 +311,8 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
     }
 
     @Override
-    public Page<Product> listByStore(MerchantStore store, Language language, ProductCriteria criteria, int page,
-                                     int count) {
+    public Page<Product> listByStore(
+            MerchantStore store, Language language, ProductCriteria criteria, int page, int count) {
 
         criteria.setPageSize(page);
         criteria.setPageSize(count);
@@ -342,11 +332,11 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
         } catch (ServiceException e) {
             throw new ServiceException("Cannot create product [" + product.getId() + "]", e);
         }
-
     }
 
     @Override
-    public Product getBySku(String productCode, MerchantStore merchant, Language language) throws ServiceException {
+    public Product getBySku(String productCode, MerchantStore merchant, Language language)
+            throws ServiceException {
 
         try {
             List<Long> products = productRepository.findBySku(productCode, merchant.getId());
@@ -358,8 +348,6 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
         } catch (Exception e) {
             throw new ServiceException("Cannot get product with sku [" + productCode + "]", e);
         }
-
-
     }
 
     public Product getBySku(String productCode, MerchantStore merchant) throws ServiceException {
@@ -373,14 +361,10 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
         } catch (Exception e) {
             throw new ServiceException("Cannot get product with sku [" + productCode + "]", e);
         }
-
-
     }
 
     @Override
     public boolean exists(String sku, MerchantStore store) {
         return productRepository.existsBySku(sku, store.getId());
     }
-
-
 }

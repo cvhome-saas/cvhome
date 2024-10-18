@@ -7,9 +7,6 @@ import lombok.Setter;
 @Getter
 public abstract class ContentFile {
 
-
     private String fileName;
     private String mimeType;
-
-
 }

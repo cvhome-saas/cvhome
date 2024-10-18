@@ -5,12 +5,12 @@ import com.asrevo.cvhome.store.core.entity.catalog.product.price.ProductPriceDes
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
-
 import java.util.List;
 
 public interface ProductPriceService extends SalesManagerEntityService<Long, ProductPrice> {
 
-    void addDescription(ProductPrice price, ProductPriceDescription description) throws ServiceException;
+    void addDescription(ProductPrice price, ProductPriceDescription description)
+            throws ServiceException;
 
     ProductPrice saveOrUpdate(ProductPrice price) throws ServiceException;
 
@@ -19,6 +19,4 @@ public interface ProductPriceService extends SalesManagerEntityService<Long, Pro
     ProductPrice findById(Long priceId, String sku, MerchantStore store);
 
     List<ProductPrice> findByInventoryId(Long productInventoryId, String sku, MerchantStore store);
-
-
 }

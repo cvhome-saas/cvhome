@@ -9,38 +9,37 @@ import com.asrevo.cvhome.store.core.entity.customer.Customer;
 import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.io.Serial;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @EntityListeners(value = AuditListener.class)
-@Table(name = "PRODUCT_REVIEW", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {
-                "CUSTOMERS_ID",
-                "PRODUCT_ID"
-        })
-}
-)
+@Table(
+        name = "PRODUCT_REVIEW",
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"CUSTOMERS_ID", "PRODUCT_ID"})})
 @Getter
 @Setter
 public class ProductReview extends SalesManagerEntity<Long, ProductReview> implements Auditable {
-    @Serial
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
 
     @Id
     @Column(name = "PRODUCT_REVIEW_ID", unique = true, nullable = false)
-    @TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME", valueColumnName = "SEQ_COUNT",
-            pkColumnValue = "PRODUCT_REVIEW_SEQ_NEXT_VAL", allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE, initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
+    @TableGenerator(
+            name = "TABLE_GEN",
+            table = "SM_SEQUENCER",
+            pkColumnName = "SEQ_NAME",
+            valueColumnName = "SEQ_COUNT",
+            pkColumnValue = "PRODUCT_REVIEW_SEQ_NEXT_VAL",
+            allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
+            initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
     private Long id;
 
-    @Embedded
-    private AuditSection auditSection = new AuditSection();
+    @Embedded private AuditSection auditSection = new AuditSection();
 
     @Column(name = "REVIEWS_RATING")
     private Double reviewRating;
@@ -67,8 +66,5 @@ public class ProductReview extends SalesManagerEntity<Long, ProductReview> imple
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "productReview")
     private Set<ProductReviewDescription> descriptions = new HashSet<>();
 
-    public ProductReview() {
-    }
-
-
+    public ProductReview() {}
 }

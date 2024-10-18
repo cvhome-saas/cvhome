@@ -30,13 +30,18 @@ public class InternalStoreServiceImpl implements InternalStoreService {
 
     @Transactional
     @Override
-    public ManagerStoreDto createStore(CreateManagerStoreRequest storeRequest, IdentityId identityId) {
-        ManagerStoreEntity entity = storeRepository.save(ManagerStoreEntity.createStore(storeRequest, identityId));
+    public ManagerStoreDto createStore(
+            CreateManagerStoreRequest storeRequest, IdentityId identityId) {
+        ManagerStoreEntity entity =
+                storeRepository.save(ManagerStoreEntity.createStore(storeRequest, identityId));
         return storeMappers.toDto(entity);
     }
 
     @Override
-    public Page<ManagerStoreDto> findAll(UserOrgStoreIdentity identityInfo, ListManagerStoreQuery listManagerStoreQuery, Pageable pageable) {
+    public Page<ManagerStoreDto> findAll(
+            UserOrgStoreIdentity identityInfo,
+            ListManagerStoreQuery listManagerStoreQuery,
+            Pageable pageable) {
         ManagerStoreEntity entity = storeMappers.toEntity(listManagerStoreQuery);
         if (identityInfo.isOrgAdminOrAnyStoreAdmin()) {
             entity.setOwner(identityInfo.org());
@@ -48,7 +53,10 @@ public class InternalStoreServiceImpl implements InternalStoreService {
         entity.setSyncedInRouter(Boolean.TRUE);
         entity.setSyncedInStore(Boolean.TRUE);
         Page<ManagerStoreEntity> all = storeRepository.findAll(Example.of(entity), pageable);
-        return new PageImpl<>(all.stream().map(storeMappers::toDto).toList(), all.getPageable(), all.getTotalElements());
+        return new PageImpl<>(
+                all.stream().map(storeMappers::toDto).toList(),
+                all.getPageable(),
+                all.getTotalElements());
     }
 
     @Transactional
@@ -68,7 +76,8 @@ public class InternalStoreServiceImpl implements InternalStoreService {
     }
 
     private ManagerStoreEntity getManagerStoreEntity(ManagerStoreId store) {
-        return storeRepository.findById(store)
+        return storeRepository
+                .findById(store)
                 .orElseThrow(() -> new OperationExecution(ErrorCodes.store_not_found));
     }
 

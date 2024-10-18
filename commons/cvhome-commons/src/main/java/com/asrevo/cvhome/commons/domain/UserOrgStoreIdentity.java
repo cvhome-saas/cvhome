@@ -7,7 +7,9 @@ public record UserOrgStoreIdentity(IdentityId org, String store, Set<Roles> role
     public boolean hasRole(Roles roles) {
         return this.roles.contains(roles);
     }
-//    ROLE_SUPER_ADMIN, ROLE_ORG_ADMIN, ROLE_STORE_ADMIN, ROLE_STORE_MODERATOR, ROLE_STORE_RETAIL, ROLE_CUSTOMER
+
+    //    ROLE_SUPER_ADMIN, ROLE_ORG_ADMIN, ROLE_STORE_ADMIN, ROLE_STORE_MODERATOR,
+    // ROLE_STORE_RETAIL, ROLE_CUSTOMER
 
     public boolean isSuperAdmin() {
         return this.hasRole(Roles.ROLE_SUPER_ADMIN);

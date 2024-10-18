@@ -1,11 +1,10 @@
 package com.asrevo.cloud.ecs.discovery;
 
+import java.net.URI;
+import java.util.Map;
 import org.springframework.cloud.client.DefaultServiceInstance;
 import org.springframework.cloud.client.ServiceInstance;
 import software.amazon.awssdk.services.servicediscovery.model.HttpInstanceSummary;
-
-import java.net.URI;
-import java.util.Map;
 
 public class CloudMapServiceInstance implements ServiceInstance {
     private final HttpInstanceSummary instance;
@@ -15,7 +14,6 @@ public class CloudMapServiceInstance implements ServiceInstance {
         this.instance = instance;
         this.port = port;
     }
-
 
     @Override
     public String getServiceId() {
@@ -33,7 +31,8 @@ public class CloudMapServiceInstance implements ServiceInstance {
 
     @Override
     public int getPort() {
-        return Integer.parseInt(instance.attributes().getOrDefault("AWS_INSTANCE_PORT", port.toString()));
+        return Integer.parseInt(
+                instance.attributes().getOrDefault("AWS_INSTANCE_PORT", port.toString()));
     }
 
     @Override

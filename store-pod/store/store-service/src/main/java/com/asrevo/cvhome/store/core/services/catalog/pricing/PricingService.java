@@ -9,11 +9,9 @@ import com.asrevo.cvhome.store.core.entity.customer.Customer;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.currency.Currency;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
-
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Locale;
-
 
 /**
  * Services for Product item price calculation.
@@ -47,8 +45,7 @@ public interface PricingService {
      * based on the customer
      *
      */
-    FinalPrice calculateProductPrice(Product product, Customer customer)
-            throws ServiceException;
+    FinalPrice calculateProductPrice(Product product, Customer customer) throws ServiceException;
 
     /**
      * Calculates the FinalPrice of a Product taking into account
@@ -56,8 +53,8 @@ public interface PricingService {
      * any additional prices based on the default attributes or based on the user selected attributes.
      *
      */
-    FinalPrice calculateProductPrice(Product product,
-                                     List<ProductAttribute> attributes) throws ServiceException;
+    FinalPrice calculateProductPrice(Product product, List<ProductAttribute> attributes)
+            throws ServiceException;
 
     /**
      * Calculates the FinalPrice of a Product taking into account
@@ -66,22 +63,22 @@ public interface PricingService {
      * It also applies other calculation based on the customer
      *
      */
-    FinalPrice calculateProductPrice(Product product,
-                                     List<ProductAttribute> attributes, Customer customer)
+    FinalPrice calculateProductPrice(
+            Product product, List<ProductAttribute> attributes, Customer customer)
             throws ServiceException;
 
     /**
      * Method to be used to print a displayable formated amount to the end user
      *
      */
-    String getDisplayAmount(BigDecimal amount, MerchantStore store)
-            throws ServiceException;
+    String getDisplayAmount(BigDecimal amount, MerchantStore store) throws ServiceException;
 
     /**
      * Method to be used when building an amount formatted with the appropriate currency
      *
      */
-    String getDisplayAmount(BigDecimal amount, Locale locale, Currency currency, MerchantStore store)
+    String getDisplayAmount(
+            BigDecimal amount, Locale locale, Currency currency, MerchantStore store)
             throws ServiceException;
 
     /**
@@ -95,8 +92,7 @@ public interface PricingService {
      * String format of the money amount without currency symbol
      *
      */
-    String getStringAmount(BigDecimal amount, MerchantStore store)
-            throws ServiceException;
+    String getStringAmount(BigDecimal amount, MerchantStore store) throws ServiceException;
 
     /**
      * Method for calculating sub total

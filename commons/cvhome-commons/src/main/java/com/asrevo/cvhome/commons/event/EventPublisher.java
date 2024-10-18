@@ -1,9 +1,7 @@
 package com.asrevo.cvhome.commons.event;
 
-
-import org.springframework.scheduling.annotation.Async;
-
 import java.util.List;
+import org.springframework.scheduling.annotation.Async;
 
 public interface EventPublisher {
     @Async

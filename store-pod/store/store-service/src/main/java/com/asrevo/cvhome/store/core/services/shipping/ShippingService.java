@@ -5,12 +5,10 @@ import com.asrevo.cvhome.store.core.entity.reference.country.Country;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.shipping.ShippingConfiguration;
-
 import java.util.List;
 
 /*@TODO ASHRAF*/
 public interface ShippingService {
-
 
     /**
      * Returns a list of supported countries (ship to country list) configured by merchant
@@ -25,6 +23,4 @@ public interface ShippingService {
     ShippingConfiguration getShippingConfiguration(MerchantStore store) throws ServiceException;
 
     boolean hasTaxOnShipping(MerchantStore store) throws ServiceException;
-
-
 }

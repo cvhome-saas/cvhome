@@ -1,5 +1,7 @@
 package com.asrevo.cvhome.store.controller.exception;
 
+import java.util.Objects;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.Ordered;
@@ -7,14 +9,10 @@ import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Objects;
-import java.util.Optional;
-
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice({"com.asrevo.cvhome.store.controller"})
 @Slf4j
 public class RestErrorHandler {
-
 
     @RequestMapping(produces = "application/json")
     @ExceptionHandler(Exception.class)
@@ -26,11 +24,10 @@ public class RestErrorHandler {
         while (rootCause.getCause() != null && rootCause.getCause() != rootCause) {
             rootCause = rootCause.getCause();
         }
-        ErrorEntity errorEntity = createErrorEntity("500", exception.getMessage(),
-                rootCause.getMessage());
+        ErrorEntity errorEntity =
+                createErrorEntity("500", exception.getMessage(), rootCause.getMessage());
         return errorEntity;
     }
-
 
     /**
      * Generic exception serviceException handler
@@ -44,8 +41,11 @@ public class RestErrorHandler {
         while (rootCause.getCause() != null && rootCause.getCause() != rootCause) {
             rootCause = rootCause.getCause();
         }
-        ErrorEntity errorEntity = createErrorEntity(exception.getErrorCode() != null ? exception.getErrorCode() : "500", exception.getErrorMessage(),
-                rootCause.getMessage());
+        ErrorEntity errorEntity =
+                createErrorEntity(
+                        exception.getErrorCode() != null ? exception.getErrorCode() : "500",
+                        exception.getErrorMessage(),
+                        rootCause.getMessage());
         return errorEntity;
     }
 
@@ -54,8 +54,11 @@ public class RestErrorHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorEntity handleServiceException(ConversionRuntimeException exception) {
         log.error(exception.getErrorMessage(), exception);
-        ErrorEntity errorEntity = createErrorEntity(exception.getErrorCode(), exception.getErrorMessage(),
-                exception.getLocalizedMessage());
+        ErrorEntity errorEntity =
+                createErrorEntity(
+                        exception.getErrorCode(),
+                        exception.getErrorMessage(),
+                        exception.getLocalizedMessage());
         return errorEntity;
     }
 
@@ -65,8 +68,11 @@ public class RestErrorHandler {
     public @ResponseBody ErrorEntity handleServiceException(ResourceNotFoundException exception) {
         log.error(exception.getErrorMessage(), exception);
 
-        ErrorEntity errorEntity = createErrorEntity(exception.getErrorCode(), exception.getErrorMessage(),
-                exception.getLocalizedMessage());
+        ErrorEntity errorEntity =
+                createErrorEntity(
+                        exception.getErrorCode(),
+                        exception.getErrorMessage(),
+                        exception.getLocalizedMessage());
         return errorEntity;
     }
 
@@ -76,8 +82,11 @@ public class RestErrorHandler {
     public @ResponseBody ErrorEntity handleServiceException(UnauthorizedException exception) {
         log.error(exception.getErrorMessage(), exception);
 
-        ErrorEntity errorEntity = createErrorEntity(exception.getErrorCode(), exception.getErrorMessage(),
-                exception.getLocalizedMessage());
+        ErrorEntity errorEntity =
+                createErrorEntity(
+                        exception.getErrorCode(),
+                        exception.getErrorMessage(),
+                        exception.getLocalizedMessage());
         return errorEntity;
     }
 
@@ -87,22 +96,30 @@ public class RestErrorHandler {
     public @ResponseBody ErrorEntity handleRestApiException(RestApiException exception) {
         log.error(exception.getErrorMessage(), exception);
 
-        ErrorEntity errorEntity = createErrorEntity(exception.getErrorCode(), exception.getErrorMessage(),
-                exception.getLocalizedMessage());
+        ErrorEntity errorEntity =
+                createErrorEntity(
+                        exception.getErrorCode(),
+                        exception.getErrorMessage(),
+                        exception.getLocalizedMessage());
         return errorEntity;
     }
 
     private ErrorEntity createErrorEntity(String errorCode, String message, String detailMessage) {
         ErrorEntity errorEntity = new ErrorEntity();
-        Optional.ofNullable(errorCode)
-                .ifPresent(errorEntity::setErrorCode);
+        Optional.ofNullable(errorCode).ifPresent(errorEntity::setErrorCode);
 
-        String resultMessage = (message != null && detailMessage != null) ? new StringBuilder().append(message).append(", ").append(detailMessage).toString() : detailMessage;
+        String resultMessage =
+                (message != null && detailMessage != null)
+                        ? new StringBuilder()
+                                .append(message)
+                                .append(", ")
+                                .append(detailMessage)
+                                .toString()
+                        : detailMessage;
         if (StringUtils.isBlank(resultMessage)) {
             resultMessage = message;
         }
-        Optional.ofNullable(resultMessage)
-                .ifPresent(errorEntity::setMessage);
+        Optional.ofNullable(resultMessage).ifPresent(errorEntity::setMessage);
         return errorEntity;
     }
 }

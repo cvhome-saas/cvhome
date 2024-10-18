@@ -20,7 +20,6 @@ public interface CustomerOptinService extends SalesManagerEntityService<Long, Cu
      */
     void optinCumtomer(CustomerOptin optin) throws ServiceException;
 
-
     /**
      * Removes a specific CustomerOptin
      *
@@ -31,7 +30,6 @@ public interface CustomerOptinService extends SalesManagerEntityService<Long, Cu
      * Find an existing CustomerOptin
      *
      */
-    CustomerOptin findByEmailAddress(MerchantStore store, String emailAddress, String code) throws ServiceException;
-
-
+    CustomerOptin findByEmailAddress(MerchantStore store, String emailAddress, String code)
+            throws ServiceException;
 }

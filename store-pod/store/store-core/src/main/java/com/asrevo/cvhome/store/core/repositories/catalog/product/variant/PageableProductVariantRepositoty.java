@@ -6,10 +6,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
-public interface PageableProductVariantRepositoty extends PagingAndSortingRepository<ProductVariant, Long> {
+public interface PageableProductVariantRepositoty
+        extends PagingAndSortingRepository<ProductVariant, Long> {
 
-
-    @Query(value = """
+    @Query(
+            value =
+                    """
             select p from ProductVariant p
             join fetch p.product pr
             left join fetch p.variation pv
@@ -26,12 +28,11 @@ public interface PageableProductVariantRepositoty extends PagingAndSortingReposi
             left join fetch pigi.descriptions pigid
             left join fetch pr.merchantStore prm
             where pr.id = ?2 and prm.id = ?1""",
-            countQuery = """
+            countQuery =
+                    """
                     select p from ProductVariant p
                     join fetch p.product pr
                     left join fetch pr.merchantStore prm
                     where pr.id = ?2 and prm.id = ?1""")
     Page<ProductVariant> findByProductId(Integer storeId, Long productId, Pageable pageable);
-
-
 }

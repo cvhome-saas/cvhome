@@ -7,30 +7,32 @@ import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import com.asrevo.cvhome.store.core.model.catalog.product.*;
 import com.asrevo.cvhome.store.core.model.catalog.product.product.PersistableProduct;
-
 import java.util.List;
 
 public interface ProductCommonFacade {
-
 
     /**
      * Create / Update product
      *
      */
-    Long saveProduct(MerchantStore store, PersistableProduct product,
-                     Language language);
+    Long saveProduct(MerchantStore store, PersistableProduct product, Language language);
 
     /**
      * Update minimal product details
      *
      */
-    void update(Long productId, LightPersistableProduct product, MerchantStore merchant, Language language);
+    void update(
+            Long productId,
+            LightPersistableProduct product,
+            MerchantStore merchant,
+            Language language);
 
     /**
      * Patch inventory by sku
      *
      */
-    void update(String sku, LightPersistableProduct product, MerchantStore merchant, Language language);
+    void update(
+            String sku, LightPersistableProduct product, MerchantStore merchant, Language language);
 
     /**
      * Get a Product by id and store
@@ -49,13 +51,12 @@ public interface ProductCommonFacade {
     ReadableProduct getProductByCode(MerchantStore store, String uniqueCode, Language language)
             throws Exception;
 
-
     /**
      * Sets a new price to an existing product
      *
      */
-    ReadableProduct updateProductPrice(ReadableProduct product, ProductPriceEntity price,
-                                       Language language) throws Exception;
+    ReadableProduct updateProductPrice(
+            ReadableProduct product, ProductPriceEntity price, Language language) throws Exception;
 
     /**
      * Sets a new price to an existing product
@@ -76,7 +77,6 @@ public interface ProductCommonFacade {
      */
     void deleteProduct(Long id, MerchantStore store);
 
-
     /**
      * Adds a product to a category
      *
@@ -90,7 +90,6 @@ public interface ProductCommonFacade {
     ReadableProduct removeProductFromCategory(Category category, Product product, Language language)
             throws Exception;
 
-
     /**
      * Saves or updates a Product review
      *
@@ -102,20 +101,19 @@ public interface ProductCommonFacade {
      * Deletes a product review
      *
      */
-    void deleteReview(ProductReview review, MerchantStore store, Language language) throws Exception;
+    void deleteReview(ProductReview review, MerchantStore store, Language language)
+            throws Exception;
 
     /**
      * Get reviews for a given product
      *
      */
-    List<ReadableProductReview> getProductReviews(Product product, MerchantStore store,
-                                                  Language language) throws Exception;
+    List<ReadableProductReview> getProductReviews(
+            Product product, MerchantStore store, Language language) throws Exception;
 
     /**
      * validates if product exists
      *
      */
     boolean exists(String sku, MerchantStore store);
-
-
 }

@@ -11,25 +11,29 @@ import com.asrevo.cvhome.store.core.services.customer.CustomerService;
 import com.asrevo.cvhome.store.core.services.reference.language.LanguageService;
 import com.asrevo.cvhome.store.utils.AbstractDataPopulator;
 import com.asrevo.cvhome.store.utils.DateUtil;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.util.Assert;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
-
 @Setter
 @Getter
-public class PersistableCustomerReviewPopulator extends AbstractDataPopulator<PersistableCustomerReview, CustomerReview> {
+public class PersistableCustomerReviewPopulator
+        extends AbstractDataPopulator<PersistableCustomerReview, CustomerReview> {
 
     private CustomerService customerService;
 
     private LanguageService languageService;
 
     @Override
-    public CustomerReview populate(PersistableCustomerReview source, CustomerReview target, MerchantStore store,
-                                   Language language) throws ConversionException {
+    public CustomerReview populate(
+            PersistableCustomerReview source,
+            CustomerReview target,
+            MerchantStore store,
+            Language language)
+            throws ConversionException {
 
         Assert.notNull(customerService, "customerService cannot be null");
         Assert.notNull(languageService, "languageService cannot be null");
@@ -52,7 +56,6 @@ public class PersistableCustomerReviewPopulator extends AbstractDataPopulator<Pe
             } else {
                 target.setId(source.getId());
             }
-
 
             Customer reviewer = customerService.getById(source.getCustomerId());
             Customer reviewed = customerService.getById(source.getReviewedCustomer());
@@ -82,7 +85,6 @@ public class PersistableCustomerReviewPopulator extends AbstractDataPopulator<Pe
             throw new ConversionException("Cannot populate CustomerReview", e);
         }
 
-
         return target;
     }
 
@@ -91,5 +93,4 @@ public class PersistableCustomerReviewPopulator extends AbstractDataPopulator<Pe
         // TODO Auto-generated method stub
         return null;
     }
-
 }

@@ -9,14 +9,14 @@ import com.asrevo.cvhome.store.core.entity.system.IntegrationConfiguration;
 import com.asrevo.cvhome.store.core.entity.system.IntegrationModule;
 import com.asrevo.cvhome.store.core.exception.IntegrationException;
 import com.asrevo.cvhome.store.core.model.payments.Payment;
-
 import java.math.BigDecimal;
 import java.util.List;
 
 public interface PaymentModule {
 
-    void validateModuleConfiguration(IntegrationConfiguration integrationConfiguration, MerchantStore store) throws IntegrationException;
-
+    void validateModuleConfiguration(
+            IntegrationConfiguration integrationConfiguration, MerchantStore store)
+            throws IntegrationException;
 
     /**
      * Returns token-value related to the initialization of the transaction This
@@ -32,24 +32,50 @@ public interface PaymentModule {
      * @throws IntegrationException IntegrationException
      */
     Transaction initTransaction(
-            MerchantStore store, Customer customer, BigDecimal amount, Payment payment, IntegrationConfiguration configuration, IntegrationModule module)
+            MerchantStore store,
+            Customer customer,
+            BigDecimal amount,
+            Payment payment,
+            IntegrationConfiguration configuration,
+            IntegrationModule module)
             throws IntegrationException;
 
     Transaction authorize(
-            MerchantStore store, Customer customer, List<ShoppingCartItem> items, BigDecimal amount, Payment payment, IntegrationConfiguration configuration, IntegrationModule module)
+            MerchantStore store,
+            Customer customer,
+            List<ShoppingCartItem> items,
+            BigDecimal amount,
+            Payment payment,
+            IntegrationConfiguration configuration,
+            IntegrationModule module)
             throws IntegrationException;
 
-
     Transaction capture(
-            MerchantStore store, Customer customer, Order order, Transaction capturableTransaction, IntegrationConfiguration configuration, IntegrationModule module)
+            MerchantStore store,
+            Customer customer,
+            Order order,
+            Transaction capturableTransaction,
+            IntegrationConfiguration configuration,
+            IntegrationModule module)
             throws IntegrationException;
 
     Transaction authorizeAndCapture(
-            MerchantStore store, Customer customer, List<ShoppingCartItem> items, BigDecimal amount, Payment payment, IntegrationConfiguration configuration, IntegrationModule module)
+            MerchantStore store,
+            Customer customer,
+            List<ShoppingCartItem> items,
+            BigDecimal amount,
+            Payment payment,
+            IntegrationConfiguration configuration,
+            IntegrationModule module)
             throws IntegrationException;
 
     Transaction refund(
-            boolean partial, MerchantStore store, Transaction transaction, Order order, BigDecimal amount, IntegrationConfiguration configuration, IntegrationModule module)
+            boolean partial,
+            MerchantStore store,
+            Transaction transaction,
+            Order order,
+            BigDecimal amount,
+            IntegrationConfiguration configuration,
+            IntegrationModule module)
             throws IntegrationException;
-
 }

@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.s2s.oauth2;
 
+import java.util.HashMap;
 import lombok.Setter;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -11,14 +12,14 @@ import org.springframework.security.oauth2.core.endpoint.DefaultMapOAuth2AccessT
 import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.HashMap;
-
 @Setter
-public abstract class OAuth2AccessTokenResponseClient<T extends AbstractOAuth2AuthorizationGrantRequest> {
+public abstract class OAuth2AccessTokenResponseClient<
+        T extends AbstractOAuth2AuthorizationGrantRequest> {
     protected RestTemplate restTemplate;
-    private DefaultMapOAuth2AccessTokenResponseConverter converter = new DefaultMapOAuth2AccessTokenResponseConverter();
-    private ParameterizedTypeReference<HashMap<String, Object>> responseType = new ParameterizedTypeReference<>() {
-    };
+    private DefaultMapOAuth2AccessTokenResponseConverter converter =
+            new DefaultMapOAuth2AccessTokenResponseConverter();
+    private ParameterizedTypeReference<HashMap<String, Object>> responseType =
+            new ParameterizedTypeReference<>() {};
 
     public OAuth2AccessTokenResponseClient() {
         this.restTemplate = new RestTemplate();
@@ -30,7 +31,9 @@ public abstract class OAuth2AccessTokenResponseClient<T extends AbstractOAuth2Au
 
     protected OAuth2AccessTokenResponse exchange(T request) {
         String tokenUri = request.getClientRegistration().getProviderDetails().getTokenUri();
-        ResponseEntity<HashMap<String, Object>> exchange = restTemplate.exchange(tokenUri, HttpMethod.POST, getRequestEntity(request), responseType);
+        ResponseEntity<HashMap<String, Object>> exchange =
+                restTemplate.exchange(
+                        tokenUri, HttpMethod.POST, getRequestEntity(request), responseType);
         if (exchange.getStatusCode() == HttpStatus.OK) {
             HashMap<String, Object> body = exchange.getBody();
             if (body != null) {
@@ -44,5 +47,4 @@ public abstract class OAuth2AccessTokenResponseClient<T extends AbstractOAuth2Au
     }
 
     abstract HttpEntity<?> getRequestEntity(T request);
-
 }

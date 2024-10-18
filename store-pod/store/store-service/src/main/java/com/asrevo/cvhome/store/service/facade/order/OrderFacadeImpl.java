@@ -44,6 +44,9 @@ import com.asrevo.cvhome.store.service.populator.order.ReadableOrderPopulator;
 import com.asrevo.cvhome.store.service.populator.order.ReadableOrderProductPopulator;
 import com.asrevo.cvhome.store.service.populator.order.transaction.PersistablePaymentPopulator;
 import com.asrevo.cvhome.store.utils.*;
+import java.math.BigDecimal;
+import java.util.*;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -51,14 +54,9 @@ import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import java.math.BigDecimal;
-import java.util.*;
-import java.util.stream.Collectors;
-
 @Service("orderFacade")
 @Slf4j
 public class OrderFacadeImpl implements OrderFacade {
-
 
     private final ShoppingCartService shoppingCartService;
     private final ShoppingCartFacade shoppingCartFacade;
@@ -81,7 +79,26 @@ public class OrderFacadeImpl implements OrderFacade {
     private final StoreProperties storeProperties;
     private final ShoppingCartCalculationServiceImpl shoppingCartCalculationService;
 
-    public OrderFacadeImpl(ShoppingCartFacade shoppingCartFacade, ShoppingCartService shoppingCartService, OrderService orderService, ShippingQuoteService shippingQuoteService, ProductAttributeService productAttributeService, ProductService productService, PersistableOrderApiPopulator persistableOrderApiPopulator, ProductPriceUtils productPriceUtils, PricingService pricingService, ReadableOrderProductMapper readableOrderProductMapper, LabelUtils messages, CustomerFacade customerFacade, ReadableCustomerMapper readableCustomerMapper, ReadableOrderTotalMapper readableOrderTotalMapper, LanguageService languageService, ReadableOrderPopulator readableOrderPopulator, ImageFilePath imageUtils, StoreProperties storeProperties, ShoppingCartCalculationServiceImpl shoppingCartCalculationService) {
+    public OrderFacadeImpl(
+            ShoppingCartFacade shoppingCartFacade,
+            ShoppingCartService shoppingCartService,
+            OrderService orderService,
+            ShippingQuoteService shippingQuoteService,
+            ProductAttributeService productAttributeService,
+            ProductService productService,
+            PersistableOrderApiPopulator persistableOrderApiPopulator,
+            ProductPriceUtils productPriceUtils,
+            PricingService pricingService,
+            ReadableOrderProductMapper readableOrderProductMapper,
+            LabelUtils messages,
+            CustomerFacade customerFacade,
+            ReadableCustomerMapper readableCustomerMapper,
+            ReadableOrderTotalMapper readableOrderTotalMapper,
+            LanguageService languageService,
+            ReadableOrderPopulator readableOrderPopulator,
+            ImageFilePath imageUtils,
+            StoreProperties storeProperties,
+            ShoppingCartCalculationServiceImpl shoppingCartCalculationService) {
         this.shoppingCartFacade = shoppingCartFacade;
         this.shoppingCartService = shoppingCartService;
         this.orderService = orderService;
@@ -104,8 +121,13 @@ public class OrderFacadeImpl implements OrderFacade {
     }
 
     @Override
-    public Order processOrder(PersistableOrder order, Customer customer,
-                              MerchantStore store, Language language, Locale locale) throws ServiceException {
+    public Order processOrder(
+            PersistableOrder order,
+            Customer customer,
+            MerchantStore store,
+            Language language,
+            Locale locale)
+            throws ServiceException {
 
         Assert.notNull(order, "Order cannot be null");
         Assert.notNull(customer, "Customer cannot be null");
@@ -115,7 +137,6 @@ public class OrderFacadeImpl implements OrderFacade {
 
         try {
 
-
             Order modelOrder = new Order();
             persistableOrderApiPopulator.populate(order, modelOrder, store, language);
 
@@ -123,9 +144,11 @@ public class OrderFacadeImpl implements OrderFacade {
             ShoppingCart cart = shoppingCartService.getById(shoppingCartId, store);
 
             if (cart == null) {
-                throw new ServiceException("Shopping cart with id " + shoppingCartId + " does not exist");
+                throw new ServiceException(
+                        "Shopping cart with id " + shoppingCartId + " does not exist");
             }
-            OrderTotalSummary calculate = shoppingCartCalculationService.calculate(cart, customer, store, language);
+            OrderTotalSummary calculate =
+                    shoppingCartCalculationService.calculate(cart, customer, store, language);
             order.getPayment().setAmount(calculate.getTotal().toString());
             Set<ShoppingCartItem> shoppingCartItems = cart.getLineItems();
 
@@ -134,7 +157,7 @@ public class OrderFacadeImpl implements OrderFacade {
             Set<OrderProduct> orderProducts = new LinkedHashSet<>();
 
             OrderProductPopulator orderProductPopulator = new OrderProductPopulator();
-//            orderProductPopulator.setDigitalProductService(digitalProductService);
+            //            orderProductPopulator.setDigitalProductService(digitalProductService);
             orderProductPopulator.setProductAttributeService(productAttributeService);
             orderProductPopulator.setProductService(productService);
 
@@ -164,7 +187,8 @@ public class OrderFacadeImpl implements OrderFacade {
 
             // get shipping quote if asked for
             if (order.getShippingQuote() != null && order.getShippingQuote() > 0) {
-                shippingSummary = shippingQuoteService.getShippingSummary(order.getShippingQuote(), store);
+                shippingSummary =
+                        shippingQuoteService.getShippingSummary(order.getShippingQuote(), store);
                 if (shippingSummary != null) {
                     modelOrder.setShippingModuleCode(shippingSummary.getShippingModule());
                 }
@@ -175,14 +199,15 @@ public class OrderFacadeImpl implements OrderFacade {
             // of process order request. If totals does not match, an error
             // should be thrown.
 
-            OrderTotalSummary orderTotalSummary = null;
+            OrderTotalSummary orderTotalSummary;
 
             OrderSummary orderSummary = new OrderSummary();
             orderSummary.setShippingSummary(shippingSummary);
             List<ShoppingCartItem> itemsSet = new ArrayList<>(cart.getLineItems());
             orderSummary.setProducts(itemsSet);
 
-            orderTotalSummary = orderService.caculateOrderTotal(orderSummary, customer, store, language);
+            orderTotalSummary =
+                    orderService.caculateOrderTotal(orderSummary, customer, store, language);
 
             if (order.getPayment().getAmount() == null) {
                 throw new ConversionException("Requires Payment.amount");
@@ -200,9 +225,12 @@ public class OrderFacadeImpl implements OrderFacade {
             // compare both prices
             if (calculatedAmount.compareTo(formattedSubmittedAmount) != 0) {
 
-
-                throw new ConversionException("Payment.amount does not match what the system has calculated "
-                        + strCalculatedTotal + " (received " + submitedAmount + ") please recalculate the order and submit again");
+                throw new ConversionException(
+                        "Payment.amount does not match what the system has calculated "
+                                + strCalculatedTotal
+                                + " (received "
+                                + submitedAmount
+                                + ") please recalculate the order and submit again");
             }
 
             modelOrder.setTotal(calculatedAmount);
@@ -224,19 +252,22 @@ public class OrderFacadeImpl implements OrderFacade {
 
             modelOrder.setShoppingCartCode(cart.getShoppingCartCode());
 
-            //lookup existing customer
-            //if customer exist then do not set authentication for this customer and send an instructions email
+            // lookup existing customer
+            // if customer exist then do not set authentication for this customer and send an
+            // instructions email
             if (!StringUtils.isBlank(customer.getNick()) && !customer.isAnonymous()) {
-                if (order.getCustomerId() == null && (customerFacade.checkIfUserExists(customer.getNick(), store))) {
+                if (order.getCustomerId() == null
+                        && (customerFacade.checkIfUserExists(customer.getNick(), store))) {
                     customer.setAnonymous(true);
                     customer.setNick(null);
-                    //send email instructions
+                    // send email instructions
                 }
             }
 
-
-            //order service
-            modelOrder = orderService.processOrder(modelOrder, customer, items, orderTotalSummary, paymentModel, store);
+            // order service
+            modelOrder =
+                    orderService.processOrder(
+                            modelOrder, customer, items, orderTotalSummary, paymentModel, store);
 
             // update cart
             try {
@@ -246,13 +277,12 @@ public class OrderFacadeImpl implements OrderFacade {
                 log.error("Cannot delete cart {}", cart.getId(), e);
             }
 
-            //email management
+            // email management
             if (this.storeProperties.enableOrderMailApi()) {
                 // send email
                 try {
 
                     notify(modelOrder, customer, store, language, locale);
-
 
                 } catch (Exception e) {
                     log.error("Cannot send order confirmation email", e);
@@ -264,53 +294,59 @@ public class OrderFacadeImpl implements OrderFacade {
         } catch (Exception e) {
 
             throw new ServiceException(e);
-
         }
-
     }
 
     @Override
-    public ReadableOrderConfirmation orderConfirmation(Order order, Customer customer, MerchantStore store,
-                                                       Language language) {
+    public ReadableOrderConfirmation orderConfirmation(
+            Order order, Customer customer, MerchantStore store, Language language) {
         Validate.notNull(order, "Order cannot be null");
         Validate.notNull(customer, "Customer cannot be null");
         Validate.notNull(store, "MerchantStore cannot be null");
 
         ReadableOrderConfirmation orderConfirmation = new ReadableOrderConfirmation();
 
-        ReadableCustomer readableCustomer = readableCustomerMapper.convert(customer, store, language);
+        ReadableCustomer readableCustomer =
+                readableCustomerMapper.convert(customer, store, language);
         orderConfirmation.setBilling(readableCustomer.getBilling());
         orderConfirmation.setDelivery(readableCustomer.getDelivery());
 
         ReadableTotal readableTotal = new ReadableTotal();
 
         Set<OrderTotal> totals = order.getOrderTotal();
-        List<ReadableOrderTotal> readableTotals = totals.stream()
-                .sorted(Comparator.comparingInt(OrderTotal::getSortOrder))
-                .map(tot -> convertOrderTotal(tot, store, language))
-                .collect(Collectors.toList());
+        List<ReadableOrderTotal> readableTotals =
+                totals.stream()
+                        .sorted(Comparator.comparingInt(OrderTotal::getSortOrder))
+                        .map(tot -> convertOrderTotal(tot, store, language))
+                        .collect(Collectors.toList());
 
         readableTotal.setTotals(readableTotals);
 
+        Optional<ReadableOrderTotal> grandTotal =
+                readableTotals.stream()
+                        .filter(tot -> tot.getCode().equals("order.total.total"))
+                        .findFirst();
 
-        Optional<ReadableOrderTotal> grandTotal = readableTotals.stream().filter(tot -> tot.getCode().equals("order.total.total")).findFirst();
-
-
-        grandTotal.ifPresent(readableOrderTotal -> readableTotal.setGrandTotal(readableOrderTotal.getText()));
+        grandTotal.ifPresent(
+                readableOrderTotal -> readableTotal.setGrandTotal(readableOrderTotal.getText()));
         orderConfirmation.setTotal(readableTotal);
 
-
-        List<ReadableOrderProduct> products = order.getOrderProducts().stream().map(pr -> convertOrderProduct(pr, store, language)).collect(Collectors.toList());
+        List<ReadableOrderProduct> products =
+                order.getOrderProducts().stream()
+                        .map(pr -> convertOrderProduct(pr, store, language))
+                        .collect(Collectors.toList());
         orderConfirmation.setProducts(products);
 
         if (!StringUtils.isBlank(order.getShippingModuleCode())) {
             StringBuilder optionCodeBuilder = new StringBuilder();
             try {
 
-                optionCodeBuilder
-                        .append("module.shipping.")
-                        .append(order.getShippingModuleCode());
-                String shippingName = messages.getMessage(optionCodeBuilder.toString(), new String[]{store.getStorename()}, languageService.toLocale(language, store));
+                optionCodeBuilder.append("module.shipping.").append(order.getShippingModuleCode());
+                String shippingName =
+                        messages.getMessage(
+                                optionCodeBuilder.toString(),
+                                new String[] {store.getStorename()},
+                                languageService.toLocale(language, store));
                 orderConfirmation.setShipping(shippingName);
             } catch (Exception e) { // label not found
                 log.warn("No shipping code found for {}", optionCodeBuilder);
@@ -321,15 +357,15 @@ public class OrderFacadeImpl implements OrderFacade {
             orderConfirmation.setPayment(order.getPaymentType().name());
         }
 
-
         orderConfirmation.setId(order.getId());
-
 
         return orderConfirmation;
     }
 
     @Override
-    public com.asrevo.cvhome.store.core.model.order.v0.ReadableOrderList getReadableOrderList(MerchantStore store, Customer customer, int start, int maxCount, Language language) throws Exception {
+    public com.asrevo.cvhome.store.core.model.order.v0.ReadableOrderList getReadableOrderList(
+            MerchantStore store, Customer customer, int start, int maxCount, Language language)
+            throws Exception {
         OrderCriteria criteria = new OrderCriteria();
         criteria.setStartIndex(start);
         criteria.setMaxCount(maxCount);
@@ -339,26 +375,29 @@ public class OrderFacadeImpl implements OrderFacade {
     }
 
     @Override
-    public com.asrevo.cvhome.store.core.model.order.v0.ReadableOrderList getReadableOrderList(OrderCriteria criteria, MerchantStore store) {
+    public com.asrevo.cvhome.store.core.model.order.v0.ReadableOrderList getReadableOrderList(
+            OrderCriteria criteria, MerchantStore store) {
         try {
             criteria.setLegacyPagination(false);
 
             OrderList orderList = orderService.getOrders(criteria, store);
 
             List<Order> orders = orderList.getOrders();
-            com.asrevo.cvhome.store.core.model.order.v0.ReadableOrderList returnList = new com.asrevo.cvhome.store.core.model.order.v0.ReadableOrderList();
+            com.asrevo.cvhome.store.core.model.order.v0.ReadableOrderList returnList =
+                    new com.asrevo.cvhome.store.core.model.order.v0.ReadableOrderList();
 
             if (CollectionUtils.isEmpty(orders)) {
                 returnList.setRecordsTotal(0);
                 return returnList;
             }
 
-            List<com.asrevo.cvhome.store.core.model.order.v0.ReadableOrder> readableOrders = new ArrayList<>();
+            List<com.asrevo.cvhome.store.core.model.order.v0.ReadableOrder> readableOrders =
+                    new ArrayList<>();
             for (Order order : orders) {
-                com.asrevo.cvhome.store.core.model.order.v0.ReadableOrder readableOrder = new com.asrevo.cvhome.store.core.model.order.v0.ReadableOrder();
+                com.asrevo.cvhome.store.core.model.order.v0.ReadableOrder readableOrder =
+                        new com.asrevo.cvhome.store.core.model.order.v0.ReadableOrder();
                 readableOrderPopulator.populate(order, readableOrder, null, null);
                 readableOrders.add(readableOrder);
-
             }
             returnList.setOrders(readableOrders);
 
@@ -375,8 +414,8 @@ public class OrderFacadeImpl implements OrderFacade {
     }
 
     @Override
-    public com.asrevo.cvhome.store.core.model.order.v0.ReadableOrderList getReadableOrderList(MerchantStore store, int start,
-                                                                                              int maxCount, Language language) throws Exception {
+    public com.asrevo.cvhome.store.core.model.order.v0.ReadableOrderList getReadableOrderList(
+            MerchantStore store, int start, int maxCount, Language language) throws Exception {
 
         OrderCriteria criteria = new OrderCriteria();
         criteria.setStartIndex(start);
@@ -385,19 +424,20 @@ public class OrderFacadeImpl implements OrderFacade {
         return getReadableOrderList(criteria, store, language);
     }
 
-    private ReadableOrderTotal convertOrderTotal(OrderTotal total, MerchantStore store, Language language) {
+    private ReadableOrderTotal convertOrderTotal(
+            OrderTotal total, MerchantStore store, Language language) {
 
         return readableOrderTotalMapper.convert(total, store, language);
     }
 
-    private ReadableOrderProduct convertOrderProduct(OrderProduct product, MerchantStore store, Language language) {
+    private ReadableOrderProduct convertOrderProduct(
+            OrderProduct product, MerchantStore store, Language language) {
 
         return readableOrderProductMapper.convert(product, store, language);
-
     }
 
-    private com.asrevo.cvhome.store.core.model.order.v0.ReadableOrderList getReadableOrderList(OrderCriteria criteria,
-                                                                                               MerchantStore store, Language language) throws Exception {
+    private com.asrevo.cvhome.store.core.model.order.v0.ReadableOrderList getReadableOrderList(
+            OrderCriteria criteria, MerchantStore store, Language language) throws Exception {
 
         OrderList orderList = orderService.listByStore(store, criteria);
 
@@ -406,7 +446,8 @@ public class OrderFacadeImpl implements OrderFacade {
         readableOrderPopulator.setLocale(locale);
 
         List<Order> orders = orderList.getOrders();
-        com.asrevo.cvhome.store.core.model.order.v0.ReadableOrderList returnList = new com.asrevo.cvhome.store.core.model.order.v0.ReadableOrderList();
+        com.asrevo.cvhome.store.core.model.order.v0.ReadableOrderList returnList =
+                new com.asrevo.cvhome.store.core.model.order.v0.ReadableOrderList();
 
         if (CollectionUtils.isEmpty(orders)) {
             returnList.setRecordsTotal(0);
@@ -414,23 +455,24 @@ public class OrderFacadeImpl implements OrderFacade {
             return null;
         }
 
-        List<com.asrevo.cvhome.store.core.model.order.v0.ReadableOrder> readableOrders = new ArrayList<>();
+        List<com.asrevo.cvhome.store.core.model.order.v0.ReadableOrder> readableOrders =
+                new ArrayList<>();
         for (Order order : orders) {
-            com.asrevo.cvhome.store.core.model.order.v0.ReadableOrder readableOrder = new com.asrevo.cvhome.store.core.model.order.v0.ReadableOrder();
+            com.asrevo.cvhome.store.core.model.order.v0.ReadableOrder readableOrder =
+                    new com.asrevo.cvhome.store.core.model.order.v0.ReadableOrder();
             readableOrderPopulator.populate(order, readableOrder, store, language);
             readableOrders.add(readableOrder);
-
         }
 
         returnList.setRecordsTotal(orderList.getTotalCount());
         return this.populateOrderList(orderList, store, language);
-
     }
 
-    private com.asrevo.cvhome.store.core.model.order.v0.ReadableOrderList populateOrderList(final OrderList orderList,
-                                                                                            final MerchantStore store, final Language language) {
+    private com.asrevo.cvhome.store.core.model.order.v0.ReadableOrderList populateOrderList(
+            final OrderList orderList, final MerchantStore store, final Language language) {
         List<Order> orders = orderList.getOrders();
-        com.asrevo.cvhome.store.core.model.order.v0.ReadableOrderList returnList = new com.asrevo.cvhome.store.core.model.order.v0.ReadableOrderList();
+        com.asrevo.cvhome.store.core.model.order.v0.ReadableOrderList returnList =
+                new com.asrevo.cvhome.store.core.model.order.v0.ReadableOrderList();
         if (CollectionUtils.isEmpty(orders)) {
             log.info("Order list if empty..Returning empty list");
             returnList.setRecordsTotal(0);
@@ -442,31 +484,35 @@ public class OrderFacadeImpl implements OrderFacade {
         Locale locale = LocaleUtils.getLocale(language);
         readableOrderPopulator.setLocale(locale);
 
-        List<com.asrevo.cvhome.store.core.model.order.v0.ReadableOrder> readableOrders = new ArrayList<>();
+        List<com.asrevo.cvhome.store.core.model.order.v0.ReadableOrder> readableOrders =
+                new ArrayList<>();
         for (Order order : orders) {
-            com.asrevo.cvhome.store.core.model.order.v0.ReadableOrder readableOrder = new com.asrevo.cvhome.store.core.model.order.v0.ReadableOrder();
+            com.asrevo.cvhome.store.core.model.order.v0.ReadableOrder readableOrder =
+                    new com.asrevo.cvhome.store.core.model.order.v0.ReadableOrder();
             try {
                 readableOrderPopulator.populate(order, readableOrder, store, language);
                 setOrderProductList(order, locale, store, language, readableOrder);
             } catch (ConversionException ex) {
                 log.error("Error while converting order to order data", ex);
-
             }
             readableOrders.add(readableOrder);
-
         }
 
         returnList.setOrders(readableOrders);
         return returnList;
-
     }
 
-    private void setOrderProductList(final Order order, final Locale locale, final MerchantStore store,
-                                     final Language language, final com.asrevo.cvhome.store.core.model.order.v0.ReadableOrder readableOrder)
+    private void setOrderProductList(
+            final Order order,
+            final Locale locale,
+            final MerchantStore store,
+            final Language language,
+            final com.asrevo.cvhome.store.core.model.order.v0.ReadableOrder readableOrder)
             throws ConversionException {
         List<ReadableOrderProduct> orderProducts = new ArrayList<>();
         for (OrderProduct p : order.getOrderProducts()) {
-            ReadableOrderProductPopulator orderProductPopulator = new ReadableOrderProductPopulator();
+            ReadableOrderProductPopulator orderProductPopulator =
+                    new ReadableOrderProductPopulator();
             orderProductPopulator.setLocale(locale);
             orderProductPopulator.setProductService(productService);
             orderProductPopulator.setPricingService(pricingService);
@@ -485,19 +531,21 @@ public class OrderFacadeImpl implements OrderFacade {
     }
 
     @Override
-    public com.asrevo.cvhome.store.core.model.order.v0.ReadableOrder getReadableOrder(Long orderId, MerchantStore store,
-                                                                                      Language language) {
+    public com.asrevo.cvhome.store.core.model.order.v0.ReadableOrder getReadableOrder(
+            Long orderId, MerchantStore store, Language language) {
         Validate.notNull(store, "MerchantStore cannot be null");
         Order modelOrder = orderService.getOrder(orderId, store);
         if (modelOrder == null) {
             throw new ResourceNotFoundException("Order not found with id " + orderId);
         }
 
-        com.asrevo.cvhome.store.core.model.order.v0.ReadableOrder readableOrder = new com.asrevo.cvhome.store.core.model.order.v0.ReadableOrder();
+        com.asrevo.cvhome.store.core.model.order.v0.ReadableOrder readableOrder =
+                new com.asrevo.cvhome.store.core.model.order.v0.ReadableOrder();
 
         Long customerId = modelOrder.getCustomerId();
         if (customerId != null) {
-            ReadableCustomer readableCustomer = customerFacade.getCustomerById(customerId, store, language);
+            ReadableCustomer readableCustomer =
+                    customerFacade.getCustomerById(customerId, store, language);
             if (readableCustomer == null) {
                 log.warn("Customer id {} not found in order {}", customerId, orderId);
             } else {
@@ -511,7 +559,8 @@ public class OrderFacadeImpl implements OrderFacade {
             // order products
             List<ReadableOrderProduct> orderProducts = new ArrayList<>();
             for (OrderProduct p : modelOrder.getOrderProducts()) {
-                ReadableOrderProductPopulator orderProductPopulator = new ReadableOrderProductPopulator();
+                ReadableOrderProductPopulator orderProductPopulator =
+                        new ReadableOrderProductPopulator();
                 orderProductPopulator.setProductService(productService);
                 orderProductPopulator.setPricingService(pricingService);
                 orderProductPopulator.setImageUtils(imageUtils);
@@ -530,8 +579,8 @@ public class OrderFacadeImpl implements OrderFacade {
     }
 
     @Override
-    public List<ReadableOrderStatusHistory> getReadableOrderHistory(Long orderId, MerchantStore store,
-                                                                    Language language) {
+    public List<ReadableOrderStatusHistory> getReadableOrderHistory(
+            Long orderId, MerchantStore store, Language language) {
 
         Order order = orderService.getOrder(orderId, store);
         if (order == null) {
@@ -540,8 +589,10 @@ public class OrderFacadeImpl implements OrderFacade {
         }
 
         Set<OrderStatusHistory> historyList = order.getOrderHistory();
-        List<ReadableOrderStatusHistory> returnList = historyList.stream().map(this::mapToReadbleOrderStatusHistory)
-                .collect(Collectors.toList());
+        List<ReadableOrderStatusHistory> returnList =
+                historyList.stream()
+                        .map(this::mapToReadbleOrderStatusHistory)
+                        .collect(Collectors.toList());
         return returnList;
     }
 
@@ -557,7 +608,8 @@ public class OrderFacadeImpl implements OrderFacade {
     }
 
     @Override
-    public void createOrderStatus(PersistableOrderStatusHistory status, Long id, MerchantStore store) {
+    public void createOrderStatus(
+            PersistableOrderStatusHistory status, Long id, MerchantStore store) {
         Validate.notNull(status, "OrderStatusHistory must not be null");
         Validate.notNull(id, "Order id must not be null");
         Validate.notNull(store, "MerchantStore must not be null");
@@ -566,7 +618,11 @@ public class OrderFacadeImpl implements OrderFacade {
         Order order = orderService.getOrder(id, store);
         if (order == null) {
             throw new ResourceNotFoundException(
-                    "Order with id [" + id + "] does not exist for merchant [" + store.getCode() + "]");
+                    "Order with id ["
+                            + id
+                            + "] does not exist for merchant ["
+                            + store.getCode()
+                            + "]");
         }
 
         try {
@@ -579,14 +635,17 @@ public class OrderFacadeImpl implements OrderFacade {
             orderService.addOrderStatusHistory(order, history);
 
         } catch (Exception e) {
-            throw new ServiceRuntimeException("An error occured while converting orderstatushistory", e);
+            throw new ServiceRuntimeException(
+                    "An error occured while converting orderstatushistory", e);
         }
-
     }
 
-    private void notify(Order modelOrder, Customer customer, MerchantStore store, Language language, Locale locale) {
-//@TODO ASHRAF
+    private void notify(
+            Order modelOrder,
+            Customer customer,
+            MerchantStore store,
+            Language language,
+            Locale locale) {
+        // @TODO ASHRAF
     }
-
-
 }

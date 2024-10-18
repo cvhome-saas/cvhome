@@ -7,24 +7,26 @@ import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
-import org.springframework.data.domain.Page;
-
 import java.util.List;
+import org.springframework.data.domain.Page;
 
 public interface ManufacturerService extends SalesManagerEntityService<Long, Manufacturer> {
 
-    List<Manufacturer> listByStore(MerchantStore store, Language language)
-            throws ServiceException;
+    List<Manufacturer> listByStore(MerchantStore store, Language language) throws ServiceException;
 
     List<Manufacturer> listByStore(MerchantStore store) throws ServiceException;
 
-    Page<Manufacturer> listByStore(MerchantStore store, Language language, int page, int count) throws ServiceException;
+    Page<Manufacturer> listByStore(MerchantStore store, Language language, int page, int count)
+            throws ServiceException;
 
-    Page<Manufacturer> listByStore(MerchantStore store, Language language, String name, int page, int count) throws ServiceException;
+    Page<Manufacturer> listByStore(
+            MerchantStore store, Language language, String name, int page, int count)
+            throws ServiceException;
 
     void saveOrUpdate(Manufacturer manufacturer) throws ServiceException;
 
-    void addManufacturerDescription(Manufacturer manufacturer, ManufacturerDescription description) throws ServiceException;
+    void addManufacturerDescription(Manufacturer manufacturer, ManufacturerDescription description)
+            throws ServiceException;
 
     Long getCountManufAttachedProducts(Manufacturer manufacturer) throws ServiceException;
 
@@ -36,20 +38,18 @@ public interface ManufacturerService extends SalesManagerEntityService<Long, Man
      * List manufacturers by products from a given list of categories
      *
      */
-    List<Manufacturer> listByProductsByCategoriesId(MerchantStore store,
-                                                    List<Long> ids, Language language) throws ServiceException;
+    List<Manufacturer> listByProductsByCategoriesId(
+            MerchantStore store, List<Long> ids, Language language) throws ServiceException;
 
     /**
      * List by product in category lineage
      *
      */
-    List<Manufacturer> listByProductsInCategory(MerchantStore store,
-                                                Category category, Language language) throws ServiceException;
+    List<Manufacturer> listByProductsInCategory(
+            MerchantStore store, Category category, Language language) throws ServiceException;
 
-    Page<Manufacturer> listByStore(MerchantStore store, String name,
-                                   int page, int count) throws ServiceException;
+    Page<Manufacturer> listByStore(MerchantStore store, String name, int page, int count)
+            throws ServiceException;
 
     int count(MerchantStore store);
-
-
 }

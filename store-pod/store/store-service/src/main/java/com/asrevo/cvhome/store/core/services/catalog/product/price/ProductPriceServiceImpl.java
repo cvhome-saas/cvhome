@@ -1,16 +1,14 @@
 package com.asrevo.cvhome.store.core.services.catalog.product.price;
 
-
 import com.asrevo.cvhome.store.core.entity.catalog.product.price.ProductPrice;
 import com.asrevo.cvhome.store.core.entity.catalog.product.price.ProductPriceDescription;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.repositories.catalog.product.price.ProductPriceRepository;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service("productPrice")
 public class ProductPriceServiceImpl extends SalesManagerEntityServiceImpl<Long, ProductPrice>
@@ -25,12 +23,11 @@ public class ProductPriceServiceImpl extends SalesManagerEntityServiceImpl<Long,
     }
 
     @Override
-    public void addDescription(ProductPrice price,
-                               ProductPriceDescription description) throws ServiceException {
+    public void addDescription(ProductPrice price, ProductPriceDescription description)
+            throws ServiceException {
         price.getDescriptions().add(description);
         update(price);
     }
-
 
     @Override
     public ProductPrice saveOrUpdate(ProductPrice price) throws ServiceException {
@@ -39,10 +36,9 @@ public class ProductPriceServiceImpl extends SalesManagerEntityServiceImpl<Long,
 
     @Override
     public void delete(ProductPrice price) throws ServiceException {
-        //override method, this allows the error that we try to remove a detached variant
+        // override method, this allows the error that we try to remove a detached variant
         price = this.getById(price.getId());
         super.delete(price);
-
     }
 
     @Override
@@ -56,9 +52,9 @@ public class ProductPriceServiceImpl extends SalesManagerEntityServiceImpl<Long,
     }
 
     @Override
-    public List<ProductPrice> findByInventoryId(Long productInventoryId, String sku, MerchantStore store) {
-        return productPriceRepository.findByProductInventoty(sku, productInventoryId, store.getCode());
+    public List<ProductPrice> findByInventoryId(
+            Long productInventoryId, String sku, MerchantStore store) {
+        return productPriceRepository.findByProductInventoty(
+                sku, productInventoryId, store.getCode());
     }
-
-
 }

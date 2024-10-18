@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.store.controller.v1.auth;
 
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -11,8 +12,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Optional;
-
 @RestController
 @RequestMapping("api/v1/auth")
 @Slf4j
@@ -22,8 +21,7 @@ public class AuthController {
     public ResponseEntity<Jwt> current(JwtAuthenticationToken jwtAuthenticationToken) {
         return Optional.ofNullable((Jwt) jwtAuthenticationToken.getPrincipal())
                 .map(ResponseEntity::ok)
-                .orElseGet(() ->
-                        new ResponseEntity<>(HttpStatus.UNAUTHORIZED));
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.UNAUTHORIZED));
     }
 
     @GetMapping("me")

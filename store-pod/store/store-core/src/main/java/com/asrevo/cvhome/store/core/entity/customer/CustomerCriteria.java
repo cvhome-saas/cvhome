@@ -13,5 +13,4 @@ public class CustomerCriteria extends Criteria {
     private String name;
     private String email;
     private String country;
-
 }

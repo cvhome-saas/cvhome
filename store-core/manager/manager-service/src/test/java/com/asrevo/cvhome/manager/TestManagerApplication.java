@@ -20,6 +20,8 @@ public class TestManagerApplication {
     }
 
     public static void main(String[] args) {
-        SpringApplication.from(ManagerApplication::main).with(TestManagerApplication.class).run(args);
+        SpringApplication.from(ManagerApplication::main)
+                .with(TestManagerApplication.class)
+                .run(args);
     }
 }

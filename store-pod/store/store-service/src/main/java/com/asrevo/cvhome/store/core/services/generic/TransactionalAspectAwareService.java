@@ -7,6 +7,4 @@ package com.asrevo.cvhome.store.core.services.generic;
  * il suffit alors de déclarer le pointcut de l'aspect sur
  * this(com.asrevo.cvhome.store.core.services.common.generic.ITransactionalAspectAwareService)
  */
-public interface TransactionalAspectAwareService {
-
-}
+public interface TransactionalAspectAwareService {}

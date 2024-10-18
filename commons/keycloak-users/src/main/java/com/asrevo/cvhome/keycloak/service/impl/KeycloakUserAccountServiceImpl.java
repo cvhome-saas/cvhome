@@ -1,5 +1,7 @@
 package com.asrevo.cvhome.keycloak.service.impl;
 
+import static com.asrevo.cvhome.keycloak.utils.Constants.*;
+
 import com.asrevo.cvhome.commons.domain.*;
 import com.asrevo.cvhome.commons.utils.OperationExecution;
 import com.asrevo.cvhome.keycloak.domain.group.GroupEntity;
@@ -9,6 +11,11 @@ import com.asrevo.cvhome.keycloak.service.UserAccountService;
 import com.asrevo.cvhome.keycloak.utils.ErrorCodes;
 import com.asrevo.cvhome.keycloak.utils.KCUserType;
 import jakarta.ws.rs.core.Response;
+import java.net.URI;
+import java.security.Principal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.Keycloak;
@@ -18,14 +25,6 @@ import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 
-import java.net.URI;
-import java.security.Principal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import static com.asrevo.cvhome.keycloak.utils.Constants.*;
-
 public class KeycloakUserAccountServiceImpl implements UserAccountService {
     private final UserRepresentationMapper userRepresentationMapper;
     private final UsersResource usersResource;
@@ -33,18 +32,15 @@ public class KeycloakUserAccountServiceImpl implements UserAccountService {
     public KeycloakUserAccountServiceImpl(URI jwkSetUri, KeycloakCredentials credentials) {
         Keycloak keycloak = createKeycloak(jwkSetUri, credentials);
         this.usersResource = keycloak.realm(jwkSetUri.getPath().split("/")[2]).users();
-        this.userRepresentationMapper = new UserRepresentationMapper() {
-        };
+        this.userRepresentationMapper = new UserRepresentationMapper() {};
     }
-
 
     @Override
     public ReadableUser createOrgUser(PersistableUser persistableUser) {
         try {
             UserRepresentation user = userRepresentationMapper.copyPersistableUser(persistableUser);
-            Map<String, List<String>> attributes = Map.of(
-                    USER_TYPE_ATTR_KEY, List.of(KCUserType.ORG_USER.name())
-            );
+            Map<String, List<String>> attributes =
+                    Map.of(USER_TYPE_ATTR_KEY, List.of(KCUserType.ORG_USER.name()));
             user.setAttributes(attributes);
             user.setGroups(List.of(Groups.ORG_ADMIN.name()));
 
@@ -52,15 +48,16 @@ public class KeycloakUserAccountServiceImpl implements UserAccountService {
         } catch (Exception e) {
             throw new OperationExecution(ErrorCodes.CREATE_ORG_USER_FAIL);
         }
-
     }
 
-
-    private ReadableUser doCreateKCUser(PersistableUser persistableUser, UserRepresentation user, boolean temporary) {
+    private ReadableUser doCreateKCUser(
+            PersistableUser persistableUser, UserRepresentation user, boolean temporary) {
         Response response = usersResource.create(user);
         String userId = CreatedResponseUtil.getCreatedId(response);
         UserRepresentation representation = usersResource.get(userId).toRepresentation();
-        UserPassword passwordRequestDto = new UserPassword(persistableUser.getPassword(), persistableUser.getRepeatPassword());
+        UserPassword passwordRequestDto =
+                new UserPassword(
+                        persistableUser.getPassword(), persistableUser.getRepeatPassword());
         doResetPassword(passwordRequestDto, userId, temporary);
         return userRepresentationMapper.toDto(representation, usersResource.get(userId).groups());
     }
@@ -73,26 +70,33 @@ public class KeycloakUserAccountServiceImpl implements UserAccountService {
     }
 
     @Override
-    public ReadableUserList list(Principal principal, UserOrgStoreIdentity identity, ManagerStoreId store) {
+    public ReadableUserList list(
+            Principal principal, UserOrgStoreIdentity identity, ManagerStoreId store) {
 
-        List<UserRepresentation> allUsers = new ArrayList<>(usersResource.searchByAttributes(new ListUsersQuery(identity.org(), store).query()));
+        List<UserRepresentation> allUsers =
+                new ArrayList<>(
+                        usersResource.searchByAttributes(
+                                new ListUsersQuery(identity.org(), store).query()));
 
-        if (isSupperAdmin(identity)) allUsers.add(0, usersResource.get(identity.org().id()).toRepresentation());
+        if (isSupperAdmin(identity))
+            allUsers.add(0, usersResource.get(identity.org().id()).toRepresentation());
 
-        List<UserRepresentation> usersExceptMe = allUsers.stream().filter(it -> !it.getId().equals(principal.getName())).toList();
+        List<UserRepresentation> usersExceptMe =
+                allUsers.stream().filter(it -> !it.getId().equals(principal.getName())).toList();
 
-        return userRepresentationMapper.toDto(usersExceptMe, (it) -> usersResource.get(it.getId()).groups());
+        return userRepresentationMapper.toDto(
+                usersExceptMe, (it) -> usersResource.get(it.getId()).groups());
     }
 
-    private ReadableUser createManagedUser(IdentityId identityId, ManagerStoreId managerStoreId,
-                                           PersistableUser persistableUser) {
+    private ReadableUser createManagedUser(
+            IdentityId identityId, ManagerStoreId managerStoreId, PersistableUser persistableUser) {
         try {
             UserRepresentation user = userRepresentationMapper.copyPersistableUser(persistableUser);
-            Map<String, List<String>> attributes = Map.of(
-                    USER_TYPE_ATTR_KEY, List.of(KCUserType.MANAGED_USER.name()),
-                    ORG_ATTR_KEY, List.of(identityId.id()),
-                    STORE_ATTR_KEY, List.of(managerStoreId.getId().toString())
-            );
+            Map<String, List<String>> attributes =
+                    Map.of(
+                            USER_TYPE_ATTR_KEY, List.of(KCUserType.MANAGED_USER.name()),
+                            ORG_ATTR_KEY, List.of(identityId.id()),
+                            STORE_ATTR_KEY, List.of(managerStoreId.getId().toString()));
             user.setAttributes(attributes);
             user.setGroups(persistableUser.getGroups().stream().map(GroupEntity::getName).toList());
 
@@ -102,19 +106,22 @@ public class KeycloakUserAccountServiceImpl implements UserAccountService {
         }
     }
 
-
     @Override
-    public ReadableUser createManagedUser(UserOrgStoreIdentity identity, ManagerStoreId store, PersistableUser create) {
+    public ReadableUser createManagedUser(
+            UserOrgStoreIdentity identity, ManagerStoreId store, PersistableUser create) {
         if (create.getGroups() == null || create.getGroups().isEmpty()) {
             throw new OperationExecution(ErrorCodes.GROUPS_SHOULD_NOT_BE_EMPTY);
         }
-        if (create.getGroups().stream().anyMatch(it -> it.getName().equals(Groups.CUSTOMER.name()))) {
+        if (create.getGroups().stream()
+                .anyMatch(it -> it.getName().equals(Groups.CUSTOMER.name()))) {
             throw new OperationExecution(ErrorCodes.CREATE_CUSTOMER_NOT_ALLOWED);
         }
-        if (create.getGroups().stream().anyMatch(it -> it.getName().equals(Groups.ORG_ADMIN.name()))) {
+        if (create.getGroups().stream()
+                .anyMatch(it -> it.getName().equals(Groups.ORG_ADMIN.name()))) {
             throw new OperationExecution(ErrorCodes.CREATE_ORG_ADMIN_NOT_ALLOWED);
         }
-        if (create.getGroups().stream().anyMatch(it -> it.getName().equals(Groups.SUPER_ADMIN.name()))) {
+        if (create.getGroups().stream()
+                .anyMatch(it -> it.getName().equals(Groups.SUPER_ADMIN.name()))) {
             throw new OperationExecution(ErrorCodes.CREATE_SUPER_ADMIN_NOT_ALLOWED);
         }
         if (usernameExist(create.getUserName())) {
@@ -127,23 +134,29 @@ public class KeycloakUserAccountServiceImpl implements UserAccountService {
     }
 
     @Override
-    public ReadableUser updateManagedUser(UserOrgStoreIdentity identity, ManagerStoreId store, PersistableUser user) {
+    public ReadableUser updateManagedUser(
+            UserOrgStoreIdentity identity, ManagerStoreId store, PersistableUser user) {
         return null;
     }
 
     @Override
-    public void resetPassword(UserOrgStoreIdentity userOrgStoreInfo,
-                              ManagerStoreId store,
-                              UserPassword passwordRequestDto,
-                              String userId,
-                              boolean temporary) {
+    public void resetPassword(
+            UserOrgStoreIdentity userOrgStoreInfo,
+            ManagerStoreId store,
+            UserPassword passwordRequestDto,
+            String userId,
+            boolean temporary) {
         UserResource userResource = usersResource.get(userId);
         UserRepresentation representation = userResource.toRepresentation();
-        checkAttrAndValidate(userOrgStoreInfo, store, representation,
+        checkAttrAndValidate(
+                userOrgStoreInfo,
+                store,
+                representation,
                 () -> doResetPassword(passwordRequestDto, userId, temporary));
     }
 
-    private void doResetPassword(UserPassword passwordRequestDto, String userId, boolean temporary) {
+    private void doResetPassword(
+            UserPassword passwordRequestDto, String userId, boolean temporary) {
         CredentialRepresentation passwordCred = new CredentialRepresentation();
         passwordCred.setTemporary(temporary);
         passwordCred.setType(CredentialRepresentation.PASSWORD);
@@ -154,52 +167,67 @@ public class KeycloakUserAccountServiceImpl implements UserAccountService {
     }
 
     public boolean usernameExist(String username) {
-        List<UserRepresentation> userRepresentations = this.usersResource.searchByUsername(username, Boolean.TRUE);
+        List<UserRepresentation> userRepresentations =
+                this.usersResource.searchByUsername(username, Boolean.TRUE);
         return !userRepresentations.isEmpty();
     }
 
     public boolean emailExist(String email) {
-        List<UserRepresentation> userRepresentations = this.usersResource.searchByEmail(email, Boolean.TRUE);
+        List<UserRepresentation> userRepresentations =
+                this.usersResource.searchByEmail(email, Boolean.TRUE);
         return !userRepresentations.isEmpty();
     }
 
     @Override
-    public void deleteUser(UserOrgStoreIdentity userOrgStoreInfo, ManagerStoreId store, String userId) {
+    public void deleteUser(
+            UserOrgStoreIdentity userOrgStoreInfo, ManagerStoreId store, String userId) {
         UserResource userResource = usersResource.get(userId);
         UserRepresentation representation = userResource.toRepresentation();
         checkAttrAndValidate(userOrgStoreInfo, store, representation, userResource::remove);
     }
 
     @Override
-    public void enableUser(UserOrgStoreIdentity userOrgStoreInfo, ManagerStoreId store, String userId) {
+    public void enableUser(
+            UserOrgStoreIdentity userOrgStoreInfo, ManagerStoreId store, String userId) {
         UserResource userResource = usersResource.get(userId);
         UserRepresentation representation = userResource.toRepresentation();
-        checkAttrAndValidate(userOrgStoreInfo, store, representation, () -> {
-            representation.setEnabled(Boolean.TRUE);
-            userResource.update(representation);
-        });
+        checkAttrAndValidate(
+                userOrgStoreInfo,
+                store,
+                representation,
+                () -> {
+                    representation.setEnabled(Boolean.TRUE);
+                    userResource.update(representation);
+                });
     }
 
     @Override
-    public void disableUser(UserOrgStoreIdentity userOrgStoreInfo, ManagerStoreId store, String userId) {
+    public void disableUser(
+            UserOrgStoreIdentity userOrgStoreInfo, ManagerStoreId store, String userId) {
         UserResource userResource = usersResource.get(userId);
         UserRepresentation representation = userResource.toRepresentation();
-        checkAttrAndValidate(userOrgStoreInfo, store, representation, () -> {
-            representation.setEnabled(Boolean.FALSE);
-            userResource.update(representation);
-        });
+        checkAttrAndValidate(
+                userOrgStoreInfo,
+                store,
+                representation,
+                () -> {
+                    representation.setEnabled(Boolean.FALSE);
+                    userResource.update(representation);
+                });
     }
 
     @Override
     public ReadableUser findOne(UserOrgStoreIdentity identity, String userId) {
         UserResource userResource = usersResource.get(userId);
-        return userRepresentationMapper.toDto(userResource.toRepresentation(), userResource.groups());
+        return userRepresentationMapper.toDto(
+                userResource.toRepresentation(), userResource.groups());
     }
 
-    private void checkAttrAndValidate(UserOrgStoreIdentity userOrgStoreInfo,
-                                      ManagerStoreId store,
-                                      UserRepresentation representation,
-                                      Runnable runnable) {
+    private void checkAttrAndValidate(
+            UserOrgStoreIdentity userOrgStoreInfo,
+            ManagerStoreId store,
+            UserRepresentation representation,
+            Runnable runnable) {
         if (attrMatch(representation, userOrgStoreInfo, store)) {
             runnable.run();
         } else {
@@ -207,17 +235,28 @@ public class KeycloakUserAccountServiceImpl implements UserAccountService {
         }
     }
 
-    private boolean attrMatch(UserRepresentation representation,
-                              UserOrgStoreIdentity userOrgStoreInfo,
-                              ManagerStoreId store) {
+    private boolean attrMatch(
+            UserRepresentation representation,
+            UserOrgStoreIdentity userOrgStoreInfo,
+            ManagerStoreId store) {
         if (isSupperAdmin(userOrgStoreInfo)) return true;
-        String orgAttr = userRepresentationMapper.extractKey(representation.getAttributes(), ORG_ATTR_KEY)
-                .orElseThrow(() -> new OperationExecution(ErrorCodes.KEYCLOAK_USER_ATTR_NOT_CONTAIN_ORG));
+        String orgAttr =
+                userRepresentationMapper
+                        .extractKey(representation.getAttributes(), ORG_ATTR_KEY)
+                        .orElseThrow(
+                                () ->
+                                        new OperationExecution(
+                                                ErrorCodes.KEYCLOAK_USER_ATTR_NOT_CONTAIN_ORG));
         if (!orgAttr.equals(userOrgStoreInfo.org().id())) {
             return false;
         }
-        String storeAttr = userRepresentationMapper.extractKey(representation.getAttributes(), STORE_ATTR_KEY)
-                .orElseThrow(() -> new OperationExecution(ErrorCodes.KEYCLOAK_USER_ATTR_NOT_CONTAIN_STORE));
+        String storeAttr =
+                userRepresentationMapper
+                        .extractKey(representation.getAttributes(), STORE_ATTR_KEY)
+                        .orElseThrow(
+                                () ->
+                                        new OperationExecution(
+                                                ErrorCodes.KEYCLOAK_USER_ATTR_NOT_CONTAIN_STORE));
         if (!userOrgStoreInfo.store().equals("*")) {
             if (!storeAttr.equals(userOrgStoreInfo.store())) {
                 return false;
@@ -232,7 +271,6 @@ public class KeycloakUserAccountServiceImpl implements UserAccountService {
         return userOrgStoreInfo.roles().contains(Roles.ROLE_SUPER_ADMIN);
     }
 
-
     public Keycloak createKeycloak(URI jwkSetUri, KeycloakCredentials credentials) {
         String serverUrl = jwkSetUri.getScheme() + "://" + jwkSetUri.getAuthority();
         return KeycloakBuilder.builder()
@@ -243,6 +281,4 @@ public class KeycloakUserAccountServiceImpl implements UserAccountService {
                 .clientSecret(credentials.clientSecret())
                 .build();
     }
-
 }
-

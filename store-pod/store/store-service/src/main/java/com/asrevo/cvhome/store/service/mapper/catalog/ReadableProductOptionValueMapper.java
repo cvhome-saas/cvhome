@@ -8,15 +8,15 @@ import com.asrevo.cvhome.store.core.model.catalog.product.attribute.api.Readable
 import com.asrevo.cvhome.store.core.model.catalog.product.attribute.api.ReadableProductOptionValueFull;
 import com.asrevo.cvhome.store.service.mapper.Mapper;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Component
-public class ReadableProductOptionValueMapper implements Mapper<ProductOptionValue, ReadableProductOptionValue> {
+public class ReadableProductOptionValueMapper
+        implements Mapper<ProductOptionValue, ReadableProductOptionValue> {
 
     private final ImageFilePath imageUtils;
 
@@ -25,23 +25,36 @@ public class ReadableProductOptionValueMapper implements Mapper<ProductOptionVal
     }
 
     @Override
-    public ReadableProductOptionValue merge(ProductOptionValue source, ReadableProductOptionValue destination,
-                                            MerchantStore store, Language language) {
+    public ReadableProductOptionValue merge(
+            ProductOptionValue source,
+            ReadableProductOptionValue destination,
+            MerchantStore store,
+            Language language) {
         ReadableProductOptionValue readableProductOptionValue = new ReadableProductOptionValue();
         if (language == null) {
             readableProductOptionValue = new ReadableProductOptionValueFull();
-            List<com.asrevo.cvhome.store.core.model.catalog.product.attribute.ProductOptionValueDescription> descriptions = new ArrayList<>();
+            List<
+                            com.asrevo.cvhome.store.core.model.catalog.product.attribute
+                                    .ProductOptionValueDescription>
+                    descriptions = new ArrayList<>();
             for (ProductOptionValueDescription desc : source.getDescriptions()) {
-                com.asrevo.cvhome.store.core.model.catalog.product.attribute.ProductOptionValueDescription d = this.description(desc);
+                com.asrevo.cvhome.store.core.model.catalog.product.attribute
+                                .ProductOptionValueDescription
+                        d = this.description(desc);
                 descriptions.add(d);
             }
-            ((ReadableProductOptionValueFull) readableProductOptionValue).setDescriptions(descriptions);
+            ((ReadableProductOptionValueFull) readableProductOptionValue)
+                    .setDescriptions(descriptions);
         } else {
             readableProductOptionValue = new ReadableProductOptionValue();
             if (!CollectionUtils.isEmpty(source.getDescriptions())) {
                 for (ProductOptionValueDescription desc : source.getDescriptions()) {
-                    if (desc != null && desc.getLanguage() != null && desc.getLanguage().getId().equals(language.getId())) {
-                        com.asrevo.cvhome.store.core.model.catalog.product.attribute.ProductOptionValueDescription d = this.description(desc);
+                    if (desc != null
+                            && desc.getLanguage() != null
+                            && desc.getLanguage().getId().equals(language.getId())) {
+                        com.asrevo.cvhome.store.core.model.catalog.product.attribute
+                                        .ProductOptionValueDescription
+                                d = this.description(desc);
                         readableProductOptionValue.setDescription(d);
                     }
                 }
@@ -56,15 +69,20 @@ public class ReadableProductOptionValueMapper implements Mapper<ProductOptionVal
             readableProductOptionValue.setOrder(source.getProductOptionValueSortOrder());
         }
         if (!StringUtils.isBlank(source.getProductOptionValueImage())) {
-            readableProductOptionValue.setImage(imageUtils.buildProductPropertyImageUtils(store, source.getProductOptionValueImage()));
+            readableProductOptionValue.setImage(
+                    imageUtils.buildProductPropertyImageUtils(
+                            store, source.getProductOptionValueImage()));
         }
 
         return readableProductOptionValue;
     }
 
-
-    com.asrevo.cvhome.store.core.model.catalog.product.attribute.ProductOptionValueDescription description(ProductOptionValueDescription description) {
-        com.asrevo.cvhome.store.core.model.catalog.product.attribute.ProductOptionValueDescription desc = new com.asrevo.cvhome.store.core.model.catalog.product.attribute.ProductOptionValueDescription();
+    com.asrevo.cvhome.store.core.model.catalog.product.attribute.ProductOptionValueDescription
+            description(ProductOptionValueDescription description) {
+        com.asrevo.cvhome.store.core.model.catalog.product.attribute.ProductOptionValueDescription
+                desc =
+                        new com.asrevo.cvhome.store.core.model.catalog.product.attribute
+                                .ProductOptionValueDescription();
         desc.setDescription(description.getDescription());
         desc.setName(description.getName());
         desc.setId(description.getId());
@@ -72,11 +90,10 @@ public class ReadableProductOptionValueMapper implements Mapper<ProductOptionVal
         return desc;
     }
 
-
     @Override
-    public ReadableProductOptionValue convert(ProductOptionValue source, MerchantStore store, Language language) {
+    public ReadableProductOptionValue convert(
+            ProductOptionValue source, MerchantStore store, Language language) {
         ReadableProductOptionValue destination = new ReadableProductOptionValue();
         return merge(source, destination, store, language);
     }
-
 }

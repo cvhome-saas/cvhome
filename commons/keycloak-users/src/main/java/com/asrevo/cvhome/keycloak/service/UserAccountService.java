@@ -6,9 +6,7 @@ import com.asrevo.cvhome.keycloak.domain.user.PersistableUser;
 import com.asrevo.cvhome.keycloak.domain.user.ReadableUser;
 import com.asrevo.cvhome.keycloak.domain.user.ReadableUserList;
 import com.asrevo.cvhome.keycloak.domain.user.UserPassword;
-
 import java.security.Principal;
-
 
 public interface UserAccountService {
     ReadableUser createOrgUser(PersistableUser user);
@@ -17,11 +15,18 @@ public interface UserAccountService {
 
     ReadableUserList list(Principal principal, UserOrgStoreIdentity identity, ManagerStoreId store);
 
-    ReadableUser createManagedUser(UserOrgStoreIdentity identity, ManagerStoreId store, PersistableUser create);
+    ReadableUser createManagedUser(
+            UserOrgStoreIdentity identity, ManagerStoreId store, PersistableUser create);
 
-    ReadableUser updateManagedUser(UserOrgStoreIdentity identity, ManagerStoreId store, PersistableUser user);
+    ReadableUser updateManagedUser(
+            UserOrgStoreIdentity identity, ManagerStoreId store, PersistableUser user);
 
-    void resetPassword(UserOrgStoreIdentity userOrgStoreInfo, ManagerStoreId store, UserPassword passwordRequestDto, String userId,boolean temporary);
+    void resetPassword(
+            UserOrgStoreIdentity userOrgStoreInfo,
+            ManagerStoreId store,
+            UserPassword passwordRequestDto,
+            String userId,
+            boolean temporary);
 
     boolean usernameExist(String username);
 
@@ -32,5 +37,4 @@ public interface UserAccountService {
     void disableUser(UserOrgStoreIdentity userOrgStoreInfo, ManagerStoreId store, String userId);
 
     ReadableUser findOne(UserOrgStoreIdentity identity, String userId);
-
 }

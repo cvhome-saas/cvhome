@@ -5,8 +5,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import org.bson.types.ObjectId;
 
-
-public record EventId(@JsonSerialize(using = ToStringSerializer.class) ObjectId id) implements Identifier {
+public record EventId(@JsonSerialize(using = ToStringSerializer.class) ObjectId id)
+        implements Identifier {
     public EventId(String id) {
         this(new ObjectId(id));
     }

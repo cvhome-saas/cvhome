@@ -16,16 +16,15 @@ import com.asrevo.cvhome.store.core.entity.reference.currency.Currency;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
-import lombok.Getter;
-import lombok.Setter;
-import org.hibernate.annotations.SQLOrder;
-
 import java.io.Serial;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Set;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.SQLOrder;
 
 @Entity
 @Table(name = "ORDERS")
@@ -33,17 +32,21 @@ import java.util.Set;
 @Setter
 public class Order extends SalesManagerEntity<Long, Order> {
 
-
     /**
      *
      */
-    @Serial
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
 
     @Id
     @Column(name = "ORDER_ID", unique = true, nullable = false)
-    @TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME", valueColumnName = "SEQ_COUNT",
-            pkColumnValue = "ORDER_ID_SEQ_NEXT_VAL", allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE, initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
+    @TableGenerator(
+            name = "TABLE_GEN",
+            table = "SM_SEQUENCER",
+            pkColumnName = "SEQ_NAME",
+            valueColumnName = "SEQ_COUNT",
+            pkColumnValue = "ORDER_ID_SEQ_NEXT_VAL",
+            allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
+            initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
     private Long id;
 
@@ -55,7 +58,7 @@ public class Order extends SalesManagerEntity<Long, Order> {
     @Column(name = "LAST_MODIFIED")
     private Date lastModified;
 
-    //the customer object can be detached. An order can exist and the customer deleted
+    // the customer object can be detached. An order can exist and the customer deleted
     @Column(name = "CUSTOMER_ID")
     private Long customerId;
 
@@ -63,14 +66,14 @@ public class Order extends SalesManagerEntity<Long, Order> {
     @Column(name = "DATE_PURCHASED")
     private Date datePurchased;
 
-    //used for an order payable on multiple installment
+    // used for an order payable on multiple installment
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "ORDER_DATE_FINISHED")
     private Date orderDateFinished;
 
-    //What was the exchange rate
+    // What was the exchange rate
     @Column(name = "CURRENCY_VALUE")
-    private BigDecimal currencyValue = new BigDecimal(1);//default 1-1
+    private BigDecimal currencyValue = new BigDecimal(1); // default 1-1
 
     @Column(name = "ORDER_TOTAL")
     private BigDecimal total;
@@ -105,17 +108,11 @@ public class Order extends SalesManagerEntity<Long, Order> {
     @Column(name = "CONFIRMED_ADDRESS")
     private Boolean confirmedAddress = false;
 
-    @Embedded
-    private Delivery delivery = null;
+    @Embedded private Delivery delivery = null;
 
-    @Valid
-    @Embedded
-    private Billing billing = null;
+    @Valid @Embedded private Billing billing = null;
 
-    @Embedded
-    @Deprecated
-    private CreditCard creditCard = null;
-
+    @Embedded @Deprecated private CreditCard creditCard = null;
 
     @ManyToOne(targetEntity = Currency.class)
     @JoinColumn(name = "CURRENCY_ID")
@@ -125,14 +122,13 @@ public class Order extends SalesManagerEntity<Long, Order> {
     @Convert(converter = LocaleConverter.class)
     private Locale locale;
 
-
     @JsonIgnore
     @ManyToOne(targetEntity = MerchantStore.class)
     @JoinColumn(name = "MERCHANTID")
     private MerchantStore merchant;
 
-    //@OneToMany(mappedBy = "order")
-    //private Set<OrderAccount> orderAccounts = new HashSet<OrderAccount>();
+    // @OneToMany(mappedBy = "order")
+    // private Set<OrderAccount> orderAccounts = new HashSet<OrderAccount>();
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private Set<OrderProduct> orderProducts = new LinkedHashSet<>();
@@ -147,11 +143,9 @@ public class Order extends SalesManagerEntity<Long, Order> {
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private Set<OrderAttribute> orderAttributes = new LinkedHashSet<>();
+
     @Column(name = "CUSTOMER_EMAIL_ADDRESS", length = 50, nullable = false)
     private String customerEmailAddress;
 
-    public Order() {
-    }
-
-
+    public Order() {}
 }

@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.s2s.oauth2;
 
+import java.time.Instant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.client.endpoint.OAuth2ClientCredentialsGrantRequest;
 import org.springframework.security.oauth2.client.endpoint.WebClientReactiveClientCredentialsTokenResponseClient;
@@ -12,8 +13,6 @@ import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.ExchangeFunction;
 import reactor.core.publisher.Mono;
 
-import java.time.Instant;
-
 @Slf4j
 public class ServerCallBearerExchangeFilterFunction implements ExchangeFilterFunction {
     private final WebClientReactiveClientCredentialsTokenResponseClient tokenClient;
@@ -21,12 +20,13 @@ public class ServerCallBearerExchangeFilterFunction implements ExchangeFilterFun
     private final String registrationId;
     private OAuth2AccessTokenResponse accessToken;
 
-    public ServerCallBearerExchangeFilterFunction(WebClientReactiveClientCredentialsTokenResponseClient tokenClient,
-                                                  ReactiveClientRegistrationRepository registrationRepository, String registrationId) {
+    public ServerCallBearerExchangeFilterFunction(
+            WebClientReactiveClientCredentialsTokenResponseClient tokenClient,
+            ReactiveClientRegistrationRepository registrationRepository,
+            String registrationId) {
         this.tokenClient = tokenClient;
         this.registrationRepository = registrationRepository;
         this.registrationId = registrationId;
-
     }
 
     @Override
@@ -37,26 +37,28 @@ public class ServerCallBearerExchangeFilterFunction implements ExchangeFilterFun
                 return next.exchange(bearer(request));
             } else {
                 log.info("wil generate access token because expired");
-                return getNewAccessToken()
-                        .flatMap(it -> next.exchange(bearer(request)));
+                return getNewAccessToken().flatMap(it -> next.exchange(bearer(request)));
             }
         } else {
             log.info("wil generate access token for first time");
-            return getNewAccessToken()
-                    .flatMap(it -> next.exchange(bearer(request)));
+            return getNewAccessToken().flatMap(it -> next.exchange(bearer(request)));
         }
     }
 
     private Mono<OAuth2AccessTokenResponse> getNewAccessToken() {
-        return getClientRegistration().flatMap(this::doGenerateAccessToken)
-                .map(accessToken -> {
-                    this.accessToken = accessToken;
-                    return accessToken;
-                });
+        return getClientRegistration()
+                .flatMap(this::doGenerateAccessToken)
+                .map(
+                        accessToken -> {
+                            this.accessToken = accessToken;
+                            return accessToken;
+                        });
     }
 
     Mono<ClientRegistration> getClientRegistration() {
-        return this.registrationRepository.findByRegistrationId(this.registrationId).switchIfEmpty(Mono.error(() -> new Exception("ClientRegistration not found")));
+        return this.registrationRepository
+                .findByRegistrationId(this.registrationId)
+                .switchIfEmpty(Mono.error(() -> new Exception("ClientRegistration not found")));
     }
 
     Mono<OAuth2AccessTokenResponse> doGenerateAccessToken(ClientRegistration registration) {
@@ -65,6 +67,10 @@ public class ServerCallBearerExchangeFilterFunction implements ExchangeFilterFun
     }
 
     private ClientRequest bearer(ClientRequest request) {
-        return ClientRequest.from(request).headers((headers) -> headers.setBearerAuth(accessToken.getAccessToken().getTokenValue())).build();
+        return ClientRequest.from(request)
+                .headers(
+                        (headers) ->
+                                headers.setBearerAuth(accessToken.getAccessToken().getTokenValue()))
+                .build();
     }
 }

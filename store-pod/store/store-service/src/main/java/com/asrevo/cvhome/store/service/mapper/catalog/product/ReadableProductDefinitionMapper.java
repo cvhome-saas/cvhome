@@ -24,15 +24,14 @@ import com.asrevo.cvhome.store.service.mapper.catalog.ReadableProductTypeMapper;
 import com.asrevo.cvhome.store.service.mapper.inventory.ReadableInventoryMapper;
 import com.asrevo.cvhome.store.utils.DateUtil;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
 @Component
 public class ReadableProductDefinitionMapper implements Mapper<Product, ReadableProductDefinition> {
@@ -47,7 +46,12 @@ public class ReadableProductDefinitionMapper implements Mapper<Product, Readable
 
     private final ImageFilePath imageUtils;
 
-    public ReadableProductDefinitionMapper(ReadableCategoryMapper readableCategoryMapper, ReadableProductTypeMapper readableProductTypeMapper, ReadableManufacturerMapper readableManufacturerMapper, ReadableInventoryMapper readableInventoryMapper, ImageFilePath imageUtils) {
+    public ReadableProductDefinitionMapper(
+            ReadableCategoryMapper readableCategoryMapper,
+            ReadableProductTypeMapper readableProductTypeMapper,
+            ReadableManufacturerMapper readableManufacturerMapper,
+            ReadableInventoryMapper readableInventoryMapper,
+            ImageFilePath imageUtils) {
         this.readableCategoryMapper = readableCategoryMapper;
         this.readableProductTypeMapper = readableProductTypeMapper;
         this.readableManufacturerMapper = readableManufacturerMapper;
@@ -56,14 +60,18 @@ public class ReadableProductDefinitionMapper implements Mapper<Product, Readable
     }
 
     @Override
-    public ReadableProductDefinition convert(Product source, MerchantStore store, Language language) {
+    public ReadableProductDefinition convert(
+            Product source, MerchantStore store, Language language) {
         ReadableProductDefinition target = new ReadableProductDefinition();
         return this.merge(source, target, store, language);
     }
 
     @Override
-    public ReadableProductDefinition merge(Product source, ReadableProductDefinition destination, MerchantStore store,
-                                           Language language) {
+    public ReadableProductDefinition merge(
+            Product source,
+            ReadableProductDefinition destination,
+            MerchantStore store,
+            Language language) {
         Assert.notNull(source, "Product cannot be null");
         Assert.notNull(destination, "Product destination cannot be null");
 
@@ -72,7 +80,8 @@ public class ReadableProductDefinitionMapper implements Mapper<Product, Readable
             returnDestination = new ReadableProductDefinitionFull();
         }
 
-        List<com.asrevo.cvhome.store.core.model.catalog.product.ProductDescription> fulldescriptions = new ArrayList<>();
+        List<com.asrevo.cvhome.store.core.model.catalog.product.ProductDescription>
+                fulldescriptions = new ArrayList<>();
 
         returnDestination.setIdentifier(source.getSku());
         returnDestination.setId(source.getId());
@@ -82,7 +91,8 @@ public class ReadableProductDefinitionMapper implements Mapper<Product, Readable
         ProductDescription description = null;
         if (source.getDescriptions() != null && !source.getDescriptions().isEmpty()) {
             for (ProductDescription desc : source.getDescriptions()) {
-                if (language != null && desc.getLanguage() != null
+                if (language != null
+                        && desc.getLanguage() != null
                         && desc.getLanguage().getId().intValue() == language.getId().intValue()) {
                     description = desc;
                     break;
@@ -92,39 +102,37 @@ public class ReadableProductDefinitionMapper implements Mapper<Product, Readable
             }
         }
 
-/*		if (source.getProductReviewAvg() != null) {
-			double avg = source.getProductReviewAvg().doubleValue();
-			double rating = Math.round(avg * 2) / 2.0f;
-			returnDestination.setRating(rating);
-		}
+        /*		if (source.getProductReviewAvg() != null) {
+        	double avg = source.getProductReviewAvg().doubleValue();
+        	double rating = Math.round(avg * 2) / 2.0f;
+        	returnDestination.setRating(rating);
+        }
 
-		if (source.getProductReviewCount() != null) {
-			returnDestination.setRatingCount(source.getProductReviewCount().intValue());
-		}*/
+        if (source.getProductReviewCount() != null) {
+        	returnDestination.setRatingCount(source.getProductReviewCount().intValue());
+        }*/
 
         if (description != null) {
-            com.asrevo.cvhome.store.core.model.catalog.product.ProductDescription tragetDescription = populateDescription(
-                    description);
+            com.asrevo.cvhome.store.core.model.catalog.product.ProductDescription
+                    tragetDescription = populateDescription(description);
             returnDestination.setDescription(tragetDescription);
-
         }
 
         if (source.getManufacturer() != null) {
-            ReadableManufacturer manufacturer = readableManufacturerMapper.convert(source.getManufacturer(), store,
-                    language);
+            ReadableManufacturer manufacturer =
+                    readableManufacturerMapper.convert(source.getManufacturer(), store, language);
             returnDestination.setManufacturer(manufacturer);
         }
 
         if (!CollectionUtils.isEmpty(source.getCategories())) {
             List<ReadableCategory> categoryList = new ArrayList<>();
             for (Category category : source.getCategories()) {
-                ReadableCategory readableCategory = readableCategoryMapper.convert(category, store, language);
+                ReadableCategory readableCategory =
+                        readableCategoryMapper.convert(category, store, language);
                 categoryList.add(readableCategory);
-
             }
             returnDestination.setCategories(categoryList);
         }
-
 
         ProductSpecification specifications = new ProductSpecification();
         specifications.setHeight(source.getProductHeight());
@@ -132,47 +140,51 @@ public class ReadableProductDefinitionMapper implements Mapper<Product, Readable
         specifications.setWeight(source.getProductWeight());
         specifications.setWidth(source.getProductWidth());
         if (!StringUtils.isBlank(store.getSeizeunitcode())) {
-            specifications.setDimensionUnitOfMeasure(DimensionUnitOfMeasure.valueOf(store.getSeizeunitcode().toLowerCase()));
+            specifications.setDimensionUnitOfMeasure(
+                    DimensionUnitOfMeasure.valueOf(store.getSeizeunitcode().toLowerCase()));
         }
         if (!StringUtils.isBlank(store.getWeightunitcode())) {
-            specifications.setWeightUnitOfMeasure(WeightUnitOfMeasure.valueOf(store.getWeightunitcode().toLowerCase()));
+            specifications.setWeightUnitOfMeasure(
+                    WeightUnitOfMeasure.valueOf(store.getWeightunitcode().toLowerCase()));
         }
         returnDestination.setProductSpecifications(specifications);
 
         if (source.getType() != null) {
-            ReadableProductType readableType = readableProductTypeMapper.convert(source.getType(), store, language);
+            ReadableProductType readableType =
+                    readableProductTypeMapper.convert(source.getType(), store, language);
             returnDestination.setType(readableType);
         }
 
         returnDestination.setSortOrder(source.getSortOrder());
 
-        //images
+        // images
         Set<ProductImage> images = source.getImages();
         if (CollectionUtils.isNotEmpty(images)) {
 
-            List<ReadableImage> imageList = images.stream().map(i -> this.convertImage(source, i, store)).collect(Collectors.toList());
+            List<ReadableImage> imageList =
+                    images.stream()
+                            .map(i -> this.convertImage(source, i, store))
+                            .collect(Collectors.toList());
             returnDestination.setImages(imageList);
         }
 
-        //quantity
+        // quantity
         ProductAvailability availability = null;
         for (ProductAvailability a : source.getAvailabilities()) {
             availability = a;
-            if (a.getProductVariant() != null) {
-            }
+            if (a.getProductVariant() != null) {}
         }
 
         if (availability != null) {
             returnDestination.setCanBePurchased(availability.isProductStatus());
-            ReadableInventory inventory = readableInventoryMapper.convert(availability, store, language);
+            ReadableInventory inventory =
+                    readableInventoryMapper.convert(availability, store, language);
             returnDestination.setInventory(inventory);
         }
-
 
         if (returnDestination instanceof ReadableProductDefinitionFull) {
             ((ReadableProductDefinitionFull) returnDestination).setDescriptions(fulldescriptions);
         }
-
 
         return returnDestination;
     }
@@ -183,7 +195,10 @@ public class ReadableProductDefinitionMapper implements Mapper<Product, Readable
         prdImage.setDefaultImage(image.isDefaultImage());
 
         StringBuilder imgPath = new StringBuilder();
-        imgPath.append(imageUtils.getContextPath()).append(imageUtils.buildProductImageUtils(store, product.getSku(), image.getProductImage()));
+        imgPath.append(imageUtils.getContextPath())
+                .append(
+                        imageUtils.buildProductImageUtils(
+                                store, product.getSku(), image.getProductImage()));
 
         prdImage.setImageUrl(imgPath.toString());
         prdImage.setId(image.getId());
@@ -191,7 +206,7 @@ public class ReadableProductDefinitionMapper implements Mapper<Product, Readable
         if (image.getProductImageUrl() != null) {
             prdImage.setExternalUrl(image.getProductImageUrl());
         }
-        if (image.getImageType() == 1 && image.getProductImageUrl() != null) {//video
+        if (image.getImageType() == 1 && image.getProductImageUrl() != null) { // video
             prdImage.setVideoUrl(image.getProductImageUrl());
         }
 
@@ -202,12 +217,14 @@ public class ReadableProductDefinitionMapper implements Mapper<Product, Readable
         return prdImage;
     }
 
-    private com.asrevo.cvhome.store.core.model.catalog.product.ProductDescription populateDescription(ProductDescription description) {
+    private com.asrevo.cvhome.store.core.model.catalog.product.ProductDescription
+            populateDescription(ProductDescription description) {
         if (description == null) {
             return null;
         }
 
-        com.asrevo.cvhome.store.core.model.catalog.product.ProductDescription tragetDescription = new com.asrevo.cvhome.store.core.model.catalog.product.ProductDescription();
+        com.asrevo.cvhome.store.core.model.catalog.product.ProductDescription tragetDescription =
+                new com.asrevo.cvhome.store.core.model.catalog.product.ProductDescription();
         tragetDescription.setFriendlyUrl(description.getSeUrl());
         tragetDescription.setName(description.getName());
         tragetDescription.setId(description.getId());
@@ -227,5 +244,4 @@ public class ReadableProductDefinitionMapper implements Mapper<Product, Readable
         }
         return tragetDescription;
     }
-
 }

@@ -8,15 +8,14 @@ import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.repositories.system.MerchantConfigurationRepository;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service("merchantConfigurationService")
-public class MerchantConfigurationServiceImpl extends
-        SalesManagerEntityServiceImpl<Long, MerchantConfiguration> implements
-        MerchantConfigurationService {
+public class MerchantConfigurationServiceImpl
+        extends SalesManagerEntityServiceImpl<Long, MerchantConfiguration>
+        implements MerchantConfigurationService {
 
     private final MerchantConfigurationRepository merchantConfigurationRepository;
 
@@ -27,9 +26,8 @@ public class MerchantConfigurationServiceImpl extends
         this.merchantConfigurationRepository = merchantConfigurationRepository;
     }
 
-
     @Override
-    public MerchantConfiguration getMerchantConfiguration(String key, MerchantStore store) throws ServiceException {
+    public MerchantConfiguration getMerchantConfiguration(String key, MerchantStore store) {
         return merchantConfigurationRepository.findByMerchantStoreAndKey(store.getId(), key);
     }
 
@@ -39,26 +37,25 @@ public class MerchantConfigurationServiceImpl extends
     }
 
     @Override
-    public List<MerchantConfiguration> listByType(MerchantConfigurationType type, MerchantStore store) throws ServiceException {
+    public List<MerchantConfiguration> listByType(
+            MerchantConfigurationType type, MerchantStore store) {
         return merchantConfigurationRepository.findByMerchantStoreAndType(store.getId(), type);
     }
 
     @Override
     public void saveOrUpdate(MerchantConfiguration entity) throws ServiceException {
 
-
         if (entity.getId() != null && entity.getId() > 0) {
             super.update(entity);
         } else {
             super.create(entity);
-
         }
     }
 
-
     @Override
     public void delete(MerchantConfiguration merchantConfiguration) throws ServiceException {
-        MerchantConfiguration config = merchantConfigurationRepository.getOne(merchantConfiguration.getId());
+        MerchantConfiguration config =
+                merchantConfigurationRepository.getOne(merchantConfiguration.getId());
         if (config != null) {
             super.delete(config);
         }
@@ -67,7 +64,9 @@ public class MerchantConfigurationServiceImpl extends
     @Override
     public MerchantConfig getMerchantConfig(MerchantStore store) throws ServiceException {
 
-        MerchantConfiguration configuration = merchantConfigurationRepository.findByMerchantStoreAndKey(store.getId(), MerchantConfigurationType.CONFIG.name());
+        MerchantConfiguration configuration =
+                merchantConfigurationRepository.findByMerchantStoreAndKey(
+                        store.getId(), MerchantConfigurationType.CONFIG.name());
 
         MerchantConfig config = null;
         if (configuration != null) {
@@ -81,13 +80,15 @@ public class MerchantConfigurationServiceImpl extends
             }
         }
         return config;
-
     }
 
     @Override
-    public void saveMerchantConfig(MerchantConfig config, MerchantStore store) throws ServiceException {
+    public void saveMerchantConfig(MerchantConfig config, MerchantStore store)
+            throws ServiceException {
 
-        MerchantConfiguration configuration = merchantConfigurationRepository.findByMerchantStoreAndKey(store.getId(), MerchantConfigurationType.CONFIG.name());
+        MerchantConfiguration configuration =
+                merchantConfigurationRepository.findByMerchantStoreAndKey(
+                        store.getId(), MerchantConfigurationType.CONFIG.name());
 
         if (configuration == null) {
             configuration = new MerchantConfiguration();
@@ -102,10 +103,6 @@ public class MerchantConfigurationServiceImpl extends
             super.update(configuration);
         } else {
             super.create(configuration);
-
         }
-
     }
-
-
 }

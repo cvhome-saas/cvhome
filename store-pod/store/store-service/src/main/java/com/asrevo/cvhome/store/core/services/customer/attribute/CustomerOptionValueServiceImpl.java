@@ -8,16 +8,14 @@ import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.repositories.customer.attribute.CustomerOptionValueRepository;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
-
 @Service("customerOptionValueService")
-public class CustomerOptionValueServiceImpl extends
-        SalesManagerEntityServiceImpl<Long, CustomerOptionValue> implements
-        CustomerOptionValueService {
+public class CustomerOptionValueServiceImpl
+        extends SalesManagerEntityServiceImpl<Long, CustomerOptionValue>
+        implements CustomerOptionValueService {
 
     private final CustomerAttributeService customerAttributeService;
 
@@ -27,26 +25,26 @@ public class CustomerOptionValueServiceImpl extends
 
     @Autowired
     public CustomerOptionValueServiceImpl(
-            CustomerOptionValueRepository customerOptionValueRepository, CustomerAttributeService customerAttributeService, CustomerOptionSetService customerOptionSetService) {
+            CustomerOptionValueRepository customerOptionValueRepository,
+            CustomerAttributeService customerAttributeService,
+            CustomerOptionSetService customerOptionSetService) {
         super(customerOptionValueRepository);
         this.customerOptionValueRepository = customerOptionValueRepository;
         this.customerAttributeService = customerAttributeService;
         this.customerOptionSetService = customerOptionSetService;
     }
 
-
     @Override
-    public List<CustomerOptionValue> listByStore(MerchantStore store, Language language) throws ServiceException {
+    public List<CustomerOptionValue> listByStore(MerchantStore store, Language language)
+            throws ServiceException {
 
         return customerOptionValueRepository.findByStore(store.getId(), language.getId());
     }
 
-
     @Override
     public void saveOrUpdate(CustomerOptionValue entity) throws ServiceException {
 
-
-        //save or update (persist and attach entities
+        // save or update (persist and attach entities
         if (entity.getId() != null && entity.getId() > 0) {
 
             super.update(entity);
@@ -54,22 +52,23 @@ public class CustomerOptionValueServiceImpl extends
         } else {
 
             super.save(entity);
-
         }
-
     }
-
 
     public void delete(CustomerOptionValue customerOptionValue) throws ServiceException {
 
-        //remove all attributes having this option
-        List<CustomerAttribute> attributes = customerAttributeService.getByCustomerOptionValueId(customerOptionValue.getMerchantStore(), customerOptionValue.getId());
+        // remove all attributes having this option
+        List<CustomerAttribute> attributes =
+                customerAttributeService.getByCustomerOptionValueId(
+                        customerOptionValue.getMerchantStore(), customerOptionValue.getId());
 
         for (CustomerAttribute attribute : attributes) {
             customerAttributeService.delete(attribute);
         }
 
-        List<CustomerOptionSet> optionSets = customerOptionSetService.listByOptionValue(customerOptionValue, customerOptionValue.getMerchantStore());
+        List<CustomerOptionSet> optionSets =
+                customerOptionSetService.listByOptionValue(
+                        customerOptionValue, customerOptionValue.getMerchantStore());
 
         for (CustomerOptionSet optionSet : optionSets) {
             customerOptionSetService.delete(optionSet);
@@ -77,15 +76,12 @@ public class CustomerOptionValueServiceImpl extends
 
         CustomerOptionValue option = super.getById(customerOptionValue.getId());
 
-        //remove option
+        // remove option
         super.delete(option);
-
     }
 
     @Override
     public CustomerOptionValue getByCode(MerchantStore store, String optionValueCode) {
         return customerOptionValueRepository.findByCode(store.getId(), optionValueCode);
     }
-
-
 }

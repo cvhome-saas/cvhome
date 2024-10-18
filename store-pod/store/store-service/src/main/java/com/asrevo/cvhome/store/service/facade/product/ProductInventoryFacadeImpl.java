@@ -1,5 +1,7 @@
 package com.asrevo.cvhome.store.service.facade.product;
 
+import static com.asrevo.cvhome.store.utils.ReadableEntityUtil.createReadableList;
+
 import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
 import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
 import com.asrevo.cvhome.store.core.entity.catalog.product.Product;
@@ -16,18 +18,15 @@ import com.asrevo.cvhome.store.core.services.catalog.product.availability.Produc
 import com.asrevo.cvhome.store.core.services.catalog.product.variant.ProductVariantService;
 import com.asrevo.cvhome.store.service.mapper.inventory.PersistableInventoryMapper;
 import com.asrevo.cvhome.store.service.mapper.inventory.ReadableInventoryMapper;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import static com.asrevo.cvhome.store.utils.ReadableEntityUtil.createReadableList;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 @Service("productInventoryFacade")
 public class ProductInventoryFacadeImpl implements ProductInventoryFacade {
@@ -42,7 +41,12 @@ public class ProductInventoryFacadeImpl implements ProductInventoryFacade {
 
     private final PersistableInventoryMapper productInventoryMapper;
 
-    public ProductInventoryFacadeImpl(ProductAvailabilityService productAvailabilityService, ProductService productService, ProductVariantService productVariantService, ReadableInventoryMapper readableInventoryMapper, PersistableInventoryMapper productInventoryMapper) {
+    public ProductInventoryFacadeImpl(
+            ProductAvailabilityService productAvailabilityService,
+            ProductService productService,
+            ProductVariantService productVariantService,
+            ReadableInventoryMapper readableInventoryMapper,
+            PersistableInventoryMapper productInventoryMapper) {
         this.productAvailabilityService = productAvailabilityService;
         this.productService = productService;
         this.productVariantService = productVariantService;
@@ -50,26 +54,44 @@ public class ProductInventoryFacadeImpl implements ProductInventoryFacade {
         this.productInventoryMapper = productInventoryMapper;
     }
 
-
     private void validateProductHasSameStore(MerchantStore store, Product product) {
         if (!product.getMerchantStore().getId().equals(store.getId())) {
-            throw new ResourceNotFoundException("Product with id [" + product.getId() + "] not found for store id ["
-                    + store.getInvoiceTemplate() + "]");
+            throw new ResourceNotFoundException(
+                    "Product with id ["
+                            + product.getId()
+                            + "] not found for store id ["
+                            + store.getInvoiceTemplate()
+                            + "]");
         }
     }
 
     @Override
     public void delete(Long productId, Long inventoryId, MerchantStore store) {
-        Optional<ProductAvailability> availability = productAvailabilityService.getById(inventoryId, store);
+        Optional<ProductAvailability> availability =
+                productAvailabilityService.getById(inventoryId, store);
         try {
             if (availability.isPresent()) {
                 if (availability.get().getProduct().getId().equals(productId)) {
                     productAvailabilityService.delete(availability.get());
                 } else {
-                    throw new ResourceNotFoundException("Product with id [" + productId + "] and inventory id [" + inventoryId + "] not found for store id [" + store.getId() + "]");
+                    throw new ResourceNotFoundException(
+                            "Product with id ["
+                                    + productId
+                                    + "] and inventory id ["
+                                    + inventoryId
+                                    + "] not found for store id ["
+                                    + store.getId()
+                                    + "]");
                 }
             } else {
-                throw new ResourceNotFoundException("Product with id [" + productId + "] and inventory id [" + inventoryId + "] not found for store id [" + store.getId() + "]");
+                throw new ResourceNotFoundException(
+                        "Product with id ["
+                                + productId
+                                + "] and inventory id ["
+                                + inventoryId
+                                + "] not found for store id ["
+                                + store.getId()
+                                + "]");
             }
         } catch (ServiceException e) {
             throw new ServiceRuntimeException("Error while deleting inventory", e);
@@ -83,8 +105,7 @@ public class ProductInventoryFacadeImpl implements ProductInventoryFacade {
      * readableInventoryMapper.convert(availability, store, language); }
      */
 
-
-    //public ReadableInventory get(String child, Language language) {
+    // public ReadableInventory get(String child, Language language) {
     /*
      * Product product = getProductById(productId); MerchantStore store =
      * getMerchantStore(child);
@@ -100,7 +121,7 @@ public class ProductInventoryFacadeImpl implements ProductInventoryFacade {
      *
      * return this.readableInventory(availability, store, language);
      */
-    //}
+    // }
 
     /**
      * private boolean isStoreParentNotExist(MerchantStore store) {
@@ -121,26 +142,31 @@ public class ProductInventoryFacadeImpl implements ProductInventoryFacade {
      * return readableInventoryMapper.convert(availability, store, language);
      * }
      **/
-
-
     private Product getProductById(Long productId, MerchantStore store) {
         return productService
                 .retrieveById(productId, store)
-                .orElseThrow(() -> new ResourceNotFoundException("Product with id [" + productId + "] not found"));
+                .orElseThrow(
+                        () ->
+                                new ResourceNotFoundException(
+                                        "Product with id [" + productId + "] not found"));
     }
 
     private ProductVariant getProductByInstance(Long instanceId, MerchantStore store) {
-        return productVariantService.getById(instanceId, store).orElseThrow(() -> new ResourceNotFoundException("Product with instance [" + instanceId + "] not found"));
-
+        return productVariantService
+                .getById(instanceId, store)
+                .orElseThrow(
+                        () ->
+                                new ResourceNotFoundException(
+                                        "Product with instance [" + instanceId + "] not found"));
     }
 
     @Override
-    public ReadableInventory add(PersistableInventory inventory, MerchantStore store,
-                                 Language language) {
+    public ReadableInventory add(
+            PersistableInventory inventory, MerchantStore store, Language language) {
         Assert.notNull(store, "MerchantStore cannot be null");
         ProductAvailability availability = getProductAvailabilityToSave(inventory, store);
 
-        //add inventory to the product
+        // add inventory to the product
 
         saveOrUpdate(availability);
         return readableInventoryMapper.convert(availability, store, language);
@@ -154,18 +180,24 @@ public class ProductInventoryFacadeImpl implements ProductInventoryFacade {
         }
     }
 
-    private ProductAvailability getProductAvailabilityToSave(PersistableInventory inventory, MerchantStore store) {
+    private ProductAvailability getProductAvailabilityToSave(
+            PersistableInventory inventory, MerchantStore store) {
 
         return productInventoryMapper.convert(inventory, store, store.getDefaultLanguage());
-
     }
 
     @Override
     public ReadableInventory get(Long inventoryId, MerchantStore store, Language language) {
 
-
-        ProductAvailability availability = productAvailabilityService.getById(inventoryId, store)
-                .orElseThrow(() -> new ResourceNotFoundException("Inventory with id [" + inventoryId + "] not found"));
+        ProductAvailability availability =
+                productAvailabilityService
+                        .getById(inventoryId, store)
+                        .orElseThrow(
+                                () ->
+                                        new ResourceNotFoundException(
+                                                "Inventory with id ["
+                                                        + inventoryId
+                                                        + "] not found"));
         return readableInventoryMapper.convert(availability, store, language);
     }
 
@@ -189,16 +221,16 @@ public class ProductInventoryFacadeImpl implements ProductInventoryFacade {
             }
         }
 
-        ProductAvailability avail = originAvailability.stream()
-                .filter(a -> a.getId().longValue() == inventory.getId())
-                .findAny()
-                .orElse(null);
+        ProductAvailability avail =
+                originAvailability.stream()
+                        .filter(a -> a.getId().longValue() == inventory.getId())
+                        .findAny()
+                        .orElse(null);
 
         if (avail == null) {
             throw new ResourceNotFoundException(
                     "Inventory with id [" + inventory.getId() + "] not found");
         }
-
 
         inventory.setProductId(product.getId());
 
@@ -208,47 +240,53 @@ public class ProductInventoryFacadeImpl implements ProductInventoryFacade {
         saveOrUpdate(avail);
     }
 
-
     @Override
-    public ReadableEntityList<ReadableInventory> get(String sku, MerchantStore store, Language language, int page, int count) {
+    public ReadableEntityList<ReadableInventory> get(
+            String sku, MerchantStore store, Language language, int page, int count) {
         Assert.notNull(sku, "Product sku cannot be null");
         Assert.notNull(store, "MerchantStore code cannot be null");
         Assert.notNull(language, "Language cannot be null");
 
-        Page<ProductAvailability> availabilities = productAvailabilityService.getBySku(sku, page, count);
+        Page<ProductAvailability> availabilities =
+                productAvailabilityService.getBySku(sku, page, count);
 
         if (availabilities.isEmpty()) {
-            //get parent product
+            // get parent product
             try {
                 Product singleProduct = productService.getBySku(sku, store);
                 if (singleProduct != null) {
-                    availabilities = new PageImpl<>(new ArrayList<>(singleProduct.getAvailabilities()));
+                    availabilities =
+                            new PageImpl<>(new ArrayList<>(singleProduct.getAvailabilities()));
                 }
             } catch (ServiceException e) {
-                throw new ServiceRuntimeException("An error occured while getting product with sku " + sku, e);
+                throw new ServiceRuntimeException(
+                        "An error occured while getting product with sku " + sku, e);
             }
         }
 
-        List<ReadableInventory> returnList = availabilities.getContent().stream().map(i -> this.readableInventoryMapper.convert(i, store, language))
-                .collect(Collectors.toList());
+        List<ReadableInventory> returnList =
+                availabilities.getContent().stream()
+                        .map(i -> this.readableInventoryMapper.convert(i, store, language))
+                        .collect(Collectors.toList());
 
         return createReadableList(availabilities, returnList);
     }
 
     @Override
-    public ReadableEntityList<ReadableInventory> get(Long productId, MerchantStore store, Language language, int page, int count) {
+    public ReadableEntityList<ReadableInventory> get(
+            Long productId, MerchantStore store, Language language, int page, int count) {
 
         Assert.notNull(productId, "Product id cannot be null");
         Assert.notNull(store, "MerchantStore code cannot be null");
 
-        Page<ProductAvailability> availabilities = productAvailabilityService.listByProduct(productId, store, page, count);
+        Page<ProductAvailability> availabilities =
+                productAvailabilityService.listByProduct(productId, store, page, count);
 
-        List<ReadableInventory> returnList = availabilities.getContent().stream().map(i -> this.readableInventoryMapper.convert(i, store, language))
-                .collect(Collectors.toList());
+        List<ReadableInventory> returnList =
+                availabilities.getContent().stream()
+                        .map(i -> this.readableInventoryMapper.convert(i, store, language))
+                        .collect(Collectors.toList());
 
         return createReadableList(availabilities, returnList);
-
     }
-
-
 }

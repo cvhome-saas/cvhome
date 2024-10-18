@@ -4,18 +4,19 @@ import com.asrevo.cvhome.store.core.entity.catalog.product.variant.ProductVarian
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.repositories.catalog.product.variant.ProductVariantImageRepository;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
+import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import java.util.List;
-
-
 @Service("productVariantImageService")
-public class ProductVariantImageServiceImpl extends SalesManagerEntityServiceImpl<Long, ProductVariantImage> implements ProductVariantImageService {
+public class ProductVariantImageServiceImpl
+        extends SalesManagerEntityServiceImpl<Long, ProductVariantImage>
+        implements ProductVariantImageService {
 
     private final ProductVariantImageRepository productVariantImageRepository;
 
-    public ProductVariantImageServiceImpl(ProductVariantImageRepository productVariantImageRepository) {
+    public ProductVariantImageServiceImpl(
+            ProductVariantImageRepository productVariantImageRepository) {
         super(productVariantImageRepository);
         this.productVariantImageRepository = productVariantImageRepository;
     }
@@ -33,9 +34,10 @@ public class ProductVariantImageServiceImpl extends SalesManagerEntityServiceImp
     }
 
     @Override
-    public List<ProductVariantImage> listByProductVariantGroup(Long productVariantGroupId, MerchantStore store) {
+    public List<ProductVariantImage> listByProductVariantGroup(
+            Long productVariantGroupId, MerchantStore store) {
         Assert.notNull(store, "MerchantStore cannot be null");
-        return productVariantImageRepository.finByProductVariantGroup(productVariantGroupId, store.getCode());
+        return productVariantImageRepository.finByProductVariantGroup(
+                productVariantGroupId, store.getCode());
     }
-
 }

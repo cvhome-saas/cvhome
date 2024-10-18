@@ -1,5 +1,7 @@
 package com.asrevo.cvhome.manager.controller;
 
+import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.mockJwt;
+
 import com.asrevo.cvhome.manager.config.SecurityConfig;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -9,37 +11,42 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.mockJwt;
-
 @WebFluxTest(AuthController.class)
 @Import(SecurityConfig.class)
 @Testcontainers
 @Tag("unit-test")
 class AuthControllerTest {
-    @Autowired
-    WebTestClient client;
+    @Autowired WebTestClient client;
 
     @Test
     void current() {
         client.mutateWith(mockJwt().jwt((jwt) -> jwt.subject("test-subject")))
-                .get().uri("/api/v1/auth/current").exchange()
-                .expectStatus().isOk()
+                .get()
+                .uri("/api/v1/auth/current")
+                .exchange()
+                .expectStatus()
+                .isOk()
                 .expectBody(String.class)
-                .consumeWith(it -> {
-                    String responseBody = it.getResponseBody();
-                    System.out.println(responseBody);
-                });
+                .consumeWith(
+                        it -> {
+                            String responseBody = it.getResponseBody();
+                            System.out.println(responseBody);
+                        });
     }
 
     @Test
     void me() {
         client.mutateWith(mockJwt().jwt((jwt) -> jwt.subject("test-subject")))
-                .get().uri("/api/v1/auth/me").exchange()
-                .expectStatus().isOk()
+                .get()
+                .uri("/api/v1/auth/me")
+                .exchange()
+                .expectStatus()
+                .isOk()
                 .expectBody(String.class)
-                .consumeWith(it -> {
-                    String responseBody = it.getResponseBody();
-                    System.out.println(responseBody);
-                });
+                .consumeWith(
+                        it -> {
+                            String responseBody = it.getResponseBody();
+                            System.out.println(responseBody);
+                        });
     }
 }

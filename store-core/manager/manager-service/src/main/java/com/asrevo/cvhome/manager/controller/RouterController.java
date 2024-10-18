@@ -5,15 +5,14 @@ import com.asrevo.cvhome.commons.domain.Domain;
 import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
 import com.asrevo.cvhome.manager.service.RouterService;
+import java.util.List;
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
-
-import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("api/v1/router")
@@ -36,22 +35,29 @@ public class RouterController {
 
     @GetMapping("allocates")
     @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE.DOMAIN.LIST')")
-    public Mono<List<Domain>> allocatedDomains(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store) {
+    public Mono<List<Domain>> allocatedDomains(
+            @OrgStorePrincipalInfo UserOrgStoreIdentity identity,
+            @RequestParam ManagerStoreId store) {
         return Mono.just(routerService.allocations(store));
     }
 
     @PostMapping("allocate")
     @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE.DOMAIN.CREATE')")
-    public Mono<Void> allocate(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store, Domain domain) {
+    public Mono<Void> allocate(
+            @OrgStorePrincipalInfo UserOrgStoreIdentity identity,
+            @RequestParam ManagerStoreId store,
+            Domain domain) {
         routerService.create(domain, store);
         return Mono.empty();
     }
 
     @DeleteMapping("remove")
     @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE.DOMAIN.DELETE')")
-    public Mono<Void> remove(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store, Domain domain) {
+    public Mono<Void> remove(
+            @OrgStorePrincipalInfo UserOrgStoreIdentity identity,
+            @RequestParam ManagerStoreId store,
+            Domain domain) {
         routerService.remove(domain, store);
         return Mono.empty();
     }
-
 }

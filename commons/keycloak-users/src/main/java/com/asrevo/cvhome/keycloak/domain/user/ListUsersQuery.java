@@ -2,7 +2,6 @@ package com.asrevo.cvhome.keycloak.domain.user;
 
 import com.asrevo.cvhome.commons.domain.IdentityId;
 import com.asrevo.cvhome.commons.domain.ManagerStoreId;
-
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -10,7 +9,11 @@ public record ListUsersQuery(IdentityId org, ManagerStoreId store) implements Ke
     @Override
     public String query() {
         return Map.of("org", org, "store", store).entrySet().stream()
-                .filter(it -> it.getValue() != null && it.getValue().getId() != null && !"*".equals(it.getValue().getId().toString()))
+                .filter(
+                        it ->
+                                it.getValue() != null
+                                        && it.getValue().getId() != null
+                                        && !"*".equals(it.getValue().getId().toString()))
                 .map(it -> it.getKey() + ":" + it.getValue().getId().toString())
                 .collect(Collectors.joining(" "));
     }

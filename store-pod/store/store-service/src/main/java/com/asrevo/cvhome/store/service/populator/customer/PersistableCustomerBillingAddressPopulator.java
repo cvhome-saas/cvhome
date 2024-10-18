@@ -8,12 +8,13 @@ import com.asrevo.cvhome.store.core.model.customer.address.Address;
 import com.asrevo.cvhome.store.utils.AbstractDataPopulator;
 import org.apache.commons.lang3.StringUtils;
 
-public class PersistableCustomerBillingAddressPopulator extends AbstractDataPopulator<Address, Customer> {
+public class PersistableCustomerBillingAddressPopulator
+        extends AbstractDataPopulator<Address, Customer> {
 
     @Override
-    public Customer populate(Address source, Customer target, MerchantStore store, Language language)
+    public Customer populate(
+            Address source, Customer target, MerchantStore store, Language language)
             throws ConversionException {
-
 
         target.getBilling().setFirstName(source.getFirstName());
         target.getBilling().setLastName(source.getLastName());
@@ -45,13 +46,10 @@ public class PersistableCustomerBillingAddressPopulator extends AbstractDataPopu
         }
 
         return target;
-
     }
 
     @Override
     protected Customer createTarget() {
         return null;
     }
-
-
 }

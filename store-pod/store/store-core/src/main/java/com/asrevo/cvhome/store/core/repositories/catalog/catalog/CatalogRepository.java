@@ -1,15 +1,13 @@
 package com.asrevo.cvhome.store.core.repositories.catalog.catalog;
 
 import com.asrevo.cvhome.store.core.entity.catalog.catalog.Catalog;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import java.util.Optional;
-
 public interface CatalogRepository extends JpaRepository<Catalog, Long> {
 
-
-    @Query(//+ "left join fetch ce.product cep "
+    @Query( // + "left join fetch ce.product cep "
             """
                     select c from Catalog c
                     join c.merchantStore cm
@@ -17,7 +15,7 @@ public interface CatalogRepository extends JpaRepository<Catalog, Long> {
                     left join fetch ce.category cec where c.id=?1 and cm.id = ?2""")
     Optional<Catalog> findById(Long catalogId, Integer merchantId);
 
-    @Query(//+ "left join fetch ce.product cep "
+    @Query( // + "left join fetch ce.product cep "
             """
                     select c from Catalog c
                     join c.merchantStore cm
@@ -25,10 +23,10 @@ public interface CatalogRepository extends JpaRepository<Catalog, Long> {
                     left join fetch ce.category cec where c.code=?1 and cm.id = ?2""")
     Optional<Catalog> findByCode(String code, Integer merchantId);
 
-    @Query("""
+    @Query(
+            """
             SELECT COUNT(c) > 0 FROM Catalog c
             join c.merchantStore cm
             WHERE c.code = ?1 and cm.id = ?2""")
     boolean existsByCode(String code, Integer merchantId);
-
 }

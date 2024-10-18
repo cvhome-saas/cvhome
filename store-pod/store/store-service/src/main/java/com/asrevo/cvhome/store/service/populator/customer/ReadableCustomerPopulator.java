@@ -13,14 +13,12 @@ import com.asrevo.cvhome.store.core.model.security.ReadableGroup;
 import com.asrevo.cvhome.store.utils.AbstractDataPopulator;
 import org.apache.commons.lang3.StringUtils;
 
-
-public class ReadableCustomerPopulator extends
-        AbstractDataPopulator<Customer, ReadableCustomer> {
-
+public class ReadableCustomerPopulator extends AbstractDataPopulator<Customer, ReadableCustomer> {
 
     @Override
-    public ReadableCustomer populate(Customer source, ReadableCustomer target,
-                                     MerchantStore store, Language language) throws ConversionException {
+    public ReadableCustomer populate(
+            Customer source, ReadableCustomer target, MerchantStore store, Language language)
+            throws ConversionException {
 
         try {
 
@@ -114,8 +112,18 @@ public class ReadableCustomerPopulator extends
                     option.setCode(attribute.getCustomerOption().getCode());
 
                     CustomerOptionDescription d = new CustomerOptionDescription();
-                    d.setDescription(attribute.getCustomerOption().getDescriptionsSettoList().getFirst().getDescription());
-                    d.setName(attribute.getCustomerOption().getDescriptionsSettoList().getFirst().getName());
+                    d.setDescription(
+                            attribute
+                                    .getCustomerOption()
+                                    .getDescriptionsSettoList()
+                                    .getFirst()
+                                    .getDescription());
+                    d.setName(
+                            attribute
+                                    .getCustomerOption()
+                                    .getDescriptionsSettoList()
+                                    .getFirst()
+                                    .getName());
                     option.setDescription(d);
 
                     readableAttribute.setCustomerOption(option);
@@ -123,11 +131,20 @@ public class ReadableCustomerPopulator extends
                     ReadableCustomerOptionValue optionValue = new ReadableCustomerOptionValue();
                     optionValue.setId(attribute.getCustomerOptionValue().getId());
                     CustomerOptionValueDescription vd = new CustomerOptionValueDescription();
-                    vd.setDescription(attribute.getCustomerOptionValue().getDescriptionsSettoList().getFirst().getDescription());
-                    vd.setName(attribute.getCustomerOptionValue().getDescriptionsSettoList().getFirst().getName());
+                    vd.setDescription(
+                            attribute
+                                    .getCustomerOptionValue()
+                                    .getDescriptionsSettoList()
+                                    .getFirst()
+                                    .getDescription());
+                    vd.setName(
+                            attribute
+                                    .getCustomerOptionValue()
+                                    .getDescriptionsSettoList()
+                                    .getFirst()
+                                    .getName());
                     optionValue.setCode(attribute.getCustomerOptionValue().getCode());
                     optionValue.setDescription(vd);
-
 
                     readableAttribute.setCustomerOptionValue(optionValue);
                     target.getAttributes().add(readableAttribute);
@@ -139,9 +156,7 @@ public class ReadableCustomerPopulator extends
                         readableGroup.setId(group.getId().longValue());
                         readableGroup.setName(group.getGroupName());
                         readableGroup.setType(group.getGroupType().name());
-                        target.getGroups().add(
-                                readableGroup
-                        );
+                        target.getGroups().add(readableGroup);
                     }
                 }
             }
@@ -157,5 +172,4 @@ public class ReadableCustomerPopulator extends
     protected ReadableCustomer createTarget() {
         return null;
     }
-
 }

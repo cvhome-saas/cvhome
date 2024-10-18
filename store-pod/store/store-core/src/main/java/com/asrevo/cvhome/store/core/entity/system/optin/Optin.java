@@ -5,13 +5,11 @@ import com.asrevo.cvhome.store.core.entity.common.audit.AuditListener;
 import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
-
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Optin defines optin campaigns for the system.
@@ -20,22 +18,26 @@ import java.util.Date;
  */
 @Entity
 @EntityListeners(value = AuditListener.class)
-@Table(name = "OPTIN", uniqueConstraints =
-@UniqueConstraint(columnNames = {"MERCHANT_ID", "CODE"}))
+@Table(name = "OPTIN", uniqueConstraints = @UniqueConstraint(columnNames = {"MERCHANT_ID", "CODE"}))
 @Getter
 @Setter
 public class Optin extends SalesManagerEntity<Long, Optin> implements Serializable {
 
-
     /**
      *
      */
-    @Serial
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
 
     @Id
     @Column(name = "OPTIN_ID")
-    @TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME", valueColumnName = "SEQ_COUNT", pkColumnValue = "OPTIN_SEQ_NEXT_VAL", allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE, initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
+    @TableGenerator(
+            name = "TABLE_GEN",
+            table = "SM_SEQUENCER",
+            pkColumnName = "SEQ_NAME",
+            valueColumnName = "SEQ_COUNT",
+            pkColumnValue = "OPTIN_SEQ_NEXT_VAL",
+            allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
+            initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
     private Long id;
 
@@ -60,5 +62,4 @@ public class Optin extends SalesManagerEntity<Long, Optin> implements Serializab
 
     @Column(name = "DESCRIPTION")
     private String description;
-
 }

@@ -1,14 +1,13 @@
 package com.asrevo.cvhome.store.core.model.shipping;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONAware;
 import org.json.simple.JSONObject;
-
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Object saved in the database maintaining various shipping options
@@ -19,7 +18,7 @@ import java.util.List;
 @Setter
 public class ShippingConfiguration implements JSONAware {
 
-    //enums
+    // enums
     private ShippingType shippingType = ShippingType.NATIONAL;
     private ShippingBasisType shippingBasisType = ShippingBasisType.SHIPPING;
     private ShippingOptionPriceType shippingOptionPriceType = ShippingOptionPriceType.ALL;
@@ -33,18 +32,16 @@ public class ShippingConfiguration implements JSONAware {
     private double boxWeight = 0;
     private double maxWeight = 0;
 
-    //free shipping
+    // free shipping
     private boolean freeShippingEnabled = false;
     private BigDecimal orderTotalFreeShipping = null;
 
     private List<Package> packages = new ArrayList<>();
 
-
     private BigDecimal handlingFees = null;
     private boolean taxOnShipping = false;
 
-
-    //JSON bindings
+    // JSON bindings
     private String shipType;
     private String shipBaseType;
     private String shipOptionPriceType = ShippingOptionPriceType.ALL.name();
@@ -52,34 +49,29 @@ public class ShippingConfiguration implements JSONAware {
     private String shipDescription;
     private String shipFreeType;
 
-    //Transient
+    // Transient
     private String orderTotalFreeShippingText = null;
     private String handlingFeesText = null;
-
 
     public void setShippingOptionPriceType(ShippingOptionPriceType shippingOptionPriceType) {
         this.shippingOptionPriceType = shippingOptionPriceType;
         this.shipOptionPriceType = this.shippingOptionPriceType.name();
     }
 
-
     public void setShippingBasisType(ShippingBasisType shippingBasisType) {
         this.shippingBasisType = shippingBasisType;
         this.shipBaseType = this.shippingBasisType.name();
     }
-
 
     public void setShippingType(ShippingType shippingType) {
         this.shippingType = shippingType;
         this.shipType = this.shippingType.name();
     }
 
-
     public void setShippingPackageType(ShippingPackageType shippingPackageType) {
         this.shippingPackageType = shippingPackageType;
         this.shipPackageType = shippingPackageType.name();
     }
-
 
     /**
      * JSON bindding
@@ -93,7 +85,6 @@ public class ShippingConfiguration implements JSONAware {
         setShippingType(sType);
     }
 
-
     public void setShipOptionPriceType(String shipOptionPriceType) {
         this.shipOptionPriceType = shipOptionPriceType;
         ShippingOptionPriceType sType = ShippingOptionPriceType.ALL;
@@ -106,7 +97,6 @@ public class ShippingConfiguration implements JSONAware {
         setShippingOptionPriceType(sType);
     }
 
-
     public void setShipBaseType(String shipBaseType) {
         this.shipBaseType = shipBaseType;
         ShippingBasisType sType = ShippingBasisType.SHIPPING;
@@ -115,7 +105,6 @@ public class ShippingConfiguration implements JSONAware {
         }
         setShippingBasisType(sType);
     }
-
 
     public void setShipPackageType(String shipPackageType) {
         this.shipPackageType = shipPackageType;
@@ -157,7 +146,6 @@ public class ShippingConfiguration implements JSONAware {
         }
         data.put("shipDescription", this.getShippingDescription().name());
 
-
         data.put("boxWidth", this.getBoxWidth());
         data.put("boxHeight", this.getBoxHeight());
         data.put("boxLength", this.getBoxLength());
@@ -168,7 +156,6 @@ public class ShippingConfiguration implements JSONAware {
         data.put("handlingFees", this.handlingFees);
         data.put("taxOnShipping", this.taxOnShipping);
 
-
         JSONArray jsonArray = new JSONArray();
 
         for (Package p : this.getPackages()) {
@@ -176,7 +163,6 @@ public class ShippingConfiguration implements JSONAware {
         }
 
         data.put("packages", jsonArray);
-
 
         return data.toJSONString();
     }
@@ -196,6 +182,3 @@ public class ShippingConfiguration implements JSONAware {
         return data;
     }
 }
-
-
-

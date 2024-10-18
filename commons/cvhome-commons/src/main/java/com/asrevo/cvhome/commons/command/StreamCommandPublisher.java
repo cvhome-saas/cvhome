@@ -1,8 +1,7 @@
 package com.asrevo.cvhome.commons.command;
 
-import org.springframework.cloud.stream.function.StreamBridge;
-
 import java.util.List;
+import org.springframework.cloud.stream.function.StreamBridge;
 
 public class StreamCommandPublisher implements CommandPublisher {
     private final StreamBridge streamBridge;

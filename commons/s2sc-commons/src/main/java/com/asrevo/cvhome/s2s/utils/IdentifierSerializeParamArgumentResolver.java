@@ -7,7 +7,8 @@ import org.springframework.web.service.invoker.HttpServiceArgumentResolver;
 
 public class IdentifierSerializeParamArgumentResolver implements HttpServiceArgumentResolver {
     @Override
-    public boolean resolve(Object argument, MethodParameter parameter, HttpRequestValues.Builder requestValues) {
+    public boolean resolve(
+            Object argument, MethodParameter parameter, HttpRequestValues.Builder requestValues) {
         try {
             if (argument instanceof Identifier identifier) {
                 String name = parameter.getParameterName();
@@ -18,6 +19,5 @@ public class IdentifierSerializeParamArgumentResolver implements HttpServiceArgu
         } catch (Exception ignored) {
         }
         return false;
-
     }
 }

@@ -3,7 +3,6 @@
  */
 package com.asrevo.cvhome.store.service.facade.customer;
 
-
 import com.asrevo.cvhome.store.core.entity.customer.Customer;
 import com.asrevo.cvhome.store.core.entity.customer.CustomerCriteria;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
@@ -12,7 +11,6 @@ import com.asrevo.cvhome.store.core.entity.shoppingcart.ShoppingCart;
 import com.asrevo.cvhome.store.core.model.customer.*;
 import com.asrevo.cvhome.store.core.model.customer.address.Address;
 import com.asrevo.cvhome.store.core.model.customer.optin.PersistableCustomerOptin;
-
 import java.util.List;
 
 /**
@@ -31,13 +29,16 @@ public interface CustomerFacade {
      * Customer username is unique to each store.
      *
      */
-    CustomerEntity getCustomerDataByUserName(final String userName, final MerchantStore store, final Language language) throws Exception;
+    CustomerEntity getCustomerDataByUserName(
+            final String userName, final MerchantStore store, final Language language)
+            throws Exception;
 
     /**
      * Creates a ReadableCustomer
      *
      */
-    ReadableCustomer getCustomerById(final Long id, final MerchantStore merchantStore, final Language language);
+    ReadableCustomer getCustomerById(
+            final Long id, final MerchantStore merchantStore, final Language language);
 
     /**
      * Get Customer using unique username
@@ -55,33 +56,48 @@ public interface CustomerFacade {
      * @param customer              username of Customer
      * @param sessionShoppingCartId session shopping cart, if user already have few items in Cart.
      */
-    ShoppingCart mergeCart(final Customer customer, final String sessionShoppingCartId, final MerchantStore store, final Language language) throws Exception;
+    ShoppingCart mergeCart(
+            final Customer customer,
+            final String sessionShoppingCartId,
+            final MerchantStore store,
+            final Language language)
+            throws Exception;
 
     Customer getCustomerByUserName(final String userName, final MerchantStore store);
 
     boolean checkIfUserExists(final String userName, final MerchantStore store) throws Exception;
 
-    PersistableCustomer registerCustomer(final PersistableCustomer customer, final MerchantStore merchantStore, final Language language) throws Exception;
+    PersistableCustomer registerCustomer(
+            final PersistableCustomer customer,
+            final MerchantStore merchantStore,
+            final Language language)
+            throws Exception;
 
-    Address getAddress(final Long userId, final MerchantStore merchantStore, boolean isBillingAddress) throws Exception;
+    Address getAddress(
+            final Long userId, final MerchantStore merchantStore, boolean isBillingAddress)
+            throws Exception;
 
-    void updateAddress(Long userId, MerchantStore merchantStore, Address address, final Language language)
+    void updateAddress(
+            Long userId, MerchantStore merchantStore, Address address, final Language language)
             throws Exception;
 
     void setCustomerModelDefaultProperties(Customer customer, MerchantStore store) throws Exception;
 
+    Customer getCustomerModel(
+            PersistableCustomer customer, MerchantStore merchantStore, Language language)
+            throws Exception;
 
-    Customer getCustomerModel(PersistableCustomer customer,
-                              MerchantStore merchantStore, Language language) throws Exception;
-
-    Customer populateCustomerModel(Customer customerModel, PersistableCustomer customer,
-                                   MerchantStore merchantStore, Language language) throws Exception;
+    Customer populateCustomerModel(
+            Customer customerModel,
+            PersistableCustomer customer,
+            MerchantStore merchantStore,
+            Language language)
+            throws Exception;
 
     /*
      * Creates a Customer from a PersistableCustomer received from REST API
      */
     ReadableCustomer create(PersistableCustomer customer, MerchantStore store, Language language);
-
 
     /**
      * Updates a Customer
@@ -103,19 +119,22 @@ public interface CustomerFacade {
      * Save or update a CustomerReview
      *
      */
-    PersistableCustomerReview saveOrUpdateCustomerReview(PersistableCustomerReview review, MerchantStore store, Language language);
+    PersistableCustomerReview saveOrUpdateCustomerReview(
+            PersistableCustomerReview review, MerchantStore store, Language language);
 
     /**
      * List all customer reviews by reviewed
      *
      */
-    List<ReadableCustomerReview> getAllCustomerReviewsByReviewed(Long customerId, MerchantStore store, Language language);
+    List<ReadableCustomerReview> getAllCustomerReviewsByReviewed(
+            Long customerId, MerchantStore store, Language language);
 
     /**
      * Deletes a customer review
      *
      */
-    void deleteCustomerReview(Long customerId, Long reviewId, MerchantStore store, Language language);
+    void deleteCustomerReview(
+            Long customerId, Long reviewId, MerchantStore store, Language language);
 
     /**
      * Optin a customer to newsletter
@@ -123,7 +142,8 @@ public interface CustomerFacade {
      */
     void optinCustomer(PersistableCustomerOptin optin, MerchantStore store);
 
-    ReadableCustomer getCustomerByNick(String userName, MerchantStore merchantStore, Language language);
+    ReadableCustomer getCustomerByNick(
+            String userName, MerchantStore merchantStore, Language language);
 
     void deleteByNick(String nick);
 
@@ -131,7 +151,8 @@ public interface CustomerFacade {
 
     void delete(Customer entity);
 
-    ReadableCustomerList getListByStore(MerchantStore store, CustomerCriteria criteria, Language language);
+    ReadableCustomerList getListByStore(
+            MerchantStore store, CustomerCriteria criteria, Language language);
 
     PersistableCustomerReview createCustomerReview(
             Long customerId,
@@ -139,7 +160,10 @@ public interface CustomerFacade {
             MerchantStore merchantStore,
             Language language);
 
-    PersistableCustomerReview updateCustomerReview(Long id, Long reviewId, PersistableCustomerReview review, MerchantStore store, Language language);
-
-
+    PersistableCustomerReview updateCustomerReview(
+            Long id,
+            Long reviewId,
+            PersistableCustomerReview review,
+            MerchantStore store,
+            Language language);
 }

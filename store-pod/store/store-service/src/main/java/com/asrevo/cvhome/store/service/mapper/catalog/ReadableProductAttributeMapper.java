@@ -13,7 +13,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ReadableProductAttributeMapper implements Mapper<ProductAttribute, ReadableProductAttributeEntity> {
+public class ReadableProductAttributeMapper
+        implements Mapper<ProductAttribute, ReadableProductAttributeEntity> {
 
     private final ReadableProductOptionMapper readableProductOptionMapper;
 
@@ -21,35 +22,44 @@ public class ReadableProductAttributeMapper implements Mapper<ProductAttribute, 
 
     private final PricingService pricingService;
 
-    public ReadableProductAttributeMapper(ReadableProductOptionMapper readableProductOptionMapper, ReadableProductOptionValueMapper readableProductOptionValueMapper, PricingService pricingService) {
+    public ReadableProductAttributeMapper(
+            ReadableProductOptionMapper readableProductOptionMapper,
+            ReadableProductOptionValueMapper readableProductOptionValueMapper,
+            PricingService pricingService) {
         this.readableProductOptionMapper = readableProductOptionMapper;
         this.readableProductOptionValueMapper = readableProductOptionValueMapper;
         this.pricingService = pricingService;
     }
 
-
     @Override
-    public ReadableProductAttributeEntity convert(ProductAttribute source, MerchantStore store, Language language) {
+    public ReadableProductAttributeEntity convert(
+            ProductAttribute source, MerchantStore store, Language language) {
         ReadableProductAttributeEntity productAttribute = new ReadableProductAttributeEntity();
         return merge(source, productAttribute, store, language);
     }
 
     @Override
-    public ReadableProductAttributeEntity merge(ProductAttribute source, ReadableProductAttributeEntity destination,
-                                                MerchantStore store, Language language) {
+    public ReadableProductAttributeEntity merge(
+            ProductAttribute source,
+            ReadableProductAttributeEntity destination,
+            MerchantStore store,
+            Language language) {
 
         ReadableProductAttributeEntity attr = new ReadableProductAttributeEntity();
         if (destination != null) {
             attr = destination;
         }
         try {
-            attr.setId(source.getId());//attribute of the option
+            attr.setId(source.getId()); // attribute of the option
 
-            if (source.getProductAttributePrice() != null && source.getProductAttributePrice().doubleValue() > 0) {
+            if (source.getProductAttributePrice() != null
+                    && source.getProductAttributePrice().doubleValue() > 0) {
                 String formatedPrice;
-                formatedPrice = pricingService.getDisplayAmount(source.getProductAttributePrice(), store);
+                formatedPrice =
+                        pricingService.getDisplayAmount(source.getProductAttributePrice(), store);
                 attr.setProductAttributePrice(formatedPrice);
-                attr.setProductAttributeUnformattedPrice(pricingService.getStringAmount(source.getProductAttributePrice(), store));
+                attr.setProductAttributeUnformattedPrice(
+                        pricingService.getStringAmount(source.getProductAttributePrice(), store));
             }
 
             attr.setProductAttributeWeight(source.getAttributeAdditionalWeight());
@@ -60,12 +70,16 @@ public class ReadableProductAttributeMapper implements Mapper<ProductAttribute, 
             }
 
             if (source.getProductOption() != null) {
-                ReadableProductOptionEntity option = readableProductOptionMapper.convert(source.getProductOption(), store, language);
+                ReadableProductOptionEntity option =
+                        readableProductOptionMapper.convert(
+                                source.getProductOption(), store, language);
                 attr.setOption(option);
             }
 
             if (source.getProductOptionValue() != null) {
-                ReadableProductOptionValue optionValue = readableProductOptionValueMapper.convert(source.getProductOptionValue(), store, language);
+                ReadableProductOptionValue optionValue =
+                        readableProductOptionValueMapper.convert(
+                                source.getProductOptionValue(), store, language);
                 attr.setOptionValue(optionValue);
             }
 
@@ -73,8 +87,6 @@ public class ReadableProductAttributeMapper implements Mapper<ProductAttribute, 
             throw new ConversionRuntimeException("Exception while product attribute conversion", e);
         }
 
-
         return attr;
     }
-
 }

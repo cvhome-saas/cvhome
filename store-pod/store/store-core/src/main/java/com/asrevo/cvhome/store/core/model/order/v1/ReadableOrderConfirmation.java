@@ -4,11 +4,10 @@ import com.asrevo.cvhome.commons.domain.Entity;
 import com.asrevo.cvhome.store.core.model.customer.address.Address;
 import com.asrevo.cvhome.store.core.model.order.ReadableOrderProduct;
 import com.asrevo.cvhome.store.core.model.order.total.ReadableTotal;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.io.Serial;
 import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
 
 @Setter
 @Getter
@@ -17,13 +16,12 @@ public class ReadableOrderConfirmation extends Entity {
     /**
      *
      */
-    @Serial
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
+
     private Address billing;
     private Address delivery;
     private String shipping;
     private String payment;
     private ReadableTotal total;
     private List<ReadableOrderProduct> products;
-
 }

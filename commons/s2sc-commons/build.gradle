@@ -1,24 +1,25 @@
 plugins {
-    id 'com.asrevo.java-library-conventions'
+	id 'com.asrevo.java-library-conventions'
+	id("com.diffplug.spotless") version "7.0.0.BETA2"
 }
 
 dependencies {
-    compileOnly project(":commons:cvhome-commons")
-    compileOnly project(":commons:ecs-commons:fargate-task-info")
-    compileOnly 'org.springframework:spring-webflux:6.1.10'
-    compileOnly 'org.springframework:spring-webmvc:6.1.10'
-    compileOnly 'org.springframework.data:spring-data-commons:3.3.1'
-    compileOnly 'org.springframework.boot:spring-boot-starter-oauth2-client:3.3.1'
-    compileOnly 'org.springframework.cloud:spring-cloud-gateway-server:4.1.4'
-    compileOnly 'org.springframework.cloud:spring-cloud-commons:4.1.3'
-    compileOnly 'org.springframework.boot:spring-boot-starter-actuator:3.3.1'
-    compileOnly 'com.fasterxml.jackson.core:jackson-databind:2.17.1'
-    compileOnly 'com.fasterxml.jackson.core:jackson-core:2.17.1'
-    compileOnly 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.17.1'
-    compileOnly 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.17.1'
+	compileOnly project(":commons:cvhome-commons")
+	compileOnly project(":commons:ecs-commons:fargate-task-info")
+	compileOnly 'org.springframework:spring-webflux:6.1.10'
+	compileOnly 'org.springframework:spring-webmvc:6.1.10'
+	compileOnly 'org.springframework.data:spring-data-commons:3.3.1'
+	compileOnly 'org.springframework.boot:spring-boot-starter-oauth2-client:3.3.1'
+	compileOnly 'org.springframework.cloud:spring-cloud-gateway-server:4.1.4'
+	compileOnly 'org.springframework.cloud:spring-cloud-commons:4.1.3'
+	compileOnly 'org.springframework.boot:spring-boot-starter-actuator:3.3.1'
+	compileOnly 'com.fasterxml.jackson.core:jackson-databind:2.17.1'
+	compileOnly 'com.fasterxml.jackson.core:jackson-core:2.17.1'
+	compileOnly 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.17.1'
+	compileOnly 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.17.1'
 //    compileOnly 'org.springdoc:springdoc-openapi-starter-common:2.5.0'
-    compileOnly 'io.swagger.core.v3:swagger-models:2.2.8'
+	compileOnly 'io.swagger.core.v3:swagger-models:2.2.8'
 
-    compileOnly 'org.projectlombok:lombok:1.18.32'
-    annotationProcessor 'org.projectlombok:lombok:1.18.32'
+	compileOnly 'org.projectlombok:lombok:1.18.32'
+	annotationProcessor 'org.projectlombok:lombok:1.18.32'
 }

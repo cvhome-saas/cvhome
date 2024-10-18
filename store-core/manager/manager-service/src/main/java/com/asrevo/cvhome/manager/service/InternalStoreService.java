@@ -12,7 +12,10 @@ import org.springframework.data.domain.Pageable;
 public interface InternalStoreService {
     ManagerStoreDto createStore(CreateManagerStoreRequest storeRequest, IdentityId identityId);
 
-    Page<ManagerStoreDto> findAll(UserOrgStoreIdentity identity, ListManagerStoreQuery listManagerStoreQuery, Pageable pageable);
+    Page<ManagerStoreDto> findAll(
+            UserOrgStoreIdentity identity,
+            ListManagerStoreQuery listManagerStoreQuery,
+            Pageable pageable);
 
     void syncInRouter(ManagerStoreId store);
 

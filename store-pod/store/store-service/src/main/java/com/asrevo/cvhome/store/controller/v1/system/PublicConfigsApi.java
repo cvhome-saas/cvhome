@@ -1,5 +1,7 @@
 package com.asrevo.cvhome.store.controller.v1.system;
 
+import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1;
+
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
@@ -14,14 +16,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1;
-
-
 @RestController
 @RequestMapping("/api/v1")
 @Slf4j
 public class PublicConfigsApi {
-
 
     private final MerchantConfigurationFacade configurationFacade;
 
@@ -34,14 +32,26 @@ public class PublicConfigsApi {
      *
      */
     @GetMapping("/config")
-    @Operation(
-            method = "GET",
-            description = "Get public configuration for a given merchant store")
+    @Operation(method = "GET", description = "Get public configuration for a given merchant store")
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
+        @Parameter(
+                name = "store",
+                schema =
+                        @Schema(
+                                name = "store",
+                                type = "string",
+                                defaultValue = DEFAULT_ORG1_STORE1)),
+        @Parameter(
+                name = "lang",
+                schema =
+                        @Schema(
+                                name = "lang",
+                                type = "string",
+                                defaultValue = Constants.DEFAULT_LANGUAGE))
     })
-    public Configs getConfig(@Parameter(hidden = true) MerchantStore merchantStore, @Parameter(hidden = true) Language language) {
+    public Configs getConfig(
+            @Parameter(hidden = true) MerchantStore merchantStore,
+            @Parameter(hidden = true) Language language) {
         return configurationFacade.getMerchantConfig(merchantStore, language);
     }
 }

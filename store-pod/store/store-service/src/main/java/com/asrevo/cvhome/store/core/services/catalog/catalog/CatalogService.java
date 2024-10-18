@@ -5,12 +5,10 @@ import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 
-import java.util.Optional;
-
 public interface CatalogService extends SalesManagerEntityService<Long, Catalog> {
-
 
     /**
      * Creates a new Catalog
@@ -28,7 +26,8 @@ public interface CatalogService extends SalesManagerEntityService<Long, Catalog>
      *
      * @return List<Catalog>
      */
-    Page<Catalog> getCatalogs(MerchantStore store, Language language, String name, int page, int count);
+    Page<Catalog> getCatalogs(
+            MerchantStore store, Language language, String name, int page, int count);
 
     /**
      * Delete a Catalog and related objects
@@ -36,5 +35,4 @@ public interface CatalogService extends SalesManagerEntityService<Long, Catalog>
     void delete(Catalog catalog) throws ServiceException;
 
     boolean existByCode(String code, MerchantStore store);
-
 }

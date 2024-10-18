@@ -9,5 +9,4 @@ public interface Optionable {
     ProductOptionValue getProductOptionValue();
 
     void setProductOptionValue(ProductOptionValue optionValue);
-
 }

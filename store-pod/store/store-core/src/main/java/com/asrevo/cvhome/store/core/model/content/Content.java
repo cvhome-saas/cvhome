@@ -1,11 +1,10 @@
 package com.asrevo.cvhome.store.core.model.content;
 
 import jakarta.validation.constraints.NotEmpty;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.io.Serial;
 import java.io.Serializable;
+import lombok.Getter;
+import lombok.Setter;
 
 @Setter
 @Getter
@@ -15,14 +14,12 @@ public abstract class Content implements Serializable {
     /**
      *
      */
-    @Serial
-    private static final long serialVersionUID = 1L;
-    @NotEmpty
-    private String name;
+    @Serial private static final long serialVersionUID = 1L;
+
+    @NotEmpty private String name;
     private String contentType;
 
-    public Content() {
-    }
+    public Content() {}
 
     public Content(String name) {
         this.name = name;
@@ -32,6 +29,4 @@ public abstract class Content implements Serializable {
         this.name = name;
         this.contentType = contentType;
     }
-
-
 }

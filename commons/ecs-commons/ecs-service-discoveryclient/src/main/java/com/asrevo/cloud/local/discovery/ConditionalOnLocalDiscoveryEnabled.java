@@ -1,8 +1,7 @@
 package com.asrevo.cloud.local.discovery;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-
 import java.lang.annotation.*;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 /**
  * @author ashraf
@@ -13,5 +12,4 @@ import java.lang.annotation.*;
 @Documented
 @Inherited
 @ConditionalOnProperty(value = "spring.cloud.local.discovery.enabled")
-public @interface ConditionalOnLocalDiscoveryEnabled {
-}
+public @interface ConditionalOnLocalDiscoveryEnabled {}

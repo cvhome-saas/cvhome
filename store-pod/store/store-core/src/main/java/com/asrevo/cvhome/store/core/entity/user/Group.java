@@ -8,17 +8,17 @@ import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.io.Serial;
 import java.util.HashSet;
 import java.util.Set;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @EntityListeners(value = AuditListener.class)
-@Table(name = "SM_GROUP", indexes = {
-        @Index(name = "SM_GROUP_GROUP_TYPE", columnList = "GROUP_TYPE")})
+@Table(
+        name = "SM_GROUP",
+        indexes = {@Index(name = "SM_GROUP_GROUP_TYPE", columnList = "GROUP_TYPE")})
 @Getter
 @Setter
 public class Group extends SalesManagerEntity<Integer, Group> implements Auditable {
@@ -26,34 +26,38 @@ public class Group extends SalesManagerEntity<Integer, Group> implements Auditab
     /**
      *
      */
-    @Serial
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
+
     @Id
     @Column(name = "GROUP_ID", unique = true, nullable = false)
-    @TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME", valueColumnName = "SEQ_COUNT", pkColumnValue = "GROUP_SEQ_NEXT_VAL", allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE, initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
+    @TableGenerator(
+            name = "TABLE_GEN",
+            table = "SM_SEQUENCER",
+            pkColumnName = "SEQ_NAME",
+            valueColumnName = "SEQ_COUNT",
+            pkColumnValue = "GROUP_SEQ_NEXT_VAL",
+            allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
+            initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
     private Integer id;
+
     @Column(name = "GROUP_TYPE")
     @Enumerated(value = EnumType.STRING)
     private GroupType groupType;
+
     @NotEmpty
     @Column(name = "GROUP_NAME", unique = true)
     private String groupName;
+
     @JsonIgnore
-    @ManyToMany(cascade = {
-            CascadeType.PERSIST,
-            CascadeType.MERGE
-    })
-    @JoinTable(name = "PERMISSION_GROUP",
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(
+            name = "PERMISSION_GROUP",
             joinColumns = @JoinColumn(name = "GROUP_ID"),
-            inverseJoinColumns = @JoinColumn(name = "PERMISSION_ID")
-    )
+            inverseJoinColumns = @JoinColumn(name = "PERMISSION_ID"))
     private Set<Permission> permissions = new HashSet<>();
-    @Embedded
-    private AuditSection auditSection = new AuditSection();
 
-    public Group() {
+    @Embedded private AuditSection auditSection = new AuditSection();
 
-    }
-
+    public Group() {}
 }

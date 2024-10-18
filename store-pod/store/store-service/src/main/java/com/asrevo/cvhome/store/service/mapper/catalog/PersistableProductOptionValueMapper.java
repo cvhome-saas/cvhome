@@ -24,7 +24,9 @@ public class PersistableProductOptionValueMapper
     }
 
     ProductOptionValueDescription description(
-            com.asrevo.cvhome.store.core.model.catalog.product.attribute.ProductOptionValueDescription description)
+            com.asrevo.cvhome.store.core.model.catalog.product.attribute
+                            .ProductOptionValueDescription
+                    description)
             throws Exception {
         Assert.notNull(description.getLanguage(), "description.language should not be null");
         ProductOptionValueDescription desc = new ProductOptionValueDescription();
@@ -43,8 +45,11 @@ public class PersistableProductOptionValueMapper
     }
 
     @Override
-    public ProductOptionValue merge(PersistableProductOptionValue source, ProductOptionValue destination,
-                                    MerchantStore store, Language language) {
+    public ProductOptionValue merge(
+            PersistableProductOptionValue source,
+            ProductOptionValue destination,
+            MerchantStore store,
+            Language language) {
         if (destination == null) {
             destination = new ProductOptionValue();
         }
@@ -58,8 +63,9 @@ public class PersistableProductOptionValueMapper
             }
 
             if (!CollectionUtils.isEmpty(source.getDescriptions())) {
-                for (com.asrevo.cvhome.store.core.model.catalog.product.attribute.ProductOptionValueDescription desc : source
-                        .getDescriptions()) {
+                for (com.asrevo.cvhome.store.core.model.catalog.product.attribute
+                                .ProductOptionValueDescription
+                        desc : source.getDescriptions()) {
                     ProductOptionValueDescription description = null;
                     if (!CollectionUtils.isEmpty(destination.getDescriptions())) {
                         for (ProductOptionValueDescription d : destination.getDescriptions()) {
@@ -74,26 +80,24 @@ public class PersistableProductOptionValueMapper
                                 }
                                 description = d;
                                 break;
-
                             }
                         }
-                    } //else {
+                    } // else {
                     if (description == null) {
                         description = description(desc);
                         description.setProductOptionValue(destination);
                         destination.getDescriptions().add(description);
                     }
-                    //description = description(desc);
-                    //description.setProductOptionValue(destination);
-                    //}
-                    //destination.getDescriptions().add(description);
+                    // description = description(desc);
+                    // description.setProductOptionValue(destination);
+                    // }
+                    // destination.getDescriptions().add(description);
                 }
             }
 
             destination.setCode(source.getCode());
             destination.setMerchantStore(store);
             destination.setProductOptionValueSortOrder(source.getSortOrder());
-
 
             return destination;
         } catch (Exception e) {
@@ -102,11 +106,9 @@ public class PersistableProductOptionValueMapper
     }
 
     @Override
-    public ProductOptionValue convert(PersistableProductOptionValue source, MerchantStore store,
-                                      Language language) {
+    public ProductOptionValue convert(
+            PersistableProductOptionValue source, MerchantStore store, Language language) {
         ProductOptionValue destination = new ProductOptionValue();
         return merge(source, destination, store, language);
     }
-
-
 }

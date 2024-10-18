@@ -6,11 +6,10 @@ import com.asrevo.cvhome.store.core.entity.common.audit.AuditSection;
 import com.asrevo.cvhome.store.core.entity.common.audit.Auditable;
 import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.io.Serial;
 import java.io.Serializable;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Global system configuration information
@@ -22,13 +21,20 @@ import java.io.Serializable;
 @Table(name = "SYSTEM_CONFIGURATION")
 @Getter
 @Setter
-public class SystemConfiguration extends SalesManagerEntity<Long, SystemConfiguration> implements Serializable, Auditable {
-    @Serial
-    private static final long serialVersionUID = 1L;
+public class SystemConfiguration extends SalesManagerEntity<Long, SystemConfiguration>
+        implements Serializable, Auditable {
+    @Serial private static final long serialVersionUID = 1L;
 
     @Id
     @Column(name = "SYSTEM_CONFIG_ID")
-    @TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME", valueColumnName = "SEQ_COUNT", pkColumnValue = "SYST_CONF_SEQ_NEXT_VAL", allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE, initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
+    @TableGenerator(
+            name = "TABLE_GEN",
+            table = "SM_SEQUENCER",
+            pkColumnName = "SEQ_NAME",
+            valueColumnName = "SEQ_COUNT",
+            pkColumnValue = "SYST_CONF_SEQ_NEXT_VAL",
+            allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
+            initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
     private Long id;
 
@@ -38,6 +44,5 @@ public class SystemConfiguration extends SalesManagerEntity<Long, SystemConfigur
     @Column(name = "VALUE")
     private String value;
 
-    @Embedded
-    private AuditSection auditSection = new AuditSection();
+    @Embedded private AuditSection auditSection = new AuditSection();
 }

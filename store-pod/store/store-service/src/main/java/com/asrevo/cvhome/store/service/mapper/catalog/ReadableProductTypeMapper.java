@@ -7,13 +7,12 @@ import com.asrevo.cvhome.store.core.model.catalog.product.type.ProductTypeDescri
 import com.asrevo.cvhome.store.core.model.catalog.product.type.ReadableProductType;
 import com.asrevo.cvhome.store.core.model.catalog.product.type.ReadableProductTypeFull;
 import com.asrevo.cvhome.store.service.mapper.Mapper;
-import org.apache.commons.collections.CollectionUtils;
-import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.apache.commons.collections.CollectionUtils;
+import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
 @Component
 public class ReadableProductTypeMapper implements Mapper<ProductType, ReadableProductType> {
@@ -25,8 +24,11 @@ public class ReadableProductTypeMapper implements Mapper<ProductType, ReadablePr
     }
 
     @Override
-    public ReadableProductType merge(ProductType source, ReadableProductType destination, MerchantStore store,
-                                     Language language) {
+    public ReadableProductType merge(
+            ProductType source,
+            ReadableProductType destination,
+            MerchantStore store,
+            Language language) {
         Assert.notNull(source, "ProductType cannot be null");
         Assert.notNull(destination, "ReadableProductType cannot be null");
         return type(source, language);
@@ -35,12 +37,14 @@ public class ReadableProductTypeMapper implements Mapper<ProductType, ReadablePr
     private ReadableProductType type(ProductType type, Language language) {
         ReadableProductType readableType = null;
 
-
         if (language != null) {
             readableType = new ReadableProductType();
             if (!CollectionUtils.isEmpty(type.getDescriptions())) {
-                Optional<ProductTypeDescription> desc = type.getDescriptions().stream().filter(t -> t.getLanguage().getCode().equals(language.getCode()))
-                        .map(this::typeDescription).findFirst();
+                Optional<ProductTypeDescription> desc =
+                        type.getDescriptions().stream()
+                                .filter(t -> t.getLanguage().getCode().equals(language.getCode()))
+                                .map(this::typeDescription)
+                                .findFirst();
                 if (desc.isPresent()) {
                     readableType.setDescription(desc.get());
                 }
@@ -48,20 +52,25 @@ public class ReadableProductTypeMapper implements Mapper<ProductType, ReadablePr
         } else {
 
             readableType = new ReadableProductTypeFull();
-            List<ProductTypeDescription> descriptions = type.getDescriptions().stream().map(this::typeDescription).collect(Collectors.toList());
+            List<ProductTypeDescription> descriptions =
+                    type.getDescriptions().stream()
+                            .map(this::typeDescription)
+                            .collect(Collectors.toList());
             ((ReadableProductTypeFull) readableType).setDescriptions(descriptions);
-
         }
 
         readableType.setCode(type.getCode());
         readableType.setId(type.getId());
         readableType.setVisible(type.getVisible() != null && type.getVisible() ? true : false);
-        readableType.setAllowAddToCart(type.getAllowAddToCart() != null && type.getAllowAddToCart() ? true : false);
+        readableType.setAllowAddToCart(
+                type.getAllowAddToCart() != null && type.getAllowAddToCart() ? true : false);
 
         return readableType;
     }
 
-    private ProductTypeDescription typeDescription(com.asrevo.cvhome.store.core.entity.catalog.product.type.ProductTypeDescription description) {
+    private ProductTypeDescription typeDescription(
+            com.asrevo.cvhome.store.core.entity.catalog.product.type.ProductTypeDescription
+                    description) {
         ProductTypeDescription desc = new ProductTypeDescription();
         desc.setId(description.getId());
         desc.setName(description.getName());
@@ -69,5 +78,4 @@ public class ReadableProductTypeMapper implements Mapper<ProductType, ReadablePr
         desc.setLanguage(description.getLanguage().getCode());
         return desc;
     }
-
 }

@@ -1,12 +1,11 @@
 package com.asrevo.cvhome.store.core.model.catalog.product.attribute;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Input object used when selecting an item option
@@ -20,8 +19,7 @@ public class ReadableSelectedProductVariant implements Serializable {
     /**
      *
      */
-    @Serial
-    private static final long serialVersionUID = 1L;
-    private List<ReadableProductVariantValue> options = new ArrayList<>();
+    @Serial private static final long serialVersionUID = 1L;
 
+    private List<ReadableProductVariantValue> options = new ArrayList<>();
 }

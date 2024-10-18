@@ -21,15 +21,14 @@ import com.asrevo.cvhome.store.core.services.catalog.product.attribute.ProductOp
 import com.asrevo.cvhome.store.core.services.catalog.product.attribute.ProductOptionValueService;
 import com.asrevo.cvhome.store.core.services.content.ContentService;
 import com.asrevo.cvhome.store.service.mapper.catalog.*;
+import java.io.InputStream;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.InputStream;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class ProductOptionFacadeImpl implements ProductOptionFacade {
@@ -56,7 +55,18 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
 
     private final ProductService productService;
 
-    public ProductOptionFacadeImpl(ReadableProductOptionValueMapper readableOptionValueMapper, ProductOptionService productOptionService, ProductOptionValueService productOptionValueService, ReadableProductOptionMapper readableMapper, PersistableProductOptionMapper persistableeMapper, PersistableProductOptionValueMapper persistableOptionValueMapper, ContentService contentService, ProductAttributeService productAttributeService, PersistableProductAttributeMapper persistableProductAttributeMapper, ReadableProductAttributeMapper readableProductAttributeMapper, ProductService productService) {
+    public ProductOptionFacadeImpl(
+            ReadableProductOptionValueMapper readableOptionValueMapper,
+            ProductOptionService productOptionService,
+            ProductOptionValueService productOptionValueService,
+            ReadableProductOptionMapper readableMapper,
+            PersistableProductOptionMapper persistableeMapper,
+            PersistableProductOptionValueMapper persistableOptionValueMapper,
+            ContentService contentService,
+            ProductAttributeService productAttributeService,
+            PersistableProductAttributeMapper persistableProductAttributeMapper,
+            ReadableProductAttributeMapper readableProductAttributeMapper,
+            ProductService productService) {
         this.readableOptionValueMapper = readableOptionValueMapper;
         this.productOptionService = productOptionService;
         this.productOptionValueService = productOptionValueService;
@@ -71,8 +81,8 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
     }
 
     @Override
-    public ReadableProductOptionEntity saveOption(PersistableProductOptionEntity option, MerchantStore store,
-                                                  Language language) {
+    public ReadableProductOptionEntity saveOption(
+            PersistableProductOptionEntity option, MerchantStore store, Language language) {
         Assert.notNull(option, "ProductOption cannot be null");
         Assert.notNull(store, "MerchantStore cannot be null");
 
@@ -81,7 +91,11 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
             optionModel = productOptionService.getById(store, option.getId());
             if (optionModel == null) {
                 throw new ResourceNotFoundException(
-                        "ProductOption not found for if [" + option.getId() + "] and store [" + store.getCode() + "]");
+                        "ProductOption not found for if ["
+                                + option.getId()
+                                + "] and store ["
+                                + store.getCode()
+                                + "]");
             }
         }
 
@@ -93,9 +107,7 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
         }
 
         optionModel = productOptionService.getById(store, optionModel.getId());
-        ReadableProductOptionEntity readable = readableMapper.convert(optionModel, store, language);
-        return readable;
-
+        return readableMapper.convert(optionModel, store, language);
     }
 
     @Override
@@ -103,13 +115,17 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
         ProductOption optionModel = productOptionService.getById(store, optionId);
         if (optionModel == null) {
             throw new ResourceNotFoundException(
-                    "ProductOption not found for [" + optionId + "] and store [" + store.getCode() + "]");
+                    "ProductOption not found for ["
+                            + optionId
+                            + "] and store ["
+                            + store.getCode()
+                            + "]");
         }
         try {
             productOptionService.delete(optionModel);
         } catch (ServiceException e) {
-            throw new ServiceRuntimeException("An exception occured while deleting ProductOption [" + optionId + "]",
-                    e);
+            throw new ServiceRuntimeException(
+                    "An exception occured while deleting ProductOption [" + optionId + "]", e);
         }
     }
 
@@ -118,30 +134,39 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
         ProductOptionValue optionModel = productOptionValueService.getById(store, optionValueId);
         if (optionModel == null) {
             throw new ResourceNotFoundException(
-                    "ProductOptionValue not found for  [" + optionValueId + "] and store [" + store.getCode() + "]");
+                    "ProductOptionValue not found for  ["
+                            + optionValueId
+                            + "] and store ["
+                            + store.getCode()
+                            + "]");
         }
         try {
             productOptionValueService.delete(optionModel);
         } catch (ServiceException e) {
             throw new ServiceRuntimeException(
-                    "An exception occured while deleting ProductOptionValue [" + optionValueId + "]", e);
+                    "An exception occured while deleting ProductOptionValue ["
+                            + optionValueId
+                            + "]",
+                    e);
         }
-
     }
 
     @Override
-    public ReadableProductOptionValueList optionValues(MerchantStore store, Language language, String name, int page,
-                                                       int count) {
+    public ReadableProductOptionValueList optionValues(
+            MerchantStore store, Language language, String name, int page, int count) {
         Assert.notNull(store, "MerchantStore should not be null");
 
-        Page<ProductOptionValue> options = productOptionValueService.getByMerchant(store, null, name, page, count);
+        Page<ProductOptionValue> options =
+                productOptionValueService.getByMerchant(store, null, name, page, count);
         ReadableProductOptionValueList valueList = new ReadableProductOptionValueList();
         valueList.setTotalPages(options.getTotalPages());
         valueList.setRecordsTotal(options.getTotalElements());
         valueList.setNumber(options.getNumber());
 
-        List<ReadableProductOptionValue> values = options.getContent().stream()
-                .map(option -> readableOptionValueMapper.convert(option, store, null)).collect(Collectors.toList());
+        List<ReadableProductOptionValue> values =
+                options.getContent().stream()
+                        .map(option -> readableOptionValueMapper.convert(option, store, null))
+                        .collect(Collectors.toList());
 
         valueList.setOptionValues(values);
 
@@ -149,17 +174,21 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
     }
 
     @Override
-    public ReadableProductOptionList options(MerchantStore store, Language language, String name, int page, int count) {
+    public ReadableProductOptionList options(
+            MerchantStore store, Language language, String name, int page, int count) {
         Assert.notNull(store, "MerchantStore should not be null");
 
-        Page<ProductOption> options = productOptionService.getByMerchant(store, null, name, page, count);
+        Page<ProductOption> options =
+                productOptionService.getByMerchant(store, null, name, page, count);
         ReadableProductOptionList valueList = new ReadableProductOptionList();
         valueList.setTotalPages(options.getTotalPages());
         valueList.setRecordsTotal(options.getTotalElements());
         valueList.setNumber(options.getNumber());
 
-        List<ReadableProductOptionEntity> values = options.getContent().stream()
-                .map(option -> readableMapper.convert(option, store, null)).collect(Collectors.toList());
+        List<ReadableProductOptionEntity> values =
+                options.getContent().stream()
+                        .map(option -> readableMapper.convert(option, store, null))
+                        .collect(Collectors.toList());
 
         valueList.setOptions(values);
 
@@ -167,7 +196,8 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
     }
 
     @Override
-    public ReadableProductOptionEntity getOption(Long optionId, MerchantStore store, Language language) {
+    public ReadableProductOptionEntity getOption(
+            Long optionId, MerchantStore store, Language language) {
 
         Assert.notNull(optionId, "Option id cannot be null");
         Assert.notNull(store, "Store cannot be null");
@@ -206,8 +236,8 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
     }
 
     @Override
-    public ReadableProductOptionValue saveOptionValue(PersistableProductOptionValue optionValue,
-                                                      MerchantStore store, Language language) {
+    public ReadableProductOptionValue saveOptionValue(
+            PersistableProductOptionValue optionValue, MerchantStore store, Language language) {
         Assert.notNull(optionValue, "Option value code must not be null");
         Assert.notNull(store, "Store code must not be null");
 
@@ -215,13 +245,16 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
         if (optionValue.getId() != null && optionValue.getId() > 0) {
             value = productOptionValueService.getById(store, optionValue.getId());
             if (value == null) {
-                throw new ResourceNotFoundException("ProductOptionValue [" + optionValue.getId()
-                        + "] does not exists for store [" + store.getCode() + "]");
+                throw new ResourceNotFoundException(
+                        "ProductOptionValue ["
+                                + optionValue.getId()
+                                + "] does not exists for store ["
+                                + store.getCode()
+                                + "]");
             }
         }
 
         value = persistableOptionValueMapper.merge(optionValue, value, store, language);
-
 
         try {
             productOptionValueService.saveOrUpdate(value);
@@ -233,14 +266,16 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
 
         // convert to readable
         ReadableProductOptionValue readableProductOptionValue = new ReadableProductOptionValue();
-        readableProductOptionValue = readableOptionValueMapper.merge(optValue, readableProductOptionValue, store,
-                language);
+        readableProductOptionValue =
+                readableOptionValueMapper.merge(
+                        optValue, readableProductOptionValue, store, language);
 
         return readableProductOptionValue;
     }
 
     @Override
-    public ReadableProductOptionValue getOptionValue(Long optionValueId, MerchantStore store, Language language) {
+    public ReadableProductOptionValue getOptionValue(
+            Long optionValueId, MerchantStore store, Language language) {
 
         Assert.notNull(optionValueId, "OptionValue id cannot be null");
         Assert.notNull(store, "Store cannot be null");
@@ -255,8 +290,11 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
     }
 
     @Override
-    public ReadableProductAttributeEntity saveAttribute(Long productId, PersistableProductAttribute attribute,
-                                                        MerchantStore store, Language language) {
+    public ReadableProductAttributeEntity saveAttribute(
+            Long productId,
+            PersistableProductAttribute attribute,
+            MerchantStore store,
+            Language language) {
         Assert.notNull(productId, "Product id cannot be null");
         Assert.notNull(attribute, "ProductAttribute cannot be null");
         Assert.notNull(attribute.getOption(), "ProductAttribute option cannot be null");
@@ -268,12 +306,17 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
         if (attribute.getId() != null && attribute.getId() > 0) {
             attr = productAttributeService.getById(attribute.getId());
             if (attr == null) {
-                throw new ResourceNotFoundException("Product attribute [" + attribute.getId() + "] not found");
+                throw new ResourceNotFoundException(
+                        "Product attribute [" + attribute.getId() + "] not found");
             }
 
             if (productId != attr.getProduct().getId().longValue()) {
                 throw new ResourceNotFoundException(
-                        "Product attribute [" + attribute.getId() + "] not found for product [" + productId + "]");
+                        "Product attribute ["
+                                + attribute.getId()
+                                + "] not found for product ["
+                                + productId
+                                + "]");
             }
         }
 
@@ -287,35 +330,48 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
 
         // refresh
         attr = productAttributeService.getById(attr.getId());
-        ReadableProductAttributeEntity readable = readableProductAttributeMapper.convert(attr, store, language);
+        ReadableProductAttributeEntity readable =
+                readableProductAttributeMapper.convert(attr, store, language);
 
         return readable;
     }
 
     @Override
-    public ReadableProductAttributeEntity getAttribute(Long productId, Long attributeId, MerchantStore store,
-                                                       Language language) {
+    public ReadableProductAttributeEntity getAttribute(
+            Long productId, Long attributeId, MerchantStore store, Language language) {
 
         ProductAttribute attr = productAttributeService.getById(attributeId);
 
         if (attr == null) {
             throw new ResourceNotFoundException(
-                    "ProductAttribute not found for [" + attributeId + "] and store [" + store.getCode() + "]");
+                    "ProductAttribute not found for ["
+                            + attributeId
+                            + "] and store ["
+                            + store.getCode()
+                            + "]");
         }
 
         if (attr.getProduct().getId().longValue() != productId) {
             throw new ResourceNotFoundException(
-                    "ProductAttribute not found for [" + attributeId + "] and product [" + productId + "]");
+                    "ProductAttribute not found for ["
+                            + attributeId
+                            + "] and product ["
+                            + productId
+                            + "]");
         }
 
         if (attr.getProduct().getMerchantStore().getId().intValue() != store.getId().intValue()) {
-            throw new ResourceNotFoundException("ProductAttribute not found for [" + attributeId + "] and product ["
-                    + productId + "] and store [" + store.getCode() + "]");
+            throw new ResourceNotFoundException(
+                    "ProductAttribute not found for ["
+                            + attributeId
+                            + "] and product ["
+                            + productId
+                            + "] and store ["
+                            + store.getCode()
+                            + "]");
         }
 
-        ReadableProductAttributeEntity readable = readableProductAttributeMapper.convert(attr, store, language);
-
-        return readable;
+        return readableProductAttributeMapper.convert(attr, store, language);
     }
 
     private Product product(long id, MerchantStore store) {
@@ -334,19 +390,21 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
     }
 
     @Override
-    public ReadableProductAttributeList getAttributesList(Long productId, MerchantStore store, Language language, int page, int count) {
+    public ReadableProductAttributeList getAttributesList(
+            Long productId, MerchantStore store, Language language, int page, int count) {
 
         try {
 
             Product product = this.product(productId, store);
 
             ReadableProductAttributeList attrList = new ReadableProductAttributeList();
-            Page<ProductAttribute> attr = null;
+            Page<ProductAttribute> attr;
 
-
-            if (language != null) { //all entry
-                //attributes = productAttributeService.getByProductId(store, product, language);
-                attr = productAttributeService.getByProductId(store, product, language, page, count);
+            if (language != null) { // all entry
+                // attributes = productAttributeService.getByProductId(store, product, language);
+                attr =
+                        productAttributeService.getByProductId(
+                                store, product, language, page, count);
                 attrList.setRecordsTotal(attr.getTotalElements());
                 attrList.setNumber(attr.getNumberOfElements());
                 attrList.setTotalPages(attr.getTotalPages());
@@ -357,10 +415,13 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
                 attrList.setTotalPages(attr.getTotalPages());
             }
 
-
-            List<ReadableProductAttributeEntity> values = attr.getContent().stream()
-                    .map(attribute -> readableProductAttributeMapper.convert(attribute, store, language))
-                    .collect(Collectors.toList());
+            List<ReadableProductAttributeEntity> values =
+                    attr.getContent().stream()
+                            .map(
+                                    attribute ->
+                                            readableProductAttributeMapper.convert(
+                                                    attribute, store, language))
+                            .collect(Collectors.toList());
 
             attrList.setAttributes(values);
 
@@ -369,7 +430,6 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
         } catch (ServiceException e) {
             throw new ServiceRuntimeException("Error while getting attributes", e);
         }
-
     }
 
     @Override
@@ -379,40 +439,54 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
             ProductAttribute attr = productAttributeService.getById(attributeId);
             if (attr == null) {
                 throw new ResourceNotFoundException(
-                        "ProductAttribute not found for [" + attributeId + "] and store [" + store.getCode() + "]");
+                        "ProductAttribute not found for ["
+                                + attributeId
+                                + "] and store ["
+                                + store.getCode()
+                                + "]");
             }
 
             if (attr.getProduct().getId().longValue() != productId) {
                 throw new ResourceNotFoundException(
-                        "ProductAttribute not found for [" + attributeId + "] and product [" + productId + "]");
+                        "ProductAttribute not found for ["
+                                + attributeId
+                                + "] and product ["
+                                + productId
+                                + "]");
             }
 
-            if (attr.getProduct().getMerchantStore().getId().intValue() != store.getId().intValue()) {
-                throw new ResourceNotFoundException("ProductAttribute not found for [" + attributeId + "] and product ["
-                        + productId + "] and store [" + store.getCode() + "]");
+            if (attr.getProduct().getMerchantStore().getId().intValue()
+                    != store.getId().intValue()) {
+                throw new ResourceNotFoundException(
+                        "ProductAttribute not found for ["
+                                + attributeId
+                                + "] and product ["
+                                + productId
+                                + "] and store ["
+                                + store.getCode()
+                                + "]");
             }
 
             productAttributeService.delete(attr);
 
         } catch (ServiceException e) {
             throw new ServiceRuntimeException(
-                    "An exception occured while deleting ProductAttribute [" + attributeId + "]", e);
+                    "An exception occured while deleting ProductAttribute [" + attributeId + "]",
+                    e);
         }
-
     }
 
-
     @Override
-    public void addOptionValueImage(MultipartFile image, Long optionValueId,
-                                    MerchantStore store, Language language) {
-
+    public void addOptionValueImage(
+            MultipartFile image, Long optionValueId, MerchantStore store, Language language) {
 
         Assert.notNull(optionValueId, "OptionValueId must not be null");
         Assert.notNull(image, "Image must not be null");
-        //get option value
+        // get option value
         ProductOptionValue value = productOptionValueService.getById(store, optionValueId);
         if (value == null) {
-            throw new ResourceNotFoundException("Product option value [" + optionValueId + "] not found");
+            throw new ResourceNotFoundException(
+                    "Product option value [" + optionValueId + "] not found");
         }
 
         try {
@@ -429,47 +503,47 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
         } catch (Exception e) {
             throw new ServiceRuntimeException("Exception while adding option value image", e);
         }
-
-
     }
 
     @Override
-    public void removeOptionValueImage(Long optionValueId, MerchantStore store,
-                                       Language language) {
+    public void removeOptionValueImage(Long optionValueId, MerchantStore store, Language language) {
         Assert.notNull(optionValueId, "OptionValueId must not be null");
         ProductOptionValue value = productOptionValueService.getById(store, optionValueId);
         if (value == null) {
-            throw new ResourceNotFoundException("Product option value [" + optionValueId + "] not found");
+            throw new ResourceNotFoundException(
+                    "Product option value [" + optionValueId + "] not found");
         }
 
         try {
 
-            contentService.removeFile(store.getCode(), FileContentType.PROPERTY, value.getProductOptionValueImage());
+            contentService.removeFile(
+                    store.getCode(), FileContentType.PROPERTY, value.getProductOptionValueImage());
             value.setProductOptionValueImage(null);
             productOptionValueService.saveOrUpdate(value);
         } catch (Exception e) {
             throw new ServiceRuntimeException("Exception while removing option value image", e);
         }
-
     }
 
     @Override
-    public List<CodeEntity> createAttributes(List<PersistableProductAttribute> attributes, Long productId,
-                                             MerchantStore store) {
+    public List<CodeEntity> createAttributes(
+            List<PersistableProductAttribute> attributes, Long productId, MerchantStore store) {
         Assert.notNull(productId, "Product id must not be null");
         Assert.notNull(store, "Merchant cannot be null");
 
-        //convert to model
+        // convert to model
 
-        List<ProductAttribute> modelAttributes = attributes.stream().map(attr -> persistableProductAttributeMapper.convert(attr, store, null)).collect(Collectors.toList());
+        List<ProductAttribute> modelAttributes =
+                attributes.stream()
+                        .map(attr -> persistableProductAttributeMapper.convert(attr, store, null))
+                        .collect(Collectors.toList());
 
         try {
             productAttributeService.saveAll(modelAttributes);
 
-            //save to a product
+            // save to a product
             Product product = this.product(productId, store);
             product.getAttributes().addAll(modelAttributes);
-
 
             productService.save(product);
         } catch (ServiceException e) {
@@ -477,7 +551,6 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
         }
 
         return modelAttributes.stream().map(this::codeEntity).collect(Collectors.toList());
-
     }
 
     private CodeEntity codeEntity(ProductAttribute attr) {
@@ -488,10 +561,9 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
     }
 
     @Override
-    public void updateAttributes(List<PersistableProductAttribute> attributes, Long productId, MerchantStore store) {
+    public void updateAttributes(
+            List<PersistableProductAttribute> attributes, Long productId, MerchantStore store) {
         // TODO Auto-generated method stub
         throw new NotImplementedException("Method not implemented");
-
     }
-
 }

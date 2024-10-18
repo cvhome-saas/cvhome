@@ -22,5 +22,4 @@ public class CurrencyServiceImpl extends SalesManagerEntityServiceImpl<Long, Cur
     public Currency getByCode(String code) {
         return currencyRepository.getByCode(code);
     }
-
 }

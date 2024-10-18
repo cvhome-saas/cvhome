@@ -1,5 +1,7 @@
 package com.asrevo.cvhome.store.service.facade.store;
 
+import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1;
+
 import com.asrevo.cvhome.store.controller.exception.ConversionException;
 import com.asrevo.cvhome.store.controller.exception.ConversionRuntimeException;
 import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
@@ -24,20 +26,17 @@ import com.asrevo.cvhome.store.service.populator.store.ReadableMerchantStorePopu
 import com.asrevo.cvhome.store.utils.ImageFilePath;
 import com.asrevo.cvhome.store.utils.LanguageUtils;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1;
 
 @Service("storeFacade")
 @Slf4j
@@ -52,7 +51,15 @@ public class StoreFacadeImpl implements StoreFacade {
     private final LanguageUtils languageUtils;
     private final ReadableMerchantStorePopulator readableMerchantStorePopulator;
 
-    public StoreFacadeImpl(MerchantStoreService merchantStoreService, MerchantConfigurationService merchantConfigurationService, LanguageService languageService, ContentService contentService, PersistableMerchantStorePopulator persistableMerchantStorePopulator, ImageFilePath imageUtils, LanguageUtils languageUtils, ReadableMerchantStorePopulator readableMerchantStorePopulator) {
+    public StoreFacadeImpl(
+            MerchantStoreService merchantStoreService,
+            MerchantConfigurationService merchantConfigurationService,
+            LanguageService languageService,
+            ContentService contentService,
+            PersistableMerchantStorePopulator persistableMerchantStorePopulator,
+            ImageFilePath imageUtils,
+            LanguageUtils languageUtils,
+            ReadableMerchantStorePopulator readableMerchantStorePopulator) {
         this.merchantStoreService = merchantStoreService;
         this.merchantConfigurationService = merchantConfigurationService;
         this.languageService = languageService;
@@ -110,32 +117,38 @@ public class StoreFacadeImpl implements StoreFacade {
         return merchantStoreService.getByCode(code) != null;
     }
 
-    private ReadableMerchantStore convertMerchantStoreToReadableMerchantStore(Language language, MerchantStore store) {
+    private ReadableMerchantStore convertMerchantStoreToReadableMerchantStore(
+            Language language, MerchantStore store) {
         ReadableMerchantStore readable = new ReadableMerchantStore();
 
         try {
             readableMerchantStorePopulator.populate(store, readable, store, language);
         } catch (Exception e) {
-            throw new ConversionRuntimeException("Error while populating MerchantStore " + e.getMessage());
+            throw new ConversionRuntimeException(
+                    "Error while populating MerchantStore " + e.getMessage());
         }
         return readable;
     }
 
-    private ReadableMerchantStore convertMerchantStoreToReadableMerchantStoreWithFullDetails(Language language, MerchantStore store) {
+    private ReadableMerchantStore convertMerchantStoreToReadableMerchantStoreWithFullDetails(
+            Language language, MerchantStore store) {
         ReadableMerchantStore readable = new ReadableMerchantStore();
-
 
         try {
             readableMerchantStorePopulator.populate(store, readable, store, language);
         } catch (Exception e) {
-            throw new ConversionRuntimeException("Error while populating MerchantStore " + e.getMessage());
+            throw new ConversionRuntimeException(
+                    "Error while populating MerchantStore " + e.getMessage());
         }
         return readable;
     }
 
     private MerchantStore getMerchantStoreByCode(String code) {
         return Optional.ofNullable(get(code))
-                .orElseThrow(() -> new ResourceNotFoundException("Merchant store code [" + code + "] not found"));
+                .orElseThrow(
+                        () ->
+                                new ResourceNotFoundException(
+                                        "Merchant store code [" + code + "] not found"));
     }
 
     @Override
@@ -147,12 +160,14 @@ public class StoreFacadeImpl implements StoreFacade {
         // check if store code exists
         MerchantStore storeForCheck = get(store.getCode());
         if (storeForCheck != null) {
-            throw new ServiceRuntimeException("MerhantStore " + store.getCode() + " already exists");
+            throw new ServiceRuntimeException(
+                    "MerhantStore " + store.getCode() + " already exists");
         }
 
-        MerchantStore mStore = convertPersistableMerchantStoreToMerchantStore(store, languageService.defaultLanguage());
+        MerchantStore mStore =
+                convertPersistableMerchantStoreToMerchantStore(
+                        store, languageService.defaultLanguage());
         createMerchantStore(mStore);
-
     }
 
     private void createMerchantStore(MerchantStore mStore) {
@@ -163,8 +178,8 @@ public class StoreFacadeImpl implements StoreFacade {
         }
     }
 
-    private MerchantStore convertPersistableMerchantStoreToMerchantStore(PersistableMerchantStore store,
-                                                                         Language language) {
+    private MerchantStore convertPersistableMerchantStoreToMerchantStore(
+            PersistableMerchantStore store, Language language) {
         MerchantStore mStore = new MerchantStore();
 
         // set default values
@@ -184,11 +199,11 @@ public class StoreFacadeImpl implements StoreFacade {
 
         Assert.notNull(store, "store can't be null");
 
-        MerchantStore mStore = mergePersistableMerchantStoreToMerchantStore(store, store.getCode(),
-                languageService.defaultLanguage());
+        MerchantStore mStore =
+                mergePersistableMerchantStoreToMerchantStore(
+                        store, store.getCode(), languageService.defaultLanguage());
 
         updateMerchantStore(mStore);
-
     }
 
     private void updateMerchantStore(MerchantStore mStore) {
@@ -197,11 +212,10 @@ public class StoreFacadeImpl implements StoreFacade {
         } catch (ServiceException e) {
             throw new ServiceRuntimeException(e);
         }
-
     }
 
-    private MerchantStore mergePersistableMerchantStoreToMerchantStore(PersistableMerchantStore store, String code,
-                                                                       Language language) {
+    private MerchantStore mergePersistableMerchantStoreToMerchantStore(
+            PersistableMerchantStore store, String code, Language language) {
 
         MerchantStore mStore = getMerchantStoreByCode(code);
 
@@ -219,22 +233,23 @@ public class StoreFacadeImpl implements StoreFacade {
     @Override
     public ReadableMerchantStoreList getByCriteria(MerchantStoreCriteria criteria, Language lang) {
         return getMerchantStoresByCriteria(criteria, lang);
-
     }
 
-
-    private ReadableMerchantStoreList getMerchantStoresByCriteria(MerchantStoreCriteria criteria, Language language) {
+    private ReadableMerchantStoreList getMerchantStoresByCriteria(
+            MerchantStoreCriteria criteria, Language language) {
         try {
-            GenericEntityList<MerchantStore> stores = Optional.ofNullable(merchantStoreService.getByCriteria(criteria))
-                    .orElseThrow(() -> new ResourceNotFoundException("Criteria did not match any store"));
-
+            GenericEntityList<MerchantStore> stores =
+                    Optional.ofNullable(merchantStoreService.getByCriteria(criteria))
+                            .orElseThrow(
+                                    () ->
+                                            new ResourceNotFoundException(
+                                                    "Criteria did not match any store"));
 
             ReadableMerchantStoreList storeList = new ReadableMerchantStoreList();
             storeList.setData(
                     stores.getList().stream()
                             .map(s -> convertMerchantStoreToReadableMerchantStore(language, s))
-                            .collect(Collectors.toList())
-            );
+                            .collect(Collectors.toList()));
             storeList.setTotalPages(stores.getTotalPages());
             storeList.setRecordsTotal(stores.getTotalCount());
             storeList.setNumber(stores.getList().size());
@@ -244,7 +259,6 @@ public class StoreFacadeImpl implements StoreFacade {
         } catch (ServiceException e) {
             throw new ServiceRuntimeException(e);
         }
-
     }
 
     @Override
@@ -260,9 +274,9 @@ public class StoreFacadeImpl implements StoreFacade {
             merchantStoreService.delete(mStore);
         } catch (Exception e) {
             log.error("Error while deleting MerchantStore", e);
-            throw new ServiceRuntimeException("Error while deleting MerchantStore " + e.getMessage());
+            throw new ServiceRuntimeException(
+                    "Error while deleting MerchantStore " + e.getMessage());
         }
-
     }
 
     @Override
@@ -286,19 +300,21 @@ public class StoreFacadeImpl implements StoreFacade {
     }
 
     private List<MerchantConfigEntity> getMerchantConfigEntities(MerchantStore mStore) {
-        List<MerchantConfiguration> configurations = getMergeConfigurationsByStore(MerchantConfigurationType.SOCIAL,
-                mStore);
+        List<MerchantConfiguration> configurations =
+                getMergeConfigurationsByStore(MerchantConfigurationType.SOCIAL, mStore);
 
-        return configurations.stream().map(this::convertToMerchantConfigEntity)
+        return configurations.stream()
+                .map(this::convertToMerchantConfigEntity)
                 .collect(Collectors.toList());
     }
 
-    private List<MerchantConfiguration> getMergeConfigurationsByStore(MerchantConfigurationType configurationType,
-                                                                      MerchantStore mStore) {
+    private List<MerchantConfiguration> getMergeConfigurationsByStore(
+            MerchantConfigurationType configurationType, MerchantStore mStore) {
         try {
             return merchantConfigurationService.listByType(configurationType, mStore);
         } catch (ServiceException e) {
-            throw new ServiceRuntimeException("Error wile getting merchantConfigurations " + e.getMessage());
+            throw new ServiceRuntimeException(
+                    "Error wile getting merchantConfigurations " + e.getMessage());
         }
     }
 
@@ -312,8 +328,8 @@ public class StoreFacadeImpl implements StoreFacade {
         return configTO;
     }
 
-    private MerchantConfiguration convertToMerchantConfiguration(MerchantConfigEntity config,
-                                                                 MerchantConfigurationType configurationType) {
+    private MerchantConfiguration convertToMerchantConfiguration(
+            MerchantConfigEntity config, MerchantConfigurationType configurationType) {
         MerchantConfiguration configTO = new MerchantConfiguration();
         configTO.setId(config.getId());
         configTO.setKey(config.getKey());
@@ -405,7 +421,6 @@ public class StoreFacadeImpl implements StoreFacade {
         } catch (ServiceException e) {
             throw new ServiceRuntimeException(e);
         }
-
     }
 
     @Override
@@ -414,18 +429,23 @@ public class StoreFacadeImpl implements StoreFacade {
 
         List<MerchantConfigEntity> createdConfigs = brand.getSocialNetworks();
 
-        List<MerchantConfiguration> configurations = createdConfigs.stream()
-                .map(config -> convertToMerchantConfiguration(config, MerchantConfigurationType.SOCIAL))
-                .toList();
+        List<MerchantConfiguration> configurations =
+                createdConfigs.stream()
+                        .map(
+                                config ->
+                                        convertToMerchantConfiguration(
+                                                config, MerchantConfigurationType.SOCIAL))
+                        .toList();
         try {
             for (MerchantConfiguration mConfigs : configurations) {
                 mConfigs.setMerchantStore(mStore);
                 if (!StringUtils.isEmpty(mConfigs.getValue())) {
                     mConfigs.setMerchantConfigurationType(MerchantConfigurationType.SOCIAL);
                     merchantConfigurationService.saveOrUpdate(mConfigs);
-                } else {// remove if submited blank and exists
-                    MerchantConfiguration config = merchantConfigurationService
-                            .getMerchantConfiguration(mConfigs.getKey(), mStore);
+                } else { // remove if submited blank and exists
+                    MerchantConfiguration config =
+                            merchantConfigurationService.getMerchantConfiguration(
+                                    mConfigs.getKey(), mStore);
                     if (config != null) {
                         merchantConfigurationService.delete(config);
                     }
@@ -434,11 +454,11 @@ public class StoreFacadeImpl implements StoreFacade {
         } catch (ServiceException se) {
             throw new ServiceRuntimeException(se);
         }
-
     }
 
     @Override
-    public ReadableMerchantStoreList getChildStores(Language language, String code, int page, int count) {
+    public ReadableMerchantStoreList getChildStores(
+            Language language, String code, int page, int count) {
         try {
 
             // first check if store is retailer
@@ -451,13 +471,13 @@ public class StoreFacadeImpl implements StoreFacade {
                 throw new ResourceNotFoundException("Merchant [" + code + "] not a retailer");
             }
 
-
             Page<MerchantStore> children = merchantStoreService.listChildren(code, page, count);
             List<ReadableMerchantStore> readableStores = new ArrayList<>();
             ReadableMerchantStoreList readableList = new ReadableMerchantStoreList();
             if (!CollectionUtils.isEmpty(children.getContent())) {
                 for (MerchantStore store : children)
-                    readableStores.add(convertMerchantStoreToReadableMerchantStore(language, store));
+                    readableStores.add(
+                            convertMerchantStoreToReadableMerchantStore(language, store));
             }
             readableList.setData(readableStores);
             readableList.setRecordsFiltered(children.getSize());
@@ -466,24 +486,22 @@ public class StoreFacadeImpl implements StoreFacade {
             readableList.setNumber(children.getNumber());
 
             return readableList;
-			
-			
-			
-/*			List<MerchantStore> children = merchantStoreService.listChildren(code);
-			List<ReadableMerchantStore> readableStores = new ArrayList<ReadableMerchantStore>();
-			if (!CollectionUtils.isEmpty(children)) {
-				for (MerchantStore store : children)
-					readableStores.add(convertMerchantStoreToReadableMerchantStore(language, store));
-			}
-			return readableStores;*/
+
+            /*			List<MerchantStore> children = merchantStoreService.listChildren(code);
+            List<ReadableMerchantStore> readableStores = new ArrayList<ReadableMerchantStore>();
+            if (!CollectionUtils.isEmpty(children)) {
+            	for (MerchantStore store : children)
+            		readableStores.add(convertMerchantStoreToReadableMerchantStore(language, store));
+            }
+            return readableStores;*/
         } catch (ServiceException e) {
             throw new ServiceRuntimeException(e);
         }
-
     }
 
     @Override
-    public ReadableMerchantStoreList findAll(MerchantStoreCriteria criteria, Language language, int page, int count) {
+    public ReadableMerchantStoreList findAll(
+            MerchantStoreCriteria criteria, Language language, int page, int count) {
 
         try {
             Page<MerchantStore> stores = null;
@@ -504,10 +522,10 @@ public class StoreFacadeImpl implements StoreFacade {
                 }
             }
 
-
             if (!CollectionUtils.isEmpty(stores.getContent())) {
                 for (MerchantStore store : stores)
-                    readableStores.add(convertMerchantStoreToReadableMerchantStore(language, store));
+                    readableStores.add(
+                            convertMerchantStoreToReadableMerchantStore(language, store));
             }
             readableList.setData(readableStores);
             readableList.setRecordsTotal(stores.getTotalElements());
@@ -519,8 +537,6 @@ public class StoreFacadeImpl implements StoreFacade {
         } catch (ServiceException e) {
             throw new ServiceRuntimeException("Error while finding all merchant", e);
         }
-
-
     }
 
     private ReadableMerchantStore convertStoreName(MerchantStore store) {
@@ -541,26 +557,24 @@ public class StoreFacadeImpl implements StoreFacade {
             List<ReadableMerchantStore> stores = null;
             Optional<String> code = Optional.ofNullable(criteria.getStoreCode());
 
-
-            //TODO Pageable
+            // TODO Pageable
             if (code.isPresent()) {
 
-                stores = merchantStoreService.findAllStoreNames(code.get()).stream()
-                        .map(this::convertStoreName)
-                        .collect(Collectors.toList());
+                stores =
+                        merchantStoreService.findAllStoreNames(code.get()).stream()
+                                .map(this::convertStoreName)
+                                .collect(Collectors.toList());
             } else {
-                stores = merchantStoreService.findAllStoreNames().stream()
-                        .map(this::convertStoreName)
-                        .collect(Collectors.toList());
+                stores =
+                        merchantStoreService.findAllStoreNames().stream()
+                                .map(this::convertStoreName)
+                                .collect(Collectors.toList());
             }
-
 
             return stores;
         } catch (ServiceException e) {
             throw new ServiceRuntimeException("Exception while getting store name", e);
         }
-
-
     }
 
     @Override
@@ -573,7 +587,7 @@ public class StoreFacadeImpl implements StoreFacade {
             return store.getLanguages();
         }
 
-        //refresh
+        // refresh
         store = merchantStoreService.getByCode(store.getCode());
 
         if (store != null) {
@@ -582,5 +596,4 @@ public class StoreFacadeImpl implements StoreFacade {
 
         return Collections.emptyList();
     }
-
 }

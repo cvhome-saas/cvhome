@@ -14,40 +14,50 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.io.Serial;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
-@Table(name = "PRODUCT_AVAILABILITY",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"MERCHANT_ID", "PRODUCT_ID", "PRODUCT_VARIANT", "REGION_VARIANT"}),
-        indexes =
-                {
-                        @Index(name = "PRD_AVAIL_STORE_PRD_IDX", columnList = "PRODUCT_ID,MERCHANT_ID"),
-                        @Index(name = "PRD_AVAIL_PRD_IDX", columnList = "PRODUCT_ID")
-                }
-)
-
+@Table(
+        name = "PRODUCT_AVAILABILITY",
+        uniqueConstraints =
+                @UniqueConstraint(
+                        columnNames = {
+                            "MERCHANT_ID",
+                            "PRODUCT_ID",
+                            "PRODUCT_VARIANT",
+                            "REGION_VARIANT"
+                        }),
+        indexes = {
+            @Index(name = "PRD_AVAIL_STORE_PRD_IDX", columnList = "PRODUCT_ID,MERCHANT_ID"),
+            @Index(name = "PRD_AVAIL_PRD_IDX", columnList = "PRODUCT_ID")
+        })
 @Getter
 @Setter
-public class ProductAvailability extends SalesManagerEntity<Long, ProductAvailability> implements Auditable {
+public class ProductAvailability extends SalesManagerEntity<Long, ProductAvailability>
+        implements Auditable {
 
     /**
      *
      */
-    @Serial
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
 
-    @Embedded
-    private AuditSection auditSection = new AuditSection();
+    @Embedded private AuditSection auditSection = new AuditSection();
 
     @Id
     @Column(name = "PRODUCT_AVAIL_ID", unique = true, nullable = false)
-    @TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME", valueColumnName = "SEQ_COUNT", pkColumnValue = "PRODUCT_AVAIL_SEQ_NEXT_VAL", allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE, initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
+    @TableGenerator(
+            name = "TABLE_GEN",
+            table = "SM_SEQUENCER",
+            pkColumnName = "SEQ_NAME",
+            valueColumnName = "SEQ_COUNT",
+            pkColumnValue = "PRODUCT_AVAIL_SEQ_NEXT_VAL",
+            allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
+            initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
     private Long id;
 
@@ -74,11 +84,9 @@ public class ProductAvailability extends SalesManagerEntity<Long, ProductAvailab
     @Column(name = "SKU")
     private String sku;
 
-    @Embedded
-    private ProductDimensions dimensions;
+    @Embedded private ProductDimensions dimensions;
 
-    @NotNull
-    @Column(name = "QUANTITY")
+    @NotNull @Column(name = "QUANTITY")
     private Integer productQuantity = 0;
 
     @Temporal(TemporalType.DATE)
@@ -95,7 +103,7 @@ public class ProductAvailability extends SalesManagerEntity<Long, ProductAvailab
     private String owner;
 
     @Column(name = "STATUS")
-    private boolean productStatus = true; //can be used as flag for variant can be purchase or not
+    private boolean productStatus = true; // can be used as flag for variant can be purchase or not
 
     @Column(name = "FREE_SHIPPING")
     private boolean productIsAlwaysFreeShipping;
@@ -112,9 +120,7 @@ public class ProductAvailability extends SalesManagerEntity<Long, ProductAvailab
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "productAvailability", cascade = CascadeType.ALL)
     private Set<ProductPrice> prices = new HashSet<>();
 
-
-    public ProductAvailability() {
-    }
+    public ProductAvailability() {}
 
     public ProductAvailability(Product product, MerchantStore store) {
         this.product = product;
@@ -131,7 +137,6 @@ public class ProductAvailability extends SalesManagerEntity<Long, ProductAvailab
         return new ProductPrice();
     }
 
-
     public Date getProductDateAvailable() {
         return CloneUtils.clone(productDateAvailable);
     }
@@ -139,6 +144,4 @@ public class ProductAvailability extends SalesManagerEntity<Long, ProductAvailab
     public void setProductDateAvailable(Date productDateAvailable) {
         this.productDateAvailable = CloneUtils.clone(productDateAvailable);
     }
-
-
 }

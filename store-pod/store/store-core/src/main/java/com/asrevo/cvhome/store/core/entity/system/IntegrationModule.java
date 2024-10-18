@@ -6,34 +6,40 @@ import com.asrevo.cvhome.store.core.entity.common.audit.AuditSection;
 import com.asrevo.cvhome.store.core.entity.common.audit.Auditable;
 import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @EntityListeners(value = AuditListener.class)
-@Table(name = "MODULE_CONFIGURATION", indexes = {
-        @Index(name = "MODULE_CONFIGURATION_MODULE", columnList = "MODULE")})
+@Table(
+        name = "MODULE_CONFIGURATION",
+        indexes = {@Index(name = "MODULE_CONFIGURATION_MODULE", columnList = "MODULE")})
 @Getter
 @Setter
-
-public class IntegrationModule extends SalesManagerEntity<Long, IntegrationModule> implements Serializable, Auditable {
+public class IntegrationModule extends SalesManagerEntity<Long, IntegrationModule>
+        implements Serializable, Auditable {
 
     /**
      *
      */
-    @Serial
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
 
     @Id
     @Column(name = "MODULE_CONF_ID")
-    @TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME", valueColumnName = "SEQ_COUNT", pkColumnValue = "MOD_CONF_SEQ_NEXT_VAL", allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE, initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
+    @TableGenerator(
+            name = "TABLE_GEN",
+            table = "SM_SEQUENCER",
+            pkColumnName = "SEQ_NAME",
+            valueColumnName = "SEQ_COUNT",
+            pkColumnValue = "MOD_CONF_SEQ_NEXT_VAL",
+            allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
+            initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
     private Long id;
 
@@ -61,29 +67,21 @@ public class IntegrationModule extends SalesManagerEntity<Long, IntegrationModul
     @Column(name = "CUSTOM_IND")
     private boolean customModule = false;
 
-    @Transient
-    private Set<String> regionsSet = new HashSet<>();
+    @Transient private Set<String> regionsSet = new HashSet<>();
 
-    @Transient
-    private String binaryImage = null;
+    @Transient private String binaryImage = null;
 
     /**
      * Contains a map of module config by environment (DEV,PROD)
      */
-    @Transient
-    private Map<String, ModuleConfig> moduleConfigs = new HashMap<>();
+    @Transient private Map<String, ModuleConfig> moduleConfigs = new HashMap<>();
 
-    @Transient
-    private Map<String, String> details = new HashMap<>();
+    @Transient private Map<String, String> details = new HashMap<>();
 
     /**
      * A json tructure decribing how the module must be built
      */
-    @Transient
-    private String configurable = null;
+    @Transient private String configurable = null;
 
-
-    @Embedded
-    private AuditSection auditSection = new AuditSection();
-
+    @Embedded private AuditSection auditSection = new AuditSection();
 }

@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class ReadableProductImageMapper implements Mapper<ProductImage, ReadableImage> {
 
-
     private final ImageFilePath imageUtils;
 
     public ReadableProductImageMapper(ImageFilePath imageUtils) {
@@ -25,7 +24,11 @@ public class ReadableProductImageMapper implements Mapper<ProductImage, Readable
     }
 
     @Override
-    public ReadableImage merge(ProductImage source, ReadableImage destination, MerchantStore store, Language language) {
+    public ReadableImage merge(
+            ProductImage source,
+            ReadableImage destination,
+            MerchantStore store,
+            Language language) {
 
         String contextPath = imageUtils.getContextPath();
 
@@ -37,7 +40,10 @@ public class ReadableProductImageMapper implements Mapper<ProductImage, Readable
             destination.setImageUrl(source.getProductImageUrl());
         } else {
             StringBuilder imgPath = new StringBuilder();
-            imgPath.append(contextPath).append(imageUtils.buildProductImageUtils(store, source.getProduct().getSku(), source.getProductImage()));
+            imgPath.append(contextPath)
+                    .append(
+                            imageUtils.buildProductImageUtils(
+                                    store, source.getProduct().getSku(), source.getProductImage()));
             destination.setImageUrl(imgPath.toString());
         }
         destination.setId(source.getId());
@@ -45,11 +51,10 @@ public class ReadableProductImageMapper implements Mapper<ProductImage, Readable
         if (source.getProductImageUrl() != null) {
             destination.setExternalUrl(source.getProductImageUrl());
         }
-        if (source.getImageType() == 1 && source.getProductImageUrl() != null) {//video
+        if (source.getImageType() == 1 && source.getProductImageUrl() != null) { // video
             destination.setVideoUrl(source.getProductImageUrl());
         }
 
         return destination;
     }
-
 }

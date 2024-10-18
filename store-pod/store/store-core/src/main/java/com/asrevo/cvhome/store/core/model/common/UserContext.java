@@ -10,8 +10,7 @@ public final class UserContext implements AutoCloseable {
     private static ThreadLocal<UserContext> instance = new ThreadLocal<>();
     private String ipAddress;
 
-    private UserContext() {
-    }
+    private UserContext() {}
 
     public static UserContext create() {
         UserContext context = new UserContext();
@@ -27,5 +26,4 @@ public final class UserContext implements AutoCloseable {
     public void close() throws Exception {
         instance.remove();
     }
-
 }

@@ -9,6 +9,4 @@ public interface MerchantRepositoryCustom {
 
     GenericEntityList<MerchantStore> listByCriteria(MerchantStoreCriteria criteria)
             throws ServiceException;
-
-
 }

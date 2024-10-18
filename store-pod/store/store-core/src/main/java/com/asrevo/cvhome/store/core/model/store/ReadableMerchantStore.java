@@ -5,22 +5,21 @@ import com.asrevo.cvhome.store.core.model.entity.ReadableAudit;
 import com.asrevo.cvhome.store.core.model.entity.ReadableAuditable;
 import com.asrevo.cvhome.store.core.model.references.ReadableAddress;
 import com.asrevo.cvhome.store.core.model.references.ReadableLanguage;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Setter
-public class ReadableMerchantStore extends MerchantStoreEntity implements ReadableAuditable, Serializable {
+public class ReadableMerchantStore extends MerchantStoreEntity
+        implements ReadableAuditable, Serializable {
 
     /**
      *
      */
-    @Serial
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
 
     private String currentUserLanguage;
     private ReadableAddress address;
@@ -38,6 +37,4 @@ public class ReadableMerchantStore extends MerchantStoreEntity implements Readab
     public void setReadableAudit(ReadableAudit audit) {
         this.audit = audit;
     }
-
-
 }

@@ -2,6 +2,7 @@ package com.asrevo.cvhome.s2s.config.internal;
 
 import com.asrevo.cvhome.commons.annotation.OrgStorePrincipalInfo;
 import com.asrevo.cvhome.s2s.utils.SecurityUtils;
+import java.lang.annotation.Annotation;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -10,10 +11,7 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
-import java.lang.annotation.Annotation;
-
 public class ServletOrgStorePrincipalInfoArgumentResolver implements HandlerMethodArgumentResolver {
-
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
@@ -21,8 +19,14 @@ public class ServletOrgStorePrincipalInfoArgumentResolver implements HandlerMeth
     }
 
     @Override
-    public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
-        return SecurityUtils.getOrgStoreIdentity(SecurityContextHolder.getContext().getAuthentication());
+    public Object resolveArgument(
+            MethodParameter parameter,
+            ModelAndViewContainer mavContainer,
+            NativeWebRequest webRequest,
+            WebDataBinderFactory binderFactory)
+            throws Exception {
+        return SecurityUtils.getOrgStoreIdentity(
+                SecurityContextHolder.getContext().getAuthentication());
     }
 
     /**
@@ -33,7 +37,8 @@ public class ServletOrgStorePrincipalInfoArgumentResolver implements HandlerMeth
      * @param parameter       the {@link MethodParameter} to search for an {@link Annotation}
      * @return the {@link Annotation} that was found or null.
      */
-    private <T extends Annotation> T findMethodAnnotation(Class<T> annotationClass, MethodParameter parameter) {
+    private <T extends Annotation> T findMethodAnnotation(
+            Class<T> annotationClass, MethodParameter parameter) {
         T annotation = parameter.getParameterAnnotation(annotationClass);
         if (annotation != null) {
             return annotation;
@@ -47,5 +52,4 @@ public class ServletOrgStorePrincipalInfoArgumentResolver implements HandlerMeth
         }
         return null;
     }
-
 }

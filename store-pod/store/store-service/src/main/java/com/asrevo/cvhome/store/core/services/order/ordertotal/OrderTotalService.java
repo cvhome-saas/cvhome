@@ -1,6 +1,5 @@
 package com.asrevo.cvhome.store.core.services.order.ordertotal;
 
-
 import com.asrevo.cvhome.store.core.entity.customer.Customer;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
@@ -15,6 +14,10 @@ import com.asrevo.cvhome.store.core.model.order.OrderTotalVariation;
  */
 public interface OrderTotalService {
 
-    OrderTotalVariation findOrderTotalVariation(final OrderSummary summary, final Customer customer, final MerchantStore store, final Language language) throws Exception;
-
+    OrderTotalVariation findOrderTotalVariation(
+            final OrderSummary summary,
+            final Customer customer,
+            final MerchantStore store,
+            final Language language)
+            throws Exception;
 }

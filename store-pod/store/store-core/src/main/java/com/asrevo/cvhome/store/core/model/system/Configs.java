@@ -21,5 +21,4 @@ public class Configs {
     private boolean displayAddToCartOnFeaturedItems = false;
     private boolean displayCustomerAgreement = false;
     private boolean displayPagesMenu = true;
-
 }

@@ -5,7 +5,8 @@ import org.testcontainers.utility.DockerImageName;
 
 public class MinIOContainer extends GenericContainer<MinIOContainer> {
 
-    private static final DockerImageName DEFAULT_IMAGE_NAME = DockerImageName.parse("bitnami/minio");
+    private static final DockerImageName DEFAULT_IMAGE_NAME =
+            DockerImageName.parse("bitnami/minio");
 
     private static final int MINIO_S3_PORT = 9000;
 
@@ -45,13 +46,13 @@ public class MinIOContainer extends GenericContainer<MinIOContainer> {
         super(dockerImageName);
         dockerImageName.assertCompatibleWith(DEFAULT_IMAGE_NAME);
         withExposedPorts(MINIO_S3_PORT, MINIO_UI_PORT);
-//        withCommand("server", "--console-address", ":" + MINIO_UI_PORT, "/data");
-//        waitingFor(
-//                Wait
-//                        .forHttp("/minio/health/live")
-//                        .forPort(MINIO_S3_PORT)
-//                        .withStartupTimeout(Duration.of(60, ChronoUnit.SECONDS))
-//        );
+        //        withCommand("server", "--console-address", ":" + MINIO_UI_PORT, "/data");
+        //        waitingFor(
+        //                Wait
+        //                        .forHttp("/minio/health/live")
+        //                        .forPort(MINIO_S3_PORT)
+        //                        .withStartupTimeout(Duration.of(60, ChronoUnit.SECONDS))
+        //        );
     }
 
     /**

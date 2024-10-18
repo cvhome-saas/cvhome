@@ -1,6 +1,5 @@
 package com.asrevo.cvhome.store.core.entity.catalog.catalog;
 
-
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
 import com.asrevo.cvhome.store.core.entity.common.audit.AuditListener;
 import com.asrevo.cvhome.store.core.entity.common.audit.AuditSection;
@@ -10,12 +9,11 @@ import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.io.Serial;
 import java.util.HashSet;
 import java.util.Set;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Allows grouping products and category
@@ -30,33 +28,29 @@ import java.util.Set;
  *
  * @author carlsamson
  */
-
-
 @Entity
 @EntityListeners(value = AuditListener.class)
-@Table(name = "CATALOG",
+@Table(
+        name = "CATALOG",
         uniqueConstraints = @UniqueConstraint(columnNames = {"MERCHANT_ID", "CODE"}))
 @Getter
 @Setter
 public class Catalog extends SalesManagerEntity<Long, Catalog> implements Auditable {
-    @Serial
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE,
-            generator = "TABLE_GEN")
-    @TableGenerator(name = "TABLE_GEN",
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
+    @TableGenerator(
+            name = "TABLE_GEN",
             table = "SM_SEQUENCER",
             pkColumnName = "SEQ_NAME",
             valueColumnName = "SEQ_COUNT",
             pkColumnValue = "CATALOG_SEQ_NEXT_VAL",
             allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
-            initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE
-    )
+            initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
     private Long id;
 
-    @Embedded
-    private AuditSection auditSection = new AuditSection();
+    @Embedded private AuditSection auditSection = new AuditSection();
 
     @Valid
     @OneToMany(mappedBy = "catalog", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -65,7 +59,6 @@ public class Catalog extends SalesManagerEntity<Long, Catalog> implements Audita
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MERCHANT_ID", nullable = false)
     private MerchantStore merchantStore;
-
 
     @Column(name = "VISIBLE")
     private boolean visible;
@@ -80,13 +73,10 @@ public class Catalog extends SalesManagerEntity<Long, Catalog> implements Audita
     @Column(name = "SORT_ORDER")
     private Integer sortOrder = 0;
 
-    public Catalog() {
-    }
+    public Catalog() {}
 
     public Catalog(MerchantStore store) {
         this.merchantStore = store;
         this.id = 0L;
     }
-
-
 }

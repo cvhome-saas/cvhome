@@ -8,26 +8,26 @@ import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.repositories.catalog.product.variant.PageableProductVariantRepositoty;
 import com.asrevo.cvhome.store.core.repositories.catalog.product.variant.ProductVariantRepository;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-
 @Service("productVariantService")
 public class ProductVariantServiceImpl extends SalesManagerEntityServiceImpl<Long, ProductVariant>
         implements ProductVariantService {
-
 
     private final ProductVariantRepository productVariantRepository;
 
     private final PageableProductVariantRepositoty pageableProductVariantRepositoty;
 
     @Autowired
-    public ProductVariantServiceImpl(ProductVariantRepository productVariantRepository, PageableProductVariantRepositoty pageableProductVariantRepositoty) {
+    public ProductVariantServiceImpl(
+            ProductVariantRepository productVariantRepository,
+            PageableProductVariantRepositoty pageableProductVariantRepositoty) {
         super(productVariantRepository);
         this.productVariantRepository = productVariantRepository;
         this.pageableProductVariantRepositoty = pageableProductVariantRepositoty;
@@ -38,19 +38,22 @@ public class ProductVariantServiceImpl extends SalesManagerEntityServiceImpl<Lon
         return productVariantRepository.findById(id, productId, store.getId());
     }
 
-    public Page<ProductVariant> getByProductId(MerchantStore store, Product product, Language language, int page,
-                                               int count) {
+    public Page<ProductVariant> getByProductId(
+            MerchantStore store, Product product, Language language, int page, int count) {
         Pageable pageRequest = PageRequest.of(page, count);
-        return pageableProductVariantRepositoty.findByProductId(store.getId(), product.getId(), pageRequest);
+        return pageableProductVariantRepositoty.findByProductId(
+                store.getId(), product.getId(), pageRequest);
     }
 
     @Override
-    public List<ProductVariant> getByProductId(MerchantStore store, Product product, Language language) {
+    public List<ProductVariant> getByProductId(
+            MerchantStore store, Product product, Language language) {
         return productVariantRepository.findByProductId(store.getId(), product.getId());
     }
 
     @Override
-    public Optional<ProductVariant> getBySku(String sku, Long productId, MerchantStore store, Language language) {
+    public Optional<ProductVariant> getBySku(
+            String sku, Long productId, MerchantStore store, Language language) {
         return productVariantRepository.findBySku(sku, productId, store.getId(), language.getId());
     }
 
@@ -59,7 +62,6 @@ public class ProductVariantServiceImpl extends SalesManagerEntityServiceImpl<Lon
 
         ProductVariant instance = productVariantRepository.existsBySkuAndProduct(sku, productId);
         return instance != null;
-
     }
 
     @Override
@@ -85,5 +87,4 @@ public class ProductVariantServiceImpl extends SalesManagerEntityServiceImpl<Lon
     public void delete(ProductVariant instance) throws ServiceException {
         super.delete(instance);
     }
-
 }

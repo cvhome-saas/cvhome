@@ -9,23 +9,22 @@ import com.asrevo.cvhome.store.core.model.order.transaction.PersistablePayment;
 import com.asrevo.cvhome.store.core.model.payments.Payment;
 import com.asrevo.cvhome.store.core.services.catalog.pricing.PricingService;
 import com.asrevo.cvhome.store.utils.AbstractDataPopulator;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.util.Assert;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @Setter
 @Getter
-public class PersistablePaymentPopulator extends AbstractDataPopulator<PersistablePayment, Payment> {
-
+public class PersistablePaymentPopulator
+        extends AbstractDataPopulator<PersistablePayment, Payment> {
 
     PricingService pricingService;
 
-
     @Override
-    public Payment populate(PersistablePayment source, Payment target, MerchantStore store, Language language)
+    public Payment populate(
+            PersistablePayment source, Payment target, MerchantStore store, Language language)
             throws ConversionException {
 
         Assert.notNull(source, "PersistablePayment cannot be null");
@@ -57,5 +56,4 @@ public class PersistablePaymentPopulator extends AbstractDataPopulator<Persistab
         // TODO Auto-generated method stub
         return null;
     }
-
 }

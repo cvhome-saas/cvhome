@@ -12,37 +12,44 @@ import com.asrevo.cvhome.store.core.services.catalog.product.ProductService;
 import com.asrevo.cvhome.store.service.mapper.catalog.product.PersistableProductDefinitionMapper;
 import com.asrevo.cvhome.store.service.mapper.catalog.product.ReadableProductDefinitionMapper;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 @Service("productDefinitionFacade")
-//@Profile({"default", "cloud", "gcp", "aws", "mysql", "local"})
+// @Profile({"default", "cloud", "gcp", "aws", "mysql", "local"})
 public class ProductDefinitionFacadeImpl implements ProductDefinitionFacade {
 
-
     private final ProductService productService;
-
 
     private final PersistableProductDefinitionMapper persistableProductDefinitionMapper;
 
     private final ReadableProductDefinitionMapper readableProductDefinitionMapper;
 
-    public ProductDefinitionFacadeImpl(ProductService productService, PersistableProductDefinitionMapper persistableProductDefinitionMapper, ReadableProductDefinitionMapper readableProductDefinitionMapper, ProductVariantFacade productVariantFacade, ImageFilePath imageUtils) {
+    public ProductDefinitionFacadeImpl(
+            ProductService productService,
+            PersistableProductDefinitionMapper persistableProductDefinitionMapper,
+            ReadableProductDefinitionMapper readableProductDefinitionMapper,
+            ProductVariantFacade productVariantFacade,
+            ImageFilePath imageUtils) {
         this.productService = productService;
         this.persistableProductDefinitionMapper = persistableProductDefinitionMapper;
         this.readableProductDefinitionMapper = readableProductDefinitionMapper;
     }
 
     @Override
-    public Long saveProductDefinition(MerchantStore store, PersistableProductDefinition product, Language language) {
-
+    public Long saveProductDefinition(
+            MerchantStore store, PersistableProductDefinition product, Language language) {
 
         Product target = null;
         if (product.getId() != null && product.getId() > 0) {
             Optional<Product> p = productService.retrieveById(product.getId(), store);
             if (p.isEmpty()) {
-                throw new ResourceNotFoundException("Product with id [" + product.getId() + "] not found for store [" + store.getCode() + "]");
+                throw new ResourceNotFoundException(
+                        "Product with id ["
+                                + product.getId()
+                                + "] not found for store ["
+                                + store.getCode()
+                                + "]");
             }
             target = p.get();
         } else {
@@ -55,17 +62,18 @@ public class ProductDefinitionFacadeImpl implements ProductDefinitionFacade {
             productService.saveProduct(target);
             product.setId(target.getId());
 
-
             return target.getId();
         } catch (Exception e) {
             throw new ServiceRuntimeException(e);
         }
-
     }
 
     @Override
-    public void update(Long id, PersistableProductDefinition product, MerchantStore merchant,
-                       Language language) {
+    public void update(
+            Long id,
+            PersistableProductDefinition product,
+            MerchantStore merchant,
+            Language language) {
         product.setId(id);
         this.saveProductDefinition(merchant, product, language);
     }
@@ -77,7 +85,8 @@ public class ProductDefinitionFacadeImpl implements ProductDefinitionFacade {
     }
 
     @Override
-    public ReadableProductDefinition getProductBySku(MerchantStore store, String uniqueCode, Language language) {
+    public ReadableProductDefinition getProductBySku(
+            MerchantStore store, String uniqueCode, Language language) {
 
         Product product = null;
         try {
@@ -86,7 +95,5 @@ public class ProductDefinitionFacadeImpl implements ProductDefinitionFacade {
             throw new ServiceRuntimeException(e);
         }
         return readableProductDefinitionMapper.convert(product, store, language);
-
     }
-
 }

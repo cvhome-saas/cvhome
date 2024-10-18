@@ -3,13 +3,12 @@ package com.asrevo.cvhome.manager.entity;
 import com.asrevo.cvhome.commons.domain.*;
 import com.asrevo.cvhome.manager.commons.dto.CreateManagerStoreRequest;
 import com.asrevo.cvhome.manager.commons.event.store.StoreCreatedEvent;
+import java.time.Instant;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Embedded;
 import org.springframework.data.relational.core.mapping.Table;
-
-import java.time.Instant;
 
 @Getter
 @Setter
@@ -17,19 +16,26 @@ import java.time.Instant;
 public class ManagerStoreEntity extends BaseEntity<ManagerStoreEntity, ManagerStoreId> {
     @Column("name")
     private String name;
+
     @Column("owner_id")
     private IdentityId owner;
+
     @Column("created_date")
     private Instant createdDate;
+
     private Country country;
+
     @Embedded(onEmpty = Embedded.OnEmpty.USE_NULL)
     private Email email;
+
     @Embedded(onEmpty = Embedded.OnEmpty.USE_NULL)
     private Phone phone;
+
     private Boolean syncedInRouter;
     private Boolean syncedInStore;
 
-    public static ManagerStoreEntity createStore(CreateManagerStoreRequest request, IdentityId identityId) {
+    public static ManagerStoreEntity createStore(
+            CreateManagerStoreRequest request, IdentityId identityId) {
         ManagerStoreEntity entity = new ManagerStoreEntity();
         entity.setNew();
         entity.setName(request.name());
@@ -43,7 +49,6 @@ public class ManagerStoreEntity extends BaseEntity<ManagerStoreEntity, ManagerSt
         entity.registerEvent(StoreCreatedEvent.from(entity.getId(), identityId));
         return entity;
     }
-
 
     @Override
     protected ManagerStoreId generateId() {

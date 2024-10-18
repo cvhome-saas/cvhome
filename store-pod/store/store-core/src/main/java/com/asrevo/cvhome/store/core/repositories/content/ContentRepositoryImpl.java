@@ -8,20 +8,16 @@ import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
-
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class ContentRepositoryImpl implements ContentRepositoryCustom {
 
-
-    @PersistenceContext
-    private EntityManager em;
+    @PersistenceContext private EntityManager em;
 
     @Override
-    public List<ContentDescription> listNameByType(List<ContentType> contentType, MerchantStore store, Language language) {
-
+    public List<ContentDescription> listNameByType(
+            List<ContentType> contentType, MerchantStore store, Language language) {
 
         StringBuilder qs = new StringBuilder();
 
@@ -40,7 +36,6 @@ public class ContentRepositoryImpl implements ContentRepositoryCustom {
         q.setParameter("cm", store.getId());
         q.setParameter("cl", language.getId());
 
-
         @SuppressWarnings("unchecked")
         List<Content> contents = q.getResultList();
 
@@ -53,11 +48,9 @@ public class ContentRepositoryImpl implements ContentRepositoryCustom {
             contentDescription.setSeUrl(url);
             contentDescription.setContent(c);
             descriptions.add(contentDescription);
-
         }
 
         return descriptions;
-
     }
 
     @Override
@@ -71,16 +64,13 @@ public class ContentRepositoryImpl implements ContentRepositoryCustom {
         qs.append("and c.visible =true ");
         qs.append("and cd.seUrl =:se ");
 
-
         String hql = qs.toString();
         Query q = this.em.createQuery(hql);
 
         q.setParameter("cm", store.getId());
         q.setParameter("se", seUrl);
 
-
         Content content = (Content) q.getSingleResult();
-
 
         if (content != null) {
             return content.getDescription();
@@ -98,10 +88,6 @@ public class ContentRepositoryImpl implements ContentRepositoryCustom {
             return content.getDescription();
         }
 
-
         return null;
-
     }
-
-
 }

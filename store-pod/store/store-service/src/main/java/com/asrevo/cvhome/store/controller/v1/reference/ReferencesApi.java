@@ -11,14 +11,13 @@ import com.asrevo.cvhome.store.service.facade.store.StoreFacade;
 import com.asrevo.cvhome.store.service.facade.zone.ZoneFacade;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.Arrays;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * Get system Language, Country and Currency objects
@@ -30,7 +29,6 @@ import java.util.List;
 @Slf4j
 public class ReferencesApi {
 
-
     private final StoreFacade storeFacade;
 
     private final LanguageFacade languageFacade;
@@ -41,7 +39,12 @@ public class ReferencesApi {
 
     private final CurrencyFacade currencyFacade;
 
-    public ReferencesApi(StoreFacade storeFacade, LanguageFacade languageFacade, CountryFacade countryFacade, ZoneFacade zoneFacade, CurrencyFacade currencyFacade) {
+    public ReferencesApi(
+            StoreFacade storeFacade,
+            LanguageFacade languageFacade,
+            CountryFacade countryFacade,
+            ZoneFacade zoneFacade,
+            CurrencyFacade currencyFacade) {
         this.storeFacade = storeFacade;
         this.languageFacade = languageFacade;
         this.countryFacade = countryFacade;
@@ -64,14 +67,17 @@ public class ReferencesApi {
      *
      */
     @GetMapping("/country")
-    public List<ReadableCountry> getCountry(@Parameter(hidden = true) Language language, HttpServletRequest request) {
+    public List<ReadableCountry> getCountry(
+            @Parameter(hidden = true) Language language, HttpServletRequest request) {
         MerchantStore merchantStore = storeFacade.getByCode(request);
         return countryFacade.getListCountryZones(language, merchantStore);
     }
 
     @GetMapping("/zones")
     public List<ReadableZone> getZones(
-            @RequestParam("code") String code, @Parameter(hidden = true) Language language, HttpServletRequest request) {
+            @RequestParam("code") String code,
+            @Parameter(hidden = true) Language language,
+            HttpServletRequest request) {
         MerchantStore merchantStore = storeFacade.getByCode(request);
         return zoneFacade.getZones(code, language, merchantStore);
     }

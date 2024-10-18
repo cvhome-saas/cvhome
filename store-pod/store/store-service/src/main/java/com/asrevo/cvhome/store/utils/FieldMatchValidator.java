@@ -4,7 +4,6 @@ import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import lombok.extern.slf4j.Slf4j;
 
-
 @Slf4j
 public class FieldMatchValidator implements ConstraintValidator<FieldMatch, Object> {
 
@@ -25,12 +24,11 @@ public class FieldMatchValidator implements ConstraintValidator<FieldMatch, Obje
         try {
             final Object firstObj = this.beanUtils.getPropertyValue(value, this.firstFieldName);
             final Object secondObj = this.beanUtils.getPropertyValue(value, this.secondFieldName);
-            return firstObj == null && secondObj == null || firstObj != null && firstObj.equals(secondObj);
+            return firstObj == null && secondObj == null
+                    || firstObj != null && firstObj.equals(secondObj);
         } catch (final Exception ex) {
             log.info("Error while getting values from object", ex);
             return false;
-
         }
-
     }
 }

@@ -2,13 +2,12 @@ package com.asrevo.cvhome.store.service.populator;
 
 import com.asrevo.cvhome.store.core.entity.common.audit.AuditSection;
 import com.asrevo.cvhome.store.core.entity.common.audit.Auditable;
+import java.util.Date;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.Date;
 
 /**
  * Create audit section
@@ -20,9 +19,7 @@ import java.util.Date;
 @Slf4j
 public class PersistableAuditAspect {
 
-
-    @AfterReturning(value = "execution(* populate(..))",
-            returning = "result")
+    @AfterReturning(value = "execution(* populate(..))", returning = "result")
     public void afterReturning(JoinPoint joinPoint, Object result) {
 
         try {
@@ -32,25 +29,22 @@ public class PersistableAuditAspect {
                     audit = new AuditSection();
                 }
                 audit.setDateModified(new Date());
-//	@TODO ASHRAF
+                //	@TODO ASHRAF
 
-/*
-					Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-					if(auth!=null) {
-						if(auth instanceof UsernamePasswordAuthenticationToken) {//api only is captured
-							com.asrevo.cvhome.store.store.security.user.JWTUser user = (com.asrevo.cvhome.store.store.security.user.JWTUser)auth.getPrincipal();
-							audit.setModifiedBy(user.getUsername());
-						}
-					}
-*/
-                //TODO put in log audit log trail
+                /*
+                					Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+                					if(auth!=null) {
+                						if(auth instanceof UsernamePasswordAuthenticationToken) {//api only is captured
+                							com.asrevo.cvhome.store.store.security.user.JWTUser user = (com.asrevo.cvhome.store.store.security.user.JWTUser)auth.getPrincipal();
+                							audit.setModifiedBy(user.getUsername());
+                						}
+                					}
+                */
+                // TODO put in log audit log trail
                 entity.setAuditSection(audit);
             }
         } catch (Throwable e) {
             log.error("Error while setting audit values{}", e.getMessage());
         }
-
     }
-
-
 }

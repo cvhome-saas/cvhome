@@ -18,18 +18,16 @@ import com.asrevo.cvhome.store.core.services.catalog.product.ProductService;
 import com.asrevo.cvhome.store.core.services.catalog.product.relationship.ProductRelationshipService;
 import com.asrevo.cvhome.store.service.populator.catalog.ReadableProductPopulator;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
-import org.apache.commons.collections.CollectionUtils;
-import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
-
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.apache.commons.collections.CollectionUtils;
+import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
 @Component
 public class ProductItemsFacadeImpl implements ProductItemsFacade {
-
 
     final ProductService productService;
 
@@ -39,7 +37,11 @@ public class ProductItemsFacadeImpl implements ProductItemsFacade {
 
     private final ProductRelationshipService productRelationshipService;
 
-    public ProductItemsFacadeImpl(ProductService productService, PricingService pricingService, ImageFilePath imageUtils, ProductRelationshipService productRelationshipService) {
+    public ProductItemsFacadeImpl(
+            ProductService productService,
+            PricingService pricingService,
+            ImageFilePath imageUtils,
+            ProductRelationshipService productRelationshipService) {
         this.productService = productService;
         this.pricingService = pricingService;
         this.imageUtils = imageUtils;
@@ -47,69 +49,66 @@ public class ProductItemsFacadeImpl implements ProductItemsFacade {
     }
 
     @Override
-    public ReadableProductList listItemsByManufacturer(MerchantStore store,
-                                                       Language language, Long manufacturerId, int startCount, int maxCount) throws Exception {
-
+    public ReadableProductList listItemsByManufacturer(
+            MerchantStore store,
+            Language language,
+            Long manufacturerId,
+            int startCount,
+            int maxCount)
+            throws Exception {
 
         ProductCriteria productCriteria = new ProductCriteria();
         productCriteria.setMaxCount(maxCount);
         productCriteria.setStartIndex(startCount);
 
-
         productCriteria.setManufacturerId(manufacturerId);
         ProductList products = productService.listByStore(store, language, productCriteria);
-
 
         ReadableProductPopulator populator = new ReadableProductPopulator();
         populator.setPricingService(pricingService);
         populator.setImageUtils(imageUtils);
 
-
         ReadableProductList productList = new ReadableProductList();
         for (Product product : products.getProducts()) {
 
-            //create new proxy product
-            ReadableProduct readProduct = populator.populate(product, new ReadableProduct(), store, language);
+            // create new proxy product
+            ReadableProduct readProduct =
+                    populator.populate(product, new ReadableProduct(), store, language);
             productList.getProducts().add(readProduct);
-
         }
 
         productList.setTotalPages(Math.toIntExact(products.getTotalCount()));
-
 
         return productList;
     }
 
     @Override
-    public ReadableProductList listItemsByIds(MerchantStore store, Language language, List<Long> ids, int startCount,
-                                              int maxCount) throws Exception {
+    public ReadableProductList listItemsByIds(
+            MerchantStore store, Language language, List<Long> ids, int startCount, int maxCount)
+            throws Exception {
 
         if (CollectionUtils.isEmpty(ids)) {
             return new ReadableProductList();
         }
-
 
         ProductCriteria productCriteria = new ProductCriteria();
         productCriteria.setMaxCount(maxCount);
         productCriteria.setStartIndex(startCount);
         productCriteria.setProductIds(ids);
 
-
         ProductList products = productService.listByStore(store, language, productCriteria);
-
 
         ReadableProductPopulator populator = new ReadableProductPopulator();
         populator.setPricingService(pricingService);
         populator.setImageUtils(imageUtils);
 
-
         ReadableProductList productList = new ReadableProductList();
         for (Product product : products.getProducts()) {
 
-            //create new proxy product
-            ReadableProduct readProduct = populator.populate(product, new ReadableProduct(), store, language);
+            // create new proxy product
+            ReadableProduct readProduct =
+                    populator.populate(product, new ReadableProduct(), store, language);
             productList.getProducts().add(readProduct);
-
         }
 
         productList.setNumber(Math.toIntExact(products.getTotalCount()));
@@ -119,10 +118,12 @@ public class ProductItemsFacadeImpl implements ProductItemsFacade {
     }
 
     @Override
-    public ReadableProductList listItemsByGroup(String group, MerchantStore store, Language language) throws Exception {
+    public ReadableProductList listItemsByGroup(
+            String group, MerchantStore store, Language language) throws Exception {
 
-        //get product group
-        List<ProductRelationship> groups = productRelationshipService.getByGroup(store, group, language);
+        // get product group
+        List<ProductRelationship> groups =
+                productRelationshipService.getByGroup(store, group, language);
 
         if (group != null) {
             List<Long> ids = new ArrayList<>();
@@ -132,9 +133,12 @@ public class ProductItemsFacadeImpl implements ProductItemsFacade {
             }
 
             ReadableProductList list = listItemsByIds(store, language, ids, 0, 0);
-            List<ReadableProduct> prds = list.getProducts().stream().sorted(Comparator.comparing(ReadableProduct::getSortOrder)).collect(Collectors.toList());
+            List<ReadableProduct> prds =
+                    list.getProducts().stream()
+                            .sorted(Comparator.comparing(ReadableProduct::getSortOrder))
+                            .collect(Collectors.toList());
             list.setProducts(prds);
-            list.setTotalPages(1);//no paging
+            list.setTotalPages(1); // no paging
             ProductGroup productGroup = getProductGroup(store, group);
             list.setProductGroup(productGroup);
             return list;
@@ -144,26 +148,32 @@ public class ProductItemsFacadeImpl implements ProductItemsFacade {
     }
 
     @Override
-    public ReadableProductList addItemToGroup(Product product, String group, MerchantStore store, Language language) {
+    public ReadableProductList addItemToGroup(
+            Product product, String group, MerchantStore store, Language language) {
 
         Assert.notNull(product, "Product must not be null");
         Assert.notNull(group, "group must not be null");
 
-
-        //check if product is already in group
-        List<ProductRelationship> existList = null;
+        // check if product is already in group
+        List<ProductRelationship> existList;
         try {
-            existList = productRelationshipService.getByGroup(store, group).stream()
-                    .filter(prod -> prod.getRelatedProduct() != null && (product.getId().longValue() == prod.getRelatedProduct().getId()))
-                    .toList();
+            existList =
+                    productRelationshipService.getByGroup(store, group).stream()
+                            .filter(
+                                    prod ->
+                                            prod.getRelatedProduct() != null
+                                                    && (product.getId().longValue()
+                                                            == prod.getRelatedProduct().getId()))
+                            .toList();
         } catch (ServiceException e) {
-            throw new ServiceRuntimeException("ExceptionWhile getting product group [" + group + "]", e);
+            throw new ServiceRuntimeException(
+                    "ExceptionWhile getting product group [" + group + "]", e);
         }
 
         if (!existList.isEmpty()) {
-            throw new OperationNotAllowedException("Product with id [" + product.getId() + "] is already in the group");
+            throw new OperationNotAllowedException(
+                    "Product with id [" + product.getId() + "] is already in the group");
         }
-
 
         ProductRelationship relationship = new ProductRelationship();
         relationship.setActive(true);
@@ -175,19 +185,18 @@ public class ProductItemsFacadeImpl implements ProductItemsFacade {
             productRelationshipService.saveOrUpdate(relationship);
             return listItemsByGroup(group, store, language);
         } catch (Exception e) {
-            throw new ServiceRuntimeException("ExceptionWhile getting product group [" + group + "]", e);
+            throw new ServiceRuntimeException(
+                    "ExceptionWhile getting product group [" + group + "]", e);
         }
-
-
     }
 
     @Override
-    public ReadableProductList removeItemFromGroup(Product product, String group, MerchantStore store,
-                                                   Language language) throws Exception {
+    public ReadableProductList removeItemFromGroup(
+            Product product, String group, MerchantStore store, Language language)
+            throws Exception {
 
-        List<ProductRelationship> relationships = productRelationshipService
-                .getByType(store, product, group);
-
+        List<ProductRelationship> relationships =
+                productRelationshipService.getByType(store, product, group);
 
         for (ProductRelationship r : relationships) {
             productRelationshipService.delete(r);
@@ -207,7 +216,6 @@ public class ProductItemsFacadeImpl implements ProductItemsFacade {
         } catch (ServiceException e) {
             throw new ServiceRuntimeException("Cannor delete product group", e);
         }
-
     }
 
     @Override
@@ -226,7 +234,8 @@ public class ProductItemsFacadeImpl implements ProductItemsFacade {
     @Override
     public void updateProductGroup(String code, ProductGroup group, MerchantStore store) {
         try {
-            List<ProductRelationship> items = productRelationshipService.getGroupDefinition(store, code);
+            List<ProductRelationship> items =
+                    productRelationshipService.getGroupDefinition(store, code);
             if (CollectionUtils.isEmpty(items)) {
                 throw new ResourceNotFoundException("ProductGroup [" + code + "] not found");
             }
@@ -240,7 +249,6 @@ public class ProductItemsFacadeImpl implements ProductItemsFacade {
         } catch (ServiceException e) {
             throw new ServiceRuntimeException("Exception while updating product [" + code + "]");
         }
-
     }
 
     @Override
@@ -258,8 +266,6 @@ public class ProductItemsFacadeImpl implements ProductItemsFacade {
             g.setCode(relationship.getCode());
             g.setId(relationship.getId());
             groups.add(g);
-
-
         }
 
         return groups;
@@ -276,5 +282,4 @@ public class ProductItemsFacadeImpl implements ProductItemsFacade {
         g.setId(group.getId());
         return g;
     }
-
 }

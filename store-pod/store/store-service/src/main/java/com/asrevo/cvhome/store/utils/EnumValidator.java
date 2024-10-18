@@ -3,7 +3,6 @@ package com.asrevo.cvhome.store.utils;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
-
 /**
  * Validates values of a String used as payload in REST service
  * Solution taken from <a href="https://funofprograming.wordpress.com/2016/09/29/java-enum-validator/">...</a>
@@ -19,7 +18,8 @@ public class EnumValidator implements ConstraintValidator<Enum, String> {
     }
 
     @Override
-    public boolean isValid(String valueForValidation, ConstraintValidatorContext constraintValidatorContext) {
+    public boolean isValid(
+            String valueForValidation, ConstraintValidatorContext constraintValidatorContext) {
         boolean result = false;
 
         Object[] enumValues = this.annotation.enumClass().getEnumConstants();
@@ -27,7 +27,8 @@ public class EnumValidator implements ConstraintValidator<Enum, String> {
         if (enumValues != null) {
             for (Object enumValue : enumValues) {
                 if (valueForValidation.equals(enumValue.toString())
-                        || (this.annotation.ignoreCase() && valueForValidation.equalsIgnoreCase(enumValue.toString()))) {
+                        || (this.annotation.ignoreCase()
+                                && valueForValidation.equalsIgnoreCase(enumValue.toString()))) {
                     result = true;
                     break;
                 }

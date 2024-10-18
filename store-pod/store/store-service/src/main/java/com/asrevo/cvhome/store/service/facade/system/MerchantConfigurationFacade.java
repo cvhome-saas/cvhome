@@ -7,5 +7,4 @@ import com.asrevo.cvhome.store.core.model.system.Configs;
 public interface MerchantConfigurationFacade {
 
     Configs getMerchantConfig(MerchantStore merchantStore, Language language);
-
 }

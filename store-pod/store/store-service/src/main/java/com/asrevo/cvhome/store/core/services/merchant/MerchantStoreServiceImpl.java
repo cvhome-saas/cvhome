@@ -9,15 +9,14 @@ import com.asrevo.cvhome.store.core.repositories.merchant.MerchantRepository;
 import com.asrevo.cvhome.store.core.repositories.merchant.PageableMerchantRepository;
 import com.asrevo.cvhome.store.core.services.catalog.product.type.ProductTypeService;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-
-import java.util.List;
-import java.util.Optional;
 
 @Service("merchantService")
 public class MerchantStoreServiceImpl extends SalesManagerEntityServiceImpl<Integer, MerchantStore>
@@ -30,7 +29,10 @@ public class MerchantStoreServiceImpl extends SalesManagerEntityServiceImpl<Inte
     private final MerchantRepository merchantRepository;
 
     @Autowired
-    public MerchantStoreServiceImpl(MerchantRepository merchantRepository, ProductTypeService productTypeService, PageableMerchantRepository pageableMerchantRepository) {
+    public MerchantStoreServiceImpl(
+            MerchantRepository merchantRepository,
+            ProductTypeService productTypeService,
+            PageableMerchantRepository pageableMerchantRepository) {
         super(merchantRepository);
         this.merchantRepository = merchantRepository;
         this.productTypeService = productTypeService;
@@ -38,13 +40,13 @@ public class MerchantStoreServiceImpl extends SalesManagerEntityServiceImpl<Inte
     }
 
     @Override
-    //@CacheEvict(value="store", key="#store.code")
+    // @CacheEvict(value="store", key="#store.code")
     public void saveOrUpdate(MerchantStore store) throws ServiceException {
         super.save(store);
     }
 
     @Override
-    //@Cacheable(value = "store")
+    // @Cacheable(value = "store")
     public MerchantStore getByCode(String code) {
         return merchantRepository.findByCode(code);
     }
@@ -65,25 +67,27 @@ public class MerchantStoreServiceImpl extends SalesManagerEntityServiceImpl<Inte
     }
 
     @Override
-    public GenericEntityList<MerchantStore> getByCriteria(MerchantStoreCriteria criteria) throws ServiceException {
+    public GenericEntityList<MerchantStore> getByCriteria(MerchantStoreCriteria criteria)
+            throws ServiceException {
         return merchantRepository.listByCriteria(criteria);
     }
 
     @Override
-    public Page<MerchantStore> listChildren(String code, int page, int count) throws ServiceException {
+    public Page<MerchantStore> listChildren(String code, int page, int count)
+            throws ServiceException {
         Pageable pageRequest = PageRequest.of(page, count);
         return pageableMerchantRepository.listByStore(code, pageRequest);
     }
 
     @Override
-    public Page<MerchantStore> listAll(Optional<String> storeName, int page, int count) throws ServiceException {
+    public Page<MerchantStore> listAll(Optional<String> storeName, int page, int count)
+            throws ServiceException {
         String store = null;
         if (storeName != null && storeName.isPresent()) {
             store = storeName.get();
         }
         Pageable pageRequest = PageRequest.of(page, count);
         return pageableMerchantRepository.listAll(store, pageRequest);
-
     }
 
     @Override
@@ -100,7 +104,6 @@ public class MerchantStoreServiceImpl extends SalesManagerEntityServiceImpl<Inte
         }
         Pageable pageRequest = PageRequest.of(page, count);
         return pageableMerchantRepository.listAllRetailers(store, pageRequest);
-
     }
 
     @Override
@@ -112,8 +115,7 @@ public class MerchantStoreServiceImpl extends SalesManagerEntityServiceImpl<Inte
     public MerchantStore getParent(String code) throws ServiceException {
         Assert.notNull(code, "MerchantStore code cannot be null");
 
-
-        //get it
+        // get it
         MerchantStore storeModel = this.getByCode(code);
 
         if (storeModel == null) {
@@ -131,7 +133,6 @@ public class MerchantStoreServiceImpl extends SalesManagerEntityServiceImpl<Inte
         return merchantRepository.getById(storeModel.getParent().getId());
     }
 
-
     @Override
     public List<MerchantStore> findAllStoreNames(String code) throws ServiceException {
         return merchantRepository.findAllStoreNames(code);
@@ -145,37 +146,30 @@ public class MerchantStoreServiceImpl extends SalesManagerEntityServiceImpl<Inte
      * Method can also filter on storeName
      */
     @Override
-    public Page<MerchantStore> listByGroup(Optional<String> storeName, String code, int page, int count) throws ServiceException {
+    public Page<MerchantStore> listByGroup(
+            Optional<String> storeName, String code, int page, int count) throws ServiceException {
 
         String name = null;
         if (storeName != null && storeName.isPresent()) {
             name = storeName.get();
         }
 
-
-        MerchantStore store = getByCode(code);//if exist
+        MerchantStore store = getByCode(code); // if exist
         Optional<Integer> id = Optional.ofNullable(store.getId());
-
 
         Pageable pageRequest = PageRequest.of(page, count);
 
-
         return pageableMerchantRepository.listByGroup(code, id.get(), name, pageRequest);
-
-
     }
 
     @Override
     public boolean isStoreInGroup(String code) throws ServiceException {
 
-        MerchantStore store = getByCode(code);//if exist
+        MerchantStore store = getByCode(code); // if exist
         Optional<Integer> id = Optional.ofNullable(store.getId());
 
         List<MerchantStore> stores = merchantRepository.listByGroup(code, id.get());
 
-
         return !stores.isEmpty();
     }
-
-
 }

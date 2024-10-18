@@ -4,25 +4,29 @@ import com.asrevo.cvhome.store.core.constants.SchemaConstant;
 import com.asrevo.cvhome.store.core.entity.order.orderproduct.OrderProduct;
 import com.asrevo.cvhome.store.core.utils.CloneUtils;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name = "ORDER_ACCOUNT_PRODUCT")
 @Getter
 @Setter
 public class OrderAccountProduct implements Serializable {
-    @Serial
-    private static final long serialVersionUID = -7437197293537758668L;
+    @Serial private static final long serialVersionUID = -7437197293537758668L;
 
     @Id
     @Column(name = "ORDER_ACCOUNT_PRODUCT_ID")
-    @TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME", valueColumnName = "SEQ_COUNT",
-            pkColumnValue = "ORDERACCOUNTPRODUCT_SEQ_NEXT_VAL", allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE, initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
+    @TableGenerator(
+            name = "TABLE_GEN",
+            table = "SM_SEQUENCER",
+            pkColumnName = "SEQ_NAME",
+            valueColumnName = "SEQ_COUNT",
+            pkColumnValue = "ORDERACCOUNTPRODUCT_SEQ_NEXT_VAL",
+            allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
+            initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
     private Long orderAccountProductId;
 
@@ -63,9 +67,7 @@ public class OrderAccountProduct implements Serializable {
     @Column(name = "ORDER_ACCOUNT_PRODUCT_STATUS", nullable = false)
     private Integer orderAccountProductStatus;
 
-    public OrderAccountProduct() {
-    }
-
+    public OrderAccountProduct() {}
 
     public Date getOrderAccountProductStartDate() {
         return CloneUtils.clone(orderAccountProductStartDate);
@@ -95,8 +97,7 @@ public class OrderAccountProduct implements Serializable {
         return CloneUtils.clone(orderAccountProductAccountedDate);
     }
 
-    public void setOrderAccountProductAccountedDate(
-            Date orderAccountProductAccountedDate) {
+    public void setOrderAccountProductAccountedDate(Date orderAccountProductAccountedDate) {
         this.orderAccountProductAccountedDate = CloneUtils.clone(orderAccountProductAccountedDate);
     }
 
@@ -104,9 +105,8 @@ public class OrderAccountProduct implements Serializable {
         return CloneUtils.clone(orderAccountProductLastStatusDate);
     }
 
-    public void setOrderAccountProductLastStatusDate(
-            Date orderAccountProductLastStatusDate) {
-        this.orderAccountProductLastStatusDate = CloneUtils.clone(orderAccountProductLastStatusDate);
+    public void setOrderAccountProductLastStatusDate(Date orderAccountProductLastStatusDate) {
+        this.orderAccountProductLastStatusDate =
+                CloneUtils.clone(orderAccountProductLastStatusDate);
     }
-
 }

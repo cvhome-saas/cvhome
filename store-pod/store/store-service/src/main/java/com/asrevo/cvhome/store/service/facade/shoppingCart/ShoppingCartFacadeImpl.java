@@ -14,6 +14,4 @@ import org.springframework.stereotype.Service;
  */
 @Service(value = "shoppingCartFacade")
 @Slf4j
-public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
-
-}
+public class ShoppingCartFacadeImpl implements ShoppingCartFacade {}

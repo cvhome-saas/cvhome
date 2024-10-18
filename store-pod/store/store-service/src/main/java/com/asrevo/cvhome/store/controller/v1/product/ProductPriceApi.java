@@ -1,5 +1,7 @@
 package com.asrevo.cvhome.store.controller.v1.product;
 
+import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1;
+
 import com.asrevo.cvhome.commons.annotation.SecuredResource;
 import com.asrevo.cvhome.commons.domain.Entity;
 import com.asrevo.cvhome.store.core.constants.Constants;
@@ -13,27 +15,22 @@ import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-
-import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1;
 
 /**
  * Use inventory
  *
  * @author carlsamson
  */
-
 @Controller
 @RequestMapping("/api/v1")
 @Tag(name = "Product price api")
 @Slf4j
 public class ProductPriceApi {
-
 
     private final ProductPriceFacade productPriceFacade;
 
@@ -42,11 +39,24 @@ public class ProductPriceApi {
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @RequestMapping(value = {"/private/product/{sku}/inventory/{inventoryId}/price"},
+    @RequestMapping(
+            value = {"/private/product/{sku}/inventory/{inventoryId}/price"},
             method = RequestMethod.POST)
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
+        @Parameter(
+                name = "store",
+                schema =
+                        @Schema(
+                                name = "store",
+                                type = "string",
+                                defaultValue = DEFAULT_ORG1_STORE1)),
+        @Parameter(
+                name = "lang",
+                schema =
+                        @Schema(
+                                name = "lang",
+                                type = "string",
+                                defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public @ResponseBody Entity save(
             @PathVariable String sku,
@@ -60,16 +70,27 @@ public class ProductPriceApi {
 
         Long id = productPriceFacade.save(price, merchantStore);
         return new Entity(id);
-
-
     }
 
     @ResponseStatus(HttpStatus.CREATED)
-    @RequestMapping(value = {"/private/product/{sku}/price"},
+    @RequestMapping(
+            value = {"/private/product/{sku}/price"},
             method = RequestMethod.POST)
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
+        @Parameter(
+                name = "store",
+                schema =
+                        @Schema(
+                                name = "store",
+                                type = "string",
+                                defaultValue = DEFAULT_ORG1_STORE1)),
+        @Parameter(
+                name = "lang",
+                schema =
+                        @Schema(
+                                name = "lang",
+                                type = "string",
+                                defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public @ResponseBody Entity save(
             @PathVariable String sku,
@@ -81,16 +102,27 @@ public class ProductPriceApi {
 
         Long id = productPriceFacade.save(price, merchantStore);
         return new Entity(id);
-
-
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @RequestMapping(value = {"/private/product/{sku}/inventory/{inventoryId}/price/{priceId}"},
+    @RequestMapping(
+            value = {"/private/product/{sku}/inventory/{inventoryId}/price/{priceId}"},
             method = RequestMethod.PUT)
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
+        @Parameter(
+                name = "store",
+                schema =
+                        @Schema(
+                                name = "store",
+                                type = "string",
+                                defaultValue = DEFAULT_ORG1_STORE1)),
+        @Parameter(
+                name = "lang",
+                schema =
+                        @Schema(
+                                name = "lang",
+                                type = "string",
+                                defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public void edit(
             @PathVariable String sku,
@@ -100,21 +132,31 @@ public class ProductPriceApi {
             @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language) {
 
-
         price.setSku(sku);
         price.setProductAvailabilityId(inventoryId);
         price.setId(priceId);
         productPriceFacade.save(price, merchantStore);
-
-
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @RequestMapping(value = {"/private/product/{sku}/price/{priceId}"},
+    @RequestMapping(
+            value = {"/private/product/{sku}/price/{priceId}"},
             method = RequestMethod.GET)
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
+        @Parameter(
+                name = "store",
+                schema =
+                        @Schema(
+                                name = "store",
+                                type = "string",
+                                defaultValue = DEFAULT_ORG1_STORE1)),
+        @Parameter(
+                name = "lang",
+                schema =
+                        @Schema(
+                                name = "lang",
+                                type = "string",
+                                defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public ReadableProductPrice get(
             @PathVariable String sku,
@@ -123,19 +165,30 @@ public class ProductPriceApi {
             @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language) {
 
-
         price.setSku(sku);
         price.setId(priceId);
 
         return productPriceFacade.get(sku, priceId, merchantStore, language);
-
     }
 
-    @RequestMapping(value = {"/private/product/{sku}/inventory/{inventoryId}/price"},
+    @RequestMapping(
+            value = {"/private/product/{sku}/inventory/{inventoryId}/price"},
             method = RequestMethod.GET)
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
+        @Parameter(
+                name = "store",
+                schema =
+                        @Schema(
+                                name = "store",
+                                type = "string",
+                                defaultValue = DEFAULT_ORG1_STORE1)),
+        @Parameter(
+                name = "lang",
+                schema =
+                        @Schema(
+                                name = "lang",
+                                type = "string",
+                                defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public List<ReadableProductPrice> list(
             @PathVariable String sku,
@@ -143,36 +196,55 @@ public class ProductPriceApi {
             @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language) {
 
-
         return productPriceFacade.list(sku, inventoryId, merchantStore, language);
-
-
     }
 
-
-    @RequestMapping(value = {"/private/product/{sku}/prices"},
+    @RequestMapping(
+            value = {"/private/product/{sku}/prices"},
             method = RequestMethod.GET)
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
+        @Parameter(
+                name = "store",
+                schema =
+                        @Schema(
+                                name = "store",
+                                type = "string",
+                                defaultValue = DEFAULT_ORG1_STORE1)),
+        @Parameter(
+                name = "lang",
+                schema =
+                        @Schema(
+                                name = "lang",
+                                type = "string",
+                                defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public List<ReadableProductPrice> list(
             @PathVariable String sku,
             @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language) {
 
-
         return productPriceFacade.list(sku, merchantStore, language);
-
-
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @RequestMapping(value = {"/private/product/{sku}/price/{priceId}"},
+    @RequestMapping(
+            value = {"/private/product/{sku}/price/{priceId}"},
             method = RequestMethod.DELETE)
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
+        @Parameter(
+                name = "store",
+                schema =
+                        @Schema(
+                                name = "store",
+                                type = "string",
+                                defaultValue = DEFAULT_ORG1_STORE1)),
+        @Parameter(
+                name = "lang",
+                schema =
+                        @Schema(
+                                name = "lang",
+                                type = "string",
+                                defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public void delete(
             @PathVariable String sku,
@@ -180,9 +252,6 @@ public class ProductPriceApi {
             @Parameter(hidden = true) @SecuredResource MerchantStore merchantStore,
             @Parameter(hidden = true) Language language) {
 
-
         productPriceFacade.delete(priceId, sku, merchantStore);
-
     }
-
 }

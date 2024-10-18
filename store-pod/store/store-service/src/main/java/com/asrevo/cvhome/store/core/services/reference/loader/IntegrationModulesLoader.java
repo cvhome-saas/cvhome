@@ -4,22 +4,19 @@ import com.asrevo.cvhome.store.core.entity.system.IntegrationModule;
 import com.asrevo.cvhome.store.core.entity.system.ModuleConfig;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
-
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
 public class IntegrationModulesLoader {
 
-
     public List<IntegrationModule> loadIntegrationModules(String jsonFilePath) throws Exception {
-
 
         List<IntegrationModule> modules = new ArrayList<>();
 
@@ -27,14 +24,12 @@ public class IntegrationModulesLoader {
 
         try {
 
-            InputStream in =
-                    this.getClass().getClassLoader().getResourceAsStream(jsonFilePath);
-
+            InputStream in = this.getClass().getClassLoader().getResourceAsStream(jsonFilePath);
 
             @SuppressWarnings("rawtypes")
             Map[] objects = mapper.readValue(in, Map[].class);
 
-            for (Map<?,?> object : objects) {
+            for (Map<?, ?> object : objects) {
 
                 modules.add(this.loadModule(object));
             }
@@ -44,8 +39,6 @@ public class IntegrationModulesLoader {
         } catch (Exception e) {
             throw new ServiceException(e);
         }
-
-
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
@@ -75,13 +68,13 @@ public class IntegrationModulesLoader {
             }
             module.setCustomModule(b);
         }
-        //module.setRegions(regions)
+        // module.setRegions(regions)
         if (object.get("details") != null) {
 
             Map<String, String> details = (Map<String, String>) object.get("details");
             module.setDetails(details);
 
-            //maintain the original json structure
+            // maintain the original json structure
             StringBuilder detailsStructure = new StringBuilder();
             int count = 0;
             detailsStructure.append("{");
@@ -98,14 +91,11 @@ public class IntegrationModulesLoader {
             }
             detailsStructure.append("}");
             module.setConfigDetails(detailsStructure.toString());
-
         }
-
 
         List confs = (List) object.get("configuration");
 
-        //convert to json
-
+        // convert to json
 
         if (confs != null) {
             StringBuilder configString = new StringBuilder();
@@ -140,8 +130,6 @@ public class IntegrationModulesLoader {
                     configString.append(",");
                 }
                 count++;
-
-
             }
             configString.append("]");
             module.setConfiguration(configString.toString());
@@ -150,7 +138,6 @@ public class IntegrationModulesLoader {
 
         List<String> regions = (List<String>) object.get("regions");
         if (regions != null) {
-
 
             StringBuilder configString = new StringBuilder();
             configString.append("[");
@@ -165,16 +152,11 @@ public class IntegrationModulesLoader {
                     configString.append(",");
                 }
                 count++;
-
             }
             configString.append("]");
             module.setRegions(configString.toString());
-
         }
 
         return module;
-
-
     }
-
 }

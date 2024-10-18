@@ -1,11 +1,10 @@
 package com.asrevo.cvhome.s2s.config.internal;
 
 import com.asrevo.cvhome.commons.event.*;
+import java.util.List;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.List;
 
 @Configuration
 public class EventProcessorConfig {
@@ -13,7 +12,8 @@ public class EventProcessorConfig {
     @Bean
     public EventProcessor eventProcessor(List<EventImpl<?>> eventsImpl) {
         //noinspection unchecked
-        return new DefaultEventProcessor(eventsImpl.stream().map(it -> (EventImpl<Event>) it).toList());
+        return new DefaultEventProcessor(
+                eventsImpl.stream().map(it -> (EventImpl<Event>) it).toList());
     }
 
     @Bean
@@ -21,4 +21,3 @@ public class EventProcessorConfig {
         return new LocalEventPublisher(publisher);
     }
 }
-

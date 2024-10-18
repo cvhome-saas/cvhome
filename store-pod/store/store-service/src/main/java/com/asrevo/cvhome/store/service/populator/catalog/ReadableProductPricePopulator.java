@@ -10,30 +10,32 @@ import com.asrevo.cvhome.store.core.model.catalog.product.ReadableProductPrice;
 import com.asrevo.cvhome.store.core.model.catalog.product.ReadableProductPriceFull;
 import com.asrevo.cvhome.store.core.services.catalog.pricing.PricingService;
 import com.asrevo.cvhome.store.utils.AbstractDataPopulator;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.util.Assert;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
-
 @Setter
 @Getter
-public class ReadableProductPricePopulator extends
-        AbstractDataPopulator<ProductPrice, ReadableProductPrice> {
-
+public class ReadableProductPricePopulator
+        extends AbstractDataPopulator<ProductPrice, ReadableProductPrice> {
 
     private PricingService pricingService;
 
     @Override
-    public ReadableProductPrice populate(ProductPrice source,
-                                         ReadableProductPrice target, MerchantStore store, Language language)
+    public ReadableProductPrice populate(
+            ProductPrice source,
+            ReadableProductPrice target,
+            MerchantStore store,
+            Language language)
             throws ConversionException {
         Assert.notNull(pricingService, "pricingService must be set");
         Assert.notNull(source.getProductAvailability(), "productPrice.availability cannot be null");
-        Assert.notNull(source.getProductAvailability().getProduct(), "productPrice.availability.product cannot be null");
+        Assert.notNull(
+                source.getProductAvailability().getProduct(),
+                "productPrice.availability.product cannot be null");
 
         try {
 
@@ -47,23 +49,31 @@ public class ReadableProductPricePopulator extends
 
             target.setDefaultPrice(source.isDefaultPrice());
 
-            FinalPrice finalPrice = pricingService.calculateProductPrice(source.getProductAvailability().getProduct());
+            FinalPrice finalPrice =
+                    pricingService.calculateProductPrice(
+                            source.getProductAvailability().getProduct());
 
-            target.setOriginalPrice(pricingService.getDisplayAmount(source.getProductPriceAmount(), store));
+            target.setOriginalPrice(
+                    pricingService.getDisplayAmount(source.getProductPriceAmount(), store));
             if (finalPrice.isDiscounted()) {
                 target.setDiscounted(true);
-                target.setFinalPrice(pricingService.getDisplayAmount(source.getProductPriceSpecialAmount(), store));
+                target.setFinalPrice(
+                        pricingService.getDisplayAmount(
+                                source.getProductPriceSpecialAmount(), store));
             } else {
-                target.setFinalPrice(pricingService.getDisplayAmount(finalPrice.getOriginalPrice(), store));
+                target.setFinalPrice(
+                        pricingService.getDisplayAmount(finalPrice.getOriginalPrice(), store));
             }
 
             if (source.getDescriptions() != null && !source.getDescriptions().isEmpty()) {
-                List<com.asrevo.cvhome.store.core.model.catalog.product.ProductPriceDescription> fulldescriptions = new ArrayList<>();
+                List<com.asrevo.cvhome.store.core.model.catalog.product.ProductPriceDescription>
+                        fulldescriptions = new ArrayList<>();
 
                 Set<ProductPriceDescription> descriptions = source.getDescriptions();
                 ProductPriceDescription description = null;
                 for (ProductPriceDescription desc : descriptions) {
-                    if (language != null && desc.getLanguage().getCode().equals(language.getCode())) {
+                    if (language != null
+                            && desc.getLanguage().getCode().equals(language.getCode())) {
                         description = desc;
                         break;
                     } else {
@@ -71,9 +81,9 @@ public class ReadableProductPricePopulator extends
                     }
                 }
 
-
                 if (description != null) {
-                    com.asrevo.cvhome.store.core.model.catalog.product.ProductPriceDescription d = populateDescription(description);
+                    com.asrevo.cvhome.store.core.model.catalog.product.ProductPriceDescription d =
+                            populateDescription(description);
                     target.setDescription(d);
                 }
 
@@ -82,11 +92,9 @@ public class ReadableProductPricePopulator extends
                 }
             }
 
-
         } catch (Exception e) {
             throw new ConversionException("Exception while converting to ReadableProductPrice", e);
         }
-
 
         return target;
     }
@@ -113,5 +121,4 @@ public class ReadableProductPricePopulator extends
         }
         return d;
     }
-
 }

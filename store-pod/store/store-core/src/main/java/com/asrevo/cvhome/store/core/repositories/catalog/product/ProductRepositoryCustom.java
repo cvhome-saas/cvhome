@@ -6,16 +6,13 @@ import com.asrevo.cvhome.store.core.entity.catalog.product.ProductList;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import com.asrevo.cvhome.store.core.entity.tax.taxclass.TaxClass;
-
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
 public interface ProductRepositoryCustom {
 
-
-    ProductList listByStore(MerchantStore store, Language language,
-                            ProductCriteria criteria);
+    ProductList listByStore(MerchantStore store, Language language, ProductCriteria criteria);
 
     Product getProductWithOnlyMerchantStoreById(Long productId);
 
@@ -23,8 +20,7 @@ public interface ProductRepositoryCustom {
 
     List<Product> getProductsListByCategories(@SuppressWarnings("rawtypes") Set categoryIds);
 
-    List<Product> getProductsListByCategories(Set<Long> categoryIds,
-                                              Language language);
+    List<Product> getProductsListByCategories(Set<Long> categoryIds, Language language);
 
     List<Product> getProductsListByIds(Set<Long> productIds);
 
@@ -32,8 +28,7 @@ public interface ProductRepositoryCustom {
 
     List<Product> listByStore(MerchantStore store);
 
-    Product getProductForLocale(long productId, Language language,
-                                Locale locale);
+    Product getProductForLocale(long productId, Language language, Locale locale);
 
     Product getById(Long productId);
 
@@ -59,7 +54,6 @@ public interface ProductRepositoryCustom {
 
     Product getById(Long productId, MerchantStore store, Language language);
 
-    List<Product> getProductsForLocale(MerchantStore store,
-                                       Set<Long> categoryIds, Language language, Locale locale);
-
+    List<Product> getProductsForLocale(
+            MerchantStore store, Set<Long> categoryIds, Language language, Locale locale);
 }

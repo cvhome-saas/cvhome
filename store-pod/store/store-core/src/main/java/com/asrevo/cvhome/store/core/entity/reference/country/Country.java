@@ -6,12 +6,11 @@ import com.asrevo.cvhome.store.core.entity.reference.geozone.GeoZone;
 import com.asrevo.cvhome.store.core.entity.reference.zone.Zone;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.io.Serial;
 import java.util.HashSet;
 import java.util.Set;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name = "COUNTRY")
@@ -19,13 +18,18 @@ import java.util.Set;
 @Getter
 @Setter
 public class Country extends SalesManagerEntity<Integer, Country> {
-    @Serial
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
 
     @Id
     @Column(name = "COUNTRY_ID")
-    @TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME", valueColumnName = "SEQ_COUNT",
-            pkColumnValue = "COUNTRY_SEQ_NEXT_VAL", allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE, initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
+    @TableGenerator(
+            name = "TABLE_GEN",
+            table = "SM_SEQUENCER",
+            pkColumnName = "SEQ_NAME",
+            valueColumnName = "SEQ_COUNT",
+            pkColumnValue = "COUNTRY_SEQ_NEXT_VAL",
+            allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
+            initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
     private Integer id;
 
@@ -47,14 +51,11 @@ public class Country extends SalesManagerEntity<Integer, Country> {
     @Column(name = "COUNTRY_ISOCODE", unique = true, nullable = false)
     private String isoCode;
 
-    @Transient
-    private String name;
+    @Transient private String name;
 
-    public Country() {
-    }
+    public Country() {}
 
     public Country(String isoCode) {
         this.setIsoCode(isoCode);
     }
-
 }

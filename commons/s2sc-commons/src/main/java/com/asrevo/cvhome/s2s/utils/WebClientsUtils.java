@@ -23,8 +23,10 @@ public class WebClientsUtils {
     }
 
     private static <T> T buildClient(Class<T> tClass, HttpExchangeAdapter clientAdapter) {
-        HttpServiceProxyFactory.Builder proxyBuilder = HttpServiceProxyFactory.builderFor(clientAdapter);
-        proxyBuilder.customArgumentResolver(new IdentifierSerializeParamArgumentResolver())
+        HttpServiceProxyFactory.Builder proxyBuilder =
+                HttpServiceProxyFactory.builderFor(clientAdapter);
+        proxyBuilder
+                .customArgumentResolver(new IdentifierSerializeParamArgumentResolver())
                 .customArgumentResolver(new DomainSerializeParamArgumentResolver())
                 .customArgumentResolver(new DomainReferenceSerializeParamArgumentResolver());
         try {

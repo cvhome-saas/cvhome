@@ -13,7 +13,6 @@ public interface ImageFilePath {
      */
     String getContextPath();
 
-
     String getBasePath(MerchantStore store);
 
     /**
@@ -35,7 +34,8 @@ public interface ImageFilePath {
      * utility for getting the physical image
      *
      */
-    String buildManufacturerImageUtils(MerchantStore store, Manufacturer manufacturer, String imageName);
+    String buildManufacturerImageUtils(
+            MerchantStore store, Manufacturer manufacturer, String imageName);
 
     /**
      * Builds a product image file path that can be used by image servlet
@@ -56,7 +56,6 @@ public interface ImageFilePath {
      *
      */
     String buildLargeProductImageUtils(MerchantStore store, String sku, String imageName);
-
 
     /**
      * Builds a merchant store logo path
@@ -82,12 +81,9 @@ public interface ImageFilePath {
      */
     String buildCustomTypeImageUtils(MerchantStore store, String imageName, FileContentType type);
 
-
     /**
      * Builds static file path
      *
      */
     String buildStaticContentFilePath(MerchantStore store, String fileName);
-
-
 }

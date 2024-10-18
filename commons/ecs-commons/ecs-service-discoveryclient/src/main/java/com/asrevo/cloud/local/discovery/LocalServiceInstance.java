@@ -1,10 +1,9 @@
 package com.asrevo.cloud.local.discovery;
 
-import org.springframework.cloud.client.DefaultServiceInstance;
-import org.springframework.cloud.client.ServiceInstance;
-
 import java.net.URI;
 import java.util.Map;
+import org.springframework.cloud.client.DefaultServiceInstance;
+import org.springframework.cloud.client.ServiceInstance;
 
 /**
  * @author ashraf
@@ -23,7 +22,6 @@ public class LocalServiceInstance implements ServiceInstance {
         this.instance = instance;
         this.serviceId = serviceId;
     }
-
 
     @Override
     public String getServiceId() {

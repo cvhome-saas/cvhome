@@ -5,25 +5,29 @@ import com.asrevo.cvhome.store.core.entity.order.Order;
 import com.asrevo.cvhome.store.core.utils.CloneUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name = "ORDER_STATUS_HISTORY")
 @Getter
 @Setter
 public class OrderStatusHistory implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 3438730310126102187L;
+    @Serial private static final long serialVersionUID = 3438730310126102187L;
 
     @Id
     @Column(name = "ORDER_STATUS_HISTORY_ID")
-    @TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME", valueColumnName = "SEQ_COUNT",
-            pkColumnValue = "STATUS_HIST_ID_NEXT_VALUE", allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE, initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
+    @TableGenerator(
+            name = "TABLE_GEN",
+            table = "SM_SEQUENCER",
+            pkColumnName = "SEQ_NAME",
+            valueColumnName = "SEQ_COUNT",
+            pkColumnValue = "STATUS_HIST_ID_NEXT_VALUE",
+            allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
+            initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
     private Long id;
 
@@ -45,8 +49,7 @@ public class OrderStatusHistory implements Serializable {
     @Column(name = "COMMENTS", columnDefinition = "text")
     private String comments;
 
-    public OrderStatusHistory() {
-    }
+    public OrderStatusHistory() {}
 
     public Date getDateAdded() {
         return CloneUtils.clone(dateAdded);
@@ -55,6 +58,4 @@ public class OrderStatusHistory implements Serializable {
     public void setDateAdded(Date dateAdded) {
         this.dateAdded = CloneUtils.clone(dateAdded);
     }
-
-
 }

@@ -8,16 +8,14 @@ import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.repositories.catalog.product.relationship.ProductRelationshipRepository;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service("productRelationshipService")
-public class ProductRelationshipServiceImpl extends
-        SalesManagerEntityServiceImpl<Long, ProductRelationship> implements
-        ProductRelationshipService {
-
+public class ProductRelationshipServiceImpl
+        extends SalesManagerEntityServiceImpl<Long, ProductRelationship>
+        implements ProductRelationshipService {
 
     private final ProductRelationshipRepository productRelationshipRepository;
 
@@ -38,9 +36,7 @@ public class ProductRelationshipServiceImpl extends
         } else {
             this.create(relationship);
         }
-
     }
-
 
     @Override
     public void addGroup(MerchantStore store, String groupName) throws ServiceException {
@@ -63,7 +59,8 @@ public class ProductRelationshipServiceImpl extends
 
     @Override
     public void deleteGroup(MerchantStore store, String groupName) throws ServiceException {
-        List<ProductRelationship> entities = productRelationshipRepository.getByGroup(store, groupName);
+        List<ProductRelationship> entities =
+                productRelationshipRepository.getByGroup(store, groupName);
         for (ProductRelationship relation : entities) {
             this.delete(relation);
         }
@@ -89,63 +86,56 @@ public class ProductRelationshipServiceImpl extends
 
     public void deleteRelationship(ProductRelationship relationship) throws ServiceException {
 
-        //throws detached exception so need to query first
+        // throws detached exception so need to query first
         relationship = this.getById(relationship.getId());
         if (relationship != null) {
             delete(relationship);
         }
-
-
     }
 
     @Override
     public List<ProductRelationship> listByProduct(Product product) throws ServiceException {
 
         return productRelationshipRepository.listByProducts(product);
-
     }
 
-
     @Override
-    public List<ProductRelationship> getByType(MerchantStore store, Product product, ProductRelationshipType type, Language language) throws ServiceException {
+    public List<ProductRelationship> getByType(
+            MerchantStore store, Product product, ProductRelationshipType type, Language language) {
 
         return productRelationshipRepository.getByType(store, type.name(), product, language);
-
     }
 
     @Override
-    public List<ProductRelationship> getByType(MerchantStore store, ProductRelationshipType type, Language language) throws ServiceException {
+    public List<ProductRelationship> getByType(
+            MerchantStore store, ProductRelationshipType type, Language language) {
         return productRelationshipRepository.getByType(store, type.name(), language);
     }
 
     @Override
-    public List<ProductRelationship> getByType(MerchantStore store, ProductRelationshipType type) throws ServiceException {
+    public List<ProductRelationship> getByType(MerchantStore store, ProductRelationshipType type) {
 
         return productRelationshipRepository.getByType(store, type.name());
-
     }
 
     @Override
-    public List<ProductRelationship> getByGroup(MerchantStore store, String groupName) throws ServiceException {
+    public List<ProductRelationship> getByGroup(MerchantStore store, String groupName) {
 
         return productRelationshipRepository.getByType(store, groupName);
-
     }
 
     @Override
-    public List<ProductRelationship> getByGroup(MerchantStore store, String groupName, Language language) throws ServiceException {
+    public List<ProductRelationship> getByGroup(
+            MerchantStore store, String groupName, Language language) {
 
         return productRelationshipRepository.getByType(store, groupName, language);
-
     }
 
     @Override
-    public List<ProductRelationship> getByType(MerchantStore store, Product product, ProductRelationshipType type) throws ServiceException {
-
+    public List<ProductRelationship> getByType(
+            MerchantStore store, Product product, ProductRelationshipType type) {
 
         return productRelationshipRepository.getByType(store, type.name(), product);
-
-
     }
 
     @Override
@@ -154,10 +144,7 @@ public class ProductRelationshipServiceImpl extends
     }
 
     @Override
-    public List<ProductRelationship> getByType(MerchantStore store, Product product, String name)
-            throws ServiceException {
+    public List<ProductRelationship> getByType(MerchantStore store, Product product, String name) {
         return productRelationshipRepository.getByTypeAndRelatedProduct(store, name, product);
     }
-
-
 }

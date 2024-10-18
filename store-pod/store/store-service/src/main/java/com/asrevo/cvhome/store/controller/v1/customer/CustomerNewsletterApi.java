@@ -1,5 +1,7 @@
 package com.asrevo.cvhome.store.controller.v1.customer;
 
+import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1;
+
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
@@ -17,8 +19,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1;
-
 // @TODO ASHRAF
 
 /**
@@ -27,8 +27,13 @@ import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1;
  * @author carlsamson
  */
 @RestController
-@RequestMapping(value = "/api/v1", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-@Tag(name = "Manage customer subscription to newsletter", description = "Manage customer subscription to newsletter")
+@RequestMapping(
+        value = "/api/v1",
+        consumes = MediaType.APPLICATION_JSON_VALUE,
+        produces = MediaType.APPLICATION_JSON_VALUE)
+@Tag(
+        name = "Manage customer subscription to newsletter",
+        description = "Manage customer subscription to newsletter")
 public class CustomerNewsletterApi {
 
     private final CustomerFacade customerFacade;
@@ -37,18 +42,26 @@ public class CustomerNewsletterApi {
         this.customerFacade = customerFacade;
     }
 
-
     /**
      * Create new optin
      */
     @PostMapping("/newsletter")
-    @Operation(
-            method = "POST",
-            description = "Creates a newsletter optin"
-    )
+    @Operation(method = "POST", description = "Creates a newsletter optin")
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
+        @Parameter(
+                name = "store",
+                schema =
+                        @Schema(
+                                name = "store",
+                                type = "string",
+                                defaultValue = DEFAULT_ORG1_STORE1)),
+        @Parameter(
+                name = "lang",
+                schema =
+                        @Schema(
+                                name = "lang",
+                                type = "string",
+                                defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public void create(
             @Valid @RequestBody PersistableCustomerOptin optin,
@@ -56,5 +69,4 @@ public class CustomerNewsletterApi {
             @Parameter(hidden = true) Language language) {
         customerFacade.optinCustomer(optin, merchantStore);
     }
-
 }

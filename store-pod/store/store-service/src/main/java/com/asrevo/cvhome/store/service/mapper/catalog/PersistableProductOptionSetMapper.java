@@ -13,17 +13,17 @@ import com.asrevo.cvhome.store.core.services.catalog.product.attribute.ProductOp
 import com.asrevo.cvhome.store.core.services.catalog.product.attribute.ProductOptionValueService;
 import com.asrevo.cvhome.store.core.services.catalog.product.type.ProductTypeService;
 import com.asrevo.cvhome.store.service.mapper.Mapper;
-import org.apache.commons.collections.CollectionUtils;
-import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.apache.commons.collections.CollectionUtils;
+import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
 @Component
-public class PersistableProductOptionSetMapper implements Mapper<PersistableProductOptionSet, ProductOptionSet> {
+public class PersistableProductOptionSetMapper
+        implements Mapper<PersistableProductOptionSet, ProductOptionSet> {
 
     private final ProductOptionService productOptionService;
 
@@ -31,19 +31,21 @@ public class PersistableProductOptionSetMapper implements Mapper<PersistableProd
 
     private final ProductTypeService productTypeService;
 
-    public PersistableProductOptionSetMapper(ProductOptionService productOptionService, ProductOptionValueService productOptionValueService, ProductTypeService productTypeService) {
+    public PersistableProductOptionSetMapper(
+            ProductOptionService productOptionService,
+            ProductOptionValueService productOptionValueService,
+            ProductTypeService productTypeService) {
         this.productOptionService = productOptionService;
         this.productOptionValueService = productOptionValueService;
         this.productTypeService = productTypeService;
     }
 
     @Override
-    public ProductOptionSet convert(PersistableProductOptionSet source, MerchantStore store, Language language) {
-
+    public ProductOptionSet convert(
+            PersistableProductOptionSet source, MerchantStore store, Language language) {
 
         ProductOptionSet optionSet = new ProductOptionSet();
         return this.merge(source, optionSet, store, language);
-
     }
 
     private ProductOptionValue value(Long productOptionValue, MerchantStore store) {
@@ -51,8 +53,11 @@ public class PersistableProductOptionSetMapper implements Mapper<PersistableProd
     }
 
     @Override
-    public ProductOptionSet merge(PersistableProductOptionSet source, ProductOptionSet destination,
-                                  MerchantStore store, Language language) {
+    public ProductOptionSet merge(
+            PersistableProductOptionSet source,
+            ProductOptionSet destination,
+            MerchantStore store,
+            Language language) {
         Assert.notNull(destination, "ProductOptionSet must not be null");
 
         destination.setId(source.getId());
@@ -63,13 +68,18 @@ public class PersistableProductOptionSetMapper implements Mapper<PersistableProd
         destination.setOption(option);
 
         if (!CollectionUtils.isEmpty(source.getOptionValues())) {
-            List<ProductOptionValue> values = source.getOptionValues().stream().map(id -> value(id, store)).collect(Collectors.toList());
+            List<ProductOptionValue> values =
+                    source.getOptionValues().stream()
+                            .map(id -> value(id, store))
+                            .collect(Collectors.toList());
             destination.setValues(values);
         }
 
         if (!CollectionUtils.isEmpty(source.getProductTypes())) {
             try {
-                List<ProductType> types = productTypeService.listProductTypes(source.getProductTypes(), store, language);
+                List<ProductType> types =
+                        productTypeService.listProductTypes(
+                                source.getProductTypes(), store, language);
                 Set<ProductType> typesSet = new HashSet<>(types);
                 destination.setProductTypes(typesSet);
             } catch (ServiceException e) {
@@ -79,5 +89,4 @@ public class PersistableProductOptionSetMapper implements Mapper<PersistableProd
 
         return destination;
     }
-
 }

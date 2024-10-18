@@ -7,28 +7,34 @@ import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.io.Serial;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
-@Table(name = "CUSTOMER_OPTION", indexes = {@Index(name = "CUST_OPT_CODE_IDX", columnList = "CUSTOMER_OPT_CODE")}, uniqueConstraints =
-@UniqueConstraint(columnNames = {"MERCHANT_ID", "CUSTOMER_OPT_CODE"}))
+@Table(
+        name = "CUSTOMER_OPTION",
+        indexes = {@Index(name = "CUST_OPT_CODE_IDX", columnList = "CUSTOMER_OPT_CODE")},
+        uniqueConstraints = @UniqueConstraint(columnNames = {"MERCHANT_ID", "CUSTOMER_OPT_CODE"}))
 @Getter
 @Setter
 public class CustomerOption extends SalesManagerEntity<Long, CustomerOption> {
-    @Serial
-    private static final long serialVersionUID = -2019269055342226086L;
+    @Serial private static final long serialVersionUID = -2019269055342226086L;
 
     @Id
     @Column(name = "CUSTOMER_OPTION_ID")
-    @TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME", valueColumnName = "SEQ_COUNT", pkColumnValue = "CUSTOMER_OPTION_SEQ_NEXT_VAL", allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE, initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
+    @TableGenerator(
+            name = "TABLE_GEN",
+            table = "SM_SEQUENCER",
+            pkColumnName = "SEQ_NAME",
+            valueColumnName = "SEQ_COUNT",
+            pkColumnValue = "CUSTOMER_OPTION_SEQ_NEXT_VAL",
+            allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
+            initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
     private Long id;
 
@@ -41,7 +47,7 @@ public class CustomerOption extends SalesManagerEntity<Long, CustomerOption> {
     @NotEmpty
     @Pattern(regexp = "^[a-zA-Z0-9_]*$")
     @Column(name = "CUSTOMER_OPT_CODE")
-    //@Index(name="CUST_OPT_CODE_IDX")
+    // @Index(name="CUST_OPT_CODE_IDX")
     private String code;
 
     @Column(name = "CUSTOMER_OPT_ACTIVE")
@@ -54,24 +60,18 @@ public class CustomerOption extends SalesManagerEntity<Long, CustomerOption> {
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "customerOption")
     private Set<CustomerOptionDescription> descriptions = new HashSet<>();
 
-    @Transient
-    private List<CustomerOptionDescription> descriptionsList = new ArrayList<>();
-
+    @Transient private List<CustomerOptionDescription> descriptionsList = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MERCHANT_ID", nullable = false)
     private MerchantStore merchantStore;
 
-    public CustomerOption() {
-    }
+    public CustomerOption() {}
 
     public List<CustomerOptionDescription> getDescriptionsSettoList() {
         if (descriptionsList == null || descriptionsList.isEmpty()) {
             descriptionsList = new ArrayList<>(this.getDescriptions());
         }
         return descriptionsList;
-
     }
-
-
 }

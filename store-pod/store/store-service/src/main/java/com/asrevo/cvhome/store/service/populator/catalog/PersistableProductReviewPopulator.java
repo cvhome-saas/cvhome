@@ -13,35 +13,31 @@ import com.asrevo.cvhome.store.core.services.customer.CustomerService;
 import com.asrevo.cvhome.store.core.services.reference.language.LanguageService;
 import com.asrevo.cvhome.store.utils.AbstractDataPopulator;
 import com.asrevo.cvhome.store.utils.DateUtil;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.util.Assert;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
-
-
 @Setter
 @Getter
-public class PersistableProductReviewPopulator extends
-        AbstractDataPopulator<PersistableProductReview, ProductReview> {
-
+public class PersistableProductReviewPopulator
+        extends AbstractDataPopulator<PersistableProductReview, ProductReview> {
 
     private CustomerService customerService;
 
-
     private ProductService productService;
-
 
     private LanguageService languageService;
 
-
     @Override
-    public ProductReview populate(PersistableProductReview source,
-                                  ProductReview target, MerchantStore store, Language language)
+    public ProductReview populate(
+            PersistableProductReview source,
+            ProductReview target,
+            MerchantStore store,
+            Language language)
             throws ConversionException {
-
 
         Assert.notNull(customerService, "customerService cannot be null");
         Assert.notNull(productService, "productService cannot be null");
@@ -56,8 +52,9 @@ public class PersistableProductReviewPopulator extends
 
             Customer customer = customerService.getById(source.getCustomerId());
 
-            //check if customer belongs to store
-            if (customer == null || customer.getMerchantStore().getId().intValue() != store.getId().intValue()) {
+            // check if customer belongs to store
+            if (customer == null
+                    || customer.getMerchantStore().getId().intValue() != store.getId().intValue()) {
                 throw new ConversionException("Invalid customer id for the given store");
             }
 
@@ -71,8 +68,9 @@ public class PersistableProductReviewPopulator extends
 
             Product product = productService.getById(source.getProductId());
 
-            //check if product belongs to store
-            if (product == null || product.getMerchantStore().getId().intValue() != store.getId().intValue()) {
+            // check if product belongs to store
+            if (product == null
+                    || product.getMerchantStore().getId().intValue() != store.getId().intValue()) {
                 throw new ConversionException("Invalid product id for the given store");
             }
 
@@ -94,19 +92,15 @@ public class PersistableProductReviewPopulator extends
 
             target.setDescriptions(descriptions);
 
-
             return target;
 
         } catch (Exception e) {
             throw new ConversionException("Cannot populate ProductReview", e);
         }
-
     }
 
     @Override
     protected ProductReview createTarget() {
         return null;
     }
-
-
 }

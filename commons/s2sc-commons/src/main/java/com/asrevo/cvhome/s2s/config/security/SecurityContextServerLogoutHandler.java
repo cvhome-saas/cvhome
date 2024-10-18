@@ -10,5 +10,4 @@ public class SecurityContextServerLogoutHandler {
     public Mono<Void> logout(ServerWebExchange exchange, Authentication authentication) {
         return exchange.getSession().flatMap(WebSession::invalidate);
     }
-
 }

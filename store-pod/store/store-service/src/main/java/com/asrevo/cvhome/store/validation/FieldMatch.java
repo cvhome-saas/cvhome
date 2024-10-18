@@ -3,17 +3,15 @@
  */
 package com.asrevo.cvhome.store.validation;
 
-import jakarta.validation.Constraint;
-import jakarta.validation.Payload;
-
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
-
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
+import jakarta.validation.Constraint;
+import jakarta.validation.Payload;
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
 /**
  * Validation annotation to validate that 2 fields have the same value.
@@ -29,7 +27,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * @FieldMatch(first = "password", second = "confirmPassword", message = "The password fields must match"),
  * @FieldMatch(first = "email", second = "confirmEmail", message = "The email fields must match")})
  */
-
 @Constraint(validatedBy = FieldMatchValidator.class)
 @Documented
 @Target({TYPE, ANNOTATION_TYPE})

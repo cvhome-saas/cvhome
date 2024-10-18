@@ -1,19 +1,17 @@
 package com.asrevo.cvhome.store.core.repositories.reference.country;
 
 import com.asrevo.cvhome.store.core.entity.reference.country.Country;
+import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-
-import java.util.List;
-
 
 public interface CountryRepository extends JpaRepository<Country, Integer> {
 
     @Query("select c from Country c left join fetch c.descriptions cd where c.isoCode=?1")
     Country findByIsoCode(String code);
 
-
-    @Query("""
+    @Query(
+            """
             select c from Country c
             left join fetch c.descriptions cd
             left join fetch c.zones cz left join fetch cz.descriptions
@@ -23,7 +21,8 @@ public interface CountryRepository extends JpaRepository<Country, Integer> {
     /**
      * get country including zones by language
      **/
-    @Query("select distinct c from Country c left join fetch c.descriptions cd left join fetch c.zones cz left join fetch cz.descriptions where cd.language.id=?1")
+    @Query(
+            "select distinct c from Country c left join fetch c.descriptions cd left join fetch"
+                    + " c.zones cz left join fetch cz.descriptions where cd.language.id=?1")
     List<Country> listCountryZonesByLanguage(Integer id);
-
 }

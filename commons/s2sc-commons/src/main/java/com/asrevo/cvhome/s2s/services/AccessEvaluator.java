@@ -4,23 +4,32 @@ import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import org.springframework.security.core.Authentication;
 
 public interface AccessEvaluator {
-    boolean hasAccessOnStoreUsersList(Authentication authentication, ManagerStoreId requestedStoreId);
+    boolean hasAccessOnStoreUsersList(
+            Authentication authentication, ManagerStoreId requestedStoreId);
 
-    boolean hasAccessOnStoreUsersCreate(Authentication authentication, ManagerStoreId requestedStoreId);
+    boolean hasAccessOnStoreUsersCreate(
+            Authentication authentication, ManagerStoreId requestedStoreId);
 
-    boolean hasAccessOnStoreUsersUpdate(Authentication authentication, ManagerStoreId requestedStoreId);
+    boolean hasAccessOnStoreUsersUpdate(
+            Authentication authentication, ManagerStoreId requestedStoreId);
 
-    boolean hasAccessOnStoreUsersDelete(Authentication authentication, ManagerStoreId requestedStoreId);
+    boolean hasAccessOnStoreUsersDelete(
+            Authentication authentication, ManagerStoreId requestedStoreId);
 
-    boolean hasAccessOnStoreUsersEnable(Authentication authentication, ManagerStoreId requestedStoreId);
+    boolean hasAccessOnStoreUsersEnable(
+            Authentication authentication, ManagerStoreId requestedStoreId);
 
-    boolean hasAccessOnStoreUsersDisable(Authentication authentication, ManagerStoreId requestedStoreId);
+    boolean hasAccessOnStoreUsersDisable(
+            Authentication authentication, ManagerStoreId requestedStoreId);
 
     boolean hasAccessOnStoreFindOne(Authentication authentication, ManagerStoreId requestedStoreId);
 
-    boolean hasAccessOnStoreDomainList(Authentication authentication, ManagerStoreId requestedStoreId);
+    boolean hasAccessOnStoreDomainList(
+            Authentication authentication, ManagerStoreId requestedStoreId);
 
-    boolean hasAccessOnStoreDomainCreate(Authentication authentication, ManagerStoreId requestedStoreId);
+    boolean hasAccessOnStoreDomainCreate(
+            Authentication authentication, ManagerStoreId requestedStoreId);
 
-    boolean hasAccessOnStoreDomainDelete(Authentication authentication, ManagerStoreId requestedStoreId);
+    boolean hasAccessOnStoreDomainDelete(
+            Authentication authentication, ManagerStoreId requestedStoreId);
 }

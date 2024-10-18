@@ -10,6 +10,4 @@ public class MerchantStoreCriteria extends Criteria {
 
     private boolean retailers = false;
     private boolean stores = false;
-
-
 }

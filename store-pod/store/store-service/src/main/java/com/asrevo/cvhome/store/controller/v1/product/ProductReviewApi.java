@@ -1,5 +1,7 @@
 package com.asrevo.cvhome.store.controller.v1.product;
 
+import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1;
+
 import com.asrevo.cvhome.commons.annotation.SecuredResource;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.entity.catalog.product.Product;
@@ -17,14 +19,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-
-import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1;
 
 @Controller
 @RequestMapping("/api/v1")
@@ -35,7 +34,10 @@ public class ProductReviewApi {
     private final ProductService productService;
     private final ProductReviewService productReviewService;
 
-    public ProductReviewApi(ProductCommonFacade productCommonFacade, ProductService productService, ProductReviewService productReviewService) {
+    public ProductReviewApi(
+            ProductCommonFacade productCommonFacade,
+            ProductService productService,
+            ProductReviewService productReviewService) {
         this.productCommonFacade = productCommonFacade;
         this.productService = productService;
         this.productReviewService = productReviewService;
@@ -43,17 +45,29 @@ public class ProductReviewApi {
 
     @RequestMapping(
             value = {
-                    "/private/products/{id}/reviews",
-                    "/auth/products/{id}/reviews",
-                    "/auth/products/{id}/reviews",
-                    "/auth/products/{id}/reviews"
+                "/private/products/{id}/reviews",
+                "/auth/products/{id}/reviews",
+                "/auth/products/{id}/reviews",
+                "/auth/products/{id}/reviews"
             },
             method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
+        @Parameter(
+                name = "store",
+                schema =
+                        @Schema(
+                                name = "store",
+                                type = "string",
+                                defaultValue = DEFAULT_ORG1_STORE1)),
+        @Parameter(
+                name = "lang",
+                schema =
+                        @Schema(
+                                name = "lang",
+                                type = "string",
+                                defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public PersistableProductReview create(
             @PathVariable final Long id,
@@ -75,7 +89,8 @@ public class ProductReviewApi {
 
             // rating maximum 5
             if (review.getRating() > Constants.MAX_REVIEW_RATING_SCORE) {
-                response.sendError(503, "Maximum rating score is " + Constants.MAX_REVIEW_RATING_SCORE);
+                response.sendError(
+                        503, "Maximum rating score is " + Constants.MAX_REVIEW_RATING_SCORE);
                 return null;
             }
 
@@ -100,8 +115,20 @@ public class ProductReviewApi {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
+        @Parameter(
+                name = "store",
+                schema =
+                        @Schema(
+                                name = "store",
+                                type = "string",
+                                defaultValue = DEFAULT_ORG1_STORE1)),
+        @Parameter(
+                name = "lang",
+                schema =
+                        @Schema(
+                                name = "lang",
+                                type = "string",
+                                defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public List<ReadableProductReview> getAll(
             @PathVariable final Long id,
@@ -136,15 +163,27 @@ public class ProductReviewApi {
 
     @RequestMapping(
             value = {
-                    "/private/products/{id}/reviews/{reviewid}",
-                    "/auth/products/{id}/reviews/{reviewid}"
+                "/private/products/{id}/reviews/{reviewid}",
+                "/auth/products/{id}/reviews/{reviewid}"
             },
             method = RequestMethod.PUT)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
+        @Parameter(
+                name = "store",
+                schema =
+                        @Schema(
+                                name = "store",
+                                type = "string",
+                                defaultValue = DEFAULT_ORG1_STORE1)),
+        @Parameter(
+                name = "lang",
+                schema =
+                        @Schema(
+                                name = "lang",
+                                type = "string",
+                                defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public PersistableProductReview update(
             @PathVariable final Long id,
@@ -162,14 +201,16 @@ public class ProductReviewApi {
                 return null;
             }
 
-            if (prodReview.getCustomer().getId().longValue() != review.getCustomerId().longValue()) {
+            if (prodReview.getCustomer().getId().longValue()
+                    != review.getCustomerId().longValue()) {
                 response.sendError(404, "Product review with id " + reviewId + " does not exist");
                 return null;
             }
 
             // rating maximum 5
             if (review.getRating() > Constants.MAX_REVIEW_RATING_SCORE) {
-                response.sendError(503, "Maximum rating score is " + Constants.MAX_REVIEW_RATING_SCORE);
+                response.sendError(
+                        503, "Maximum rating score is " + Constants.MAX_REVIEW_RATING_SCORE);
                 return null;
             }
 
@@ -192,15 +233,27 @@ public class ProductReviewApi {
 
     @RequestMapping(
             value = {
-                    "/private/products/{id}/reviews/{reviewid}",
-                    "/auth/products/{id}/reviews/{reviewid}"
+                "/private/products/{id}/reviews/{reviewid}",
+                "/auth/products/{id}/reviews/{reviewid}"
             },
             method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1)),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
+        @Parameter(
+                name = "store",
+                schema =
+                        @Schema(
+                                name = "store",
+                                type = "string",
+                                defaultValue = DEFAULT_ORG1_STORE1)),
+        @Parameter(
+                name = "lang",
+                schema =
+                        @Schema(
+                                name = "lang",
+                                type = "string",
+                                defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     public void delete(
             @PathVariable final Long id,
@@ -229,7 +282,6 @@ public class ProductReviewApi {
                 response.sendError(503, "Error while deleting product review" + e.getMessage());
             } catch (Exception ignore) {
             }
-
         }
     }
 }

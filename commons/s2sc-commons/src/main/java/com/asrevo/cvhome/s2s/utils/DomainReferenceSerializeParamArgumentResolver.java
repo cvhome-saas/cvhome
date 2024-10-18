@@ -7,7 +7,8 @@ import org.springframework.web.service.invoker.HttpServiceArgumentResolver;
 
 public class DomainReferenceSerializeParamArgumentResolver implements HttpServiceArgumentResolver {
     @Override
-    public boolean resolve(Object argument, MethodParameter parameter, HttpRequestValues.Builder requestValues) {
+    public boolean resolve(
+            Object argument, MethodParameter parameter, HttpRequestValues.Builder requestValues) {
         try {
             if (argument instanceof DomainReference domainReference) {
                 requestValues.addRequestParameter("reference", domainReference.reference());
@@ -16,6 +17,5 @@ public class DomainReferenceSerializeParamArgumentResolver implements HttpServic
         } catch (Exception ignored) {
         }
         return false;
-
     }
 }

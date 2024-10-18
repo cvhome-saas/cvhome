@@ -8,26 +8,32 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.io.Serial;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name = "PRODUCT_PRICE")
 @Getter
 @Setter
 public class ProductPrice extends SalesManagerEntity<Long, ProductPrice> {
-    public final static String DEFAULT_PRICE_CODE = "base";
-    @Serial
-    private static final long serialVersionUID = 1L;
+    public static final String DEFAULT_PRICE_CODE = "base";
+    @Serial private static final long serialVersionUID = 1L;
+
     @Id
     @Column(name = "PRODUCT_PRICE_ID")
-    @TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME", valueColumnName = "SEQ_COUNT", pkColumnValue = "PRODUCT_PRICE_SEQ_NEXT_VAL", allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE, initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
+    @TableGenerator(
+            name = "TABLE_GEN",
+            table = "SM_SEQUENCER",
+            pkColumnName = "SEQ_NAME",
+            valueColumnName = "SEQ_COUNT",
+            pkColumnValue = "PRODUCT_PRICE_SEQ_NEXT_VAL",
+            allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
+            initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
     private Long id;
 
@@ -68,9 +74,7 @@ public class ProductPrice extends SalesManagerEntity<Long, ProductPrice> {
     @Column(name = "PRODUCT_IDENTIFIER_ID")
     private Long productIdentifierId;
 
-    public ProductPrice() {
-    }
-
+    public ProductPrice() {}
 
     public Date getProductPriceSpecialStartDate() {
         return CloneUtils.clone(productPriceSpecialStartDate);
@@ -87,6 +91,4 @@ public class ProductPrice extends SalesManagerEntity<Long, ProductPrice> {
     public void setProductPriceSpecialEndDate(Date productPriceSpecialEndDate) {
         this.productPriceSpecialEndDate = CloneUtils.clone(productPriceSpecialEndDate);
     }
-
-
 }

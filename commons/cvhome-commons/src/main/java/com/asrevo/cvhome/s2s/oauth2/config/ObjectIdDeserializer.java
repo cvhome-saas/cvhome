@@ -4,9 +4,8 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
-import org.bson.types.ObjectId;
-
 import java.io.IOException;
+import org.bson.types.ObjectId;
 
 public class ObjectIdDeserializer extends StdDeserializer<ObjectId> {
 
@@ -19,16 +18,15 @@ public class ObjectIdDeserializer extends StdDeserializer<ObjectId> {
     }
 
     @Override
-    public ObjectId deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
+    public ObjectId deserialize(
+            JsonParser jsonParser, DeserializationContext deserializationContext)
+            throws IOException {
         TreeNode node = jsonParser.getCodec().readTree(jsonParser);
         if (node != null && node.get("id") != null) {
             String id = node.get("id").toString().replaceAll("\"", "");
             return new ObjectId(id);
         } else {
             return null;
-
         }
     }
-
-
 }

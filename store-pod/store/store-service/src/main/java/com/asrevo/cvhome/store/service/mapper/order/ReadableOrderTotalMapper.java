@@ -10,11 +10,10 @@ import com.asrevo.cvhome.store.core.services.catalog.pricing.PricingService;
 import com.asrevo.cvhome.store.service.mapper.Mapper;
 import com.asrevo.cvhome.store.utils.LabelUtils;
 import com.asrevo.cvhome.store.utils.LocaleUtils;
+import java.util.Locale;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Component;
-
-import java.util.Locale;
 
 @Component
 public class ReadableOrderTotalMapper implements Mapper<OrderTotal, ReadableOrderTotal> {
@@ -35,8 +34,8 @@ public class ReadableOrderTotalMapper implements Mapper<OrderTotal, ReadableOrde
     }
 
     @Override
-    public ReadableOrderTotal merge(OrderTotal source, ReadableOrderTotal target, MerchantStore store,
-                                    Language language) {
+    public ReadableOrderTotal merge(
+            OrderTotal source, ReadableOrderTotal target, MerchantStore store, Language language) {
 
         Validate.notNull(source, "OrderTotal must not be null");
         Validate.notNull(target, "ReadableTotal must not be null");
@@ -52,7 +51,9 @@ public class ReadableOrderTotalMapper implements Mapper<OrderTotal, ReadableOrde
             target.setModule(source.getModule());
             target.setOrder(source.getSortOrder());
 
-            target.setTitle(messages.getMessage(source.getOrderTotalCode(), locale, source.getOrderTotalCode()));
+            target.setTitle(
+                    messages.getMessage(
+                            source.getOrderTotalCode(), locale, source.getOrderTotalCode()));
             target.setText(source.getText());
 
             target.setValue(source.getValue());
@@ -69,7 +70,5 @@ public class ReadableOrderTotalMapper implements Mapper<OrderTotal, ReadableOrde
         }
 
         return target;
-
     }
-
 }

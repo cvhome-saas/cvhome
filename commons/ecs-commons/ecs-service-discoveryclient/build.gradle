@@ -1,10 +1,11 @@
 plugins {
-    id 'com.asrevo.java-library-conventions'
+	id 'com.asrevo.java-library-conventions'
+	id("com.diffplug.spotless") version "7.0.0.BETA2"
 }
 
 dependencies {
-    implementation 'org.springframework.cloud:spring-cloud-starter-loadbalancer:4.1.3'
-    implementation 'software.amazon.awssdk:servicediscovery:2.26.7'
-    compileOnly 'org.projectlombok:lombok:1.18.32'
-    annotationProcessor 'org.projectlombok:lombok:1.18.32'
+	implementation 'org.springframework.cloud:spring-cloud-starter-loadbalancer:4.1.3'
+	implementation 'software.amazon.awssdk:servicediscovery:2.26.7'
+	compileOnly 'org.projectlombok:lombok:1.18.32'
+	annotationProcessor 'org.projectlombok:lombok:1.18.32'
 }

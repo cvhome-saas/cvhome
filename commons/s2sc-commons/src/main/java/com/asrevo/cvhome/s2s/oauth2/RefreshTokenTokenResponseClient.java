@@ -7,7 +7,8 @@ import org.springframework.security.oauth2.client.endpoint.OAuth2RefreshTokenGra
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-public class RefreshTokenTokenResponseClient extends OAuth2AccessTokenResponseClient<OAuth2RefreshTokenGrantRequest> {
+public class RefreshTokenTokenResponseClient
+        extends OAuth2AccessTokenResponseClient<OAuth2RefreshTokenGrantRequest> {
     @Override
     HttpEntity<?> getRequestEntity(OAuth2RefreshTokenGrantRequest request) {
         HttpHeaders headers = new HttpHeaders();

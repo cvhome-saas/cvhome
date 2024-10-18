@@ -12,7 +12,8 @@ import jakarta.persistence.Query;
 public class RepositoryHelper {
 
     @SuppressWarnings("rawtypes")
-    public static Query paginateQuery(Query q, Number count, GenericEntityList entityList, Criteria criteria) {
+    public static Query paginateQuery(
+            Query q, Number count, GenericEntityList entityList, Criteria criteria) {
 
         if (entityList == null) {
             entityList = new GenericEntityList();
@@ -24,8 +25,12 @@ public class RepositoryHelper {
                 q.setMaxResults(Math.min(criteria.getMaxCount(), count.intValue()));
             }
         } else {
-            //int firstResult = ((criteria.getStartPage()==0?criteria.getStartPage()+1:criteria.getStartPage()) - 1) * criteria.getPageSize();
-            int firstResult = ((criteria.getStartPage() == 0 ? 0 : criteria.getStartPage())) * criteria.getPageSize();
+            // int firstResult =
+            // ((criteria.getStartPage()==0?criteria.getStartPage()+1:criteria.getStartPage()) - 1)
+            // * criteria.getPageSize();
+            int firstResult =
+                    ((criteria.getStartPage() == 0 ? 0 : criteria.getStartPage()))
+                            * criteria.getPageSize();
             q.setFirstResult(firstResult);
             q.setMaxResults(criteria.getPageSize());
             int lastPageNumber = (count.intValue() / criteria.getPageSize()) + 1;
@@ -34,7 +39,5 @@ public class RepositoryHelper {
         }
 
         return q;
-
     }
-
 }

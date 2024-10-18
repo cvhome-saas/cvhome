@@ -5,19 +5,15 @@ import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
-
 import java.util.Date;
 import java.util.List;
 
-
 public class CategoryRepositoryImpl implements CategoryRepositoryCustom {
 
-    @PersistenceContext
-    private EntityManager em;
+    @PersistenceContext private EntityManager em;
 
     @Override
     public List<Object[]> countProductsByCategories(MerchantStore store, List<Long> categoryIds) {
-
 
         StringBuilder qs = new StringBuilder();
         qs.append("select category.id, count(product.id) from Product product ");
@@ -32,14 +28,10 @@ public class CategoryRepositoryImpl implements CategoryRepositoryCustom {
         q.setParameter("cid", categoryIds);
         q.setParameter("dt", new Date());
 
-
         @SuppressWarnings("unchecked")
         List<Object[]> counts = q.getResultList();
 
-
         return counts;
-
-
     }
 
     @SuppressWarnings("unchecked")
@@ -51,29 +43,29 @@ public class CategoryRepositoryImpl implements CategoryRepositoryCustom {
 
         if (store == null) {
             if (category == null) {
-                //query.from(qCategory)
+                // query.from(qCategory)
                 queryBuilder.append(" where c.parent IsNull ");
-                //.where(qCategory.parent.isNull())
-                //.orderBy(qCategory.sortOrder.asc(),qCategory.id.desc());
+                // .where(qCategory.parent.isNull())
+                // .orderBy(qCategory.sortOrder.asc(),qCategory.id.desc());
             } else {
-                //query.from(qCategory)
+                // query.from(qCategory)
                 queryBuilder.append(" join fetch c.parent cp where cp.id =:cid ");
-                //.where(qCategory.parent.eq(category))
-                //.orderBy(qCategory.sortOrder.asc(),qCategory.id.desc());
+                // .where(qCategory.parent.eq(category))
+                // .orderBy(qCategory.sortOrder.asc(),qCategory.id.desc());
             }
         } else {
             if (category == null) {
-                //query.from(qCategory)
+                // query.from(qCategory)
                 queryBuilder.append(" where c.parent IsNull and cm.id=:mid ");
-                //.where(qCategory.parent.isNull()
+                // .where(qCategory.parent.isNull()
                 //	.and(qCategory.merchantStore.eq(store)))
-                //.orderBy(qCategory.sortOrder.asc(),qCategory.id.desc());
+                // .orderBy(qCategory.sortOrder.asc(),qCategory.id.desc());
             } else {
-                //query.from(qCategory)
+                // query.from(qCategory)
                 queryBuilder.append(" join fetch c.parent cp where cp.id =:cId and cm.id=:mid ");
-                //.where(qCategory.parent.eq(category)
+                // .where(qCategory.parent.eq(category)
                 //	.and(qCategory.merchantStore.eq(store)))
-                //.orderBy(qCategory.sortOrder.asc(),qCategory.id.desc());
+                // .orderBy(qCategory.sortOrder.asc(),qCategory.id.desc());
             }
         }
 
@@ -87,13 +79,11 @@ public class CategoryRepositoryImpl implements CategoryRepositoryCustom {
             q.setParameter("mid", store.getId());
         }
 
-
         return q.getResultList();
     }
 
     @Override
     public List<Category> listByProduct(MerchantStore store, Long product) {
-
 
         StringBuilder qs = new StringBuilder();
         qs.append("select category from Product product ");
@@ -110,9 +100,6 @@ public class CategoryRepositoryImpl implements CategoryRepositoryCustom {
         @SuppressWarnings("unchecked")
         List<Category> c = q.getResultList();
 
-
         return c;
-
     }
-
 }

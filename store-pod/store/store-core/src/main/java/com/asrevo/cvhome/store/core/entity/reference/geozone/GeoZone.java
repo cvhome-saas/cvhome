@@ -5,12 +5,11 @@ import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
 import com.asrevo.cvhome.store.core.entity.reference.country.Country;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name = "GEOZONE")
@@ -18,12 +17,18 @@ import java.util.List;
 @Getter
 @Setter
 public class GeoZone extends SalesManagerEntity<Long, GeoZone> {
-    @Serial
-    private static final long serialVersionUID = -5992008645857938825L;
+    @Serial private static final long serialVersionUID = -5992008645857938825L;
 
     @Id
     @Column(name = "GEOZONE_ID")
-    @TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME", valueColumnName = "SEQ_COUNT", pkColumnValue = "GEOZONE_SEQ_NEXT_VAL", allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE, initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
+    @TableGenerator(
+            name = "TABLE_GEN",
+            table = "SM_SEQUENCER",
+            pkColumnName = "SEQ_NAME",
+            valueColumnName = "SEQ_COUNT",
+            pkColumnValue = "GEOZONE_SEQ_NEXT_VAL",
+            allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
+            initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
     private Long id;
 
@@ -34,15 +39,11 @@ public class GeoZone extends SalesManagerEntity<Long, GeoZone> {
     @OneToMany(mappedBy = "geoZone", targetEntity = Country.class)
     private List<Country> countries = new ArrayList<>();
 
-
     @Column(name = "GEOZONE_NAME")
     private String name;
 
     @Column(name = "GEOZONE_CODE")
     private String code;
 
-    public GeoZone() {
-    }
-
-
+    public GeoZone() {}
 }

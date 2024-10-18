@@ -8,6 +8,13 @@ import com.asrevo.cvhome.store.core.modules.cms.content.ContentAssetsManager;
 import com.asrevo.cvhome.store.core.repositories.content.ContentRepository;
 import com.asrevo.cvhome.store.core.repositories.content.PageContentRepository;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.net.URLConnection;
+import java.util.List;
+import java.util.Optional;
+import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -16,25 +23,20 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.net.URLConnection;
-import java.util.List;
-import java.util.Optional;
-import java.util.regex.Pattern;
-
 @Service("contentService")
 @Slf4j
-public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Content> implements ContentService {
-
+public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Content>
+        implements ContentService {
 
     private final ContentAssetsManager assetsManager;
     private final ContentRepository contentRepository;
     private final PageContentRepository pageContentRepository;
 
     @Autowired
-    public ContentServiceImpl(ContentRepository contentRepository, ContentAssetsManager assetsManager, PageContentRepository pageContentRepository) {
+    public ContentServiceImpl(
+            ContentRepository contentRepository,
+            ContentAssetsManager assetsManager,
+            PageContentRepository pageContentRepository) {
         super(contentRepository);
 
         this.contentRepository = contentRepository;
@@ -54,7 +56,6 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
 
         Content c = this.getById(content.getId());
         super.delete(c);
-
     }
 
     @Override
@@ -63,7 +64,8 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
     }
 
     @Override
-    public List<Content> listByType(List<ContentType> contentType, MerchantStore store, Language language)
+    public List<Content> listByType(
+            List<ContentType> contentType, MerchantStore store, Language language)
             throws ServiceException {
 
         /*
@@ -76,14 +78,16 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
     }
 
     @Override
-    public List<ContentDescription> listNameByType(List<ContentType> contentType, MerchantStore store,
-                                                   Language language) throws ServiceException {
+    public List<ContentDescription> listNameByType(
+            List<ContentType> contentType, MerchantStore store, Language language)
+            throws ServiceException {
 
         return contentRepository.listNameByType(contentType, store, language);
     }
 
     @Override
-    public List<Content> listByType(List<ContentType> contentType, MerchantStore store) throws ServiceException {
+    public List<Content> listByType(List<ContentType> contentType, MerchantStore store)
+            throws ServiceException {
 
         return contentRepository.findByTypes(contentType, store.getId());
     }
@@ -92,7 +96,6 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
     public Content getByCode(String code, MerchantStore store) throws ServiceException {
 
         return contentRepository.findByCode(code, store.getId());
-
     }
 
     @Override
@@ -109,11 +112,11 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
         } else {
             super.save(content);
         }
-
     }
 
     @Override
-    public Content getByCode(String code, MerchantStore store, Language language) throws ServiceException {
+    public Content getByCode(String code, MerchantStore store, Language language)
+            throws ServiceException {
         return contentRepository.findByCode(code, store.getId(), language.getId());
     }
 
@@ -128,63 +131,75 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
      * @throws ServiceException service exception
      */
     @Override
-    public void addContentFile(String merchantStoreCode, InputContentFile contentFile) throws ServiceException {
+    public void addContentFile(String merchantStoreCode, InputContentFile contentFile)
+            throws ServiceException {
         Assert.notNull(merchantStoreCode, "Merchant store Id can not be null");
         Assert.notNull(contentFile, "InputContentFile image can not be null");
         Assert.notNull(contentFile.getFileName(), "InputContentFile.fileName can not be null");
-        Assert.notNull(contentFile.getFileContentType(), "InputContentFile.fileContentType can not be null");
+        Assert.notNull(
+                contentFile.getFileContentType(),
+                "InputContentFile.fileContentType can not be null");
 
         String mimeType = URLConnection.guessContentTypeFromName(contentFile.getFileName());
         contentFile.setMimeType(mimeType);
 
         if (contentFile.getFileContentType().name().equals(FileContentType.IMAGE.name())
-                || contentFile.getFileContentType().name().equals(FileContentType.STATIC_FILE.name())) {
+                || contentFile
+                        .getFileContentType()
+                        .name()
+                        .equals(FileContentType.STATIC_FILE.name())) {
             addFile(merchantStoreCode, contentFile);
-        } else if (contentFile.getFileContentType().name().equals(FileContentType.API_IMAGE.name())) {
+        } else if (contentFile
+                .getFileContentType()
+                .name()
+                .equals(FileContentType.API_IMAGE.name())) {
             contentFile.setFileContentType(FileContentType.IMAGE);
             addImage(merchantStoreCode, contentFile);
-        } else if (contentFile.getFileContentType().name().equals(FileContentType.API_FILE.name())) {
+        } else if (contentFile
+                .getFileContentType()
+                .name()
+                .equals(FileContentType.API_FILE.name())) {
             contentFile.setFileContentType(FileContentType.STATIC_FILE);
             addFile(merchantStoreCode, contentFile);
         } else {
             addImage(merchantStoreCode, contentFile);
         }
-
     }
 
     @Override
-    public void addLogo(String merchantStoreCode, InputContentFile cmsContentImage) throws ServiceException {
+    public void addLogo(String merchantStoreCode, InputContentFile cmsContentImage)
+            throws ServiceException {
 
         Assert.notNull(merchantStoreCode, "Merchant store Id can not be null");
         Assert.notNull(cmsContentImage, "CMSContent image can not be null");
 
         cmsContentImage.setFileContentType(FileContentType.LOGO);
         addImage(merchantStoreCode, cmsContentImage);
-
     }
 
     @Override
-    public void addBanner(String merchantStoreCode, InputContentFile cmsContentImage) throws ServiceException {
+    public void addBanner(String merchantStoreCode, InputContentFile cmsContentImage)
+            throws ServiceException {
 
         Assert.notNull(merchantStoreCode, "Merchant store Id can not be null");
         Assert.notNull(cmsContentImage, "CMSContent image can not be null");
 
         cmsContentImage.setFileContentType(FileContentType.BANNER);
         addImage(merchantStoreCode, cmsContentImage);
-
     }
 
     @Override
-    public void addOptionImage(String merchantStoreCode, InputContentFile cmsContentImage) throws ServiceException {
+    public void addOptionImage(String merchantStoreCode, InputContentFile cmsContentImage)
+            throws ServiceException {
 
         Assert.notNull(merchantStoreCode, "Merchant store Id can not be null");
         Assert.notNull(cmsContentImage, "CMSContent image can not be null");
         cmsContentImage.setFileContentType(FileContentType.PROPERTY);
         addImage(merchantStoreCode, cmsContentImage);
-
     }
 
-    private void addImage(String merchantStoreCode, InputContentFile contentImage) throws ServiceException {
+    private void addImage(String merchantStoreCode, InputContentFile contentImage)
+            throws ServiceException {
 
         try {
             log.info("Adding content image for merchant id {}", merchantStoreCode);
@@ -205,12 +220,11 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
                 }
             } catch (Exception ignore) {
             }
-
         }
-
     }
 
-    private void addFile(final String merchantStoreCode, InputContentFile contentImage) throws ServiceException {
+    private void addFile(final String merchantStoreCode, InputContentFile contentImage)
+            throws ServiceException {
 
         try {
             log.info("Adding content file for merchant id {}", merchantStoreCode);
@@ -235,7 +249,6 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
             } catch (Exception ignore) {
             }
         }
-
     }
 
     /**
@@ -271,7 +284,6 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
         } catch (Exception e) {
             throw new ServiceException(e);
         }
-
     }
 
     /**
@@ -281,7 +293,8 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
      *
      */
     @Override
-    public void removeFile(String merchantStoreCode, FileContentType fileContentType, String fileName)
+    public void removeFile(
+            String merchantStoreCode, FileContentType fileContentType, String fileName)
             throws ServiceException {
         Assert.notNull(merchantStoreCode, "Merchant Store Id can not be null");
         Assert.notNull(fileContentType, "Content file type can not be null");
@@ -291,7 +304,6 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
         Optional<String> path = Optional.ofNullable(p);
 
         assetsManager.removeFile(merchantStoreCode, fileContentType, fileName, path);
-
     }
 
     @Override
@@ -300,14 +312,12 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
         String fileType = "IMAGE";
         String mimetype = URLConnection.guessContentTypeFromName(fileName);
         String type = mimetype.split("/")[0];
-        if (!type.equals("image"))
-            fileType = "STATIC_FILE";
+        if (!type.equals("image")) fileType = "STATIC_FILE";
 
         String p = null;
         Optional<String> path = Optional.ofNullable(p);
 
         assetsManager.removeFile(storeCode, FileContentType.valueOf(fileType), fileName, path);
-
     }
 
     /**
@@ -336,7 +346,8 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
      * @return {@link OutputContentFile}
      */
     @Override
-    public OutputContentFile getContentFile(String merchantStoreCode, FileContentType fileContentType, String fileName)
+    public OutputContentFile getContentFile(
+            String merchantStoreCode, FileContentType fileContentType, String fileName)
             throws ServiceException {
         Assert.notNull(merchantStoreCode, "Merchant store ID can not be null");
         Assert.notNull(fileName, "File name can not be null");
@@ -345,7 +356,6 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
         Optional<String> path = Optional.ofNullable(p);
 
         return assetsManager.getFile(merchantStoreCode, path, fileContentType, fileName);
-
     }
 
     /**
@@ -358,8 +368,8 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
      * @return list of {@link List<OutputContentFile>}
      */
     @Override
-    public List<OutputContentFile> getContentFiles(String merchantStoreCode, FileContentType fileContentType)
-            throws ServiceException {
+    public List<OutputContentFile> getContentFiles(
+            String merchantStoreCode, FileContentType fileContentType) throws ServiceException {
         Assert.notNull(merchantStoreCode, "Merchant store Id can not be null");
         // return staticassetsManager.getFiles(merchantStoreCode,
         // fileContentType);
@@ -374,8 +384,8 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
      * @return images name list
      */
     @Override
-    public List<String> getContentFilesNames(String merchantStoreCode, FileContentType fileContentType)
-            throws ServiceException {
+    public List<String> getContentFilesNames(
+            String merchantStoreCode, FileContentType fileContentType) throws ServiceException {
         Assert.notNull(merchantStoreCode, "Merchant store Id can not be null");
 
         String p = null;
@@ -399,12 +409,15 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
     }
 
     @Override
-    public List<Content> getByCodeLike(ContentType type, String codeLike, MerchantStore store, Language language) {
-        return contentRepository.findByCodeLike(type, '%' + codeLike + '%', store.getId(), language.getId());
+    public List<Content> getByCodeLike(
+            ContentType type, String codeLike, MerchantStore store, Language language) {
+        return contentRepository.findByCodeLike(
+                type, '%' + codeLike + '%', store.getId(), language.getId());
     }
 
     @Override
-    public Content getById(Long id, MerchantStore store, Language language) throws ServiceException {
+    public Content getById(Long id, MerchantStore store, Language language)
+            throws ServiceException {
 
         Content content = contentRepository.findOne(id);
 
@@ -431,58 +444,72 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
     }
 
     @Override
-    public void addFolder(MerchantStore store, Optional<String> path, String folderName) throws ServiceException {
+    public void addFolder(MerchantStore store, Optional<String> path, String folderName)
+            throws ServiceException {
         Assert.notNull(store, "MerchantStore cannot be null");
         Assert.notNull(folderName, "Folder name cannot be null");
 
         if (path.isPresent()) {
             if (!this.isValidLinuxDirectory(path.get())) {
-                throw new ServiceException("Path format [" + path.get() + "] not a valid directory format");
+                throw new ServiceException(
+                        "Path format [" + path.get() + "] not a valid directory format");
             }
         }
         assetsManager.addFolder(store.getCode(), folderName, path);
-
-
     }
 
     @Override
-    public List<String> listFolders(MerchantStore store, Optional<String> path) throws ServiceException {
+    public List<String> listFolders(MerchantStore store, Optional<String> path)
+            throws ServiceException {
         Assert.notNull(store, "MerchantStore cannot be null");
 
         return assetsManager.listFolders(store.getCode(), path);
     }
 
     @Override
-    public void removeFolder(MerchantStore store, Optional<String> path, String folderName) throws ServiceException {
+    public void removeFolder(MerchantStore store, Optional<String> path, String folderName)
+            throws ServiceException {
         Assert.notNull(store, "MerchantStore cannot be null");
         Assert.notNull(folderName, "Folder name cannot be null");
 
         assetsManager.removeFolder(store.getCode(), folderName, path);
-
     }
 
     public boolean isValidLinuxDirectory(String path) {
         Pattern linuxDirectoryPattern = Pattern.compile("^/|(/[a-zA-Z0-9_-]+)+$");
-        return path != null && !path.trim().isEmpty() && linuxDirectoryPattern.matcher(path).matches();
+        return path != null
+                && !path.trim().isEmpty()
+                && linuxDirectoryPattern.matcher(path).matches();
     }
 
     @Override
-    public void renameFile(String merchantStoreCode, FileContentType fileContentType, Optional<String> path,
-                           String originalName, String newName) throws ServiceException {
+    public void renameFile(
+            String merchantStoreCode,
+            FileContentType fileContentType,
+            Optional<String> path,
+            String originalName,
+            String newName)
+            throws ServiceException {
 
-        OutputContentFile file = assetsManager.getFile(merchantStoreCode, path, fileContentType, originalName);
+        OutputContentFile file =
+                assetsManager.getFile(merchantStoreCode, path, fileContentType, originalName);
 
         if (file == null) {
-            throw new ServiceException("File name [" + originalName + "] not found for merchant [" + merchantStoreCode + "]");
+            throw new ServiceException(
+                    "File name ["
+                            + originalName
+                            + "] not found for merchant ["
+                            + merchantStoreCode
+                            + "]");
         }
 
         ByteArrayOutputStream os = file.getFile();
         InputStream is = new ByteArrayInputStream(os.toByteArray());
 
-        //remove file
+        // remove file
         assetsManager.removeFile(merchantStoreCode, fileContentType, originalName, path);
 
-        //recreate file
+        // recreate file
         InputContentFile inputFile = new InputContentFile();
         inputFile.setFileContentType(fileContentType);
         inputFile.setFileName(newName);
@@ -490,21 +517,23 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
         inputFile.setFile(is);
 
         assetsManager.addFile(merchantStoreCode, path, inputFile);
-
     }
 
     @Override
-    public Page<Content> listByType(ContentType contentType, MerchantStore store, int page, int count)
+    public Page<Content> listByType(
+            ContentType contentType, MerchantStore store, int page, int count)
             throws ServiceException {
         Pageable pageRequest = PageRequest.of(page, count);
         return pageContentRepository.findByContentType(contentType, store.getId(), pageRequest);
     }
 
     @Override
-    public Page<Content> listByType(ContentType contentType, MerchantStore store, Language language, int page,
-                                    int count) throws ServiceException {
+    public Page<Content> listByType(
+            ContentType contentType, MerchantStore store, Language language, int page, int count)
+            throws ServiceException {
         Pageable pageRequest = PageRequest.of(page, count);
-        return pageContentRepository.findByContentType(contentType, store.getId(), language.getId(), pageRequest);
+        return pageContentRepository.findByContentType(
+                contentType, store.getId(), language.getId(), pageRequest);
     }
 
     @Override
@@ -512,5 +541,4 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
         Content c = contentRepository.findByCodeAndType(code, type, store.getId());
         return c != null ? true : false;
     }
-
 }

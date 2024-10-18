@@ -11,10 +11,8 @@ import com.asrevo.cvhome.store.core.model.shoppingcart.PersistableShoppingCartIt
 import com.asrevo.cvhome.store.core.model.shoppingcart.ReadableShoppingCart;
 import com.asrevo.cvhome.store.core.model.shoppingcart.ShoppingCartData;
 import com.asrevo.cvhome.store.core.model.shoppingcart.ShoppingCartItem;
-import org.springframework.lang.Nullable;
-
 import java.util.List;
-
+import org.springframework.lang.Nullable;
 
 /**
  * </p>Shopping cart Facade which provide abstraction layer between
@@ -27,27 +25,34 @@ import java.util.List;
  * @version 1.0
  * @since1.0
  */
-
-
 public interface ShoppingCartFacade {
 
-    ShoppingCartData addItemsToShoppingCart(ShoppingCartData shoppingCart, final ShoppingCartItem item, final MerchantStore store, final Language language, final Customer customer) throws Exception;
+    ShoppingCartData addItemsToShoppingCart(
+            ShoppingCartData shoppingCart,
+            final ShoppingCartItem item,
+            final MerchantStore store,
+            final Language language,
+            final Customer customer)
+            throws Exception;
 
-    ShoppingCart createCartModel(final String shoppingCartCode, final MerchantStore store, final Customer customer) throws Exception;
+    ShoppingCart createCartModel(
+            final String shoppingCartCode, final MerchantStore store, final Customer customer)
+            throws Exception;
 
     /**
      * @param store
      * @return
      * @throws Exception
      */
-
     void deleteShoppingCart(final Long id, final MerchantStore store) throws Exception;
 
-    ShoppingCart getShoppingCartModel(final String shoppingCartCode, MerchantStore store) throws Exception;
+    ShoppingCart getShoppingCartModel(final String shoppingCartCode, MerchantStore store)
+            throws Exception;
 
     ShoppingCart getShoppingCartModel(Long id, MerchantStore store) throws Exception;
 
-    ShoppingCart getShoppingCartModel(final Customer customer, MerchantStore store) throws Exception;
+    ShoppingCart getShoppingCartModel(final Customer customer, MerchantStore store)
+            throws Exception;
 
     void deleteShoppingCart(String code, MerchantStore store) throws Exception;
 
@@ -63,7 +68,8 @@ public interface ShoppingCartFacade {
      * @return
      * @throws Exception
      */
-    ReadableShoppingCart getCart(Customer customer, MerchantStore store, Language language) throws Exception;
+    ReadableShoppingCart getCart(Customer customer, MerchantStore store, Language language)
+            throws Exception;
 
     /**
      * Modify an item to an existing cart, quantity of line item will reflect item.getQuantity
@@ -75,8 +81,12 @@ public interface ShoppingCartFacade {
      * @return
      * @throws Exception
      */
-    ReadableShoppingCart modifyCart(String cartCode, PersistableShoppingCartItem item, MerchantStore store,
-                                    Language language) throws Exception;
+    ReadableShoppingCart modifyCart(
+            String cartCode,
+            PersistableShoppingCartItem item,
+            MerchantStore store,
+            Language language)
+            throws Exception;
 
     /**
      * Adds a promo code / coupon code to an existing code
@@ -88,8 +98,8 @@ public interface ShoppingCartFacade {
      * @return
      * @throws Exception
      */
-    ReadableShoppingCart modifyCart(String cartCode, String promo, MerchantStore store,
-                                    Language language) throws Exception;
+    ReadableShoppingCart modifyCart(
+            String cartCode, String promo, MerchantStore store, Language language) throws Exception;
 
     /**
      * Modify a list of items to an existing cart, quantity of line item will reflect item.getQuantity
@@ -101,8 +111,12 @@ public interface ShoppingCartFacade {
      * @return
      * @throws Exception
      */
-    ReadableShoppingCart modifyCartMulti(String cartCode, List<PersistableShoppingCartItem> items, MerchantStore store,
-                                         Language language) throws Exception;
+    ReadableShoppingCart modifyCartMulti(
+            String cartCode,
+            List<PersistableShoppingCartItem> items,
+            MerchantStore store,
+            Language language)
+            throws Exception;
 
     /**
      * Add item to shopping cart
@@ -111,8 +125,8 @@ public interface ShoppingCartFacade {
      * @param store
      * @param language
      */
-    ReadableShoppingCart addToCart(PersistableShoppingCartItem item, MerchantStore store,
-                                   Language language);
+    ReadableShoppingCart addToCart(
+            PersistableShoppingCartItem item, MerchantStore store, Language language);
 
     /**
      * Removes a shopping cart item
@@ -125,8 +139,13 @@ public interface ShoppingCartFacade {
      * @return ReadableShoppingCart or NULL
      * @throws Exception
      */
-    @Nullable
-    ReadableShoppingCart removeShoppingCartItem(String cartCode, String sku, MerchantStore merchant, Language language, boolean returnCart) throws Exception;
+    @Nullable ReadableShoppingCart removeShoppingCartItem(
+            String cartCode,
+            String sku,
+            MerchantStore merchant,
+            Language language,
+            boolean returnCart)
+            throws Exception;
 
     /**
      * Add product to ShoppingCart
@@ -139,7 +158,12 @@ public interface ShoppingCartFacade {
      * @return
      * @throws Exception
      */
-    ReadableShoppingCart addToCart(Customer customer, PersistableShoppingCartItem item, MerchantStore store, Language language) throws Exception;
+    ReadableShoppingCart addToCart(
+            Customer customer,
+            PersistableShoppingCartItem item,
+            MerchantStore store,
+            Language language)
+            throws Exception;
 
     /**
      * Retrieves a shopping cart by ID
@@ -150,7 +174,8 @@ public interface ShoppingCartFacade {
      * @return
      * @throws Exception
      */
-    ReadableShoppingCart getById(Long shoppingCartId, MerchantStore store, Language language) throws Exception;
+    ReadableShoppingCart getById(Long shoppingCartId, MerchantStore store, Language language)
+            throws Exception;
 
     /**
      * Retrieves a shopping cart
@@ -161,8 +186,8 @@ public interface ShoppingCartFacade {
      * @return
      * @throws Exception
      */
-    ReadableShoppingCart getByCode(String code, MerchantStore store, Language language) throws Exception;
-
+    ReadableShoppingCart getByCode(String code, MerchantStore store, Language language)
+            throws Exception;
 
     /**
      * Set an order id to a shopping cart
@@ -174,7 +199,6 @@ public interface ShoppingCartFacade {
      */
     void setOrderId(String code, Long orderId, MerchantStore store) throws Exception;
 
-
     /**
      * Transform cart model to readable cart
      *
@@ -184,5 +208,4 @@ public interface ShoppingCartFacade {
      * @return
      */
     ReadableShoppingCart readableCart(ShoppingCart cart, MerchantStore store, Language language);
-
 }

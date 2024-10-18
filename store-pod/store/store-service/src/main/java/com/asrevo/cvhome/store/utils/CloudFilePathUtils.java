@@ -4,10 +4,9 @@ import com.asrevo.cvhome.s2s.model.CdnProperties;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.entity.content.FileContentType;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
+import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
-
-import java.util.Optional;
 
 @Component
 public class CloudFilePathUtils implements AbstractimageFilePath {
@@ -20,10 +19,9 @@ public class CloudFilePathUtils implements AbstractimageFilePath {
 
     @Override
     public String getBasePath(MerchantStore store) {
-        //store has no incidence, basepath drives the url
+        // store has no incidence, basepath drives the url
         return cdnProperties.basePath();
     }
-
 
     @Override
     public String getContextPath() {
@@ -37,12 +35,17 @@ public class CloudFilePathUtils implements AbstractimageFilePath {
      */
     @Override
     public String buildStaticImageUtils(MerchantStore store, String imageName) {
-        StringBuilder imgName = new StringBuilder().append(getBasePath(store)).append(Constants.FILES_URI).append(Constants.SLASH).append(store.getCode()).append(Constants.SLASH);
+        StringBuilder imgName =
+                new StringBuilder()
+                        .append(getBasePath(store))
+                        .append(Constants.FILES_URI)
+                        .append(Constants.SLASH)
+                        .append(store.getCode())
+                        .append(Constants.SLASH);
         if (!StringUtils.isBlank(imageName)) {
             imgName.append(imageName);
         }
         return imgName.toString();
-
     }
 
     /**
@@ -52,7 +55,13 @@ public class CloudFilePathUtils implements AbstractimageFilePath {
      */
     @Override
     public String buildStaticImageUtils(MerchantStore store, String type, String imageName) {
-        StringBuilder imgName = new StringBuilder().append(getBasePath(store)).append(Constants.FILES_URI).append(Constants.SLASH).append(store.getCode()).append(Constants.SLASH);
+        StringBuilder imgName =
+                new StringBuilder()
+                        .append(getBasePath(store))
+                        .append(Constants.FILES_URI)
+                        .append(Constants.SLASH)
+                        .append(store.getCode())
+                        .append(Constants.SLASH);
         if (type != null && !FileContentType.IMAGE.name().equals(type)) {
             imgName.append(type).append(Constants.SLASH);
         }
@@ -60,8 +69,5 @@ public class CloudFilePathUtils implements AbstractimageFilePath {
             imgName.append(imageName);
         }
         return imgName.toString();
-
     }
-
-
 }

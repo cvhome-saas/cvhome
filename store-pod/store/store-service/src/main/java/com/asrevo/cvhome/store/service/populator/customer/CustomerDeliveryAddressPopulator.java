@@ -11,7 +11,6 @@ import com.asrevo.cvhome.store.core.model.customer.address.Address;
 import com.asrevo.cvhome.store.utils.AbstractDataPopulator;
 import org.apache.commons.lang3.StringUtils;
 
-
 /**
  * @author Admin
  */
@@ -70,5 +69,4 @@ public class CustomerDeliveryAddressPopulator extends AbstractDataPopulator<Cust
     protected Address createTarget() {
         return new Address();
     }
-
 }

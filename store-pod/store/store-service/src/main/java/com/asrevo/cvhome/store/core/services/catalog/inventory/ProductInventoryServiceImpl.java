@@ -8,17 +8,14 @@ import com.asrevo.cvhome.store.core.entity.catalog.product.price.FinalPrice;
 import com.asrevo.cvhome.store.core.entity.catalog.product.variant.ProductVariant;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.services.catalog.pricing.PricingService;
+import java.util.Set;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import java.util.Set;
-
-
 @Service("inventoryService")
 public class ProductInventoryServiceImpl implements ProductInventoryService {
-
 
     private final PricingService pricingService;
 
@@ -66,13 +63,14 @@ public class ProductInventoryServiceImpl implements ProductInventoryService {
 
         for (ProductAvailability availability : availabilities) {
             if (!StringUtils.isEmpty(availability.getRegion())
-                    && availability.getRegion().equals(Constants.ALL_REGIONS)) {// TODO REL 2.1 accept a region
+                    && availability
+                            .getRegion()
+                            .equals(Constants.ALL_REGIONS)) { // TODO REL 2.1 accept a region
                 defaultAvailability = availability;
             }
         }
 
         return defaultAvailability;
-
     }
 
     private ProductInventory inventory(ProductAvailability availability, FinalPrice price) {
@@ -82,5 +80,4 @@ public class ProductInventoryServiceImpl implements ProductInventoryService {
 
         return inventory;
     }
-
 }

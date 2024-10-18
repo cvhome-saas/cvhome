@@ -9,14 +9,15 @@ import com.asrevo.cvhome.store.core.model.catalog.category.ReadableCategory;
 import com.asrevo.cvhome.store.utils.AbstractDataPopulator;
 import org.springframework.util.Assert;
 
-public class ReadableCategoryPopulator extends
-        AbstractDataPopulator<Category, ReadableCategory> {
+public class ReadableCategoryPopulator extends AbstractDataPopulator<Category, ReadableCategory> {
 
     @Override
-    public ReadableCategory populate(final Category source,
-                                     final ReadableCategory target,
-                                     final MerchantStore store,
-                                     final Language language) throws ConversionException {
+    public ReadableCategory populate(
+            final Category source,
+            final ReadableCategory target,
+            final MerchantStore store,
+            final Language language)
+            throws ConversionException {
 
         Assert.notNull(source, "Category must not be null");
 
@@ -34,7 +35,9 @@ public class ReadableCategoryPopulator extends
             }
 
             if (description != null) {
-                final com.asrevo.cvhome.store.core.model.catalog.category.CategoryDescription desc = new com.asrevo.cvhome.store.core.model.catalog.category.CategoryDescription();
+                final com.asrevo.cvhome.store.core.model.catalog.category.CategoryDescription desc =
+                        new com.asrevo.cvhome.store.core.model.catalog.category
+                                .CategoryDescription();
                 desc.setFriendlyUrl(description.getSeUrl());
                 desc.setName(description.getName());
                 desc.setId(source.getId());
@@ -47,11 +50,11 @@ public class ReadableCategoryPopulator extends
 
                 target.setDescription(desc);
             }
-
         }
 
         if (source.getParent() != null) {
-            final com.asrevo.cvhome.store.core.model.catalog.category.Category parent = new com.asrevo.cvhome.store.core.model.catalog.category.Category();
+            final com.asrevo.cvhome.store.core.model.catalog.category.Category parent =
+                    new com.asrevo.cvhome.store.core.model.catalog.category.Category();
             parent.setCode(source.getParent().getCode());
             parent.setId(source.getParent().getId());
             target.setParent(parent);
@@ -67,12 +70,10 @@ public class ReadableCategoryPopulator extends
         target.setFeatured(source.isFeatured());
 
         return target;
-
     }
 
     @Override
     protected ReadableCategory createTarget() {
         return null;
     }
-
 }

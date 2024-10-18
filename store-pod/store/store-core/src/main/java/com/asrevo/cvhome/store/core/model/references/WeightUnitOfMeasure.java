@@ -8,6 +8,9 @@ public enum WeightUnitOfMeasure {
      * lb = pound
      * T = ton
      */
-    g, kg, l, lb, T
-
+    g,
+    kg,
+    l,
+    lb,
+    T
 }

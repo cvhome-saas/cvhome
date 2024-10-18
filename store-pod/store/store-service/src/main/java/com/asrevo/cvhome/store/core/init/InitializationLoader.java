@@ -1,5 +1,7 @@
 package com.asrevo.cvhome.store.core.init;
 
+import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1;
+
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.system.MerchantConfig;
 import com.asrevo.cvhome.store.core.services.merchant.MerchantStoreService;
@@ -10,22 +12,23 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1;
-
-
 @Component
 @Slf4j
 public class InitializationLoader {
 
     protected final MerchantStoreService merchantService;
     private final MerchantConfigurationService merchantConfigurationService;
-    //@Autowired
-    //private InitData initData;
+    // @Autowired
+    // private InitData initData;
     private final InitializationDatabase initializationDatabase;
+
     @Value("${db.init.data:false}")
     private boolean initDefaultData;
 
-    public InitializationLoader(MerchantStoreService merchantService, MerchantConfigurationService merchantConfigurationService, InitializationDatabase initializationDatabase) {
+    public InitializationLoader(
+            MerchantStoreService merchantService,
+            MerchantConfigurationService merchantConfigurationService,
+            InitializationDatabase initializationDatabase) {
         this.merchantService = merchantService;
         this.merchantConfigurationService = merchantConfigurationService;
         this.initializationDatabase = initializationDatabase;
@@ -36,17 +39,18 @@ public class InitializationLoader {
 
         try {
 
-            //Check flag to populate or not the database
+            // Check flag to populate or not the database
             if (!this.initDefaultData) {
                 return;
             }
 
             if (initializationDatabase.isEmpty()) {
 
+                // All default data to be created
 
-                //All default data to be created
-
-                log.info(String.format("%s : Shopizer database is empty, populate it....", "sm-shop"));
+                log.info(
+                        String.format(
+                                "%s : Shopizer database is empty, populate it....", "sm-shop"));
 
                 initializationDatabase.populate("sm-shop");
 
@@ -57,15 +61,10 @@ public class InitializationLoader {
                 config.setDisplayAddToCartOnFeaturedItems(true);
 
                 merchantConfigurationService.saveMerchantConfig(config, store);
-
-
             }
 
         } catch (Exception e) {
             log.error("Error in the init method", e);
         }
-
     }
-
-
 }

@@ -5,13 +5,11 @@ import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
-import org.springframework.data.domain.Page;
-
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
 
 public interface ProductVariationService extends SalesManagerEntityService<Long, ProductVariation> {
-
 
     void saveOrUpdate(ProductVariation entity) throws ServiceException;
 
@@ -21,8 +19,8 @@ public interface ProductVariationService extends SalesManagerEntityService<Long,
 
     Optional<ProductVariation> getByCode(MerchantStore store, String code);
 
-    Page<ProductVariation> getByMerchant(MerchantStore store, Language language, String code, int page, int count);
+    Page<ProductVariation> getByMerchant(
+            MerchantStore store, Language language, String code, int page, int count);
 
     List<ProductVariation> getByIds(List<Long> ids, MerchantStore store);
-
 }

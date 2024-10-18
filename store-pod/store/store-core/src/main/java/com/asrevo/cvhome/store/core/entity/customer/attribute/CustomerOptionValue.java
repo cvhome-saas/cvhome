@@ -8,28 +8,35 @@ import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.io.Serial;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
-@Table(name = "CUSTOMER_OPTION_VALUE", indexes = {@Index(name = "CUST_OPT_VAL_CODE_IDX", columnList = "CUSTOMER_OPT_VAL_CODE")}, uniqueConstraints =
-@UniqueConstraint(columnNames = {"MERCHANT_ID", "CUSTOMER_OPT_VAL_CODE"}))
+@Table(
+        name = "CUSTOMER_OPTION_VALUE",
+        indexes = {@Index(name = "CUST_OPT_VAL_CODE_IDX", columnList = "CUSTOMER_OPT_VAL_CODE")},
+        uniqueConstraints =
+                @UniqueConstraint(columnNames = {"MERCHANT_ID", "CUSTOMER_OPT_VAL_CODE"}))
 @Getter
 @Setter
 public class CustomerOptionValue extends SalesManagerEntity<Long, CustomerOptionValue> {
-    @Serial
-    private static final long serialVersionUID = 3736085877929910891L;
+    @Serial private static final long serialVersionUID = 3736085877929910891L;
 
     @Id
     @Column(name = "CUSTOMER_OPTION_VALUE_ID")
-    @TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME", valueColumnName = "SEQ_COUNT", pkColumnValue = "CUSTOMER_OPT_VAL_SEQ_NEXT_VAL", allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE, initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
+    @TableGenerator(
+            name = "TABLE_GEN",
+            table = "SM_SEQUENCER",
+            pkColumnName = "SEQ_NAME",
+            valueColumnName = "SEQ_COUNT",
+            pkColumnValue = "CUSTOMER_OPT_VAL_SEQ_NEXT_VAL",
+            allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
+            initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
     private Long id;
 
@@ -44,21 +51,18 @@ public class CustomerOptionValue extends SalesManagerEntity<Long, CustomerOption
     @Column(name = "CUSTOMER_OPT_VAL_CODE")
     private String code;
 
-
     @Valid
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "customerOptionValue")
     private Set<CustomerOptionValueDescription> descriptions = new HashSet<>();
 
-    @Transient
-    private List<CustomerOptionValueDescription> descriptionsList = new ArrayList<>();
+    @Transient private List<CustomerOptionValueDescription> descriptionsList = new ArrayList<>();
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MERCHANT_ID", nullable = false)
     private MerchantStore merchantStore;
 
-    public CustomerOptionValue() {
-    }
+    public CustomerOptionValue() {}
 
     public List<CustomerOptionValueDescription> getDescriptionsSettoList() {
         if (descriptionsList == null || descriptionsList.isEmpty()) {
@@ -66,6 +70,4 @@ public class CustomerOptionValue extends SalesManagerEntity<Long, CustomerOption
         }
         return descriptionsList;
     }
-
-
 }

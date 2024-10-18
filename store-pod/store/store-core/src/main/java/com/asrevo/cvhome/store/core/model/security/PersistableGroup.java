@@ -12,14 +12,11 @@ public class PersistableGroup extends GroupEntity {
     /**
      *
      */
-    @Serial
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
 
-    public PersistableGroup() {
-    }
+    public PersistableGroup() {}
 
     public PersistableGroup(String name) {
         super.setName(name);
     }
-
 }

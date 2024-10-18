@@ -3,24 +3,29 @@ package com.asrevo.cvhome.store.core.entity.order.orderproduct;
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name = "ORDER_PRODUCT_ATTRIBUTE")
 @Getter
 @Setter
 public class OrderProductAttribute implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 6037571119918073015L;
+    @Serial private static final long serialVersionUID = 6037571119918073015L;
 
     @Id
     @Column(name = "ORDER_PRODUCT_ATTRIBUTE_ID", nullable = false, unique = true)
-    @TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME", valueColumnName = "SEQ_COUNT", pkColumnValue = "ORDER_PRODUCT_ATTR_ID_NEXT_VAL", allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE, initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
+    @TableGenerator(
+            name = "TABLE_GEN",
+            table = "SM_SEQUENCER",
+            pkColumnName = "SEQ_NAME",
+            valueColumnName = "SEQ_COUNT",
+            pkColumnValue = "ORDER_PRODUCT_ATTR_ID_NEXT_VAL",
+            allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
+            initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
     private Long id;
 
@@ -41,7 +46,6 @@ public class OrderProductAttribute implements Serializable {
     @Column(name = "PRODUCT_OPTION_ID", nullable = false)
     private Long productOptionId;
 
-
     @Column(name = "PRODUCT_OPTION_VALUE_ID", nullable = false)
     private Long productOptionValueId;
 
@@ -51,7 +55,5 @@ public class OrderProductAttribute implements Serializable {
     @Column(name = "PRODUCT_ATTRIBUTE_VAL_NAME")
     private String productAttributeValueName;
 
-    public OrderProductAttribute() {
-    }
-
+    public OrderProductAttribute() {}
 }

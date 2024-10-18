@@ -8,5 +8,4 @@ import lombok.Setter;
 public class ErrorEntity {
     private String errorCode;
     private String message;
-
 }

@@ -1,13 +1,12 @@
 package com.asrevo.cvhome.keycloak.domain.user;
 
 import com.asrevo.cvhome.keycloak.domain.group.ReadableGroup;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -16,8 +15,8 @@ public class ReadableUser extends UserEntity implements Serializable {
     /**
      *
      */
-    @Serial
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
+
     private String lastAccess;
     private String loginTime;
     private String store;
@@ -25,5 +24,4 @@ public class ReadableUser extends UserEntity implements Serializable {
     private boolean active;
 
     private List<ReadableGroup> groups = new ArrayList<>();
-
 }

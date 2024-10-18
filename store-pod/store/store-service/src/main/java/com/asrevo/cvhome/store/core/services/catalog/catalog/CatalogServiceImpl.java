@@ -7,6 +7,7 @@ import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.repositories.catalog.catalog.CatalogRepository;
 import com.asrevo.cvhome.store.core.repositories.catalog.catalog.PageableCatalogRepository;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -14,20 +15,17 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import java.util.Optional;
-
 @Service("catalogService")
-public class CatalogServiceImpl
-        extends SalesManagerEntityServiceImpl<Long, Catalog>
+public class CatalogServiceImpl extends SalesManagerEntityServiceImpl<Long, Catalog>
         implements CatalogService {
-
 
     private final CatalogRepository catalogRepository;
 
     private final PageableCatalogRepository pageableCatalogRepository;
 
     @Autowired
-    public CatalogServiceImpl(CatalogRepository repository, PageableCatalogRepository pageableCatalogRepository) {
+    public CatalogServiceImpl(
+            CatalogRepository repository, PageableCatalogRepository pageableCatalogRepository) {
         super(repository);
         this.catalogRepository = repository;
         this.pageableCatalogRepository = pageableCatalogRepository;
@@ -40,7 +38,8 @@ public class CatalogServiceImpl
     }
 
     @Override
-    public Page<Catalog> getCatalogs(MerchantStore store, Language language, String name, int page, int count) {
+    public Page<Catalog> getCatalogs(
+            MerchantStore store, Language language, String name, int page, int count) {
         Pageable pageRequest = PageRequest.of(page, count);
         return pageableCatalogRepository.listByStore(store.getId(), name, pageRequest);
     }
@@ -65,6 +64,4 @@ public class CatalogServiceImpl
     public boolean existByCode(String code, MerchantStore store) {
         return catalogRepository.existsByCode(code, store.getId());
     }
-
-
 }

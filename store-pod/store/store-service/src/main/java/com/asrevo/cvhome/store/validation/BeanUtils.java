@@ -8,9 +8,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public class BeanUtils {
-    private BeanUtils() {
-
-    }
+    private BeanUtils() {}
 
     public static BeanUtils newInstance() {
         return new BeanUtils();
@@ -18,24 +16,30 @@ public class BeanUtils {
 
     @SuppressWarnings("nls")
     public Object getPropertyValue(Object bean, String property)
-            throws IntrospectionException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+            throws IntrospectionException,
+                    IllegalArgumentException,
+                    IllegalAccessException,
+                    InvocationTargetException {
 
         if (bean == null) {
             throw new IllegalArgumentException("No bean specified");
         }
         if (property == null) {
 
-            throw new IllegalArgumentException("No name specified for bean class '" + bean.getClass() + "'");
+            throw new IllegalArgumentException(
+                    "No name specified for bean class '" + bean.getClass() + "'");
         }
         Class<?> beanClass = bean.getClass();
         PropertyDescriptor propertyDescriptor = getPropertyDescriptor(beanClass, property);
         if (propertyDescriptor == null) {
-            throw new IllegalArgumentException("No such property " + property + " for " + beanClass + " exists");
+            throw new IllegalArgumentException(
+                    "No such property " + property + " for " + beanClass + " exists");
         }
 
         Method readMethod = propertyDescriptor.getReadMethod();
         if (readMethod == null) {
-            throw new IllegalStateException("No getter available for property " + property + " on " + beanClass);
+            throw new IllegalStateException(
+                    "No getter available for property " + property + " on " + beanClass);
         }
         return readMethod.invoke(bean);
     }
@@ -49,9 +53,7 @@ public class BeanUtils {
             if (currentPropertyDescriptor.getName().equals(propertyname)) {
                 propertyDescriptor = currentPropertyDescriptor;
             }
-
         }
         return propertyDescriptor;
     }
-
 }

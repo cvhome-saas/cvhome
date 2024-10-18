@@ -1,10 +1,9 @@
 package com.asrevo.cvhome.commons.command;
 
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
-
-import java.util.List;
 
 @AllArgsConstructor
 @Slf4j

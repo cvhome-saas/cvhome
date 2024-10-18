@@ -13,9 +13,7 @@ import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
  */
 public interface OptinService extends SalesManagerEntityService<Long, Optin> {
 
-
     Optin getOptinByMerchantAndType(MerchantStore store, OptinType type) throws ServiceException;
 
     Optin getOptinByCode(MerchantStore store, String code) throws ServiceException;
-
 }

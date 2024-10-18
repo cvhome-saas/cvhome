@@ -1,28 +1,25 @@
 package com.asrevo.cvhome.store.core.model.shipping;
 
+import java.io.Serial;
+import java.io.Serializable;
+import java.math.BigDecimal;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-
-import java.io.Serial;
-import java.io.Serializable;
-import java.math.BigDecimal;
 
 @Getter
 @Setter
 @Slf4j
 public class ShippingOption implements Serializable {
 
-
     /**
      *
      */
-    @Serial
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
+
     private BigDecimal optionPrice;
     private Long shippingQuoteOptionId;
-
 
     private String optionName = null;
     private String optionCode = null;
@@ -36,10 +33,12 @@ public class ShippingOption implements Serializable {
 
     private String estimatedNumberOfDays;
 
-
     public BigDecimal getOptionPrice() {
 
-        if (optionPrice == null && !StringUtils.isBlank(this.getOptionPriceText())) {//if price text only is available, try to parse it
+        if (optionPrice == null
+                && !StringUtils.isBlank(
+                        this.getOptionPriceText())) { // if price text only is available, try to
+            // parse it
             try {
                 this.optionPrice = new BigDecimal(this.getOptionPriceText());
             } catch (Exception e) {
@@ -49,5 +48,4 @@ public class ShippingOption implements Serializable {
 
         return optionPrice;
     }
-
 }

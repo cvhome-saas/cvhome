@@ -3,13 +3,13 @@ package com.asrevo.cvhome.store.service.facade.content;
 import com.asrevo.cvhome.store.controller.exception.ConstraintException;
 import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
 import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
-import com.asrevo.cvhome.store.core.entity.content.Content;
 import com.asrevo.cvhome.store.core.entity.content.*;
+import com.asrevo.cvhome.store.core.entity.content.Content;
 import com.asrevo.cvhome.store.core.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.entity.reference.language.Language;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
-import com.asrevo.cvhome.store.core.model.content.ContentFile;
 import com.asrevo.cvhome.store.core.model.content.*;
+import com.asrevo.cvhome.store.core.model.content.ContentFile;
 import com.asrevo.cvhome.store.core.model.content.box.PersistableContentBox;
 import com.asrevo.cvhome.store.core.model.content.box.ReadableContentBox;
 import com.asrevo.cvhome.store.core.model.content.box.ReadableContentBoxFull;
@@ -21,13 +21,6 @@ import com.asrevo.cvhome.store.core.services.content.ContentService;
 import com.asrevo.cvhome.store.core.services.reference.language.LanguageService;
 import com.asrevo.cvhome.store.utils.FilePathUtils;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.data.domain.Page;
-import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,7 +30,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 
 @Component("contentFacade")
 @Slf4j
@@ -52,7 +50,11 @@ public class ContentFacadeImpl implements ContentFacade {
 
     private final FilePathUtils fileUtils;
 
-    public ContentFacadeImpl(ContentService contentService, LanguageService languageService, ImageFilePath imageUtils, FilePathUtils fileUtils) {
+    public ContentFacadeImpl(
+            ContentService contentService,
+            LanguageService languageService,
+            ImageFilePath imageUtils,
+            FilePathUtils fileUtils) {
         this.contentService = contentService;
         this.languageService = languageService;
         this.imageUtils = imageUtils;
@@ -62,13 +64,18 @@ public class ContentFacadeImpl implements ContentFacade {
     @Override
     public ContentFolder getContentFolder(String folder, MerchantStore store) throws Exception {
         try {
-            List<String> imageNames = Optional
-                    .ofNullable(contentService.getContentFilesNames(store.getCode(), FileContentType.IMAGE))
-                    .orElseThrow(() -> new ResourceNotFoundException("No Folder found for path : " + folder));
+            List<String> imageNames =
+                    Optional.ofNullable(
+                                    contentService.getContentFilesNames(
+                                            store.getCode(), FileContentType.IMAGE))
+                            .orElseThrow(
+                                    () ->
+                                            new ResourceNotFoundException(
+                                                    "No Folder found for path : " + folder));
 
             // images from CMS
-            List<ContentImage> contentImages = imageNames.stream().map(name -> convertToContentImage(name, store))
-                    .toList();
+            List<ContentImage> contentImages =
+                    imageNames.stream().map(name -> convertToContentImage(name, store)).toList();
 
             ContentFolder contentFolder = new ContentFolder();
             if (!StringUtils.isBlank(folder)) {
@@ -92,8 +99,10 @@ public class ContentFacadeImpl implements ContentFacade {
 
     @Override
     public String absolutePath(MerchantStore store, String file) {
-        return new StringBuilder().append(imageUtils.getContextPath())
-                .append(imageUtils.buildStaticImageUtils(store, file)).toString();
+        return new StringBuilder()
+                .append(imageUtils.getContextPath())
+                .append(imageUtils.buildStaticImageUtils(store, file))
+                .toString();
     }
 
     @Override
@@ -110,8 +119,8 @@ public class ContentFacadeImpl implements ContentFacade {
 
     @SuppressWarnings("unchecked")
     @Override
-    public ReadableEntityList<ReadableContentPage> getContentPages(MerchantStore store, Language language, int page,
-                                                                   int count) {
+    public ReadableEntityList<ReadableContentPage> getContentPages(
+            MerchantStore store, Language language, int page, int count) {
         Assert.notNull(store, "MerchantStore cannot be null");
 
         @SuppressWarnings("rawtypes")
@@ -124,9 +133,13 @@ public class ContentFacadeImpl implements ContentFacade {
             items.setNumber(contentPages.getContent().size());
             items.setRecordsTotal(contentPages.getNumberOfElements());
 
-            List<ReadableContentBox> boxes = contentPages.getContent().stream()
-                    .map(content -> convertContentToReadableContentBox(store, language, content))
-                    .collect(Collectors.toList());
+            List<ReadableContentBox> boxes =
+                    contentPages.getContent().stream()
+                            .map(
+                                    content ->
+                                            convertContentToReadableContentBox(
+                                                    store, language, content))
+                            .collect(Collectors.toList());
 
             items.setItems(boxes);
             return items;
@@ -134,12 +147,11 @@ public class ContentFacadeImpl implements ContentFacade {
         } catch (ServiceException e) {
             throw new ServiceRuntimeException("Exception while getting content ", e);
         }
-
     }
 
     // @TODO ASHRAF CHECK IF WE CAN USE THIS IN THE NAV MENU
-    private ReadableContentPage contentDescriptionToReadableContent(MerchantStore store, Content content,
-                                                                    ContentDescription contentDescription) {
+    private ReadableContentPage contentDescriptionToReadableContent(
+            MerchantStore store, Content content, ContentDescription contentDescription) {
 
         ReadableContentPage page = new ReadableContentPage();
 
@@ -157,17 +169,16 @@ public class ContentFacadeImpl implements ContentFacade {
         page.setCode(content.getCode());
         page.setPath(fileUtils.buildStaticFilePath(store.getCode(), contentDescription.getSeUrl()));
         return page;
-
     }
 
     @Deprecated
-    private ReadableContentFull convertContentToReadableContentFull(MerchantStore store, Language language,
-                                                                    Content content) {
+    private ReadableContentFull convertContentToReadableContentFull(
+            MerchantStore store, Language language, Content content) {
         ReadableContentFull contentFull = new ReadableContentFull();
 
         try {
-            List<ContentDescriptionEntity> descriptions = this.createContentDescriptionEntitys(store, content,
-                    language);
+            List<ContentDescriptionEntity> descriptions =
+                    this.createContentDescriptionEntitys(store, content, language);
 
             contentFull.setDescriptions(descriptions);
             contentFull.setId(content.getId());
@@ -185,8 +196,8 @@ public class ContentFacadeImpl implements ContentFacade {
     }
 
     @Deprecated
-    private ReadableContentEntity convertContentToReadableContentEntity(MerchantStore store, Language language,
-                                                                        Content content) {
+    private ReadableContentEntity convertContentToReadableContentEntity(
+            MerchantStore store, Language language, Content content) {
 
         ReadableContentEntity contentEntity = new ReadableContentEntity();
 
@@ -201,18 +212,18 @@ public class ContentFacadeImpl implements ContentFacade {
         contentEntity.setVisible(content.isVisible());
 
         return contentEntity;
-
     }
 
-    private Content convertContentPageToContent(MerchantStore store, Content model, PersistableContentPage content) throws Exception {
-
+    private Content convertContentPageToContent(
+            MerchantStore store, Content model, PersistableContentPage content) throws Exception {
 
         Content contentModel = new Content();
         if (model != null) {
             contentModel = model;
         }
 
-        List<ContentDescription> descriptions = buildDescriptions(contentModel, content.getDescriptions());
+        List<ContentDescription> descriptions =
+                buildDescriptions(contentModel, content.getDescriptions());
         contentModel.setCode(content.getCode());
         contentModel.setContentType(ContentType.PAGE);
         contentModel.setMerchantStore(store);
@@ -223,13 +234,15 @@ public class ContentFacadeImpl implements ContentFacade {
         return contentModel;
     }
 
-    private Content convertContentBoxToContent(MerchantStore store, Content model, PersistableContentBox content) throws Exception {
+    private Content convertContentBoxToContent(
+            MerchantStore store, Content model, PersistableContentBox content) throws Exception {
         Content contentModel = new Content();
         if (model != null) {
             contentModel = model;
         }
 
-        List<ContentDescription> descriptions = buildDescriptions(contentModel, content.getDescriptions());
+        List<ContentDescription> descriptions =
+                buildDescriptions(contentModel, content.getDescriptions());
         for (ContentDescription cd : descriptions) {
             cd.setContent(contentModel);
         }
@@ -277,14 +290,15 @@ public class ContentFacadeImpl implements ContentFacade {
      */
 
     @Deprecated
-    private List<ContentDescriptionEntity> createContentDescriptionEntitys(MerchantStore store, Content contentModel,
-                                                                           Language language) throws ServiceException {
+    private List<ContentDescriptionEntity> createContentDescriptionEntitys(
+            MerchantStore store, Content contentModel, Language language) throws ServiceException {
 
         List<ContentDescriptionEntity> descriptions = new ArrayList<>();
 
         if (!CollectionUtils.isEmpty(contentModel.getDescriptions())) {
             for (ContentDescription description : contentModel.getDescriptions()) {
-                if (language != null && !language.getId().equals(description.getLanguage().getId())) {
+                if (language != null
+                        && !language.getId().equals(description.getLanguage().getId())) {
                     continue;
                 }
 
@@ -310,7 +324,6 @@ public class ContentFacadeImpl implements ContentFacade {
         }
 
         return contentDescription;
-
     }
 
     /*
@@ -334,11 +347,14 @@ public class ContentFacadeImpl implements ContentFacade {
      * contentDescription.setMetatagTitle(objectContent.getTitle());
      * descriptions.add(contentDescription); } return descriptions; }
      */
-    private List<ContentDescription> buildDescriptions(Content contentModel,
-                                                       List<com.asrevo.cvhome.store.core.model.content.common.ContentDescription> persistableDescriptions)
+    private List<ContentDescription> buildDescriptions(
+            Content contentModel,
+            List<com.asrevo.cvhome.store.core.model.content.common.ContentDescription>
+                    persistableDescriptions)
             throws Exception {
         List<ContentDescription> descriptions = new ArrayList<>();
-        for (com.asrevo.cvhome.store.core.model.content.common.ContentDescription objectContent : persistableDescriptions) {
+        for (com.asrevo.cvhome.store.core.model.content.common.ContentDescription objectContent :
+                persistableDescriptions) {
             Language lang = languageService.getByCode(objectContent.getLanguage());
             Assert.notNull(lang, "language cannot be null");
             ContentDescription contentDescription = null;
@@ -355,9 +371,9 @@ public class ContentFacadeImpl implements ContentFacade {
                 contentDescription = new ContentDescription();
             }
 
-            //if (contentModel != null) {
+            // if (contentModel != null) {
             //	setContentDescriptionToContentModel(contentModel, contentDescription, lang);
-            //}
+            // }
             contentDescription.setMetatagDescription(objectContent.getMetaDescription());
             contentDescription.setTitle(objectContent.getTitle());
             contentDescription.setName(objectContent.getName());
@@ -367,19 +383,20 @@ public class ContentFacadeImpl implements ContentFacade {
             contentDescription.setContent(contentModel);
             contentDescription.setLanguage(lang);
             descriptions.add(contentDescription);
-            //contentDescription.setId(objectContent.getId());
+            // contentDescription.setId(objectContent.getId());
         }
         return descriptions;
     }
 
-    private void setContentDescriptionToContentModel(Content content, ContentDescription contentDescription,
-                                                     Language language) {
+    private void setContentDescriptionToContentModel(
+            Content content, ContentDescription contentDescription, Language language) {
 
-        Optional<ContentDescription> contentDescriptionModel = findAppropriateContentDescription(
-                content.getDescriptions(), language);
+        Optional<ContentDescription> contentDescriptionModel =
+                findAppropriateContentDescription(content.getDescriptions(), language);
 
         if (contentDescriptionModel.isPresent()) {
-            contentDescription.setMetatagDescription(contentDescriptionModel.get().getMetatagDescription());
+            contentDescription.setMetatagDescription(
+                    contentDescriptionModel.get().getMetatagDescription());
             contentDescription.setDescription(contentDescriptionModel.get().getDescription());
             contentDescription.setId(contentDescriptionModel.get().getId());
             contentDescription.setAuditSection(contentDescriptionModel.get().getAuditSection());
@@ -387,7 +404,6 @@ public class ContentFacadeImpl implements ContentFacade {
             contentDescription.setTitle(contentDescriptionModel.get().getTitle());
             contentDescription.setName(contentDescriptionModel.get().getName());
         }
-
     }
 
     @Override
@@ -400,11 +416,19 @@ public class ContentFacadeImpl implements ContentFacade {
             Content content = null;
 
             if (language == null) {
-                content = Optional.ofNullable(contentService.getByCode(code, store))
-                        .orElseThrow(() -> new ResourceNotFoundException("No page found : " + code));
+                content =
+                        Optional.ofNullable(contentService.getByCode(code, store))
+                                .orElseThrow(
+                                        () ->
+                                                new ResourceNotFoundException(
+                                                        "No page found : " + code));
             } else {
-                content = Optional.ofNullable(contentService.getByCode(code, store, language))
-                        .orElseThrow(() -> new ResourceNotFoundException("No page found : " + code));
+                content =
+                        Optional.ofNullable(contentService.getByCode(code, store, language))
+                                .orElseThrow(
+                                        () ->
+                                                new ResourceNotFoundException(
+                                                        "No page found : " + code));
             }
 
             return convertContentToReadableContentPage(store, language, content);
@@ -415,8 +439,13 @@ public class ContentFacadeImpl implements ContentFacade {
     }
 
     @Override
-    public ReadableEntityList<ReadableContentBox> getContentBoxes(ContentType type, String codePrefix,
-                                                                  MerchantStore store, Language language, int page, int count) {
+    public ReadableEntityList<ReadableContentBox> getContentBoxes(
+            ContentType type,
+            String codePrefix,
+            MerchantStore store,
+            Language language,
+            int page,
+            int count) {
 
         Assert.notNull(codePrefix, "content code prefix cannot be null");
         Assert.notNull(store, "MerchantStore cannot be null");
@@ -434,8 +463,8 @@ public class ContentFacadeImpl implements ContentFacade {
 
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Override
-    public ReadableEntityList<ReadableContentBox> getContentBoxes(ContentType type, MerchantStore store,
-                                                                  Language language, int page, int count) {
+    public ReadableEntityList<ReadableContentBox> getContentBoxes(
+            ContentType type, MerchantStore store, Language language, int page, int count) {
 
         Assert.notNull(store, "MerchantStore cannot be null");
 
@@ -448,9 +477,13 @@ public class ContentFacadeImpl implements ContentFacade {
             items.setNumber(contentBoxes.getContent().size());
             items.setRecordsTotal(contentBoxes.getNumberOfElements());
 
-            List<ReadableContentBox> boxes = contentBoxes.getContent().stream()
-                    .map(content -> convertContentToReadableContentBox(store, language, content))
-                    .collect(Collectors.toList());
+            List<ReadableContentBox> boxes =
+                    contentBoxes.getContent().stream()
+                            .map(
+                                    content ->
+                                            convertContentToReadableContentBox(
+                                                    store, language, content))
+                            .collect(Collectors.toList());
 
             items.setItems(boxes);
 
@@ -459,11 +492,11 @@ public class ContentFacadeImpl implements ContentFacade {
         } catch (ServiceException e) {
             throw new ServiceRuntimeException("Exception while getting content ", e);
         }
-
     }
 
     @Override
-    public void addContentFile(com.asrevo.cvhome.store.core.model.content.ContentFile file, String merchantStoreCode) {
+    public void addContentFile(
+            com.asrevo.cvhome.store.core.model.content.ContentFile file, String merchantStoreCode) {
         try {
             byte[] payload = file.getFile();
             String fileName = file.getName();
@@ -488,15 +521,15 @@ public class ContentFacadeImpl implements ContentFacade {
 
     private FileContentType getFileContentType(String type) {
         FileContentType fileType = FileContentType.STATIC_FILE;
-        if (type.equals("image")) {// for now we consider this route from api
+        if (type.equals("image")) { // for now we consider this route from api
             // only
             fileType = FileContentType.API_IMAGE;
         }
         return fileType;
     }
 
-    private ReadableContentBox convertContentToReadableContentBox(MerchantStore store, Language language,
-                                                                  Content content) {
+    private ReadableContentBox convertContentToReadableContentBox(
+            MerchantStore store, Language language, Content content) {
         if (language != null) {
             ReadableContentBox box = new ReadableContentBox();
             this.setDescription(content, box, language);
@@ -506,8 +539,11 @@ public class ContentFacadeImpl implements ContentFacade {
             return box;
         } else {
             ReadableContentBoxFull box = new ReadableContentBoxFull();
-            List<com.asrevo.cvhome.store.core.model.content.common.ContentDescription> descriptions = content.getDescriptions()
-                    .stream().map(this::contentDescription).collect(Collectors.toList());
+            List<com.asrevo.cvhome.store.core.model.content.common.ContentDescription>
+                    descriptions =
+                            content.getDescriptions().stream()
+                                    .map(this::contentDescription)
+                                    .collect(Collectors.toList());
             this.setDescription(content, box, store.getDefaultLanguage());
             box.setDescriptions(descriptions);
             box.setCode(content.getCode());
@@ -523,25 +559,24 @@ public class ContentFacadeImpl implements ContentFacade {
 
     private void setDescription(Content content, ReadableContentBox box, Language lang) {
 
-        Optional<ContentDescription> contentDescription = findAppropriateContentDescription(
-                content.getDescriptions(), lang);
+        Optional<ContentDescription> contentDescription =
+                findAppropriateContentDescription(content.getDescriptions(), lang);
         if (contentDescription.isPresent()) {
-            com.asrevo.cvhome.store.core.model.content.common.ContentDescription desc = this
-                    .contentDescription(contentDescription.get());
+            com.asrevo.cvhome.store.core.model.content.common.ContentDescription desc =
+                    this.contentDescription(contentDescription.get());
             box.setDescription(desc);
         }
-
     }
 
-    private ReadableContentPage convertContentToReadableContentPage(MerchantStore store, Language language,
-                                                                    Content content) {
+    private ReadableContentPage convertContentToReadableContentPage(
+            MerchantStore store, Language language, Content content) {
         if (language != null) {
             ReadableContentPage page = new ReadableContentPage();
-            Optional<ContentDescription> contentDescription = findAppropriateContentDescription(
-                    content.getDescriptions(), language);
+            Optional<ContentDescription> contentDescription =
+                    findAppropriateContentDescription(content.getDescriptions(), language);
             if (contentDescription.isPresent()) {
-                com.asrevo.cvhome.store.core.model.content.common.ContentDescription desc = this
-                        .contentDescription(contentDescription.get());
+                com.asrevo.cvhome.store.core.model.content.common.ContentDescription desc =
+                        this.contentDescription(contentDescription.get());
                 page.setDescription(desc);
             }
             page.setCode(content.getCode());
@@ -551,8 +586,11 @@ public class ContentFacadeImpl implements ContentFacade {
             return page;
         } else {
             ReadableContentPageFull page = new ReadableContentPageFull();
-            List<com.asrevo.cvhome.store.core.model.content.common.ContentDescription> descriptions = content.getDescriptions()
-                    .stream().map(this::contentDescription).collect(Collectors.toList());
+            List<com.asrevo.cvhome.store.core.model.content.common.ContentDescription>
+                    descriptions =
+                            content.getDescriptions().stream()
+                                    .map(this::contentDescription)
+                                    .collect(Collectors.toList());
             page.setDescriptions(descriptions);
             page.setCode(content.getCode());
             page.setId(content.getId());
@@ -560,14 +598,14 @@ public class ContentFacadeImpl implements ContentFacade {
             page.setLinkToMenu(content.isLinkToMenu());
             return page;
         }
-
     }
 
     private com.asrevo.cvhome.store.core.model.content.common.ContentDescription contentDescription(
             ContentDescription description) {
         Assert.notNull(description, "ContentDescription cannot be null");
-        com.asrevo.cvhome.store.core.model.content.common.ContentDescription desc = new com.asrevo.cvhome.store.core.model.content.common.ContentDescription();
-        desc.setDescription(description.getDescription());//return description as is
+        com.asrevo.cvhome.store.core.model.content.common.ContentDescription desc =
+                new com.asrevo.cvhome.store.core.model.content.common.ContentDescription();
+        desc.setDescription(description.getDescription()); // return description as is
         desc.setName(description.getName());
         desc.setTitle(description.getTitle());
         desc.setFriendlyUrl(description.getSeUrl());
@@ -576,8 +614,8 @@ public class ContentFacadeImpl implements ContentFacade {
         return desc;
     }
 
-    private ReadableContentBox convertContentToReadableLegacyContentBox(MerchantStore store, Language language,
-                                                                        Content content) {
+    private ReadableContentBox convertContentToReadableLegacyContentBox(
+            MerchantStore store, Language language, Content content) {
         /*
          * ReadableContentBox box = new ReadableContentBox();
          * Optional<ContentDescription> contentDescription =
@@ -593,10 +631,13 @@ public class ContentFacadeImpl implements ContentFacade {
         return null;
     }
 
-    private Optional<ContentDescription> findAppropriateContentDescription(List<ContentDescription> contentDescriptions,
-                                                                           Language language) {
+    private Optional<ContentDescription> findAppropriateContentDescription(
+            List<ContentDescription> contentDescriptions, Language language) {
         return contentDescriptions.stream()
-                .filter(description -> description.getLanguage().getCode().equals(language.getCode())).findFirst();
+                .filter(
+                        description ->
+                                description.getLanguage().getCode().equals(language.getCode()))
+                .findFirst();
     }
 
     @Override
@@ -610,16 +651,24 @@ public class ContentFacadeImpl implements ContentFacade {
 
             if (language != null) {
 
-                content = Optional.ofNullable(contentService.getByCode(code, store, language))
-                        .orElseThrow(() -> new ResourceNotFoundException(
-                                "Resource not found [" + code + "] for store [" + store.getCode() + "]"));
+                content =
+                        Optional.ofNullable(contentService.getByCode(code, store, language))
+                                .orElseThrow(
+                                        () ->
+                                                new ResourceNotFoundException(
+                                                        "Resource not found ["
+                                                                + code
+                                                                + "] for store ["
+                                                                + store.getCode()
+                                                                + "]"));
 
-                Optional<ContentDescription> contentDescription = findAppropriateContentDescription(
-                        content.getDescriptions(), language);
+                Optional<ContentDescription> contentDescription =
+                        findAppropriateContentDescription(content.getDescriptions(), language);
 
                 if (contentDescription.isPresent()) {
-                    com.asrevo.cvhome.store.core.model.content.common.ContentDescription desc = this
-                            .contentDescription(contentDescription.get());//return cdata description
+                    com.asrevo.cvhome.store.core.model.content.common.ContentDescription desc =
+                            this.contentDescription(
+                                    contentDescription.get()); // return cdata description
                     desc.setDescription(this.fixContentDescription(desc.getDescription()));
                     box.setDescription(desc);
                 }
@@ -628,15 +677,24 @@ public class ContentFacadeImpl implements ContentFacade {
 
             } else {
 
-                content = Optional.ofNullable(contentService.getByCode(code, store))
-                        .orElseThrow(() -> new ResourceNotFoundException(
-                                "Resource not found [" + code + "] for store [" + store.getCode() + "]"));
+                content =
+                        Optional.ofNullable(contentService.getByCode(code, store))
+                                .orElseThrow(
+                                        () ->
+                                                new ResourceNotFoundException(
+                                                        "Resource not found ["
+                                                                + code
+                                                                + "] for store ["
+                                                                + store.getCode()
+                                                                + "]"));
 
-                ReadableContentBoxFull full = new ReadableContentBoxFull(); //all languages
+                ReadableContentBoxFull full = new ReadableContentBoxFull(); // all languages
 
-                List<com.asrevo.cvhome.store.core.model.content.common.ContentDescription> descriptions = content.getDescriptions()
-                        .stream().map(this::contentDescription).collect(Collectors.toList());
-
+                List<com.asrevo.cvhome.store.core.model.content.common.ContentDescription>
+                        descriptions =
+                                content.getDescriptions().stream()
+                                        .map(this::contentDescription)
+                                        .collect(Collectors.toList());
 
                 full.setDescriptions(descriptions);
                 full.setCode(content.getCode());
@@ -644,9 +702,7 @@ public class ContentFacadeImpl implements ContentFacade {
                 full.setVisible(content.isVisible());
 
                 return full;
-
             }
-
 
         } catch (ServiceException e) {
             throw new ServiceRuntimeException(e);
@@ -655,12 +711,14 @@ public class ContentFacadeImpl implements ContentFacade {
 
     private String fixContentDescription(String description) {
         Assert.notNull(description, "description cannot be empty");
-//        return "<![CDATA[" + description.replaceAll("\r\n", "").replaceAll("\t", "") + "]]>";
+        //        return "<![CDATA[" + description.replaceAll("\r\n", "").replaceAll("\t", "") +
+        // "]]>";
         return description;
     }
 
     @Override
-    public Long saveContentPage(PersistableContentPage page, MerchantStore merchantStore, Language language) {
+    public Long saveContentPage(
+            PersistableContentPage page, MerchantStore merchantStore, Language language) {
         Assert.notNull(page, "page can't be null");
         Assert.notNull(page.getCode(), "Content code must not be null");
         Assert.notNull(merchantStore, "store can't be null");
@@ -670,8 +728,12 @@ public class ContentFacadeImpl implements ContentFacade {
 
             content = contentService.getByCode(page.getCode(), merchantStore);
             if (content != null) {
-                throw new ConstraintException("Page with code [" + page.getCode() + "] already exist for store ["
-                        + merchantStore.getCode() + "]");
+                throw new ConstraintException(
+                        "Page with code ["
+                                + page.getCode()
+                                + "] already exist for store ["
+                                + merchantStore.getCode()
+                                + "]");
             }
 
             content = convertContentPageToContent(merchantStore, content, page);
@@ -683,7 +745,8 @@ public class ContentFacadeImpl implements ContentFacade {
     }
 
     @Override
-    public Long saveContentBox(PersistableContentBox box, MerchantStore merchantStore, Language language) {
+    public Long saveContentBox(
+            PersistableContentBox box, MerchantStore merchantStore, Language language) {
         Assert.notNull(box, "box can't be null");
         Assert.notNull(box.getCode(), "Content box must not be null");
         Assert.notNull(merchantStore, "store can't be null");
@@ -693,8 +756,12 @@ public class ContentFacadeImpl implements ContentFacade {
 
             content = contentService.getByCode(box.getCode(), merchantStore);
             if (content != null) {
-                throw new ConstraintException("Content box with code [" + box.getCode() + "] already exist for store ["
-                        + merchantStore.getCode() + "]");
+                throw new ConstraintException(
+                        "Content box with code ["
+                                + box.getCode()
+                                + "] already exist for store ["
+                                + merchantStore.getCode()
+                                + "]");
             }
 
             content = convertContentBoxToContent(merchantStore, content, box);
@@ -703,7 +770,6 @@ public class ContentFacadeImpl implements ContentFacade {
         } catch (Exception e) {
             throw new ServiceRuntimeException(e);
         }
-
     }
 
     @Override
@@ -711,7 +777,6 @@ public class ContentFacadeImpl implements ContentFacade {
         for (ContentFile file : files) {
             addContentFile(file, merchantStoreCode);
         }
-
     }
 
     @Override
@@ -723,16 +788,20 @@ public class ContentFacadeImpl implements ContentFacade {
         if (content != null) {
             if (content.getMerchantStore().getId().intValue() != store.getId().intValue()) {
                 throw new ResourceNotFoundException(
-                        "No content found with id [" + id + "] for store [" + store.getCode() + "]");
+                        "No content found with id ["
+                                + id
+                                + "] for store ["
+                                + store.getCode()
+                                + "]");
             }
         }
 
         try {
             contentService.delete(content);
         } catch (ServiceException e) {
-            throw new ServiceRuntimeException("Exception while deleting content " + e.getMessage(), e);
+            throw new ServiceRuntimeException(
+                    "Exception while deleting content " + e.getMessage(), e);
         }
-
     }
 
     @Override
@@ -744,18 +813,22 @@ public class ContentFacadeImpl implements ContentFacade {
             Content content = contentService.getByCode(code, store);
             if (content == null) {
                 throw new ResourceNotFoundException(
-                        "No content found with code [" + code + "] for store [" + store.getCode() + "]");
+                        "No content found with code ["
+                                + code
+                                + "] for store ["
+                                + store.getCode()
+                                + "]");
             }
 
             return this.convertContentToReadableContentFull(store, language, content);
         } catch (ServiceException e) {
             throw new ServiceRuntimeException("Error while getting content [" + code + "]", e);
         }
-
     }
 
     @Override
-    public List<ReadableContentEntity> getContents(Optional<String> type, MerchantStore store, Language language) {
+    public List<ReadableContentEntity> getContents(
+            Optional<String> type, MerchantStore store, Language language) {
 
         List<ContentType> types = new ArrayList<>();
         types.add(ContentType.BOX);
@@ -770,21 +843,24 @@ public class ContentFacadeImpl implements ContentFacade {
         } catch (ServiceException e) {
             throw new ServiceRuntimeException("Exception while getting contents", e);
         }
-
     }
 
     @Override
-    public ReadableContentPage getContentPageByName(String name, MerchantStore store, Language language) {
+    public ReadableContentPage getContentPageByName(
+            String name, MerchantStore store, Language language) {
         Assert.notNull(name, "Content name cannot be null");
         Assert.notNull(store, "MerchantStore cannot be null");
         Assert.notNull(language, "Language cannot be null");
 
         try {
 
-            ContentDescription contentDescription = Optional.ofNullable(contentService.getBySeUrl(store, name))
-                    .orElseThrow(() -> new ResourceNotFoundException("No page found : " + name));
+            ContentDescription contentDescription =
+                    Optional.ofNullable(contentService.getBySeUrl(store, name))
+                            .orElseThrow(
+                                    () -> new ResourceNotFoundException("No page found : " + name));
 
-            return convertContentToReadableContentPage(store, language, contentDescription.getContent());
+            return convertContentToReadableContentPage(
+                    store, language, contentDescription.getContent());
 
         } catch (Exception e) {
             throw new ServiceRuntimeException("Error while getting page " + e.getMessage(), e);
@@ -792,31 +868,30 @@ public class ContentFacadeImpl implements ContentFacade {
     }
 
     @Override
-    public void renameFile(MerchantStore store, FileContentType fileType, String originalName, String newName) {
+    public void renameFile(
+            MerchantStore store, FileContentType fileType, String originalName, String newName) {
         Optional<String> path = Optional.ofNullable(null);
         try {
             contentService.renameFile(store.getCode(), fileType, path, originalName, newName);
         } catch (ServiceException e) {
             throw new ServiceRuntimeException("Error while renaming file " + e.getMessage(), e);
         }
-
     }
 
     @Override
-    public OutputContentFile download(MerchantStore store, FileContentType fileType, String fileName) {
+    public OutputContentFile download(
+            MerchantStore store, FileContentType fileType, String fileName) {
 
         try {
             return contentService.getContentFile(store.getCode(), fileType, fileName);
         } catch (ServiceException e) {
             throw new ServiceRuntimeException("Error while downloading file " + e.getMessage(), e);
         }
-
     }
 
-
     @Override
-    public void updateContentPage(Long id, PersistableContentPage page, MerchantStore merchantStore,
-                                  Language language) {
+    public void updateContentPage(
+            Long id, PersistableContentPage page, MerchantStore merchantStore, Language language) {
         Assert.notNull(page, "page can't be null");
         Assert.notNull(id, "Content id must not be null");
         Assert.notNull(merchantStore, "store can't be null");
@@ -826,8 +901,12 @@ public class ContentFacadeImpl implements ContentFacade {
 
             content = contentService.getById(id, merchantStore);
             if (content == null) {
-                throw new ConstraintException("Page with id [" + id + "] does not exist for store ["
-                        + merchantStore.getCode() + "]");
+                throw new ConstraintException(
+                        "Page with id ["
+                                + id
+                                + "] does not exist for store ["
+                                + merchantStore.getCode()
+                                + "]");
             }
 
             page.setId(id);
@@ -837,7 +916,6 @@ public class ContentFacadeImpl implements ContentFacade {
         } catch (Exception e) {
             throw new ServiceRuntimeException(e);
         }
-
     }
 
     @Override
@@ -850,8 +928,12 @@ public class ContentFacadeImpl implements ContentFacade {
 
             content = contentService.getById(id, merchantStore);
             if (content == null) {
-                throw new ConstraintException("Content with id [" + id + "] does not exist for store ["
-                        + merchantStore.getCode() + "]");
+                throw new ConstraintException(
+                        "Content with id ["
+                                + id
+                                + "] does not exist for store ["
+                                + merchantStore.getCode()
+                                + "]");
             }
 
             contentService.delete(content);
@@ -859,11 +941,11 @@ public class ContentFacadeImpl implements ContentFacade {
         } catch (Exception e) {
             throw new ServiceRuntimeException(e);
         }
-
     }
 
     @Override
-    public void updateContentBox(Long id, PersistableContentBox box, MerchantStore merchantStore, Language language) {
+    public void updateContentBox(
+            Long id, PersistableContentBox box, MerchantStore merchantStore, Language language) {
         Assert.notNull(box, "bix can't be null");
         Assert.notNull(id, "Content id must not be null");
         Assert.notNull(merchantStore, "store can't be null");
@@ -873,8 +955,12 @@ public class ContentFacadeImpl implements ContentFacade {
 
             content = contentService.getById(id, merchantStore);
             if (content == null) {
-                throw new ConstraintException("Page with id [" + id + "] does not exist for store ["
-                        + merchantStore.getCode() + "]");
+                throw new ConstraintException(
+                        "Page with id ["
+                                + id
+                                + "] does not exist for store ["
+                                + merchantStore.getCode()
+                                + "]");
             }
 
             box.setId(id);
@@ -884,12 +970,10 @@ public class ContentFacadeImpl implements ContentFacade {
         } catch (Exception e) {
             throw new ServiceRuntimeException(e);
         }
-
     }
 
     @Override
     public boolean codeExist(String code, String type, MerchantStore store) {
         return contentService.exists(code, ContentType.valueOf(type), store);
     }
-
 }

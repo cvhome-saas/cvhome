@@ -1,42 +1,45 @@
-//package com.asrevo.session.dynamodb;
+// package com.asrevo.session.dynamodb;
 //
 //
 //
-//import java.io.*;
-//import java.nio.ByteBuffer;
-//import java.time.Duration;
-//import java.time.Instant;
-//import java.util.Date;
-//import java.util.HashMap;
-//import java.util.Map;
-//import java.util.Set;
-//import java.util.UUID;
-//import java.util.concurrent.TimeUnit;
-//import java.util.stream.Collectors;
+// import java.io.*;
+// import java.nio.ByteBuffer;
+// import java.time.Duration;
+// import java.time.Instant;
+// import java.util.Date;
+// import java.util.HashMap;
+// import java.util.Map;
+// import java.util.Set;
+// import java.util.UUID;
+// import java.util.concurrent.TimeUnit;
+// import java.util.stream.Collectors;
 //
-//import lombok.extern.slf4j.Slf4j;
-//import org.springframework.session.Session;
-//import org.springframework.session.SessionRepository;
+// import lombok.extern.slf4j.Slf4j;
+// import org.springframework.session.Session;
+// import org.springframework.session.SessionRepository;
 //
 //
 //
-//import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
-//import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
-//import software.amazon.awssdk.services.dynamodb.model.GetItemRequest;
-//import software.amazon.awssdk.services.dynamodb.model.PutItemRequest;
+// import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
+// import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
+// import software.amazon.awssdk.services.dynamodb.model.GetItemRequest;
+// import software.amazon.awssdk.services.dynamodb.model.PutItemRequest;
 //
-//@Slf4j
-//public class DynamoDBSessionRepository implements SessionRepository<DynamoDBSessionRepository.DynamoDBSession> {
+// @Slf4j
+// public class DynamoDBSessionRepository implements
+// SessionRepository<DynamoDBSessionRepository.DynamoDBSession> {
 //
 //    private static final String ITEM_SESSION_ID_ATTRIBUTE_NAME = "SessionID";
-//    private static final String ITEM_SESSION_EXPIRATION_TIME_ATTRIBUTE_NAME = "SessionExpirationTime";
+//    private static final String ITEM_SESSION_EXPIRATION_TIME_ATTRIBUTE_NAME =
+// "SessionExpirationTime";
 //    private static final String ITEM_SESSION_DATA_ATTRIBUTE_NAME = "SessionData";
 //
 //    private final DynamoDbClient dynamoDB;
 //    private final int maxInactiveIntervalInSeconds;
 //    private final String sessionsTableName;
 //
-//    public DynamoDBSessionRepository(DynamoDbClient dynamoDB, int maxInactiveIntervalInSeconds, String sessionsTableName) {
+//    public DynamoDBSessionRepository(DynamoDbClient dynamoDB, int maxInactiveIntervalInSeconds,
+// String sessionsTableName) {
 //        this.dynamoDB = dynamoDB;
 //        this.maxInactiveIntervalInSeconds = maxInactiveIntervalInSeconds;
 //        this.sessionsTableName = sessionsTableName;
@@ -44,7 +47,8 @@
 //
 //    @Override
 //    public DynamoDBSession createSession() {
-//        return new DynamoDBSession(UUID.randomUUID().toString(), this.maxInactiveIntervalInSeconds);
+//        return new DynamoDBSession(UUID.randomUUID().toString(),
+// this.maxInactiveIntervalInSeconds);
 //    }
 //
 //    @Override
@@ -92,7 +96,8 @@
 //
 //    @Override
 //    public void deleteById(String id) {
-//        this.dynamoDB.getTable(this.sessionsTableName).deleteItem(ITEM_SESSION_ID_ATTRIBUTE_NAME, id);
+//        this.dynamoDB.getTable(this.sessionsTableName).deleteItem(ITEM_SESSION_ID_ATTRIBUTE_NAME,
+// id);
 //    }
 //
 //
@@ -131,7 +136,8 @@
 //        @Override
 //        public void setLastAccessedTime(Instant lastAccessedTime) {
 //            this.lastAccessedTime = lastAccessedTime.toEpochMilli();
-//            this.expireAt = Date.from(lastAccessedTime.plus(Duration.ofSeconds(this.maxInactiveIntervalSeconds)));
+//            this.expireAt =
+// Date.from(lastAccessedTime.plus(Duration.ofSeconds(this.maxInactiveIntervalSeconds)));
 //        }
 //
 //        @Override
@@ -192,7 +198,8 @@
 //        ObjectOutputStream oos = null;
 //        try {
 //            PutItemRequest.builder()
-//            Item item = new Item().withPrimaryKey(ITEM_SESSION_ID_ATTRIBUTE_NAME, session.getId());
+//            Item item = new Item().withPrimaryKey(ITEM_SESSION_ID_ATTRIBUTE_NAME,
+// session.getId());
 //            updateTimeToLive(item, session);
 //            ByteArrayOutputStream fos = new ByteArrayOutputStream();
 //            oos = new ObjectOutputStream(fos);
@@ -205,10 +212,12 @@
 //        }
 //    }
 //
-//    private DynamoDBSession toSession(Map<String, AttributeValue> item) throws IOException, ClassNotFoundException {
+//    private DynamoDBSession toSession(Map<String, AttributeValue> item) throws IOException,
+// ClassNotFoundException {
 //        ObjectInputStream ois = null;
 //        try {
-//            ByteArrayInputStream bis = new ByteArrayInputStream(item.getBinary(ITEM_SESSION_DATA_ATTRIBUTE_NAME));
+//            ByteArrayInputStream bis = new
+// ByteArrayInputStream(item.getBinary(ITEM_SESSION_DATA_ATTRIBUTE_NAME));
 //            ois = new ObjectInputStream(bis);
 //            DynamoDBSession session = (DynamoDBSession) ois.readObject();
 //            return session;
@@ -222,8 +231,9 @@
 //            final long lastAccessTimeSeconds =
 //                    TimeUnit.MILLISECONDS.toSeconds(session.getLastAccessedTime().toEpochMilli());
 //
-//            final long ttlInSeconds = lastAccessTimeSeconds + session.getMaxInactiveInterval().getSeconds();
+//            final long ttlInSeconds = lastAccessTimeSeconds +
+// session.getMaxInactiveInterval().getSeconds();
 //            item.withNumber(ITEM_SESSION_EXPIRATION_TIME_ATTRIBUTE_NAME, ttlInSeconds);
 //        }
 //    }
-//}
+// }

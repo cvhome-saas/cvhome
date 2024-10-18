@@ -8,6 +8,7 @@ import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.repositories.catalog.product.attribute.PageableProductOptionRepository;
 import com.asrevo.cvhome.store.core.repositories.catalog.product.attribute.ProductOptionRepository;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -15,12 +16,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import java.util.List;
-
 @Service("productOptionService")
-public class ProductOptionServiceImpl extends
-        SalesManagerEntityServiceImpl<Long, ProductOption> implements ProductOptionService {
-
+public class ProductOptionServiceImpl extends SalesManagerEntityServiceImpl<Long, ProductOption>
+        implements ProductOptionService {
 
     private final ProductOptionRepository productOptionRepository;
 
@@ -30,7 +28,9 @@ public class ProductOptionServiceImpl extends
 
     @Autowired
     public ProductOptionServiceImpl(
-            ProductOptionRepository productOptionRepository, PageableProductOptionRepository pageableProductOptionRepository, ProductAttributeService productAttributeService) {
+            ProductOptionRepository productOptionRepository,
+            PageableProductOptionRepository pageableProductOptionRepository,
+            ProductAttributeService productAttributeService) {
         super(productOptionRepository);
         this.productOptionRepository = productOptionRepository;
         this.pageableProductOptionRepository = pageableProductOptionRepository;
@@ -38,53 +38,47 @@ public class ProductOptionServiceImpl extends
     }
 
     @Override
-    public List<ProductOption> listByStore(MerchantStore store, Language language) throws ServiceException {
-
+    public List<ProductOption> listByStore(MerchantStore store, Language language)
+            throws ServiceException {
 
         return productOptionRepository.findByStoreId(store.getId(), language.getId());
-
-
     }
 
     @Override
-    public List<ProductOption> listReadOnly(MerchantStore store, Language language) throws ServiceException {
+    public List<ProductOption> listReadOnly(MerchantStore store, Language language)
+            throws ServiceException {
 
         return productOptionRepository.findByReadOnly(store.getId(), language.getId(), true);
-
-
     }
 
-
     @Override
-    public List<ProductOption> getByName(MerchantStore store, String name, Language language) throws ServiceException {
+    public List<ProductOption> getByName(MerchantStore store, String name, Language language)
+            throws ServiceException {
 
         try {
             return productOptionRepository.findByName(store.getId(), name, language.getId());
         } catch (Exception e) {
             throw new ServiceException(e);
         }
-
-
     }
 
     @Override
     public void saveOrUpdate(ProductOption entity) throws ServiceException {
 
-
-        //save or update (persist and attach entities
+        // save or update (persist and attach entities
         if (entity.getId() != null && entity.getId() > 0) {
             super.update(entity);
         } else {
             super.save(entity);
         }
-
     }
 
     @Override
     public void delete(ProductOption entity) throws ServiceException {
 
-        //remove all attributes having this option
-        List<ProductAttribute> attributes = productAttributeService.getByOptionId(entity.getMerchantStore(), entity.getId());
+        // remove all attributes having this option
+        List<ProductAttribute> attributes =
+                productAttributeService.getByOptionId(entity.getMerchantStore(), entity.getId());
 
         for (ProductAttribute attribute : attributes) {
             productAttributeService.delete(attribute);
@@ -92,9 +86,8 @@ public class ProductOptionServiceImpl extends
 
         ProductOption option = this.getById(entity.getId());
 
-        //remove option
+        // remove option
         super.delete(option);
-
     }
 
     @Override
@@ -108,12 +101,10 @@ public class ProductOptionServiceImpl extends
     }
 
     @Override
-    public Page<ProductOption> getByMerchant(MerchantStore store, Language language, String name,
-                                             int page, int count) {
+    public Page<ProductOption> getByMerchant(
+            MerchantStore store, Language language, String name, int page, int count) {
         Assert.notNull(store, "MerchantStore cannot be null");
         Pageable p = PageRequest.of(page, count);
         return pageableProductOptionRepository.listOptions(store.getId(), name, p);
     }
-
-
 }

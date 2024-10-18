@@ -4,12 +4,19 @@ import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.entity.content.FileContentType;
 import com.asrevo.cvhome.store.core.entity.content.OutputContentFile;
 import com.asrevo.cvhome.store.core.modules.cms.common.AssetsManager;
-import org.apache.commons.lang3.StringUtils;
-
 import java.io.ByteArrayOutputStream;
 import java.io.Serializable;
+import org.apache.commons.lang3.StringUtils;
 
-public interface ContentAssetsManager extends AssetsManager, FileGet, FilePut, FileRemove, FolderPut, FolderList, FolderRemove, Serializable {
+public interface ContentAssetsManager
+        extends AssetsManager,
+                FileGet,
+                FilePut,
+                FileRemove,
+                FolderPut,
+                FolderList,
+                FolderRemove,
+                Serializable {
     char UNIX_SEPARATOR = '/';
     char WINDOWS_SEPARATOR = '\\';
     String ROOT_NAME = "files";
@@ -21,12 +28,13 @@ public interface ContentAssetsManager extends AssetsManager, FileGet, FilePut, F
         StringBuilder builder = new StringBuilder();
         String root = nodePath(store);
         builder.append(root);
-        if (type != null && !FileContentType.IMAGE.name().equals(type.name()) && !FileContentType.STATIC_FILE.name().equals(type.name())) {
+        if (type != null
+                && !FileContentType.IMAGE.name().equals(type.name())
+                && !FileContentType.STATIC_FILE.name().equals(type.name())) {
             builder.append(type.name()).append(Constants.SLASH);
         }
 
         return builder.toString();
-
     }
 
     default String nodePath(String store) {
@@ -34,7 +42,6 @@ public interface ContentAssetsManager extends AssetsManager, FileGet, FilePut, F
         StringBuilder builder = new StringBuilder();
         builder.append(ROOT_NAME).append(Constants.SLASH).append(store).append(Constants.SLASH);
         return builder.toString();
-
     }
 
     default OutputContentFile getOutputContentFile(byte[] byteArray) {
@@ -66,6 +73,4 @@ public interface ContentAssetsManager extends AssetsManager, FileGet, FilePut, F
         int lastWindowsPos = filename.lastIndexOf(WINDOWS_SEPARATOR);
         return Math.max(lastUnixPos, lastWindowsPos);
     }
-
-
 }

@@ -7,27 +7,24 @@ import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.repositories.reference.country.CountryRepository;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
 import com.asrevo.cvhome.store.core.utils.CacheUtils;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 @Service("countryService")
 @Slf4j
 public class CountryServiceImpl extends SalesManagerEntityServiceImpl<Integer, Country>
         implements CountryService {
 
-
     private final CountryRepository countryRepository;
 
     private final CacheUtils cache;
-
 
     @Autowired
     public CountryServiceImpl(CountryRepository countryRepository, CacheUtils cache) {
@@ -42,7 +39,8 @@ public class CountryServiceImpl extends SalesManagerEntityServiceImpl<Integer, C
     }
 
     @Override
-    public void addCountryDescription(Country country, CountryDescription description) throws ServiceException {
+    public void addCountryDescription(Country country, CountryDescription description)
+            throws ServiceException {
         country.getDescriptions().add(description);
         description.setCountry(country);
         update(country);
@@ -63,9 +61,9 @@ public class CountryServiceImpl extends SalesManagerEntityServiceImpl<Integer, C
         return returnMap;
     }
 
-
     @Override
-    public List<Country> getCountries(final List<String> isoCodes, final Language language) throws ServiceException {
+    public List<Country> getCountries(final List<String> isoCodes, final Language language)
+            throws ServiceException {
         List<Country> countryList = getCountries(language);
         List<Country> requestedCountryList = new ArrayList<>();
         if (!CollectionUtils.isEmpty(countryList)) {
@@ -77,7 +75,6 @@ public class CountryServiceImpl extends SalesManagerEntityServiceImpl<Integer, C
         }
         return requestedCountryList;
     }
-
 
     @SuppressWarnings("unchecked")
     @Override
@@ -91,12 +88,11 @@ public class CountryServiceImpl extends SalesManagerEntityServiceImpl<Integer, C
 
                 countries = countryRepository.listByLanguage(language.getId());
 
-                //set names
+                // set names
                 for (Country country : countries) {
 
                     CountryDescription description = country.getDescriptions().iterator().next();
                     country.setName(description.getName());
-
                 }
 
                 cache.putInCache(countries, "COUNTRIES_" + language.getCode());
@@ -107,8 +103,6 @@ public class CountryServiceImpl extends SalesManagerEntityServiceImpl<Integer, C
         }
 
         return countries;
-
-
     }
 
     @Override
@@ -119,8 +113,5 @@ public class CountryServiceImpl extends SalesManagerEntityServiceImpl<Integer, C
             log.error("listCountryZones", e);
             throw new ServiceException(e);
         }
-
     }
-
-
 }

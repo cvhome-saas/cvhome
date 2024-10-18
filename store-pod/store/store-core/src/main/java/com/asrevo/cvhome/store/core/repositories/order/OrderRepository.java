@@ -1,14 +1,13 @@
 package com.asrevo.cvhome.store.core.repositories.order;
 
-
 import com.asrevo.cvhome.store.core.entity.order.Order;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-
 public interface OrderRepository extends JpaRepository<Order, Long>, OrderRepositoryCustom {
 
-    @Query("""
+    @Query(
+            """
             select o from Order o join fetch o.merchant om
             join fetch o.orderProducts op
             left join fetch o.delivery od left join fetch od.country left join fetch od.zone
@@ -20,5 +19,4 @@ public interface OrderRepository extends JpaRepository<Order, Long>, OrderReposi
             join fetch op.orderAttributes opa
             left join fetch op.prices opp where o.id = ?1 and om.id = ?2""")
     Order findOne(Long id, Integer merchantId);
-
 }

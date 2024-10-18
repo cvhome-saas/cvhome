@@ -9,23 +9,22 @@ import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.repositories.reference.zone.ZoneRepository;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
 import com.asrevo.cvhome.store.core.utils.CacheUtils;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 @Service("zoneService")
 @Slf4j
-public class ZoneServiceImpl extends SalesManagerEntityServiceImpl<Long, Zone> implements
-        ZoneService {
+public class ZoneServiceImpl extends SalesManagerEntityServiceImpl<Long, Zone>
+        implements ZoneService {
 
-    private final static String ZONE_CACHE_PREFIX = "ZONES_";
+    private static final String ZONE_CACHE_PREFIX = "ZONES_";
     private final ZoneRepository zoneRepository;
     private final CacheUtils cache;
 
@@ -61,7 +60,7 @@ public class ZoneServiceImpl extends SalesManagerEntityServiceImpl<Long, Zone> i
     @Override
     public List<Zone> getZones(Country country, Language language) throws ServiceException {
 
-        //Assert.notNull(country,"Country cannot be null");
+        // Assert.notNull(country,"Country cannot be null");
         Assert.notNull(language, "Language cannot be null");
 
         List<Zone> zones = null;
@@ -72,20 +71,19 @@ public class ZoneServiceImpl extends SalesManagerEntityServiceImpl<Long, Zone> i
                 countryCode = country.getIsoCode();
             }
 
-            String cacheKey = ZONE_CACHE_PREFIX + countryCode + Constants.UNDERSCORE + language.getCode();
+            String cacheKey =
+                    ZONE_CACHE_PREFIX + countryCode + Constants.UNDERSCORE + language.getCode();
 
             zones = (List<Zone>) cache.getFromCache(cacheKey);
-
 
             if (zones == null) {
 
                 zones = zoneRepository.listByLanguageAndCountry(countryCode, language.getId());
 
-                //set names
+                // set names
                 for (Zone zone : zones) {
                     ZoneDescription description = zone.getDescriptions().getFirst();
                     zone.setName(description.getName());
-
                 }
                 cache.putInCache(zones, cacheKey);
             }
@@ -94,8 +92,6 @@ public class ZoneServiceImpl extends SalesManagerEntityServiceImpl<Long, Zone> i
             log.error("getZones()", e);
         }
         return zones;
-
-
     }
 
     @SuppressWarnings("unchecked")
@@ -108,21 +104,19 @@ public class ZoneServiceImpl extends SalesManagerEntityServiceImpl<Long, Zone> i
         List<Zone> zones = null;
         try {
 
-
-            String cacheKey = ZONE_CACHE_PREFIX + countryCode + Constants.UNDERSCORE + language.getCode();
+            String cacheKey =
+                    ZONE_CACHE_PREFIX + countryCode + Constants.UNDERSCORE + language.getCode();
 
             zones = (List<Zone>) cache.getFromCache(cacheKey);
-
 
             if (zones == null) {
 
                 zones = zoneRepository.listByLanguageAndCountry(countryCode, language.getId());
 
-                //set names
+                // set names
                 for (Zone zone : zones) {
                     ZoneDescription description = zone.getDescriptions().getFirst();
                     zone.setName(description.getName());
-
                 }
                 cache.putInCache(zones, cacheKey);
             }
@@ -131,8 +125,6 @@ public class ZoneServiceImpl extends SalesManagerEntityServiceImpl<Long, Zone> i
             log.error("getZones()", e);
         }
         return zones;
-
-
     }
 
     @Override
@@ -146,17 +138,15 @@ public class ZoneServiceImpl extends SalesManagerEntityServiceImpl<Long, Zone> i
 
             zones = (Map<String, Zone>) cache.getFromCache(cacheKey);
 
-
             if (zones == null) {
                 zones = new HashMap<>();
                 List<Zone> zns = zoneRepository.listByLanguage(language.getId());
 
-                //set names
+                // set names
                 for (Zone zone : zns) {
                     ZoneDescription description = zone.getDescriptions().getFirst();
                     zone.setName(description.getName());
                     zones.put(zone.getCode(), zone);
-
                 }
                 cache.putInCache(zones, cacheKey);
             }
@@ -165,8 +155,5 @@ public class ZoneServiceImpl extends SalesManagerEntityServiceImpl<Long, Zone> i
             log.error("getZones()", e);
         }
         return zones;
-
-
     }
-
 }

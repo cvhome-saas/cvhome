@@ -14,14 +14,14 @@ import com.asrevo.cvhome.store.core.services.catalog.product.ProductService;
 import com.asrevo.cvhome.store.core.services.catalog.product.variation.ProductVariationService;
 import com.asrevo.cvhome.store.service.mapper.Mapper;
 import com.asrevo.cvhome.store.utils.DateUtil;
+import java.util.Date;
+import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
-import java.util.Optional;
-
 @Component
-public class PersistableProductVariantMapper implements Mapper<PersistableProductVariant, ProductVariant> {
+public class PersistableProductVariantMapper
+        implements Mapper<PersistableProductVariant, ProductVariant> {
 
     private final ProductVariationService productVariationService;
 
@@ -29,21 +29,28 @@ public class PersistableProductVariantMapper implements Mapper<PersistableProduc
 
     private final ProductService productService;
 
-    public PersistableProductVariantMapper(ProductVariationService productVariationService, PersistableProductAvailabilityMapper persistableProductAvailabilityMapper, ProductService productService) {
+    public PersistableProductVariantMapper(
+            ProductVariationService productVariationService,
+            PersistableProductAvailabilityMapper persistableProductAvailabilityMapper,
+            ProductService productService) {
         this.productVariationService = productVariationService;
         this.persistableProductAvailabilityMapper = persistableProductAvailabilityMapper;
         this.productService = productService;
     }
 
     @Override
-    public ProductVariant convert(PersistableProductVariant source, MerchantStore store, Language language) {
+    public ProductVariant convert(
+            PersistableProductVariant source, MerchantStore store, Language language) {
         ProductVariant productVariantModel = new ProductVariant();
         return this.merge(source, productVariantModel, store, language);
     }
 
     @Override
-    public ProductVariant merge(PersistableProductVariant source, ProductVariant destination, MerchantStore store,
-                                Language language) {
+    public ProductVariant merge(
+            PersistableProductVariant source,
+            ProductVariant destination,
+            MerchantStore store,
+            Language language) {
 
         //
         Long productVariation = source.getVariation();
@@ -61,28 +68,40 @@ public class PersistableProductVariantMapper implements Mapper<PersistableProduc
             if (productVariationValue != null) {
                 variationValue = productVariationService.getById(store, productVariationValue);
                 if (variationValue.isEmpty()) {
-                    throw new ResourceNotFoundException("ProductVaritionValue [" + productVariationValue + "] + not found for store [" + store.getCode() + "]");
+                    throw new ResourceNotFoundException(
+                            "ProductVaritionValue ["
+                                    + productVariationValue
+                                    + "] + not found for store ["
+                                    + store.getCode()
+                                    + "]");
                 }
-
             }
         } else {
             variation = productVariationService.getByCode(store, productVariationCode);
             if (productVariationValueCode != null) {
-                variationValue = productVariationService.getByCode(store, productVariationValueCode);
+                variationValue =
+                        productVariationService.getByCode(store, productVariationValueCode);
                 if (variationValue.isEmpty()) {
-                    throw new ResourceNotFoundException("ProductVaritionValue [" + productVariationValue + "] + not found for store [" + store.getCode() + "]");
+                    throw new ResourceNotFoundException(
+                            "ProductVaritionValue ["
+                                    + productVariationValue
+                                    + "] + not found for store ["
+                                    + store.getCode()
+                                    + "]");
                 }
-
             }
         }
 
-
         if (variation.isEmpty()) {
-            throw new ResourceNotFoundException("ProductVarition [" + productVariation + "] + not found for store [" + store.getCode() + "]");
+            throw new ResourceNotFoundException(
+                    "ProductVarition ["
+                            + productVariation
+                            + "] + not found for store ["
+                            + store.getCode()
+                            + "]");
         }
 
         destination.setVariation(variation.get());
-
 
         if (productVariationValue != null) {
             destination.setVariationValue(variationValue.get());
@@ -108,19 +127,20 @@ public class PersistableProductVariantMapper implements Mapper<PersistableProduc
             try {
                 destination.setDateAvailable(DateUtil.getDate(source.getDateAvailable()));
             } catch (Exception e) {
-                throw new ServiceRuntimeException("Cant format date [" + source.getDateAvailable() + "]");
+                throw new ServiceRuntimeException(
+                        "Cant format date [" + source.getDateAvailable() + "]");
             }
         }
 
         destination.setSortOrder(source.getSortOrder());
 
-
         if (source.getInventory() != null) {
-            ProductAvailability availability = persistableProductAvailabilityMapper.convert(source.getInventory(), store, language);
+            ProductAvailability availability =
+                    persistableProductAvailabilityMapper.convert(
+                            source.getInventory(), store, language);
             availability.setProductVariant(destination);
             destination.getAvailabilities().add(availability);
         }
-
 
         Product product = null;
 
@@ -128,25 +148,35 @@ public class PersistableProductVariantMapper implements Mapper<PersistableProduc
             product = productService.findOne(source.getProductId(), store);
 
             if (product == null) {
-                throw new ResourceNotFoundException("Product [" + source.getId() + "] + not found for store [" + store.getCode() + "]");
+                throw new ResourceNotFoundException(
+                        "Product ["
+                                + source.getId()
+                                + "] + not found for store ["
+                                + store.getCode()
+                                + "]");
             }
 
             if (!product.getMerchantStore().getId().equals(store.getId())) {
-                throw new ResourceNotFoundException("Product [" + source.getId() + "] + not found for store [" + store.getCode() + "]");
+                throw new ResourceNotFoundException(
+                        "Product ["
+                                + source.getId()
+                                + "] + not found for store ["
+                                + store.getCode()
+                                + "]");
             }
 
             if (product.getSku() != null && product.getSku().equals(source.getSku())) {
-                throw new OperationNotAllowedException("Product variant sku [" + source.getSku() + "] + must be different than product instance sku [" + product.getSku() + "]");
+                throw new OperationNotAllowedException(
+                        "Product variant sku ["
+                                + source.getSku()
+                                + "] + must be different than product instance sku ["
+                                + product.getSku()
+                                + "]");
             }
 
             destination.setProduct(product);
-
-
         }
 
-
         return destination;
-
     }
-
 }

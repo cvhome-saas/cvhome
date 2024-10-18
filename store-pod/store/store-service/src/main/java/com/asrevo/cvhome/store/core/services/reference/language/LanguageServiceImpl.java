@@ -7,27 +7,24 @@ import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.repositories.reference.language.LanguageRepository;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
 import com.asrevo.cvhome.store.core.utils.CacheUtils;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.stereotype.Service;
-
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.stereotype.Service;
 
 /**
  * <a href="https://samerabdelkafi.wordpress.com/2014/05/29/spring-data-jpa/">...</a>
  *
  * @author c.samson
  */
-
 @Service("languageService")
 @Slf4j
 public class LanguageServiceImpl extends SalesManagerEntityServiceImpl<Integer, Language>
         implements LanguageService {
-
 
     private final CacheUtils cache;
 
@@ -39,7 +36,6 @@ public class LanguageServiceImpl extends SalesManagerEntityServiceImpl<Integer, 
         this.languageRepository = languageRepository;
         this.cache = cache;
     }
-
 
     @Override
     @Cacheable("languageByCode")
@@ -74,7 +70,6 @@ public class LanguageServiceImpl extends SalesManagerEntityServiceImpl<Integer, 
             language = new Language(Constants.DEFAULT_LANGUAGE);
         }
         return language;
-
     }
 
     @Override
@@ -87,14 +82,11 @@ public class LanguageServiceImpl extends SalesManagerEntityServiceImpl<Integer, 
             returnMap.put(lang.getCode(), lang);
         }
         return returnMap;
-
     }
-
 
     @Override
     @SuppressWarnings("unchecked")
     public List<Language> getLanguages() throws ServiceException {
-
 
         List<Language> langs = null;
         try {
@@ -102,7 +94,6 @@ public class LanguageServiceImpl extends SalesManagerEntityServiceImpl<Integer, 
             langs = (List<Language>) cache.getFromCache("LANGUAGES");
             if (langs == null) {
                 langs = this.list();
-
 
                 cache.putInCache(langs, "LANGUAGES");
             }
@@ -113,12 +104,10 @@ public class LanguageServiceImpl extends SalesManagerEntityServiceImpl<Integer, 
         }
 
         return langs;
-
     }
 
     @Override
     public Language defaultLanguage() {
         return toLanguage(Locale.ENGLISH);
     }
-
 }

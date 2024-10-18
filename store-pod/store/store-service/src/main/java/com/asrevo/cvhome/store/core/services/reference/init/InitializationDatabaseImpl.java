@@ -1,5 +1,7 @@
 package com.asrevo.cvhome.store.core.services.reference.init;
 
+import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1;
+
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
 import com.asrevo.cvhome.store.core.entity.catalog.product.manufacturer.Manufacturer;
@@ -25,14 +27,11 @@ import com.asrevo.cvhome.store.core.services.reference.loader.IntegrationModules
 import com.asrevo.cvhome.store.core.services.reference.loader.ZonesLoader;
 import com.asrevo.cvhome.store.core.services.reference.zone.ZoneService;
 import com.asrevo.cvhome.store.core.services.system.optin.OptinService;
+import java.sql.Date;
+import java.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.sql.Date;
-import java.util.*;
-
-import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1;
 
 @Service("initializationDatabase")
 @Slf4j
@@ -53,17 +52,26 @@ public class InitializationDatabaseImpl implements InitializationDatabase {
 
     private final ManufacturerService manufacturerService;
 
-/*
-    @Autowired
-    private ModuleConfigurationService moduleConfigurationService;
-*/
+    /*
+        @Autowired
+        private ModuleConfigurationService moduleConfigurationService;
+    */
 
     private final OptinService optinService;
 
-
     private String name;
 
-    public InitializationDatabaseImpl(MerchantStoreService merchantService, ProductTypeService productTypeService, ZoneService zoneService, LanguageService languageService, CountryService countryService, CurrencyService currencyService, ZonesLoader zonesLoader, IntegrationModulesLoader modulesLoader, ManufacturerService manufacturerService, OptinService optinService) {
+    public InitializationDatabaseImpl(
+            MerchantStoreService merchantService,
+            ProductTypeService productTypeService,
+            ZoneService zoneService,
+            LanguageService languageService,
+            CountryService countryService,
+            CurrencyService currencyService,
+            ZonesLoader zonesLoader,
+            IntegrationModulesLoader modulesLoader,
+            ManufacturerService manufacturerService,
+            OptinService optinService) {
         this.merchantService = merchantService;
         this.productTypeService = productTypeService;
         this.zoneService = zoneService;
@@ -90,10 +98,7 @@ public class InitializationDatabaseImpl implements InitializationDatabase {
         createSubReferences();
         createModules();
         createMerchant();
-
-
     }
-
 
     private void createCurrencies() throws ServiceException {
         log.info(String.format("%s : Populating Currencies ", name));
@@ -104,19 +109,26 @@ public class InitializationDatabaseImpl implements InitializationDatabase {
                 java.util.Currency c = java.util.Currency.getInstance(code);
 
                 if (c == null) {
-                    log.info(String.format("%s : Populating Currencies : no currency for code : %s", name, code));
+                    log.info(
+                            String.format(
+                                    "%s : Populating Currencies : no currency for code : %s",
+                                    name, code));
                 }
 
-                //check if it exist
+                // check if it exist
 
                 Currency currency = new Currency();
                 currency.setName(c.getCurrencyCode());
                 currency.setCurrency(c);
                 currencyService.create(currency);
 
-                //System.out.println(l.getCountry() + "   " + c.getSymbol() + "  " + c.getSymbol(l));
+                // System.out.println(l.getCountry() + "   " + c.getSymbol() + "  " +
+                // c.getSymbol(l));
             } catch (IllegalArgumentException e) {
-                log.info(String.format("%s : Populating Currencies : no currency for code : %s", name, code));
+                log.info(
+                        String.format(
+                                "%s : Populating Currencies : no currency for code : %s",
+                                name, code));
             }
         }
     }
@@ -132,8 +144,8 @@ public class InitializationDatabaseImpl implements InitializationDatabase {
 
                 for (Language language : languages) {
                     String name = locale.getDisplayCountry(new Locale(language.getCode()));
-                    //byte[] ptext = value.getBytes(Constants.ISO_8859_1);
-                    //String name = new String(ptext, Constants.UTF_8);
+                    // byte[] ptext = value.getBytes(Constants.ISO_8859_1);
+                    // String name = new String(ptext, Constants.UTF_8);
                     CountryDescription description = new CountryDescription(language, name);
                     countryService.addCountryDescription(country, description);
                 }
@@ -149,33 +161,33 @@ public class InitializationDatabaseImpl implements InitializationDatabase {
             zonesMap = zonesLoader.loadZones("reference/zoneconfig.json");
 
             this.addZonesToDb(zonesMap);
-/*              
-              for (Map.Entry<String, Zone> entry : zonesMap.entrySet()) {
-            	    String key = entry.getKey();
-            	    Zone value = entry.getValue();
-            	    if(value.getDescriptions()==null) {
-            	    	LOGGER.warn("This zone " + key + " has no descriptions");
-            	    	continue;
-            	    }
-            	    
-            	    List<ZoneDescription> zoneDescriptions = value.getDescriptions();
-            	    value.setDescriptons(null);
+            /*
+            for (Map.Entry<String, Zone> entry : zonesMap.entrySet()) {
+               String key = entry.getKey();
+               Zone value = entry.getValue();
+               if(value.getDescriptions()==null) {
+               	LOGGER.warn("This zone " + key + " has no descriptions");
+               	continue;
+               }
 
-            	    zoneService.create(value);
-            	    
-            	    for(ZoneDescription description : zoneDescriptions) {
-            	    	description.setZone(value);
-            	    	zoneService.addDescription(value, description);
-            	    }
-              }*/
+               List<ZoneDescription> zoneDescriptions = value.getDescriptions();
+               value.setDescriptons(null);
 
-            //lookup additional zones
-            //iterate configured languages
+               zoneService.create(value);
+
+               for(ZoneDescription description : zoneDescriptions) {
+               	description.setZone(value);
+               	zoneService.addDescription(value, description);
+               }
+            }*/
+
+            // lookup additional zones
+            // iterate configured languages
             log.info("Populating additional zones");
 
-            //load reference/zones/* (zone config for additional country)
-            //example in.json and in-fr.son
-            //will load es zones and use a specific file for french es zones
+            // load reference/zones/* (zone config for additional country)
+            // example in.json and in-fr.son
+            // will load es zones and use a specific file for french es zones
             List<Map<String, Zone>> loadIndividualZones = zonesLoader.loadIndividualZones();
 
             loadIndividualZones.forEach(this::addZonesToDb);
@@ -184,9 +196,7 @@ public class InitializationDatabaseImpl implements InitializationDatabase {
 
             throw new ServiceException(e);
         }
-
     }
-
 
     private void addZonesToDb(Map<String, Zone> zonesMap) throws RuntimeException {
 
@@ -214,9 +224,7 @@ public class InitializationDatabaseImpl implements InitializationDatabase {
 
         } catch (Exception e) {
             log.error("An error occured while loading zones", e);
-
         }
-
     }
 
     private void createLanguages() throws ServiceException {
@@ -240,7 +248,7 @@ public class InitializationDatabaseImpl implements InitializationDatabase {
         List<Language> supportedLanguages = new ArrayList<>();
         supportedLanguages.add(en);
 
-        //create a merchant
+        // create a merchant
         MerchantStore store = new MerchantStore();
         store.setCountry(ca);
         store.setCurrency(currency);
@@ -263,14 +271,14 @@ public class InitializationDatabaseImpl implements InitializationDatabase {
         merchantService.create(store);
 
         //	@TODO ASHRAF
-/*
-        TaxClass taxclass = new TaxClass(TaxClass.DEFAULT_TAX_CLASS);
-        taxclass.setMerchantStore(store);
+        /*
+                TaxClass taxclass = new TaxClass(TaxClass.DEFAULT_TAX_CLASS);
+                taxclass.setMerchantStore(store);
 
-        taxClassService.create(taxclass);
-*/
+                taxClassService.create(taxclass);
+        */
 
-        //create default manufacturer
+        // create default manufacturer
         Manufacturer defaultManufacturer = new Manufacturer();
         defaultManufacturer.setCode(Constants.DEFAULT_MANUFACTURER);
         defaultManufacturer.setMerchantStore(store);
@@ -289,26 +297,23 @@ public class InitializationDatabaseImpl implements InitializationDatabase {
         newsletter.setMerchant(store);
         newsletter.setOptinType(OptinType.NEWSLETTER);
         optinService.create(newsletter);
-
-
     }
 
     private void createModules() throws ServiceException {
         //	@TODO ASHRAF
-/*
-        try {
+        /*
+                try {
 
-            List<IntegrationModule> modules = modulesLoader.loadIntegrationModules("reference/integrationmodules.json");
-            for (IntegrationModule entry : modules) {
-                moduleConfigurationService.create(entry);
-            }
+                    List<IntegrationModule> modules = modulesLoader.loadIntegrationModules("reference/integrationmodules.json");
+                    for (IntegrationModule entry : modules) {
+                        moduleConfigurationService.create(entry);
+                    }
 
 
-        } catch (Exception e) {
-            throw new ServiceException(e);
-        }
-*/
-
+                } catch (Exception e) {
+                    throw new ServiceException(e);
+                }
+        */
 
     }
 
@@ -316,13 +321,8 @@ public class InitializationDatabaseImpl implements InitializationDatabase {
 
         log.info(String.format("%s : Loading catalog sub references ", name));
 
-
         ProductType productType = new ProductType();
         productType.setCode(ProductType.GENERAL_TYPE);
         productTypeService.create(productType);
-
-
     }
-
-
 }

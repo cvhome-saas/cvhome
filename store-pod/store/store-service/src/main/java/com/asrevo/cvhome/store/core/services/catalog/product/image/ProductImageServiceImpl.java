@@ -14,16 +14,15 @@ import com.asrevo.cvhome.store.core.repositories.catalog.product.image.ProductIm
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
 import com.asrevo.cvhome.store.events.products.DeleteProductImageEvent;
 import com.asrevo.cvhome.store.events.products.SaveProductImageEvent;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 @Service("productImage")
 public class ProductImageServiceImpl extends SalesManagerEntityServiceImpl<Long, ProductImage>
@@ -34,7 +33,10 @@ public class ProductImageServiceImpl extends SalesManagerEntityServiceImpl<Long,
     private final ApplicationEventPublisher eventPublisher;
 
     @Autowired
-    public ProductImageServiceImpl(ProductImageRepository productImageRepository, ProductFileManager productFileManager, ApplicationEventPublisher eventPublisher) {
+    public ProductImageServiceImpl(
+            ProductImageRepository productImageRepository,
+            ProductFileManager productFileManager,
+            ApplicationEventPublisher eventPublisher) {
         super(productImageRepository);
         this.productImageRepository = productImageRepository;
         this.productFileManager = productFileManager;
@@ -47,7 +49,8 @@ public class ProductImageServiceImpl extends SalesManagerEntityServiceImpl<Long,
     }
 
     @Override
-    public void addProductImages(Product product, List<ProductImage> productImages) throws ServiceException {
+    public void addProductImages(Product product, List<ProductImage> productImages)
+            throws ServiceException {
 
         try {
             for (ProductImage productImage : productImages) {
@@ -66,11 +69,11 @@ public class ProductImageServiceImpl extends SalesManagerEntityServiceImpl<Long,
         } catch (Exception e) {
             throw new ServiceException(e);
         }
-
     }
 
     @Override
-    public void addProductImage(Product product, ProductImage productImage, ImageContentFile inputImage)
+    public void addProductImage(
+            Product product, ProductImage productImage, ImageContentFile inputImage)
             throws ServiceException {
 
         productImage.setProduct(product);
@@ -83,7 +86,7 @@ public class ProductImageServiceImpl extends SalesManagerEntityServiceImpl<Long,
 
             // insert ProductImage
             ProductImage img = saveOrUpdate(productImage);
-            //manual workaround since aspect is not working
+            // manual workaround since aspect is not working
             eventPublisher.publishEvent(new SaveProductImageEvent(eventPublisher, img, product));
 
         } catch (Exception e) {
@@ -99,17 +102,16 @@ public class ProductImageServiceImpl extends SalesManagerEntityServiceImpl<Long,
 
             }
         }
-
     }
 
     @Override
     public ProductImage saveOrUpdate(ProductImage productImage) throws ServiceException {
 
         return productImageRepository.save(productImage);
-
     }
 
-    public void addProductImageDescription(ProductImage productImage, ProductImageDescription description)
+    public void addProductImageDescription(
+            ProductImage productImage, ProductImageDescription description)
             throws ServiceException {
 
         if (productImage.getDescriptions() == null) {
@@ -119,13 +121,13 @@ public class ProductImageServiceImpl extends SalesManagerEntityServiceImpl<Long,
         productImage.getDescriptions().add(description);
         description.setProductImage(productImage);
         update(productImage);
-
     }
 
     // TODO get default product image
 
     @Override
-    public OutputContentFile getProductImage(ProductImage productImage, ProductImageSize size) throws ServiceException {
+    public OutputContentFile getProductImage(ProductImage productImage, ProductImageSize size)
+            throws ServiceException {
 
         ProductImage pi = new ProductImage();
         String imageName = productImage.getProductImage();
@@ -141,14 +143,16 @@ public class ProductImageServiceImpl extends SalesManagerEntityServiceImpl<Long,
         pi.setProduct(productImage.getProduct());
 
         return productFileManager.getProductImage(pi);
-
     }
 
     @Override
-    public OutputContentFile getProductImage(final String storeCode, final String productCode, final String fileName,
-                                             final ProductImageSize size) throws ServiceException {
+    public OutputContentFile getProductImage(
+            final String storeCode,
+            final String productCode,
+            final String fileName,
+            final ProductImageSize size)
+            throws ServiceException {
         return productFileManager.getProductImage(storeCode, productCode, fileName, size);
-
     }
 
     @Override
@@ -160,21 +164,19 @@ public class ProductImageServiceImpl extends SalesManagerEntityServiceImpl<Long,
     public void removeProductImage(ProductImage productImage) throws ServiceException {
 
         if (!StringUtils.isBlank(productImage.getProductImage())) {
-            productFileManager.removeProductImage(productImage);// managed internally
+            productFileManager.removeProductImage(productImage); // managed internally
         }
         ProductImage p = getById(productImage.getId());
 
         Product product = p.getProduct();
 
-
         delete(p);
         eventPublisher.publishEvent(new DeleteProductImageEvent(eventPublisher, p, product));
-
-
     }
 
     @Override
-    public Optional<ProductImage> getProductImage(Long imageId, Long productId, MerchantStore store) {
+    public Optional<ProductImage> getProductImage(
+            Long imageId, Long productId, MerchantStore store) {
 
         Optional<ProductImage> image = Optional.empty();
 
@@ -192,6 +194,5 @@ public class ProductImageServiceImpl extends SalesManagerEntityServiceImpl<Long,
         Assert.notNull(productImage, "ProductImage cannot be null");
         productImage.setProduct(product);
         productImageRepository.save(productImage);
-
     }
 }

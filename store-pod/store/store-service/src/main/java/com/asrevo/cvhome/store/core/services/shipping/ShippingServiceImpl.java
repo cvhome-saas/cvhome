@@ -11,31 +11,32 @@ import com.asrevo.cvhome.store.core.model.shipping.ShippingType;
 import com.asrevo.cvhome.store.core.services.reference.country.CountryService;
 import com.asrevo.cvhome.store.core.services.system.MerchantConfigurationService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONValue;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Service
 public class ShippingServiceImpl implements ShippingService {
-    private final static String SUPPORTED_COUNTRIES = "SUPPORTED_CNTR";
-    private final static String SHIPPING_MODULES = "SHIPPING";
-    private final static String SHIPPING_DISTANCE = "shippingDistanceModule";
+    private static final String SUPPORTED_COUNTRIES = "SUPPORTED_CNTR";
+    private static final String SHIPPING_MODULES = "SHIPPING";
+    private static final String SHIPPING_DISTANCE = "shippingDistanceModule";
 
     private final CountryService countryService;
     private final MerchantConfigurationService merchantConfigurationService;
 
-    public ShippingServiceImpl(CountryService countryService, MerchantConfigurationService merchantConfigurationService) {
+    public ShippingServiceImpl(
+            CountryService countryService,
+            MerchantConfigurationService merchantConfigurationService) {
         this.countryService = countryService;
         this.merchantConfigurationService = merchantConfigurationService;
     }
 
     @Override
-    public List<Country> getShipToCountryList(MerchantStore store, Language language) throws ServiceException {
-
+    public List<Country> getShipToCountryList(MerchantStore store, Language language)
+            throws ServiceException {
 
         ShippingConfiguration shippingConfiguration = getShippingConfiguration(store);
         ShippingType shippingType = ShippingType.INTERNATIONAL;
@@ -48,14 +49,15 @@ public class ShippingServiceImpl implements ShippingService {
             shippingType = shippingConfiguration.getShippingType();
         }
 
-
         if (shippingType.name().equals(ShippingType.NATIONAL.name())) {
 
             supportedCountries.add(store.getCountry().getIsoCode());
 
         } else {
 
-            MerchantConfiguration configuration = merchantConfigurationService.getMerchantConfiguration(SUPPORTED_COUNTRIES, store);
+            MerchantConfiguration configuration =
+                    merchantConfigurationService.getMerchantConfiguration(
+                            SUPPORTED_COUNTRIES, store);
 
             if (configuration != null) {
 
@@ -68,19 +70,19 @@ public class ShippingServiceImpl implements ShippingService {
                         supportedCountries.add((String) arrayRegion);
                     }
                 }
-
             }
-
         }
 
         return countryService.getCountries(supportedCountries, language);
-
     }
 
     @Override
-    public ShippingConfiguration getShippingConfiguration(MerchantStore store) throws ServiceException {
+    public ShippingConfiguration getShippingConfiguration(MerchantStore store)
+            throws ServiceException {
 
-        MerchantConfiguration configuration = merchantConfigurationService.getMerchantConfiguration(Constants.SHIPPING_CONFIGURATION, store);
+        MerchantConfiguration configuration =
+                merchantConfigurationService.getMerchantConfiguration(
+                        Constants.SHIPPING_CONFIGURATION, store);
 
         ShippingConfiguration shippingConfiguration = null;
 
@@ -95,7 +97,6 @@ public class ShippingServiceImpl implements ShippingService {
             }
         }
         return shippingConfiguration;
-
     }
 
     @Override
