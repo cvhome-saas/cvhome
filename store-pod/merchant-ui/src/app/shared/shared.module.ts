@@ -31,6 +31,7 @@ import {NgxDatatableModule} from '@swimlane/ngx-datatable';
 import {QuillModule} from 'ngx-quill';
 import {FilePickerModule} from "ngx-awesome-uploader";
 import {NgcxTreeComponent} from "@cluetec/ngcx-tree";
+import {ProductAutoCompleteComponent} from "./components/product-autocomplete/product-auto-complete.component";
 
 export const MODULES = [
   NbLayoutModule,
@@ -70,6 +71,7 @@ export const MODULES = [
 
 const COMPONENTS = [
   StoreAutocompleteComponent,
+  ProductAutoCompleteComponent,
   ShowcaseDialogComponent,
   ImageUploadingComponent,
   ImageBrowserComponent

@@ -1,9 +1,9 @@
 import {AfterViewInit, Component, ElementRef, EventEmitter, Input, Output, ViewChild} from '@angular/core';
 import {TranslateService} from "@ngx-translate/core";
 import {Observable, of} from "rxjs";
-import {ProductService} from "../../products/services/product.service";
+import {ProductService} from "../../../pages/catalogue/products/services/product.service";
 import {map} from "rxjs/operators";
-import {ErrorService} from "../../../../shared/services/error.service";
+import {ErrorService} from "../../services/error.service";
 
 
 @Component({

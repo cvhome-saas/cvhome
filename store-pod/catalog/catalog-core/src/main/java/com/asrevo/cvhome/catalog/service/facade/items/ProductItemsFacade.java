@@ -4,6 +4,7 @@ import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.model.product.ReadableProductList;
 import com.asrevo.cvhome.catalog.model.product.group.ProductGroup;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import java.util.List;
 
@@ -19,17 +20,6 @@ public interface ProductItemsFacade {
      * Update product group visible flag
      */
     void updateProductGroup(String code, ProductGroup group, StoreMerchantId store);
-
-    /**
-     * List product items by id
-     */
-    ReadableProductList listItemsByIds(
-            StoreMerchantId store,
-            LanguageCode language,
-            List<Long> ids,
-            int startCount,
-            int maxCount)
-            throws Exception;
 
     /**
      * List products created in a group, for instance FEATURED group
@@ -51,4 +41,14 @@ public interface ProductItemsFacade {
             throws Exception;
 
     void deleteGroup(String group, StoreMerchantId store);
+
+    ReadableProductList relatedItems(
+            Product product, StoreMerchantId merchantStore, LanguageCode language);
+
+    ReadableProductList addItemToRelatedProduct(
+            Product product, Product related, StoreMerchantId store, LanguageCode language);
+
+    ReadableProductList removeItemFromRelated(
+            Product product, Product related, StoreMerchantId store, LanguageCode language)
+            throws ServiceException;
 }

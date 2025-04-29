@@ -13,3 +13,7 @@ GET {{LANDING_UI_URL}}/catalog/api/v2/product/name/fiat?store=65f023632bc46470c1
 
 ###
 
+# curl '{{LANDING_UI_URL}}/catalog/api/v1/products/1/related?store=65f023632bc46470c104b76f&lang=en&count=50&page=0'
+GET {{LANDING_UI_URL}}/catalog/api/v1/products/1/related?store=65f023632bc46470c104b76f&lang=en&count=50&page=0
+
+###
