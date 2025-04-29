@@ -1,0 +1,68 @@
+package com.asrevo.cvhome.order.entity.reference.language;
+
+import com.asrevo.cvhome.store.core.entity.common.audit.AuditListener;
+import com.asrevo.cvhome.store.core.entity.common.audit.AuditSection;
+import com.asrevo.cvhome.store.core.entity.common.audit.Auditable;
+import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
+import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
+import com.asrevo.cvhome.store.core.serializer.LanguageCodeDeSerializer;
+import com.asrevo.cvhome.store.core.serializer.LanguageCodeSerializer;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import jakarta.persistence.*;
+import java.io.Serial;
+import lombok.Getter;
+import lombok.Setter;
+
+@Entity
+@EntityListeners(value = AuditListener.class)
+@Table(
+        name = "LANGUAGE",
+        indexes = {@Index(name = "CODE_IDX2", columnList = "CODE")})
+@Cacheable
+@Getter
+@Setter
+public class Language extends SalesManagerEntity<LanguageCode, Language> implements Auditable {
+    @Serial private static final long serialVersionUID = 1L;
+
+    @EmbeddedId
+    @JsonSerialize(using = LanguageCodeSerializer.class)
+    @JsonDeserialize(using = LanguageCodeDeSerializer.class)
+    @AttributeOverrides({
+        @AttributeOverride(name = "code", column = @Column(name = "CODE", length = 6))
+    })
+    private LanguageCode code;
+
+    @JsonIgnore @Embedded private AuditSection auditSection = new AuditSection();
+
+    @JsonIgnore
+    @Column(name = "SORT_ORDER")
+    private Integer sortOrder;
+
+    public Language() {}
+
+    public Language(LanguageCode code) {
+        this.setCode(code);
+    }
+
+    @Override
+    public LanguageCode getId() {
+        return code;
+    }
+
+    @Override
+    public void setId(LanguageCode id) {
+        this.code = id;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (null == obj) return false;
+        if (!(obj instanceof Language language)) {
+            return false;
+        } else {
+            return (this.getId().equals(language.getId()));
+        }
+    }
+}

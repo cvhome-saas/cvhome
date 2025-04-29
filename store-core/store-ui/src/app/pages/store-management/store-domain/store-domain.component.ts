@@ -4,23 +4,24 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {StoreService} from '../services/store.service';
 import {NbToastrService} from "@nebular/theme";
 import {TranslateService} from '@ngx-translate/core';
-import {Page} from "../../shared/models/Page";
+import {Page} from "../../../shared/models/Page";
 import {ColumnMode} from "@swimlane/ngx-datatable";
-import {validators} from "../../shared/validation/validators";
+import {validators} from "../../../shared/validation/validators";
+import {ErrorService} from "../../../shared/services/error.service";
+import {zip} from "rxjs";
 
 @Component({
   selector: 'ngx-store-domain',
+  standalone: false,
   templateUrl: './store-domain.component.html',
   styleUrls: ['./store-domain.component.scss']
 })
 export class StoreDomainComponent implements OnInit {
   isSubmited = false
-  code;
+  store;
   loading = false;
   page: Page = new Page();
   rows = [];
-  perPage = 10;
-  currentPage = 2;
   selectedItem = '2';
   sidemenuLinks = [
     {
@@ -43,6 +44,18 @@ export class StoreDomainComponent implements OnInit {
     },
     {
       id: '3',
+      title: 'Store Social Links',
+      key: 'COMPONENTS.STORE_SOCIAL_LINKS',
+      link: 'store-social-links'
+    },
+    {
+      id: '4',
+      title: 'Store Slider Images',
+      key: 'COMPONENTS.STORE_SLIDER_IMAGES',
+      link: 'store-slider-images'
+    },
+    {
+      id: '5',
       title: 'Store details',
       key: 'COMPONENTS.STORE_DETAILS',
       link: 'store'
@@ -50,6 +63,8 @@ export class StoreDomainComponent implements OnInit {
   ];
   form: FormGroup;
   protected readonly ColumnMode = ColumnMode;
+  saasProperties = {alis: '', domain: ''};
+  podId = {id: ''};
 
   constructor(
     private storeService: StoreService,
@@ -58,6 +73,7 @@ export class StoreDomainComponent implements OnInit {
     private translate: TranslateService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
+    private errorService: ErrorService
   ) {
   }
 
@@ -66,13 +82,13 @@ export class StoreDomainComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.code = this.activatedRoute.snapshot.paramMap.get('code');
+    this.store = this.activatedRoute.snapshot.paramMap.get('code');
     this.createForm();
     this.getAllocations();
   }
 
   route(link) {
-    this.router.navigate(['pages/store-management/' + link + "/", this.code]);
+    this.router.navigate(['pages/store-management/' + link + "/", this.store]);
   }
 
   setPage(pageInfo) {
@@ -81,26 +97,34 @@ export class StoreDomainComponent implements OnInit {
   }
 
   getAllocations() {
+
     this.loading = true;
-    this.storeService.getAllocations(this.code).subscribe({
-      next: (it) => {
-        this.loading = false;
-        if (it && it.length > 0) {
-          this.rows = it
-          this.page.totalPages = 1
-          this.page.totalElements = it.length
-          this.page.size = it.length
+    zip(this.storeService.saasProperties(), this.storeService.getAllocations(this.store), this.storeService.storePodByStoreId(this.store))
+      .subscribe({
+        next: (it) => {
+          this.loading = false;
+          this.saasProperties = it[0];
+          this.podId = it[2].id;
+          if (it && it[1].data && it[1].data.length > 0) {
+            this.rows = it[1].data
+            this.page.totalPages = 1
+            this.page.totalElements = it[1].data.length
+            this.page.size = it[1].data.length
+          }
+        },
+        error: (err) => {
+          this.loading = false;
+          this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        },
+        complete: () => {
+          this.loading = false;
         }
-      },
-      error: (err) => {
-        this.loading = false;
-      }
-    });
+      })
   }
 
   onDelete(domain: string) {
     this.loading = true;
-    this.storeService.removeDomain(this.code, domain).subscribe({
+    this.storeService.removeDomain(this.store, domain).subscribe({
         next: (it) => {
           this.loading = false;
           this.toastr.success(this.translate.instant('STORE.DOMAIN_REMOVED'));
@@ -108,7 +132,7 @@ export class StoreDomainComponent implements OnInit {
         },
         error: (err) => {
           this.loading = false;
-          this.toastr.success(this.translate.instant('STORE.ERROR_REMOVING_DOMAIN'));
+          this.errorService.error('ERROR.SYSTEM_ERROR', err);
         }
       }
     )
@@ -116,7 +140,7 @@ export class StoreDomainComponent implements OnInit {
 
   createDomain(domain: string) {
     this.loading = true;
-    this.storeService.allocateDomain(this.code, domain).subscribe({
+    this.storeService.allocateDomain(this.store, domain).subscribe({
         next: (it) => {
           this.loading = false;
           this.toastr.success(this.translate.instant('STORE.DOMAIN_CREATED'));
@@ -124,7 +148,7 @@ export class StoreDomainComponent implements OnInit {
         },
         error: (err) => {
           this.loading = false;
-          this.toastr.success(this.translate.instant('STORE.ERROR_CREATING_DOMAIN'));
+          this.errorService.error('ERROR.SYSTEM_ERROR', err);
         },
         complete: () => {
           this.form.reset();
@@ -149,4 +173,11 @@ export class StoreDomainComponent implements OnInit {
     });
   }
 
+  public generateDomain(row: any): string {
+    if (row.domainType === "SUB_DOMAIN") {
+      return row.domain + "." + this.saasProperties.alis + "-" + this.podId.id + "." + this.saasProperties.domain;
+    } else {
+      return row.domain;
+    }
+  }
 }

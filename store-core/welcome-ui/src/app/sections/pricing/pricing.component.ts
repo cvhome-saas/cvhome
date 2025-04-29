@@ -1,102 +1,96 @@
-import {Component} from '@angular/core';
-import {NgClass, NgFor} from "@angular/common";
+import {Component, OnInit} from '@angular/core';
+import {NgFor, NgIf} from "@angular/common";
 import {RouterLink} from "@angular/router";
+import {Option, SubscriptionService, Table} from "../../service/subscription.service";
 
 @Component({
   selector: 'app-pricing',
   standalone: true,
   imports: [
-    NgClass, NgFor, RouterLink
+    NgFor, RouterLink, NgIf
   ],
   templateUrl: './pricing.component.html',
   styleUrl: './pricing.component.css'
 })
-export class PricingComponent {
+export class PricingComponent implements OnInit {
+  BASE_IMG_PATH = `img/pricing/`;
   title: string = 'Unlock Full Power Of Cvhome';
   desc: string = 'Choose your Plan that fit your business.';
-  prices: Pricing[] = [
-    {
-      name: "Free",
-      fade: "fadeInLeft",
-      cost: "0",
-      icon: "img/pricing/basic.png",
-      pricingFeatures: [
-        {
-          desc: "50 order"
-        },
-        {
-          desc: "25 product"
-        },
-        {
-          desc: "2 stores"
-        },
-        {
-          desc: "2k visitor"
-        },
-        {
-          desc: "24/7 Tech Support"
-        }
-      ],
-      url: "signup"
-    },
-    {
-      name: "Basic",
-      fade: "fadeInDown",
-      cost: "9",
-      icon: "img/pricing/basic.png",
-      pricingFeatures: [
-        {
-          desc: "200 order"
-        },
-        {
-          desc: "100 product"
-        },
-        {
-          desc: "5 stores"
-        },
-        {
-          desc: "20k visitor"
-        },
-        {
-          desc: "24/7 Tech Support"
-        }
-      ],
-      url: "signup"
-    },
-    {
-      name: "Performance",
-      fade: "fadeInRight",
-      cost: "49",
-      icon: "img/pricing/premium.png",
-      pricingFeatures: [
-        {
-          desc: "2k order"
-        },
-        {
-          desc: "1k product"
-        },
-        {
-          desc: "10 stores"
-        },
-        {
-          desc: "200k visitor"
-        },
-        {
-          desc: "24/7 Tech Support"
-        }
-      ],
-      url: "signup"
+  prices: Pricing[] | undefined;
+  table: Table | undefined;
+  freePricing: Pricing | undefined;
+  flag: boolean = false;
+
+  constructor(private subscriptionService: SubscriptionService) {
+  }
+
+  ngOnInit(): void {
+    this.subscriptionService.table().subscribe(it => {
+      this.table = it;
+      this.constructFreePricing();
+      this.displayTable();
+    });
+  }
+
+  toggle() {
+    this.flag = !this.flag;
+    this.displayTable();
+  }
+
+  constructFreePricing() {
+    if (this.table) {
+      this.freePricing = {
+        name: this.table.freeOption.subscriptionPlan,
+        cost: `${this.table.freeOption.cost.price / 100}`,
+        url: "",
+        icon: `${this.BASE_IMG_PATH}${this.table.freeOption.subscriptionPlan.toLowerCase()}.png`,
+        pricingFeatures: this.table.freeOption.feature.features.map(it => {
+          return {desc: it.code} as PricingFeature
+        }),
+      } as Pricing;
     }
-  ];
+  }
+
+  displayTable() {
+    this.prices = [];
+    let options: Option[] | undefined;
+    if (!this.flag) {
+      options = this.table?.tables.MONTHLY.options;
+    } else {
+      options = this.table?.tables.YEARLY.options;
+    }
+    if (options && options.length > 0) {
+
+      this.prices = options.map(it => {
+        return {
+          id: it.id,
+          name: it.subscriptionPlan,
+          cost: `${it.cost.price / 100}`,
+          previousCost: `${it.previousCost.price / 100}`,
+          url: "",
+          icon: `${this.BASE_IMG_PATH}${it.subscriptionPlan.toLowerCase()}.png`,
+          pricingFeatures: it.feature.features.map(it => {
+            return {desc: it.code} as PricingFeature
+          }),
+        } as Pricing
+      })
+    }
+  }
+
 }
 
 interface Pricing {
+  id: PriceId
   name: string
-  fade: string
   icon: string
   cost: string
+  previousCost: string
   pricingFeatures: PricingFeature[]
   url: string
+}
+
+interface PriceId {
+  id: string
 }
 
 interface PricingFeature {

@@ -4,8 +4,12 @@ spring:
       eager-load:
         clients:
           - "store-pod-gateway"
-          - "store"
+          - "merchant"
+          - "content"
+          - "catalog"
+          - "order"
           - "landing-ui"
+          - "merchant-ui"
     ecs:
       discovery:
         namespace: "store-pod-1.cvhome.lcl"
@@ -13,9 +17,19 @@ spring:
         enabled: true
         default-port: 8080
         service-ports:
-          "manager": 7001
-          "store": 7101
-          "landing-ui": 7102
+          "auth": 9999
+          "store-core-gateway": 8000
+          "store-ui": 8010
+          "welcome-ui": 8011
+          "manager": 8020
+          "subscription": 8021
+          "store-pod-gateway": 8100
+          "landing-ui": 8110
+          "merchant-ui": 8111
+          "merchant": 8120
+          "content": 8121
+          "catalog": 8122
+          "order": 8123
     gateway:
       discovery:
         locator:
@@ -24,17 +38,6 @@ spring:
         - TokenRelay
         - PreserveHostHeader
         - AddResponseHeader=X-Frame-Options, SAMEORIGIN
-      routes:
-        - id: landing-ui
-          order: 10
-          uri: lb://landing-ui
-          predicates:
-            - FNotService=store,manager,auth
-          filters:
-            - name: AddStoreParam
-              args:
-                addRequestHeader: true
-                addResponseHeader: true
       x-forwarded:
         host-append: false
         for-append: false

@@ -93,7 +93,7 @@ export class FooterComponent {
     name: "me@asrevo.com",
     link: "#"
   }
-  copyrights:string='Copyrights 2024 Cvhome All rights reserved.'
+  copyrights: string = 'Copyrights 2024 Cvhome All rights reserved.'
 }
 
 interface SocialLink {

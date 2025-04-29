@@ -1,16 +1,18 @@
-import {ChangeDetectorRef, Component, Input, NgZone, OnInit} from '@angular/core';
+import {ChangeDetectorRef, Component, Input, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {Router} from '@angular/router';
 
-import {ConfigService} from '../../shared/services/config.service';
+import {ConfigService} from '../../../shared/services/config.service';
 import {StoreService} from '../services/store.service';
 import {NbToastrService} from "@nebular/theme";
 import {TranslateService} from '@ngx-translate/core';
-import {validators} from '../../shared/validation/validators';
+import {validators} from '../../../shared/validation/validators';
 import {forkJoin} from 'rxjs';
+import {ErrorService} from "../../../shared/services/error.service";
 
 @Component({
   selector: 'ngx-store-form',
+  standalone: false,
   templateUrl: './store-form.component.html',
   styleUrls: ['./store-form.component.scss']
 })
@@ -22,14 +24,16 @@ export class StoreFormComponent implements OnInit {
   supportedLanguages = [];
   supportedLanguagesSelected = [];
   supportedCurrency = [];
+  supportedTheme = [];
+  supportedColorThemes = [];
   weightList = [];
   sizeList = [];
   countries = [];
   form: FormGroup;
-  loading = false;
+  loader = false;
   isReadonlyName = false;
   isNameUnique = true;
-  selectedItem = '3';
+  selectedItem = '5';
   sidemenuLinks = [
     {
       id: '0',
@@ -51,6 +55,18 @@ export class StoreFormComponent implements OnInit {
     },
     {
       id: '3',
+      title: 'Store Social Links',
+      key: 'COMPONENTS.STORE_SOCIAL_LINKS',
+      link: 'store-social-links'
+    },
+    {
+      id: '4',
+      title: 'Store Slider Images',
+      key: 'COMPONENTS.STORE_SLIDER_IMAGES',
+      link: 'store-slider-images'
+    },
+    {
+      id: '5',
       title: 'Store details',
       key: 'COMPONENTS.STORE_DETAILS',
       link: 'store'
@@ -61,23 +77,27 @@ export class StoreFormComponent implements OnInit {
     private fb: FormBuilder,
     private configService: ConfigService,
     private storeService: StoreService,
-    private ngZone: NgZone,
     private cdr: ChangeDetectorRef,
     private router: Router,
     private toastr: NbToastrService,
-    private translate: TranslateService) {
+    private translate: TranslateService,
+    private errorService: ErrorService) {
   }
 
   get name() {
     return this.form.get('name');
   }
 
-  get code() {
-    return this.form.get('code');
-  }
-
   get phone() {
     return this.form.get('phone');
+  }
+
+  get theme() {
+    return this.form.get('theme');
+  }
+
+  get colorTheme() {
+    return this.form.get('colorTheme');
   }
 
   get address() {
@@ -109,15 +129,26 @@ export class StoreFormComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.loading = true;
-    forkJoin([this.configService.getListOfCountries(), this.configService.getListOfSupportedCurrency(), this.configService.getWeightAndSizes()])
-      .subscribe(([countries, currencies, measures]) => {
+    this.loader = true;
+    forkJoin([
+      this.configService.getListOfCountries(),
+      this.configService.getListOfSupportedCurrency(),
+      this.configService.getWeightAndSizes(),
+      this.storeService.getSupportedThemes(),
+      this.storeService.getSupportedColorThemes(),
+    ])
+      .subscribe(([countries, currencies, measures, themes, colorThemes]) => {
         this.countries = [...countries];
         this.supportedCurrency = [...currencies];
+        this.supportedTheme = [...themes];
+        this.supportedColorThemes = [...colorThemes];
         this.weightList = [...measures.weights];
         this.sizeList = [...measures.measures];
         this.supportedLanguages = this.configService.getListOfGlobalLanguages();
-        this.loading = false;
+        this.loader = false;
+      }, err => {
+        this.loader = false;
+        this.errorService.error('ERROR.SYSTEM_ERROR', err);
       });
 
 
@@ -130,8 +161,10 @@ export class StoreFormComponent implements OnInit {
       this.supportedLanguagesSelected.push(lang.code);
     });
     this.form.patchValue({
+      id: this.store.id,
       name: this.store.name,
-      code: this.store.code,
+      theme: this.store.theme,
+      colorTheme: this.store.colorTheme,
       phone: this.store.phone,
       email: this.store.email,
       supportedLanguages: this.store.supportedLanguages,
@@ -163,11 +196,14 @@ export class StoreFormComponent implements OnInit {
 
     storeObj.supportedLanguages = this.supportedLanguagesSelected;
     if (this.store && this.store.id) {
-      storeObj.code = this.store.code;
+      storeObj.id = this.store.id;
+      console.log(storeObj)
       this.storeService.updateStore(storeObj)
         .subscribe(store => {
           this.toastr.success(this.translate.instant('STORE_FORM.STORE_UPDATED'));
           this.router.navigate(['pages/store-management/stores-list']);
+        }, err => {
+          this.errorService.error('ERROR.SYSTEM_ERROR', err);
         });
     } else {
       this.storeService.checkIfStoreExist(this.form.value.name)
@@ -179,8 +215,12 @@ export class StoreFormComponent implements OnInit {
               .subscribe(store => {
                 this.toastr.success(this.translate.instant('STORE_FORM.STORE_CREATED'));
                 this.router.navigate(['pages/store-management/stores-list']);
+              }, err => {
+                this.errorService.error('ERROR.SYSTEM_ERROR', err);
               });
           }
+        }, err => {
+          this.errorService.error('ERROR.SYSTEM_ERROR', err);
         });
     }
   }
@@ -212,11 +252,13 @@ export class StoreFormComponent implements OnInit {
     this.storeService.checkIfStoreExist(this.form.value.name)
       .subscribe(res => {
         this.isNameUnique = !res.exists
+      }, err => {
+        this.errorService.error('ERROR.SYSTEM_ERROR', err);
       });
   }
 
   onClickRoute(link) {
-    this.router.navigate(['pages/store-management/' + link + "/", this.store.code]);
+    this.router.navigate(['pages/store-management/' + link + "/", this.store.id]);
   }
 
   goToBack() {
@@ -227,6 +269,8 @@ export class StoreFormComponent implements OnInit {
     this.form = this.fb.group({
       name: ['', [Validators.required, Validators.pattern(validators.alphanumeric)]],
       phone: ['', [Validators.required]],
+      theme: ['', [Validators.required]],
+      colorTheme: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.pattern(validators.emailPattern)]],
       address: this.fb.group({
         searchControl: [''],
@@ -246,7 +290,7 @@ export class StoreFormComponent implements OnInit {
       useCache: [false],
     });
 
-    if (this.store && this.store.id > 0) {
+    if (this.store && this.store.id) {
       this.fillForm();
     }
 

@@ -1,0 +1,14 @@
+<nb-card status="basic" accent="info">
+  <nb-card-header>
+    <div class="row">
+      <h1 class="page_title">{{ 'COMPONENTS.CATEGORIES_HIERARCHY' | translate }}</h1>
+    </div>
+  </nb-card-header>
+
+  <nb-card-body [nbSpinner]="loader" nbSpinnerSize="large" nbSpinnerStatus="primary">
+    <div >
+      <ngcx-tree   #tree [nodes]="nodes" (nodeMoved)="onMoveNode($event)"></ngcx-tree>
+    </div>
+  </nb-card-body>
+</nb-card>
+

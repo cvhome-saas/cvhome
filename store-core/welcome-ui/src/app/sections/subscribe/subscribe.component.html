@@ -3,11 +3,12 @@
     <div class="row justify-content-center">
       <div class="col-12 col-md-10 col-lg-8">
         <div class="subscribe-content text-center">
-          <h2>{{title}}</h2>
-          <p class="my-4">{{message}}</p>
+          <h2>{{ title }}</h2>
+          <p class="my-4">{{ message }}</p>
           <form class="subscribe-form">
             <div class="form-group">
-              <input [(ngModel)]="email" name="email" type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
+              <input [(ngModel)]="email" name="email" type="email" class="form-control" id="exampleInputEmail1"
+                     aria-describedby="emailHelp"
                      placeholder="Enter your email">
             </div>
             <button type="button" (click)="sub()" class="btn btn-lg btn-block">Subscribe</button>

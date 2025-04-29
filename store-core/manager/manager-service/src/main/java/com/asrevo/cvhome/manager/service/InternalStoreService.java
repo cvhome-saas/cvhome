@@ -1,29 +1,41 @@
 package com.asrevo.cvhome.manager.service;
 
-import com.asrevo.cvhome.commons.domain.IdentityId;
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
-import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
-import com.asrevo.cvhome.manager.commons.dto.CreateManagerStoreRequest;
+import com.asrevo.cvhome.commons.domain.*;
 import com.asrevo.cvhome.manager.commons.dto.ListManagerStoreQuery;
 import com.asrevo.cvhome.manager.commons.dto.ManagerStoreDto;
+import com.asrevo.cvhome.manager.dto.StoreDomainList;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.Map;
+
 public interface InternalStoreService {
-    ManagerStoreDto createStore(CreateManagerStoreRequest storeRequest, IdentityId identityId);
+    ManagerStoreDto createStore(Map<Object, Object> request, ManagerOrgId orgId, PodId pod);
 
-    Page<ManagerStoreDto> findAll(
-            UserOrgStoreIdentity identity,
-            ListManagerStoreQuery listManagerStoreQuery,
-            Pageable pageable);
+    void completeProvisioning(ManagerStoreId store);
 
-    void syncInRouter(ManagerStoreId store);
+    void failProvisioning(ManagerStoreId store);
 
-    void syncInStore(ManagerStoreId store);
+    void startProvisioning(ManagerStoreId store);
 
-    IdentityId getStoreOwner(ManagerStoreId store);
+    Page<ManagerStoreDto> findAll(UserOrgStoreIdentity identity, ListManagerStoreQuery listManagerStoreQuery, Pageable pageable);
+
+    Page<ManagerStoreDto> findAll(ManagerOrgId id, Pageable pageable);
+
+    ManagerOrgId getStoreOwner(ManagerStoreId store);
 
     ManagerStoreDto findStore(ManagerStoreId store);
 
     Boolean checkNameExists(String name);
+
+    Pod getStorePod(ManagerStoreId managerStoreId);
+
+    StoreDomainList domains(ManagerStoreId managerStoreId);
+
+    ManagerStoreId getReferenceByDomain(Domain domain);
+
+    void addDomain(ManagerStoreId managerStoreId, Domain domain);
+
+    void removeDomain(ManagerStoreId managerStoreId, Domain domain);
+
 }

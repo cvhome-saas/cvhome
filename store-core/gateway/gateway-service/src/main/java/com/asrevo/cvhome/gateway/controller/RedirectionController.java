@@ -1,8 +1,10 @@
 package com.asrevo.cvhome.gateway.controller;
 
-import com.asrevo.cvhome.s2s.model.ServiceDomain;
+import com.asrevo.cvhome.commons.domain.ServiceDomain;
 import com.asrevo.cvhome.s2s.model.ServiceDomainProperties;
+import com.asrevo.cvhome.s2s.utils.RedirectionUrlBuilder;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
@@ -13,19 +15,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
+import static com.asrevo.cvhome.s2s.utils.RedirectionUrlBuilder.getPort;
+import static com.asrevo.cvhome.s2s.utils.RedirectionUrlBuilder.getScheme;
+
 @Controller
 @RequestMapping("redirect")
 @AllArgsConstructor
+@Slf4j
 public class RedirectionController {
     private final ServiceDomainProperties serviceDomainProperties;
-    private static final int HTTP_PORT = 80;
-    private static final int HTTPS_PORT = 443;
-    private static final String SCHEMA_SPLITTER = "://";
-    private static final String URL_SPLITTER = "/";
 
-    @GetMapping(
-            value = "internal",
-            params = {"serviceName"})
+    @GetMapping(value = "internal", params = {"serviceName"})
     public Mono<Void> redirect(
             @RequestParam() String serviceName,
             @RequestParam(required = false, defaultValue = "") String path,
@@ -33,39 +33,17 @@ public class RedirectionController {
 
         ServerHttpRequest request = exchange.getRequest();
 
-        ServiceDomain serviceDomain = serviceDomainProperties.services().get(serviceName);
+        ServiceDomain serviceDomain = serviceDomainProperties.getService(serviceName);
 
         if (serviceDomain == null) {
             throw new RuntimeException(serviceName + " not defined");
         }
 
-        String fullUrl = buildRedirectionUrl(path, request, serviceDomain);
+        String fullUrl = new RedirectionUrlBuilder(getScheme(request), getPort(request), serviceDomain).getRedirectionUrl(path);
         ServerHttpResponse response = exchange.getResponse();
         response.setStatusCode(HttpStatus.PERMANENT_REDIRECT);
         response.getHeaders().add("Location", fullUrl);
         return response.setComplete();
     }
-
-    private static String buildRedirectionUrl(
-            String path, ServerHttpRequest request, ServiceDomain serviceDomain) {
-        String scheme = request.getURI().getScheme();
-        int port = request.getURI().getPort();
-        boolean ignorePort = port == HTTP_PORT || port == HTTPS_PORT;
-
-        String fullUrl;
-
-        if (ignorePort) {
-            fullUrl = scheme + SCHEMA_SPLITTER + serviceDomain.domain();
-        } else {
-            fullUrl = scheme + SCHEMA_SPLITTER + serviceDomain.domain() + ":" + port;
-        }
-        if (!path.isEmpty() && !path.equals(URL_SPLITTER)) {
-            if (path.startsWith(URL_SPLITTER)) {
-                fullUrl = fullUrl + path;
-            } else {
-                fullUrl = fullUrl + URL_SPLITTER + path;
-            }
-        }
-        return fullUrl;
-    }
 }
+

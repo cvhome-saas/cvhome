@@ -4,9 +4,13 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {StoreService} from '../services/store.service';
 import {NbToastrService} from "@nebular/theme";
 import {TranslateService} from '@ngx-translate/core';
+import {ErrorService} from "../../../shared/services/error.service";
+import {SelectedStoreService} from "../../../shared/services/selected-store.service";
+import {map} from "rxjs";
 
 @Component({
   selector: 'ngx-store-branding',
+  standalone: false,
   templateUrl: './store-branding.component.html',
   styleUrls: ['./store-branding.component.scss']
 })
@@ -36,6 +40,18 @@ export class StoreBrandingComponent implements OnInit {
     },
     {
       id: '3',
+      title: 'Store Social Links',
+      key: 'COMPONENTS.STORE_SOCIAL_LINKS',
+      link: 'store-social-links'
+    },
+    {
+      id: '4',
+      title: 'Store Slider Images',
+      key: 'COMPONENTS.STORE_SLIDER_IMAGES',
+      link: 'store-slider-images'
+    },
+    {
+      id: '5',
       title: 'Store details',
       key: 'COMPONENTS.STORE_DETAILS',
       link: 'store'
@@ -53,6 +69,7 @@ export class StoreBrandingComponent implements OnInit {
     private translate: TranslateService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
+    private errorService: ErrorService,
   ) {
     this.createForm();
   }
@@ -63,39 +80,20 @@ export class StoreBrandingComponent implements OnInit {
 
   ngOnInit() {
     this.loading = true;
-    const code = this.activatedRoute.snapshot.paramMap.get('code');
-    this.storeService.getStore(code).subscribe(it => {
+    const store = this.activatedRoute.snapshot.paramMap.get('code');
+    this.storeService.getStore(store).subscribe(it => {
       this.store = it;
       this.loading = false;
+    }, err => {
+      this.loading = false;
+      this.errorService.error('ERROR.SYSTEM_ERROR', err);
     })
 
 
   }
 
   route(link) {
-    this.router.navigate(['pages/store-management/' + link + "/", this.store.code]);
-  }
-
-  fillForm(socialNetworksArray) {
-    const control = <FormArray>this.form.controls.socialNetworks;
-    socialNetworksArray.forEach(el => {
-      control.push(
-        this.formBuilder.group({
-          id: el.id,
-          active: el.active,
-          key: el.key,
-          type: el.type,
-          value: el.value
-        })
-      );
-    });
-  }
-
-  saveNetworks() {
-    this.storeService.updateSocialNetworks(this.form.value)
-      .subscribe(res => {
-        this.toastr.success(this.translate.instant('STORE_BRANDING.NETWORKS_UPDATED'));
-      });
+    this.router.navigate(['pages/store-management/' + link + "/", this.store.id]);
   }
 
   private createForm() {

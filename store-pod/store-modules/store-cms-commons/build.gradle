@@ -1,0 +1,13 @@
+plugins {
+	id 'com.asrevo.java-library-conventions'
+	id("com.diffplug.spotless") version "6.25.0"
+}
+
+dependencies {
+	api project(':store-pod:store-commons')
+	implementation 'software.amazon.awssdk:s3:2.29.43'
+	implementation 'commons-io:commons-io:2.16.1'
+	compileOnly 'org.apache.commons:commons-lang3:3.17.0'
+	compileOnly 'org.projectlombok:lombok:1.18.36'
+	annotationProcessor 'org.projectlombok:lombok:1.18.36'
+}

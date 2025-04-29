@@ -1,135 +1,163 @@
 # cvhome
 
-## Not just e-commerce its a SaaS e-commerce
+[![CI Build](https://github.com/cvhome-saas/cvhome/actions/workflows/code-build-check.yml/badge.svg)](https://github.com/cvhome-saas/cvhome/actions/workflows/code-build-check.yml)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/cvhome-saas/cvhome)](https://github.com/cvhome-saas/cvhome/releases)
+[![Documentation](https://img.shields.io/badge/docs-cvhome.io-success)](https://cvhome-saas.github.io)
 
-1. want to host many e-commerce websites for your business, or you want to provide e-commerce as SaaS solution to any
-   client around the world
-2. every client will have its special subdomain like store1.cvhome.com or custom domain like example.com with automated
-   https certificate
-3. every store can be served under many domains like example1.com , example2.net
-4. with all e-commerce features (Catalog ,Shopping cart ,Checkout ,Merchant ,Order ,Customer ,User)
-5. seo friendly with next-js server side rendering for your store
-6. every store data is totally separated and not shared to other stores
-7. support many user level access  ( SUPER_ADMIN , ORG_ADMIN , STORE_ADMIN , STORE_MODERATOR , CUSTOMER )
+Welcome to **cvhome**, a robust, open-source platform engineered for building scalable, multi-tenant e-commerce
+solutions. Designed with flexibility and modern architecture in mind, `cvhome` provides the foundational backend
+microservices (Java/Spring Boot) and frontend applications (Next.js/Angular) necessary to power sophisticated online
+retail operations.
 
-### Technologies Used
+Whether you're an entrepreneur aiming to launch a niche e-commerce SaaS, an agency managing multiple client stores, or a
+developer seeking a powerful e-commerce framework, `cvhome` offers the tools to succeed.
 
-1. java 21
-2. spring boot 3.3
-3. spring cloud 2023.0.2
-4. caddy
-5. postgres
-6. keycloak
-7. aws s3 | minio
-8. angular 17
-9. next-js
-10. gradle
-11. buildPacks using spring
-12. docker compose (deployment options for dev|local mode)
-13. AWS Fargate (deployment options)
-14. AWS EKS (deployment options)
-15. Terraform (iac for AWS & AWS EKS deployment options)
+**Key Features & What cvhome Provides:**
 
-### Structure of project
+* 🚀 **True Multi-Tenancy:** Host and manage numerous independent stores, each with potentially distinct branding,
+  products, and configurations, all running on a shared or isolated, optimized infrastructure. **Crucially, each store
+  will be mapped
+  to its own custom domain (e.g., `www.mystore.com`) and have its subdomain (e.g., `mystore.yourplatform.com`) for a
+  fully branded
+  presence.**
+* 🔧 **Microservice Architecture:** Built with scalable and resilient Java/Spring Boot microservices (API Gateway, Auth,
+  Tenant Management, Store Core, etc.), allowing for independent development, deployment, and scaling of different
+  platform components.
+* ☁️ **Cloud-Native Design:** Architected for deployment on cloud platforms like AWS, leveraging services like ECS
+  Fargate for container orchestration and RDS for databases (see full documentation for deployment guides).
+* 💡 **Foundation for SaaS:** Provides the essential building blocks – tenant isolation, centralized
+  management,subscription management, scalable infrastructure patterns – required to build and operate your own
+  e-commerce Software-as-a-Service.
+* 🔓 **Open Source:** Fully open-source under the Apache 2.0 License, offering transparency, community collaboration, and
+  the freedom to customize and extend the platform to meet specific needs.
 
-1. this project is a mono repo which is kind for splitting small microservice in one repo
-   - it's a small project and will help us in fast development
-   - will easily share common lib
-  
-2. we are using gradle for every thing for example we are building docker images for keycloak and angular and next-js using gradle
-3. in `settings.gradle` every project that end with `-service` is a java microservice and `auth` microservice
-4. in `settings.gradle` every project that end with `-ui` is a frontend microservice
+## History
 
-### Clusters
+`cvhome` builds upon the foundation laid by the excellent open-source e-commerce project, **[Shopizer](https://github.com/shopizer-ecommerce/shopizer)**.
 
-so we split the project to `3 main clusters` that can scale independently
+While leveraging core e-commerce concepts and potentially some code structures inspired by Shopizer,
+`cvhome` significantly enhances and refactors the architecture to introduce robust **Software-as-a-Service (SaaS)**
+capabilities.
+Key enhancements include:
 
-so you can have :
+* **True Multi-Tenancy:** Designed from the ground up to support multiple isolated tenant stores.
+* **Tenant Isolation:** Mechanisms to ensure data and configuration separation between tenants.
+* **Cloud-Native Architecture:** Optimized for deployment and scaling on cloud platforms like AWS using
+  containerization (Docker/Fargate).
+* **Subscription Management:** Integrated capabilities for managing tenant subscriptions.
+* **Modernized Stack:** Incorporates updated frameworks and technologies (e.g., specific versions of Spring Boot,
+  Next.js, Angular).
 
-1. one `store-core-cluster` hold all system operation like auth, domains, register org, creating n stores
-2. One or Many `store-pod-cluster` hold all e-commerce functions like Catalog, Shopping Cart , .... you can have one or
-   many of this cluster type based on your need for example if you have special store and want to deploy it in a
-   separate cluster with different memory cpu spec and isolated from all stores in the systems , or just one for all
-   stores
-3. Zero or One Or Many`saas-pod-cluster`  handle https traffic and automate https certificate and renewal then forward
-   traffic to `store-pod-cluster` you can have zero or many based on your need so you can ignore it and forward traffic
-   from `lb` to `store-pod-cluster` directly if you own the domains and can prove ownership on them so no need to this
-   to automate https if not you can use it to automate https you can deploy many clusters also based on your need if you
-   have client that need totally isolated gateway from other stores in the system
+Essentially,
+`cvhome` takes the single-instance e-commerce model and evolves it into a scalable, multi-tenant platform suitable for SaaS providers.
+---
 
-#### note -->
+**➡️ Full Documentation:** For comprehensive guides on architecture, deployment, concepts, and usage, please visit the
+main documentation site: **https://cvhome-saas.github.io**
 
-you still can scale every cluster services horizontal autoscale as normal by scaling number of instances,pods,services
+---
 
-### Microservices
+## Table of Contents
 
-##### --- store-core-cluster --
+* [Technology Stack](#technology-stack)
+* [Building the Application](#building-the-application)
+* [Running Locally](#running-locally)
+* [Contributing](#contributing)
+* [License](#license)
+* [Support](#support)
 
-1. `store-core:welcome-ui` welcome page for the Saas that display provider info , contact, pricing , register
-2. `store-core:store-ui` dashboard build using angular to manage org and stores
-3. `store-core:auth` identity provider using keycloak which provide secure access to any microservice or any
-   service-to-service call
-4. `store-core:manager:manager-service` core for creating org , store and registering domain and domain ownership
-   validation
-5. `store-core:gateway:gateway-service` gateway that provide access to all `store core cluster` microservices
+## Technology Stack
 
-##### --- store-pod-cluster --
+**Backend:**
 
-1. `store-pod:store:store-service`   responsible for all e-commerce functions like  (Catalog ,Shopping cart ,Checkout
-   ,Merchant ,Order ,Customer)
-2. `store-pod:landing-ui` server side rending for every store that serve products , landing page , categories , contact
-   info for store
-3. `store-pod:gateway:gateway-service`  gateway that provide access to all `store pod cluster` microservices specially
-   it map every domain like example.com to its corresponding store-id so example.com>>point-to-store-id>>store-id
+* Java (JDK 23)
+* Spring Boot 3.4
+* Spring Boot & Spring Cloud
+* Spring Data JPA / Hibernate
+* Postgres SQL
+* Gradle
+* Keycloak
 
-##### --- store-pod-cluster --
+**Frontend:**
 
-1. `saas-pod:gateway:gateway-service-v2` caddy server responsible for handling https and renewing certificates for every
-   domain then forward every request to `store-pod:gateway:gateway-service`
+* Node.js (v18+)
+* TypeScript
+* Next.js
+* Angular
 
-### Installation
+**Cloud:**
 
-1. we require you hava `java 21` , `gradle-8.9` , `node v20` , `docker && docker compose`
+* AWS
+* Terraform
 
-### Demo and Deployment
+**Integration:**
 
-there are 4 options to run cvhome saas project
+* Stripe
 
-1. AWS ECS FARGATE --> check here
-2. AWS EKS --> check here
-3. DOCKER COMPOSE --> check here
-4. KIND K8S --> check here
+**Other:**
 
-##### but before we start to deploy keep in mind we are populating with some test data (org, stores , users , catalog)
+* Caddy
+* Minio
+* Docker & Docker Compose
 
-1. keycloak system user sys-admin@mail.com admin
+## Building the Application
 
-2.
+This project uses the Gradle wrapper (`gradlew`) for building. You do not need to install Gradle separately.
 
-| org                                         | store                                                                                    | username                       | pass  | role            |
-|---------------------------------------------|------------------------------------------------------------------------------------------|--------------------------------|-------|-----------------|
-| all                                         | all                                                                                      | super-admin@mail.com           | admin | SUPER_ADMIN     |
-| ---org1---                                  |                                                                                          | org1-admin@mail.com            | admin | ORG_ADMIN       |
-| `id = d1952c95-312e-4bb9-9a2d-b703d031276f` | ---store1---<br/>`id = 65f023632bc46470c104b76f`<br/>`domain = org1-store1.gateway.com`  | org1-store1-admin@mail.com     | admin | STORE_ADMIN     |
-|                                             |                                                                                          | org1-store1-moderator@mail.com | admin | STORE_MODERATOR |
-|                                             | ---store2--- <br/>`id = 65f023632bc46470c104b75f`<br/>`domain = org1-store2.gateway.com` | org1-store2-admin@mail.com     | admin | STORE_ADMIN     |
-|                                             |                                                                                          | org1-store2-moderator@mail.com | admin | STORE_MODERATOR |
-| ---org2---                                  |                                                                                          | org2-admin@mail.com            | admin | ORG_ADMIN       |
-| `id = d1952c95-312e-4bb6-9a2d-b703d031276f` | ---store1---<br/>`id = 65f020632bc46470c104b76f`<br/>`domain = org2-store1.gateway.com`  | org2-store1-admin@mail.com     | admin | STORE_ADMIN     |
-|                                             |                                                                                          | org2-store1-moderator@mail.com | admin | STORE_MODERATOR |
-|                                             | ---store2---<br/>`id = 65f023632bc26470c104b75f`<br/>`domain = org2-store2.gateway.com`  | org2-store2-admin@mail.com     | admin | STORE_ADMIN     |
-|                                             |                                                                                          | org2-store2-moderator@mail.com | admin | STORE_MODERATOR |
+To build all microservices and frontend applications:
 
-### DOCKER COMPOSE deployment options
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/cvhome-saas/cvhome.git
+   ```
+2. **Run the build command:**
+   ### On Linux/macOS
+    ```bash
+   ./gradlew clean build -x test
+   ```
+   ### On Windows
+    ```bash
+   gradlew.bat clean build -x test
+   ``` 
 
-#### Steps to run on linux
+## Running Locally
 
-1. configure hosts in `/etc/hosts` by running `bash scripts/configure-domain.sh`
-2. run `docker compose -f docker-compose.yml up`
-3. access the application
-    - http://gateway.com:7000    access the welcome page
-    - http://store-ui.gateway.com:7000    access the dashboard
-    - http://org1-store1.gateway.com:7100    access org1-store1 store
-    - http://org1-store2.gateway.com:7100    access org1-store2 store
-    - http://org2-store1.gateway.com:7100    access org2-store1 store
-    - http://org2-store2.gateway.com:7100    access org2-store2 store
+### Quick Start (Docker Compose)
+
+* **➡️ For a faster way to get the essential services running using Docker Compose:**
+  [Quick Start with Docker Compose Instructions](https://cvhome-saas.github.io/development/local-setup.html#quick-start-with-docker-compose)
+
+### Full Development Setup
+
+Setting up the complete local development environment manually involves multiple steps including dependencies,
+configuration, and service startup. This provides more control for detailed development and debugging across services.
+
+* **➡️ Please follow the comprehensive guide available in the official documentation:**
+
+  [Full Development Setup Instructions](https://cvhome-saas.github.io/development/local-setup.html#full-development-setup)
+
+## License
+
+This project is licensed under the **Apache License 2.0**. See the `LICENSE` file in the root of this repository for
+details.
+
+## Support
+
+* **Bugs & Feature Requests:** Please use the GitHub Issues tracker for this repository.
+* **General Questions & Discussion:** Please check the [Full Documentation](https://cvhome-saas.github.io) first, or
+  use [GitHub Discussions](https://github.com/cvhome-saas/cvhome/discussions).
+
+## Contributing
+
+Contributions are welcome! We appreciate help with bug fixes, feature development, testing, and documentation
+improvements.
+
+Please read our **[Contributing Guide](https://cvhome-saas.github.io/development/contributing)** before submitting
+pull requests. This guide covers:
+
+* Finding issues to work on
+* Development workflow (forking, branching)
+* Coding style guidelines
+* Commit message conventions
+* Pull request process    

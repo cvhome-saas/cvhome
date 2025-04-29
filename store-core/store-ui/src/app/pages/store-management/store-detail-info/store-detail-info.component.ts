@@ -1,62 +1,34 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {StoreService} from '../services/store.service';
+import {ErrorService} from "../../../shared/services/error.service";
 
 @Component({
   selector: 'ngx-store-detail-info',
+  standalone:false,
   templateUrl: './store-detail-info.component.html',
   styleUrls: ['./store-detail-info.component.scss']
 })
 export class StoreDetailInfoComponent implements OnInit {
   store;
-  loadingInfo = false;
-  selectedItem = '3';
-  sidemenuLinks = [
-    {
-      id: '0',
-      title: 'Store branding',
-      key: 'COMPONENTS.STORE_BRANDING',
-      link: 'store-branding'
-    },
-    {
-      id: '1',
-      title: 'Store home page',
-      key: 'COMPONENTS.STORE_LANDING',
-      link: 'store-landing'
-    },
-    {
-      id: '2',
-      title: 'Store domain',
-      key: 'COMPONENTS.STORE_DOMAIN',
-      link: 'store-domain'
-    },
-    {
-      id: '3',
-      title: 'Store details',
-      key: 'COMPONENTS.STORE_DETAILS',
-      link: 'store'
-    }
-  ];
+  loader = false;
 
   constructor(
     private storeService: StoreService,
     private activatedRoute: ActivatedRoute,
-    private router: Router,
+    private errorService: ErrorService
   ) {
   }
 
   ngOnInit() {
-    this.loadingInfo = true;
-    const code = this.activatedRoute.snapshot.paramMap.get('code');
-    this.storeService.getStore(code)
+    const store = this.activatedRoute.snapshot.paramMap.get('code');
+    this.storeService.getStore(store)
       .subscribe(res => {
         this.store = res;
-        this.loadingInfo = false;
+        this.loader = false;
+      }, err => {
+        this.loader = false;
+        this.errorService.error('ERROR.SYSTEM_ERROR', err);
       });
   }
-
-  route(link) {
-    this.router.navigate(['pages/store-management/' + link + "/", this.store.code]);
-  }
-
 }

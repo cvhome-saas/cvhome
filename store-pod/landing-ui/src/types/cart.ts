@@ -1,3 +1,5 @@
+import {Product} from "@/types/product-groups";
+
 export interface Cart {
     id: number
     language: any
@@ -13,75 +15,6 @@ export interface Cart {
     products: Product[]
     totals: Total[]
     customer: any
-}
-
-export interface Product {
-    id: number
-    productShipeable: boolean
-    available: boolean
-    visible: boolean
-    sortOrder: number
-    dateAvailable: string
-    creationDate: any
-    price: number
-    quantity: number
-    sku: string
-    preOrder: boolean
-    productVirtual: boolean
-    quantityOrderMaximum: number
-    quantityOrderMinimum: number
-    productIsFree: boolean
-    productSpecifications: ProductSpecifications
-    rating: number
-    ratingCount: number
-    refSku: string
-    rentalDuration: number
-    rentalPeriod: number
-    description: Description
-    productPrice: any
-    finalPrice: string
-    originalPrice: string
-    image: Image|undefined
-    images: Image[]|undefined
-    subTotal: number
-    displaySubTotal: string
-    cartItemattributes: any[]
-    variant: any
-    variantValue: any
-}
-
-export interface ProductSpecifications {
-    height: number
-    weight: number
-    length: number
-    width: number
-    model: any
-    manufacturer: any
-    dimensionUnitOfMeasure: any
-    weightUnitOfMeasure: any
-}
-
-export interface Description {
-    id: number
-    language: string
-    name: string
-    description: string
-    friendlyUrl: any
-    keyWords: any
-    highlights: any
-    metaDescription: any
-    title: any
-}
-
-export interface Image {
-    id: number
-    imageName: string
-    imageUrl: string
-    externalUrl: any
-    videoUrl: any
-    imageType: number
-    order: number
-    defaultImage: boolean
 }
 
 

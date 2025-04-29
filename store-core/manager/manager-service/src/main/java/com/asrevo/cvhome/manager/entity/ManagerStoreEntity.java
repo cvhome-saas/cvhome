@@ -1,14 +1,19 @@
 package com.asrevo.cvhome.manager.entity;
 
 import com.asrevo.cvhome.commons.domain.*;
-import com.asrevo.cvhome.manager.commons.dto.CreateManagerStoreRequest;
+import com.asrevo.cvhome.manager.commons.dto.ProvisioningState;
 import com.asrevo.cvhome.manager.commons.event.store.StoreCreatedEvent;
-import java.time.Instant;
+import com.asrevo.cvhome.manager.commons.event.store.StoreProvisionedEvent;
+import com.asrevo.cvhome.manager.dto.StoreDomainDto;
+import com.asrevo.cvhome.manager.dto.StoreDomainList;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Embedded;
+import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
+
+import java.time.Instant;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -16,38 +21,43 @@ import org.springframework.data.relational.core.mapping.Table;
 public class ManagerStoreEntity extends BaseEntity<ManagerStoreEntity, ManagerStoreId> {
     @Column("name")
     private String name;
-
-    @Column("owner_id")
-    private IdentityId owner;
-
+    @Column("org_id")
+    private ManagerOrgId orgId;
     @Column("created_date")
     private Instant createdDate;
+    @Column("pod_id")
+    private PodId podId;
+    @Column("provisioning_state")
+    private ProvisioningState provisioningState;
+    @MappedCollection(idColumn = "manager_store_id")
+    private ManagerStoreDomains managerStoreDomains;
 
-    private Country country;
-
-    @Embedded(onEmpty = Embedded.OnEmpty.USE_NULL)
-    private Email email;
-
-    @Embedded(onEmpty = Embedded.OnEmpty.USE_NULL)
-    private Phone phone;
-
-    private Boolean syncedInRouter;
-    private Boolean syncedInStore;
-
-    public static ManagerStoreEntity createStore(
-            CreateManagerStoreRequest request, IdentityId identityId) {
+    public static ManagerStoreEntity createStore(Map<Object, Object> request, ManagerOrgId orgId, PodId podId) {
         ManagerStoreEntity entity = new ManagerStoreEntity();
-        entity.setNew();
-        entity.setName(request.name());
+        entity.id = entity.generateId();
+        String storeName = request.get("name").toString();
+        entity.setName(storeName);
         entity.setCreatedDate(Instant.now());
-        entity.setOwner(identityId);
-        entity.setEmail(request.email());
-        entity.setPhone(request.phone());
-        entity.setCountry(request.country());
-        entity.setSyncedInRouter(Boolean.FALSE);
-        entity.setSyncedInRouter(Boolean.FALSE);
-        entity.registerEvent(StoreCreatedEvent.from(entity.getId(), identityId));
+        entity.setOrgId(orgId);
+        entity.setPodId(podId);
+        entity.provisioningState = ProvisioningState.NOT_STARTED_PROVISIONING;
+        entity.managerStoreDomains = ManagerStoreDomains.of(new ManagerStoreDomain(storeName, AlisType.SUB_DOMAIN));
+        entity.registerEvent(StoreCreatedEvent.from(entity.getId(), orgId, podId, request));
         return entity;
+    }
+
+    public ManagerStoreEntity addDomain(Domain domain) {
+        this.managerStoreDomains = managerStoreDomains.addDomain(domain);
+        return this;
+    }
+
+    public ManagerStoreEntity removeDomain(Domain domain) {
+        this.managerStoreDomains = managerStoreDomains.removeDomain(domain);
+        return this;
+    }
+
+    public StoreDomainList domains() {
+        return new StoreDomainList(this.managerStoreDomains.stream().map(it -> new StoreDomainDto(it.domain(), it.domainType())).toList());
     }
 
     @Override
@@ -55,13 +65,21 @@ public class ManagerStoreEntity extends BaseEntity<ManagerStoreEntity, ManagerSt
         return ManagerStoreId.newId();
     }
 
-    public ManagerStoreEntity syncInRouter() {
-        this.setSyncedInRouter(Boolean.TRUE);
+    public ManagerStoreEntity completeProvisioning() {
+        this.provisioningState = ProvisioningState.SUCCESSFULLY_PROVISIONING;
+        this.registerEvent(StoreProvisionedEvent.from(this.getId(), podId, this.provisioningState));
         return this;
     }
 
-    public ManagerStoreEntity syncInStore() {
-        this.setSyncedInStore(Boolean.TRUE);
+    public ManagerStoreEntity failProvisioning() {
+        this.provisioningState = ProvisioningState.FAILED_PROVISIONING;
+        this.registerEvent(StoreProvisionedEvent.from(this.getId(), podId, this.provisioningState));
+        return this;
+    }
+
+    public ManagerStoreEntity startProvisioning() {
+        this.provisioningState = ProvisioningState.IN_PROGRESS_PROVISIONING;
+        this.registerEvent(StoreProvisionedEvent.from(this.getId(), podId, this.provisioningState));
         return this;
     }
 }

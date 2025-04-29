@@ -1,4 +1,3 @@
-
 spring:
   cloud:
     loadbalancer:
@@ -7,6 +6,7 @@ spring:
           - "store-core-gateway"
           - "auth"
           - "manager"
+          - "subscription"
           - "store-ui"
           - "welcome-ui"
     ecs:
@@ -16,44 +16,20 @@ spring:
         enabled: true
         default-port: 8080
         service-ports:
-          "store-core-gateway": 7000
           "auth": 9999
-          "manager": 7001
-          "store": 7101
-          "store-ui": 4200
-          "welcome-ui": 4300
+          "store-core-gateway": 8000
+          "store-ui": 8010
+          "welcome-ui": 8011
+          "manager": 8020
+          "subscription": 8021
+          "store-pod-gateway": 8100
+          "landing-ui": 8110
+          "merchant-ui": 8111
+          "merchant": 8120
+          "content": 8121
+          "catalog": 8122
+          "order": 8123
     gateway:
       discovery:
         locator:
-          enabled: true
-      default-filters:
-        - TokenRelay
-        - PreserveHostHeader
-        - AddResponseHeader=X-Frame-Options, SAMEORIGIN
-      routes:
-        - id: store
-          order: -3
-          uri: lb://store.store-pod-1.cvhome.lcl
-          filters:
-            - StripPrefix=1
-          predicates:
-            - Path=/store/**
-        - id: manager
-          order: -2
-          uri: lb://manager
-          predicates:
-            - Path=/manager/**
-          filters:
-            - StripPrefix=1
-        - id: welcome-ui
-          order: -1
-          uri: lb://welcome-ui
-          predicates:
-            - FNotService=store,manager,auth
-            - FHost=${com.asrevo.cvhome.services.store-core-gateway.domain},www.${com.asrevo.cvhome.services.store-core-gateway.domain}
-        - id: store-ui
-          order: -1
-          uri: lb://store-ui
-          predicates:
-            - FNotService=store,manager,auth
-            - FHost=store-ui.${com.asrevo.cvhome.services.store-core-gateway.domain}
+          enabled: false

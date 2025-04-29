@@ -1,7 +1,10 @@
+import {ColorTheme} from "@/types/color-schema";
+
 export interface Store {
     id: number
     code: string
     name: string
+    theme: Theme
     defaultLanguage: string
     currency: string
     inBusinessSince: string
@@ -15,11 +18,14 @@ export interface Store {
     weight: string
     currentUserLanguage: any
     address: Address
-    logo: Logo
-    banner: Logo
+    logo: ImageFile
+    banner: ImageFile
     parent: any
     supportedLanguages: SupportedLanguage[]
     readableAudit: ReadableAudit
+    colorTheme: ColorTheme
+    sliderImages: SliderImage[]
+    socialLinks: SocialLink[]
 }
 
 export interface Address {
@@ -31,7 +37,7 @@ export interface Address {
     active: boolean
 }
 
-export interface Logo {
+export interface ImageFile {
     name: string
     path: string
 }
@@ -45,4 +51,29 @@ export interface ReadableAudit {
     created: any
     modified: string
     user: string
+}
+
+export enum Theme {
+    DEFAULT = 'DEFAULT',
+    FASHION = 'FASHION',
+    FURNITURE = 'FURNITURE',
+    SPORTS = 'SPORTS',
+    ELECTRONICS = 'ELECTRONICS',
+    FOOD = 'FOOD',
+    GLASSES = 'GLASSES',
+    COSMETICS = 'COSMETICS',
+    WATCHES = 'WATCHES',
+    BABY = 'BABY',
+    JEWELERY = 'JEWELERY',
+    TOOLS = 'TOOLS',
+}
+
+export interface SliderImage {
+    priority: number
+    url: string
+}
+
+export interface SocialLink {
+    provider: string
+    url: string
 }

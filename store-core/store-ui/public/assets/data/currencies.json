@@ -1,0 +1,1266 @@
+[
+  {
+    "id": 101,
+    "currency": "AED",
+    "supported": true,
+    "code": "AED",
+    "name": "AED",
+    "new": false
+  },
+  {
+    "id": 131,
+    "currency": "AFN",
+    "supported": true,
+    "code": "AFN",
+    "name": "AFN",
+    "new": false
+  },
+  {
+    "id": 78,
+    "currency": "ALL",
+    "supported": true,
+    "code": "ALL",
+    "name": "ALL",
+    "new": false
+  },
+  {
+    "id": 92,
+    "currency": "AMD",
+    "supported": true,
+    "code": "AMD",
+    "name": "AMD",
+    "new": false
+  },
+  {
+    "id": 120,
+    "currency": "ANG",
+    "supported": true,
+    "code": "ANG",
+    "name": "ANG",
+    "new": false
+  },
+  {
+    "id": 138,
+    "currency": "AOA",
+    "supported": true,
+    "code": "AOA",
+    "name": "AOA",
+    "new": false
+  },
+  {
+    "id": 43,
+    "currency": "ARS",
+    "supported": true,
+    "code": "ARS",
+    "name": "ARS",
+    "new": false
+  },
+  {
+    "id": 82,
+    "currency": "AUD",
+    "supported": true,
+    "code": "AUD",
+    "name": "AUD",
+    "new": false
+  },
+  {
+    "id": 133,
+    "currency": "AWG",
+    "supported": true,
+    "code": "AWG",
+    "name": "AWG",
+    "new": false
+  },
+  {
+    "id": 32,
+    "currency": "AZN",
+    "supported": true,
+    "code": "AZN",
+    "name": "AZN",
+    "new": false
+  },
+  {
+    "id": 149,
+    "currency": "BAM",
+    "supported": true,
+    "code": "BAM",
+    "name": "BAM",
+    "new": false
+  },
+  {
+    "id": 7,
+    "currency": "BBD",
+    "supported": true,
+    "code": "BBD",
+    "name": "BBD",
+    "new": false
+  },
+  {
+    "id": 51,
+    "currency": "BDT",
+    "supported": true,
+    "code": "BDT",
+    "name": "BDT",
+    "new": false
+  },
+  {
+    "id": 107,
+    "currency": "BGN",
+    "supported": true,
+    "code": "BGN",
+    "name": "BGN",
+    "new": false
+  },
+  {
+    "id": 122,
+    "currency": "BHD",
+    "supported": true,
+    "code": "BHD",
+    "name": "BHD",
+    "new": false
+  },
+  {
+    "id": 144,
+    "currency": "BIF",
+    "supported": true,
+    "code": "BIF",
+    "name": "BIF",
+    "new": false
+  },
+  {
+    "id": 53,
+    "currency": "BMD",
+    "supported": true,
+    "code": "BMD",
+    "name": "BMD",
+    "new": false
+  },
+  {
+    "id": 72,
+    "currency": "BND",
+    "supported": true,
+    "code": "BND",
+    "name": "BND",
+    "new": false
+  },
+  {
+    "id": 87,
+    "currency": "BOB",
+    "supported": true,
+    "code": "BOB",
+    "name": "BOB",
+    "new": false
+  },
+  {
+    "id": 106,
+    "currency": "BOV",
+    "supported": true,
+    "code": "BOV",
+    "name": "BOV",
+    "new": false
+  },
+  {
+    "id": 158,
+    "currency": "BRL",
+    "supported": true,
+    "code": "BRL",
+    "name": "BRL",
+    "new": false
+  },
+  {
+    "id": 15,
+    "currency": "BSD",
+    "supported": true,
+    "code": "BSD",
+    "name": "BSD",
+    "new": false
+  },
+  {
+    "id": 37,
+    "currency": "BTN",
+    "supported": true,
+    "code": "BTN",
+    "name": "BTN",
+    "new": false
+  },
+  {
+    "id": 93,
+    "currency": "BWP",
+    "supported": true,
+    "code": "BWP",
+    "name": "BWP",
+    "new": false
+  },
+  {
+    "id": 143,
+    "currency": "BYR",
+    "supported": true,
+    "code": "BYR",
+    "name": "BYR",
+    "new": false
+  },
+  {
+    "id": 148,
+    "currency": "BZD",
+    "supported": true,
+    "code": "BZD",
+    "name": "BZD",
+    "new": false
+  },
+  {
+    "id": 105,
+    "currency": "CAD",
+    "supported": true,
+    "code": "CAD",
+    "name": "CAD",
+    "new": false
+  },
+  {
+    "id": 6,
+    "currency": "CDF",
+    "supported": true,
+    "code": "CDF",
+    "name": "CDF",
+    "new": false
+  },
+  {
+    "id": 77,
+    "currency": "CHF",
+    "supported": true,
+    "code": "CHF",
+    "name": "CHF",
+    "new": false
+  },
+  {
+    "id": 157,
+    "currency": "CLF",
+    "supported": true,
+    "code": "CLF",
+    "name": "CLF",
+    "new": false
+  },
+  {
+    "id": 9,
+    "currency": "CLP",
+    "supported": true,
+    "code": "CLP",
+    "name": "CLP",
+    "new": false
+  },
+  {
+    "id": 47,
+    "currency": "CNY",
+    "supported": true,
+    "code": "CNY",
+    "name": "CNY",
+    "new": false
+  },
+  {
+    "id": 60,
+    "currency": "COP",
+    "supported": true,
+    "code": "COP",
+    "name": "COP",
+    "new": false
+  },
+  {
+    "id": 116,
+    "currency": "CRC",
+    "supported": true,
+    "code": "CRC",
+    "name": "CRC",
+    "new": false
+  },
+  {
+    "id": 19,
+    "currency": "CUP",
+    "supported": true,
+    "code": "CUP",
+    "name": "CUP",
+    "new": false
+  },
+  {
+    "id": 31,
+    "currency": "CVE",
+    "supported": true,
+    "code": "CVE",
+    "name": "CVE",
+    "new": false
+  },
+  {
+    "id": 117,
+    "currency": "CZK",
+    "supported": true,
+    "code": "CZK",
+    "name": "CZK",
+    "new": false
+  },
+  {
+    "id": 79,
+    "currency": "DJF",
+    "supported": true,
+    "code": "DJF",
+    "name": "DJF",
+    "new": false
+  },
+  {
+    "id": 104,
+    "currency": "DKK",
+    "supported": true,
+    "code": "DKK",
+    "name": "DKK",
+    "new": false
+  },
+  {
+    "id": 23,
+    "currency": "DOP",
+    "supported": true,
+    "code": "DOP",
+    "name": "DOP",
+    "new": false
+  },
+  {
+    "id": 63,
+    "currency": "DZD",
+    "supported": true,
+    "code": "DZD",
+    "name": "DZD",
+    "new": false
+  },
+  {
+    "id": 150,
+    "currency": "EGP",
+    "supported": true,
+    "code": "EGP",
+    "name": "EGP",
+    "new": false
+  },
+  {
+    "id": 40,
+    "currency": "ERN",
+    "supported": true,
+    "code": "ERN",
+    "name": "ERN",
+    "new": false
+  },
+  {
+    "id": 66,
+    "currency": "ETB",
+    "supported": true,
+    "code": "ETB",
+    "name": "ETB",
+    "new": false
+  },
+  {
+    "id": 102,
+    "currency": "EUR",
+    "supported": true,
+    "code": "EUR",
+    "name": "EUR",
+    "new": false
+  },
+  {
+    "id": 1,
+    "currency": "FJD",
+    "supported": true,
+    "code": "FJD",
+    "name": "FJD",
+    "new": false
+  },
+  {
+    "id": 26,
+    "currency": "FKP",
+    "supported": true,
+    "code": "FKP",
+    "name": "FKP",
+    "new": false
+  },
+  {
+    "id": 140,
+    "currency": "GBP",
+    "supported": true,
+    "code": "GBP",
+    "name": "GBP",
+    "new": false
+  },
+  {
+    "id": 28,
+    "currency": "GEL",
+    "supported": true,
+    "code": "GEL",
+    "name": "GEL",
+    "new": false
+  },
+  {
+    "id": 84,
+    "currency": "GHS",
+    "supported": true,
+    "code": "GHS",
+    "name": "GHS",
+    "new": false
+  },
+  {
+    "id": 112,
+    "currency": "GIP",
+    "supported": true,
+    "code": "GIP",
+    "name": "GIP",
+    "new": false
+  },
+  {
+    "id": 20,
+    "currency": "GMD",
+    "supported": true,
+    "code": "GMD",
+    "name": "GMD",
+    "new": false
+  },
+  {
+    "id": 39,
+    "currency": "GNF",
+    "supported": true,
+    "code": "GNF",
+    "name": "GNF",
+    "new": false
+  },
+  {
+    "id": 8,
+    "currency": "GTQ",
+    "supported": true,
+    "code": "GTQ",
+    "name": "GTQ",
+    "new": false
+  },
+  {
+    "id": 85,
+    "currency": "GYD",
+    "supported": true,
+    "code": "GYD",
+    "name": "GYD",
+    "new": false
+  },
+  {
+    "id": 99,
+    "currency": "HKD",
+    "supported": true,
+    "code": "HKD",
+    "name": "HKD",
+    "new": false
+  },
+  {
+    "id": 10,
+    "currency": "HNL",
+    "supported": true,
+    "code": "HNL",
+    "name": "HNL",
+    "new": false
+  },
+  {
+    "id": 76,
+    "currency": "HRK",
+    "supported": true,
+    "code": "HRK",
+    "name": "HRK",
+    "new": false
+  },
+  {
+    "id": 121,
+    "currency": "HTG",
+    "supported": true,
+    "code": "HTG",
+    "name": "HTG",
+    "new": false
+  },
+  {
+    "id": 142,
+    "currency": "HUF",
+    "supported": true,
+    "code": "HUF",
+    "name": "HUF",
+    "new": false
+  },
+  {
+    "id": 90,
+    "currency": "IDR",
+    "supported": true,
+    "code": "IDR",
+    "name": "IDR",
+    "new": false
+  },
+  {
+    "id": 83,
+    "currency": "ILS",
+    "supported": true,
+    "code": "ILS",
+    "name": "ILS",
+    "new": false
+  },
+  {
+    "id": 132,
+    "currency": "INR",
+    "supported": true,
+    "code": "INR",
+    "name": "INR",
+    "new": false
+  },
+  {
+    "id": 18,
+    "currency": "IQD",
+    "supported": true,
+    "code": "IQD",
+    "name": "IQD",
+    "new": false
+  },
+  {
+    "id": 45,
+    "currency": "IRR",
+    "supported": true,
+    "code": "IRR",
+    "name": "IRR",
+    "new": false
+  },
+  {
+    "id": 58,
+    "currency": "ISK",
+    "supported": true,
+    "code": "ISK",
+    "name": "ISK",
+    "new": false
+  },
+  {
+    "id": 59,
+    "currency": "JMD",
+    "supported": true,
+    "code": "JMD",
+    "name": "JMD",
+    "new": false
+  },
+  {
+    "id": 98,
+    "currency": "JOD",
+    "supported": true,
+    "code": "JOD",
+    "name": "JOD",
+    "new": false
+  },
+  {
+    "id": 136,
+    "currency": "JPY",
+    "supported": true,
+    "code": "JPY",
+    "name": "JPY",
+    "new": false
+  },
+  {
+    "id": 35,
+    "currency": "KES",
+    "supported": true,
+    "code": "KES",
+    "name": "KES",
+    "new": false
+  },
+  {
+    "id": 67,
+    "currency": "KGS",
+    "supported": true,
+    "code": "KGS",
+    "name": "KGS",
+    "new": false
+  },
+  {
+    "id": 88,
+    "currency": "KHR",
+    "supported": true,
+    "code": "KHR",
+    "name": "KHR",
+    "new": false
+  },
+  {
+    "id": 24,
+    "currency": "KMF",
+    "supported": true,
+    "code": "KMF",
+    "name": "KMF",
+    "new": false
+  },
+  {
+    "id": 86,
+    "currency": "KPW",
+    "supported": true,
+    "code": "KPW",
+    "name": "KPW",
+    "new": false
+  },
+  {
+    "id": 134,
+    "currency": "KRW",
+    "supported": true,
+    "code": "KRW",
+    "name": "KRW",
+    "new": false
+  },
+  {
+    "id": 54,
+    "currency": "KWD",
+    "supported": true,
+    "code": "KWD",
+    "name": "KWD",
+    "new": false
+  },
+  {
+    "id": 91,
+    "currency": "KYD",
+    "supported": true,
+    "code": "KYD",
+    "name": "KYD",
+    "new": false
+  },
+  {
+    "id": 123,
+    "currency": "KZT",
+    "supported": true,
+    "code": "KZT",
+    "name": "KZT",
+    "new": false
+  },
+  {
+    "id": 71,
+    "currency": "LAK",
+    "supported": true,
+    "code": "LAK",
+    "name": "LAK",
+    "new": false
+  },
+  {
+    "id": 96,
+    "currency": "LBP",
+    "supported": true,
+    "code": "LBP",
+    "name": "LBP",
+    "new": false
+  },
+  {
+    "id": 114,
+    "currency": "LKR",
+    "supported": true,
+    "code": "LKR",
+    "name": "LKR",
+    "new": false
+  },
+  {
+    "id": 75,
+    "currency": "LRD",
+    "supported": true,
+    "code": "LRD",
+    "name": "LRD",
+    "new": false
+  },
+  {
+    "id": 103,
+    "currency": "LSL",
+    "supported": true,
+    "code": "LSL",
+    "name": "LSL",
+    "new": false
+  },
+  {
+    "id": 126,
+    "currency": "LTL",
+    "supported": true,
+    "code": "LTL",
+    "name": "LTL",
+    "new": false
+  },
+  {
+    "id": 4,
+    "currency": "LVL",
+    "supported": true,
+    "code": "LVL",
+    "name": "LVL",
+    "new": false
+  },
+  {
+    "id": 52,
+    "currency": "LYD",
+    "supported": true,
+    "code": "LYD",
+    "name": "LYD",
+    "new": false
+  },
+  {
+    "id": 30,
+    "currency": "MAD",
+    "supported": true,
+    "code": "MAD",
+    "name": "MAD",
+    "new": false
+  },
+  {
+    "id": 89,
+    "currency": "MDL",
+    "supported": true,
+    "code": "MDL",
+    "name": "MDL",
+    "new": false
+  },
+  {
+    "id": 146,
+    "currency": "MGA",
+    "supported": true,
+    "code": "MGA",
+    "name": "MGA",
+    "new": false
+  },
+  {
+    "id": 62,
+    "currency": "MKD",
+    "supported": true,
+    "code": "MKD",
+    "name": "MKD",
+    "new": false
+  },
+  {
+    "id": 108,
+    "currency": "MMK",
+    "supported": true,
+    "code": "MMK",
+    "name": "MMK",
+    "new": false
+  },
+  {
+    "id": 137,
+    "currency": "MNT",
+    "supported": true,
+    "code": "MNT",
+    "name": "MNT",
+    "new": false
+  },
+  {
+    "id": 151,
+    "currency": "MOP",
+    "supported": true,
+    "code": "MOP",
+    "name": "MOP",
+    "new": false
+  },
+  {
+    "id": 46,
+    "currency": "MRO",
+    "supported": true,
+    "code": "MRO",
+    "name": "MRO",
+    "new": false
+  },
+  {
+    "id": 110,
+    "currency": "MUR",
+    "supported": true,
+    "code": "MUR",
+    "name": "MUR",
+    "new": false
+  },
+  {
+    "id": 130,
+    "currency": "MVR",
+    "supported": true,
+    "code": "MVR",
+    "name": "MVR",
+    "new": false
+  },
+  {
+    "id": 145,
+    "currency": "MWK",
+    "supported": true,
+    "code": "MWK",
+    "name": "MWK",
+    "new": false
+  },
+  {
+    "id": 2,
+    "currency": "MXN",
+    "supported": true,
+    "code": "MXN",
+    "name": "MXN",
+    "new": false
+  },
+  {
+    "id": 13,
+    "currency": "MXV",
+    "supported": true,
+    "code": "MXV",
+    "name": "MXV",
+    "new": false
+  },
+  {
+    "id": 25,
+    "currency": "MYR",
+    "supported": true,
+    "code": "MYR",
+    "name": "MYR",
+    "new": false
+  },
+  {
+    "id": 41,
+    "currency": "MZN",
+    "supported": true,
+    "code": "MZN",
+    "name": "MZN",
+    "new": false
+  },
+  {
+    "id": 152,
+    "currency": "NAD",
+    "supported": true,
+    "code": "NAD",
+    "name": "NAD",
+    "new": false
+  },
+  {
+    "id": 115,
+    "currency": "NGN",
+    "supported": true,
+    "code": "NGN",
+    "name": "NGN",
+    "new": false
+  },
+  {
+    "id": 153,
+    "currency": "NIO",
+    "supported": true,
+    "code": "NIO",
+    "name": "NIO",
+    "new": false
+  },
+  {
+    "id": 109,
+    "currency": "NOK",
+    "supported": true,
+    "code": "NOK",
+    "name": "NOK",
+    "new": false
+  },
+  {
+    "id": 135,
+    "currency": "NPR",
+    "supported": true,
+    "code": "NPR",
+    "name": "NPR",
+    "new": false
+  },
+  {
+    "id": 155,
+    "currency": "NZD",
+    "supported": true,
+    "code": "NZD",
+    "name": "NZD",
+    "new": false
+  },
+  {
+    "id": 33,
+    "currency": "OMR",
+    "supported": true,
+    "code": "OMR",
+    "name": "OMR",
+    "new": false
+  },
+  {
+    "id": 64,
+    "currency": "PAB",
+    "supported": true,
+    "code": "PAB",
+    "name": "PAB",
+    "new": false
+  },
+  {
+    "id": 154,
+    "currency": "PEN",
+    "supported": true,
+    "code": "PEN",
+    "name": "PEN",
+    "new": false
+  },
+  {
+    "id": 34,
+    "currency": "PGK",
+    "supported": true,
+    "code": "PGK",
+    "name": "PGK",
+    "new": false
+  },
+  {
+    "id": 55,
+    "currency": "PHP",
+    "supported": true,
+    "code": "PHP",
+    "name": "PHP",
+    "new": false
+  },
+  {
+    "id": 118,
+    "currency": "PKR",
+    "supported": true,
+    "code": "PKR",
+    "name": "PKR",
+    "new": false
+  },
+  {
+    "id": 139,
+    "currency": "PLN",
+    "supported": true,
+    "code": "PLN",
+    "name": "PLN",
+    "new": false
+  },
+  {
+    "id": 57,
+    "currency": "PYG",
+    "supported": true,
+    "code": "PYG",
+    "name": "PYG",
+    "new": false
+  },
+  {
+    "id": 44,
+    "currency": "QAR",
+    "supported": true,
+    "code": "QAR",
+    "name": "QAR",
+    "new": false
+  },
+  {
+    "id": 113,
+    "currency": "RON",
+    "supported": true,
+    "code": "RON",
+    "name": "RON",
+    "new": false
+  },
+  {
+    "id": 22,
+    "currency": "RSD",
+    "supported": true,
+    "code": "RSD",
+    "name": "RSD",
+    "new": false
+  },
+  {
+    "id": 56,
+    "currency": "RUB",
+    "supported": true,
+    "code": "RUB",
+    "name": "RUB",
+    "new": false
+  },
+  {
+    "id": 100,
+    "currency": "RWF",
+    "supported": true,
+    "code": "RWF",
+    "name": "RWF",
+    "new": false
+  },
+  {
+    "id": 127,
+    "currency": "SAR",
+    "supported": true,
+    "code": "SAR",
+    "name": "SAR",
+    "new": false
+  },
+  {
+    "id": 141,
+    "currency": "SBD",
+    "supported": true,
+    "code": "SBD",
+    "name": "SBD",
+    "new": false
+  },
+  {
+    "id": 5,
+    "currency": "SCR",
+    "supported": true,
+    "code": "SCR",
+    "name": "SCR",
+    "new": false
+  },
+  {
+    "id": 17,
+    "currency": "SDG",
+    "supported": true,
+    "code": "SDG",
+    "name": "SDG",
+    "new": false
+  },
+  {
+    "id": 36,
+    "currency": "SEK",
+    "supported": true,
+    "code": "SEK",
+    "name": "SEK",
+    "new": false
+  },
+  {
+    "id": 65,
+    "currency": "SGD",
+    "supported": true,
+    "code": "SGD",
+    "name": "SGD",
+    "new": false
+  },
+  {
+    "id": 94,
+    "currency": "SHP",
+    "supported": true,
+    "code": "SHP",
+    "name": "SHP",
+    "new": false
+  },
+  {
+    "id": 16,
+    "currency": "SLL",
+    "supported": true,
+    "code": "SLL",
+    "name": "SLL",
+    "new": false
+  },
+  {
+    "id": 68,
+    "currency": "SOS",
+    "supported": true,
+    "code": "SOS",
+    "name": "SOS",
+    "new": false
+  },
+  {
+    "id": 124,
+    "currency": "SRD",
+    "supported": true,
+    "code": "SRD",
+    "name": "SRD",
+    "new": false
+  },
+  {
+    "id": 3,
+    "currency": "STD",
+    "supported": true,
+    "code": "STD",
+    "name": "STD",
+    "new": false
+  },
+  {
+    "id": 42,
+    "currency": "SVC",
+    "supported": true,
+    "code": "SVC",
+    "name": "SVC",
+    "new": false
+  },
+  {
+    "id": 111,
+    "currency": "SYP",
+    "supported": true,
+    "code": "SYP",
+    "name": "SYP",
+    "new": false
+  },
+  {
+    "id": 125,
+    "currency": "SZL",
+    "supported": true,
+    "code": "SZL",
+    "name": "SZL",
+    "new": false
+  },
+  {
+    "id": 49,
+    "currency": "THB",
+    "supported": true,
+    "code": "THB",
+    "name": "THB",
+    "new": false
+  },
+  {
+    "id": 97,
+    "currency": "TJS",
+    "supported": true,
+    "code": "TJS",
+    "name": "TJS",
+    "new": false
+  },
+  {
+    "id": 14,
+    "currency": "TND",
+    "supported": true,
+    "code": "TND",
+    "name": "TND",
+    "new": false
+  },
+  {
+    "id": 95,
+    "currency": "TRY",
+    "supported": true,
+    "code": "TRY",
+    "name": "TRY",
+    "new": false
+  },
+  {
+    "id": 128,
+    "currency": "TTD",
+    "supported": true,
+    "code": "TTD",
+    "name": "TTD",
+    "new": false
+  },
+  {
+    "id": 21,
+    "currency": "TWD",
+    "supported": true,
+    "code": "TWD",
+    "name": "TWD",
+    "new": false
+  },
+  {
+    "id": 80,
+    "currency": "TZS",
+    "supported": true,
+    "code": "TZS",
+    "name": "TZS",
+    "new": false
+  },
+  {
+    "id": 38,
+    "currency": "UAH",
+    "supported": true,
+    "code": "UAH",
+    "name": "UAH",
+    "new": false
+  },
+  {
+    "id": 11,
+    "currency": "UGX",
+    "supported": true,
+    "code": "UGX",
+    "name": "UGX",
+    "new": false
+  },
+  {
+    "id": 61,
+    "currency": "USD",
+    "supported": true,
+    "code": "USD",
+    "name": "USD",
+    "new": false
+  },
+  {
+    "id": 29,
+    "currency": "UYU",
+    "supported": true,
+    "code": "UYU",
+    "name": "UYU",
+    "new": false
+  },
+  {
+    "id": 50,
+    "currency": "UZS",
+    "supported": true,
+    "code": "UZS",
+    "name": "UZS",
+    "new": false
+  },
+  {
+    "id": 70,
+    "currency": "VEF",
+    "supported": true,
+    "code": "VEF",
+    "name": "VEF",
+    "new": false
+  },
+  {
+    "id": 81,
+    "currency": "VND",
+    "supported": true,
+    "code": "VND",
+    "name": "VND",
+    "new": false
+  },
+  {
+    "id": 69,
+    "currency": "VUV",
+    "supported": true,
+    "code": "VUV",
+    "name": "VUV",
+    "new": false
+  },
+  {
+    "id": 156,
+    "currency": "WST",
+    "supported": true,
+    "code": "WST",
+    "name": "WST",
+    "new": false
+  },
+  {
+    "id": 74,
+    "currency": "XAF",
+    "supported": true,
+    "code": "XAF",
+    "name": "XAF",
+    "new": false
+  },
+  {
+    "id": 119,
+    "currency": "XCD",
+    "supported": true,
+    "code": "XCD",
+    "name": "XCD",
+    "new": false
+  },
+  {
+    "id": 147,
+    "currency": "XDR",
+    "supported": true,
+    "code": "XDR",
+    "name": "XDR",
+    "new": false
+  },
+  {
+    "id": 27,
+    "currency": "XOF",
+    "supported": true,
+    "code": "XOF",
+    "name": "XOF",
+    "new": false
+  },
+  {
+    "id": 48,
+    "currency": "XPF",
+    "supported": true,
+    "code": "XPF",
+    "name": "XPF",
+    "new": false
+  },
+  {
+    "id": 129,
+    "currency": "YER",
+    "supported": true,
+    "code": "YER",
+    "name": "YER",
+    "new": false
+  },
+  {
+    "id": 12,
+    "currency": "ZAR",
+    "supported": true,
+    "code": "ZAR",
+    "name": "ZAR",
+    "new": false
+  },
+  {
+    "id": 73,
+    "currency": "ZMK",
+    "supported": true,
+    "code": "ZMK",
+    "name": "ZMK",
+    "new": false
+  }
+]

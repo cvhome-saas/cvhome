@@ -1,0 +1,15 @@
+# curl '{{LANDING_UI_URL}}/catalog/api/v1/products/group/FEATURED_ITEMS?store=65f023632bc46470c104b76f&lang=en'
+GET {{LANDING_UI_URL}}/catalog/api/v1/products/group/FEATURED_ITEMS?store=65f023632bc46470c104b76f&lang=en
+
+###
+
+# curl '{{LANDING_UI_URL}}/catalog/api/v1/products?store=65f023632bc46470c104b76f&category=1&page=0&count=15&lang=en'
+GET {{LANDING_UI_URL}}/catalog/api/v1/products?store=65f023632bc46470c104b76f&category=1&page=0&count=15&lang=en
+
+###
+
+# curl '{{LANDING_UI_URL}}/catalog/api/v2/product/name/fiat?store=65f023632bc46470c104b76f&lang=en'
+GET {{LANDING_UI_URL}}/catalog/api/v2/product/name/fiat?store=65f023632bc46470c104b76f&lang=en
+
+###
+

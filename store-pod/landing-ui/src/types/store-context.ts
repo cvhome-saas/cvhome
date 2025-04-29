@@ -1,34 +1,32 @@
-import {ReadonlyHeaders} from "next/dist/server/web/spec-extension/adapters/headers";
-import type {ReadonlyRequestCookies} from "next/dist/server/web/spec-extension/adapters/request-cookies";
+import {DEFAULT_STORE_POD_GATEWAY} from "@/types/constant";
 
 export interface StoreContext {
     store: string,
-    host: string
-    schema: string,
-    local: string | undefined,
-    baseUrl: string,
+    locale: string,
 }
 
-export const extractStoreContext = (headers: ReadonlyHeaders, cookie: ReadonlyRequestCookies, local: string): StoreContext => {
-    const proto = headers.get("x-forwarded-proto") || "";
-    const host = headers.get("x-forwarded-host") || "";
-    const schema= proto.includes("https") ? "https" : "http"
-    const sc: StoreContext = {
-        store: headers.get("store") || "",
-        host: host,
-        schema: schema.includes("https") ? "https" : "http",
-        local: local ? local : cookie.get('NEXT_LOCALE' as any)?.value,
-        baseUrl: schema + "://" + host,
-    };
-
-    console.log("********************** headers *****************")
-    console.log(JSON.stringify(sc))
-    return sc
-}
-export const baseServiceUrl = (storeContext: StoreContext, service: string): string => {
-    return storeContext.schema + "://" + storeContext.host + "/" + service;
+export const storeBaseServiceUrl = (service: string): string => {
+    return typeof window === 'undefined' ? handleInternalServiceCall(service) : handleBrowserServiceCall(service)
 }
 
-export const storeBaseServiceUrl = (storeContext: StoreContext): string => {
-    return baseServiceUrl(storeContext, "store");
+const handleInternalServiceCall = (service: string): string => {
+    const STORE_POD_GATEWAY = process.env.INTERNAL_STORE_POD_GATEWAY;
+    if (STORE_POD_GATEWAY) {
+        // GATEWAY env Passed
+        return STORE_POD_GATEWAY + "/" + service;
+    } else {
+        // local or fallback if no env provided
+        return DEFAULT_STORE_POD_GATEWAY + "/" + service
+    }
+}
+
+const handleBrowserServiceCall = (service: string): string => {
+    const STORE_POD_GATEWAY = process.env.EXTERNAL_STORE_POD_GATEWAY;
+    if (STORE_POD_GATEWAY) {
+        // with custom domain
+        return STORE_POD_GATEWAY + "/" + service;
+    } else {
+        // with default domain
+        return "/" + service  //FAILED_TO_PLACE_ORDER
+    }
 }

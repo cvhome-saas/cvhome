@@ -9,12 +9,14 @@ plugins {
     id 'com.asrevo.java-common-conventions'
 
     // Apply the java-library plugin for API and implementation separation.
-    id("com.diffplug.spotless")
     id 'java-library'
+
+    id 'com.diffplug.spotless'
+
 }
+
 spotless {
     // optional: limit format enforcement to just the files changed by this feature branch
-//	ratchetFrom 'origin/main'
 
     format 'misc', {
         // define the files to apply `misc` to
@@ -26,15 +28,7 @@ spotless {
         endWithNewline()
     }
     java {
-        // don't need to set target, it is inferred from java
-
-        // apply a specific flavor of google-java-format
         googleJavaFormat('1.17.0').aosp().reflowLongStrings().skipJavadocFormatting()
-        // fix formatting of type annotations
         formatAnnotations()
-        // make sure every file has the following copyright header.
-        // optionally, Spotless can set copyright years by digging
-        // through git history (see "license" section below)
-//		licenseHeader '/* (C)$YEAR */'
     }
 }

@@ -8,6 +8,7 @@ spring:
           - "store-core-gateway"
           - "auth"
           - "manager"
+          - "subscription"
           - "store-ui"
           - "welcome-ui"
     ecs:
@@ -17,9 +18,16 @@ spring:
         enabled: true
         default-port: 8080
         service-ports:
-          "store-core-gateway": 7000
           "auth": 9999
-          "manager": 7001
-          "store": 7101
-          "store-ui": 4200
-          "welcome-ui": 4200
+          "store-core-gateway": 8000
+          "store-ui": 8010
+          "welcome-ui": 8011
+          "manager": 8020
+          "subscription": 8021
+          "store-pod-gateway": 8100
+          "landing-ui": 8110
+          "merchant-ui": 8111
+          "merchant": 8120
+          "content": 8121
+          "catalog": 8122
+          "order": 8123

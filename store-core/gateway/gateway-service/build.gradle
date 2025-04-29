@@ -1,11 +1,10 @@
 plugins {
     id 'com.asrevo.java-application-conventions'
-    id 'org.springframework.boot' version '3.3.1'
-    id 'io.spring.dependency-management' version '1.1.5'
-//    id 'org.graalvm.buildtools.native' version '0.10.2'
-    id("com.diffplug.spotless") version "7.0.0.BETA2"
+    id 'org.springframework.boot' version '3.4.3'
+    id 'io.spring.dependency-management' version '1.1.7'
+//    id 'org.graalvm.buildtools.native' version '0.10.5'
 }
-apply from: "$rootDir/helpers/common-methods.gradle"
+apply from: "$rootDir/build-logic/helpers/common-methods.gradle"
 group = 'com.asrevo.cvhome'
 
 repositories {
@@ -19,9 +18,13 @@ springBoot {
 }
 
 bootBuildImage {
-    builder = "paketobuildpacks/builder-jammy-tiny:latest"
-    imageName = createImageName("store-core/store-core-gateway")
-    tags = createImageTags("store-core/store-core-gateway",project.version)
+/*
+    builder = "bellsoft/buildpacks.builder:musl"
+*/
+    environment["BP_JVM_JLINK_ENABLED"] = "true"
+    environment["BP_JVM_JLINK_ARGS"] = " --compress zip-6 --no-header-files --no-man-pages --vm client --add-modules java.base,java.se,jdk.unsupported,jdk.crypto.ec"
+    imageName = createImageName("store-core/store-core-gateway", project.version)
+    tags = createImageTags("store-core/store-core-gateway", project.version)
     docker {
         publishRegistry {
             url = System.getenv("REGISTRY")
@@ -32,7 +35,7 @@ bootBuildImage {
 }
 
 ext {
-    set('springCloudVersion', "2023.0.2")
+    set('springCloudVersion', "2024.0.0")
 }
 dependencies {
     implementation 'org.springframework.cloud:spring-cloud-starter-gateway'
@@ -40,10 +43,14 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 
-    implementation project(':commons:cvhome-commons')
-    implementation project(':commons:s2sc-commons')
-    implementation project(':commons:ecs-commons:fargate-task-info')
-    implementation project(':commons:ecs-commons:ecs-service-discoveryclient')
+    implementation 'com.github.ben-manes.caffeine:caffeine:3.1.8'
+
+
+    implementation project(':store-commons:commons')
+    implementation project(':store-core:manager:manager-external-api')
+    implementation project(':store-commons:autoconfigure')
+    implementation project(':store-commons:ecs-commons:fargate-task-info')
+    implementation project(':store-commons:ecs-commons:ecs-service-discoveryclient')
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'

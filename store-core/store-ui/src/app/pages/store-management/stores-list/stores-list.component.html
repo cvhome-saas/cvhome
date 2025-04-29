@@ -1,90 +1,78 @@
-<nb-card class="page-card inner_pages">
-  <!-- <div *ngIf="loadingList" class="loading-block" [nbSpinner]="loadingList" nbSpinnerSize="large" nbSpinnerStatus="primary"></div> -->
-  <nb-card-body [nbSpinner]="loadingList" class="storeList" nbSpinnerSize="large" nbSpinnerStatus="primary">
-    <div class="inner_pages_legacy">
-      <nb-card-header class="main_header">
-        <h1 class="page_title">{{ 'COMPONENTS.STORES' | translate }}</h1>
-        <div class="content_spacing_empty"></div>
-
-      </nb-card-header>
-
-      <form class="form-inline filter_section" style="height: 60px" >
-        <div class="filter_left_section">
-        </div>
-        <div class="filter_right_section" style="margin: 5px">
-          <a routerLink="/pages/store-management/create-store" class="createBtn" >
-            <img alt="" class="pointer sda"
-                 src="../../../../assets/img/plus.png"
-                 title="{{ 'COMPONENTS.CREATE_OPTION' | translate}}">
-            <label>{{ 'COMPONENTS.CREATE_STORE' | translate }}</label>
-          </a>
-        </div>
-      </form>
-
-      <ngx-datatable
-        (page)="setPage($event)"
-        [columnMode]="ColumnMode.force"
-        [count]="page.totalElements"
-        [externalPaging]="true"
-        [footerHeight]="50"
-        [headerHeight]="50"
-        [limit]="page.size"
-        [offset]="page.pageNumber"
-        [rows]="rows"
-        class="material"
-        rowHeight="auto">
-
-        <ngx-datatable-column name="Id">
-          <ng-template let-column="column" ngx-datatable-header-template> {{ 'COMMON.ID' |translate }}</ng-template>
-          <ng-template let-value="value" ngx-datatable-cell-template>
-            <strong>{{ value }}</strong>
-          </ng-template>
-        </ngx-datatable-column>
-
-        <ngx-datatable-column name="code">
-          <ng-template let-column="column" ngx-datatable-header-template> {{ 'CONTENT.CODE' |translate }}</ng-template>
-          <ng-template let-value="value" ngx-datatable-cell-template>
-            <strong>{{ value }}</strong>
-          </ng-template>
-        </ngx-datatable-column>
-
-        <ngx-datatable-column name="name">
-          <ng-template let-column="column" ngx-datatable-header-template> {{ 'COMMON.STORE_NAME' |translate }}
-          </ng-template>
-          <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-            {{ row.name }}
-          </ng-template>
-        </ngx-datatable-column>
-
-        <ngx-datatable-column name="retailer">
-          <ng-template let-column="column" ngx-datatable-header-template> {{ 'COMPONENTS.RETAILER' |translate }}
-          </ng-template>
-          <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-            {{ row.retailer }}
-          </ng-template>
-        </ngx-datatable-column>
-
-        <ngx-datatable-column name="name">
-          <ng-template let-column="column" ngx-datatable-header-template> {{ 'COMMON.EMAIL_ADDRESS' |translate }}
-          </ng-template>
-          <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-            {{ row.email }}
-          </ng-template>
-        </ngx-datatable-column>
-
-        <ngx-datatable-column name="actions">
-          <ng-template let-column="column" ngx-datatable-header-template>
-            {{ 'ORDER.ACTIONS' |translate }}
-          </ng-template>
-          <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-            <button (click)="onEdit(row)" nbButton shape="round" size="small" status="primary"><i class="nb-edit"></i>
-            </button>
-            <button (click)="onDelete(row)" nbButton shape="round" size="small" status="danger"><i class="nb-trash"></i>
-            </button>
-          </ng-template>
-        </ngx-datatable-column>
-      </ngx-datatable>
-
+<nb-card status="basic" accent="info">
+  <nb-card-header>
+    <div class="row">
+      <h1 class="page_title">{{ 'COMPONENTS.STORES' | translate }}</h1>
     </div>
+
+    <div class="row">
+      <div class="col">
+      </div>
+      <div class="col col-lg-2">
+        <button nbButton status="success" routerLink="/pages/store-management/create-store">
+          <label>{{ 'COMPONENTS.CREATE_STORE' | translate }}</label>
+        </button>
+      </div>
+    </div>
+  </nb-card-header>
+  <nb-card-body [nbSpinner]="isLoading" nbSpinnerSize="large" nbSpinnerStatus="primary">
+    <ngx-datatable
+      (page)="onPageEvent($event)"
+      [columnMode]="ColumnMode.force"
+      [count]="page.totalElements"
+      [externalPaging]="true"
+      [footerHeight]="50"
+      [headerHeight]="50"
+      [limit]="page.size"
+      [offset]="page.pageNumber"
+      [rows]="page.content"
+      class="material"
+      rowHeight="auto">
+
+      <ngx-datatable-column name="Id">
+        <ng-template let-column="column" ngx-datatable-header-template> {{ 'COMMON.ID' |translate }}</ng-template>
+        <ng-template let-value="value" ngx-datatable-cell-template>
+          <strong>{{ value }}</strong>
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column name="name">
+        <ng-template let-column="column" ngx-datatable-header-template> {{ 'COMMON.STORE_NAME' |translate }}
+        </ng-template>
+        <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+          {{ row.name }}
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column name="email">
+        <ng-template let-column="column" ngx-datatable-header-template> {{ 'COMMON.EMAIL_ADDRESS' |translate }}
+        </ng-template>
+        <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+          {{ row.email }}
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column name="podId">
+        <ng-template let-column="column" ngx-datatable-header-template> {{ 'COMMON.POD_ID' |translate }}
+        </ng-template>
+        <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+          {{ row.pod.id }}
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column name="actions">
+        <ng-template let-column="column" ngx-datatable-header-template>
+          {{ 'ORDER.ACTIONS' |translate }}
+        </ng-template>
+        <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+          <button (click)="onEdit(row)" nbButton shape="round" size="small" status="primary">
+            <nb-icon icon="edit"></nb-icon>
+          </button>
+          <button (click)="onDelete(row)" nbButton shape="round" size="small" status="danger">
+            <nb-icon icon="trash"></nb-icon>
+          </button>
+        </ng-template>
+      </ngx-datatable-column>
+    </ngx-datatable>
   </nb-card-body>
 </nb-card>
+

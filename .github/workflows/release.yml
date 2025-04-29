@@ -1,0 +1,93 @@
+name: Release Workflow
+
+on:
+  workflow_dispatch
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code Main branch
+        uses: actions/checkout@v2
+        with:
+          ref: main
+
+      - name: Checkout code develop branch
+        uses: actions/checkout@v2
+        with:
+          ref: develop
+
+      - name: Configure github user
+        run: |
+          git config --global user.name 'github-actions'
+          git config --global user.email 'github-actions@github.com'
+
+      - name: Next Version
+        id: next_version
+        run: |
+          CURRENT_VERSION_STR=$(cat gradle.properties | grep 'version='|   cut -d"=" -f2-)
+          NEXT_VERSION=$(echo $CURRENT_VERSION_STR | awk -F. -v OFS=. '{$NF += 1 ; print}')
+          CURRENT_VERSION=$(echo $CURRENT_VERSION_STR | awk -F. -v OFS=. '{$NF += 0 ; print}')
+          echo "NEXT_VERSION=$NEXT_VERSION" >> $GITHUB_ENV
+          echo "CURRENT_VERSION=$CURRENT_VERSION" >> $GITHUB_ENV
+
+      - name: Delete Old Release branches
+        run: |
+          git push origin --delete release/${{ env.CURRENT_VERSION}} &>/dev/null || true 
+          git push origin --delete ${{ env.CURRENT_VERSION}} &>/dev/null || true 
+
+      - name: Create new Release branch
+        run: |
+          git checkout -b release/${{ env.CURRENT_VERSION}}
+          git pull origin develop
+
+      - name: Commit version to new release branch
+        run: |
+          sed -i "s/version=.*/version=${{ env.CURRENT_VERSION}}/" gradle.properties
+          git add gradle.properties
+          git commit -m "Releasing ${{ env.CURRENT_VERSION}}"
+          git push origin release/${{ env.CURRENT_VERSION}}
+
+      - name: Create pr for release branch and merge it to develop and main
+        run: |
+          PR_DEVELOP=$(gh pr create --base develop --head release/${{ env.CURRENT_VERSION}} --title "Pull Request for release/${{ env.CURRENT_VERSION}} for develop" --body "Description of the pull request")
+          PR_MAIN=$(gh pr create --base main --head release/${{ env.CURRENT_VERSION}} --title "Pull Request for release/${{ env.CURRENT_VERSION}} for main" --body "Description of the pull request")
+
+          PR_DEVELOP_NUMBER=$(echo "$PR_DEVELOP" | sed 's#.*/pull/\([0-9]*\)$#\1#')
+          PR_MAIN_NUMBER=$(echo "$PR_MAIN" | sed 's#.*/pull/\([0-9]*\)$#\1#')
+          
+          gh pr merge $PR_DEVELOP_NUMBER --merge --admin
+          gh pr merge $PR_MAIN_NUMBER --merge --admin
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Tag main for new release
+        run: |
+          git checkout main
+          git pull
+          git tag -a ${{ env.CURRENT_VERSION}} -m "Release ${{ env.CURRENT_VERSION}}" main
+          git push origin ${{ env.CURRENT_VERSION}}
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: GH Release
+        run: |
+          gh release create ${{ env.CURRENT_VERSION}} --generate-notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Delete Develop Branch
+        run: |
+          git push origin --delete develop
+          git branch -d develop
+
+      - name: Create a new Develop Branch
+        run: |
+          git checkout -b develop
+          git pull origin main
+
+      - name: Set Source Code version to -SNAPSHOT
+        run: |
+          sed -i "s/version=.*/version=${{ env.NEXT_VERSION }}-SNAPSHOT/" gradle.properties
+          git commit -am "Update develop to next snapshot ${{ env.NEXT_VERSION }}-SNAPSHOT"
+          git push origin develop

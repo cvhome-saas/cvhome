@@ -1,9 +1,18 @@
+import {Description} from "@/types/description";
+
 export interface ProductGroupPage {
     totalPages: number
     number: number
     recordsTotal: number
     recordsFiltered: number
     products: Product[]
+    productGroup: ProductGroup
+}
+
+export interface ProductGroup {
+    code: string
+    active: boolean
+    id: number
 }
 
 export interface Product {
@@ -44,6 +53,11 @@ export interface Product {
     type: any
     canBePurchased: boolean
     owner: any
+    subTotal: number
+    displaySubTotal: string
+    cartItemattributes: any[]
+    variant: any
+    variantValue: any
 }
 
 export interface ProductSpecifications {
@@ -57,18 +71,6 @@ export interface ProductSpecifications {
     weightUnitOfMeasure: any
 }
 
-export interface Description {
-    id: number
-    language: string
-    name: string
-    description: string
-    friendlyUrl: string
-    keyWords: string
-    highlights: string
-    metaDescription: string
-    title: string
-    priceAppender: any
-}
 
 export interface ProductPrice {
     id: number

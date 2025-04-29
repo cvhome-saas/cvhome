@@ -1,0 +1,202 @@
+com:
+  asrevo:
+    cvhome:
+      app:
+        domain: "gateway.com"
+      saas:
+        domain: saas.${com.asrevo.cvhome.app.domain}
+      services:
+        auth:
+          name: auth
+          domain: auth.${com.asrevo.cvhome.app.domain}
+          port: 9999
+          schema: http
+          namespace: store-core.cvhome.lcl
+          gateway-service-name: store-core-gateway
+        store-core-gateway:
+          name: store-core-gateway
+          domain: ${com.asrevo.cvhome.app.domain}
+          port: 8000
+          schema: http
+          namespace: store-core.cvhome.lcl
+          gateway-service-name: store-core-gateway
+        manager:
+          name: manager
+          domain: ${com.asrevo.cvhome.app.domain}
+          port: 8020
+          schema: http
+          namespace: store-core.cvhome.lcl
+          gateway-service-name: store-core-gateway
+        subscription:
+          name: subscription
+          domain: ${com.asrevo.cvhome.app.domain}
+          port: 8021
+          schema: http
+          namespace: store-core.cvhome.lcl
+          gateway-service-name: store-core-gateway
+        store-ui:
+          name: store-ui
+          domain: store-ui.${com.asrevo.cvhome.app.domain}
+          port: 8010
+          schema: http
+          namespace: store-core.cvhome.lcl
+          gateway-service-name: store-core-gateway
+        welcome-ui:
+          name: welcome-ui
+          domain: welcome-ui.${com.asrevo.cvhome.app.domain}
+          port: 8011
+          schema: http
+          namespace: store-core.cvhome.lcl
+          gateway-service-name: store-core-gateway
+        store-pod-saas-gateway:
+          name: store-pod-saas-gateway
+          domain: ${com.asrevo.cvhome.saas.domain}
+          port: 8443
+          schema: https
+          namespace: store-pod-1.cvhome.lcl
+          gateway-service-name: store-pod-saas-gateway
+        store-pod-gateway:
+          name: store-pod-gateway
+          domain: store-pod-1.${com.asrevo.cvhome.app.domain}
+          port: 8100
+          schema: http
+          namespace: store-pod-1.cvhome.lcl
+          gateway-service-name: store-pod-gateway
+        merchant:
+          name: merchant
+          domain: store-pod-1.${com.asrevo.cvhome.app.domain}
+          port: 8120
+          schema: http
+          namespace: store-pod-1.cvhome.lcl
+          gateway-service-name: store-pod-gateway
+        content:
+          name: content
+          domain: store-pod-1.${com.asrevo.cvhome.app.domain}
+          port: 8121
+          schema: http
+          namespace: store-pod-1.cvhome.lcl
+          gateway-service-name: store-pod-gateway
+        catalog:
+          name: catalog
+          domain: store-pod-1.${com.asrevo.cvhome.app.domain}
+          port: 8122
+          schema: http
+          namespace: store-pod-1.cvhome.lcl
+          gateway-service-name: store-pod-gateway
+        order:
+          name: order
+          domain: store-pod-1.${com.asrevo.cvhome.app.domain}
+          port: 8123
+          schema: http
+          namespace: store-pod-1.cvhome.lcl
+          gateway-service-name: store-pod-gateway
+        landing-ui:
+          name: landing-ui
+          domain: store-pod-1.${com.asrevo.cvhome.app.domain}
+          port: 8110
+          schema: http
+          namespace: store-pod-1.cvhome.lcl
+          gateway-service-name: store-pod-gateway
+        merchant-ui:
+          name: merchant-ui
+          domain: store-pod-1.${com.asrevo.cvhome.app.domain}
+          port: 8111
+          schema: http
+          namespace: store-pod-1.cvhome.lcl
+          gateway-service-name: store-pod-gateway
+      stripe:
+        key: ""
+        webhook-signing-key: ""
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          s2s:
+            provider: keycloak
+            client-id: subscription@service.store-core.internal
+            client-secret: TxbDxIhATuz8hyhzz899G7QpfixjFjzW
+            authorization-grant-type: client_credentials
+          keycloak:
+            client-id: web-app
+            client-authentication-method: client_secret_basic
+            authorization-grant-type: authorization_code
+            scope: openid, profile, email
+            redirect-uri: "{baseUrl}/login/oauth2/code/keycloak"
+            provider: keycloak
+            client-secret: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
+        provider:
+          keycloak:
+            #            comment issuer-uri to skip validation
+            #            issuer-uri: https://gateway.com:8443/realms/cvhome
+            jwk-set-uri: ${com.asrevo.cvhome.services.auth.schema}://${com.asrevo.cvhome.services.auth.domain}:${com.asrevo.cvhome.services.auth.port}/realms/cvhome/protocol/openid-connect/certs
+            authorization-uri: ${com.asrevo.cvhome.services.auth.schema}://${com.asrevo.cvhome.services.auth.domain}:${com.asrevo.cvhome.services.auth.port}/realms/cvhome/protocol/openid-connect/auth
+            token-uri: ${com.asrevo.cvhome.services.auth.schema}://${com.asrevo.cvhome.services.auth.domain}:${com.asrevo.cvhome.services.auth.port}/realms/cvhome/protocol/openid-connect/token
+
+      #            need to trace why getting 401 error=invalid_token, auth_method=validate_access_token is by issuer?
+      #            user-info-uri: https://auth.gateway.com:8443/realms/cvhome/protocol/openid-connect/userinfo
+      #            user-name-attribute: sub
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${com.asrevo.cvhome.services.auth.schema}://${com.asrevo.cvhome.services.auth.domain}:${com.asrevo.cvhome.services.auth.port}/realms/cvhome/protocol/openid-connect/certs
+  docker:
+    compose:
+      file: ${spring.application.name}/compose.yml
+  sql:
+    init:
+      mode: always
+
+springdoc:
+  show-actuator: true
+  api-docs:
+    path: /api-docs
+management:
+  info:
+    env:
+      enabled: true
+    os:
+      enabled: true
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: [ '*' ]
+#logging:
+#  level:
+#    org.springframework.boot: debug
+#    org.springframework.web: debug
+#    org.springframework.cloud.gateway: debug
+#    org.springframework.security: debug
+#    reactor.netty.http: debug
+---
+spring:
+  application:
+    name: subscription
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      schema: subscription
+  cloud:
+    function:
+      definition: events
+    stream:
+      input-bindings: events
+      bindings:
+        events-in-0:
+          destination: events
+          group: ${spring.application.name}
+        events-out-0:
+          content-type: application/json
+          destination: events
+server:
+  forward-headers-strategy: NATIVE
+  port: ${com.asrevo.cvhome.services.subscription.port}
+info:
+  app:
+    name: ${spring.application.name}
+management:
+  observations:
+    key-values:
+      application: ${spring.application.name}

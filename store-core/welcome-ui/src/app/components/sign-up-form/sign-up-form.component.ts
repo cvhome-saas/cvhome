@@ -1,43 +1,61 @@
 import {Component} from '@angular/core';
-import {Router, RouterLink} from "@angular/router";
 import {SignUpService} from "../../service/sign-up.service";
-import {FormBuilder, ReactiveFormsModule, Validators} from "@angular/forms";
+import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
+import {ToastrService} from "ngx-toastr";
+import {NgFor} from "@angular/common";
 
 @Component({
   selector: 'app-sign-up-form',
   standalone: true,
   imports: [
-    RouterLink,
     ReactiveFormsModule
+    , NgFor
   ],
   templateUrl: './sign-up-form.component.html',
   styleUrl: './sign-up-form.component.css'
 })
 export class SignUpFormComponent {
   title: string = 'Sign Up';
-  desc: string = 'Fill all fields so we can get required info';
   userForm: any;
 
-  constructor(private signUpService: SignUpService, private formBuilder: FormBuilder, private router: Router) {
+  constructor(private signUpService: SignUpService, private formBuilder: FormBuilder, private toastr: ToastrService) {
     this.userForm = this.formBuilder.group({
-      firstName: ['', Validators.required],
-      lastName: ['', Validators.required],
-      emailAddress: ['', [Validators.required, Validators.email]],
-      password: ['', Validators.required],
+      user: this.formBuilder.group({
+        firstName: ['', Validators.required],
+        lastName: ['', Validators.required],
+        emailAddress: ['', [Validators.required, Validators.email]],
+        password: ['', Validators.required],
+        repeatPassword: ['', Validators.required],
+      }, {validators: this.checkPasswords}),
     })
   }
 
+  checkPasswords(group: FormGroup) { // here we have the 'passwords' group
+    // @ts-ignore
+    const password = group.get('password').value;
+    // @ts-ignore
+    const confirmPassword = group.get('repeatPassword').value;
+    return password === confirmPassword ? null : {notSame: true}
+  }
+
+
   signUp() {
     if (this.userForm?.valid) {
-      this.signUpService.signUp({
-        firstName: "ashraf",
-        lastName: "ashraf",
-        emailAddress: "ashraf@mail.com",
-        password: "admin"
-      }).subscribe(it => {
-        this.router.navigate(['/redirect/internal?serviceName=store-ui&path=/oauth2/authorization/keycloak']);
-      })
-
+      this.signUpService.signUp(this.userForm.value).subscribe({
+        next: (it) => {
+          this.toastr.success('Successfully Register!', 'You will be redirected to login page');
+          this.doLazyRedirect();
+        },
+        error: (err) => {
+          this.toastr.error('Failed to Register!', 'Please fill all required fields');
+        }
+      });
     }
+  }
+
+  doLazyRedirect() {
+    setTimeout(() => {
+      window.location.href = window.location.origin + "/redirect/internal?serviceName=store-ui&path=/oauth2/authorization/keycloak"
+    }, 2000);
   }
 }

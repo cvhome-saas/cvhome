@@ -1,0 +1,18 @@
+# curl '{{STORE-UI_URL}}/manager/api/v1/store-manager/private/store?lang=en&count=10&page=0'
+GET {{STORE-UI_URL}}/manager/api/v1/store-manager/private/store?lang=en&count=10&page=0
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
+
+###
+
+# curl 'GET {{STORE-UI_URL}}/store-pod-gateway/merchant/api/v1/store/65f023632bc46470c104b75f?store=65f023632bc46470c104b75f'
+GET {{STORE-UI_URL}}/store-pod-gateway/merchant/api/v1/store/65f023632bc46470c104b75f?store=65f023632bc46470c104b75f
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
+
+###
+
+# curl '{{STORE-UI_URL}}/manager/api/v1/router/allocates?store=65f023632bc46470c104b75f'
+GET {{STORE-UI_URL}}/manager/api/v1/router/allocates?store=65f023632bc46470c104b75f
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
+
+###
+

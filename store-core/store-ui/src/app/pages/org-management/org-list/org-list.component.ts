@@ -1,0 +1,58 @@
+import {Component, OnInit} from '@angular/core';
+import {Router} from '@angular/router';
+
+import {OrgService} from '../services/org.service';
+import {TranslateService} from '@ngx-translate/core';
+import {ColumnMode} from "@swimlane/ngx-datatable";
+import {ErrorService} from "../../../shared/services/error.service";
+import {BaseTable, PageT, StorePageRequest} from "../../common/BaseTable";
+import {Observable, of} from "rxjs";
+import {map} from "rxjs/operators";
+
+@Component({
+  selector: 'ngx-org-list',
+  standalone: false,
+  templateUrl: './org-list.component.html',
+  styleUrls: ['./org-list.component.scss']
+})
+export class OrgListComponent extends BaseTable<any> implements OnInit {
+  protected readonly ColumnMode = ColumnMode;
+  private isInitialized: boolean = false;
+
+  constructor(
+    private orgService: OrgService,
+    private router: Router,
+    translate: TranslateService,
+    errorService: ErrorService
+  ) {
+    super(null, translate, errorService)
+  }
+
+  ngOnInit() {
+    this.isInitialized = true;
+    this.trigger();
+  }
+
+  override list(request: StorePageRequest): Observable<PageT<any>> {
+    if (!this.isInitialized) {
+      return of();
+    }
+    return this.orgService.getListOfOrg(request)
+      .pipe(map(it => {
+        const mappedX = {
+          content: it.content,
+          totalPages: it.totalPages,
+          totalElements: it.totalElements,
+          size: it.numberOfElements,
+          pageNumber: request.page
+        };
+        return mappedX;
+      }));
+  }
+
+  onEdit(row) {
+    this.router.navigate(['pages/org-management/org/', row.id.id]);
+
+  }
+
+}

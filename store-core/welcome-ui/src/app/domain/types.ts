@@ -1,4 +1,9 @@
 export interface SignUpForm {
+  user: PersistableUser
+  subscriptionPlan: string
+}
+
+export interface PersistableUser {
   firstName: string
   lastName: string
   emailAddress: string

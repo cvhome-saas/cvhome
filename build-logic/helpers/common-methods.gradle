@@ -1,0 +1,16 @@
+static String createImageName(String repo, String version) {
+    String registry = System.getenv("REGISTRY")
+    return registry ? "${registry}/${repo}:${version}" : "${repo}:${version}"
+}
+
+static List<String> createImageTags(String repo, String version) {
+    if (!version.contains("-SNAPSHOT"))
+        return [createImageName(repo, "latest")]
+    else
+        return [];
+}
+
+ext {
+    createImageName = this.&createImageName
+    createImageTags = this.&createImageTags
+}

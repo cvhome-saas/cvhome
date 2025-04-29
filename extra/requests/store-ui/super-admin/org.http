@@ -1,0 +1,70 @@
+# curl '{{STORE-UI_URL}}/manager/api/v1/org-manager/find-all?lang=en&count=10&page=0'
+GET {{STORE-UI_URL}}/manager/api/v1/org-manager/find-all?lang=en&count=10&page=0
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+###
+
+# curl '{{STORE-UI_URL}}/manager/api/v1/org-manager/find-one?id=21f023932bc66470c104b76f'
+GET {{STORE-UI_URL}}/manager/api/v1/org-manager/find-one?id=21f023932bc66470c104b76f
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+###
+
+# curl '{{STORE-UI_URL}}/subscription/api/v1/subscription-plan/public/list'
+GET {{STORE-UI_URL}}/subscription/api/v1/subscription-plan/public/list
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+###
+
+# curl '{{STORE-UI_URL}}/manager/api/v1/org-manager/find-one?id=21f023932bc66470c104b76f'
+GET {{STORE-UI_URL}}/manager/api/v1/org-manager/find-one?id=21f023932bc66470c104b76f
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+###
+
+# curl '{{STORE-UI_URL}}/manager/api/v1/org-manager/stores?id=21f023932bc66470c104b76f&lang=en&count=10&page=0'
+GET {{STORE-UI_URL}}/manager/api/v1/org-manager/stores?id=21f023932bc66470c104b76f&lang=en&count=10&page=0
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+
+###
+
+# curl '{{STORE-UI_URL}}/manager/api/v1/org-manager/create'
+POST {{STORE-UI_URL}}/manager/api/v1/org-manager/create
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{
+  "user": {
+    "firstName": "{{$random.name.firstName}}",
+    "lastName": "{{$random.name.lastName}}",
+    "emailAddress": "{{$random.email}}",
+    "password": "01122asA",
+    "repeatPassword": "01122asA"
+  },
+  "subscriptionPlan": "BASIC"
+}
+
+###
+
+# curl '{{STORE-UI_URL}}/manager/api/v1/org-manager/update?id=21f023932bc66470c104b76f'
+PUT {{STORE-UI_URL}}/manager/api/v1/org-manager/update?id=21f023932bc66470c104b76f
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{
+  "subscriptionPlan": "PERFORMANCE"
+}
+
+###
+
+# curl '{{STORE-UI_URL}}/manager/api/v1/org-manager/change-password?id=21f023932bc66470c104b76f' 
+POST {{STORE-UI_URL}}/manager/api/v1/org-manager/change-password?id=21f023932bc66470c104b76f
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{
+  "password": "ASas123"
+}
+
+###
+

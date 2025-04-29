@@ -1,47 +1,7 @@
-import {NewsLetter} from "@/componants/news-letter/NewsLetter";
-import {TabProduct} from "@/wrappers/product/TabProduct";
-import {cookies, headers} from "next/headers";
-import {extractStoreContext, StoreContext} from "@/types/store-context";
-import {getTranslations} from "next-intl/server";
-import {Link} from "@/navigation";
-import {StoreService} from "@/services/store-service";
+import {PageLoader} from "@/app/[locale]/_components/PageLoader";
+import {HomePageParams} from "@/types/params";
+import {HOME_PAGE_PATH} from "@/types/constant";
 
-export default async function Home({params}: { params: { locale: string } }) {
-    const storeContext: StoreContext = extractStoreContext(headers(), cookies(), params.locale);
-    const store = await StoreService.getStore(storeContext);
-    const t = await getTranslations("Home");
-    return (
-        <>
-            <div className="site-blocks-cover">
-                <div className="container">
-                    <div className="row">
-                        <div className="col-md-4 ml-auto order-md-2 align-self-start">
-                            <div className="site-block-cover-content">
-                                <h2 className="sub-title">
-                                    {t('Pitch1')}
-
-                                </h2>
-                                <h1>
-                                    {t('Pitch2')}
-
-                                </h1>
-                                <p>
-                                    <Link prefetch={false} href={"/"} className="btn btn-black rounded-0">
-                                        {t('Shop Now')}
-                                    </Link>
-                                </p>
-                            </div>
-                        </div>
-                        <div className="col-md-8 order-1 align-self-end">
-                            <img src={store.banner.path} alt={store.banner.name} className="img-fluid"/>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-
-            <TabProduct storeContext={storeContext}/>
-            <NewsLetter/>
-        </>
-    );
+export default async function Page({params}: { params: Promise<HomePageParams> }) {
+    return PageLoader({params, path: HOME_PAGE_PATH});
 }

@@ -1,4 +1,4 @@
 FROM nginx:1.25-alpine-slim
-ADD  /dist/store-ui/ /usr/share/nginx/html
+ADD  /dist/store-ui /usr/share/nginx/html
 COPY nginx.conf  /etc/nginx/conf.d/default.conf
-EXPOSE 4200
+EXPOSE 8010

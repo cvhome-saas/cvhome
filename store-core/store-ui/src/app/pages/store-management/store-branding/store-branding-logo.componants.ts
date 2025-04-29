@@ -4,9 +4,11 @@ import {TranslateService} from "@ngx-translate/core";
 import {StoreService} from "../services/store.service";
 import {NbToastrService} from "@nebular/theme";
 import {Logo} from "../models/logo";
+import {ErrorService} from "../../../shared/services/error.service";
 
 @Component({
   selector: 'ngx-store-branding-logo',
+  standalone:false,
   template: `
     <form [formGroup]="imageUpload">
       <div (click)='imageInput.click()' (dragover)="allowDrop($event)" (drop)="drop($event)" class="wrapper">
@@ -18,18 +20,17 @@ import {Logo} from "../models/logo";
         <div class="uploadingPhrase">{{ 'STORE_BRANDING.DROP_FILE' | translate }}</div>
       </div>
 
-      <input #imageInput (change)='imageChange($event)' formControlName="imageInput" id="imageInput" required
+      <input nbInput fullWidth #imageInput (change)='imageChange($event)' formControlName="imageInput" id="imageInput" required
              type="file">
 
       <div class="form-group actions-button">
-        <button (click)="removeLogo()" *ngIf="showRemoveButton" class="btn btn-danger" type="submit">{{
+        <button nbButton status="danger" (click)="removeLogo()" *ngIf="showRemoveButton"  type="submit">{{
             'COMMON.REMOVE' | translate
           }}
         </button>
-        <button (click)="saveLogo()" *ngIf="logoFile" [nbSpinner]="loadingButton" class="btn btn-primary" nbButton
+        <button nbButton status="success" (click)="saveLogo()" *ngIf="logoFile" [nbSpinner]="loadingButton"
                 nbSpinnerMessage="" nbSpinnerSize="large" type="submit">
           {{ (!loadingButton ? 'COMMON.SAVE' : '') | translate }}
-          <!-- {{ 'COMMON.SAVE' | translate}} -->
         </button>
       </div>
 
@@ -42,9 +43,7 @@ export class StoreBrandingLogoComponent implements OnInit {
   store: any
   @ViewChild('imageDrop', {static: false}) imageDrop;
   acceptedImageTypes = {'image/png': true, 'image/jpeg': true, 'image/gif': true};
-  imageUpload = this.formBuilder.group({
-    imageInput: ['', Validators.required]
-  });
+  imageUpload;
   loadingButton = false;
   logo: Logo;
 
@@ -55,7 +54,12 @@ export class StoreBrandingLogoComponent implements OnInit {
               private storeService: StoreService,
               private toastr: NbToastrService,
               private translate: TranslateService,
+              private errorService: ErrorService
   ) {
+    this.imageUpload = this.formBuilder.group({
+      imageInput: ['', Validators.required]
+    });
+
   }
 
   ngOnInit(): void {
@@ -110,7 +114,7 @@ export class StoreBrandingLogoComponent implements OnInit {
 
   saveLogo() {
     this.loadingButton = true;
-    this.storeService.addStoreLogo(this.store.code, this.logoFile)
+    this.storeService.addStoreLogo(this.store.id, this.logoFile)
       .subscribe({
         next: (data) => {
           this.toastr.success(this.translate.instant('STORE_BRANDING.LOGO_SAVED'));
@@ -118,6 +122,7 @@ export class StoreBrandingLogoComponent implements OnInit {
         },
         error: (err) => {
           this.loadingButton = false;
+          this.errorService.error('ERROR.SYSTEM_ERROR', err);
         }
       })
   }
@@ -144,9 +149,11 @@ export class StoreBrandingLogoComponent implements OnInit {
     } else {
       node.removeChild(node.getElementsByClassName('appendedImage')[0]);
     }
-    this.storeService.removeStoreLogo(this.store.code)
+    this.storeService.removeStoreLogo(this.store.id)
       .subscribe(res => {
         this.toastr.success(this.translate.instant('STORE_BRANDING.LOGO_REMOVED'));
+      }, err => {
+        this.errorService.error('ERROR.SYSTEM_ERROR', err);
       });
   }
 }

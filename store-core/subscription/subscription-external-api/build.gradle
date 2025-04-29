@@ -1,0 +1,11 @@
+plugins {
+	id 'com.asrevo.java-library-conventions'
+	id("com.diffplug.spotless") version "6.25.0"
+}
+
+dependencies {
+	api project(':store-core:manager:manager-commons')
+	compileOnly 'org.springframework:spring-webflux:6.2.3'
+	compileOnly 'org.projectlombok:lombok:1.18.36'
+	annotationProcessor 'org.projectlombok:lombok:1.18.36'
+}

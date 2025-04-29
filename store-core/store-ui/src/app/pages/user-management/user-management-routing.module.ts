@@ -21,22 +21,19 @@ const routes: Routes = [
         component: UserProfileComponent,
       },
       {
-        path: 'change-password',
+        path: 'change-password/:id',
         component: ChangePasswordComponent,
       },
       {
         path: 'create-user/:store',
-        //     canActivate: [SuperuserAdminRetailGuard],
         component: CreateNewUserComponent,
       },
       {
         path: 'users',
-        //     canActivate: [SuperuserAdminGuard],
         component: UsersListComponent,
       },
       {
         path: 'user/:id',
-        //     canActivate: [SuperuserAdminGuard],
         component: UserDetailsComponent,
       },
     ],

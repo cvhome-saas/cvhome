@@ -57,10 +57,10 @@
           <div
             class="copyright-area d-flex flex-wrap justify-content-center justify-content-sm-between text-center py-4">
             <!-- Copyright Left -->
-            <div class="copyright-left">{{copyrights}}</div>
+            <div class="copyright-left">{{ copyrights }}</div>
             <!-- Copyright Right -->
             <div class="copyright-right">Made with <i class="fas fa-heart"></i> By <a
-              [href]="creator.link">{{ creator.name }}</a></div>
+              [href]="'mailto:'+creator.name">{{ creator.name }}</a></div>
           </div>
         </div>
       </div>

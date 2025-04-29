@@ -1,0 +1,201 @@
+version: '3'
+services:
+  rabbitmq:
+    image: rabbitmq:4.0.2-management
+    ports:
+      - 5672:5672
+      - 15672:15672
+  postgres:
+    image: postgres:15-alpine
+    network_mode: host
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: cvhome
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+  minio:
+    image: bitnami/minio
+    network_mode: host
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_API_PORT_NUMBER: "9000"
+      MINIO_CONSOLE_PORT_NUMBER: "9001"
+      MINIO_DEFAULT_BUCKETS: "d0dd4299-963a-4458-b31f-8efe31c35e8e"
+      MINIO_ROOT_USER: "minioadmin"
+      MINIO_ROOT_PASSWORD: "minioadmin"
+      MINIO_ACCESS_KEY: "minioadmin"
+      MINIO_SECRET_KEY: "minioadmin"
+  auth:
+    image: store-core/auth
+    network_mode: host
+    environment:
+      KC_HTTP_ENABLED: true
+      KC_HTTP_PORT: 9999
+      KC_HTTP_MANAGEMENT_PORT: 9998
+      KC_HOSTNAME_STRICT_HTTPS: false
+
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://localhost:5432/cvhome
+      KC_DB_USERNAME: postgres
+      KC_DB_PASSWORD: password
+
+      KEYCLOAK_ADMIN: sys-admin@mail.com
+      KEYCLOAK_ADMIN_PASSWORD: admin
+
+    ports:
+      - "9999:9999"
+      - "9998:9998"
+    depends_on:
+      - postgres
+  merchant:
+    image: store-pod/merchant
+    network_mode: host
+    environment:
+      SPRING_PROFILES_ACTIVE: lcl
+      COM_ASREVO_CVHOME_CDN_STORAGE_PROVIDER: "MINIO"
+      COM_ASREVO_CVHOME_CDN_STORAGE_BUCKET: "d0dd4299-963a-4458-b31f-8efe31c35e8e"
+      COM_ASREVO_CVHOME_CDN_STORAGE_S3-URL: "http://localhost:9000"
+      COM_ASREVO_CVHOME_CDN_STORAGE_S3-ACCESS-KEY: "minioadmin"
+      COM_ASREVO_CVHOME_CDN_STORAGE_S3-SECRET-KEY: "minioadmin"
+      COM_ASREVO_CVHOME_CDN_STORAGE_REGION: "eu-central-1"
+      COM_ASREVO_CVHOME_CDN_BASE-PATH: "http://localhost:9000/d0dd4299-963a-4458-b31f-8efe31c35e8e"
+    ports:
+      - "8120:8120"
+    depends_on:
+      - auth
+      - postgres
+      - minio
+  content:
+    image: store-pod/content
+    network_mode: host
+    environment:
+      SPRING_PROFILES_ACTIVE: lcl
+      COM_ASREVO_CVHOME_CDN_STORAGE_PROVIDER: "MINIO"
+      COM_ASREVO_CVHOME_CDN_STORAGE_BUCKET: "d0dd4299-963a-4458-b31f-8efe31c35e8e"
+      COM_ASREVO_CVHOME_CDN_STORAGE_S3-URL: "http://localhost:9000"
+      COM_ASREVO_CVHOME_CDN_STORAGE_S3-ACCESS-KEY: "minioadmin"
+      COM_ASREVO_CVHOME_CDN_STORAGE_S3-SECRET-KEY: "minioadmin"
+      COM_ASREVO_CVHOME_CDN_STORAGE_REGION: "eu-central-1"
+      COM_ASREVO_CVHOME_CDN_BASE-PATH: "http://localhost:9000/d0dd4299-963a-4458-b31f-8efe31c35e8e"
+    ports:
+      - "8121:8121"
+    depends_on:
+      - auth
+      - postgres
+      - minio
+  catalog:
+    image: store-pod/catalog
+    network_mode: host
+    environment:
+      SPRING_PROFILES_ACTIVE: lcl
+      COM_ASREVO_CVHOME_CDN_STORAGE_PROVIDER: "MINIO"
+      COM_ASREVO_CVHOME_CDN_STORAGE_BUCKET: "d0dd4299-963a-4458-b31f-8efe31c35e8e"
+      COM_ASREVO_CVHOME_CDN_STORAGE_S3-URL: "http://localhost:9000"
+      COM_ASREVO_CVHOME_CDN_STORAGE_S3-ACCESS-KEY: "minioadmin"
+      COM_ASREVO_CVHOME_CDN_STORAGE_S3-SECRET-KEY: "minioadmin"
+      COM_ASREVO_CVHOME_CDN_STORAGE_REGION: "eu-central-1"
+      COM_ASREVO_CVHOME_CDN_BASE-PATH: "http://localhost:9000/d0dd4299-963a-4458-b31f-8efe31c35e8e"
+    ports:
+      - "8122:8122"
+    depends_on:
+      - auth
+      - postgres
+      - minio
+  order:
+    image: store-pod/order
+    network_mode: host
+    environment:
+      SPRING_PROFILES_ACTIVE: lcl
+      COM_ASREVO_CVHOME_CDN_STORAGE_PROVIDER: "MINIO"
+      COM_ASREVO_CVHOME_CDN_STORAGE_BUCKET: "d0dd4299-963a-4458-b31f-8efe31c35e8e"
+      COM_ASREVO_CVHOME_CDN_STORAGE_S3-URL: "http://localhost:9000"
+      COM_ASREVO_CVHOME_CDN_STORAGE_S3-ACCESS-KEY: "minioadmin"
+      COM_ASREVO_CVHOME_CDN_STORAGE_S3-SECRET-KEY: "minioadmin"
+      COM_ASREVO_CVHOME_CDN_STORAGE_REGION: "eu-central-1"
+      COM_ASREVO_CVHOME_CDN_BASE-PATH: "http://localhost:9000/d0dd4299-963a-4458-b31f-8efe31c35e8e"
+    ports:
+      - "8123:8123"
+    depends_on:
+      - auth
+      - postgres
+      - minio
+
+  landing-ui:
+    image: store-pod/landing-ui
+    network_mode: host
+    environment:
+      SPRING_PROFILES_ACTIVE: lcl
+    ports:
+      - "8110:8110"
+  merchant-ui:
+    image: store-pod/merchant-ui
+    network_mode: host
+    environment:
+      SPRING_PROFILES_ACTIVE: lcl
+    ports:
+      - "8111:8111"
+  store-pod-gateway:
+    image: store-pod/store-pod-gateway
+    network_mode: host
+    environment:
+      SPRING_PROFILES_ACTIVE: lcl
+    ports:
+      - "8100:8100"
+  store-pod-saas-gateway:
+    image: store-pod/store-pod-saas-gateway
+    network_mode: host
+    environment:
+      SPRING_PROFILES_ACTIVE: lcl
+      STORE_POD_GATEWAY: http://store-pod-1.gateway.com:8100
+      ASK_TLS_URL: http://gateway.com:8000/manager/api/v1/router/public/ask-for-tls
+    ports:
+      - "80:80"
+      - "443:443"
+      - "2019:2019"
+    depends_on:
+      - store-pod-gateway
+
+  manager:
+    image: store-core/manager
+    network_mode: host
+    environment:
+      SPRING_PROFILES_ACTIVE: lcl
+    ports:
+      - "8020:8020"
+    depends_on:
+      - postgres
+      - auth
+  subscription:
+    image: store-core/subscription
+    network_mode: host
+    environment:
+      SPRING_PROFILES_ACTIVE: lcl
+    ports:
+      - "8021:8021"
+    depends_on:
+      - postgres
+      - auth
+  store-ui:
+    image: store-core/store-ui
+    network_mode: host
+    environment:
+      SPRING_PROFILES_ACTIVE: lcl
+    ports:
+      - "8010:8010"
+  welcome-ui:
+    image: store-core/welcome-ui
+    network_mode: host
+    environment:
+      SPRING_PROFILES_ACTIVE: lcl
+    ports:
+      - "8011:8011"
+  store-core-gateway:
+    image: store-core/store-core-gateway
+    network_mode: host
+    environment:
+      SPRING_PROFILES_ACTIVE: lcl
+    ports:
+      - "8000:8000"

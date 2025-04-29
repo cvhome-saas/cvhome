@@ -20,56 +20,91 @@ com:
         store-core-gateway:
           name: store-core-gateway
           domain: ${com.asrevo.cvhome.app.domain}
-          port: 7000
+          port: 8000
           schema: http
           namespace: store-core.cvhome.lcl
           gateway-service-name: store-core-gateway
         manager:
           name: manager
           domain: ${com.asrevo.cvhome.app.domain}
-          port: 7001
+          port: 8020
+          schema: http
+          namespace: store-core.cvhome.lcl
+          gateway-service-name: store-core-gateway
+        subscription:
+          name: subscription
+          domain: ${com.asrevo.cvhome.app.domain}
+          port: 8021
           schema: http
           namespace: store-core.cvhome.lcl
           gateway-service-name: store-core-gateway
         store-ui:
           name: store-ui
           domain: store-ui.${com.asrevo.cvhome.app.domain}
-          port: 4200
+          port: 8010
           schema: http
           namespace: store-core.cvhome.lcl
           gateway-service-name: store-core-gateway
         welcome-ui:
           name: welcome-ui
           domain: welcome-ui.${com.asrevo.cvhome.app.domain}
-          port: 4300
+          port: 8011
           schema: http
           namespace: store-core.cvhome.lcl
           gateway-service-name: store-core-gateway
-        saas-pod-gateway:
-          name: saas-pod-gateway
+        store-pod-saas-gateway:
+          name: store-pod-saas-gateway
           domain: ${com.asrevo.cvhome.saas.domain}
           port: 8443
           schema: https
-          namespace: saas-pod-1.cvhome.lcl
-          gateway-service-name: saas-pod-gateway
+          namespace: store-pod-1.cvhome.lcl
+          gateway-service-name: store-pod-saas-gateway
         store-pod-gateway:
           name: store-pod-gateway
           domain: store-pod-1.${com.asrevo.cvhome.app.domain}
-          port: 7100
+          port: 8100
           schema: http
           namespace: store-pod-1.cvhome.lcl
           gateway-service-name: store-pod-gateway
-        store:
-          name: store
+        merchant:
+          name: merchant
           domain: store-pod-1.${com.asrevo.cvhome.app.domain}
-          port: 7101
+          port: 8120
+          schema: http
+          namespace: store-pod-1.cvhome.lcl
+          gateway-service-name: store-pod-gateway
+        content:
+          name: content
+          domain: store-pod-1.${com.asrevo.cvhome.app.domain}
+          port: 8121
+          schema: http
+          namespace: store-pod-1.cvhome.lcl
+          gateway-service-name: store-pod-gateway
+        catalog:
+          name: catalog
+          domain: store-pod-1.${com.asrevo.cvhome.app.domain}
+          port: 8122
+          schema: http
+          namespace: store-pod-1.cvhome.lcl
+          gateway-service-name: store-pod-gateway
+        order:
+          name: order
+          domain: store-pod-1.${com.asrevo.cvhome.app.domain}
+          port: 8123
           schema: http
           namespace: store-pod-1.cvhome.lcl
           gateway-service-name: store-pod-gateway
         landing-ui:
           name: landing-ui
           domain: store-pod-1.${com.asrevo.cvhome.app.domain}
-          port: 7102
+          port: 8110
+          schema: http
+          namespace: store-pod-1.cvhome.lcl
+          gateway-service-name: store-pod-gateway
+        merchant-ui:
+          name: merchant-ui
+          domain: store-pod-1.${com.asrevo.cvhome.app.domain}
+          port: 8111
           schema: http
           namespace: store-pod-1.cvhome.lcl
           gateway-service-name: store-pod-gateway
@@ -129,13 +164,13 @@ management:
     web:
       exposure:
         include: [ '*' ]
-logging:
-  level:
-    org.springframework.boot: debug
-    org.springframework.web: debug
-    org.springframework.cloud.gateway: debug
-    org.springframework.security: debug
-    reactor.netty.http: debug
+#logging:
+#  level:
+#    org.springframework.boot: debug
+#    org.springframework.web: debug
+#    org.springframework.cloud.gateway: debug
+#    org.springframework.security: debug
+#    reactor.netty.http: debug
 ---
 spring:
   application:
@@ -144,8 +179,20 @@ spring:
     driver-class-name: org.postgresql.Driver
     hikari:
       schema: manager
+  cloud:
+    function:
+      definition: events
+    stream:
+      input-bindings: events
+      bindings:
+        events-in-0:
+          destination: events
+          group: ${spring.application.name}
+        events-out-0:
+          content-type: application/json
+          destination: events
 server:
-  forward-headers-strategy: FRAMEWORK
+  forward-headers-strategy: NATIVE
   port: ${com.asrevo.cvhome.services.manager.port}
 info:
   app:

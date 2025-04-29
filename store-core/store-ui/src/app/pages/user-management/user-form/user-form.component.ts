@@ -2,17 +2,15 @@ import {ChangeDetectorRef, Component, Input, OnInit} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {Router} from '@angular/router';
 
-import {ConfigService} from '../../shared/services/config.service';
-import {UserService} from '../../shared/services/user.service';
-import {User} from '../../shared/models/user';
+import {UserService} from '../../../shared/services/user.service';
+import {User} from '../../../shared/models/user';
 import {NbToastrService} from '@nebular/theme';
 import {TranslateService} from '@ngx-translate/core';
-import {StoreService} from '../../store-management/services/store.service';
-import {SecurityService} from '../../shared/services/security.service';
-import {StorageService} from '../../shared/services/storage.service';
+import {ErrorService} from "../../../shared/services/error.service";
 
 @Component({
   selector: 'ngx-user-form',
+  standalone: false,
   templateUrl: './user-form.component.html',
   styleUrls: ['./user-form.component.scss']
 })
@@ -21,44 +19,26 @@ export class UserFormComponent implements OnInit {
   @Input() title: string;
   @Input() action: string = 'CREATE';
   @Input() store: string = '';
+  @Input() user: User;
   allGroups: string[] = [];
   groups = [];
   pwdPattern = '^(?=[^A-Z]*[A-Z])(?=[^a-z]*[a-z])(?=[^0-9]*[0-9]).{6,12}$';
   emailPattern = '^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$';
   selectedItem = '0';
-  sidemenuLinks = [
-    {
-      id: '0',
-      title: 'COMPONENTS.CHANGE_PASSWORD',
-      key: 'COMPONENTS.CHANGE_PASSWORD',
-      link: '/pages/user-management/change-password',
-    }
-  ];
+  sidemenuLinks = []
   loader = false;
 
   constructor(
     private fb: FormBuilder,
-    private configService: ConfigService,
     private userService: UserService,
-    private storeService: StoreService,
-    private storageService: StorageService,
-    private securityService: SecurityService,
     private router: Router,
     private cdr: ChangeDetectorRef,
     private toastr: NbToastrService,
-    private translate: TranslateService) {
+    private translate: TranslateService,
+    private errorService: ErrorService
+  ) {
   }
 
-  private _user: User;
-
-  get user(): User {
-    return this._user;
-  }
-
-  @Input()
-  set user(user: User) {
-    this._user = user;
-  }
 
   get userName() {
     return this.form.get('userName');
@@ -89,19 +69,57 @@ export class UserFormComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.userService.groups().subscribe(it => {
-      this.allGroups = it;
-      if (this.action == 'CREATE') {
-        this.groups = this.allGroups.map(it => {
-          return {name: it, checked: false}
-        });
-      } else {
-        this.groups = this.allGroups.map(name => {
-          const checked = this._user.groups.filter(it => it.name == name).length > 0
-          return {name, checked}
-        });
-      }
-    });
+    this.userService.groups()
+      .subscribe({
+        next: (it) => {
+          this.allGroups = it;
+          if (this.action == 'CREATE') {
+            this.groups = this.allGroups.map(it => {
+              return {name: it, checked: false}
+            });
+          } else {
+            this.groups = this.allGroups.map(name => {
+              const checked = this.user.groups.filter(it => it.name == name).length > 0
+              return {name, checked}
+            });
+          }
+        },
+        error: (err) => {
+          this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        }
+      });
+
+    if (this.user) {
+      this.sidemenuLinks = [
+        {
+          id: '0',
+          title: 'COMPONENTS.USER_DETAILS',
+          key: 'COMPONENTS.USER_DETAILS',
+          link: `/pages/user-management/user/${this.user.id}`,
+        },
+        {
+          id: '1',
+          title: 'COMPONENTS.CHANGE_PASSWORD',
+          key: 'COMPONENTS.CHANGE_PASSWORD',
+          link: `/pages/user-management/change-password/${this.user.id}`,
+        }
+      ];
+    } else {
+      this.sidemenuLinks = [
+        {
+          id: '0',
+          title: 'COMPONENTS.USER_DETAILS',
+          key: 'COMPONENTS.USER_DETAILS',
+          link: `/pages/user-management/user`,
+        },
+        {
+          id: '1',
+          title: 'COMPONENTS.CHANGE_PASSWORD',
+          key: 'COMPONENTS.CHANGE_PASSWORD',
+          link: `/pages/user-management/change-password`,
+        }
+      ];
+    }
 
     this.createForm();
 
@@ -123,14 +141,14 @@ export class UserFormComponent implements OnInit {
   fillForm() {
     this.form.get('password').clearValidators();
     this.form.patchValue({
-      firstName: this._user.firstName,
-      lastName: this._user.lastName,
-      userName: this._user.userName,
+      firstName: this.user.firstName,
+      lastName: this.user.lastName,
+      userName: this.user.userName,
       password: '',
       repeatPassword: '',
-      emailAddress: this._user.emailAddress,
-      active: this._user.active,
-      groups: [...this._user.groups],
+      emailAddress: this.user.emailAddress,
+      active: this.user.active,
+      groups: [...this.user.groups],
     });
     this.cdr.detectChanges();
     this.findInvalidControls();
@@ -147,12 +165,12 @@ export class UserFormComponent implements OnInit {
     this.form.patchValue({groups: newGroups});
     const userData = this.form.value;
     if (userData.groups.length === 0) {
-      this.toastr.warning(this.translate.instant('COMMON.ADDING_USER_GROUPS_ERROR'));
+      this.toastr.warning(this.translate.instant('COMMON.ADDINGuser_GROUPS_ERROR'));
       this.loader = false;
       return;
     }
-    if (this._user && this._user.id) {
-      userData.id = this._user.id;
+    if (this.user && this.user.id) {
+      userData.id = this.user.id;
       this.userService.updateUser(userData, this.store)
         .subscribe({
           next: (res) => {
@@ -160,7 +178,7 @@ export class UserFormComponent implements OnInit {
             this.loader = false;
           },
           error: (err) => {
-            this.toastr.danger(err.error.detail);
+            this.errorService.error('ERROR.SYSTEM_ERROR', err);
             this.loader = false;
           },
         });
@@ -172,7 +190,7 @@ export class UserFormComponent implements OnInit {
           this.router.navigate(['pages/user-management/users']);
         },
         error: (err) => {
-          this.toastr.danger(err.error.detail);
+          this.errorService.error('ERROR.SYSTEM_ERROR', err);
           this.loader = false;
         }
       });

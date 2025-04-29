@@ -1,20 +1,14 @@
 package com.asrevo.cvhome.manager.service.impl;
 
-import com.asrevo.cvhome.commons.domain.Domain;
-import com.asrevo.cvhome.commons.domain.IdentityId;
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
-import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
-import com.asrevo.cvhome.manager.commons.dto.CreateManagerStoreRequest;
+import com.asrevo.cvhome.commons.domain.*;
 import com.asrevo.cvhome.manager.commons.dto.ListManagerStoreQuery;
 import com.asrevo.cvhome.manager.commons.dto.ManagerStoreDto;
 import com.asrevo.cvhome.manager.mappers.ManagerStoreMappers;
 import com.asrevo.cvhome.manager.service.InternalStoreService;
-import com.asrevo.cvhome.manager.service.RouterService;
+import com.asrevo.cvhome.manager.service.PodSelection;
 import com.asrevo.cvhome.manager.service.StoreManagerService;
-import com.asrevo.cvhome.manager.service.StorePodClient;
-import com.asrevo.cvhome.s2s.model.SaasProperties;
-import java.util.List;
-import java.util.Map;
+import com.asrevo.cvhome.manager.service.StorePodClientFactory;
+import com.asrevo.cvhome.merchant.api.StorePodClient;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -22,63 +16,50 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 @Service
 public class StoreManagerServiceImpl implements StoreManagerService {
-    private final SaasProperties saasProperties;
-    private final RouterService routerService;
     private final InternalStoreService internalStoreService;
     private final ManagerStoreMappers managerStoreMappers;
-    private final StorePodClient storePodClient;
+    private final StorePodClientFactory podClientFactory;
+    private final PodSelection podSelection;
 
-    public StoreManagerServiceImpl(
-            SaasProperties saasProperties,
-            RouterService routerService,
-            InternalStoreService internalStoreService,
-            ManagerStoreMappers managerStoreMappers,
-            StorePodClient storePodClient) {
-        this.saasProperties = saasProperties;
-        this.routerService = routerService;
+    public StoreManagerServiceImpl(InternalStoreService internalStoreService, ManagerStoreMappers managerStoreMappers, StorePodClientFactory podClientFactory, PodSelection podSelection) {
         this.internalStoreService = internalStoreService;
         this.managerStoreMappers = managerStoreMappers;
-        this.storePodClient = storePodClient;
+        this.podClientFactory = podClientFactory;
+        this.podSelection = podSelection;
     }
 
     @Override
-    public Mono<Void> createStore(IdentityId identityId, Map<Object, Object> request) {
-        CreateManagerStoreRequest storeRequest = managerStoreMappers.toCreateStoreRequest(request);
-        ManagerStoreDto store = internalStoreService.createStore(storeRequest, identityId);
-        Domain suggestedSubDomain = new Domain(storeRequest.name() + "." + saasProperties.domain());
-        routerService.create(suggestedSubDomain, store.id());
-        internalStoreService.syncInRouter(store.id());
-        Map<Object, Object> newRequest =
-                managerStoreMappers.toExternalCreateRequest(
-                        request, identityId, store.id().getId().toString());
-        return storePodClient
-                .create(newRequest)
-                .map(
-                        it -> {
-                            internalStoreService.syncInStore(store.id());
-                            return it;
-                        })
-                .then();
+    public void createStore(ManagerOrgId orgId, Map<Object, Object> request) {
+        PodId podId = podSelection.next(new OrgId(orgId.id().toString()), null);
+        internalStoreService.createStore(request, orgId, podId);
     }
 
     @Override
-    public Mono<PageImpl<Object>> findAll(
-            UserOrgStoreIdentity identity,
-            ListManagerStoreQuery listManagerStoreQuery,
-            Pageable pageable) {
-        Page<ManagerStoreDto> internalStores =
-                internalStoreService.findAll(identity, listManagerStoreQuery, pageable);
-        Mono<List<Object>> listMono =
-                Flux.fromIterable(internalStores.getContent())
-                        .flatMap(it -> getStore(it.id()))
-                        .collectList();
+    public Mono<PageImpl<Object>> findAll(UserOrgStoreIdentity identity, ListManagerStoreQuery listManagerStoreQuery, Pageable pageable) {
+        Page<ManagerStoreDto> internalStores = internalStoreService.findAll(identity, listManagerStoreQuery, pageable);
+        Mono<List<Object>> listMono = Flux.fromIterable(internalStores.getContent())
+                .flatMap(it -> getStore(it.id()))
+                .collectList();
         return listMono.map(it -> managerStoreMappers.toPage(it, internalStores));
     }
 
     @Override
     public Mono<Object> getStore(ManagerStoreId managerStoreId) {
-        return storePodClient.getStore(managerStoreId.getId().toString());
+        Pod pod = internalStoreService.getStorePod(managerStoreId);
+        StorePodClient client = podClientFactory.getClient(pod.id());
+        Mono<Map<String, Object>> store = client.getStore(managerStoreId.getId().toString());
+        return store
+                .map(it -> {
+                    HashMap<String, Object> newIt = new HashMap<>(it);
+                    newIt.put("pod", Map.of("id", pod.id().id()));
+                    return newIt;
+                })
+                .cast(Object.class);
     }
 }

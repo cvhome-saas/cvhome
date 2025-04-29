@@ -1,21 +1,18 @@
 package com.asrevo.cvhome.manager.mappers;
 
-import com.asrevo.cvhome.commons.domain.Country;
-import com.asrevo.cvhome.commons.domain.Email;
-import com.asrevo.cvhome.commons.domain.IdentityId;
-import com.asrevo.cvhome.commons.domain.Phone;
-import com.asrevo.cvhome.manager.commons.dto.CreateManagerStoreRequest;
+import com.asrevo.cvhome.commons.domain.ManagerOrgId;
+import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.manager.commons.dto.ListManagerStoreQuery;
 import com.asrevo.cvhome.manager.commons.dto.ManagerStoreDto;
 import com.asrevo.cvhome.manager.entity.ManagerStoreEntity;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Mapper(componentModel = "spring")
 public interface ManagerStoreMappers {
@@ -23,37 +20,23 @@ public interface ManagerStoreMappers {
 
     @Mapping(target = "new", ignore = true)
     @Mapping(target = "createdDate", ignore = true)
-    @Mapping(target = "country", ignore = true)
-    @Mapping(target = "email", ignore = true)
-    @Mapping(target = "phone", ignore = true)
-    @Mapping(target = "syncedInRouter", ignore = true)
-    @Mapping(target = "syncedInStore", ignore = true)
-    @Mapping(target = "isNew", ignore = true)
+    @Mapping(target = "version", ignore = true)
+    @Mapping(target = "removeDomain", ignore = true)
+    @Mapping(target = "podId", ignore = true)
+    @Mapping(target = "orgId", ignore = true)
+    @Mapping(target = "provisioningState", ignore = true)
+    @Mapping(target = "managerStoreDomains", ignore = true)
     ManagerStoreEntity toEntity(ListManagerStoreQuery managerStoreDto);
 
-    default CreateManagerStoreRequest toCreateStoreRequest(Map<Object, Object> request) {
-        String name = (String) request.get("name");
-        String email = (String) request.get("email");
-        String phone = (String) request.get("phone");
-        Object address = request.get("address");
-        String country =
-                Optional.ofNullable(address)
-                        .map(it -> ((Map<String, String>) it))
-                        .map(it -> it.get("country"))
-                        .orElse(null);
-        return new CreateManagerStoreRequest(
-                name, new Phone(phone), Country.valueOf(country), new Email(email));
-    }
-
-    default Map<Object, Object> toExternalCreateRequest(
-            Map<Object, Object> request, IdentityId identityId, String reference) {
+    default Map<Object, Object> toExternalCreateRequest(Map<Object, Object> request, ManagerOrgId orgId, ManagerStoreId managerStoreId) {
         HashMap<Object, Object> newRequest = new HashMap<>(request);
-        newRequest.put("code", reference);
-        newRequest.put("org", identityId.id());
+        newRequest.put("id", managerStoreId.id().toString());
+        newRequest.put("org", orgId.id().toString());
         return newRequest;
     }
 
     default PageImpl<Object> toPage(List<Object> it, Page<ManagerStoreDto> internalStores) {
         return new PageImpl<>(it, internalStores.getPageable(), internalStores.getTotalElements());
     }
+
 }

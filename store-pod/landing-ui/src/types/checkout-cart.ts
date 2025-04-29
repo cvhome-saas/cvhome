@@ -12,7 +12,7 @@ export interface Billing {
     lastName: string
     phone: string
     postalCode: string,
-    country:string
+    country: string
 
 }
 

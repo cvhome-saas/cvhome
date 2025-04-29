@@ -2,12 +2,23 @@ import {RouterModule, Routes} from '@angular/router';
 import {NgModule} from '@angular/core';
 
 import {PagesComponent} from './pages.component';
-import {canAccessSecuredPages} from "../shared/service/auth-guard.service";
+import {canAccessSecuredPages} from "../shared/services/auth-guard.service";
 import {NotFoundComponent} from "./not-found/not-found.component";
-// import {DashboardComponent} from "./dashboard/dashboard.component";
-// import { DashboardComponent } from './dashboard/dashboard.component';
-// import { ECommerceComponent } from './e-commerce/e-commerce.component';
-// import { NotFoundComponent } from './miscellaneous/not-found/not-found.component';
+import {loadRemoteModule} from '@angular-architects/module-federation';
+
+interface RemoteRoute {
+  path: string;
+  module: string;
+}
+
+let remoteEntry = "/store-pod-gateway/merchant-ui/remoteEntry.js";
+const remoteRoutes: RemoteRoute[] = [
+  {path: 'orders', module: "OrdersModule"},
+  {path: 'catalogue', module: "CatalogueModule"},
+  {path: 'content', module: "ContentModule"},
+  {path: 'customer', module: "CustomersModule"},
+];
+
 
 const routes: Routes = [{
   path: '',
@@ -15,37 +26,39 @@ const routes: Routes = [{
   component: PagesComponent,
   children: [
     {
-      path: 'home',
+      path: '',
       loadChildren: () => import('./home/home.module')
         .then(m => m.HomeModule)
-    },
-    {
-      path: 'orders',
-      loadChildren: () => import('./orders/orders.module')
-        .then(m => m.OrdersModule),
     }, {
       path: 'user-management',
       loadChildren: () => import('./user-management/user-management.module')
         .then(m => m.UserManagementModule),
     }, {
+      path: 'org-management',
+      loadChildren: () => import('./org-management/org-management.module')
+        .then(m => m.OrgManagementModule),
+    }, {
       path: 'store-management',
       loadChildren: () => import('./store-management/store-management.module')
         .then(m => m.StoreManagementModule),
     }, {
-      path: 'catalogue',
-      // canActivate: [SuperadminStoreRetailCatalogueGuard],
-      loadChildren: () => import('./catalogue/catalogue.module')
-        .then(m => m.CatalogueModule),
-
-    }, {
-      path: 'content',
-      loadChildren: () => import('./content/content.module')
-        .then(m => m.ContentModule),
-    }, {
-      path: 'customer',
-      loadChildren: () => import('./customers/customer.module')
-        .then(m => m.CustomersModule),
-    }, {
+      path: 'subscription-and-usage',
+      loadChildren: () => import('./subscription-and-usage/subscription-and-usage.module')
+        .then(m => m.SubscriptionAndUsageModule),
+    },
+    ...remoteRoutes.map(it => {
+      return {
+        path: it.path,
+        loadChildren: () => loadRemoteModule({
+          remoteEntry: remoteEntry,
+          type: 'module',
+          exposedModule: `./${it.module}`
+        })
+          .then((m) => m[it.module])
+          .catch(handleRemoteModuleFailure),
+      }
+    }),
+    {
       path: '**',
       component: NotFoundComponent
     }
@@ -58,3 +71,23 @@ const routes: Routes = [{
 })
 export class PagesRoutingModule {
 }
+
+// async function routedLoadRemoteModule(options: any, module: string) {
+//   const storeId = localStorage.getItem(SelectedStoreService.STORE_ID_KEY)
+//   if (storeId) {
+//     options = {
+//       ...options,
+//       remoteEntry: options.remoteEntry + "?store=" + storeId
+//     }
+//   }
+//   return loadRemoteModule(options)
+//     .then((m) => m[module])
+//     .catch(handleRemoteModuleFailure)
+// }
+
+async function handleRemoteModuleFailure() {
+  return import(
+    '../remote-module-placeholder/remote-module-placeholder.module'
+    ).then((m) => m.RemoteModulePlaceholderModule);
+}
+

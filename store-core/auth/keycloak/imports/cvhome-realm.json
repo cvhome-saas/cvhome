@@ -27,7 +27,7 @@
   "oauth2DevicePollingInterval": 5,
   "enabled": true,
   "sslRequired": "external",
-  "registrationAllowed": true,
+  "registrationAllowed": false,
   "registrationEmailAsUsername": false,
   "rememberMe": true,
   "verifyEmail": false,
@@ -269,7 +269,7 @@
           "attributes": {}
         },
         {
-          "id": "7826b333-2b6e-4300-8e0c-4c66577df9b4",
+          "id": "7826b333-2b6e-8011-8e0c-4c66577df9b4",
           "name": "impersonation",
           "description": "${role_impersonation}",
           "composite": false,
@@ -650,6 +650,9 @@
       "username": "org1-admin@mail.com",
       "emailVerified": false,
       "attributes": {
+        "org": [
+          "21f023932bc66470c104b76f"
+        ],
         "user_type": [
           "ORG_USER"
         ]
@@ -683,7 +686,7 @@
       "emailVerified": false,
       "attributes": {
         "org": [
-          "d1952c95-312e-4bb9-9a2d-b703d031276f"
+          "21f023932bc66470c104b76f"
         ],
         "user_type": [
           "MANAGED_USER"
@@ -721,7 +724,7 @@
       "emailVerified": false,
       "attributes": {
         "org": [
-          "d1952c95-312e-4bb9-9a2d-b703d031276f"
+          "21f023932bc66470c104b76f"
         ],
         "user_type": [
           "MANAGED_USER"
@@ -759,7 +762,7 @@
       "emailVerified": false,
       "attributes": {
         "org": [
-          "d1952c95-312e-4bb9-9a2d-b703d031276f"
+          "21f023932bc66470c104b76f"
         ],
         "user_type": [
           "MANAGED_USER"
@@ -797,7 +800,7 @@
       "emailVerified": false,
       "attributes": {
         "org": [
-          "d1952c95-312e-4bb9-9a2d-b703d031276f"
+          "21f023932bc66470c104b76f"
         ],
         "user_type": [
           "MANAGED_USER"
@@ -834,6 +837,9 @@
       "username": "org2-admin@mail.com",
       "emailVerified": false,
       "attributes": {
+        "org": [
+          "352023632b046970c104b76f"
+        ],
         "user_type": [
           "ORG_USER"
         ]
@@ -867,7 +873,7 @@
       "emailVerified": false,
       "attributes": {
         "org": [
-          "d1952c95-312e-4bb6-9a2d-b703d031276f"
+          "352023632b046970c104b76f"
         ],
         "user_type": [
           "MANAGED_USER"
@@ -905,7 +911,7 @@
       "emailVerified": false,
       "attributes": {
         "org": [
-          "d1952c95-312e-4bb6-9a2d-b703d031276f"
+          "352023632b046970c104b76f"
         ],
         "user_type": [
           "MANAGED_USER"
@@ -943,7 +949,7 @@
       "emailVerified": false,
       "attributes": {
         "org": [
-          "d1952c95-312e-4bb6-9a2d-b703d031276f"
+          "352023632b046970c104b76f"
         ],
         "user_type": [
           "MANAGED_USER"
@@ -981,7 +987,7 @@
       "emailVerified": false,
       "attributes": {
         "org": [
-          "d1952c95-312e-4bb6-9a2d-b703d031276f"
+          "352023632b046970c104b76f"
         ],
         "user_type": [
           "MANAGED_USER"
@@ -1044,9 +1050,6 @@
         "/SUPER_ADMIN"
       ]
     },
-
-
-
     {
       "id": "9c8afc2f-85bf-4073-b262-c2924f758a75",
       "username": "service-account-auth@service.store-core.internal",
@@ -1062,7 +1065,9 @@
         "default-roles-cvhome"
       ],
       "notBefore": 0,
-      "groups": []
+      "groups": [
+        "/MICROSERVICE"
+      ]
     },
     {
       "id": "14c02e44-fb4e-4669-807c-1b620799cbe7",
@@ -1079,7 +1084,9 @@
         "default-roles-cvhome"
       ],
       "notBefore": 0,
-      "groups": []
+      "groups": [
+        "/MICROSERVICE"
+      ]
     },
     {
       "id": "4179d9c2-d161-4808-af29-181daee95ce8",
@@ -1096,7 +1103,9 @@
         "default-roles-cvhome"
       ],
       "notBefore": 0,
-      "groups": []
+      "groups": [
+        "/MICROSERVICE"
+      ]
     },
     {
       "id": "02bffe0f-1a7d-4ad6-8d48-113d69d4defc",
@@ -1113,7 +1122,9 @@
         "default-roles-cvhome"
       ],
       "notBefore": 0,
-      "groups": []
+      "groups": [
+        "/MICROSERVICE"
+      ]
     },
     {
       "id": "142d5dcf-6142-4de4-9a62-bd394951dea8",
@@ -1130,7 +1141,9 @@
         "default-roles-cvhome"
       ],
       "notBefore": 0,
-      "groups": []
+      "groups": [
+        "/MICROSERVICE"
+      ]
     },
     {
       "id": "b18372aa-5a25-4768-a6f9-d0cb67b7a94c",
@@ -1147,7 +1160,28 @@
         "default-roles-cvhome"
       ],
       "notBefore": 0,
-      "groups": []
+      "groups": [
+        "/MICROSERVICE"
+      ]
+    },
+    {
+      "id": "b18372aa-5225-4768-a6f9-d0cb67b7a94c",
+      "username": "service-account-subscription@service.store-core.internal",
+      "emailVerified": false,
+      "createdTimestamp": 1721806483874,
+      "enabled": true,
+      "totp": false,
+      "serviceAccountClientId": "subscription@service.store-core.internal",
+      "credentials": [],
+      "disableableCredentialTypes": [],
+      "requiredActions": [],
+      "realmRoles": [
+        "default-roles-cvhome"
+      ],
+      "notBefore": 0,
+      "groups": [
+        "/MICROSERVICE"
+      ]
     },
     {
       "id": "3de26d02-f090-4aa3-88a9-9c3ad37b2b24",
@@ -1602,8 +1636,6 @@
         "microprofile-jwt"
       ]
     },
-
-
     {
       "id": "48823754-b7d0-44d7-856f-2825c455f72f",
       "clientId": "auth@service.store-core.internal",
@@ -1890,6 +1922,112 @@
         },
         {
           "id": "f831efab-dde3-4a28-b970-9eb5001a8f49",
+          "name": "Client IP Address",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usersessionmodel-note-mapper",
+          "consentRequired": false,
+          "config": {
+            "user.session.note": "clientAddress",
+            "introspection.token.claim": "true",
+            "userinfo.token.claim": "true",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "clientAddress",
+            "jsonType.label": "String"
+          }
+        }
+      ],
+      "defaultClientScopes": [
+        "web-origins",
+        "acr",
+        "profile",
+        "roles",
+        "basic",
+        "email"
+      ],
+      "optionalClientScopes": [
+        "address",
+        "phone",
+        "offline_access",
+        "microprofile-jwt"
+      ]
+    },
+    {
+      "id": "663afc1b-b823-4e13-881a-136412fd87f5",
+      "clientId": "subscription@service.store-core.internal",
+      "name": "",
+      "description": "",
+      "rootUrl": "",
+      "adminUrl": "",
+      "baseUrl": "",
+      "surrogateAuthRequired": false,
+      "enabled": true,
+      "alwaysDisplayInConsole": false,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "TxbDxIhATuz8hyhzz899G7QpfixjFjzW",
+      "redirectUris": [
+        "/*"
+      ],
+      "webOrigins": [
+        "/*"
+      ],
+      "notBefore": 0,
+      "bearerOnly": false,
+      "consentRequired": false,
+      "standardFlowEnabled": false,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": true,
+      "publicClient": false,
+      "frontchannelLogout": true,
+      "protocol": "openid-connect",
+      "attributes": {
+        "oidc.ciba.grant.enabled": "false",
+        "client.secret.creation.time": "1721493579",
+        "backchannel.logout.session.required": "true",
+        "post.logout.redirect.uris": "+",
+        "oauth2.device.authorization.grant.enabled": "false",
+        "display.on.consent.screen": "false",
+        "backchannel.logout.revoke.offline.tokens": "false"
+      },
+      "authenticationFlowBindingOverrides": {},
+      "fullScopeAllowed": true,
+      "nodeReRegistrationTimeout": -1,
+      "protocolMappers": [
+        {
+          "id": "d34338fe-8768-4a70-be14-5ef0be631030",
+          "name": "Client Host",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usersessionmodel-note-mapper",
+          "consentRequired": false,
+          "config": {
+            "user.session.note": "clientHost",
+            "introspection.token.claim": "true",
+            "userinfo.token.claim": "true",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "clientHost",
+            "jsonType.label": "String"
+          }
+        },
+        {
+          "id": "a3c82fdb-2af3-46fd-8ff9-02c98825706a",
+          "name": "Client ID",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usersessionmodel-note-mapper",
+          "consentRequired": false,
+          "config": {
+            "user.session.note": "client_id",
+            "introspection.token.claim": "true",
+            "userinfo.token.claim": "true",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "client_id",
+            "jsonType.label": "String"
+          }
+        },
+        {
+          "id": "f331efab-dde3-4a28-b970-9eb5001a8f49",
           "name": "Client IP Address",
           "protocol": "openid-connect",
           "protocolMapper": "oidc-usersessionmodel-note-mapper",
@@ -2978,7 +3116,7 @@
     "strictTransportSecurity": "max-age=31536000; includeSubDomains"
   },
   "smtpServer": {},
-  "loginTheme": "keycloak",
+  "loginTheme": "cvhome",
   "accountTheme": "keycloak.v2",
   "adminTheme": "keycloak.v2",
   "emailTheme": "keycloak",
@@ -3374,7 +3512,7 @@
       ]
     },
     {
-      "id": "8b01018a-5d90-4772-b778-2b8916857002",
+      "id": "8b01018a-5d90-4772-b778-2b8916858021",
       "alias": "User creation or linking",
       "description": "Flow for the existing/non-existing user alternatives",
       "providerId": "basic-flow",
@@ -3858,7 +3996,7 @@
     "cibaInterval": "5",
     "realmReusableOtpCode": "false"
   },
-  "keycloakVersion": "25.0.0",
+  "keycloakVersion": "26.1.3",
   "userManagedAccessAllowed": false,
   "organizationsEnabled": false,
   "clientProfiles": {

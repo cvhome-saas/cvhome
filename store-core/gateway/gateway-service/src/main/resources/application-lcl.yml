@@ -10,67 +10,46 @@ spring:
                 service-name: auth
                 instance: auth-1
           manager:
-            - url: "http://localhost:7001"
+            - url: "http://localhost:8020"
               metadata:
                 service-name: manager
                 instance: manager-1
+          subscription:
+            - url: "http://localhost:8021"
+              metadata:
+                service-name: subscription
+                instance: subscription-1
           store-ui:
-            - url: "http://localhost:4200"
+            - url: "http://localhost:8010"
               metadata:
                 service-name: store-ui
                 instance: store-ui-1
           welcome-ui:
-            - url: "http://localhost:4300"
+            - url: "http://localhost:8011"
               metadata:
                 service-name: welcome-ui
                 instance: welcome-ui-1
-          store:
-            - url: "http://localhost:7101"
+          'store-pod-gateway':
+            - url: "http://localhost:8100"
               metadata:
-                service-name: store
-                instance: store-1
-          'store.store-pod-1.cvhome.lcl':
-            - url: "http://localhost:7101"
+                service-name: store-pod-gateway
+                instance: store-pod-gateway-1
+          'store-pod-gateway.store-pod-1.cvhome.lcl':
+            - url: "http://localhost:8100"
               metadata:
-                service-name: store
-                instance: store-1
-          landing-ui:
-            - url: "http://localhost:7102"
-              metadata:
-                service-name: landing-ui
-                instance: landing-ui-1
+                service-name: store-pod-gateway
+                instance: store-pod-gateway-1
     gateway:
       discovery:
         locator:
-          enabled: true
-      default-filters:
-        - TokenRelay
-        - PreserveHostHeader
-        - AddResponseHeader=X-Frame-Options, SAMEORIGIN
-      routes:
-        - id: store
-          order: -3
-          uri: lb://store.store-pod-1.cvhome.lcl
-          filters:
-            - StripPrefix=1
-          predicates:
-            - Path=/store/**
-        - id: manager
-          order: -2
-          uri: lb://manager
-          predicates:
-            - Path=/manager/**
-          filters:
-            - StripPrefix=1
-        - id: welcome-ui
-          order: -1
-          uri: lb://welcome-ui
-          predicates:
-            - FNotService=store,manager,auth
-            - FHost=${com.asrevo.cvhome.services.store-core-gateway.domain},www.${com.asrevo.cvhome.services.store-core-gateway.domain}
-        - id: store-ui
-          order: -1
-          uri: lb://store-ui
-          predicates:
-            - FNotService=store,manager,auth
-            - FHost=store-ui.${com.asrevo.cvhome.services.store-core-gateway.domain}
+          enabled: false
+com:
+  asrevo:
+    cvhome:
+      pods:
+        - id:
+            id: 1
+          name: default
+          endpoint:
+            endpoint: store-pod-1.cvhome.lcl
+            type: EXTERNAL

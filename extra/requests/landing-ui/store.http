@@ -1,0 +1,5 @@
+# curl '{{LANDING_UI_URL}}/merchant/api/v1/store/65f023632bc46470c104b76f?store=65f023632bc46470c104b76f&lang=en'
+GET {{LANDING_UI_URL}}/merchant/api/v1/store/65f023632bc46470c104b76f?store=65f023632bc46470c104b76f&lang=en
+
+###
+

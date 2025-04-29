@@ -1,0 +1,34 @@
+<div class="header-container">
+  <div>
+    <a (click)="toggleSidebar()" class="sidebar-toggle" href="#">
+      <nb-icon icon="bars"/>
+    </a>
+    <a (click)="navigateHome()" class="logo" href="">store-ui</a>
+  </div>
+</div>
+
+<div class="header-container">
+  <nb-select (selectedChange)="changed({id:$event})" [selected]="selectedStoreId"
+             placeholder="Select Store" class="m-1" size="medium" shape="semi-round">
+    <nb-option *ngFor="let s of stores" [value]="s.id.id">{{ s.name }}</nb-option>
+  </nb-select>
+
+  <nb-select (selectedChange)="changeLanguage($event)" [selected]="currentLanguage" status="primary" class="m-1" size="medium"
+             shape="semi-round">
+    <nb-option *ngFor="let l of languages" [value]="l"> {{ l }}</nb-option>
+  </nb-select>
+  <nb-actions size="small">
+    <nb-action>
+      <nb-search type="rotate-layout"></nb-search>
+    </nb-action>
+    <nb-action icon="inbox"></nb-action>
+    <nb-action icon="bell"></nb-action>
+    <nb-action>
+      <nb-user [name]="user?.preferred_username"
+               [nbContextMenu]="userMenu"
+               [onlyPicture]="userPictureOnly"
+               [picture]="user?.picture">
+      </nb-user>
+    </nb-action>
+  </nb-actions>
+</div>

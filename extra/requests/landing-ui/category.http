@@ -1,0 +1,15 @@
+# curl '{{LANDING_UI_URL}}/catalog/api/v1/category?count=20&page=0&store=65f023632bc46470c104b76f&lang=en'
+GET {{LANDING_UI_URL}}/catalog/api/v1/category?count=20&page=0&store=65f023632bc46470c104b76f&lang=en
+
+###
+
+# curl '{{LANDING_UI_URL}}/catalog/api/v1/category/phones?store=65f023632bc46470c104b76f&lang=en'
+GET {{LANDING_UI_URL}}/catalog/api/v1/category/phones?store=65f023632bc46470c104b76f&lang=en
+
+###
+
+# curl '{{LANDING_UI_URL}}/catalog/api/v1/category/1/manufacturer?store=65f023632bc46470c104b76f&lang=en'
+GET {{LANDING_UI_URL}}/catalog/api/v1/category/1/manufacturer?store=65f023632bc46470c104b76f&lang=en
+
+###
+

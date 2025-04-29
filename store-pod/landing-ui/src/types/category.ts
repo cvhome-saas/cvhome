@@ -1,3 +1,5 @@
+import {Description} from "@/types/description";
+
 export interface CategoryPage {
     totalPages: number
     number: number
@@ -21,14 +23,3 @@ export interface Category {
     children: Category[]
 }
 
-export interface Description {
-    id: number
-    language: string
-    name: string
-    description: string
-    friendlyUrl: string
-    keyWords: any
-    highlights: string
-    metaDescription: string
-    title: string
-}

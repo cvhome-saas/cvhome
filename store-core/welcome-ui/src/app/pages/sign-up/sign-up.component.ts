@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
 import {ShapeComponent} from "../../components/shape/shape.component";
 import {SignUpFormComponent} from "../../components/sign-up-form/sign-up-form.component";
 

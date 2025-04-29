@@ -4,8 +4,8 @@
       <div class="col-12 col-md-10 col-lg-8">
         <!-- Section Heading -->
         <div class="section-heading text-center">
-          <h2 class="text-capitalize">{{title}}</h2>
-          <p class="d-none d-sm-block mt-4">{{d1}}</p>
+          <h2 class="text-capitalize">{{ title }}</h2>
+          <p class="d-none d-sm-block mt-4">{{ d1 }}</p>
         </div>
       </div>
     </div>
@@ -13,14 +13,14 @@
       <div class="col-12 col-md-5">
         <!-- Contact Us -->
         <div class="contact-us">
-          <p class="mb-3">{{d2}}</p>
+          <p class="mb-3">{{ d2 }}</p>
           <ul>
             <li class="py-2">
               <a class="media" href="#">
                 <div class="social-icon mr-3">
                   <i class="fas fa-home"></i>
                 </div>
-                <span class="media-body align-self-center">{{address}}</span>
+                <span class="media-body align-self-center">{{ address }}</span>
               </a>
             </li>
             <li class="py-2">
@@ -28,7 +28,7 @@
                 <div class="social-icon mr-3">
                   <i class="fas fa-phone-alt"></i>
                 </div>
-                <span class="media-body align-self-center">{{phone}}</span>
+                <span class="media-body align-self-center">{{ phone }}</span>
               </a>
             </li>
             <li class="py-2">
@@ -36,7 +36,7 @@
                 <div class="social-icon mr-3">
                   <i class="fas fa-envelope"></i>
                 </div>
-                <span class="media-body align-self-center">{{email}}</span>
+                <span class="media-body align-self-center">{{ email }}</span>
               </a>
             </li>
           </ul>
@@ -50,22 +50,28 @@
             <div class="row">
               <div class="col-12">
                 <div class="form-group">
-                  <input type="text" formControlName="name" class="form-control" name="name" placeholder="Name" required="required">
+                  <input type="text" formControlName="name" class="form-control" name="name" placeholder="Name"
+                         required="required">
                 </div>
                 <div class="form-group">
-                  <input type="email" formControlName="email" class="form-control" name="email" placeholder="Email" required="required">
+                  <input type="email" formControlName="email" class="form-control" name="email" placeholder="Email"
+                         required="required">
                 </div>
                 <div class="form-group">
-                  <input type="text" formControlName="subject" class="form-control" name="subject" placeholder="Subject" required="required">
+                  <input type="text" formControlName="subject" class="form-control" name="subject" placeholder="Subject"
+                         required="required">
                 </div>
               </div>
               <div class="col-12">
                 <div class="form-group">
-                  <textarea formControlName="message" class="form-control" name="message" placeholder="Message" required="required"></textarea>
+                  <textarea formControlName="message" class="form-control" name="message" placeholder="Message"
+                            required="required"></textarea>
                 </div>
               </div>
               <div class="col-12">
-                <button type="button" (click)="contact()" class="btn btn-lg btn-block mt-3"><span class="text-white pr-3"><i class="fas fa-paper-plane"></i></span>Send Message</button>
+                <button type="button" (click)="contact()" class="btn btn-lg btn-block mt-3"><span
+                  class="text-white pr-3"><i class="fas fa-paper-plane"></i></span>Send Message
+                </button>
               </div>
             </div>
           </form>

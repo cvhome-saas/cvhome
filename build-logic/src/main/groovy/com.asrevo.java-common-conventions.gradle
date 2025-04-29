@@ -10,9 +10,9 @@ plugins {
 }
 
 java {
-    sourceCompatibility = '21'
+    sourceCompatibility = '23'
     toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+        languageVersion = JavaLanguageVersion.of(23)
     }
 }
 

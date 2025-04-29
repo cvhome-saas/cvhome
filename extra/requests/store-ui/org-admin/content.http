@@ -1,0 +1,36 @@
+# curl 'GET {{STORE-UI_URL}}/store-pod-gateway/content/api/v1/private/content/pages?lang=en&store=65f023632bc46470c104b76f&count=10&page=0'
+GET {{STORE-UI_URL}}/store-pod-gateway/content/api/v1/private/content/pages?lang=en&store=65f023632bc46470c104b76f&count=10&page=0
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
+
+###
+
+# curl 'GET {{STORE-UI_URL}}/store-pod-gateway/content/api/v1/private/content/boxes?store=65f023632bc46470c104b76f&lang=_all&count=10&page=0'
+GET {{STORE-UI_URL}}/store-pod-gateway/content/api/v1/private/content/boxes?store=65f023632bc46470c104b76f&lang=_all&count=10&page=0
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
+
+###
+
+# curl 'GET {{STORE-UI_URL}}/store-pod-gateway/content/api/v1/content/images?store=65f023632bc46470c104b76f'
+GET {{STORE-UI_URL}}/store-pod-gateway/content/api/v1/content/images?store=65f023632bc46470c104b76f
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
+
+###
+
+# curl 'GET {{STORE-UI_URL}}/store-pod-gateway/content/api/v1/store/languages?store=65f023632bc46470c104b76f'
+GET {{STORE-UI_URL}}/store-pod-gateway/merchant/api/v1/store/languages?store=65f023632bc46470c104b76f
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
+
+###
+
+# curl 'GET {{STORE-UI_URL}}/store-pod-gateway/content/api/v1/content/pages/aboutus?lang=_all&store=65f023632bc46470c104b76f'
+GET {{STORE-UI_URL}}/store-pod-gateway/content/api/v1/content/pages/aboutus?lang=_all&store=65f023632bc46470c104b76f
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
+
+###
+
+# curl 'GET {{STORE-UI_URL}}/store-pod-gateway/content/api/v1/private/content/boxes/agreement?store=65f023632bc46470c104b76f&lang=_all'
+GET {{STORE-UI_URL}}/store-pod-gateway/content/api/v1/private/content/boxes/agreement?store=65f023632bc46470c104b76f&lang=_all
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
+
+###
+

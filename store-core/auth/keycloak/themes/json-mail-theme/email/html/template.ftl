@@ -1,7 +1,7 @@
 <#macro emailLayout>
-<html>
-<body>
+    <html>
+    <body>
     <#nested>
-</body>
-</html>
+    </body>
+    </html>
 </#macro>

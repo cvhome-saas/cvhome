@@ -9,7 +9,7 @@ import {UserFormComponent} from './user-form/user-form.component';
 import {CreateNewUserComponent} from './create-new-user/create-new-user.component';
 import {NbDialogModule} from '@nebular/theme';
 import {UserDetailsComponent} from './user-details/user-details.component';
-import {SharedModule} from "../shared/shared.module";
+import {SharedModule} from "../../shared/shared.module";
 import {UserStatusComponent} from "./users-list/user-status.component";
 
 // import { EqualValidator } from '../shared/validation/equal-validator';

@@ -1,17 +1,32 @@
 import {Product, ProductGroupPage} from "@/types/product-groups";
 import {storeBaseServiceUrl, StoreContext} from "@/types/store-context";
+import {handleResponse} from "@/utils/http-utils";
 
 export class ProductService {
-    public static getFeaturedItemsProductGroup = async (storeContext: StoreContext): Promise<ProductGroupPage> => {
-        return fetch(`${storeBaseServiceUrl(storeContext)}/api/v1/products/group/FEATURED_ITEMS?store=${storeContext.store}&lang=${storeContext.local}`)
-            .then((it: Response) => {
-                return it.json() as unknown as ProductGroupPage
-            });
+
+    public static getHomePageProductGroup = async (storeContext: StoreContext): Promise<ProductGroupPage | undefined> => {
+        return this.getProductByGroup(storeContext, 'HOME_PAGE');
     }
-    public static getProductByFriendlyUrl = async (storeContext: StoreContext, friendlyUrl: string): Promise<Product> => {
-        return fetch(`${storeBaseServiceUrl(storeContext)}/api/v2/product/name/${friendlyUrl}?store=${storeContext.store}&lang=${storeContext.local}`)
-            .then((it: Response) => {
-                return it.json() as unknown as Product
-            });
+
+    public static getRecommendedProductGroup = async (storeContext: StoreContext): Promise<ProductGroupPage | undefined> => {
+        return this.getProductByGroup(storeContext, 'RECOMMENDED');
+    }
+
+    public static getNewlyAddedProductGroup = async (storeContext: StoreContext): Promise<ProductGroupPage | undefined> => {
+        return this.getProductByGroup(storeContext, 'NEWLY_ADDED');
+    }
+
+    public static getFeaturedItemsProductGroup = async (storeContext: StoreContext): Promise<ProductGroupPage | undefined> => {
+        return this.getProductByGroup(storeContext, 'FEATURED_ITEMS');
+    }
+
+    public static getProductByGroup = async (storeContext: StoreContext, group: string): Promise<ProductGroupPage | undefined> => {
+        return fetch(`${storeBaseServiceUrl('catalog')}/api/v1/products/group/${group}?store=${storeContext.store}&lang=${storeContext.locale}`)
+            .then(it => handleResponse(it))
+    }
+
+    public static getProductByUrl = async (url: string, storeContext: StoreContext): Promise<Product | undefined> => {
+        return fetch(`${storeBaseServiceUrl('catalog')}/api/v2/product/name/${url}?store=${storeContext.store}&lang=${storeContext.locale}`)
+            .then(it => handleResponse(it))
     }
 }

@@ -1,0 +1,56 @@
+### get token from test application
+POST http://localhost:8120/api/v1/test/sign
+Content-Type: application/json
+
+{
+  "iat": 1711619569,
+  "auth_time": 1711618828,
+  "jti": "52596bdf-9b1a-478b-8116-0bc4571399cc",
+  "iss": "http://auth.gateway.com:9999/realms/cvhome",
+  "aud": "account",
+  "sub": "3dea29fd-f6b2-48b1-8231-f4b5f1c68714",
+  "typ": "Bearer",
+  "azp": "web-app",
+  "nonce": "CFetJG7x-JJ26dNX6DbX-aRtxmIR0fJUkK90EY0ia40",
+  "session_state": "210caafe-2333-4f9e-8fa1-837f02d1affd",
+  "acr": "0",
+  "allowed-origins": [
+    "https://gateway.com:8443"
+  ],
+  "realm_access": {
+    "roles": [
+      "ROLE_USER",
+      "ROLE_STORE_ADMIN",
+      "offline_access",
+      "uma_authorization",
+      "default-roles-cvhome"
+    ]
+  },
+  "resource_access": {
+    "account": {
+      "roles": [
+        "manage-account",
+        "manage-account-links",
+        "view-profile"
+      ]
+    }
+  },
+  "scope": "openid profile org email",
+  "sid": "210caafe-2333-4f9e-8fa1-837f02d1affd",
+  "email_verified": false,
+  "org": "d1952c95-312e-4bb6-9a2d-b703d031276f",
+  "preferred_username": "revo",
+  "store": "65f020632bc46470c104b76f"
+}
+
+> {%
+    client.global.set("access_token", response.body.access_token)
+%}
+
+
+### update category
+POST http://store-ui.gateway.com:8120/api/v1/private/product/5/category/6?store=65f020632bc46470c104b76f
+Authorization: Bearer {{access_token}}
+Content-Type: application/json
+
+{}

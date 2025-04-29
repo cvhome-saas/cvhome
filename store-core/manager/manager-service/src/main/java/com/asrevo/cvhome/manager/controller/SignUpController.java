@@ -1,8 +1,9 @@
 package com.asrevo.cvhome.manager.controller;
 
-import com.asrevo.cvhome.keycloak.domain.user.PersistableUser;
+import com.asrevo.cvhome.commons.annotation.ConditionalOnApiStatus;
 import com.asrevo.cvhome.keycloak.domain.user.ReadableUser;
-import com.asrevo.cvhome.keycloak.service.UserAccountService;
+import com.asrevo.cvhome.manager.dto.CreateOrgRequest;
+import com.asrevo.cvhome.manager.service.SignupService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,12 +17,12 @@ import reactor.core.publisher.Mono;
 @AllArgsConstructor
 @Slf4j
 public class SignUpController {
-    private final UserAccountService userAccountService;
+    private final SignupService signupService;
 
     @PostMapping("public/create")
-    public Mono<ReadableUser> create(@RequestBody PersistableUser user) {
-        user.setActive(true);
-        user.setUserName(user.getEmailAddress());
-        return Mono.just(userAccountService.createOrgUser(user));
+    @ConditionalOnApiStatus
+    public Mono<ReadableUser> create(@RequestBody CreateOrgRequest request) {
+        return Mono.just(signupService.createOrgUser(request));
     }
+
 }

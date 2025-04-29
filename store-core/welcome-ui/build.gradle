@@ -7,13 +7,13 @@ task "clean" {
 
 task "build" {
   doLast {
-    exec {
+    project.exec {
       workingDir '.'
       commandLine "npm", "i"
     }
-    exec {
+    project.exec {
       workingDir '.'
-      commandLine "npm", "run", "build","--","--configuration","production"
+      commandLine "npm", "run", "build", "--", "--configuration", "production"
     }
   }
 }
@@ -40,7 +40,7 @@ abstract class BootBuildImageTask extends DefaultTask {
   void bootBuildImage() {
     project.exec {
       workingDir '.'
-      commandLine createBuildCmd("store-core/${project.name}",project.version as String) as List<String>
+      commandLine createBuildCmd("store-core/${project.name}", project.version as String) as List<String>
     }
     if (publishImage) {
       project.exec {
@@ -50,18 +50,25 @@ abstract class BootBuildImageTask extends DefaultTask {
     }
   }
 
-  static String createImageName(String repo) {
+  static String createImageName(String repo, String version) {
     String registry = System.getenv("REGISTRY")
-    return registry ? "${registry}/${repo}" : repo
+    return registry ? "${registry}/${repo}:${version}" : "${repo}:${version}"
+  }
+
+  static String createBaseImageName(String repo) {
+    String registry = System.getenv("REGISTRY")
+    return registry ? "${registry}/${repo}" : "${repo}}"
   }
 
   static List<String> createImageTags(String repo, String version) {
-    String image = createImageName(repo)
-    return ["${image}:latest", "${image}:${version}"]
+    if (!version.contains("-SNAPSHOT"))
+      return [createImageName(repo, "latest")]
+    else
+      return [];
   }
 
   static List<String> createBuildCmd(String repo, String version) {
-    String image = createImageName(repo)
+    String image = createImageName(repo, version)
     List<String> tags = createImageTags(repo, version)
     List<String> commands = ["docker", "build", "-t", image]
     tags.forEach {
@@ -73,7 +80,7 @@ abstract class BootBuildImageTask extends DefaultTask {
   }
 
   static List<String> createPushCmd(String repo) {
-    String image = createImageName(repo)
+    String image = createBaseImageName(repo)
     return ["docker", "push", image, "--all-tags"]
   }
 

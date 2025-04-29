@@ -1,16 +1,16 @@
 import {Component, OnInit} from '@angular/core';
 import {FormArray, FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {ActivatedRoute, Router} from '@angular/router';
-import {ConfigService} from '../../shared/services/config.service';
 import {StoreService} from '../services/store.service';
 import {NbToastrService} from "@nebular/theme";
 import {TranslateService} from '@ngx-translate/core';
-import {StorageService} from '../../shared/services/storage.service';
 import {forkJoin} from 'rxjs';
+import {ErrorService} from "../../../shared/services/error.service";
 
 
 @Component({
   selector: 'ngx-store-landing-page',
+  standalone: false,
   templateUrl: './store-landing-page.component.html',
   styleUrls: ['./store-landing-page.component.scss']
 })
@@ -39,23 +39,34 @@ export class StoreLandingPageComponent implements OnInit {
     },
     {
       id: '3',
+      title: 'Store Social Links',
+      key: 'COMPONENTS.STORE_SOCIAL_LINKS',
+      link: 'store-social-links'
+    },
+    {
+      id: '4',
+      title: 'Store Slider Images',
+      key: 'COMPONENTS.STORE_SLIDER_IMAGES',
+      link: 'store-slider-images'
+    },
+    {
+      id: '5',
       title: 'Store details',
       key: 'COMPONENTS.STORE_DETAILS',
       link: 'store'
     }
   ];
-  loading = false;
+  loader = false;
   page;
 
   constructor(
     private fb: FormBuilder,
-    private configService: ConfigService,
     private storeService: StoreService,
     private toastr: NbToastrService,
     private translate: TranslateService,
-    private storageService: StorageService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
+    private errorService: ErrorService
   ) {
   }
 
@@ -69,9 +80,9 @@ export class StoreLandingPageComponent implements OnInit {
 
   ngOnInit() {
     this.createForm();
-    const code = this.activatedRoute.snapshot.paramMap.get('code');
+    const store = this.activatedRoute.snapshot.paramMap.get('code');
 
-    forkJoin([this.storeService.getPageContent('LANDING_PAGE', code), this.storeService.getStore(code)])
+    forkJoin([this.storeService.getPageContent('LANDING_PAGE', store), this.storeService.getStore(store)])
       .subscribe(([res, st]) => {
         if (!res.status) {//404 should not rais an error
           this.page = res;
@@ -80,11 +91,13 @@ export class StoreLandingPageComponent implements OnInit {
         this.languages = this.store.supportedLanguages;
         this.createForm();
         this.fillForm();
+      }, err => {
+        this.errorService.error('ERROR.SYSTEM_ERROR', err);
       });
   }
 
   route(link) {
-    this.router.navigate(['pages/store-management/' + link + "/", this.store.code]);
+    this.router.navigate(['pages/store-management/' + link + "/", this.store.id]);
   }
 
   addFormArray() {
@@ -137,16 +150,20 @@ export class StoreLandingPageComponent implements OnInit {
     this.form.patchValue({code: 'LANDING_PAGE'});
     console.log(JSON.stringify(this.form.value));
     if (this.page && this.page.id) {
-      this.storeService.updatePageContent(this.store.code, this.page.id, this.form.value)
+      this.storeService.updatePageContent(this.store.id, this.page.id, this.form.value)
         .subscribe(res => {
           this.toastr.success(this.translate.instant('STORE_LANDING.PAGE_UPDATED'));
+        }, err => {
+          this.errorService.error('ERROR.SYSTEM_ERROR', err);
         });
     } else {
       JSON.stringify(this.form.value);
-      this.storeService.createPageContent(this.form.value, this.store.code)
+      this.storeService.createPageContent(this.form.value, this.store.id)
         .subscribe(res => {
           this.toastr.success(this.translate.instant('STORE_LANDING.PAGE_ADDED'));
-          this.router.navigate(['pages/store-management/store/', this.store.code]);
+          this.router.navigate(['pages/store-management/store/', this.store.id]);
+        }, err => {
+          this.errorService.error('ERROR.SYSTEM_ERROR', err);
         });
     }
   }

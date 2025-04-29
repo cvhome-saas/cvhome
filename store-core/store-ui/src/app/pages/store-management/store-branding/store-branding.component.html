@@ -1,24 +1,24 @@
-<nb-card class="page-card">
-  <div *ngIf="loading" [nbSpinner]="loading" class="loading-block" nbSpinnerSize="large" nbSpinnerStatus="primary">
-  </div>
-  <nb-card-body *ngIf="!loading">
-    <div class="inner_pages_legacy">
-      <nb-card-header class="main_header">
-        <h1 class="page_title">{{ 'STORE.STORE_INFORMATION' | translate }}</h1>
-        <div class="content_spacing">
-          <nb-select [(selected)]="selectedItem" outline shape="rectangle">
-            <nb-option (click)="route(item.link)" *ngFor="let item of sidemenuLinks" [value]="item.id">{{ item.title }}
-            </nb-option>
-          </nb-select>
-        </div>
-
-        <div class="content_spacing">
-
-        </div>
-
-      </nb-card-header>
-      <ngx-store-branding-logo [store]="store" *ngIf="store"/>
-      <ngx-store-branding-banner [store]="store" *ngIf="store"/>
+<nb-card status="basic" accent="info">
+  <nb-card-header>
+    <div class="row">
+      <h1 class="page_title">{{ 'STORE.STORE_INFORMATION' | translate }}</h1>
     </div>
+
+    <div class="row">
+      <div class="col">
+      </div>
+      <div class="col col-lg-2">
+        <nb-select fullWidth [(selected)]="selectedItem" outline shape="rectangle">
+          <nb-option (click)="route(item.link)" *ngFor="let item of sidemenuLinks" [value]="item.id">{{ item.title }}
+          </nb-option>
+        </nb-select>
+      </div>
+      <div class="col col-lg-2">
+      </div>
+    </div>
+  </nb-card-header>
+  <nb-card-body>
+    <ngx-store-branding-logo [store]="store" *ngIf="store"/>
+    <ngx-store-branding-banner [store]="store" *ngIf="store"/>
   </nb-card-body>
 </nb-card>
