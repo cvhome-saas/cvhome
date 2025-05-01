@@ -71,7 +71,7 @@ services:
       - postgres
       - mailcatcher
   store-pod-saas-gateway:
-    image: caddy:2.8.4
+    image: ashraf1abdelrasool/saas-gateway:sha-7ed71e3
     network_mode: "host"
     ports:
       - "80:80"
@@ -80,5 +80,6 @@ services:
     environment:
       STORE_POD_GATEWAY: http://store-pod-1.gateway.com:8100
       ASK_TLS_URL: http://gateway.com:8000/manager/api/v1/router/public/ask-for-tls
+      DOMAIN_LOOKUP_URL: http://gateway.com:8000/manager/api/v1/router/public/lookup-by-domain
     volumes:
       - ./store-pod/gateway/store-pod-saas-gateway-service/Caddyfile:/etc/caddy/Caddyfile
