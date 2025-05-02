@@ -4,9 +4,9 @@ Content-Type: application/json
 
 {
   "user": {
-    "firstName": "ashraf",
-    "lastName": "ashraf",
-    "emailAddress": "new-user@mail.com",
+    "firstName": "ash1raf",
+    "lastName": "ashra1f",
+    "emailAddress": "ne10s0w-user@mail.com",
     "password": "admin"
   },
   "subscriptionPlan": "FREE"

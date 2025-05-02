@@ -4,6 +4,7 @@ import static com.asrevo.cvhome.s2s.utils.WebClientsUtils.build;
 
 import com.asrevo.cvhome.commons.domain.ServiceDomain;
 import com.asrevo.cvhome.s2s.model.ServiceDomainProperties;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -24,14 +25,26 @@ public class WebClientBuilder {
     }
 
     public <T> T buildClient(String serviceName, Class<T> tClass) {
+        String url = getServiceUrl(serviceDomainProperties, environment, serviceName);
+        return build(defaultMicroServiceBuilder, url, tClass);
+    }
+
+    public <T> T buildClient(String serviceName, Class<T> tClass, ObjectMapper objectMapper) {
+        String url = getServiceUrl(serviceDomainProperties, environment, serviceName);
+        return build(defaultMicroServiceBuilder, url, tClass, objectMapper);
+    }
+
+    public static String getServiceUrl(
+            ServiceDomainProperties serviceDomainProperties,
+            Environment environment,
+            String serviceName) {
         ServiceDomain requestedService = serviceDomainProperties.getService(serviceName);
         ServiceDomain currentService =
                 serviceDomainProperties.getService(
                         environment.getProperty("spring.application.name"));
-
         if (requestedService.namespace().equals(currentService.namespace())) {
             log.info("will create internal client for {}", serviceName);
-            return buildInternalClient(serviceName, tClass);
+            return "lb://" + serviceName;
         } else {
             ServiceDomain gateway =
                     serviceDomainProperties.getService(requestedService.gatewayServiceName());
@@ -40,8 +53,7 @@ public class WebClientBuilder {
                     serviceName,
                     gateway.name(),
                     gateway.namespace());
-            return buildInternalClient(
-                    gateway.name() + "." + gateway.namespace() + "/" + serviceName, tClass);
+            return "lb://" + gateway.name() + "." + gateway.namespace() + "/" + serviceName;
         }
     }
 
