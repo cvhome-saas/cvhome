@@ -14,7 +14,7 @@ export default async function
 
     const p = await params;
     p.storeContext = await extractSsrContext();
-    const store: Store | undefined = await StoreService.getStore(p.storeContext);
+    const store: Store | undefined = p.storeContext.store != "" ? await StoreService.getStore(p.storeContext) : undefined;
     if (store) {
         p.store = store;
         return <StoreLayout p={p} children={children}/>

@@ -10,11 +10,16 @@ import com.asrevo.cvhome.manager.dto.StoreDomainList;
 import com.asrevo.cvhome.manager.service.InternalStoreService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
+import java.net.URI;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -27,9 +32,19 @@ public class RouterController {
     @GetMapping("public/ask-for-tls")
     @ConditionalOnApiStatus
     public ResponseEntity<Object> ask(Domain domain) {
+        log.info("tls ask: {}", domain);
         return Optional.ofNullable(internalStoreService.getReferenceByDomain(domain))
                 .map(it -> ResponseEntity.ok().build())
                 .orElseGet(() -> ResponseEntity.badRequest().build());
+    }
+
+    @GetMapping("public/lookup-by-domain")
+    @ConditionalOnApiStatus
+    public Map<String, String> getLookupHeadersByDomain(Domain domain) {
+        log.info("header lookup: {}", domain);
+        return Optional.ofNullable(internalStoreService.getReferenceByDomain(domain))
+                .map(it -> Map.of("Store-Id",it.id().toString()))
+                .orElseGet(() -> Map.of("",""));
     }
 
     @GetMapping("store-id-by-domain")

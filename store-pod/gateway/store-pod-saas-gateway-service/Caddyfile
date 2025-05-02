@@ -1,6 +1,6 @@
 {
-    debug
-    admin 0.0.0.0:2019
+	debug
+	admin 0.0.0.0:2019
 
 	log {
 		format json
@@ -9,14 +9,17 @@
 
 	on_demand_tls {
 		ask {$ASK_TLS_URL}
-
-		burst 5
-		interval 2m
 	}
 }
 
 http:// {
-	reverse_proxy {$STORE_POD_GATEWAY} {
+	route {
+		domain_lookup {
+			lookup_url {$DOMAIN_LOOKUP_URL}
+			cache_ttl  5m
+		}
+
+		reverse_proxy {$STORE_POD_GATEWAY}
 	}
 }
 
@@ -25,6 +28,12 @@ https:// {
 	tls {
 		on_demand
 	}
-	reverse_proxy {$STORE_POD_GATEWAY} {
+
+	route {
+		domain_lookup {
+			lookup_url {$DOMAIN_LOOKUP_URL}
+		}
+
+		reverse_proxy {$STORE_POD_GATEWAY}
 	}
 }
