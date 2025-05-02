@@ -20,6 +20,11 @@ export class ProductService {
         return this.getProductByGroup(storeContext, 'FEATURED_ITEMS');
     }
 
+    public static getRelatedProductGroup = async (storeContext: StoreContext, product: number): Promise<ProductGroupPage | undefined> => {
+        return fetch(`${storeBaseServiceUrl('catalog')}/api/v1/products/${product}/related?store=${storeContext.store}&lang=${storeContext.locale}`)
+            .then(it => handleResponse(it))
+    }
+
     public static getProductByGroup = async (storeContext: StoreContext, group: string): Promise<ProductGroupPage | undefined> => {
         return fetch(`${storeBaseServiceUrl('catalog')}/api/v1/products/group/${group}?store=${storeContext.store}&lang=${storeContext.locale}`)
             .then(it => handleResponse(it))

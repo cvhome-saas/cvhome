@@ -12,7 +12,8 @@
       "ADD_TO_CART": "Добавить в корзину",
       "PRODUCT_DESCRIPTION": "Описание продукта",
       "SUCCESSFULLY_ADDED_PRODUCT_TO_CART": "Товар успешно добавлен в корзину!",
-      "FAILED_TO_ADD_PRODUCT_TO_CART": "Не удалось добавить товар в корзину."
+      "FAILED_TO_ADD_PRODUCT_TO_CART": "Не удалось добавить товар в корзину.",
+      "RELATED_PRODUCTS": "Сопутствующие товары"
     },
     "CHECKOUT": {
       "TITLE": "Оформление заказа",

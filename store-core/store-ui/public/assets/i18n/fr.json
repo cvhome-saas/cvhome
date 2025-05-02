@@ -68,6 +68,7 @@
     "LIST_INVENTORY": "Liste de l'inventaire",
     "PRODUCT_TO_CATEGORY": "Produit à catégorie",
     "PRODUCT_TO_CATEGORY_ADD": "Ajouter une catégorie",
+    "PRODUCT_RELATED": "Produit connexe",
     "PRODUCT_ATTRIBUTES": "Attributs produits",
     "CREATE_PRODUCT_ATTRIBUTES": "Ajouter une option ou un attribut produit",
     "MANAGE_INVENTORY": "Gérer l'inventaire",

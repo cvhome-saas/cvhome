@@ -7,6 +7,7 @@ import {ProductCreationComponent} from '../product-creation/product-creation.com
 import {ProductDetailsComponent} from "../product-details/product-details.component";
 import {ProductsImagesComponent} from "../products-images/products-images.component";
 import {ProductToCategoryComponent} from "../product-to-category/product-to-category.component";
+import {ProductRelatedComponent} from "../product-related/product-related.component";
 
 
 const routes: Routes = [
@@ -49,6 +50,10 @@ const routes: Routes = [
           {
             path: 'category',
             component: ProductToCategoryComponent,
+          },
+          {
+            path: 'related',
+            component: ProductRelatedComponent,
           },
         ],
       },

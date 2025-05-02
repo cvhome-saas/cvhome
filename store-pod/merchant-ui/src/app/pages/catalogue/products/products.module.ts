@@ -11,6 +11,7 @@ import {ProductsImagesComponent} from './products-images/products-images.compone
 import {NbDialogModule} from '@nebular/theme';
 import {SharedModule} from "../../../shared/shared.module";
 import {ProductDetailsComponent} from "./product-details/product-details.component";
+import {ProductRelatedComponent} from "./product-related/product-related.component";
 
 @NgModule({
 
@@ -21,6 +22,7 @@ import {ProductDetailsComponent} from "./product-details/product-details.compone
     ProductFormComponent,
     ProductDetailsComponent,
     ProductToCategoryComponent,
+    ProductRelatedComponent,
     ProductsImagesComponent,
   ],
   imports: [

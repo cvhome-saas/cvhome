@@ -68,6 +68,7 @@
     "LIST_INVENTORY": "List inventory",
     "PRODUCT_TO_CATEGORY": "Product to category",
     "PRODUCT_TO_CATEGORY_ADD": "Add category",
+    "PRODUCT_RELATED": "Related Product",
     "PRODUCT_ATTRIBUTES": "Product attributes",
     "CREATE_PRODUCT_ATTRIBUTES": "Create product option / attribute",
     "MANAGE_INVENTORY": "Manage inventory",

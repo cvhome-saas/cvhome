@@ -65,7 +65,10 @@ export class ProductFormComponent implements OnInit {
       {
         title: this.translate.instant('COMPONENTS.PRODUCT_TO_CATEGORY'),
         route: 'category',
-
+      },
+      {
+        title: this.translate.instant('COMPONENTS.PRODUCT_RELATED'),
+        route: 'related',
       },
       {
         title: this.translate.instant('COMPONENTS.OPTIONS_CONFIG'),

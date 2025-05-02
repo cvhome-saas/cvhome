@@ -68,6 +68,7 @@ export class ProductsImagesComponent implements OnInit, AfterViewInit {
     this.loading = true;
     this.productImageService.getImages(this.store, this.uniqueCode)
       .subscribe(res => {
+        console.log(res)
         this.images = res;
         this.loading = false;
         this.loaded = true;

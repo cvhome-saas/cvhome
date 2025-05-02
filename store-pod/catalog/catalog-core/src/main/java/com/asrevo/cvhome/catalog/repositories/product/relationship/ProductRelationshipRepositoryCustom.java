@@ -21,5 +21,12 @@ public interface ProductRelationshipRepositoryCustom {
     List<ProductRelationship> listByProducts(Product product);
 
     List<ProductRelationship> getByTypeAndRelatedProduct(
-            StoreMerchantId store, String type, Product product);
+            StoreMerchantId store, String type, Product product, LanguageCode language);
+
+    List<ProductRelationship> getByTypeAndRelatedProduct(
+            StoreMerchantId store,
+            String type,
+            Product product,
+            Product related,
+            LanguageCode language);
 }
