@@ -30,7 +30,7 @@ export default async function Page({params}: { params: LayoutParams }) {
                         </Link>
                     </div>
                     {
-                        params.contents && params.contents.items && params.contents.items.length > 0 &&
+                        params.contents && params.contents.content && params.contents.content.length > 0 &&
                         <div className={`grid grid-cols-2 gap-8 sm:gap-6 sm:grid-cols-3`}>
                             <div></div>
                             <div></div>
@@ -40,7 +40,7 @@ export default async function Page({params}: { params: LayoutParams }) {
                                 </h2>
                                 <ul className="text-neutral dark:text-neutral font-medium">
                                     {
-                                        params.contents.items
+                                        params.contents.content
                                             .filter(it => !it.linkToMenu)
                                             .filter(it => it.visible)
                                             .filter(it => it.description)

@@ -121,10 +121,10 @@ export class ProductToCategoryComponent implements OnInit, AfterViewInit {
       .subscribe(([p$, c$]) => {
         this.selectedItems = [];
         this.categories = [];
-        p$.categories.forEach((data) => {
+        p$.content.forEach((data) => {
           this.selectedItems.push(data.id)
         });
-        c$.categories.forEach((value) => {
+        c$.content.forEach((value) => {
           this.categories.push({'id': value.id, 'name': value.description.name})
         })
         this.loading = false;

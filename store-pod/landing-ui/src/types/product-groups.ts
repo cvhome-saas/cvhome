@@ -5,7 +5,7 @@ export interface ProductGroupPage {
     number: number
     recordsTotal: number
     recordsFiltered: number
-    products: Product[]
+    content: Product[]
     productGroup: ProductGroup
 }
 

@@ -99,8 +99,8 @@ export class CategoryFormComponent implements OnInit {
   init() {
     this.categoryService.getListOfCategories(this.params)
       .subscribe(res => {
-        res.categories.push({id: 0, code: 'root', children: []});
-        res.categories.forEach((el) => {
+        res.content.push({id: 0, code: 'root', children: []});
+        res.content.forEach((el) => {
           this.getChildren(el);
         });
         this.roots.sort((a, b) => {

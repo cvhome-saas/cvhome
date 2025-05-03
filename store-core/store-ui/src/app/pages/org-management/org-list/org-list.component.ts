@@ -38,16 +38,6 @@ export class OrgListComponent extends BaseTable<any> implements OnInit {
       return of();
     }
     return this.orgService.getListOfOrg(request)
-      .pipe(map(it => {
-        const mappedX = {
-          content: it.content,
-          totalPages: it.totalPages,
-          totalElements: it.totalElements,
-          size: it.numberOfElements,
-          pageNumber: request.page
-        };
-        return mappedX;
-      }));
   }
 
   onEdit(row) {

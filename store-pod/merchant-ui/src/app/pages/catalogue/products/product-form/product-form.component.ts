@@ -398,11 +398,11 @@ export class ProductFormComponent implements OnInit {
     forkJoin([manufacture, types, config])
       .subscribe(([manufacturers, productTypes, languages]) => {
 
-        manufacturers.manufacturers.forEach((option) => {
+        manufacturers.content.forEach((option) => {
           this.manufacturers.push({value: option.code, label: option.code});
         });
 
-        productTypes.list.forEach((option) => {
+        productTypes.content.forEach((option) => {
           this.productTypes.push({value: option.code, label: option.code});
         });
 

@@ -62,8 +62,8 @@ export class ProductRelatedComponent implements OnInit, AfterViewInit {
 
   getProductByCode() {
     this.productGroupsService.getRelatedProduct(this.product, this.params)
-      .subscribe(res => {
-        this.rows = res.products;
+      .subscribe(it => {
+        this.rows = it.content;
         this.page.totalPages = 1
         this.page.totalElements = this.rows.length
         this.page.size = this.rows.length

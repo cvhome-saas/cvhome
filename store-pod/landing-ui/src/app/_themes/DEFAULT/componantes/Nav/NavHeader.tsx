@@ -78,8 +78,8 @@ export const NavHeader = ({params}: { params: LayoutParams }) => {
                         {t('HOME_TITLE')}
                     </Link>
 
-                    {params.categories && params.categories.categories &&
-                        params.categories.categories.filter(it => it.description)
+                    {params.categories && params.categories.content &&
+                        params.categories.content.filter(it => it.description)
                             .map((it) => {
                                 if (it.children && it.children.length > 0) {
                                     return (<Popover className="relative" key={it.code}>
@@ -131,8 +131,8 @@ export const NavHeader = ({params}: { params: LayoutParams }) => {
 
                             })}
 
-                    {params.contents && params.contents.items &&
-                        params.contents.items
+                    {params.contents && params.contents.content &&
+                        params.contents.content
                             .filter(it => it.linkToMenu)
                             .filter(it => it.visible)
                             .filter(it => it.description)
@@ -199,8 +199,8 @@ export const NavHeader = ({params}: { params: LayoutParams }) => {
                                 </Link>
 
                                 {
-                                    params.categories && params.categories.categories &&
-                                    params.categories.categories
+                                    params.categories && params.categories.content &&
+                                    params.categories.content
                                         .filter(it => it.description)
                                         .map(it => {
                                             if (it.children && it.children.length > 0) {
@@ -247,8 +247,8 @@ export const NavHeader = ({params}: { params: LayoutParams }) => {
 
 
                                 {
-                                    params.contents && params.contents.items &&
-                                    params.contents.items
+                                    params.contents && params.contents.content &&
+                                    params.contents.content
                                         .filter(it => it.linkToMenu)
                                         .filter(it => it.visible)
                                         .filter(it => it.description)
