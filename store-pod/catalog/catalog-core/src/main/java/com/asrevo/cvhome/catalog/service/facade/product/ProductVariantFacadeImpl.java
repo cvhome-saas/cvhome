@@ -25,6 +25,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
@@ -209,7 +210,7 @@ public class ProductVariantFacadeImpl implements ProductVariantFacade {
 
     @Override
     public ReadableEntityList<ReadableProductVariant> list(
-            Long productId, StoreMerchantId store, LanguageCode language, int page, int count) {
+            Long productId, StoreMerchantId store, LanguageCode language, Pageable pageable) {
         Assert.notNull(store, "store cannot be null");
         Assert.notNull(productId, "Product id cannot be null");
 
@@ -221,7 +222,7 @@ public class ProductVariantFacadeImpl implements ProductVariantFacade {
         }
 
         Page<ProductVariant> instances =
-                productVariantService.getByProductId(store, product, language, page, count);
+                productVariantService.getByProductId(store, product, language, pageable);
 
         List<ReadableProductVariant> readableInstances =
                 instances.stream()

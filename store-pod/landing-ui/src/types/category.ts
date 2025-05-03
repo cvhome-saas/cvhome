@@ -5,7 +5,7 @@ export interface CategoryPage {
     number: number
     recordsTotal: number
     recordsFiltered: number
-    categories: Category[]
+    content: Category[]
 }
 
 export interface Category {

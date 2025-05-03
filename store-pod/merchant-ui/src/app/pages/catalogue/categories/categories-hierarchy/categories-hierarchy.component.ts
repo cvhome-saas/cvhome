@@ -43,7 +43,7 @@ export class CategoriesHierarchyComponent implements OnInit {
       this.categoryService.getHierarchyOfCategories(this.params)
         .subscribe({
           next: res => {
-            this.nodes = this.toTreeRoot(res.categories)
+            this.nodes = this.toTreeRoot(res.content)
             this.loader = false;
           },
           error: err => {

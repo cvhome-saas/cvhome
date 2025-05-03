@@ -8,6 +8,7 @@ import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.model.entity.ListCriteria;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import java.util.List;
+import org.springframework.data.domain.Pageable;
 
 /**
  * Manufacturer / brand / collection product grouping
@@ -40,21 +41,13 @@ public interface ManufacturerFacade {
      * Get all Manufacturer
      */
     ReadableManufacturerList getAllManufacturers(
-            StoreMerchantId store,
-            LanguageCode language,
-            ListCriteria criteria,
-            int page,
-            int count);
+            StoreMerchantId store, LanguageCode language, ListCriteria criteria, Pageable pageable);
 
     /**
      * List manufacturers by a specific store
      */
     ReadableManufacturerList listByStore(
-            StoreMerchantId store,
-            LanguageCode language,
-            ListCriteria criteria,
-            int page,
-            int count);
+            StoreMerchantId store, LanguageCode language, ListCriteria criteria, Pageable pageable);
 
     /**
      * Determines if manufacturer code already exists

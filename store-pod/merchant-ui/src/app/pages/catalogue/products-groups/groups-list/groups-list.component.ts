@@ -43,16 +43,6 @@ export class GroupsListComponent extends BaseTable<any> implements OnInit {
       return of();
     }
     return this.productGroupsService.getListOfProductGroups(request)
-      .pipe(map(it => {
-        const mappedX = {
-          content: it,
-          totalPages: 1,
-          totalElements: it.length,
-          size: it.length,
-          pageNumber: request.page
-        };
-        return mappedX;
-      }));
   }
 
   onEdit(row: any) {

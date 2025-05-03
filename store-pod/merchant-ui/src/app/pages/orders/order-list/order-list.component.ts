@@ -39,16 +39,6 @@ export class OrderListComponent extends BaseTable<any> implements OnInit {
       return of();
     }
     return this.ordersService.getOrders(request)
-      .pipe(map(it => {
-        const mappedX = {
-          content: it.orders,
-          totalPages: it.totalPages,
-          totalElements: it.recordsTotal,
-          size: it.number,
-          pageNumber: request.page
-        };
-        return mappedX;
-      }));
   }
 
 }

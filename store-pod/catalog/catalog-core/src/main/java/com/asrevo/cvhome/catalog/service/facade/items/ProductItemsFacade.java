@@ -3,16 +3,16 @@ package com.asrevo.cvhome.catalog.service.facade.items;
 import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.model.product.ReadableProductList;
 import com.asrevo.cvhome.catalog.model.product.group.ProductGroup;
+import com.asrevo.cvhome.catalog.model.product.group.ReadableProductGroupList;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
-import java.util.List;
 
 public interface ProductItemsFacade {
 
     ProductGroup createProductGroup(ProductGroup group, StoreMerchantId store);
 
-    List<ProductGroup> listProductGroups(StoreMerchantId store, LanguageCode language);
+    ReadableProductGroupList listProductGroups(StoreMerchantId store, LanguageCode language);
 
     ProductGroup getProductGroup(StoreMerchantId store, String code);
 

@@ -15,7 +15,6 @@ import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceIm
 import java.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -247,12 +246,9 @@ public class CategoryServiceImpl extends SalesManagerEntityServiceImpl<Long, Cat
             LanguageCode language,
             String name,
             int depth,
-            int page,
-            int count) {
+            Pageable pageable) {
 
-        Pageable pageRequest = PageRequest.of(page, count);
-
-        return pageableCategoryRepository.listByStore(store, language, name, pageRequest);
+        return pageableCategoryRepository.listByStore(store, language, name, pageable);
     }
 
     @Override

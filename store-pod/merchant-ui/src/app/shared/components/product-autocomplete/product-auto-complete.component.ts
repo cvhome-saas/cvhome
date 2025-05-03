@@ -65,14 +65,14 @@ export class ProductAutoCompleteComponent implements AfterViewInit {
   getProductList() {
     this.params.name = this.autoInput.nativeElement.value;
     this.filteredOptions$ = this.productService.getListOfProducts(this.params).pipe(map(it => {
-      return it.products
+      return it.content
     }));
   }
 
   ngAfterViewInit(): void {
     this.params.store = this.store;
     this.productService.getListOfProducts(this.params).pipe(map(it => {
-      return it.products
+      return it.content
     })).subscribe((it: any[]) => {
       this.firstProducts = it
       this.resetResultToFirst();

@@ -8,12 +8,12 @@ import {ReadableCountryList} from "@/types/country";
 export class CartService {
 
     public static getCart = async (storeContext: StoreContext, cart: string): Promise<Cart | undefined> => {
-        return fetch(`${storeBaseServiceUrl('order')}/api/v1/cart/${cart}?store=${storeContext.store}`)
+        return fetch(`${storeBaseServiceUrl('order')}/api/v1/cart/${cart}?store=${storeContext.store}&lang=${storeContext.locale}`)
             .then(it => handleResponse(it))
     }
 
     public static removeFromCart = async (storeContext: StoreContext, cart: string, productSku: string) => {
-        return fetch(`${storeBaseServiceUrl('order')}/api/v1/cart/${cart}/product/${productSku}?store=${storeContext.store}`, {
+        return fetch(`${storeBaseServiceUrl('order')}/api/v1/cart/${cart}/product/${productSku}?store=${storeContext.store}&lang=${storeContext.locale}`, {
             method: 'DELETE',
         });
     }
@@ -29,14 +29,14 @@ export class CartService {
     }
 
     private static addToNewCart = async (storeContext: StoreContext, product: string, quantity: number) => {
-        return fetch(`${storeBaseServiceUrl('order')}/api/v1/cart?store=${storeContext.store}`, post({
+        return fetch(`${storeBaseServiceUrl('order')}/api/v1/cart?store=${storeContext.store}&lang=${storeContext.locale}`, post({
             product,
             quantity
         }));
     }
 
     private static appendToCart = async (storeContext: StoreContext, cartCode: string, product: string, quantity: number) => {
-        return fetch(`${storeBaseServiceUrl('order')}/api/v1/cart/${cartCode}?store=${storeContext.store}`, put({
+        return fetch(`${storeBaseServiceUrl('order')}/api/v1/cart/${cartCode}?store=${storeContext.store}&lang=${storeContext.locale}`, put({
             product,
             quantity
         }));
@@ -44,7 +44,7 @@ export class CartService {
     }
 
     public static checkout = async (storeContext: StoreContext, code: string, checkoutCart: CheckoutCart): Promise<Order | undefined> => {
-        return fetch(`${storeBaseServiceUrl('order')}/api/v1/cart/${code}/checkout?store=${storeContext.store}`, post(checkoutCart))
+        return fetch(`${storeBaseServiceUrl('order')}/api/v1/cart/${code}/checkout?store=${storeContext.store}&lang=${storeContext.locale}`, post(checkoutCart))
             .then(it => handleResponse(it))
     }
 

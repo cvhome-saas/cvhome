@@ -16,7 +16,6 @@ import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import org.springframework.data.domain.Page;
 
 public interface ProductService extends SalesManagerEntityService<Long, Product> {
 
@@ -32,16 +31,6 @@ public interface ProductService extends SalesManagerEntityService<Long, Product>
     ProductList listByStore(StoreMerchantId store, LanguageCode language, ProductCriteria criteria);
 
     boolean exists(String sku, StoreMerchantId store);
-
-    /**
-     * List using Page interface in order to unify all page requests (since 2.16.0)
-     */
-    Page<Product> listByStore(
-            StoreMerchantId store,
-            LanguageCode language,
-            ProductCriteria criteria,
-            int page,
-            int count);
 
     List<Product> listByStore(StoreMerchantId store);
 

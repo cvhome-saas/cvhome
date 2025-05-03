@@ -9,12 +9,13 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public class ReadableProductOptionValueList extends ReadableList {
+@Deprecated
+public class ReadableProductOptionValueList extends ReadableList<ReadableProductOptionValue> {
 
     /**
      *
      */
     @Serial private static final long serialVersionUID = 1L;
 
-    List<ReadableProductOptionValue> optionValues = new ArrayList<>();
+    List<ReadableProductOptionValue> content = new ArrayList<>();
 }

@@ -44,16 +44,6 @@ export class ProductsListComponent extends BaseTable<any> implements OnInit {
       return of();
     }
     return this.productService.getListOfProducts(request)
-      .pipe(map(it => {
-        const mappedX = {
-          content: it.products,
-          totalPages: it.totalPages,
-          totalElements: it.recordsTotal,
-          size: it.number,
-          pageNumber: request.page
-        };
-        return mappedX;
-      }));
   }
 
 

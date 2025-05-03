@@ -3,6 +3,7 @@ package com.asrevo.cvhome.catalog.service.facade.product;
 import com.asrevo.cvhome.catalog.entity.category.Category;
 import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.entity.product.ProductCriteria;
+import com.asrevo.cvhome.catalog.entity.product.ProductList;
 import com.asrevo.cvhome.catalog.model.product.ReadableProduct;
 import com.asrevo.cvhome.catalog.model.product.ReadableProductList;
 import com.asrevo.cvhome.catalog.service.populator.catalog.ReadableProductPopulator;
@@ -18,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import org.apache.commons.collections.CollectionUtils;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -78,17 +78,11 @@ public class ProductFacadeImpl implements ProductFacade {
             }
         }
 
-        Page<Product> modelProductList =
-                productService.listByStore(
-                        store,
-                        language,
-                        criterias,
-                        criterias.getStartPage(),
-                        criterias.getMaxCount());
-
-        List<Product> products = modelProductList.getContent();
-
-        products = products.stream().sorted(Comparator.comparing(Product::getSortOrder)).toList();
+        ProductList productsLIst = productService.listByStore(store, language, criterias);
+        List<Product> products =
+                productsLIst.getProducts().stream()
+                        .sorted(Comparator.comparing(Product::getSortOrder))
+                        .toList();
 
         ReadableProductPopulator populator =
                 new ReadableProductPopulator(
@@ -100,14 +94,14 @@ public class ProductFacadeImpl implements ProductFacade {
             // create new proxy product
             ReadableProduct readProduct =
                     populator.populate(product, new ReadableProduct(), store, language);
-            productList.getProducts().add(readProduct);
+            productList.getContent().add(readProduct);
         }
 
         // productList.setTotalPages(products.getTotalCount());
-        productList.setRecordsTotal(modelProductList.getTotalElements());
-        productList.setNumber(productList.getProducts().size());
+        productList.setTotalElements(productsLIst.getTotalCount());
+        productList.setSize(productList.getContent().size());
 
-        productList.setTotalPages(modelProductList.getTotalPages());
+        productList.setTotalPages(productList.getTotalPages());
 
         return productList;
     }

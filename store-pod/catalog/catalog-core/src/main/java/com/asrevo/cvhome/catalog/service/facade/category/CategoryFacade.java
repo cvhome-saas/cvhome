@@ -9,6 +9,7 @@ import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.model.entity.ListCriteria;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import java.util.List;
+import org.springframework.data.domain.Pageable;
 
 public interface CategoryFacade {
 
@@ -23,8 +24,7 @@ public interface CategoryFacade {
             int depth,
             LanguageCode language,
             List<String> filter,
-            int page,
-            int count);
+            Pageable pageable);
 
     /**
      * Returns a list of ReadableCategory ordered and built according to a given depth
@@ -37,8 +37,7 @@ public interface CategoryFacade {
             int depth,
             LanguageCode language,
             List<String> filter,
-            int page,
-            int count);
+            Pageable pageable);
 
     /**
      * @return PersistableCategory

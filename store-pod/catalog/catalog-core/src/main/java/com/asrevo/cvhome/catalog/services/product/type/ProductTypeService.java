@@ -7,11 +7,12 @@ import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
 import java.util.List;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface ProductTypeService extends SalesManagerEntityService<Long, ProductType> {
 
     Page<ProductType> getByMerchant(
-            StoreMerchantId store, LanguageCode language, int page, int count);
+            StoreMerchantId store, LanguageCode language, Pageable pageable);
 
     ProductType getByCode(String code, StoreMerchantId store, LanguageCode language);
 

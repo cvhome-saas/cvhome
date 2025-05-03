@@ -1,16 +1,16 @@
 package com.asrevo.cvhome.catalog.api.v1.product;
 
+import com.asrevo.cvhome.catalog.model.product.attribute.PersistableProductAttribute;
+import com.asrevo.cvhome.catalog.model.product.attribute.PersistableProductOptionValue;
 import com.asrevo.cvhome.catalog.model.product.attribute.api.*;
+import com.asrevo.cvhome.catalog.service.facade.product.ProductOptionFacade;
 import com.asrevo.cvhome.commons.annotation.SecuredResource;
 import com.asrevo.cvhome.commons.domain.Entity;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.constants.Constants;
-import com.asrevo.cvhome.catalog.model.product.attribute.PersistableProductAttribute;
-import com.asrevo.cvhome.catalog.model.product.attribute.PersistableProductOptionValue;
 import com.asrevo.cvhome.store.core.model.entity.CodeEntity;
 import com.asrevo.cvhome.store.core.model.entity.EntityExists;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
-import com.asrevo.cvhome.catalog.service.facade.product.ProductOptionFacade;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -19,6 +19,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -229,10 +230,9 @@ public class ProductAttributeOptionApi {
             @Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
             @Parameter(hidden = true) LanguageCode language,
             @RequestParam(value = "name", required = false) String name,
-            @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
-            @RequestParam(value = "count", required = false, defaultValue = "10") Integer count) {
+            Pageable pageable) {
 
-        return productOptionFacade.options(merchantStore, language, name, page, count);
+        return productOptionFacade.options(merchantStore, language, name, pageable);
 
     }
 
@@ -246,10 +246,9 @@ public class ProductAttributeOptionApi {
             @Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
             @Parameter(hidden = true) LanguageCode language,
             @RequestParam(value = "name", required = false) String name,
-            @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
-            @RequestParam(value = "count", required = false, defaultValue = "10") Integer count) {
+            Pageable pageable) {
 
-        return productOptionFacade.optionValues(merchantStore, language, name, page, count);
+        return productOptionFacade.optionValues(merchantStore, language, name, pageable);
 
     }
 
@@ -268,10 +267,9 @@ public class ProductAttributeOptionApi {
             @PathVariable Long id,
             @Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
             @Parameter(hidden = true) LanguageCode language,
-            @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
-            @RequestParam(value = "count", required = false, defaultValue = "10") Integer count) {
+            Pageable pageable) {
 
-        return productOptionFacade.getAttributesList(id, merchantStore, language, page, count);
+        return productOptionFacade.getAttributesList(id, merchantStore, language, pageable);
 
     }
 

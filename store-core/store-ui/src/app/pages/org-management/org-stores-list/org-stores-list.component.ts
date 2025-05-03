@@ -75,16 +75,6 @@ export class OrgStoresListComponent extends BaseTable<any> implements OnInit {
     }
     this.params['id'] = this.org.id.id;
     return this.orgService.getOrgStoresList(this.params)
-      .pipe(map(it => {
-        const mappedX = {
-          content: it.content,
-          totalPages: it.totalPages,
-          totalElements: it.totalElements,
-          size: it.numberOfElements,
-          pageNumber: request.page
-        };
-        return mappedX;
-      }));
   }
 
 

@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -59,20 +60,20 @@ public class ProductVariationFacadeImpl implements ProductVariationFacade {
 
     @Override
     public ReadableEntityList<ReadableProductVariation> list(
-            StoreMerchantId store, LanguageCode language, int page, int count) {
+            StoreMerchantId store, LanguageCode language, Pageable pageable) {
         Assert.notNull(store, "store cannot be null");
         Assert.notNull(language, "LanguageCode cannot be null");
 
         Page<ProductVariation> vars =
-                productVariationService.getByMerchant(store, language, null, page, count);
+                productVariationService.getByMerchant(store, language, null, pageable);
         List<ReadableProductVariation> variations =
                 vars.stream()
                         .map(opt -> this.convert(opt, store, language))
                         .collect(Collectors.toList());
         ReadableEntityList<ReadableProductVariation> returnList = new ReadableEntityList<>();
-        returnList.setItems(variations);
-        returnList.setNumber(variations.size());
-        returnList.setRecordsTotal(vars.getTotalElements());
+        returnList.setContent(variations);
+        returnList.setSize(variations.size());
+        returnList.setTotalElements(vars.getTotalElements());
         returnList.setTotalPages(vars.getTotalPages());
         return returnList;
     }

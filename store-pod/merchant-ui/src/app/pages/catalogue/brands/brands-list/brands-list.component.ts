@@ -44,16 +44,6 @@ export class BrandsListComponent extends BaseTable<any> implements OnInit {
       return of();
     }
     return this.brandService.getListOfBrands(request)
-      .pipe(map(it => {
-        const mappedX = {
-          content: it.manufacturers,
-          totalPages: it.totalPages,
-          totalElements: it.recordsTotal,
-          size: it.number,
-          pageNumber: request.page
-        };
-        return mappedX;
-      }));
   }
 
 

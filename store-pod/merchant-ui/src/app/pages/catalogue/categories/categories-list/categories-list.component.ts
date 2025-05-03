@@ -47,16 +47,6 @@ export class CategoriesListComponent extends BaseTable<any> implements OnInit {
       return of();
     }
     return this.categoryService.getListOfCategories(request)
-      .pipe(map(it => {
-        const mappedX = {
-          content: it.categories,
-          totalPages: it.totalPages,
-          totalElements: it.recordsTotal,
-          size: it.number,
-          pageNumber: request.page
-        };
-        return mappedX;
-      }));
   }
 
   onEdit(event) {

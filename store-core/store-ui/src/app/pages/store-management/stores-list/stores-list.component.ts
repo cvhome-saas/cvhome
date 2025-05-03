@@ -42,16 +42,6 @@ export class StoresListComponent extends BaseTable<any> implements OnInit {
       return of();
     }
     return this.storeService.getListOfStores(this.params)
-      .pipe(map(it => {
-        const mappedX = {
-          content: it.content,
-          totalPages: it.totalPages,
-          totalElements: it.totalElements,
-          size: it.numberOfElements,
-          pageNumber: request.page
-        };
-        return mappedX;
-      }));
   }
 
 

@@ -11,7 +11,6 @@ import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceIm
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -77,9 +76,8 @@ public class ProductOptionServiceImpl extends SalesManagerEntityServiceImpl<Long
 
     @Override
     public Page<ProductOption> getByMerchant(
-            StoreMerchantId store, LanguageCode language, String name, int page, int count) {
+            StoreMerchantId store, LanguageCode language, String name, Pageable pageable) {
         Assert.notNull(store, "Store cannot be null");
-        Pageable p = PageRequest.of(page, count);
-        return pageableProductOptionRepository.listOptions(store, name, p);
+        return pageableProductOptionRepository.listOptions(store, name, pageable);
     }
 }

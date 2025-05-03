@@ -21,7 +21,6 @@ import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -505,9 +504,8 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
 
     @Override
     public Page<Content> listByType(
-            ContentType contentType, StoreMerchantId store, int page, int count) {
-        Pageable pageRequest = PageRequest.of(page, count);
-        return pageContentRepository.findByContentType(contentType, store, pageRequest);
+            ContentType contentType, StoreMerchantId store, Pageable pageable) {
+        return pageContentRepository.findByContentType(contentType, store, pageable);
     }
 
     @Override
@@ -515,10 +513,8 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
             ContentType contentType,
             StoreMerchantId store,
             LanguageCode language,
-            int page,
-            int count) {
-        Pageable pageRequest = PageRequest.of(page, count);
-        return pageContentRepository.findByContentType(contentType, store, language, pageRequest);
+            Pageable pageable) {
+        return pageContentRepository.findByContentType(contentType, store, language, pageable);
     }
 
     @Override

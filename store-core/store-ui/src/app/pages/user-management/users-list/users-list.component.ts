@@ -45,16 +45,6 @@ export class UsersListComponent extends BaseTable<any> implements OnInit {
       return of();
     }
     return this.userService.getUsersList(request)
-      .pipe(map(it => {
-        const mappedX = {
-          content: it.data,
-          totalPages: 1,
-          totalElements: it.data.length,
-          size: it.data.length,
-          pageNumber: request.page
-        };
-        return mappedX;
-      }));
   }
 
 

@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -40,18 +41,15 @@ public class CustomerApi {
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     @ConditionalOnApiStatus
-    public ReadableCustomerList list(@RequestParam(value = "page", required = false) Integer page,
-                                     @RequestParam(value = "count", required = false) Integer count,
-                                     @Parameter(hidden = true) StoreMerchantId merchantStore,
-                                     @Parameter(hidden = true) LanguageCode language) {
-        CustomerCriteria customerCriteria = createCustomerCriteria(page, count);
+    public ReadableCustomerList list(@Parameter(hidden = true) StoreMerchantId merchantStore,
+                                     @Parameter(hidden = true) LanguageCode language, Pageable pageable) {
+        CustomerCriteria customerCriteria = createCustomerCriteria(pageable);
         return customerFacade.getListByStore(merchantStore, customerCriteria, language);
     }
 
-    private CustomerCriteria createCustomerCriteria(Integer start, Integer count) {
+    private CustomerCriteria createCustomerCriteria(Pageable pageable) {
         CustomerCriteria customerCriteria = new CustomerCriteria();
-        Optional.ofNullable(start).ifPresent(customerCriteria::setStartIndex);
-        Optional.ofNullable(count).ifPresent(customerCriteria::setMaxCount);
+        customerCriteria.setPageable(pageable);
         return customerCriteria;
     }
 

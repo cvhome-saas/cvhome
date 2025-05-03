@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -115,10 +116,10 @@ public class ProductVariantGroupFacadeImpl implements ProductVariantGroupFacade 
 
     @Override
     public ReadableEntityList<ReadableProductVariantGroup> list(
-            Long productId, StoreMerchantId store, LanguageCode language, int page, int count) {
+            Long productId, StoreMerchantId store, LanguageCode language, Pageable pageable) {
 
         Page<ProductVariantGroup> groups =
-                productVariantGroupService.getByProductId(store, productId, language, page, count);
+                productVariantGroupService.getByProductId(store, productId, language, pageable);
 
         List<ReadableProductVariantGroup> readableInstances =
                 groups.stream()

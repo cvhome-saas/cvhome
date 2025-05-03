@@ -8,7 +8,6 @@ import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -43,9 +42,7 @@ public class ProductVariantGroupServiceImpl
 
     @Override
     public Page<ProductVariantGroup> getByProductId(
-            StoreMerchantId store, Long productId, LanguageCode language, int page, int count) {
-
-        Pageable pageRequest = PageRequest.of(page, count);
-        return pageableProductVariantGroupRepository.findByProductId(store, productId, pageRequest);
+            StoreMerchantId store, Long productId, LanguageCode language, Pageable pageable) {
+        return pageableProductVariantGroupRepository.findByProductId(store, productId, pageable);
     }
 }

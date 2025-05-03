@@ -10,7 +10,8 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public class ReadableProductList extends ReadableList {
+@Deprecated
+public class ReadableProductList extends ReadableList<ReadableProduct> {
 
     /**
      *
@@ -19,5 +20,5 @@ public class ReadableProductList extends ReadableList {
 
     private ProductGroup productGroup;
 
-    private List<ReadableProduct> products = new ArrayList<>();
+    private List<ReadableProduct> content = new ArrayList<>();
 }

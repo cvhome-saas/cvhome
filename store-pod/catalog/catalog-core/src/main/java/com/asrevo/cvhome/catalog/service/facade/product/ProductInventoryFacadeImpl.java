@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -198,13 +199,13 @@ public class ProductInventoryFacadeImpl implements ProductInventoryFacade {
 
     @Override
     public ReadableEntityList<ReadableInventory> get(
-            String sku, StoreMerchantId store, LanguageCode language, int page, int count) {
+            String sku, StoreMerchantId store, LanguageCode language, Pageable pageable) {
         Assert.notNull(sku, "Product sku cannot be null");
         Assert.notNull(store, "StoreMerchantId code cannot be null");
         Assert.notNull(language, "LanguageCode cannot be null");
 
         Page<ProductAvailability> availabilities =
-                productAvailabilityService.getBySku(sku, page, count);
+                productAvailabilityService.getBySku(sku, pageable);
 
         if (availabilities.isEmpty()) {
             // get parent product
@@ -230,13 +231,13 @@ public class ProductInventoryFacadeImpl implements ProductInventoryFacade {
 
     @Override
     public ReadableEntityList<ReadableInventory> get(
-            Long productId, StoreMerchantId store, LanguageCode language, int page, int count) {
+            Long productId, StoreMerchantId store, LanguageCode language, Pageable pageable) {
 
         Assert.notNull(productId, "Product id cannot be null");
         Assert.notNull(store, "StoreMerchantId code cannot be null");
 
         Page<ProductAvailability> availabilities =
-                productAvailabilityService.listByProduct(productId, store, page, count);
+                productAvailabilityService.listByProduct(productId, store, pageable);
 
         List<ReadableInventory> returnList =
                 availabilities.getContent().stream()

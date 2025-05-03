@@ -34,6 +34,7 @@ import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -104,17 +105,17 @@ public class ContentFacadeImpl implements ContentFacade {
     @SuppressWarnings("unchecked")
     @Override
     public ReadableEntityList<ReadableContentPage> getContentPages(
-            StoreMerchantId store, LanguageCode language, int page, int count) {
+            StoreMerchantId store, LanguageCode language, Pageable pageable) {
         Assert.notNull(store, "store cannot be null");
 
         @SuppressWarnings("rawtypes")
         ReadableEntityList items = new ReadableEntityList();
         Page<Content> contentPages;
-        contentPages = contentService.listByType(ContentType.PAGE, store, page, count);
+        contentPages = contentService.listByType(ContentType.PAGE, store, pageable);
 
         items.setTotalPages(contentPages.getTotalPages());
-        items.setNumber(contentPages.getContent().size());
-        items.setRecordsTotal(contentPages.getNumberOfElements());
+        items.setSize(contentPages.getContent().size());
+        items.setTotalElements(contentPages.getTotalElements());
 
         List<ReadableContentPage> pages =
                 contentPages.getContent().stream()
@@ -124,7 +125,7 @@ public class ContentFacadeImpl implements ContentFacade {
                                                 store, language, content))
                         .collect(Collectors.toList());
 
-        items.setItems(pages);
+        items.setContent(pages);
         return items;
     }
 
@@ -344,24 +345,24 @@ public class ContentFacadeImpl implements ContentFacade {
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Override
     public ReadableEntityList<ReadableContentBox> getContentBoxes(
-            ContentType type, StoreMerchantId store, LanguageCode language, int page, int count) {
+            ContentType type, StoreMerchantId store, LanguageCode language, Pageable pageable) {
 
         Assert.notNull(store, "store cannot be null");
 
         ReadableEntityList items = new ReadableEntityList();
         Page<Content> contentBoxes;
-        contentBoxes = contentService.listByType(type, store, page, count);
+        contentBoxes = contentService.listByType(type, store, pageable);
 
         items.setTotalPages(contentBoxes.getTotalPages());
-        items.setNumber(contentBoxes.getContent().size());
-        items.setRecordsTotal(contentBoxes.getNumberOfElements());
+        items.setSize(contentBoxes.getContent().size());
+        items.setTotalElements(contentBoxes.getTotalElements());
 
         List<ReadableContentBox> boxes =
                 contentBoxes.getContent().stream()
                         .map(content -> convertContentToReadableContentBox(language, content))
                         .collect(Collectors.toList());
 
-        items.setItems(boxes);
+        items.setContent(boxes);
 
         return items;
     }

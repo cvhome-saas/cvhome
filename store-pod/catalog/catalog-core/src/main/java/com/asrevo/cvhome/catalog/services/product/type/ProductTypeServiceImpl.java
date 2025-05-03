@@ -10,7 +10,6 @@ import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceIm
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -38,9 +37,8 @@ public class ProductTypeServiceImpl extends SalesManagerEntityServiceImpl<Long, 
 
     @Override
     public Page<ProductType> getByMerchant(
-            StoreMerchantId store, LanguageCode language, int page, int count) {
-        Pageable pageRequest = PageRequest.of(page, count);
-        return pageableProductTypeRepository.listByStore(store, pageRequest);
+            StoreMerchantId store, LanguageCode language, Pageable pageable) {
+        return pageableProductTypeRepository.listByStore(store, pageable);
     }
 
     @Override

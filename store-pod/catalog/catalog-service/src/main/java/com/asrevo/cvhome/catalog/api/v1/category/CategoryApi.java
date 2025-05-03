@@ -20,6 +20,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -106,14 +107,12 @@ public class CategoryApi {
             @RequestParam(value = "name", required = false) String name,
             @Parameter(hidden = true) StoreMerchantId merchantStore,
             @Parameter(hidden = true) LanguageCode language,
-            @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
-            @RequestParam(value = "count", required = false, defaultValue = "10") Integer count) {
+            Pageable pageable) {
 
 
         ListCriteria criteria = new ListCriteria();
         criteria.setName(name);
-        return categoryFacade.getReadableCategoryList(merchantStore, criteria, DEFAULT_CATEGORY_DEPTH, language, filter,
-                page, count);
+        return categoryFacade.getReadableCategoryList(merchantStore, criteria, DEFAULT_CATEGORY_DEPTH, language, filter, pageable);
     }
 
     /**
@@ -132,14 +131,12 @@ public class CategoryApi {
             @RequestParam(value = "name", required = false) String name,
             @Parameter(hidden = true) StoreMerchantId merchantStore,
             @Parameter(hidden = true) LanguageCode language,
-            @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
-            @RequestParam(value = "count", required = false, defaultValue = "10") Integer count) {
+            Pageable pageable) {
 
 
         ListCriteria criteria = new ListCriteria();
         criteria.setName(name);
-        return categoryFacade.getCategoryHierarchy(merchantStore, criteria, DEFAULT_CATEGORY_DEPTH, language, filter,
-                page, count);
+        return categoryFacade.getCategoryHierarchy(merchantStore, criteria, DEFAULT_CATEGORY_DEPTH, language, filter,pageable);
     }
 
 

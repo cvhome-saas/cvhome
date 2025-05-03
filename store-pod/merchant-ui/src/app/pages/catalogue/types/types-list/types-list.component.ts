@@ -45,16 +45,6 @@ export class TypesListComponent extends BaseTable<any> implements OnInit {
       return of();
     }
     return this.typesService.getListOfTypes(request)
-      .pipe(map(it => {
-        const mappedX = {
-          content: it.list,
-          totalPages: it.totalPages,
-          totalElements: it.recordsTotal,
-          size: it.number,
-          pageNumber: request.page
-        }
-        return mappedX;
-      }));
   }
 
 

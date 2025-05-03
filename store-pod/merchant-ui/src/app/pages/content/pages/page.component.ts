@@ -43,16 +43,6 @@ export class PageComponent extends BaseTable<any> implements OnInit {
       return of();
     }
     return this.contentService.pages(request)
-      .pipe(map(it => {
-        const mappedX = {
-          content: it.items,
-          totalPages: it.totalPages,
-          totalElements: it.recordsTotal,
-          size: it.number,
-          pageNumber: request.page
-        };
-        return mappedX;
-      }));
   }
 
 

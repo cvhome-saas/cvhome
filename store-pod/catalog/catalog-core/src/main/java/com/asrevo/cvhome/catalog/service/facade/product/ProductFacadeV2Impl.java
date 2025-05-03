@@ -3,6 +3,7 @@ package com.asrevo.cvhome.catalog.service.facade.product;
 import com.asrevo.cvhome.catalog.entity.category.Category;
 import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.entity.product.ProductCriteria;
+import com.asrevo.cvhome.catalog.entity.product.ProductList;
 import com.asrevo.cvhome.catalog.entity.product.variant.ProductVariant;
 import com.asrevo.cvhome.catalog.model.product.ReadableProduct;
 import com.asrevo.cvhome.catalog.model.product.ReadableProductList;
@@ -25,7 +26,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.collections.CollectionUtils;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -133,28 +133,20 @@ public class ProductFacadeV2Impl implements ProductFacade {
             }
         }
 
-        Page<Product> modelProductList =
-                productService.listByStore(
-                        store,
-                        language,
-                        criterias,
-                        criterias.getStartPage(),
-                        criterias.getMaxCount());
-
-        List<Product> products = modelProductList.getContent();
-        ReadableProductList productList = new ReadableProductList();
+        ProductList productList = productService.listByStore(store, language, criterias);
+        ReadableProductList readableProductList = new ReadableProductList();
 
         List<ReadableProduct> readableProducts =
-                products.stream()
+                productList.getProducts().stream()
                         .map(p -> readableProductMapper.convert(p, store, language))
                         .sorted(Comparator.comparing(ReadableProduct::getSortOrder))
                         .collect(Collectors.toList());
 
-        productList.setRecordsTotal(modelProductList.getTotalElements());
-        productList.setNumber(modelProductList.getNumberOfElements());
-        productList.setProducts(readableProducts);
-        productList.setTotalPages(modelProductList.getTotalPages());
+        readableProductList.setTotalElements(productList.getTotalCount());
+        readableProductList.setSize(productList.getProducts().size());
+        readableProductList.setContent(readableProducts);
+        readableProductList.setTotalPages(productList.getTotalPages());
 
-        return productList;
+        return readableProductList;
     }
 }
