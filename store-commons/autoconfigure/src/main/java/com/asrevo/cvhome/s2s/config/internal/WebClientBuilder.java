@@ -14,19 +14,22 @@ public class WebClientBuilder {
     private final Environment environment;
     private final WebClient.Builder defaultMicroServiceBuilder;
     private final ServiceDomainProperties serviceDomainProperties;
+    private final ObjectMapper objectMapper;
 
     public WebClientBuilder(
             Environment environment,
             WebClient.Builder defaultMicroServiceBuilder,
-            ServiceDomainProperties serviceDomainProperties) {
+            ServiceDomainProperties serviceDomainProperties,
+            ObjectMapper objectMapper) {
         this.environment = environment;
         this.defaultMicroServiceBuilder = defaultMicroServiceBuilder;
         this.serviceDomainProperties = serviceDomainProperties;
+        this.objectMapper = objectMapper;
     }
 
     public <T> T buildClient(String serviceName, Class<T> tClass) {
         String url = getServiceUrl(serviceDomainProperties, environment, serviceName);
-        return build(defaultMicroServiceBuilder, url, tClass);
+        return build(defaultMicroServiceBuilder, url, tClass, objectMapper);
     }
 
     public <T> T buildClient(String serviceName, Class<T> tClass, ObjectMapper objectMapper) {

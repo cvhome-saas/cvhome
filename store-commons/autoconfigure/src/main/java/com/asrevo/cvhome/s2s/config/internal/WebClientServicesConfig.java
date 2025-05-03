@@ -8,6 +8,7 @@ import com.asrevo.cvhome.s2s.oauth2.PasswordTokenResponseClient;
 import com.asrevo.cvhome.s2s.oauth2.RefreshTokenTokenResponseClient;
 import com.asrevo.cvhome.s2s.oauth2.ServerCallBearerExchangeFilterFunction;
 import com.asrevo.cvhome.s2s.oauth2.ServerCallBearerExchangeInterceptor;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -206,9 +207,10 @@ public class WebClientServicesConfig {
         public WebClientBuilder webClientBuilder(
                 Environment environment,
                 @Qualifier("defaultMicroServiceBuilder") WebClient.Builder defaultMicroServiceBuilder,
-                ServiceDomainProperties serviceDomainProperties) {
+                ServiceDomainProperties serviceDomainProperties,
+                ObjectMapper objectMapper) {
             return new WebClientBuilder(
-                    environment, defaultMicroServiceBuilder, serviceDomainProperties);
+                    environment, defaultMicroServiceBuilder, serviceDomainProperties, objectMapper);
         }
     }
 
