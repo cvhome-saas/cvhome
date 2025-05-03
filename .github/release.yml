@@ -16,12 +16,12 @@ changelog:
     - title: ":sparkles: New features and improvements"
       labels:
         - "type/enhancement"
-    - title: ":lady_beetle: Bug fixes"
-      labels:
-        - "type/bug"
     - title: ":book: Documentation"
       labels:
         - "type/documentation"
+    - title: ":lady_beetle: Bug fixes"
+      labels:
+        - "type/bug"
     - title: ":question: Other Changes"
       labels:
         - "*"

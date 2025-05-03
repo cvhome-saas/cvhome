@@ -31,7 +31,7 @@ jobs:
           echo "NEXT_VERSION=$NEXT_VERSION" >> $GITHUB_ENV
           echo "CURRENT_VERSION=$CURRENT_VERSION" >> $GITHUB_ENV
 
-      - name: Delete Old Release branches
+      - name: Delete Old Release branche
         run: |
           git push origin --delete release/${{ env.CURRENT_VERSION}} &>/dev/null || true 
           git push origin --delete ${{ env.CURRENT_VERSION}} &>/dev/null || true 
