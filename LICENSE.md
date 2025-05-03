@@ -116,4 +116,4 @@ TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
    hold each Contributor harmless for any liability incurred by, or claims asserted against, such Contributor by reason
    of your accepting any such warranty or additional liability.
 
-END OF TERMS AND CONDITIONS
+END OF TERMS AND CONDITIONS.
