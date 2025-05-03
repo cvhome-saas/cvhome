@@ -151,8 +151,8 @@ public class ManufacturerFacadeImpl implements ManufacturerFacade {
                 } else {
                     manufacturers = manufacturerService.listByStore(store);
                 }
-                readableList.setRecordsTotal(total);
-                readableList.setNumber(manufacturers.size());
+                readableList.setTotalElements(total);
+                readableList.setSize(manufacturers.size());
             } else {
 
                 Page<Manufacturer> m;
@@ -165,8 +165,8 @@ public class ManufacturerFacadeImpl implements ManufacturerFacade {
                 }
                 manufacturers = m.getContent();
                 readableList.setTotalPages(m.getTotalPages());
-                readableList.setRecordsTotal(m.getTotalElements());
-                readableList.setNumber(m.getNumber());
+                readableList.setTotalElements(m.getTotalElements());
+                readableList.setSize(m.getNumber());
             }
 
             ReadableManufacturerPopulator populator = new ReadableManufacturerPopulator();
@@ -178,7 +178,7 @@ public class ManufacturerFacadeImpl implements ManufacturerFacade {
                 returnList.add(readableManufacturer);
             }
 
-            readableList.setManufacturers(returnList);
+            readableList.setContent(returnList);
             return readableList;
 
         } catch (Exception e) {
@@ -223,8 +223,8 @@ public class ManufacturerFacadeImpl implements ManufacturerFacade {
 
             manufacturers = m.getContent();
             readableList.setTotalPages(m.getTotalPages());
-            readableList.setRecordsTotal(m.getTotalElements());
-            readableList.setNumber(m.getContent().size());
+            readableList.setTotalElements(m.getTotalElements());
+            readableList.setSize(m.getContent().size());
 
             ReadableManufacturerPopulator populator = new ReadableManufacturerPopulator();
             List<ReadableManufacturer> returnList = new ArrayList<>();
@@ -235,7 +235,7 @@ public class ManufacturerFacadeImpl implements ManufacturerFacade {
                 returnList.add(readableManufacturer);
             }
 
-            readableList.setManufacturers(returnList);
+            readableList.setContent(returnList);
             return readableList;
 
         } catch (Exception e) {

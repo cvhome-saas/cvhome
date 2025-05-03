@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.catalog.api.v1.product;
 
+import com.asrevo.cvhome.catalog.model.product.group.ReadableProductGroupList;
 import com.asrevo.cvhome.commons.annotation.SecuredResource;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.constants.Constants;
@@ -83,7 +84,7 @@ public class ProductGroupApi {
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
-    public @ResponseBody java.util.List<ProductGroup> list(
+    public @ResponseBody ReadableProductGroupList list(
             @Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
             @Parameter(hidden = true) LanguageCode language) {
 

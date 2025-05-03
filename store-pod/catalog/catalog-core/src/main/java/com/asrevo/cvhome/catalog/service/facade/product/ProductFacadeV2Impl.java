@@ -150,9 +150,9 @@ public class ProductFacadeV2Impl implements ProductFacade {
                         .sorted(Comparator.comparing(ReadableProduct::getSortOrder))
                         .collect(Collectors.toList());
 
-        productList.setRecordsTotal(modelProductList.getTotalElements());
-        productList.setNumber(modelProductList.getNumberOfElements());
-        productList.setProducts(readableProducts);
+        productList.setTotalElements(modelProductList.getTotalElements());
+        productList.setSize(modelProductList.getNumberOfElements());
+        productList.setContent(readableProducts);
         productList.setTotalPages(modelProductList.getTotalPages());
 
         return productList;

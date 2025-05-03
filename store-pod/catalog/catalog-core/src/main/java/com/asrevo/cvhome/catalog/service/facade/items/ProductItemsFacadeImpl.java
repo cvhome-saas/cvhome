@@ -5,6 +5,7 @@ import com.asrevo.cvhome.catalog.entity.product.relationship.ProductRelationship
 import com.asrevo.cvhome.catalog.model.product.ReadableProduct;
 import com.asrevo.cvhome.catalog.model.product.ReadableProductList;
 import com.asrevo.cvhome.catalog.model.product.group.ProductGroup;
+import com.asrevo.cvhome.catalog.model.product.group.ReadableProductGroupList;
 import com.asrevo.cvhome.catalog.service.populator.catalog.ReadableMinimalProductPopulator;
 import com.asrevo.cvhome.catalog.services.pricing.PricingService;
 import com.asrevo.cvhome.catalog.services.product.ProductService;
@@ -17,14 +18,15 @@ import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
+
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -85,9 +87,9 @@ public class ProductItemsFacadeImpl implements ProductItemsFacade {
                             .sorted(Comparator.comparing(ReadableProduct::getSortOrder))
                             .toList();
 
-            list.setProducts(productList);
+            list.setContent(productList);
             list.setTotalPages(1); // no paging
-            list.setNumber(groups.size());
+            list.setSize(groups.size());
             list.setProductGroup(productGroup);
             return list;
         }
@@ -187,9 +189,9 @@ public class ProductItemsFacadeImpl implements ProductItemsFacade {
                         .sorted(Comparator.comparing(ReadableProduct::getSortOrder))
                         .toList();
 
-        list.setProducts(productList);
+        list.setContent(productList);
         list.setTotalPages(1);
-        list.setNumber(groups.size());
+        list.setSize(groups.size());
         list.setProductGroup(productGroup);
         return list;
     }
@@ -269,23 +271,24 @@ public class ProductItemsFacadeImpl implements ProductItemsFacade {
     }
 
     @Override
-    public List<ProductGroup> listProductGroups(StoreMerchantId store, LanguageCode language) {
+    public ReadableProductGroupList listProductGroups(StoreMerchantId store, LanguageCode language) {
         Assert.notNull(store, "store cannot be null");
 
-        List<ProductRelationship> relationships = productRelationshipService.getGroups(store);
-
-        List<ProductGroup> groups = new ArrayList<>();
-
-        for (ProductRelationship relationship : relationships) {
-
-            ProductGroup g = new ProductGroup();
-            g.setActive(relationship.isActive());
-            g.setCode(relationship.getCode());
-            g.setId(relationship.getId());
-            groups.add(g);
-        }
-
-        return groups;
+        return productRelationshipService.getGroups(store)
+                .stream().map(it -> {
+                    ProductGroup g = new ProductGroup();
+                    g.setActive(it.isActive());
+                    g.setCode(it.getCode());
+                    g.setId(it.getId());
+                    return g;
+                }).collect(Collectors.collectingAndThen(Collectors.toList(), (it) -> {
+                    ReadableProductGroupList g = new ReadableProductGroupList();
+                    g.setContent(it);
+                    g.setSize(it.size());
+                    g.setTotalElements(it.size());
+                    g.setTotalPages(1);
+                    return g;
+                }));
     }
 
     @Override

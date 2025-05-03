@@ -70,9 +70,9 @@ public class ProductVariationFacadeImpl implements ProductVariationFacade {
                         .map(opt -> this.convert(opt, store, language))
                         .collect(Collectors.toList());
         ReadableEntityList<ReadableProductVariation> returnList = new ReadableEntityList<>();
-        returnList.setItems(variations);
-        returnList.setNumber(variations.size());
-        returnList.setRecordsTotal(vars.getTotalElements());
+        returnList.setContent(variations);
+        returnList.setSize(variations.size());
+        returnList.setTotalElements(vars.getTotalElements());
         returnList.setTotalPages(vars.getTotalPages());
         return returnList;
     }

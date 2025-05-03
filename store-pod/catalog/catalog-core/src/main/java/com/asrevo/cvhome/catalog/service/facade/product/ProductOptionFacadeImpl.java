@@ -147,15 +147,15 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
                 productOptionValueService.getByMerchant(store, null, name, page, count);
         ReadableProductOptionValueList valueList = new ReadableProductOptionValueList();
         valueList.setTotalPages(options.getTotalPages());
-        valueList.setRecordsTotal(options.getTotalElements());
-        valueList.setNumber(options.getNumber());
+        valueList.setTotalElements(options.getTotalElements());
+        valueList.setSize(options.getNumber());
 
         List<ReadableProductOptionValue> values =
                 options.getContent().stream()
                         .map(option -> readableOptionValueMapper.convert(option, store, null))
                         .collect(Collectors.toList());
 
-        valueList.setOptionValues(values);
+        valueList.setContent(values);
 
         return valueList;
     }
@@ -169,15 +169,15 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
                 productOptionService.getByMerchant(store, null, name, page, count);
         ReadableProductOptionList valueList = new ReadableProductOptionList();
         valueList.setTotalPages(options.getTotalPages());
-        valueList.setRecordsTotal(options.getTotalElements());
-        valueList.setNumber(options.getNumber());
+        valueList.setTotalElements(options.getTotalElements());
+        valueList.setSize(options.getNumber());
 
         List<ReadableProductOptionEntity> values =
                 options.getContent().stream()
                         .map(option -> readableMapper.convert(option, store, null))
                         .collect(Collectors.toList());
 
-        valueList.setOptions(values);
+        valueList.setContent(values);
 
         return valueList;
     }
@@ -387,8 +387,8 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
         } else {
             attr = productAttributeService.getByProductId(store, product, page, count);
         }
-        attrList.setRecordsTotal(attr.getTotalElements());
-        attrList.setNumber(attr.getNumberOfElements());
+        attrList.setTotalElements(attr.getTotalElements());
+        attrList.setSize(attr.getNumberOfElements());
         attrList.setTotalPages(attr.getTotalPages());
 
         List<ReadableProductAttributeEntity> values =
@@ -399,7 +399,7 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
                                                 attribute, store, language))
                         .collect(Collectors.toList());
 
-        attrList.setAttributes(values);
+        attrList.setContent(values);
 
         return attrList;
     }

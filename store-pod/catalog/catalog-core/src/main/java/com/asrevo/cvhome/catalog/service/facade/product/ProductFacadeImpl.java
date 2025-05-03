@@ -100,12 +100,12 @@ public class ProductFacadeImpl implements ProductFacade {
             // create new proxy product
             ReadableProduct readProduct =
                     populator.populate(product, new ReadableProduct(), store, language);
-            productList.getProducts().add(readProduct);
+            productList.getContent().add(readProduct);
         }
 
         // productList.setTotalPages(products.getTotalCount());
-        productList.setRecordsTotal(modelProductList.getTotalElements());
-        productList.setNumber(productList.getProducts().size());
+        productList.setTotalElements(modelProductList.getTotalElements());
+        productList.setSize(productList.getContent().size());
 
         productList.setTotalPages(modelProductList.getTotalPages());
 

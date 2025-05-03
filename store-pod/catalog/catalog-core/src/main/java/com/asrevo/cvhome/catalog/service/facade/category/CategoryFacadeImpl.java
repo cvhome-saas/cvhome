@@ -68,10 +68,10 @@ public class CategoryFacadeImpl implements CategoryFacade {
                 getReadableCategoryList(store, criteria, depth, language, filter, page, count);
 
         Map<Long, ReadableCategory> readableCategoryMap =
-                returnList.getCategories().stream()
+                returnList.getContent().stream()
                         .collect(Collectors.toMap(ReadableCategory::getId, Function.identity()));
 
-        returnList.getCategories().stream()
+        returnList.getContent().stream()
                 // .filter(ReadableCategory::isVisible)
                 .filter(cat -> Objects.nonNull(cat.getParent()))
                 .filter(cat -> readableCategoryMap.containsKey(cat.getParent().getId()))
@@ -94,10 +94,10 @@ public class CategoryFacadeImpl implements CategoryFacade {
                             .sorted(Comparator.comparing(ReadableCategory::getSortOrder))
                             .collect(Collectors.toList());
 
-            returnList.setNumber(filteredList.size());
+            returnList.setSize(filteredList.size());
         }
 
-        returnList.setCategories(filteredList);
+        returnList.setContent(filteredList);
 
         return returnList;
     }
@@ -115,8 +115,8 @@ public class CategoryFacadeImpl implements CategoryFacade {
         ReadableCategoryList returnList = new ReadableCategoryList();
         if (!CollectionUtils.isEmpty(filter) && filter.contains(FEATURED_CATEGORY)) {
             categories = categoryService.getListByDepthFilterByFeatured(store, depth, language);
-            returnList.setRecordsTotal(categories.size());
-            returnList.setNumber(categories.size());
+            returnList.setTotalElements(categories.size());
+            returnList.setSize(categories.size());
             returnList.setTotalPages(1);
         } else {
             org.springframework.data.domain.Page<Category> pageable =
@@ -128,9 +128,9 @@ public class CategoryFacadeImpl implements CategoryFacade {
                             page,
                             count);
             categories = pageable.getContent();
-            returnList.setRecordsTotal(pageable.getTotalElements());
+            returnList.setTotalElements(pageable.getTotalElements());
             returnList.setTotalPages(pageable.getTotalPages());
-            returnList.setNumber(categories.size());
+            returnList.setSize(categories.size());
         }
 
         if (filter != null && filter.contains(VISIBLE_CATEGORY)) {
@@ -139,13 +139,13 @@ public class CategoryFacadeImpl implements CategoryFacade {
                             .filter(Category::isVisible)
                             .map(cat -> readableCategoryMapper.convert(cat, store, language))
                             .collect(Collectors.toList());
-            returnList.setCategories(categoryList);
+            returnList.setContent(categoryList);
         } else {
             List<ReadableCategory> categoryList =
                     categories.stream()
                             .map(cat -> readableCategoryMapper.convert(cat, store, language))
                             .collect(Collectors.toList());
-            returnList.setCategories(categoryList);
+            returnList.setContent(categoryList);
         }
         return returnList;
     }
@@ -549,10 +549,10 @@ public class CategoryFacadeImpl implements CategoryFacade {
                         .collect(Collectors.toList());
 
         ReadableCategoryList readableList = new ReadableCategoryList();
-        readableList.setCategories(readableCategories);
+        readableList.setContent(readableCategories);
         readableList.setTotalPages(1);
-        readableList.setNumber(readableCategories.size());
-        readableList.setRecordsTotal(readableCategories.size());
+        readableList.setSize(readableCategories.size());
+        readableList.setTotalElements(readableCategories.size());
 
         return readableList;
     }

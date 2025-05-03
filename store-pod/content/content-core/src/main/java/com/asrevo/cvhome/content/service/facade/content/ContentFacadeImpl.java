@@ -113,8 +113,8 @@ public class ContentFacadeImpl implements ContentFacade {
         contentPages = contentService.listByType(ContentType.PAGE, store, page, count);
 
         items.setTotalPages(contentPages.getTotalPages());
-        items.setNumber(contentPages.getContent().size());
-        items.setRecordsTotal(contentPages.getNumberOfElements());
+        items.setSize(contentPages.getContent().size());
+        items.setTotalElements(contentPages.getNumberOfElements());
 
         List<ReadableContentPage> pages =
                 contentPages.getContent().stream()
@@ -124,7 +124,7 @@ public class ContentFacadeImpl implements ContentFacade {
                                                 store, language, content))
                         .collect(Collectors.toList());
 
-        items.setItems(pages);
+        items.setContent(pages);
         return items;
     }
 
@@ -353,15 +353,15 @@ public class ContentFacadeImpl implements ContentFacade {
         contentBoxes = contentService.listByType(type, store, page, count);
 
         items.setTotalPages(contentBoxes.getTotalPages());
-        items.setNumber(contentBoxes.getContent().size());
-        items.setRecordsTotal(contentBoxes.getNumberOfElements());
+        items.setSize(contentBoxes.getContent().size());
+        items.setTotalElements(contentBoxes.getNumberOfElements());
 
         List<ReadableContentBox> boxes =
                 contentBoxes.getContent().stream()
                         .map(content -> convertContentToReadableContentBox(language, content))
                         .collect(Collectors.toList());
 
-        items.setItems(boxes);
+        items.setContent(boxes);
 
         return items;
     }

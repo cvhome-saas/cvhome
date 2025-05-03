@@ -339,7 +339,7 @@ public class OrderFacadeImpl implements OrderFacade {
             ReadableOrderList returnList = new ReadableOrderList();
 
             if (CollectionUtils.isEmpty(orders)) {
-                returnList.setRecordsTotal(0);
+                returnList.setTotalElements(0);
                 return returnList;
             }
 
@@ -349,11 +349,11 @@ public class OrderFacadeImpl implements OrderFacade {
                 readableOrderPopulator.populate(order, readableOrder, null, null);
                 readableOrders.add(readableOrder);
             }
-            returnList.setOrders(readableOrders);
+            returnList.setContent(readableOrders);
 
-            returnList.setRecordsTotal(orderList.getTotalCount());
+            returnList.setTotalElements(orderList.getTotalCount());
             returnList.setTotalPages(orderList.getTotalPages());
-            returnList.setNumber(orderList.getOrders().size());
+            returnList.setSize(orderList.getOrders().size());
             returnList.setRecordsFiltered(orderList.getOrders().size());
 
             return returnList;

@@ -48,14 +48,14 @@ public class ProductTypeFacadeImpl implements ProductTypeFacade {
                     productTypeService.getByMerchant(store, language, page, count);
 
             if (types != null) {
-                returnList.setList(
+                returnList.setContent(
                         types.getContent().stream()
                                 .map(t -> readableProductTypeMapper.convert(t, store, language))
                                 .collect(Collectors.toList()));
                 returnList.setTotalPages(types.getTotalPages());
-                returnList.setRecordsTotal(types.getTotalElements());
+                returnList.setTotalElements(types.getTotalElements());
                 returnList.setRecordsFiltered(types.getSize());
-                returnList.setNumber(Long.valueOf(types.getTotalElements()).intValue());
+                returnList.setSize(Long.valueOf(types.getTotalElements()).intValue());
             }
 
             return returnList;
