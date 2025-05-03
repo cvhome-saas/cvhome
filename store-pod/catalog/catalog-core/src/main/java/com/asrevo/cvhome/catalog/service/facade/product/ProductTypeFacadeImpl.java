@@ -45,8 +45,7 @@ public class ProductTypeFacadeImpl implements ProductTypeFacade {
 
         try {
 
-            Page<ProductType> types =
-                    productTypeService.getByMerchant(store, language, pageable);
+            Page<ProductType> types = productTypeService.getByMerchant(store, language, pageable);
 
             if (types != null) {
                 returnList.setContent(

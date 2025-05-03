@@ -11,7 +11,6 @@ import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceIm
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -55,9 +54,10 @@ public class ProductAttributeServiceImpl
      */
     @Override
     public Page<ProductAttribute> getByProductId(
-            StoreMerchantId store, Product product, LanguageCode language,Pageable pageable) {
+            StoreMerchantId store, Product product, LanguageCode language, Pageable pageable) {
 
-        return pageableProductAttributeRepository.findByProductId(store, product.getId(), language, pageable);
+        return pageableProductAttributeRepository.findByProductId(
+                store, product.getId(), language, pageable);
     }
 
     @Override

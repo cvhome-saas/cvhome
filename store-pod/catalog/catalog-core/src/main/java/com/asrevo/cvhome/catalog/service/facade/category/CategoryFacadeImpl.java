@@ -123,7 +123,8 @@ public class CategoryFacadeImpl implements CategoryFacade {
                             store,
                             language,
                             criteria != null ? criteria.getName() : null,
-                            depth,pageable);
+                            depth,
+                            pageable);
             categories = page.getContent();
             returnList.setTotalElements(page.getTotalElements());
             returnList.setTotalPages(page.getTotalPages());

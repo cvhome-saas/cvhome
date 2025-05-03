@@ -8,9 +8,8 @@ import com.asrevo.cvhome.catalog.model.product.attribute.ReadableProductVariant;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.model.entity.ListCriteria;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
-import org.springframework.data.domain.Pageable;
-
 import java.util.List;
+import org.springframework.data.domain.Pageable;
 
 public interface CategoryFacade {
 

@@ -16,16 +16,15 @@ import com.asrevo.cvhome.store.controller.exception.UnauthorizedException;
 import com.asrevo.cvhome.store.core.mapper.Mapper;
 import com.asrevo.cvhome.store.core.model.entity.ListCriteria;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
-
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 @Service("manufacturerFacade")
 public class ManufacturerFacadeImpl implements ManufacturerFacade {
@@ -144,7 +143,8 @@ public class ManufacturerFacadeImpl implements ManufacturerFacade {
 
             List<Manufacturer> manufacturers;
 
-            Page<Manufacturer> m = manufacturerService.listByStore(store, language, criteria.getName(), pageable);
+            Page<Manufacturer> m =
+                    manufacturerService.listByStore(store, language, criteria.getName(), pageable);
             manufacturers = m.getContent();
             readableList.setTotalPages(m.getTotalPages());
             readableList.setTotalElements(m.getTotalElements());
@@ -192,7 +192,8 @@ public class ManufacturerFacadeImpl implements ManufacturerFacade {
 
             List<Manufacturer> manufacturers;
 
-            Page<Manufacturer> m = manufacturerService.listByStore(store, language, criteria.getName(), pageable);
+            Page<Manufacturer> m =
+                    manufacturerService.listByStore(store, language, criteria.getName(), pageable);
 
             manufacturers = m.getContent();
             readableList.setTotalPages(m.getTotalPages());

@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import org.apache.commons.collections.CollectionUtils;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -79,12 +78,11 @@ public class ProductFacadeImpl implements ProductFacade {
             }
         }
 
-
-        ProductList productsLIst = productService.listByStore(
-                store,
-                language,
-                criterias);
-        List<Product> products = productsLIst.getProducts().stream().sorted(Comparator.comparing(Product::getSortOrder)).toList();
+        ProductList productsLIst = productService.listByStore(store, language, criterias);
+        List<Product> products =
+                productsLIst.getProducts().stream()
+                        .sorted(Comparator.comparing(Product::getSortOrder))
+                        .toList();
 
         ReadableProductPopulator populator =
                 new ReadableProductPopulator(

@@ -4,30 +4,39 @@ import com.asrevo.cvhome.catalog.entity.product.manufacturer.Manufacturer;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import jakarta.persistence.criteria.Predicate;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public interface PageableManufacturerRepository
-        extends PagingAndSortingRepository<Manufacturer, Long>, JpaSpecificationExecutor<Manufacturer> {
+        extends PagingAndSortingRepository<Manufacturer, Long>,
+                JpaSpecificationExecutor<Manufacturer> {
 
-
-    default Page<Manufacturer> findByStore(StoreMerchantId storeMerchantId, LanguageCode languageCode, String name, Pageable pageable) {
-        return findAll((Specification<Manufacturer>) (root, query, cb) -> {
-            List<Predicate> predicates = new ArrayList<>();
-            predicates.add(cb.equal(root.get("storeMerchantId"), storeMerchantId));
-            if (languageCode != null) {
-                predicates.add(cb.equal(root.get("descriptions").get("languageCode"), languageCode));
-            }
-            if (name != null && !name.trim().isEmpty()) {
-                predicates.add(cb.like(root.get("name"), "%" + name + "%"));
-            }
-            return cb.and(predicates.toArray(Predicate[]::new));
-        }, pageable);
+    default Page<Manufacturer> findByStore(
+            StoreMerchantId storeMerchantId,
+            LanguageCode languageCode,
+            String name,
+            Pageable pageable) {
+        return findAll(
+                (Specification<Manufacturer>)
+                        (root, query, cb) -> {
+                            List<Predicate> predicates = new ArrayList<>();
+                            predicates.add(cb.equal(root.get("storeMerchantId"), storeMerchantId));
+                            if (languageCode != null) {
+                                predicates.add(
+                                        cb.equal(
+                                                root.get("descriptions").get("languageCode"),
+                                                languageCode));
+                            }
+                            if (name != null && !name.trim().isEmpty()) {
+                                predicates.add(cb.like(root.get("name"), "%" + name + "%"));
+                            }
+                            return cb.and(predicates.toArray(Predicate[]::new));
+                        },
+                pageable);
     }
 }

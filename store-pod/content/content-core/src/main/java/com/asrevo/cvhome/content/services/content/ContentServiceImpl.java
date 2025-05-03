@@ -21,7 +21,6 @@ import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -513,7 +512,8 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
     public Page<Content> listByType(
             ContentType contentType,
             StoreMerchantId store,
-            LanguageCode language,Pageable pageable) {
+            LanguageCode language,
+            Pageable pageable) {
         return pageContentRepository.findByContentType(contentType, store, language, pageable);
     }
 

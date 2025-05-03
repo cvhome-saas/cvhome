@@ -20,7 +20,7 @@ public interface ProductAvailabilityService
     /**
      * Get by sku
      */
-    Page<ProductAvailability> getBySku(String sku,Pageable pageable);
+    Page<ProductAvailability> getBySku(String sku, Pageable pageable);
 
     /**
      * All availability by product / product variant sku and store

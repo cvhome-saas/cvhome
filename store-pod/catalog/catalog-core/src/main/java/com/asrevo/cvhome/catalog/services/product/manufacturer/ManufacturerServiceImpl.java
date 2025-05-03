@@ -12,7 +12,6 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -95,5 +94,4 @@ public class ManufacturerServiceImpl extends SalesManagerEntityServiceImpl<Long,
             StoreMerchantId store, LanguageCode language, String name, Pageable pageable) {
         return pageableManufacturerRepository.findByStore(store, language, name, pageable);
     }
-
 }

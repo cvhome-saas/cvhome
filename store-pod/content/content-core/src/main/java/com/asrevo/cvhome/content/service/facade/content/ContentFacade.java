@@ -40,7 +40,8 @@ public interface ContentFacade {
     /**
      * Returns page names and urls configured for a given StoreMerchantId
      */
-    ReadableEntityList<ReadableContentPage> getContentPages(StoreMerchantId store, LanguageCode language, Pageable pageable);
+    ReadableEntityList<ReadableContentPage> getContentPages(
+            StoreMerchantId store, LanguageCode language, Pageable pageable);
 
     /**
      * Returns page name by code

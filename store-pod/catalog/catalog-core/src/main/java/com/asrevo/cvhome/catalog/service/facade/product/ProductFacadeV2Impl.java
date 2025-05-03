@@ -26,7 +26,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.collections.CollectionUtils;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -134,10 +133,7 @@ public class ProductFacadeV2Impl implements ProductFacade {
             }
         }
 
-        ProductList productList = productService.listByStore(
-                store,
-                language,
-                criterias);
+        ProductList productList = productService.listByStore(store, language, criterias);
         ReadableProductList readableProductList = new ReadableProductList();
 
         List<ReadableProduct> readableProducts =

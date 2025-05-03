@@ -18,15 +18,14 @@ import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.CollectionUtils;
-import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
-
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
+import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
 @Component
 @Slf4j
@@ -271,24 +270,30 @@ public class ProductItemsFacadeImpl implements ProductItemsFacade {
     }
 
     @Override
-    public ReadableProductGroupList listProductGroups(StoreMerchantId store, LanguageCode language) {
+    public ReadableProductGroupList listProductGroups(
+            StoreMerchantId store, LanguageCode language) {
         Assert.notNull(store, "store cannot be null");
 
-        return productRelationshipService.getGroups(store)
-                .stream().map(it -> {
-                    ProductGroup g = new ProductGroup();
-                    g.setActive(it.isActive());
-                    g.setCode(it.getCode());
-                    g.setId(it.getId());
-                    return g;
-                }).collect(Collectors.collectingAndThen(Collectors.toList(), (it) -> {
-                    ReadableProductGroupList g = new ReadableProductGroupList();
-                    g.setContent(it);
-                    g.setSize(it.size());
-                    g.setTotalElements(it.size());
-                    g.setTotalPages(1);
-                    return g;
-                }));
+        return productRelationshipService.getGroups(store).stream()
+                .map(
+                        it -> {
+                            ProductGroup g = new ProductGroup();
+                            g.setActive(it.isActive());
+                            g.setCode(it.getCode());
+                            g.setId(it.getId());
+                            return g;
+                        })
+                .collect(
+                        Collectors.collectingAndThen(
+                                Collectors.toList(),
+                                (it) -> {
+                                    ReadableProductGroupList g = new ReadableProductGroupList();
+                                    g.setContent(it);
+                                    g.setSize(it.size());
+                                    g.setTotalElements(it.size());
+                                    g.setTotalPages(1);
+                                    return g;
+                                }));
     }
 
     @Override

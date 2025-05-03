@@ -16,7 +16,6 @@ import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import org.springframework.data.domain.Page;
 
 public interface ProductService extends SalesManagerEntityService<Long, Product> {
 

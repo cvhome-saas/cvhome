@@ -3,7 +3,6 @@ package com.asrevo.cvhome.commons.domain;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
-
 import lombok.Getter;
 import lombok.Setter;
 

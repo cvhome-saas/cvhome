@@ -141,7 +141,6 @@ public class CustomerRepositoryImpl implements CustomerRepositoryCustom {
 
         if (count.intValue() == 0) return customerList;
 
-
         objectQ.setFirstResult((int) criteria.getPageable().getOffset());
         objectQ.setMaxResults(criteria.getPageable().getPageSize());
 
