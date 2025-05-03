@@ -5,10 +5,8 @@
  */
 
 plugins {
-    // Apply the common convention plugin for shared build configuration between library and application projects.
     id 'com.asrevo.java-common-conventions'
 
-    // Apply the java-library plugin for API and implementation separation.
     id 'java-library'
 
     id 'com.diffplug.spotless'
@@ -16,7 +14,6 @@ plugins {
 }
 
 spotless {
-    // optional: limit format enforcement to just the files changed by this feature branch
 
     format 'misc', {
         // define the files to apply `misc` to
