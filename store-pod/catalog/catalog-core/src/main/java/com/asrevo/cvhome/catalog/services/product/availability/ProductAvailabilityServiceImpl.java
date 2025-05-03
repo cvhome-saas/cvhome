@@ -57,11 +57,10 @@ public class ProductAvailabilityServiceImpl
 
     @Override
     public Page<ProductAvailability> listByProduct(
-            Long productId, StoreMerchantId store, int page, int count) {
+            Long productId, StoreMerchantId store, Pageable pageable) {
         Assert.notNull(productId, "Product cannot be null");
         Assert.notNull(store, "MercantStore cannot be null");
-        Pageable pageRequest = PageRequest.of(page, count);
-        return pageableProductAvailabilityRepository.getByProductId(productId, store, pageRequest);
+        return pageableProductAvailabilityRepository.getByProductId(productId, store, pageable);
     }
 
     @Override
@@ -71,9 +70,8 @@ public class ProductAvailabilityServiceImpl
     }
 
     @Override
-    public Page<ProductAvailability> getBySku(String sku, int page, int count) {
-        Pageable pageRequest = PageRequest.of(page, count);
-        return pageableProductAvailabilityRepository.getBySku(sku, pageRequest);
+    public Page<ProductAvailability> getBySku(String sku, Pageable pageable) {
+        return pageableProductAvailabilityRepository.getBySku(sku, pageable);
     }
 
     @Override

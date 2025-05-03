@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -140,11 +141,11 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
 
     @Override
     public ReadableProductOptionValueList optionValues(
-            StoreMerchantId store, LanguageCode language, String name, int page, int count) {
+            StoreMerchantId store, LanguageCode language, String name, Pageable pageable) {
         Assert.notNull(store, "StoreMerchantId should not be null");
 
         Page<ProductOptionValue> options =
-                productOptionValueService.getByMerchant(store, null, name, page, count);
+                productOptionValueService.getByMerchant(store, null, name, pageable);
         ReadableProductOptionValueList valueList = new ReadableProductOptionValueList();
         valueList.setTotalPages(options.getTotalPages());
         valueList.setTotalElements(options.getTotalElements());
@@ -162,11 +163,11 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
 
     @Override
     public ReadableProductOptionList options(
-            StoreMerchantId store, LanguageCode language, String name, int page, int count) {
+            StoreMerchantId store, LanguageCode language, String name, Pageable pageable) {
         Assert.notNull(store, "StoreMerchantId should not be null");
 
         Page<ProductOption> options =
-                productOptionService.getByMerchant(store, null, name, page, count);
+                productOptionService.getByMerchant(store, null, name, pageable);
         ReadableProductOptionList valueList = new ReadableProductOptionList();
         valueList.setTotalPages(options.getTotalPages());
         valueList.setTotalElements(options.getTotalElements());
@@ -374,7 +375,7 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
 
     @Override
     public ReadableProductAttributeList getAttributesList(
-            Long productId, StoreMerchantId store, LanguageCode language, int page, int count) {
+            Long productId, StoreMerchantId store, LanguageCode language, Pageable pageable) {
 
         Product product = this.product(productId, store);
 
@@ -383,9 +384,9 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
 
         if (language != null) { // all entry
             // attributes = productAttributeService.getByProductId(store, product, language);
-            attr = productAttributeService.getByProductId(store, product, language, page, count);
+            attr = productAttributeService.getByProductId(store, product, language, pageable);
         } else {
-            attr = productAttributeService.getByProductId(store, product, page, count);
+            attr = productAttributeService.getByProductId(store, product,pageable);
         }
         attrList.setTotalElements(attr.getTotalElements());
         attrList.setSize(attr.getNumberOfElements());

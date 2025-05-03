@@ -43,9 +43,7 @@ public class ProductVariantGroupServiceImpl
 
     @Override
     public Page<ProductVariantGroup> getByProductId(
-            StoreMerchantId store, Long productId, LanguageCode language, int page, int count) {
-
-        Pageable pageRequest = PageRequest.of(page, count);
-        return pageableProductVariantGroupRepository.findByProductId(store, productId, pageRequest);
+            StoreMerchantId store, Long productId, LanguageCode language, Pageable pageable) {
+        return pageableProductVariantGroupRepository.findByProductId(store, productId, pageable);
     }
 }

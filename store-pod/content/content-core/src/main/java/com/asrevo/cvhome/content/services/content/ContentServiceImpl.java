@@ -505,20 +505,16 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
 
     @Override
     public Page<Content> listByType(
-            ContentType contentType, StoreMerchantId store, int page, int count) {
-        Pageable pageRequest = PageRequest.of(page, count);
-        return pageContentRepository.findByContentType(contentType, store, pageRequest);
+            ContentType contentType, StoreMerchantId store, Pageable pageable) {
+        return pageContentRepository.findByContentType(contentType, store, pageable);
     }
 
     @Override
     public Page<Content> listByType(
             ContentType contentType,
             StoreMerchantId store,
-            LanguageCode language,
-            int page,
-            int count) {
-        Pageable pageRequest = PageRequest.of(page, count);
-        return pageContentRepository.findByContentType(contentType, store, language, pageRequest);
+            LanguageCode language,Pageable pageable) {
+        return pageContentRepository.findByContentType(contentType, store, language, pageable);
     }
 
     @Override

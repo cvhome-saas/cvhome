@@ -6,6 +6,7 @@ import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface ProductOptionValueService
         extends SalesManagerEntityService<Long, ProductOptionValue> {
@@ -17,5 +18,5 @@ public interface ProductOptionValueService
     ProductOptionValue getById(StoreMerchantId store, Long optionValueId);
 
     Page<ProductOptionValue> getByMerchant(
-            StoreMerchantId store, LanguageCode language, String name, int page, int count);
+            StoreMerchantId store, LanguageCode language, String name, Pageable pageable);
 }

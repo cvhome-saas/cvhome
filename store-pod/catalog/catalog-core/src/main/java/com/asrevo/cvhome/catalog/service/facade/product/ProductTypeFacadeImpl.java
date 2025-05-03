@@ -14,6 +14,7 @@ import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -37,7 +38,7 @@ public class ProductTypeFacadeImpl implements ProductTypeFacade {
 
     @Override
     public ReadableProductTypeList getByMerchant(
-            StoreMerchantId store, LanguageCode language, int count, int page) {
+            StoreMerchantId store, LanguageCode language, Pageable pageable) {
 
         Assert.notNull(store, "store cannot be null");
         ReadableProductTypeList returnList = new ReadableProductTypeList();
@@ -45,7 +46,7 @@ public class ProductTypeFacadeImpl implements ProductTypeFacade {
         try {
 
             Page<ProductType> types =
-                    productTypeService.getByMerchant(store, language, page, count);
+                    productTypeService.getByMerchant(store, language, pageable);
 
             if (types != null) {
                 returnList.setContent(
@@ -54,8 +55,7 @@ public class ProductTypeFacadeImpl implements ProductTypeFacade {
                                 .collect(Collectors.toList()));
                 returnList.setTotalPages(types.getTotalPages());
                 returnList.setTotalElements(types.getTotalElements());
-                returnList.setRecordsFiltered(types.getSize());
-                returnList.setSize(Long.valueOf(types.getTotalElements()).intValue());
+                returnList.setSize(types.getSize());
             }
 
             return returnList;

@@ -1,5 +1,16 @@
 package com.asrevo.cvhome.catalog.api.v1.product;
 
+import com.asrevo.cvhome.catalog.entity.category.Category;
+import com.asrevo.cvhome.catalog.entity.product.Product;
+import com.asrevo.cvhome.catalog.entity.product.ProductCriteria;
+import com.asrevo.cvhome.catalog.model.product.LightPersistableProduct;
+import com.asrevo.cvhome.catalog.model.product.ReadableProduct;
+import com.asrevo.cvhome.catalog.model.product.ReadableProductList;
+import com.asrevo.cvhome.catalog.model.product.product.PersistableProduct;
+import com.asrevo.cvhome.catalog.service.facade.product.ProductCommonFacade;
+import com.asrevo.cvhome.catalog.service.facade.product.ProductFacade;
+import com.asrevo.cvhome.catalog.services.category.CategoryService;
+import com.asrevo.cvhome.catalog.services.product.ProductService;
 import com.asrevo.cvhome.commons.annotation.ConditionalOnApiStatus;
 import com.asrevo.cvhome.commons.annotation.SecuredResource;
 import com.asrevo.cvhome.commons.domain.Entity;
@@ -8,19 +19,8 @@ import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
 import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
 import com.asrevo.cvhome.store.controller.exception.UnauthorizedException;
 import com.asrevo.cvhome.store.core.constants.Constants;
-import com.asrevo.cvhome.catalog.entity.category.Category;
-import com.asrevo.cvhome.catalog.entity.product.Product;
-import com.asrevo.cvhome.catalog.entity.product.ProductCriteria;
-import com.asrevo.cvhome.catalog.model.product.LightPersistableProduct;
-import com.asrevo.cvhome.catalog.model.product.ReadableProduct;
-import com.asrevo.cvhome.catalog.model.product.ReadableProductList;
-import com.asrevo.cvhome.catalog.model.product.product.PersistableProduct;
 import com.asrevo.cvhome.store.core.model.entity.EntityExists;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
-import com.asrevo.cvhome.catalog.services.category.CategoryService;
-import com.asrevo.cvhome.catalog.services.product.ProductService;
-import com.asrevo.cvhome.catalog.service.facade.product.ProductCommonFacade;
-import com.asrevo.cvhome.catalog.service.facade.product.ProductFacade;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -35,6 +35,7 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -152,12 +153,11 @@ public class ProductApi {
             @RequestParam(value = "optionValues", required = false) List<Long> optionValueIds,
             @RequestParam(value = "status", required = false) String status,
             @RequestParam(value = "owner", required = false) Long owner,
-            @RequestParam(value = "page", required = false, defaultValue = "0") Integer page, // current
             @RequestParam(value = "origin", required = false, defaultValue = ProductCriteria.ORIGIN_SHOP) String origin,
-            @RequestParam(value = "count", required = false, defaultValue = "100") Integer count, // count
             @RequestParam(value = "slug", required = false) String slug, // category slug
             @RequestParam(value = "available", required = false) Boolean available,
             @Parameter(hidden = true) StoreMerchantId merchantStore, @Parameter(hidden = true) LanguageCode language,
+            Pageable pageable,
             HttpServletResponse response) {
 
         ProductCriteria criteria = new ProductCriteria();
@@ -203,13 +203,7 @@ public class ProductApi {
             criteria.setOwnerId(owner);
         }
 
-        if (page != null) {
-            criteria.setStartPage(page);
-        }
-
-        if (count != null) {
-            criteria.setMaxCount(count);
-        }
+        criteria.setPageable(pageable);
 
         if (!StringUtils.isBlank(name)) {
             criteria.setProductName(name);

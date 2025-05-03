@@ -5,6 +5,7 @@ import com.asrevo.cvhome.catalog.model.product.product.variant.ReadableProductVa
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.model.entity.ReadableEntityList;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
+import org.springframework.data.domain.Pageable;
 
 public interface ProductVariantFacade {
 
@@ -29,5 +30,5 @@ public interface ProductVariantFacade {
     void delete(Long productVariant, Long productId, StoreMerchantId store);
 
     ReadableEntityList<ReadableProductVariant> list(
-            Long productId, StoreMerchantId store, LanguageCode language, int page, int count);
+            Long productId, StoreMerchantId store, LanguageCode language, Pageable pageable);
 }

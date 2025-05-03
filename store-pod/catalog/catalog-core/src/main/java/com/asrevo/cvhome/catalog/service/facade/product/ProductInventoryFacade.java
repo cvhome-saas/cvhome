@@ -5,13 +5,14 @@ import com.asrevo.cvhome.catalog.model.product.inventory.ReadableInventory;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.model.entity.ReadableEntityList;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
+import org.springframework.data.domain.Pageable;
 
 public interface ProductInventoryFacade {
 
     ReadableInventory get(Long inventoryId, StoreMerchantId store, LanguageCode language);
 
     ReadableEntityList<ReadableInventory> get(
-            String sku, StoreMerchantId store, LanguageCode language, int page, int count);
+            String sku, StoreMerchantId store, LanguageCode language, Pageable pageable);
 
     ReadableInventory add(
             PersistableInventory inventory, StoreMerchantId store, LanguageCode language);
@@ -21,5 +22,5 @@ public interface ProductInventoryFacade {
     void delete(Long productId, Long inventoryId, StoreMerchantId store);
 
     ReadableEntityList<ReadableInventory> get(
-            Long productId, StoreMerchantId store, LanguageCode language, int page, int count);
+            Long productId, StoreMerchantId store, LanguageCode language, Pageable pageable);
 }

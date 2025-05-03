@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -88,9 +89,8 @@ public class ProductVariantGroupApi {
             @PathVariable final Long id,
             @Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
             @Parameter(hidden = true) LanguageCode language,
-            @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
-            @RequestParam(value = "count", required = false, defaultValue = "10") Integer count) {
-        return productVariantGroupFacade.list(id, merchantStore, language, page, count);
+            Pageable pageable) {
+        return productVariantGroupFacade.list(id, merchantStore, language, pageable);
     }
 
 //    // add image

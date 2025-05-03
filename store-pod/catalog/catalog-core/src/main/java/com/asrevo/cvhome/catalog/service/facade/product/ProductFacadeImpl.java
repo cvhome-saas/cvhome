@@ -3,6 +3,7 @@ package com.asrevo.cvhome.catalog.service.facade.product;
 import com.asrevo.cvhome.catalog.entity.category.Category;
 import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.entity.product.ProductCriteria;
+import com.asrevo.cvhome.catalog.entity.product.ProductList;
 import com.asrevo.cvhome.catalog.model.product.ReadableProduct;
 import com.asrevo.cvhome.catalog.model.product.ReadableProductList;
 import com.asrevo.cvhome.catalog.service.populator.catalog.ReadableProductPopulator;
@@ -78,17 +79,12 @@ public class ProductFacadeImpl implements ProductFacade {
             }
         }
 
-        Page<Product> modelProductList =
-                productService.listByStore(
-                        store,
-                        language,
-                        criterias,
-                        criterias.getStartPage(),
-                        criterias.getMaxCount());
 
-        List<Product> products = modelProductList.getContent();
-
-        products = products.stream().sorted(Comparator.comparing(Product::getSortOrder)).toList();
+        ProductList productsLIst = productService.listByStore(
+                store,
+                language,
+                criterias);
+        List<Product> products = productsLIst.getProducts().stream().sorted(Comparator.comparing(Product::getSortOrder)).toList();
 
         ReadableProductPopulator populator =
                 new ReadableProductPopulator(
@@ -104,10 +100,10 @@ public class ProductFacadeImpl implements ProductFacade {
         }
 
         // productList.setTotalPages(products.getTotalCount());
-        productList.setTotalElements(modelProductList.getTotalElements());
+        productList.setTotalElements(productsLIst.getTotalCount());
         productList.setSize(productList.getContent().size());
 
-        productList.setTotalPages(modelProductList.getTotalPages());
+        productList.setTotalPages(productList.getTotalPages());
 
         return productList;
     }

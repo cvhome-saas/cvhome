@@ -32,6 +32,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -232,10 +233,9 @@ public class ProductVariationApi {
     public @ResponseBody ReadableEntityList<ReadableProductVariation> list(
             @Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
             @Parameter(hidden = true) LanguageCode language,
-            @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
-            @RequestParam(value = "count", required = false, defaultValue = "10") Integer count) {
+            Pageable pageable) {
 
-        return productVariationFacade.list(merchantStore, language, page, count);
+        return productVariationFacade.list(merchantStore, language, pageable);
 
 
     }

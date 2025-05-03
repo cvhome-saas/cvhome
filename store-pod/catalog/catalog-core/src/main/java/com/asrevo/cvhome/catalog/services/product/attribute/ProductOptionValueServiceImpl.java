@@ -81,9 +81,8 @@ public class ProductOptionValueServiceImpl
 
     @Override
     public Page<ProductOptionValue> getByMerchant(
-            StoreMerchantId store, LanguageCode language, String name, int page, int count) {
+            StoreMerchantId store, LanguageCode language, String name, Pageable pageable) {
         Assert.notNull(store, "Store cannot be null");
-        Pageable p = PageRequest.of(page, count);
-        return pageableProductOptionValueRepository.listOptionValues(store, name, p);
+        return pageableProductOptionValueRepository.listOptionValues(store, name, pageable);
     }
 }

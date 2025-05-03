@@ -11,6 +11,7 @@ import com.asrevo.cvhome.content.model.content.page.ReadableContentPage;
 import com.asrevo.cvhome.store.core.entity.content.ContentType;
 import com.asrevo.cvhome.store.core.model.entity.ReadableEntityList;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
+import org.springframework.data.domain.Pageable;
 
 /**
  * Images and files management
@@ -39,8 +40,7 @@ public interface ContentFacade {
     /**
      * Returns page names and urls configured for a given StoreMerchantId
      */
-    ReadableEntityList<ReadableContentPage> getContentPages(
-            StoreMerchantId store, LanguageCode language, int page, int count);
+    ReadableEntityList<ReadableContentPage> getContentPages(StoreMerchantId store, LanguageCode language, Pageable pageable);
 
     /**
      * Returns page name by code
@@ -64,7 +64,7 @@ public interface ContentFacade {
     boolean codeExist(String code, String type, StoreMerchantId store);
 
     ReadableEntityList<ReadableContentBox> getContentBoxes(
-            ContentType type, StoreMerchantId store, LanguageCode language, int start, int count);
+            ContentType type, StoreMerchantId store, LanguageCode language, Pageable pageable);
 
     void addContentFile(ContentFile file, String merchantStoreCode);
 

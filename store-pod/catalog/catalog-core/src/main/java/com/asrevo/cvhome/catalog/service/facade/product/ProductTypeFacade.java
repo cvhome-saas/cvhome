@@ -5,11 +5,12 @@ import com.asrevo.cvhome.catalog.model.product.type.ReadableProductType;
 import com.asrevo.cvhome.catalog.model.product.type.ReadableProductTypeList;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
+import org.springframework.data.domain.Pageable;
 
 public interface ProductTypeFacade {
 
     ReadableProductTypeList getByMerchant(
-            StoreMerchantId store, LanguageCode language, int count, int page);
+            StoreMerchantId store, LanguageCode language, Pageable pageable);
 
     ReadableProductType get(StoreMerchantId store, Long id, LanguageCode language);
 

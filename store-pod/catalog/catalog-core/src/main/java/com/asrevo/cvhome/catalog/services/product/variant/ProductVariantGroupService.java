@@ -6,6 +6,7 @@ import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface ProductVariantGroupService
         extends SalesManagerEntityService<Long, ProductVariantGroup> {
@@ -13,7 +14,7 @@ public interface ProductVariantGroupService
     Optional<ProductVariantGroup> getById(Long id, StoreMerchantId store);
 
     Page<ProductVariantGroup> getByProductId(
-            StoreMerchantId store, Long productId, LanguageCode language, int page, int count);
+            StoreMerchantId store, Long productId, LanguageCode language, Pageable pageable);
 
     ProductVariantGroup saveOrUpdate(ProductVariantGroup entity);
 }

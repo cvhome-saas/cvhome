@@ -55,19 +55,15 @@ public class ProductAttributeServiceImpl
      */
     @Override
     public Page<ProductAttribute> getByProductId(
-            StoreMerchantId store, Product product, LanguageCode language, int page, int count) {
+            StoreMerchantId store, Product product, LanguageCode language,Pageable pageable) {
 
-        Pageable pageRequest = PageRequest.of(page, count);
-        return pageableProductAttributeRepository.findByProductId(
-                store, product.getId(), language, pageRequest);
+        return pageableProductAttributeRepository.findByProductId(store, product.getId(), language, pageable);
     }
 
     @Override
     public Page<ProductAttribute> getByProductId(
-            StoreMerchantId store, Product product, int page, int count) {
-        Pageable pageRequest = PageRequest.of(page, count);
-        return pageableProductAttributeRepository.findByProductId(
-                store, product.getId(), pageRequest);
+            StoreMerchantId store, Product product, Pageable pageable) {
+        return pageableProductAttributeRepository.findByProductId(store, product.getId(), pageable);
     }
 
     @Override

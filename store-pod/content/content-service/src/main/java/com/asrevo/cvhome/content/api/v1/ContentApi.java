@@ -25,6 +25,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -65,11 +66,9 @@ public class ContentApi {
     @ConditionalOnApiStatus
     public ReadableEntityList<ReadableContentPage> pages(
             @Parameter(hidden = true) StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language,
-            int page,
-            int count) {
+            @Parameter(hidden = true) LanguageCode language, Pageable pageable) {
         return contentFacade
-                .getContentPages(merchantStore, language, page, count);
+                .getContentPages(merchantStore, language, pageable);
     }
 
     /**
@@ -84,11 +83,9 @@ public class ContentApi {
     @ConditionalOnApiStatus
     public ReadableEntityList<ReadableContentBox> boxes(
             @Parameter(hidden = true) StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language,
-            int page,
-            int count
+            @Parameter(hidden = true) LanguageCode language, Pageable pageable
     ) {
-        return contentFacade.getContentBoxes(ContentType.BOX, merchantStore, language, page, count);
+        return contentFacade.getContentBoxes(ContentType.BOX, merchantStore, language, pageable);
     }
 
     /**

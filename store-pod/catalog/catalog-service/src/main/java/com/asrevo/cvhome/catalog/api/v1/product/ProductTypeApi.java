@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -50,11 +51,12 @@ public class ProductTypeApi {
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
-    public ReadableProductTypeList list(@RequestParam(name = "count", defaultValue = "10") int count,
-                                        @RequestParam(name = "page", defaultValue = "0") int page, @Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-                                        @Parameter(hidden = true) LanguageCode language) {
+    public ReadableProductTypeList list(
+                                        @Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
+                                        @Parameter(hidden = true) LanguageCode language,
+                                        Pageable pageable) {
 
-        return productTypeFacade.getByMerchant(merchantStore, language, count, page);
+        return productTypeFacade.getByMerchant(merchantStore, language, pageable);
 
     }
 

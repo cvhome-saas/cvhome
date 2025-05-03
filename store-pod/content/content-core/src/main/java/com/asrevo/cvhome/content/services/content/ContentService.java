@@ -10,6 +10,7 @@ import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 /**
  * Interface defining methods responsible for CMSContentService.
@@ -130,14 +131,13 @@ public interface ContentService extends SalesManagerEntityService<Long, Content>
 
     List<Content> listByType(List<ContentType> contentType, StoreMerchantId store);
 
-    Page<Content> listByType(ContentType contentType, StoreMerchantId store, int page, int count);
+    Page<Content> listByType(ContentType contentType, StoreMerchantId store, Pageable pageable);
 
     Page<Content> listByType(
             ContentType contentType,
             StoreMerchantId store,
             LanguageCode language,
-            int page,
-            int count);
+            Pageable pageable);
 
     List<ContentDescription> listNameByType(
             List<ContentType> contentType, StoreMerchantId store, LanguageCode language);

@@ -7,6 +7,7 @@ import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface ProductAvailabilityService
         extends SalesManagerEntityService<Long, ProductAvailability> {
@@ -14,12 +15,12 @@ public interface ProductAvailabilityService
     ProductAvailability saveOrUpdate(ProductAvailability availability) throws ServiceException;
 
     Page<ProductAvailability> listByProduct(
-            Long productId, StoreMerchantId store, int page, int count);
+            Long productId, StoreMerchantId store, Pageable pageable);
 
     /**
      * Get by sku
      */
-    Page<ProductAvailability> getBySku(String sku, int page, int count);
+    Page<ProductAvailability> getBySku(String sku,Pageable pageable);
 
     /**
      * All availability by product / product variant sku and store

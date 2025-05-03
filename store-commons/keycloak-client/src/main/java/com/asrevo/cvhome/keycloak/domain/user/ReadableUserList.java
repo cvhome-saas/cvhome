@@ -9,12 +9,13 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ReadableUserList extends ReadableList {
+@Deprecated
+public class ReadableUserList extends ReadableList<ReadableUser> {
 
     /**
      *
      */
     @Serial private static final long serialVersionUID = 1L;
 
-    private List<ReadableUser> data = new ArrayList<>();
+    private List<ReadableUser> content = new ArrayList<>();
 }

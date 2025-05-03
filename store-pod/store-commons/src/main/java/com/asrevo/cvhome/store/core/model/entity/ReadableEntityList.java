@@ -8,12 +8,13 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public class ReadableEntityList<T> extends ReadableList {
+@Deprecated
+public class ReadableEntityList<T> extends ReadableList<T> {
 
     /**
      *
      */
     @Serial private static final long serialVersionUID = 1L;
 
-    private List<T> items;
+    private List<T> content;
 }

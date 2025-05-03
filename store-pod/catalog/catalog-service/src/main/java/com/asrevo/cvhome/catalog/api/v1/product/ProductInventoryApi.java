@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -91,10 +92,9 @@ public class ProductInventoryApi {
             @PathVariable String sku,
             @Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
             @Parameter(hidden = true) LanguageCode language,
-            @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
-            @RequestParam(value = "count", required = false, defaultValue = "10") Integer count) {
+            Pageable pageable) {
 
-        return productInventoryFacade.get(sku, merchantStore, language, page, count);
+        return productInventoryFacade.get(sku, merchantStore, language, pageable);
 
     }
 
@@ -108,14 +108,13 @@ public class ProductInventoryApi {
             @RequestParam Long productId,
             @Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
             @Parameter(hidden = true) LanguageCode language,
-            @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
-            @RequestParam(value = "count", required = false, defaultValue = "10") Integer count) {
+            Pageable pageable) {
 
         if (productId == null) {
             throw new RestApiException("Requires request parameter product id [/product/inventoty?productId");
         }
 
-        return productInventoryFacade.get(productId, merchantStore, language, page, count);
+        return productInventoryFacade.get(productId, merchantStore, language, pageable);
 
     }
 

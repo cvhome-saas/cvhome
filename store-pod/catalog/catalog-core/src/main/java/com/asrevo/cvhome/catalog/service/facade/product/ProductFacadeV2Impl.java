@@ -3,6 +3,7 @@ package com.asrevo.cvhome.catalog.service.facade.product;
 import com.asrevo.cvhome.catalog.entity.category.Category;
 import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.entity.product.ProductCriteria;
+import com.asrevo.cvhome.catalog.entity.product.ProductList;
 import com.asrevo.cvhome.catalog.entity.product.variant.ProductVariant;
 import com.asrevo.cvhome.catalog.model.product.ReadableProduct;
 import com.asrevo.cvhome.catalog.model.product.ReadableProductList;
@@ -133,28 +134,23 @@ public class ProductFacadeV2Impl implements ProductFacade {
             }
         }
 
-        Page<Product> modelProductList =
-                productService.listByStore(
-                        store,
-                        language,
-                        criterias,
-                        criterias.getStartPage(),
-                        criterias.getMaxCount());
-
-        List<Product> products = modelProductList.getContent();
-        ReadableProductList productList = new ReadableProductList();
+        ProductList productList = productService.listByStore(
+                store,
+                language,
+                criterias);
+        ReadableProductList readableProductList = new ReadableProductList();
 
         List<ReadableProduct> readableProducts =
-                products.stream()
+                productList.getProducts().stream()
                         .map(p -> readableProductMapper.convert(p, store, language))
                         .sorted(Comparator.comparing(ReadableProduct::getSortOrder))
                         .collect(Collectors.toList());
 
-        productList.setTotalElements(modelProductList.getTotalElements());
-        productList.setSize(modelProductList.getNumberOfElements());
-        productList.setContent(readableProducts);
-        productList.setTotalPages(modelProductList.getTotalPages());
+        readableProductList.setTotalElements(productList.getTotalCount());
+        readableProductList.setSize(productList.getProducts().size());
+        readableProductList.setContent(readableProducts);
+        readableProductList.setTotalPages(productList.getTotalPages());
 
-        return productList;
+        return readableProductList;
     }
 }

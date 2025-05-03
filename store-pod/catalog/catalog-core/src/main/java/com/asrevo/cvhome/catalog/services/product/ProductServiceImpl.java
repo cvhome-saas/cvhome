@@ -267,25 +267,6 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
     }
 
     @Override
-    public Page<Product> listByStore(
-            StoreMerchantId store,
-            LanguageCode language,
-            ProductCriteria criteria,
-            int page,
-            int count) {
-
-        criteria.setPageSize(page);
-        criteria.setPageSize(count);
-        criteria.setLegacyPagination(false);
-
-        ProductList productList = productRepository.listByStore(store, language, criteria);
-
-        PageRequest pageRequest = PageRequest.of(page, count);
-
-        return new PageImpl<>(productList.getProducts(), pageRequest, productList.getTotalCount());
-    }
-
-    @Override
     public Product saveProduct(Product product) throws ServiceException {
         try {
             return this.saveOrUpdate(product);

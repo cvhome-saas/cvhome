@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -57,15 +58,14 @@ public class CategoryFacadeImpl implements CategoryFacade {
             int depth,
             LanguageCode language,
             List<String> filter,
-            int page,
-            int count) {
+            Pageable pageable) {
 
         Assert.notNull(store, "Store can not be null");
 
         // get parent store
 
         ReadableCategoryList returnList =
-                getReadableCategoryList(store, criteria, depth, language, filter, page, count);
+                getReadableCategoryList(store, criteria, depth, language, filter, pageable);
 
         Map<Long, ReadableCategory> readableCategoryMap =
                 returnList.getContent().stream()
@@ -109,8 +109,7 @@ public class CategoryFacadeImpl implements CategoryFacade {
             int depth,
             LanguageCode language,
             List<String> filter,
-            int page,
-            int count) {
+            Pageable pageable) {
         List<Category> categories;
         ReadableCategoryList returnList = new ReadableCategoryList();
         if (!CollectionUtils.isEmpty(filter) && filter.contains(FEATURED_CATEGORY)) {
@@ -119,17 +118,15 @@ public class CategoryFacadeImpl implements CategoryFacade {
             returnList.setSize(categories.size());
             returnList.setTotalPages(1);
         } else {
-            org.springframework.data.domain.Page<Category> pageable =
+            org.springframework.data.domain.Page<Category> page =
                     categoryService.getListByDepth(
                             store,
                             language,
                             criteria != null ? criteria.getName() : null,
-                            depth,
-                            page,
-                            count);
-            categories = pageable.getContent();
-            returnList.setTotalElements(pageable.getTotalElements());
-            returnList.setTotalPages(pageable.getTotalPages());
+                            depth,pageable);
+            categories = page.getContent();
+            returnList.setTotalElements(page.getTotalElements());
+            returnList.setTotalPages(page.getTotalPages());
             returnList.setSize(categories.size());
         }
 

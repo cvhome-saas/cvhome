@@ -92,16 +92,8 @@ public class ManufacturerServiceImpl extends SalesManagerEntityServiceImpl<Long,
 
     @Override
     public Page<Manufacturer> listByStore(
-            StoreMerchantId store, LanguageCode language, String name, int page, int count) {
-
-        Pageable pageRequest = PageRequest.of(page, count);
-        return pageableManufacturerRepository.findByStore(store, language, name, pageRequest);
+            StoreMerchantId store, LanguageCode language, String name, Pageable pageable) {
+        return pageableManufacturerRepository.findByStore(store, language, name, pageable);
     }
 
-    @Override
-    public Page<Manufacturer> listByStore(StoreMerchantId store, String name, int page, int count) {
-
-        Pageable pageRequest = PageRequest.of(page, count);
-        return pageableManufacturerRepository.findByStore(store, name, pageRequest);
-    }
 }

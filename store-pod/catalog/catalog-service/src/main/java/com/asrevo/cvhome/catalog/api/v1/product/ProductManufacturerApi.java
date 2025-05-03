@@ -22,6 +22,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -127,12 +128,11 @@ public class ProductManufacturerApi {
             @Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
             @Parameter(hidden = true) LanguageCode language,
             @RequestParam(value = "name", required = false) String name,
-            @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
-            @RequestParam(value = "count", required = false, defaultValue = "10") Integer count) {
+            Pageable pageable) {
 
         ListCriteria listCriteria = new ListCriteria();
         listCriteria.setName(name);
-        return manufacturerFacade.listByStore(merchantStore, language, listCriteria, page, count);
+        return manufacturerFacade.listByStore(merchantStore, language, listCriteria, pageable);
     }
 
 
@@ -148,12 +148,11 @@ public class ProductManufacturerApi {
     )
     public ReadableManufacturerList list(@Parameter(hidden = true) StoreMerchantId merchantStore, @Parameter(hidden = true) LanguageCode language,
                                          @RequestParam(value = "name", required = false) String name,
-                                         @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
-                                         @RequestParam(value = "count", required = false, defaultValue = "10") Integer count) {
+                                         Pageable pageable) {
 
         ListCriteria listCriteria = new ListCriteria();
         listCriteria.setName(name);
-        return manufacturerFacade.getAllManufacturers(merchantStore, language, listCriteria, page, count);
+        return manufacturerFacade.getAllManufacturers(merchantStore, language, listCriteria, pageable);
     }
 
     @ResponseStatus(HttpStatus.OK)

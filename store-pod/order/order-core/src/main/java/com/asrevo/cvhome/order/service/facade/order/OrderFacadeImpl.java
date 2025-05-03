@@ -331,8 +331,6 @@ public class OrderFacadeImpl implements OrderFacade {
     @Override
     public ReadableOrderList getReadableOrderList(OrderCriteria criteria, StoreMerchantId store) {
         try {
-            criteria.setLegacyPagination(false);
-
             OrderList orderList = orderService.getOrders(criteria, store);
 
             List<Order> orders = orderList.getOrders();

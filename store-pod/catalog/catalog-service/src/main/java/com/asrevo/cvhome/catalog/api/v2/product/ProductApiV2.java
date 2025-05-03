@@ -29,6 +29,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -168,19 +169,11 @@ public class ProductApiV2 {
     })
     @ConditionalOnApiStatus
     public ReadableProductList list(
-            @RequestParam(value = "lang", required = false) String lang,
             ProductCriteria searchCriterias,
-
-            // page
-            // 0
-            // ..
-            // n
-            // allowing
-            // navigation
-            @RequestParam(value = "count", required = false, defaultValue = "100") Integer count, // count
-            // per
-            // page
-            @Parameter(hidden = true) StoreMerchantId merchantStore, @Parameter(hidden = true) LanguageCode language) {
+            @Parameter(hidden = true) StoreMerchantId merchantStore,
+            @Parameter(hidden = true) LanguageCode language,
+            Pageable pageable
+    ) {
 
 
         if (!StringUtils.isBlank(searchCriterias.getSku())) {
@@ -191,7 +184,7 @@ public class ProductApiV2 {
             searchCriterias.setProductName(searchCriterias.getName());
         }
 
-        searchCriterias.setMaxCount(count);
+        searchCriterias.setPageable(pageable);
         searchCriterias.setLanguage(language);
 
         try {

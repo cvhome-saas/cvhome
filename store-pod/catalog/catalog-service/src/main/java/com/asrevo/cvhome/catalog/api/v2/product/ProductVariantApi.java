@@ -20,6 +20,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -118,10 +119,9 @@ public class ProductVariantApi {
     })
     public @ResponseBody ReadableEntityList<ReadableProductVariant> list(@PathVariable final Long id,
                                                                          @Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore, @Parameter(hidden = true) LanguageCode language,
-                                                                         @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
-                                                                         @RequestParam(value = "count", required = false, defaultValue = "10") Integer count) {
+                                                                         Pageable pageable) {
 
-        return productVariantFacade.list(id, merchantStore, language, page, count);
+        return productVariantFacade.list(id, merchantStore, language, pageable);
 
     }
 

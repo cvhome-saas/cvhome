@@ -77,9 +77,8 @@ public class ProductOptionServiceImpl extends SalesManagerEntityServiceImpl<Long
 
     @Override
     public Page<ProductOption> getByMerchant(
-            StoreMerchantId store, LanguageCode language, String name, int page, int count) {
+            StoreMerchantId store, LanguageCode language, String name, Pageable pageable) {
         Assert.notNull(store, "Store cannot be null");
-        Pageable p = PageRequest.of(page, count);
-        return pageableProductOptionRepository.listOptions(store, name, p);
+        return pageableProductOptionRepository.listOptions(store, name, pageable);
     }
 }
