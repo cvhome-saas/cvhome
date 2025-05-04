@@ -23,14 +23,6 @@ public interface ProductTypeRepository extends JpaRepository<ProductType, Long> 
                             select p from ProductType p
                             left join fetch p.descriptions pd
                             where p.id=?1 and p.storeMerchantId=?2""")
-    ProductType findById(Long id, StoreMerchantId storeMerchantId, LanguageCode language);
-
-    @Query(
-            value =
-                    """
-                            select p from ProductType p
-                            left join fetch p.descriptions pd
-                            where p.id=?1 and p.storeMerchantId=?2""")
     ProductType findById(Long id, StoreMerchantId storeMerchantId);
 
     @Query(

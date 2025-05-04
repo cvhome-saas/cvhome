@@ -16,8 +16,6 @@ public interface ProductTypeService extends SalesManagerEntityService<Long, Prod
 
     ProductType getByCode(String code, StoreMerchantId store, LanguageCode language);
 
-    ProductType getById(Long id, StoreMerchantId store, LanguageCode language);
-
     ProductType getById(Long id, StoreMerchantId store);
 
     ProductType saveOrUpdate(ProductType productType) throws ServiceException;

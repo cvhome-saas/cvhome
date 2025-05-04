@@ -43,26 +43,17 @@ public class ProductTypeFacadeImpl implements ProductTypeFacade {
         Assert.notNull(store, "store cannot be null");
         ReadableProductTypeList returnList = new ReadableProductTypeList();
 
-        try {
+        Page<ProductType> types = productTypeService.getByMerchant(store, language, pageable);
 
-            Page<ProductType> types = productTypeService.getByMerchant(store, language, pageable);
+        returnList.setContent(
+                types.getContent().stream()
+                        .map(t -> readableProductTypeMapper.convert(t, store, language))
+                        .collect(Collectors.toList()));
+        returnList.setTotalPages(types.getTotalPages());
+        returnList.setTotalElements(types.getTotalElements());
+        returnList.setSize(types.getSize());
 
-            if (types != null) {
-                returnList.setContent(
-                        types.getContent().stream()
-                                .map(t -> readableProductTypeMapper.convert(t, store, language))
-                                .collect(Collectors.toList()));
-                returnList.setTotalPages(types.getTotalPages());
-                returnList.setTotalElements(types.getTotalElements());
-                returnList.setSize(types.getSize());
-            }
-
-            return returnList;
-        } catch (Exception e) {
-            throw new ServiceRuntimeException(
-                    "An exception occured while getting product types for merchant[ " + store + "]",
-                    e);
-        }
+        return returnList;
     }
 
     @Override
@@ -72,12 +63,7 @@ public class ProductTypeFacadeImpl implements ProductTypeFacade {
         Assert.notNull(id, "ProductType code cannot be empty");
         try {
 
-            ProductType type;
-            if (language == null) {
-                type = productTypeService.getById(id, store);
-            } else {
-                type = productTypeService.getById(id, store, language);
-            }
+            ProductType type = productTypeService.getById(id, store);
 
             if (type == null) {
                 throw new ResourceNotFoundException(
@@ -134,7 +120,7 @@ public class ProductTypeFacadeImpl implements ProductTypeFacade {
 
         try {
 
-            ProductType t = productTypeService.getById(id, store, language);
+            ProductType t = productTypeService.getById(id, store);
             if (t == null) {
                 throw new ResourceNotFoundException(
                         "Product type ["
@@ -163,7 +149,7 @@ public class ProductTypeFacadeImpl implements ProductTypeFacade {
 
         try {
 
-            ProductType t = productTypeService.getById(id, store, language);
+            ProductType t = productTypeService.getById(id, store);
             if (t == null) {
                 throw new ResourceNotFoundException(
                         "Product type [" + id + "] does not exist for store [" + store + "]");
