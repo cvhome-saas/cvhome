@@ -52,12 +52,4 @@ public interface CategoryRepository
                      where c.storeMerchantId=?1 and c.lineage like
                      %?2% order by c.lineage, c.sortOrder asc""")
     List<Category> findByLineage(StoreMerchantId storeMerchantId, String linenage);
-
-    @Query(
-            """
-                    select distinct c from Category c left join fetch c.descriptions cd
-                     where c.storeMerchantId=?1 and cd.languageCode=?3 and
-                     c.depth >= ?2 and c.featured=true order by c.lineage, c.sortOrder asc""")
-    List<Category> findByDepthFilterByFeatured(
-            StoreMerchantId storeMerchantId, int depth, LanguageCode languageId);
 }

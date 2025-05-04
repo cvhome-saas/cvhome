@@ -58,7 +58,7 @@ export class CategoryService {
   }
 
   getHierarchyOfCategories(params?): Observable<any> {
-    return this.crudService.get(`/store-pod-gateway/catalog/api/v1/category`, params);
+    return this.crudService.get(`/store-pod-gateway/catalog/api/v1/private/category-hierarchy`, params);
   }
 
   updateHierarchy(childId, parentId, store): Observable<any> {

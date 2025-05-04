@@ -18,5 +18,6 @@ public class ReadableCategory extends CategoryEntity {
     private CategoryDescription description; // one category based on language
     private int productCount;
     private String store;
+    private List<CategoryDescription> descriptions = new ArrayList<>();
     private List<ReadableCategory> children = new ArrayList<>();
 }

@@ -58,7 +58,7 @@ public class CategoryApi {
             @PathVariable(name = "id") Long categoryId,
             @Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
             @Parameter(hidden = true) LanguageCode language) {
-        return categoryFacade.getById(merchantStore, categoryId, language);
+        return categoryFacade.getById(merchantStore, categoryId, LanguageCode.allLanguage());
     }
 
     @GetMapping(value = "/category/{friendlyUrl}", produces = {APPLICATION_JSON_VALUE})
@@ -70,7 +70,7 @@ public class CategoryApi {
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     @ConditionalOnApiStatus
-    public ReadableCategory getByfriendlyUrl(
+    public ReadableCategory getByFriendlyUrl(
             @PathVariable(name = "friendlyUrl") String friendlyUrl,
             @Parameter(hidden = true) StoreMerchantId merchantStore,
             @Parameter(hidden = true) LanguageCode language) throws Exception {
@@ -95,7 +95,7 @@ public class CategoryApi {
      * Get all categories starting from root filter can be used for filtering on
      * fields only featured is supported
      */
-    @GetMapping(value = "private/category", produces = {APPLICATION_JSON_VALUE})
+    @GetMapping(value = "/private/category", produces = {APPLICATION_JSON_VALUE})
     @Operation(method = "GET", description = "Get category hierarchy from root. Supports filtering FEATURED_CATEGORIES and VISIBLE ONLY by adding ?filter=[featured] or ?filter=[visible] or ? filter=[featured,visible", summary = "Does not return any product attached")
     @Parameters({
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
@@ -112,14 +112,14 @@ public class CategoryApi {
 
         ListCriteria criteria = new ListCriteria();
         criteria.setName(name);
-        return categoryFacade.getReadableCategoryList(merchantStore, criteria, DEFAULT_CATEGORY_DEPTH, language, filter, pageable);
+        return categoryFacade.getReadableCategoryList(merchantStore, criteria, DEFAULT_CATEGORY_DEPTH, LanguageCode.nonLanguage(), filter, pageable);
     }
 
     /**
      * Get all categories starting from root filter can be used for filtering on
      * fields only featured is supported
      */
-    @GetMapping(value = "/category", produces = {APPLICATION_JSON_VALUE})
+    @GetMapping(value = "/private/category-hierarchy", produces = {APPLICATION_JSON_VALUE})
     @Operation(method = "GET", description = "Get category hierarchy from root. Supports filtering FEATURED_CATEGORIES and VISIBLE ONLY by adding ?filter=[featured] or ?filter=[visible] or ? filter=[featured,visible", summary = "Does not return any product attached")
     @Parameters({
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
@@ -136,11 +136,31 @@ public class CategoryApi {
 
         ListCriteria criteria = new ListCriteria();
         criteria.setName(name);
+        return categoryFacade.getCategoryHierarchy(merchantStore, criteria, DEFAULT_CATEGORY_DEPTH, LanguageCode.nonLanguage(), filter,pageable);
+    }
+
+    @GetMapping(value = "/category-hierarchy", produces = {APPLICATION_JSON_VALUE})
+    @Operation(method = "GET", description = "Get category hierarchy from root. Supports filtering FEATURED_CATEGORIES and VISIBLE ONLY by adding ?filter=[featured] or ?filter=[visible] or ? filter=[featured,visible", summary = "Does not return any product attached")
+    @Parameters({
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
+    })
+    @ConditionalOnApiStatus
+    public ReadableCategoryList getHierarchyList(
+            @RequestParam(value = "filter", required = false) List<String> filter,
+            @RequestParam(value = "name", required = false) String name,
+            @Parameter(hidden = true) StoreMerchantId merchantStore,
+            @Parameter(hidden = true) LanguageCode language,
+            Pageable pageable) {
+
+
+        ListCriteria criteria = new ListCriteria();
+        criteria.setName(name);
         return categoryFacade.getCategoryHierarchy(merchantStore, criteria, DEFAULT_CATEGORY_DEPTH, language, filter,pageable);
     }
 
 
-    @GetMapping(value = "/category/product/{ProductId}", produces = {APPLICATION_JSON_VALUE})
+    @GetMapping(value = "/private/category/product/{productId}", produces = {APPLICATION_JSON_VALUE})
     @Operation(method = "GET", description = "Get category by product")
     @Parameters({
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
@@ -148,12 +168,12 @@ public class CategoryApi {
     })
     @ConditionalOnApiStatus
     public ReadableCategoryList list(
-            @PathVariable(name = "ProductId") Long id,
+            @PathVariable(name = "productId") Long productId,
             @Parameter(hidden = true) StoreMerchantId merchantStore,
             @Parameter(hidden = true) LanguageCode lang) {
 
 
-        return categoryFacade.listByProduct(merchantStore, id, lang);
+        return categoryFacade.listByProduct(merchantStore, productId, LanguageCode.nonLanguage());
 
     }
 

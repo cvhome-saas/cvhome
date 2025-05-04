@@ -67,7 +67,7 @@ export class CategoriesHierarchyComponent implements OnInit {
 
   toTreeNode(root: NgcxTreeNode, categories: any[]): void {
     categories.forEach(it => {
-      const node: NgcxTreeNode = this.toNode(it.description.name, it.id);
+      const node: NgcxTreeNode = this.toNode(it.code, it.id);
       root.children.push(node);
       if (it.children) {
         this.toTreeNode(node, it.children)
