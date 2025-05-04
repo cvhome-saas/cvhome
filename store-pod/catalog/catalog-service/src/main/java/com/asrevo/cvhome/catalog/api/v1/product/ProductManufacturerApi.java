@@ -113,6 +113,36 @@ public class ProductManufacturerApi {
         return null;
     }
 
+    @RequestMapping(value = "/private/manufacturer/{id}", method = RequestMethod.GET)
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    @Parameters({
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
+    })
+    public ReadableManufacturer getBrand(@PathVariable Long id, @Parameter(hidden = true) StoreMerchantId merchantStore,
+                                    @Parameter(hidden = true) LanguageCode language, HttpServletResponse response) {
+
+        try {
+            ReadableManufacturer manufacturer = manufacturerFacade.getManufacturer(id, merchantStore, LanguageCode.allLanguage());
+
+            if (manufacturer == null) {
+                response.sendError(404, "No Manufacturer found for ID : " + id);
+            }
+
+            return manufacturer;
+
+        } catch (Exception e) {
+            log.error("Error while getting manufacturer", e);
+            try {
+                response.sendError(503, "Error while getting manufacturer " + e.getMessage());
+            } catch (Exception ignore) {
+            }
+        }
+
+        return null;
+    }
+
 
     @RequestMapping(value = "/private/manufacturers", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
@@ -132,7 +162,7 @@ public class ProductManufacturerApi {
 
         ListCriteria listCriteria = new ListCriteria();
         listCriteria.setName(name);
-        return manufacturerFacade.listByStore(merchantStore, language, listCriteria, pageable);
+        return manufacturerFacade.listByStore(merchantStore, LanguageCode.nonLanguage(), listCriteria, pageable);
     }
 
 
@@ -146,13 +176,14 @@ public class ProductManufacturerApi {
     @Operation(method = "GET", description = "List manufacturers by store", summary = "This request supports paging or not. Paging supports page number and request count",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ReadableManufacturerList.class)))
     )
-    public ReadableManufacturerList list(@Parameter(hidden = true) StoreMerchantId merchantStore, @Parameter(hidden = true) LanguageCode language,
+    public ReadableManufacturerList list(@Parameter(hidden = true) StoreMerchantId merchantStore,
+                                         @Parameter(hidden = true) LanguageCode language,
                                          @RequestParam(value = "name", required = false) String name,
                                          Pageable pageable) {
 
         ListCriteria listCriteria = new ListCriteria();
         listCriteria.setName(name);
-        return manufacturerFacade.getAllManufacturers(merchantStore, language, listCriteria, pageable);
+        return manufacturerFacade.listByStore(merchantStore, language, listCriteria, pageable);
     }
 
     @ResponseStatus(HttpStatus.OK)

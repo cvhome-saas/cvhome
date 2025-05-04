@@ -2,6 +2,7 @@ package com.asrevo.cvhome.content.model.content.page;
 
 import com.asrevo.cvhome.content.model.content.common.ContentDescription;
 import java.io.Serial;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,4 +17,5 @@ public class ReadableContentPage extends ContentPage {
 
     private ContentDescription description;
     private String path;
+    private List<ContentDescription> descriptions;
 }

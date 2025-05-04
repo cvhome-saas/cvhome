@@ -38,12 +38,6 @@ public interface ManufacturerFacade {
     ReadableManufacturer getManufacturer(Long id, StoreMerchantId store, LanguageCode language);
 
     /**
-     * Get all Manufacturer
-     */
-    ReadableManufacturerList getAllManufacturers(
-            StoreMerchantId store, LanguageCode language, ListCriteria criteria, Pageable pageable);
-
-    /**
      * List manufacturers by a specific store
      */
     ReadableManufacturerList listByStore(

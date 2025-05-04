@@ -58,7 +58,7 @@ export class ContentService {
   }
 
   getPage(uniqueCode: string, store: string) {
-    return this.crudService.get('/store-pod-gateway/content/api/v1/content/pages/' + uniqueCode + '?lang=_all&store=' + store)
+    return this.crudService.get('/store-pod-gateway/content/api/v1/private/content/pages/' + uniqueCode + '?lang=_all&store=' + store)
 
   }
 

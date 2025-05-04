@@ -44,7 +44,7 @@ public class CustomerApi {
     public ReadableCustomerList list(@Parameter(hidden = true) StoreMerchantId merchantStore,
                                      @Parameter(hidden = true) LanguageCode language, Pageable pageable) {
         CustomerCriteria customerCriteria = createCustomerCriteria(pageable);
-        return customerFacade.getListByStore(merchantStore, customerCriteria, language);
+        return customerFacade.getListByStore(merchantStore, customerCriteria, LanguageCode.nonLanguage());
     }
 
     private CustomerCriteria createCustomerCriteria(Pageable pageable) {

@@ -132,42 +132,6 @@ public class ManufacturerFacadeImpl implements ManufacturerFacade {
     }
 
     @Override
-    public ReadableManufacturerList getAllManufacturers(
-            StoreMerchantId store,
-            LanguageCode language,
-            ListCriteria criteria,
-            Pageable pageable) {
-
-        ReadableManufacturerList readableList = new ReadableManufacturerList();
-        try {
-
-            List<Manufacturer> manufacturers;
-
-            Page<Manufacturer> m =
-                    manufacturerService.listByStore(store, language, criteria.getName(), pageable);
-            manufacturers = m.getContent();
-            readableList.setTotalPages(m.getTotalPages());
-            readableList.setTotalElements(m.getTotalElements());
-            readableList.setSize(m.getNumber());
-
-            ReadableManufacturerPopulator populator = new ReadableManufacturerPopulator();
-            List<ReadableManufacturer> returnList = new ArrayList<>();
-
-            for (Manufacturer ms : manufacturers) {
-                ReadableManufacturer readableManufacturer = new ReadableManufacturer();
-                populator.populate(ms, readableManufacturer, store, language);
-                returnList.add(readableManufacturer);
-            }
-
-            readableList.setContent(returnList);
-            return readableList;
-
-        } catch (Exception e) {
-            throw new ServiceRuntimeException("Error while get manufacturers", e);
-        }
-    }
-
-    @Override
     public boolean manufacturerExist(StoreMerchantId store, String manufacturerCode) {
         Assert.notNull(store, "Store must not be null");
         Assert.notNull(manufacturerCode, "Manufacturer code must not be null");
@@ -198,7 +162,7 @@ public class ManufacturerFacadeImpl implements ManufacturerFacade {
             manufacturers = m.getContent();
             readableList.setTotalPages(m.getTotalPages());
             readableList.setTotalElements(m.getTotalElements());
-            readableList.setSize(m.getContent().size());
+            readableList.setSize(m.getNumberOfElements());
 
             ReadableManufacturerPopulator populator = new ReadableManufacturerPopulator();
             List<ReadableManufacturer> returnList = new ArrayList<>();

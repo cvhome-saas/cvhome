@@ -1,37 +1,36 @@
-package com.asrevo.cvhome.catalog.service.populator.manufacturer;
+package com.asrevo.cvhome.content.service.populator.content;
 
-import com.asrevo.cvhome.catalog.entity.product.manufacturer.Manufacturer;
-import com.asrevo.cvhome.catalog.entity.product.manufacturer.ManufacturerDescription;
-import com.asrevo.cvhome.catalog.model.manufacturer.ReadableManufacturer;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.content.entity.content.Content;
+import com.asrevo.cvhome.content.entity.content.ContentDescription;
+import com.asrevo.cvhome.content.model.content.box.ReadableContentBox;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import com.asrevo.cvhome.store.core.populator.AbstractDataPopulator;
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
-public class ReadableManufacturerPopulator
-        extends AbstractDataPopulator<Manufacturer, StoreMerchantId, ReadableManufacturer> {
-
+public class ReadableContentBoxPopulator
+        extends AbstractDataPopulator<Content, StoreMerchantId, ReadableContentBox> {
     @Override
-    public ReadableManufacturer populate(
-            Manufacturer source,
-            ReadableManufacturer target,
+    public ReadableContentBox populate(
+            Content source,
+            ReadableContentBox target,
             StoreMerchantId store,
             LanguageCode language) {
 
         if (target == null) {
-            target = new ReadableManufacturer();
+            target = new ReadableContentBox();
         }
-        target.setOrder(source.getOrder());
         target.setId(source.getId());
         target.setCode(source.getCode());
+        target.setVisible(source.isVisible());
 
         if (LanguageCode.isAllLanguage(language)) {
-            var descriptionSet = Optional.ofNullable(source.getDescriptions()).orElse(Set.of());
+            var descriptionSet = Optional.ofNullable(source.getDescriptions()).orElse(List.of());
             target.setDescriptions(descriptionSet.stream().map(this::populateDescription).toList());
         }
         if (LanguageCode.isLanguage(language)) {
-            var descriptionSet = Optional.ofNullable(source.getDescriptions()).orElse(Set.of());
+            var descriptionSet = Optional.ofNullable(source.getDescriptions()).orElse(List.of());
             var description =
                     descriptionSet.stream()
                             .filter(it -> language.equals(it.getLanguageCode()))
@@ -45,19 +44,21 @@ public class ReadableManufacturerPopulator
     }
 
     @Override
-    protected ReadableManufacturer createTarget() {
+    protected ReadableContentBox createTarget() {
         return null;
     }
 
-    com.asrevo.cvhome.catalog.model.manufacturer.ManufacturerDescription populateDescription(
-            ManufacturerDescription description) {
+    com.asrevo.cvhome.content.model.content.common.ContentDescription populateDescription(
+            ContentDescription description) {
         if (description == null) {
             return null;
         }
-        var d = new com.asrevo.cvhome.catalog.model.manufacturer.ManufacturerDescription();
+        var d = new com.asrevo.cvhome.content.model.content.common.ContentDescription();
         d.setName(description.getName());
         d.setDescription(description.getDescription());
+        d.setMetaDescription(description.getMetatagDescription());
         d.setId(description.getId());
+        d.setFriendlyUrl(description.getSeUrl());
         d.setTitle(description.getTitle());
         if (description.getLanguageCode() != null) {
             d.setLanguage(description.getLanguageCode());

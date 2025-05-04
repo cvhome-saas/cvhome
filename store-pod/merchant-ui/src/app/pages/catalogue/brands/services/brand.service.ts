@@ -26,7 +26,7 @@ export class BrandService {
       store,
       lang: '_all'
     };
-    return this.crudService.get(`/store-pod-gateway/catalog/api/v1/manufacturer/${id}`, params);
+    return this.crudService.get(`/store-pod-gateway/catalog/api/v1/private/manufacturer/${id}`, params);
   }
 
   createBrand(store, brand): Observable<any> {
