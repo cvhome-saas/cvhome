@@ -68,11 +68,6 @@ public class PersistableOrderApiPopulator
 
             Currency currency = currencyService.getByCode(baseStore.getCurrency());
 
-            if (currency == null) {
-                throw new ConversionException(
-                        "Currency not found for code " + source.getCurrency());
-            }
-
             // Customer
             Customer customer;
             if (source.getCustomerId() != null && source.getCustomerId() > 0) {
@@ -81,7 +76,7 @@ public class PersistableOrderApiPopulator
 
                 if (customer == null) {
                     throw new ConversionException(
-                            "Curstomer with id " + source.getCustomerId() + " does not exist");
+                            "Customer with id " + source.getCustomerId() + " does not exist");
                 }
                 target.setCustomerId(customerId);
 
@@ -94,7 +89,7 @@ public class PersistableOrderApiPopulator
                             customerPopulator.populate(
                                     persistableCustomer, customer, store, language);
                 } else {
-                    throw new ConversionException("Curstomer details or id not set in request");
+                    throw new ConversionException("Customer details or id not set in request");
                 }
             }
 
