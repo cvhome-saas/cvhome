@@ -46,7 +46,7 @@ public class CustomerOptionValue extends SalesManagerEntity<Long, CustomerOption
     private String customerOptionValueImage;
 
     @NotEmpty
-    @Pattern(regexp = "^[a-zA-Z0-9_]*$")
+    @Pattern(regexp = "^[a-zA-Z0-9_-]*$")
     @Column(name = "CUSTOMER_OPT_VAL_CODE")
     private String code;
 
