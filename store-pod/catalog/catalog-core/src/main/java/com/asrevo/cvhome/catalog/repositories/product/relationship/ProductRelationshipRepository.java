@@ -39,10 +39,11 @@ public interface ProductRelationshipRepository
             @Param("code") String code,
             @Param("storeMerchantId") StoreMerchantId storeMerchantId);
 
-    default List<ProductRelationship> ss(
+    default List<ProductRelationship> getByGroup(
             StoreMerchantId storeMerchantId,
             String type,
             Product relatedProduct,
+            Product product,
             LanguageCode languageCode) {
         return findAll(
                 (Specification<ProductRelationship>)
@@ -63,6 +64,12 @@ public interface ProductRelationshipRepository
                                         cb.equal(
                                                 root.get("relatedProduct").get("id"),
                                                 relatedProduct.getId()));
+                            }
+                            if (Objects.nonNull(product)) {
+                                predicates.add(
+                                        cb.equal(
+                                                root.get("product").get("id"),
+                                                product.getId()));
                             }
                             return cb.and(predicates.toArray(Predicate[]::new));
                         });

@@ -7,10 +7,11 @@ import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service("productRelationshipService")
 public class ProductRelationshipServiceImpl
@@ -106,24 +107,20 @@ public class ProductRelationshipServiceImpl
     }
 
     @Override
-    public List<ProductRelationship> getByGroup(
-            StoreMerchantId store, String groupName, LanguageCode language) {
-
-        return productRelationshipRepository.ss(store, groupName, null, language);
+    public List<ProductRelationship> getByGroup(StoreMerchantId store, String groupName, LanguageCode language) {
+        return productRelationshipRepository.getByGroup(store, groupName, null, null, language);
     }
 
     @Transactional
     @Override
-    public int deleteRelationship(
-            Product relatedProduct, String code, StoreMerchantId storeMerchantId) {
+    public int deleteRelationship(Product relatedProduct, String code, StoreMerchantId storeMerchantId) {
         return productRelationshipRepository.deleteAllByRelatedProduct_IdAndCodeAndStoreMerchantId(
                 relatedProduct.getId(), code, storeMerchantId);
     }
 
     @Transactional
     @Override
-    public int deleteRelationship(
-            Product relatedProduct, Product product, String code, StoreMerchantId storeMerchantId) {
+    public int deleteRelationship(Product relatedProduct, Product product, String code, StoreMerchantId storeMerchantId) {
         return productRelationshipRepository
                 .deleteAllByRelatedProduct_IdAndProduct_IdAndCodeAndStoreMerchantId(
                         relatedProduct.getId(), product.getId(), code, storeMerchantId);
@@ -137,7 +134,7 @@ public class ProductRelationshipServiceImpl
     @Override
     public List<ProductRelationship> getByType(
             StoreMerchantId store, Product product, String name, LanguageCode language) {
-        return productRelationshipRepository.ss(store, name, product, language);
+        return productRelationshipRepository.getByGroup(store, name, product, null, language);
     }
 
     @Override
@@ -147,7 +144,6 @@ public class ProductRelationshipServiceImpl
             Product product,
             Product related,
             LanguageCode language) {
-        return productRelationshipRepository.getByTypeAndRelatedProduct(
-                store, name, product, related, language);
+        return productRelationshipRepository.getByGroup(store, name, product, related, language);
     }
 }
