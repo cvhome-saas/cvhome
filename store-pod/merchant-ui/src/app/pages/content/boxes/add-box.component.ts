@@ -48,7 +48,6 @@ export class AddBoxComponent implements OnInit {
     public router: Router,
     private toastr: NbToastrService,
     private configService: ConfigService,
-    private dialogService: NbDialogService,
     private activatedRoute: ActivatedRoute,
     private translate: TranslateService,
     private errorService: ErrorService
@@ -73,7 +72,6 @@ export class AddBoxComponent implements OnInit {
   param() {
     return {
       store: '',
-      lang: "_all"
     };
   }
 

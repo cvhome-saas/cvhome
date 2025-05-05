@@ -21,15 +21,14 @@ export class CategoryService {
 
   getCategoryById(id, store): Observable<any> {
     const params = {
-      lang: '_all'
+      store
     };
-    return this.crudService.get(`/store-pod-gateway/catalog/api/v1/private/category/${id}?store=${store}`, params);
+    return this.crudService.get(`/store-pod-gateway/catalog/api/v1/private/category/${id}`, params);
   }
 
-  getCategoryByProductId(id, store, lang): Observable<any> {
+  getCategoryByProductId(id, store): Observable<any> {
     const params = {
-      store: store,
-      lang
+      store: store
     };
     return this.crudService.get(`/store-pod-gateway/catalog/api/v1/private/category/product/${id}`, params);
   }

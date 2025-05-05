@@ -44,11 +44,11 @@ export class ProductGroupsService {
   }
 
   addProductToRelated(store, product: string, item) {
-    return this.crudService.post(`/store-pod-gateway/catalog/api/v1/private/products/${product}/related/${item}?lang=en&store=${store}`, {});
+    return this.crudService.post(`/store-pod-gateway/catalog/api/v1/private/products/${product}/related/${item}?store=${store}`, {});
   }
 
   removeProductFromRelated(store, product: string, item) {
-    return this.crudService.delete(`/store-pod-gateway/catalog/api/v1/private/products/${product}/related/${item}?lang=en&store=${store}`, {});
+    return this.crudService.delete(`/store-pod-gateway/catalog/api/v1/private/products/${product}/related/${item}?store=${store}`, {});
 
   }
 }

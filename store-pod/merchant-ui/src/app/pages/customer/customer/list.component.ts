@@ -22,11 +22,10 @@ export class ListComponent extends BaseTable<any> implements OnInit {
   constructor(
     private customersService: CustomersService,
     public router: Router,
-    translate: TranslateService,
     errorService: ErrorService,
     selectedStoreService: SelectedStoreService
   ) {
-    super(selectedStoreService, translate, errorService)
+    super(selectedStoreService,  errorService)
   }
 
   ngOnInit(): void {

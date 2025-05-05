@@ -31,7 +31,6 @@ export class CategoriesHierarchyComponent implements OnInit {
 
   loadParams() {
     return {
-      lang: this.translate.currentLang,
       store: "",
       page: 0
     };
@@ -107,10 +106,6 @@ export class CategoriesHierarchyComponent implements OnInit {
 
 
   ngOnInit(): void {
-    this.translate.onLangChange.subscribe(lang => {
-      this.params.lang = lang.lang;
-      this.getList();
-    });
     this.selectedStoreService.current().subscribe({
       next: (it) => {
         this.params.store = it;

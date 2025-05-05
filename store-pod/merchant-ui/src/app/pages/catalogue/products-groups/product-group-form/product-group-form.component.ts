@@ -48,7 +48,6 @@ export class ProductGroupFormComponent implements OnInit {
   loadParams() {
     return {
       store: "",
-      lang: this.translate.currentLang,
       count: this.perPage,
       page: 0
     };

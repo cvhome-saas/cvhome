@@ -27,10 +27,9 @@ export class PageComponent extends BaseTable<any> implements OnInit {
     private dialogService: NbDialogService,
     private toastr: NbToastrService,
     errorService: ErrorService,
-    translate: TranslateService,
     selectedStoreService: SelectedStoreService,
   ) {
-    super(selectedStoreService, translate, errorService)
+    super(selectedStoreService,  errorService)
   }
 
   ngOnInit(): void {

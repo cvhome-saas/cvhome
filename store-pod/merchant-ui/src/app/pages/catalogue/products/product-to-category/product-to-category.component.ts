@@ -42,7 +42,6 @@ export class ProductToCategoryComponent implements OnInit, AfterViewInit {
       store: "",
       count: this.perPage,
       page: 0,
-      lang: this.translate.currentLang
     };
   }
 
@@ -114,7 +113,7 @@ export class ProductToCategoryComponent implements OnInit, AfterViewInit {
   private load() {
     this.loading = true;
 
-    const p$ = this.categoryService.getCategoryByProductId(this.uniqueCode, this.params.store, this.translate.currentLang)
+    const p$ = this.categoryService.getCategoryByProductId(this.uniqueCode, this.params.store)
     const c$ = this.categoryService.getListOfCategories(this.params)
 
     forkJoin([p$, c$])

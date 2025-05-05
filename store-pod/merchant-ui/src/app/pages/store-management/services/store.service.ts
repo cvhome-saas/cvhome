@@ -68,10 +68,9 @@ export class StoreService {
 
   getPageContent(pageCode: string, store: string): Observable<any> {
     const params = {
-      lang: '_all',
       store
     };
-    return this.crudService.getWithEmpty(`/store-pod-gateway/content/api/v1/private/content/any/${pageCode}?store=${store}`, params);
+    return this.crudService.getWithEmpty(`/store-pod-gateway/content/api/v1/private/content/any/${pageCode}`, params);
   }
 
   updatePageContent(store, id, content: any): Observable<any> {

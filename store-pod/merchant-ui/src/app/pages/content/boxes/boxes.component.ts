@@ -25,11 +25,11 @@ export class BoxesComponent extends BaseTable<any> implements OnInit {
     private contentService: ContentService,
     public router: Router,
     errorService: ErrorService,
-    translate: TranslateService,
+    private translate: TranslateService,
     private toastr: NbToastrService,
     selectedStoreService: SelectedStoreService,
     private dialogService: NbDialogService) {
-    super(selectedStoreService, translate, errorService)
+    super(selectedStoreService,  errorService)
   }
 
   ngOnInit(): void {

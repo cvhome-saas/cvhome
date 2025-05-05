@@ -9,7 +9,6 @@ import {ErrorService} from "../../../../shared/services/error.service";
 import {SelectedStoreService} from "../../../../shared/services/selected-store.service";
 import {BaseTable, PageT, StorePageRequest} from "../../../common/BaseTable";
 import {Observable, of} from "rxjs";
-import {map} from "rxjs/operators";
 
 @Component({
   selector: 'ngx-products-list',
@@ -26,12 +25,12 @@ export class ProductsListComponent extends BaseTable<any> implements OnInit {
     private productService: ProductService,
     private dialogService: NbDialogService,
     errorService: ErrorService,
-    translate: TranslateService,
+    private translate: TranslateService,
     private toastr: NbToastrService,
     private router: Router,
     selectedStoreService: SelectedStoreService
   ) {
-    super(selectedStoreService, translate, errorService);
+    super(selectedStoreService, errorService);
   }
 
   ngOnInit(): void {

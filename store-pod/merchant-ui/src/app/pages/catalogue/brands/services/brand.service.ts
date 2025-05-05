@@ -23,8 +23,7 @@ export class BrandService {
 
   getBrandById(store, id): Observable<any> {
     const params = {
-      store,
-      lang: '_all'
+      store
     };
     return this.crudService.get(`/store-pod-gateway/catalog/api/v1/private/manufacturer/${id}`, params);
   }
