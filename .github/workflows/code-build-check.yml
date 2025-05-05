@@ -29,13 +29,32 @@ jobs:
         with:
           java-version: '23'
           distribution: 'corretto'
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Cache node_modules directories
+        id: cache-node-modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            store-core/store-ui/node_modules
+            store-core/welcome-ui/node_modules
+            store-pod/landing-ui/node_modules
+            store-pod/merchant-ui/node_modules
+          key: npm-modules-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            npm-modules-${{ runner.os }}-
 
       - name: Validate Gradle wrapper
         uses: gradle/actions/wrapper-validation@v3
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
+        with:
+          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/develop' }}
 
-      - name: Package And Publish Docker with Gradle
-        run: gradle build -x test -x check
-
+      - name: Build Project (Skip Tests/Checks)
+        run: gradle build --build-cache -x test -x check

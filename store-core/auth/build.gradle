@@ -32,9 +32,9 @@ List<String> createBuildProviders(String version) {
 
     if (os != null) {
         if (os.startsWithIgnoreCase("linux")) {
-            gradleCmd = "./gradlew"
+//            gradleCmd = "./gradlew"
         } else if (os.startsWithIgnoreCase("windows")) {
-            gradleCmd = "gradlew.bat"
+//            gradleCmd = "gradlew.bat"
         }
 
     }
