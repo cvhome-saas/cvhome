@@ -3,7 +3,6 @@ package com.asrevo.cvhome.catalog.repositories.product.relationship;
 import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.entity.product.relationship.ProductRelationship;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-
 import java.util.List;
 
 public interface ProductRelationshipRepositoryCustom {
@@ -17,5 +16,4 @@ public interface ProductRelationshipRepositoryCustom {
     List<ProductRelationship> getByType(StoreMerchantId store, String type);
 
     List<ProductRelationship> listByProducts(Product product);
-
 }

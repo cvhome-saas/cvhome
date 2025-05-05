@@ -7,11 +7,10 @@ import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service("productRelationshipService")
 public class ProductRelationshipServiceImpl
@@ -107,20 +106,23 @@ public class ProductRelationshipServiceImpl
     }
 
     @Override
-    public List<ProductRelationship> getByGroup(StoreMerchantId store, String groupName, LanguageCode language) {
+    public List<ProductRelationship> getByGroup(
+            StoreMerchantId store, String groupName, LanguageCode language) {
         return productRelationshipRepository.getByGroup(store, groupName, null, null, language);
     }
 
     @Transactional
     @Override
-    public int deleteRelationship(Product relatedProduct, String code, StoreMerchantId storeMerchantId) {
+    public int deleteRelationship(
+            Product relatedProduct, String code, StoreMerchantId storeMerchantId) {
         return productRelationshipRepository.deleteAllByRelatedProduct_IdAndCodeAndStoreMerchantId(
                 relatedProduct.getId(), code, storeMerchantId);
     }
 
     @Transactional
     @Override
-    public int deleteRelationship(Product relatedProduct, Product product, String code, StoreMerchantId storeMerchantId) {
+    public int deleteRelationship(
+            Product relatedProduct, Product product, String code, StoreMerchantId storeMerchantId) {
         return productRelationshipRepository
                 .deleteAllByRelatedProduct_IdAndProduct_IdAndCodeAndStoreMerchantId(
                         relatedProduct.getId(), product.getId(), code, storeMerchantId);

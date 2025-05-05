@@ -67,9 +67,7 @@ public interface ProductRelationshipRepository
                             }
                             if (Objects.nonNull(product)) {
                                 predicates.add(
-                                        cb.equal(
-                                                root.get("product").get("id"),
-                                                product.getId()));
+                                        cb.equal(root.get("product").get("id"), product.getId()));
                             }
                             return cb.and(predicates.toArray(Predicate[]::new));
                         });

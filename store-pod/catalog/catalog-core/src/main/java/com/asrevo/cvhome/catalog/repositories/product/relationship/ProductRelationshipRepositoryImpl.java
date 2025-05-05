@@ -119,5 +119,4 @@ public class ProductRelationshipRepositoryImpl implements ProductRelationshipRep
                 .setParameter("id", product.getId())
                 .getResultList();
     }
-
 }
