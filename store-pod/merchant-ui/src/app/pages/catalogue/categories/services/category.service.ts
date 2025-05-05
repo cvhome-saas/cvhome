@@ -31,7 +31,7 @@ export class CategoryService {
       store: store,
       lang
     };
-    return this.crudService.get(`/store-pod-gateway/catalog/api/v1/category/product/${id}`, params);
+    return this.crudService.get(`/store-pod-gateway/catalog/api/v1/private/category/product/${id}`, params);
   }
 
   addCategory(category, store): Observable<any> {

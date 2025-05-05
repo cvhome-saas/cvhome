@@ -1,16 +1,16 @@
 package com.asrevo.cvhome.catalog.api.v1.product;
 
-import com.asrevo.cvhome.catalog.model.product.group.ReadableProductGroupList;
-import com.asrevo.cvhome.commons.annotation.SecuredResource;
-import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.model.product.ReadableProductList;
 import com.asrevo.cvhome.catalog.model.product.group.ProductGroup;
+import com.asrevo.cvhome.catalog.model.product.group.ReadableProductGroupList;
+import com.asrevo.cvhome.catalog.service.facade.items.ProductItemsFacade;
+import com.asrevo.cvhome.catalog.services.product.ProductService;
+import com.asrevo.cvhome.commons.annotation.SecuredResource;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.model.entity.EntityExists;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
-import com.asrevo.cvhome.catalog.services.product.ProductService;
-import com.asrevo.cvhome.catalog.service.facade.items.ProductItemsFacade;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -18,7 +18,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -99,6 +98,22 @@ public class ProductGroupApi {
      * being FEATURED
      */
     @ResponseStatus(HttpStatus.OK)
+    @GetMapping("/private/products/group/{code}")
+    @Operation(method = "GET", description = "Get products by group code",
+            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ReadableProductList.class))))
+    @Parameters({
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
+    })
+    public @ResponseBody ReadableProductList productItemsByGroup(
+            @PathVariable final String code,
+            @Parameter(hidden = true) StoreMerchantId merchantStore,
+            @Parameter(hidden = true) LanguageCode language)
+            throws Exception {
+        return productItemsFacade.listTinyProductsGroup(code, merchantStore, language);
+    }
+
+    @ResponseStatus(HttpStatus.OK)
     @GetMapping("/products/group/{code}")
     @Operation(method = "GET", description = "Get products by group code",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ReadableProductList.class))))
@@ -109,25 +124,8 @@ public class ProductGroupApi {
     public @ResponseBody ReadableProductList getProductItemsByGroup(
             @PathVariable final String code,
             @Parameter(hidden = true) StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language,
-            HttpServletResponse response)
-            throws Exception {
-        try {
-            ReadableProductList list = productItemsFacade.listItemsByGroup(code, merchantStore, language);
-
-            if (list == null) {
-                response.sendError(404, "Group not fount for code " + code);
-                return null;
-            }
-
-            return list;
-
-        } catch (Exception e) {
-            log.error("Error while getting products", e);
-            response.sendError(503, "An error occured while retrieving products " + e.getMessage());
-        }
-
-        return null;
+            @Parameter(hidden = true) LanguageCode language) {
+        return productItemsFacade.listMinimalProductsGroup(code, merchantStore, language);
     }
 
     @ResponseStatus(HttpStatus.CREATED)
@@ -136,37 +134,13 @@ public class ProductGroupApi {
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
-    public @ResponseBody ReadableProductList addProductToGroup(
+    public @ResponseBody void addProductToGroup(
             @PathVariable Long productId,
             @PathVariable String code,
             @Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language,
-            HttpServletResponse response) {
-
-
-        Product product;
-        try {
-            // get the product
-            product = productService.findOne(productId, merchantStore);
-
-            if (product == null) {
-                response.sendError(404, "Product not fount for id " + productId);
-                return null;
-            }
-
-        } catch (Exception e) {
-            log.error("Error while adding product to group", e);
-            try {
-                response.sendError(503, "Error while adding product to group " + e.getMessage());
-            } catch (Exception ignore) {
-            }
-
-            return null;
-        }
-
-        return productItemsFacade.addItemToGroup(product, code, merchantStore, language);
-
-
+            @Parameter(hidden = true) LanguageCode language) {
+        Product product = productService.findOne(productId, merchantStore);
+        productItemsFacade.addItemToGroup(product, code, merchantStore, language);
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -177,37 +151,18 @@ public class ProductGroupApi {
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
-    public @ResponseBody ReadableProductList removeProductFromGroup(
+    public @ResponseBody void removeProductFromGroup(
             @PathVariable Long productId,
             @PathVariable String code,
             @Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language,
-            HttpServletResponse response) {
+            @Parameter(hidden = true) LanguageCode language) {
 
-        try {
-            // get the product
-            Product product = productService.findOne(productId, merchantStore);
-
-            if (product == null) {
-                response.sendError(404, "Product not fount for id " + productId);
-                return null;
-            }
-
-            return productItemsFacade.removeItemFromGroup(product, code, merchantStore, language);
-
-        } catch (Exception e) {
-            log.error("Error while removing product from category", e);
-            try {
-                response.sendError(503, "Error while removing product from category " + e.getMessage());
-            } catch (Exception ignore) {
-            }
-
-            return null;
-        }
+        Product product = productService.findOne(productId, merchantStore);
+        productItemsFacade.removeItemFromGroup(product, code, merchantStore, language);
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @DeleteMapping("/products/group/{code}")
+    @DeleteMapping("/private/products/group/{code}")
     @Operation(method = "DELETE", description = "Delete product group by group code",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = EntityExists.class))))
     @Parameters({

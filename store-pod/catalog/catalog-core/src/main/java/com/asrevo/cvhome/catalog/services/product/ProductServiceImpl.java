@@ -31,6 +31,7 @@ import java.util.*;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -261,6 +262,11 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
     public ReadableProductAvailability getProductAvailability(StoreMerchantId store, String sku) {
         Product product = getBySku(sku, store);
         return readableProductAvailabilityMapper.convert(product, store, null);
+    }
+
+    @Override
+    public Page<Product> findAll(ProductCriteria criteria, StoreMerchantId store) {
+        return productRepository.findAll(criteria, store);
     }
 
     @Override

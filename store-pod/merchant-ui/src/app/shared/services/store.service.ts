@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {Observable, of} from "rxjs";
+import {Observable} from "rxjs";
 import {CreateStoreRequest, Page, Store} from "../models/commons";
 
 @Injectable({
@@ -17,15 +17,15 @@ export class StoreService {
   }
 
   list(): Observable<Page<Store>> {
-    return of({
-      content: [{
-        id: {
-          id: "65f023632bc46470c104b76f"
-        },
-        name: "default"
-      }]
-    })
-    // return this.httpClient.post<Page<Store>>(`${this.STORE_MANAGER_BASE_URL}/list`, {})
+    // return of({
+    //   content: [{
+    //     id: {
+    //       id: "65f023632bc46470c104b76f"
+    //     },
+    //     name: "default"
+    //   }]
+    // })
+    return this.httpClient.post<Page<Store>>(`${this.STORE_MANAGER_BASE_URL}/list`, {})
   }
 
 }

@@ -19,7 +19,7 @@ import {ErrorService} from "../../services/error.service";
 
   <nb-autocomplete #auto (selectedChange)="onSelectionChange($event)">
     <nb-option *ngFor="let option of filteredOptions$ | async" [value]="option">
-      {{ option.description.name }}
+      {{ option.sku }}
       <nb-icon icon="heart-outline" status="success"></nb-icon>
     </nb-option>
   </nb-autocomplete>
@@ -64,14 +64,14 @@ export class ProductAutoCompleteComponent implements AfterViewInit {
 
   getProductList() {
     this.params.name = this.autoInput.nativeElement.value;
-    this.filteredOptions$ = this.productService.getListOfProducts(this.params).pipe(map(it => {
+    this.filteredOptions$ = this.productService.getListOfTinyProducts(this.params).pipe(map(it => {
       return it.content
     }));
   }
 
   ngAfterViewInit(): void {
     this.params.store = this.store;
-    this.productService.getListOfProducts(this.params).pipe(map(it => {
+    this.productService.getListOfTinyProducts(this.params).pipe(map(it => {
       return it.content
     })).subscribe((it: any[]) => {
       this.firstProducts = it

@@ -5,7 +5,6 @@ import com.asrevo.cvhome.catalog.model.product.ReadableProductList;
 import com.asrevo.cvhome.catalog.model.product.group.ProductGroup;
 import com.asrevo.cvhome.catalog.model.product.group.ReadableProductGroupList;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 
 public interface ProductItemsFacade {
@@ -24,31 +23,35 @@ public interface ProductItemsFacade {
     /**
      * List products created in a group, for instance FEATURED group
      */
-    ReadableProductList listItemsByGroup(String group, StoreMerchantId store, LanguageCode language)
-            throws Exception;
+    ReadableProductList listTinyProductsGroup(
+            String group, StoreMerchantId store, LanguageCode language);
+
+    ReadableProductList listMinimalProductsGroup(
+            String group, StoreMerchantId store, LanguageCode language);
 
     /**
      * Add product to a group
      */
-    ReadableProductList addItemToGroup(
+    void addItemToGroup(
             Product product, String group, StoreMerchantId store, LanguageCode language);
 
     /**
      * Removes a product from a group
      */
-    ReadableProductList removeItemFromGroup(
-            Product product, String group, StoreMerchantId store, LanguageCode language)
-            throws Exception;
+    void removeItemFromGroup(
+            Product product, String group, StoreMerchantId store, LanguageCode language);
 
     void deleteGroup(String group, StoreMerchantId store);
 
-    ReadableProductList relatedItems(
+    ReadableProductList relatedTinyProducts(
             Product product, StoreMerchantId merchantStore, LanguageCode language);
 
-    ReadableProductList addItemToRelatedProduct(
+    ReadableProductList relatedMinimalProducts(
+            Product product, StoreMerchantId merchantStore, LanguageCode language);
+
+    void addItemToRelatedProduct(
             Product product, Product related, StoreMerchantId store, LanguageCode language);
 
-    ReadableProductList removeItemFromRelated(
-            Product product, Product related, StoreMerchantId store, LanguageCode language)
-            throws ServiceException;
+    void removeItemFromRelated(
+            Product product, Product related, StoreMerchantId store, LanguageCode language);
 }

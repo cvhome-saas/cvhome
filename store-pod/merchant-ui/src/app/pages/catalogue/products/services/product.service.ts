@@ -17,7 +17,11 @@ export class ProductService {
 
   getListOfProducts(params): Observable<any> {
     //release 3.2.1 use V2
-    return this.crudService.get(`/store-pod-gateway/catalog/api/v2/products`, params);
+    return this.crudService.get(`/store-pod-gateway/catalog/api/v2/private/base-products`, params);
+  }
+  getListOfTinyProducts(params): Observable<any> {
+    //release 3.2.1 use V2
+    return this.crudService.get(`/store-pod-gateway/catalog/api/v2/private/tiny-products`, params);
   }
 
   updateProductFromTable(store, id, product): Observable<any> {
