@@ -143,6 +143,14 @@ export class ProductFormComponent implements OnInit {
     });
   }
 
+  toPrice(price: string) {
+    try {
+      const cleanedPriceString = this.product.inventory.price.replace(/,/g, '');
+      return parseFloat(cleanedPriceString)
+    }catch (e) {
+      return 0;
+    }
+  }
   fillForm() {
     this.form.patchValue({
       sku: this.product.sku,
@@ -151,7 +159,7 @@ export class ProductFormComponent implements OnInit {
       dateAvailable: new Date(this.product.dateAvailable),
       manufacturer: this.product.manufacturer == null ? '' : this.product.manufacturer.code,
       type: this.product.type == null ? '' : this.product.type.code,
-      price: this.product.inventory.price,
+      price: this.toPrice(this.product.inventory.price),
       quantity: this.product.inventory.quantity,
       productSpecifications: {
         weight: this.product.productSpecifications.weight,

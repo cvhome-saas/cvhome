@@ -42,7 +42,7 @@ public class ProductPrice extends SalesManagerEntity<Long, ProductPrice> {
     private Set<ProductPriceDescription> descriptions = new HashSet<>();
 
     @NotEmpty
-    @Pattern(regexp = "^[a-zA-Z0-9_]*$")
+    @Pattern(regexp = "^[a-zA-Z0-9_-]*$")
     @Column(name = "PRODUCT_PRICE_CODE", nullable = false)
     private String code = DEFAULT_PRICE_CODE;
 
