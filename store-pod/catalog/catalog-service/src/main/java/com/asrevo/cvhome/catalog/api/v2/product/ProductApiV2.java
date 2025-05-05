@@ -113,7 +113,7 @@ public class ProductApiV2 {
             @Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
             @Parameter(hidden = true) LanguageCode language) {
 
-        return productDefinitionFacade.getProduct(merchantStore, id, language);
+        return productDefinitionFacade.getProduct(merchantStore, id, LanguageCode.allLanguage());
 
     }
 

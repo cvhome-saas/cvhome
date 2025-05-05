@@ -49,7 +49,7 @@ public class ProductRelationshipApi {
             @Parameter(hidden = true) StoreMerchantId merchantStore,
             @Parameter(hidden = true) LanguageCode language) {
         Product product = productService.getById(id);
-        return productItemsFacade.relatedTinyProducts(product, merchantStore, language);
+        return productItemsFacade.relatedTinyProducts(product, merchantStore, LanguageCode.nonLanguage());
 
     }
 

@@ -108,9 +108,8 @@ public class ProductGroupApi {
     public @ResponseBody ReadableProductList productItemsByGroup(
             @PathVariable final String code,
             @Parameter(hidden = true) StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language)
-            throws Exception {
-        return productItemsFacade.listTinyProductsGroup(code, merchantStore, language);
+            @Parameter(hidden = true) LanguageCode language) {
+        return productItemsFacade.listTinyProductsGroup(code, merchantStore, LanguageCode.nonLanguage());
     }
 
     @ResponseStatus(HttpStatus.OK)

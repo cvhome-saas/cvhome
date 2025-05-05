@@ -1,5 +1,4 @@
 import {AfterViewInit, Component, ElementRef, EventEmitter, Input, Output, ViewChild} from '@angular/core';
-import {TranslateService} from "@ngx-translate/core";
 import {Observable, of} from "rxjs";
 import {ProductService} from "../../../pages/catalogue/products/services/product.service";
 import {map} from "rxjs/operators";
@@ -38,13 +37,11 @@ export class ProductAutoCompleteComponent implements AfterViewInit {
 
   constructor(
     private productService: ProductService,
-    private translate: TranslateService,
     private errorService: ErrorService,
   ) {
     this.params = {
       "store": "",
       "name": "",
-      "lang": this.translate.currentLang
     }
   }
 

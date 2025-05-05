@@ -11,7 +11,6 @@ import com.asrevo.cvhome.catalog.model.product.ReadableImage;
 import com.asrevo.cvhome.catalog.model.product.inventory.ReadableInventory;
 import com.asrevo.cvhome.catalog.model.product.product.ProductSpecification;
 import com.asrevo.cvhome.catalog.model.product.product.definition.ReadableProductDefinition;
-import com.asrevo.cvhome.catalog.model.product.product.definition.ReadableProductDefinitionFull;
 import com.asrevo.cvhome.catalog.model.product.type.ReadableProductType;
 import com.asrevo.cvhome.catalog.service.mapper.catalog.ReadableCategoryMapper;
 import com.asrevo.cvhome.catalog.service.mapper.catalog.ReadableManufacturerMapper;
@@ -26,10 +25,7 @@ import com.asrevo.cvhome.store.model.references.DimensionUnitOfMeasure;
 import com.asrevo.cvhome.store.model.references.WeightUnitOfMeasure;
 import com.asrevo.cvhome.store.utils.DateUtil;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -75,57 +71,37 @@ public class ReadableProductDefinitionMapper implements Mapper<Product, Readable
     @Override
     public ReadableProductDefinition merge(
             Product source,
-            ReadableProductDefinition destination,
+            ReadableProductDefinition target,
             StoreMerchantId store,
             LanguageCode language) {
         Assert.notNull(source, "Product cannot be null");
-        Assert.notNull(destination, "Product destination cannot be null");
+        Assert.notNull(target, "Product destination cannot be null");
 
-        ReadableProductDefinition returnDestination = destination;
-        if (language == null) {
-            returnDestination = new ReadableProductDefinitionFull();
+        target.setIdentifier(source.getSku());
+        target.setId(source.getId());
+        target.setVisible(source.isAvailable());
+        target.setDateAvailable(DateUtil.formatDate(source.getDateAvailable()));
+        target.setSku(source.getSku());
+
+        if (LanguageCode.isAllLanguage(language)) {
+            var descriptionSet = Optional.ofNullable(source.getDescriptions()).orElse(Set.of());
+            target.setDescriptions(descriptionSet.stream().map(this::populateDescription).toList());
         }
-
-        List<com.asrevo.cvhome.catalog.model.product.ProductDescription> fulldescriptions =
-                new ArrayList<>();
-
-        returnDestination.setIdentifier(source.getSku());
-        returnDestination.setId(source.getId());
-        returnDestination.setVisible(source.isAvailable());
-        returnDestination.setDateAvailable(DateUtil.formatDate(source.getDateAvailable()));
-        returnDestination.setSku(source.getSku());
-        ProductDescription description = null;
-        if (source.getDescriptions() != null && !source.getDescriptions().isEmpty()) {
-            for (ProductDescription desc : source.getDescriptions()) {
-                if (Objects.equals(desc.getLanguageCode(), language)) {
-                    description = desc;
-                    break;
-                } else {
-                    fulldescriptions.add(populateDescription(desc));
-                }
-            }
-        }
-
-        /*		if (source.getProductReviewAvg() != null) {
-        	double avg = source.getProductReviewAvg().doubleValue();
-        	double rating = Math.round(avg * 2) / 2.0f;
-        	returnDestination.setRating(rating);
-        }
-
-        if (source.getProductReviewCount() != null) {
-        	returnDestination.setRatingCount(source.getProductReviewCount().intValue());
-        }*/
-
-        if (description != null) {
-            com.asrevo.cvhome.catalog.model.product.ProductDescription tragetDescription =
-                    populateDescription(description);
-            returnDestination.setDescription(tragetDescription);
+        if (LanguageCode.isLanguage(language)) {
+            var descriptionSet = Optional.ofNullable(source.getDescriptions()).orElse(Set.of());
+            var description =
+                    descriptionSet.stream()
+                            .filter(it -> language.equals(it.getLanguageCode()))
+                            .findFirst()
+                            .map(this::populateDescription)
+                            .orElse(null);
+            target.setDescription(description);
         }
 
         if (source.getManufacturer() != null) {
             ReadableManufacturer manufacturer =
                     readableManufacturerMapper.convert(source.getManufacturer(), store, language);
-            returnDestination.setManufacturer(manufacturer);
+            target.setManufacturer(manufacturer);
         }
 
         if (!CollectionUtils.isEmpty(source.getCategories())) {
@@ -135,7 +111,7 @@ public class ReadableProductDefinitionMapper implements Mapper<Product, Readable
                         readableCategoryMapper.convert(category, store, language);
                 categoryList.add(readableCategory);
             }
-            returnDestination.setCategories(categoryList);
+            target.setCategories(categoryList);
         }
 
         ReadableMerchantStore baseStore = externalMerchantStoreService.getStore(store);
@@ -149,15 +125,15 @@ public class ReadableProductDefinitionMapper implements Mapper<Product, Readable
         specifications.setWeightUnitOfMeasure(
                 WeightUnitOfMeasure.valueOf(baseStore.getWeight().name().toLowerCase()));
 
-        returnDestination.setProductSpecifications(specifications);
+        target.setProductSpecifications(specifications);
 
         if (source.getType() != null) {
             ReadableProductType readableType =
                     readableProductTypeMapper.convert(source.getType(), store, language);
-            returnDestination.setType(readableType);
+            target.setType(readableType);
         }
 
-        returnDestination.setSortOrder(source.getSortOrder());
+        target.setSortOrder(source.getSortOrder());
 
         // images
         Set<ProductImage> images = source.getImages();
@@ -167,7 +143,7 @@ public class ReadableProductDefinitionMapper implements Mapper<Product, Readable
                     images.stream()
                             .map(i -> this.convertImage(source, i, store))
                             .collect(Collectors.toList());
-            returnDestination.setImages(imageList);
+            target.setImages(imageList);
         }
 
         // quantity
@@ -177,17 +153,13 @@ public class ReadableProductDefinitionMapper implements Mapper<Product, Readable
         }
 
         if (availability != null) {
-            returnDestination.setCanBePurchased(availability.isProductStatus());
+            target.setCanBePurchased(availability.isProductStatus());
             ReadableInventory inventory =
                     readableInventoryMapper.convert(availability, store, language);
-            returnDestination.setInventory(inventory);
+            target.setInventory(inventory);
         }
 
-        if (returnDestination instanceof ReadableProductDefinitionFull) {
-            ((ReadableProductDefinitionFull) returnDestination).setDescriptions(fulldescriptions);
-        }
-
-        return returnDestination;
+        return target;
     }
 
     private ReadableImage convertImage(Product product, ProductImage image, StoreMerchantId store) {
