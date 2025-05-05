@@ -32,8 +32,8 @@ include(
         'store-pod:store-commons',
         'store-pod:store-service-commons',
         'store-pod:store-modules:store-cms-commons',
-        'store-pod:landing-ui',
-        'store-pod:merchant-ui',
+//        'store-pod:landing-ui',
+//        'store-pod:merchant-ui',
         'store-pod:catalog:catalog-commons',
         'store-pod:catalog:catalog-external-api',
         'store-pod:catalog:catalog-core',
@@ -52,7 +52,7 @@ include(
         'store-pod:reference:reference-commons',
         'store-pod:reference:reference-core',
 
-        'store-core:auth',
+//        'store-core:auth',
         'store-core:gateway:gateway-service',
         'store-core:manager:manager-commons',
         'store-core:manager:manager-events',
@@ -62,6 +62,6 @@ include(
         'store-core:subscription:subscription-events',
         'store-core:subscription:subscription-external-api',
         'store-core:subscription:subscription-service',
-        'store-core:store-ui',
-        'store-core:welcome-ui',
+//        'store-core:store-ui',
+//        'store-core:welcome-ui',
 )
