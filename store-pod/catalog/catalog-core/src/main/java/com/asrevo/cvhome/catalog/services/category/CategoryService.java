@@ -26,12 +26,6 @@ public interface CategoryService extends SalesManagerEntityService<Long, Categor
             int depth,
             Pageable pageable);
 
-    /**
-     * Returns category hierarchy filter by featured
-     */
-    List<Category> getListByDepthFilterByFeatured(
-            StoreMerchantId store, int depth, LanguageCode language);
-
     Category getByCode(StoreMerchantId storeCode, String code) throws ServiceException;
 
     Category getBySeUrl(StoreMerchantId store, String seUrl, LanguageCode language);

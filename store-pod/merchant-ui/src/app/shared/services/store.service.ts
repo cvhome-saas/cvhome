@@ -2,6 +2,8 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {Observable, of} from "rxjs";
 import {CreateStoreRequest, Page, Store} from "../models/commons";
+import {catchError} from "rxjs/operators";
+import {environment} from "../../../environments/environment";
 
 @Injectable({
   providedIn: 'root'
@@ -17,15 +19,16 @@ export class StoreService {
   }
 
   list(): Observable<Page<Store>> {
-    return of({
+    const defaultPageOnError: Page<Store> = {
       content: [{
         id: {
-          id: "65f023632bc46470c104b76f"
+          id: environment.defaultStore
         },
         name: "default"
-      }]
-    })
-    // return this.httpClient.post<Page<Store>>(`${this.STORE_MANAGER_BASE_URL}/list`, {})
+      }],
+    };
+    return this.httpClient.post<Page<Store>>(`${this.STORE_MANAGER_BASE_URL}/list`, {})
+      .pipe(catchError(error => of(defaultPageOnError)));
   }
 
 }

@@ -21,22 +21,21 @@ public interface PageableManufacturerRepository
             LanguageCode languageCode,
             String name,
             Pageable pageable) {
-        return findAll(
-                (Specification<Manufacturer>)
-                        (root, query, cb) -> {
-                            List<Predicate> predicates = new ArrayList<>();
-                            predicates.add(cb.equal(root.get("storeMerchantId"), storeMerchantId));
-                            if (languageCode != null) {
-                                predicates.add(
-                                        cb.equal(
-                                                root.get("descriptions").get("languageCode"),
-                                                languageCode));
-                            }
-                            if (name != null && !name.trim().isEmpty()) {
-                                predicates.add(cb.like(root.get("name"), "%" + name + "%"));
-                            }
-                            return cb.and(predicates.toArray(Predicate[]::new));
-                        },
-                pageable);
+        Specification<Manufacturer> specification =
+                (root, query, cb) -> {
+                    List<Predicate> predicates = new ArrayList<>();
+                    predicates.add(cb.equal(root.get("storeMerchantId"), storeMerchantId));
+                    if (LanguageCode.isLanguage(languageCode)) {
+                        predicates.add(
+                                cb.equal(
+                                        root.get("descriptions").get("languageCode"),
+                                        languageCode));
+                    }
+                    if (name != null && !name.trim().isEmpty()) {
+                        predicates.add(cb.like(root.get("name"), "%" + name + "%"));
+                    }
+                    return cb.and(predicates.toArray(Predicate[]::new));
+                };
+        return findAll(specification, pageable);
     }
 }

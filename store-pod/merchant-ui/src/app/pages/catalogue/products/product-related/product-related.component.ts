@@ -54,7 +54,6 @@ export class ProductRelatedComponent implements OnInit, AfterViewInit {
   loadParams() {
     return {
       store: "",
-      lang: this.translate.currentLang,
       count: this.perPage,
       page: 0
     };

@@ -3,27 +3,38 @@ package com.asrevo.cvhome.catalog.repositories.category;
 import com.asrevo.cvhome.catalog.entity.category.Category;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
+import jakarta.persistence.criteria.Predicate;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
-public interface PageableCategoryRepository extends PagingAndSortingRepository<Category, Long> {
+public interface PageableCategoryRepository
+        extends PagingAndSortingRepository<Category, Long>, JpaSpecificationExecutor<Category> {
 
-    @Query(
-            value =
-                    """
-                            select distinct c from Category c left join fetch c.descriptions cd
-                             where c.storeMerchantId=?1 and
-                             cd.languageCode=?2 and (cd.name like %?3% or ?3 is null) order by c.depth,
-                             c.sortOrder asc""",
-            countQuery =
-                    """
-                            select  count(c) from Category c join c.descriptions cd where c.storeMerchantId=?1 and cd.languageCode=?2 and (cd.name like %?3% or ?3 is
-                             null)""")
-    Page<Category> listByStore(
+    default Page<Category> listByStore(
             StoreMerchantId storeMerchantId,
-            LanguageCode languageId,
+            LanguageCode languageCode,
             String name,
-            Pageable pageable);
+            Pageable pageable) {
+        Specification<Category> spec =
+                (root, query, cb) -> {
+                    List<Predicate> predicates = new ArrayList<>();
+                    predicates.add(cb.equal(root.get("storeMerchantId"), storeMerchantId));
+                    if (LanguageCode.isLanguage(languageCode)) {
+                        predicates.add(
+                                cb.equal(
+                                        root.get("descriptions").get("languageCode"),
+                                        languageCode));
+                    }
+                    if (name != null && !name.trim().isEmpty()) {
+                        predicates.add(cb.like(root.get("name"), "%" + name + "%"));
+                    }
+                    return cb.and(predicates.toArray(Predicate[]::new));
+                };
+        return findAll(spec, pageable);
+    }
 }

@@ -24,13 +24,12 @@ export class GroupsListComponent extends BaseTable<any> implements OnInit {
 
   constructor(
     private dialogService: NbDialogService,
-    translate: TranslateService,
     private productGroupsService: ProductGroupsService,
     errorService: ErrorService,
     selectedStoreService: SelectedStoreService,
     private router: Router) {
 
-    super(selectedStoreService, translate, errorService);
+    super(selectedStoreService,  errorService);
   }
 
   ngOnInit(): void {

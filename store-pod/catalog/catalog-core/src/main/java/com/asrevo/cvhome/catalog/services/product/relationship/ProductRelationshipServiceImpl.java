@@ -108,8 +108,7 @@ public class ProductRelationshipServiceImpl
     @Override
     public List<ProductRelationship> getByGroup(
             StoreMerchantId store, String groupName, LanguageCode language) {
-
-        return productRelationshipRepository.getByType(store, groupName, language);
+        return productRelationshipRepository.getByGroup(store, groupName, null, null, language);
     }
 
     @Transactional
@@ -137,8 +136,7 @@ public class ProductRelationshipServiceImpl
     @Override
     public List<ProductRelationship> getByType(
             StoreMerchantId store, Product product, String name, LanguageCode language) {
-        return productRelationshipRepository.getByTypeAndRelatedProduct(
-                store, name, product, language);
+        return productRelationshipRepository.getByGroup(store, name, product, null, language);
     }
 
     @Override
@@ -148,7 +146,6 @@ public class ProductRelationshipServiceImpl
             Product product,
             Product related,
             LanguageCode language) {
-        return productRelationshipRepository.getByTypeAndRelatedProduct(
-                store, name, product, related, language);
+        return productRelationshipRepository.getByGroup(store, name, product, related, language);
     }
 }

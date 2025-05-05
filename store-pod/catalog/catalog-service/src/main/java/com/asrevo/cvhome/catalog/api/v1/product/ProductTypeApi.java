@@ -56,7 +56,7 @@ public class ProductTypeApi {
                                         @Parameter(hidden = true) LanguageCode language,
                                         Pageable pageable) {
 
-        return productTypeFacade.getByMerchant(merchantStore, language, pageable);
+        return productTypeFacade.getByMerchant(merchantStore, LanguageCode.allLanguage(), pageable);
 
     }
 
@@ -70,7 +70,7 @@ public class ProductTypeApi {
     public ReadableProductType get(@PathVariable Long id, @Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
                                    @Parameter(hidden = true) LanguageCode language) {
 
-        return productTypeFacade.get(merchantStore, id, language);
+        return productTypeFacade.get(merchantStore, id, LanguageCode.allLanguage());
 
     }
 

@@ -16,6 +16,7 @@ import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
 
 public interface ProductService extends SalesManagerEntityService<Long, Product> {
 
@@ -61,4 +62,6 @@ public interface ProductService extends SalesManagerEntityService<Long, Product>
             StoreMerchantId store, String productSku, LanguageCode language);
 
     ReadableProductAvailability getProductAvailability(StoreMerchantId store, String sku);
+
+    Page<Product> findAll(ProductCriteria criteria, StoreMerchantId store);
 }

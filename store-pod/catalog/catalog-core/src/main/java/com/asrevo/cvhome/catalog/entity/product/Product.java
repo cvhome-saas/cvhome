@@ -26,6 +26,9 @@ import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.FilterDef;
+import org.hibernate.annotations.ParamDef;
 
 @Entity
 @EntityListeners(value = AuditListener.class)
@@ -34,6 +37,10 @@ import org.hibernate.annotations.Cascade;
         uniqueConstraints = @UniqueConstraint(columnNames = {"STORE_MERCHANT_ID", "SKU"}))
 @Getter
 @Setter
+@FilterDef(
+        name = "productDescriptionLanguageCodeFilter",
+        parameters = @ParamDef(name = "languageCode", type = String.class),
+        defaultCondition = "LANGUAGE_CODE = :languageCode")
 public class Product extends SalesManagerEntity<Long, Product> implements Auditable {
     @Serial private static final long serialVersionUID = 1L;
 
@@ -53,6 +60,7 @@ public class Product extends SalesManagerEntity<Long, Product> implements Audita
     @Embedded private AuditSection auditSection = new AuditSection();
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "product")
+    @Filter(name = "productDescriptionLanguageCodeFilter")
     private Set<ProductDescription> descriptions = new HashSet<>();
 
     /**

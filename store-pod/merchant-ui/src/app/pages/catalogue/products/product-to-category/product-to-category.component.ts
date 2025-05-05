@@ -42,7 +42,6 @@ export class ProductToCategoryComponent implements OnInit, AfterViewInit {
       store: "",
       count: this.perPage,
       page: 0,
-      lang: this.translate.currentLang
     };
   }
 
@@ -114,7 +113,7 @@ export class ProductToCategoryComponent implements OnInit, AfterViewInit {
   private load() {
     this.loading = true;
 
-    const p$ = this.categoryService.getCategoryByProductId(this.uniqueCode, this.params.store, this.translate.currentLang)
+    const p$ = this.categoryService.getCategoryByProductId(this.uniqueCode, this.params.store)
     const c$ = this.categoryService.getListOfCategories(this.params)
 
     forkJoin([p$, c$])
@@ -125,7 +124,7 @@ export class ProductToCategoryComponent implements OnInit, AfterViewInit {
           this.selectedItems.push(data.id)
         });
         c$.content.forEach((value) => {
-          this.categories.push({'id': value.id, 'name': value.description.name})
+          this.categories.push({'id': value.id, 'name': value.code})
         })
         this.loading = false;
       }, err => {

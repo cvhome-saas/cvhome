@@ -45,7 +45,6 @@ export class CategoryFormComponent implements OnInit {
     private router: Router,
     private toastr: NbToastrService,
     private translate: TranslateService,
-    private dialogService: NbDialogService
   ) {
     this.defaultLanguage = this.translate.defaultLang;
     this.params=this.loadParams();
@@ -73,7 +72,6 @@ export class CategoryFormComponent implements OnInit {
 
   loadParams() {
     return {
-      lang: this.translate.currentLang,
       store: "",
       count: this.perPage,
       page: 0

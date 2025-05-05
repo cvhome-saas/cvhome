@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.catalog.model.product.type;
 
 import java.io.Serial;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,4 +15,5 @@ public class ReadableProductType extends ProductTypeEntity {
     @Serial private static final long serialVersionUID = 1L;
 
     private ProductTypeDescription description;
+    private List<ProductTypeDescription> descriptions;
 }

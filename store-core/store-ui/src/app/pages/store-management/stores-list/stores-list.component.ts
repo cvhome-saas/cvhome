@@ -9,7 +9,6 @@ import {ColumnMode} from "@swimlane/ngx-datatable";
 import {ErrorService} from "../../../shared/services/error.service";
 import {BaseTable, PageT, StorePageRequest} from "../../common/BaseTable";
 import {Observable, of} from "rxjs";
-import {map} from "rxjs/operators";
 
 @Component({
   selector: 'ngx-stores-list',
@@ -26,10 +25,10 @@ export class StoresListComponent extends BaseTable<any> implements OnInit {
     private router: Router,
     private toastr: NbToastrService,
     private dialogService: NbDialogService,
-    translate: TranslateService,
+    private translate: TranslateService,
     errorService: ErrorService
   ) {
-    super(null, translate, errorService);
+    super(null, errorService);
   }
 
   ngOnInit() {

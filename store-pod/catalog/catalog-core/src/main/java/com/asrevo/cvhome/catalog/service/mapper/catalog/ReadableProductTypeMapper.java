@@ -1,16 +1,12 @@
 package com.asrevo.cvhome.catalog.service.mapper.catalog;
 
 import com.asrevo.cvhome.catalog.entity.product.type.ProductType;
-import com.asrevo.cvhome.catalog.model.product.type.ProductTypeDescription;
 import com.asrevo.cvhome.catalog.model.product.type.ReadableProductType;
-import com.asrevo.cvhome.catalog.model.product.type.ReadableProductTypeFull;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.mapper.Mapper;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import org.apache.commons.collections.CollectionUtils;
+import java.util.Set;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
@@ -27,53 +23,45 @@ public class ReadableProductTypeMapper implements Mapper<ProductType, ReadablePr
     @Override
     public ReadableProductType merge(
             ProductType source,
-            ReadableProductType destination,
+            ReadableProductType target,
             StoreMerchantId store,
             LanguageCode language) {
         Assert.notNull(source, "ProductType cannot be null");
-        Assert.notNull(destination, "ReadableProductType cannot be null");
-        return type(source, language);
-    }
+        Assert.notNull(target, "ReadableProductType cannot be null");
 
-    private ReadableProductType type(ProductType type, LanguageCode language) {
-        ReadableProductType readableType;
+        target = new ReadableProductType();
 
-        if (language != null) {
-            readableType = new ReadableProductType();
-            if (!CollectionUtils.isEmpty(type.getDescriptions())) {
-                Optional<ProductTypeDescription> desc =
-                        type.getDescriptions().stream()
-                                .filter(t -> t.getLanguageCode().equals(language))
-                                .map(this::typeDescription)
-                                .findFirst();
-                desc.ifPresent(readableType::setDescription);
-            }
-        } else {
+        target.setCode(source.getCode());
+        target.setId(source.getId());
+        target.setVisible(source.getVisible() != null && source.getVisible());
+        target.setAllowAddToCart(source.getAllowAddToCart() != null && source.getAllowAddToCart());
 
-            readableType = new ReadableProductTypeFull();
-            List<ProductTypeDescription> descriptions =
-                    type.getDescriptions().stream()
-                            .map(this::typeDescription)
-                            .collect(Collectors.toList());
-            ((ReadableProductTypeFull) readableType).setDescriptions(descriptions);
+        if (LanguageCode.isAllLanguage(language)) {
+            var descriptionSet = Optional.ofNullable(source.getDescriptions()).orElse(Set.of());
+            target.setDescriptions(descriptionSet.stream().map(this::populateDescription).toList());
+        }
+        if (LanguageCode.isLanguage(language)) {
+            var descriptionSet = Optional.ofNullable(source.getDescriptions()).orElse(Set.of());
+            var description =
+                    descriptionSet.stream()
+                            .filter(it -> language.equals(it.getLanguageCode()))
+                            .findFirst()
+                            .map(this::populateDescription)
+                            .orElse(null);
+            target.setDescription(description);
         }
 
-        readableType.setCode(type.getCode());
-        readableType.setId(type.getId());
-        readableType.setVisible(type.getVisible() != null && type.getVisible());
-        readableType.setAllowAddToCart(
-                type.getAllowAddToCart() != null && type.getAllowAddToCart());
-
-        return readableType;
+        return target;
     }
 
-    private ProductTypeDescription typeDescription(
+    private com.asrevo.cvhome.catalog.model.product.type.ProductTypeDescription populateDescription(
             com.asrevo.cvhome.catalog.entity.product.type.ProductTypeDescription description) {
-        ProductTypeDescription desc = new ProductTypeDescription();
-        desc.setId(description.getId());
-        desc.setName(description.getName());
-        desc.setDescription(description.getDescription());
-        desc.setLanguage(description.getLanguageCode());
-        return desc;
+        com.asrevo.cvhome.catalog.model.product.type.ProductTypeDescription d =
+                new com.asrevo.cvhome.catalog.model.product.type.ProductTypeDescription();
+        d.setId(description.getId());
+        d.setName(description.getName());
+        d.setDescription(description.getDescription());
+        d.setLanguage(description.getLanguageCode());
+        return d;
     }
 }

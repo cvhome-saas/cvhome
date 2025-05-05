@@ -20,8 +20,11 @@ export class TypesService {
     return this.crudService.get(`/store-pod-gateway/catalog/api/v1/private/product/types`, params);
   }
 
-  getType(store, id, params): Observable<any> {
-    return this.crudService.get(`/store-pod-gateway/catalog/api/v1/private/product/type/${id}?store=${store}`, params);
+  getType(store, id): Observable<any> {
+    const params = {
+      store
+    };
+    return this.crudService.get(`/store-pod-gateway/catalog/api/v1/private/product/type/${id}`, params);
   }
 
   createType(store, req): Observable<any> {
@@ -37,7 +40,11 @@ export class TypesService {
   }
 
   checkCode(store, code): Observable<any> {
-    return this.crudService.get(`/store-pod-gateway/catalog/api/v1/private/product/type/unique?code=${code}&store=${store}`);
+    const params = {
+      store,
+      code
+    };
+    return this.crudService.get(`/store-pod-gateway/catalog/api/v1/private/product/type/unique`,params);
   }
 
 

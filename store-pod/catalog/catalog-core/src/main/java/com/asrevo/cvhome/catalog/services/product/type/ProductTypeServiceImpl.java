@@ -38,12 +38,7 @@ public class ProductTypeServiceImpl extends SalesManagerEntityServiceImpl<Long, 
     @Override
     public Page<ProductType> getByMerchant(
             StoreMerchantId store, LanguageCode language, Pageable pageable) {
-        return pageableProductTypeRepository.listByStore(store, pageable);
-    }
-
-    @Override
-    public ProductType getById(Long id, StoreMerchantId store, LanguageCode language) {
-        return productTypeRepository.findById(id, store, language);
+        return pageableProductTypeRepository.findByStoreMerchantId(store, pageable);
     }
 
     @Override

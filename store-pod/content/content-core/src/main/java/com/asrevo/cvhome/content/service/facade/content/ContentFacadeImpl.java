@@ -3,13 +3,17 @@ package com.asrevo.cvhome.content.service.facade.content;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.content.entity.content.Content;
 import com.asrevo.cvhome.content.entity.content.ContentDescription;
-import com.asrevo.cvhome.content.model.content.*;
+import com.asrevo.cvhome.content.model.content.ContentFile;
+import com.asrevo.cvhome.content.model.content.ContentFolder;
+import com.asrevo.cvhome.content.model.content.ContentImage;
 import com.asrevo.cvhome.content.model.content.box.PersistableContentBox;
 import com.asrevo.cvhome.content.model.content.box.ReadableContentBox;
-import com.asrevo.cvhome.content.model.content.box.ReadableContentBoxFull;
+import com.asrevo.cvhome.content.model.content.box.ReadableContentBoxList;
 import com.asrevo.cvhome.content.model.content.page.PersistableContentPage;
 import com.asrevo.cvhome.content.model.content.page.ReadableContentPage;
-import com.asrevo.cvhome.content.model.content.page.ReadableContentPageFull;
+import com.asrevo.cvhome.content.model.content.page.ReadableContentPageList;
+import com.asrevo.cvhome.content.service.populator.content.ReadableContentBoxPopulator;
+import com.asrevo.cvhome.content.service.populator.content.ReadableContentPagePopulator;
 import com.asrevo.cvhome.content.services.content.ContentService;
 import com.asrevo.cvhome.store.controller.exception.ConstraintException;
 import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
@@ -17,8 +21,8 @@ import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
 import com.asrevo.cvhome.store.core.entity.content.ContentType;
 import com.asrevo.cvhome.store.core.entity.content.FileContentType;
 import com.asrevo.cvhome.store.core.entity.content.InputContentFile;
+import com.asrevo.cvhome.store.core.exception.ConversionException;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
-import com.asrevo.cvhome.store.core.model.entity.ReadableEntityList;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
 import java.io.ByteArrayInputStream;
@@ -32,6 +36,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -104,52 +109,38 @@ public class ContentFacadeImpl implements ContentFacade {
 
     @SuppressWarnings("unchecked")
     @Override
-    public ReadableEntityList<ReadableContentPage> getContentPages(
+    public ReadableContentPageList getContentPages(
             StoreMerchantId store, LanguageCode language, Pageable pageable) {
         Assert.notNull(store, "store cannot be null");
 
         @SuppressWarnings("rawtypes")
-        ReadableEntityList items = new ReadableEntityList();
-        Page<Content> contentPages;
-        contentPages = contentService.listByType(ContentType.PAGE, store, pageable);
+        ReadableContentPageList items = new ReadableContentPageList();
+        Page<Content> contentPages =
+                contentService.listByType(ContentType.PAGE, store, language, pageable);
 
         items.setTotalPages(contentPages.getTotalPages());
-        items.setSize(contentPages.getContent().size());
+        items.setSize(contentPages.getNumberOfElements());
         items.setTotalElements(contentPages.getTotalElements());
-
+        ReadableContentPagePopulator populator = new ReadableContentPagePopulator();
         List<ReadableContentPage> pages =
                 contentPages.getContent().stream()
                         .map(
-                                content ->
-                                        convertContentToReadableContentPage(
-                                                store, language, content))
+                                content -> {
+                                    try {
+                                        return populator.populate(content, store, language);
+                                    } catch (ConversionException e) {
+                                        return null;
+                                    }
+                                })
+                        .filter(Objects::nonNull)
                         .collect(Collectors.toList());
 
         items.setContent(pages);
         return items;
     }
 
-    @Deprecated
-    private ReadableContentFull convertContentToReadableContentFull(
-            StoreMerchantId store, LanguageCode language, Content content) {
-        ReadableContentFull contentFull = new ReadableContentFull();
-
-        List<ContentDescriptionEntity> descriptions =
-                this.createContentDescriptionEntitys(store, content, language);
-
-        contentFull.setDescriptions(descriptions);
-        contentFull.setId(content.getId());
-        contentFull.setDisplayedInMenu(content.isLinkToMenu());
-        contentFull.setContentType(content.getContentType().name());
-        contentFull.setCode(content.getCode());
-        contentFull.setId(content.getId());
-        contentFull.setVisible(content.isVisible());
-
-        return contentFull;
-    }
-
     private Content convertContentPageToContent(
-            StoreMerchantId store, Content model, PersistableContentPage content) throws Exception {
+            StoreMerchantId store, Content model, PersistableContentPage content) {
 
         Content contentModel = new Content();
         if (model != null) {
@@ -169,7 +160,7 @@ public class ContentFacadeImpl implements ContentFacade {
     }
 
     private Content convertContentBoxToContent(
-            StoreMerchantId store, Content model, PersistableContentBox content) throws Exception {
+            StoreMerchantId store, Content model, PersistableContentBox content) {
         Content contentModel = new Content();
         if (model != null) {
             contentModel = model;
@@ -190,96 +181,6 @@ public class ContentFacadeImpl implements ContentFacade {
         return contentModel;
     }
 
-    /*
-     * private Content convertContentPageToContent(StoreMerchantId store, Language
-     * language, Content content, PersistableContentEntity contentPage) throws
-     * ServiceException {
-     *
-     * ContentType contentType =
-     * ContentType.valueOf(contentPage.getContentType()); if (contentType ==
-     * null) { throw new
-     * ServiceRuntimeException("Invalid specified contentType [" +
-     * contentPage.getContentType() + "]"); }
-     *
-     * List<ContentDescription> descriptions = createContentDescription(store,
-     * content, contentPage); descriptions.stream().forEach(c ->
-     * c.setContent(content));
-     *
-     * content.setDescriptions(descriptions);
-     *
-     * // ContentDescription contentDescription = //
-     * createContentDescription(store, contentPage, language); //
-     * setContentDescriptionToContentModel(content,contentDescription,language);
-     *
-     * // contentDescription.setContent(content);
-     *
-     * if (contentPage.getId() != null && contentPage.getId().longValue() > 0) {
-     * content.setId(contentPage.getId()); }
-     * content.setVisible(contentPage.isVisible());
-     * content.setLinkToMenu(contentPage.isDisplayedInMenu());
-     * content.setContentType(ContentType.valueOf(contentPage.getContentType()))
-     * ; content.setStoreMerchantId(store);
-     *
-     * return content; }
-     */
-
-    @Deprecated
-    private List<ContentDescriptionEntity> createContentDescriptionEntitys(
-            StoreMerchantId store, Content contentModel, LanguageCode language) {
-
-        List<ContentDescriptionEntity> descriptions = new ArrayList<>();
-
-        if (!CollectionUtils.isEmpty(contentModel.getDescriptions())) {
-            for (ContentDescription description : contentModel.getDescriptions()) {
-                if (language != null && !language.equals(description.getLanguageCode())) {
-                    continue;
-                }
-
-                ContentDescriptionEntity contentDescription = create(description);
-                descriptions.add(contentDescription);
-            }
-        }
-
-        return descriptions;
-    }
-
-    @Deprecated
-    private ContentDescriptionEntity create(ContentDescription description) {
-
-        ContentDescriptionEntity contentDescription = new ContentDescriptionEntity();
-        contentDescription.setLanguage(description.getLanguageCode());
-        contentDescription.setTitle(description.getTitle());
-        contentDescription.setName(description.getName());
-        contentDescription.setFriendlyUrl(description.getSeUrl());
-        contentDescription.setDescription(description.getDescription());
-        if (description.getId() != null && description.getId() > 0) {
-            contentDescription.setId(description.getId());
-        }
-
-        return contentDescription;
-    }
-
-    /*
-     * private List<ContentDescription> createContentDescription(
-     * PersistableContentPage content) throws ServiceException {
-     * Assert.notNull(contentModel, "Content cannot be null");
-     *
-     * List<ContentDescription> descriptions = new
-     * ArrayList<ContentDescription>(); for (NamedEntity objectContent :
-     * content.getDescriptions()) { LanguageCode lang =
-     * languageService.getByCode(objectContent.getLanguage());
-     * ContentDescription contentDescription = new ContentDescription(); if
-     * (contentModel != null) {
-     * setContentDescriptionToContentModel(contentModel, contentDescription,
-     * lang); } contentDescription.setLanguage(lang);
-     * contentDescription.setMetatagDescription(objectContent.getMetaDescription
-     * ()); contentDescription.setTitle(objectContent.getTitle());
-     * contentDescription.setName(objectContent.getName());
-     * contentDescription.setSeUrl(objectContent.getFriendlyUrl());
-     * contentDescription.setDescription(objectContent.getDescription());
-     * contentDescription.setMetatagTitle(objectContent.getTitle());
-     * descriptions.add(contentDescription); } return descriptions; }
-     */
     private List<ContentDescription> buildDescriptions(
             Content contentModel,
             List<com.asrevo.cvhome.content.model.content.common.ContentDescription>
@@ -301,9 +202,6 @@ public class ContentFacadeImpl implements ContentFacade {
                 contentDescription = new ContentDescription();
             }
 
-            // if (contentModel != null) {
-            //	setContentDescriptionToContentModel(contentModel, contentDescription, lang);
-            // }
             contentDescription.setMetatagDescription(objectContent.getMetaDescription());
             contentDescription.setTitle(objectContent.getTitle());
             contentDescription.setName(objectContent.getName());
@@ -318,50 +216,67 @@ public class ContentFacadeImpl implements ContentFacade {
         return descriptions;
     }
 
-    @Override
-    public ReadableContentPage getContentPage(
-            String code, StoreMerchantId store, LanguageCode language) {
-
+    private Content getContent(String code, StoreMerchantId store, LanguageCode language) {
         Assert.notNull(code, "Content code cannot be null");
         Assert.notNull(store, "StoreMerchantId cannot be null");
 
         Content content;
 
-        if (language == null) {
-            content =
-                    Optional.ofNullable(contentService.getByCode(code, store))
-                            .orElseThrow(
-                                    () -> new ResourceNotFoundException("No page found : " + code));
-        } else {
+        if (LanguageCode.isLanguage(language)) {
             content =
                     Optional.ofNullable(contentService.getByCode(code, store, language))
                             .orElseThrow(
                                     () -> new ResourceNotFoundException("No page found : " + code));
+        } else if (LanguageCode.isAllLanguage(language)) {
+            content =
+                    Optional.ofNullable(contentService.getByCodeFetchAllLanguages(code, store))
+                            .orElseThrow(
+                                    () -> new ResourceNotFoundException("No page found : " + code));
+        } else {
+            content =
+                    Optional.ofNullable(contentService.getByCodeFetchNonLanguages(code, store))
+                            .orElseThrow(
+                                    () -> new ResourceNotFoundException("No page found : " + code));
         }
-
-        return convertContentToReadableContentPage(store, language, content);
+        return content;
     }
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
+    @SneakyThrows
     @Override
-    public ReadableEntityList<ReadableContentBox> getContentBoxes(
-            ContentType type, StoreMerchantId store, LanguageCode language, Pageable pageable) {
+    public ReadableContentPage getContentPage(
+            String code, StoreMerchantId store, LanguageCode language) {
+        Content content = getContent(code, store, language);
+        ReadableContentPagePopulator populator = new ReadableContentPagePopulator();
+        return populator.populate(content, store, language);
+    }
+
+    @Override
+    public ReadableContentBoxList getContentBoxes(
+            StoreMerchantId store, LanguageCode language, Pageable pageable) {
 
         Assert.notNull(store, "store cannot be null");
 
-        ReadableEntityList items = new ReadableEntityList();
-        Page<Content> contentBoxes;
-        contentBoxes = contentService.listByType(type, store, pageable);
+        ReadableContentBoxList items = new ReadableContentBoxList();
+        Page<Content> contentBoxes =
+                contentService.listByType(ContentType.BOX, store, language, pageable);
 
         items.setTotalPages(contentBoxes.getTotalPages());
-        items.setSize(contentBoxes.getContent().size());
+        items.setSize(contentBoxes.getNumberOfElements());
         items.setTotalElements(contentBoxes.getTotalElements());
-
+        ReadableContentBoxPopulator readableContentBoxPopulator = new ReadableContentBoxPopulator();
         List<ReadableContentBox> boxes =
                 contentBoxes.getContent().stream()
-                        .map(content -> convertContentToReadableContentBox(language, content))
+                        .map(
+                                content -> {
+                                    try {
+                                        return readableContentBoxPopulator.populate(
+                                                content, store, language);
+                                    } catch (ConversionException e) {
+                                        return null;
+                                    }
+                                })
+                        .filter(Objects::nonNull)
                         .collect(Collectors.toList());
-
         items.setContent(boxes);
 
         return items;
@@ -400,156 +315,16 @@ public class ContentFacadeImpl implements ContentFacade {
         return fileType;
     }
 
-    private ReadableContentBox convertContentToReadableContentBox(
-            LanguageCode language, Content content) {
-        ReadableContentBox box = new ReadableContentBox();
-        this.setDescription(content, box, language);
-        box.setCode(content.getCode());
-        box.setId(content.getId());
-        box.setVisible(content.isVisible());
-        return box;
-        // TODO revise this
-        // String staticImageFilePath = imageUtils.buildStaticImageUtils(store,
-        // content.getCode() + ".jpg");
-        // box.setImage(staticImageFilePath);
-    }
-
-    private void setDescription(Content content, ReadableContentBox box, LanguageCode lang) {
-
-        Optional<ContentDescription> contentDescription =
-                findAppropriateContentDescription(content.getDescriptions(), lang);
-        if (contentDescription.isPresent()) {
-            com.asrevo.cvhome.content.model.content.common.ContentDescription desc =
-                    this.contentDescription(contentDescription.get());
-            box.setDescription(desc);
-        }
-    }
-
-    private ReadableContentPage convertContentToReadableContentPage(
-            StoreMerchantId store, LanguageCode language, Content content) {
-        if (language != null) {
-            ReadableContentPage page = new ReadableContentPage();
-            Optional<ContentDescription> contentDescription =
-                    findAppropriateContentDescription(content.getDescriptions(), language);
-            if (contentDescription.isPresent()) {
-                com.asrevo.cvhome.content.model.content.common.ContentDescription desc =
-                        this.contentDescription(contentDescription.get());
-                page.setDescription(desc);
-            }
-            page.setCode(content.getCode());
-            page.setId(content.getId());
-            page.setVisible(content.isVisible());
-            page.setLinkToMenu(content.isLinkToMenu());
-            return page;
-        } else {
-            ReadableContentPageFull page = new ReadableContentPageFull();
-            List<com.asrevo.cvhome.content.model.content.common.ContentDescription> descriptions =
-                    content.getDescriptions().stream()
-                            .map(this::contentDescription)
-                            .collect(Collectors.toList());
-            page.setDescriptions(descriptions);
-            page.setCode(content.getCode());
-            page.setId(content.getId());
-            page.setVisible(content.isVisible());
-            page.setLinkToMenu(content.isLinkToMenu());
-            return page;
-        }
-    }
-
-    private com.asrevo.cvhome.content.model.content.common.ContentDescription contentDescription(
-            ContentDescription description) {
-        Assert.notNull(description, "ContentDescription cannot be null");
-        com.asrevo.cvhome.content.model.content.common.ContentDescription desc =
-                new com.asrevo.cvhome.content.model.content.common.ContentDescription();
-        desc.setDescription(description.getDescription()); // return description as is
-        desc.setName(description.getName());
-        desc.setTitle(description.getTitle());
-        desc.setFriendlyUrl(description.getSeUrl());
-        desc.setId(description.getId());
-        desc.setLanguage(description.getLanguageCode());
-        return desc;
-    }
-
-    private Optional<ContentDescription> findAppropriateContentDescription(
-            List<ContentDescription> contentDescriptions, LanguageCode language) {
-        return contentDescriptions.stream()
-                .filter(description -> description.getLanguageCode().equals(language))
-                .findFirst();
-    }
-
+    @SneakyThrows
     @Override
     public ReadableContentBox getContentBox(
             String code, StoreMerchantId store, LanguageCode language) {
         Assert.notNull(code, "Content code cannot be null");
         Assert.notNull(store, "StoreMerchantId cannot be null");
 
-        Content content;
-
-        if (language != null) {
-
-            content =
-                    Optional.ofNullable(contentService.getByCode(code, store, language))
-                            .orElseThrow(
-                                    () ->
-                                            new ResourceNotFoundException(
-                                                    "Resource not found ["
-                                                            + code
-                                                            + "] for store ["
-                                                            + store
-                                                            + "]"));
-
-            Optional<ContentDescription> contentDescription =
-                    findAppropriateContentDescription(content.getDescriptions(), language);
-            ReadableContentBox box = new ReadableContentBox();
-            box.setId(content.getId());
-            box.setCode(content.getCode());
-            box.setContentType(content.getContentType().name());
-            box.setVisible(content.isVisible());
-
-            if (contentDescription.isPresent()) {
-                com.asrevo.cvhome.content.model.content.common.ContentDescription desc =
-                        this.contentDescription(
-                                contentDescription.get()); // return cdata description
-                desc.setDescription(this.fixContentDescription(desc.getDescription()));
-                box.setDescription(desc);
-            }
-
-            return box;
-
-        } else {
-
-            content =
-                    Optional.ofNullable(contentService.getByCode(code, store))
-                            .orElseThrow(
-                                    () ->
-                                            new ResourceNotFoundException(
-                                                    "Resource not found ["
-                                                            + code
-                                                            + "] for store ["
-                                                            + store
-                                                            + "]"));
-
-            ReadableContentBoxFull full = new ReadableContentBoxFull(); // all languages
-
-            List<com.asrevo.cvhome.content.model.content.common.ContentDescription> descriptions =
-                    content.getDescriptions().stream()
-                            .map(this::contentDescription)
-                            .collect(Collectors.toList());
-
-            full.setDescriptions(descriptions);
-            full.setCode(content.getCode());
-            full.setId(content.getId());
-            full.setVisible(content.isVisible());
-
-            return full;
-        }
-    }
-
-    private String fixContentDescription(String description) {
-        Assert.notNull(description, "description cannot be empty");
-        //        return "<![CDATA[" + description.replaceAll("\r\n", "").replaceAll("\t", "") +
-        // "]]>";
-        return description;
+        Content content = getContent(code, store, language);
+        ReadableContentBoxPopulator populator = new ReadableContentBoxPopulator();
+        return populator.populate(content, store, language);
     }
 
     @Override
@@ -562,7 +337,7 @@ public class ContentFacadeImpl implements ContentFacade {
         try {
             Content content;
 
-            content = contentService.getByCode(page.getCode(), merchantStore);
+            content = contentService.getByCodeFetchAllLanguages(page.getCode(), merchantStore);
             if (content != null) {
                 throw new ConstraintException(
                         "Page with code ["
@@ -590,7 +365,7 @@ public class ContentFacadeImpl implements ContentFacade {
         try {
             Content content;
 
-            content = contentService.getByCode(box.getCode(), merchantStore);
+            content = contentService.getByCodeFetchAllLanguages(box.getCode(), merchantStore);
             if (content != null) {
                 throw new ConstraintException(
                         "Content box with code ["
@@ -629,21 +404,7 @@ public class ContentFacadeImpl implements ContentFacade {
         }
     }
 
-    @Override
-    public ReadableContentFull getContent(
-            String code, StoreMerchantId store, LanguageCode language) {
-        Assert.notNull(store, "StoreMerchantId not null");
-        Assert.notNull(code, "Content code must not be null");
-
-        Content content = contentService.getByCode(code, store);
-        if (content == null) {
-            throw new ResourceNotFoundException(
-                    "No content found with code [" + code + "] for store [" + store + "]");
-        }
-
-        return this.convertContentToReadableContentFull(store, language, content);
-    }
-
+    @SneakyThrows
     @Override
     public ReadableContentPage getContentPageByName(
             String name, StoreMerchantId store, LanguageCode language) {
@@ -651,19 +412,14 @@ public class ContentFacadeImpl implements ContentFacade {
         Assert.notNull(store, "StoreMerchantId cannot be null");
         Assert.notNull(language, "LanguageCode cannot be null");
 
-        try {
+        Content content =
+                contentService
+                        .findBySeUrl(store, name, language)
+                        .orElseThrow(
+                                () -> new ResourceNotFoundException("No page found : " + name));
 
-            ContentDescription contentDescription =
-                    Optional.ofNullable(contentService.getBySeUrl(store, name))
-                            .orElseThrow(
-                                    () -> new ResourceNotFoundException("No page found : " + name));
-
-            return convertContentToReadableContentPage(
-                    store, language, contentDescription.getContent());
-
-        } catch (Exception e) {
-            throw new ServiceRuntimeException("Error while getting page " + e.getMessage(), e);
-        }
+        ReadableContentPagePopulator populator = new ReadableContentPagePopulator();
+        return populator.populate(content, store, language);
     }
 
     @Override

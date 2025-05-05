@@ -2,7 +2,6 @@ package com.asrevo.cvhome.content.services.content;
 
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.content.entity.content.Content;
-import com.asrevo.cvhome.content.entity.content.ContentDescription;
 import com.asrevo.cvhome.content.repositories.content.ContentRepository;
 import com.asrevo.cvhome.content.repositories.content.PageContentRepository;
 import com.asrevo.cvhome.store.core.entity.content.*;
@@ -47,13 +46,6 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
     }
 
     @Override
-    public List<Content> listByType(
-            ContentType contentType, StoreMerchantId store, LanguageCode language) {
-
-        return contentRepository.findByType(contentType, store, language);
-    }
-
-    @Override
     public void delete(Content content) throws ServiceException {
 
         Content c = this.getById(content.getId());
@@ -61,40 +53,15 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
     }
 
     @Override
-    public Content getByLanguage(Long id, LanguageCode language) {
-        return contentRepository.findByIdAndLanguage(id, language);
+    public Content getByCodeFetchAllLanguages(String code, StoreMerchantId store) {
+
+        return contentRepository.findByCodeFetchAllLanguages(code, store);
     }
 
     @Override
-    public List<Content> listByType(
-            List<ContentType> contentType, StoreMerchantId store, LanguageCode language) {
+    public Content getByCodeFetchNonLanguages(String code, StoreMerchantId store) {
 
-        /*
-         * List<String> contentTypes = new ArrayList<String>(); for (int i = 0;
-         * i < contentType.size(); i++) {
-         * contentTypes.add(contentType.get(i).name()); }
-         */
-
-        return contentRepository.findByTypes(contentType, store, language);
-    }
-
-    @Override
-    public List<ContentDescription> listNameByType(
-            List<ContentType> contentType, StoreMerchantId store, LanguageCode language) {
-
-        return contentRepository.listNameByType(contentType, store, language);
-    }
-
-    @Override
-    public List<Content> listByType(List<ContentType> contentType, StoreMerchantId store) {
-
-        return contentRepository.findByTypes(contentType, store);
-    }
-
-    @Override
-    public Content getByCode(String code, StoreMerchantId store) {
-
-        return contentRepository.findByCode(code, store);
+        return contentRepository.findByCodeFetchNonLanguages(code, store);
     }
 
     @Override
@@ -391,28 +358,9 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
     }
 
     @Override
-    public ContentDescription getBySeUrl(StoreMerchantId store, String seUrl) {
-        return contentRepository.getBySeUrl(store, seUrl);
-    }
-
-    @Override
-    public List<Content> getByCodeLike(
-            ContentType type, String codeLike, StoreMerchantId store, LanguageCode language) {
-        return contentRepository.findByCodeLike(type, '%' + codeLike + '%', store, language);
-    }
-
-    @Override
-    public Content getById(Long id, StoreMerchantId store, LanguageCode language) {
-
-        Content content = contentRepository.findOne(id);
-
-        if (content != null) {
-            if (!Objects.equals(content.getStoreMerchantId(), store)) {
-                return null;
-            }
-        }
-
-        return content;
+    public Optional<Content> findBySeUrl(
+            StoreMerchantId store, String seUrl, LanguageCode languageCode) {
+        return contentRepository.findBySeUrl(store, seUrl, languageCode);
     }
 
     public Content getById(Long id, StoreMerchantId store) {
@@ -500,12 +448,6 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
         inputFile.setFile(is);
 
         assetsManager.addFile(merchantStoreCode, path, inputFile);
-    }
-
-    @Override
-    public Page<Content> listByType(
-            ContentType contentType, StoreMerchantId store, Pageable pageable) {
-        return pageContentRepository.findByContentType(contentType, store, pageable);
     }
 
     @Override

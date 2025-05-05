@@ -1,7 +1,4 @@
 import {Component, OnInit} from '@angular/core';
-
-import {TranslateService} from '@ngx-translate/core';
-import {DomSanitizer} from '@angular/platform-browser';
 import {ColumnMode} from "@swimlane/ngx-datatable";
 import {ErrorService} from "../../../shared/services/error.service";
 import {OrgService} from "../services/org.service";
@@ -47,13 +44,11 @@ export class OrgStoresListComponent extends BaseTable<any> implements OnInit {
 
   constructor(
     private orgService: OrgService,
-    translate: TranslateService,
-    private _sanitizer: DomSanitizer,
     private activatedRoute: ActivatedRoute,
     private router: Router,
     errorService: ErrorService
   ) {
-    super(null, translate, errorService)
+    super(null,  errorService)
   }
 
   ngOnInit() {

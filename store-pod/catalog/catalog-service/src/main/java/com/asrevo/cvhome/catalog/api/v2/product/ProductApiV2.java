@@ -5,7 +5,6 @@ import com.asrevo.cvhome.commons.annotation.ConditionalOnApiStatus;
 import com.asrevo.cvhome.commons.annotation.SecuredResource;
 import com.asrevo.cvhome.commons.domain.Entity;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.catalog.entity.product.ProductCriteria;
 import com.asrevo.cvhome.catalog.model.product.LightPersistableProduct;
@@ -28,7 +27,6 @@ import io.swagger.v3.oas.annotations.tags.Tags;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -115,7 +113,7 @@ public class ProductApiV2 {
             @Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
             @Parameter(hidden = true) LanguageCode language) {
 
-        return productDefinitionFacade.getProduct(merchantStore, id, language);
+        return productDefinitionFacade.getProduct(merchantStore, id, LanguageCode.allLanguage());
 
     }
 
@@ -154,13 +152,46 @@ public class ProductApiV2 {
     }
 
 
-    /**
-     * List products
-     * Filtering product lists based on product option and option value ?category=1
-     * &manufacturer=2 &type=... &lang=en|fr NOT REQUIRED, will use request language
-     * &start=0 NOT REQUIRED, can be used for pagination &count=10 NOT REQUIRED, can
-     * be used to limit item count
-     */
+    @RequestMapping(value = "/private/tiny-products", method = RequestMethod.GET)
+    @ResponseBody
+    @Parameters({
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
+    })
+    @ConditionalOnApiStatus
+    public ReadableProductList tiny(
+            ProductCriteria searchCriteria,
+            @Parameter(hidden = true) StoreMerchantId merchantStore,
+            @Parameter(hidden = true) LanguageCode language,
+            Pageable pageable
+    ) {
+
+        searchCriteria.setPageable(pageable);
+        searchCriteria.setLanguage(language);
+
+            return productFacadeV2.getBaseProductListsByCriteria(merchantStore,  searchCriteria);
+    }
+
+    @RequestMapping(value = "/private/base-products", method = RequestMethod.GET)
+    @ResponseBody
+    @Parameters({
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
+    })
+    @ConditionalOnApiStatus
+    public ReadableProductList base(
+            ProductCriteria searchCriteria,
+            @Parameter(hidden = true) StoreMerchantId merchantStore,
+            @Parameter(hidden = true) LanguageCode language,
+            Pageable pageable
+    ) {
+
+        searchCriteria.setPageable(pageable);
+        searchCriteria.setLanguage(language);
+
+            return productFacadeV2.getBaseProductListsByCriteria(merchantStore,  searchCriteria);
+    }
+
     @RequestMapping(value = "/products", method = RequestMethod.GET)
     @ResponseBody
     @Parameters({
@@ -168,33 +199,17 @@ public class ProductApiV2 {
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     @ConditionalOnApiStatus
-    public ReadableProductList list(
-            ProductCriteria searchCriterias,
+    public ReadableProductList getList(
+            ProductCriteria searchCriteria,
             @Parameter(hidden = true) StoreMerchantId merchantStore,
             @Parameter(hidden = true) LanguageCode language,
             Pageable pageable
     ) {
 
+        searchCriteria.setPageable(pageable);
+        searchCriteria.setLanguage(language);
 
-        if (!StringUtils.isBlank(searchCriterias.getSku())) {
-            searchCriterias.setCode(searchCriterias.getSku());
-        }
-
-        if (!StringUtils.isBlank(searchCriterias.getName())) {
-            searchCriterias.setProductName(searchCriterias.getName());
-        }
-
-        searchCriterias.setPageable(pageable);
-        searchCriterias.setLanguage(language);
-
-        try {
-            return productFacadeV2.getProductListsByCriterias(merchantStore, language, searchCriterias);
-
-        } catch (Exception e) {
-            log.error("Error while filtering products product", e);
-            throw new ServiceRuntimeException(e);
-
-        }
+    return productFacadeV2.getProductListsByCriteria(merchantStore, searchCriteria);
     }
 
     /**

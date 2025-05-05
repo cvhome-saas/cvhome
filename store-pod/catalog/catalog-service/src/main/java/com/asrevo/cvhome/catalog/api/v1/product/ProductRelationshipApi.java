@@ -16,7 +16,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -37,11 +36,23 @@ public class ProductRelationshipApi {
         this.productItemsFacade = productItemsFacade;
     }
 
-    /**
-     * Query for a product group public/product/group/{code}?lang=fr|en no lang it will take session
-     * lang or default store lang code can be any code used while creating product group, defeult
-     * being FEATURED
-     */
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping("/private/products/{id}/related")
+    @Operation(method = "GET", description = "Get products by group code",
+            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ReadableProductList.class))))
+    @Parameters({
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
+    })
+    public @ResponseBody ReadableProductList productRelatedProducts(
+            @PathVariable final Long id,
+            @Parameter(hidden = true) StoreMerchantId merchantStore,
+            @Parameter(hidden = true) LanguageCode language) {
+        Product product = productService.getById(id);
+        return productItemsFacade.relatedTinyProducts(product, merchantStore, LanguageCode.nonLanguage());
+
+    }
+
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/products/{id}/related")
     @Operation(method = "GET", description = "Get products by group code",
@@ -50,31 +61,12 @@ public class ProductRelationshipApi {
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
-    public @ResponseBody ReadableProductList getProductRelatedItems(
+    public @ResponseBody ReadableProductList getProductRelatedProducts(
             @PathVariable final Long id,
             @Parameter(hidden = true) StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language,
-            HttpServletResponse response)
-            throws Exception {
-        try {
-            Product product = productService.getById(id);
-            if (product == null) {
-                response.sendError(404, "Product id " + id + " does not exists");
-                return null;
-            }
-
-
-            return productItemsFacade.relatedItems(product, merchantStore, language);
-
-        } catch (Exception e) {
-            log.error("Error while getting product reviews", e);
-            try {
-                response.sendError(503, "Error while getting product reviews" + e.getMessage());
-            } catch (Exception ignore) {
-            }
-
-            return null;
-        }
+            @Parameter(hidden = true) LanguageCode language) {
+        Product product = productService.getById(id);
+        return productItemsFacade.relatedMinimalProducts(product, merchantStore, language);
     }
 
     @ResponseStatus(HttpStatus.CREATED)
@@ -83,53 +75,16 @@ public class ProductRelationshipApi {
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
-    public @ResponseBody ReadableProductList addProductToRelatedGroup(
+    public @ResponseBody void addProductToRelatedGroup(
             @PathVariable Long relatedId,
             @PathVariable Long productId,
             @Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language,
-            HttpServletResponse response) {
+            @Parameter(hidden = true) LanguageCode language) {
 
-        Product relatedProduct;
-        try {
-            // get the relatedProduct
-            relatedProduct = productService.findOne(relatedId, merchantStore);
+        Product relatedProduct = productService.findOne(relatedId, merchantStore);
 
-            if (relatedProduct == null) {
-                response.sendError(404, "Related Product not fount for id " + productId);
-                return null;
-            }
-
-        } catch (Exception e) {
-            log.error("Error while adding related product to group", e);
-            try {
-                response.sendError(503, "Error while adding related product to group " + e.getMessage());
-            } catch (Exception ignore) {
-            }
-
-            return null;
-        }
-
-        Product product;
-        try {
-            // get the product
-            product = productService.findOne(productId, merchantStore);
-
-            if (product == null) {
-                response.sendError(404, "Product not fount for id " + productId);
-                return null;
-            }
-
-        } catch (Exception e) {
-            log.error("Error while adding product to group", e);
-            try {
-                response.sendError(503, "Error while adding product to group " + e.getMessage());
-            } catch (Exception ignore) {
-            }
-
-            return null;
-        }
-        return productItemsFacade.addItemToRelatedProduct(relatedProduct, product, merchantStore, language);
+        Product product = productService.findOne(productId, merchantStore);
+        productItemsFacade.addItemToRelatedProduct(relatedProduct, product, merchantStore, language);
     }
 
     @ResponseStatus(HttpStatus.CREATED)
@@ -138,53 +93,16 @@ public class ProductRelationshipApi {
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
             @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     })
-    public @ResponseBody ReadableProductList removeProductToRelatedGroup(
+    public @ResponseBody void removeProductToRelatedGroup(
             @PathVariable Long relatedId,
             @PathVariable Long productId,
             @Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language,
-            HttpServletResponse response) throws ServiceException {
+            @Parameter(hidden = true) LanguageCode language) throws ServiceException {
 
-        Product relatedProduct;
-        try {
-            // get the relatedProduct
-            relatedProduct = productService.findOne(relatedId, merchantStore);
+        Product relatedProduct = productService.findOne(relatedId, merchantStore);
 
-            if (relatedProduct == null) {
-                response.sendError(404, "Related Product not fount for id " + productId);
-                return null;
-            }
-
-        } catch (Exception e) {
-            log.error("Error while adding related product to group", e);
-            try {
-                response.sendError(503, "Error while adding related product to group " + e.getMessage());
-            } catch (Exception ignore) {
-            }
-
-            return null;
-        }
-
-        Product product;
-        try {
-            // get the product
-            product = productService.findOne(productId, merchantStore);
-
-            if (product == null) {
-                response.sendError(404, "Product not fount for id " + productId);
-                return null;
-            }
-
-        } catch (Exception e) {
-            log.error("Error while adding product to group", e);
-            try {
-                response.sendError(503, "Error while adding product to group " + e.getMessage());
-            } catch (Exception ignore) {
-            }
-
-            return null;
-        }
-        return productItemsFacade.removeItemFromRelated(relatedProduct, product, merchantStore, language);
+        Product product = productService.findOne(productId, merchantStore);
+        productItemsFacade.removeItemFromRelated(relatedProduct, product, merchantStore, language);
     }
 
 }

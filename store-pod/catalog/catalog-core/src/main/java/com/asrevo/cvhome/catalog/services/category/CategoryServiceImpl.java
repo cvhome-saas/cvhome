@@ -235,12 +235,6 @@ public class CategoryServiceImpl extends SalesManagerEntityServiceImpl<Long, Cat
     }
 
     @Override
-    public List<Category> getListByDepthFilterByFeatured(
-            StoreMerchantId store, int depth, LanguageCode language) {
-        return categoryRepository.findByDepthFilterByFeatured(store, depth, language);
-    }
-
-    @Override
     public Page<Category> getListByDepth(
             StoreMerchantId store,
             LanguageCode language,

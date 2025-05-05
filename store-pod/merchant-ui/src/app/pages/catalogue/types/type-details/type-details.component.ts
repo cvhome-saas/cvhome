@@ -5,7 +5,6 @@ import {validators} from '../../../../shared/validation/validators';
 import {TypesService} from '../services/types.service';
 import {NbToastrService} from '@nebular/theme';
 import {ActivatedRoute, Router} from '@angular/router';
-import {DomSanitizer} from '@angular/platform-browser';
 import {ConfigService} from '../../../../shared/services/config.service';
 import {ErrorService} from "../../../../shared/services/error.service";
 
@@ -37,7 +36,6 @@ export class TypeDetailsComponent implements OnInit {
   uniqueCode: string;//identifier fromroute
 
   constructor(
-    private _sanitizer: DomSanitizer,
     private fb: FormBuilder,
     private translate: TranslateService,
     private router: Router,
@@ -77,9 +75,7 @@ export class TypeDetailsComponent implements OnInit {
   }
 
   fillData() {
-    this.typesService.getType(this.store, this.uniqueCode, {
-      lang: "_all",
-    })
+    this.typesService.getType(this.store, this.uniqueCode)
       .subscribe({
         next: (types) => {
           this.type.id = types.id;
