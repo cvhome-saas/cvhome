@@ -33,7 +33,7 @@ bin/
 
 ### VS Code ###
 .vscode/
-**/package-lock.json
+ackage-lock.json
 **/node_modules/
 /extra/test-data/generated/
 /store-core/auth/keycloak/providers/*
