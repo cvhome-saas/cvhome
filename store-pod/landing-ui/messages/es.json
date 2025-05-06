@@ -66,7 +66,9 @@
   "COMPONENTS": {
     "PRODUCT": {
       "SUCCESSFULLY_ADDED_PRODUCT_TO_CART": "¡Producto añadido al carrito con éxito!",
-      "FAILED_TO_ADD_PRODUCT_TO_CART": "Error al añadir el producto al carrito."
+      "FAILED_TO_ADD_PRODUCT_TO_CART": "Error al añadir el producto al carrito.",
+      "IN_STOCK": "En stock",
+      "OUT_OF_STOCK": "Agotado"
     },
     "HEADER": {
       "HOME_TITLE": "Inicio",
