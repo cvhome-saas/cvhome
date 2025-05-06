@@ -22,6 +22,8 @@ export default function ProductItemButtonGroup({storeContext, product}: {
     const [showQuickView, setShowQuickView] = useState(false);
     const toastPosition = isRtl(storeContext.locale) ? "bottom-left" : "bottom-right";
 
+    const isAddToCartDisabled = !product.available || product.quantity == null || product.quantity < 1;
+
     const updateCart = async () => {
         return await CartService.addToCart(storeContext, getCartCode(), product.sku, 1)
             .then(newCartData => {
@@ -68,8 +70,9 @@ export default function ProductItemButtonGroup({storeContext, product}: {
             </button>
             <button
                 onClick={addToCart}
+                disabled={isAddToCartDisabled}
                 aria-label="Add to Cart"
-                className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-r from-success to-primary text-neutral hover:shadow-lg hover:shadow-success/50 transition-transform duration-300 hover:scale-110"
+                className={`flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-r from-success to-primary text-neutral transition-transform duration-300 ${isAddToCartDisabled ? 'cursor-not-allowed opacity-50' : 'hover:shadow-lg hover:shadow-success/50 hover:scale-110'}`}
             >
                 <ShoppingCartIcon className="w-6 h-6"/>
             </button>
