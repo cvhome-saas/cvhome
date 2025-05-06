@@ -27,10 +27,9 @@ export class PageComponent extends BaseTable<any> implements OnInit {
     private dialogService: NbDialogService,
     private toastr: NbToastrService,
     errorService: ErrorService,
-    translate: TranslateService,
     selectedStoreService: SelectedStoreService,
   ) {
-    super(selectedStoreService, translate, errorService)
+    super(selectedStoreService,  errorService)
   }
 
   ngOnInit(): void {
@@ -43,16 +42,6 @@ export class PageComponent extends BaseTable<any> implements OnInit {
       return of();
     }
     return this.contentService.pages(request)
-      .pipe(map(it => {
-        const mappedX = {
-          content: it.items,
-          totalPages: it.totalPages,
-          totalElements: it.recordsTotal,
-          size: it.number,
-          pageNumber: request.page
-        };
-        return mappedX;
-      }));
   }
 
 

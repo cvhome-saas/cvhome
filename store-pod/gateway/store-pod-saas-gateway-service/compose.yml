@@ -1,7 +1,9 @@
 version: '3'
 services:
   gateway-service-v2:
-    image: gateway-service-v2
+    build:
+      context: .
+      dockerfile: Dockerfile
     network_mode: "host"
     ports:
       - "80:80"
@@ -10,3 +12,4 @@ services:
     environment:
       STORE_POD_GATEWAY: http://store-pod-1.gateway.com:8100
       ASK_TLS_URL: http://gateway.com:8000/manager/api/v1/router/public/ask-for-tls
+      DOMAIN_LOOKUP_URL: http://gateway.com:8000/manager/api/v1/router/public/lookup-by-domain

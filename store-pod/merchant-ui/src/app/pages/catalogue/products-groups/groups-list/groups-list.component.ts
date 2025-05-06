@@ -24,13 +24,12 @@ export class GroupsListComponent extends BaseTable<any> implements OnInit {
 
   constructor(
     private dialogService: NbDialogService,
-    translate: TranslateService,
     private productGroupsService: ProductGroupsService,
     errorService: ErrorService,
     selectedStoreService: SelectedStoreService,
     private router: Router) {
 
-    super(selectedStoreService, translate, errorService);
+    super(selectedStoreService,  errorService);
   }
 
   ngOnInit(): void {
@@ -43,16 +42,6 @@ export class GroupsListComponent extends BaseTable<any> implements OnInit {
       return of();
     }
     return this.productGroupsService.getListOfProductGroups(request)
-      .pipe(map(it => {
-        const mappedX = {
-          content: it,
-          totalPages: 1,
-          totalElements: it.length,
-          size: it.length,
-          pageNumber: request.page
-        };
-        return mappedX;
-      }));
   }
 
   onEdit(row: any) {

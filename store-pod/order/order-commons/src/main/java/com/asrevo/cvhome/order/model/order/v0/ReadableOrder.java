@@ -15,7 +15,6 @@ import lombok.Setter;
 
 @Setter
 @Getter
-@Deprecated
 public class ReadableOrder extends OrderEntity implements Serializable {
 
     /**

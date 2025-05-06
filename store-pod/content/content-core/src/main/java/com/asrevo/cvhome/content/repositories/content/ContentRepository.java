@@ -4,20 +4,12 @@ import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.content.entity.content.Content;
 import com.asrevo.cvhome.store.core.entity.content.ContentType;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
-import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface ContentRepository extends JpaRepository<Content, Long>, ContentRepositoryCustom {
-
-    @Query(
-            """
-                    select c from Content c
-                    left join fetch c.descriptions cd
-                    where c.contentType = ?1 and c.storeMerchantId = ?2 and cd.languageCode = ?3
-                    order by c.sortOrder asc""")
-    List<Content> findByType(
-            ContentType contentType, StoreMerchantId storeMerchantId, LanguageCode languageCode);
 
     @Query(
             """
@@ -30,39 +22,14 @@ public interface ContentRepository extends JpaRepository<Content, Long>, Content
             """
                     select c from Content c
                     left join fetch c.descriptions cd
-                    where c.contentType in (?1) and c.storeMerchantId = ?2 and cd.languageCode = ?3
-                    order by c.sortOrder asc""")
-    List<Content> findByTypes(
-            List<ContentType> contentTypes,
-            StoreMerchantId storeMerchantId,
-            LanguageCode languageCode);
-
-    @Query(
-            """
-                    select c from Content c
-                    left join fetch c.descriptions cd
-                    where c.contentType in (?1) and c.storeMerchantId = ?2
-                    order by c.sortOrder asc""")
-    List<Content> findByTypes(List<ContentType> contentTypes, StoreMerchantId storeMerchantId);
-
-    @Query(
-            """
-                    select c from Content c
-                    left join fetch c.descriptions cd
                     where c.code = ?1 and c.storeMerchantId = ?2""")
-    Content findByCode(String code, StoreMerchantId storeMerchantId);
+    Content findByCodeFetchAllLanguages(String code, StoreMerchantId storeMerchantId);
 
     @Query(
             """
                     select c from Content c
-                    left join fetch c.descriptions cd
-                    where c.contentType = ?1 and c.storeMerchantId=?3
-                    and c.code like ?2 and cd.languageCode= ?4""")
-    List<Content> findByCodeLike(
-            ContentType contentType,
-            String code,
-            StoreMerchantId storeMerchantId,
-            LanguageCode languageCode);
+                    where c.code = ?1 and c.storeMerchantId = ?2""")
+    Content findByCodeFetchNonLanguages(String code, StoreMerchantId storeMerchantId);
 
     @Query(
             """
@@ -75,13 +42,20 @@ public interface ContentRepository extends JpaRepository<Content, Long>, Content
             """
                     select c from Content c
                     left join fetch c.descriptions cd
-                    where c.id = ?1 and cd.languageCode = ?2""")
-    Content findByIdAndLanguage(Long contentId, LanguageCode languageCode);
+                    where c.id = ?1""")
+    Content findOne(Long contentId);
 
     @Query(
             """
-                    select c from Content c
-                    left join fetch c.descriptions cd
-                    where c.id = ?1""")
-    Content findOne(Long contentId);
+            select c from Content c
+                                    left join fetch c.descriptions cd
+                                    where c.storeMerchantId =:storeMerchantId
+                                    and cd.languageCode=:languageCode
+                                    and cd.seUrl =:seUrl
+                                    and c.visible =true
+            """)
+    Optional<Content> findBySeUrl(
+            @Param("storeMerchantId") StoreMerchantId storeMerchantId,
+            @Param("seUrl") String seUrl,
+            @Param("languageCode") LanguageCode languageCode);
 }

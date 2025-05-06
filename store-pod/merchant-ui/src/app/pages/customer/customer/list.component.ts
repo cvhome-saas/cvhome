@@ -22,11 +22,10 @@ export class ListComponent extends BaseTable<any> implements OnInit {
   constructor(
     private customersService: CustomersService,
     public router: Router,
-    translate: TranslateService,
     errorService: ErrorService,
     selectedStoreService: SelectedStoreService
   ) {
-    super(selectedStoreService, translate, errorService)
+    super(selectedStoreService,  errorService)
   }
 
   ngOnInit(): void {
@@ -39,16 +38,6 @@ export class ListComponent extends BaseTable<any> implements OnInit {
       return of();
     }
     return this.customersService.getCustomers(request)
-      .pipe(map(it => {
-        const mappedX = {
-          content: it.customers,
-          totalPages: it.totalPages,
-          totalElements: it.recordsTotal,
-          size: it.number,
-          pageNumber: request.page
-        };
-        return mappedX;
-      }));
   }
 
 }

@@ -8,6 +8,7 @@ import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface ProductVariantService extends SalesManagerEntityService<Long, ProductVariant> {
 
@@ -21,7 +22,7 @@ public interface ProductVariantService extends SalesManagerEntityService<Long, P
             StoreMerchantId store, Product product, LanguageCode language);
 
     Page<ProductVariant> getByProductId(
-            StoreMerchantId store, Product product, LanguageCode language, int page, int count);
+            StoreMerchantId store, Product product, LanguageCode language, Pageable pageable);
 
     boolean exist(String sku, Long productId);
 

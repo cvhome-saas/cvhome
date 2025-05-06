@@ -1,5 +1,16 @@
 package com.asrevo.cvhome.catalog.api.v1.product;
 
+import com.asrevo.cvhome.catalog.entity.category.Category;
+import com.asrevo.cvhome.catalog.entity.product.Product;
+import com.asrevo.cvhome.catalog.entity.product.ProductCriteria;
+import com.asrevo.cvhome.catalog.model.product.LightPersistableProduct;
+import com.asrevo.cvhome.catalog.model.product.ReadableProduct;
+import com.asrevo.cvhome.catalog.model.product.ReadableProductList;
+import com.asrevo.cvhome.catalog.model.product.product.PersistableProduct;
+import com.asrevo.cvhome.catalog.service.facade.product.ProductCommonFacade;
+import com.asrevo.cvhome.catalog.service.facade.product.ProductFacade;
+import com.asrevo.cvhome.catalog.services.category.CategoryService;
+import com.asrevo.cvhome.catalog.services.product.ProductService;
 import com.asrevo.cvhome.commons.annotation.ConditionalOnApiStatus;
 import com.asrevo.cvhome.commons.annotation.SecuredResource;
 import com.asrevo.cvhome.commons.domain.Entity;
@@ -8,19 +19,8 @@ import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
 import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
 import com.asrevo.cvhome.store.controller.exception.UnauthorizedException;
 import com.asrevo.cvhome.store.core.constants.Constants;
-import com.asrevo.cvhome.catalog.entity.category.Category;
-import com.asrevo.cvhome.catalog.entity.product.Product;
-import com.asrevo.cvhome.catalog.entity.product.ProductCriteria;
-import com.asrevo.cvhome.catalog.model.product.LightPersistableProduct;
-import com.asrevo.cvhome.catalog.model.product.ReadableProduct;
-import com.asrevo.cvhome.catalog.model.product.ReadableProductList;
-import com.asrevo.cvhome.catalog.model.product.product.PersistableProduct;
 import com.asrevo.cvhome.store.core.model.entity.EntityExists;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
-import com.asrevo.cvhome.catalog.services.category.CategoryService;
-import com.asrevo.cvhome.catalog.services.product.ProductService;
-import com.asrevo.cvhome.catalog.service.facade.product.ProductCommonFacade;
-import com.asrevo.cvhome.catalog.service.facade.product.ProductFacade;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -35,6 +35,7 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -127,115 +128,6 @@ public class ProductApi {
     public void delete(@PathVariable Long id, @Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore, @Parameter(hidden = true) LanguageCode language) {
 
         productCommonFacade.deleteProduct(id, merchantStore);
-    }
-
-    /**
-     * List products
-     * Filtering product lists based on product option and option value ?category=1
-     * &manufacturer=2 &type=... &lang=en|fr NOT REQUIRED, will use request language
-     * &start=0 NOT REQUIRED, can be used for pagination &count=10 NOT REQUIRED, can
-     * be used to limit item count
-     */
-    @RequestMapping(value = "/products", method = RequestMethod.GET)
-    @ResponseBody
-    @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
-    })
-    @ConditionalOnApiStatus
-    public ReadableProductList list(
-            @RequestParam(value = "lang", required = false) String lang,
-            @RequestParam(value = "category", required = false) Long category,
-            @RequestParam(value = "name", required = false) String name,
-            @RequestParam(value = "sku", required = false) String sku,
-            @RequestParam(value = "manufacturer", required = false) Long manufacturer,
-            @RequestParam(value = "optionValues", required = false) List<Long> optionValueIds,
-            @RequestParam(value = "status", required = false) String status,
-            @RequestParam(value = "owner", required = false) Long owner,
-            @RequestParam(value = "page", required = false, defaultValue = "0") Integer page, // current
-            @RequestParam(value = "origin", required = false, defaultValue = ProductCriteria.ORIGIN_SHOP) String origin,
-            @RequestParam(value = "count", required = false, defaultValue = "100") Integer count, // count
-            @RequestParam(value = "slug", required = false) String slug, // category slug
-            @RequestParam(value = "available", required = false) Boolean available,
-            @Parameter(hidden = true) StoreMerchantId merchantStore, @Parameter(hidden = true) LanguageCode language,
-            HttpServletResponse response) {
-
-        ProductCriteria criteria = new ProductCriteria();
-
-        criteria.setOrigin(origin);
-
-        // do not use legacy pagination anymore
-        if (lang != null) {
-            criteria.setLanguage(new LanguageCode(lang));
-        } else {
-            criteria.setLanguage(language);
-        }
-        if (!StringUtils.isBlank(status)) {
-            criteria.setStatus(status);
-        }
-        // Start Category handling
-        List<Long> categoryIds = new ArrayList<>();
-        if (slug != null) {
-            Category categoryBySlug = categoryService.getBySeUrl(merchantStore, slug, language);
-            categoryIds.add(categoryBySlug.getId());
-        }
-        if (category != null) {
-            categoryIds.add(category);
-        }
-        if (!categoryIds.isEmpty()) {
-            criteria.setCategoryIds(categoryIds);
-        }
-        // End Category handling
-
-        if (available != null && available) {
-            criteria.setAvailable(true);
-        }
-
-        if (manufacturer != null) {
-            criteria.setManufacturerId(manufacturer);
-        }
-
-        if (CollectionUtils.isNotEmpty(optionValueIds)) {
-            criteria.setOptionValueIds(optionValueIds);
-        }
-
-        if (owner != null) {
-            criteria.setOwnerId(owner);
-        }
-
-        if (page != null) {
-            criteria.setStartPage(page);
-        }
-
-        if (count != null) {
-            criteria.setMaxCount(count);
-        }
-
-        if (!StringUtils.isBlank(name)) {
-            criteria.setProductName(name);
-        }
-
-        if (!StringUtils.isBlank(sku)) {
-            criteria.setCode(sku);
-        }
-
-        // TODO
-        // RENTAL add filter by owner
-        // REPOSITORY to use the new filters
-
-        try {
-            return productFacade.getProductListsByCriterias(merchantStore, language, criteria);
-
-        } catch (Exception e) {
-
-            log.error("Error while filtering products product", e);
-            try {
-                response.sendError(503, "Error while filtering products " + e.getMessage());
-            } catch (Exception ignore) {
-            }
-
-            return null;
-        }
     }
 
     /**

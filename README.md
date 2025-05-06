@@ -18,7 +18,7 @@ developer seeking a powerful e-commerce framework, `cvhome` offers the tools to 
 * 🚀 **True Multi-Tenancy:** Host and manage numerous independent stores, each with potentially distinct branding,
   products, and configurations, all running on a shared or isolated, optimized infrastructure. **Crucially, each store
   will be mapped
-  to its own custom domain (e.g., `www.mystore.com`) and have its subdomain (e.g., `mystore.yourplatform.com`) for a
+  to its own custom domain (e.g., `mystore.com`, `www.mystore.com`) and have its subdomain (e.g., `mystore.yourplatform.com`) for a
   fully branded
   presence.**
 * 🔧 **Microservice Architecture:** Built with scalable and resilient Java/Spring Boot microservices (API Gateway, Auth,

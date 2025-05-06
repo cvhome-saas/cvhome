@@ -29,4 +29,5 @@ public class ReadableProductDefinition extends ProductDefinition {
     private List<PersistableProductAttribute> properties = new ArrayList<>();
     private List<ReadableImage> images = new ArrayList<>();
     private ReadableInventory inventory;
+    private List<ProductDescription> descriptions = new ArrayList<>();
 }

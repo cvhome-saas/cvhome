@@ -33,16 +33,6 @@ public interface ProductService extends SalesManagerEntityService<Long, Product>
 
     boolean exists(String sku, StoreMerchantId store);
 
-    /**
-     * List using Page interface in order to unify all page requests (since 2.16.0)
-     */
-    Page<Product> listByStore(
-            StoreMerchantId store,
-            LanguageCode language,
-            ProductCriteria criteria,
-            int page,
-            int count);
-
     List<Product> listByStore(StoreMerchantId store);
 
     Product getBySeUrl(StoreMerchantId store, String seUrl, Locale locale);
@@ -72,4 +62,6 @@ public interface ProductService extends SalesManagerEntityService<Long, Product>
             StoreMerchantId store, String productSku, LanguageCode language);
 
     ReadableProductAvailability getProductAvailability(StoreMerchantId store, String sku);
+
+    Page<Product> findAll(ProductCriteria criteria, StoreMerchantId store);
 }

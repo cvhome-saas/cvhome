@@ -2,7 +2,6 @@ package com.asrevo.cvhome.content.services.content;
 
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.content.entity.content.Content;
-import com.asrevo.cvhome.content.entity.content.ContentDescription;
 import com.asrevo.cvhome.store.core.entity.content.*;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
@@ -10,6 +9,7 @@ import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 /**
  * Interface defining methods responsible for CMSContentService.
@@ -22,20 +22,15 @@ import org.springframework.data.domain.Page;
  */
 public interface ContentService extends SalesManagerEntityService<Long, Content> {
 
-    List<Content> listByType(ContentType contentType, StoreMerchantId store, LanguageCode language);
+    Content getByCodeFetchAllLanguages(String code, StoreMerchantId store);
 
-    List<Content> listByType(
-            List<ContentType> contentType, StoreMerchantId store, LanguageCode language);
-
-    Content getByCode(String code, StoreMerchantId store);
+    Content getByCodeFetchNonLanguages(String code, StoreMerchantId store);
 
     void saveOrUpdate(Content content) throws ServiceException;
 
     boolean exists(String code, ContentType type, StoreMerchantId store);
 
     Content getByCode(String code, StoreMerchantId store, LanguageCode language);
-
-    Content getById(Long id, StoreMerchantId store, LanguageCode language);
 
     Content getById(Long id, StoreMerchantId store);
 
@@ -128,30 +123,13 @@ public interface ContentService extends SalesManagerEntityService<Long, Content>
     void addOptionImage(String merchantStoreCode, InputContentFile cmsContentImage)
             throws ServiceException;
 
-    List<Content> listByType(List<ContentType> contentType, StoreMerchantId store);
-
-    Page<Content> listByType(ContentType contentType, StoreMerchantId store, int page, int count);
-
     Page<Content> listByType(
             ContentType contentType,
             StoreMerchantId store,
             LanguageCode language,
-            int page,
-            int count);
+            Pageable pageable);
 
-    List<ContentDescription> listNameByType(
-            List<ContentType> contentType, StoreMerchantId store, LanguageCode language);
-
-    Content getByLanguage(Long id, LanguageCode language);
-
-    ContentDescription getBySeUrl(StoreMerchantId store, String seUrl);
-
-    /**
-     * Finds content for a specific Merchant for a specific ContentType where content
-     * code is like a given prefix in a specific language
-     */
-    List<Content> getByCodeLike(
-            ContentType type, String codeLike, StoreMerchantId store, LanguageCode language);
+    Optional<Content> findBySeUrl(StoreMerchantId store, String seUrl, LanguageCode languageCode);
 
     void addFolder(StoreMerchantId store, Optional<String> path, String folderName)
             throws ServiceException;

@@ -10,12 +10,13 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public class ReadableCustomerList extends ReadableList implements Serializable {
+@Deprecated
+public class ReadableCustomerList extends ReadableList<ReadableCustomer> implements Serializable {
 
     /**
      *
      */
     @Serial private static final long serialVersionUID = 1L;
 
-    private List<ReadableCustomer> customers = new ArrayList<>();
+    private List<ReadableCustomer> content = new ArrayList<>();
 }

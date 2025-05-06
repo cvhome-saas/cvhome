@@ -21,15 +21,8 @@ export abstract class BaseTable<T> {
   };
 
   protected constructor(private _selectedStoreService: SelectedStoreService,
-                        private _translate: TranslateService,
                         private _errorService: ErrorService,
   ) {
-    if (_translate) {
-      this.onLangEvent(this._translate.currentLang);
-      this._translate.onLangChange.subscribe((lang) => {
-        this.onLangEvent(lang.lang);
-      });
-    }
 
     if (_selectedStoreService) {
       this._selectedStoreService.current().subscribe({
@@ -78,13 +71,6 @@ export abstract class BaseTable<T> {
     }
   }
 
-  onLangEvent(lang: string) {
-    if (this._params.lang != lang) {
-      this._params.lang = lang;
-      this.trigger();
-    }
-  }
-
   get params(): StorePageRequest {
     return this._params;
   }
@@ -102,10 +88,6 @@ export abstract class BaseTable<T> {
     return this._selectedStoreService;
   }
 
-  get translate(): TranslateService {
-    return this._translate;
-  }
-
   get errorService(): ErrorService {
     return this._errorService;
   }
@@ -117,7 +99,6 @@ export interface PageRequest {
 }
 
 export interface StorePageRequest extends PageRequest {
-  lang?: string,
   store?: string,
 }
 

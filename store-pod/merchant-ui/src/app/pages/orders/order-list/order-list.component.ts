@@ -1,13 +1,10 @@
 import {Component, OnInit} from '@angular/core';
 import {OrdersService} from "../services/orders.service";
-import {TranslateService} from "@ngx-translate/core";
 import {ColumnMode} from "@swimlane/ngx-datatable";
 import {ErrorService} from "../../../shared/services/error.service";
-import {SelectedLanguageService} from '../../../shared/services/selected-language.service';
 import {SelectedStoreService} from "../../../shared/services/selected-store.service";
 import {BaseTable, PageT, StorePageRequest} from "../../common/BaseTable";
 import {Observable, of} from "rxjs";
-import {map} from "rxjs/operators";
 
 @Component({
   selector: 'ngx-order-list',
@@ -21,12 +18,10 @@ export class OrderListComponent extends BaseTable<any> implements OnInit {
 
   constructor(
     private ordersService: OrdersService,
-    translate: TranslateService,
     errorService: ErrorService,
-    private selectedLanguageService: SelectedLanguageService,
     selectedStoreService: SelectedStoreService
   ) {
-    super(selectedStoreService, translate, errorService)
+    super(selectedStoreService, errorService)
   }
 
   ngOnInit(): void {
@@ -39,16 +34,6 @@ export class OrderListComponent extends BaseTable<any> implements OnInit {
       return of();
     }
     return this.ordersService.getOrders(request)
-      .pipe(map(it => {
-        const mappedX = {
-          content: it.orders,
-          totalPages: it.totalPages,
-          totalElements: it.recordsTotal,
-          size: it.number,
-          pageNumber: request.page
-        };
-        return mappedX;
-      }));
   }
 
 }

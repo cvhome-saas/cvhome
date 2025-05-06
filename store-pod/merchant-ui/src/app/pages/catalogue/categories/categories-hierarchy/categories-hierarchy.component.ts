@@ -31,7 +31,6 @@ export class CategoriesHierarchyComponent implements OnInit {
 
   loadParams() {
     return {
-      lang: this.translate.currentLang,
       store: "",
       page: 0
     };
@@ -43,7 +42,7 @@ export class CategoriesHierarchyComponent implements OnInit {
       this.categoryService.getHierarchyOfCategories(this.params)
         .subscribe({
           next: res => {
-            this.nodes = this.toTreeRoot(res.categories)
+            this.nodes = this.toTreeRoot(res.content)
             this.loader = false;
           },
           error: err => {
@@ -67,7 +66,7 @@ export class CategoriesHierarchyComponent implements OnInit {
 
   toTreeNode(root: NgcxTreeNode, categories: any[]): void {
     categories.forEach(it => {
-      const node: NgcxTreeNode = this.toNode(it.description.name, it.id);
+      const node: NgcxTreeNode = this.toNode(it.code, it.id);
       root.children.push(node);
       if (it.children) {
         this.toTreeNode(node, it.children)
@@ -107,10 +106,6 @@ export class CategoriesHierarchyComponent implements OnInit {
 
 
   ngOnInit(): void {
-    this.translate.onLangChange.subscribe(lang => {
-      this.params.lang = lang.lang;
-      this.getList();
-    });
     this.selectedStoreService.current().subscribe({
       next: (it) => {
         this.params.store = it;

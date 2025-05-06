@@ -14,6 +14,7 @@ import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -37,33 +38,22 @@ public class ProductTypeFacadeImpl implements ProductTypeFacade {
 
     @Override
     public ReadableProductTypeList getByMerchant(
-            StoreMerchantId store, LanguageCode language, int count, int page) {
+            StoreMerchantId store, LanguageCode language, Pageable pageable) {
 
         Assert.notNull(store, "store cannot be null");
         ReadableProductTypeList returnList = new ReadableProductTypeList();
 
-        try {
+        Page<ProductType> types = productTypeService.getByMerchant(store, language, pageable);
 
-            Page<ProductType> types =
-                    productTypeService.getByMerchant(store, language, page, count);
+        returnList.setContent(
+                types.getContent().stream()
+                        .map(t -> readableProductTypeMapper.convert(t, store, language))
+                        .collect(Collectors.toList()));
+        returnList.setTotalPages(types.getTotalPages());
+        returnList.setTotalElements(types.getTotalElements());
+        returnList.setSize(types.getSize());
 
-            if (types != null) {
-                returnList.setList(
-                        types.getContent().stream()
-                                .map(t -> readableProductTypeMapper.convert(t, store, language))
-                                .collect(Collectors.toList()));
-                returnList.setTotalPages(types.getTotalPages());
-                returnList.setRecordsTotal(types.getTotalElements());
-                returnList.setRecordsFiltered(types.getSize());
-                returnList.setNumber(Long.valueOf(types.getTotalElements()).intValue());
-            }
-
-            return returnList;
-        } catch (Exception e) {
-            throw new ServiceRuntimeException(
-                    "An exception occured while getting product types for merchant[ " + store + "]",
-                    e);
-        }
+        return returnList;
     }
 
     @Override
@@ -73,12 +63,7 @@ public class ProductTypeFacadeImpl implements ProductTypeFacade {
         Assert.notNull(id, "ProductType code cannot be empty");
         try {
 
-            ProductType type;
-            if (language == null) {
-                type = productTypeService.getById(id, store);
-            } else {
-                type = productTypeService.getById(id, store, language);
-            }
+            ProductType type = productTypeService.getById(id, store);
 
             if (type == null) {
                 throw new ResourceNotFoundException(
@@ -135,7 +120,7 @@ public class ProductTypeFacadeImpl implements ProductTypeFacade {
 
         try {
 
-            ProductType t = productTypeService.getById(id, store, language);
+            ProductType t = productTypeService.getById(id, store);
             if (t == null) {
                 throw new ResourceNotFoundException(
                         "Product type ["
@@ -164,7 +149,7 @@ public class ProductTypeFacadeImpl implements ProductTypeFacade {
 
         try {
 
-            ProductType t = productTypeService.getById(id, store, language);
+            ProductType t = productTypeService.getById(id, store);
             if (t == null) {
                 throw new ResourceNotFoundException(
                         "Product type [" + id + "] does not exist for store [" + store + "]");

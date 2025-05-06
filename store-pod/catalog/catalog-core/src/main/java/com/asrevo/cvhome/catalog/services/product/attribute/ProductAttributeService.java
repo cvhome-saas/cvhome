@@ -7,6 +7,7 @@ import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
 import java.util.List;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface ProductAttributeService extends SalesManagerEntityService<Long, ProductAttribute> {
 
@@ -17,10 +18,10 @@ public interface ProductAttributeService extends SalesManagerEntityService<Long,
     List<ProductAttribute> getByOptionValueId(StoreMerchantId store, Long id);
 
     Page<ProductAttribute> getByProductId(
-            StoreMerchantId store, Product product, LanguageCode language, int page, int count);
+            StoreMerchantId store, Product product, LanguageCode language, Pageable pageable);
 
     Page<ProductAttribute> getByProductId(
-            StoreMerchantId store, Product product, int page, int count);
+            StoreMerchantId store, Product product, Pageable pageable);
 
     List<ProductAttribute> getProductAttributesByCategoryLineage(
             StoreMerchantId store, String lineage, LanguageCode language);

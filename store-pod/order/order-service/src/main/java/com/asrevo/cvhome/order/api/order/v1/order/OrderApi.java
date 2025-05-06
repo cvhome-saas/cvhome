@@ -2,9 +2,6 @@ package com.asrevo.cvhome.order.api.order.v1.order;
 
 import com.asrevo.cvhome.commons.annotation.ConditionalOnApiStatus;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
-import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
-import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.order.entity.customer.Customer;
 import com.asrevo.cvhome.order.entity.order.Order;
 import com.asrevo.cvhome.order.entity.shoppingcart.ShoppingCart;
@@ -13,10 +10,13 @@ import com.asrevo.cvhome.order.model.order.v0.ReadableOrder;
 import com.asrevo.cvhome.order.model.order.v0.ReadableOrderList;
 import com.asrevo.cvhome.order.model.order.v1.PersistableAnonymousOrder;
 import com.asrevo.cvhome.order.model.order.v1.ReadableOrderConfirmation;
-import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
-import com.asrevo.cvhome.order.services.shoppingcart.ShoppingCartService;
 import com.asrevo.cvhome.order.service.facade.customer.CustomerFacade;
 import com.asrevo.cvhome.order.service.facade.order.OrderFacade;
+import com.asrevo.cvhome.order.services.shoppingcart.ShoppingCartService;
+import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
+import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
+import com.asrevo.cvhome.store.core.constants.Constants;
+import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import com.asrevo.cvhome.store.utils.LocaleUtils;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -26,6 +26,7 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.boot.beanvalidation.IntegrationException;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
@@ -115,19 +116,17 @@ public class OrderApi {
     @ResponseBody
     @ConditionalOnApiStatus
     public ReadableOrderList list(
-            @RequestParam(value = "count", required = false, defaultValue = DEFAULT_ORDER_LIST_COUNT) Integer count,
-            @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
             @RequestParam(value = "name", required = false) String name,
             @RequestParam(value = "id", required = false) Long id,
             @RequestParam(value = "status", required = false) String status,
             @RequestParam(value = "phone", required = false) String phone,
             @RequestParam(value = "email", required = false) String email,
             @Parameter(hidden = true) StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language) {
+            @Parameter(hidden = true) LanguageCode language,
+            Pageable pageable) {
 
         OrderCriteria orderCriteria = new OrderCriteria();
-        orderCriteria.setPageSize(count);
-        orderCriteria.setStartPage(page);
+        orderCriteria.setPageable(pageable);
 
         orderCriteria.setCustomerName(name);
         orderCriteria.setCustomerPhone(phone);

@@ -18,25 +18,8 @@ public class RepositoryHelper {
         if (entityList == null) {
             entityList = new GenericEntityList();
         }
-
-        if (criteria.isLegacyPagination()) {
-            if (criteria.getMaxCount() > 0) {
-                q.setFirstResult(criteria.getStartIndex());
-                q.setMaxResults(Math.min(criteria.getMaxCount(), count.intValue()));
-            }
-        } else {
-            // int firstResult =
-            // ((criteria.getStartPage()==0?criteria.getStartPage()+1:criteria.getStartPage()) - 1)
-            // * criteria.getPageSize();
-            int firstResult =
-                    ((criteria.getStartPage() == 0 ? 0 : criteria.getStartPage()))
-                            * criteria.getPageSize();
-            q.setFirstResult(firstResult);
-            q.setMaxResults(criteria.getPageSize());
-            int lastPageNumber = (count.intValue() / criteria.getPageSize()) + 1;
-            entityList.setTotalPages(lastPageNumber);
-            entityList.setTotalCount(count.intValue());
-        }
+        q.setFirstResult((int) criteria.getPageable().getOffset());
+        q.setMaxResults(criteria.getPageable().getPageSize());
 
         return q;
     }

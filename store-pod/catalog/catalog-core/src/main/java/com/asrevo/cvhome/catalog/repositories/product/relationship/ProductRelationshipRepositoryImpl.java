@@ -3,7 +3,6 @@ package com.asrevo.cvhome.catalog.repositories.product.relationship;
 import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.entity.product.relationship.ProductRelationship;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import java.util.List;
@@ -12,14 +11,6 @@ import java.util.stream.Collectors;
 
 public class ProductRelationshipRepositoryImpl implements ProductRelationshipRepositoryCustom {
 
-    private static final String HQL_GET_BY_CODE_AND_STORE_ID_AND_RP_PRODUCT_ID =
-            """
-                    select distinct pr from ProductRelationship as pr
-                    left join fetch pr.relatedProduct rp
-                    where pr.code=:code
-                    and pr.storeMerchantId=:storeId
-                    and rp.available=:available
-                    and rp.id=:rpid""";
     private static final String HQL_GET_PRODUCTS_BY_PRODUCT_ID =
             """
                     select distinct pr from ProductRelationship as pr
@@ -39,20 +30,6 @@ public class ProductRelationshipRepositoryImpl implements ProductRelationshipRep
                     left join fetch rp.descriptions rpd
                     where pr.code=:code
                     and pr.storeMerchantId=:storeId""";
-    private static final String HQL_GET_PRODUCT_BY_CODE_AND_STORE_ID_AND_LANG_ID =
-            """
-                    select distinct pr from ProductRelationship as pr
-                    left join fetch pr.product p
-                    join fetch pr.relatedProduct rp
-                    left join fetch rp.descriptions rpd
-                    left join fetch rp.images pd
-                    left join fetch rp.availabilities pa
-                    left join fetch pa.prices pap
-                    where pr.code=:code
-                    and pr.storeMerchantId=:storeId
-                    and rpd.languageCode=:langId
-                    and pd.defaultImage=true
-                    """;
     private static final String HQL_GET_GROUP_BY_CODE_AND_STORE_ID =
             """
                     select distinct pr from ProductRelationship as pr
@@ -86,18 +63,6 @@ public class ProductRelationshipRepositoryImpl implements ProductRelationshipRep
                     """;
 
     @PersistenceContext private EntityManager entityManager;
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public List<ProductRelationship> getByType(
-            StoreMerchantId store, String type, LanguageCode language) {
-        return entityManager
-                .createQuery(HQL_GET_PRODUCT_BY_CODE_AND_STORE_ID_AND_LANG_ID)
-                .setParameter("code", type)
-                .setParameter("langId", language)
-                .setParameter("storeId", store)
-                .getResultList();
-    }
 
     @Override
     @SuppressWarnings("unchecked")
@@ -152,19 +117,6 @@ public class ProductRelationshipRepositoryImpl implements ProductRelationshipRep
         return entityManager
                 .createQuery(HQL_GET_PRODUCTS_BY_PRODUCT_ID)
                 .setParameter("id", product.getId())
-                .getResultList();
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public List<ProductRelationship> getByTypeAndRelatedProduct(
-            StoreMerchantId store, String type, Product product) {
-        return entityManager
-                .createQuery(HQL_GET_BY_CODE_AND_STORE_ID_AND_RP_PRODUCT_ID)
-                .setParameter("code", type)
-                .setParameter("available", true)
-                .setParameter("rpid", product.getId())
-                .setParameter("storeId", store)
                 .getResultList();
     }
 }

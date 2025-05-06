@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -57,21 +58,20 @@ public class CategoryFacadeImpl implements CategoryFacade {
             int depth,
             LanguageCode language,
             List<String> filter,
-            int page,
-            int count) {
+            Pageable pageable) {
 
         Assert.notNull(store, "Store can not be null");
 
         // get parent store
 
         ReadableCategoryList returnList =
-                getReadableCategoryList(store, criteria, depth, language, filter, page, count);
+                getReadableCategoryList(store, criteria, depth, language, filter, pageable);
 
         Map<Long, ReadableCategory> readableCategoryMap =
-                returnList.getCategories().stream()
+                returnList.getContent().stream()
                         .collect(Collectors.toMap(ReadableCategory::getId, Function.identity()));
 
-        returnList.getCategories().stream()
+        returnList.getContent().stream()
                 // .filter(ReadableCategory::isVisible)
                 .filter(cat -> Objects.nonNull(cat.getParent()))
                 .filter(cat -> readableCategoryMap.containsKey(cat.getParent().getId()))
@@ -86,18 +86,7 @@ public class CategoryFacadeImpl implements CategoryFacade {
 
         List<ReadableCategory> filteredList = new ArrayList<>(readableCategoryMap.values());
 
-        // execute only if not admin filtered
-        if (filter == null || !filter.contains(ADMIN_CATEGORY)) {
-            filteredList =
-                    readableCategoryMap.values().stream()
-                            .filter(cat -> cat.getDepth() == 0)
-                            .sorted(Comparator.comparing(ReadableCategory::getSortOrder))
-                            .collect(Collectors.toList());
-
-            returnList.setNumber(filteredList.size());
-        }
-
-        returnList.setCategories(filteredList);
+        returnList.setContent(filteredList.stream().filter(it -> it.getDepth() == 0).toList());
 
         return returnList;
     }
@@ -109,44 +98,26 @@ public class CategoryFacadeImpl implements CategoryFacade {
             int depth,
             LanguageCode language,
             List<String> filter,
-            int page,
-            int count) {
+            Pageable pageable) {
         List<Category> categories;
         ReadableCategoryList returnList = new ReadableCategoryList();
-        if (!CollectionUtils.isEmpty(filter) && filter.contains(FEATURED_CATEGORY)) {
-            categories = categoryService.getListByDepthFilterByFeatured(store, depth, language);
-            returnList.setRecordsTotal(categories.size());
-            returnList.setNumber(categories.size());
-            returnList.setTotalPages(1);
-        } else {
-            org.springframework.data.domain.Page<Category> pageable =
-                    categoryService.getListByDepth(
-                            store,
-                            language,
-                            criteria != null ? criteria.getName() : null,
-                            depth,
-                            page,
-                            count);
-            categories = pageable.getContent();
-            returnList.setRecordsTotal(pageable.getTotalElements());
-            returnList.setTotalPages(pageable.getTotalPages());
-            returnList.setNumber(categories.size());
-        }
+        org.springframework.data.domain.Page<Category> page =
+                categoryService.getListByDepth(
+                        store,
+                        language,
+                        criteria != null ? criteria.getName() : null,
+                        depth,
+                        pageable);
+        categories = page.getContent();
+        returnList.setTotalElements(page.getTotalElements());
+        returnList.setTotalPages(page.getTotalPages());
+        returnList.setSize(categories.size());
 
-        if (filter != null && filter.contains(VISIBLE_CATEGORY)) {
-            List<ReadableCategory> categoryList =
-                    categories.stream()
-                            .filter(Category::isVisible)
-                            .map(cat -> readableCategoryMapper.convert(cat, store, language))
-                            .collect(Collectors.toList());
-            returnList.setCategories(categoryList);
-        } else {
-            List<ReadableCategory> categoryList =
-                    categories.stream()
-                            .map(cat -> readableCategoryMapper.convert(cat, store, language))
-                            .collect(Collectors.toList());
-            returnList.setCategories(categoryList);
-        }
+        List<ReadableCategory> categoryList =
+                categories.stream()
+                        .map(cat -> readableCategoryMapper.convert(cat, store, language))
+                        .collect(Collectors.toList());
+        returnList.setContent(categoryList);
         return returnList;
     }
 
@@ -244,52 +215,26 @@ public class CategoryFacadeImpl implements CategoryFacade {
 
     @Override
     public ReadableCategory getById(StoreMerchantId store, Long id, LanguageCode language) {
+        Category category = categoryService.getById(id, store);
+        ;
 
-        Category categoryModel;
-        if (language != null) {
-            categoryModel = getCategoryById(id, language);
-        } else { // all langs
-            categoryModel = getById(store, id);
-        }
+        if (category == null)
+            throw new ResourceNotFoundException("Category id [" + id + "] not found");
 
-        if (categoryModel == null)
-            throw new ResourceNotFoundException("Categori id [" + id + "] not found");
-
-        String lineage = categoryModel.getLineage();
+        String lineage = category.getLineage();
 
         ReadableCategory readableCategory =
-                readableCategoryMapper.convert(categoryModel, store, language);
+                readableCategoryMapper.convert(category, store, language);
 
-        // get children
-        List<Category> children = getListByLineage(store, lineage);
-
-        List<ReadableCategory> childrenCats =
-                children.stream()
-                        .map(cat -> readableCategoryMapper.convert(cat, store, language))
-                        .collect(Collectors.toList());
-
-        addChildToParent(readableCategory, childrenCats);
+        var children =
+                getListByLineage(store, lineage).stream()
+                        .map(
+                                cat ->
+                                        readableCategoryMapper.convert(
+                                                cat, store, LanguageCode.nonLanguage()))
+                        .toList();
+        readableCategory.setChildren(children);
         return readableCategory;
-    }
-
-    private void addChildToParent(
-            ReadableCategory readableCategory, List<ReadableCategory> childrenCats) {
-        Map<Long, ReadableCategory> categoryMap =
-                childrenCats.stream()
-                        .collect(Collectors.toMap(ReadableCategory::getId, Function.identity()));
-        categoryMap.put(readableCategory.getId(), readableCategory);
-
-        // traverse map and add child to parent
-        for (ReadableCategory readable : childrenCats) {
-
-            if (readable.getParent() != null) {
-
-                ReadableCategory rc = categoryMap.get(readable.getParent().getId());
-                if (rc != null) {
-                    rc.getChildren().add(readable);
-                }
-            }
-        }
     }
 
     private List<Category> getListByLineage(StoreMerchantId store, String lineage) {
@@ -299,12 +244,6 @@ public class CategoryFacadeImpl implements CategoryFacade {
             throw new ServiceRuntimeException(
                     String.format("Error while getting root category %s", e.getMessage()), e);
         }
-    }
-
-    private Category getCategoryById(Long id, LanguageCode language) {
-        return Optional.ofNullable(categoryService.getOneByLanguage(id, language))
-                .orElseThrow(
-                        () -> new ResourceNotFoundException("Category id [" + id + "] not found"));
     }
 
     private void deleteCategory(Category category) {
@@ -549,10 +488,10 @@ public class CategoryFacadeImpl implements CategoryFacade {
                         .collect(Collectors.toList());
 
         ReadableCategoryList readableList = new ReadableCategoryList();
-        readableList.setCategories(readableCategories);
+        readableList.setContent(readableCategories);
         readableList.setTotalPages(1);
-        readableList.setNumber(readableCategories.size());
-        readableList.setRecordsTotal(readableCategories.size());
+        readableList.setSize(readableCategories.size());
+        readableList.setTotalElements(readableCategories.size());
 
         return readableList;
     }

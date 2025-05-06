@@ -65,7 +65,10 @@ export class ProductFormComponent implements OnInit {
       {
         title: this.translate.instant('COMPONENTS.PRODUCT_TO_CATEGORY'),
         route: 'category',
-
+      },
+      {
+        title: this.translate.instant('COMPONENTS.PRODUCT_RELATED'),
+        route: 'related',
       },
       {
         title: this.translate.instant('COMPONENTS.OPTIONS_CONFIG'),
@@ -140,6 +143,14 @@ export class ProductFormComponent implements OnInit {
     });
   }
 
+  toPrice(price: string) {
+    try {
+      const cleanedPriceString = this.product.inventory.price.replace(/,/g, '');
+      return parseFloat(cleanedPriceString)
+    }catch (e) {
+      return 0;
+    }
+  }
   fillForm() {
     this.form.patchValue({
       sku: this.product.sku,
@@ -148,7 +159,7 @@ export class ProductFormComponent implements OnInit {
       dateAvailable: new Date(this.product.dateAvailable),
       manufacturer: this.product.manufacturer == null ? '' : this.product.manufacturer.code,
       type: this.product.type == null ? '' : this.product.type.code,
-      price: this.product.inventory.price,
+      price: this.toPrice(this.product.inventory.price),
       quantity: this.product.inventory.quantity,
       productSpecifications: {
         weight: this.product.productSpecifications.weight,
@@ -395,11 +406,11 @@ export class ProductFormComponent implements OnInit {
     forkJoin([manufacture, types, config])
       .subscribe(([manufacturers, productTypes, languages]) => {
 
-        manufacturers.manufacturers.forEach((option) => {
+        manufacturers.content.forEach((option) => {
           this.manufacturers.push({value: option.code, label: option.code});
         });
 
-        productTypes.list.forEach((option) => {
+        productTypes.content.forEach((option) => {
           this.productTypes.push({value: option.code, label: option.code});
         });
 

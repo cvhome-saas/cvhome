@@ -12,7 +12,8 @@
       "ADD_TO_CART": "Add to Cart",
       "PRODUCT_DESCRIPTION": "Product Description",
       "SUCCESSFULLY_ADDED_PRODUCT_TO_CART": "Product added to cart successfully!",
-      "FAILED_TO_ADD_PRODUCT_TO_CART": "Failed to add product to cart."
+      "FAILED_TO_ADD_PRODUCT_TO_CART": "Failed to add product to cart.",
+      "RELATED_PRODUCTS": "Related Products"
     },
     "CHECKOUT": {
       "TITLE": "Checkout",
@@ -65,7 +66,9 @@
   "COMPONENTS": {
     "PRODUCT": {
       "SUCCESSFULLY_ADDED_PRODUCT_TO_CART": "Product added to cart successfully!",
-      "FAILED_TO_ADD_PRODUCT_TO_CART": "Failed to add product to cart."
+      "FAILED_TO_ADD_PRODUCT_TO_CART": "Failed to add product to cart.",
+      "IN_STOCK": "In Stock",
+      "OUT_OF_STOCK": "Out Of Stock"
     },
     "HEADER": {
       "HOME_TITLE": "Home",

@@ -1,13 +1,19 @@
+'use client'
 import {Link} from "@/i18n/navigation";
 import {Product} from "@/types/product-groups";
 import {StoreContext} from "@/types/store-context";
 import ProductItemButtonGroup from "@/app/_themes/DEFAULT/componantes/ProductItem/ProductItemButtonGroup";
 import Image from 'next/image';
+import {useTranslations} from "next-intl";
 
 export default function ProductItem({storeContext, product}: { storeContext: StoreContext, product: Product }) {
 
     const imageUrl = product.image?.imageUrl || '/placeholder-image.png';
+    const t = useTranslations('COMPONENTS.PRODUCT');
     const imageAlt = product.description?.name || product.image?.imageName || 'Product image';
+    const isAvailable = product.available && product.quantity > 0;
+    const availabilityText = isAvailable ? t('IN_STOCK') : t('OUT_OF_STOCK');
+    const availabilityClass = isAvailable ? "text-success" : "text-error";
 
     return (
         <div
@@ -32,6 +38,13 @@ export default function ProductItem({storeContext, product}: { storeContext: Sto
                         {product.description?.name || 'Product Name'}
                     </span>
                 </Link>
+
+                <div className="mt-2 mb-2">
+                    <span className={`text-sm font-medium ${availabilityClass}`}>
+                        {availabilityText}
+                    </span>
+                </div>
+
                 <div className="mt-3 mb-5">
                     <p className="text-2xl font-extrabold text-foreground">{product.productPrice?.finalPrice || '$?.??'}</p>
                 </div>

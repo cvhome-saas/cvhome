@@ -4,47 +4,36 @@ import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.content.entity.content.Content;
 import com.asrevo.cvhome.store.core.entity.content.ContentType;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
+import jakarta.persistence.criteria.Predicate;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
-public interface PageContentRepository extends PagingAndSortingRepository<Content, Long> {
+public interface PageContentRepository
+        extends PagingAndSortingRepository<Content, Long>, JpaSpecificationExecutor<Content> {
 
-    @Query(
-            value =
-                    """
-                            select c from Content c
-                            left join fetch c.descriptions cd
-                            where c.contentType = ?1
-                            and c.storeMerchantId = ?2
-                            order by c.sortOrder asc
-                            """,
-            countQuery =
-                    """
-                            select count(distinct c) from Content c
-                            where c.contentType = ?1
-                            and c.storeMerchantId = ?2""")
-    Page<Content> findByContentType(
-            ContentType contentType, StoreMerchantId storeMerchantId, Pageable pageable);
-
-    @Query(
-            value =
-                    """
-                            select c from Content c
-                            left join fetch c.descriptions cd
-                            where c.contentType = ?1
-                            and c.storeMerchantId = ?2
-                            and cd.languageCode = ?3
-                            order by c.sortOrder asc""",
-            countQuery =
-                    """
-                            select count(distinct c) from Content c
-                            where c.contentType = ?1
-                            and c.storeMerchantId = ?2""")
-    Page<Content> findByContentType(
+    default Page<Content> findByContentType(
             ContentType contentTypes,
             StoreMerchantId storeMerchantId,
             LanguageCode languageCode,
-            Pageable pageable);
+            Pageable pageable) {
+        Specification<Content> specification =
+                (root, query, cb) -> {
+                    List<Predicate> predicates = new ArrayList<>();
+                    predicates.add(cb.equal(root.get("storeMerchantId"), storeMerchantId));
+                    predicates.add(cb.equal(root.get("contentType"), contentTypes));
+                    if (LanguageCode.isLanguage(languageCode)) {
+                        predicates.add(
+                                cb.equal(
+                                        root.get("descriptions").get("languageCode"),
+                                        languageCode));
+                    }
+                    return cb.and(predicates.toArray(Predicate[]::new));
+                };
+        return findAll(specification, pageable);
+    }
 }

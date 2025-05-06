@@ -21,17 +21,16 @@ export class CategoryService {
 
   getCategoryById(id, store): Observable<any> {
     const params = {
-      lang: '_all'
+      store
     };
-    return this.crudService.get(`/store-pod-gateway/catalog/api/v1/private/category/${id}?store=${store}`, params);
+    return this.crudService.get(`/store-pod-gateway/catalog/api/v1/private/category/${id}`, params);
   }
 
-  getCategoryByProductId(id, store, lang): Observable<any> {
+  getCategoryByProductId(id, store): Observable<any> {
     const params = {
-      store: store,
-      lang
+      store: store
     };
-    return this.crudService.get(`/store-pod-gateway/catalog/api/v1/category/product/${id}`, params);
+    return this.crudService.get(`/store-pod-gateway/catalog/api/v1/private/category/product/${id}`, params);
   }
 
   addCategory(category, store): Observable<any> {
@@ -58,7 +57,7 @@ export class CategoryService {
   }
 
   getHierarchyOfCategories(params?): Observable<any> {
-    return this.crudService.get(`/store-pod-gateway/catalog/api/v1/category`, params);
+    return this.crudService.get(`/store-pod-gateway/catalog/api/v1/private/category-hierarchy`, params);
   }
 
   updateHierarchy(childId, parentId, store): Observable<any> {

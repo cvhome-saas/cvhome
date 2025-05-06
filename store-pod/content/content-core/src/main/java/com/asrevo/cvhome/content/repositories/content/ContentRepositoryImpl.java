@@ -50,40 +50,4 @@ public class ContentRepositoryImpl implements ContentRepositoryCustom {
 
         return descriptions;
     }
-
-    @Override
-    public ContentDescription getBySeUrl(StoreMerchantId store, String seUrl) {
-
-        String hql =
-                """
-                        select c from Content c
-                        left join fetch c.descriptions cd
-                        where c.storeMerchantId =:cm
-                        and c.visible =true
-                        and cd.seUrl =:se""";
-        Query q = this.em.createQuery(hql);
-
-        q.setParameter("cm", store);
-        q.setParameter("se", seUrl);
-
-        Content content = (Content) q.getSingleResult();
-
-        if (content != null) {
-            return content.getDescription();
-        }
-
-        @SuppressWarnings("unchecked")
-        List<Content> results = q.getResultList();
-        if (results.isEmpty()) {
-            return null;
-        } else {
-            content = results.getFirst();
-        }
-
-        if (content != null) {
-            return content.getDescription();
-        }
-
-        return null;
-    }
 }

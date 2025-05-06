@@ -11,10 +11,10 @@ public final class ReadableEntityUtil {
     public static <T, R> ReadableEntityList<R> createReadableList(
             Page<T> entityList, List<R> items) {
         ReadableEntityList<R> readableList = new ReadableEntityList<>();
-        readableList.setItems(items);
+        readableList.setContent(items);
         readableList.setTotalPages(entityList.getTotalPages());
-        readableList.setRecordsTotal(entityList.getTotalElements());
-        readableList.setNumber(items.size());
+        readableList.setTotalElements(entityList.getTotalElements());
+        readableList.setSize(items.size());
         return readableList;
     }
 }

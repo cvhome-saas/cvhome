@@ -7,6 +7,7 @@ import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
 import java.util.List;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface CategoryService extends SalesManagerEntityService<Long, Category> {
 
@@ -23,14 +24,7 @@ public interface CategoryService extends SalesManagerEntityService<Long, Categor
             LanguageCode language,
             String name,
             int depth,
-            int page,
-            int count);
-
-    /**
-     * Returns category hierarchy filter by featured
-     */
-    List<Category> getListByDepthFilterByFeatured(
-            StoreMerchantId store, int depth, LanguageCode language);
+            Pageable pageable);
 
     Category getByCode(StoreMerchantId storeCode, String code) throws ServiceException;
 

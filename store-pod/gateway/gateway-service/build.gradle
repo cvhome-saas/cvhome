@@ -43,10 +43,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 
-    implementation 'com.github.ben-manes.caffeine:caffeine:3.1.8'
-
     implementation project(':store-commons:commons')
-    implementation project(':store-core:manager:manager-external-api')
 
     implementation project(':store-commons:autoconfigure')
     implementation project(':store-commons:ecs-commons:fargate-task-info')

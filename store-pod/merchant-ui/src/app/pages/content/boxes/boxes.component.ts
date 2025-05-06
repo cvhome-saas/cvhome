@@ -25,11 +25,11 @@ export class BoxesComponent extends BaseTable<any> implements OnInit {
     private contentService: ContentService,
     public router: Router,
     errorService: ErrorService,
-    translate: TranslateService,
+    private translate: TranslateService,
     private toastr: NbToastrService,
     selectedStoreService: SelectedStoreService,
     private dialogService: NbDialogService) {
-    super(selectedStoreService, translate, errorService)
+    super(selectedStoreService,  errorService)
   }
 
   ngOnInit(): void {
@@ -42,16 +42,6 @@ export class BoxesComponent extends BaseTable<any> implements OnInit {
       return of();
     }
     return this.contentService.getBoxes(request)
-      .pipe(map(it => {
-        const mappedX = {
-          content: it.items,
-          totalPages: it.totalPages,
-          totalElements: it.recordsTotal,
-          size: it.number,
-          pageNumber: request.page
-        };
-        return mappedX;
-      }));
   }
 
   addBoxes() {

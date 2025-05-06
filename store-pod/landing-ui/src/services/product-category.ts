@@ -10,9 +10,9 @@ export class ProductCategory {
     }
 
     public static getProducts = async (storeContext: StoreContext, categoryId?: number, manufacturerId?: number): Promise<ProductGroupPage | undefined> => {
-        const categoryParam = categoryId ? `&category=${categoryId}` : '';
-        const manufacturerParam = manufacturerId ? `&manufacturer=${manufacturerId}` : '';
-        return fetch(`${storeBaseServiceUrl('catalog')}/api/v1/products?store=${storeContext.store}${categoryParam}${manufacturerParam}&page=0&count=15&lang=${storeContext.locale}`)
+        const categoryParam = categoryId ? `&categoryIds=${categoryId}` : '';
+        const manufacturerParam = manufacturerId ? `&manufacturerId=${manufacturerId}` : '';
+        return fetch(`${storeBaseServiceUrl('catalog')}/api/v2/products?store=${storeContext.store}${categoryParam}${manufacturerParam}&page=0&count=15&lang=${storeContext.locale}`)
             .then(it => handleResponse(it))
     }
 

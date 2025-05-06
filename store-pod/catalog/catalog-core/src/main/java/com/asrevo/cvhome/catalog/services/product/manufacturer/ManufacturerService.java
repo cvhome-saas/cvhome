@@ -8,6 +8,7 @@ import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
 import java.util.List;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface ManufacturerService extends SalesManagerEntityService<Long, Manufacturer> {
 
@@ -16,7 +17,7 @@ public interface ManufacturerService extends SalesManagerEntityService<Long, Man
     List<Manufacturer> listByStore(StoreMerchantId store);
 
     Page<Manufacturer> listByStore(
-            StoreMerchantId store, LanguageCode language, String name, int page, int count);
+            StoreMerchantId store, LanguageCode language, String name, Pageable pageable);
 
     void saveOrUpdate(Manufacturer manufacturer) throws ServiceException;
 
@@ -29,8 +30,6 @@ public interface ManufacturerService extends SalesManagerEntityService<Long, Man
      */
     List<Manufacturer> listByProductsInCategory(
             StoreMerchantId store, Category category, LanguageCode language);
-
-    Page<Manufacturer> listByStore(StoreMerchantId store, String name, int page, int count);
 
     int count(StoreMerchantId store);
 }

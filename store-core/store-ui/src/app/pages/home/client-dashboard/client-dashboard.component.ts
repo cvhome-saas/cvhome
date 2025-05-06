@@ -21,11 +21,10 @@ export class ClientDashboardComponent {
   toMaxDates: Date = new Date();
 
 
-  constructor(private translate: TranslateService,private selectedStoreService:SelectedStoreService) {
+  constructor(private selectedStoreService:SelectedStoreService) {
     this.fromDateControl = new FormControl(this.previousDays(7));
     this.toDateControl = new FormControl(new Date());
     this.params = {
-      lang: this.translate.currentLang,
       store: "",
       fromDate: this.fromDateControl.value,
       toDate: this.toDateControl.value

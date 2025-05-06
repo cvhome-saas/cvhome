@@ -48,7 +48,6 @@ export class ProductGroupFormComponent implements OnInit {
   loadParams() {
     return {
       store: "",
-      lang: this.translate.currentLang,
       count: this.perPage,
       page: 0
     };
@@ -69,13 +68,13 @@ export class ProductGroupFormComponent implements OnInit {
 
   getProductByCode() {
     this.productGroupsService.getProductsByGroup(this.uniqueCode, this.params)
-      .subscribe(res => {
-        this.rows = res.products;
+      .subscribe(it => {
+        this.rows = it.content;
         this.page.totalPages = 1
         this.page.totalElements = this.rows.length
         this.page.size = this.rows.length
         this.createForm();
-        this.fillForm(res.productGroup);
+        this.fillForm(it.productGroup);
       }, err => {
         this.errorService.error('ERROR.SYSTEM_ERROR', err);
       });
@@ -113,7 +112,7 @@ export class ProductGroupFormComponent implements OnInit {
     this.loader = true;
     this.productGroupsService.addProductToGroup(this.params.store, item.id, groupCode)
       .subscribe({
-        next: (data) => {
+        next: (it) => {
           this.loader = false;
           this.rows.push(item)
           this.rows = this.rows.map(it => it);

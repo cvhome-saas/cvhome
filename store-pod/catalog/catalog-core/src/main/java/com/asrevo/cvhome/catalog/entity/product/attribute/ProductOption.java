@@ -60,7 +60,7 @@ public class ProductOption extends SalesManagerEntity<Long, ProductOption> {
     private boolean readOnly;
 
     @NotEmpty
-    @Pattern(regexp = "^[a-zA-Z0-9_]*$")
+    @Pattern(regexp = "^[a-zA-Z0-9_-]*$")
     @Column(name = "PRODUCT_OPTION_CODE")
     private String code;
 

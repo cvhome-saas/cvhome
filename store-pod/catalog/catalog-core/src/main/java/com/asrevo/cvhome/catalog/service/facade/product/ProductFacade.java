@@ -23,7 +23,11 @@ public interface ProductFacade {
     /**
      * Filters a list of product based on criteria
      */
-    ReadableProductList getProductListsByCriterias(
-            StoreMerchantId store, LanguageCode language, ProductCriteria criterias)
-            throws Exception;
+    ReadableProductList getProductListsByCriteria(StoreMerchantId store, ProductCriteria criteria);
+
+    ReadableProductList getTinyProductListsByCriteria(
+            StoreMerchantId merchantStore, ProductCriteria searchCriteria);
+
+    ReadableProductList getBaseProductListsByCriteria(
+            StoreMerchantId merchantStore, ProductCriteria searchCriteria);
 }

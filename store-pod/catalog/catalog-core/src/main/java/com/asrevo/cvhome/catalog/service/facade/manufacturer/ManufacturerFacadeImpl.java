@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -131,62 +132,6 @@ public class ManufacturerFacadeImpl implements ManufacturerFacade {
     }
 
     @Override
-    public ReadableManufacturerList getAllManufacturers(
-            StoreMerchantId store,
-            LanguageCode language,
-            ListCriteria criteria,
-            int page,
-            int count) {
-
-        ReadableManufacturerList readableList = new ReadableManufacturerList();
-        try {
-
-            List<Manufacturer> manufacturers;
-            if (page == 0 && count == 0) {
-                // need total count
-                int total = manufacturerService.count(store);
-
-                if (language != null) {
-                    manufacturers = manufacturerService.listByStore(store, language);
-                } else {
-                    manufacturers = manufacturerService.listByStore(store);
-                }
-                readableList.setRecordsTotal(total);
-                readableList.setNumber(manufacturers.size());
-            } else {
-
-                Page<Manufacturer> m;
-                if (language != null) {
-                    m =
-                            manufacturerService.listByStore(
-                                    store, language, criteria.getName(), page, count);
-                } else {
-                    m = manufacturerService.listByStore(store, criteria.getName(), page, count);
-                }
-                manufacturers = m.getContent();
-                readableList.setTotalPages(m.getTotalPages());
-                readableList.setRecordsTotal(m.getTotalElements());
-                readableList.setNumber(m.getNumber());
-            }
-
-            ReadableManufacturerPopulator populator = new ReadableManufacturerPopulator();
-            List<ReadableManufacturer> returnList = new ArrayList<>();
-
-            for (Manufacturer m : manufacturers) {
-                ReadableManufacturer readableManufacturer = new ReadableManufacturer();
-                populator.populate(m, readableManufacturer, store, language);
-                returnList.add(readableManufacturer);
-            }
-
-            readableList.setManufacturers(returnList);
-            return readableList;
-
-        } catch (Exception e) {
-            throw new ServiceRuntimeException("Error while get manufacturers", e);
-        }
-    }
-
-    @Override
     public boolean manufacturerExist(StoreMerchantId store, String manufacturerCode) {
         Assert.notNull(store, "Store must not be null");
         Assert.notNull(manufacturerCode, "Manufacturer code must not be null");
@@ -203,8 +148,7 @@ public class ManufacturerFacadeImpl implements ManufacturerFacade {
             StoreMerchantId store,
             LanguageCode language,
             ListCriteria criteria,
-            int page,
-            int count) {
+            Pageable pageable) {
 
         ReadableManufacturerList readableList = new ReadableManufacturerList();
 
@@ -212,19 +156,13 @@ public class ManufacturerFacadeImpl implements ManufacturerFacade {
 
             List<Manufacturer> manufacturers;
 
-            Page<Manufacturer> m;
-            if (language != null) {
-                m =
-                        manufacturerService.listByStore(
-                                store, language, criteria.getName(), page, count);
-            } else {
-                m = manufacturerService.listByStore(store, criteria.getName(), page, count);
-            }
+            Page<Manufacturer> m =
+                    manufacturerService.listByStore(store, language, criteria.getName(), pageable);
 
             manufacturers = m.getContent();
             readableList.setTotalPages(m.getTotalPages());
-            readableList.setRecordsTotal(m.getTotalElements());
-            readableList.setNumber(m.getContent().size());
+            readableList.setTotalElements(m.getTotalElements());
+            readableList.setSize(m.getNumberOfElements());
 
             ReadableManufacturerPopulator populator = new ReadableManufacturerPopulator();
             List<ReadableManufacturer> returnList = new ArrayList<>();
@@ -235,7 +173,7 @@ public class ManufacturerFacadeImpl implements ManufacturerFacade {
                 returnList.add(readableManufacturer);
             }
 
-            readableList.setManufacturers(returnList);
+            readableList.setContent(returnList);
             return readableList;
 
         } catch (Exception e) {

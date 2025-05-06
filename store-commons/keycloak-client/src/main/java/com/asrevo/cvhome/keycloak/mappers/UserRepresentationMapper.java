@@ -44,10 +44,13 @@ public interface UserRepresentationMapper {
             List<UserRepresentation> representations,
             Function<UserRepresentation, List<GroupRepresentation>> groupExtractor) {
         ReadableUserList list = new ReadableUserList();
-        list.setData(
+        list.setContent(
                 representations.stream()
                         .map(it -> this.toDto(it, groupExtractor.apply(it)))
                         .toList());
+        list.setTotalPages(1);
+        list.setSize(representations.size());
+        list.setTotalElements(representations.size());
         return list;
     }
 

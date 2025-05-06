@@ -3,12 +3,10 @@ package com.asrevo.cvhome.catalog.service.populator.manufacturer;
 import com.asrevo.cvhome.catalog.entity.product.manufacturer.Manufacturer;
 import com.asrevo.cvhome.catalog.entity.product.manufacturer.ManufacturerDescription;
 import com.asrevo.cvhome.catalog.model.manufacturer.ReadableManufacturer;
-import com.asrevo.cvhome.catalog.model.manufacturer.ReadableManufacturerFull;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import com.asrevo.cvhome.store.core.populator.AbstractDataPopulator;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 public class ReadableManufacturerPopulator
@@ -21,37 +19,26 @@ public class ReadableManufacturerPopulator
             StoreMerchantId store,
             LanguageCode language) {
 
-        if (language == null) {
-            target = new ReadableManufacturerFull();
+        if (target == null) {
+            target = new ReadableManufacturer();
         }
         target.setOrder(source.getOrder());
         target.setId(source.getId());
         target.setCode(source.getCode());
-        if (source.getDescriptions() != null && !source.getDescriptions().isEmpty()) {
 
-            List<com.asrevo.cvhome.catalog.model.manufacturer.ManufacturerDescription>
-                    fulldescriptions = new ArrayList<>();
-
-            Set<ManufacturerDescription> descriptions = source.getDescriptions();
-            ManufacturerDescription description = null;
-            for (ManufacturerDescription desc : descriptions) {
-                if (desc.getLanguageCode().equals(language)) {
-                    description = desc;
-                    break;
-                } else {
-                    fulldescriptions.add(populateDescription(desc));
-                }
-            }
-
-            if (description != null) {
-                com.asrevo.cvhome.catalog.model.manufacturer.ManufacturerDescription d =
-                        populateDescription(description);
-                target.setDescription(d);
-            }
-
-            if (target instanceof ReadableManufacturerFull) {
-                ((ReadableManufacturerFull) target).setDescriptions(fulldescriptions);
-            }
+        if (LanguageCode.isAllLanguage(language)) {
+            var descriptionSet = Optional.ofNullable(source.getDescriptions()).orElse(Set.of());
+            target.setDescriptions(descriptionSet.stream().map(this::populateDescription).toList());
+        }
+        if (LanguageCode.isLanguage(language)) {
+            var descriptionSet = Optional.ofNullable(source.getDescriptions()).orElse(Set.of());
+            var description =
+                    descriptionSet.stream()
+                            .filter(it -> language.equals(it.getLanguageCode()))
+                            .findFirst()
+                            .map(this::populateDescription)
+                            .orElse(null);
+            target.setDescription(description);
         }
 
         return target;
@@ -67,8 +54,7 @@ public class ReadableManufacturerPopulator
         if (description == null) {
             return null;
         }
-        com.asrevo.cvhome.catalog.model.manufacturer.ManufacturerDescription d =
-                new com.asrevo.cvhome.catalog.model.manufacturer.ManufacturerDescription();
+        var d = new com.asrevo.cvhome.catalog.model.manufacturer.ManufacturerDescription();
         d.setName(description.getName());
         d.setDescription(description.getDescription());
         d.setId(description.getId());

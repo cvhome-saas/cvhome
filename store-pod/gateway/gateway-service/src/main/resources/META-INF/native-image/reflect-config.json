@@ -40,18 +40,6 @@
     ]
   },
   {
-    "name": "com.asrevo.cvhome.gateway.filters.AddStoreParamGatewayFilterFactory",
-    "allDeclaredFields": true,
-    "allDeclaredConstructors": true,
-    "allDeclaredMethods": true
-  },
-  {
-    "name": "com.asrevo.cvhome.gateway.filters.MapHostAsRequestParamGatewayFilterFactory$Config",
-    "allDeclaredFields": true,
-    "allDeclaredConstructors": true,
-    "allDeclaredMethods": true
-  },
-  {
     "name": "com.asrevo.cvhome.s2s.config.gateway.FHostRoutePredicateFactory",
     "allDeclaredFields": true,
     "allDeclaredConstructors": true,
@@ -71,18 +59,6 @@
   },
   {
     "name": "com.asrevo.cvhome.s2s.config.gateway.FNotServiceRoutePredicateFactory$Config",
-    "allDeclaredFields": true,
-    "allDeclaredConstructors": true,
-    "allDeclaredMethods": true
-  },
-  {
-    "name": "com.asrevo.cvhome.gateway.filters.AddStoreParamGatewayFilterFactory",
-    "allDeclaredFields": true,
-    "allDeclaredConstructors": true,
-    "allDeclaredMethods": true
-  },
-  {
-    "name": "com.asrevo.cvhome.gateway.filters.AddStoreParamGatewayFilterFactory$Config",
     "allDeclaredFields": true,
     "allDeclaredConstructors": true,
     "allDeclaredMethods": true

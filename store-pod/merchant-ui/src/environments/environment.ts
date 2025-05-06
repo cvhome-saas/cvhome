@@ -16,6 +16,7 @@ export const environment = {
   //apiUrl: "http://localhost:8080/api/api",
   apiUrl: '',
   shippingApi: '',
+  defaultStore: '65f023632bc46470c104b76f',
   client: {
     language: {
       default: 'en',

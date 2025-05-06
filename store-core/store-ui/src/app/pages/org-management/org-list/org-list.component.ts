@@ -7,7 +7,6 @@ import {ColumnMode} from "@swimlane/ngx-datatable";
 import {ErrorService} from "../../../shared/services/error.service";
 import {BaseTable, PageT, StorePageRequest} from "../../common/BaseTable";
 import {Observable, of} from "rxjs";
-import {map} from "rxjs/operators";
 
 @Component({
   selector: 'ngx-org-list',
@@ -22,10 +21,9 @@ export class OrgListComponent extends BaseTable<any> implements OnInit {
   constructor(
     private orgService: OrgService,
     private router: Router,
-    translate: TranslateService,
     errorService: ErrorService
   ) {
-    super(null, translate, errorService)
+    super(null, errorService)
   }
 
   ngOnInit() {
@@ -38,16 +36,6 @@ export class OrgListComponent extends BaseTable<any> implements OnInit {
       return of();
     }
     return this.orgService.getListOfOrg(request)
-      .pipe(map(it => {
-        const mappedX = {
-          content: it.content,
-          totalPages: it.totalPages,
-          totalElements: it.totalElements,
-          size: it.numberOfElements,
-          pageNumber: request.page
-        };
-        return mappedX;
-      }));
   }
 
   onEdit(row) {

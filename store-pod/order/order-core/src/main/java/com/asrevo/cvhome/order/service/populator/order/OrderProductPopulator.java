@@ -27,26 +27,6 @@ public class OrderProductPopulator
         extends AbstractDataPopulator<ShoppingCartItem, StoreMerchantId, OrderProduct> {
     private final ExternalProductService productService;
 
-    //    private ProductService productService;
-    /*
-        private DigitalProductService digitalProductService;
-    */
-    //    private ProductAttributeService productAttributeService;
-
-    /*
-    	public DigitalProductService getDigitalProductService() {
-    		return digitalProductService;
-    	}
-
-    	public void setDigitalProductService(DigitalProductService digitalProductService) {
-    		this.digitalProductService = digitalProductService;
-    	}
-    */
-
-    /**
-     * Converts a ShoppingCartItem carried in the ShoppingCart to an OrderProduct
-     * that will be saved in the system
-     */
     @Override
     public OrderProduct populate(
             ShoppingCartItem source,
@@ -56,33 +36,9 @@ public class OrderProductPopulator
             throws ConversionException {
 
         Assert.notNull(productService, "productService must be set");
-        //		Assert.notNull(digitalProductService,"digitalProductService must be set");
-        //        Assert.notNull(productAttributeService, "productAttributeService must be set");
 
         try {
 
-            /*@TODO ASHRAF
-
-                        Product modelProduct = productService.getBySku(source.getSku(), store.getId(), language);
-                        if (modelProduct == null) {
-                            throw new ConversionException("Cannot get product with sku " + source.getSku());
-                        }
-
-                        if (!Objects.equals(modelProduct.getStore(), store.getId())) {
-                            throw new ConversionException("Invalid product with sku " + source.getSku());
-                        }
-
-            			DigitalProduct digitalProduct = digitalProductService.getByProduct(store, modelProduct);
-
-            			if(digitalProduct!=null) {
-            				OrderProductDownload orderProductDownload = new OrderProductDownload();
-            				orderProductDownload.setOrderProductFilename(digitalProduct.getProductFileName());
-            				orderProductDownload.setOrderProduct(target);
-            				orderProductDownload.setDownloadCount(0);
-            				orderProductDownload.setMaxdays(Constants.MAX_DOWNLOAD_DAYS);
-            				target.getDownloads().add(orderProductDownload);
-            			}
-            */
             target.setOneTimeCharge(source.getItemPrice());
             target.setProductName("Product " + source.getSku());
             target.setProductQuantity(source.getQuantity());
@@ -134,11 +90,6 @@ public class OrderProductPopulator
 
         orderProductPrice.setProductPrice(price.getFinalPrice());
         orderProductPrice.setProductPriceCode(productPrice.getCode());
-        //        if (productPrice.getDescriptions() != null &&
-        // !productPrice.getDescriptions().isEmpty()) {
-        //
-        // orderProductPrice.setProductPriceName(productPrice.getDescriptions().iterator().next().getName());
-        //        }
         if (price.isDiscounted()) {
             orderProductPrice.setProductPriceSpecial(productPrice.getProductPriceSpecialAmount());
             orderProductPrice.setProductPriceSpecialStartDate(

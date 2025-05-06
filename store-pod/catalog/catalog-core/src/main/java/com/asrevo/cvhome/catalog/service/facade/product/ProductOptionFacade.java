@@ -7,6 +7,7 @@ import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.model.entity.CodeEntity;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import java.util.List;
+import org.springframework.data.domain.Pageable;
 
 /*
  * Attributes, Options and Options values management independently from Product
@@ -44,10 +45,10 @@ public interface ProductOptionFacade {
     void deleteOptionValue(Long optionValueId, StoreMerchantId store);
 
     ReadableProductOptionList options(
-            StoreMerchantId store, LanguageCode language, String name, int page, int count);
+            StoreMerchantId store, LanguageCode language, String name, Pageable pageable);
 
     ReadableProductOptionValueList optionValues(
-            StoreMerchantId store, LanguageCode language, String name, int page, int count);
+            StoreMerchantId store, LanguageCode language, String name, Pageable pageable);
 
     ReadableProductAttributeEntity saveAttribute(
             Long productId,
@@ -59,7 +60,7 @@ public interface ProductOptionFacade {
             Long productId, Long attributeId, StoreMerchantId store, LanguageCode language);
 
     ReadableProductAttributeList getAttributesList(
-            Long productId, StoreMerchantId store, LanguageCode language, int page, int count);
+            Long productId, StoreMerchantId store, LanguageCode language, Pageable pageable);
 
     void deleteAttribute(Long productId, Long attributeId, StoreMerchantId store);
 }

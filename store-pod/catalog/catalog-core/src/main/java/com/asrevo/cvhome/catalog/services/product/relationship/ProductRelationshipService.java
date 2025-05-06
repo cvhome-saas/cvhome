@@ -16,7 +16,15 @@ public interface ProductRelationshipService
     /**
      * Find by product and group name
      */
-    List<ProductRelationship> getByType(StoreMerchantId store, Product product, String name);
+    List<ProductRelationship> getByType(
+            StoreMerchantId store, Product product, String name, LanguageCode language);
+
+    List<ProductRelationship> getByType(
+            StoreMerchantId store,
+            String name,
+            Product product,
+            Product related,
+            LanguageCode language);
 
     List<ProductRelationship> listByProduct(Product product);
 
@@ -52,4 +60,9 @@ public interface ProductRelationshipService
 
     List<ProductRelationship> getByGroup(
             StoreMerchantId store, String groupName, LanguageCode language);
+
+    int deleteRelationship(Product relatedProduct, String code, StoreMerchantId storeMerchantId);
+
+    int deleteRelationship(
+            Product relatedProduct, Product product, String code, StoreMerchantId storeMerchantId);
 }

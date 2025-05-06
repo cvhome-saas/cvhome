@@ -26,7 +26,6 @@ public class ReadableOrderPopulator
         target.setDatePurchased(source.getDatePurchased());
         target.setOrderStatus(source.getStatus());
         target.setCurrency(source.getCurrency());
-        // target.setCurrencyModel(source.getCurrency());
 
         target.setPaymentType(source.getPaymentType());
         target.setPaymentModule(source.getPaymentModuleCode());

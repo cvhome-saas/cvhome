@@ -1,5 +1,4 @@
 import {Component, OnInit} from '@angular/core';
-import {DomSanitizer} from '@angular/platform-browser';
 import {TranslateService} from '@ngx-translate/core';
 import {NbDialogService, NbToastrService} from '@nebular/theme';
 import {Router} from '@angular/router';
@@ -10,7 +9,6 @@ import {ErrorService} from "../../../../shared/services/error.service";
 import {SelectedStoreService} from "../../../../shared/services/selected-store.service";
 import {BaseTable, PageT, StorePageRequest} from "../../../common/BaseTable";
 import {Observable, of} from "rxjs";
-import {map} from "rxjs/operators";
 
 @Component({
   selector: 'ngx-types-list',
@@ -23,15 +21,14 @@ export class TypesListComponent extends BaseTable<any> implements OnInit {
   private isInitialized: boolean = false;
 
   constructor(
-    private _sanitizer: DomSanitizer,
-    translate: TranslateService,
+    private translate: TranslateService,
     private router: Router,
     private dialogService: NbDialogService,
     private toastr: NbToastrService,
     errorService: ErrorService,
     selectedStoreService: SelectedStoreService,
     private typesService: TypesService) {
-    super(selectedStoreService, translate, errorService)
+    super(selectedStoreService, errorService)
   }
 
 
@@ -45,16 +42,6 @@ export class TypesListComponent extends BaseTable<any> implements OnInit {
       return of();
     }
     return this.typesService.getListOfTypes(request)
-      .pipe(map(it => {
-        const mappedX = {
-          content: it.list,
-          totalPages: it.totalPages,
-          totalElements: it.recordsTotal,
-          size: it.number,
-          pageNumber: request.page
-        }
-        return mappedX;
-      }));
   }
 
 

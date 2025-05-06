@@ -3,14 +3,14 @@ package com.asrevo.cvhome.content.service.facade.content;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.content.model.content.ContentFile;
 import com.asrevo.cvhome.content.model.content.ContentFolder;
-import com.asrevo.cvhome.content.model.content.ReadableContentFull;
 import com.asrevo.cvhome.content.model.content.box.PersistableContentBox;
 import com.asrevo.cvhome.content.model.content.box.ReadableContentBox;
+import com.asrevo.cvhome.content.model.content.box.ReadableContentBoxList;
 import com.asrevo.cvhome.content.model.content.page.PersistableContentPage;
 import com.asrevo.cvhome.content.model.content.page.ReadableContentPage;
-import com.asrevo.cvhome.store.core.entity.content.ContentType;
-import com.asrevo.cvhome.store.core.model.entity.ReadableEntityList;
+import com.asrevo.cvhome.content.model.content.page.ReadableContentPageList;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
+import org.springframework.data.domain.Pageable;
 
 /**
  * Images and files management
@@ -39,8 +39,8 @@ public interface ContentFacade {
     /**
      * Returns page names and urls configured for a given StoreMerchantId
      */
-    ReadableEntityList<ReadableContentPage> getContentPages(
-            StoreMerchantId store, LanguageCode language, int page, int count);
+    ReadableContentPageList getContentPages(
+            StoreMerchantId store, LanguageCode language, Pageable pageable);
 
     /**
      * Returns page name by code
@@ -63,8 +63,8 @@ public interface ContentFacade {
      */
     boolean codeExist(String code, String type, StoreMerchantId store);
 
-    ReadableEntityList<ReadableContentBox> getContentBoxes(
-            ContentType type, StoreMerchantId store, LanguageCode language, int start, int count);
+    ReadableContentBoxList getContentBoxes(
+            StoreMerchantId store, LanguageCode language, Pageable pageable);
 
     void addContentFile(ContentFile file, String merchantStoreCode);
 
@@ -91,7 +91,4 @@ public interface ContentFacade {
             PersistableContentBox box,
             StoreMerchantId merchantStore,
             LanguageCode language);
-
-    @Deprecated
-    ReadableContentFull getContent(String code, StoreMerchantId store, LanguageCode language);
 }

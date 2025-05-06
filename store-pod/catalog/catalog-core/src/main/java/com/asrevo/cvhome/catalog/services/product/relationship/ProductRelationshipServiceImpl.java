@@ -10,6 +10,7 @@ import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceIm
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service("productRelationshipService")
 public class ProductRelationshipServiceImpl
@@ -107,8 +108,24 @@ public class ProductRelationshipServiceImpl
     @Override
     public List<ProductRelationship> getByGroup(
             StoreMerchantId store, String groupName, LanguageCode language) {
+        return productRelationshipRepository.getByGroup(store, groupName, null, null, language);
+    }
 
-        return productRelationshipRepository.getByType(store, groupName, language);
+    @Transactional
+    @Override
+    public int deleteRelationship(
+            Product relatedProduct, String code, StoreMerchantId storeMerchantId) {
+        return productRelationshipRepository.deleteAllByRelatedProduct_IdAndCodeAndStoreMerchantId(
+                relatedProduct.getId(), code, storeMerchantId);
+    }
+
+    @Transactional
+    @Override
+    public int deleteRelationship(
+            Product relatedProduct, Product product, String code, StoreMerchantId storeMerchantId) {
+        return productRelationshipRepository
+                .deleteAllByRelatedProduct_IdAndProduct_IdAndCodeAndStoreMerchantId(
+                        relatedProduct.getId(), product.getId(), code, storeMerchantId);
     }
 
     @Override
@@ -118,7 +135,17 @@ public class ProductRelationshipServiceImpl
 
     @Override
     public List<ProductRelationship> getByType(
-            StoreMerchantId store, Product product, String name) {
-        return productRelationshipRepository.getByTypeAndRelatedProduct(store, name, product);
+            StoreMerchantId store, Product product, String name, LanguageCode language) {
+        return productRelationshipRepository.getByGroup(store, name, product, null, language);
+    }
+
+    @Override
+    public List<ProductRelationship> getByType(
+            StoreMerchantId store,
+            String name,
+            Product product,
+            Product related,
+            LanguageCode language) {
+        return productRelationshipRepository.getByGroup(store, name, product, related, language);
     }
 }

@@ -45,7 +45,6 @@ export class CategoryFormComponent implements OnInit {
     private router: Router,
     private toastr: NbToastrService,
     private translate: TranslateService,
-    private dialogService: NbDialogService
   ) {
     this.defaultLanguage = this.translate.defaultLang;
     this.params=this.loadParams();
@@ -73,7 +72,6 @@ export class CategoryFormComponent implements OnInit {
 
   loadParams() {
     return {
-      lang: this.translate.currentLang,
       store: "",
       count: this.perPage,
       page: 0
@@ -99,8 +97,8 @@ export class CategoryFormComponent implements OnInit {
   init() {
     this.categoryService.getListOfCategories(this.params)
       .subscribe(res => {
-        res.categories.push({id: 0, code: 'root', children: []});
-        res.categories.forEach((el) => {
+        res.content.push({id: 0, code: 'root', children: []});
+        res.content.forEach((el) => {
           this.getChildren(el);
         });
         this.roots.sort((a, b) => {

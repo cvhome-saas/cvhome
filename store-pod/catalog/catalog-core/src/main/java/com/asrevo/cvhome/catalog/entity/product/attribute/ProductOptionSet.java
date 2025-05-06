@@ -50,7 +50,7 @@ public class ProductOptionSet extends SalesManagerEntity<Long, ProductOptionSet>
     private Long id;
 
     @NotEmpty
-    @Pattern(regexp = "^[a-zA-Z0-9_]*$")
+    @Pattern(regexp = "^[a-zA-Z0-9_-]*$")
     @Column(name = "PRODUCT_OPTION_SET_CODE")
     private String code;
 

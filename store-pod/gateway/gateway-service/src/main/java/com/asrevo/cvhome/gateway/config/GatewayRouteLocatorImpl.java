@@ -1,11 +1,9 @@
 package com.asrevo.cvhome.gateway.config;
 
-import com.asrevo.cvhome.gateway.filters.AddStoreParamGatewayFilterFactory;
 import com.asrevo.cvhome.s2s.config.gateway.FHostRoutePredicateFactory;
 import com.asrevo.cvhome.s2s.config.gateway.FNotServiceRoutePredicateFactory;
 import com.asrevo.cvhome.s2s.model.ServiceDomainProperties;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.route.Route;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
@@ -23,7 +21,6 @@ public class GatewayRouteLocatorImpl implements RouteLocator {
     private final ServiceDomainProperties serviceDomainProperties;
     private final FNotServiceRoutePredicateFactory notServicePredicate;
     private final FHostRoutePredicateFactory hostRoutePredicate;
-    private final AddStoreParamGatewayFilterFactory addStoreParamGatewayFilterFactory;
 
     @Override
     public Flux<Route> getRoutes() {
@@ -33,10 +30,6 @@ public class GatewayRouteLocatorImpl implements RouteLocator {
 
         Predicate<ServerWebExchange> merchantUiHostPredicate = hostRoutePredicate.apply(config -> config.setHost(Set.of("merchant-ui." + storeCoreGatewayDomain)));
 
-        GatewayFilter addStoreParamGatewayFilter = addStoreParamGatewayFilterFactory.apply(config -> {
-            config.setAddRequestHeader(true);
-            config.setAddResponseHeader(true);
-        });
 
         RouteLocatorBuilder.Builder routes = routeLocatorBuilder.routes();
 
@@ -59,7 +52,6 @@ public class GatewayRouteLocatorImpl implements RouteLocator {
                         .uri("lb://merchant-ui"))
                 .route(r -> r
                         .predicate(notBackendService)
-                        .filters(spec -> spec.filter(addStoreParamGatewayFilter))
                         .uri("lb://landing-ui"));
         return routes.build().getRoutes();
 

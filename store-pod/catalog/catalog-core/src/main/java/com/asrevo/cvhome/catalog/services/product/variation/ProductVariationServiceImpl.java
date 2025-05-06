@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -44,9 +43,8 @@ public class ProductVariationServiceImpl
 
     @Override
     public Page<ProductVariation> getByMerchant(
-            StoreMerchantId store, LanguageCode language, String code, int page, int count) {
-        Pageable p = PageRequest.of(page, count);
-        return pageableProductVariationSetRepository.list(store, code, p);
+            StoreMerchantId store, LanguageCode language, String code, Pageable pageable) {
+        return pageableProductVariationSetRepository.list(store, code, pageable);
     }
 
     @Override

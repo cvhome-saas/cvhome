@@ -1,6 +1,5 @@
 package com.asrevo.cvhome.catalog.service.facade.product;
 
-import com.asrevo.cvhome.catalog.entity.category.Category;
 import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.entity.product.ProductCriteria;
 import com.asrevo.cvhome.catalog.model.product.ReadableProduct;
@@ -14,13 +13,7 @@ import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
 import com.asrevo.cvhome.store.utils.LocaleUtils;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import org.apache.commons.collections.CollectionUtils;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 
 @Service("productFacade")
 // @Profile({"default", "cloud", "gcp", "aws", "mysql", "local"})
@@ -49,67 +42,21 @@ public class ProductFacadeImpl implements ProductFacade {
     }
 
     @Override
-    public ReadableProductList getProductListsByCriterias(
-            StoreMerchantId store, LanguageCode language, ProductCriteria criterias)
-            throws Exception {
+    public ReadableProductList getProductListsByCriteria(
+            StoreMerchantId store, ProductCriteria criteria) {
+        return null;
+    }
 
-        Assert.notNull(criterias, "ProductCriteria must be set for this product");
+    @Override
+    public ReadableProductList getTinyProductListsByCriteria(
+            StoreMerchantId merchantStore, ProductCriteria searchCriteria) {
+        return null;
+    }
 
-        if (CollectionUtils.isNotEmpty(criterias.getCategoryIds())) {
-
-            if (criterias.getCategoryIds().size() == 1) {
-
-                Category category = categoryService.getById(criterias.getCategoryIds().getFirst());
-
-                if (category != null) {
-                    String lineage = category.getLineage();
-
-                    List<Category> categories = categoryService.getListByLineage(store, lineage);
-
-                    List<Long> ids = new ArrayList<>();
-                    if (categories != null && !categories.isEmpty()) {
-                        for (Category c : categories) {
-                            ids.add(c.getId());
-                        }
-                    }
-                    ids.add(category.getId());
-                    criterias.setCategoryIds(ids);
-                }
-            }
-        }
-
-        Page<Product> modelProductList =
-                productService.listByStore(
-                        store,
-                        language,
-                        criterias,
-                        criterias.getStartPage(),
-                        criterias.getMaxCount());
-
-        List<Product> products = modelProductList.getContent();
-
-        products = products.stream().sorted(Comparator.comparing(Product::getSortOrder)).toList();
-
-        ReadableProductPopulator populator =
-                new ReadableProductPopulator(
-                        pricingService, imageUtils, externalMerchantStoreService);
-
-        ReadableProductList productList = new ReadableProductList();
-        for (Product product : products) {
-
-            // create new proxy product
-            ReadableProduct readProduct =
-                    populator.populate(product, new ReadableProduct(), store, language);
-            productList.getProducts().add(readProduct);
-        }
-
-        // productList.setTotalPages(products.getTotalCount());
-        productList.setRecordsTotal(modelProductList.getTotalElements());
-        productList.setNumber(productList.getProducts().size());
-
-        productList.setTotalPages(modelProductList.getTotalPages());
-
-        return productList;
+    @Override
+    public ReadableProductList getBaseProductListsByCriteria(
+            StoreMerchantId merchantStore, ProductCriteria searchCriteria) {
+        return null;
     }
 
     @Override
