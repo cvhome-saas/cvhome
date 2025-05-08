@@ -3,16 +3,18 @@ import {Breadcrumb} from "@/app/_themes/DEFAULT/componantes/Breadcrumb/Breadcrum
 import {CheckoutForm} from "@/app/_themes/DEFAULT/componantes/Checkout/CheckoutForm";
 import {CheckoutCartBox} from "@/app/_themes/DEFAULT/componantes/Checkout/CheckoutCartBox";
 import {getTranslations} from "next-intl/server";
+import {BreadcrumbItem} from "@/types/bread-crumb";
 
 export default async function Page({params}: { params: CheckoutPageParams }) {
     const t = await getTranslations('PAGE.CHECKOUT');
+    const current: BreadcrumbItem = {id: "0", name: t('TITLE'), href: `/checkout`};
     return <div className="flex-grow bg-background">
         <div className="p-6">
             <Breadcrumb breadcrumbs={{
                 prev: [
                     {id: "1", name: t('HOME_TITLE'), href: '/'},
                 ],
-                current: {id: "0", name: t('TITLE'), href: `/checkout`}
+                current: current
             }}/>
             <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-5 pt-10">
                 {/* User Form */}

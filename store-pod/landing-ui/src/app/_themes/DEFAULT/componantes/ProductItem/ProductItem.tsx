@@ -32,12 +32,15 @@ export default function ProductItem({storeContext, product}: { storeContext: Sto
                 </div>
             </div>
             <div className="mt-4 px-5 pb-0">
-                <Link prefetch={false} href={"/product/" + product.description.friendlyUrl}>
+                {
+                    product.description &&
+                    <Link prefetch={false} href={"/product/" + product.description.friendlyUrl}>
                     <span
                         className="text-xl font-bold tracking-tight text-foreground hover:underline hover:text-primary transition-colors duration-300 line-clamp-1">
                         {product.description?.name || 'Product Name'}
                     </span>
-                </Link>
+                    </Link>
+                }
 
                 <div className="mt-2 mb-2">
                     <span className={`text-sm font-medium ${availabilityClass}`}>

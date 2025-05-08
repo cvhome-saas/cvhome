@@ -28,32 +28,38 @@ export const CartProductList = ({storeContext, cart, setCart}: {
         <ul role="list" className="-my-6 divide-y divide-border">
             {cart && cart.products && cart.products.map((product) => (
                 <li key={product.id} className="flex py-6">
-                    <div
-                        className="relative size-24 shrink-0 overflow-hidden rounded-md border border-border">
-                        <Link prefetch={false}
-                              href={`/product/${product.description.friendlyUrl}`}
-                              className="block size-full"
-                        >
-                            {
-                                product.images && product.images.length > 0 &&
-                                <Image alt={product.images[0].imageName}
-                                       src={product.images[0].imageUrl}
-                                       fill
-                                       style={{objectFit: 'cover'}}
-                                       sizes="96px"
-                                />
-                            }
-                        </Link>
-                    </div>
+                    {
+                        product.description &&
+                        <div
+                            className="relative size-24 shrink-0 overflow-hidden rounded-md border border-border">
+                            <Link prefetch={false}
+                                  href={`/product/${product.description.friendlyUrl}`}
+                                  className="block size-full"
+                            >
+                                {
+                                    product.images && product.images.length > 0 &&
+                                    <Image alt={product.images[0].imageName}
+                                           src={product.images[0].imageUrl}
+                                           fill
+                                           style={{objectFit: 'cover'}}
+                                           sizes="96px"
+                                    />
+                                }
+                            </Link>
+                        </div>
+                    }
 
                     <div className="ms-4 flex flex-1 flex-col">
                         <div>
                             <div
                                 className="flex justify-between text-base font-medium text-foreground">
-                                <h3>
-                                    <Link prefetch={false}
-                                          href={`/product/${product.description.friendlyUrl}`}>{product.description.name}</Link>
-                                </h3>
+                                {
+                                    product.description &&
+                                    <h3>
+                                        <Link prefetch={false}
+                                              href={`/product/${product.description.friendlyUrl}`}>{product.description.name}</Link>
+                                    </h3>
+                                }
                                 <p className="ms-4">{product.finalPrice}</p>
                             </div>
                         </div>

@@ -5,7 +5,7 @@ export interface CategoryPage {
     number: number
     recordsTotal: number
     recordsFiltered: number
-    content: Category[]
+    content: Category[] | undefined
 }
 
 export interface Category {
@@ -19,7 +19,7 @@ export interface Category {
     description: Description
     productCount: number
     store: string
-    parent: Category
-    children: Category[]
+    parent: Category | undefined
+    children: Category[] | undefined
 }
 

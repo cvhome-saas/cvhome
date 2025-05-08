@@ -26,12 +26,14 @@ export const Breadcrumb = ({breadcrumbs}: { breadcrumbs: BreadcrumbItems }) => {
                         </div>
                     </li>
                 ))}
-                <li className="text-sm">
-                    <Link prefetch={false} href={breadcrumbs.current.href} aria-current="page"
-                          className="font-medium text-neutral hover:text-hover-neutral">
-                        {breadcrumbs.current.name}
-                    </Link>
-                </li>
+                {breadcrumbs.current &&
+                    <li className="text-sm">
+                        <Link prefetch={false} href={breadcrumbs.current.href} aria-current="page"
+                              className="font-medium text-neutral hover:text-hover-neutral">
+                            {breadcrumbs.current.name}
+                        </Link>
+                    </li>
+                }
             </ol>
         </nav>
     )

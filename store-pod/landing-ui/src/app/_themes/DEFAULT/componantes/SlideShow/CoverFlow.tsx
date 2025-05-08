@@ -53,7 +53,7 @@ export default function CoverFlow({store}: { store: Store }) {
                             swiper.el.style.opacity = '1';
                         }}
                     >
-                        {store.sliderImages.map((p, index) => {
+                        {store.sliderImages && store.sliderImages.map((p, index) => {
                             return (
                                 <SwiperSlide key={index} className="flex justify-center items-center bg-transparent">
                                     <div className="relative w-full h-full">
