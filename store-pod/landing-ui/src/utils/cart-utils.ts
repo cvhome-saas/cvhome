@@ -25,8 +25,8 @@ export function getCartData(): Cart | undefined {
 }
 
 export const getMatchedProductsInCart = (product: Product) => {
-    let currentCartData = getCartData();
-    if (currentCartData) {
+    const currentCartData = getCartData();
+    if (currentCartData && currentCartData.products) {
         return currentCartData.products.find(it => it.id === product.id);
     } else {
         return undefined;

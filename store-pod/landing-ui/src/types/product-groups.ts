@@ -5,8 +5,8 @@ export interface ProductGroupPage {
     number: number
     recordsTotal: number
     recordsFiltered: number
-    content: Product[]
-    productGroup: ProductGroup
+    content: Product[] | undefined
+    productGroup: ProductGroup | undefined
 }
 
 export interface ProductGroup {
@@ -31,25 +31,25 @@ export interface Product {
     quantityOrderMaximum: number
     quantityOrderMinimum: number
     productIsFree: boolean
-    productSpecifications: ProductSpecifications
+    productSpecifications: ProductSpecifications | undefined
     rating: number
     ratingCount: number
     refSku: string
     rentalDuration: number
     rentalPeriod: number
-    description: Description
-    productPrice: ProductPrice
+    description: Description | undefined
+    productPrice: ProductPrice | undefined
     finalPrice: string
     originalPrice: string
     discounted: boolean
-    image: Image
-    images: Image[]
-    manufacturer: Manufacturer
+    image: Image | undefined
+    images: Image[] | undefined
+    manufacturer: Manufacturer | undefined
     attributes: any[]
     options: any[]
     variants: any[]
     properties: any[]
-    categories: Category[]
+    categories: Category[] | undefined
     type: any
     canBePurchased: boolean
     owner: any

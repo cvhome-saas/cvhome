@@ -4,8 +4,8 @@ export interface Order {
     delivery: Address
     shipping: any
     payment: string
-    total: Total
-    products: ProductItem[]
+    total: Total | undefined
+    products: ProductItem[] | undefined
 }
 
 export interface Address {
@@ -27,7 +27,7 @@ export interface Address {
 }
 
 export interface Total {
-    totals: TotalItem[]
+    totals: TotalItem[] | undefined
     grandTotal: any
 }
 

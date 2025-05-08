@@ -12,8 +12,8 @@ export interface Cart {
     order: any
     promoCode: any
     variant: any
-    products: Product[]
-    totals: Total[]
+    products: Product[] | undefined
+    totals: Total[] | undefined
     customer: any
 }
 

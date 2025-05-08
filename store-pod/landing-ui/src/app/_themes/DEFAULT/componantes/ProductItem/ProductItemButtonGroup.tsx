@@ -76,13 +76,16 @@ export default function ProductItemButtonGroup({storeContext, product}: {
             >
                 <ShoppingCartIcon className="w-6 h-6"/>
             </button>
-            <Link
-                href={"/product/" + product.description.friendlyUrl}
-                aria-label="Go to Product Page"
-                className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-r from-info to-primary text-neutral hover:shadow-lg hover:shadow-info/50 transition-transform duration-300 hover:scale-110"
-            >
-                <ArrowTopRightOnSquareIcon className="w-6 h-6"/>
-            </Link>
+            {
+                product.description &&
+                <Link
+                    href={"/product/" + product.description.friendlyUrl}
+                    aria-label="Go to Product Page"
+                    className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-r from-info to-primary text-neutral hover:shadow-lg hover:shadow-info/50 transition-transform duration-300 hover:scale-110"
+                >
+                    <ArrowTopRightOnSquareIcon className="w-6 h-6"/>
+                </Link>
+            }
         </div>
     </>;
 }

@@ -4,7 +4,7 @@ export interface Store {
     id: number
     code: string
     name: string
-    theme: Theme
+    theme: Theme | undefined
     defaultLanguage: string
     currency: string
     inBusinessSince: string
@@ -17,15 +17,15 @@ export interface Store {
     dimension: string
     weight: string
     currentUserLanguage: any
-    address: Address
-    logo: ImageFile
-    banner: ImageFile
+    address: Address | undefined
+    logo: ImageFile | undefined
+    banner: ImageFile | undefined
     parent: any
-    supportedLanguages: SupportedLanguage[]
+    supportedLanguages: SupportedLanguage[] | undefined
     readableAudit: ReadableAudit
-    colorTheme: ColorTheme
-    sliderImages: SliderImage[]
-    socialLinks: SocialLink[]
+    colorTheme: ColorTheme | undefined
+    sliderImages: SliderImage[] | undefined
+    socialLinks: SocialLink[] | undefined
 }
 
 export interface Address {
