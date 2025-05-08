@@ -74,7 +74,6 @@ public class InternalStoreServiceImpl implements InternalStoreService {
         if (identityInfo.isAnyStoreAdmin()) {
             entity.setId(new ManagerStoreId(identityInfo.store()));
         }
-        entity.setProvisioningState(ProvisioningState.SUCCESSFULLY_PROVISIONING);
         Page<ManagerStoreEntity> all = storeRepository.findAll(Example.of(entity), pageable);
         return new PageImpl<>(all.stream().map(storeMappers::toDto).toList(), all.getPageable(), all.getTotalElements());
     }
@@ -83,7 +82,6 @@ public class InternalStoreServiceImpl implements InternalStoreService {
     public Page<ManagerStoreDto> findAll(ManagerOrgId id, Pageable pageable) {
         ManagerStoreEntity entity = new ManagerStoreEntity();
         entity.setOrgId(new ManagerOrgId(id.id()));
-        entity.setProvisioningState(ProvisioningState.SUCCESSFULLY_PROVISIONING);
         Page<ManagerStoreEntity> all = storeRepository.findAll(Example.of(entity), pageable);
         return new PageImpl<>(all.stream().map(storeMappers::toDto).toList(), all.getPageable(), all.getTotalElements());
     }
