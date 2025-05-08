@@ -98,7 +98,7 @@ public class ProductTypeApi {
     public Entity create(@RequestBody PersistableProductType type, @Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
                          @Parameter(hidden = true) LanguageCode language) {
 
-        Long id = productTypeFacade.save(type, merchantStore, language);
+        Long id = productTypeFacade.save(type, merchantStore, LanguageCode.allLanguage());
         Entity entity = new Entity();
         entity.setId(id);
         return entity;

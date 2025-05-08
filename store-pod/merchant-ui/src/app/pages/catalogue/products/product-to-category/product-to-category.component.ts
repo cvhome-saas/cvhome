@@ -4,9 +4,10 @@ import {ActivatedRoute} from '@angular/router';
 import {CategoryService} from '../../categories/services/category.service';
 import {ProductService} from '../services/product.service';
 import {TranslateService} from '@ngx-translate/core';
-import {forkJoin} from 'rxjs';
+import {forkJoin, zip} from 'rxjs';
 import {NbToastrService} from "@nebular/theme";
 import {ErrorService} from "../../../../shared/services/error.service";
+import {SelectedStoreService} from "../../../../shared/services/selected-store.service";
 
 @Component({
   selector: 'ngx-product-to-category',
@@ -19,7 +20,6 @@ export class ProductToCategoryComponent implements OnInit, AfterViewInit {
   loading: boolean = false;
   uniqueCode: string;
   perPage: number = 50;//ideally display all category
-  currentPage: number = 1;
 
   categories: any[] = [];
   selectedItems: string[] = [];
@@ -32,7 +32,9 @@ export class ProductToCategoryComponent implements OnInit, AfterViewInit {
     private errorService: ErrorService,
     private productService: ProductService,
     private toastr: NbToastrService,
-    private activatedRoute: ActivatedRoute) {
+    private activatedRoute: ActivatedRoute,
+    private selectedStoreService:SelectedStoreService
+    ) {
     this.params = this.loadParams();
 
   }
@@ -46,14 +48,13 @@ export class ProductToCategoryComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit() {
-    this.activatedRoute.parent.params.subscribe(it => {
-      const split: string[] = it['code'].split("-");
-      this.params.store = split[0];
-      if (split.length == 2 && split[1] != "") {
-        this.uniqueCode = split[1];
+    zip([this.selectedStoreService.current(), this.activatedRoute.parent.params]).subscribe({
+      next: (([selectedStore, params]) => {
+        this.params.store = selectedStore
+        this.uniqueCode = params['code'];
         this.load();
-      }
-    });
+      })
+    })
   }
 
   change($event: string[]) {

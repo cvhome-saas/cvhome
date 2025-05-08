@@ -14,7 +14,7 @@ public class Entity implements Serializable {
      */
     @Serial private static final long serialVersionUID = 1L;
 
-    private Long id = 0L;
+    private Long id;
 
     public Entity() {}
 

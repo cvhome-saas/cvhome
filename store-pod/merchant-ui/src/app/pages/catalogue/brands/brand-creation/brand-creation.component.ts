@@ -1,9 +1,9 @@
 import {Component, OnInit} from '@angular/core';
-import {ActivatedRoute} from "@angular/router";
+import {SelectedStoreService} from "../../../../shared/services/selected-store.service";
 
 @Component({
   selector: 'ngx-brand-creation',
-  standalone:false,
+  standalone: false,
   templateUrl: './brand-creation.component.html',
   styleUrls: ['./brand-creation.component.scss']
 })
@@ -11,16 +11,15 @@ export class BrandCreationComponent implements OnInit {
   brand = {};
   store: string;
 
-  constructor(private activatedRoute: ActivatedRoute) {
+  constructor(private selectedStoreService: SelectedStoreService) {
 
   }
 
 
   ngOnInit() {
-    this.activatedRoute.params.subscribe(it => {
-      let split: string[] = it["id"].split("-");
-      this.store = split[0];
-    });
+    this.selectedStoreService.current().subscribe(it => {
+      this.store = it;
+    })
   }
 
 }

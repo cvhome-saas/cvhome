@@ -10,10 +10,12 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {AsYouType} from 'libphonenumber-js';
 import {ErrorService} from "../../../shared/services/error.service";
 import {StoreService} from "../../store-management/services/store.service";
+import {SelectedStoreService} from "../../../shared/services/selected-store.service";
+import {zip} from "rxjs";
 
 @Component({
   selector: 'ngx-order-details',
-  standalone:false,
+  standalone: false,
   templateUrl: './order-details.component.html',
   styleUrls: ['./order-details.component.scss']
 })
@@ -83,7 +85,7 @@ export class OrderDetailsComponent implements OnInit {
 
   constructor(private ordersService: OrdersService, private storeService: StoreService, private toastr: NbToastrService,
               private errorService: ErrorService, private dialogService: NbDialogService, private router: Router,
-              private activatedRoute: ActivatedRoute) {
+              private activatedRoute: ActivatedRoute, private selectedStoreService: SelectedStoreService) {
 
   }
 
@@ -115,16 +117,25 @@ export class OrderDetailsComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.activatedRoute.params.subscribe(it => {
-      const ids: string[] = it["id"].split("-");
-      this.storeID = ids[0];
-      this.orderID = ids[1];
-      this.getStore();
-      this.getCountry();
-      this.getOrderDetails();
-      this.getHistory();
-      this.getNextTransaction();
-    })
+
+    zip([this.selectedStoreService.current(), this.activatedRoute.params])
+      .subscribe({
+        next: ([selectedStore, params]) => {
+          this.storeID = selectedStore;
+          this.orderID = params.code
+          this.getStore();
+          this.getCountry();
+          this.getOrderDetails();
+          this.getHistory();
+          this.getNextTransaction();
+        },
+        error: (err) => {
+          this.loader = false;
+        },
+        complete: () => {
+          this.loader = false;
+        }
+      });
   }
 
   getNextTransaction() {

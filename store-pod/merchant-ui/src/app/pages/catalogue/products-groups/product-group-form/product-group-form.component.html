@@ -66,7 +66,7 @@
       <div class="form-group row mb-3">
         <label class="col-sm-4 col-form-label" for="product-autocomplete">{{ 'PRODUCT_GROUP.SEARCH_PRODUCT' | translate }}</label>
         <div class="col-sm-6">
-          <ngx-product-auto-complete (onProduct)="onItemSelect($event,uniqueCode)" [disabled]="uniqueCode==undefined"
+          <ngx-product-auto-complete *ngIf="params.store" (onProduct)="onItemSelect($event,uniqueCode)" [disabled]="uniqueCode==undefined"
                                      [store]="params.store"/>
 
           <p class="caption text-muted" *ngIf="!isCodeUnique || !code.valid">

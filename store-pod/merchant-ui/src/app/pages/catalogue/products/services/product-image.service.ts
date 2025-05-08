@@ -23,14 +23,7 @@ export class ProductImageService {
   }
 
   getImages(store, productId): Observable<any> {
-    return this.crudService.get(`/store-pod-gateway/catalog/api/v1/product/${productId}/images?store=${store}`)
-      .pipe(map(it => {
-        it.forEach(x=>{
-          x.imageUrl="http://localhost:9000/d0dd4299-963a-4458-b31f-8efe31c35e8e/products/65f023632bc46470c104b76f/iphone/SMALL/pm1.jpg"
-        })
-        return it;
-      }))
-      ;
+    return this.crudService.get(`/store-pod-gateway/catalog/api/v1/product/${productId}/images?store=${store}`);
   }
 
   removeImage(productId, imageId): Observable<any> {

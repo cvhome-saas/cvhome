@@ -3,6 +3,9 @@ import {ActivatedRoute} from '@angular/router';
 
 import {CategoryService} from '../services/category.service';
 import {ErrorService} from "../../../../shared/services/error.service";
+import {SelectedStoreService} from "../../../../shared/services/selected-store.service";
+import {mergeMap, zip} from "rxjs";
+import {map} from "rxjs/operators";
 
 @Component({
   selector: 'ngx-category-detail',
@@ -18,25 +21,30 @@ export class CategoryDetailComponent implements OnInit {
   constructor(
     private categoryService: CategoryService,
     private activatedRoute: ActivatedRoute,
-    private errorService: ErrorService
+    private errorService: ErrorService,
+    private selectedStoreService: SelectedStoreService
   ) {
   }
 
   ngOnInit() {
     this.loadingInfo = true;
-    this.activatedRoute.params.subscribe(it => {
-      let split: string[] = it["id"].split("-");
-      let store = split[0];
-      let id = split[1];
-      this.categoryService.getCategoryById(id, store)
-        .subscribe(res => {
-          this.category = res;
+    zip([this.selectedStoreService.current(), this.activatedRoute.params])
+      .pipe(mergeMap(([selectedStore, params]) => {
+        return this.categoryService.getCategoryById(params['id'], selectedStore);
+      }))
+      .subscribe({
+        next: (data) => {
           this.loadingInfo = false;
-        }, err => {
+          this.category = data;
+        },
+        error: (err) => {
           this.loadingInfo = false;
           this.errorService.error('ERROR.SYSTEM_ERROR', err);
-        })
-    });
+        },
+        complete: () => {
+          this.loadingInfo = false;
+        },
+      });
 
   }
 
