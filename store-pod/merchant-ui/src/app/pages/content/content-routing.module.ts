@@ -17,11 +17,11 @@ const routes: Routes = [{
       component: PageComponent,
     },
     {
-      path: 'pages/add/:code',
+      path: 'pages/add',
       component: AddPageComponent,
     },
     {
-      path: 'pages/add',
+      path: 'pages/edit/:code',
       component: AddPageComponent,
     },
     {
@@ -29,22 +29,17 @@ const routes: Routes = [{
       component: BoxesComponent,
     },
     {
-      path: 'boxes/add/:code',
+      path: 'boxes/add',
       component: AddBoxComponent,
     },
     {
-      path: 'boxes/add',
+      path: 'boxes/edit/:code',
       component: AddBoxComponent,
     },
     {
       path: 'files/list',
       component: FilesComponent,
-    },
-    /*   {
-         path: 'promotion',
-         component: PromotionComponent,
-       }
-   */],
+    }],
 }];
 
 @NgModule({

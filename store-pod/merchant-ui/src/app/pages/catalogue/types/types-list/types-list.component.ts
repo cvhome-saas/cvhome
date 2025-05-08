@@ -71,7 +71,7 @@ export class TypesListComponent extends BaseTable<any> implements OnInit {
   }
 
   onEdit(row) {
-    this.router.navigate(['/pages/catalogue/types/type/' + this.params.store + '-' + row.id]);
+    this.router.navigate(['/pages/catalogue/types/type/' + row.id]);
   }
 
 }

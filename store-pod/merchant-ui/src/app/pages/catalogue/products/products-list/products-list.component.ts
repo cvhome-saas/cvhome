@@ -81,7 +81,7 @@ export class ProductsListComponent extends BaseTable<any> implements OnInit {
   }
 
   onEdit(row: any) {
-    this.router.navigate(['pages/catalogue/products/product/' + this.params.store + "-" + row.id]);
+    this.router.navigate(['pages/catalogue/products/product/' + row.id]);
   }
 
   onDelete(row: any) {

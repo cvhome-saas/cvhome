@@ -1,9 +1,9 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {NbMediaBreakpointsService, NbMenuItem, NbMenuService, NbSidebarService} from '@nebular/theme';
 
-import {Subject} from 'rxjs';
+import {filter, map, Subject, takeUntil} from 'rxjs';
 import {TranslateService} from "@ngx-translate/core";
-import {Router} from "@angular/router";
+import {NavigationEnd, Router} from "@angular/router";
 import {AuthService} from "../../../shared/services/auth.service";
 import {StoreService} from "../../../shared/services/store.service";
 import {ErrorService} from "../../../shared/services/error.service";
@@ -14,11 +14,12 @@ import {SelectedLanguageService} from '../../../shared/services/selected-languag
 @Component({
   selector: 'ngx-header',
   standalone: false,
-  styleUrls: ['./header.component.scss'],
   templateUrl: './header.component.html',
+  styleUrls: ['./header.component.scss'],
 })
 export class HeaderComponent implements OnInit, OnDestroy {
 
+  isStoreSelectDisabled: boolean = false;
   userPictureOnly: boolean = false;
   user: any;
   languages: string[];
@@ -52,6 +53,14 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.checkStoreSelectDisabledState(this.router.url);
+    this.router.events.pipe(
+      filter((event) => event instanceof NavigationEnd),
+      map(it => (<NavigationEnd>it)),
+      takeUntil(this.destroy$)
+    ).subscribe((event: NavigationEnd) => {
+      this.checkStoreSelectDisabledState(event.urlAfterRedirects || event.url);
+    });
     this.selectedStoreService.current().subscribe(it => {
       this.selectedStoreId = it;
     });
@@ -71,6 +80,15 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
 
     const {xl} = this.breakpointService.getBreakpointsMap();
+  }
+
+  private checkStoreSelectDisabledState(currentUrl: string): void {
+    const disablePatterns = [
+      '/pages/store-management',
+      '/pages/subscription-and-usage',
+      '/pages/org-management'
+    ];
+    this.isStoreSelectDisabled = disablePatterns.some(pattern => currentUrl.startsWith(pattern));
   }
 
   ngOnDestroy() {

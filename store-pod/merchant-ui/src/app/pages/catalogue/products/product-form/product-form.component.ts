@@ -10,9 +10,9 @@ import {ProductService} from '../services/product.service';
 import {TranslateService} from '@ngx-translate/core';
 import {validators} from '../../../../shared/validation/validators';
 import {slugify} from '../../../../shared/utils/slugifying';
-import {forkJoin} from 'rxjs';
-import {ImageBrowserComponent} from "../../../../shared/components/image-browser/image-browser.component";
+import {forkJoin, zip} from 'rxjs';
 import {ErrorService} from "../../../../shared/services/error.service";
+import {SelectedStoreService} from "../../../../shared/services/selected-store.service";
 
 declare var $: any;
 
@@ -39,7 +39,7 @@ export class ProductFormComponent implements OnInit {
   currentLanguage: string;
 
 
-  tabs: NbRouteTab[] ;
+  tabs: NbRouteTab[];
 
   isCodeUnique = true;
 
@@ -54,6 +54,7 @@ export class ProductFormComponent implements OnInit {
     private translate: TranslateService,
     private dialogService: NbDialogService,
     private activatedRoute: ActivatedRoute,
+    private selectedStoreService: SelectedStoreService
   ) {
     this.defaultLanguage = this.translate.defaultLang
     this.currentLanguage = this.translate.currentLang
@@ -110,17 +111,13 @@ export class ProductFormComponent implements OnInit {
   }
 
   ngOnInit() {
-
-
-    this.activatedRoute.params.subscribe(it => {
-      const split: string[] = it['code'].split("-");
-      this.store = split[0];
-      if (split.length == 2 && split[1] != "") {
-        this.action = 'edit';
-        this.uniqueCode = split[1];
-      }
-      this.loadssss();
-    });
+    zip([this.selectedStoreService.current(), this.activatedRoute.params]).subscribe({
+      next: (([selectedStore, params]) => {
+        this.store = selectedStore
+        this.uniqueCode = params['code'];
+        this.loadProduct();
+      })
+    })
 
 
   }
@@ -147,10 +144,11 @@ export class ProductFormComponent implements OnInit {
     try {
       const cleanedPriceString = this.product.inventory.price.replace(/,/g, '');
       return parseFloat(cleanedPriceString)
-    }catch (e) {
+    } catch (e) {
       return 0;
     }
   }
+
   fillForm() {
     this.form.patchValue({
       sku: this.product.sku,
@@ -168,23 +166,10 @@ export class ProductFormComponent implements OnInit {
         length: this.product.productSpecifications.length
       },
       sortOrder: this.product.sortOrder,
-      // productShipeable: this.product.productShipeable,
-      // placementOrder: [0, [Validators.required]],  // ???
-      // taxClass: [0, [Validators.required]], // ???
       selectedLanguage: this.defaultLanguage,
       descriptions: [],
     });
     this.fillFormArray();
-
-    //this.findInvalidControls();
-
-    // const dimension = {
-    //   weight: this.product.productSpecifications.weight,
-    //   height: this.product.productSpecifications.height,
-    //   width: this.product.productSpecifications.width,
-    //   length: this.product.productSpecifications.length,
-    // };
-    // this.form.patchValue({ productSpecifications: dimension });
   }
 
   fillFormArray() {
@@ -397,7 +382,7 @@ export class ProductFormComponent implements OnInit {
     });
   }
 
-  private loadssss() {
+  private loadProduct() {
     this.loadEvent();
 
     const manufacture = this.manufactureService.getManufacturers(this.store);

@@ -7,6 +7,8 @@ import {NbToastrService} from '@nebular/theme';
 import {ActivatedRoute, Router} from '@angular/router';
 import {ConfigService} from '../../../../shared/services/config.service';
 import {ErrorService} from "../../../../shared/services/error.service";
+import {SelectedStoreService} from "../../../../shared/services/selected-store.service";
+import {zip} from "rxjs";
 
 @Component({
   selector: 'ngx-types',
@@ -43,7 +45,8 @@ export class TypeDetailsComponent implements OnInit {
     private toastr: NbToastrService,
     private typesService: TypesService,
     private activatedRoute: ActivatedRoute,
-    private configService: ConfigService
+    private configService: ConfigService,
+    private selectedStoreService:SelectedStoreService
   ) {
     this.defaultLanguage = this.translate.defaultLang;
   }
@@ -61,16 +64,24 @@ export class TypeDetailsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-
-    this.activatedRoute.params.subscribe(it => {
-      const split: string[] = it['id'].split("-");
-      this.store = split[0];
-      this.getLanguages();
-      if (split.length == 2 && split[1] != "") {
-        this.uniqueCode = split[1];
-        this.fillData()
-      }
-    });
+    zip([this.selectedStoreService.current(), this.activatedRoute.params])
+      .subscribe({
+        next: ([selectedStore, params]) => {
+          this.store = selectedStore;
+          this.uniqueCode = params.id
+          this.getLanguages();
+          if (this.uniqueCode) {
+            this.fillData();
+          }
+        },
+        error: (err) => {
+          this.loader = false;
+        },
+        complete: () => {
+          this.loader = false;
+        }
+      });
+    this.createForm();
 
   }
 
@@ -105,7 +116,6 @@ export class TypeDetailsComponent implements OnInit {
     const config$ = this.configService.getListOfSupportedLanguages(this.store)
       .subscribe((languages) => {
         this.languages = [...languages];
-        this.createForm();
         this.addFormArray();
         this.loader = false;
         this.loaded = true;

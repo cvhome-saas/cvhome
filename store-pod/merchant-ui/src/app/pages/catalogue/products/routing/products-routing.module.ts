@@ -16,21 +16,15 @@ const routes: Routes = [
     component: ProductsComponent,
     children: [
       {
-        path: 'create-product/:code',
-        // canDeactivate: [ExitGuard],
+        path: 'create-product',
         component: ProductCreationComponent,
       },
       {
         path: 'products-list',
         component: ProductsListComponent,
       },
-      // {
-      //   path: 'product-ordering',
-      //   component: ProductOrderingComponent
-      // },
       {
         path: 'product/:code',
-        // canDeactivate: [ExitGuard],
         component: ProductDetailsComponent,
 
         children: [
@@ -40,11 +34,11 @@ const routes: Routes = [
             pathMatch: 'full',
           },
           {
-            path: 'default', //images by default
+            path: 'default',
             component: ProductsImagesComponent,
           },
           {
-            path: 'images', //images by default
+            path: 'images',
             component: ProductsImagesComponent,
           },
           {

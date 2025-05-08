@@ -47,7 +47,7 @@ export class BrandsListComponent extends BaseTable<any> implements OnInit {
 
 
   onEdit(row: any) {
-    this.router.navigate(['pages/catalogue/brands/brand/', this.params.store + '-' + row.id]);
+    this.router.navigate(['pages/catalogue/brands/brand/', row.id]);
   }
 
   onDelete(row: any) {

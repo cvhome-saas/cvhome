@@ -5,6 +5,8 @@ import {TranslateService} from '@ngx-translate/core';
 import {ProductImageService} from '../services/product-image.service';
 import {Location} from '@angular/common';
 import {ErrorService} from "../../../../shared/services/error.service";
+import {zip} from "rxjs";
+import {SelectedStoreService} from "../../../../shared/services/selected-store.service";
 
 @Component({
   selector: 'ngx-products-images',
@@ -35,33 +37,24 @@ export class ProductsImagesComponent implements OnInit, AfterViewInit {
     private productImageService: ProductImageService,
     private location: Location,
     private errorService: ErrorService,
-    private activatedRoute: ActivatedRoute) {
+    private activatedRoute: ActivatedRoute,
+    private selectedStoreService:SelectedStoreService
+    ) {
 
 
   }
 
   ngOnInit() {
-    this.activatedRoute.parent.params.subscribe(it => {
-      const split: string[] = it['code'].split("-");
-      this.store = split[0];
-      if (split.length == 2 && split[1] != "") {
-        this.uniqueCode = split[1];
+    zip([this.selectedStoreService.current(), this.activatedRoute.parent.params]).subscribe({
+      next: (([selectedStore, params]) => {
+        this.store = selectedStore
+        this.uniqueCode = params['code'];
         this.load();
         this.addImageUrl = this.productImageService.addImageUrl(this.store, this.uniqueCode)
         this.removeImageUrl = this.productImageService.removeImageUrl(this.store, this.uniqueCode)
-      }
-    });
+      })
+    })
 
-
-    // this.id = this.productService.getProductIdRoute(this.router, this.location);
-    // this.load();
-    // //specify add image url to image component
-    // this.addImageUrlComponent = this.productImageService.addImageUrl(this.id);
-    // //this only happens when /images, not when default
-    // if (this.location.path().includes('images')) {
-    //   let el = document.getElementById('tabs');
-    //   el.scrollIntoView();
-    // }
   }
 
   load() {

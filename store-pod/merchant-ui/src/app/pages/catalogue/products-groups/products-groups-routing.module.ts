@@ -15,7 +15,7 @@ const routes: Routes = [
         component: ProductGroupFormComponent,
       },
       {
-        path: 'create-products-group/:code',
+        path: 'create-products-group',
         component: ProductGroupFormComponent,
       },
       {

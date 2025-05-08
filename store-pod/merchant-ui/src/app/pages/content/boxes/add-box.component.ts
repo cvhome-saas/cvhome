@@ -1,19 +1,20 @@
 import {Component, OnInit} from '@angular/core';
 import {FormArray, FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {ActivatedRoute, Router} from '@angular/router';
-import {NbDialogService, NbToastrService} from '@nebular/theme';
+import {NbToastrService} from '@nebular/theme';
 import {validators} from '../../../shared/validation/validators';
 import {TranslateService} from '@ngx-translate/core';
 import {ConfigService} from '../../../shared/services/config.service';
-import {ImageBrowserComponent} from "../../../shared/components/image-browser/image-browser.component";
 import {ErrorService} from "../../../shared/services/error.service";
 import {ContentService} from "../services/content.service";
+import {SelectedStoreService} from "../../../shared/services/selected-store.service";
+import {zip} from "rxjs";
 
 declare var $: any;
 
 @Component({
   selector: 'add-box',
-  standalone:false,
+  standalone: false,
   templateUrl: './add-box.component.html',
   styleUrls: ['./add-box.component.scss'],
 })
@@ -40,7 +41,7 @@ export class AddBoxComponent implements OnInit {
     code: '',
     order: '',
   }
-  params :any;
+  params: any;
 
   constructor(
     private fb: FormBuilder,
@@ -50,7 +51,8 @@ export class AddBoxComponent implements OnInit {
     private configService: ConfigService,
     private activatedRoute: ActivatedRoute,
     private translate: TranslateService,
-    private errorService: ErrorService
+    private errorService: ErrorService,
+    private selectedStoreService: SelectedStoreService
   ) {
     this.params = this.param();
     this.defaultLanguage = this.translate.defaultLang
@@ -77,16 +79,24 @@ export class AddBoxComponent implements OnInit {
 
   ngOnInit() {
     this.loader = true;
-    this.activatedRoute.params.subscribe(it => {
-      const split: string[] = it['code'].split("-");
-      this.params.store = split[0];
-      this.getLanguages();
-      if (split.length == 2 && split[1] != "") {
-        this.action = 'edit';
-        this.uniqueCode = split[1];
-        this.loadContent();
-      }
-    });
+    zip([this.selectedStoreService.current(), this.activatedRoute.params])
+      .subscribe({
+        next: ([selectedStore, params]) => {
+          this.params.store = selectedStore;
+          this.uniqueCode = params.code
+          this.getLanguages();
+          if (this.uniqueCode) {
+            this.action = 'edit';
+            this.loadContent();
+          }
+        },
+        error: (err) => {
+          this.loader = false;
+        },
+        complete: () => {
+          this.loader = false;
+        }
+      });
     this.createForm();
   }
 

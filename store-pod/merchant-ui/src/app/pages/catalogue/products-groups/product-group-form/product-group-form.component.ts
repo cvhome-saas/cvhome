@@ -9,6 +9,8 @@ import {ColumnMode} from "@swimlane/ngx-datatable";
 import {Page} from "../../../../shared/models/Page";
 import {NbToastrService} from "@nebular/theme";
 import {ErrorService} from "../../../../shared/services/error.service";
+import {SelectedStoreService} from "../../../../shared/services/selected-store.service";
+import {zip} from "rxjs";
 
 @Component({
   selector: 'ngx-product-group-form',
@@ -37,7 +39,9 @@ export class ProductGroupFormComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private errorService: ErrorService,
     private toastr: NbToastrService,
-    private translate: TranslateService) {
+    private translate: TranslateService,
+    private selectedStoreService:SelectedStoreService
+    ) {
     this.params=this.loadParams();
   }
 
@@ -54,15 +58,19 @@ export class ProductGroupFormComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.activatedRoute.params.subscribe(it => {
-      const split: string[] = it['code'].split("-");
-      this.params.store = split[0];
-      if (split.length == 2 && split[1] != "") {
-        this.action = 'edit';
-        this.uniqueCode = split[1];
-        this.getProductByCode();
-      }
-    });
+
+    zip([this.selectedStoreService.current(), this.activatedRoute.params]).subscribe({
+      next: (([selectedStore, params]) => {
+        this.params.store = selectedStore
+        this.uniqueCode = params['code'];
+        if (this.uniqueCode) {
+          this.action='edit'
+          this.getProductByCode();
+        }
+
+      })
+    })
+
     this.createForm();
   }
 
@@ -83,10 +91,6 @@ export class ProductGroupFormComponent implements OnInit {
   checkCode(event) {
     const code = event.target.value.trim();
     this.uniqueCode = code;
-    // this.productGroupsService.checkGroupCode(code)
-    //   .subscribe(res => {
-    //     this.isCodeUnique = !(res.exists && (this.option.code !== code));
-    //   });
   }
 
   save() {

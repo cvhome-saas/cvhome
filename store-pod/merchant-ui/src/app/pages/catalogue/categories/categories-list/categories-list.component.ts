@@ -48,7 +48,7 @@ export class CategoriesListComponent extends BaseTable<any> implements OnInit {
   }
 
   onEdit(event) {
-    this.router.navigate(['pages/catalogue/categories/category/', this.params.store + "-" + event.id]);
+    this.router.navigate(['pages/catalogue/categories/category/', event.id]);
   }
 
   onDelete(event) {

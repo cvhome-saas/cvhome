@@ -45,7 +45,7 @@ export class GroupsListComponent extends BaseTable<any> implements OnInit {
   }
 
   onEdit(row: any) {
-    this.router.navigate([`/pages/catalogue/products-groups/update-products-group/${this.params.store}-${row.code}`]);
+    this.router.navigate([`/pages/catalogue/products-groups/update-products-group/${row.code}`]);
   }
 
   onDelete(row: any) {
