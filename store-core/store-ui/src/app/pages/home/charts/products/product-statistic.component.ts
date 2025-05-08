@@ -1,13 +1,13 @@
 import {AfterViewInit, Component, EventEmitter, Input, OnDestroy} from '@angular/core';
 import {NbJSThemeVariable, NbThemeService} from '@nebular/theme';
-import {combineLatest, mergeMap, Observable, Subscription} from "rxjs";
+import {combineLatest, mergeMap, Observable, of, Subscription} from "rxjs";
 import {map} from "rxjs/operators";
 import {StatisticList, StatisticService, StatisticsParams} from "../../service/statistic.service";
 import {ErrorService} from '../../../../shared/services/error.service';
 
 @Component({
   selector: 'ngx-products-statistic',
-  standalone:false,
+  standalone: false,
   template: `
     <div echarts [options]="options" class="echart"></div>
   `,
@@ -22,7 +22,13 @@ export class ProductsStatisticComponent implements AfterViewInit, OnDestroy {
   }
 
   getData(p: StatisticsParams): Observable<StatisticList> {
-    return this.statisticService.getProductStatistic(p);
+    if (p.store) {
+      return this.statisticService.getProductStatistic(p);
+    } else {
+      return of({
+        entries: []
+      })
+    }
   }
 
   ngAfterViewInit() {
