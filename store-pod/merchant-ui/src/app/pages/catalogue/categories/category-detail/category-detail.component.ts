@@ -4,12 +4,13 @@ import {ActivatedRoute} from '@angular/router';
 import {CategoryService} from '../services/category.service';
 import {ErrorService} from "../../../../shared/services/error.service";
 import {SelectedStoreService} from "../../../../shared/services/selected-store.service";
-import {mergeMap, zip} from "rxjs";
-import {map} from "rxjs/operators";
+import {mergeMap, of, zip} from "rxjs";
+import {StoreService} from "../../../store-management/services/store.service";
+import {Store} from "../../../store-management/models/store";
 
 @Component({
   selector: 'ngx-category-detail',
-  standalone:false,
+  standalone: false,
   templateUrl: './category-detail.component.html',
   styleUrls: ['./category-detail.component.scss']
 })
@@ -17,12 +18,14 @@ export class CategoryDetailComponent implements OnInit {
   category: any = {};
   loadingInfo = false;
   loading: boolean = false;
+  store: Store
 
   constructor(
     private categoryService: CategoryService,
     private activatedRoute: ActivatedRoute,
     private errorService: ErrorService,
-    private selectedStoreService: SelectedStoreService
+    private selectedStoreService: SelectedStoreService,
+    private storeService: StoreService
   ) {
   }
 
@@ -30,12 +33,13 @@ export class CategoryDetailComponent implements OnInit {
     this.loadingInfo = true;
     zip([this.selectedStoreService.current(), this.activatedRoute.params])
       .pipe(mergeMap(([selectedStore, params]) => {
-        return this.categoryService.getCategoryById(params['id'], selectedStore);
+        return zip(of(selectedStore), of(params), this.storeService.getStore(selectedStore), this.categoryService.getCategoryById(params['id'], selectedStore));
       }))
       .subscribe({
-        next: (data) => {
+        next: ([selectedStore, params, store, category]) => {
+          this.store = store;
           this.loadingInfo = false;
-          this.category = data;
+          this.category = category;
         },
         error: (err) => {
           this.loadingInfo = false;

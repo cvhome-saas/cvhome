@@ -2,6 +2,7 @@ import {Injectable} from '@angular/core';
 
 import {CrudService} from '../../../shared/services/crud.service';
 import {Observable} from 'rxjs';
+import {Store} from "../models/store";
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +14,7 @@ export class StoreService {
   }
 
 
-  getStore(store): Observable<any> {
+  getStore(store): Observable<Store> {
     return this.crudService.get(`/store-pod-gateway/merchant/api/v1/store/${store}?store=${store}`);
   }
 

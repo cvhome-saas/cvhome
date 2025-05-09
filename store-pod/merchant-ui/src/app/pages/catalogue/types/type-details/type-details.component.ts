@@ -8,11 +8,12 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {ConfigService} from '../../../../shared/services/config.service';
 import {ErrorService} from "../../../../shared/services/error.service";
 import {SelectedStoreService} from "../../../../shared/services/selected-store.service";
-import {zip} from "rxjs";
+import {mergeMap, of, zip} from "rxjs";
+import {StoreService} from "../../../store-management/services/store.service";
 
 @Component({
   selector: 'ngx-types',
-  standalone:false,
+  standalone: false,
   templateUrl: './type-details.component.html',
   styleUrls: ['./type-details.component.scss']
 })
@@ -35,7 +36,7 @@ export class TypeDetailsComponent implements OnInit {
     descriptions: []
   }
   store: string;
-  uniqueCode: string;//identifier fromroute
+  uniqueCode: string;
 
   constructor(
     private fb: FormBuilder,
@@ -46,9 +47,9 @@ export class TypeDetailsComponent implements OnInit {
     private typesService: TypesService,
     private activatedRoute: ActivatedRoute,
     private configService: ConfigService,
-    private selectedStoreService:SelectedStoreService
+    private selectedStoreService: SelectedStoreService,
+    private storeService: StoreService
   ) {
-    this.defaultLanguage = this.translate.defaultLang;
   }
 
   get code() {
@@ -64,12 +65,24 @@ export class TypeDetailsComponent implements OnInit {
   }
 
   ngOnInit(): void {
+
     zip([this.selectedStoreService.current(), this.activatedRoute.params])
+      .pipe(mergeMap(([selectedStore, params]) => {
+        return zip(
+          of(selectedStore),
+          of(params),
+          this.storeService.getStore(selectedStore),
+          this.configService.getListOfSupportedLanguages(selectedStore)
+        )
+      }))
+
       .subscribe({
-        next: ([selectedStore, params]) => {
+        next: ([selectedStore, params, store, languages]) => {
           this.store = selectedStore;
           this.uniqueCode = params.id
-          this.getLanguages();
+          this.languages = [...languages];
+          this.addFormArray();
+          this.defaultLanguage = store.defaultLanguage;
           if (this.uniqueCode) {
             this.fillData();
           }
@@ -109,19 +122,6 @@ export class TypeDetailsComponent implements OnInit {
         }
       })
 
-
-  }
-
-  getLanguages() {
-    const config$ = this.configService.getListOfSupportedLanguages(this.store)
-      .subscribe((languages) => {
-        this.languages = [...languages];
-        this.addFormArray();
-        this.loader = false;
-        this.loaded = true;
-      }, err => {
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
-      });
 
   }
 
