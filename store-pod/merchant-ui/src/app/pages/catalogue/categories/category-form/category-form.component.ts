@@ -1,29 +1,28 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {AfterViewInit, Component, Input, OnInit} from '@angular/core';
 import {FormArray, FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {Router} from '@angular/router';
-import {NbDialogService, NbToastrService} from '@nebular/theme';
+import {NbToastrService} from '@nebular/theme';
 import {CategoryService} from '../services/category.service';
 import {ConfigService} from '../../../../shared/services/config.service';
 import {TranslateService} from '@ngx-translate/core';
 import {validators} from '../../../../shared/validation/validators';
 import {slugify} from '../../../../shared/utils/slugifying';
-import {ImageBrowserComponent} from "../../../../shared/components/image-browser/image-browser.component";
 import {ErrorService} from "../../../../shared/services/error.service";
-import {SelectedStoreService} from "../../../../shared/services/selected-store.service";
+import {Store} from "../../../store-management/models/store";
+import {zip} from "rxjs";
 
-declare var $: any;
 
 @Component({
   selector: 'ngx-category-form',
-  standalone:false,
+  standalone: false,
   templateUrl: './category-form.component.html',
   styleUrls: ['./category-form.component.scss']
 })
-export class CategoryFormComponent implements OnInit {
+export class CategoryFormComponent implements AfterViewInit, OnInit {
   @Input() category: any;
+  @Input() store: Store;
   form: FormGroup;
   roots = [];
-  perPage = 100;
   languages = [];
   defaultLanguage: string;
 
@@ -34,20 +33,20 @@ export class CategoryFormComponent implements OnInit {
   //category code must be unique
   isCodeUnique = true;
 
-  params :any;
-
   constructor(
     private fb: FormBuilder,
     private categoryService: CategoryService,
     private configService: ConfigService,
     private errorService: ErrorService,
-    private selectedStoreService:SelectedStoreService,
     private router: Router,
     private toastr: NbToastrService,
     private translate: TranslateService,
   ) {
-    this.defaultLanguage = this.translate.defaultLang;
-    this.params=this.loadParams();
+
+  }
+
+  ngOnInit(): void {
+    this.createForm();
   }
 
   get code() {
@@ -70,65 +69,47 @@ export class CategoryFormComponent implements OnInit {
     return <FormArray>this.form.get('names');
   }
 
-  loadParams() {
-    return {
-      store: "",
-      count: this.perPage,
-      page: 0
+  ngAfterViewInit(): void {
+    const params = {
+      store: this.store.id
     };
-  }
+    this.defaultLanguage = this.store.defaultLanguage
+    zip([this.categoryService.getListOfCategories(params), this.configService.getListOfSupportedLanguages(this.store.id)])
+      .subscribe({
+        next: ([categories, languages]) => {
+          this.loader = false;
 
-  ngOnInit() {
-    this.loader = true;
-    this.selectedStoreService.current().subscribe({
-      next: (it) => {
-        this.params.store = it;
-      },
-      error: err => {
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
-      },
-      complete: () => {
-        this.init();
-      }
-    })
+          categories.content.push({id: 0, code: 'root', children: []});
+          categories.content.forEach((el) => {
+            this.getChildren(el);
+          });
+          this.roots.sort((a, b) => {
+            if (a.code < b.code)
+              return -1;
+            if (a.code > b.code)
+              return 1;
+            return 0;
+          });
 
-  }
+          this.languages = [...languages];
+          this.addFormArray();
+          this.fillEmptyForm();
+          if (this.category.id) {
+            this.fillForm();
+          }
 
-  init() {
-    this.categoryService.getListOfCategories(this.params)
-      .subscribe(res => {
-        res.content.push({id: 0, code: 'root', children: []});
-        res.content.forEach((el) => {
-          this.getChildren(el);
-        });
-        this.roots.sort((a, b) => {
-          if (a.code < b.code)
-            return -1;
-          if (a.code > b.code)
-            return 1;
-          return 0;
-        });
-        //this.roots = [...res.categories];
-        //console.log(JSON.stringify(this.roots));
-      }, err => {
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
-      });
+        },
+        error: (err) => {
+          this.loader = false;
+          this.errorService.error('ERROR.SYSTEM_ERROR', err);
 
-    //determines how many languages should be supported
-    this.configService.getListOfSupportedLanguages(this.params.store)
-      .subscribe(res => {
-        this.languages = [...res];
-        this.createForm();
-        this.addFormArray();
-        this.fillEmptyForm();
-        if (this.category.id) {
-          this.fillForm();
+        },
+        complete: () => {
+          this.loader = false;
+
         }
-        this.loader = false;
-      }, err => {
-        this.loader = false;
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
-      });
+      })
+
   }
 
   getChildren(node) {
@@ -162,7 +143,7 @@ export class CategoryFormComponent implements OnInit {
 
   fillEmptyForm() {
     this.form.patchValue({
-      store: this.params.store,
+      store: this.store.id,
       sortOrder: 0,
       selectedLanguage: this.defaultLanguage,
       descriptions: [],
@@ -220,7 +201,7 @@ export class CategoryFormComponent implements OnInit {
 
   checkCode(event) {
     const code = event.target.value;
-    this.categoryService.checkCategoryCode(code, this.params.store)
+    this.categoryService.checkCategoryCode(code, this.store.id)
       .subscribe(res => {
         this.isCodeUnique = !(res.exists && (this.category.code !== code));
       }, err => {
@@ -294,7 +275,7 @@ export class CategoryFormComponent implements OnInit {
         return;
       }
       if (this.category.id) {
-        this.categoryService.updateCategory(this.category.id, categoryObject, this.params.store)
+        this.categoryService.updateCategory(this.category.id, categoryObject, this.store.id)
           .subscribe(result => {
             this.loading = false;
             this.toastr.success(this.translate.instant('CATEGORY_FORM.CATEGORY_UPDATED'));
@@ -302,7 +283,7 @@ export class CategoryFormComponent implements OnInit {
             this.errorService.error('ERROR.SYSTEM_ERROR', err);
           });
       } else {
-        this.categoryService.addCategory(categoryObject, this.params.store)
+        this.categoryService.addCategory(categoryObject, this.store.id)
           .subscribe(result => {
             this.loading = false;
             this.toastr.success(this.translate.instant('CATEGORY_FORM.CATEGORY_CREATED'));
@@ -339,7 +320,7 @@ export class CategoryFormComponent implements OnInit {
   private createForm() {
     this.form = this.fb.group({
       parent: ['root', [Validators.required]],
-      store: [this.params.store],
+      store: [this.store.id],
       visible: [false],
       code: ['', [Validators.required, Validators.pattern(validators.alphanumericwithhyphen)]],
       sortOrder: [0, [Validators.required, Validators.pattern(validators.number)]],

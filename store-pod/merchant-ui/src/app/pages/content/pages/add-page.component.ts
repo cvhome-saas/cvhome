@@ -10,9 +10,8 @@ import {TranslateService} from '@ngx-translate/core';
 import {ErrorService} from "../../../shared/services/error.service";
 import {ContentService} from "../services/content.service";
 import {SelectedStoreService} from "../../../shared/services/selected-store.service";
-import {zip} from "rxjs";
-
-declare var $: any;
+import {mergeMap, of, zip} from "rxjs";
+import {StoreService} from "../../store-management/services/store.service";
 
 @Component({
   selector: 'add-page',
@@ -36,6 +35,7 @@ export class AddPageComponent implements OnInit {
   isCodeExists = false;
 
   params: any;
+
   constructor(
     private contentService: ContentService,
     public router: Router,
@@ -45,11 +45,10 @@ export class AddPageComponent implements OnInit {
     private fb: FormBuilder,
     private translate: TranslateService,
     private errorService: ErrorService,
-    private selectedStoreService: SelectedStoreService
+    private selectedStoreService: SelectedStoreService,
+    private storeService: StoreService
   ) {
     this.params = this.param();
-    this.defaultLanguage = this.translate.defaultLang;
-    this.currentLanguage = this.translate.currentLang;
   }
 
   get code() {
@@ -73,11 +72,22 @@ export class AddPageComponent implements OnInit {
   ngOnInit() {
     this.loader = true;
     zip([this.selectedStoreService.current(), this.activatedRoute.params])
+      .pipe(mergeMap(([selectedStore, params]) => {
+        return zip(
+          of(selectedStore),
+          of(params),
+          this.storeService.getStore(selectedStore),
+          this.configService.getListOfSupportedLanguages(selectedStore)
+        )
+      }))
       .subscribe({
-        next: ([selectedStore, params]) => {
+        next: ([selectedStore, params, store, languages]) => {
           this.params.store = selectedStore;
           this.uniqueCode = params.code
-          this.getLanguages();
+          this.languages = [...languages];
+          this.addFormArray();
+          this.defaultLanguage = store.defaultLanguage;
+          this.currentLanguage = store.defaultLanguage;
           if (this.uniqueCode) {
             this.action = 'edit';
             this.getPage();
@@ -210,21 +220,6 @@ export class AddPageComponent implements OnInit {
 
   goToBack() {
     this.router.navigate(['/pages/content/pages/list']);
-  }
-
-  private getLanguages() {
-    this.configService.getListOfSupportedLanguages(this.params.store)
-      .subscribe({
-        next: (languages) => {
-          this.languages = [...languages];
-          this.addFormArray();
-          this.loader = false;
-        },
-        error: (err) => {
-          this.errorService.error('ERROR.SYSTEM_ERROR', err);
-          this.loader = false;
-        },
-      });
   }
 
   private getPage() {

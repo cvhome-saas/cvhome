@@ -8,9 +8,8 @@ import {ConfigService} from '../../../shared/services/config.service';
 import {ErrorService} from "../../../shared/services/error.service";
 import {ContentService} from "../services/content.service";
 import {SelectedStoreService} from "../../../shared/services/selected-store.service";
-import {zip} from "rxjs";
-
-declare var $: any;
+import {mergeMap, of, zip} from "rxjs";
+import {StoreService} from "../../store-management/services/store.service";
 
 @Component({
   selector: 'add-box',
@@ -22,25 +21,14 @@ export class AddBoxComponent implements OnInit {
   loader = false;
   form: FormGroup;
   content: any;
-
   languages = [];
-
-  uniqueCode: string;//identifier fromroute
+  uniqueCode: string;
   isCodeExists = false;
   action: any = 'save'
 
-  //default selected lang
   defaultLanguage: string;
-  //changed from seo section
   currentLanguage: string;
-  uploadData = new FormData();
   description: Array<any> = []
-  page = {
-    visible: false,
-    mainmenu: false,
-    code: '',
-    order: '',
-  }
   params: any;
 
   constructor(
@@ -52,11 +40,10 @@ export class AddBoxComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private translate: TranslateService,
     private errorService: ErrorService,
-    private selectedStoreService: SelectedStoreService
+    private selectedStoreService: SelectedStoreService,
+    private storeService: StoreService
   ) {
     this.params = this.param();
-    this.defaultLanguage = this.translate.defaultLang
-    this.currentLanguage = this.translate.currentLang
   }
 
   get code() {
@@ -80,11 +67,22 @@ export class AddBoxComponent implements OnInit {
   ngOnInit() {
     this.loader = true;
     zip([this.selectedStoreService.current(), this.activatedRoute.params])
+      .pipe(mergeMap(([selectedStore, params]) => {
+        return zip(
+          of(selectedStore),
+          of(params),
+          this.storeService.getStore(selectedStore),
+          this.configService.getListOfSupportedLanguages(selectedStore)
+        )
+      }))
       .subscribe({
-        next: ([selectedStore, params]) => {
+        next: ([selectedStore, params, store, languages]) => {
           this.params.store = selectedStore;
           this.uniqueCode = params.code
-          this.getLanguages();
+          this.languages = [...languages];
+          this.addFormArray();
+          this.defaultLanguage = store.defaultLanguage;
+          this.currentLanguage = store.defaultLanguage;
           if (this.uniqueCode) {
             this.action = 'edit';
             this.loadContent();
@@ -92,6 +90,7 @@ export class AddBoxComponent implements OnInit {
         },
         error: (err) => {
           this.loader = false;
+          this.errorService.error('ERROR.SYSTEM_ERROR', err);
         },
         complete: () => {
           this.loader = false;
@@ -120,22 +119,6 @@ export class AddBoxComponent implements OnInit {
 
   goToBack() {
     this.router.navigate(['/pages/content/boxes/list']);
-  }
-
-  private getLanguages() {
-    this.configService.getListOfSupportedLanguages(this.params.store)
-      .subscribe({
-        next: (languages) => {
-          this.languages = [...languages];
-          this.addFormArray();
-          this.loader = false;
-        },
-        error: (err) => {
-          this.toastr.danger(err.error.message);
-          this.loader = false;
-          this.errorService.error('ERROR.SYSTEM_ERROR', err);
-        },
-      });
   }
 
   private loadContent() {
