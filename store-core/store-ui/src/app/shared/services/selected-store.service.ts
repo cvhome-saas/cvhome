@@ -2,7 +2,6 @@ import {Injectable} from '@angular/core';
 import {StoreService} from './store.service';
 import {Store} from '../models/commons';
 import {map, Observable, of, tap} from 'rxjs';
-import {CookieService} from "ngx-cookie-service";
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +10,7 @@ export class SelectedStoreService {
   public static STORE_ID_KEY = "Store-Id";
   private _stores: Store[] | undefined = undefined;
 
-  constructor(private storeService: StoreService, private cookieService: CookieService) {
+  constructor(private storeService: StoreService) {
   }
 
   public select(storeId: string): void {
