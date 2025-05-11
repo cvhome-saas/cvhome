@@ -14,6 +14,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcReactiveOAuth2UserService;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
+import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
 import org.springframework.security.oauth2.client.userinfo.ReactiveOAuth2UserService;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
@@ -39,6 +40,9 @@ import static org.springframework.security.web.server.util.matcher.ServerWebExch
 @Configuration
 @EnableWebFluxSecurity
 public class SecurityConfig {
+    private final RedirectingServerAuthenticationSuccessHandler redirectingServerAuthenticationSuccessHandler = new RedirectingServerAuthenticationSuccessHandler();
+
+
     private static Mono<ServerWebExchangeMatcher.MatchResult> matches(ServerWebExchange exchange) {
         ServerHttpRequest request = exchange.getRequest();
         // @formatter:off
@@ -63,12 +67,21 @@ public class SecurityConfig {
     }
 
     @Bean
-    SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http, CookieServerCsrfTokenRepository tokenRepository) {
-        // @formatter:off
+    public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http,
+                                                            ReactiveClientRegistrationRepository clientRegistrationRepository) {
+        // Instantiate your custom resolver
+        CapturingServerOAuth2AuthorizationRequestResolver customAuthorizationRequestResolver =
+                new CapturingServerOAuth2AuthorizationRequestResolver(clientRegistrationRepository);
+
         return http.authorizeExchange(it ->
                         it.anyExchange().permitAll()
                 )
-                .oauth2Login(withDefaults())
+                .oauth2Login(oauth2 -> oauth2
+                                // Use the custom resolver here
+                                .authorizationRequestResolver(customAuthorizationRequestResolver)
+                                .authenticationSuccessHandler(this.redirectingServerAuthenticationSuccessHandler)
+                        // You can also customize authenticationSuccessHandler or authenticationFailureHandler if needed
+                )
                 .oauth2Client(withDefaults())
                 .logout(ServerHttpSecurity.LogoutSpec::disable)
                 .csrf(ServerHttpSecurity.CsrfSpec::disable
