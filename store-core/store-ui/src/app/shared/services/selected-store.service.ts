@@ -15,12 +15,12 @@ export class SelectedStoreService {
   }
 
   public select(storeId: string): void {
-    this.cookieService.set(SelectedStoreService.STORE_ID_KEY, storeId);
+    localStorage.setItem(SelectedStoreService.STORE_ID_KEY, storeId);
   }
 
   current(): Observable<string> {
     return this.getAllStores().pipe(map(it => {
-      let current = this.cookieService.get(SelectedStoreService.STORE_ID_KEY);
+      let current = localStorage.getItem(SelectedStoreService.STORE_ID_KEY);
       if (current && current != '') {
         if (it.filter(s => s.id.id == current).length > 0) {
           return current;

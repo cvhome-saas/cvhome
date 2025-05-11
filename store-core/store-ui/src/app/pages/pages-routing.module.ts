@@ -5,13 +5,13 @@ import {PagesComponent} from './pages.component';
 import {canAccessSecuredPages} from "../shared/services/auth-guard.service";
 import {NotFoundComponent} from "./not-found/not-found.component";
 import {loadRemoteModule} from '@angular-architects/module-federation';
+import {SelectedStoreService} from "../shared/services/selected-store.service";
 
 interface RemoteRoute {
   path: string;
   module: string;
 }
 
-let remoteEntry = "/store-pod-gateway/merchant-ui/remoteEntry.js";
 const remoteRoutes: RemoteRoute[] = [
   {path: 'orders', module: "OrdersModule"},
   {path: 'catalogue', module: "CatalogueModule"},
@@ -49,13 +49,17 @@ const routes: Routes = [{
     ...remoteRoutes.map(it => {
       return {
         path: it.path,
-        loadChildren: () => loadRemoteModule({
-          remoteEntry: remoteEntry,
-          type: 'module',
-          exposedModule: `./${it.module}`
-        })
-          .then((m) => m[it.module])
-          .catch(handleRemoteModuleFailure),
+        loadChildren: () => {
+          let store = localStorage.getItem(SelectedStoreService.STORE_ID_KEY);
+          let url = `/store-pod-gateway-v2/${store}/merchant-ui/remoteEntry.js`;
+          return loadRemoteModule({
+            remoteEntry: url,
+            type: 'module',
+            exposedModule: `./${it.module}`
+          })
+            .then((m) => m[it.module])
+            .catch(handleRemoteModuleFailure);
+        },
       }
     }),
     {

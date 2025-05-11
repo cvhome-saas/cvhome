@@ -11,7 +11,6 @@ import org.springframework.cloud.gateway.handler.AsyncPredicate;
 import org.springframework.cloud.gateway.route.Route;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
-import org.springframework.http.HttpCookie;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
@@ -30,12 +29,11 @@ public class GatewayRouteLocatorImpl implements RouteLocator {
     private final FNotServiceRoutePredicateFactory notServicePredicate;
     private final FHostRoutePredicateFactory hostRoutePredicate;
     private final CachedRouterService router;
-    private final String STORE_ID_KEY = "Store-Id";
 
     @Override
     public Flux<Route> getRoutes() {
         String storeCoreGatewayDomain = serviceDomainProperties.getService("store-core-gateway").domain();
-        Set<String> backendServices = Set.of("manager", "subscription", "auth", "store-pod-gateway", "merchant-ui");
+        Set<String> backendServices = Set.of("manager", "subscription", "auth", "store-pod-gateway", "store-pod-gateway-v2", "merchant-ui");
         Predicate<ServerWebExchange> notBackendService = notServicePredicate.apply(new FNotServiceRoutePredicateFactory.Config(backendServices));
         Predicate<ServerWebExchange> storeUiHostPredicate = hostRoutePredicate.apply(new FHostRoutePredicateFactory.Config(Set.of("store-ui." + storeCoreGatewayDomain)));
         Predicate<ServerWebExchange> wwwHostPredicate = hostRoutePredicate.apply(new FHostRoutePredicateFactory.Config(Set.of(storeCoreGatewayDomain, "www." + storeCoreGatewayDomain)));
@@ -80,23 +78,36 @@ public class GatewayRouteLocatorImpl implements RouteLocator {
     }
 
     private void addPodServiceExactMatchPod(Pod pod, RouteLocatorBuilder.Builder route, String serviceName) {
-        route.route("store-" + serviceName + pod.id().id(),
+        route.route("store-" + serviceName + "-v1-" + pod.id().id(),
                 r -> {
                     return r.path("/" + serviceName + "/**")
-                            .and().cookie(this.STORE_ID_KEY, ".*")
-                            .and().asyncPredicate(checkStoreMatchPod(pod))
+                            .and().asyncPredicate(checkStoreMatchPodFromParam(pod))
                             .filters(f -> f.stripPrefix(1).tokenRelay().preserveHostHeader())
+                            .uri("lb://" + serviceName + "." + pod.endpoint().endpoint());
+                });
+        route.route("store-" + serviceName + "-v2-" + pod.id().id(),
+                r -> {
+                    return r.path("/" + serviceName + "-v2/**")
+                            .and().asyncPredicate(checkStoreMatchPodFromUrl(pod))
+                            .filters(f -> f.stripPrefix(2).tokenRelay().preserveHostHeader())
                             .uri("lb://" + serviceName + "." + pod.endpoint().endpoint());
                 });
     }
 
-    private AsyncPredicate<ServerWebExchange> checkStoreMatchPod(Pod pod) {
+    private AsyncPredicate<ServerWebExchange> checkStoreMatchPodFromParam(Pod pod) {
         return serverWebExchange -> {
-            ManagerStoreId store = Optional.ofNullable(serverWebExchange.getRequest().getCookies().getFirst(STORE_ID_KEY))
-                    .map(HttpCookie::getValue)
+            ManagerStoreId store = Optional.ofNullable(serverWebExchange.getRequest().getQueryParams().getFirst("store"))
                     .map(ManagerStoreId::new)
                     .orElse(null);
+            return isStoreInPod(store, pod);
+        };
+    }
 
+    private AsyncPredicate<ServerWebExchange> checkStoreMatchPodFromUrl(Pod pod) {
+        return serverWebExchange -> {
+            ManagerStoreId store = Optional.ofNullable(serverWebExchange.getRequest().getURI().getPath())
+                    .map(url -> new ManagerStoreId(url.split("/")[2]))
+                    .orElse(null);
             return isStoreInPod(store, pod);
         };
     }
