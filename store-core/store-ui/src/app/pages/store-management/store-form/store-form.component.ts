@@ -21,7 +21,7 @@ export class StoreFormComponent implements OnInit {
   @Input() store: any;
   @Input() isCancel: string;
 
-  supportedLanguages = [];
+  supportedLanguagesList = [];
   supportedLanguagesSelected = [];
   supportedCurrency = [];
   supportedTheme = [];
@@ -34,6 +34,7 @@ export class StoreFormComponent implements OnInit {
   isReadonlyName = false;
   isNameUnique = true;
   selectedItem = '5';
+  submitted=false;
   sidemenuLinks = [
     {
       id: '0',
@@ -128,6 +129,26 @@ export class StoreFormComponent implements OnInit {
     return this.form.get('inBusinessSince');
   }
 
+  get supportedLanguages() {
+    return this.form.get('supportedLanguages');
+  }
+
+  get defaultLanguage() {
+    return this.form.get('defaultLanguage');
+  }
+
+  get currency() {
+    return this.form.get('currency');
+  }
+
+  get weight() {
+    return this.form.get('weight');
+  }
+
+  get dimension() {
+    return this.form.get('dimension');
+  }
+
   ngOnInit() {
     this.loader = true;
     forkJoin([
@@ -144,7 +165,7 @@ export class StoreFormComponent implements OnInit {
         this.supportedColorThemes = [...colorThemes];
         this.weightList = [...measures.weights];
         this.sizeList = [...measures.measures];
-        this.supportedLanguages = this.configService.getListOfGlobalLanguages();
+        this.supportedLanguagesList = this.configService.getListOfGlobalLanguages();
         this.loader = false;
       }, err => {
         this.loader = false;
@@ -174,7 +195,6 @@ export class StoreFormComponent implements OnInit {
       weight: this.store.weight,
       dimension: this.store.dimension,
       inBusinessSince: new Date(this.store.inBusinessSince),
-      useCache: this.store.useCache,
     });
     this.form.controls['address'].patchValue({searchControl: ''});
     this.form.controls['address'].patchValue({stateProvince: this.store.address.stateProvince}, {disabled: false});
@@ -188,24 +208,14 @@ export class StoreFormComponent implements OnInit {
   }
 
   save() {
-    //this.findInvalidControls();
-    this.form.controls['address'].patchValue({country: this.form.value.address.country});
-    this.form.controls['address'].patchValue({stateProvince: this.form.value.address.stateProvince});
-    const storeObj = this.form.value;
-
-
-    storeObj.supportedLanguages = this.supportedLanguagesSelected;
-    if (this.store && this.store.id) {
-      storeObj.id = this.store.id;
-      console.log(storeObj)
-      this.storeService.updateStore(storeObj)
-        .subscribe(store => {
-          this.toastr.success(this.translate.instant('STORE_FORM.STORE_UPDATED'));
-          this.router.navigate(['pages/store-management/stores-list']);
-        }, err => {
-          this.errorService.error('ERROR.SYSTEM_ERROR', err);
-        });
-    } else {
+    this.submitted = true;
+    console.log(this.submitted)
+    console.log(this.form.valid)
+    if (this.form.valid) {
+      this.form.controls['address'].patchValue({country: this.form.value.address.country});
+      this.form.controls['address'].patchValue({stateProvince: this.form.value.address.stateProvince});
+      const storeObj = this.form.value;
+      storeObj.supportedLanguages = this.supportedLanguagesSelected;
       this.storeService.checkIfStoreExist(this.form.value.name)
         .subscribe(res => {
           if (res.exist) {
@@ -214,7 +224,7 @@ export class StoreFormComponent implements OnInit {
             this.storeService.createStore(storeObj)
               .subscribe(store => {
                 this.toastr.success(this.translate.instant('STORE_FORM.STORE_CREATED'));
-                this.router.navigate(['pages/store-management/stores-list']);
+                this.router.navigate(['pages/']);
               }, err => {
                 this.errorService.error('ERROR.SYSTEM_ERROR', err);
               });
@@ -257,7 +267,7 @@ export class StoreFormComponent implements OnInit {
       });
   }
 
-  onClickRoute(link) {
+  route(link) {
     this.router.navigate(['pages/store-management/' + link + "/", this.store.id]);
   }
 
@@ -282,12 +292,11 @@ export class StoreFormComponent implements OnInit {
       }),
       supportedLanguages: [[], [Validators.required]],
       defaultLanguage: ['', [Validators.required]],
-      currency: [''],
+      currency: ['', [Validators.required]],
       currencyFormatNational: [true],
       weight: ['', [Validators.required]],
       dimension: ['', [Validators.required]],
       inBusinessSince: [new Date()],
-      useCache: [false],
     });
 
     if (this.store && this.store.id) {
