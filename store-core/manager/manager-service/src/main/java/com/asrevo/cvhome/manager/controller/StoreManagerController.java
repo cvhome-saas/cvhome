@@ -49,8 +49,8 @@ public class StoreManagerController {
     @GetMapping("private/store")
 //    @PreAuthorize("hasAnyRole('ROLE_ORG_ADMIN')")
     @ConditionalOnApiStatus
-    public Mono<PageImpl<Object>> findAllStoresDetailed(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, Pageable pageable) {
-        return managerService.findAll(identity, new ListManagerStoreQuery(null, null, null), pageable);
+    public Mono<Page<ManagerStoreDto>> findAllStoresDetailed(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, Pageable pageable) {
+        return Mono.just(internalStoreService.findAll(identity, new ListManagerStoreQuery(null, null, null), pageable));
     }
 
     @GetMapping("private/store/{code}")

@@ -97,6 +97,7 @@ public class GatewayRouteLocatorImpl implements RouteLocator {
     private AsyncPredicate<ServerWebExchange> checkStoreMatchPodFromParam(Pod pod) {
         return serverWebExchange -> {
             ManagerStoreId store = Optional.ofNullable(serverWebExchange.getRequest().getQueryParams().getFirst("store"))
+                    .filter(it -> !it.trim().isEmpty())
                     .map(ManagerStoreId::new)
                     .orElse(null);
             return isStoreInPod(store, pod);
