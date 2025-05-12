@@ -24,7 +24,7 @@ public class InvoicePaymentFailed implements WebhookHandler {
 
         JsonObject jo = toJsonObj(event);
 
-        JsonElement orgIdElement = jo.getAsJsonObject("subscription_details").getAsJsonObject("metadata").get("orgId");
+        JsonElement orgIdElement = jo.getAsJsonObject("parent").getAsJsonObject("subscription_details").getAsJsonObject("metadata").get("orgId");
         ManagerOrgId orgId = new ManagerOrgId(orgIdElement.getAsString());
         eventPublisher.publish(InvoicePaymentFailedEvent.from(orgId));
         log.info("Invoice payment failed for {}", orgId);
