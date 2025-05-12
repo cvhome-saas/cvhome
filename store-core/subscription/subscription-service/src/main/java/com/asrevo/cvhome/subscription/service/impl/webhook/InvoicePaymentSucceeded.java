@@ -28,7 +28,7 @@ public class InvoicePaymentSucceeded implements WebhookHandler {
         JsonObject jo = toJsonObj(event);
 
         JsonObject data = jo.getAsJsonObject("lines").getAsJsonArray("data").get(0).getAsJsonObject();
-        JsonElement orgIdElement = jo.getAsJsonObject("subscription_details").getAsJsonObject("metadata").get("orgId");
+        JsonElement orgIdElement = jo.getAsJsonObject("parent").getAsJsonObject("subscription_details").getAsJsonObject("metadata").get("orgId");
         JsonElement priceIdElement = data.getAsJsonObject("price").get("id");
         JsonElement startElement = data.getAsJsonObject("period").get("start");
         JsonElement endElement = data.getAsJsonObject("period").get("end");
