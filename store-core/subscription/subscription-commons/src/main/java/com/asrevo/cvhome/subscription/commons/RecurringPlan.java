@@ -6,8 +6,8 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum RecurringPlan {
-    MONTHLY(1, 1),
-    YEARLY(12, 1.2f);
+    MONTH(1, 1),
+    YEAR(12, .83333333f);
     private final int times;
     private final float factor;
 }
