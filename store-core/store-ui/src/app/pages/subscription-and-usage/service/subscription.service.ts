@@ -35,11 +35,11 @@ export interface Table {
 }
 
 export interface Tables {
-  MONTHLY: Monthly
-  YEARLY: Yearly
+  MONTH: Month
+  YEAR: Year
 }
 
-export interface Monthly {
+export interface Month {
   options: Option[]
 }
 
@@ -84,7 +84,7 @@ export interface Feature{
   code: string
 }
 
-export interface Yearly {
+export interface Year {
   options: Option[]
 }
 

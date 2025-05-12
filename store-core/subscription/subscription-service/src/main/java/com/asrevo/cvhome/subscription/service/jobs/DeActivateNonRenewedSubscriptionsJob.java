@@ -1,6 +1,6 @@
 package com.asrevo.cvhome.subscription.service.jobs;
 
-import com.asrevo.cvhome.commons.event.EventPublisher;
+import com.asrevo.cvhome.commons.event.EventProcessor;
 import com.asrevo.cvhome.subscription.commons.SubscriptionStatus;
 import com.asrevo.cvhome.subscription.commons.command.DeActivateNonRenewedSubscriptionCommand;
 import com.asrevo.cvhome.subscription.domain.SubscriptionEntity;
@@ -18,15 +18,14 @@ import java.util.List;
 @Slf4j
 public class DeActivateNonRenewedSubscriptionsJob {
     private final SubscriptionRepository subscriptionRepository;
-    private final EventPublisher eventPublisher;
-
+    private final EventProcessor eventProcessor;
     @Scheduled(cron = "0 */5 * * * *")
     void execute() {
         log.info("Running Deactivating non-renewed subscriptions Job at {}", Instant.now());
         List<SubscriptionEntity> subscriptions = subscriptionRepository.findAllByStatusAndEndDateBefore(SubscriptionStatus.ACTIVE, Instant.now());
         subscriptions.forEach(subscription -> {
             log.info("Firing Locking non-renewed subscription {}", subscription.getId());
-            eventPublisher.publish(DeActivateNonRenewedSubscriptionCommand.from(subscription.getId()));
+            eventProcessor.process(DeActivateNonRenewedSubscriptionCommand.from(subscription.getId()));
         });
     }
 }

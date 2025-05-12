@@ -19,6 +19,7 @@ public class StripeWebhookController {
     private final StripeProperties stripeProperties;
 
     // http://localhost:7002/api/v1/stripe-webhook/public/events
+    // https://gateway.com/subscription/api/v1/stripe-webhook/public/events
     @PostMapping("public/events")
     public void events(@RequestBody String eventStr, @RequestHeader(STRIPE_SIGNATURE_HEADER) String sigHeader) {
         try {

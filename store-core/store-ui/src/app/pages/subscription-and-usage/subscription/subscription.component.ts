@@ -27,7 +27,7 @@ export class SubscriptionComponent implements OnInit {
     zip(this.subscriptionService.details(), this.subscriptionService.table()).subscribe({
         next: (it) => {
           this.currentSubscriptionDetails = it[0];
-          this.flag = (this.currentSubscriptionDetails.recurringPlan == 'YEARLY')
+          this.flag = (this.currentSubscriptionDetails.recurringPlan == 'YEAR')
           this.table = it[1];
           this.constructFreePricing();
           this.displayTable();
@@ -62,9 +62,9 @@ export class SubscriptionComponent implements OnInit {
     this.prices = [];
     let options: Option[] | undefined;
     if (!this.flag) {
-      options = this.table?.tables.MONTHLY.options;
+      options = this.table?.tables.MONTH.options;
     } else {
-      options = this.table?.tables.YEARLY.options;
+      options = this.table?.tables.YEAR.options;
     }
     if (options && options.length > 0) {
 

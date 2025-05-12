@@ -7,7 +7,7 @@ import {TranslateService} from '@ngx-translate/core';
 import {ErrorService} from "../../../shared/services/error.service";
 
 @Component({
-  selector: 'ngx-store-social-links',
+  selector: 'ngx-store-slider-images',
   standalone: false,
   templateUrl: './store-slider-images.component.html',
   styleUrls: ['./store-slider-images.component.scss']

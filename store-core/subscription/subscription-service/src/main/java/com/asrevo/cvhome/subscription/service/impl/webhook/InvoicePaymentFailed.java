@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.subscription.service.impl.webhook;
 
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
-import com.asrevo.cvhome.commons.event.EventPublisher;
+import com.asrevo.cvhome.commons.event.EventProcessor;
 import com.asrevo.cvhome.stripe.event.InvoicePaymentFailedEvent;
 import com.asrevo.cvhome.subscription.service.WebhookHandler;
 import com.asrevo.cvhome.subscription.utils.ToJsonObj;
@@ -17,16 +17,16 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class InvoicePaymentFailed implements WebhookHandler {
     private final ToJsonObj toJsonObj = new ToJsonObj();
-    private final EventPublisher eventPublisher;
+    private final EventProcessor eventProcessor;
 
     @Override
     public void handle(Event event) {
 
         JsonObject jo = toJsonObj(event);
 
-        JsonElement orgIdElement = jo.getAsJsonObject("subscription_details").getAsJsonObject("metadata").get("orgId");
+        JsonElement orgIdElement = jo.getAsJsonObject("parent").getAsJsonObject("subscription_details").getAsJsonObject("metadata").get("orgId");
         ManagerOrgId orgId = new ManagerOrgId(orgIdElement.getAsString());
-        eventPublisher.publish(InvoicePaymentFailedEvent.from(orgId));
+        eventProcessor.process(InvoicePaymentFailedEvent.from(orgId));
         log.info("Invoice payment failed for {}", orgId);
 
     }
