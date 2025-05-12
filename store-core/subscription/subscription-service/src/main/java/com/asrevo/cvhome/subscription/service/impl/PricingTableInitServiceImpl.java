@@ -32,7 +32,8 @@ public class PricingTableInitServiceImpl implements PricingTableInitService {
     public void init() {
         if (stripeInitService.isConfigured()) {
             List<ProductPriceDetails> productPriceDetails = stripeInitService.loadTable();
-            if (productPriceDetails.size() != getPaidSubscriptionPlans().size() * RecurringPlan.values().length) {
+            int expectedPlans = getPaidSubscriptionPlans().size() * RecurringPlan.values().length;
+            if (productPriceDetails.size() != expectedPlans || subscriptionPricePlanRepository.count() != expectedPlans) {
                 log.info("will create subscription plan table");
                 createNewPricingTable();
             }
@@ -63,7 +64,7 @@ public class PricingTableInitServiceImpl implements PricingTableInitService {
 
                                 }))
                 .toList();
-
+        subscriptionPricePlanRepository.deleteAll();
         subscriptionPricePlanRepository.saveAll(list);
     }
 
