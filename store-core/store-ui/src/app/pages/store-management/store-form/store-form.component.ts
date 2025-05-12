@@ -34,7 +34,7 @@ export class StoreFormComponent implements OnInit {
   isReadonlyName = false;
   isNameUnique = true;
   selectedItem = '5';
-  submitted=false;
+  submitted = false;
   sidemenuLinks = [
     {
       id: '0',
@@ -209,29 +209,38 @@ export class StoreFormComponent implements OnInit {
 
   save() {
     this.submitted = true;
-    console.log(this.submitted)
-    console.log(this.form.valid)
     if (this.form.valid) {
       this.form.controls['address'].patchValue({country: this.form.value.address.country});
       this.form.controls['address'].patchValue({stateProvince: this.form.value.address.stateProvince});
       const storeObj = this.form.value;
       storeObj.supportedLanguages = this.supportedLanguagesSelected;
-      this.storeService.checkIfStoreExist(this.form.value.name)
-        .subscribe(res => {
-          if (res.exist) {
-            this.toastr.success(this.translate.instant('COMMON.NAME_EXISTS'));
-          } else {
-            this.storeService.createStore(storeObj)
-              .subscribe(store => {
-                this.toastr.success(this.translate.instant('STORE_FORM.STORE_CREATED'));
-                this.router.navigate(['pages/']);
-              }, err => {
-                this.errorService.error('ERROR.SYSTEM_ERROR', err);
-              });
-          }
-        }, err => {
-          this.errorService.error('ERROR.SYSTEM_ERROR', err);
-        });
+      if (this.store && this.store.id) {
+        storeObj.id = this.store.id;
+        this.storeService.updateStore(storeObj)
+          .subscribe(store => {
+            this.toastr.success(this.translate.instant('STORE_FORM.STORE_UPDATED'));
+            this.router.navigate(['pages/store-management/stores-list']);
+          }, err => {
+            this.errorService.error('ERROR.SYSTEM_ERROR', err);
+          });
+      } else {
+        this.storeService.checkIfStoreExist(this.form.value.name)
+          .subscribe(res => {
+            if (res.exist) {
+              this.toastr.success(this.translate.instant('COMMON.NAME_EXISTS'));
+            } else {
+              this.storeService.createStore(storeObj)
+                .subscribe(store => {
+                  this.toastr.success(this.translate.instant('STORE_FORM.STORE_CREATED'));
+                  this.router.navigate(['pages/']);
+                }, err => {
+                  this.errorService.error('ERROR.SYSTEM_ERROR', err);
+                });
+            }
+          }, err => {
+            this.errorService.error('ERROR.SYSTEM_ERROR', err);
+          });
+      }
     }
   }
 

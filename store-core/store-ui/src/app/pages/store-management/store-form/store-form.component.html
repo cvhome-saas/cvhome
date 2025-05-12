@@ -7,7 +7,7 @@
     <div class="row">
       <div class="col">
       </div>
-      <div class="col col-lg-2">
+      <div *ngIf="store&&store.id" class="col col-lg-2">
         <nb-select fullWidth [(selected)]="selectedItem" outline shape="rectangle">
           <nb-option (click)="route(item.link)" *ngFor="let item of sidemenuLinks" [value]="item.id">
             {{ item.title }}
