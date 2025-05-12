@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.subscription.service.impl.webhook;
 
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
-import com.asrevo.cvhome.commons.event.EventPublisher;
+import com.asrevo.cvhome.commons.event.EventProcessor;
 import com.asrevo.cvhome.stripe.event.CustomerSubscriptionDeletedEvent;
 import com.asrevo.cvhome.subscription.service.WebhookHandler;
 import com.asrevo.cvhome.subscription.utils.ToJsonObj;
@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class CustomerSubscriptionDeleted implements WebhookHandler {
     private final ToJsonObj toJsonObj = new ToJsonObj();
-    private final EventPublisher eventPublisher;
+    private final EventProcessor eventProcessor;
 
     @Override
     public void handle(Event event) {
@@ -28,7 +28,7 @@ public class CustomerSubscriptionDeleted implements WebhookHandler {
 
         ManagerOrgId orgId = new ManagerOrgId(orgIdElement.getAsString());
 
-        eventPublisher.publish(CustomerSubscriptionDeletedEvent.from(orgId));
+        eventProcessor.process(CustomerSubscriptionDeletedEvent.from(orgId));
         log.info("Customer subscription deleted for {}", orgId);
     }
 

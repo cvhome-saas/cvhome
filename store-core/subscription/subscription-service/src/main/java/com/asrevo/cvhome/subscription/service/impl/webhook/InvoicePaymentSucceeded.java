@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.subscription.service.impl.webhook;
 
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
-import com.asrevo.cvhome.commons.event.EventPublisher;
+import com.asrevo.cvhome.commons.event.EventProcessor;
 import com.asrevo.cvhome.stripe.event.InvoicePaymentSucceededEvent;
 import com.asrevo.cvhome.subscription.commons.PriceId;
 import com.asrevo.cvhome.subscription.service.WebhookHandler;
@@ -20,7 +20,7 @@ import java.time.Instant;
 @Slf4j
 public class InvoicePaymentSucceeded implements WebhookHandler {
     private final ToJsonObj toJsonObj = new ToJsonObj();
-    private final EventPublisher eventPublisher;
+    private final EventProcessor eventProcessor;
 
     @Override
     public void handle(Event event) {
@@ -37,7 +37,7 @@ public class InvoicePaymentSucceeded implements WebhookHandler {
         PriceId priceId = new PriceId(priceIdElement.getAsString());
         Instant startDate = Instant.ofEpochSecond(startElement.getAsLong());
         Instant endDate = Instant.ofEpochSecond(endElement.getAsLong());
-        eventPublisher.publish(InvoicePaymentSucceededEvent.from(orgId, priceId, startDate, endDate));
+        eventProcessor.process(InvoicePaymentSucceededEvent.from(orgId, priceId, startDate, endDate));
         log.info("Invoice payment succeeded for {}  {} start {} end {}", orgId, priceId, startDate, endDate);
 
     }

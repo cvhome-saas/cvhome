@@ -15,6 +15,7 @@ public class OrgCreatedEventImpl implements EventImpl<OrgCreatedEvent> {
 
     @Override
     public void process(OrgCreatedEvent event) {
+        log.info("Received org created event: {}", event);
         subscriptionService.createInitialSubscription(event.org());
     }
 
