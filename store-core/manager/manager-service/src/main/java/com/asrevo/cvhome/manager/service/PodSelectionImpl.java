@@ -31,7 +31,7 @@ public class PodSelectionImpl implements PodSelection {
         }
 
         List<Pod> publicNamespaces = properties.pods().stream()
-                .filter(it -> Objects.isNull(it.orgId()))
+                .filter(it -> Objects.isNull(it.orgId()) || Objects.isNull(it.orgId().getId()))
                 .toList();
 
         log.info("find {} public namespaces valid for org {}", publicNamespaces.size(), orgId);
