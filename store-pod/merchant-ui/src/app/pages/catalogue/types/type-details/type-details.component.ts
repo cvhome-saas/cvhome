@@ -86,11 +86,14 @@ export class TypeDetailsComponent implements OnInit {
           if (this.uniqueCode) {
             this.fillData();
           }
+          this.loaded = true;
         },
         error: (err) => {
+          this.loaded = true;
           this.loader = false;
         },
         complete: () => {
+          this.loaded = true;
           this.loader = false;
         }
       });
@@ -113,8 +116,6 @@ export class TypeDetailsComponent implements OnInit {
           if (this.type) {
             this.fillForm();
           }
-          this.loader = false;
-          this.loaded = true;
 
         },
         error: (err) => {

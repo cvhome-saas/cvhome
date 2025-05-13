@@ -31,7 +31,7 @@ public class Manufacturer extends SalesManagerEntity<Long, Manufacturer> impleme
             table = "SM_SEQUENCER",
             pkColumnName = "SEQ_NAME",
             valueColumnName = "SEQ_COUNT",
-            pkColumnValue = "MANUFACTURE_SEQ_NEXT_VAL",
+            pkColumnValue = "MANUFACTURER_SEQ_NEXT_VAL",
             allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
             initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
