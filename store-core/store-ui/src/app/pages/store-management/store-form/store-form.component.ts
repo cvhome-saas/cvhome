@@ -232,7 +232,7 @@ export class StoreFormComponent implements OnInit {
               this.storeService.createStore(storeObj)
                 .subscribe(store => {
                   this.toastr.success(this.translate.instant('STORE_FORM.STORE_CREATED'));
-                  this.router.navigate(['pages/']);
+                  this.router.navigate(['pages/store-management/stores-list']);
                 }, err => {
                   this.errorService.error('ERROR.SYSTEM_ERROR', err);
                 });
