@@ -7,7 +7,7 @@ import org.bson.types.ObjectId;
 public record ManagerOrgId(@JsonSerialize(using = ToStringSerializer.class) ObjectId id)
         implements Identifier {
     public ManagerOrgId(String id) {
-        this(new ObjectId(id));
+        this(id == null || id.trim().length() != 24 ? null : new ObjectId(id));
     }
 
     public static ManagerOrgId newId() {
