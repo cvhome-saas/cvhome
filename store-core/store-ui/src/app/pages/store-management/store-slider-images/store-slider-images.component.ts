@@ -173,7 +173,7 @@ export class StoreSliderImagesComponent implements OnInit {
       .subscribe({
         next: (data) => {
           this.sliderImages.push(data)
-          this.toastr.success(this.translate.instant('STORE_BRANDING.NETWORKS_UPDATED'));
+          this.toastr.success(this.translate.instant('STORE.SLIDER_IMAGE_UPLOADED_SUCCESSFULLY'));
         },
         error: (err) => {
           this.errorService.error('ERROR.SYSTEM_ERROR', err);
