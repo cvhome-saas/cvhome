@@ -36,7 +36,7 @@ public class StoreManagerServiceImpl implements StoreManagerService {
 
     @Override
     public void createStore(ManagerOrgId orgId, Map<Object, Object> request) {
-        PodId podId = podSelection.next(new OrgId(orgId.id().toString()), null);
+        PodId podId = podSelection.next(orgId, null);
         internalStoreService.createStore(request, orgId, podId);
     }
 
