@@ -1,9 +1,6 @@
 package com.asrevo.cvhome.merchant.model.merchant;
 
-import com.asrevo.cvhome.commons.domain.ColorTheme;
-import com.asrevo.cvhome.commons.domain.SliderImage;
-import com.asrevo.cvhome.commons.domain.SocialLink;
-import com.asrevo.cvhome.commons.domain.Theme;
+import com.asrevo.cvhome.commons.domain.*;
 import com.asrevo.cvhome.store.core.model.MerchantStorePricingBase;
 import com.asrevo.cvhome.store.model.references.MeasureUnit;
 import com.asrevo.cvhome.store.model.references.WeightUnit;
@@ -29,7 +26,6 @@ public class MerchantStoreEntity extends MerchantStorePricingBase implements Ser
     private Theme theme;
     private ColorTheme colorTheme;
     private Set<SocialLink> socialLinks;
-    private Set<SliderImage> sliderImages;
 
     private String inBusinessSince;
     @NotNull private String email;

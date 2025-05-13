@@ -3,6 +3,7 @@ package com.asrevo.cvhome.merchant.api.v1;
 import com.asrevo.cvhome.commons.annotation.ApiUsage;
 import com.asrevo.cvhome.commons.annotation.ConditionalOnApiStatus;
 import com.asrevo.cvhome.commons.annotation.SecuredResource;
+import com.asrevo.cvhome.commons.domain.ReadableSliderImage;
 import com.asrevo.cvhome.commons.domain.SliderImage;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.merchant.entity.merchant.MerchantStore;
@@ -35,7 +36,9 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1_STR;
 
@@ -154,14 +157,14 @@ public class MerchantStoreApi {
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
     })
     @ConditionalOnApiStatus
-    public SliderImage addSliderImage(@SecuredResource StoreMerchantId merchantStore, @RequestParam("file") MultipartFile file) {
+    public ReadableSliderImage addSliderImage(@SecuredResource StoreMerchantId merchantStore, @RequestParam("file") MultipartFile file) {
 
         InputContentFile cmsContentImage = createInputContentFile(file, FileContentType.SLIDER);
         String extension = FilenameUtils.getExtension(file.getOriginalFilename());
         String newFileName = UUID.randomUUID() + "." + extension;
         cmsContentImage.setFileName(newFileName);
-        storeFacade.addStoreSliderImage(merchantStore, cmsContentImage);
-        return new SliderImage(null, imageFilePath.buildStoreSliderFilePath(merchantStore, newFileName));
+        SliderImage sliderImage = storeFacade.addStoreSliderImage(merchantStore, cmsContentImage);
+        return new ReadableSliderImage(sliderImage.priority(), sliderImage.name(), imageFilePath.buildStoreSliderFilePath(merchantStore, newFileName));
     }
 
     @ResponseStatus(HttpStatus.CREATED)

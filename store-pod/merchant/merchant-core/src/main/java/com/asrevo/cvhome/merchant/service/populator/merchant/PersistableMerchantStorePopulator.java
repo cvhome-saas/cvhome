@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.merchant.service.populator.merchant;
 
+import com.asrevo.cvhome.commons.domain.SliderImage;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.merchant.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.merchant.model.merchant.PersistableMerchantStore;
@@ -11,6 +12,8 @@ import com.asrevo.cvhome.store.model.references.PersistableAddress;
 import com.asrevo.cvhome.store.utils.DateUtil;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
@@ -81,7 +84,11 @@ public class PersistableMerchantStorePopulator
             target.setSocialLinks(source.getSocialLinks());
         }
         if (source.getSliderImages() != null) {
-            target.setSliderImages(source.getSliderImages());
+            Set<SliderImage> sliderImages =
+                    source.getSliderImages().stream()
+                            .map(it -> new SliderImage(it.priority(), it.name()))
+                            .collect(Collectors.toSet());
+            target.setSliderImages(sliderImages);
         }
         target.setStorephone(source.getPhone());
         target.setStoreEmailAddress(source.getEmail());

@@ -49,8 +49,11 @@ public interface StoreFacade {
 
     /**
      * Add MerchantStore banner
+     *
+     * @return
      */
-    void addStoreSliderImage(StoreMerchantId storeMerchantId, InputContentFile cmsContentImage);
+    SliderImage addStoreSliderImage(
+            StoreMerchantId storeMerchantId, InputContentFile cmsContentImage);
 
     void update(PersistableMerchantStore store);
 

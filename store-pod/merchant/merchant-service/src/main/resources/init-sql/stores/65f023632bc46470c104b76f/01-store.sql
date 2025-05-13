@@ -25,15 +25,15 @@ on conflict (store_merchant_id, language_code) do nothing;
 -- End Loop>>
 
 -- <<Begin Loop on l in ('0','1','2','3','4')
-INSERT INTO merchant.merchant_slider_images (store_merchant_id, priority, url)
+INSERT INTO merchant.merchant_slider_images (store_merchant_id, priority, name)
 VALUES ('65f023632bc46470c104b76f', 0, 'slide-1.jpeg');
-INSERT INTO merchant.merchant_slider_images (store_merchant_id, priority, url)
+INSERT INTO merchant.merchant_slider_images (store_merchant_id, priority, name)
 VALUES ('65f023632bc46470c104b76f', 1, 'slide-2.jpeg');
-INSERT INTO merchant.merchant_slider_images (store_merchant_id, priority, url)
+INSERT INTO merchant.merchant_slider_images (store_merchant_id, priority, name)
 VALUES ('65f023632bc46470c104b76f', 2, 'slide-3.jpeg');
-INSERT INTO merchant.merchant_slider_images (store_merchant_id, priority, url)
+INSERT INTO merchant.merchant_slider_images (store_merchant_id, priority, name)
 VALUES ('65f023632bc46470c104b76f', 3, 'slide-4.jpeg');
-INSERT INTO merchant.merchant_slider_images (store_merchant_id, priority, url)
+INSERT INTO merchant.merchant_slider_images (store_merchant_id, priority, name)
 VALUES ('65f023632bc46470c104b76f', 4, 'slide-5.jpeg');
 -- End Loop>>
 

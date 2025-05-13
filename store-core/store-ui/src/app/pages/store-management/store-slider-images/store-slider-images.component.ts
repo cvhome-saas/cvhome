@@ -97,11 +97,12 @@ export class StoreSliderImagesComponent implements OnInit {
 
   save() {
     if (this.sliderImages && this.sliderImages.length > 0) {
-      let i=0;
+      let i = 0;
       let sliderImages = this.sliderImages.map(it => {
         return {
           priority: i++,
-          url: new URL(it.url).pathname.split('/').pop(),
+          name: it.name,
+          url: it.url
         };
       });
       this.storeService.saveStoreImageSliders(this.store.id, sliderImages)
@@ -171,10 +172,7 @@ export class StoreSliderImagesComponent implements OnInit {
     this.storeService.addStoreSliderImage(this.store.id, newImageInput.files[0])
       .subscribe({
         next: (data) => {
-          this.sliderImages.push({
-            "priority": this.sliderImages.length,
-            "url": "http://localhost:32897/620fe7ff-fc77-4862-8c2d-9e7261104932/files/65f023632bc46470c104b75f/SLIDER/f7a70e38-5f92-42d5-9c04-3f5301deb75e.jpg"
-          })
+          this.sliderImages.push(data)
           this.toastr.success(this.translate.instant('STORE_BRANDING.NETWORKS_UPDATED'));
         },
         error: (err) => {
@@ -190,5 +188,6 @@ export class StoreSliderImagesComponent implements OnInit {
 
 export interface SliderImage {
   priority: number;
+  name: string;
   url: string;
 }
