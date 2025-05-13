@@ -130,7 +130,7 @@ public class MerchantStore extends SalesManagerEntity<StoreMerchantId, MerchantS
     @AttributeOverrides(
             value = {
                 @AttributeOverride(name = "priority", column = @Column(name = "PRIORITY")),
-                @AttributeOverride(name = "url", column = @Column(name = "URL", length = 100))
+                @AttributeOverride(name = "name", column = @Column(name = "NAME", length = 100))
             })
     private Set<SliderImage> sliderImages = new HashSet<>();
 

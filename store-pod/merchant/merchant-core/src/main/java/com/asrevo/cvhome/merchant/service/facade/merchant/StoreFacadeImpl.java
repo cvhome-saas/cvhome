@@ -21,10 +21,7 @@ import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import com.asrevo.cvhome.store.core.modules.cms.content.ContentAssetsManager;
 import com.asrevo.cvhome.store.model.references.MeasureUnit;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -200,12 +197,22 @@ public class StoreFacadeImpl implements StoreFacade {
 
     @SneakyThrows
     @Override
-    public void addStoreSliderImage(
+    public SliderImage addStoreSliderImage(
             StoreMerchantId storeMerchantId, InputContentFile cmsContentImage) {
         MerchantStore store = getByMerchantStoreId(storeMerchantId);
-        store.setStoreBanner(cmsContentImage.getFileName());
+        Set<SliderImage> sliderImages = new HashSet<>(store.getSliderImages());
+        Integer nextPriority =
+                sliderImages.stream()
+                        .map(SliderImage::priority)
+                        .max(Comparator.naturalOrder())
+                        .map(it -> it + 1)
+                        .orElse(0);
+        SliderImage sliderImage = new SliderImage(nextPriority, cmsContentImage.getFileName());
+        sliderImages.add(sliderImage);
+        store.setSliderImages(sliderImages);
         saveMerchantStore(store);
         addSlider(storeMerchantId.getId(), cmsContentImage);
+        return sliderImage;
     }
 
     @Override

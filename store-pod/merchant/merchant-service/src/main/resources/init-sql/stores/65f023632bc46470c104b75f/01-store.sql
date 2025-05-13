@@ -37,15 +37,15 @@ on conflict (store_merchant_id, language_code) do nothing;
 -- Specify conflict target
 
 -- Loop for slider images (0 to 4)
-INSERT INTO merchant.merchant_slider_images (store_merchant_id, priority, url)
+INSERT INTO merchant.merchant_slider_images (store_merchant_id, priority, name)
 VALUES ('65f023632bc46470c104b75f', 0, 'slide-1.jpeg');
-INSERT INTO merchant.merchant_slider_images (store_merchant_id, priority, url)
+INSERT INTO merchant.merchant_slider_images (store_merchant_id, priority, name)
 VALUES ('65f023632bc46470c104b75f', 1, 'slide-2.jpeg');
-INSERT INTO merchant.merchant_slider_images (store_merchant_id, priority, url)
+INSERT INTO merchant.merchant_slider_images (store_merchant_id, priority, name)
 VALUES ('65f023632bc46470c104b75f', 2, 'slide-3.jpeg');
-INSERT INTO merchant.merchant_slider_images (store_merchant_id, priority, url)
+INSERT INTO merchant.merchant_slider_images (store_merchant_id, priority, name)
 VALUES ('65f023632bc46470c104b75f', 3, 'slide-4.jpeg');
-INSERT INTO merchant.merchant_slider_images (store_merchant_id, priority, url)
+INSERT INTO merchant.merchant_slider_images (store_merchant_id, priority, name)
 VALUES ('65f023632bc46470c104b75f', 4, 'slide-5.jpeg');
 
 

@@ -1,6 +1,6 @@
 package com.asrevo.cvhome.merchant.service.populator.merchant;
 
-import com.asrevo.cvhome.commons.domain.SliderImage;
+import com.asrevo.cvhome.commons.domain.ReadableSliderImage;
 import com.asrevo.cvhome.merchant.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.merchant.model.merchant.ReadableMerchantStore;
 import com.asrevo.cvhome.store.core.model.content.ReadableImage;
@@ -106,14 +106,15 @@ public class ReadableMerchantStorePopulator
         target.setUseCache(source.isUseCache());
 
         if (source.getSliderImages() != null && !source.getSliderImages().isEmpty()) {
-            Set<SliderImage> images =
+            Set<ReadableSliderImage> images =
                     source.getSliderImages().stream()
                             .map(
                                     it ->
-                                            new SliderImage(
+                                            new ReadableSliderImage(
                                                     it.priority(),
+                                                    it.name(),
                                                     filePath.buildStoreSliderFilePath(
-                                                            source.getId(), it.url())))
+                                                            source.getId(), it.name())))
                             .collect(Collectors.toSet());
             target.setSliderImages(images);
         }
