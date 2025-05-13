@@ -51,7 +51,8 @@
       "TERMS_AND_CONDITIONS": "Términos y Condiciones",
       "AGREE": "Aceptar",
       "REJECT": "Rechazar",
-      "ORDER_ID": "ID del Pedido"
+      "ORDER_ID": "ID del Pedido",
+      "FAILED_TO_PLACE_ORDER": "Error al realizar el pedido"
     },
     "CONTENT": {
       "HOME_TITLE": "Contenido"

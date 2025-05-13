@@ -27,6 +27,6 @@ const handleBrowserServiceCall = (service: string): string => {
         return STORE_POD_GATEWAY + "/" + service;
     } else {
         // with default domain
-        return "/" + service  //FAILED_TO_PLACE_ORDER
+        return "/" + service
     }
 }

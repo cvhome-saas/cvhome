@@ -245,6 +245,7 @@
     "STORE_STATE_PROVINCE_REQUIRED": "State is required",
     "STORE_SUPPORTED_LANGUAGES_REQUIRED": "Supported Languages is required",
     "STORE_DEFAULT_LANGUAGE_REQUIRED": "Default language is required",
+    "ERROR_DEFAULT_LANGUAGE_NOT_SUPPORTED": "Default language should be one of supported language",
     "STORE_CURRENCY_REQUIRED": "Currency is required",
     "STORE_WEIGHT_UNITS_REQUIRED": "weight unit is required",
     "STORE_SIZE_UNITS_REQUIRED": "size unit is required",

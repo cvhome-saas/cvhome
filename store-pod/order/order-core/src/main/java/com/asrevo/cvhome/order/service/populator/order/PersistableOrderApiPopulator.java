@@ -66,7 +66,6 @@ public class PersistableOrderApiPopulator
             ReadableMerchantStore baseStore = externalMerchantStoreService.getStore(store);
             target.setLocale(LocaleUtils.getLocale(baseStore.getDefaultLanguage()));
 
-            Currency currency = currencyService.getByCode(baseStore.getCurrency());
 
             // Customer
             Customer customer;
@@ -102,7 +101,7 @@ public class PersistableOrderApiPopulator
             target.setBilling(billing);
 
             target.setDatePurchased(new Date());
-            target.setCurrency(currency.getCode());
+            target.setCurrency(baseStore.getCurrency());
             target.setCurrencyValue(new BigDecimal(0));
             target.setStore(store);
             target.setChannel(OrderChannel.API);

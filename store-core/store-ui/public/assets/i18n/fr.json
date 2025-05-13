@@ -245,6 +245,7 @@
     "STORE_STATE_PROVINCE_REQUIRED": "L'état/province est requis",
     "STORE_SUPPORTED_LANGUAGES_REQUIRED": "Les langues prises en charge sont requises",
     "STORE_DEFAULT_LANGUAGE_REQUIRED": "La langue par défaut est requise",
+    "ERROR_DEFAULT_LANGUAGE_NOT_SUPPORTED": "La langue par défaut doit être l'une des langues prises en charge",
     "STORE_CURRENCY_REQUIRED": "La devise est requise",
     "STORE_WEIGHT_UNITS_REQUIRED": "L'unité de poids est requise",
     "STORE_SIZE_UNITS_REQUIRED": "L'unité de taille est requise",

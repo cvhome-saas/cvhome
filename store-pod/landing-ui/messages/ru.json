@@ -51,7 +51,8 @@
       "TERMS_AND_CONDITIONS": "Условиями и положениями",
       "AGREE": "Согласен",
       "REJECT": "Отклонить",
-      "ORDER_ID": "ID Заказа"
+      "ORDER_ID": "ID Заказа",
+      "FAILED_TO_PLACE_ORDER": "Не удалось разместить заказ"
     },
     "CONTENT": {
       "HOME_TITLE": "Контент"
