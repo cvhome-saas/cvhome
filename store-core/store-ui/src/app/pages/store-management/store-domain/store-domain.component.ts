@@ -122,6 +122,10 @@ export class StoreDomainComponent implements OnInit {
       })
   }
 
+  onAccess(row: any) {
+    window.open(`https://${this.generateDomain(row)}`, '_blank');
+  }
+
   onDelete(domain: string) {
     this.loading = true;
     this.storeService.removeDomain(this.store, domain).subscribe({

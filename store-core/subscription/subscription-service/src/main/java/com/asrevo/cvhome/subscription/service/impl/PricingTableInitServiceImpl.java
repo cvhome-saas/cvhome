@@ -18,7 +18,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.StreamSupport;
 
 @Service
 @AllArgsConstructor
@@ -31,39 +30,16 @@ public class PricingTableInitServiceImpl implements PricingTableInitService {
     @Transactional
     @Override
     public void init() {
-        if (subscriptionPricePlanRepository.count() == 0) {
-
-            log.info("Stripe subscription plan is empty");
-            createNewPricingTable();
-
-        } else {
-
-            log.info("Stripe subscription plan is already created will validate them");
-            boolean isValid = validateCurrentPricingTable();
-            if (isValid) {
-                log.info("Stripe subscription plan is valid");
-                return;
+        if (stripeInitService.isConfigured()) {
+            List<ProductPriceDetails> productPriceDetails = stripeInitService.loadTable();
+            int expectedPlans = getPaidSubscriptionPlans().size() * RecurringPlan.values().length;
+            if (productPriceDetails.size() != expectedPlans || subscriptionPricePlanRepository.count() != expectedPlans) {
+                log.info("will create subscription plan table");
+                createNewPricingTable();
             }
-
-            log.info("Stripe subscription plan is not valid will delete all and re initialize");
-            subscriptionPricePlanRepository.deleteAll();
-            createNewPricingTable();
         }
-
     }
 
-    private boolean validateCurrentPricingTable() {
-        List<PriceId> prices = StreamSupport.stream(subscriptionPricePlanRepository.findAll().spliterator(), false)
-                .map(SubscriptionPricePlanEntity::getId)
-                .toList();
-        long expectedPrices = getPaidSubscriptionPlans().stream().flatMap(it -> Arrays.stream(RecurringPlan.values())).count();
-
-        if (prices.size() != expectedPrices) {
-            return false;
-        }
-
-        return prices.stream().allMatch(stripeInitService::exist);
-    }
 
     private void createNewPricingTable() {
         List<SubscriptionPlan> subscriptionPlans = getPaidSubscriptionPlans();
@@ -82,13 +58,13 @@ public class PricingTableInitServiceImpl implements PricingTableInitService {
                                     PricePlanCost pricePlanCost = PricePlanCost.fromUsingFactor(CURRENCY, it, rp);
 
                                     ProductId productId = productBySubscriptionPlan.computeIfAbsent(it, stripeInitService::createProduct);
-                                    PriceId priceId = stripeInitService.createPrice(productId, it, rp, pricePlanCost);
+                                    PriceId priceId = stripeInitService.createProductPrice(new ProductPriceDetails(productId, it, rp, pricePlanCost));
 
                                     return SubscriptionPricePlanEntity.create(priceId, productId, pricePlanCost, it, rp);
 
                                 }))
                 .toList();
-
+        subscriptionPricePlanRepository.deleteAll();
         subscriptionPricePlanRepository.saveAll(list);
     }
 

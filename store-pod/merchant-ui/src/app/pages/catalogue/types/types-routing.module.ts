@@ -11,19 +11,16 @@ const routes: Routes = [
     component: TypesComponent,
     children: [
       {
-        path: 'create-type/:id',
+        path: 'create-type',
         component: TypeDetailsComponent,
-        // canActivate: [StoreGuard]
       },
       {
         path: 'types-list',
         component: TypesListComponent,
-        // canActivate: [StoreGuard]
       },
       {
         path: 'type/:id',
         component: TypeDetailsComponent,
-        // canActivate: [StoreGuard]
       },
     ],
   }

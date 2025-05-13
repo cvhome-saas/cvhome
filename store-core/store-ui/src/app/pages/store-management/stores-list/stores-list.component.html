@@ -31,7 +31,7 @@
       <ngx-datatable-column name="Id">
         <ng-template let-column="column" ngx-datatable-header-template> {{ 'COMMON.ID' |translate }}</ng-template>
         <ng-template let-value="value" ngx-datatable-cell-template>
-          <strong>{{ value }}</strong>
+          <strong>{{ value.id }}</strong>
         </ng-template>
       </ngx-datatable-column>
 
@@ -43,19 +43,20 @@
         </ng-template>
       </ngx-datatable-column>
 
-      <ngx-datatable-column name="email">
-        <ng-template let-column="column" ngx-datatable-header-template> {{ 'COMMON.EMAIL_ADDRESS' |translate }}
-        </ng-template>
-        <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-          {{ row.email }}
-        </ng-template>
-      </ngx-datatable-column>
 
       <ngx-datatable-column name="podId">
         <ng-template let-column="column" ngx-datatable-header-template> {{ 'COMMON.POD_ID' |translate }}
         </ng-template>
         <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-          {{ row.pod.id }}
+          {{ row.podId.id }}
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column name="provisioningState">
+        <ng-template let-column="column" ngx-datatable-header-template> {{ 'COMMON.STATUS' |translate }}
+        </ng-template>
+        <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+          {{ row.provisioningState }}
         </ng-template>
       </ngx-datatable-column>
 

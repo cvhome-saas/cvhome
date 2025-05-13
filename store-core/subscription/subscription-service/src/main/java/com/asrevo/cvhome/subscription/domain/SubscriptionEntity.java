@@ -40,7 +40,7 @@ public class SubscriptionEntity extends BaseEntity<SubscriptionEntity, ManagerOr
         entity.createdDate = now;
         entity.lastRenewedDate = now;
         SubscriptionPlan defaultSubscriptionPlan = SubscriptionPlan.FREE;
-        entity.recurringPlan = RecurringPlan.MONTHLY;
+        entity.recurringPlan = RecurringPlan.MONTH;
         entity.endDate = Instant.now().plus(defaultSubscriptionPlan.getTrialAmount());
         entity.deActivatedDate = null;
         entity.subscriptionPlan = defaultSubscriptionPlan;

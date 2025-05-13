@@ -18,11 +18,14 @@ export default async function Page({params}: { params: LayoutParams }) {
                 <div className="md:flex md:justify-between">
                     <div className="mb-6 md:mb-0">
                         <Link prefetch={false} href={"/"} className="flex items-center">
-                            <Image src={params.store.logo.path}
-                                   width={32}
-                                   height={32}
-                                   className={`h-8 w-auto ${isRtlLayout ? 'ms-3' : 'me-3'}`}
-                                   alt={params.store.logo.name}/>
+                            {
+                                params.store.logo &&
+                                <Image src={params.store.logo.path}
+                                       width={32}
+                                       height={32}
+                                       className={`h-8 w-auto ${isRtlLayout ? 'ms-3' : 'me-3'}`}
+                                       alt={params.store.logo.name}/>
+                            }
                             <span
                                 className="self-center text-2xl font-semibold whitespace-nowrap dark:text-foreground">
                                 {params.store.name}

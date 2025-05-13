@@ -112,7 +112,6 @@ export class StoreSocialLinksComponent implements OnInit {
     })
       .subscribe(store => {
         this.toastr.success(this.translate.instant('STORE.SOCIAL_LINKS_UPDATED'));
-        this.router.navigate(['pages/store-management/stores-list']);
       }, err => {
         this.errorService.error('ERROR.SYSTEM_ERROR', err);
       });

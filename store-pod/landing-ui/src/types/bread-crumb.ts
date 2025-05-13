@@ -6,5 +6,5 @@ export interface BreadcrumbItem {
 
 export interface BreadcrumbItems {
     prev: BreadcrumbItem[];
-    current: BreadcrumbItem;
+    current: BreadcrumbItem | undefined;
 }

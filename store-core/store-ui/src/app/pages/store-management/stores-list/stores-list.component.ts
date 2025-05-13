@@ -45,7 +45,7 @@ export class StoresListComponent extends BaseTable<any> implements OnInit {
 
 
   onEdit(row) {
-    this.router.navigate(['pages/store-management/store/', row.id]);
+    this.router.navigate(['pages/store-management/store/', row.id.id]);
   }
 
   onDelete(row) {
@@ -57,7 +57,7 @@ export class StoresListComponent extends BaseTable<any> implements OnInit {
     })
       .onClose.subscribe(res => {
       if (res) {
-        this.storeService.deleteStore(row.id)
+        this.storeService.deleteStore(row.id.id)
           .subscribe(data => {
             this.toastr.success(this.translate.instant('USER_FORM.USER_REMOVED'));
             this.trigger();

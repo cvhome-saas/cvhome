@@ -53,13 +53,16 @@ export const NavHeader = ({params}: { params: LayoutParams }) => {
                 <div className="flex lg:flex-1">
                     <Link prefetch={false} href={"/"} className="-m-1.5 p-1.5 group">
                         <span className="sr-only">{params.store.name}</span>
-                        <Image
-                            alt={params.store.logo.name}
-                            src={params.store.logo.path}
-                            width={32}
-                            height={32}
-                            className="h-8 w-auto transition-transform duration-300 ease-in-out group-hover:scale-110"
-                        />
+                        {
+                            params.store.logo &&
+                            <Image
+                                alt={params.store.logo.name}
+                                src={params.store.logo.path}
+                                width={32}
+                                height={32}
+                                className="h-8 w-auto transition-transform duration-300 ease-in-out group-hover:scale-110"
+                            />
+                        }
                     </Link>
                 </div>
                 <div className="flex lg:hidden">
@@ -173,13 +176,16 @@ export const NavHeader = ({params}: { params: LayoutParams }) => {
                             <span className="sr-only">
                                 {params.store.name}
                             </span>
-                            <Image
-                                alt={params.store.logo.name}
-                                src={params.store.logo.path}
-                                width={32}
-                                height={32}
-                                className="h-8 w-auto transition-transform duration-300 ease-in-out group-hover:scale-110"
-                            />
+                            {
+                                params.store.logo &&
+                                <Image
+                                    alt={params.store.logo.name}
+                                    src={params.store.logo.path}
+                                    width={32}
+                                    height={32}
+                                    className="h-8 w-auto transition-transform duration-300 ease-in-out group-hover:scale-110"
+                                />
+                            }
                         </Link>
                         <button
                             type="button"

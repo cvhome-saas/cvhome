@@ -55,9 +55,9 @@ export class PricingComponent implements OnInit {
     this.prices = [];
     let options: Option[] | undefined;
     if (!this.flag) {
-      options = this.table?.tables.MONTHLY.options;
+      options = this.table?.tables.MONTH.options;
     } else {
-      options = this.table?.tables.YEARLY.options;
+      options = this.table?.tables.YEAR.options;
     }
     if (options && options.length > 0) {
 

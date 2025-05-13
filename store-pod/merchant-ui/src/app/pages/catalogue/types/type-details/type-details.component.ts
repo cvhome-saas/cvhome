@@ -7,10 +7,13 @@ import {NbToastrService} from '@nebular/theme';
 import {ActivatedRoute, Router} from '@angular/router';
 import {ConfigService} from '../../../../shared/services/config.service';
 import {ErrorService} from "../../../../shared/services/error.service";
+import {SelectedStoreService} from "../../../../shared/services/selected-store.service";
+import {mergeMap, of, zip} from "rxjs";
+import {StoreService} from "../../../store-management/services/store.service";
 
 @Component({
   selector: 'ngx-types',
-  standalone:false,
+  standalone: false,
   templateUrl: './type-details.component.html',
   styleUrls: ['./type-details.component.scss']
 })
@@ -33,7 +36,7 @@ export class TypeDetailsComponent implements OnInit {
     descriptions: []
   }
   store: string;
-  uniqueCode: string;//identifier fromroute
+  uniqueCode: string;
 
   constructor(
     private fb: FormBuilder,
@@ -43,9 +46,10 @@ export class TypeDetailsComponent implements OnInit {
     private toastr: NbToastrService,
     private typesService: TypesService,
     private activatedRoute: ActivatedRoute,
-    private configService: ConfigService
+    private configService: ConfigService,
+    private selectedStoreService: SelectedStoreService,
+    private storeService: StoreService
   ) {
-    this.defaultLanguage = this.translate.defaultLang;
   }
 
   get code() {
@@ -62,15 +66,38 @@ export class TypeDetailsComponent implements OnInit {
 
   ngOnInit(): void {
 
-    this.activatedRoute.params.subscribe(it => {
-      const split: string[] = it['id'].split("-");
-      this.store = split[0];
-      this.getLanguages();
-      if (split.length == 2 && split[1] != "") {
-        this.uniqueCode = split[1];
-        this.fillData()
-      }
-    });
+    zip([this.selectedStoreService.current(), this.activatedRoute.params])
+      .pipe(mergeMap(([selectedStore, params]) => {
+        return zip(
+          of(selectedStore),
+          of(params),
+          this.storeService.getStore(selectedStore),
+          this.configService.getListOfSupportedLanguages(selectedStore)
+        )
+      }))
+
+      .subscribe({
+        next: ([selectedStore, params, store, languages]) => {
+          this.store = selectedStore;
+          this.uniqueCode = params.id
+          this.languages = [...languages];
+          this.addFormArray();
+          this.defaultLanguage = store.defaultLanguage;
+          if (this.uniqueCode) {
+            this.fillData();
+          }
+          this.loaded = true;
+        },
+        error: (err) => {
+          this.loaded = true;
+          this.loader = false;
+        },
+        complete: () => {
+          this.loaded = true;
+          this.loader = false;
+        }
+      });
+    this.createForm();
 
   }
 
@@ -89,8 +116,6 @@ export class TypeDetailsComponent implements OnInit {
           if (this.type) {
             this.fillForm();
           }
-          this.loader = false;
-          this.loaded = true;
 
         },
         error: (err) => {
@@ -98,20 +123,6 @@ export class TypeDetailsComponent implements OnInit {
         }
       })
 
-
-  }
-
-  getLanguages() {
-    const config$ = this.configService.getListOfSupportedLanguages(this.store)
-      .subscribe((languages) => {
-        this.languages = [...languages];
-        this.createForm();
-        this.addFormArray();
-        this.loader = false;
-        this.loaded = true;
-      }, err => {
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
-      });
 
   }
 

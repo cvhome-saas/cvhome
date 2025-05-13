@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {AfterViewInit, Component, Input, OnInit} from '@angular/core';
 import {FormArray, FormBuilder, FormGroup, Validators} from '@angular/forms';
 
 import {BrandService} from '../services/brand.service';
@@ -9,17 +9,18 @@ import {validators} from '../../../../shared/validation/validators';
 import {slugify} from '../../../../shared/utils/slugifying';
 import {NbToastrService} from "@nebular/theme";
 import {ErrorService} from "../../../../shared/services/error.service";
+import {Store} from "../../../store-management/models/store";
 
 @Component({
   selector: 'ngx-brand-form',
-  standalone:false,
+  standalone: false,
   templateUrl: './brand-form.component.html',
   styleUrls: ['./brand-form.component.scss']
 })
-export class BrandFormComponent implements OnInit {
+export class BrandFormComponent implements AfterViewInit, OnInit {
   @Input() brand;
   @Input() title;
-  @Input() store: string;
+  @Input() store: Store;
   form: FormGroup;
   loader = false;
   defaultLanguage: string;
@@ -35,8 +36,12 @@ export class BrandFormComponent implements OnInit {
     private router: Router,
     private errorService: ErrorService
   ) {
-    this.defaultLanguage = this.translate.defaultLang;
   }
+
+  ngOnInit(): void {
+    this.createForm();
+  }
+
 
   get code() {
     return this.form.get('code');
@@ -50,10 +55,11 @@ export class BrandFormComponent implements OnInit {
     return <FormArray>this.form.get('descriptions');
   }
 
-  ngOnInit() {
+  ngAfterViewInit(): void {
+    this.defaultLanguage = this.store.defaultLanguage;
     this.createForm();
     this.loader = true;
-    this.configService.getListOfSupportedLanguages(this.store)
+    this.configService.getListOfSupportedLanguages(this.store.id)
       .subscribe(res => {
         this.languages = [...res];
         this.createForm();
@@ -67,6 +73,7 @@ export class BrandFormComponent implements OnInit {
         this.errorService.error('ERROR.SYSTEM_ERROR', err);
       });
   }
+
 
   createForm() {
     this.form = this.fb.group({
@@ -142,7 +149,7 @@ export class BrandFormComponent implements OnInit {
 
   checkCode(event) {
     const code = event.target.value;
-    this.brandService.checkBrandCode(this.store, code)
+    this.brandService.checkBrandCode(this.store.id, code)
       .subscribe(res => {
         this.isCodeUnique = !(res.exists && (this.brand.code !== code));
       }, err => {
@@ -205,14 +212,14 @@ export class BrandFormComponent implements OnInit {
       }
 
       if (this.brand.id) {
-        this.brandService.updateBrand(this.store, this.brand.id, brandObject)
+        this.brandService.updateBrand(this.store.id, this.brand.id, brandObject)
           .subscribe(result => {
             this.toastr.success(this.translate.instant('BRAND.BRAND_UPDATED'));
           }, err => {
             this.errorService.error('ERROR.SYSTEM_ERROR', err);
           });
       } else {
-        this.brandService.createBrand(this.store, brandObject)
+        this.brandService.createBrand(this.store.id, brandObject)
           .subscribe(result => {
             this.toastr.success(this.translate.instant('BRAND.BRAND_CREATED'));
             this.router.navigate(['pages/catalogue/brands/brands-list']);

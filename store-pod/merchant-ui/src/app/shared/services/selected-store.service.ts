@@ -11,16 +11,16 @@ export class SelectedStoreService {
   public static STORE_ID_KEY = "Store-Id";
   private _stores: Store[] | undefined = undefined;
 
-  constructor(private storeService: StoreService, private cookieService: CookieService) {
+  constructor(private storeService: StoreService) {
   }
 
   public select(storeId: string): void {
-    this.cookieService.set(SelectedStoreService.STORE_ID_KEY, storeId);
+    localStorage.setItem(SelectedStoreService.STORE_ID_KEY, storeId);
   }
 
   current(): Observable<string> {
     return this.getAllStores().pipe(map(it => {
-      let current = this.cookieService.get(SelectedStoreService.STORE_ID_KEY);
+      let current = localStorage.getItem(SelectedStoreService.STORE_ID_KEY);
       if (current && current != '') {
         if (it.filter(s => s.id.id == current).length > 0) {
           return current;

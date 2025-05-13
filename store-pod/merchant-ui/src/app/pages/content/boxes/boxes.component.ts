@@ -45,11 +45,11 @@ export class BoxesComponent extends BaseTable<any> implements OnInit {
   }
 
   addBoxes() {
-    this.router.navigate(['/pages/content/boxes/add', this.params.store]);
+    this.router.navigate(['/pages/content/boxes/add']);
   }
 
   onEdit(event) {
-    this.router.navigate(['/pages/content/boxes/add', this.params.store + "-" + event.code]);
+    this.router.navigate(['/pages/content/boxes/edit',  event.code]);
   }
 
   onDelete(event) {

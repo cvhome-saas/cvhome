@@ -1,7 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
 import {NbDialogService, NbToastrService} from '@nebular/theme';
-import {TranslateService} from '@ngx-translate/core';
 import {ColumnMode} from "@swimlane/ngx-datatable";
 import {ShowcaseDialogComponent} from "../../../shared/components/showcase-dialog/showcase-dialog.component";
 import {ErrorService} from "../../../shared/services/error.service";
@@ -9,7 +8,6 @@ import {ContentService} from "../services/content.service";
 import {SelectedStoreService} from "../../../shared/services/selected-store.service";
 import {BaseTable, PageT, StorePageRequest} from "../../common/BaseTable";
 import {Observable, of} from "rxjs";
-import {map} from "rxjs/operators";
 
 @Component({
   selector: 'page-table',
@@ -29,7 +27,7 @@ export class PageComponent extends BaseTable<any> implements OnInit {
     errorService: ErrorService,
     selectedStoreService: SelectedStoreService,
   ) {
-    super(selectedStoreService,  errorService)
+    super(selectedStoreService, errorService)
   }
 
   ngOnInit(): void {
@@ -47,11 +45,11 @@ export class PageComponent extends BaseTable<any> implements OnInit {
 
   addPages() {
     localStorage.setItem('contentpageid', '');
-    this.router.navigate(['/pages/content/pages/add', this.params.store + "-"]);
+    this.router.navigate(['/pages/content/pages/add']);
   }
 
   onEdit(event) {
-    this.router.navigate(['/pages/content/pages/add/' + this.params.store + "-" + event.code]);
+    this.router.navigate(['/pages/content/pages/edit/' + event.code]);
   }
 
   onDelete(event) {

@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.merchant.model.merchant;
 
+import com.asrevo.cvhome.commons.domain.ReadableSliderImage;
 import com.asrevo.cvhome.store.core.model.content.ReadableImage;
 import com.asrevo.cvhome.store.core.model.entity.ReadableAudit;
 import com.asrevo.cvhome.store.core.model.entity.ReadableAuditable;
@@ -8,6 +9,7 @@ import com.asrevo.cvhome.store.model.references.ReadableLanguage;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
+import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -27,6 +29,7 @@ public class ReadableMerchantStore extends MerchantStoreEntity
     private ReadableImage banner;
     private ReadableAudit audit;
     private ReadableMerchantStore parent;
+    private Set<ReadableSliderImage> sliderImages;
 
     private List<ReadableLanguage> supportedLanguages;
 

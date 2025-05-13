@@ -5,7 +5,7 @@ export interface ContentPage {
     number: number
     recordsTotal: number
     recordsFiltered: number
-    content: Page[]
+    content: Page[] | undefined
 }
 
 export interface Page {

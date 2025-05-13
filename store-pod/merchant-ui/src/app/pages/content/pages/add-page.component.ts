@@ -2,27 +2,26 @@ import {Component, OnInit} from '@angular/core';
 import {FormArray, FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {ActivatedRoute, Router} from '@angular/router';
 import {ConfigService} from '../../../shared/services/config.service';
-import {NbDialogService, NbToastrService} from '@nebular/theme';
+import {NbToastrService} from '@nebular/theme';
 import {validators} from '../../../shared/validation/validators';
 import {slugify} from '../../../shared/utils/slugifying';
 
 import {TranslateService} from '@ngx-translate/core';
-import {ImageBrowserComponent} from "../../../shared/components/image-browser/image-browser.component";
 import {ErrorService} from "../../../shared/services/error.service";
 import {ContentService} from "../services/content.service";
-
-declare var $: any;
+import {SelectedStoreService} from "../../../shared/services/selected-store.service";
+import {mergeMap, of, zip} from "rxjs";
+import {StoreService} from "../../store-management/services/store.service";
 
 @Component({
   selector: 'add-page',
-  standalone:false,
+  standalone: false,
   templateUrl: './add-page.component.html',
   styleUrls: ['./add-page.component.scss'],
 })
 export class AddPageComponent implements OnInit {
 
   loader = false;
-  store: string;
   uniqueCode: string;
   form: FormGroup;
   content: any;
@@ -35,19 +34,21 @@ export class AddPageComponent implements OnInit {
 
   isCodeExists = false;
 
+  params: any;
+
   constructor(
     private contentService: ContentService,
     public router: Router,
     private toastr: NbToastrService,
     private configService: ConfigService,
-    private dialogService: NbDialogService,
     private activatedRoute: ActivatedRoute,
     private fb: FormBuilder,
     private translate: TranslateService,
-    private errorService: ErrorService
+    private errorService: ErrorService,
+    private selectedStoreService: SelectedStoreService,
+    private storeService: StoreService
   ) {
-    this.defaultLanguage = this.translate.defaultLang;
-    this.currentLanguage = this.translate.currentLang;
+    this.params = this.param();
   }
 
   get code() {
@@ -62,17 +63,41 @@ export class AddPageComponent implements OnInit {
     return this.form.get('selectedLanguage');
   }
 
+  param() {
+    return {
+      store: '',
+    };
+  }
+
   ngOnInit() {
     this.loader = true;
-    this.activatedRoute.params
-      .subscribe(it => {
-        const split: string[] = it['code'].split("-");
-        this.store = split[0];
-        this.getLanguages();
-        if (split.length == 2 && split[1] != "") {
-          this.action = 'edit';
-          this.uniqueCode = split[1];
-          this.getPage();
+    zip([this.selectedStoreService.current(), this.activatedRoute.params])
+      .pipe(mergeMap(([selectedStore, params]) => {
+        return zip(
+          of(selectedStore),
+          of(params),
+          this.storeService.getStore(selectedStore),
+          this.configService.getListOfSupportedLanguages(selectedStore)
+        )
+      }))
+      .subscribe({
+        next: ([selectedStore, params, store, languages]) => {
+          this.params.store = selectedStore;
+          this.uniqueCode = params.code
+          this.languages = [...languages];
+          this.addFormArray();
+          this.defaultLanguage = store.defaultLanguage;
+          this.currentLanguage = store.defaultLanguage;
+          if (this.uniqueCode) {
+            this.action = 'edit';
+            this.getPage();
+          }
+        },
+        error: (err) => {
+          this.loader = false;
+        },
+        complete: () => {
+          this.loader = false;
         }
       });
 
@@ -116,7 +141,6 @@ export class AddPageComponent implements OnInit {
 
   public findInvalidControls() {
     const invalid = [];
-    console.log(this.form.controls)
     const controls = this.form.controls;
     for (const name in controls) {
       if (controls[name].invalid) {
@@ -139,7 +163,7 @@ export class AddPageComponent implements OnInit {
 
   focusOutFunction(event) {
     const code = event.target.value.trim();
-    this.contentService.checkCodePageExist(code, this.store)
+    this.contentService.checkCodePageExist(code, this.params.store)
       .subscribe(res => {
         this.isCodeExists = res.exists;
       }, err => {
@@ -165,7 +189,7 @@ export class AddPageComponent implements OnInit {
 
     if (object.id) {
 
-      this.contentService.updatePage(object.id, this.store, object)
+      this.contentService.updatePage(object.id, this.params.store, object)
         .subscribe({
           next: (data) => {
             this.loadingList = false;
@@ -178,7 +202,7 @@ export class AddPageComponent implements OnInit {
           },
         });
     } else {
-      this.contentService.createPage(this.store, object)
+      this.contentService.createPage(this.params.store, object)
         .subscribe({
           next: (data) => {
             this.loadingList = false;
@@ -198,24 +222,8 @@ export class AddPageComponent implements OnInit {
     this.router.navigate(['/pages/content/pages/list']);
   }
 
-  private getLanguages() {
-    console.log("will get lang")
-    this.configService.getListOfSupportedLanguages(this.store)
-      .subscribe({
-        next: (languages) => {
-          this.languages = [...languages];
-          this.addFormArray();
-          this.loader = false;
-        },
-        error: (err) => {
-          this.errorService.error('ERROR.SYSTEM_ERROR', err);
-          this.loader = false;
-        },
-      });
-  }
-
   private getPage() {
-    this.contentService.getPage(this.uniqueCode, this.store)
+    this.contentService.getPage(this.uniqueCode, this.params.store)
       .subscribe({
         next: (data) => {
           this.content = data;

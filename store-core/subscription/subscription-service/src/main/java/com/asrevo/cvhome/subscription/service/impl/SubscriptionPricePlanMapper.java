@@ -21,7 +21,7 @@ public interface SubscriptionPricePlanMapper {
 
     @Named("toPreviousCost")
     default PricePlanCost toPreviousCost(SubscriptionPricePlanEntity it) {
-        if (RecurringPlan.YEARLY.equals(it.getRecurringPlan())) {
+        if (RecurringPlan.YEAR.equals(it.getRecurringPlan())) {
             return PricePlanCost.from(it.getCost().currency(), it.getSubscriptionPlan(), it.getRecurringPlan());
         } else {
             return it.getCost();

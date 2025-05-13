@@ -15,22 +15,18 @@ const routes: Routes = [
       {
         path: 'create-category',
         component: CategoryCreationComponent,
-        // canActivate: [SuperadminGuard]
       },
       {
         path: 'categories-list',
         component: CategoriesListComponent,
-        // canActivate: [StoreGuard]
       },
       {
         path: 'categories-hierarchy',
         component: CategoriesHierarchyComponent,
-        // canActivate: [SuperadminGuard]
       },
       {
         path: 'category/:id',
         component: CategoryDetailComponent,
-        // canActivate: [SuperadminGuard]
       },
     ],
   }

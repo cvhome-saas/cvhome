@@ -1,19 +1,19 @@
 import {Component, OnInit} from '@angular/core';
 import {FormArray, FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {ActivatedRoute, Router} from '@angular/router';
-import {NbDialogService, NbToastrService} from '@nebular/theme';
+import {NbToastrService} from '@nebular/theme';
 import {validators} from '../../../shared/validation/validators';
 import {TranslateService} from '@ngx-translate/core';
 import {ConfigService} from '../../../shared/services/config.service';
-import {ImageBrowserComponent} from "../../../shared/components/image-browser/image-browser.component";
 import {ErrorService} from "../../../shared/services/error.service";
 import {ContentService} from "../services/content.service";
-
-declare var $: any;
+import {SelectedStoreService} from "../../../shared/services/selected-store.service";
+import {mergeMap, of, zip} from "rxjs";
+import {StoreService} from "../../store-management/services/store.service";
 
 @Component({
   selector: 'add-box',
-  standalone:false,
+  standalone: false,
   templateUrl: './add-box.component.html',
   styleUrls: ['./add-box.component.scss'],
 })
@@ -21,26 +21,15 @@ export class AddBoxComponent implements OnInit {
   loader = false;
   form: FormGroup;
   content: any;
-
   languages = [];
-
-  uniqueCode: string;//identifier fromroute
+  uniqueCode: string;
   isCodeExists = false;
   action: any = 'save'
 
-  //default selected lang
   defaultLanguage: string;
-  //changed from seo section
   currentLanguage: string;
-  uploadData = new FormData();
   description: Array<any> = []
-  page = {
-    visible: false,
-    mainmenu: false,
-    code: '',
-    order: '',
-  }
-  params :any;
+  params: any;
 
   constructor(
     private fb: FormBuilder,
@@ -50,11 +39,11 @@ export class AddBoxComponent implements OnInit {
     private configService: ConfigService,
     private activatedRoute: ActivatedRoute,
     private translate: TranslateService,
-    private errorService: ErrorService
+    private errorService: ErrorService,
+    private selectedStoreService: SelectedStoreService,
+    private storeService: StoreService
   ) {
     this.params = this.param();
-    this.defaultLanguage = this.translate.defaultLang
-    this.currentLanguage = this.translate.currentLang
   }
 
   get code() {
@@ -77,16 +66,36 @@ export class AddBoxComponent implements OnInit {
 
   ngOnInit() {
     this.loader = true;
-    this.activatedRoute.params.subscribe(it => {
-      const split: string[] = it['code'].split("-");
-      this.params.store = split[0];
-      this.getLanguages();
-      if (split.length == 2 && split[1] != "") {
-        this.action = 'edit';
-        this.uniqueCode = split[1];
-        this.loadContent();
-      }
-    });
+    zip([this.selectedStoreService.current(), this.activatedRoute.params])
+      .pipe(mergeMap(([selectedStore, params]) => {
+        return zip(
+          of(selectedStore),
+          of(params),
+          this.storeService.getStore(selectedStore),
+          this.configService.getListOfSupportedLanguages(selectedStore)
+        )
+      }))
+      .subscribe({
+        next: ([selectedStore, params, store, languages]) => {
+          this.params.store = selectedStore;
+          this.uniqueCode = params.code
+          this.languages = [...languages];
+          this.addFormArray();
+          this.defaultLanguage = store.defaultLanguage;
+          this.currentLanguage = store.defaultLanguage;
+          if (this.uniqueCode) {
+            this.action = 'edit';
+            this.loadContent();
+          }
+        },
+        error: (err) => {
+          this.loader = false;
+          this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        },
+        complete: () => {
+          this.loader = false;
+        }
+      });
     this.createForm();
   }
 
@@ -110,22 +119,6 @@ export class AddBoxComponent implements OnInit {
 
   goToBack() {
     this.router.navigate(['/pages/content/boxes/list']);
-  }
-
-  private getLanguages() {
-    this.configService.getListOfSupportedLanguages(this.params.store)
-      .subscribe({
-        next: (languages) => {
-          this.languages = [...languages];
-          this.addFormArray();
-          this.loader = false;
-        },
-        error: (err) => {
-          this.toastr.danger(err.error.message);
-          this.loader = false;
-          this.errorService.error('ERROR.SYSTEM_ERROR', err);
-        },
-      });
   }
 
   private loadContent() {

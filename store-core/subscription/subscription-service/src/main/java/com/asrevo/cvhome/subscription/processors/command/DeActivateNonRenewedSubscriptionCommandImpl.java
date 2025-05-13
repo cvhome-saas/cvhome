@@ -15,6 +15,7 @@ public class DeActivateNonRenewedSubscriptionCommandImpl implements EventImpl<De
 
     @Override
     public void process(DeActivateNonRenewedSubscriptionCommand command) {
+        log.info("Received DeActivateNonRenewedSubscriptionCommand {}", command);
         subscriptionService.deActivateSubscription(command.org());
     }
 

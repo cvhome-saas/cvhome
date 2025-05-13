@@ -7,7 +7,7 @@ import {TranslateService} from '@ngx-translate/core';
 import {ErrorService} from "../../../shared/services/error.service";
 
 @Component({
-  selector: 'ngx-store-social-links',
+  selector: 'ngx-store-slider-images',
   standalone: false,
   templateUrl: './store-slider-images.component.html',
   styleUrls: ['./store-slider-images.component.scss']
@@ -97,11 +97,12 @@ export class StoreSliderImagesComponent implements OnInit {
 
   save() {
     if (this.sliderImages && this.sliderImages.length > 0) {
-      let i=0;
+      let i = 0;
       let sliderImages = this.sliderImages.map(it => {
         return {
           priority: i++,
-          url: new URL(it.url).pathname.split('/').pop(),
+          name: it.name,
+          url: it.url
         };
       });
       this.storeService.saveStoreImageSliders(this.store.id, sliderImages)
@@ -171,11 +172,8 @@ export class StoreSliderImagesComponent implements OnInit {
     this.storeService.addStoreSliderImage(this.store.id, newImageInput.files[0])
       .subscribe({
         next: (data) => {
-          this.sliderImages.push({
-            "priority": this.sliderImages.length,
-            "url": "http://localhost:32897/620fe7ff-fc77-4862-8c2d-9e7261104932/files/65f023632bc46470c104b75f/SLIDER/f7a70e38-5f92-42d5-9c04-3f5301deb75e.jpg"
-          })
-          this.toastr.success(this.translate.instant('STORE_BRANDING.NETWORKS_UPDATED'));
+          this.sliderImages.push(data)
+          this.toastr.success(this.translate.instant('STORE.SLIDER_IMAGE_UPLOADED_SUCCESSFULLY'));
         },
         error: (err) => {
           this.errorService.error('ERROR.SYSTEM_ERROR', err);
@@ -190,5 +188,6 @@ export class StoreSliderImagesComponent implements OnInit {
 
 export interface SliderImage {
   priority: number;
+  name: string;
   url: string;
 }

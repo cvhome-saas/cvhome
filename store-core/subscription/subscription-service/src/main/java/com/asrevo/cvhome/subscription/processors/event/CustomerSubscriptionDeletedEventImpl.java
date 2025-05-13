@@ -15,6 +15,7 @@ public class CustomerSubscriptionDeletedEventImpl implements EventImpl<CustomerS
 
     @Override
     public void process(CustomerSubscriptionDeletedEvent event) {
+        log.info("Received CustomerSubscriptionDeletedEvent from CustomerSubscriptionService {}", event);
         subscriptionService.deActivateSubscription(event.org());
     }
 

@@ -15,6 +15,7 @@ public class InvoicePaymentFailedEventImpl implements EventImpl<InvoicePaymentFa
 
     @Override
     public void process(InvoicePaymentFailedEvent event) {
+        log.info("Invoice payment failed event received: {}", event);
         subscriptionService.deActivateSubscription(event.org());
     }
 

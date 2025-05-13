@@ -2,11 +2,11 @@ package com.asrevo.cvhome.commons.domain;
 
 import java.io.Serializable;
 
-public record SliderImage(Integer priority, String url)
+public record SliderImage(Integer priority, String name)
         implements Serializable, Comparable<SliderImage> {
 
     @Override
     public int compareTo(SliderImage o) {
-        return o.url.compareTo(this.url);
+        return o.name.compareTo(this.name);
     }
 }

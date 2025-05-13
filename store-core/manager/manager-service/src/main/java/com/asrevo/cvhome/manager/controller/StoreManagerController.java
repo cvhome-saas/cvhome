@@ -10,12 +10,12 @@ import com.asrevo.cvhome.manager.service.StoreManagerService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -49,8 +49,8 @@ public class StoreManagerController {
     @GetMapping("private/store")
 //    @PreAuthorize("hasAnyRole('ROLE_ORG_ADMIN')")
     @ConditionalOnApiStatus
-    public Mono<PageImpl<Object>> findAllStoresDetailed(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, Pageable pageable) {
-        return managerService.findAll(identity, new ListManagerStoreQuery(null, null, null), pageable);
+    public Mono<Page<ManagerStoreDto>> findAllStoresDetailed(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, Pageable pageable) {
+        return Mono.just(internalStoreService.findAll(identity, new ListManagerStoreQuery(null, null, null), pageable));
     }
 
     @GetMapping("private/store/{code}")
@@ -66,8 +66,8 @@ public class StoreManagerController {
     }
 
     @GetMapping("public/themes")
-    public Theme[] themes() {
-        return Theme.values();
+    public List<Theme> themes() {
+        return Theme.getImplementedThemes();
     }
 
     @GetMapping("public/color-themes")

@@ -14,7 +14,12 @@ export async function FooterSocialLinks({
         {
             params.store.socialLinks && params.store.socialLinks.length > 0 &&
             params.store.socialLinks.map(it => {
-                return <a key={it.provider} href={it.url} target="_blank"
+
+                const url = it.url.startsWith('http://') || it.url.startsWith('https://')
+                    ? it.url
+                    : `https://${it.url}`
+
+                return <a key={it.provider} href={url} target="_blank"
                           className={`text-neutral hover:text-neutral dark:hover:text-foreground ${isRtlLayout ? 'me-5' : 'ms-5'}`}>
                     <SocialIcons icon={it.provider.toLowerCase()}/>
                     <span className="sr-only">{it.provider.toLowerCase()}</span>

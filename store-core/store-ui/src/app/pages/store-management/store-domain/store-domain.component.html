@@ -82,6 +82,9 @@
           {{ 'ORDER.ACTIONS' |translate }}
         </ng-template>
         <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+          <button (click)="onAccess(row)" nbButton shape="round" size="small" status="success">
+            <nb-icon icon="external-link"></nb-icon>
+          </button>
           <button (click)="onDelete(row.domain)" nbButton shape="round" size="small" status="danger" *ngIf="row.domainType!='SUB_DOMAIN'">
             <nb-icon icon="trash"></nb-icon>
           </button>
