@@ -58,6 +58,7 @@ public class PodSelectionImpl implements PodSelection {
             log.info("will select private preferred pod {} for org {}", preferredPod, orgId);
             return preferredPod.id();
         } else {
+            log.info("will select private pod for org {} from {}", orgId, myPrivatePods);
             Pod pod = random(myPrivatePods);
             log.info("will select private pod {} for org {}", pod, orgId);
             return pod.id();
