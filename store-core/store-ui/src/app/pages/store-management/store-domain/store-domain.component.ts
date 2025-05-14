@@ -9,6 +9,8 @@ import {ColumnMode} from "@swimlane/ngx-datatable";
 import {validators} from "../../../shared/validation/validators";
 import {ErrorService} from "../../../shared/services/error.service";
 import {zip} from "rxjs";
+import {DnsCheckService} from "../services/dns-check.service";
+import {dnsPointsToPodValidatorFactory, StoreDomainComponentValidatorContext} from "./store-domain.validator";
 
 @Component({
   selector: 'ngx-store-domain',
@@ -16,7 +18,7 @@ import {zip} from "rxjs";
   templateUrl: './store-domain.component.html',
   styleUrls: ['./store-domain.component.scss']
 })
-export class StoreDomainComponent implements OnInit {
+export class StoreDomainComponent implements OnInit , StoreDomainComponentValidatorContext{
   isSubmited = false
   store;
   loading = false;
@@ -73,7 +75,8 @@ export class StoreDomainComponent implements OnInit {
     private translate: TranslateService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
-    private errorService: ErrorService
+    private errorService: ErrorService,
+    private dnsCheckService: DnsCheckService
   ) {
   }
 
@@ -173,15 +176,26 @@ export class StoreDomainComponent implements OnInit {
 
   private createForm() {
     this.form = this.fb.group({
-      domain: ['', [Validators.required, Validators.pattern(validators.domainPattern)]],
+      domain: [
+        '',
+        {
+          validators: [Validators.required, Validators.pattern(validators.domainPattern)],
+          asyncValidators: [dnsPointsToPodValidatorFactory(this, this.dnsCheckService)],
+          updateOn: 'blur'
+        }
+      ],
     });
   }
 
   public generateDomain(row: any): string {
     if (row.domainType === "SUB_DOMAIN") {
-      return row.domain + "." + this.saasProperties.alis + "-" + this.podId.id + "." + this.saasProperties.domain;
+      return row.domain + "." + this.podServerDomain();
     } else {
       return row.domain;
     }
+  }
+
+  public podServerDomain() {
+    return this.saasProperties.alis + "-" + this.podId.id + "." + this.saasProperties.domain;
   }
 }
