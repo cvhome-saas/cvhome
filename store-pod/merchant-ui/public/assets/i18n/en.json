@@ -214,7 +214,16 @@
     "ERROR_REMOVING_DOMAIN": "Error while removing domain",
     "DOMAIN_CREATED": "Domain created successfully",
     "ERROR_CREATING_DOMAIN": "Error while creating domain",
-    "SAVE": "Save"
+    "SAVE": "Save",
+    "DOMAIN": "Domain",
+    "DOMAIN_PLACEHOLDER": "example.com",
+    "DOMAIN_INVALID_PATTERN": "Domain format is invalid (e.g., example.com).",
+    "DOMAIN_DNS_NOT_POINTING": "Domain '{{domain}}' is not correctly pointing to our servers.",
+    "DOMAIN_DNS_CNAME_HINT": "Please create a CNAME record for '{{domain}}' pointing to '{{target}}'. DNS changes can take some time to propagate.",
+    "DOMAIN_DNS_CHECK_ERROR": "Could not verify domain DNS at this time. Please try again or contact support.",
+    "DOMAIN_DNS_CHECKING": "Verifying domain DNS...",
+    "DOMAIN_DNS_WAITING_INFO": "Waiting for server information to verify domain...",
+    "DOMAIN_HELP_TEXT": "Make sure to add CNAME record points to {{podDomain}} firsts."
   },
   "STORE_LANDING": {
     "LANDING_PAGE_TITLE": "Landing page title",
