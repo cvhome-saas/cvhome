@@ -3,7 +3,7 @@ import {AuthService} from "../../shared/services/auth.service";
 
 @Component({
   selector: 'ngx-home',
-  standalone:false,
+  standalone: false,
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })

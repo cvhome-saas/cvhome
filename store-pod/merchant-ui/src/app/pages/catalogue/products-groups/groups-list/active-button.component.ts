@@ -8,7 +8,7 @@ import {ErrorService} from "../../../../shared/services/error.service";
 
 @Component({
   selector: 'ngx-product-groups-active',
-  standalone:false,
+  standalone: false,
   template: `<nb-checkbox [checked]="value" (checkedChange)="clicked()"/>`,
 })
 export class ActiveButtonComponent {

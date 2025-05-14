@@ -1,11 +1,11 @@
 import {Component, OnInit} from '@angular/core';
-import {ActivatedRoute, Router} from '@angular/router';
+import {ActivatedRoute} from '@angular/router';
 import {StoreService} from '../services/store.service';
 import {ErrorService} from "../../../shared/services/error.service";
 
 @Component({
   selector: 'ngx-store-detail-info',
-  standalone:false,
+  standalone: false,
   templateUrl: './store-detail-info.component.html',
   styleUrls: ['./store-detail-info.component.scss']
 })

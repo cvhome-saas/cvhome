@@ -8,7 +8,7 @@ import {ErrorService} from "../../../shared/services/error.service";
 
 @Component({
   selector: 'ngx-store-branding-logo',
-  standalone:false,
+  standalone: false,
   template: `
     <form [formGroup]="imageUpload">
       <div (click)='imageInput.click()' (dragover)="allowDrop($event)" (drop)="drop($event)" class="wrapper">
@@ -24,7 +24,7 @@ import {ErrorService} from "../../../shared/services/error.service";
              type="file">
 
       <div class="form-group actions-button">
-        <button nbButton status="danger" (click)="removeLogo()" *ngIf="showRemoveButton"  type="submit">{{
+        <button nbButton status="danger" (click)="removeLogo()" *ngIf="showRemoveButton" type="submit">{{
             'COMMON.REMOVE' | translate
           }}
         </button>

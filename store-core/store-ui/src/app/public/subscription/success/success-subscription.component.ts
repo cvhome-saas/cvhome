@@ -2,9 +2,9 @@ import {Component} from '@angular/core';
 import {Router} from "@angular/router";
 
 @Component({
-    selector: 'store-ui-success-subscription',
-    standalone: false,
-    styles: `
+  selector: 'store-ui-success-subscription',
+  standalone: false,
+  styles: `
       .flex-centered {
         margin: auto;
       }
@@ -27,7 +27,7 @@ import {Router} from "@angular/router";
         margin-bottom: 2rem;
       }
     `,
-    template: `
+  template: `
         <div class="row">
             <div class="col-md-12">
                 <nb-card status="success">
@@ -48,11 +48,11 @@ import {Router} from "@angular/router";
 })
 export class SuccessSubscriptionComponent {
 
-    constructor(private router: Router) {
-        console.log('ngx-success-subscription');
-    }
+  constructor(private router: Router) {
+    console.log('ngx-success-subscription');
+  }
 
-    goToHome() {
-        this.router.navigate(['/']);
-    }
+  goToHome() {
+    this.router.navigate(['/']);
+  }
 }

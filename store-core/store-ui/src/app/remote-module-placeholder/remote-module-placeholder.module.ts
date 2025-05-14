@@ -1,7 +1,7 @@
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import {NgModule} from '@angular/core';
+import {CommonModule} from '@angular/common';
 
-import { RemoteModulePlaceholderRoutingModule } from './remote-module-placeholder-routing.module';
+import {RemoteModulePlaceholderRoutingModule} from './remote-module-placeholder-routing.module';
 
 
 @NgModule({
@@ -11,4 +11,5 @@ import { RemoteModulePlaceholderRoutingModule } from './remote-module-placeholde
     RemoteModulePlaceholderRoutingModule
   ]
 })
-export class RemoteModulePlaceholderModule { }
+export class RemoteModulePlaceholderModule {
+}

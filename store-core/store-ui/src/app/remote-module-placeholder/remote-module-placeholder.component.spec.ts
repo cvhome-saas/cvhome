@@ -1,6 +1,6 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { RemoteModulePlaceholderComponent } from './remote-module-placeholder.component';
+import {RemoteModulePlaceholderComponent} from './remote-module-placeholder.component';
 
 describe('RemoteModulePlaceholderComponent', () => {
   let component: RemoteModulePlaceholderComponent;
@@ -10,7 +10,7 @@ describe('RemoteModulePlaceholderComponent', () => {
     await TestBed.configureTestingModule({
       imports: [RemoteModulePlaceholderComponent]
     })
-    .compileComponents();
+      .compileComponents();
 
     fixture = TestBed.createComponent(RemoteModulePlaceholderComponent);
     component = fixture.componentInstance;

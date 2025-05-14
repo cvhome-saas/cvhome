@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 
 @Component({
   selector: 'ngx-usage',
-  standalone:false,
+  standalone: false,
   templateUrl: './usage.component.html',
   styleUrls: ['./usage.component.scss']
 })

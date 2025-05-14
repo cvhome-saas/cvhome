@@ -9,7 +9,6 @@ import {ErrorService} from "../../../../shared/services/error.service";
 import {SelectedStoreService} from "../../../../shared/services/selected-store.service";
 import {BaseTable, PageT, StorePageRequest} from "../../../common/BaseTable";
 import {Observable, of} from "rxjs";
-import {map} from "rxjs/operators";
 
 @Component({
   selector: 'ngx-groups-list',

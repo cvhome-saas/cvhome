@@ -6,7 +6,7 @@ import {ErrorService} from "../../../shared/services/error.service";
 
 @Component({
   selector: 'ngx-user-profile',
-  standalone:false,
+  standalone: false,
   templateUrl: './user-profile.component.html',
   styleUrls: ['./user-profile.component.scss']
 })

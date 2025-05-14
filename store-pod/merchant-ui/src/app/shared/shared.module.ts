@@ -1,7 +1,8 @@
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {
-  NbActionsModule, NbAutocompleteModule,
+  NbActionsModule,
+  NbAutocompleteModule,
   NbButtonModule,
   NbCardModule,
   NbChatModule,
@@ -9,10 +10,12 @@ import {
   NbContextMenuModule,
   NbDatepickerModule,
   NbDialogModule,
-  NbIconModule, NbInputModule,
+  NbIconModule,
+  NbInputModule,
   NbLayoutModule,
   NbMenuModule,
-  NbOptionModule, NbRouteTabsetModule,
+  NbOptionModule,
+  NbRouteTabsetModule,
   NbSearchModule,
   NbSelectModule,
   NbSidebarModule,

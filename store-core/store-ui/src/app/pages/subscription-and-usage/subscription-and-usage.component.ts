@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 
 @Component({
   selector: 'ngx-subscription-and-usage',
-  standalone:false,
+  standalone: false,
   templateUrl: './subscription-and-usage.component.html',
   styleUrls: ['./subscription-and-usage.component.scss']
 })

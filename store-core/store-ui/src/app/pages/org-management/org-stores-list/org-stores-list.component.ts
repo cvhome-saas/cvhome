@@ -48,7 +48,7 @@ export class OrgStoresListComponent extends BaseTable<any> implements OnInit {
     private router: Router,
     errorService: ErrorService
   ) {
-    super(null,  errorService)
+    super(null, errorService)
   }
 
   ngOnInit() {

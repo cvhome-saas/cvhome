@@ -11,7 +11,7 @@ import {SelectedStoreService} from "../../../../shared/services/selected-store.s
 
 @Component({
   selector: 'ngx-product-to-category',
-  standalone:false,
+  standalone: false,
   templateUrl: './product-to-category.component.html',
   styleUrls: ['./product-to-category.component.scss']
 })
@@ -24,7 +24,7 @@ export class ProductToCategoryComponent implements OnInit, AfterViewInit {
   categories: any[] = [];
   selectedItems: string[] = [];
 
-  params :any;
+  params: any;
 
   constructor(
     private translate: TranslateService,
@@ -33,8 +33,8 @@ export class ProductToCategoryComponent implements OnInit, AfterViewInit {
     private productService: ProductService,
     private toastr: NbToastrService,
     private activatedRoute: ActivatedRoute,
-    private selectedStoreService:SelectedStoreService
-    ) {
+    private selectedStoreService: SelectedStoreService
+  ) {
     this.params = this.loadParams();
 
   }

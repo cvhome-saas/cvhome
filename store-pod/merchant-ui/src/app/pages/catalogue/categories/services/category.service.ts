@@ -1,7 +1,6 @@
 import {Injectable} from '@angular/core';
 
 import {CrudService} from '../../../../shared/services/crud.service';
-import {StorageService} from '../../../../shared/services/storage.service';
 import {Observable} from 'rxjs';
 
 @Injectable({

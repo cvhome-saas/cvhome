@@ -7,13 +7,13 @@ import {SubscriptionModule} from "./subscription/subscription.module";
 
 
 @NgModule({
-    declarations: [PublicComponent],
-    imports: [
-        PublicRoutingModule,
-        ThemeModule,
-        SharedModule,
-        SubscriptionModule
-    ]
+  declarations: [PublicComponent],
+  imports: [
+    PublicRoutingModule,
+    ThemeModule,
+    SharedModule,
+    SubscriptionModule
+  ]
 })
 export class PublicModule {
 }

@@ -1,12 +1,11 @@
 import {Component, EventEmitter} from '@angular/core';
 import {FormControl} from "@angular/forms";
-import {TranslateService} from "@ngx-translate/core";
 import {StatisticsParams} from "../service/statistic.service";
 import {SelectedStoreService} from '../../../shared/services/selected-store.service';
 
 @Component({
   selector: 'ngx-client-dashboard',
-  standalone:false,
+  standalone: false,
   templateUrl: './client-dashboard.component.html',
   styleUrl: './client-dashboard.component.scss'
 })
@@ -21,7 +20,7 @@ export class ClientDashboardComponent {
   toMaxDates: Date = new Date();
 
 
-  constructor(private selectedStoreService:SelectedStoreService) {
+  constructor(private selectedStoreService: SelectedStoreService) {
     this.fromDateControl = new FormControl(this.previousDays(7));
     this.toDateControl = new FormControl(new Date());
     this.params = {

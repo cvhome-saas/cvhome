@@ -18,6 +18,7 @@ export class SubscriptionService {
     return this.httpClient.get<SubscriptionDetails>("subscription/api/v1/subscription/subscription-plan-details");
   }
 }
+
 export interface SubscriptionDetails {
   createdDate: string
   lastRenewedDate: string
@@ -80,7 +81,7 @@ export interface FeatureList {
   features: Feature[]
 }
 
-export interface Feature{
+export interface Feature {
   code: string
 }
 

@@ -2,7 +2,6 @@ import {Injectable} from '@angular/core';
 import {StoreService} from './store.service';
 import {Store} from '../models/commons';
 import {map, Observable, of, tap} from 'rxjs';
-import {CookieService} from "ngx-cookie-service";
 
 @Injectable({
   providedIn: 'root'

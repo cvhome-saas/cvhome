@@ -3,13 +3,13 @@ import {NbDialogRef} from '@nebular/theme';
 
 @Component({
   selector: 'ngx-order-invoice',
-  standalone:false,
+  standalone: false,
   templateUrl: 'order-invoice.html',
   styleUrls: ['order-invoice.scss'],
 })
 export class OrderInvoiceComponent {
   orderData: any;
-  store:any;
+  store: any;
 
   constructor(protected ref: NbDialogRef<OrderInvoiceComponent>) {
   }

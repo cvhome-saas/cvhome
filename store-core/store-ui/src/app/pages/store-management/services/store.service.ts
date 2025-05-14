@@ -131,7 +131,7 @@ export class StoreService {
     return this.crudService.get(`/manager/api/v1/store-manager/public/social-links-providers`);
   }
 
-  updateStoreSocialLinks(storeId,request) {
+  updateStoreSocialLinks(storeId, request) {
     return this.crudService.put(`/store-pod-gateway/merchant/api/v1/private/store/social-links?store=${storeId}`, request);
   }
 }

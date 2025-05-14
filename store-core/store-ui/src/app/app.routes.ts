@@ -15,7 +15,7 @@ export const routes: Routes = [
   {
     path: 'external-login-link',
     loadChildren: () => new Promise(() => {
-      window.location.href = environment.LOGIN_URL+"?redirectTo="+encodeURIComponent(window.location.pathname);
+      window.location.href = environment.LOGIN_URL + "?redirectTo=" + encodeURIComponent(window.location.pathname);
     })
   },
   {

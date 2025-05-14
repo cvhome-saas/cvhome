@@ -1,13 +1,13 @@
 import {AfterViewInit, Component, EventEmitter, Input, OnDestroy} from '@angular/core';
 import {NbJSThemeVariable, NbThemeService} from '@nebular/theme';
-import {combineLatest, mergeMap, Observable, of, Subscription} from "rxjs";
+import {combineLatest, mergeMap, Observable, Subscription} from "rxjs";
 import {map} from "rxjs/operators";
 import {StatisticList, StatisticService, StatisticsParams} from "../../service/statistic.service";
 import {ErrorService} from '../../../../shared/services/error.service';
 
 @Component({
   selector: 'ngx-new-store-created-statistic',
-  standalone:false,
+  standalone: false,
   template: `
     <div echarts [options]="options" class="echart"></div>
   `,

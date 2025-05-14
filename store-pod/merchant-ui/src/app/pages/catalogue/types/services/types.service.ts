@@ -44,7 +44,7 @@ export class TypesService {
       store,
       code
     };
-    return this.crudService.get(`/store-pod-gateway/catalog/api/v1/private/product/type/unique`,params);
+    return this.crudService.get(`/store-pod-gateway/catalog/api/v1/private/product/type/unique`, params);
   }
 
 

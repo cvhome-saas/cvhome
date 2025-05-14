@@ -1,11 +1,10 @@
 import {AfterViewInit, Component, EventEmitter, OnInit} from '@angular/core';
 import {StatisticsParams} from "../service/statistic.service";
 import {FormControl} from "@angular/forms";
-import {TranslateService} from "@ngx-translate/core";
 
 @Component({
   selector: 'ngx-admin-dashboard',
-  standalone:false,
+  standalone: false,
   templateUrl: './admin-dashboard.component.html',
   styleUrl: './admin-dashboard.component.scss'
 })

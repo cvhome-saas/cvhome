@@ -7,7 +7,7 @@ import {ErrorService} from '../../../../shared/services/error.service';
 
 @Component({
   selector: 'ngx-orders-statistic',
-  standalone:false,
+  standalone: false,
   template: `
     <div echarts [options]="options" class="echart"></div>
   `,
@@ -22,7 +22,7 @@ export class OrdersStatisticComponent implements AfterViewInit, OnDestroy {
   }
 
   getData(p: StatisticsParams): Observable<StatisticList> {
-    if (p.store){
+    if (p.store) {
       return this.statisticService.getOrderStatistic(p);
     } else {
       return of({

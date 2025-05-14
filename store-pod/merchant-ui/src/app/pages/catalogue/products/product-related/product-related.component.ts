@@ -33,7 +33,7 @@ export class ProductRelatedComponent implements OnInit, AfterViewInit {
     private errorService: ErrorService,
     private toastr: NbToastrService,
     private translate: TranslateService,
-    private selectedStoreService:SelectedStoreService
+    private selectedStoreService: SelectedStoreService
   ) {
     this.params = this.loadParams();
   }

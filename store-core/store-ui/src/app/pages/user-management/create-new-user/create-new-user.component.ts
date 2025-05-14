@@ -5,7 +5,7 @@ import {ActivatedRoute} from "@angular/router";
 
 @Component({
   selector: 'ngx-create-new-user',
-  standalone:false,
+  standalone: false,
   templateUrl: './create-new-user.component.html',
   styleUrls: ['./create-new-user.component.scss']
 })

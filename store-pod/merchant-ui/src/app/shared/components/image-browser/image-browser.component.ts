@@ -5,7 +5,7 @@ import {ErrorService} from "../../services/error.service";
 
 @Component({
   selector: 'ngx-image-browser',
-  standalone:false,
+  standalone: false,
   templateUrl: './image-browser.component.html',
   styleUrls: ['./image-browser.component.scss']
 })

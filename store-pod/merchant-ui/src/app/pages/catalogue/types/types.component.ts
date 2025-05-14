@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 
 @Component({
   selector: 'ngx-types',
-  standalone:false,
+  standalone: false,
   templateUrl: './types.component.html',
   styleUrls: ['./types.component.css']
 })

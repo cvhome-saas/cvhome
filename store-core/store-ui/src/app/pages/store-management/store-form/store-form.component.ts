@@ -306,7 +306,7 @@ export class StoreFormComponent implements OnInit {
       weight: ['', [Validators.required]],
       dimension: ['', [Validators.required]],
       inBusinessSince: [new Date()],
-    },{ validators: defaultLanguageMustBeInSupportedValidator });
+    }, {validators: defaultLanguageMustBeInSupportedValidator});
 
     if (this.store && this.store.id) {
       this.fillForm();
@@ -315,6 +315,7 @@ export class StoreFormComponent implements OnInit {
   }
 
 }
+
 export function defaultLanguageMustBeInSupportedValidator(group: FormGroup): { [key: string]: boolean } | null {
   const defaultLangControl: AbstractControl = group.get('defaultLanguage');
   const supportedLangsControl: AbstractControl = group.get('supportedLanguages');
@@ -331,7 +332,7 @@ export function defaultLanguageMustBeInSupportedValidator(group: FormGroup): { [
   if (defaultLanguageValue && supportedLanguagesValue && Array.isArray(supportedLanguagesValue) && supportedLanguagesValue.length > 0) {
     if (!supportedLanguagesValue.includes(defaultLanguageValue)) {
       console.log("rasing error")
-      return { 'defaultLanguageNotInSupported': true }; // Validation error for the group
+      return {'defaultLanguageNotInSupported': true}; // Validation error for the group
     }
   }
 

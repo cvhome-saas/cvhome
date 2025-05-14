@@ -10,7 +10,7 @@ import {SelectedStoreService} from "../../../../shared/services/selected-store.s
 
 @Component({
   selector: 'ngx-products-images',
-  standalone:false,
+  standalone: false,
   templateUrl: './products-images.component.html',
   styleUrls: ['./products-images.component.css']
 })
@@ -38,8 +38,8 @@ export class ProductsImagesComponent implements OnInit, AfterViewInit {
     private location: Location,
     private errorService: ErrorService,
     private activatedRoute: ActivatedRoute,
-    private selectedStoreService:SelectedStoreService
-    ) {
+    private selectedStoreService: SelectedStoreService
+  ) {
 
 
   }

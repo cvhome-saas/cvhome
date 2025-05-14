@@ -7,7 +7,7 @@ import {ErrorService} from '../../../../shared/services/error.service';
 
 @Component({
   selector: 'ngx-customer-countries-statistic',
-  standalone:false,
+  standalone: false,
   template: `
     <div echarts [options]="options" class="echart"></div>
   `,
@@ -25,7 +25,7 @@ export class CustomerCountriesStatisticComponent implements AfterViewInit, OnDes
   }
 
   getData(p: StatisticsParams): Observable<StatisticList> {
-    if (p.store){
+    if (p.store) {
       return this.statisticService.getCustomerStatistic(p)
     } else {
       return of({

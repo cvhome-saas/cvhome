@@ -8,7 +8,7 @@ import {Roles} from "../shared/models/roles";
 
 @Component({
   selector: 'ngx-pages',
-  standalone:false,
+  standalone: false,
   styleUrls: ['pages.component.scss'],
   template: `
     <ngx-one-column-layout>

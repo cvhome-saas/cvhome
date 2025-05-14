@@ -7,7 +7,7 @@ import {ErrorService} from "../../../shared/services/error.service";
 
 @Component({
   selector: 'ngx-user-status',
-  standalone:false,
+  standalone: false,
   template: `
     <nb-checkbox [checked]="rowData.active" (checkedChange)="clicked()"/>`,
 })

@@ -24,7 +24,7 @@ import {ErrorService} from "../../../shared/services/error.service";
              type="file">
 
       <div class="form-group actions-button">
-        <button nbButton status="danger" (click)="removeBanner()" *ngIf="showRemoveButton"  type="submit">{{
+        <button nbButton status="danger" (click)="removeBanner()" *ngIf="showRemoveButton" type="submit">{{
             'COMMON.REMOVE' | translate
           }}
         </button>

@@ -6,7 +6,7 @@ import {ErrorService} from "../../services/error.service";
 
 @Component({
   selector: 'ngx-store-autocomplete',
-  standalone:false,
+  standalone: false,
   templateUrl: './store-autocomplete.component.html',
   styleUrls: ['./store-autocomplete.component.scss']
 })
@@ -35,7 +35,7 @@ export class StoreAutocompleteComponent implements AfterViewInit {
   ngAfterViewInit(): void {
     this.storeService.list()
       .subscribe({
-        next:(it)=>{
+        next: (it) => {
           this.stores = it.content;
           if (this.stores.length > 0) {
             if (this.selectedItem == undefined) {
@@ -52,7 +52,7 @@ export class StoreAutocompleteComponent implements AfterViewInit {
             this.changed(this.selectedItem)
           }
         },
-        error:(err)=>{
+        error: (err) => {
           this.errorService.error('ERROR.SYSTEM_ERROR', err);
         }
       });

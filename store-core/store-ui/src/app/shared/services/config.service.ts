@@ -4,7 +4,6 @@ import {TranslateService} from '@ngx-translate/core';
 import {environment} from '../../../environments/environment';
 import {HttpClient} from "@angular/common/http";
 import {CrudService} from "./crud.service";
-import {Observable} from "rxjs";
 
 
 @Injectable({
@@ -40,7 +39,7 @@ export class ConfigService {
     return languages;
   }
 
-  getListOfCountries(){
+  getListOfCountries() {
     return this.httpClient.get<any[]>("assets/data/countries.json");
   }
 

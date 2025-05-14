@@ -11,7 +11,7 @@ import {NbIconLibraries} from '@nebular/theme';
 })
 export class AppComponent {
   constructor(private iconLibraries: NbIconLibraries) {
-    this.iconLibraries.registerFontPack('font-awesome', { packClass: 'fa', iconClassPrefix: 'fa' });
+    this.iconLibraries.registerFontPack('font-awesome', {packClass: 'fa', iconClassPrefix: 'fa'});
     this.iconLibraries.setDefaultPack('font-awesome');
   }
 }
