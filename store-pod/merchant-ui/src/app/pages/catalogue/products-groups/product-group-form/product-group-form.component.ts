@@ -14,7 +14,7 @@ import {zip} from "rxjs";
 
 @Component({
   selector: 'ngx-product-group-form',
-  standalone:false,
+  standalone: false,
   templateUrl: './product-group-form.component.html',
   styleUrls: ['./product-group-form.component.scss']
 })
@@ -24,7 +24,7 @@ export class ProductGroupFormComponent implements OnInit {
   uniqueCode: string;
   loader: boolean = false;
   perPage = 50;
-  params :any;
+  params: any;
   products: Array<any> = [];
   rows: Array<any> = [];
   store: string;
@@ -40,9 +40,9 @@ export class ProductGroupFormComponent implements OnInit {
     private errorService: ErrorService,
     private toastr: NbToastrService,
     private translate: TranslateService,
-    private selectedStoreService:SelectedStoreService
-    ) {
-    this.params=this.loadParams();
+    private selectedStoreService: SelectedStoreService
+  ) {
+    this.params = this.loadParams();
   }
 
   get code() {
@@ -58,20 +58,27 @@ export class ProductGroupFormComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.createForm();
 
-    zip([this.selectedStoreService.current(), this.activatedRoute.params]).subscribe({
-      next: (([selectedStore, params]) => {
+    zip([this.selectedStoreService.current(), this.activatedRoute.params, this.activatedRoute.queryParams]).subscribe({
+      next: (([selectedStore, params, queryParams]) => {
         this.params.store = selectedStore
         this.uniqueCode = params['code'];
         if (this.uniqueCode) {
-          this.action='edit'
+          this.action = 'edit'
           this.getProductByCode();
+        } else {
+          const suggestedCode = queryParams['code'];
+          if (suggestedCode) {
+            this.form.patchValue({
+              code: suggestedCode,
+            });
+          }
         }
 
       })
     })
 
-    this.createForm();
   }
 
   getProductByCode() {

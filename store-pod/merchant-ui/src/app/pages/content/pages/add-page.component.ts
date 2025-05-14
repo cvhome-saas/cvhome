@@ -77,11 +77,12 @@ export class AddPageComponent implements OnInit {
           of(selectedStore),
           of(params),
           this.storeService.getStore(selectedStore),
-          this.configService.getListOfSupportedLanguages(selectedStore)
+          this.configService.getListOfSupportedLanguages(selectedStore),
+          this.activatedRoute.queryParams
         )
       }))
       .subscribe({
-        next: ([selectedStore, params, store, languages]) => {
+        next: ([selectedStore, params, store, languages, queryParams]) => {
           this.params.store = selectedStore;
           this.uniqueCode = params.code
           this.languages = [...languages];
@@ -91,6 +92,13 @@ export class AddPageComponent implements OnInit {
           if (this.uniqueCode) {
             this.action = 'edit';
             this.getPage();
+          } else {
+            const suggestedCode = queryParams['code'];
+            if (suggestedCode) {
+              this.form.patchValue({
+                code: suggestedCode,
+              });
+            }
           }
         },
         error: (err) => {
