@@ -15,7 +15,6 @@ public class CachedExternalMerchantStoreService implements ExternalMerchantStore
     @Cacheable(value = "STORE",key = "#store.storeMerchantId()", unless = "#result==null")
     @Override
     public ReadableMerchantStore getStore(StoreMerchantId store) {
-        System.out.println(store);
         return externalMerchantStoreService.getStore(store);
     }
 

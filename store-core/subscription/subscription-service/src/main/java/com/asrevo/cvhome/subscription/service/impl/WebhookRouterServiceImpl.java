@@ -33,7 +33,6 @@ public class WebhookRouterServiceImpl implements WebhookRouterService {
         if (ignoredEventTypes.contains(event.getType())) {
             return;
         }
-        System.out.println(event);
         List<WebhookHandler> currentHandlersImpl = handlers.stream().filter(it -> it.type().equals(event.getType()))
                 .toList();
 
