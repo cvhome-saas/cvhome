@@ -218,7 +218,6 @@
     "DOMAIN": "Domaine",
     "DOMAIN_PLACEHOLDER": "exemple.com",
     "DOMAIN_INVALID_PATTERN": "Le format du domaine est invalide (par exemple, exemple.com).",
-    "DOMAIN_DNS_NOT_POINTING": "Le domaine '{{domain}}' ne pointe pas correctement vers nos serveurs.",
     "DOMAIN_DNS_CNAME_HINT": "Veuillez créer un enregistrement CNAME pour '{{domain}}' pointant vers '{{target}}'. Les modifications DNS peuvent prendre un certain temps à se propager.",
     "DOMAIN_DNS_CHECK_ERROR": "Impossible de vérifier le DNS du domaine pour le moment. Veuillez réessayer ou contacter le support.",
     "DOMAIN_DNS_CHECKING": "Vérification du DNS du domaine en cours...",
