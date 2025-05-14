@@ -214,7 +214,15 @@
     "ERROR_REMOVING_DOMAIN": "Erreur lors de la suppression du domaine",
     "DOMAIN_CREATED": "Domaine créé avec succès",
     "ERROR_CREATING_DOMAIN": "Erreur lors de la création du domaine",
-    "SAVE": "Sauvegarder"
+    "SAVE": "Sauvegarder",
+    "DOMAIN": "Domaine",
+    "DOMAIN_PLACEHOLDER": "exemple.com",
+    "DOMAIN_INVALID_PATTERN": "Le format du domaine est invalide (par exemple, exemple.com).",
+    "DOMAIN_DNS_CNAME_HINT": "Veuillez créer un enregistrement CNAME pour '{{domain}}' pointant vers '{{target}}'. Les modifications DNS peuvent prendre un certain temps à se propager.",
+    "DOMAIN_DNS_CHECK_ERROR": "Impossible de vérifier le DNS du domaine pour le moment. Veuillez réessayer ou contacter le support.",
+    "DOMAIN_DNS_CHECKING": "Vérification du DNS du domaine en cours...",
+    "DOMAIN_DNS_WAITING_INFO": "En attente des informations du serveur pour vérifier le domaine...",
+    "DOMAIN_HELP_TEXT": "Assurez-vous d'abord d'ajouter un enregistrement CNAME pointant vers {{podDomain}}."
   },
   "STORE_LANDING": {
     "LANDING_PAGE_TITLE": "Titre de la page de destination",
@@ -245,6 +253,7 @@
     "STORE_STATE_PROVINCE_REQUIRED": "L'état/province est requis",
     "STORE_SUPPORTED_LANGUAGES_REQUIRED": "Les langues prises en charge sont requises",
     "STORE_DEFAULT_LANGUAGE_REQUIRED": "La langue par défaut est requise",
+    "ERROR_DEFAULT_LANGUAGE_NOT_SUPPORTED": "La langue par défaut doit être l'une des langues prises en charge",
     "STORE_CURRENCY_REQUIRED": "La devise est requise",
     "STORE_WEIGHT_UNITS_REQUIRED": "L'unité de poids est requise",
     "STORE_SIZE_UNITS_REQUIRED": "L'unité de taille est requise",

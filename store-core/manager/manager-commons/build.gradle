@@ -5,10 +5,10 @@ plugins {
 
 dependencies {
 	api project(':store-commons:commons')
-	compileOnly 'com.fasterxml.jackson.core:jackson-databind:2.18.2'
-	compileOnly 'com.fasterxml.jackson.core:jackson-annotations:2.18.2'
-	compileOnly 'org.springframework.data:spring-data-relational:3.4.3'
-	compileOnly 'org.projectlombok:lombok:1.18.36'
+	compileOnly 'com.fasterxml.jackson.core:jackson-databind:2.18.3'
+	compileOnly 'com.fasterxml.jackson.core:jackson-annotations:2.18.3'
+	compileOnly 'org.springframework.data:spring-data-relational:3.4.5'
+	compileOnly 'org.projectlombok:lombok:1.18.38'
 	implementation 'dnsjava:dnsjava:3.5.2'
-	annotationProcessor 'org.projectlombok:lombok:1.18.36'
+	annotationProcessor 'org.projectlombok:lombok:1.18.38'
 }

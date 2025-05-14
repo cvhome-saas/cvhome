@@ -69,14 +69,6 @@ export class ProductFormComponent implements OnInit {
         route: 'related',
       },
       {
-        title: this.translate.instant('COMPONENTS.OPTIONS_CONFIG'),
-        route: 'options',
-      },
-      {
-        title: this.translate.instant('COMPONENTS.PRODUCTS_PROPERTIES'),
-        route: 'properties',
-      },
-      {
         title: this.translate.instant('COMPONENTS.PRODUCTS_DISCOUNT'),
         route: 'discount',
       }

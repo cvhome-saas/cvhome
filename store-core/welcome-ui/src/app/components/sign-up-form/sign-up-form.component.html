@@ -1,5 +1,5 @@
 <div class="contact-box bg-white text-center rounded p-1 pr-sm-5 pl-sm-5 pb-sm-5 mt-4 mt-lg-0 shadow-lg">
-  <form id="contact-form" [formGroup]="userForm" onsubmit="event.preventDefault();">
+  <form id="contact-form" [formGroup]="userForm" (submit)="signUp()">
     <div class="contact-top pb-sm-3 pt-sm-3">
       <h3 class="contact-title">{{ title }}</h3>
     </div>
@@ -58,7 +58,7 @@
 
       </div>
       <div class="col-12">
-        <button class="btn btn-bordered w-100 mt-3" type="button" (click)="signUp()">Sign Up</button>
+        <button class="btn btn-bordered w-100 mt-3" type="submit">Sign Up</button>
       </div>
       <div class="col-12">
         <span class="d-block pt-2 mt-4 border-top">Already have an account? <a

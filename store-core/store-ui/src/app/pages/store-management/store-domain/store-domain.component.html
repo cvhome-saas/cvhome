@@ -21,27 +21,41 @@
 
     <form [formGroup]='form' (ngSubmit)="save()" class="mx-auto" style="max-width: 600px;">
       <div class="card border-0 shadow-sm rounded-3 p-4">
-        <div class="form-group mb-4">
-          <label for="inputDomain" class="form-label text-primary h6 mb-3">
-            {{ 'STORE.STORE_DOMAIN' | translate }}
-          </label>
-          <input
-            nbInput
-            fullWidth
-            id="inputDomain"
-            formControlName="domain"
-            class="form-control form-control-lg"
-            placeholder="example.com"
-            required
-            type="text">
-          <div *ngIf="isSubmited&&(domain.dirty || domain.touched) && domain.invalid && domain"
-               class="invalid-feedback d-block mt-2">
-            <span *ngIf="domain.errors.required" class="text-danger">
-              {{ 'STORE.DOMAIN_REQUIRED' | translate }}
-            </span>
-            <span *ngIf="domain.errors.pattern" class="text-danger">
-              {{ 'STORE.DOMAIN_PATTERN_INVALID' | translate }}
-            </span>
+        <div class="row">
+          <div class="col-md-12">
+            <div class="form-group">
+              <label for="domain" class="label required">{{ 'STORE.DOMAIN' | translate }}</label>
+              <input type="text" nbInput fullWidth id="domain" formControlName="domain"
+                     [placeholder]="'STORE.DOMAIN_PLACEHOLDER' | translate">
+              <ng-container *ngIf="(domain.dirty || domain.touched || isSubmited) && domain.invalid">
+                <p class="caption status-danger" *ngIf="domain.errors?.required">
+                  {{ 'STORE.DOMAIN_REQUIRED' | translate }}
+                </p>
+                <p class="caption status-danger" *ngIf="domain.errors?.pattern">
+                  {{ 'STORE.DOMAIN_INVALID_PATTERN' | translate }}
+                </p>
+                <p class="caption status-danger" *ngIf="domain.errors?.dnsNotPointingToCname">
+                  {{
+                    'STORE.DOMAIN_DNS_CNAME_HINT' | translate: {
+                      domain: domain.errors.dnsNotPointingToCname.domainChecked,
+                      target: domain.errors.dnsNotPointingToCname.requiredTarget
+                    }
+                  }}
+                </p>
+                <p class="caption status-warning" *ngIf="domain.errors?.dnsCheckServiceError">
+                  {{ 'STORE.DOMAIN_DNS_CHECK_ERROR' | translate }}
+                </p>
+                <p class="caption text-hint" *ngIf="domain.errors?.waitingForInfraInfo">
+                  {{ 'STORE.DOMAIN_DNS_WAITING_INFO' | translate }}
+                </p>
+              </ng-container>
+              <p class="caption text-hint" *ngIf="domain.pending">
+                {{ 'STORE.DOMAIN_DNS_CHECKING' | translate }}
+              </p>
+              <p class="caption">
+                {{ 'STORE.DOMAIN_HELP_TEXT' | translate: {podDomain: podServerDomain()} }}
+              </p>
+            </div>
           </div>
         </div>
 

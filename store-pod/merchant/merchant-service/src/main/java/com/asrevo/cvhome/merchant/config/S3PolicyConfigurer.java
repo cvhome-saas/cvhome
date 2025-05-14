@@ -49,9 +49,8 @@ public class S3PolicyConfigurer implements ApplicationListener<ApplicationReadyE
                             finalPolicy
                     )
                     .build());
-            System.out.println(putBucketPolicyResponse);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            log.error("error putting policy",e);
         }
     }
 }

@@ -8,7 +8,6 @@ import com.asrevo.cvhome.order.entity.customer.Customer;
 import com.asrevo.cvhome.order.entity.order.Order;
 import com.asrevo.cvhome.order.entity.order.OrderChannel;
 import com.asrevo.cvhome.order.entity.order.orderstatus.OrderStatusHistory;
-import com.asrevo.cvhome.order.entity.reference.currency.Currency;
 import com.asrevo.cvhome.order.model.order.v1.PersistableAnonymousOrder;
 import com.asrevo.cvhome.order.model.order.v1.PersistableOrder;
 import com.asrevo.cvhome.order.service.populator.customer.CustomerPopulator;
@@ -66,8 +65,6 @@ public class PersistableOrderApiPopulator
             ReadableMerchantStore baseStore = externalMerchantStoreService.getStore(store);
             target.setLocale(LocaleUtils.getLocale(baseStore.getDefaultLanguage()));
 
-            Currency currency = currencyService.getByCode(baseStore.getCurrency());
-
             // Customer
             Customer customer;
             if (source.getCustomerId() != null && source.getCustomerId() > 0) {
@@ -102,7 +99,7 @@ public class PersistableOrderApiPopulator
             target.setBilling(billing);
 
             target.setDatePurchased(new Date());
-            target.setCurrency(currency.getCode());
+            target.setCurrency(baseStore.getCurrency());
             target.setCurrencyValue(new BigDecimal(0));
             target.setStore(store);
             target.setChannel(OrderChannel.API);

@@ -163,6 +163,7 @@ public class ReadableProductMapper implements Mapper<Product, ReadableProduct> {
                             .map(i -> this.convertImage(source, i, store))
                             .collect(Collectors.toList());
             destination.setImages(imageList);
+            destination.setImage(imageList.getFirst());
         }
 
         if (!CollectionUtils.isEmpty(source.getAttributes())) {

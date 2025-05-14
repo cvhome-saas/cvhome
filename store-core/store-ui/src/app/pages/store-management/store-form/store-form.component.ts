@@ -1,5 +1,5 @@
 import {ChangeDetectorRef, Component, Input, OnInit} from '@angular/core';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {AbstractControl, FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {Router} from '@angular/router';
 
 import {ConfigService} from '../../../shared/services/config.service';
@@ -306,7 +306,7 @@ export class StoreFormComponent implements OnInit {
       weight: ['', [Validators.required]],
       dimension: ['', [Validators.required]],
       inBusinessSince: [new Date()],
-    });
+    },{ validators: defaultLanguageMustBeInSupportedValidator });
 
     if (this.store && this.store.id) {
       this.fillForm();
@@ -314,4 +314,26 @@ export class StoreFormComponent implements OnInit {
 
   }
 
+}
+export function defaultLanguageMustBeInSupportedValidator(group: FormGroup): { [key: string]: boolean } | null {
+  const defaultLangControl: AbstractControl = group.get('defaultLanguage');
+  const supportedLangsControl: AbstractControl = group.get('supportedLanguages');
+
+  if (!defaultLangControl || !supportedLangsControl) {
+    return null; // Controls not found, should not happen in a well-defined form
+  }
+
+  const defaultLanguageValue = defaultLangControl.value;
+  const supportedLanguagesValue = supportedLangsControl.value; // This should be an array of language codes
+
+  // Only proceed if both controls have values and supportedLanguages is a non-empty array.
+  // The 'required' validator on individual controls will handle cases where they are empty.
+  if (defaultLanguageValue && supportedLanguagesValue && Array.isArray(supportedLanguagesValue) && supportedLanguagesValue.length > 0) {
+    if (!supportedLanguagesValue.includes(defaultLanguageValue)) {
+      console.log("rasing error")
+      return { 'defaultLanguageNotInSupported': true }; // Validation error for the group
+    }
+  }
+
+  return null; // No error
 }
