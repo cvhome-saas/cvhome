@@ -42,7 +42,7 @@
                     }
                   }}
                   <br>
-                  <small>{{ 'STORE.DOMAIN_DNS_CNAME_HINT' | translate: {target: domain.errors.dnsNotPointingToPod.requiredTarget} }}</small>
+                  <small>{{ 'STORE.DOMAIN_DNS_CNAME_HINT' | translate: {target: domain.errors.dnsNotPointingToCname.requiredTarget} }}</small>
                 </p>
                 <p class="caption status-warning" *ngIf="domain.errors?.dnsCheckServiceError">
                   {{ 'STORE.DOMAIN_DNS_CHECK_ERROR' | translate }}

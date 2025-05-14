@@ -1,6 +1,6 @@
 // /home/ashraf-revo/IdeaProjects/cvhome-saas/cvhome/store-core/store-ui/src/app/pages/store-management/services/dns-check.service.ts
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http'; // Import HttpClient
+import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http'; // Import HttpHeaders
 import { Observable, of } from 'rxjs';
 import { map, catchError, tap } from 'rxjs/operators';
 
@@ -39,11 +39,19 @@ export class DnsCheckService {
     // We are looking for a CNAME record for the customDomain
     const params = new HttpParams()
       .set('name', customDomain)
-      .set('type', 'CNAME'); // Type 5 for CNAME
+      .set('type', 'CNAME') // Type 5 for CNAME
+      .set('_cb', new Date().getTime().toString()); // Cache-busting parameter with current timestamp
 
-    console.log(`[DnsCheckService] Querying Google DNS for CNAME: ${customDomain}`);
+    // Optionally, set headers to suggest no caching, though cache-busting param is more effective for GET
+    const headers = new HttpHeaders({
+      'Cache-Control': 'no-cache, no-store, must-revalidate, post-check=0, pre-check=0',
+      'Pragma': 'no-cache',
+      'Expires': '0'
+    });
 
-    return this.http.get<GoogleDnsResponse>(this.googleDohUrl, { params }).pipe(
+    console.log(`[DnsCheckService] Querying Google DNS for CNAME: ${customDomain} (Cache buster: ${params.get('_cb')})`);
+
+    return this.http.get<GoogleDnsResponse>(this.googleDohUrl, { params, headers }).pipe( // Added headers
       tap(response => console.log(`[DnsCheckService] Google DNS Response for ${customDomain}:`, response)),
       map(response => {
         if (response && response.Status === 0 && response.Answer) { // Status 0 means NOERROR
