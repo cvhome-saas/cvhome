@@ -4,16 +4,16 @@ plugins {
 }
 
 dependencies {
-	compileOnly 'org.springframework:spring-web:6.2.3'
+	compileOnly 'org.springframework:spring-web:6.2.6'
 	api project(':store-pod:store-commons')
 	api project(':store-pod:merchant:merchant-commons')
 	api project(':store-pod:customer:customer-commons')
 	api project(':store-pod:reference:reference-commons')
-	compileOnly 'org.springframework.data:spring-data-jpa:3.4.3'
+	compileOnly 'org.springframework.data:spring-data-jpa:3.4.5'
 	compileOnly 'jakarta.validation:jakarta.validation-api:3.0.2'
-	compileOnly 'com.fasterxml.jackson.core:jackson-annotations:2.18.2'
+	compileOnly 'com.fasterxml.jackson.core:jackson-annotations:2.18.3'
 	compileOnly 'org.apache.commons:commons-lang3:3.17.0'
-	compileOnly 'org.projectlombok:lombok:1.18.36'
-	compileOnly 'org.hibernate.orm:hibernate-core:6.6.8.Final'
-	annotationProcessor 'org.projectlombok:lombok:1.18.36'
+	compileOnly 'org.projectlombok:lombok:1.18.38'
+	compileOnly 'org.hibernate.orm:hibernate-core:6.6.13.Final'
+	annotationProcessor 'org.projectlombok:lombok:1.18.38'
 }
