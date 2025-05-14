@@ -20,6 +20,7 @@ import {map} from "rxjs/operators";
 export class BoxesComponent extends BaseTable<any> implements OnInit {
   protected readonly ColumnMode = ColumnMode;
   private isInitialized: boolean = false;
+  private recommendedCodes = ["agreement", "header-message"];
 
   constructor(
     private contentService: ContentService,
@@ -29,7 +30,7 @@ export class BoxesComponent extends BaseTable<any> implements OnInit {
     private toastr: NbToastrService,
     selectedStoreService: SelectedStoreService,
     private dialogService: NbDialogService) {
-    super(selectedStoreService,  errorService)
+    super(selectedStoreService, errorService)
   }
 
   ngOnInit(): void {
@@ -42,6 +43,20 @@ export class BoxesComponent extends BaseTable<any> implements OnInit {
       return of();
     }
     return this.contentService.getBoxes(request)
+      .pipe(map(it => {
+        const missingCodes = this.recommendedCodes.filter(code => !it.content.some(e => e.code === code));
+        missingCodes.forEach(code => {
+          it.content.unshift({
+            code: code
+          })
+        });
+        return {
+          ...it,
+          "size": it.content.length,
+          "totalElements": it.content.length,
+          "content": it.content
+        }
+      }));
   }
 
   addBoxes() {
@@ -49,7 +64,11 @@ export class BoxesComponent extends BaseTable<any> implements OnInit {
   }
 
   onEdit(event) {
-    this.router.navigate(['/pages/content/boxes/edit',  event.code]);
+    this.router.navigate(['/pages/content/boxes/edit', event.code]);
+  }
+
+  onCreate(event) {
+    this.router.navigate([`/pages/content/boxes/add`], {queryParams: {code: event.code}});
   }
 
   onDelete(event) {

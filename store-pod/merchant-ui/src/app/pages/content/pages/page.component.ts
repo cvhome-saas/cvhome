@@ -8,6 +8,7 @@ import {ContentService} from "../services/content.service";
 import {SelectedStoreService} from "../../../shared/services/selected-store.service";
 import {BaseTable, PageT, StorePageRequest} from "../../common/BaseTable";
 import {Observable, of} from "rxjs";
+import {map} from "rxjs/operators";
 
 @Component({
   selector: 'page-table',
@@ -18,6 +19,7 @@ import {Observable, of} from "rxjs";
 export class PageComponent extends BaseTable<any> implements OnInit {
   protected readonly ColumnMode = ColumnMode;
   private isInitialized: boolean = false;
+  private recommendedCodes = ["about-us", "contact-us", "faq", "location", "privacy", "terms"];
 
   constructor(
     private contentService: ContentService,
@@ -40,6 +42,20 @@ export class PageComponent extends BaseTable<any> implements OnInit {
       return of();
     }
     return this.contentService.pages(request)
+      .pipe(map(it => {
+        const missingCodes = this.recommendedCodes.filter(code => !it.content.some(e => e.code === code));
+        missingCodes.forEach(code => {
+          it.content.unshift({
+            code: code
+          })
+        });
+        return {
+          ...it,
+          "size": it.content.length,
+          "totalElements": it.content.length,
+          "content": it.content
+        }
+      }));
   }
 
 
@@ -50,6 +66,10 @@ export class PageComponent extends BaseTable<any> implements OnInit {
 
   onEdit(event) {
     this.router.navigate(['/pages/content/pages/edit/' + event.code]);
+  }
+
+  onCreate(event) {
+    this.router.navigate([`/pages/content/pages/add`], {queryParams: {code: event.code}});
   }
 
   onDelete(event) {

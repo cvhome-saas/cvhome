@@ -16,7 +16,7 @@ export class ProductGroupsService {
 
 
   createProductGroup(store, group): Observable<any> {
-    return this.crudService.post(`/store-pod-gateway/catalog/api/v1/private/product/group?store=${store}`, group);
+    return this.crudService.post(`/store-pod-gateway/catalog/api/v1/private/products/group?store=${store}`, group);
   }
 
   updateGroupActiveValue(store, group): Observable<any> {

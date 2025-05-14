@@ -1,7 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 
 import {NbDialogService} from '@nebular/theme';
-import {TranslateService} from '@ngx-translate/core';
 import {ProductGroupsService} from '../services/product-groups.service';
 import {Router} from '@angular/router';
 import {ShowcaseDialogComponent} from "../../../../shared/components/showcase-dialog/showcase-dialog.component";
@@ -21,6 +20,7 @@ import {map} from "rxjs/operators";
 export class GroupsListComponent extends BaseTable<any> implements OnInit {
   protected readonly ColumnMode = ColumnMode;
   private isInitialized: boolean = false;
+  private recommendedCodes = ["NEWLY_ADDED", "RECOMMENDED", "FEATURED_ITEMS", "HOME_PAGE"];
 
   constructor(
     private dialogService: NbDialogService,
@@ -29,7 +29,7 @@ export class GroupsListComponent extends BaseTable<any> implements OnInit {
     selectedStoreService: SelectedStoreService,
     private router: Router) {
 
-    super(selectedStoreService,  errorService);
+    super(selectedStoreService, errorService);
   }
 
   ngOnInit(): void {
@@ -42,10 +42,28 @@ export class GroupsListComponent extends BaseTable<any> implements OnInit {
       return of();
     }
     return this.productGroupsService.getListOfProductGroups(request)
+      .pipe(map(it => {
+        const missingCodes = this.recommendedCodes.filter(code => !it.content.some(e => e.code === code));
+        missingCodes.forEach(code => {
+          it.content.unshift({
+            code: code
+          })
+        });
+        return {
+          ...it,
+          "size": it.content.length,
+          "totalElements": it.content.length,
+          "content": it.content
+        }
+      }));
   }
 
   onEdit(row: any) {
     this.router.navigate([`/pages/catalogue/products-groups/update-products-group/${row.code}`]);
+  }
+
+  onCreate(event) {
+    this.router.navigate([`/pages/catalogue/products-groups/create-products-group`], {queryParams: {code: event.code}});
   }
 
   onDelete(row: any) {
