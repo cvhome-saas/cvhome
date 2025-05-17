@@ -222,7 +222,8 @@
     "DOMAIN_DNS_CHECK_ERROR": "Could not verify domain DNS at this time. Please try again or contact support.",
     "DOMAIN_DNS_CHECKING": "Verifying domain DNS...",
     "DOMAIN_DNS_WAITING_INFO": "Waiting for server information to verify domain...",
-    "DOMAIN_HELP_TEXT": "Make sure to add CNAME record points to {{podDomain}} firsts."
+    "DOMAIN_HELP_TEXT": "Make sure to add CNAME record points to {{podDomain}} firsts.",
+    "PREFERRED_POD": "Preferred Pod"
   },
   "STORE_LANDING": {
     "LANDING_PAGE_TITLE": "Landing page title",
