@@ -5,7 +5,6 @@ import com.asrevo.cvhome.store.core.model.content.ReadableImage;
 import com.asrevo.cvhome.store.core.model.entity.ReadableAudit;
 import com.asrevo.cvhome.store.core.model.entity.ReadableAuditable;
 import com.asrevo.cvhome.store.model.references.ReadableAddress;
-import com.asrevo.cvhome.store.model.references.ReadableLanguage;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
@@ -31,7 +30,7 @@ public class ReadableMerchantStore extends MerchantStoreEntity
     private ReadableMerchantStore parent;
     private Set<ReadableSliderImage> sliderImages;
 
-    private List<ReadableLanguage> supportedLanguages;
+    private List<String> supportedLanguages;
 
     public ReadableAudit getReadableAudit() {
         return this.audit;

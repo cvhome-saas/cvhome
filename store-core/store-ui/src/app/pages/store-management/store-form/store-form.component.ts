@@ -179,7 +179,7 @@ export class StoreFormComponent implements OnInit {
   fillForm() {
 
     this.store.supportedLanguages.forEach(lang => {
-      this.supportedLanguagesSelected.push(lang.code);
+      this.supportedLanguagesSelected.push(lang);
     });
     this.form.patchValue({
       id: this.store.id,
@@ -264,7 +264,7 @@ export class StoreFormComponent implements OnInit {
   userHasSupportedLanguage(language) {
     if (!this.store || !this.store.supportedLanguages)
       return false;
-    return this.store.supportedLanguages.find((l: any) => l.code === language.code) != undefined;
+    return this.store.supportedLanguages.find((l: any) => l === language.code) != undefined;
   }
 
   checkName(event) {

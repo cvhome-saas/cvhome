@@ -20,7 +20,7 @@ INSERT INTO merchant.merchant_store (store_merchant_id, currency_format_national
                                      use_cache, weightunitcode, country_id, currency_id, language_code)
 VALUES ('65f023632bc26470c104b75f', false, '2024-04-01', '352023632b046970c104b76f', 'DEFAULT', 'LIGHT',
         'CM', -- Changed seizeunitcode slightly
-        'info@egyptcarsales.com', 'logo.jpeg', 'banner.jpeg', '123 Auto Road', 'Cairo', 'Egypt Car Sales',
+        'info@egyptcarsales.com', 'logo.jpeg', 'banner.jpeg', '123 Auto Road', 'Cairo', 'Egypt-Car-Sales',
         '+201001234567', -- Cars domain reflected
         '11511', 'Cairo', false, 'KG', 'EG', 'EGP',
         'ar') -- Using 'ar' as the first language
