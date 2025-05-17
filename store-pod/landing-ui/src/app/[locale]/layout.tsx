@@ -6,6 +6,9 @@ import {Store} from "@/types/store";
 import {StoreNotFoundLayout} from "@/app/[locale]/_layout/StoreNotFoundLayout";
 import {StoreLayout} from "@/app/[locale]/_layout/StoreLayout";
 import {Metadata} from "next";
+import {redirect} from 'next/navigation';
+import {headers} from 'next/headers';
+import {buildDefaultLangRedirectionUrl} from "@/utils/locale-utils";
 
 const svgIcon = `<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚀</text></svg>`;
 const svgDataUri = `data:image/svg+xml,${svgIcon}`;
@@ -18,20 +21,26 @@ export const metadata: Metadata = {
     },
 };
 
-export default async function
-    LocaleLayout({children, params}: {
+export default async function LocaleLayout({children, params}: {
     children: React.ReactNode;
     params: Promise<DefaultParams>;
 }) {
-
     const p = await params;
+    const urlLocale = p.locale;
     p.storeContext = await extractSsrContext();
-    const store: Store | undefined = p.storeContext.store != "" ? await StoreService.getStore(p.storeContext) : undefined;
+    const store: Store | undefined = p.storeContext.store !== "" ? await StoreService.getStore(p.storeContext) : undefined;
+
     if (store) {
         p.store = store;
-        return <StoreLayout p={p} children={children}/>
+        const storeSupportedLanguages = store.supportedLanguages || [];
+
+        if (storeSupportedLanguages.includes(urlLocale)) {
+            return <StoreLayout p={p} children={children}/>;
+        } else {
+            redirect(buildDefaultLangRedirectionUrl(store, await headers(), urlLocale));
+        }
     } else {
-        return <StoreNotFoundLayout p={p}/>
+        return <StoreNotFoundLayout p={p}/>;
     }
 }
 
