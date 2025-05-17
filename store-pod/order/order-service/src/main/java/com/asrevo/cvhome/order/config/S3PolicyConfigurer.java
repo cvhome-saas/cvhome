@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.order.config;
 
+import com.asrevo.cvhome.commons.domain.StorageProviderType;
 import com.asrevo.cvhome.s2s.model.CdnStorageProperties;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +21,9 @@ public class S3PolicyConfigurer implements ApplicationListener<ApplicationReadyE
 
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {
-        configurePolicy();
+        if (StorageProviderType.MINIO.equals(cdnStorageProperties.provider())){
+            configurePolicy();
+        }
     }
 
     public void configurePolicy() {
