@@ -22,7 +22,6 @@ create table if not exists orders.country
     country_isocode   varchar(6) not null primary key,
     country_supported boolean,
     geozone_id        bigint
-        constraint fkdkldrhiqa274imykuh0p8icb references orders.geozone
 );
 create table if not exists orders.language
 (
@@ -41,10 +40,8 @@ create table if not exists orders.country_description
     description    text,
     name           varchar(120) not null,
     title          varchar(100),
-    language_code  varchar(6)   not null
-        constraint fkorknwk5v8t484n6goauqlw2jj references orders.language (code),
-    country_id     varchar(6)   not null
-        constraint fkcqt2eksj1ucfg822rlx0ah55m references orders.country,
+    language_code  varchar(6)   not null,
+    country_id     varchar(6)   not null,
     constraint UKdf8ewjt49cy3enpcwoe9ganps unique (country_id, language_code)
 );
 create table if not exists orders.geozone_description
@@ -56,10 +53,8 @@ create table if not exists orders.geozone_description
     description    text,
     name           varchar(120) not null,
     title          varchar(100),
-    language_code  varchar(6)   not null
-        constraint fkb5ti8ksr90esthy3knbjut8n1 references orders.language (code),
-    geozone_id     bigint
-        constraint fkmq8egxrpyx60s17ng3kbx80ex references orders.geozone,
+    language_code  varchar(6)   not null,
+    geozone_id     bigint,
     constraint UKl86ppufwjqn6fy1sd7vfc7any unique (geozone_id, language_code)
 );
 create index if not exists code_idx2 on orders.language (code);
@@ -67,7 +62,6 @@ create table if not exists orders.zone
 (
     zone_code  varchar(100) not null primary key,
     country_id varchar(6)   not null
-        constraint fkjd0ph7dy8trl6m0lyid2eicsb references orders.country
 );
 create table if not exists orders.zone_description
 (
@@ -78,10 +72,8 @@ create table if not exists orders.zone_description
     description    text,
     name           varchar(120) not null,
     title          varchar(100),
-    language_code  varchar(6)   not null
-        constraint fk3bhgm7w9u4lmb1oct3icvp55j references orders.language (code),
-    zone_id        varchar(100) not null
-        constraint fkkgubo9lvv7fyi3yug7692evh9 references orders.zone,
+    language_code  varchar(6)   not null,
+    zone_id        varchar(100) not null,
     constraint UKbb9ur48rkg1nngdmka6tjlmum unique (zone_id, language_code)
 );
 create table if not exists orders.customer
@@ -123,16 +115,11 @@ create table if not exists orders.customer
     customer_nick           varchar(96),
     customer_password       varchar(60),
     provider                varchar(255),
-    billing_country_id      varchar(6)  not null
-        constraint fkfaowmep2brbb0f973vnuw9cr3 references orders.country,
-    billing_zone_id         varchar(100)
-        constraint fkduvvfcfgokno59eki42x1biuq references orders.zone,
-    language_code           varchar(6)  not null
-        constraint fkptjfm48g49mrkhravgibb02h7 references orders.language (code),
-    DELIVERY_COUNTRY_CODE   varchar(6)
-        constraint fk6cwqotnrr8rh9hrw0sn1kt1e6 references orders.country (country_isocode),
-    delivery_zone_id        varchar(100)
-        constraint fk8yqdxfoqy25vvy56gs68k9p4 references orders.zone,
+    billing_country_id      varchar(6)  not null,
+    billing_zone_id         varchar(100),
+    language_code           varchar(6)  not null,
+    DELIVERY_COUNTRY_CODE   varchar(6),
+    delivery_zone_id        varchar(100),
     store_merchant_id       varchar(50) not null,
     constraint UKsniymsufa1eqq35pc8kfgyo7p unique (store_merchant_id, customer_nick)
 );
@@ -164,8 +151,7 @@ create table if not exists orders.customer_option_desc
     name                    varchar(120) not null,
     title                   varchar(100),
     customer_option_comment varchar(4000),
-    language_code           varchar(6)   not null
-        constraint fkhalrtqiqm06t2s17lwnu2icos references orders.language (code),
+    language_code           varchar(6)   not null,
     customer_option_id      bigint       not null
         constraint fk201v4egnnqx20q6qky676mks2 references orders.customer_option,
     constraint UKq3l77dsrwyrmm10bct1tbl4dw unique (customer_option_id, language_code)
@@ -202,8 +188,7 @@ create table if not exists orders.customer_opt_val_description
     description         text,
     name                varchar(120) not null,
     title               varchar(100),
-    language_code       varchar(6)   not null
-        constraint fkigy69gv3asw6r90hno6vc3vu4 references orders.language (code),
+    language_code       varchar(6)   not null,
     customer_opt_val_id bigint
         constraint fkmej30yqti7y4t4iqsq15t9yc3 references orders.customer_option_value,
     constraint UKf0c1ffdlvc2a6k0dqqvmucjjy unique (customer_opt_val_id, language_code)
@@ -249,8 +234,7 @@ create table if not exists orders.customer_review_description
     description        text,
     name               varchar(120) not null,
     title              varchar(100),
-    language_code      varchar(6)   not null
-        constraint fkellhkha3lu8w2b5kuuujj5d38 references orders.language (code),
+    language_code      varchar(6)   not null,
     customer_review_id bigint
         constraint fk3nu9inejlfrkcig7ppv3glhrh references orders.customer_review,
     constraint UKmxdv3d04v2swtcv7ss7cx7qc9 unique (customer_review_id, language_code)
@@ -391,16 +375,11 @@ create table if not exists orders.orders
                 )
             ),
     order_total             numeric(38, 2),
-    billing_country_id      varchar(6)  not null
-        constraint fk5ynmp6ibx15b6xilw3d8ssqt6 references orders.country,
-    billing_zone_id         varchar(100)
-        constraint fkhuynwr7s98867e5ooemlmcagu references orders.zone,
-    currency_id             varchar(6)
-        constraint fk4g9gno7ww2i06rxkfl3vbrgcu references orders.currency,
-    DELIVERY_COUNTRY_CODE   varchar(6)
-        constraint fk4fi5e3yv4cl23arphenx4cc4a references orders.country (country_isocode),
-    delivery_zone_id        varchar(100)
-        constraint fkehld6io3ukp9wm0fypp04dbfg references orders.zone,
+    billing_country_id      varchar(6)  not null,
+    billing_zone_id         varchar(100),
+    currency_id             varchar(6),
+    DELIVERY_COUNTRY_CODE   varchar(6),
+    delivery_zone_id        varchar(100),
     store_merchant_id       varchar(50)
 );
 create table if not exists orders.order_account

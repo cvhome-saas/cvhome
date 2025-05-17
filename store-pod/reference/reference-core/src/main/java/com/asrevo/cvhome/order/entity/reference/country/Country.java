@@ -1,6 +1,5 @@
 package com.asrevo.cvhome.order.entity.reference.country;
 
-import com.asrevo.cvhome.order.entity.reference.geozone.GeoZone;
 import com.asrevo.cvhome.order.entity.reference.zone.Zone;
 import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
 import com.asrevo.cvhome.store.core.model.reference.CountryIsoCode;
@@ -39,10 +38,6 @@ public class Country extends SalesManagerEntity<CountryIsoCode, Country> {
     @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "country")
     private Set<Zone> zones = new HashSet<>();
-
-    @ManyToOne(targetEntity = GeoZone.class)
-    @JoinColumn(name = "GEOZONE_ID")
-    private GeoZone geoZone;
 
     @Column(name = "COUNTRY_SUPPORTED")
     private boolean supported = true;
