@@ -16,9 +16,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class StoreManagerServiceImpl implements StoreManagerService {
@@ -36,7 +34,14 @@ public class StoreManagerServiceImpl implements StoreManagerService {
 
     @Override
     public void createStore(ManagerOrgId orgId, Map<Object, Object> request) {
-        PodId podId = podSelection.next(orgId, null);
+        PodId prefaredPodId = Optional.ofNullable(request.get("pod"))
+                .map(it -> ((Map<String, String>) it))
+                .filter(it -> it.containsKey("id"))
+                .map(it -> it.get("id"))
+                .filter(it -> !it.trim().isEmpty())
+                .map(PodId::new)
+                .orElse(null);
+        PodId podId = podSelection.next(orgId, prefaredPodId);
         internalStoreService.createStore(request, orgId, podId);
     }
 

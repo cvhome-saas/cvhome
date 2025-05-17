@@ -15,7 +15,7 @@ export class StoreService {
 
 
   getStore(store): Observable<any> {
-    return this.crudService.get(`/store-pod-gateway/merchant/api/v1/store/${store}?store=${store}`);
+    return this.crudService.get(`/manager/api/v1/store-manager/private/store/${store}?store=${store}`);
   }
 
   getAllocations(store): Observable<any> {
