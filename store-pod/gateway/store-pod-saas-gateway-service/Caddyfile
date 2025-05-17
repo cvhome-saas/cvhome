@@ -10,6 +10,15 @@
 	on_demand_tls {
 		ask {$ASK_TLS_URL}
 	}
+	storage s3 {
+		bucket         {$S3_BUCKET_NAME}
+		region         {$AWS_REGION}
+
+        prefix         "caddy_tls_certs/"
+        host           {$S3_ENDPOINT}
+        access_key_id  {$AWS_ACCESS_KEY_ID}
+        secret_key     {$AWS_SECRET_ACCESS_KEY}
+	}
 }
 
 http:// {
