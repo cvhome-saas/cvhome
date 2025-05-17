@@ -20,7 +20,7 @@ INSERT INTO merchant.merchant_store (store_merchant_id, currency_format_national
                                      use_cache, weightunitcode, country_id, currency_id, language_code)
 VALUES ('65f023632bc46470c104b75f', false, '2024-04-01', '21f023932bc66470c104b76f', 'DEFAULT', 'LIGHT', 'IN',
         'info@usaelectronics.com', 'logo.jpeg', 'banner.jpeg', '456 Tech Avenue',
-        'New York', 'USA Electronics Hub', '+1-212-555-0123',
+        'New York', 'USA-Electronics-Hub', '+1-212-555-0123',
         '10001', 'NY', false, 'LB', 'USA', 'USD',
         'en') -- Using 'en' as the first language
 on conflict (store_merchant_id) do nothing;

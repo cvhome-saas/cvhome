@@ -128,7 +128,11 @@ public class ReadableMerchantStorePopulator
                 l.setCode(lang);
                 supported.add(l);
             }
-            target.setSupportedLanguages(supported);
+            target.setSupportedLanguages(
+                    supported.stream()
+                            .map(ReadableLanguage::getCode)
+                            .map(LanguageCode::code)
+                            .collect(Collectors.toList()));
         }
 
         if (source.getAuditSection() != null) {

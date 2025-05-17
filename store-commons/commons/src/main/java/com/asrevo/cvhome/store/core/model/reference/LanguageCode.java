@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.store.core.model.reference;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -36,6 +37,7 @@ public record LanguageCode(String code) implements Serializable, Comparable<Lang
         return code.isLanguage();
     }
 
+    @JsonIgnore
     public boolean isLanguage() {
         if (Objects.isNull(code)) {
             return false;
