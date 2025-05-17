@@ -13,7 +13,7 @@ export const LanguageSelector = ({store, locale}: { store: Store, locale: string
     if (!store.supportedLanguages || store.supportedLanguages.length <= 1) {
         return <></>
     } else {
-        const currentLocale = store.supportedLanguages.map(it => it.code).includes(locale) ? locale : 'en';
+        const currentLocale = store.supportedLanguages.includes(locale) ? locale : 'en';
         return (
             <div className="relative inline-block text-start">
                 <Menu as="div" className="relative">
@@ -45,14 +45,14 @@ export const LanguageSelector = ({store, locale}: { store: Store, locale: string
                             className="absolute end-0 z-10 mt-2 w-auto origin-top-end rounded-md bg-background shadow-lg ring-1 ring-border ring-opacity-5 focus:outline-none">
                             <div className="py-1">
                                 {store.supportedLanguages.map((it) => (
-                                    <MenuItem key={it.code}>
+                                    <MenuItem key={it}>
                                         {({focus}) => (
-                                            <Button onClick={() => router.push(pathname, {locale: it.code})}
+                                            <Button onClick={() => router.push(pathname, {locale: it})}
                                                     className={`${
                                                         focus ? "bg-hover-neutral text-foreground" : "text-neutral"
                                                     } block px-4 py-2 text-sm w-full text-start transition-colors duration-150`}
                                             >
-                                                {t(it.code.toUpperCase())}
+                                                {t(it.toUpperCase())}
                                             </Button>
                                         )}
                                     </MenuItem>
