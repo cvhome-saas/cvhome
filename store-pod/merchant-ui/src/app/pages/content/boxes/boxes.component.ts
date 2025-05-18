@@ -20,7 +20,7 @@ import {map} from "rxjs/operators";
 export class BoxesComponent extends BaseTable<any> implements OnInit {
   protected readonly ColumnMode = ColumnMode;
   private isInitialized: boolean = false;
-  private recommendedCodes = ["agreement", "header-message"];
+  private recommendedCodes = ["meta-title", "meta-description", "agreement", "header-message"];
 
   constructor(
     private contentService: ContentService,
