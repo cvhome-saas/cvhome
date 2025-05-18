@@ -1,27 +1,8 @@
-import {FALLBACK_LOCALE, STORE_DEFAULT_LOCALE_COOKIE_NAME} from "@/types/constant";
 import {Store} from "@/types/store";
 import type {ReadonlyHeaders} from "next/dist/server/web/spec-extension/adapters/headers";
 
-export function getLocaleFromCookie(): string | null {
-    if (typeof document !== 'undefined') {
-        const match = document.cookie.match(new RegExp(`(^| )${STORE_DEFAULT_LOCALE_COOKIE_NAME}=([^;]+)`));
-        return match ? decodeURIComponent(match[2]) : null;
-    }
-    return null;
-}
-
-export function setLocaleCookie(): string {
-    if (typeof document !== 'undefined') {
-        document.cookie = `${STORE_DEFAULT_LOCALE_COOKIE_NAME}=${encodeURIComponent(FALLBACK_LOCALE)}; path=/`;
-    }
-    return FALLBACK_LOCALE;
-}
-
 export function buildDefaultLangRedirectionUrl(store: Store, headers: ReadonlyHeaders, urlLocale: string): string {
-    // Construct the new path for redirection
     let newPath: string;
-    // Try to get the full path from headers if no slug (e.g. for base path /en)
-    // x-middleware-request-next-url is often more reliable if middleware is involved
     const requestUrlHeader = headers.get('x-middleware-request-next-url') || headers.get('x-next-pathname');
 
     if (requestUrlHeader) {
