@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.order.services.order;
 
+import com.asrevo.cvhome.catalog.model.product.ReadableProductAvailability;
 import com.asrevo.cvhome.catalog.model.product.product.price.FinalPrice;
 import com.asrevo.cvhome.catalog.services.product.ExternalProductService;
 import com.asrevo.cvhome.commons.domain.Entry;
@@ -29,6 +30,8 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -98,14 +101,14 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
         Assert.notNull(customer, "Customery cannot be null");
         Assert.notNull(store, "Store cannot be null.");
         try {
-            return caculateShoppingCart(shoppingCart, customer, store, language);
+            return caculateshoppingcart(shoppingCart, customer, store, language);
         } catch (Exception e) {
             log.error("Error while calculating shopping cart total", e);
             throw new ServiceException(e);
         }
     }
 
-    private OrderTotalSummary caculateShoppingCart(
+    private OrderTotalSummary caculateshoppingcart(
             ShoppingCart shoppingCart,
             final Customer customer,
             final StoreMerchantId store,
@@ -136,13 +139,21 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
 
         List<ShoppingCartItem> itemList = new ArrayList<>(shoppingCart.getLineItems());
         // filter out unavailable
+        List<String> skus = itemList.stream().map(ShoppingCartItem::getSku).toList();
+        Map<String, ReadableProductAvailability> availabilityMap =
+                productService.getProductsAvailability(store, skus).stream()
+                        .collect(
+                                Collectors.toMap(
+                                        ReadableProductAvailability::getSku, Function.identity()));
         itemList =
                 itemList.stream()
                         .filter(
-                                p ->
-                                        productService
-                                                .getProductAvailability(store, p.getSku())
-                                                .isCanBePurchased())
+                                p -> {
+                                    var availability = availabilityMap.get(p.getSku());
+                                    return Optional.ofNullable(availability)
+                                            .map(ReadableProductAvailability::isCanBePurchased)
+                                            .orElse(Boolean.FALSE);
+                                })
                         .toList();
         orderSummary.setProducts(itemList);
 
@@ -166,7 +177,7 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
         Assert.notNull(store, "Store cannot be null");
 
         try {
-            return caculateShoppingCart(shoppingCart, null, store, language);
+            return caculateshoppingcart(shoppingCart, null, store, language);
         } catch (Exception e) {
             log.error("Error while calculating shopping cart total", e);
             throw new ServiceException(e);
