@@ -1,7 +1,7 @@
 /*
 Generated content for store_id='65f023632bc46470c104b76f' (Fashion Domain) store name Riyadh Fashion Hub
 Pages: ['about-us', 'contact-us', 'terms', 'privacy', 'location', 'faq']
-Boxes: ['header-message', 'agreement']
+Boxes: ['header-message', 'agreement','meta-title','meta-description']
 Languages: ['ar', 'en']
 Starting content_id: 1
 Starting description_id: 1
@@ -234,4 +234,48 @@ VALUES (16, now(), now(),
         '<p style="text-align:center; font-size:0.9em; padding:5px;">By using the site, you agree to our <a href="/terms">Terms & Conditions</a>.</p>',
         'User Agreement', 'User Agreement',
         '', '', '', '', 8, 'en')
+on conflict (description_id) do nothing;
+
+-- Box: meta-title
+INSERT INTO content.content (content_id, code, content_type,
+                             link_to_menu, sort_order, visible, store_merchant_id)
+VALUES (9, 'meta-title', 'BOX', false, 9, true, '65f023632bc46470c104b76f')
+on conflict (content_id) do nothing;
+
+-- Language: ar
+INSERT INTO content.content_description (description_id, date_created, date_modified, description, name, title,
+                                         meta_description, meta_keywords, meta_title, sef_url, content_id,
+                                         language_code)
+VALUES (17, now(), now(),
+        'رياض فاشن هاب | أزياء عصرية وتشكيلات حصرية في الرياض', '', '', '', '', '', '', 9, 'ar')
+on conflict (description_id) do nothing;
+-- Language: en
+INSERT INTO content.content_description (description_id, date_created, date_modified, description, name, title,
+                                         meta_description, meta_keywords, meta_title, sef_url, content_id,
+                                         language_code)
+VALUES (18, now(), now(),
+        'Riyadh Fashion Hub | Trendy Fashion & Exclusive Collections in Riyadh', '', '', '', '', '', '', 9, 'en')
+on conflict (description_id) do nothing;
+
+-- Box: meta-description
+INSERT INTO content.content (content_id, code, content_type,
+                             link_to_menu, sort_order, visible, store_merchant_id)
+VALUES (10, 'meta-description', 'BOX', false, 10, true, '65f023632bc46470c104b76f')
+on conflict (content_id) do nothing;
+
+-- Language: ar
+INSERT INTO content.content_description (description_id, date_created, date_modified, description, name, title,
+                                         meta_description, meta_keywords, meta_title, sef_url, content_id,
+                                         language_code)
+VALUES (19, now(), now(),
+        'اكتشف أحدث صيحات الموضة والأزياء النسائية والرجالية في رياض فاشن هاب. تسوق أونلاين تشكيلات حصرية من الملابس، الأحذية، والإكسسوارات. توصيل لجميع أنحاء المملكة.',
+        '', '', '', '', '', '', 10, 'ar')
+on conflict (description_id) do nothing;
+-- Language: en
+INSERT INTO content.content_description (description_id, date_created, date_modified, description, name, title,
+                                         meta_description, meta_keywords, meta_title, sef_url, content_id,
+                                         language_code)
+VALUES (20, now(), now(),
+        'Discover the latest fashion trends for women and men at Riyadh Fashion Hub. Shop online for exclusive collections of clothing, shoes, and accessories. Delivery across Saudi Arabia.',
+        '', '', '', '', '', '', 10, 'en')
 on conflict (description_id) do nothing;
