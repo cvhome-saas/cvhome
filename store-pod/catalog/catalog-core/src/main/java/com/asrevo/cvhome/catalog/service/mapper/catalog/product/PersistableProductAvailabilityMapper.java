@@ -69,7 +69,15 @@ public class PersistableProductAvailabilityMapper
                 destination.getPrices().add(price);
                 ReadableMerchantStore baseStore = externalMerchantStoreService.getStore(store);
 
-                List<ReadableLanguage> supportedLanguages = baseStore.getSupportedLanguages();
+                List<ReadableLanguage> supportedLanguages = baseStore.getSupportedLanguages()
+                        .stream()
+                        .map(it -> {
+                            ReadableLanguage readableLanguage = new ReadableLanguage();
+                            readableLanguage.setCode(new LanguageCode(it));
+                            return readableLanguage;
+                        })
+                        .toList();
+
                 for (ReadableLanguage lang : supportedLanguages) {
                     ProductPriceDescription ppd = new ProductPriceDescription();
                     ppd.setProductPrice(price);
