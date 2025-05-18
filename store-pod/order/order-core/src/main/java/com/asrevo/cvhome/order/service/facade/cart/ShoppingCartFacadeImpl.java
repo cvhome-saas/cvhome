@@ -4,7 +4,6 @@
 package com.asrevo.cvhome.order.service.facade.cart;
 
 import com.asrevo.cvhome.catalog.model.product.ReadableProductAvailability;
-import com.asrevo.cvhome.catalog.model.product.product.variant.ReadableProductVariant;
 import com.asrevo.cvhome.catalog.services.product.ExternalProductService;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
@@ -79,38 +78,12 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
             throw new Exception("Item with sku " + availability.getSku() + " is not available");
         }
 
-        ReadableProductVariant instance = null;
-        //        if
-        // (org.apache.commons.collections.CollectionUtils.isNotEmpty(products.getVariants())) {
-        //            instance = products.getVariants().iterator().next();
-        //            Set<ProductAvailability> instanceAvailabilities =
-        // instance.getAvailabilities();
-        //            if (!CollectionUtils.isEmpty(instanceAvailabilities)) {
-        //                availabilities = instanceAvailabilities;
-        //            }
-        //
-        //        }
-
-        //        //todo filter sku and store
-        //        for (ProductAvailability availability : availabilities) {
-        //            if (availability.getProductQuantity() == null ||
-        // availability.getProductQuantity() == 0) {
-        //                throw new Exception("Product with id " + products.getId() + " is not
-        // available");
-        //            }
-        //        }
-
-        // use a mapper
         ShoppingCartItem item =
                 shoppingCartService.populateShoppingCartItem(availability.getSku(), store);
 
         item.setQuantity(shoppingCartItem.getQuantity());
         item.setShoppingCart(cartModel);
         item.setSku(availability.getSku());
-
-        if (instance != null) {
-            item.setVariant(instance.getId());
-        }
 
         return item;
     }
@@ -327,8 +300,6 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
         if (cartModel == null) {
             return null;
         }
-
-        shoppingCartCalculationService.calculate(cartModel, store, language);
 
         return readableShoppingCartMapper.convert(cartModel, store, language);
     }
