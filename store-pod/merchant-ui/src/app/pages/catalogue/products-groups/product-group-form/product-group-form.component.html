@@ -68,10 +68,6 @@
         <div class="col-sm-6">
           <ngx-product-auto-complete *ngIf="params.store" (onProduct)="onItemSelect($event,uniqueCode)" [disabled]="uniqueCode==undefined"
                                      [store]="params.store"/>
-
-          <p class="caption text-muted" *ngIf="!isCodeUnique || !code.valid">
-            {{ 'PRODUCT_GROUP.VALID_CODE_REQUIRED_HINT' | translate }}
-          </p>
         </div>
       </div>
 
