@@ -83,6 +83,7 @@ export class TypeDetailsComponent implements OnInit {
           this.languages = [...languages];
           this.addFormArray();
           this.defaultLanguage = store.defaultLanguage;
+          this.selectLanguage(this.defaultLanguage);
           if (this.uniqueCode) {
             this.fillData();
           }
