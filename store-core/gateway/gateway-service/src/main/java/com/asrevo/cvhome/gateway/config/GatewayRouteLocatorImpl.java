@@ -5,12 +5,14 @@ import com.asrevo.cvhome.commons.domain.Pod;
 import com.asrevo.cvhome.manager.api.CachedRouterService;
 import com.asrevo.cvhome.s2s.config.gateway.FHostRoutePredicateFactory;
 import com.asrevo.cvhome.s2s.config.gateway.FNotServiceRoutePredicateFactory;
+import com.asrevo.cvhome.s2s.config.internal.ServiceUrlBuilder;
 import com.asrevo.cvhome.s2s.model.ServiceDomainProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cloud.gateway.handler.AsyncPredicate;
 import org.springframework.cloud.gateway.route.Route;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
@@ -29,6 +31,7 @@ public class GatewayRouteLocatorImpl implements RouteLocator {
     private final FNotServiceRoutePredicateFactory notServicePredicate;
     private final FHostRoutePredicateFactory hostRoutePredicate;
     private final CachedRouterService router;
+    private final Environment environment;
 
     @Override
     public Flux<Route> getRoutes() {
@@ -78,19 +81,20 @@ public class GatewayRouteLocatorImpl implements RouteLocator {
     }
 
     private void addPodServiceExactMatchPod(Pod pod, RouteLocatorBuilder.Builder route, String serviceName) {
+        ServiceUrlBuilder serviceUrlBuilder = new ServiceUrlBuilder(serviceDomainProperties, environment);
         route.route("store-" + serviceName + "-v1-" + pod.id().id(),
                 r -> {
                     return r.path("/" + serviceName + "/**")
                             .and().asyncPredicate(checkStoreMatchPodFromParam(pod))
                             .filters(f -> f.stripPrefix(1).tokenRelay().preserveHostHeader())
-                            .uri("lb://" + serviceName + "." + pod.endpoint().endpoint());
+                            .uri(serviceUrlBuilder.getServiceUrl(pod));
                 });
         route.route("store-" + serviceName + "-v2-" + pod.id().id(),
                 r -> {
                     return r.path("/" + serviceName + "-v2/**")
                             .and().asyncPredicate(checkStoreMatchPodFromUrl(pod))
                             .filters(f -> f.stripPrefix(2).tokenRelay().preserveHostHeader())
-                            .uri("lb://" + serviceName + "." + pod.endpoint().endpoint());
+                            .uri(serviceUrlBuilder.getServiceUrl(pod));
                 });
     }
 

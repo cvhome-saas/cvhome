@@ -37,10 +37,7 @@ public class WebClientsUtils {
                                 })
                         .build();
 
-        WebClient client =
-                builder.baseUrl(url)
-                        .exchangeStrategies(strategies) // Apply the custom strategies
-                        .build();
+        WebClient client = builder.baseUrl(url).exchangeStrategies(strategies).build();
 
         HttpExchangeAdapter clientAdapter = WebClientAdapter.create(client);
         return buildClient(tClass, clientAdapter);
@@ -70,7 +67,7 @@ public class WebClientsUtils {
                         .build();
 
         HttpExchangeAdapter clientAdapter = RestClientAdapter.create(client);
-        return buildClient(tClass, clientAdapter); // buildClient remains the same
+        return buildClient(tClass, clientAdapter);
     }
 
     private static <T> T buildClient(Class<T> tClass, HttpExchangeAdapter clientAdapter) {
