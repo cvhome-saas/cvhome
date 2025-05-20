@@ -11,7 +11,11 @@ import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
 import java.math.BigDecimal;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -135,22 +139,6 @@ public class ShoppingCartServiceImpl extends SalesManagerEntityServiceImpl<Long,
         }
     }
 
-    /*
-     * @Override
-     *
-     * @Transactional public ShoppingCart getByCustomer(final Customer customer)
-     * throws ServiceException {
-     *
-     * try { List<ShoppingCart> shoppingCart =
-     * shoppingCartRepository.findByCustomer(customer.getId()); if (shoppingCart ==
-     * null) { return null; } return getPopulatedShoppingCart(shoppingCart);
-     *
-     * } catch (Exception e) { throw new ServiceException(e); } }
-     */
-
-    // @TODO ASHRAF
-    //	@Transactional(noRollbackFor = { org.springframework.dao.EmptyResultDataAccessException.class
-    // })
     private ShoppingCart getPopulatedShoppingCart(
             final ShoppingCart shoppingCart, StoreMerchantId store) throws Exception {
 
@@ -165,11 +153,19 @@ public class ShoppingCartServiceImpl extends SalesManagerEntityServiceImpl<Long,
                     return shoppingCart;
                 }
 
-                // Set<ShoppingCartItem> shoppingCartItems = new
-                // HashSet<ShoppingCartItem>();
+                List<String> skus = items.stream().map(ShoppingCartItem::getSku).toList();
+                Map<String, FinalPrice> priceMap =
+                        productService.getProductsPrice(store, skus).stream()
+                                .collect(Collectors.toMap(FinalPrice::getSku, Function.identity()));
+
                 for (ShoppingCartItem item : items) {
                     log.debug("Populate item {}", item.getId());
-                    getPopulatedItem(item, store);
+                    item.setItemPrice(priceMap.get(item.getSku()).getFinalPrice());
+
+                    BigDecimal subTotal =
+                            item.getItemPrice().multiply(new BigDecimal(item.getQuantity()));
+                    item.setSubTotal(subTotal);
+
                     log.debug("Obsolete item ? {}", item.isObsolete());
                     if (item.isObsolete()) {
                         cartIsObsolete = true;
@@ -206,18 +202,6 @@ public class ShoppingCartServiceImpl extends SalesManagerEntityServiceImpl<Long,
         FinalPrice price = productService.getProductPrice(store, sku);
         item.setItemPrice(price.getFinalPrice());
         return item;
-    }
-
-    // @TODO ASHRAF
-    //	@Transactional
-    private void getPopulatedItem(final ShoppingCartItem item, StoreMerchantId store)
-            throws Exception {
-
-        FinalPrice price = productService.getProductPrice(store, item.getSku());
-        item.setItemPrice(price.getFinalPrice());
-
-        BigDecimal subTotal = item.getItemPrice().multiply(new BigDecimal(item.getQuantity()));
-        item.setSubTotal(subTotal);
     }
 
     @Override

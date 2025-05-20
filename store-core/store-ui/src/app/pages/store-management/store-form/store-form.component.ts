@@ -1,5 +1,5 @@
 import {ChangeDetectorRef, Component, Input, OnInit} from '@angular/core';
-import {AbstractControl, FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {AbstractControl, FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {Router} from '@angular/router';
 
 import {ConfigService} from '../../../shared/services/config.service';
@@ -9,6 +9,7 @@ import {TranslateService} from '@ngx-translate/core';
 import {validators} from '../../../shared/validation/validators';
 import {forkJoin} from 'rxjs';
 import {ErrorService} from "../../../shared/services/error.service";
+import {Pods, PodService} from "../services/pod.service";
 
 @Component({
   selector: 'ngx-store-form',
@@ -29,9 +30,12 @@ export class StoreFormComponent implements OnInit {
   weightList = [];
   sizeList = [];
   countries = [];
+  pods: Pods = [];
   form: FormGroup;
   loader = false;
   isReadonlyName = false;
+  isReadonlyPodSelection = false;
+  defaultPodName = 'DEFAULT'
   isNameUnique = true;
   selectedItem = '5';
   submitted = false;
@@ -82,11 +86,16 @@ export class StoreFormComponent implements OnInit {
     private router: Router,
     private toastr: NbToastrService,
     private translate: TranslateService,
-    private errorService: ErrorService) {
+    private errorService: ErrorService,
+    private podService: PodService) {
   }
 
   get name() {
     return this.form.get('name');
+  }
+
+  get pod() {
+    return this.form.get('pod').get('id');
   }
 
   get phone() {
@@ -157,14 +166,16 @@ export class StoreFormComponent implements OnInit {
       this.configService.getWeightAndSizes(),
       this.storeService.getSupportedThemes(),
       this.storeService.getSupportedColorThemes(),
+      this.podService.listPods()
     ])
-      .subscribe(([countries, currencies, measures, themes, colorThemes]) => {
+      .subscribe(([countries, currencies, measures, themes, colorThemes, pods]) => {
         this.countries = [...countries];
         this.supportedCurrency = [...currencies];
         this.supportedTheme = [...themes];
         this.supportedColorThemes = [...colorThemes];
         this.weightList = [...measures.weights];
         this.sizeList = [...measures.measures];
+        this.pods = pods;
         this.supportedLanguagesList = this.configService.getListOfGlobalLanguages();
         this.loader = false;
       }, err => {
@@ -179,8 +190,9 @@ export class StoreFormComponent implements OnInit {
   fillForm() {
 
     this.store.supportedLanguages.forEach(lang => {
-      this.supportedLanguagesSelected.push(lang.code);
+      this.supportedLanguagesSelected.push(lang);
     });
+
     this.form.patchValue({
       id: this.store.id,
       name: this.store.name,
@@ -196,6 +208,9 @@ export class StoreFormComponent implements OnInit {
       dimension: this.store.dimension,
       inBusinessSince: new Date(this.store.inBusinessSince),
     });
+
+    this.form.controls['pod'].patchValue({id: this.store.pod.id});
+
     this.form.controls['address'].patchValue({searchControl: ''});
     this.form.controls['address'].patchValue({stateProvince: this.store.address.stateProvince}, {disabled: false});
     this.form.controls['address'].patchValue({country: this.store.address.country});
@@ -203,6 +218,8 @@ export class StoreFormComponent implements OnInit {
     this.form.controls['address'].patchValue({postalCode: this.store.address.postalCode});
     this.form.controls['address'].patchValue({city: this.store.address.city});
     this.isReadonlyName = true;
+    this.isReadonlyPodSelection = true;
+    this.form.get("pod").get("id").disable()
     this.cdr.markForCheck();
 
   }
@@ -264,7 +281,7 @@ export class StoreFormComponent implements OnInit {
   userHasSupportedLanguage(language) {
     if (!this.store || !this.store.supportedLanguages)
       return false;
-    return this.store.supportedLanguages.find((l: any) => l.code === language.code) != undefined;
+    return this.store.supportedLanguages.find((l: any) => l === language.code) != undefined;
   }
 
   checkName(event) {
@@ -287,6 +304,9 @@ export class StoreFormComponent implements OnInit {
   private createForm() {
     this.form = this.fb.group({
       name: ['', [Validators.required, Validators.pattern(validators.alphanumeric)]],
+      pod: this.fb.group({
+        id: [''],
+      }),
       phone: ['', [Validators.required]],
       theme: ['', [Validators.required]],
       colorTheme: ['', [Validators.required]],
@@ -306,7 +326,7 @@ export class StoreFormComponent implements OnInit {
       weight: ['', [Validators.required]],
       dimension: ['', [Validators.required]],
       inBusinessSince: [new Date()],
-    },{ validators: defaultLanguageMustBeInSupportedValidator });
+    }, {validators: defaultLanguageMustBeInSupportedValidator});
 
     if (this.store && this.store.id) {
       this.fillForm();
@@ -315,6 +335,7 @@ export class StoreFormComponent implements OnInit {
   }
 
 }
+
 export function defaultLanguageMustBeInSupportedValidator(group: FormGroup): { [key: string]: boolean } | null {
   const defaultLangControl: AbstractControl = group.get('defaultLanguage');
   const supportedLangsControl: AbstractControl = group.get('supportedLanguages');
@@ -331,7 +352,7 @@ export function defaultLanguageMustBeInSupportedValidator(group: FormGroup): { [
   if (defaultLanguageValue && supportedLanguagesValue && Array.isArray(supportedLanguagesValue) && supportedLanguagesValue.length > 0) {
     if (!supportedLanguagesValue.includes(defaultLanguageValue)) {
       console.log("rasing error")
-      return { 'defaultLanguageNotInSupported': true }; // Validation error for the group
+      return {'defaultLanguageNotInSupported': true}; // Validation error for the group
     }
   }
 

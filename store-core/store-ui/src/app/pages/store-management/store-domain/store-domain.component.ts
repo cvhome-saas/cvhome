@@ -159,6 +159,7 @@ export class StoreDomainComponent implements OnInit , StoreDomainComponentValida
         },
         complete: () => {
           this.form.reset();
+          this.isSubmited = false;
         }
       }
     )

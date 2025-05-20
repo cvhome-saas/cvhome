@@ -24,7 +24,7 @@ export interface Page<T> {
 
 export enum Country {
   EG = 'EG',
-  KSA = 'KSA',
+  SA = 'SA',
   UAE = 'UAE'
 }
 

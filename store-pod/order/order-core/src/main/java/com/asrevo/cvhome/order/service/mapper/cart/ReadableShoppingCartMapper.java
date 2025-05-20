@@ -1,5 +1,8 @@
 package com.asrevo.cvhome.order.service.mapper.cart;
 
+import com.asrevo.cvhome.catalog.model.product.ReadableMinimalProduct;
+import com.asrevo.cvhome.catalog.model.product.product.ProductEntity;
+import com.asrevo.cvhome.catalog.services.product.ExternalProductService;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
 import com.asrevo.cvhome.order.entity.order.OrderTotal;
@@ -20,11 +23,11 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -36,24 +39,16 @@ public class ReadableShoppingCartMapper implements Mapper<ShoppingCart, Readable
 
     private final ShoppingCartCalculationService shoppingCartCalculationService;
 
-    /*
-        private final ProductVariantService productVariantService;
-
-        private final ReadableProductVariationMapper readableProductVariationMapper;
-
-        private final ImageFilePath imageUtils;
-    */
-
-    private final MinimalProductToReadableShoppingCartItem minimalProductToReadableShoppingCartItem;
     private final ExternalMerchantStoreService externalMerchantStoreService;
+    private final ExternalProductService externalProductService;
 
     public ReadableShoppingCartMapper(
             ShoppingCartCalculationService shoppingCartCalculationService,
-            MinimalProductToReadableShoppingCartItem minimalProductToReadableShoppingCartItem,
-            ExternalMerchantStoreService externalMerchantStoreService) {
+            ExternalMerchantStoreService externalMerchantStoreService,
+            ExternalProductService externalProductService) {
         this.shoppingCartCalculationService = shoppingCartCalculationService;
-        this.minimalProductToReadableShoppingCartItem = minimalProductToReadableShoppingCartItem;
         this.externalMerchantStoreService = externalMerchantStoreService;
+        this.externalProductService = externalProductService;
     }
 
     @Override
@@ -62,17 +57,6 @@ public class ReadableShoppingCartMapper implements Mapper<ShoppingCart, Readable
         ReadableShoppingCart destination = new ReadableShoppingCart();
         return this.merge(source, destination, store, language);
     }
-
-    /*
-        private ReadableImage image(ProductVariantImage instanceImage, StoreMerchantId store, LanguageCode language) {
-            ReadableImage img = new ReadableImage();
-            img.setDefaultImage(instanceImage.isDefaultImage());
-            img.setId(instanceImage.getId());
-            img.setImageName(instanceImage.getProductImage());
-            img.setImageUrl(imageUtils.buildCustomTypeImageUtils(store, img.getImageName(), FileContentType.VARIANT));
-            return img;
-        }
-    */
 
     @Override
     public ReadableShoppingCart merge(
@@ -111,53 +95,47 @@ public class ReadableShoppingCartMapper implements Mapper<ShoppingCart, Readable
 
             if (items != null) {
 
-                for (ShoppingCartItem item : items) {
-                    ReadableShoppingCartItem shoppingCartItem =
-                            minimalProductToReadableShoppingCartItem.convert(item, store, language);
+                if (!items.isEmpty()) {
+                    List<String> skus = items.stream().map(ShoppingCartItem::getSku).toList();
+                    Map<String, ReadableMinimalProduct> productMap =
+                            externalProductService
+                                    .getMinimalProducts(store, skus, language)
+                                    .stream()
+                                    .collect(
+                                            Collectors.toMap(
+                                                    ProductEntity::getSku, Function.identity()));
 
-                    // variation
-                    /*
-                                        if (item.getVariant() != null) {
-                                            ProductVariant productVariant = productVariantService.getById(item.getVariant(), store)
-                                                    .orElseThrow(() -> new ConversionRuntimeException("An error occured during shopping cart [" + source.getShoppingCartCode() + "] conversion, productVariant [" + item.getVariant() + "] not found"));
+                    for (ShoppingCartItem item : items) {
+                        ReadableMinimalProduct minimalProduct = productMap.get(item.getSku());
+                        if (minimalProduct != null) {
+                            ReadableShoppingCartItem shoppingCartItem =
+                                    new ReadableShoppingCartItem();
+                            BeanUtils.copyProperties(shoppingCartItem, minimalProduct);
 
-                                            shoppingCartItem.setVariant(readableProductVariationMapper.convert(productVariant.getVariation(), store, language));
-                                            if (productVariant.getVariationValue() != null) {
-                                                shoppingCartItem.setVariantValue(readableProductVariationMapper.convert(productVariant.getVariationValue(), store, language));
-                                            }
+                            shoppingCartItem.setPrice(item.getItemPrice());
+                            shoppingCartItem.setFinalPrice(
+                                    PriceUtils.getStoreFormatedAmountWithCurrency(
+                                            externalMerchantStoreService.getStore(store),
+                                            item.getItemPrice()));
 
-                                            if (productVariant.getProductVariantGroup() != null) {
-                                                Set<String> nameSet = new HashSet<>();
-                                                List<ReadableImage> instanceImages = productVariant.getProductVariantGroup().getImages()
-                                                        .stream().map(i -> this.image(i, store, language))
-                                                        .filter(e -> nameSet.add(e.getImageUrl()))
-                                                        .collect(Collectors.toList());
-                                                shoppingCartItem.setImages(instanceImages);
-                                            }
-                                        }
-                    */
+                            shoppingCartItem.setQuantity(item.getQuantity());
 
-                    shoppingCartItem.setPrice(item.getItemPrice());
-                    shoppingCartItem.setFinalPrice(
-                            PriceUtils.getStoreFormatedAmountWithCurrency(
-                                    externalMerchantStoreService.getStore(store),
-                                    item.getItemPrice()));
+                            cartQuantity = cartQuantity + item.getQuantity();
 
-                    shoppingCartItem.setQuantity(item.getQuantity());
+                            BigDecimal subTotal =
+                                    PriceUtils.calculatePriceQuantity(
+                                            item.getItemPrice(), item.getQuantity());
 
-                    cartQuantity = cartQuantity + item.getQuantity();
+                            // calculate sub total (price * quantity)
+                            shoppingCartItem.setSubTotal(subTotal);
 
-                    BigDecimal subTotal =
-                            PriceUtils.calculatePriceQuantity(
-                                    item.getItemPrice(), item.getQuantity());
-
-                    // calculate sub total (price * quantity)
-                    shoppingCartItem.setSubTotal(subTotal);
-
-                    shoppingCartItem.setDisplaySubTotal(
-                            PriceUtils.getStoreFormatedAmountWithCurrency(
-                                    externalMerchantStoreService.getStore(store), subTotal));
-                    destination.getProducts().add(shoppingCartItem);
+                            shoppingCartItem.setDisplaySubTotal(
+                                    PriceUtils.getStoreFormatedAmountWithCurrency(
+                                            externalMerchantStoreService.getStore(store),
+                                            subTotal));
+                            destination.getProducts().add(shoppingCartItem);
+                        }
+                    }
                 }
             }
 

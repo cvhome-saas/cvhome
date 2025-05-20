@@ -11,7 +11,6 @@ import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.mapper.Mapper;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
-import com.asrevo.cvhome.store.model.references.ReadableLanguage;
 import com.asrevo.cvhome.store.utils.DateUtil;
 import java.util.Date;
 import java.util.List;
@@ -69,11 +68,13 @@ public class PersistableProductAvailabilityMapper
                 destination.getPrices().add(price);
                 ReadableMerchantStore baseStore = externalMerchantStoreService.getStore(store);
 
-                List<ReadableLanguage> supportedLanguages = baseStore.getSupportedLanguages();
-                for (ReadableLanguage lang : supportedLanguages) {
+                List<LanguageCode> supportedLanguages =
+                        baseStore.getSupportedLanguages().stream().map(LanguageCode::new).toList();
+
+                for (LanguageCode lang : supportedLanguages) {
                     ProductPriceDescription ppd = new ProductPriceDescription();
                     ppd.setProductPrice(price);
-                    ppd.setLanguageCode(lang.getCode());
+                    ppd.setLanguageCode(lang);
                     ppd.setName(Constants.DEFAULT_PRICE_DESCRIPTION);
 
                     // price appender
@@ -83,8 +84,7 @@ public class PersistableProductAvailabilityMapper
                                             .filter(
                                                     d ->
                                                             d.getLanguage() != null
-                                                                    && d.getLanguage()
-                                                                            .equals(lang.getCode()))
+                                                                    && d.getLanguage().equals(lang))
                                             .findFirst();
                     description.ifPresent(
                             productPriceDescription ->

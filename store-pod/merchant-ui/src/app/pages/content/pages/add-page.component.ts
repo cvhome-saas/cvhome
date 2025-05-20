@@ -88,7 +88,7 @@ export class AddPageComponent implements OnInit {
           this.languages = [...languages];
           this.addFormArray();
           this.defaultLanguage = store.defaultLanguage;
-          this.currentLanguage = store.defaultLanguage;
+          this.selectLanguage(this.defaultLanguage);
           if (this.uniqueCode) {
             this.action = 'edit';
             this.getPage();

@@ -147,7 +147,7 @@ public class ProductPriceUtils {
                     "No inventory available to calculate the price. Availability should contain at"
                             + " least a region set to *");
         }
-
+        finalPrice.setSku(product.getSku());
         return finalPrice;
     }
 

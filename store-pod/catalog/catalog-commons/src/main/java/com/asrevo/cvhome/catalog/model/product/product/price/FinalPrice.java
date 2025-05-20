@@ -23,7 +23,8 @@ public class FinalPrice implements Serializable {
      */
     @Serial private static final long serialVersionUID = 1L;
 
-    List<FinalPrice> additionalPrices;
+    private String sku;
+    private List<FinalPrice> additionalPrices;
     private BigDecimal discountedPrice = null; // final price if a discount is applied
     private BigDecimal originalPrice = null; // original price
     private BigDecimal finalPrice = null; // final price discount or not

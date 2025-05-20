@@ -18,6 +18,15 @@ task "build" {
     }
 }
 
+task "bootRun" {
+    doLast {
+        project.exec {
+            workingDir '.'
+            commandLine "npm", "run", "dev"
+        }
+    }
+}
+
 tasks.register('bootBuildImage', BootBuildImageTask) {
     dependsOn('build')
 }

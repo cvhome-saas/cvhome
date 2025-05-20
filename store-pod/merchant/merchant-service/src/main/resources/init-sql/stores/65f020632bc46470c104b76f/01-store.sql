@@ -11,7 +11,7 @@ INSERT INTO merchant.merchant_store (store_merchant_id, currency_format_national
                                      use_cache, weightunitcode, country_id, currency_id, language_code)
 VALUES ('65f020632bc46470c104b76f', false, '2024-03-31', '352023632b046970c104b76f', 'DEFAULT', 'LIGHT',
         'CM', -- Changed seizeunitcode to CM
-        'contact@beaute-elegante.fr', 'logo.jpeg', 'banner.jpeg', '15 Rue de la Paix', 'Paris', 'Beauté Élégante Paris',
+        'contact@beaute-elegante.fr', 'logo.jpeg', 'banner.jpeg', '15 Rue de la Paix', 'Paris', 'Beauté-Élégante-Paris',
         '+33 1 23 45 67 89',
         '75002', 'Île-de-France', false, 'KG', 'FR', 'EUR',
         'fr') -- Changed weightunitcode to KG, set currency to EUR, first language to fr

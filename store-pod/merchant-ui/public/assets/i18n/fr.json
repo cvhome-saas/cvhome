@@ -222,7 +222,8 @@
     "DOMAIN_DNS_CHECK_ERROR": "Impossible de vérifier le DNS du domaine pour le moment. Veuillez réessayer ou contacter le support.",
     "DOMAIN_DNS_CHECKING": "Vérification du DNS du domaine en cours...",
     "DOMAIN_DNS_WAITING_INFO": "En attente des informations du serveur pour vérifier le domaine...",
-    "DOMAIN_HELP_TEXT": "Assurez-vous d'abord d'ajouter un enregistrement CNAME pointant vers {{podDomain}}."
+    "DOMAIN_HELP_TEXT": "Assurez-vous d'abord d'ajouter un enregistrement CNAME pointant vers {{podDomain}}.",
+    "PREFERRED_POD": "Pod préféré"
   },
   "STORE_LANDING": {
     "LANDING_PAGE_TITLE": "Titre de la page de destination",

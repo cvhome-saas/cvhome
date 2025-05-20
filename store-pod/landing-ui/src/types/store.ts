@@ -1,7 +1,7 @@
 import {ColorTheme} from "@/types/color-schema";
 
 export interface Store {
-    id: number
+    id: string
     code: string
     name: string
     theme: Theme | undefined
@@ -21,7 +21,7 @@ export interface Store {
     logo: ImageFile | undefined
     banner: ImageFile | undefined
     parent: any
-    supportedLanguages: SupportedLanguage[] | undefined
+    supportedLanguages: string[] | undefined
     readableAudit: ReadableAudit
     colorTheme: ColorTheme | undefined
     sliderImages: SliderImage[] | undefined
@@ -42,10 +42,6 @@ export interface ImageFile {
     path: string
 }
 
-export interface SupportedLanguage {
-    code: string
-    id: number
-}
 
 export interface ReadableAudit {
     created: any
