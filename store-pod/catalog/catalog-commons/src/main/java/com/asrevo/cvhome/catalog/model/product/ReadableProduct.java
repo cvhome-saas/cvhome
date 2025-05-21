@@ -39,7 +39,4 @@ public class ReadableProduct extends ProductEntity implements Serializable {
     private List<ReadableCategory> categories = new ArrayList<>();
     private ReadableProductType type;
     private boolean canBePurchased = false;
-
-    // RENTAL
-    private RentalOwner owner;
 }
