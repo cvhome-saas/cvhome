@@ -86,14 +86,14 @@ public class GatewayRouteLocatorImpl implements RouteLocator {
                 r -> {
                     return r.path("/" + serviceName + "/**")
                             .and().asyncPredicate(checkStoreMatchPodFromParam(pod))
-                            .filters(f -> f.stripPrefix(1).tokenRelay().preserveHostHeader())
+                            .filters(f -> f.stripPrefix(1).tokenRelay())
                             .uri(serviceUrlBuilder.getServiceUrl(pod));
                 });
         route.route("store-" + serviceName + "-v2-" + pod.id().id(),
                 r -> {
                     return r.path("/" + serviceName + "-v2/**")
                             .and().asyncPredicate(checkStoreMatchPodFromUrl(pod))
-                            .filters(f -> f.stripPrefix(2).tokenRelay().preserveHostHeader())
+                            .filters(f -> f.stripPrefix(2).tokenRelay())
                             .uri(serviceUrlBuilder.getServiceUrl(pod));
                 });
     }
