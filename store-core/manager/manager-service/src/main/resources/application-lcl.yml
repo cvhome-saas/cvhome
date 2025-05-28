@@ -28,16 +28,6 @@ spring:
               metadata:
                 service-name: store-ui
                 instance: store-ui-1
-          'store-pod-gateway':
-            - url: "http://localhost:8100"
-              metadata:
-                service-name: store-pod-gateway
-                instance: store-pod-gateway-1
-          'store-pod-gateway.store-pod-1.cvhome.lcl':
-            - url: "http://localhost:8100"
-              metadata:
-                service-name: store-pod-gateway
-                instance: store-pod-gateway-1
 com:
   asrevo:
     cvhome:
@@ -46,5 +36,5 @@ com:
             id: 1
           name: default
           endpoint:
-            endpoint: store-pod-1.cvhome.lcl
+            endpoint: http://store-pod-1.gateway.com:8100
             type: EXTERNAL
