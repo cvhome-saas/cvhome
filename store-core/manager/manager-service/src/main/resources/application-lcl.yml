@@ -9,7 +9,7 @@ spring:
         enabled: true
         services:
           core-auth:
-            - url: "http://localhost:9999"
+            - url: "http://localhost:8001"
               metadata:
                 service-name: core-auth
                 instance: core-auth-1

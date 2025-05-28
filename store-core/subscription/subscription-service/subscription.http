@@ -11,7 +11,7 @@ Content-Type: application/json
   "iat": 1711619569,
   "auth_time": 1711618828,
   "jti": "52596bdf-9b1a-478b-8116-0bc4571399cc",
-  "iss": "http://core-auth.gateway.com:9999/realms/cvhome",
+  "iss": "http://core-auth.gateway.com:8001/realms/cvhome",
   "aud": "account",
   "sub": "3dea29fd-f6b2-48b1-8231-f4b5f1c68714",
   "typ": "Bearer",
@@ -55,7 +55,7 @@ Content-Type: application/json
 
 
 ### get token
-POST http://core-auth.gateway.com:9999/realms/cvhome/protocol/openid-connect/token
+POST http://core-auth.gateway.com:8001/realms/cvhome/protocol/openid-connect/token
 Content-Type: application/x-www-form-urlencoded
 
 client_id = microservice-app &
