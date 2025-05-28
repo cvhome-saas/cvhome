@@ -57,10 +57,10 @@ services:
     #    command:  --verbose start --log-level=TRACE --hostname-strict=false --hostname-path=/auth --import-realm  --debug
     #    command:  --verbose start  --hostname-strict=false --import-realm
     volumes:
-      - ./store-core/auth/keycloak/imports:/opt/keycloak/data/import
-      - ./store-core/auth/keycloak/providers:/opt/keycloak/providers
-      - ./store-core/auth/keycloak/themes/json-mail-theme:/opt/keycloak/themes/json-mail-theme
-      - ./store-core/auth/keycloak/themes/cvhome:/opt/keycloak/themes/cvhome
+      - ./store-core/core-auth/keycloak/imports:/opt/keycloak/data/import
+      - ./store-core/core-auth/keycloak/providers:/opt/keycloak/providers
+      - ./store-core/core-auth/keycloak/themes/json-mail-theme:/opt/keycloak/themes/json-mail-theme
+      - ./store-core/core-auth/keycloak/themes/cvhome:/opt/keycloak/themes/cvhome
 
     ports:
       - "9999:9999"

@@ -48,7 +48,7 @@ void copyBuildProviders(String version) {
     def sourceJar = Paths.get("store-core/${project.name}/${providersProjectName}/build/libs/${providersJarName}")
 
     def distJar = Paths.get("store-core/${project.name}/keycloak/providers/${providersJarName}")
-    println "will try to copy artifacts from ${sourceJar} to ${distJar}"
+    println "will try to copy artifacts from ${sourceJar} exist ${Files.exists(sourceJar)} to ${distJar} exists ${Files.exists(distJar)}"
 
     if (Files.exists(sourceJar)) {
         if (Files.exists(distJar)) {

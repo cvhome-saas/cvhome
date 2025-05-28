@@ -19,7 +19,7 @@ jobs:
         with:
           node-version: 20
       - name: Make gradlew executable
-        run: chmod +x ./gradlew && chmod +x store-core/auth/kc-providers/gradlew
+        run: chmod +x ./gradlew && chmod +x store-core/core-auth/kc-providers/gradlew
       - name: Validate Gradle wrapper
         uses: gradle/actions/wrapper-validation@v3
       - name: Configure AWS credentials For private region
@@ -54,8 +54,6 @@ jobs:
         env:
           ECR_TOKEN: ${{ steps.login-private-ecr.outputs.aws-ecr-token }}
           REGISTRY: ${{ steps.ecr-registry.outputs.aws-ecr-registry }}
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
       - name: Suggest Build Version
         id: suggest-build-version
         run: echo "build-version=$(source extra/scripts/suggested-version.sh ${{ github.run_id }})">> $GITHUB_OUTPUT

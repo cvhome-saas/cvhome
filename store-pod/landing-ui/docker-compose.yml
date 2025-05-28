@@ -28,8 +28,8 @@ services:
       MINIO_ROOT_PASSWORD: "minioadmin"
       MINIO_ACCESS_KEY: "minioadmin"
       MINIO_SECRET_KEY: "minioadmin"
-  auth:
-    image: store-core/auth
+  core-auth:
+    image: store-core/core-auth
     network_mode: host
     environment:
       KC_HTTP_ENABLED: true
@@ -65,7 +65,7 @@ services:
     ports:
       - "8120:8120"
     depends_on:
-      - auth
+      - core-auth
       - postgres
       - minio
   content:
@@ -83,7 +83,7 @@ services:
     ports:
       - "8121:8121"
     depends_on:
-      - auth
+      - core-auth
       - postgres
       - minio
   catalog:
