@@ -16,12 +16,7 @@ spring:
               metadata:
                 service-name: auth
                 instance: auth-1
-          'store-core-gateway':
-            - url: "http://localhost:8000"
-              metadata:
-                service-name: store-core-gateway
-                instance: store-core-gateway-1
-          'store-core-gateway.store-core.cvhome.lcl':
+          store-core-gateway:
             - url: "http://localhost:8000"
               metadata:
                 service-name: store-core-gateway
