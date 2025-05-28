@@ -2,7 +2,6 @@ package com.asrevo.cloud.ecs.discovery;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.client.ServiceInstance;
@@ -28,12 +27,10 @@ public class EcsReactiveDiscoveryClient implements ReactiveDiscoveryClient {
             EcsDiscoveryProperties properties,
             String serviceId) {
         log.info("getting services for {}", serviceId);
-        String extractedServiceId = extractServiceName(serviceId).orElse(serviceId);
-        String extractedNamespace = extractNamespace(serviceId).orElse(properties.getNamespace());
         DiscoverInstancesRequest request =
                 DiscoverInstancesRequest.builder()
-                        .namespaceName(extractedNamespace)
-                        .serviceName(extractedServiceId)
+                        .namespaceName(properties.getNamespace())
+                        .serviceName(serviceId)
                         .build();
 
         return Mono.fromFuture(discoveryAsync.discoverInstances(request))
@@ -44,8 +41,8 @@ public class EcsReactiveDiscoveryClient implements ReactiveDiscoveryClient {
                                 log.info(
                                         "getting {} services for {} in namespace {}",
                                         it.get().size(),
-                                        extractedServiceId,
-                                        extractedNamespace);
+                                        serviceId,
+                                        properties.getNamespace());
                             }
                         })
                 .flatMapMany(Flux::fromIterable)
@@ -54,29 +51,9 @@ public class EcsReactiveDiscoveryClient implements ReactiveDiscoveryClient {
                             Integer defaultPort =
                                     properties
                                             .getServicePorts()
-                                            .getOrDefault(
-                                                    extractedServiceId,
-                                                    properties.getDefaultPort());
+                                            .getOrDefault(serviceId, properties.getDefaultPort());
                             return new CloudMapServiceInstance(instance, defaultPort);
                         });
-    }
-
-    private static Optional<String> extractNamespace(String serviceId) {
-        int firstSplitter = serviceId.indexOf(".");
-        if (firstSplitter > 0 && serviceId.length() > firstSplitter + 1) {
-            return Optional.of(serviceId.substring(firstSplitter + 1));
-        } else {
-            return Optional.empty();
-        }
-    }
-
-    private static Optional<String> extractServiceName(String serviceId) {
-        int firstSplitter = serviceId.indexOf(".");
-        if (firstSplitter > 0) {
-            return Optional.of(serviceId.substring(0, firstSplitter));
-        } else {
-            return Optional.empty();
-        }
     }
 
     public static Flux<String> getEcsServices(
