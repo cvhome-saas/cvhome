@@ -36,4 +36,4 @@ bin/
 **/package-lock.json
 **/node_modules/
 /extra/test-data/generated/
-/store-core/auth/keycloak/providers/*
+/store-core/core-auth/keycloak/providers/*.jar

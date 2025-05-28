@@ -11,11 +11,11 @@ spring:
       discovery:
         enabled: true
         services:
-          auth:
+          core-auth:
             - url: "http://localhost:9999"
               metadata:
-                service-name: auth
-                instance: auth-1
+                service-name: core-auth
+                instance: core-auth-1
           store-core-gateway:
             - url: "http://localhost:8000"
               metadata:
