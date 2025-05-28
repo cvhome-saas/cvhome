@@ -36,7 +36,7 @@ public class GatewayRouteLocatorImpl implements RouteLocator {
     @Override
     public Flux<Route> getRoutes() {
         String storeCoreGatewayDomain = serviceDomainProperties.getService("store-core-gateway").domain();
-        Set<String> backendServices = Set.of("manager", "subscription", "auth", "store-pod-gateway", "store-pod-gateway-v2", "merchant-ui");
+        Set<String> backendServices = Set.of("manager", "subscription", "core-auth", "store-pod-gateway", "store-pod-gateway-v2", "merchant-ui");
         Predicate<ServerWebExchange> notBackendService = notServicePredicate.apply(new FNotServiceRoutePredicateFactory.Config(backendServices));
         Predicate<ServerWebExchange> storeUiHostPredicate = hostRoutePredicate.apply(new FHostRoutePredicateFactory.Config(Set.of("store-ui." + storeCoreGatewayDomain)));
         Predicate<ServerWebExchange> wwwHostPredicate = hostRoutePredicate.apply(new FHostRoutePredicateFactory.Config(Set.of(storeCoreGatewayDomain, "www." + storeCoreGatewayDomain)));

@@ -20,7 +20,7 @@ function run-append() {
     file="/etc/hosts"
     append "127.0.0.1 gateway.com" "$file"
     append "127.0.0.1 www.gateway.com" "$file"
-    append "127.0.0.1 auth.gateway.com" "$file"
+    append "127.0.0.1 core-auth.gateway.com" "$file"
     append "127.0.0.1 store-ui.gateway.com" "$file"
     append "127.0.0.1 welcome-ui.gateway.com" "$file"
     append "127.0.0.1 store-pod-1.gateway.com" "$file"
