@@ -41,3 +41,10 @@ spring:
       x-forwarded:
         host-append: false
         for-append: false
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+        
