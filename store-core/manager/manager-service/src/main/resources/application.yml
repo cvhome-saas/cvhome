@@ -13,7 +13,7 @@ com:
         core-auth:
           name: core-auth
           domain: core-auth.${com.asrevo.cvhome.app.domain}
-          port: 9999
+          port: 8001
           schema: http
           namespace: store-core.cvhome.lcl
           gateway-service-name: store-core-gateway
