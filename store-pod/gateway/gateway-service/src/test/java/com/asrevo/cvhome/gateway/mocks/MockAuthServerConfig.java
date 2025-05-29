@@ -25,7 +25,7 @@ public class MockAuthServerConfig {
                 .parse("mockserver/mockserver")
                 .withTag("mockserver-" + MockServerClient.class.getPackage().getImplementationVersion());
         MockServerContainer container = new MockServerContainer(MOCKSERVER_IMAGE);
-        container.setPortBindings(List.of("9999:1080"));
+        container.setPortBindings(List.of("8001:1080"));
         return container;
     }
 

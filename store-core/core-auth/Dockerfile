@@ -6,6 +6,6 @@ COPY keycloak/themes/json-mail-theme /opt/keycloak/themes/json-mail-theme
 COPY keycloak/themes/cvhome /opt/keycloak/themes/cvhome
 
 
-EXPOSE 9999
+EXPOSE 8001
 EXPOSE 9000
 ENTRYPOINT ["/opt/keycloak/bin/kc.sh","--verbose","start","--proxy=edge","--hostname-strict=false","--import-realm","--health-enabled=true"]

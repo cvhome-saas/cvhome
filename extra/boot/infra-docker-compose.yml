@@ -52,7 +52,7 @@ services:
       - ../core-auth/keycloak/imports:/opt/keycloak/data/import
       - ../core-auth/keycloak/providers:/opt/keycloak/providers
     ports:
-      - "9999:8080"
+      - "8001:8080"
     depends_on:
       - postgres
       - rabbitmq

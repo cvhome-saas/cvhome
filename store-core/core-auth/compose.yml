@@ -21,7 +21,7 @@ services:
     environment:
       KC_HTTP_ENABLED: true
       KC_HOSTNAME_STRICT_HTTPS: false
-      KC_HTTP_PORT: 9999
+      KC_HTTP_PORT: 8001
       KC_HTTP_MANAGEMENT_PORT: 9998
 
       KC_DB: postgres
@@ -44,7 +44,7 @@ services:
       - ./keycloak/themes/cvhome:/opt/keycloak/themes/cvhome
 
     ports:
-      - "9999:9999"
+      - "8001:8001"
       - "8787:8787"
       - "9000:9000"
       - "9998:9998"
