@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.net.URI;
+import java.util.Optional;
 
 @Configuration
 public class KeycloakConfig {
@@ -16,7 +17,8 @@ public class KeycloakConfig {
     @SneakyThrows
     @Bean
     public UserAccountService userAccountService(OAuth2ResourceServerProperties properties, KeycloakCredentialsProperties credentialsProperties) {
-        return new KeycloakUserAccountServiceImpl(new URI(properties.getJwt().getJwkSetUri()), credentialsProperties.credentials());
+        String kc = Optional.ofNullable(properties.getJwt().getJwkSetUri()).orElse(properties.getJwt().getIssuerUri());
+        return new KeycloakUserAccountServiceImpl(new URI(kc), credentialsProperties.credentials());
     }
 
 }
