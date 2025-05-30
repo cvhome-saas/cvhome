@@ -11,7 +11,6 @@ import com.asrevo.cvhome.keycloak.service.UserAccountService;
 import com.asrevo.cvhome.keycloak.utils.ErrorCodes;
 import com.asrevo.cvhome.keycloak.utils.KCUserType;
 import jakarta.ws.rs.core.Response;
-import java.net.URI;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,9 +28,9 @@ public class KeycloakUserAccountServiceImpl implements UserAccountService {
     private final UserRepresentationMapper userRepresentationMapper;
     private final UsersResource usersResource;
 
-    public KeycloakUserAccountServiceImpl(URI jwkSetUri, KeycloakCredentials credentials) {
-        Keycloak keycloak = createKeycloak(jwkSetUri, credentials);
-        this.usersResource = keycloak.realm(jwkSetUri.getPath().split("/")[2]).users();
+    public KeycloakUserAccountServiceImpl(KeycloakProperties credentials) {
+        Keycloak keycloak = createKeycloak(credentials);
+        this.usersResource = keycloak.realm(credentials.realm()).users();
         this.userRepresentationMapper = new UserRepresentationMapper() {};
     }
 
@@ -279,11 +278,10 @@ public class KeycloakUserAccountServiceImpl implements UserAccountService {
         }
     }
 
-    public Keycloak createKeycloak(URI jwkSetUri, KeycloakCredentials credentials) {
-        String serverUrl = jwkSetUri.getScheme() + "://" + jwkSetUri.getAuthority();
+    public Keycloak createKeycloak(KeycloakProperties credentials) {
         return KeycloakBuilder.builder()
-                .serverUrl(serverUrl)
-                .realm("cvhome")
+                .serverUrl(credentials.serverUrl())
+                .realm(credentials.realm())
                 .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
                 .clientId(credentials.clientId())
                 .clientSecret(credentials.clientSecret())
