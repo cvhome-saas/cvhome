@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.s2s.config;
 
 import com.asrevo.cvhome.s2s.config.internal.*;
+import com.asrevo.cvhome.s2s.jwt.IssuerUriSetConfigrationProperties;
 import com.asrevo.cvhome.s2s.model.*;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
@@ -13,7 +14,9 @@ import org.springframework.context.annotation.Import;
     SwaggerConfig.class,
     WebConfig.class,
     WebClientServicesConfig.class,
-    ReactiveGatewayConfig.class
+    ReactiveGatewayConfig.class,
+    IssuerUriSetJwtDecoderConfiguration.class,
+    IssuerUriSetReactiveJwtDecoderConfiguration.class
 })
 @EnableConfigurationProperties({
     ServiceDomainProperties.class,
@@ -24,6 +27,7 @@ import org.springframework.context.annotation.Import;
     StripeProperties.class,
     StoreProductImageProperties.class,
     CdnStorageProperties.class,
-    KeycloakCredentialsProperties.class
+    KeycloakCredentialsProperties.class,
+    IssuerUriSetConfigrationProperties.class
 })
 public class CvhomeSharedConfig {}

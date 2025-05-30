@@ -7,6 +7,8 @@ com:
         domain: saas.${com.asrevo.cvhome.app.domain}
       kc:
         credentials:
+          server-url: ${com.asrevo.cvhome.services.core-auth.schema}://${com.asrevo.cvhome.services.core-auth.domain}:${com.asrevo.cvhome.services.core-auth.port}
+          realm: cvhome
           client-id: internal-client
           client-secret: aKl0AKjjQ6zp2bnWhKOsnTOzl3J8Vqd0
       services:
@@ -140,7 +142,8 @@ spring:
       resourceserver:
         jwt:
           #          jwk-set-uri: ${com.asrevo.cvhome.services.core-auth.schema}://${com.asrevo.cvhome.services.core-auth.domain}:${com.asrevo.cvhome.services.core-auth.port}/realms/cvhome/protocol/openid-connect/certs
-          issuer-uri: ${com.asrevo.cvhome.services.core-auth.schema}://${com.asrevo.cvhome.services.core-auth.domain}:${com.asrevo.cvhome.services.core-auth.port}/realms/cvhome
+          #          issuer-uri: ${com.asrevo.cvhome.services.core-auth.schema}://${com.asrevo.cvhome.services.core-auth.domain}:${com.asrevo.cvhome.services.core-auth.port}/realms/cvhome
+          issuer-uri-set: ${com.asrevo.cvhome.services.core-auth.schema}://${com.asrevo.cvhome.services.core-auth.domain}:${com.asrevo.cvhome.services.core-auth.port}/realms/cvhome
   docker:
     compose:
       file: ${spring.application.name}/compose.yml
