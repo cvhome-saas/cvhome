@@ -67,7 +67,13 @@ public class MultiIssuerJwtDecoder implements JwtDecoder {
      * @throws JwtException if the issuer is unsupported or the factory fails to create a decoder.
      */
     private JwtDecoder getDecoderForIssuer(String issuer) throws JwtException {
-        // @TODO check if issuer in the supportedIssuerUris
+        if (!this.supportedIssuerUris.contains(issuer)) {
+            throw new JwtException(
+                    String.format(
+                            "Unsupported issuer: '%s'. Issuer not in the configured list of"
+                                    + " supported issuers.",
+                            issuer));
+        }
         JwtDecoder delegateDecoder =
                 this.issuerDecoders.computeIfAbsent(issuer, this.decoderFactory);
         if (delegateDecoder == null) {
