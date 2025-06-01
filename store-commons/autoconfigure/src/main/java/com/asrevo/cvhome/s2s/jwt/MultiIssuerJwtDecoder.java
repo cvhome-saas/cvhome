@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.s2s.jwt;
 
+import com.asrevo.cvhome.s2s.utils.UrlNormalize;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import java.text.ParseException;
@@ -8,6 +9,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtException;
@@ -41,7 +44,7 @@ public class MultiIssuerJwtDecoder implements JwtDecoder {
         Objects.requireNonNull(supportedIssuerUris, "supportedIssuerUris cannot be null");
         Objects.requireNonNull(decoderFactory, "decoderFactory cannot be null");
 
-        this.supportedIssuerUris = Set.copyOf(supportedIssuerUris);
+        this.supportedIssuerUris = supportedIssuerUris.stream().map(UrlNormalize::normalizeUri).collect(Collectors.toSet());
         this.decoderFactory = decoderFactory;
     }
 
@@ -67,7 +70,13 @@ public class MultiIssuerJwtDecoder implements JwtDecoder {
      * @throws JwtException if the issuer is unsupported or the factory fails to create a decoder.
      */
     private JwtDecoder getDecoderForIssuer(String issuer) throws JwtException {
-        // @TODO check if issuer in the supportedIssuerUris
+        if (!this.supportedIssuerUris.contains(issuer)) {
+            throw new JwtException(
+                    String.format(
+                            "Unsupported issuer: '%s'. Issuer not in the configured list of"
+                                    + " supported issuers.",
+                            issuer));
+        }
         JwtDecoder delegateDecoder =
                 this.issuerDecoders.computeIfAbsent(issuer, this.decoderFactory);
         if (delegateDecoder == null) {
