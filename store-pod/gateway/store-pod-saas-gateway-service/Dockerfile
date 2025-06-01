@@ -1,4 +1,5 @@
-FROM ashraf1abdelrasool/saas-gateway:sha-014b6ab
+FROM ashraf1abdelrasool/saas-gateway:sha-7ed71e3
+
 COPY Caddyfile /etc/caddy/Caddyfile
 ENV HOST 0.0.0.0
 EXPOSE 80
