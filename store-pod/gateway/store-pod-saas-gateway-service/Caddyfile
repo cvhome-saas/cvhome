@@ -7,6 +7,17 @@
 		level ERROR
 	}
 
+	storage s3 {
+		bucket              1691275173-1-dev-cdn-20250601092518649200000003
+		region              eu-central-1
+		# Optional:
+		# prefix              your/custom/prefix  # Default is "certmagic"
+		# access_key_id       YOUR_AWS_ACCESS_KEY_ID
+		# secret_access_key   YOUR_AWS_SECRET_ACCESS_KEY
+		# endpoint            https://your-s3-compatible-endpoint.com
+		# encryption_key      your-32-byte-long-encryption-key
+	}
+
 	on_demand_tls {
 		ask {$ASK_TLS_URL}
 	}
