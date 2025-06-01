@@ -10,12 +10,6 @@
 	storage s3 {
 		bucket              {$CERT_BUCKET}
 		region              {$CERT_BUCKET_REGION}
-		# Optional:
-		# prefix              your/custom/prefix  # Default is "certmagic"
-		# access_key_id       YOUR_AWS_ACCESS_KEY_ID
-		# secret_access_key   YOUR_AWS_SECRET_ACCESS_KEY
-		# endpoint            https://your-s3-compatible-endpoint.com
-		# encryption_key      your-32-byte-long-encryption-key
 	}
 
 	on_demand_tls {
