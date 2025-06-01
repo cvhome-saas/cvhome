@@ -8,8 +8,8 @@
 	}
 
 	storage s3 {
-		bucket              1691275173-1-dev-cdn-20250601092518649200000003
-		region              eu-central-1
+		bucket              {$CERT_BUCKET}
+		region              {$CERT_BUCKET_REGION}
 		# Optional:
 		# prefix              your/custom/prefix  # Default is "certmagic"
 		# access_key_id       YOUR_AWS_ACCESS_KEY_ID
