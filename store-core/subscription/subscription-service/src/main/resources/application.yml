@@ -6,10 +6,10 @@ com:
       saas:
         domain: saas.${com.asrevo.cvhome.app.domain}
       services:
-        auth:
-          name: auth
-          domain: auth.${com.asrevo.cvhome.app.domain}
-          port: 9999
+        core-auth:
+          name: core-auth
+          domain: core-auth.${com.asrevo.cvhome.app.domain}
+          port: 8001
           schema: http
           namespace: store-core.cvhome.lcl
           gateway-service-name: store-core-gateway
@@ -129,16 +129,18 @@ spring:
           keycloak:
             #            comment issuer-uri to skip validation
             #            issuer-uri: https://gateway.com:8443/realms/cvhome
-            jwk-set-uri: ${com.asrevo.cvhome.services.auth.schema}://${com.asrevo.cvhome.services.auth.domain}:${com.asrevo.cvhome.services.auth.port}/realms/cvhome/protocol/openid-connect/certs
-            authorization-uri: ${com.asrevo.cvhome.services.auth.schema}://${com.asrevo.cvhome.services.auth.domain}:${com.asrevo.cvhome.services.auth.port}/realms/cvhome/protocol/openid-connect/auth
-            token-uri: ${com.asrevo.cvhome.services.auth.schema}://${com.asrevo.cvhome.services.auth.domain}:${com.asrevo.cvhome.services.auth.port}/realms/cvhome/protocol/openid-connect/token
+            jwk-set-uri: ${com.asrevo.cvhome.services.core-auth.schema}://${com.asrevo.cvhome.services.core-auth.domain}:${com.asrevo.cvhome.services.core-auth.port}/realms/cvhome/protocol/openid-connect/certs
+            authorization-uri: ${com.asrevo.cvhome.services.core-auth.schema}://${com.asrevo.cvhome.services.core-auth.domain}:${com.asrevo.cvhome.services.core-auth.port}/realms/cvhome/protocol/openid-connect/auth
+            token-uri: ${com.asrevo.cvhome.services.core-auth.schema}://${com.asrevo.cvhome.services.core-auth.domain}:${com.asrevo.cvhome.services.core-auth.port}/realms/cvhome/protocol/openid-connect/token
 
       #            need to trace why getting 401 error=invalid_token, auth_method=validate_access_token is by issuer?
-      #            user-info-uri: https://auth.gateway.com:8443/realms/cvhome/protocol/openid-connect/userinfo
+      #            user-info-uri: https://core-auth.gateway.com:8443/realms/cvhome/protocol/openid-connect/userinfo
       #            user-name-attribute: sub
       resourceserver:
         jwt:
-          jwk-set-uri: ${com.asrevo.cvhome.services.auth.schema}://${com.asrevo.cvhome.services.auth.domain}:${com.asrevo.cvhome.services.auth.port}/realms/cvhome/protocol/openid-connect/certs
+          #          jwk-set-uri: ${com.asrevo.cvhome.services.core-auth.schema}://${com.asrevo.cvhome.services.core-auth.domain}:${com.asrevo.cvhome.services.core-auth.port}/realms/cvhome/protocol/openid-connect/certs
+          #          issuer-uri: ${com.asrevo.cvhome.services.core-auth.schema}://${com.asrevo.cvhome.services.core-auth.domain}:${com.asrevo.cvhome.services.core-auth.port}/realms/cvhome
+          issuer-uri-set: ${com.asrevo.cvhome.services.core-auth.schema}://${com.asrevo.cvhome.services.core-auth.domain}:${com.asrevo.cvhome.services.core-auth.port}/realms/cvhome
   docker:
     compose:
       file: ${spring.application.name}/compose.yml

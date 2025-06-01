@@ -11,17 +11,12 @@ spring:
       discovery:
         enabled: true
         services:
-          auth:
-            - url: "http://localhost:9999"
+          core-auth:
+            - url: "http://localhost:8001"
               metadata:
-                service-name: auth
-                instance: auth-1
-          'store-core-gateway':
-            - url: "http://localhost:8000"
-              metadata:
-                service-name: store-core-gateway
-                instance: store-core-gateway-1
-          'store-core-gateway.store-core.cvhome.lcl':
+                service-name: core-auth
+                instance: core-auth-1
+          store-core-gateway:
             - url: "http://localhost:8000"
               metadata:
                 service-name: store-core-gateway

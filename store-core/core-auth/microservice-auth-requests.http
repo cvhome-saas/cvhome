@@ -1,5 +1,5 @@
 ### get token for microservice-gateway
-POST http://localhost:9999/realms/cvhome/protocol/openid-connect/token
+POST http://localhost:8001/realms/cvhome/protocol/openid-connect/token
 Content-Type: application/x-www-form-urlencoded
 
 client_id = s2s &
@@ -10,7 +10,7 @@ username = auth@service.internal
 password = password
 
 ### get token for microservice with client
-POST http://localhost:9999/realms/cvhome/protocol/openid-connect/token
+POST http://localhost:8001/realms/cvhome/protocol/openid-connect/token
 Content-Type: application/x-www-form-urlencoded
 
 client_id = communication@service.internal &
@@ -21,7 +21,7 @@ grant_type = client_credentials
 
 
 ### get token for admin
-POST http://localhost:9999/realms/master/protocol/openid-connect/token
+POST http://localhost:8001/realms/master/protocol/openid-connect/token
 Content-Type: application/x-www-form-urlencoded
 
 client_id = admin-cli &
@@ -32,7 +32,7 @@ password = admin &
 scope = roles
 
 ### get token for microservice-domain-ownership
-POST http://localhost:9999/realms/cvhome/protocol/openid-connect/token
+POST http://localhost:8001/realms/cvhome/protocol/openid-connect/token
 Content-Type: application/x-www-form-urlencoded
 
 client_id = s2s &
@@ -44,7 +44,7 @@ password = microservice-domain-ownership
 
 
 ### get token for microservice-dcm
-POST http://localhost:9999/realms/cvhome/protocol/openid-connect/token
+POST http://localhost:8001/realms/cvhome/protocol/openid-connect/token
 Content-Type: application/x-www-form-urlencoded
 
 client_id = s2s &

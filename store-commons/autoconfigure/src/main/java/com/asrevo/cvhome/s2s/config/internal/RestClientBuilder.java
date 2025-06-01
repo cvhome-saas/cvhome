@@ -1,6 +1,5 @@
 package com.asrevo.cvhome.s2s.config.internal;
 
-import static com.asrevo.cvhome.s2s.config.internal.WebClientBuilder.getServiceUrl;
 import static com.asrevo.cvhome.s2s.utils.WebClientsUtils.build;
 
 import com.asrevo.cvhome.s2s.model.ServiceDomainProperties;
@@ -24,7 +23,9 @@ public class RestClientBuilder {
     }
 
     public <T> T buildClient(String serviceName, Class<T> tClass) {
-        String url = getServiceUrl(serviceDomainProperties, environment, serviceName);
+        String url =
+                new ServiceUrlBuilder(serviceDomainProperties, environment)
+                        .getServiceUrl(serviceName);
         return build(defaultMicroServiceBuilder, url, tClass);
     }
 }

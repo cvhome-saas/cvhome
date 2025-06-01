@@ -4,7 +4,7 @@ spring:
       eager-load:
         clients:
           - "store-core-gateway"
-          - "auth"
+          - "core-auth"
           - "manager"
           - "subscription"
           - "store-ui"
@@ -16,7 +16,7 @@ spring:
         enabled: true
         default-port: 8080
         service-ports:
-          "auth": 9999
+          "core-auth": 8001
           "store-core-gateway": 8000
           "store-ui": 8010
           "welcome-ui": 8011

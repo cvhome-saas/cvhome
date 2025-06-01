@@ -1,32 +1,28 @@
 import {DEFAULT_STORE_POD_GATEWAY} from "@/types/constant";
 
 export interface StoreContext {
-    store: string,
-    locale: string,
+    store: string
+    locale: string
+    externalGateway: string | undefined
+    internalGateway: string | undefined
 }
 
-export const storeBaseServiceUrl = (service: string): string => {
-    return typeof window === 'undefined' ? handleInternalServiceCall(service) : handleBrowserServiceCall(service)
+export const storeBaseServiceUrl = (service: string, storeContext: StoreContext): string => {
+    return typeof window === 'undefined' ? handleInternalServiceCall(service, storeContext) : handleBrowserServiceCall(service, storeContext)
 }
 
-const handleInternalServiceCall = (service: string): string => {
-    const STORE_POD_GATEWAY = process.env.INTERNAL_STORE_POD_GATEWAY;
-    if (STORE_POD_GATEWAY) {
-        // GATEWAY env Passed
-        return STORE_POD_GATEWAY + "/" + service;
+const handleInternalServiceCall = (service: string, storeContext: StoreContext): string => {
+    if (storeContext.internalGateway) {
+        return storeContext.internalGateway + "/" + service;
     } else {
-        // local or fallback if no env provided
         return DEFAULT_STORE_POD_GATEWAY + "/" + service
     }
 }
 
-const handleBrowserServiceCall = (service: string): string => {
-    const STORE_POD_GATEWAY = process.env.EXTERNAL_STORE_POD_GATEWAY;
-    if (STORE_POD_GATEWAY) {
-        // with custom domain
-        return STORE_POD_GATEWAY + "/" + service;
+const handleBrowserServiceCall = (service: string, storeContext: StoreContext): string => {
+    if (storeContext.externalGateway) {
+        return storeContext.externalGateway + "/" + service;
     } else {
-        // with default domain
         return "/" + service
     }
 }
