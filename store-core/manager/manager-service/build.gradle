@@ -1,6 +1,6 @@
 plugins {
     id 'com.asrevo.java-application-conventions'
-    id 'org.springframework.boot' version '3.4.5'
+    id 'org.springframework.boot' version '3.5.0'
     id 'io.spring.dependency-management' version '1.1.7'
 //    id 'org.graalvm.buildtools.native' version '0.10.5'
 }
@@ -35,7 +35,7 @@ bootBuildImage {
 }
 
 ext {
-    set('springCloudVersion', "2024.0.1")
+    set('springCloudVersion', "2025.0.0")
 }
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-aop'
@@ -63,7 +63,7 @@ dependencies {
 
     implementation 'org.mapstruct:mapstruct:1.6.3'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
-    implementation 'org.springdoc:springdoc-openapi-starter-webflux-ui:2.8.6'
+    implementation 'org.springdoc:springdoc-openapi-starter-webflux-ui:2.8.8'
 
     implementation project(':store-core:manager:manager-events')
     implementation project(':store-core:subscription:subscription-events')

@@ -4,7 +4,7 @@ plugins {
 }
 
 dependencies {
-	implementation 'org.springframework.cloud:spring-cloud-starter-loadbalancer:4.2.1'
+	implementation 'org.springframework.cloud:spring-cloud-starter-loadbalancer:4.3.0'
 	implementation 'software.amazon.awssdk:servicediscovery:2.29.43'
 	compileOnly 'org.projectlombok:lombok:1.18.38'
 	annotationProcessor 'org.projectlombok:lombok:1.18.38'

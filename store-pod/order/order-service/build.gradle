@@ -1,8 +1,8 @@
 plugins {
     id 'com.asrevo.java-application-conventions'
-    id 'org.springframework.boot' version '3.4.5'
+    id 'org.springframework.boot' version '3.5.0'
     id 'io.spring.dependency-management' version '1.1.7'
-//    id 'org.hibernate.orm' version '6.6.13.Final'
+//    id 'org.hibernate.orm' version '6.6.15.Final'
 //    id 'org.graalvm.buildtools.native' version '0.10.5'
 }
 apply from: "$rootDir/build-logic/helpers/common-methods.gradle"
@@ -36,7 +36,7 @@ bootBuildImage {
 }
 
 ext {
-    set('springCloudVersion', "2024.0.1")
+    set('springCloudVersion', "2025.0.0")
 }
 dependencies {
     implementation 'org.springframework.cloud:spring-cloud-starter-loadbalancer'
@@ -64,7 +64,7 @@ dependencies {
 
     implementation 'org.mapstruct:mapstruct:1.6.3'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.6'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.8'
 
     implementation project(':store-commons:autoconfigure')
 
