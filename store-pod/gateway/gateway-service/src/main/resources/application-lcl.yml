@@ -14,6 +14,11 @@ spring:
               metadata:
                 service-name: store-core-gateway
                 instance: store-core-gateway-1
+          pod-auth:
+            - url: "http://localhost:8101"
+              metadata:
+                service-name: pod-auth
+                instance: pod-auth-1
           store-ui:
             - url: "http://localhost:8010"
               metadata:

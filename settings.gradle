@@ -27,6 +27,7 @@ include(
         'store-commons:keycloak-client',
         'store-commons:autoconfigure',
 
+        'store-pod:pod-auth:pod-auth-service',
         'store-pod:gateway:gateway-service',
         'store-pod:gateway:store-pod-saas-gateway-service',
         'store-pod:store-commons',
