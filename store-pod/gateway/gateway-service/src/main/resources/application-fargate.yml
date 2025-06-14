@@ -4,6 +4,7 @@ spring:
       eager-load:
         clients:
           - "store-pod-gateway"
+          - "pod-auth"
           - "merchant"
           - "content"
           - "catalog"
@@ -24,6 +25,7 @@ spring:
           "manager": 8020
           "subscription": 8021
           "store-pod-gateway": 8100
+          "pod-auth": 8101
           "landing-ui": 8110
           "merchant-ui": 8111
           "merchant": 8120
