@@ -30,6 +30,8 @@ spring:
           "catalog": 8122
           "order": 8123
     gateway:
-      discovery:
-        locator:
-          enabled: false
+      server:
+        webflux:
+          discovery:
+            locator:
+              enabled: false

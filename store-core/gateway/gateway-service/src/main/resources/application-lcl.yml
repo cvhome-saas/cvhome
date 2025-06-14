@@ -30,9 +30,11 @@ spring:
                 service-name: welcome-ui
                 instance: welcome-ui-1
     gateway:
-      discovery:
-        locator:
-          enabled: false
+      server:
+        webflux:
+          discovery:
+            locator:
+              enabled: false
 com:
   asrevo:
     cvhome:
