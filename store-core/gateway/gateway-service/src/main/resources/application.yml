@@ -159,7 +159,7 @@ management:
     health:
       show-details: always
     gateway:
-      enabled: true
+      access: unrestricted
   endpoints:
     web:
       exposure:

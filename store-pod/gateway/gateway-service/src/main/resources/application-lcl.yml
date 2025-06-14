@@ -50,19 +50,21 @@ spring:
                 service-name: merchant-ui
                 instance: merchant-ui-1
     gateway:
-      discovery:
-        locator:
-          enabled: true
-      default-filters:
-        - TokenRelay
-        - PreserveHostHeader
-        - AddResponseHeader=X-Frame-Options, SAMEORIGIN
-      x-forwarded:
-        host-append: false
-        for-append: false
-      globalcors:
-        cors-configurations:
-          '[/**]':
-            allowedOrigins: "*"
-            allowedMethods: "*"
-            allowedHeaders: "*"
+      server:
+        webflux:
+          discovery:
+            locator:
+              enabled: true
+          globalcors:
+            cors-configurations:
+              '[/**]':
+                          allowedOrigins: "*"
+                          allowedMethods: "*"
+                          allowedHeaders: "*"
+          x-forwarded:
+            host-append: false
+            for-append: false
+          default-filters:
+            - TokenRelay
+            - PreserveHostHeader
+            - AddResponseHeader=X-Frame-Options, SAMEORIGIN
