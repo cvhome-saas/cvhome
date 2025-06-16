@@ -29,6 +29,7 @@ public class GatewayRouteLocatorImpl implements RouteLocator {
         Predicate<ServerWebExchange> notBackendService = notServicePredicate.apply(new FNotServiceRoutePredicateFactory.Config(backendServices));
 
         Predicate<ServerWebExchange> merchantUiHostPredicate = hostRoutePredicate.apply(config -> config.setHost(Set.of("merchant-ui." + storeCoreGatewayDomain)));
+        Predicate<ServerWebExchange> podAuthHostPredicate = hostRoutePredicate.apply(config -> config.setHost(Set.of("pod-auth." + storeCoreGatewayDomain)));
 
 
         RouteLocatorBuilder.Builder routes = routeLocatorBuilder.routes();
@@ -45,6 +46,11 @@ public class GatewayRouteLocatorImpl implements RouteLocator {
         );
 
         routes
+                .route(r -> r
+                        .predicate(notBackendService)
+                        .and()
+                        .predicate(podAuthHostPredicate)
+                        .uri("lb://pod-auth"))
                 .route(r -> r
                         .predicate(notBackendService)
                         .and()
