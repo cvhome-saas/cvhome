@@ -1,7 +1,9 @@
 import java.nio.file.Files
 import java.nio.file.Paths
+import javax.inject.Inject
+import org.gradle.process.ExecOperations
 
-task "clean" {
+tasks.register('clean') {
     doLast {
         delete files('kc-providers/build')
         delete fileTree('keycloak/providers') {
@@ -10,9 +12,9 @@ task "clean" {
     }
 }
 
-task "build" {
+tasks.register('build') {
     doLast {
-        project.exec {
+        project.services.get(ExecOperations.class).exec {
             workingDir 'kc-providers'
             commandLine createBuildProviders(project.version as String)
         }
@@ -71,17 +73,20 @@ abstract class BootBuildImageTask extends DefaultTask {
         this.publishImage = publishImage;
     }
 
+    @Inject
+    protected abstract ExecOperations getExecOperations()
+
     BootBuildImageTask() {
     }
 
     @TaskAction
     void bootBuildImage() {
-        project.exec {
+        getExecOperations().exec {
             workingDir '.'
             commandLine createBuildCmd("store-core/${project.name}", project.version as String) as List<String>
         }
         if (publishImage) {
-            project.exec {
+            getExecOperations().exec {
                 workingDir '.'
                 commandLine createPushCmd("store-core/${project.name}") as List<String>
             }

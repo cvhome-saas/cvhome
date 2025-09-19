@@ -1,26 +1,29 @@
-task "clean" {
+import javax.inject.Inject
+import org.gradle.process.ExecOperations
+
+tasks.register('clean') {
     doLast {
         delete files('.next/')
         delete files('package-lock.json')
     }
 }
 
-task "build" {
+tasks.register('build') {
     doLast {
-        project.exec {
+        project.services.get(ExecOperations.class).exec {
             workingDir '.'
             commandLine "npm", "i"
         }
-        project.exec {
+        project.services.get(ExecOperations.class).exec {
             workingDir '.'
             commandLine "npm", "run", "build"
         }
     }
 }
 
-task "bootRun" {
+tasks.register('bootRun') {
     doLast {
-        project.exec {
+        project.services.get(ExecOperations.class).exec {
             workingDir '.'
             commandLine "npm", "run", "dev"
         }
@@ -41,18 +44,21 @@ abstract class BootBuildImageTask extends DefaultTask {
         this.publishImage = publishImage;
     }
 
+    @Inject
+    protected abstract ExecOperations getExecOperations()
+
     BootBuildImageTask() {
     }
 
 
     @TaskAction
     void bootBuildImage() {
-        project.exec {
+        getExecOperations().exec {
             workingDir '.'
             commandLine createBuildCmd("store-pod/${project.name}", project.version as String) as List<String>
         }
         if (publishImage) {
-            project.exec {
+            getExecOperations().exec {
                 workingDir '.'
                 commandLine createPushCmd("store-pod/${project.name}") as List<String>
             }
