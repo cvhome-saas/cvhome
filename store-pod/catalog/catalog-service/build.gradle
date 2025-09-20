@@ -1,9 +1,9 @@
 plugins {
-    id 'com.asrevo.java-application-conventions'
-    id 'org.springframework.boot' version '3.5.0'
-    id 'io.spring.dependency-management' version '1.1.7'
+    alias(libs.plugins.java.application.conventions)
+    alias(libs.plugins.spring.boot)
+    alias(libs.plugins.spring.dependency.management)
 //    id 'org.hibernate.orm' version '6.6.15.Final'
-//    id 'org.graalvm.buildtools.native' version '0.10.5'
+//    alias(libs.plugins.graalvm)
 }
 apply from: "$rootDir/build-logic/helpers/common-methods.gradle"
 group = 'com.asrevo.cvhome'
@@ -35,25 +35,22 @@ bootBuildImage {
     }
 }
 
-ext {
-    set('springCloudVersion', "2025.0.0")
-}
 dependencies {
-    implementation 'org.springframework.cloud:spring-cloud-starter-loadbalancer'
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation libs.spring.cloud.starter.loadbalancer
+    implementation libs.spring.boot.starter.web
+    implementation libs.spring.boot.starter.validation
+    implementation libs.spring.boot.starter.actuator
 
-    implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
-    implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    runtimeOnly 'org.postgresql:postgresql'
+    implementation libs.spring.boot.starter.security
+    implementation libs.spring.boot.starter.oauth2.client
+    implementation libs.spring.boot.starter.oauth2.resource.server
+    implementation libs.spring.boot.starter.data.jpa
+    runtimeOnly libs.postgresql
 
-    implementation 'software.amazon.awssdk:s3:2.29.43'
+    implementation libs.aws.sdk.s3
 
-    implementation 'commons-validator:commons-validator:1.9.0'
-    implementation 'commons-io:commons-io:2.16.1'
+    implementation libs.commons.validator
+    implementation libs.commons.io
 
     implementation project(':store-pod:store-modules:store-cms-commons')
     implementation project(':store-pod:merchant:merchant-external-api')
@@ -62,28 +59,28 @@ dependencies {
     implementation project(':store-commons:ecs-commons:fargate-task-info')
     implementation project(':store-commons:ecs-commons:ecs-service-discoveryclient')
 
-    implementation 'org.mapstruct:mapstruct:1.6.3'
-    annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.8'
+    implementation libs.mapstruct
+    annotationProcessor libs.mapstruct.processor
+    implementation libs.springdoc.openapi.starter.webmvc.ui
 
     implementation project(':store-commons:autoconfigure')
 
-//    developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    implementation 'org.springframework.boot:spring-boot-starter-security'
-    testImplementation 'org.springframework.security:spring-security-test'
-    testImplementation 'org.springframework.boot:spring-boot-testcontainers'
-    testImplementation 'org.testcontainers:junit-jupiter'
-    testImplementation 'org.testcontainers:postgresql'
-    testImplementation 'rocks.cleancode:hamcrest-record:1.0.0'
+//    developmentOnly libs.spring.boot.docker.compose
+    compileOnly libs.lombok
+    annotationProcessor libs.lombok
+    annotationProcessor libs.lombok.mapstruct.binding
+    testImplementation libs.spring.boot.starter.test
+    implementation libs.spring.boot.starter.security
+    testImplementation libs.spring.security.test
+    testImplementation libs.spring.boot.testcontainers
+    testImplementation libs.testcontainers.junit.jupiter
+    testImplementation libs.testcontainers.postgresql
+    testImplementation libs.hamcrest.record
 }
 
 dependencyManagement {
     imports {
-        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+//        mavenBom libs.spring.cloud.dependencies
     }
 }
 
