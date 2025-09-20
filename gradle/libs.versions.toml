@@ -1,6 +1,7 @@
 [versions]
-springBoot = "3.5.0"
+springBoot = "3.5.6"
 springCloud = "2025.0.0"
+springDataCommons = "3.5.4"
 springDependencyManagement = "1.1.7"
 springWeb = "6.2.7"
 springCloudCommons = "4.3.0"
@@ -41,8 +42,8 @@ spring-boot-starter-validation = { module = "org.springframework.boot:spring-boo
 spring-boot-starter-actuator = { module = "org.springframework.boot:spring-boot-starter-actuator", version.ref = "springBoot" }
 spring-boot-starter-oauth2-client = { module = "org.springframework.boot:spring-boot-starter-oauth2-client", version.ref = "springBoot" }
 spring-boot-starter-oauth2-resource-server = { module = "org.springframework.boot:spring-boot-starter-oauth2-resource-server", version.ref = "springBoot" }
-spring-boot-starter-data-jdbc = { module = "org.springframework.boot:spring-boot-starter-data-jdbc", version.ref = "springBoot" }
-spring-boot-starter-data-jpa = { module = "org.springframework.boot:spring-boot-starter-data-jpa", version.ref = "springBoot" }
+spring-boot-starter-data-jdbc = { module = "org.springframework.boot:spring-boot-starter-data-jdbc", version.ref = "springDataCommons" }
+spring-boot-starter-data-jpa = { module = "org.springframework.boot:spring-boot-starter-data-jpa", version.ref = "springDataCommons" }
 spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test", version.ref = "springBoot" }
 spring-boot-testcontainers = { module = "org.springframework.boot:spring-boot-testcontainers", version.ref = "springBoot" }
 spring-boot-docker-compose = { module = "org.springframework.boot:spring-boot-docker-compose", version.ref = "springBoot" }
@@ -62,9 +63,9 @@ spring-security-test = { module = "org.springframework.security:spring-security-
 spring-web = { module = "org.springframework:spring-web", version.ref = "springWeb" }
 spring-webmvc = { module = "org.springframework:spring-webmvc", version.ref = "springWeb" }
 spring-webflux = { module = "org.springframework:spring-webflux", version.ref = "springWeb" }
-spring-data-jpa = { module = "org.springframework.data:spring-data-jpa", version.ref = "springBoot" }
-spring-data-commons = { module = "org.springframework.data:spring-data-commons", version.ref = "springBoot" }
-spring-data-relational = { module = "org.springframework.data:spring-data-relational", version.ref = "springBoot" }
+spring-data-jpa = { module = "org.springframework.data:spring-data-jpa", version.ref = "springDataCommons" }
+spring-data-commons = { module = "org.springframework.data:spring-data-commons", version.ref = "springDataCommons" }
+spring-data-relational = { module = "org.springframework.data:spring-data-relational", version.ref = "springDataCommons" }
 spring-amqp-spring-rabbit-stream = { module = "org.springframework.amqp:spring-rabbit-stream" }
 
 lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
