@@ -7,11 +7,6 @@ plugins {
 apply from: "$rootDir/build-logic/helpers/common-methods.gradle"
 group = 'com.asrevo.cvhome'
 
-repositories {
-    mavenLocal()
-    mavenCentral()
-    maven { url 'https://repo.spring.io/milestone' }
-}
 
 springBoot {
     buildInfo()
