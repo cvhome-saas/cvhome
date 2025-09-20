@@ -60,7 +60,7 @@ jobs:
       - name: Print Build Version
         run:  echo ${{ steps.suggest-build-version.outputs.build-version }}
       - name: Package And Publish Docker with Gradle
-        run: ./gradlew :store-core:gateway:gateway-service:bootBuildImage --publishImage -Dorg.gradle.project.version="${{ steps.suggest-build-version.outputs.build-version }}" -x test -x check
+        run: ./gradlew bootBuildImage --publishImage -Dorg.gradle.project.version="${{ steps.suggest-build-version.outputs.build-version }}" -x test -x check
         env: # Or as an environment variable
           REGISTRY: "${{ steps.get-aws-account-id.outputs.aws-account-id }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ steps.build-state-bucket.outputs.project }}"
           ECR_TOKEN: ${{ steps.login-private-ecr.outputs.aws-ecr-token }}
