@@ -2,6 +2,7 @@
 springBoot = "3.5.0"
 springCloud = "2025.0.0"
 springDependencyManagement = "1.1.7"
+hibernate = "6.6.15.Final"
 spotless = "6.25.0"
 shadow = "8.1.1"
 graalvm = "0.10.5"
@@ -27,12 +28,12 @@ springWeb = "6.2.7"
 springDataJpa = "3.5.0"
 jakartaValidationApi = "3.0.2"
 apacheCommonsLang3 = "3.17.0"
-hibernateCore = "6.6.15.Final"
 commonsIo = "2.16.1"
 commonsValidator = "1.9.0"
 hamcrestRecord = "1.0.0"
 mockserverClient = "5.15.0"
 commonsBeanutils = "1.10.1"
+jakartaPersistenceApi = "3.1.0"
 
 [libraries]
 spring-boot-starter-web = { module = "org.springframework.boot:spring-boot-starter-web", version.ref = "springBoot" }
@@ -113,8 +114,9 @@ postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" 
 stripe-java = { module = "com.stripe:stripe-java", version.ref = "stripe" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 jakarta-validation-api = { module = "jakarta.validation:jakarta.validation-api", version.ref = "jakartaValidationApi" }
+jakarta-persistence-api = { module = "jakarta.persistence:jakarta.persistence-api", version.ref = "jakartaPersistenceApi" }
 apache-commons-lang3 = { module = "org.apache.commons:commons-lang3", version.ref = "apacheCommonsLang3" }
-hibernate-core = { module = "org.hibernate.orm:hibernate-core", version.ref = "hibernateCore" }
+hibernate-core = { module = "org.hibernate.orm:hibernate-core", version.ref = "hibernate" }
 commons-io = { module = "commons-io:commons-io", version.ref = "commonsIo" }
 commons-validator = { module = "commons-validator:commons-validator", version.ref = "commonsValidator" }
 hamcrest-record = { module = "rocks.cleancode:hamcrest-record", version.ref = "hamcrestRecord" }
@@ -124,6 +126,7 @@ commons-beanutils = { module = "commons-beanutils:commons-beanutils", version.re
 [plugins]
 spring-boot = { id = "org.springframework.boot", version.ref = "springBoot" }
 spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "springDependencyManagement" }
+hibernate-orm = { id = "org.hibernate.orm", version.ref = "hibernate" }
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 shadow = { id = "com.github.johnrengelman.shadow", version.ref = "shadow" }
 graalvm = { id = "org.graalvm.buildtools.native", version.ref = "graalvm" }

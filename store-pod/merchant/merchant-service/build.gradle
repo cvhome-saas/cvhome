@@ -2,8 +2,8 @@ plugins {
     alias(libs.plugins.java.application.conventions)
     alias(libs.plugins.spring.boot)
     alias(libs.plugins.spring.dependency.management)
-//    id 'org.hibernate.orm' version '6.6.15.Final'
-//    alias(libs.plugins.graalvm)
+    alias(libs.plugins.hibernate.orm)
+    //    alias(libs.plugins.graalvm)
 }
 apply from: "$rootDir/build-logic/helpers/common-methods.gradle"
 group = 'com.asrevo.cvhome'
