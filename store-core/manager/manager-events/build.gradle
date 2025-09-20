@@ -1,13 +1,13 @@
 plugins {
-	id 'com.asrevo.java-library-conventions'
-	id("com.diffplug.spotless") version "6.25.0"
+	alias(libs.plugins.java.library.conventions)
+	alias(libs.plugins.spotless)
 }
 
 dependencies {
 	api project(':store-core:manager:manager-commons')
-	compileOnly 'org.springframework.data:spring-data-commons:3.5.0'
-	compileOnly 'org.springframework.data:spring-data-relational:3.5.0'
-	compileOnly 'com.fasterxml.jackson.core:jackson-annotations:2.19.0'
-	compileOnly 'org.projectlombok:lombok:1.18.38'
-	annotationProcessor 'org.projectlombok:lombok:1.18.38'
+	compileOnly libs.spring.data.commons
+	compileOnly libs.spring.data.relational
+	compileOnly libs.jackson.annotations
+	compileOnly libs.lombok
+	annotationProcessor libs.lombok
 }

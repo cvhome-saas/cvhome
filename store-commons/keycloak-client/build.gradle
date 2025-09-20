@@ -1,14 +1,14 @@
 plugins {
-	id 'com.asrevo.java-library-conventions'
-	id("com.diffplug.spotless") version "6.25.0"
+	alias(libs.plugins.java.library.conventions)
+	alias(libs.plugins.spotless)
 }
 
 dependencies {
 	compileOnly project(":store-commons:commons")
-	implementation 'org.keycloak:keycloak-admin-client:26.0.4'
-	implementation 'org.mapstruct:mapstruct:1.6.3'
-	compileOnly 'org.projectlombok:lombok:1.18.38'
-	annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
-	annotationProcessor 'org.projectlombok:lombok:1.18.38'
-	annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+	implementation libs.keycloak.admin.client
+	implementation libs.mapstruct
+	compileOnly libs.lombok
+	annotationProcessor libs.mapstruct.processor
+	annotationProcessor libs.lombok
+	annotationProcessor libs.lombok.mapstruct.binding
 }

@@ -53,8 +53,13 @@ public class DefaultServiceInstance implements ServiceInstance {
      * @param secure indicates whether or not the connection needs to be secure.
      * @param metadata a map containing metadata.
      */
-    public DefaultServiceInstance(String instanceId, String serviceId, String host, int port, boolean secure,
-                                  Map<String, String> metadata) {
+    public DefaultServiceInstance(
+            String instanceId,
+            String serviceId,
+            String host,
+            int port,
+            boolean secure,
+            Map<String, String> metadata) {
         this.instanceId = instanceId;
         this.serviceId = serviceId;
         this.host = host;
@@ -70,12 +75,12 @@ public class DefaultServiceInstance implements ServiceInstance {
      * @param port the port on which the service is running.
      * @param secure indicates whether or not the connection needs to be secure.
      */
-    public DefaultServiceInstance(String instanceId, String serviceId, String host, int port, boolean secure) {
+    public DefaultServiceInstance(
+            String instanceId, String serviceId, String host, int port, boolean secure) {
         this(instanceId, serviceId, host, port, secure, new LinkedHashMap<>());
     }
 
-    public DefaultServiceInstance() {
-    }
+    public DefaultServiceInstance() {}
 
     /**
      * Creates a URI from the given ServiceInstance's host:port.
@@ -165,8 +170,23 @@ public class DefaultServiceInstance implements ServiceInstance {
 
     @Override
     public String toString() {
-        return "DefaultServiceInstance{" + "instanceId='" + instanceId + '\'' + ", serviceId='" + serviceId + '\''
-                + ", host='" + host + '\'' + ", port=" + port + ", secure=" + secure + ", metadata=" + metadata + '}';
+        return "DefaultServiceInstance{"
+                + "instanceId='"
+                + instanceId
+                + '\''
+                + ", serviceId='"
+                + serviceId
+                + '\''
+                + ", host='"
+                + host
+                + '\''
+                + ", port="
+                + port
+                + ", secure="
+                + secure
+                + ", metadata="
+                + metadata
+                + '}';
     }
 
     @Override
@@ -178,8 +198,11 @@ public class DefaultServiceInstance implements ServiceInstance {
             return false;
         }
         DefaultServiceInstance that = (DefaultServiceInstance) o;
-        return port == that.port && secure == that.secure && Objects.equals(instanceId, that.instanceId)
-                && Objects.equals(serviceId, that.serviceId) && Objects.equals(host, that.host)
+        return port == that.port
+                && secure == that.secure
+                && Objects.equals(instanceId, that.instanceId)
+                && Objects.equals(serviceId, that.serviceId)
+                && Objects.equals(host, that.host)
                 && Objects.equals(metadata, that.metadata);
     }
 
@@ -187,5 +210,4 @@ public class DefaultServiceInstance implements ServiceInstance {
     public int hashCode() {
         return Objects.hash(instanceId, serviceId, host, port, secure, metadata);
     }
-
 }
