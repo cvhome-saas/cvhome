@@ -2,30 +2,29 @@
 springBoot = "3.5.0"
 springCloud = "2025.0.0"
 springDependencyManagement = "1.1.7"
-hibernate = "6.6.15.Final"
-spotless = "6.25.0"
-shadow = "8.1.1"
-graalvm = "0.10.5"
-lombok = "1.18.38"
-jackson = "2.19.0"
+springWeb = "6.2.7"
+springCloudCommons = "4.3.0"
 springdoc = "2.8.8"
-swagger = "2.2.8"
-keycloak = "26.0.4"
+graalvm = "0.10.5"
+hibernate = "6.6.15.Final"
+postgresql = "42.7.3"
+jakartaPersistenceApi = "3.1.0"
+lombok = "1.18.38"
+lombokMapstructBinding = "0.2.0"
 mapstruct = "1.6.3"
-caffeine = "3.2.0"
+jackson = "2.19.0"
+swagger = "2.2.8"
 junit = "5.10.0"
 testcontainers = "1.19.7"
-springWebflux = "6.2.7"
-springCloudCommons = "4.3.0"
+spotless = "6.25.0"
+keycloak = "26.0.4"
+shadow = "8.1.1"
+caffeine = "3.2.0"
 mongodbBson = "5.2.1"
 dnsjava = "3.5.2"
 awsSdk = "2.29.43"
-lombokMapstructBinding = "0.2.0"
-postgresql = "42.7.3"
 stripe = "28.2.0"
 gson = "2.13.1"
-springWeb = "6.2.7"
-springDataJpa = "3.5.0"
 jakartaValidationApi = "3.0.2"
 apacheCommonsLang3 = "3.17.0"
 commonsIo = "2.16.1"
@@ -33,7 +32,6 @@ commonsValidator = "1.9.0"
 hamcrestRecord = "1.0.0"
 mockserverClient = "5.15.0"
 commonsBeanutils = "1.10.1"
-jakartaPersistenceApi = "3.1.0"
 
 [libraries]
 spring-boot-starter-web = { module = "org.springframework.boot:spring-boot-starter-web", version.ref = "springBoot" }
@@ -61,13 +59,13 @@ spring-cloud-gateway-server = { module = "org.springframework.cloud:spring-cloud
 
 
 spring-security-test = { module = "org.springframework.security:spring-security-test" }
-spring-webflux = { module = "org.springframework:spring-webflux", version.ref = "springWebflux" }
-spring-webmvc = { module = "org.springframework:spring-webmvc", version.ref = "springWebflux" }
+spring-web = { module = "org.springframework:spring-web", version.ref = "springWeb" }
+spring-webmvc = { module = "org.springframework:spring-webmvc", version.ref = "springWeb" }
+spring-webflux = { module = "org.springframework:spring-webflux", version.ref = "springWeb" }
+spring-data-jpa = { module = "org.springframework.data:spring-data-jpa", version.ref = "springBoot" }
 spring-data-commons = { module = "org.springframework.data:spring-data-commons", version.ref = "springBoot" }
 spring-data-relational = { module = "org.springframework.data:spring-data-relational", version.ref = "springBoot" }
 spring-amqp-spring-rabbit-stream = { module = "org.springframework.amqp:spring-rabbit-stream" }
-spring-web = { module = "org.springframework:spring-web", version.ref = "springWeb" }
-spring-data-jpa = { module = "org.springframework.data:spring-data-jpa", version.ref = "springDataJpa" }
 
 lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
 lombok-mapstruct-binding = { module = "org.projectlombok:lombok-mapstruct-binding", version.ref = "lombokMapstructBinding" }
