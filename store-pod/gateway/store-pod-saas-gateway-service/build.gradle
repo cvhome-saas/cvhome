@@ -1,9 +1,12 @@
-task "clean" {
+import javax.inject.Inject
+import org.gradle.process.ExecOperations
+
+tasks.register('clean') {
     doLast {
     }
 }
 
-task "build" {
+tasks.register('build') {
     doLast {
     }
 }
@@ -22,18 +25,21 @@ abstract class BootBuildImageTask extends DefaultTask {
         this.publishImage = publishImage;
     }
 
+    @Inject
+    protected abstract ExecOperations getExecOperations()
+
     BootBuildImageTask() {
     }
 
 
     @TaskAction
     void bootBuildImage() {
-        project.exec {
+        getExecOperations().exec {
             workingDir '.'
             commandLine createBuildCmd("store-pod/store-pod-saas-gateway", project.version as String) as List<String>
         }
         if (publishImage) {
-            project.exec {
+            getExecOperations().exec {
                 workingDir '.'
                 commandLine createPushCmd("store-pod/store-pod-saas-gateway") as List<String>
             }

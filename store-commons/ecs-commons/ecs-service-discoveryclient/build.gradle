@@ -1,11 +1,11 @@
 plugins {
-	id 'com.asrevo.java-library-conventions'
-	id("com.diffplug.spotless") version "6.25.0"
+	alias(libs.plugins.java.library.conventions)
+	alias(libs.plugins.spotless)
 }
 
 dependencies {
-	implementation 'org.springframework.cloud:spring-cloud-starter-loadbalancer:4.3.0'
-	implementation 'software.amazon.awssdk:servicediscovery:2.29.43'
-	compileOnly 'org.projectlombok:lombok:1.18.38'
-	annotationProcessor 'org.projectlombok:lombok:1.18.38'
+	implementation libs.spring.cloud.starter.loadbalancer
+	implementation libs.aws.sdk.servicediscovery
+	compileOnly libs.lombok
+	annotationProcessor libs.lombok
 }

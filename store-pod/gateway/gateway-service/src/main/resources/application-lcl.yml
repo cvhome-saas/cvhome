@@ -1,59 +1,69 @@
 spring:
   cloud:
-    local:
-      discovery:
-        enabled: true
-        services:
-          core-auth:
-            - url: "http://localhost:8001"
-              metadata:
-                service-name: core-auth
-                instance: core-auth-1
-          store-core-gateway:
-            - url: "http://localhost:8000"
-              metadata:
-                service-name: store-core-gateway
-                instance: store-core-gateway-1
-          pod-auth:
-            - url: "http://localhost:8101"
-              metadata:
-                service-name: pod-auth
-                instance: pod-auth-1
-          store-ui:
-            - url: "http://localhost:8010"
-              metadata:
-                service-name: store-ui
-                instance: store-ui-1
-          merchant:
-            - url: "http://localhost:8120"
-              metadata:
-                service-name: merchant
-                instance: merchant-1
-          content:
-            - url: "http://localhost:8121"
-              metadata:
-                service-name: content
-                instance: content-1
-          catalog:
-            - url: "http://localhost:8122"
-              metadata:
-                service-name: catalog
-                instance: catalog-1
-          order:
-            - url: "http://localhost:8123"
-              metadata:
-                service-name: order
-                instance: order-1
-          landing-ui:
-            - url: "http://localhost:8110"
-              metadata:
-                service-name: landing-ui
-                instance: landing-ui-1
-          merchant-ui:
-            - url: "http://localhost:8111"
-              metadata:
-                service-name: merchant-ui
-                instance: merchant-ui-1
+    discovery:
+      client:
+        simple:
+          instances:
+            core-auth:
+              - uri: "http://localhost:8001"
+                instance-id: core-auth-1
+                metadata:
+                  service-name: core-auth
+                  instance: core-auth-1
+            store-core-gateway:
+              - uri: "http://localhost:8000"
+                instance-id: store-core-gateway-1
+                metadata:
+                  service-name: store-core-gateway
+                  instance: store-core-gateway-1
+            pod-auth:
+              - uri: "http://localhost:8101"
+                instance-id: pod-auth-1
+                metadata:
+                  service-name: pod-auth
+                  instance: pod-auth-1
+            store-ui:
+              - uri: "http://localhost:8010"
+                instance-id: store-ui-1
+                metadata:
+                  service-name: store-ui
+                  instance: store-ui-1
+            merchant:
+              - uri: "http://localhost:8120"
+                instance-id: merchant-1
+                metadata:
+                  service-name: merchant
+                  instance: merchant-1
+            content:
+              - uri: "http://localhost:8121"
+                instance-id: content-1
+                metadata:
+                  service-name: content
+                  instance: content-1
+            catalog:
+              - uri: "http://localhost:8122"
+                instance-id: catalog-1
+                metadata:
+                  service-name: catalog
+                  instance: catalog-1
+            order:
+              - uri: "http://localhost:8123"
+                instance-id: order-1
+                metadata:
+                  service-name: order
+                  instance: order-1
+            landing-ui:
+              - uri: "http://localhost:8110"
+                instance-id: landing-ui-1
+                metadata:
+                  service-name: landing-ui
+                  instance: landing-ui-1
+            merchant-ui:
+              - uri: "http://localhost:8111"
+                instance-id: merchant-ui-1
+                metadata:
+                  service-name: merchant-ui
+                  instance: merchant-ui-1
     gateway:
       server:
         webflux:

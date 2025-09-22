@@ -1,10 +1,10 @@
 plugins {
-	id 'com.asrevo.java-library-conventions'
-	id("com.diffplug.spotless") version "6.25.0"
+	alias(libs.plugins.java.library.conventions)
+	alias(libs.plugins.spotless)
 }
 
 dependencies {
 	api project(':store-pod:merchant:merchant-commons')
-	compileOnly 'org.springframework:spring-webflux:6.2.7'
-	annotationProcessor 'org.projectlombok:lombok:1.18.38'
+	compileOnly libs.spring.webflux
+	annotationProcessor libs.lombok
 }
