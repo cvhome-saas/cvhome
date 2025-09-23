@@ -64,3 +64,4 @@ include(
         'store-core:store-ui',
         'store-core:welcome-ui',
 )
+project(":store-pod:gateway:store-pod-saas-gateway-service").name = "store-pod-saas-gateway"
