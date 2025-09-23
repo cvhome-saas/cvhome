@@ -33,8 +33,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Make gradlew executable
-        run: chmod +x ./gradlew && chmod +x store-core/core-auth/kc-providers/gradlew
 
       - name: Validate Gradle wrapper
         uses: gradle/actions/wrapper-validation@v3
