@@ -5,18 +5,16 @@ plugins {
 }
 
 abstract class BootBuildImageTask extends DefaultTask {
-  private Boolean publishImage = false
-
-
+  @Input
   @Option(option = "publishImage", description = "Configures PublishImage.")
-  void setPublishImage(Boolean publishImage) {
-    this.publishImage = publishImage;
-  }
-
+  abstract Property<Boolean> getPublishImage()
+  @Input
+  abstract Property<String> getImageGroup()
   @Inject
   protected abstract ExecOperations getExecOperations()
 
   BootBuildImageTask() {
+    getPublishImage().convention(false)
   }
 
 
@@ -24,12 +22,12 @@ abstract class BootBuildImageTask extends DefaultTask {
   void bootBuildImage() {
     getExecOperations().exec {
       workingDir '.'
-      commandLine createBuildCmd("store-pod/${project.name}", project.version as String) as List<String>
+      commandLine createBuildCmd("${imageGroup.get()}/${project.name}", project.version as String) as List<String>
     }
-    if (publishImage) {
+    if (publishImage.getOrElse(false)) {
       getExecOperations().exec {
         workingDir '.'
-        commandLine createPushCmd("store-pod/${project.name}") as List<String>
+        commandLine createPushCmd("${imageGroup.get()}/${project.name}") as List<String>
       }
     }
   }
