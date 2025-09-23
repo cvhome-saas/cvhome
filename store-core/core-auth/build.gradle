@@ -1,129 +1,35 @@
-import java.nio.file.Files
-import java.nio.file.Paths
-import javax.inject.Inject
-import org.gradle.process.ExecOperations
-
-tasks.register('clean') {
+plugins {
+    id "application"
+    alias(libs.plugins.docker.conventions)
+}
+String kcModule = "kc-providers"
+String kcProviders = ":store-core:core-auth:${kcModule}"
+dependencies {
+    implementation project(kcProviders)
+}
+tasks.register('cleanKcProviders') {
     doLast {
-        delete files('kc-providers/build')
         delete fileTree('keycloak/providers') {
             include("*.jar")
         }
     }
 }
 
-tasks.register('build') {
-    doLast {
-        project.services.get(ExecOperations.class).exec {
-            workingDir 'kc-providers'
-            commandLine createBuildProviders(project.version as String)
-        }
-        copyBuildProviders(project.version as String)
-    }
+tasks.register("copyKcProviders", Copy) {
+    dependsOn(":store-core:core-auth:kc-providers:fatJar")
+
+    from(project(kcProviders).tasks.named("fatJar").flatMap { it.archiveFile })
+    into("$projectDir/keycloak/providers")
 }
 
-tasks.register('bootBuildImage', BootBuildImageTask) {
-    dependsOn('build')
+tasks.named("build") {
+    dependsOn("copyKcProviders")
 }
 
-
-List<String> createBuildProviders(String version) {
-    String os = System.getProperty("os.name")
-    println "will run build for os ${os}"
-    String gradleCmd = "gradle"
-
-    if (os != null) {
-        if (os.startsWithIgnoreCase("linux")) {
-            gradleCmd = "./gradlew"
-        } else if (os.startsWithIgnoreCase("windows")) {
-            gradleCmd = "gradlew.bat"
-        }
-
-    }
-
-    return [gradleCmd, "clean", "build", "jar", "-Dorg.gradle.project.version=${version}"]
+tasks.named("clean") {
+    dependsOn("cleanKcProviders")
 }
 
-void copyBuildProviders(String version) {
-    String providersProjectName = "kc-providers";
-    String providersJarName = "${providersProjectName}-${version}-all.jar";
-    def sourceJar = Paths.get("store-core/${project.name}/${providersProjectName}/build/libs/${providersJarName}")
-
-    def distJar = Paths.get("store-core/${project.name}/keycloak/providers/${providersJarName}")
-    println "will try to copy artifacts from ${sourceJar} exist ${Files.exists(sourceJar)} to ${distJar} exists ${Files.exists(distJar)}"
-
-    if (Files.exists(sourceJar)) {
-        if (Files.exists(distJar)) {
-            Files.delete(distJar)
-        }
-        Files.copy(sourceJar, distJar)
-    } else {
-        println("sorry but sourceJar not exist")
-    }
-
-}
-
-
-abstract class BootBuildImageTask extends DefaultTask {
-    private Boolean publishImage = false
-
-
-    @Option(option = "publishImage", description = "Configures PublishImage.")
-    void setPublishImage(Boolean publishImage) {
-        this.publishImage = publishImage;
-    }
-
-    @Inject
-    protected abstract ExecOperations getExecOperations()
-
-    BootBuildImageTask() {
-    }
-
-    @TaskAction
-    void bootBuildImage() {
-        getExecOperations().exec {
-            workingDir '.'
-            commandLine createBuildCmd("store-core/${project.name}", project.version as String) as List<String>
-        }
-        if (publishImage) {
-            getExecOperations().exec {
-                workingDir '.'
-                commandLine createPushCmd("store-core/${project.name}") as List<String>
-            }
-        }
-    }
-
-    static String createImageName(String repo, String version) {
-        String registry = System.getenv("REGISTRY")
-        return registry ? "${registry}/${repo}:${version}" : "${repo}:${version}"
-    }
-
-    static String createBaseImageName(String repo) {
-        String registry = System.getenv("REGISTRY")
-        return registry ? "${registry}/${repo}" : "${repo}}"
-    }
-
-    static List<String> createImageTags(String repo, String version) {
-        if (!version.contains("-SNAPSHOT"))
-            return [createImageName(repo, "latest")]
-        else
-            return [];
-    }
-
-    static List<String> createBuildCmd(String repo, String version) {
-        String image = createImageName(repo, version)
-        List<String> tags = createImageTags(repo, version)
-        List<String> commands = ["docker", "build", "-t", image]
-        tags.forEach {
-            commands.add("-t")
-            commands.add(it)
-        }
-        commands.add(".")
-        return commands
-    }
-
-    static List<String> createPushCmd(String repo) {
-        String image = createBaseImageName(repo)
-        return ["docker", "push", image, "--all-tags"]
-    }
+bootBuildImage {
+    imageGroup = "store-core"
 }
