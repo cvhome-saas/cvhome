@@ -1,0 +1,26 @@
+plugins {
+    id 'com.asrevo.docker-conventions'
+    id 'com.github.node-gradle.node'
+}
+node {
+    version = '20.11.1'
+    npmVersion = '10.2.4'
+    download = true
+}
+
+tasks.named('build') {
+    dependsOn('npm_run_build')
+}
+
+tasks.register('bootRun') {
+    dependsOn('npm_run_dev')
+    group = 'application'
+    description = 'Runs the UI application in development mode.'
+}
+
+tasks.named('clean') {
+    delete('dist')
+    delete('package-lock.json')
+}
+
+

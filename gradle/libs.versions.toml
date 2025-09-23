@@ -33,6 +33,7 @@ commonsValidator = "1.9.0"
 hamcrestRecord = "1.0.0"
 mockserverClient = "5.15.0"
 commonsBeanutils = "1.10.1"
+nodeGradle = "7.0.2"
 
 [libraries]
 spring-boot-starter-web = { module = "org.springframework.boot:spring-boot-starter-web", version.ref = "springBoot" }
@@ -132,3 +133,6 @@ graalvm = { id = "org.graalvm.buildtools.native", version.ref = "graalvm" }
 groovy-gradle-plugin = { id = "groovy-gradle-plugin" }
 java-library-conventions = { id = "com.asrevo.java-library-conventions" }
 java-application-conventions = { id = "com.asrevo.java-application-conventions" }
+node = { id = "com.github.node-gradle.node", version.ref = "nodeGradle" }
+docker-conventions = { id = "com.asrevo.docker-conventions" }
+ui-conventions = { id = "com.asrevo.ui-conventions" }
