@@ -34,12 +34,6 @@ spring:
           #          jwk-set-uri: ${com.asrevo.cvhome.services.core-auth.schema}://${com.asrevo.cvhome.services.core-auth.domain}:${com.asrevo.cvhome.services.core-auth.port}/realms/cvhome/protocol/openid-connect/certs
           #          issuer-uri: ${com.asrevo.cvhome.services.core-auth.schema}://${com.asrevo.cvhome.services.core-auth.domain}:${com.asrevo.cvhome.services.core-auth.port}/realms/cvhome
           issuer-uri-set: ${com.asrevo.cvhome.services.core-auth.schema}://${com.asrevo.cvhome.services.core-auth.domain}:${com.asrevo.cvhome.services.core-auth.port}/realms/cvhome
-  docker:
-    compose:
-      file: ${spring.application.name}/compose.yml
-  sql:
-    init:
-      mode: always
 ---
 spring:
   application:
