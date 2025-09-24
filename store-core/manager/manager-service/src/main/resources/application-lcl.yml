@@ -1,44 +1,5 @@
 spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/cvhome
-    username: postgres
-    password: password
-  cloud:
-    discovery:
-      client:
-        simple:
-          instances:
-            core-auth:
-              - uri: "http://localhost:8001"
-                instance-id: core-auth-1
-                metadata:
-                  service-name: core-auth
-                  instance: core-auth-1
-            manager:
-              - uri: "http://localhost:8020"
-                instance-id: manager-1
-                metadata:
-                  service-name: manager
-                  instance: manager-1
-            subscription:
-              - uri: "http://localhost:8021"
-                instance-id: subscription-1
-                metadata:
-                  service-name: subscription
-                  instance: subscription-1
-            store-ui:
-              - uri: "http://localhost:8010"
-                instance-id: store-ui-1
-                metadata:
-                  service-name: store-ui
-                  instance: store-ui-1
-com:
-  asrevo:
-    cvhome:
-      pods:
-        - id:
-            id: 1
-          name: default
-          endpoint:
-            endpoint: http://store-pod-1.gateway.com:8100
-            type: EXTERNAL
+  config:
+    import: 
+      - "classpath:lcl-config.yml"
+      - "classpath:store-core-lcl-config.yml"

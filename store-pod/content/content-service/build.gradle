@@ -5,7 +5,7 @@ plugins {
     alias(libs.plugins.hibernate.orm)
     //    alias(libs.plugins.graalvm)
 }
-apply from: "$rootDir/build-logic/helpers/common-methods.gradle"
+
 group = 'com.asrevo.cvhome'
 
 
