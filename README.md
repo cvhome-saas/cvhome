@@ -81,7 +81,8 @@ main documentation site: **https://cvhome-saas.github.io**
 
 **Frontend:**
 
-* Node.js (v18+)
+* Npm (v10)
+* Node.js (v20)
 * TypeScript
 * Next.js
 * Angular
