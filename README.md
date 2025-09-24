@@ -71,8 +71,8 @@ main documentation site: **https://cvhome-saas.github.io**
 
 **Backend:**
 
-* Java (JDK 23)
-* Spring Boot 3.4
+* Java (JDK 21)
+* Spring Boot 3.5.0
 * Spring Boot & Spring Cloud
 * Spring Data JPA / Hibernate
 * Postgres SQL
