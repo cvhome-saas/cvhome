@@ -6,12 +6,16 @@ import org.springframework.security.oauth2.client.registration.ReactiveClientReg
 import org.springframework.security.oauth2.client.web.server.DefaultServerOAuth2AuthorizationRequestResolver;
 import org.springframework.security.oauth2.client.web.server.ServerOAuth2AuthorizationRequestResolver;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.server.ServerWebExchange;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class CapturingServerOAuth2AuthorizationRequestResolver implements ServerOAuth2AuthorizationRequestResolver {
 
@@ -34,13 +38,48 @@ public class CapturingServerOAuth2AuthorizationRequestResolver implements Server
     @Override
     public Mono<OAuth2AuthorizationRequest> resolve(ServerWebExchange exchange) {
         return this.delegate.resolve(exchange)
-                .flatMap(authorizationRequest -> captureParametersAndStoreInSession(exchange, authorizationRequest));
+                .flatMap(authorizationRequest -> {
+                    if (authorizationRequest == null) {
+                        return Mono.empty();
+                    }
+                    return modifyAuthorizationRequestUriWithForwardedParam(exchange, authorizationRequest)
+                            .flatMap(modifiedRequest -> captureParametersAndStoreInSession(exchange, modifiedRequest));
+                });
     }
 
     @Override
     public Mono<OAuth2AuthorizationRequest> resolve(ServerWebExchange exchange, String clientRegistrationId) {
         return this.delegate.resolve(exchange, clientRegistrationId)
-                .flatMap(authorizationRequest -> captureParametersAndStoreInSession(exchange, authorizationRequest));
+                .flatMap(authorizationRequest -> {
+                    if (authorizationRequest == null) {
+                        return Mono.empty();
+                    }
+                    return modifyAuthorizationRequestUriWithForwardedParam(exchange, authorizationRequest)
+                            .flatMap(modifiedRequest -> captureParametersAndStoreInSession(exchange, modifiedRequest));
+                });
+    }
+
+    private Mono<OAuth2AuthorizationRequest> modifyAuthorizationRequestUriWithForwardedParam(ServerWebExchange exchange, OAuth2AuthorizationRequest authorizationRequest) {
+        MultiValueMap<String, String> queryParams = exchange.getRequest().getQueryParams();
+        UriComponentsBuilder componentsBuilder = UriComponentsBuilder.fromUriString(authorizationRequest.getAuthorizationRequestUri());
+        UriComponents originalUriComponents = UriComponentsBuilder.fromUriString(authorizationRequest.getAuthorizationRequestUri()).build();
+        MultiValueMap<String, String> originalQueryParams = originalUriComponents.getQueryParams();
+
+        queryParams.entrySet().stream()
+                .filter(it ->
+                        Objects.nonNull(it.getKey())
+                                && Objects.nonNull(it.getValue())
+                                && !it.getValue().isEmpty()
+                                && !originalQueryParams.containsKey(it.getKey()))
+                .forEach((param) ->
+                        componentsBuilder.queryParam(param.getKey(), param.getValue().getFirst()));
+
+        String newRequestUri = componentsBuilder.build(true)
+                .toUriString();
+
+        return Mono.just(OAuth2AuthorizationRequest.from(authorizationRequest)
+                .authorizationRequestUri(newRequestUri)
+                .build());
     }
 
     private Mono<OAuth2AuthorizationRequest> captureParametersAndStoreInSession(ServerWebExchange exchange, OAuth2AuthorizationRequest authorizationRequest) {

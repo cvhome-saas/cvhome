@@ -1,0 +1,10 @@
+com:
+  asrevo:
+    cvhome:
+      pods:
+        - id:
+            id: 1
+          name: default
+          endpoint:
+            endpoint: http://store-pod-1.gateway.com:8100
+            type: EXTERNAL

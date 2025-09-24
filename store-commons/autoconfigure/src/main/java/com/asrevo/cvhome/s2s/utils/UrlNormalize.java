@@ -1,9 +1,8 @@
 package com.asrevo.cvhome.s2s.utils;
 
-import org.springframework.security.oauth2.jwt.JwtException;
-
 import java.net.URI;
 import java.net.URISyntaxException;
+import org.springframework.security.oauth2.jwt.JwtException;
 
 public class UrlNormalize {
     public static String normalizeUri(String uriString) throws JwtException {
@@ -24,14 +23,20 @@ public class UrlNormalize {
             scheme = scheme.toLowerCase();
             host = host.toLowerCase();
 
-            if (("http".equals(scheme) && port == 80) ||
-                    ("https".equals(scheme) && port == 443)) {
+            if (("http".equals(scheme) && port == 80) || ("https".equals(scheme) && port == 443)) {
                 port = -1;
             }
 
-            return new URI(scheme, uri.getUserInfo(), host, port,
-                    uri.getPath(), uri.getQuery(), uri.getFragment())
-                    .normalize().toString(); 
+            return new URI(
+                            scheme,
+                            uri.getUserInfo(),
+                            host,
+                            port,
+                            uri.getPath(),
+                            uri.getQuery(),
+                            uri.getFragment())
+                    .normalize()
+                    .toString();
 
         } catch (URISyntaxException e) {
             throw new JwtException("Malformed issuer URI string: " + uriString, e);

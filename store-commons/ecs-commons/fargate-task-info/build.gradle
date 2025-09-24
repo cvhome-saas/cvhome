@@ -1,11 +1,11 @@
 plugins {
-	id 'com.asrevo.java-library-conventions'
-	id("com.diffplug.spotless") version "6.25.0"
+	alias(libs.plugins.java.library.conventions)
+	alias(libs.plugins.spotless)
 }
 
 dependencies {
-	compileOnly 'com.fasterxml.jackson.core:jackson-databind:2.18.3'
-	compileOnly 'com.fasterxml.jackson.core:jackson-annotations:2.18.3'
-	compileOnly 'org.projectlombok:lombok:1.18.38'
-	annotationProcessor 'org.projectlombok:lombok:1.18.38'
+	compileOnly libs.jackson.databind
+	compileOnly libs.jackson.annotations
+	compileOnly libs.lombok
+	annotationProcessor libs.lombok
 }

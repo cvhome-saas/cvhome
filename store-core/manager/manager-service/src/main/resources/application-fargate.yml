@@ -1,33 +1,4 @@
 spring:
-  datasource:
-    url: jdbc:postgresql://${spring.datasource.host}:${spring.datasource.port}/${spring.datasource.database}
-  cloud:
-    loadbalancer:
-      eager-load:
-        clients:
-          - "store-core-gateway"
-          - "core-auth"
-          - "manager"
-          - "subscription"
-          - "store-ui"
-          - "welcome-ui"
-    ecs:
-      discovery:
-        namespace: "store-core.cvhome.lcl"
-        namespace-id: "ns-aacm3spcnftheq3b"
-        enabled: true
-        default-port: 8080
-        service-ports:
-          "core-auth": 8001
-          "store-core-gateway": 8000
-          "store-ui": 8010
-          "welcome-ui": 8011
-          "manager": 8020
-          "subscription": 8021
-          "store-pod-gateway": 8100
-          "landing-ui": 8110
-          "merchant-ui": 8111
-          "merchant": 8120
-          "content": 8121
-          "catalog": 8122
-          "order": 8123
+  config:
+    import:
+      - "classpath:fargate-config.yml"

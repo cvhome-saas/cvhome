@@ -1,45 +1,5 @@
 spring:
-  cloud:
-    local:
-      discovery:
-        enabled: true
-        services:
-          core-auth:
-            - url: "http://localhost:8001"
-              metadata:
-                service-name: core-auth
-                instance: core-auth-1
-          manager:
-            - url: "http://localhost:8020"
-              metadata:
-                service-name: manager
-                instance: manager-1
-          subscription:
-            - url: "http://localhost:8021"
-              metadata:
-                service-name: subscription
-                instance: subscription-1
-          store-ui:
-            - url: "http://localhost:8010"
-              metadata:
-                service-name: store-ui
-                instance: store-ui-1
-          welcome-ui:
-            - url: "http://localhost:8011"
-              metadata:
-                service-name: welcome-ui
-                instance: welcome-ui-1
-    gateway:
-      discovery:
-        locator:
-          enabled: false
-com:
-  asrevo:
-    cvhome:
-      pods:
-        - id:
-            id: 1
-          name: default
-          endpoint:
-            endpoint: http://store-pod-1.gateway.com:8100
-            type: EXTERNAL
+  config:
+    import:
+      - "classpath:lcl-config.yml"
+      - "classpath:store-core-lcl-config.yml"

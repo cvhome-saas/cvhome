@@ -10,7 +10,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtException;
@@ -44,7 +43,10 @@ public class MultiIssuerJwtDecoder implements JwtDecoder {
         Objects.requireNonNull(supportedIssuerUris, "supportedIssuerUris cannot be null");
         Objects.requireNonNull(decoderFactory, "decoderFactory cannot be null");
 
-        this.supportedIssuerUris = supportedIssuerUris.stream().map(UrlNormalize::normalizeUri).collect(Collectors.toSet());
+        this.supportedIssuerUris =
+                supportedIssuerUris.stream()
+                        .map(UrlNormalize::normalizeUri)
+                        .collect(Collectors.toSet());
         this.decoderFactory = decoderFactory;
     }
 
