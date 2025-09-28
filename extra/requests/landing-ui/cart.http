@@ -3,3 +3,11 @@ GET {{LANDING_UI_URL}}/order/api/v1/cart/23a52597bc1f49c996a1b4ad8a29006a?store=
 
 ###
 
+POST {{LANDING_UI_URL}}/order/api/v1/cart?store=65f023632bc46470c104b76f&lang=en
+Content-Type: application/json
+
+{
+  "product": "SKU-AD-CL-TPT03",
+  "quantity": 1
+}
+
