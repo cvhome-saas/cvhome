@@ -138,6 +138,7 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
         }
 
         List<ShoppingCartItem> itemList = new ArrayList<>(shoppingCart.getLineItems());
+        orderSummary.setProducts(itemList);
         // filter out unavailable
 //        List<String> skus = itemList.stream().map(ShoppingCartItem::getSku).toList();
 //        Map<String, ReadableProductAvailability> availabilityMap =
