@@ -1,7 +1,5 @@
 package com.asrevo.cvhome.order.services.order;
 
-import com.asrevo.cvhome.catalog.model.product.ReadableProductAvailability;
-import com.asrevo.cvhome.catalog.model.product.product.price.FinalPrice;
 import com.asrevo.cvhome.catalog.services.product.ExternalProductService;
 import com.asrevo.cvhome.commons.domain.Entry;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
@@ -30,8 +28,6 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -140,23 +136,25 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
         List<ShoppingCartItem> itemList = new ArrayList<>(shoppingCart.getLineItems());
         orderSummary.setProducts(itemList);
         // filter out unavailable
-//        List<String> skus = itemList.stream().map(ShoppingCartItem::getSku).toList();
-//        Map<String, ReadableProductAvailability> availabilityMap =
-//                productService.getProductsAvailability(store, skus).stream()
-//                        .collect(
-//                                Collectors.toMap(
-//                                        ReadableProductAvailability::getSku, Function.identity()));
-//        itemList =
-//                itemList.stream()
-//                        .filter(
-//                                p -> {
-//                                    var availability = availabilityMap.get(p.getSku());
-//                                    return Optional.ofNullable(availability)
-//                                            .map(ReadableProductAvailability::isCanBePurchased)
-//                                            .orElse(Boolean.FALSE);
-//                                })
-//                        .toList();
-//        orderSummary.setProducts(itemList);
+        //        List<String> skus = itemList.stream().map(ShoppingCartItem::getSku).toList();
+        //        Map<String, ReadableProductAvailability> availabilityMap =
+        //                productService.getProductsAvailability(store, skus).stream()
+        //                        .collect(
+        //                                Collectors.toMap(
+        //                                        ReadableProductAvailability::getSku,
+        // Function.identity()));
+        //        itemList =
+        //                itemList.stream()
+        //                        .filter(
+        //                                p -> {
+        //                                    var availability = availabilityMap.get(p.getSku());
+        //                                    return Optional.ofNullable(availability)
+        //
+        // .map(ReadableProductAvailability::isCanBePurchased)
+        //                                            .orElse(Boolean.FALSE);
+        //                                })
+        //                        .toList();
+        //        orderSummary.setProducts(itemList);
 
         return calculateOrder(orderSummary, customer, store, language);
     }
@@ -318,51 +316,50 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
         subTotal.setScale(2, RoundingMode.HALF_UP);
         for (ShoppingCartItem item : summary.getProducts()) {
 
-            FinalPrice finalPrice = productService.getProductPrice(store, item.getSku());
             BigDecimal st = item.getItemPrice().multiply(new BigDecimal(item.getQuantity()));
             item.setSubTotal(st);
             subTotal = subTotal.add(st);
             // Other prices
 
-/* @TODO comment this for now as unnecessary
-            FinalPrice finalPrice = productService.getProductPrice(store, item.getSku());
-            if (finalPrice != null) {
-                List<FinalPrice> otherPrices = finalPrice.getAdditionalPrices();
-                if (otherPrices != null) {
-                    for (FinalPrice price : otherPrices) {
-                        if (!price.isDefaultPrice()) {
-                            OrderTotal itemSubTotal =
-                                    otherPricesTotals.get(price.getProductPrice().getCode());
+            /* @TODO comment this for now as unnecessary
+                        FinalPrice finalPrice = productService.getProductPrice(store, item.getSku());
+                        if (finalPrice != null) {
+                            List<FinalPrice> otherPrices = finalPrice.getAdditionalPrices();
+                            if (otherPrices != null) {
+                                for (FinalPrice price : otherPrices) {
+                                    if (!price.isDefaultPrice()) {
+                                        OrderTotal itemSubTotal =
+                                                otherPricesTotals.get(price.getProductPrice().getCode());
 
-                            if (itemSubTotal == null) {
-                                itemSubTotal = new OrderTotal();
-                                itemSubTotal.setModule(Constants.OT_ITEM_PRICE_MODULE_CODE);
-                                itemSubTotal.setTitle(Constants.OT_ITEM_PRICE_MODULE_CODE);
-                                itemSubTotal.setOrderTotalCode(price.getProductPrice().getCode());
-                                itemSubTotal.setOrderTotalType(OrderTotalType.PRODUCT);
-                                itemSubTotal.setSortOrder(0);
-                                otherPricesTotals.put(
-                                        price.getProductPrice().getCode(), itemSubTotal);
-                            }
+                                        if (itemSubTotal == null) {
+                                            itemSubTotal = new OrderTotal();
+                                            itemSubTotal.setModule(Constants.OT_ITEM_PRICE_MODULE_CODE);
+                                            itemSubTotal.setTitle(Constants.OT_ITEM_PRICE_MODULE_CODE);
+                                            itemSubTotal.setOrderTotalCode(price.getProductPrice().getCode());
+                                            itemSubTotal.setOrderTotalType(OrderTotalType.PRODUCT);
+                                            itemSubTotal.setSortOrder(0);
+                                            otherPricesTotals.put(
+                                                    price.getProductPrice().getCode(), itemSubTotal);
+                                        }
 
-                            BigDecimal orderTotalValue = itemSubTotal.getValue();
-                            if (orderTotalValue == null) {
-                                orderTotalValue = new BigDecimal(0);
-                                orderTotalValue.setScale(2, RoundingMode.HALF_UP);
-                            }
+                                        BigDecimal orderTotalValue = itemSubTotal.getValue();
+                                        if (orderTotalValue == null) {
+                                            orderTotalValue = new BigDecimal(0);
+                                            orderTotalValue.setScale(2, RoundingMode.HALF_UP);
+                                        }
 
-                            orderTotalValue = orderTotalValue.add(price.getFinalPrice());
-                            itemSubTotal.setValue(orderTotalValue);
-                            if (OrderValueType.ONE_TIME
-                                    .name()
-                                    .equals(price.getProductPrice().getProductPriceType().name())) {
-                                subTotal = subTotal.add(price.getFinalPrice());
+                                        orderTotalValue = orderTotalValue.add(price.getFinalPrice());
+                                        itemSubTotal.setValue(orderTotalValue);
+                                        if (OrderValueType.ONE_TIME
+                                                .name()
+                                                .equals(price.getProductPrice().getProductPriceType().name())) {
+                                            subTotal = subTotal.add(price.getFinalPrice());
+                                        }
+                                    }
+                                }
                             }
                         }
-                    }
-                }
-            }
-*/
+            */
         }
 
         //  @TODO ASHRAF

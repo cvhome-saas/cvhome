@@ -192,8 +192,8 @@ public class ShoppingCartServiceImpl extends SalesManagerEntityServiceImpl<Long,
     }
 
     @Override
-    public ShoppingCartItem populateShoppingCartItem(String sku, BigDecimal price, StoreMerchantId store)
-            throws ServiceException {
+    public ShoppingCartItem populateShoppingCartItem(
+            String sku, BigDecimal price, StoreMerchantId store) throws ServiceException {
         Assert.notNull(sku, "Product should not be null");
         Assert.notNull(store, "Store should not be null");
 

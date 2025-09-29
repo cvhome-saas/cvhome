@@ -5,7 +5,6 @@ import com.asrevo.cvhome.order.entity.shoppingcart.ShoppingCart;
 import com.asrevo.cvhome.order.entity.shoppingcart.ShoppingCartItem;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
-
 import java.math.BigDecimal;
 
 public interface ShoppingCartService extends SalesManagerEntityService<Long, ShoppingCart> {
