@@ -11,3 +11,13 @@ Content-Type: application/json
   "quantity": 1
 }
 
+###
+
+PUT {{LANDING_UI_URL}}/order/api/v1/cart/a74ae65c99dd4448b69e4bb0eaec05f5?store=65f023632bc46470c104b76f&lang=en
+Content-Type: application/json
+
+{
+  "product": "SKU-GU-BG-MAR05",
+  "quantity": 3
+}
+
