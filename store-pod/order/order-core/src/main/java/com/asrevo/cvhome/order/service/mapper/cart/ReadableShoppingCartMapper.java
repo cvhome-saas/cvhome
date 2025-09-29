@@ -5,6 +5,7 @@ import com.asrevo.cvhome.catalog.model.product.product.ProductEntity;
 import com.asrevo.cvhome.catalog.services.product.ExternalProductService;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
+import com.asrevo.cvhome.merchant.model.merchant.ReadableMerchantStore;
 import com.asrevo.cvhome.order.entity.order.OrderTotal;
 import com.asrevo.cvhome.order.entity.order.OrderTotalSummary;
 import com.asrevo.cvhome.order.entity.shoppingcart.ShoppingCart;
@@ -93,6 +94,7 @@ public class ReadableShoppingCartMapper implements Mapper<ShoppingCart, Readable
 
             Set<ShoppingCartItem> items = source.getLineItems();
 
+            ReadableMerchantStore merchantStore = externalMerchantStoreService.getStore(store);
             if (items != null) {
 
                 if (!items.isEmpty()) {
@@ -116,8 +118,7 @@ public class ReadableShoppingCartMapper implements Mapper<ShoppingCart, Readable
                             shoppingCartItem.setPrice(item.getItemPrice());
                             shoppingCartItem.setFinalPrice(
                                     PriceUtils.getStoreFormatedAmountWithCurrency(
-                                            externalMerchantStoreService.getStore(store),
-                                            item.getItemPrice()));
+                                            merchantStore, item.getItemPrice()));
 
                             shoppingCartItem.setQuantity(item.getQuantity());
 
@@ -132,8 +133,7 @@ public class ReadableShoppingCartMapper implements Mapper<ShoppingCart, Readable
 
                             shoppingCartItem.setDisplaySubTotal(
                                     PriceUtils.getStoreFormatedAmountWithCurrency(
-                                            externalMerchantStoreService.getStore(store),
-                                            subTotal));
+                                            merchantStore, subTotal));
                             destination.getProducts().add(shoppingCartItem);
                         }
                     }
@@ -168,13 +168,12 @@ public class ReadableShoppingCartMapper implements Mapper<ShoppingCart, Readable
             destination.setSubtotal(orderSummary.getSubTotal());
             destination.setDisplaySubTotal(
                     PriceUtils.getStoreFormatedAmountWithCurrency(
-                            externalMerchantStoreService.getStore(store),
-                            orderSummary.getSubTotal()));
+                            merchantStore, orderSummary.getSubTotal()));
 
             destination.setTotal(orderSummary.getTotal());
             destination.setDisplayTotal(
                     PriceUtils.getStoreFormatedAmountWithCurrency(
-                            externalMerchantStoreService.getStore(store), orderSummary.getTotal()));
+                            merchantStore, orderSummary.getTotal()));
 
             destination.setQuantity(cartQuantity);
             destination.setId(source.getId());

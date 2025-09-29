@@ -7,13 +7,11 @@ import com.asrevo.cvhome.catalog.model.product.ReadableProductAvailability;
 import com.asrevo.cvhome.catalog.model.product.product.price.FinalPrice;
 import com.asrevo.cvhome.catalog.services.product.ExternalProductService;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
 import com.asrevo.cvhome.order.entity.shoppingcart.ShoppingCart;
 import com.asrevo.cvhome.order.entity.shoppingcart.ShoppingCartItem;
 import com.asrevo.cvhome.order.model.shoppingcart.PersistableShoppingCartItem;
 import com.asrevo.cvhome.order.model.shoppingcart.ReadableShoppingCart;
 import com.asrevo.cvhome.order.service.mapper.cart.ReadableShoppingCartMapper;
-import com.asrevo.cvhome.order.services.shoppingcart.ShoppingCartCalculationService;
 import com.asrevo.cvhome.order.services.shoppingcart.ShoppingCartService;
 import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
 import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
@@ -50,10 +48,7 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
 
     private final ShoppingCartService shoppingCartService;
 
-    private final ShoppingCartCalculationService shoppingCartCalculationService;
-
     private final ReadableShoppingCartMapper readableShoppingCartMapper;
-    private final ExternalMerchantStoreService externalMerchantStoreService;
     private final ExternalProductService externalProductService;
 
     // KEEP -- ENTRY
@@ -83,7 +78,8 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
         FinalPrice price = externalProductService.getProductPrice(store, availability.getSku());
 
         ShoppingCartItem item =
-                shoppingCartService.populateShoppingCartItem(availability.getSku(), price.getFinalPrice(), store);
+                shoppingCartService.populateShoppingCartItem(
+                        availability.getSku(), price.getFinalPrice(), store);
 
         item.setQuantity(shoppingCartItem.getQuantity());
         item.setShoppingCart(cartModel);
