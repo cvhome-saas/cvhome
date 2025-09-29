@@ -1,9 +1,6 @@
 package com.asrevo.cvhome.order.config;
 
-import com.asrevo.cvhome.catalog.model.product.ProductAvailabilityStatus;
-import com.asrevo.cvhome.catalog.model.product.ReadableMinimalProduct;
-import com.asrevo.cvhome.catalog.model.product.ReadableProduct;
-import com.asrevo.cvhome.catalog.model.product.ReadableProductAvailability;
+import com.asrevo.cvhome.catalog.model.product.*;
 import com.asrevo.cvhome.catalog.model.product.product.price.FinalPrice;
 import com.asrevo.cvhome.catalog.services.product.ExternalProductService;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
@@ -57,6 +54,12 @@ public class CachedExternalProductService implements ExternalProductService {
     @Override
     public List<ReadableMinimalProduct> getMinimalProducts(StoreMerchantId store, List<String> sku, LanguageCode lang) {
         return externalProductService.getMinimalProducts(store, sku, lang);
+    }
+
+    @Cacheable(value = "MINIMAL-DETAILED-PRODUCT", key = "#store.storeMerchantId()+'-'+#sku+'-'+#lang.code()", unless = "#result==null")
+    @Override
+    public ProductDetails getDetailedProduct(StoreMerchantId store, String sku, LanguageCode lang) throws ServiceException {
+        return externalProductService.getDetailedProduct(store, sku, lang);
     }
 
     @Override

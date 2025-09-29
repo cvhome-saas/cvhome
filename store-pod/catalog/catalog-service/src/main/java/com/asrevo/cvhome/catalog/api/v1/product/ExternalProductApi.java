@@ -1,9 +1,6 @@
 package com.asrevo.cvhome.catalog.api.v1.product;
 
-import com.asrevo.cvhome.catalog.model.product.ProductAvailabilityStatus;
-import com.asrevo.cvhome.catalog.model.product.ReadableMinimalProduct;
-import com.asrevo.cvhome.catalog.model.product.ReadableProduct;
-import com.asrevo.cvhome.catalog.model.product.ReadableProductAvailability;
+import com.asrevo.cvhome.catalog.model.product.*;
 import com.asrevo.cvhome.catalog.model.product.product.price.FinalPrice;
 import com.asrevo.cvhome.catalog.services.product.ExternalProductService;
 import com.asrevo.cvhome.catalog.services.product.ProductService;
@@ -139,6 +136,21 @@ public class ExternalProductApi implements ExternalProductService {
     public List<ReadableMinimalProduct> getMinimalProducts(StoreMerchantId store, List<String> sku, LanguageCode lang) {
         return sku.stream().map(it -> productService.getMinimalProduct(store, it, lang)).toList();
     }
+    
+    @GetMapping(value = "/detailed-product")
+    @Operation(method = "GET", description = "Get Full Product Details",
+            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ReadableProduct.class))))
+    @Parameters({
+            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+            @Parameter(name = "sku", schema = @Schema(name = "sku", type = "string")),
+            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
+    })
+    @ConditionalOnApiStatus
+    @Override
+    public ProductDetails getDetailedProduct(StoreMerchantId store, @RequestParam String sku, LanguageCode lang) throws ServiceException {
+        return productService.getDetailedProduct(store,sku,lang);
+    }
+
 
     @PostMapping(value = "/product-quantity-update")
     @Operation(method = "GET", description = "Update product quantity",

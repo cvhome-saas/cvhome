@@ -3,10 +3,7 @@ package com.asrevo.cvhome.catalog.services.product;
 import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.entity.product.ProductCriteria;
 import com.asrevo.cvhome.catalog.entity.product.ProductList;
-import com.asrevo.cvhome.catalog.model.product.ProductAvailabilityStatus;
-import com.asrevo.cvhome.catalog.model.product.ReadableMinimalProduct;
-import com.asrevo.cvhome.catalog.model.product.ReadableProduct;
-import com.asrevo.cvhome.catalog.model.product.ReadableProductAvailability;
+import com.asrevo.cvhome.catalog.model.product.*;
 import com.asrevo.cvhome.catalog.model.product.product.price.FinalPrice;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
@@ -64,4 +61,7 @@ public interface ProductService extends SalesManagerEntityService<Long, Product>
     ReadableProductAvailability getProductAvailability(StoreMerchantId store, String sku);
 
     Page<Product> findAll(ProductCriteria criteria, StoreMerchantId store);
+
+    ProductDetails getDetailedProduct(StoreMerchantId store, String sku, LanguageCode lang)
+            throws ServiceException;
 }
