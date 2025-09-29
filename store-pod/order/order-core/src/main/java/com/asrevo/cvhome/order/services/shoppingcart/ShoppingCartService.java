@@ -6,6 +6,8 @@ import com.asrevo.cvhome.order.entity.shoppingcart.ShoppingCartItem;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
 
+import java.math.BigDecimal;
+
 public interface ShoppingCartService extends SalesManagerEntityService<Long, ShoppingCart> {
 
     void saveOrUpdate(ShoppingCart shoppingCart) throws ServiceException;
@@ -17,7 +19,7 @@ public interface ShoppingCartService extends SalesManagerEntityService<Long, Sho
     /**
      * Populates a ShoppingCartItem from a Product and attributes if any. Calculate price based on availability
      */
-    ShoppingCartItem populateShoppingCartItem(String sku, StoreMerchantId store)
+    ShoppingCartItem populateShoppingCartItem(String sku, BigDecimal price, StoreMerchantId store)
             throws ServiceException;
 
     /**

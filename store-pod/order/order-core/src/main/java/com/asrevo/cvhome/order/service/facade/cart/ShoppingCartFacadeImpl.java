@@ -4,6 +4,7 @@
 package com.asrevo.cvhome.order.service.facade.cart;
 
 import com.asrevo.cvhome.catalog.model.product.ReadableProductAvailability;
+import com.asrevo.cvhome.catalog.model.product.product.price.FinalPrice;
 import com.asrevo.cvhome.catalog.services.product.ExternalProductService;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
@@ -62,6 +63,7 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
             StoreMerchantId store)
             throws Exception {
 
+        // @TODO we need to merge availability+price in one call
         ReadableProductAvailability availability =
                 externalProductService.getProductAvailability(store, shoppingCartItem.getProduct());
 
@@ -78,8 +80,10 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
             throw new Exception("Item with sku " + availability.getSku() + " is not available");
         }
 
+        FinalPrice price = externalProductService.getProductPrice(store, availability.getSku());
+
         ShoppingCartItem item =
-                shoppingCartService.populateShoppingCartItem(availability.getSku(), store);
+                shoppingCartService.populateShoppingCartItem(availability.getSku(), price.getFinalPrice(), store);
 
         item.setQuantity(shoppingCartItem.getQuantity());
         item.setShoppingCart(cartModel);
