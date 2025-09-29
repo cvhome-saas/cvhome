@@ -136,7 +136,7 @@ public class OrderFacadeImpl implements OrderFacade {
             persistableOrderApiPopulator.populate(order, modelOrder, store, language);
 
             Long shoppingCartId = order.getShoppingCartId();
-            ShoppingCart cart = shoppingCartService.getById(shoppingCartId, store);
+            ShoppingCart cart = shoppingCartService.findCart(shoppingCartId, store);
 
             if (cart == null) {
                 throw new ServiceException(

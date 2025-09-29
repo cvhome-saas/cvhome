@@ -11,7 +11,7 @@ public interface ShoppingCartService extends SalesManagerEntityService<Long, Sho
 
     void saveOrUpdate(ShoppingCart shoppingCart) throws ServiceException;
 
-    ShoppingCart getById(Long id, StoreMerchantId store) throws ServiceException;
+    ShoppingCart findCart(Long id, StoreMerchantId store) throws ServiceException;
 
     ShoppingCart findCart(String code, StoreMerchantId store) throws ServiceException;
 

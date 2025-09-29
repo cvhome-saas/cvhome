@@ -291,7 +291,7 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
         saveShoppingCart(cartModel);
 
         // refresh cart
-        cartModel = shoppingCartService.getById(cartModel.getId(), store);
+        cartModel = shoppingCartService.loadCartByCode(cartModel.getShoppingCartCode(), store);
 
         if (cartModel == null) {
             return null;

@@ -68,31 +68,12 @@ public class ShoppingCartServiceImpl extends SalesManagerEntityServiceImpl<Long,
      * will remove the shopping cart if no items are attached.
      */
     @Override
-    @Transactional
-    public ShoppingCart getById(final Long id, final StoreMerchantId store)
-            throws ServiceException {
-
-        try {
-            ShoppingCart shoppingCart = shoppingCartRepository.findById(store, id);
-            if (shoppingCart == null) {
-                return null;
-            }
-            getPopulatedShoppingCart(shoppingCart, store);
-
-            if (shoppingCart.isObsolete()) {
-                delete(shoppingCart);
-                return null;
-            } else {
-                return shoppingCart;
-            }
-
-        } catch (Exception e) {
-            throw new ServiceException(e);
-        }
+    public ShoppingCart findCart(Long id, StoreMerchantId store) {
+        return shoppingCartRepository.findById(store, id);
     }
 
     @Override
-    public ShoppingCart findCart(String code, StoreMerchantId store) throws ServiceException {
+    public ShoppingCart findCart(String code, StoreMerchantId store) {
         return shoppingCartRepository.findByCode(store, code);
     }
 
