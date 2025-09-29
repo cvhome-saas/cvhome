@@ -139,23 +139,23 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
 
         List<ShoppingCartItem> itemList = new ArrayList<>(shoppingCart.getLineItems());
         // filter out unavailable
-        List<String> skus = itemList.stream().map(ShoppingCartItem::getSku).toList();
-        Map<String, ReadableProductAvailability> availabilityMap =
-                productService.getProductsAvailability(store, skus).stream()
-                        .collect(
-                                Collectors.toMap(
-                                        ReadableProductAvailability::getSku, Function.identity()));
-        itemList =
-                itemList.stream()
-                        .filter(
-                                p -> {
-                                    var availability = availabilityMap.get(p.getSku());
-                                    return Optional.ofNullable(availability)
-                                            .map(ReadableProductAvailability::isCanBePurchased)
-                                            .orElse(Boolean.FALSE);
-                                })
-                        .toList();
-        orderSummary.setProducts(itemList);
+//        List<String> skus = itemList.stream().map(ShoppingCartItem::getSku).toList();
+//        Map<String, ReadableProductAvailability> availabilityMap =
+//                productService.getProductsAvailability(store, skus).stream()
+//                        .collect(
+//                                Collectors.toMap(
+//                                        ReadableProductAvailability::getSku, Function.identity()));
+//        itemList =
+//                itemList.stream()
+//                        .filter(
+//                                p -> {
+//                                    var availability = availabilityMap.get(p.getSku());
+//                                    return Optional.ofNullable(availability)
+//                                            .map(ReadableProductAvailability::isCanBePurchased)
+//                                            .orElse(Boolean.FALSE);
+//                                })
+//                        .toList();
+//        orderSummary.setProducts(itemList);
 
         return calculateOrder(orderSummary, customer, store, language);
     }
