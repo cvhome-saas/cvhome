@@ -6,10 +6,7 @@ import com.asrevo.cvhome.catalog.entity.product.ProductList;
 import com.asrevo.cvhome.catalog.entity.product.availability.ProductAvailability;
 import com.asrevo.cvhome.catalog.entity.product.image.ProductImage;
 import com.asrevo.cvhome.catalog.entity.product.relationship.ProductRelationship;
-import com.asrevo.cvhome.catalog.model.product.ProductAvailabilityStatus;
-import com.asrevo.cvhome.catalog.model.product.ReadableMinimalProduct;
-import com.asrevo.cvhome.catalog.model.product.ReadableProduct;
-import com.asrevo.cvhome.catalog.model.product.ReadableProductAvailability;
+import com.asrevo.cvhome.catalog.model.product.*;
 import com.asrevo.cvhome.catalog.model.product.product.price.FinalPrice;
 import com.asrevo.cvhome.catalog.repositories.product.ProductRepository;
 import com.asrevo.cvhome.catalog.service.mapper.catalog.ReadableMinimalProductMapper;
@@ -267,6 +264,17 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
     @Override
     public Page<Product> findAll(ProductCriteria criteria, StoreMerchantId store) {
         return productRepository.findAll(criteria, store);
+    }
+
+    @Override
+    public ProductDetails getDetailedProduct(
+            StoreMerchantId store, String sku, LanguageCode language) throws ServiceException {
+        Product p = getBySku(sku, store);
+        ReadableMinimalProduct product = readableMinimalProductMapper.convert(p, store, language);
+        FinalPrice price = pricingService.calculateProductPrice(p);
+        ReadableProductAvailability availability =
+                readableProductAvailabilityMapper.convert(p, store, null);
+        return new ProductDetails(product, price, availability);
     }
 
     @Override

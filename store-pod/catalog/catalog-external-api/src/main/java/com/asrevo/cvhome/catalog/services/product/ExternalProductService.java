@@ -1,9 +1,6 @@
 package com.asrevo.cvhome.catalog.services.product;
 
-import com.asrevo.cvhome.catalog.model.product.ProductAvailabilityStatus;
-import com.asrevo.cvhome.catalog.model.product.ReadableMinimalProduct;
-import com.asrevo.cvhome.catalog.model.product.ReadableProduct;
-import com.asrevo.cvhome.catalog.model.product.ReadableProductAvailability;
+import com.asrevo.cvhome.catalog.model.product.*;
 import com.asrevo.cvhome.catalog.model.product.product.price.FinalPrice;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
@@ -45,6 +42,11 @@ public interface ExternalProductService {
     @GetExchange("/minimal-products")
     List<ReadableMinimalProduct> getMinimalProducts(
             StoreMerchantId store, @RequestParam("sku") List<String> sku, LanguageCode lang);
+
+    @GetExchange("/detailed-product")
+    ProductDetails getDetailedProduct(
+            StoreMerchantId store, @RequestParam("sku") String sku, LanguageCode lang)
+            throws ServiceException;
 
     @PostExchange("/product-quantity-update")
     ProductAvailabilityStatus productQuantityUpdate(
