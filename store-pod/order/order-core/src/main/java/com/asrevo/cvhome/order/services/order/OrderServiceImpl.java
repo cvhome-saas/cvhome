@@ -362,6 +362,7 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
                     }
                 }
             }
+*/
         }
 
         //  @TODO ASHRAF
