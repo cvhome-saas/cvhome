@@ -25,7 +25,7 @@ import org.springframework.util.Assert;
 public class PersistablePaymentPopulator
         extends AbstractDataPopulator<PersistablePayment, StoreMerchantId, Payment> {
 
-    private final ExternalProductService productService;
+    private final ExternalProductService externalProductService;
 
     @Override
     public Payment populate(

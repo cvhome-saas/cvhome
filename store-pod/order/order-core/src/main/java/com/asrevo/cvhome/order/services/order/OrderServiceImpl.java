@@ -42,18 +42,18 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
         implements OrderService {
 
     private final ShoppingCartService shoppingCartService;
-    private final ExternalProductService productService;
+    private final ExternalProductService externalProductService;
     private final CustomerService customerService;
     private final OrderRepository orderRepository;
 
     public OrderServiceImpl(
             OrderRepository orderRepository,
             ShoppingCartService shoppingCartService,
-            ExternalProductService productService,
+            ExternalProductService externalProductService,
             CustomerService customerService) {
         super(orderRepository);
         this.shoppingCartService = shoppingCartService;
-        this.productService = productService;
+        this.externalProductService = externalProductService;
         this.customerService = customerService;
         this.orderRepository = orderRepository;
     }
@@ -290,7 +290,8 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
                 order.getOrderProducts().stream()
                         .map(it -> new Entry<>(it.getSku(), it.getProductQuantity()))
                         .toList();
-        productService.productQuantityUpdate(store, new ProductQuantityUpdate(newAvailabilities));
+        externalProductService.productQuantityUpdate(
+                store, new ProductQuantityUpdate(newAvailabilities));
         return order;
     }
 

@@ -25,7 +25,7 @@ import org.springframework.util.Assert;
 @AllArgsConstructor
 public class OrderProductPopulator
         extends AbstractDataPopulator<ShoppingCartItem, StoreMerchantId, OrderProduct> {
-    private final ExternalProductService productService;
+    private final ExternalProductService externalProductService;
 
     @Override
     public OrderProduct populate(
@@ -35,7 +35,7 @@ public class OrderProductPopulator
             LanguageCode language)
             throws ConversionException {
 
-        Assert.notNull(productService, "productService must be set");
+        Assert.notNull(externalProductService, "productService must be set");
 
         try {
 
@@ -44,7 +44,7 @@ public class OrderProductPopulator
             target.setProductQuantity(source.getQuantity());
             target.setSku(source.getSku());
 
-            FinalPrice finalPrice = productService.getProductPrice(store, source.getSku());
+            FinalPrice finalPrice = externalProductService.getProductPrice(store, source.getSku());
             if (finalPrice == null) {
                 throw new ConversionException(
                         "Object final price not populated in shoppingCartItem (source)");

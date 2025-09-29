@@ -28,18 +28,18 @@ public class ShoppingCartServiceImpl extends SalesManagerEntityServiceImpl<Long,
         implements ShoppingCartService {
 
     private final ShoppingCartRepository shoppingCartRepository;
-    private final ExternalProductService productService;
+    private final ExternalProductService externalProductService;
     private final ShoppingCartItemRepository shoppingCartItemRepository;
 
     @Autowired
     public ShoppingCartServiceImpl(
             ShoppingCartRepository shoppingCartRepository,
-            ExternalProductService productService,
+            ExternalProductService externalProductService,
             ShoppingCartItemRepository shoppingCartItemRepository) {
         super(shoppingCartRepository);
         this.shoppingCartRepository = shoppingCartRepository;
 
-        this.productService = productService;
+        this.externalProductService = externalProductService;
         this.shoppingCartItemRepository = shoppingCartItemRepository;
     }
 
@@ -155,7 +155,7 @@ public class ShoppingCartServiceImpl extends SalesManagerEntityServiceImpl<Long,
 
                 List<String> skus = items.stream().map(ShoppingCartItem::getSku).toList();
                 Map<String, FinalPrice> priceMap =
-                        productService.getProductsPrice(store, skus).stream()
+                        externalProductService.getProductsPrice(store, skus).stream()
                                 .collect(Collectors.toMap(FinalPrice::getSku, Function.identity()));
 
                 for (ShoppingCartItem item : items) {

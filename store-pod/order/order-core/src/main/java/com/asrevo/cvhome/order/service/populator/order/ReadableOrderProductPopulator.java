@@ -34,7 +34,7 @@ import org.springframework.stereotype.Component;
 public class ReadableOrderProductPopulator
         extends AbstractDataPopulator<OrderProduct, StoreMerchantId, ReadableOrderProduct> {
 
-    private final ExternalProductService productService;
+    private final ExternalProductService externalProductService;
     private final ImageFilePath imageUtils;
     private final ExternalMerchantStoreService externalMerchantStoreService;
 
@@ -46,7 +46,7 @@ public class ReadableOrderProductPopulator
             LanguageCode language)
             throws ConversionException {
 
-        Validate.notNull(productService, "Requires ProductService");
+        Validate.notNull(externalProductService, "Requires ProductService");
         Validate.notNull(imageUtils, "Requires imageUtils");
         target.setId(source.getId());
         target.setOrderedQuantity(source.getProductQuantity());
@@ -87,7 +87,8 @@ public class ReadableOrderProductPopulator
             target.setAttributes(attributes);
         }
 
-        ReadableProduct read = productService.getFullProduct(store, source.getSku(), language);
+        ReadableProduct read =
+                externalProductService.getFullProduct(store, source.getSku(), language);
         target.setProduct(read);
 
         List<ReadableImage> images = read.getImages();
