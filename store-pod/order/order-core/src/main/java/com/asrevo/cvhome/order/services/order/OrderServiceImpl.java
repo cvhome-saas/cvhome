@@ -324,6 +324,8 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
             subTotal = subTotal.add(st);
             // Other prices
 
+/* @TODO comment this for now as unnecessary
+            FinalPrice finalPrice = productService.getProductPrice(store, item.getSku());
             if (finalPrice != null) {
                 List<FinalPrice> otherPrices = finalPrice.getAdditionalPrices();
                 if (otherPrices != null) {
