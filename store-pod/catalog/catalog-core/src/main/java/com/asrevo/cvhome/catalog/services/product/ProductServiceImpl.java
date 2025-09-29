@@ -269,7 +269,7 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
     @Override
     public ProductDetails getDetailedProduct(
             StoreMerchantId store, String sku, LanguageCode language) throws ServiceException {
-        Product p = getBySku(sku, store);
+        Product p = getMinimalProductBySku(sku, store, language);
         ReadableMinimalProduct product = readableMinimalProductMapper.convert(p, store, language);
         FinalPrice price = pricingService.calculateProductPrice(p);
         ReadableProductAvailability availability =
@@ -286,17 +286,25 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
         }
     }
 
+    public Product getMinimalProductBySku(
+            String productCode, StoreMerchantId merchant, LanguageCode language)
+            throws ServiceException {
+
+        try {
+            Long productId = findProductIdByCode(productCode, merchant);
+            return productRepository.getMinimalProductById(productId, merchant, language);
+        } catch (Exception e) {
+            throw new ServiceException("Cannot get product with sku [" + productCode + "]", e);
+        }
+    }
+
     @Override
     public Product getBySku(String productCode, StoreMerchantId merchant, LanguageCode language)
             throws ServiceException {
 
         try {
-            List<Long> products = productRepository.findBySku(productCode, merchant);
-            if (products.isEmpty()) {
-                throw new ServiceException("Cannot get product with sku [" + productCode + "]");
-            }
-            Long id = products.getFirst();
-            return productRepository.getById(id, merchant, language);
+            Long productId = findProductIdByCode(productCode, merchant);
+            return productRepository.getById(productId, merchant, language);
         } catch (Exception e) {
             throw new ServiceException("Cannot get product with sku [" + productCode + "]", e);
         }
@@ -305,14 +313,20 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
     public Product getBySku(String productCode, StoreMerchantId merchant) throws ServiceException {
 
         try {
-            List<Long> products = productRepository.findBySku(productCode, merchant);
-            if (products.isEmpty()) {
-                throw new ServiceException("Cannot get product with sku [" + productCode + "]");
-            }
-            return this.findOne(products.getFirst(), merchant);
+            Long productId = findProductIdByCode(productCode, merchant);
+            return this.findOne(productId, merchant);
         } catch (Exception e) {
             throw new ServiceException("Cannot get product with sku [" + productCode + "]", e);
         }
+    }
+
+    private Long findProductIdByCode(String productCode, StoreMerchantId merchant)
+            throws ServiceException {
+        List<Long> products = productRepository.findBySku(productCode, merchant);
+        if (products.isEmpty()) {
+            throw new ServiceException("Cannot get product with sku [" + productCode + "]");
+        }
+        return products.getFirst();
     }
 
     @Override

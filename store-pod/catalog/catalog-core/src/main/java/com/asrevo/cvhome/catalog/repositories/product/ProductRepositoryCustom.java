@@ -22,4 +22,6 @@ public interface ProductRepositoryCustom {
     Product getById(Long productId, StoreMerchantId merchant);
 
     Product getById(Long productId, StoreMerchantId store, LanguageCode language);
+
+    Product getMinimalProductById(Long productId, StoreMerchantId merchant, LanguageCode language);
 }
