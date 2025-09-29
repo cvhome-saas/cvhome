@@ -13,7 +13,9 @@ public interface ShoppingCartService extends SalesManagerEntityService<Long, Sho
 
     ShoppingCart getById(Long id, StoreMerchantId store) throws ServiceException;
 
-    ShoppingCart getByCode(String code, StoreMerchantId store) throws ServiceException;
+    ShoppingCart findCart(String code, StoreMerchantId store) throws ServiceException;
+
+    ShoppingCart loadCartByCode(String code, StoreMerchantId store) throws ServiceException;
 
     /**
      * Populates a ShoppingCartItem from a Product and attributes if any. Calculate price based on availability

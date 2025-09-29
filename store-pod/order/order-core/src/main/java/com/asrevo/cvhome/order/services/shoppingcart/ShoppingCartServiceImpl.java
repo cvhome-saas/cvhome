@@ -91,6 +91,11 @@ public class ShoppingCartServiceImpl extends SalesManagerEntityServiceImpl<Long,
         }
     }
 
+    @Override
+    public ShoppingCart findCart(String code, StoreMerchantId store) throws ServiceException {
+        return shoppingCartRepository.findByCode(store, code);
+    }
+
     /*
      * @Override
      *
@@ -115,7 +120,7 @@ public class ShoppingCartServiceImpl extends SalesManagerEntityServiceImpl<Long,
      */
     @Override
     @Transactional
-    public ShoppingCart getByCode(final String code, final StoreMerchantId store)
+    public ShoppingCart loadCartByCode(final String code, final StoreMerchantId store)
             throws ServiceException {
 
         try {

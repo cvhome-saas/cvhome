@@ -104,7 +104,7 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
     private ShoppingCart getCartModel(final String cartId, final StoreMerchantId store) {
         if (StringUtils.isNotBlank(cartId)) {
             try {
-                return shoppingCartService.getByCode(cartId, store);
+                return shoppingCartService.loadCartByCode(cartId, store);
             } catch (ServiceException e) {
                 log.error("unable to find any cart asscoiated with this Id: {}", cartId);
                 log.error("error while fetching cart model...", e);
@@ -312,7 +312,7 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
         Validate.notNull(cartCode, "String cart code cannot be null");
         Validate.notNull(item, "PersistableShoppingCartItem cannot be null");
 
-        ShoppingCart cartModel = getCartModel(cartCode, store);
+        ShoppingCart cartModel = shoppingCartService.findCart(cartCode, store);
         if (cartModel == null) {
             throw new ResourceNotFoundException("Cart code [" + cartCode + "] not found");
         }
@@ -333,7 +333,7 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
     public ReadableShoppingCart getByCode(String code, StoreMerchantId store, LanguageCode language)
             throws Exception {
 
-        ShoppingCart cart = shoppingCartService.getByCode(code, store);
+        ShoppingCart cart = shoppingCartService.loadCartByCode(code, store);
         ReadableShoppingCart readableCart = null;
 
         if (cart != null) {
