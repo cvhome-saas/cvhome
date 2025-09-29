@@ -97,6 +97,7 @@ public class ReadableShoppingCartMapper implements Mapper<ShoppingCart, Readable
 
                 if (!items.isEmpty()) {
                     List<String> skus = items.stream().map(ShoppingCartItem::getSku).toList();
+                    // @TODO we need to include availability to response also
                     Map<String, ReadableMinimalProduct> productMap =
                             externalProductService
                                     .getMinimalProducts(store, skus, language)
