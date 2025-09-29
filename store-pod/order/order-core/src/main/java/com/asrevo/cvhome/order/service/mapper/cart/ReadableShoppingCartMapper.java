@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.order.service.mapper.cart;
 
+import com.asrevo.cvhome.catalog.model.product.ProductDetails;
 import com.asrevo.cvhome.catalog.model.product.ReadableMinimalProduct;
-import com.asrevo.cvhome.catalog.model.product.product.ProductEntity;
 import com.asrevo.cvhome.catalog.services.product.ExternalProductService;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
@@ -25,8 +25,6 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.CollectionUtils;
@@ -92,51 +90,37 @@ public class ReadableShoppingCartMapper implements Mapper<ShoppingCart, Readable
                 }
             }
 
-            Set<ShoppingCartItem> items = source.getLineItems();
+            Set<ShoppingCartItem> items =
+                    Optional.ofNullable(source.getLineItems()).orElse(Set.of());
 
             ReadableMerchantStore merchantStore = externalMerchantStoreService.getStore(store);
-            if (items != null) {
+            for (ShoppingCartItem item : items) {
+                ProductDetails detailedProduct =
+                        externalProductService.getDetailedProduct(store, item.getSku(), language);
+                ReadableMinimalProduct minimalProduct = detailedProduct.product();
+                if (minimalProduct != null) {
+                    ReadableShoppingCartItem shoppingCartItem = new ReadableShoppingCartItem();
+                    BeanUtils.copyProperties(shoppingCartItem, minimalProduct);
 
-                if (!items.isEmpty()) {
-                    List<String> skus = items.stream().map(ShoppingCartItem::getSku).toList();
-                    // @TODO we need to include availability to response also
-                    Map<String, ReadableMinimalProduct> productMap =
-                            externalProductService
-                                    .getMinimalProducts(store, skus, language)
-                                    .stream()
-                                    .collect(
-                                            Collectors.toMap(
-                                                    ProductEntity::getSku, Function.identity()));
+                    shoppingCartItem.setPrice(item.getItemPrice());
+                    shoppingCartItem.setFinalPrice(
+                            PriceUtils.getStoreFormatedAmountWithCurrency(
+                                    merchantStore, item.getItemPrice()));
 
-                    for (ShoppingCartItem item : items) {
-                        ReadableMinimalProduct minimalProduct = productMap.get(item.getSku());
-                        if (minimalProduct != null) {
-                            ReadableShoppingCartItem shoppingCartItem =
-                                    new ReadableShoppingCartItem();
-                            BeanUtils.copyProperties(shoppingCartItem, minimalProduct);
+                    shoppingCartItem.setQuantity(item.getQuantity());
 
-                            shoppingCartItem.setPrice(item.getItemPrice());
-                            shoppingCartItem.setFinalPrice(
-                                    PriceUtils.getStoreFormatedAmountWithCurrency(
-                                            merchantStore, item.getItemPrice()));
+                    cartQuantity = cartQuantity + item.getQuantity();
 
-                            shoppingCartItem.setQuantity(item.getQuantity());
+                    BigDecimal subTotal =
+                            PriceUtils.calculatePriceQuantity(
+                                    item.getItemPrice(), item.getQuantity());
 
-                            cartQuantity = cartQuantity + item.getQuantity();
+                    // calculate sub total (price * quantity)
+                    shoppingCartItem.setSubTotal(subTotal);
 
-                            BigDecimal subTotal =
-                                    PriceUtils.calculatePriceQuantity(
-                                            item.getItemPrice(), item.getQuantity());
-
-                            // calculate sub total (price * quantity)
-                            shoppingCartItem.setSubTotal(subTotal);
-
-                            shoppingCartItem.setDisplaySubTotal(
-                                    PriceUtils.getStoreFormatedAmountWithCurrency(
-                                            merchantStore, subTotal));
-                            destination.getProducts().add(shoppingCartItem);
-                        }
-                    }
+                    shoppingCartItem.setDisplaySubTotal(
+                            PriceUtils.getStoreFormatedAmountWithCurrency(merchantStore, subTotal));
+                    destination.getProducts().add(shoppingCartItem);
                 }
             }
 

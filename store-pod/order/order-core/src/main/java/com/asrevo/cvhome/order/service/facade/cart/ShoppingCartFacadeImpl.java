@@ -3,6 +3,7 @@
  */
 package com.asrevo.cvhome.order.service.facade.cart;
 
+import com.asrevo.cvhome.catalog.model.product.ProductDetails;
 import com.asrevo.cvhome.catalog.model.product.ReadableProductAvailability;
 import com.asrevo.cvhome.catalog.model.product.product.price.FinalPrice;
 import com.asrevo.cvhome.catalog.services.product.ExternalProductService;
@@ -55,12 +56,15 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
     private ShoppingCartItem createCartItem(
             ShoppingCart cartModel,
             PersistableShoppingCartItem shoppingCartItem,
-            StoreMerchantId store)
+            StoreMerchantId store,
+            LanguageCode language)
             throws Exception {
 
         // @TODO we need to merge availability+price in one call
-        ReadableProductAvailability availability =
-                externalProductService.getProductAvailability(store, shoppingCartItem.getProduct());
+        ProductDetails detailedProduct =
+                externalProductService.getDetailedProduct(
+                        store, shoppingCartItem.getProduct(), language);
+        ReadableProductAvailability availability = detailedProduct.availability();
 
         if (!availability.isCanBePurchased()) {
             throw new Exception(
@@ -75,7 +79,7 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
             throw new Exception("Item with sku " + availability.getSku() + " is not available");
         }
 
-        FinalPrice price = externalProductService.getProductPrice(store, availability.getSku());
+        FinalPrice price = detailedProduct.price();
 
         ShoppingCartItem item =
                 shoppingCartService.populateShoppingCartItem(
@@ -101,10 +105,11 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
         return null;
     }
 
-    private ShoppingCart getCartModel(final String cartId, final StoreMerchantId store) {
+    private ShoppingCart getCartModel(
+            final String cartId, final StoreMerchantId store, LanguageCode language) {
         if (StringUtils.isNotBlank(cartId)) {
             try {
-                return shoppingCartService.loadCartByCode(cartId, store);
+                return shoppingCartService.loadCartByCode(cartId, store, language);
             } catch (ServiceException e) {
                 log.error("unable to find any cart asscoiated with this Id: {}", cartId);
                 log.error("error while fetching cart model...", e);
@@ -164,7 +169,7 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
         Validate.notNull(merchant, "store cannot be null");
 
         // get cart
-        ShoppingCart cart = getCartModel(cartCode, merchant);
+        ShoppingCart cart = getCartModel(cartCode, merchant, language);
 
         if (cart == null) {
             throw new ResourceNotFoundException("Cart code [ " + cartCode + " ] not found");
@@ -210,7 +215,7 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
             LanguageCode language)
             throws Exception {
 
-        ShoppingCartItem itemModel = createCartItem(cartModel, item, store);
+        ShoppingCartItem itemModel = createCartItem(cartModel, item, store, language);
 
         // need to check if the item is already in the cart
         boolean duplicateFound = false;
@@ -231,7 +236,7 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
             LanguageCode language)
             throws Exception {
 
-        ShoppingCartItem itemModel = createCartItem(cartModel, item, store);
+        ShoppingCartItem itemModel = createCartItem(cartModel, item, store, language);
 
         boolean itemModified = false;
         // check if existing product
@@ -291,7 +296,9 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
         saveShoppingCart(cartModel);
 
         // refresh cart
-        cartModel = shoppingCartService.loadCartByCode(cartModel.getShoppingCartCode(), store);
+        cartModel =
+                shoppingCartService.loadCartByCode(
+                        cartModel.getShoppingCartCode(), store, language);
 
         if (cartModel == null) {
             return null;
@@ -333,7 +340,7 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
     public ReadableShoppingCart getByCode(String code, StoreMerchantId store, LanguageCode language)
             throws Exception {
 
-        ShoppingCart cart = shoppingCartService.loadCartByCode(code, store);
+        ShoppingCart cart = shoppingCartService.loadCartByCode(code, store, language);
         ReadableShoppingCart readableCart = null;
 
         if (cart != null) {

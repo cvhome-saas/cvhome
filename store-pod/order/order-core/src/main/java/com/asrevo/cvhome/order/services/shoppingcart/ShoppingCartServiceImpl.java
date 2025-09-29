@@ -1,6 +1,6 @@
 package com.asrevo.cvhome.order.services.shoppingcart;
 
-import com.asrevo.cvhome.catalog.model.product.product.price.FinalPrice;
+import com.asrevo.cvhome.catalog.model.product.ProductDetails;
 import com.asrevo.cvhome.catalog.services.product.ExternalProductService;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.order.entity.shoppingcart.ShoppingCart;
@@ -8,14 +8,11 @@ import com.asrevo.cvhome.order.entity.shoppingcart.ShoppingCartItem;
 import com.asrevo.cvhome.order.repositories.shoppingcart.ShoppingCartItemRepository;
 import com.asrevo.cvhome.order.repositories.shoppingcart.ShoppingCartRepository;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
+import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
 import java.math.BigDecimal;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -101,7 +98,8 @@ public class ShoppingCartServiceImpl extends SalesManagerEntityServiceImpl<Long,
      */
     @Override
     @Transactional
-    public ShoppingCart loadCartByCode(final String code, final StoreMerchantId store)
+    public ShoppingCart loadCartByCode(
+            final String code, final StoreMerchantId store, LanguageCode languageCode)
             throws ServiceException {
 
         try {
@@ -109,7 +107,7 @@ public class ShoppingCartServiceImpl extends SalesManagerEntityServiceImpl<Long,
             if (shoppingCart == null) {
                 return null;
             }
-            getPopulatedShoppingCart(shoppingCart, store);
+            getPopulatedShoppingCart(shoppingCart, store, languageCode);
 
             if (shoppingCart.isObsolete()) {
                 delete(shoppingCart);
@@ -126,7 +124,8 @@ public class ShoppingCartServiceImpl extends SalesManagerEntityServiceImpl<Long,
     }
 
     private ShoppingCart getPopulatedShoppingCart(
-            final ShoppingCart shoppingCart, StoreMerchantId store) throws Exception {
+            final ShoppingCart shoppingCart, StoreMerchantId store, LanguageCode language)
+            throws Exception {
 
         try {
 
@@ -139,14 +138,12 @@ public class ShoppingCartServiceImpl extends SalesManagerEntityServiceImpl<Long,
                     return shoppingCart;
                 }
 
-                List<String> skus = items.stream().map(ShoppingCartItem::getSku).toList();
-                Map<String, FinalPrice> priceMap =
-                        externalProductService.getProductsPrice(store, skus).stream()
-                                .collect(Collectors.toMap(FinalPrice::getSku, Function.identity()));
-
                 for (ShoppingCartItem item : items) {
                     log.debug("Populate item {}", item.getId());
-                    item.setItemPrice(priceMap.get(item.getSku()).getFinalPrice());
+                    ProductDetails detailedProduct =
+                            externalProductService.getDetailedProduct(
+                                    store, item.getSku(), language);
+                    item.setItemPrice(detailedProduct.price().getFinalPrice());
 
                     BigDecimal subTotal =
                             item.getItemPrice().multiply(new BigDecimal(item.getQuantity()));

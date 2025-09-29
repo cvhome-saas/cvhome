@@ -74,7 +74,7 @@ public class OrderApi {
 
         ShoppingCart cart;
         try {
-            cart = shoppingCartService.loadCartByCode(code, merchantStore);
+            cart = shoppingCartService.loadCartByCode(code, merchantStore,language);
 
             if (cart == null) {
                 throw new ResourceNotFoundException("Cart code " + code + " does not exist");
