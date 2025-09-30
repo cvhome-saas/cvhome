@@ -206,7 +206,9 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
         }
 
         for (ReserveProductEntry entry : productReservation.entries()) {
-            Product product = getBySku(entry.sku(), store);
+            Product product =
+                    productRepository.getByProductIdFetchAvailabilities(
+                            findProductIdByCode(entry.sku(), store), store);
             for (ProductAvailability availability : product.getAvailabilities()) {
                 int qty = availability.getProductQuantity();
                 if (qty < entry.reserveQty()) {
@@ -215,7 +217,7 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
                 qty = qty - entry.reserveQty();
                 availability.setProductQuantity(qty);
             }
-            update(product);
+            productRepository.save(product);
         }
         return new ProductReservationStatus(true);
     }
