@@ -3,7 +3,7 @@ package com.asrevo.cvhome.catalog.services.product;
 import com.asrevo.cvhome.catalog.model.product.*;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
-import com.asrevo.cvhome.store.core.model.catalog.ReserveProductRequest;
+import com.asrevo.cvhome.store.core.model.catalog.ProductReservationList;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,8 +18,8 @@ public interface ExternalProductService {
     ProductDetails getDetailedProduct(
             StoreMerchantId store, @RequestParam("sku") String sku, LanguageCode lang);
 
-    @PostExchange("/reserve-products")
-    ProductAvailabilityStatus reserveProducts(
-            StoreMerchantId store, @RequestBody ReserveProductRequest reserveProductRequest)
+    @PostExchange("/reserve")
+    ProductReservationStatus reserve(
+            StoreMerchantId store, @RequestBody ProductReservationList productReservation)
             throws ServiceException;
 }

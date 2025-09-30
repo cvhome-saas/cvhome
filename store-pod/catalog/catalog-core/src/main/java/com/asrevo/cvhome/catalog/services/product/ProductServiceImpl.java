@@ -14,12 +14,12 @@ import com.asrevo.cvhome.catalog.service.mapper.catalog.ReadableProductAvailabil
 import com.asrevo.cvhome.catalog.services.pricing.PricingServiceImpl;
 import com.asrevo.cvhome.catalog.services.product.image.ProductImageService;
 import com.asrevo.cvhome.catalog.services.product.relationship.ProductRelationshipService;
-import com.asrevo.cvhome.commons.domain.Entry;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.entity.content.FileContentType;
 import com.asrevo.cvhome.store.core.entity.content.ImageContentFile;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
-import com.asrevo.cvhome.store.core.model.catalog.ReserveProductRequest;
+import com.asrevo.cvhome.store.core.model.catalog.ProductReservationList;
+import com.asrevo.cvhome.store.core.model.catalog.ReserveProductEntry;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
 import java.io.InputStream;
@@ -196,37 +196,28 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
 
     @Transactional
     @Override
-    public ProductAvailabilityStatus reserveProducts(
-            StoreMerchantId store, ReserveProductRequest reserveProductRequest)
+    public ProductReservationStatus reserve(
+            StoreMerchantId store, ProductReservationList productReservation)
             throws ServiceException {
-        if (reserveProductRequest == null
-                || reserveProductRequest.newAvailabilitiesBySku() == null
-                || reserveProductRequest.newAvailabilitiesBySku().isEmpty()) {
+        if (Objects.isNull(productReservation.entries())
+                || productReservation.entries().isEmpty()) {
             throw new ServiceException(
                     "Cannot update product availability because no new availabilities exists");
         }
 
-        List<Entry<Product, Integer>> newProductAvailabilities = new ArrayList<>();
-
-        for (Entry<String, Integer> it : reserveProductRequest.newAvailabilitiesBySku()) {
-            Entry<Product, Integer> productIntegerEntry =
-                    new Entry<>(getBySku(it.key(), store), it.value());
-            newProductAvailabilities.add(productIntegerEntry);
-        }
-
-        for (Entry<Product, Integer> pv : newProductAvailabilities) {
-            Product product = pv.key();
+        for (ReserveProductEntry entry : productReservation.entries()) {
+            Product product = getBySku(entry.sku(), store);
             for (ProductAvailability availability : product.getAvailabilities()) {
                 int qty = availability.getProductQuantity();
-                if (qty < pv.value()) {
+                if (qty < entry.reserveQty()) {
                     throw new ServiceException(ServiceException.EXCEPTION_INVENTORY_MISMATCH);
                 }
-                qty = qty - pv.value();
+                qty = qty - entry.reserveQty();
                 availability.setProductQuantity(qty);
             }
             update(product);
         }
-        return new ProductAvailabilityStatus(true);
+        return new ProductReservationStatus(true);
     }
 
     @Override

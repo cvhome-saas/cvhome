@@ -6,7 +6,7 @@ import com.asrevo.cvhome.catalog.entity.product.ProductList;
 import com.asrevo.cvhome.catalog.model.product.*;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
-import com.asrevo.cvhome.store.core.model.catalog.ReserveProductRequest;
+import com.asrevo.cvhome.store.core.model.catalog.ProductReservationList;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
 import java.util.List;
@@ -46,8 +46,8 @@ public interface ProductService extends SalesManagerEntityService<Long, Product>
      */
     Product findOne(Long id, StoreMerchantId merchant);
 
-    ProductAvailabilityStatus reserveProducts(
-            StoreMerchantId store, ReserveProductRequest reserveProductRequest)
+    ProductReservationStatus reserve(
+            StoreMerchantId store, ProductReservationList productReservation)
             throws ServiceException;
 
     Page<Product> findAll(ProductCriteria criteria, StoreMerchantId store);

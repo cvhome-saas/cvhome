@@ -4,7 +4,6 @@ import com.asrevo.cvhome.catalog.services.product.ExternalProductService;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.customer.model.customer.ReadableCustomer;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
-import com.asrevo.cvhome.merchant.model.merchant.ReadableMerchantStore;
 import com.asrevo.cvhome.order.entity.customer.Customer;
 import com.asrevo.cvhome.order.entity.order.*;
 import com.asrevo.cvhome.order.entity.order.orderproduct.OrderProduct;
@@ -300,24 +299,6 @@ public class OrderFacadeImpl implements OrderFacade {
                         .map(pr -> readableOrderProductMapper.convert(pr, store, language))
                         .collect(Collectors.toList());
         orderConfirmation.setProducts(products);
-
-        if (!StringUtils.isBlank(order.getShippingModuleCode())) {
-            StringBuilder optionCodeBuilder = new StringBuilder();
-            try {
-
-                optionCodeBuilder.append("module.shipping.").append(order.getShippingModuleCode());
-                ReadableMerchantStore baseStore = externalMerchantStoreService.getStore(store);
-                String storeName = baseStore.getName();
-                String shippingName =
-                        messages.getMessage(
-                                optionCodeBuilder.toString(),
-                                new String[] {storeName},
-                                languageService.toLocale(language, baseStore.getCountryIsoCode()));
-                orderConfirmation.setShipping(shippingName);
-            } catch (Exception e) { // label not found
-                log.warn("No shipping code found for {}", optionCodeBuilder);
-            }
-        }
 
         if (order.getPaymentType() != null) {
             orderConfirmation.setPayment(order.getPaymentType().name());

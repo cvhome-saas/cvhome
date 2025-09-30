@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.order.services.order;
 
+import com.asrevo.cvhome.catalog.model.product.ProductReservationStatus;
 import com.asrevo.cvhome.catalog.services.product.ExternalProductService;
-import com.asrevo.cvhome.commons.domain.Entry;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.order.entity.customer.Customer;
 import com.asrevo.cvhome.order.entity.order.*;
@@ -18,7 +18,8 @@ import com.asrevo.cvhome.order.services.shoppingcart.ShoppingCartService;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.entity.order.orderstatus.OrderStatus;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
-import com.asrevo.cvhome.store.core.model.catalog.ReserveProductRequest;
+import com.asrevo.cvhome.store.core.model.catalog.ProductReservationList;
+import com.asrevo.cvhome.store.core.model.catalog.ReserveProductEntry;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
 import java.math.BigDecimal;
@@ -28,6 +29,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -286,11 +288,18 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
                 }*/
 
         log.debug("Update inventory");
-        List<Entry<String, Integer>> newAvailabilities =
+        ProductReservationList productReservation =
                 order.getOrderProducts().stream()
-                        .map(it -> new Entry<>(it.getSku(), it.getProductQuantity()))
-                        .toList();
-        externalProductService.reserveProducts(store, new ReserveProductRequest(newAvailabilities));
+                        .map(it -> new ReserveProductEntry(it.getSku(), it.getProductQuantity()))
+                        .collect(
+                                Collectors.collectingAndThen(
+                                        Collectors.toSet(), ProductReservationList::new));
+
+        ProductReservationStatus reservationStatus =
+                externalProductService.reserve(store, productReservation);
+        if (!reservationStatus.status()) {
+            throw new ServiceException("error updating inventory with new qty");
+        }
         return order;
     }
 

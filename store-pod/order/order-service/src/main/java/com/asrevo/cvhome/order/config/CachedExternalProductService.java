@@ -4,7 +4,7 @@ import com.asrevo.cvhome.catalog.model.product.*;
 import com.asrevo.cvhome.catalog.services.product.ExternalProductService;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
-import com.asrevo.cvhome.store.core.model.catalog.ReserveProductRequest;
+import com.asrevo.cvhome.store.core.model.catalog.ProductReservationList;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import org.springframework.cache.annotation.Cacheable;
 
@@ -23,7 +23,7 @@ public class CachedExternalProductService implements ExternalProductService {
     }
 
     @Override
-    public ProductAvailabilityStatus reserveProducts(StoreMerchantId store, ReserveProductRequest reserveProductRequest) throws ServiceException {
-        return externalProductService.reserveProducts(store, reserveProductRequest);
+    public ProductReservationStatus reserve(StoreMerchantId store, ProductReservationList productReservation) throws ServiceException {
+        return externalProductService.reserve(store, productReservation);
     }
 }

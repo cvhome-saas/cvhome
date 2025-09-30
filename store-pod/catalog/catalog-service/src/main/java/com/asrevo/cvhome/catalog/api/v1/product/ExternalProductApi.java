@@ -7,7 +7,7 @@ import com.asrevo.cvhome.commons.annotation.ConditionalOnApiStatus;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
-import com.asrevo.cvhome.store.core.model.catalog.ReserveProductRequest;
+import com.asrevo.cvhome.store.core.model.catalog.ProductReservationList;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -48,9 +48,9 @@ public class ExternalProductApi implements ExternalProductService {
     }
 
 
-    @PostMapping(value = "/reserve-products")
+    @PostMapping(value = "/reserve")
     @Operation(method = "GET", description = "Update product quantity",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ProductAvailabilityStatus.class))))
+            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ProductReservationStatus.class))))
     @Parameters({
             @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
             @Parameter(name = "sku", schema = @Schema(name = "sku", type = "string")),
@@ -58,7 +58,7 @@ public class ExternalProductApi implements ExternalProductService {
     })
     @ConditionalOnApiStatus
     @Override
-    public ProductAvailabilityStatus reserveProducts(StoreMerchantId store, @RequestBody ReserveProductRequest reserveProductRequest) throws ServiceException {
-        return productService.reserveProducts(store, reserveProductRequest);
+    public ProductReservationStatus reserve(StoreMerchantId store, @RequestBody ProductReservationList productReservation) throws ServiceException {
+        return productService.reserve(store, productReservation);
     }
 }
