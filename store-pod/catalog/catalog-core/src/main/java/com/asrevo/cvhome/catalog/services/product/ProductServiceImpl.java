@@ -11,7 +11,6 @@ import com.asrevo.cvhome.catalog.model.product.product.price.FinalPrice;
 import com.asrevo.cvhome.catalog.repositories.product.ProductRepository;
 import com.asrevo.cvhome.catalog.service.mapper.catalog.ReadableMinimalProductMapper;
 import com.asrevo.cvhome.catalog.service.mapper.catalog.ReadableProductAvailabilityMapper;
-import com.asrevo.cvhome.catalog.service.mapper.catalog.product.ReadableProductMapper;
 import com.asrevo.cvhome.catalog.services.pricing.PricingServiceImpl;
 import com.asrevo.cvhome.catalog.services.product.image.ProductImageService;
 import com.asrevo.cvhome.catalog.services.product.relationship.ProductRelationshipService;
@@ -20,7 +19,7 @@ import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.entity.content.FileContentType;
 import com.asrevo.cvhome.store.core.entity.content.ImageContentFile;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
-import com.asrevo.cvhome.store.core.model.catalog.ProductQuantityUpdate;
+import com.asrevo.cvhome.store.core.model.catalog.ReserveProductRequest;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
 import java.io.InputStream;
@@ -44,7 +43,6 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
 
     @Autowired ProductImageService productImageService;
     @Autowired private PricingServiceImpl pricingService;
-    @Autowired private ReadableProductMapper readableProductMapper;
     @Autowired private ReadableMinimalProductMapper readableMinimalProductMapper;
     @Autowired private ReadableProductAvailabilityMapper readableProductAvailabilityMapper;
 
@@ -196,36 +194,21 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
         return productRepository.getById(id, merchant);
     }
 
-    @Override
-    public FinalPrice getProductPrice(StoreMerchantId merchant, String sku)
-            throws ServiceException {
-        Product product = getBySku(sku, merchant);
-        return pricingService.calculateProductPrice(product);
-    }
-
-    @SneakyThrows
-    @Override
-    public ReadableProduct getFullProduct(
-            StoreMerchantId store, String productSku, LanguageCode language) {
-        Product product = getBySku(productSku, store);
-        return readableProductMapper.convert(product, store, language);
-    }
-
     @Transactional
     @Override
-    public ProductAvailabilityStatus productQuantityUpdate(
-            StoreMerchantId store, ProductQuantityUpdate productQuantityUpdate)
+    public ProductAvailabilityStatus reserveProducts(
+            StoreMerchantId store, ReserveProductRequest reserveProductRequest)
             throws ServiceException {
-        if (productQuantityUpdate == null
-                || productQuantityUpdate.newAvailabilitiesBySku() == null
-                || productQuantityUpdate.newAvailabilitiesBySku().isEmpty()) {
+        if (reserveProductRequest == null
+                || reserveProductRequest.newAvailabilitiesBySku() == null
+                || reserveProductRequest.newAvailabilitiesBySku().isEmpty()) {
             throw new ServiceException(
                     "Cannot update product availability because no new availabilities exists");
         }
 
         List<Entry<Product, Integer>> newProductAvailabilities = new ArrayList<>();
 
-        for (Entry<String, Integer> it : productQuantityUpdate.newAvailabilitiesBySku()) {
+        for (Entry<String, Integer> it : reserveProductRequest.newAvailabilitiesBySku()) {
             Entry<Product, Integer> productIntegerEntry =
                     new Entry<>(getBySku(it.key(), store), it.value());
             newProductAvailabilities.add(productIntegerEntry);
@@ -246,29 +229,15 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
         return new ProductAvailabilityStatus(true);
     }
 
-    @SneakyThrows
-    @Override
-    public ReadableMinimalProduct getMinimalProduct(
-            StoreMerchantId store, String productSku, LanguageCode language) {
-        Product product = getBySku(productSku, store);
-        return readableMinimalProductMapper.convert(product, store, language);
-    }
-
-    @SneakyThrows
-    @Override
-    public ReadableProductAvailability getProductAvailability(StoreMerchantId store, String sku) {
-        Product product = getBySku(sku, store);
-        return readableProductAvailabilityMapper.convert(product, store, null);
-    }
-
     @Override
     public Page<Product> findAll(ProductCriteria criteria, StoreMerchantId store) {
         return productRepository.findAll(criteria, store);
     }
 
+    @SneakyThrows
     @Override
     public ProductDetails getDetailedProduct(
-            StoreMerchantId store, String sku, LanguageCode language) throws ServiceException {
+            StoreMerchantId store, String sku, LanguageCode language) {
         Product p = getMinimalProductBySku(sku, store, language);
         ReadableMinimalProduct product = readableMinimalProductMapper.convert(p, store, language);
         FinalPrice price = pricingService.calculateProductPrice(p);

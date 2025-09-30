@@ -18,7 +18,7 @@ import com.asrevo.cvhome.order.services.shoppingcart.ShoppingCartService;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.entity.order.orderstatus.OrderStatus;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
-import com.asrevo.cvhome.store.core.model.catalog.ProductQuantityUpdate;
+import com.asrevo.cvhome.store.core.model.catalog.ReserveProductRequest;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
 import java.math.BigDecimal;
@@ -290,8 +290,7 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
                 order.getOrderProducts().stream()
                         .map(it -> new Entry<>(it.getSku(), it.getProductQuantity()))
                         .toList();
-        externalProductService.productQuantityUpdate(
-                store, new ProductQuantityUpdate(newAvailabilities));
+        externalProductService.reserveProducts(store, new ReserveProductRequest(newAvailabilities));
         return order;
     }
 

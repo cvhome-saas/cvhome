@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.order.service.mapper.order;
 
+import com.asrevo.cvhome.catalog.model.product.ProductDetails;
 import com.asrevo.cvhome.catalog.services.product.ExternalProductService;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
@@ -14,6 +15,7 @@ import com.asrevo.cvhome.store.utils.PriceUtils;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Component;
@@ -38,6 +40,7 @@ public class ReadableOrderProductMapper implements Mapper<OrderProduct, Readable
         return this.merge(source, orderProduct, store, language);
     }
 
+    @SneakyThrows
     @Override
     public ReadableOrderProduct merge(
             OrderProduct source,
@@ -95,8 +98,9 @@ public class ReadableOrderProductMapper implements Mapper<OrderProduct, Readable
         }
 
         if (!StringUtils.isBlank(source.getSku())) {
-            target.setProduct(
-                    externalProductService.getFullProduct(store, source.getSku(), language));
+            ProductDetails detailedProduct =
+                    externalProductService.getDetailedProduct(store, source.getSku(), language);
+            target.setProduct(detailedProduct.product());
         }
 
         return target;

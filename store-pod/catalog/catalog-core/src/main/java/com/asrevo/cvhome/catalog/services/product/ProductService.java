@@ -4,10 +4,9 @@ import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.entity.product.ProductCriteria;
 import com.asrevo.cvhome.catalog.entity.product.ProductList;
 import com.asrevo.cvhome.catalog.model.product.*;
-import com.asrevo.cvhome.catalog.model.product.product.price.FinalPrice;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
-import com.asrevo.cvhome.store.core.model.catalog.ProductQuantityUpdate;
+import com.asrevo.cvhome.store.core.model.catalog.ReserveProductRequest;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
 import java.util.List;
@@ -47,21 +46,11 @@ public interface ProductService extends SalesManagerEntityService<Long, Product>
      */
     Product findOne(Long id, StoreMerchantId merchant);
 
-    FinalPrice getProductPrice(StoreMerchantId merchant, String sku) throws ServiceException;
-
-    ReadableProduct getFullProduct(StoreMerchantId store, String productSku, LanguageCode language);
-
-    ProductAvailabilityStatus productQuantityUpdate(
-            StoreMerchantId store, ProductQuantityUpdate productQuantityUpdate)
+    ProductAvailabilityStatus reserveProducts(
+            StoreMerchantId store, ReserveProductRequest reserveProductRequest)
             throws ServiceException;
-
-    ReadableMinimalProduct getMinimalProduct(
-            StoreMerchantId store, String productSku, LanguageCode language);
-
-    ReadableProductAvailability getProductAvailability(StoreMerchantId store, String sku);
 
     Page<Product> findAll(ProductCriteria criteria, StoreMerchantId store);
 
-    ProductDetails getDetailedProduct(StoreMerchantId store, String sku, LanguageCode lang)
-            throws ServiceException;
+    ProductDetails getDetailedProduct(StoreMerchantId store, String sku, LanguageCode lang);
 }

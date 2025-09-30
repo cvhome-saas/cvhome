@@ -281,7 +281,7 @@ public class OrderFacadeImpl implements OrderFacade {
         List<ReadableOrderTotal> readableTotals =
                 totals.stream()
                         .sorted(Comparator.comparingInt(OrderTotal::getSortOrder))
-                        .map(tot -> convertOrderTotal(tot, store, language))
+                        .map(tot -> readableOrderTotalMapper.convert(tot, store, language))
                         .collect(Collectors.toList());
 
         readableTotal.setTotals(readableTotals);
@@ -297,7 +297,7 @@ public class OrderFacadeImpl implements OrderFacade {
 
         List<ReadableOrderProduct> products =
                 order.getOrderProducts().stream()
-                        .map(pr -> convertOrderProduct(pr, store, language))
+                        .map(pr -> readableOrderProductMapper.convert(pr, store, language))
                         .collect(Collectors.toList());
         orderConfirmation.setProducts(products);
 
@@ -359,18 +359,6 @@ public class OrderFacadeImpl implements OrderFacade {
         } catch (Exception e) {
             throw new ServiceRuntimeException("Error while getting orders", e);
         }
-    }
-
-    private ReadableOrderTotal convertOrderTotal(
-            OrderTotal total, StoreMerchantId store, LanguageCode language) {
-
-        return readableOrderTotalMapper.convert(total, store, language);
-    }
-
-    private ReadableOrderProduct convertOrderProduct(
-            OrderProduct product, StoreMerchantId store, LanguageCode language) {
-
-        return readableOrderProductMapper.convert(product, store, language);
     }
 
     @Override
