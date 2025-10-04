@@ -1,7 +1,8 @@
 package com.asrevo.cvhome.order.service.populator.order;
 
+import com.asrevo.cvhome.catalog.model.product.ProductDetails;
 import com.asrevo.cvhome.catalog.model.product.ReadableImage;
-import com.asrevo.cvhome.catalog.model.product.ReadableProduct;
+import com.asrevo.cvhome.catalog.model.product.ReadableMinimalProduct;
 import com.asrevo.cvhome.catalog.services.product.ExternalProductService;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
@@ -34,7 +35,7 @@ import org.springframework.stereotype.Component;
 public class ReadableOrderProductPopulator
         extends AbstractDataPopulator<OrderProduct, StoreMerchantId, ReadableOrderProduct> {
 
-    private final ExternalProductService productService;
+    private final ExternalProductService externalProductService;
     private final ImageFilePath imageUtils;
     private final ExternalMerchantStoreService externalMerchantStoreService;
 
@@ -46,7 +47,7 @@ public class ReadableOrderProductPopulator
             LanguageCode language)
             throws ConversionException {
 
-        Validate.notNull(productService, "Requires ProductService");
+        Validate.notNull(externalProductService, "Requires ProductService");
         Validate.notNull(imageUtils, "Requires imageUtils");
         target.setId(source.getId());
         target.setOrderedQuantity(source.getProductQuantity());
@@ -87,7 +88,9 @@ public class ReadableOrderProductPopulator
             target.setAttributes(attributes);
         }
 
-        ReadableProduct read = productService.getFullProduct(store, source.getSku(), language);
+        ProductDetails detailedProduct =
+                externalProductService.getDetailedProduct(store, source.getSku(), language);
+        ReadableMinimalProduct read = detailedProduct.product();
         target.setProduct(read);
 
         List<ReadableImage> images = read.getImages();

@@ -4,7 +4,6 @@ import com.asrevo.cvhome.catalog.services.product.ExternalProductService;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.customer.model.customer.ReadableCustomer;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
-import com.asrevo.cvhome.merchant.model.merchant.ReadableMerchantStore;
 import com.asrevo.cvhome.order.entity.customer.Customer;
 import com.asrevo.cvhome.order.entity.order.*;
 import com.asrevo.cvhome.order.entity.order.orderproduct.OrderProduct;
@@ -136,7 +135,7 @@ public class OrderFacadeImpl implements OrderFacade {
             persistableOrderApiPopulator.populate(order, modelOrder, store, language);
 
             Long shoppingCartId = order.getShoppingCartId();
-            ShoppingCart cart = shoppingCartService.getById(shoppingCartId, store);
+            ShoppingCart cart = shoppingCartService.findCart(shoppingCartId, store);
 
             if (cart == null) {
                 throw new ServiceException(
@@ -281,7 +280,7 @@ public class OrderFacadeImpl implements OrderFacade {
         List<ReadableOrderTotal> readableTotals =
                 totals.stream()
                         .sorted(Comparator.comparingInt(OrderTotal::getSortOrder))
-                        .map(tot -> convertOrderTotal(tot, store, language))
+                        .map(tot -> readableOrderTotalMapper.convert(tot, store, language))
                         .collect(Collectors.toList());
 
         readableTotal.setTotals(readableTotals);
@@ -297,27 +296,9 @@ public class OrderFacadeImpl implements OrderFacade {
 
         List<ReadableOrderProduct> products =
                 order.getOrderProducts().stream()
-                        .map(pr -> convertOrderProduct(pr, store, language))
+                        .map(pr -> readableOrderProductMapper.convert(pr, store, language))
                         .collect(Collectors.toList());
         orderConfirmation.setProducts(products);
-
-        if (!StringUtils.isBlank(order.getShippingModuleCode())) {
-            StringBuilder optionCodeBuilder = new StringBuilder();
-            try {
-
-                optionCodeBuilder.append("module.shipping.").append(order.getShippingModuleCode());
-                ReadableMerchantStore baseStore = externalMerchantStoreService.getStore(store);
-                String storeName = baseStore.getName();
-                String shippingName =
-                        messages.getMessage(
-                                optionCodeBuilder.toString(),
-                                new String[] {storeName},
-                                languageService.toLocale(language, baseStore.getCountryIsoCode()));
-                orderConfirmation.setShipping(shippingName);
-            } catch (Exception e) { // label not found
-                log.warn("No shipping code found for {}", optionCodeBuilder);
-            }
-        }
 
         if (order.getPaymentType() != null) {
             orderConfirmation.setPayment(order.getPaymentType().name());
@@ -359,18 +340,6 @@ public class OrderFacadeImpl implements OrderFacade {
         } catch (Exception e) {
             throw new ServiceRuntimeException("Error while getting orders", e);
         }
-    }
-
-    private ReadableOrderTotal convertOrderTotal(
-            OrderTotal total, StoreMerchantId store, LanguageCode language) {
-
-        return readableOrderTotalMapper.convert(total, store, language);
-    }
-
-    private ReadableOrderProduct convertOrderProduct(
-            OrderProduct product, StoreMerchantId store, LanguageCode language) {
-
-        return readableOrderProductMapper.convert(product, store, language);
     }
 
     @Override

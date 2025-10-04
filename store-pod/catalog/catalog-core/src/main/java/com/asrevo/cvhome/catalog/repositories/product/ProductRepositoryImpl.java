@@ -681,4 +681,34 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
             return null;
         }
     }
+
+    @Override
+    public Product getMinimalProductById(Long id, StoreMerchantId store, LanguageCode language) {
+        try {
+            String hql =
+                    """
+                            select distinct p from Product as p
+                            join fetch p.descriptions pd
+                            left join fetch p.images images
+                            left join fetch p.availabilities pavail
+                            left join fetch pavail.prices pavailpr
+                            left join fetch pavailpr.descriptions pavailprdesc
+                            left join fetch p.variants pinst
+                            left join fetch pinst.variation pv
+                            left join fetch pinst.availabilities pinsta
+                            left join fetch pinsta.prices pinstap
+                            left join fetch pinstap.descriptions pinstapdesc
+                            where p.id=:productId and p.store=:id and pd.languageCode=:language""";
+            Query q = this.em.createQuery(hql);
+
+            q.setParameter("productId", id);
+            q.setParameter("id", store);
+            q.setParameter("language", language);
+
+            return (Product) q.getSingleResult();
+
+        } catch (jakarta.persistence.NoResultException ers) {
+            return null;
+        }
+    }
 }

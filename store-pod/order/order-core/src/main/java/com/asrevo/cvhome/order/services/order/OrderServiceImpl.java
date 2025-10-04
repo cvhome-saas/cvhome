@@ -1,9 +1,7 @@
 package com.asrevo.cvhome.order.services.order;
 
-import com.asrevo.cvhome.catalog.model.product.ReadableProductAvailability;
-import com.asrevo.cvhome.catalog.model.product.product.price.FinalPrice;
+import com.asrevo.cvhome.catalog.model.product.ProductReservationStatus;
 import com.asrevo.cvhome.catalog.services.product.ExternalProductService;
-import com.asrevo.cvhome.commons.domain.Entry;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.order.entity.customer.Customer;
 import com.asrevo.cvhome.order.entity.order.*;
@@ -20,7 +18,8 @@ import com.asrevo.cvhome.order.services.shoppingcart.ShoppingCartService;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.entity.order.orderstatus.OrderStatus;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
-import com.asrevo.cvhome.store.core.model.catalog.ProductQuantityUpdate;
+import com.asrevo.cvhome.store.core.model.catalog.ProductReservationList;
+import com.asrevo.cvhome.store.core.model.catalog.ReserveProductEntry;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
 import java.math.BigDecimal;
@@ -30,7 +29,6 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -46,18 +44,18 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
         implements OrderService {
 
     private final ShoppingCartService shoppingCartService;
-    private final ExternalProductService productService;
+    private final ExternalProductService externalProductService;
     private final CustomerService customerService;
     private final OrderRepository orderRepository;
 
     public OrderServiceImpl(
             OrderRepository orderRepository,
             ShoppingCartService shoppingCartService,
-            ExternalProductService productService,
+            ExternalProductService externalProductService,
             CustomerService customerService) {
         super(orderRepository);
         this.shoppingCartService = shoppingCartService;
-        this.productService = productService;
+        this.externalProductService = externalProductService;
         this.customerService = customerService;
         this.orderRepository = orderRepository;
     }
@@ -138,24 +136,27 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
         }
 
         List<ShoppingCartItem> itemList = new ArrayList<>(shoppingCart.getLineItems());
-        // filter out unavailable
-        List<String> skus = itemList.stream().map(ShoppingCartItem::getSku).toList();
-        Map<String, ReadableProductAvailability> availabilityMap =
-                productService.getProductsAvailability(store, skus).stream()
-                        .collect(
-                                Collectors.toMap(
-                                        ReadableProductAvailability::getSku, Function.identity()));
-        itemList =
-                itemList.stream()
-                        .filter(
-                                p -> {
-                                    var availability = availabilityMap.get(p.getSku());
-                                    return Optional.ofNullable(availability)
-                                            .map(ReadableProductAvailability::isCanBePurchased)
-                                            .orElse(Boolean.FALSE);
-                                })
-                        .toList();
         orderSummary.setProducts(itemList);
+        // filter out unavailable
+        //        List<String> skus = itemList.stream().map(ShoppingCartItem::getSku).toList();
+        //        Map<String, ReadableProductAvailability> availabilityMap =
+        //                productService.getProductsAvailability(store, skus).stream()
+        //                        .collect(
+        //                                Collectors.toMap(
+        //                                        ReadableProductAvailability::getSku,
+        // Function.identity()));
+        //        itemList =
+        //                itemList.stream()
+        //                        .filter(
+        //                                p -> {
+        //                                    var availability = availabilityMap.get(p.getSku());
+        //                                    return Optional.ofNullable(availability)
+        //
+        // .map(ReadableProductAvailability::isCanBePurchased)
+        //                                            .orElse(Boolean.FALSE);
+        //                                })
+        //                        .toList();
+        //        orderSummary.setProducts(itemList);
 
         return calculateOrder(orderSummary, customer, store, language);
     }
@@ -287,11 +288,18 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
                 }*/
 
         log.debug("Update inventory");
-        List<Entry<String, Integer>> newAvailabilities =
+        ProductReservationList productReservation =
                 order.getOrderProducts().stream()
-                        .map(it -> new Entry<>(it.getSku(), it.getProductQuantity()))
-                        .toList();
-        productService.productQuantityUpdate(store, new ProductQuantityUpdate(newAvailabilities));
+                        .map(it -> new ReserveProductEntry(it.getSku(), it.getProductQuantity()))
+                        .collect(
+                                Collectors.collectingAndThen(
+                                        Collectors.toSet(), ProductReservationList::new));
+
+        ProductReservationStatus reservationStatus =
+                externalProductService.reserve(store, productReservation);
+        if (!reservationStatus.status()) {
+            throw new ServiceException("error updating inventory with new qty");
+        }
         return order;
     }
 
@@ -317,48 +325,50 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
         subTotal.setScale(2, RoundingMode.HALF_UP);
         for (ShoppingCartItem item : summary.getProducts()) {
 
-            FinalPrice finalPrice = productService.getProductPrice(store, item.getSku());
             BigDecimal st = item.getItemPrice().multiply(new BigDecimal(item.getQuantity()));
             item.setSubTotal(st);
             subTotal = subTotal.add(st);
             // Other prices
 
-            if (finalPrice != null) {
-                List<FinalPrice> otherPrices = finalPrice.getAdditionalPrices();
-                if (otherPrices != null) {
-                    for (FinalPrice price : otherPrices) {
-                        if (!price.isDefaultPrice()) {
-                            OrderTotal itemSubTotal =
-                                    otherPricesTotals.get(price.getProductPrice().getCode());
+            /* @TODO comment this for now as unnecessary
+                        FinalPrice finalPrice = productService.getProductPrice(store, item.getSku());
+                        if (finalPrice != null) {
+                            List<FinalPrice> otherPrices = finalPrice.getAdditionalPrices();
+                            if (otherPrices != null) {
+                                for (FinalPrice price : otherPrices) {
+                                    if (!price.isDefaultPrice()) {
+                                        OrderTotal itemSubTotal =
+                                                otherPricesTotals.get(price.getProductPrice().getCode());
 
-                            if (itemSubTotal == null) {
-                                itemSubTotal = new OrderTotal();
-                                itemSubTotal.setModule(Constants.OT_ITEM_PRICE_MODULE_CODE);
-                                itemSubTotal.setTitle(Constants.OT_ITEM_PRICE_MODULE_CODE);
-                                itemSubTotal.setOrderTotalCode(price.getProductPrice().getCode());
-                                itemSubTotal.setOrderTotalType(OrderTotalType.PRODUCT);
-                                itemSubTotal.setSortOrder(0);
-                                otherPricesTotals.put(
-                                        price.getProductPrice().getCode(), itemSubTotal);
-                            }
+                                        if (itemSubTotal == null) {
+                                            itemSubTotal = new OrderTotal();
+                                            itemSubTotal.setModule(Constants.OT_ITEM_PRICE_MODULE_CODE);
+                                            itemSubTotal.setTitle(Constants.OT_ITEM_PRICE_MODULE_CODE);
+                                            itemSubTotal.setOrderTotalCode(price.getProductPrice().getCode());
+                                            itemSubTotal.setOrderTotalType(OrderTotalType.PRODUCT);
+                                            itemSubTotal.setSortOrder(0);
+                                            otherPricesTotals.put(
+                                                    price.getProductPrice().getCode(), itemSubTotal);
+                                        }
 
-                            BigDecimal orderTotalValue = itemSubTotal.getValue();
-                            if (orderTotalValue == null) {
-                                orderTotalValue = new BigDecimal(0);
-                                orderTotalValue.setScale(2, RoundingMode.HALF_UP);
-                            }
+                                        BigDecimal orderTotalValue = itemSubTotal.getValue();
+                                        if (orderTotalValue == null) {
+                                            orderTotalValue = new BigDecimal(0);
+                                            orderTotalValue.setScale(2, RoundingMode.HALF_UP);
+                                        }
 
-                            orderTotalValue = orderTotalValue.add(price.getFinalPrice());
-                            itemSubTotal.setValue(orderTotalValue);
-                            if (OrderValueType.ONE_TIME
-                                    .name()
-                                    .equals(price.getProductPrice().getProductPriceType().name())) {
-                                subTotal = subTotal.add(price.getFinalPrice());
+                                        orderTotalValue = orderTotalValue.add(price.getFinalPrice());
+                                        itemSubTotal.setValue(orderTotalValue);
+                                        if (OrderValueType.ONE_TIME
+                                                .name()
+                                                .equals(price.getProductPrice().getProductPriceType().name())) {
+                                            subTotal = subTotal.add(price.getFinalPrice());
+                                        }
+                                    }
+                                }
                             }
                         }
-                    }
-                }
-            }
+            */
         }
 
         //  @TODO ASHRAF

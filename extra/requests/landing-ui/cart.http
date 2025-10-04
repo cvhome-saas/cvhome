@@ -3,3 +3,49 @@ GET {{LANDING_UI_URL}}/order/api/v1/cart/23a52597bc1f49c996a1b4ad8a29006a?store=
 
 ###
 
+POST {{LANDING_UI_URL}}/order/api/v1/cart?store=65f023632bc46470c104b76f&lang=en
+Content-Type: application/json
+
+{
+  "product": "SKU-AD-CL-TPT03",
+  "quantity": 1
+}
+
+###
+
+PUT {{LANDING_UI_URL}}/order/api/v1/cart/a74ae65c99dd4448b69e4bb0eaec05f5?store=65f023632bc46470c104b76f&lang=en
+Content-Type: application/json
+
+{
+  "product": "SKU-GU-BG-MAR05",
+  "quantity": 3
+}
+
+
+###
+POST {{LANDING_UI_URL}}/order/api/v1/cart/23a52597bc1f49c996a1b4ad8a29006a/checkout?store=65f023632bc46470c104b76f&lang=ar
+Content-Type: application/json
+
+{
+  "payment": {
+    "paymentType": "COD",
+    "transactionType": "INIT"
+  },
+  "customer": {
+    "emailAddress": "ashraf1abdelrasool@gmail.com",
+    "billing": {
+      "firstName": "ashraf",
+      "lastName": "mahmoud",
+      "phone": "01120266849",
+      "country": "EG",
+      "city": "cairo",
+      "postalCode": "121213",
+      "address": "nothing",
+      "isAgree": true
+    }
+  }
+}
+
+###
+
+

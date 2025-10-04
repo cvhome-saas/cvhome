@@ -122,7 +122,7 @@ export class OrderDetailsComponent implements OnInit {
       .subscribe({
         next: ([selectedStore, params]) => {
           this.storeID = selectedStore;
-          this.orderID = params.code
+          this.orderID = params.id
           this.getStore();
           this.getCountry();
           this.getOrderDetails();
