@@ -2,12 +2,12 @@ package com.asrevo.cvhome.merchant;
 
 import com.asrevo.cvhome.merchant.config.MinioS3Config;
 import com.asrevo.cvhome.s2s.config.ServletTestCustomSecurityConfig;
-import com.asrevo.cvhome.merchant.config.MinIOContainer;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.testcontainers.containers.MinIOContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
 
@@ -23,9 +23,9 @@ public class TestcontainersConfiguration {
     @Bean
     public CommandLineRunner runner(PostgreSQLContainer<?> postgresContainer, MinIOContainer minIOContainer) {
         return args -> {
-            System.out.println(minIOContainer.getUiURL());
-            System.out.println(minIOContainer.getAccessKey());
-            System.out.println(minIOContainer.getSecretKey());
+            System.out.println(minIOContainer.getS3URL());
+            System.out.println(minIOContainer.getUserName());
+            System.out.println(minIOContainer.getPassword());
 
             System.out.println(postgresContainer.getJdbcUrl());
             System.out.println(postgresContainer.getUsername());

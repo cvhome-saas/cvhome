@@ -101,6 +101,7 @@ junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
 
 testcontainers-junit-jupiter = { module = "org.testcontainers:junit-jupiter", version.ref = "testcontainers" }
 testcontainers-postgresql = { module = "org.testcontainers:postgresql", version.ref = "testcontainers" }
+testcontainers-minio = { module = "org.testcontainers:minio", version.ref = "testcontainers" }
 testcontainers-rabbitmq = { module = "org.testcontainers:rabbitmq", version.ref = "testcontainers" }
 testcontainers-mockserver = { module = "org.testcontainers:mockserver", version.ref = "testcontainers" }
 
