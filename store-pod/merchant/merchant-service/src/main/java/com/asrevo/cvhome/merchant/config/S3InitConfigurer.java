@@ -1,4 +1,4 @@
-package com.asrevo.cvhome.catalog.config;
+package com.asrevo.cvhome.merchant.config;
 
 import com.asrevo.cvhome.commons.domain.StorageProviderType;
 import com.asrevo.cvhome.s2s.model.CdnStorageProperties;
@@ -8,21 +8,31 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Configuration;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.CreateBucketRequest;
 import software.amazon.awssdk.services.s3.model.PutBucketPolicyRequest;
 import software.amazon.awssdk.services.s3.model.PutBucketPolicyResponse;
 
 @Configuration
 @AllArgsConstructor
 @Slf4j
-public class S3PolicyConfigurer implements ApplicationListener<ApplicationReadyEvent> {
+public class S3InitConfigurer implements ApplicationListener<ApplicationReadyEvent> {
     private final S3Client s3Client;
     private final CdnStorageProperties cdnStorageProperties;
 
 
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {
-        if (StorageProviderType.MINIO.equals(cdnStorageProperties.provider())){
+        if (StorageProviderType.MINIO.equals(cdnStorageProperties.provider())) {
+            configureBucket();
             configurePolicy();
+        }
+    }
+
+    private void configureBucket() {
+        try {
+            s3Client.createBucket(CreateBucketRequest.builder().bucket(cdnStorageProperties.bucket()).build());
+        } catch (Exception e) {
+            log.error("error creating bucket", e);
         }
     }
 

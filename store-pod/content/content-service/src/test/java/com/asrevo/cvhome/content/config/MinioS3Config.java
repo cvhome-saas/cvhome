@@ -4,32 +4,36 @@ import com.asrevo.cvhome.commons.domain.StorageProviderType;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.DynamicPropertyRegistrar;
+import org.testcontainers.containers.MinIOContainer;
+import software.amazon.awssdk.regions.Region;
 
 import java.util.UUID;
 import java.util.function.Supplier;
 
 @Configuration
 public class MinioS3Config {
+    private final String DEFAULT_BUCKET = UUID.randomUUID().toString();
+    private final Region region = Region.EU_CENTRAL_1;
+
     @Bean
     DynamicPropertyRegistrar dynamicPropertyRegistrar(MinIOContainer container) {
         return registry -> {
-            String bucket = container.getBucket();
-            Supplier<Object> getUiURL = () -> container.getS3URL() + "/" + bucket;
+            Supplier<Object> getUiURL = () -> container.getS3URL() + "/" + DEFAULT_BUCKET;
             registry.add("com.asrevo.cvhome.cdn.basePath", getUiURL);
-            registry.add("com.asrevo.cvhome.cdn.storage.bucket", () -> bucket);
+            registry.add("com.asrevo.cvhome.cdn.storage.bucket", () -> DEFAULT_BUCKET);
             registry.add("com.asrevo.cvhome.cdn.storage.provider", () -> StorageProviderType.MINIO);
-            registry.add("com.asrevo.cvhome.cdn.storage.region", () -> "eu-central-1");
+            registry.add("com.asrevo.cvhome.cdn.storage.region", region::id);
             registry.add("com.asrevo.cvhome.cdn.storage.s3-url", container::getS3URL);
-            registry.add("com.asrevo.cvhome.cdn.storage.s3-access-key", container::getAccessKey);
-            registry.add("com.asrevo.cvhome.cdn.storage.s3-secret-key", container::getSecretKey);
+            registry.add("com.asrevo.cvhome.cdn.storage.s3-access-key", container::getUserName);
+            registry.add("com.asrevo.cvhome.cdn.storage.s3-secret-key", container::getPassword);
         };
     }
 
-    @Bean
-    public MinIOContainer minIOContainer() {
-        MinIOContainer container = new MinIOContainer(UUID.randomUUID().toString());
-        container.start();
-        return container;
+    @Bean(destroyMethod = "stop")
+    public MinIOContainer minioContainer() {
+        MinIOContainer minio = new MinIOContainer("minio/minio:RELEASE.2025-09-07T16-13-09Z-cpuv1");
+        minio.start();
+        return minio;
     }
 
 }
