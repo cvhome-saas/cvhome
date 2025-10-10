@@ -39,6 +39,7 @@ spring:
   application:
     name: store-core-gateway
 server:
+  forward-headers-strategy: NATIVE
   port: ${com.asrevo.cvhome.services.store-core-gateway.port}
 info:
   app:
