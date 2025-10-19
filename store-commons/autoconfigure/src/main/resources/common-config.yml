@@ -118,6 +118,37 @@ spring:
   sql:
     init:
       mode: always
+  security:
+    oauth2:
+      client:
+        registration:
+          keycloak:
+            client-id: web-app
+            client-authentication-method: client_secret_basic
+            authorization-grant-type: authorization_code
+            scope: openid, profile, email
+            redirect-uri: "{baseUrl}/login/oauth2/code/keycloak"
+            provider: keycloak
+            client-secret: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
+        provider:
+          keycloak:
+            #            comment issuer-uri to skip validation
+            #            issuer-uri: https://gateway.com:8443/realms/cvhome
+            jwk-set-uri: ${com.asrevo.cvhome.services.core-auth.schema}://${com.asrevo.cvhome.services.core-auth.domain}:${com.asrevo.cvhome.services.core-auth.port}/realms/cvhome/protocol/openid-connect/certs
+            authorization-uri: ${com.asrevo.cvhome.services.core-auth.schema}://${com.asrevo.cvhome.services.core-auth.domain}:${com.asrevo.cvhome.services.core-auth.port}/realms/cvhome/protocol/openid-connect/auth
+            token-uri: ${com.asrevo.cvhome.services.core-auth.schema}://${com.asrevo.cvhome.services.core-auth.domain}:${com.asrevo.cvhome.services.core-auth.port}/realms/cvhome/protocol/openid-connect/token
+
+      #            need to trace why getting 401 error=invalid_token, auth_method=validate_access_token is by issuer?
+      #            user-info-uri: https://core-auth.gateway.com:8443/realms/cvhome/protocol/openid-connect/userinfo
+      #            user-name-attribute: sub
+      resourceserver:
+        jwt:
+          #          jwk-set-uri: ${com.asrevo.cvhome.services.core-auth.schema}://${com.asrevo.cvhome.services.core-auth.domain}:${com.asrevo.cvhome.services.core-auth.port}/realms/cvhome/protocol/openid-connect/certs
+          #          issuer-uri: ${com.asrevo.cvhome.services.core-auth.schema}://${com.asrevo.cvhome.services.core-auth.domain}:${com.asrevo.cvhome.services.core-auth.port}/realms/cvhome
+          issuer-uri-set: ${com.asrevo.cvhome.services.core-auth.schema}://${com.asrevo.cvhome.services.core-auth.domain}:${com.asrevo.cvhome.services.core-auth.port}/realms/cvhome
+#          issuer-uri-set:
+#            - ${com.asrevo.cvhome.services.core-auth.schema}://${com.asrevo.cvhome.services.core-auth.domain}:${com.asrevo.cvhome.services.core-auth.port}/realms/cvhome
+#            - ${com.asrevo.cvhome.services.pod-auth.schema}://${com.asrevo.cvhome.services.pod-auth.domain}:${com.asrevo.cvhome.services.pod-auth.port}
 
 springdoc:
   show-actuator: true
@@ -145,4 +176,3 @@ management:
           #    org.springframework.cloud.gateway: debug
           #    org.springframework.security: debug
           #    reactor.netty.http: debug
-          
