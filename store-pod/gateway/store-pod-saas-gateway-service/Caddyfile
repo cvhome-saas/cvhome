@@ -18,6 +18,8 @@
 }
 
 http:// {
+	log
+
 	route {
 		domain_lookup {
 			lookup_url {$DOMAIN_LOOKUP_URL}
@@ -30,6 +32,7 @@ http:// {
 
 https:// {
 	log
+
 	tls {
 		on_demand
 	}
