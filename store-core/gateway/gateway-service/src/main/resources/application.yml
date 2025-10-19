@@ -1,6 +1,10 @@
 spring:
   config:
     import: "classpath:common-config.yml"
+---
+spring:
+  application:
+    name: store-core-gateway
   security:
     oauth2:
       client:
@@ -10,10 +14,6 @@ spring:
             client-id: gateway@service.store-core.internal
             client-secret: YCkeAS1oyH5x4IncLgXuEdPpylAk21sv
             authorization-grant-type: client_credentials
----
-spring:
-  application:
-    name: store-core-gateway
 server:
   forward-headers-strategy: NATIVE
   port: ${com.asrevo.cvhome.services.store-core-gateway.port}

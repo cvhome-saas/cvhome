@@ -1,6 +1,10 @@
 spring:
   config:
     import: "classpath:common-config.yml"
+---
+spring:
+  application:
+    name: manager
   security:
     oauth2:
       client:
@@ -10,23 +14,10 @@ spring:
             client-id: manager@service.store-core.internal
             client-secret: VobDxIhAGZz8hyhzz7p9G7QpfixjFjzW
             authorization-grant-type: client_credentials
-com:
-  asrevo:
-    cvhome:
-      kc:
-        credentials:
-          server-url: ${com.asrevo.cvhome.services.core-auth.schema}://${com.asrevo.cvhome.services.core-auth.domain}:${com.asrevo.cvhome.services.core-auth.port}
-          realm: cvhome
-          client-id: internal-client
-          client-secret: aKl0AKjjQ6zp2bnWhKOsnTOzl3J8Vqd0
----
-spring:
-  application:
-    name: manager
   datasource:
     driver-class-name: org.postgresql.Driver
     hikari:
-      schema: manager
+      schema: ${spring.application.name}
   cloud:
     function:
       definition: events
@@ -49,3 +40,12 @@ management:
   observations:
     key-values:
       application: ${spring.application.name}
+com:
+  asrevo:
+    cvhome:
+      kc:
+        credentials:
+          server-url: ${com.asrevo.cvhome.services.core-auth.schema}://${com.asrevo.cvhome.services.core-auth.domain}:${com.asrevo.cvhome.services.core-auth.port}
+          realm: cvhome
+          client-id: internal-client
+          client-secret: aKl0AKjjQ6zp2bnWhKOsnTOzl3J8Vqd0

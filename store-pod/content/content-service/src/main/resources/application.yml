@@ -1,6 +1,10 @@
 spring:
   config:
     import: "classpath:common-config.yml"
+---
+spring:
+  application:
+    name: content
   security:
     oauth2:
       client:
@@ -15,14 +19,10 @@ spring:
       mode: always
       schema-locations: classpath:init-sql/schema.sql
       data-locations: classpath:init-sql/data-common.sql
----
-spring:
-  application:
-    name: content
   datasource:
     driver-class-name: org.postgresql.Driver
     hikari:
-      schema: content
+      schema: ${spring.application.name}
   jpa:
     hibernate:
       ddl-auto: update

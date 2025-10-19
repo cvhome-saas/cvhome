@@ -1,6 +1,10 @@
 spring:
   config:
     import: "classpath:common-config.yml"
+---
+spring:
+  application:
+    name: subscription
   security:
     oauth2:
       client:
@@ -10,14 +14,10 @@ spring:
             client-id: subscription@service.store-core.internal
             client-secret: TxbDxIhATuz8hyhzz899G7QpfixjFjzW
             authorization-grant-type: client_credentials
----
-spring:
-  application:
-    name: subscription
   datasource:
     driver-class-name: org.postgresql.Driver
     hikari:
-      schema: subscription
+      schema: ${spring.application.name}
   cloud:
     function:
       definition: events
