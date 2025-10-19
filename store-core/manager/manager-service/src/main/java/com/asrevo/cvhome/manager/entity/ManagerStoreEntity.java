@@ -18,75 +18,81 @@ import org.springframework.data.relational.core.mapping.Table;
 @Setter
 @Table("manager_store")
 public class ManagerStoreEntity extends BaseEntity<ManagerStoreEntity, ManagerStoreId> {
+    @Column("name")
+    private String name;
 
-	@Column("name")
-	private String name;
+    @Column("org_id")
+    private ManagerOrgId orgId;
 
-	@Column("org_id")
-	private ManagerOrgId orgId;
+    @Column("created_date")
+    private Instant createdDate;
 
-	@Column("created_date")
-	private Instant createdDate;
+    @Column("pod_id")
+    private PodId podId;
 
-	@Column("pod_id")
-	private PodId podId;
+    @Column("provisioning_state")
+    private ProvisioningState provisioningState;
 
-	@Column("provisioning_state")
-	private ProvisioningState provisioningState;
+    @MappedCollection(idColumn = "manager_store_id")
+    private ManagerStoreDomains managerStoreDomains;
 
-	@MappedCollection(idColumn = "manager_store_id")
-	private ManagerStoreDomains managerStoreDomains;
+    @Column("preferences")
+    private ManagerStorePreferences preferences;
 
-	public static ManagerStoreEntity createStore(Map<Object, Object> request, ManagerOrgId orgId, PodId podId) {
-		ManagerStoreEntity entity = new ManagerStoreEntity();
-		entity.id = entity.generateId();
-		String storeName = request.get("name").toString();
-		entity.setName(storeName);
-		entity.setCreatedDate(Instant.now());
-		entity.setOrgId(orgId);
-		entity.setPodId(podId);
-		entity.provisioningState = ProvisioningState.NOT_STARTED_PROVISIONING;
-		entity.managerStoreDomains = ManagerStoreDomains.of(new ManagerStoreDomain(storeName, AlisType.SUB_DOMAIN));
-		entity.registerEvent(StoreCreatedEvent.from(entity.getId(), orgId, podId, request));
-		return entity;
-	}
+    public static ManagerStoreEntity createStore(
+            Map<Object, Object> request, ManagerOrgId orgId, PodId podId) {
+        ManagerStoreEntity entity = new ManagerStoreEntity();
+        entity.id = entity.generateId();
+        String storeName = request.get("name").toString();
+        entity.setName(storeName);
+        entity.setCreatedDate(Instant.now());
+        entity.setOrgId(orgId);
+        entity.setPodId(podId);
+        entity.preferences = ManagerStorePreferences.of(request);
+        entity.provisioningState = ProvisioningState.NOT_STARTED_PROVISIONING;
+        entity.managerStoreDomains =
+                ManagerStoreDomains.of(new ManagerStoreDomain(storeName, AlisType.SUB_DOMAIN));
+        entity.registerEvent(StoreCreatedEvent.from(entity.getId(), orgId, podId, request));
+        return entity;
+    }
 
-	public ManagerStoreEntity addDomain(Domain domain) {
-		this.managerStoreDomains = managerStoreDomains.addDomain(domain);
-		return this;
-	}
+    public ManagerStoreEntity addDomain(Domain domain) {
+        this.managerStoreDomains = managerStoreDomains.addDomain(domain);
+        return this;
+    }
 
-	public ManagerStoreEntity removeDomain(Domain domain) {
-		this.managerStoreDomains = managerStoreDomains.removeDomain(domain);
-		return this;
-	}
+    public ManagerStoreEntity removeDomain(Domain domain) {
+        this.managerStoreDomains = managerStoreDomains.removeDomain(domain);
+        return this;
+    }
 
-	public StoreDomainList domains() {
-		return new StoreDomainList(
-				this.managerStoreDomains.stream().map(it -> new StoreDomainDto(it.domain(), it.domainType())).toList());
-	}
+    public StoreDomainList domains() {
+        return new StoreDomainList(
+                this.managerStoreDomains.stream()
+                        .map(it -> new StoreDomainDto(it.domain(), it.domainType()))
+                        .toList());
+    }
 
-	@Override
-	protected ManagerStoreId generateId() {
-		return ManagerStoreId.newId();
-	}
+    @Override
+    protected ManagerStoreId generateId() {
+        return ManagerStoreId.newId();
+    }
 
-	public ManagerStoreEntity completeProvisioning() {
-		this.provisioningState = ProvisioningState.SUCCESSFULLY_PROVISIONING;
-		this.registerEvent(StoreProvisionedEvent.from(this.getId(), podId, this.provisioningState));
-		return this;
-	}
+    public ManagerStoreEntity completeProvisioning() {
+        this.provisioningState = ProvisioningState.SUCCESSFULLY_PROVISIONING;
+        this.registerEvent(StoreProvisionedEvent.from(this.getId(), podId, this.provisioningState));
+        return this;
+    }
 
-	public ManagerStoreEntity failProvisioning() {
-		this.provisioningState = ProvisioningState.FAILED_PROVISIONING;
-		this.registerEvent(StoreProvisionedEvent.from(this.getId(), podId, this.provisioningState));
-		return this;
-	}
+    public ManagerStoreEntity failProvisioning() {
+        this.provisioningState = ProvisioningState.FAILED_PROVISIONING;
+        this.registerEvent(StoreProvisionedEvent.from(this.getId(), podId, this.provisioningState));
+        return this;
+    }
 
-	public ManagerStoreEntity startProvisioning() {
-		this.provisioningState = ProvisioningState.IN_PROGRESS_PROVISIONING;
-		this.registerEvent(StoreProvisionedEvent.from(this.getId(), podId, this.provisioningState));
-		return this;
-	}
-
+    public ManagerStoreEntity startProvisioning() {
+        this.provisioningState = ProvisioningState.IN_PROGRESS_PROVISIONING;
+        this.registerEvent(StoreProvisionedEvent.from(this.getId(), podId, this.provisioningState));
+        return this;
+    }
 }

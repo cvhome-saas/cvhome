@@ -13,7 +13,9 @@ import com.asrevo.cvhome.manager.utils.Defines;
 import com.asrevo.cvhome.manager.utils.ErrorCodes;
 import com.asrevo.cvhome.s2s.model.AppProperties;
 import com.asrevo.cvhome.s2s.model.ServiceDomainProperties;
+import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Example;
@@ -27,120 +29,148 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Slf4j
 public class InternalStoreServiceImpl implements InternalStoreService {
+    private final ManagerStoreRepository storeRepository;
+    private final ServiceDomainProperties serviceDomainProperties;
+    private final AppProperties appProperties;
+    private final ManagerStoreMappers storeMappers;
 
-	private final ManagerStoreRepository storeRepository;
+    @Transactional
+    @Override
+    public ManagerStoreDto createStore(
+            Map<Object, Object> request, ManagerOrgId orgId, PodId podId) {
+        ManagerStoreEntity entity =
+                storeRepository.save(ManagerStoreEntity.createStore(request, orgId, podId));
+        return storeMappers.toDto(entity);
+    }
 
-	private final ServiceDomainProperties serviceDomainProperties;
+    @Transactional
+    @Override
+    public void completeProvisioning(ManagerStoreId store) {
+        storeRepository.findById(store).map(it -> storeRepository.save(it.completeProvisioning()));
+    }
 
-	private final AppProperties appProperties;
+    @Transactional
+    @Override
+    public void failProvisioning(ManagerStoreId store) {
+        storeRepository.findById(store).map(it -> storeRepository.save(it.failProvisioning()));
+    }
 
-	private final ManagerStoreMappers storeMappers;
+    @Transactional
+    @Override
+    public void startProvisioning(ManagerStoreId store) {
+        storeRepository.findById(store).map(it -> storeRepository.save(it.startProvisioning()));
+    }
 
-	@Transactional
-	@Override
-	public ManagerStoreDto createStore(Map<Object, Object> request, ManagerOrgId orgId, PodId podId) {
-		ManagerStoreEntity entity = storeRepository.save(ManagerStoreEntity.createStore(request, orgId, podId));
-		return storeMappers.toDto(entity);
-	}
+    @Override
+    public Page<ManagerStoreDto> findAll(
+            UserOrgStoreIdentity identityInfo,
+            ListManagerStoreQuery listManagerStoreQuery,
+            Pageable pageable) {
+        ManagerStoreEntity entity = storeMappers.toEntity(listManagerStoreQuery);
+        if (identityInfo.isOrgAdminOrAnyStoreAdmin()) {
+            entity.setOrgId(new ManagerOrgId(identityInfo.org().id()));
+        }
+        if (identityInfo.isAnyStoreAdmin()) {
+            entity.setId(new ManagerStoreId(identityInfo.store()));
+        }
+        Page<ManagerStoreEntity> all = storeRepository.findAll(Example.of(entity), pageable);
+        return new PageImpl<>(
+                all.stream().map(storeMappers::toDto).toList(),
+                all.getPageable(),
+                all.getTotalElements());
+    }
 
-	@Transactional
-	@Override
-	public void completeProvisioning(ManagerStoreId store) {
-		storeRepository.findById(store).map(it -> storeRepository.save(it.completeProvisioning()));
-	}
+    @Override
+    public Page<ManagerStoreDto> findAll(ManagerOrgId id, Pageable pageable) {
+        ManagerStoreEntity entity = new ManagerStoreEntity();
+        entity.setOrgId(new ManagerOrgId(id.id()));
+        Page<ManagerStoreEntity> all = storeRepository.findAll(Example.of(entity), pageable);
+        return new PageImpl<>(
+                all.stream().map(storeMappers::toDto).toList(),
+                all.getPageable(),
+                all.getTotalElements());
+    }
 
-	@Transactional
-	@Override
-	public void failProvisioning(ManagerStoreId store) {
-		storeRepository.findById(store).map(it -> storeRepository.save(it.failProvisioning()));
-	}
+    private ManagerStoreEntity getManagerStoreEntity(ManagerStoreId store) {
+        return storeRepository
+                .findById(store)
+                .orElseThrow(() -> new OperationExecution(ErrorCodes.store_not_found));
+    }
 
-	@Transactional
-	@Override
-	public void startProvisioning(ManagerStoreId store) {
-		storeRepository.findById(store).map(it -> storeRepository.save(it.startProvisioning()));
-	}
+    @Override
+    public ManagerOrgId getStoreOwner(ManagerStoreId store) {
+        return getManagerStoreEntity(store).getOrgId();
+    }
 
-	@Override
-	public Page<ManagerStoreDto> findAll(UserOrgStoreIdentity identityInfo, ListManagerStoreQuery listManagerStoreQuery,
-			Pageable pageable) {
-		ManagerStoreEntity entity = storeMappers.toEntity(listManagerStoreQuery);
-		if (identityInfo.isOrgAdminOrAnyStoreAdmin()) {
-			entity.setOrgId(new ManagerOrgId(identityInfo.org().id()));
-		}
-		if (identityInfo.isAnyStoreAdmin()) {
-			entity.setId(new ManagerStoreId(identityInfo.store()));
-		}
-		Page<ManagerStoreEntity> all = storeRepository.findAll(Example.of(entity), pageable);
-		return new PageImpl<>(all.stream().map(storeMappers::toDto).toList(), all.getPageable(),
-				all.getTotalElements());
-	}
+    @Override
+    public ManagerStoreDto findStore(ManagerStoreId store) {
+        return storeMappers.toDto(getManagerStoreEntity(store));
+    }
 
-	@Override
-	public Page<ManagerStoreDto> findAll(ManagerOrgId id, Pageable pageable) {
-		ManagerStoreEntity entity = new ManagerStoreEntity();
-		entity.setOrgId(new ManagerOrgId(id.id()));
-		Page<ManagerStoreEntity> all = storeRepository.findAll(Example.of(entity), pageable);
-		return new PageImpl<>(all.stream().map(storeMappers::toDto).toList(), all.getPageable(),
-				all.getTotalElements());
-	}
+    @Override
+    public Boolean checkNameExists(String name) {
+        return storeRepository.existsByName(name);
+    }
 
-	private ManagerStoreEntity getManagerStoreEntity(ManagerStoreId store) {
-		return storeRepository.findById(store).orElseThrow(() -> new OperationExecution(ErrorCodes.store_not_found));
-	}
+    @Override
+    public Pod getStorePod(ManagerStoreId managerStoreId) {
+        ManagerStoreEntity store = getManagerStoreEntity(managerStoreId);
+        return serviceDomainProperties
+                .getPodByPodId(store.getPodId())
+                .orElseThrow(() -> new OperationExecution(ErrorCodes.store_pod_not_match_any));
+    }
 
-	@Override
-	public ManagerOrgId getStoreOwner(ManagerStoreId store) {
-		return getManagerStoreEntity(store).getOrgId();
-	}
+    @Override
+    public StoreDomainList domains(ManagerStoreId managerStoreId) {
+        return storeRepository
+                .findById(managerStoreId)
+                .map(ManagerStoreEntity::domains)
+                .orElseThrow(() -> new OperationExecution(ErrorCodes.store_not_found));
+    }
 
-	@Override
-	public ManagerStoreDto findStore(ManagerStoreId store) {
-		return storeMappers.toDto(getManagerStoreEntity(store));
-	}
+    @Override
+    public ManagerStoreId getReferenceByDomain(Domain domain) {
+        return storeRepository
+                .findByDomain(domain.domain(), appProperties.getDomain(), Defines.SAAS_POD_SUFFIX)
+                .map(BaseEntity::getId)
+                .orElseThrow(() -> new OperationExecution(ErrorCodes.store_not_found));
+    }
 
-	@Override
-	public Boolean checkNameExists(String name) {
-		return storeRepository.existsByName(name);
-	}
+    @Transactional
+    @Override
+    public void addDomain(ManagerStoreId managerStoreId, Domain domain) {
+        storeRepository
+                .findById(managerStoreId)
+                .map(it -> it.addDomain(domain))
+                .map(storeRepository::save)
+                .orElseThrow(() -> new OperationExecution(ErrorCodes.store_not_found));
+    }
 
-	@Override
-	public Pod getStorePod(ManagerStoreId managerStoreId) {
-		ManagerStoreEntity store = getManagerStoreEntity(managerStoreId);
-		return serviceDomainProperties.getPodByPodId(store.getPodId())
-			.orElseThrow(() -> new OperationExecution(ErrorCodes.store_pod_not_match_any));
-	}
+    @Transactional
+    @Override
+    public void removeDomain(ManagerStoreId managerStoreId, Domain domain) {
+        storeRepository
+                .findById(managerStoreId)
+                .map(it -> it.removeDomain(domain))
+                .map(storeRepository::save)
+                .orElseThrow(() -> new OperationExecution(ErrorCodes.store_not_found));
+    }
 
-	@Override
-	public StoreDomainList domains(ManagerStoreId managerStoreId) {
-		return storeRepository.findById(managerStoreId)
-			.map(ManagerStoreEntity::domains)
-			.orElseThrow(() -> new OperationExecution(ErrorCodes.store_not_found));
-	}
+    @Override
+    public Map<String, String> getLookupHeadersByDomain(Domain domain) {
+        ManagerStoreEntity entity =
+                storeRepository
+                        .findByDomain(
+                                domain.domain(), appProperties.getDomain(), Defines.SAAS_POD_SUFFIX)
+                        .orElseThrow(() -> new OperationExecution(ErrorCodes.store_not_found));
 
-	@Override
-	public ManagerStoreId getReferenceByDomain(Domain domain) {
-		return storeRepository.findByDomain(domain.domain(), appProperties.getDomain(), Defines.SAAS_POD_SUFFIX)
-			.map(BaseEntity::getId)
-			.orElseThrow(() -> new OperationExecution(ErrorCodes.store_not_found));
-	}
-
-	@Transactional
-	@Override
-	public void addDomain(ManagerStoreId managerStoreId, Domain domain) {
-		storeRepository.findById(managerStoreId)
-			.map(it -> it.addDomain(domain))
-			.map(storeRepository::save)
-			.orElseThrow(() -> new OperationExecution(ErrorCodes.store_not_found));
-	}
-
-	@Transactional
-	@Override
-	public void removeDomain(ManagerStoreId managerStoreId, Domain domain) {
-		storeRepository.findById(managerStoreId)
-			.map(it -> it.removeDomain(domain))
-			.map(storeRepository::save)
-			.orElseThrow(() -> new OperationExecution(ErrorCodes.store_not_found));
-	}
-
+        return Map.of(
+                "Store-Id", entity.getId().id().toString(),
+                "Theme", entity.getPreferences().theme().name(),
+                "Default-Language", entity.getPreferences().defaultLanguage().code(),
+                "Supported-Languages",
+                        entity.getPreferences().supportedLanguages().stream()
+                                .map(LanguageCode::code)
+                                .collect(Collectors.joining(",")));
+    }
 }
