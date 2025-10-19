@@ -1,31 +1,17 @@
 package com.asrevo.cvhome.catalog.config;
 
+import com.asrevo.cvhome.catalog.service.AssetsInitService;
 import com.asrevo.cvhome.commons.domain.StorageProviderType;
-import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.s2s.model.CdnStorageProperties;
-import com.asrevo.cvhome.store.core.entity.content.FileContentType;
-import com.asrevo.cvhome.store.core.entity.content.ImageContentFile;
-import com.asrevo.cvhome.store.core.modules.cms.model.CmsProductImage;
-import com.asrevo.cvhome.store.core.modules.cms.product.ProductFileManager;
 import lombok.AllArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.CreateBucketRequest;
 import software.amazon.awssdk.services.s3.model.PutBucketPolicyRequest;
 import software.amazon.awssdk.services.s3.model.PutBucketPolicyResponse;
-
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Objects;
 
 @Configuration
 @AllArgsConstructor
@@ -33,8 +19,7 @@ import java.util.Objects;
 public class S3InitConfigurer implements ApplicationListener<ApplicationReadyEvent> {
     private final S3Client s3Client;
     private final CdnStorageProperties cdnStorageProperties;
-    private final ResourceLoader resourceLoader;
-    private final ProductFileManager productFileManager;
+    private final AssetsInitService assetsInitService;
 
 
     @Override
@@ -43,7 +28,7 @@ public class S3InitConfigurer implements ApplicationListener<ApplicationReadyEve
             configureBucket();
             configurePolicy();
         }
-        loadAssets();
+        assetsInitService.loadAssets();
     }
 
     private void configureBucket() {
@@ -83,53 +68,5 @@ public class S3InitConfigurer implements ApplicationListener<ApplicationReadyEve
         } catch (Exception e) {
             log.error("error putting policy", e);
         }
-    }
-
-    @SneakyThrows
-    public void loadAssets() {
-        Resource[] resources = ((AnnotationConfigServletWebServerApplicationContext) resourceLoader).getResources("classpath:/assets/**");
-        Arrays.stream(resources)
-                .filter(resource -> !isDirectory(resource))
-                .forEach(r -> {
-                    if (r.toString().contains("/products/")) {
-                        uploadProduct(r);
-                    }
-                });
-
-    }
-
-    @SneakyThrows
-    private void uploadProduct(Resource r) {
-        Path p = toPath(r);
-        StoreMerchantId storeMerchantId;
-        FileContentType type = FileContentType.PRODUCT;
-        String fileName = p.getFileName().toString();
-        String product = p.getParent().getFileName().toString();
-        String productId = product.split("-")[0];
-        String productSku = product.split("-")[1];
-        storeMerchantId = new StoreMerchantId(p.getParent().getParent().getParent().getFileName().toString());
-        log.info("Store merchant id: {} , product: {}", storeMerchantId, fileName);
-        CmsProductImage pm = new CmsProductImage(Long.parseLong(productId), storeMerchantId, productSku, fileName);
-        productFileManager.addProductImage(pm, loadFile(r, type));
-    }
-
-    @SneakyThrows
-    private ImageContentFile loadFile(Resource resource, FileContentType contentType) {
-        ImageContentFile file = new ImageContentFile();
-        file.setFile(resource.getInputStream());
-        file.setFileName(resource.getFilename());
-        file.setMimeType(Files.probeContentType(Paths.get(Objects.requireNonNull(resource.getFilename()))));
-        file.setFileContentType(contentType);
-        return file;
-    }
-
-    @SneakyThrows
-    private static Path toPath(Resource resource) {
-        return resource.getFile().toPath();
-    }
-
-    @SneakyThrows
-    boolean isDirectory(Resource resource) {
-        return Files.isDirectory(resource.getFile().toPath());
     }
 }

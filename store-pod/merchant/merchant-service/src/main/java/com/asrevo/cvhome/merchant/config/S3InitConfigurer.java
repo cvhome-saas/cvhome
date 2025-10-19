@@ -2,6 +2,7 @@ package com.asrevo.cvhome.merchant.config;
 
 import com.asrevo.cvhome.commons.domain.StorageProviderType;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.merchant.service.AssetsInitService;
 import com.asrevo.cvhome.merchant.service.facade.merchant.StoreFacade;
 import com.asrevo.cvhome.s2s.model.CdnStorageProperties;
 import com.asrevo.cvhome.store.core.entity.content.FileContentType;
@@ -32,8 +33,7 @@ import java.util.Objects;
 public class S3InitConfigurer implements ApplicationListener<ApplicationReadyEvent> {
     private final S3Client s3Client;
     private final CdnStorageProperties cdnStorageProperties;
-    private final ResourceLoader resourceLoader;
-    private final StoreFacade storeFacade;
+    private final AssetsInitService assetsInitService;
 
 
     @Override
@@ -42,7 +42,7 @@ public class S3InitConfigurer implements ApplicationListener<ApplicationReadyEve
             configureBucket();
             configurePolicy();
         }
-        loadAssets();
+        assetsInitService.loadAssets();
     }
 
     private void configureBucket() {
@@ -82,79 +82,5 @@ public class S3InitConfigurer implements ApplicationListener<ApplicationReadyEve
         } catch (Exception e) {
             log.error("error putting policy", e);
         }
-    }
-
-    @SneakyThrows
-    public void loadAssets() {
-        Resource[] resources = ((AnnotationConfigServletWebServerApplicationContext) resourceLoader).getResources("classpath:/assets/**");
-        Arrays.stream(resources)
-                .filter(resource -> !isDirectory(resource))
-                .forEach(r -> {
-                    if (r.toString().contains("/logo/")) {
-                        uploadLogoFile(r);
-                    }
-                    if (r.toString().contains("/banner/")) {
-                        uploadBanner(r);
-                    }
-                    if (r.toString().contains("/slider/")) {
-                        uploadSlider(r);
-                    }
-                });
-    }
-
-    @SneakyThrows
-    private void uploadSlider(Resource r) {
-        Path p = toPath(r);
-        StoreMerchantId storeMerchantId;
-        FileContentType type = FileContentType.SLIDER;
-        String fileName = p.getFileName().toString();
-        storeMerchantId = new StoreMerchantId(p.getParent().getParent().getFileName().toString());
-        log.info("Store merchant id: {} , slider: {}", storeMerchantId, fileName);
-        ImageContentFile content = loadFile(r, type);
-        storeFacade.addSlider(storeMerchantId.storeMerchantId(), content);
-    }
-
-    @SneakyThrows
-    private void uploadBanner(Resource r) {
-        Path p = toPath(r);
-        StoreMerchantId storeMerchantId;
-        FileContentType type = FileContentType.BANNER;
-        String fileName = p.getFileName().toString();
-        storeMerchantId = new StoreMerchantId(p.getParent().getParent().getFileName().toString());
-        log.info("Store merchant id: {} , banner: {}", storeMerchantId, fileName);
-        ImageContentFile content = loadFile(r, type);
-        storeFacade.addBanner(storeMerchantId.storeMerchantId(), content);
-    }
-
-    @SneakyThrows
-    private void uploadLogoFile(Resource r) {
-        Path p = toPath(r);
-        StoreMerchantId storeMerchantId;
-        FileContentType type = FileContentType.LOGO;
-        String fileName = p.getFileName().toString();
-        storeMerchantId = new StoreMerchantId(p.getParent().getParent().getFileName().toString());
-        log.info("Store merchant id: {} , logo: {}", storeMerchantId, fileName);
-        ImageContentFile content = loadFile(r, type);
-        storeFacade.addLogo(storeMerchantId.storeMerchantId(), content);
-    }
-
-    @SneakyThrows
-    private ImageContentFile loadFile(Resource resource, FileContentType contentType) {
-        ImageContentFile file = new ImageContentFile();
-        file.setFile(resource.getInputStream());
-        file.setFileName(resource.getFilename());
-        file.setMimeType(Files.probeContentType(Paths.get(Objects.requireNonNull(resource.getFilename()))));
-        file.setFileContentType(contentType);
-        return file;
-    }
-
-    @SneakyThrows
-    private static Path toPath(Resource resource) {
-        return resource.getFile().toPath();
-    }
-
-    @SneakyThrows
-    boolean isDirectory(Resource resource) {
-        return Files.isDirectory(resource.getFile().toPath());
     }
 }
