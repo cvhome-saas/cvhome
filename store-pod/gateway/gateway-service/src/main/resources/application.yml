@@ -15,12 +15,4 @@ spring:
             client-secret: c27HPNwTPMRI1wstTx9f6EAxFB9J4Ba7
             authorization-grant-type: client_credentials
 server:
-  forward-headers-strategy: NATIVE
   port: ${com.asrevo.cvhome.services.store-pod-gateway.port}
-info:
-  app:
-    name: ${spring.application.name}
-management:
-  observations:
-    key-values:
-      application: ${spring.application.name}

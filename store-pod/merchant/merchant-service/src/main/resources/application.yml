@@ -16,24 +16,7 @@ spring:
             authorization-grant-type: client_credentials
   sql:
     init:
-      mode: always
       schema-locations: classpath:init-sql/schema.sql
       data-locations: classpath:init-sql/data-common.sql
-  datasource:
-    driver-class-name: org.postgresql.Driver
-    hikari:
-      schema: ${spring.application.name}
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
 server:
-  forward-headers-strategy: NATIVE
   port: ${com.asrevo.cvhome.services.merchant.port}
-info:
-  app:
-    name: ${spring.application.name}
-management:
-  observations:
-    key-values:
-      application: ${spring.application.name}

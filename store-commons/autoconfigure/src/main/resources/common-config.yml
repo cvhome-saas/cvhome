@@ -118,6 +118,26 @@ spring:
   sql:
     init:
       mode: always
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      schema: ${spring.application.name}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  cloud:
+    function:
+      definition: events
+    stream:
+      input-bindings: events
+      bindings:
+        events-in-0:
+          destination: events
+          group: ${spring.application.name}
+        events-out-0:
+          content-type: application/json
+          destination: events
   security:
     oauth2:
       client:
@@ -149,12 +169,17 @@ spring:
 #          issuer-uri-set:
 #            - ${com.asrevo.cvhome.services.core-auth.schema}://${com.asrevo.cvhome.services.core-auth.domain}:${com.asrevo.cvhome.services.core-auth.port}/realms/cvhome
 #            - ${com.asrevo.cvhome.services.pod-auth.schema}://${com.asrevo.cvhome.services.pod-auth.domain}:${com.asrevo.cvhome.services.pod-auth.port}
+server:
+  forward-headers-strategy: NATIVE
 
 springdoc:
   show-actuator: true
   api-docs:
     path: /api-docs
 management:
+  observations:
+    key-values:
+      application: ${spring.application.name}
   info:
     env:
       enabled: true
@@ -176,3 +201,6 @@ management:
           #    org.springframework.cloud.gateway: debug
           #    org.springframework.security: debug
           #    reactor.netty.http: debug
+info:
+  app:
+    name: ${spring.application.name}
