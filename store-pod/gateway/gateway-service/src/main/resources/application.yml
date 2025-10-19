@@ -14,5 +14,3 @@ spring:
             client-id: gateway@service.store-pod.internal
             client-secret: c27HPNwTPMRI1wstTx9f6EAxFB9J4Ba7
             authorization-grant-type: client_credentials
-server:
-  port: ${com.asrevo.cvhome.services.store-pod-gateway.port}

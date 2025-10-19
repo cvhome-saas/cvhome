@@ -14,8 +14,6 @@ spring:
             client-id: manager@service.store-core.internal
             client-secret: VobDxIhAGZz8hyhzz7p9G7QpfixjFjzW
             authorization-grant-type: client_credentials
-server:
-  port: ${com.asrevo.cvhome.services.manager.port}
 com:
   asrevo:
     cvhome:

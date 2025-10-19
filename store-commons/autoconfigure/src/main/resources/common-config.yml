@@ -171,6 +171,7 @@ spring:
 #            - ${com.asrevo.cvhome.services.pod-auth.schema}://${com.asrevo.cvhome.services.pod-auth.domain}:${com.asrevo.cvhome.services.pod-auth.port}
 server:
   forward-headers-strategy: NATIVE
+  port: ${com.asrevo.cvhome.services.${spring.application.name}.port}
 
 springdoc:
   show-actuator: true

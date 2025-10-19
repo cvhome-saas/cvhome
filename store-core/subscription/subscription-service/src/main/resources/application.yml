@@ -14,5 +14,3 @@ spring:
             client-id: subscription@service.store-core.internal
             client-secret: TxbDxIhATuz8hyhzz899G7QpfixjFjzW
             authorization-grant-type: client_credentials
-server:
-  port: ${com.asrevo.cvhome.services.subscription.port}
