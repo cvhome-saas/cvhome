@@ -1,4 +1,6 @@
 spring:
+  application:
+    name: subscription
   config:
     import: "classpath:common-config.yml"
   security:
@@ -10,33 +12,3 @@ spring:
             client-id: subscription@service.store-core.internal
             client-secret: TxbDxIhATuz8hyhzz899G7QpfixjFjzW
             authorization-grant-type: client_credentials
----
-spring:
-  application:
-    name: subscription
-  datasource:
-    driver-class-name: org.postgresql.Driver
-    hikari:
-      schema: subscription
-  cloud:
-    function:
-      definition: events
-    stream:
-      input-bindings: events
-      bindings:
-        events-in-0:
-          destination: events
-          group: ${spring.application.name}
-        events-out-0:
-          content-type: application/json
-          destination: events
-server:
-  forward-headers-strategy: NATIVE
-  port: ${com.asrevo.cvhome.services.subscription.port}
-info:
-  app:
-    name: ${spring.application.name}
-management:
-  observations:
-    key-values:
-      application: ${spring.application.name}
