@@ -106,9 +106,6 @@ public class MerchantStoreApi {
     })
     @ConditionalOnApiStatus(usage = ApiUsage.USED)
     public void update(@SecuredResource MerchantStore merchantStore, @Valid @RequestBody PersistableMerchantStore store) {
-        store.setOrg(merchantStore.getOrg());
-        store.setSocialLinks(merchantStore.getSocialLinks());
-        store.setSliderImages(merchantStore.getSliderImages());
         storeFacade.update(store);
     }
 

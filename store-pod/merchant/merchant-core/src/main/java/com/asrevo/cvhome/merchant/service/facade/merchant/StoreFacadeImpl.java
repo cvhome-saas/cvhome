@@ -147,6 +147,9 @@ public class StoreFacadeImpl implements StoreFacade {
         store.setId(mStore.getId().getId());
         store.setOrg(mStore.getOrg());
 
+        store.setSocialLinks(mStore.getSocialLinks());
+        store.setSliderImages(mStore.getSliderImages());
+
         try {
             mStore = persistableMerchantStorePopulator.populate(store, mStore, language);
         } catch (ConversionException e) {
