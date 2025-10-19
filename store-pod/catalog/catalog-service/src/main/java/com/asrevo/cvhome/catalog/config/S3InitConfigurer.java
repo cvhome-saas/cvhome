@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.catalog.config;
 
+import com.asrevo.cvhome.catalog.service.AssetsInitService;
 import com.asrevo.cvhome.commons.domain.StorageProviderType;
 import com.asrevo.cvhome.s2s.model.CdnStorageProperties;
 import lombok.AllArgsConstructor;
@@ -18,6 +19,7 @@ import software.amazon.awssdk.services.s3.model.PutBucketPolicyResponse;
 public class S3InitConfigurer implements ApplicationListener<ApplicationReadyEvent> {
     private final S3Client s3Client;
     private final CdnStorageProperties cdnStorageProperties;
+    private final AssetsInitService assetsInitService;
 
 
     @Override
@@ -26,6 +28,7 @@ public class S3InitConfigurer implements ApplicationListener<ApplicationReadyEve
             configureBucket();
             configurePolicy();
         }
+        assetsInitService.loadAssets();
     }
 
     private void configureBucket() {
@@ -63,7 +66,7 @@ public class S3InitConfigurer implements ApplicationListener<ApplicationReadyEve
                     )
                     .build());
         } catch (Exception e) {
-            log.error("error putting policy",e);
+            log.error("error putting policy", e);
         }
     }
 }

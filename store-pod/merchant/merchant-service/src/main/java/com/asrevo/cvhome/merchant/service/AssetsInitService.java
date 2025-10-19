@@ -1,18 +1,16 @@
-package com.asrevo.cvhome.merchant.config;
+package com.asrevo.cvhome.merchant.service;
 
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.merchant.service.facade.merchant.StoreFacade;
 import com.asrevo.cvhome.store.core.entity.content.FileContentType;
 import com.asrevo.cvhome.store.core.entity.content.ImageContentFile;
-import com.asrevo.cvhome.merchant.service.facade.merchant.StoreFacade;
+import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.core.Ordered;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.stereotype.Component;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -20,30 +18,15 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Objects;
 
-@Configuration
+@Component
+@AllArgsConstructor
 @Slf4j
-public class DefaultStoreAssetsInitializer implements ApplicationListener<ApplicationReadyEvent>, Ordered {
+public class AssetsInitService {
     private final ResourceLoader resourceLoader;
     private final StoreFacade storeFacade;
 
-    public DefaultStoreAssetsInitializer(ResourceLoader resourceLoader, StoreFacade storeFacade) {
-        this.resourceLoader = resourceLoader;
-        this.storeFacade = storeFacade;
-    }
-
     @SneakyThrows
-    private static Path toPath(Resource resource) {
-        return resource.getFile().toPath();
-    }
-
-    @SneakyThrows
-    boolean isDirectory(Resource resource) {
-        return Files.isDirectory(resource.getFile().toPath());
-    }
-
-    @SneakyThrows
-    @Override
-    public void onApplicationEvent(ApplicationReadyEvent event) {
+    public void loadAssets() {
         Resource[] resources = ((AnnotationConfigServletWebServerApplicationContext) resourceLoader).getResources("classpath:/assets/**");
         Arrays.stream(resources)
                 .filter(resource -> !isDirectory(resource))
@@ -58,7 +41,6 @@ public class DefaultStoreAssetsInitializer implements ApplicationListener<Applic
                         uploadSlider(r);
                     }
                 });
-
     }
 
     @SneakyThrows
@@ -107,8 +89,13 @@ public class DefaultStoreAssetsInitializer implements ApplicationListener<Applic
         return file;
     }
 
-    @Override
-    public int getOrder() {
-        return 10;
+    @SneakyThrows
+    private static Path toPath(Resource resource) {
+        return resource.getFile().toPath();
+    }
+
+    @SneakyThrows
+    boolean isDirectory(Resource resource) {
+        return Files.isDirectory(resource.getFile().toPath());
     }
 }
