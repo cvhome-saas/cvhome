@@ -1,6 +1,6 @@
 plugins {
 	id 'com.asrevo.java-common-conventions'
-	alias(libs.plugins.spotless)
+	alias(libs.plugins.spring.javaformat)
 }
 
 repositories {
