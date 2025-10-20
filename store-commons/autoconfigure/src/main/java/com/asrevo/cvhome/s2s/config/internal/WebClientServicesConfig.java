@@ -53,12 +53,11 @@ public class WebClientServicesConfig {
 		public WebClient.Builder webBuilder(ReactiveClientRegistrationRepository clientRegistrationRepository,
 				ServerOAuth2AuthorizedClientRepository serverOAuth2AuthorizedClientRepository) {
 			ServerOAuth2AuthorizedClientExchangeFilterFunction oauth = new ServerOAuth2AuthorizedClientExchangeFilterFunction(
-					clientRegistrationRepository,
-					serverOAuth2AuthorizedClientRepository /*
-															 * new
-															 * UnAuthenticatedServerOAuth2AuthorizedClientRepository
-															 * ()
-															 */);
+					clientRegistrationRepository, serverOAuth2AuthorizedClientRepository /*
+																							 * new
+																							 * UnAuthenticatedServerOAuth2AuthorizedClientRepository
+																							 * ()
+																							 */);
 			oauth.setDefaultClientRegistrationId("keycloak");
 			return WebClient.builder().filter(oauth);
 		}
@@ -71,12 +70,11 @@ public class WebClientServicesConfig {
 		public WebClient.Builder defaultWebBuilder(ReactiveClientRegistrationRepository clientRegistrationRepository,
 				ServerOAuth2AuthorizedClientRepository serverOAuth2AuthorizedClientRepository) {
 			ServerOAuth2AuthorizedClientExchangeFilterFunction oauth = new ServerOAuth2AuthorizedClientExchangeFilterFunction(
-					clientRegistrationRepository,
-					serverOAuth2AuthorizedClientRepository /*
-															 * new
-															 * UnAuthenticatedServerOAuth2AuthorizedClientRepository
-															 * ()
-															 */);
+					clientRegistrationRepository, serverOAuth2AuthorizedClientRepository /*
+																							 * new
+																							 * UnAuthenticatedServerOAuth2AuthorizedClientRepository
+																							 * ()
+																							 */);
 			oauth.setDefaultClientRegistrationId("keycloak");
 			return WebClient.builder().filter(oauth);
 		}
