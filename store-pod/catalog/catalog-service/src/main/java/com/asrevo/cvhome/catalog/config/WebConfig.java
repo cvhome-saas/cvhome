@@ -12,12 +12,14 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @AllArgsConstructor
 public class WebConfig implements WebMvcConfigurer {
 
-    private final StoreMerchantIdArgumentResolver storeMerchantIdArgumentResolver;
-    private final LanguageCodeArgumentResolver languageCodeArgumentResolver;
+	private final StoreMerchantIdArgumentResolver storeMerchantIdArgumentResolver;
 
-    @Override
-    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
-        argumentResolvers.add(storeMerchantIdArgumentResolver);
-        argumentResolvers.add(languageCodeArgumentResolver);
-    }
+	private final LanguageCodeArgumentResolver languageCodeArgumentResolver;
+
+	@Override
+	public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
+		argumentResolvers.add(storeMerchantIdArgumentResolver);
+		argumentResolvers.add(languageCodeArgumentResolver);
+	}
+
 }

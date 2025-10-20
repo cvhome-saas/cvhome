@@ -10,23 +10,24 @@ import java.math.BigDecimal;
 
 public interface ShoppingCartService extends SalesManagerEntityService<Long, ShoppingCart> {
 
-    void saveOrUpdate(ShoppingCart shoppingCart) throws ServiceException;
+	void saveOrUpdate(ShoppingCart shoppingCart) throws ServiceException;
 
-    ShoppingCart findCart(Long id, StoreMerchantId store) throws ServiceException;
+	ShoppingCart findCart(Long id, StoreMerchantId store) throws ServiceException;
 
-    ShoppingCart findCart(String code, StoreMerchantId store) throws ServiceException;
+	ShoppingCart findCart(String code, StoreMerchantId store) throws ServiceException;
 
-    ShoppingCart loadCartByCode(String code, StoreMerchantId store, LanguageCode languageCode)
-            throws ServiceException;
+	ShoppingCart loadCartByCode(String code, StoreMerchantId store, LanguageCode languageCode) throws ServiceException;
 
-    /**
-     * Populates a ShoppingCartItem from a Product and attributes if any. Calculate price based on availability
-     */
-    ShoppingCartItem populateShoppingCartItem(String sku, BigDecimal price, StoreMerchantId store)
-            throws ServiceException;
+	/**
+	 * Populates a ShoppingCartItem from a Product and attributes if any. Calculate price
+	 * based on availability
+	 */
+	ShoppingCartItem populateShoppingCartItem(String sku, BigDecimal price, StoreMerchantId store)
+			throws ServiceException;
 
-    /**
-     * Removes a shopping cart item
-     */
-    void deleteShoppingCartItem(Long id);
+	/**
+	 * Removes a shopping cart item
+	 */
+	void deleteShoppingCartItem(Long id);
+
 }

@@ -42,314 +42,233 @@ import org.springframework.web.multipart.MultipartFile;
 @Slf4j
 public class ProductImageApi {
 
-    private final ProductImageService productImageService;
-    private final ProductService productService;
-    private final ReadableProductImageMapper readableProductImageMapper;
+	private final ProductImageService productImageService;
 
-    public ProductImageApi(
-            ProductImageService productImageService,
-            ProductService productService,
-            ReadableProductImageMapper readableProductImageMapper) {
-        this.productImageService = productImageService;
-        this.productService = productService;
-        this.readableProductImageMapper = readableProductImageMapper;
-    }
+	private final ProductService productService;
 
-    /**
-     * To be used with MultipartFile
-     */
-    @ResponseStatus(HttpStatus.CREATED)
-    @RequestMapping(
-            value = {"/private/product/{id}/image", "/auth/product/{id}/image"},
-            consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
-            method = RequestMethod.POST)
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-        @Parameter(
-                name = "lang",
-                schema =
-                        @Schema(
-                                name = "lang",
-                                type = "string",
-                                defaultValue = Constants.DEFAULT_LANGUAGE))
-    })
-    public void uploadImage(
-            @PathVariable Long id,
-            @RequestParam(value = "file") MultipartFile[] files,
-            @RequestParam(value = "order", required = false, defaultValue = "0") Integer position,
-            @RequestParam(value = "defaultImage", required = false, defaultValue = "false")
-                    boolean defaultImage,
-            @Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language) {
+	private final ReadableProductImageMapper readableProductImageMapper;
 
-        try {
+	public ProductImageApi(ProductImageService productImageService, ProductService productService,
+			ReadableProductImageMapper readableProductImageMapper) {
+		this.productImageService = productImageService;
+		this.productService = productService;
+		this.readableProductImageMapper = readableProductImageMapper;
+	}
 
-            // get the product
-            Product product = productService.getById(id);
-            if (product == null) {
-                throw new ResourceNotFoundException("Product not found");
-            }
+	/**
+	 * To be used with MultipartFile
+	 */
+	@ResponseStatus(HttpStatus.CREATED)
+	@RequestMapping(value = { "/private/product/{id}/image", "/auth/product/{id}/image" },
+			consumes = { MediaType.MULTIPART_FORM_DATA_VALUE }, method = RequestMethod.POST)
+	@Parameters({
+			@Parameter(name = "store",
+					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+			@Parameter(name = "lang",
+					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	public void uploadImage(@PathVariable Long id, @RequestParam(value = "file") MultipartFile[] files,
+			@RequestParam(value = "order", required = false, defaultValue = "0") Integer position,
+			@RequestParam(value = "defaultImage", required = false, defaultValue = "false") boolean defaultImage,
+			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
+			@Parameter(hidden = true) LanguageCode language) {
 
-            // security validation
-            // product belongs to merchant store
-            if (!Objects.equals(product.getStore(), merchantStore)) {
-                throw new UnauthorizedException("Resource not authorized for this merchant");
-            }
+		try {
 
-            boolean hasDefaultImage = false;
-            Set<ProductImage> images = product.getImages();
+			// get the product
+			Product product = productService.getById(id);
+			if (product == null) {
+				throw new ResourceNotFoundException("Product not found");
+			}
 
-            if (!defaultImage && !CollectionUtils.isEmpty(images)) {
-                for (ProductImage image : images) {
-                    if (image.isDefaultImage()) {
-                        hasDefaultImage = true;
-                        break;
-                    }
-                }
-            }
+			// security validation
+			// product belongs to merchant store
+			if (!Objects.equals(product.getStore(), merchantStore)) {
+				throw new UnauthorizedException("Resource not authorized for this merchant");
+			}
 
-            List<ProductImage> contentImagesList = new ArrayList<>();
-            int sortOrder = position;
-            for (MultipartFile multipartFile : files) {
-                if (!multipartFile.isEmpty()) {
-                    ProductImage productImage = new ProductImage();
-                    productImage.setImage(multipartFile.getInputStream());
-                    productImage.setProductImage(multipartFile.getOriginalFilename());
-                    productImage.setProduct(product);
+			boolean hasDefaultImage = false;
+			Set<ProductImage> images = product.getImages();
 
-                    if (!hasDefaultImage) {
-                        productImage.setDefaultImage(true);
-                        hasDefaultImage = true;
-                    }
-                    productImage.setSortOrder(sortOrder);
-                    position++;
-                    contentImagesList.add(productImage);
-                }
-            }
+			if (!defaultImage && !CollectionUtils.isEmpty(images)) {
+				for (ProductImage image : images) {
+					if (image.isDefaultImage()) {
+						hasDefaultImage = true;
+						break;
+					}
+				}
+			}
 
-            if (CollectionUtils.isNotEmpty(contentImagesList)) {
-                productImageService.addProductImages(product, contentImagesList);
-            }
+			List<ProductImage> contentImagesList = new ArrayList<>();
+			int sortOrder = position;
+			for (MultipartFile multipartFile : files) {
+				if (!multipartFile.isEmpty()) {
+					ProductImage productImage = new ProductImage();
+					productImage.setImage(multipartFile.getInputStream());
+					productImage.setProductImage(multipartFile.getOriginalFilename());
+					productImage.setProduct(product);
 
-        } catch (Exception e) {
-            log.error("Error while creating ProductImage", e);
-            throw new ServiceRuntimeException("Error while creating image");
-        }
-    }
+					if (!hasDefaultImage) {
+						productImage.setDefaultImage(true);
+						hasDefaultImage = true;
+					}
+					productImage.setSortOrder(sortOrder);
+					position++;
+					contentImagesList.add(productImage);
+				}
+			}
 
-    @ResponseStatus(HttpStatus.OK)
-    @RequestMapping(
-            value = {"/private/product/image/{id}", "/auth/product/images/{id}"},
-            method = RequestMethod.DELETE)
-    public void deleteImage(@PathVariable Long id, HttpServletResponse response) {
+			if (CollectionUtils.isNotEmpty(contentImagesList)) {
+				productImageService.addProductImages(product, contentImagesList);
+			}
 
-        try {
-            ProductImage productImage = productImageService.getById(id);
+		}
+		catch (Exception e) {
+			log.error("Error while creating ProductImage", e);
+			throw new ServiceRuntimeException("Error while creating image");
+		}
+	}
 
-            if (productImage != null) {
-                productImageService.delete(productImage);
-            } else {
-                response.sendError(404, "No ProductImage found for ID : " + id);
-            }
+	@ResponseStatus(HttpStatus.OK)
+	@RequestMapping(value = { "/private/product/image/{id}", "/auth/product/images/{id}" },
+			method = RequestMethod.DELETE)
+	public void deleteImage(@PathVariable Long id, HttpServletResponse response) {
 
-        } catch (Exception e) {
-            log.error("Error while deleting ProductImage", e);
-            try {
-                response.sendError(503, "Error while deleting ProductImage " + e.getMessage());
-            } catch (Exception ignore) {
-            }
-        }
-    }
+		try {
+			ProductImage productImage = productImageService.getById(id);
 
-    @ResponseStatus(HttpStatus.OK)
-    @RequestMapping(
-            value = {"/private/product/{id}/image/{imageId}"},
-            method = RequestMethod.DELETE)
-    public void deleteImage(
-            @PathVariable Long id,
-            @PathVariable Long imageId,
-            @Valid NameEntity imageName,
-            @Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language) {
+			if (productImage != null) {
+				productImageService.delete(productImage);
+			}
+			else {
+				response.sendError(404, "No ProductImage found for ID : " + id);
+			}
 
-        Optional<ProductImage> productImage =
-                productImageService.getProductImage(imageId, id, merchantStore);
+		}
+		catch (Exception e) {
+			log.error("Error while deleting ProductImage", e);
+			try {
+				response.sendError(503, "Error while deleting ProductImage " + e.getMessage());
+			}
+			catch (Exception ignore) {
+			}
+		}
+	}
 
-        if (productImage.isPresent()) {
-            try {
-                productImageService.delete(productImage.get());
-            } catch (ServiceException e) {
-                log.error("Error while deleting ProductImage", e);
-                throw new ServiceRuntimeException(
-                        "ProductImage [" + imageId + "] cannot be deleted", e);
-            }
-        } else {
-            throw new ResourceNotFoundException(
-                    "Product image ["
-                            + imageId
-                            + "] not found for product id ["
-                            + id
-                            + "] and merchant ["
-                            + merchantStore
-                            + "]");
-        }
-    }
+	@ResponseStatus(HttpStatus.OK)
+	@RequestMapping(value = { "/private/product/{id}/image/{imageId}" }, method = RequestMethod.DELETE)
+	public void deleteImage(@PathVariable Long id, @PathVariable Long imageId, @Valid NameEntity imageName,
+			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
+			@Parameter(hidden = true) LanguageCode language) {
 
-    /**
-     * Get product images
-     */
-    @ResponseStatus(HttpStatus.OK)
-    @RequestMapping(
-            value = {"/product/{productId}/images"},
-            method = RequestMethod.GET)
-    @Operation(method = "GET", description = "Get images for a given product")
-    @ApiResponses(
-            value = {
-                @ApiResponse(responseCode = "200", description = "List of ProductImage found")
-            })
-    @ResponseBody
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-        @Parameter(
-                name = "lang",
-                schema =
-                        @Schema(
-                                name = "lang",
-                                type = "string",
-                                defaultValue = Constants.DEFAULT_LANGUAGE))
-    })
-    public List<ReadableImage> images(
-            @PathVariable Long productId,
-            @Parameter(hidden = true) StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language) {
+		Optional<ProductImage> productImage = productImageService.getProductImage(imageId, id, merchantStore);
 
-        Product p = productService.getById(productId);
+		if (productImage.isPresent()) {
+			try {
+				productImageService.delete(productImage.get());
+			}
+			catch (ServiceException e) {
+				log.error("Error while deleting ProductImage", e);
+				throw new ServiceRuntimeException("ProductImage [" + imageId + "] cannot be deleted", e);
+			}
+		}
+		else {
+			throw new ResourceNotFoundException("Product image [" + imageId + "] not found for product id [" + id
+					+ "] and merchant [" + merchantStore + "]");
+		}
+	}
 
-        if (p == null) {
-            throw new ResourceNotFoundException(
-                    "Product images not found for product id ["
-                            + productId
-                            + "] and merchant ["
-                            + merchantStore
-                            + "]");
-        }
+	/**
+	 * Get product images
+	 */
+	@ResponseStatus(HttpStatus.OK)
+	@RequestMapping(value = { "/product/{productId}/images" }, method = RequestMethod.GET)
+	@Operation(method = "GET", description = "Get images for a given product")
+	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "List of ProductImage found") })
+	@ResponseBody
+	@Parameters({
+			@Parameter(name = "store",
+					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+			@Parameter(name = "lang",
+					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	public List<ReadableImage> images(@PathVariable Long productId,
+			@Parameter(hidden = true) StoreMerchantId merchantStore, @Parameter(hidden = true) LanguageCode language) {
 
-        if (!p.getStore().equals(merchantStore)) {
-            throw new ResourceNotFoundException(
-                    "Product images not found for product id ["
-                            + productId
-                            + "] and merchant ["
-                            + merchantStore
-                            + "]");
-        }
+		Product p = productService.getById(productId);
 
-        List<ReadableImage> target = new ArrayList<>();
+		if (p == null) {
+			throw new ResourceNotFoundException(
+					"Product images not found for product id [" + productId + "] and merchant [" + merchantStore + "]");
+		}
 
-        Set<ProductImage> images = p.getImages();
-        if (images != null && !images.isEmpty()) {
+		if (!p.getStore().equals(merchantStore)) {
+			throw new ResourceNotFoundException(
+					"Product images not found for product id [" + productId + "] and merchant [" + merchantStore + "]");
+		}
 
-            target =
-                    images.stream()
-                            .map(i -> image(i, merchantStore, language))
-                            .sorted(Comparator.comparingInt(ReadableImage::getOrder))
-                            .collect(Collectors.toList());
-        }
+		List<ReadableImage> target = new ArrayList<>();
 
-        return target;
-    }
+		Set<ProductImage> images = p.getImages();
+		if (images != null && !images.isEmpty()) {
 
-    private ReadableImage image(ProductImage image, StoreMerchantId store, LanguageCode language) {
-        return readableProductImageMapper.convert(image, store, language);
-    }
+			target = images.stream()
+				.map(i -> image(i, merchantStore, language))
+				.sorted(Comparator.comparingInt(ReadableImage::getOrder))
+				.collect(Collectors.toList());
+		}
 
-    /**
-     * Patch image (change position)
-     */
-    @ResponseStatus(HttpStatus.OK)
-    @RequestMapping(
-            value = {"/private/product/{id}/image/{imageId}", "/auth/product/{id}/image"},
-            method = RequestMethod.PATCH)
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-        @Parameter(
-                name = "lang",
-                schema =
-                        @Schema(
-                                name = "lang",
-                                type = "string",
-                                defaultValue = Constants.DEFAULT_LANGUAGE))
-    })
-    public void imageDetails(
-            @PathVariable Long id,
-            @PathVariable Long imageId,
-            @RequestParam(value = "order", required = false, defaultValue = "0") Integer position,
-            @Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language) {
+		return target;
+	}
 
-        try {
+	private ReadableImage image(ProductImage image, StoreMerchantId store, LanguageCode language) {
+		return readableProductImageMapper.convert(image, store, language);
+	}
 
-            Product p = productService.getById(id);
+	/**
+	 * Patch image (change position)
+	 */
+	@ResponseStatus(HttpStatus.OK)
+	@RequestMapping(value = { "/private/product/{id}/image/{imageId}", "/auth/product/{id}/image" },
+			method = RequestMethod.PATCH)
+	@Parameters({
+			@Parameter(name = "store",
+					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+			@Parameter(name = "lang",
+					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	public void imageDetails(@PathVariable Long id, @PathVariable Long imageId,
+			@RequestParam(value = "order", required = false, defaultValue = "0") Integer position,
+			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
+			@Parameter(hidden = true) LanguageCode language) {
 
-            if (p == null) {
-                throw new ResourceNotFoundException(
-                        "Product image ["
-                                + imageId
-                                + "] not found for product id ["
-                                + id
-                                + "] and merchant ["
-                                + merchantStore
-                                + "]");
-            }
+		try {
 
-            if (!p.getStore().equals(merchantStore)) {
-                throw new ResourceNotFoundException(
-                        "Product image ["
-                                + imageId
-                                + "] not found for product id ["
-                                + id
-                                + "] and merchant ["
-                                + merchantStore
-                                + "]");
-            }
+			Product p = productService.getById(id);
 
-            Optional<ProductImage> productImage =
-                    productImageService.getProductImage(imageId, id, merchantStore);
+			if (p == null) {
+				throw new ResourceNotFoundException("Product image [" + imageId + "] not found for product id [" + id
+						+ "] and merchant [" + merchantStore + "]");
+			}
 
-            if (productImage.isPresent()) {
-                productImage.get().setSortOrder(position);
-                productImageService.updateProductImage(p, productImage.get());
-            } else {
-                throw new ResourceNotFoundException(
-                        "Product image ["
-                                + imageId
-                                + "] not found for product id ["
-                                + id
-                                + "] and merchant ["
-                                + merchantStore
-                                + "]");
-            }
+			if (!p.getStore().equals(merchantStore)) {
+				throw new ResourceNotFoundException("Product image [" + imageId + "] not found for product id [" + id
+						+ "] and merchant [" + merchantStore + "]");
+			}
 
-        } catch (Exception e) {
-            log.error("Error while deleting ProductImage", e);
-            throw new ServiceRuntimeException("ProductImage [" + imageId + "] cannot be edited");
-        }
-    }
+			Optional<ProductImage> productImage = productImageService.getProductImage(imageId, id, merchantStore);
+
+			if (productImage.isPresent()) {
+				productImage.get().setSortOrder(position);
+				productImageService.updateProductImage(p, productImage.get());
+			}
+			else {
+				throw new ResourceNotFoundException("Product image [" + imageId + "] not found for product id [" + id
+						+ "] and merchant [" + merchantStore + "]");
+			}
+
+		}
+		catch (Exception e) {
+			log.error("Error while deleting ProductImage", e);
+			throw new ServiceRuntimeException("ProductImage [" + imageId + "] cannot be edited");
+		}
+	}
+
 }

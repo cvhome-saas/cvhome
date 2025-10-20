@@ -19,78 +19,74 @@ import lombok.Setter;
 
 @Entity
 @EntityListeners(value = AuditListener.class)
-@Table(
-        name = "CATEGORY",
-        indexes = @Index(columnList = "LINEAGE"),
-        uniqueConstraints = @UniqueConstraint(columnNames = {"STORE_MERCHANT_ID", "CODE"}))
+@Table(name = "CATEGORY", indexes = @Index(columnList = "LINEAGE"),
+		uniqueConstraints = @UniqueConstraint(columnNames = { "STORE_MERCHANT_ID", "CODE" }))
 @Getter
 @Setter
 public class Category extends SalesManagerEntity<Long, Category> implements Auditable {
-    @Serial private static final long serialVersionUID = 1L;
 
-    @Id
-    @Column(name = "CATEGORY_ID", unique = true, nullable = false)
-    @TableGenerator(
-            name = "TABLE_GEN",
-            table = "SM_SEQUENCER",
-            pkColumnName = "SEQ_NAME",
-            valueColumnName = "SEQ_COUNT",
-            pkColumnValue = "CATEGORY_SEQ_NEXT_VAL",
-            allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
-            initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
-    private Long id;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    @Embedded private AuditSection auditSection = new AuditSection();
+	@Id
+	@Column(name = "CATEGORY_ID", unique = true, nullable = false)
+	@TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME",
+			valueColumnName = "SEQ_COUNT", pkColumnValue = "CATEGORY_SEQ_NEXT_VAL",
+			allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
+			initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
+	@GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
+	private Long id;
 
-    @Valid
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<CategoryDescription> descriptions = new HashSet<>();
+	@Embedded
+	private AuditSection auditSection = new AuditSection();
 
-    @Embedded
-    @AttributeOverrides(
-            @AttributeOverride(
-                    name = "storeMerchantId",
-                    column = @Column(name = "STORE_MERCHANT_ID", nullable = false, length = 50)))
-    private StoreMerchantId storeMerchantId;
+	@Valid
+	@OneToMany(mappedBy = "category", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	private Set<CategoryDescription> descriptions = new HashSet<>();
 
-    @ManyToOne
-    @JoinColumn(name = "PARENT_ID")
-    private Category parent;
+	@Embedded
+	@AttributeOverrides(@AttributeOverride(name = "storeMerchantId",
+			column = @Column(name = "STORE_MERCHANT_ID", nullable = false, length = 50)))
+	private StoreMerchantId storeMerchantId;
 
-    @OneToMany(mappedBy = "parent", cascade = CascadeType.REMOVE)
-    private List<Category> categories = new ArrayList<>();
+	@ManyToOne
+	@JoinColumn(name = "PARENT_ID")
+	private Category parent;
 
-    @Column(name = "CATEGORY_IMAGE", length = 100)
-    private String categoryImage;
+	@OneToMany(mappedBy = "parent", cascade = CascadeType.REMOVE)
+	private List<Category> categories = new ArrayList<>();
 
-    @Column(name = "SORT_ORDER")
-    private Integer sortOrder = 0;
+	@Column(name = "CATEGORY_IMAGE", length = 100)
+	private String categoryImage;
 
-    @Column(name = "CATEGORY_STATUS")
-    private boolean categoryStatus;
+	@Column(name = "SORT_ORDER")
+	private Integer sortOrder = 0;
 
-    @Column(name = "VISIBLE")
-    private boolean visible;
+	@Column(name = "CATEGORY_STATUS")
+	private boolean categoryStatus;
 
-    @Column(name = "DEPTH")
-    private Integer depth;
+	@Column(name = "VISIBLE")
+	private boolean visible;
 
-    @Column(name = "LINEAGE")
-    private String lineage;
+	@Column(name = "DEPTH")
+	private Integer depth;
 
-    @Column(name = "FEATURED")
-    private boolean featured;
+	@Column(name = "LINEAGE")
+	private String lineage;
 
-    @NotEmpty
-    @Column(name = "CODE", length = 100, nullable = false)
-    private String code;
+	@Column(name = "FEATURED")
+	private boolean featured;
 
-    public CategoryDescription getDescription() {
-        if (descriptions != null && !descriptions.isEmpty()) {
-            return descriptions.iterator().next();
-        }
+	@NotEmpty
+	@Column(name = "CODE", length = 100, nullable = false)
+	private String code;
 
-        return null;
-    }
+	public CategoryDescription getDescription() {
+		if (descriptions != null && !descriptions.isEmpty()) {
+			return descriptions.iterator().next();
+		}
+
+		return null;
+	}
+
 }

@@ -12,40 +12,41 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 @WebFluxTest(AuthController.class)
-@Import({TestcontainersConfiguration.class, SecurityConfig.class})
+@Import({ TestcontainersConfiguration.class, SecurityConfig.class })
 @Tag("unit-test")
 class AuthControllerTest {
-    @Autowired WebTestClient client;
 
-    @Test
-    void current() {
-        client.mutateWith(mockJwt().jwt((jwt) -> jwt.subject("test-subject")))
-                .get()
-                .uri("/api/v1/auth/current")
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody(String.class)
-                .consumeWith(
-                        it -> {
-                            String responseBody = it.getResponseBody();
-                            System.out.println(responseBody);
-                        });
-    }
+	@Autowired
+	WebTestClient client;
 
-    @Test
-    void me() {
-        client.mutateWith(mockJwt().jwt((jwt) -> jwt.subject("test-subject")))
-                .get()
-                .uri("/api/v1/auth/me")
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody(String.class)
-                .consumeWith(
-                        it -> {
-                            String responseBody = it.getResponseBody();
-                            System.out.println(responseBody);
-                        });
-    }
+	@Test
+	void current() {
+		client.mutateWith(mockJwt().jwt((jwt) -> jwt.subject("test-subject")))
+			.get()
+			.uri("/api/v1/auth/current")
+			.exchange()
+			.expectStatus()
+			.isOk()
+			.expectBody(String.class)
+			.consumeWith(it -> {
+				String responseBody = it.getResponseBody();
+				System.out.println(responseBody);
+			});
+	}
+
+	@Test
+	void me() {
+		client.mutateWith(mockJwt().jwt((jwt) -> jwt.subject("test-subject")))
+			.get()
+			.uri("/api/v1/auth/me")
+			.exchange()
+			.expectStatus()
+			.isOk()
+			.expectBody(String.class)
+			.consumeWith(it -> {
+				String responseBody = it.getResponseBody();
+				System.out.println(responseBody);
+			});
+	}
+
 }

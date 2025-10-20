@@ -11,10 +11,12 @@ import lombok.Setter;
 @Getter
 public class PersistableContentEntity extends ContentEntity implements Serializable {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private List<ContentDescriptionEntity> descriptions = new ArrayList<>();
+	private List<ContentDescriptionEntity> descriptions = new ArrayList<>();
+
 }

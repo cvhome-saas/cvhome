@@ -13,21 +13,16 @@ import java.util.Optional;
  */
 public interface FilePut {
 
-    /**
-     * Add file to folder
-     */
-    void addFile(
-            final String merchantStoreCode,
-            Optional<String> path,
-            InputContentFile inputStaticContentData)
-            throws ServiceException;
+	/**
+	 * Add file to folder
+	 */
+	void addFile(final String merchantStoreCode, Optional<String> path, InputContentFile inputStaticContentData)
+			throws ServiceException;
 
-    /**
-     * Add files to folder
-     */
-    void addFiles(
-            final String merchantStoreCode,
-            Optional<String> path,
-            List<InputContentFile> inputStaticContentDataList)
-            throws ServiceException;
+	/**
+	 * Add files to folder
+	 */
+	void addFiles(final String merchantStoreCode, Optional<String> path,
+			List<InputContentFile> inputStaticContentDataList) throws ServiceException;
+
 }

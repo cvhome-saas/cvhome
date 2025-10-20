@@ -37,256 +37,125 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 public class ProductGroupApi {
 
-    private final ProductService productService;
-    private final ProductItemsFacade productItemsFacade;
+	private final ProductService productService;
 
-    public ProductGroupApi(ProductService productService, ProductItemsFacade productItemsFacade) {
-        this.productService = productService;
-        this.productItemsFacade = productItemsFacade;
-    }
+	private final ProductItemsFacade productItemsFacade;
 
-    @ResponseStatus(HttpStatus.OK)
-    @PostMapping("/private/products/group")
-    @Operation(
-            method = "POST",
-            description = "Create product group",
-            responses =
-                    @ApiResponse(
-                            content =
-                                    @Content(
-                                            schema = @Schema(implementation = ProductGroup.class))))
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR))
-    })
-    public @ResponseBody ProductGroup creteGroup(
-            @RequestBody ProductGroup group,
-            @Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore) {
+	public ProductGroupApi(ProductService productService, ProductItemsFacade productItemsFacade) {
+		this.productService = productService;
+		this.productItemsFacade = productItemsFacade;
+	}
 
-        return productItemsFacade.createProductGroup(group, merchantStore);
-    }
+	@ResponseStatus(HttpStatus.OK)
+	@PostMapping("/private/products/group")
+	@Operation(method = "POST", description = "Create product group",
+			responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ProductGroup.class))))
+	@Parameters({ @Parameter(name = "store",
+			schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)) })
+	public @ResponseBody ProductGroup creteGroup(@RequestBody ProductGroup group,
+			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore) {
 
-    @ResponseStatus(HttpStatus.OK)
-    @PatchMapping("/private/products/group/{code}")
-    @Operation(
-            method = "PATCH",
-            description = "Update product group visible flag",
-            responses =
-                    @ApiResponse(
-                            content =
-                                    @Content(
-                                            schema = @Schema(implementation = ProductGroup.class))))
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR))
-    })
-    public void updateGroup(
-            @RequestBody ProductGroup group,
-            @PathVariable String code,
-            @Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore) {
+		return productItemsFacade.createProductGroup(group, merchantStore);
+	}
 
-        productItemsFacade.updateProductGroup(code, group, merchantStore);
-    }
+	@ResponseStatus(HttpStatus.OK)
+	@PatchMapping("/private/products/group/{code}")
+	@Operation(method = "PATCH", description = "Update product group visible flag",
+			responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ProductGroup.class))))
+	@Parameters({ @Parameter(name = "store",
+			schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)) })
+	public void updateGroup(@RequestBody ProductGroup group, @PathVariable String code,
+			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore) {
 
-    @GetMapping("/private/product/groups")
-    @Operation(
-            method = "GET",
-            description = "Get products groups for a given merchant",
-            responses =
-                    @ApiResponse(content = @Content(schema = @Schema(implementation = List.class))))
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-        @Parameter(
-                name = "lang",
-                schema =
-                        @Schema(
-                                name = "lang",
-                                type = "string",
-                                defaultValue = Constants.DEFAULT_LANGUAGE))
-    })
-    public @ResponseBody ReadableProductGroupList list(
-            @Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language) {
+		productItemsFacade.updateProductGroup(code, group, merchantStore);
+	}
 
-        return productItemsFacade.listProductGroups(merchantStore, language);
-    }
+	@GetMapping("/private/product/groups")
+	@Operation(method = "GET", description = "Get products groups for a given merchant",
+			responses = @ApiResponse(content = @Content(schema = @Schema(implementation = List.class))))
+	@Parameters({
+			@Parameter(name = "store",
+					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+			@Parameter(name = "lang",
+					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	public @ResponseBody ReadableProductGroupList list(
+			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
+			@Parameter(hidden = true) LanguageCode language) {
 
-    /**
-     * Query for a product group public/product/group/{code}?lang=fr|en no lang it will take session
-     * lang or default store lang code can be any code used while creating product group, defeult
-     * being FEATURED
-     */
-    @ResponseStatus(HttpStatus.OK)
-    @GetMapping("/private/products/group/{code}")
-    @Operation(
-            method = "GET",
-            description = "Get products by group code",
-            responses =
-                    @ApiResponse(
-                            content =
-                                    @Content(
-                                            schema =
-                                                    @Schema(
-                                                            implementation =
-                                                                    ReadableProductList.class))))
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-        @Parameter(
-                name = "lang",
-                schema =
-                        @Schema(
-                                name = "lang",
-                                type = "string",
-                                defaultValue = Constants.DEFAULT_LANGUAGE))
-    })
-    public @ResponseBody ReadableProductList productItemsByGroup(
-            @PathVariable final String code,
-            @Parameter(hidden = true) StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language) {
-        return productItemsFacade.listTinyProductsGroup(
-                code, merchantStore, LanguageCode.nonLanguage());
-    }
+		return productItemsFacade.listProductGroups(merchantStore, language);
+	}
 
-    @ResponseStatus(HttpStatus.OK)
-    @GetMapping("/products/group/{code}")
-    @Operation(
-            method = "GET",
-            description = "Get products by group code",
-            responses =
-                    @ApiResponse(
-                            content =
-                                    @Content(
-                                            schema =
-                                                    @Schema(
-                                                            implementation =
-                                                                    ReadableProductList.class))))
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-        @Parameter(
-                name = "lang",
-                schema =
-                        @Schema(
-                                name = "lang",
-                                type = "string",
-                                defaultValue = Constants.DEFAULT_LANGUAGE))
-    })
-    public @ResponseBody ReadableProductList getProductItemsByGroup(
-            @PathVariable final String code,
-            @Parameter(hidden = true) StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language) {
-        return productItemsFacade.listMinimalProductsGroup(code, merchantStore, language);
-    }
+	/**
+	 * Query for a product group public/product/group/{code}?lang=fr|en no lang it will
+	 * take session lang or default store lang code can be any code used while creating
+	 * product group, defeult being FEATURED
+	 */
+	@ResponseStatus(HttpStatus.OK)
+	@GetMapping("/private/products/group/{code}")
+	@Operation(method = "GET", description = "Get products by group code",
+			responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ReadableProductList.class))))
+	@Parameters({
+			@Parameter(name = "store",
+					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+			@Parameter(name = "lang",
+					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	public @ResponseBody ReadableProductList productItemsByGroup(@PathVariable final String code,
+			@Parameter(hidden = true) StoreMerchantId merchantStore, @Parameter(hidden = true) LanguageCode language) {
+		return productItemsFacade.listTinyProductsGroup(code, merchantStore, LanguageCode.nonLanguage());
+	}
 
-    @ResponseStatus(HttpStatus.CREATED)
-    @RequestMapping(
-            value = "/private/products/{productId}/group/{code}",
-            method = RequestMethod.POST)
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-        @Parameter(
-                name = "lang",
-                schema =
-                        @Schema(
-                                name = "lang",
-                                type = "string",
-                                defaultValue = Constants.DEFAULT_LANGUAGE))
-    })
-    public @ResponseBody void addProductToGroup(
-            @PathVariable Long productId,
-            @PathVariable String code,
-            @Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language) {
-        Product product = productService.findOne(productId, merchantStore);
-        productItemsFacade.addItemToGroup(product, code, merchantStore, language);
-    }
+	@ResponseStatus(HttpStatus.OK)
+	@GetMapping("/products/group/{code}")
+	@Operation(method = "GET", description = "Get products by group code",
+			responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ReadableProductList.class))))
+	@Parameters({
+			@Parameter(name = "store",
+					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+			@Parameter(name = "lang",
+					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	public @ResponseBody ReadableProductList getProductItemsByGroup(@PathVariable final String code,
+			@Parameter(hidden = true) StoreMerchantId merchantStore, @Parameter(hidden = true) LanguageCode language) {
+		return productItemsFacade.listMinimalProductsGroup(code, merchantStore, language);
+	}
 
-    @ResponseStatus(HttpStatus.OK)
-    @RequestMapping(
-            value = "/private/products/{productId}/group/{code}",
-            method = RequestMethod.DELETE)
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-        @Parameter(
-                name = "lang",
-                schema =
-                        @Schema(
-                                name = "lang",
-                                type = "string",
-                                defaultValue = Constants.DEFAULT_LANGUAGE))
-    })
-    public @ResponseBody void removeProductFromGroup(
-            @PathVariable Long productId,
-            @PathVariable String code,
-            @Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language) {
+	@ResponseStatus(HttpStatus.CREATED)
+	@RequestMapping(value = "/private/products/{productId}/group/{code}", method = RequestMethod.POST)
+	@Parameters({
+			@Parameter(name = "store",
+					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+			@Parameter(name = "lang",
+					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	public @ResponseBody void addProductToGroup(@PathVariable Long productId, @PathVariable String code,
+			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
+			@Parameter(hidden = true) LanguageCode language) {
+		Product product = productService.findOne(productId, merchantStore);
+		productItemsFacade.addItemToGroup(product, code, merchantStore, language);
+	}
 
-        Product product = productService.findOne(productId, merchantStore);
-        productItemsFacade.removeItemFromGroup(product, code, merchantStore, language);
-    }
+	@ResponseStatus(HttpStatus.OK)
+	@RequestMapping(value = "/private/products/{productId}/group/{code}", method = RequestMethod.DELETE)
+	@Parameters({
+			@Parameter(name = "store",
+					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+			@Parameter(name = "lang",
+					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	public @ResponseBody void removeProductFromGroup(@PathVariable Long productId, @PathVariable String code,
+			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
+			@Parameter(hidden = true) LanguageCode language) {
 
-    @ResponseStatus(HttpStatus.OK)
-    @DeleteMapping("/private/products/group/{code}")
-    @Operation(
-            method = "DELETE",
-            description = "Delete product group by group code",
-            responses =
-                    @ApiResponse(
-                            content =
-                                    @Content(
-                                            schema = @Schema(implementation = EntityExists.class))))
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR))
-    })
-    public void deleteGroup(
-            @PathVariable final String code,
-            @Parameter(hidden = true) StoreMerchantId merchantStore) {
+		Product product = productService.findOne(productId, merchantStore);
+		productItemsFacade.removeItemFromGroup(product, code, merchantStore, language);
+	}
 
-        productItemsFacade.deleteGroup(code, merchantStore);
-    }
+	@ResponseStatus(HttpStatus.OK)
+	@DeleteMapping("/private/products/group/{code}")
+	@Operation(method = "DELETE", description = "Delete product group by group code",
+			responses = @ApiResponse(content = @Content(schema = @Schema(implementation = EntityExists.class))))
+	@Parameters({ @Parameter(name = "store",
+			schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)) })
+	public void deleteGroup(@PathVariable final String code, @Parameter(hidden = true) StoreMerchantId merchantStore) {
+
+		productItemsFacade.deleteGroup(code, merchantStore);
+	}
+
 }

@@ -14,42 +14,38 @@ import org.springframework.util.Assert;
 @Setter
 @Getter
 public class ReadableFinalPricePopulator
-        extends AbstractDataPopulator<FinalPrice, StoreMerchantId, ReadableProductPrice> {
+		extends AbstractDataPopulator<FinalPrice, StoreMerchantId, ReadableProductPrice> {
 
-    private PricingService pricingService;
+	private PricingService pricingService;
 
-    @Override
-    public ReadableProductPrice populate(
-            FinalPrice source,
-            ReadableProductPrice target,
-            StoreMerchantId store,
-            LanguageCode language)
-            throws ConversionException {
-        Assert.notNull(pricingService, "pricingService must be set");
+	@Override
+	public ReadableProductPrice populate(FinalPrice source, ReadableProductPrice target, StoreMerchantId store,
+			LanguageCode language) throws ConversionException {
+		Assert.notNull(pricingService, "pricingService must be set");
 
-        try {
+		try {
 
-            target.setOriginalPrice(
-                    pricingService.getDisplayAmount(source.getOriginalPrice(), store));
-            if (source.isDiscounted()) {
-                target.setDiscounted(true);
-                target.setFinalPrice(
-                        pricingService.getDisplayAmount(source.getDiscountedPrice(), store));
-            } else {
-                target.setFinalPrice(
-                        pricingService.getDisplayAmount(source.getFinalPrice(), store));
-            }
+			target.setOriginalPrice(pricingService.getDisplayAmount(source.getOriginalPrice(), store));
+			if (source.isDiscounted()) {
+				target.setDiscounted(true);
+				target.setFinalPrice(pricingService.getDisplayAmount(source.getDiscountedPrice(), store));
+			}
+			else {
+				target.setFinalPrice(pricingService.getDisplayAmount(source.getFinalPrice(), store));
+			}
 
-        } catch (Exception e) {
-            throw new ConversionException("Exception while converting to ReadableProductPrice", e);
-        }
+		}
+		catch (Exception e) {
+			throw new ConversionException("Exception while converting to ReadableProductPrice", e);
+		}
 
-        return target;
-    }
+		return target;
+	}
 
-    @Override
-    protected ReadableProductPrice createTarget() {
-        // TODO Auto-generated method stub
-        return null;
-    }
+	@Override
+	protected ReadableProductPrice createTarget() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

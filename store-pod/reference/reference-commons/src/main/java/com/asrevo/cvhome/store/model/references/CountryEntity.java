@@ -14,14 +14,16 @@ import lombok.Setter;
 @Getter
 public class CountryEntity extends Entity {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    @JsonSerialize(using = CountryIsoCodeSerializer.class)
-    @JsonDeserialize(using = CountryIsoCodeDeSerializer.class)
-    private CountryIsoCode code;
+	@JsonSerialize(using = CountryIsoCodeSerializer.class)
+	@JsonDeserialize(using = CountryIsoCodeDeSerializer.class)
+	private CountryIsoCode code;
 
-    private boolean supported;
+	private boolean supported;
+
 }

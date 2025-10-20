@@ -6,6 +6,9 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Health {
-    private String status;
-    private String statusSince;
+
+	private String status;
+
+	private String statusSince;
+
 }

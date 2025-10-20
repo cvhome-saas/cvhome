@@ -7,9 +7,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface InternalOrgService {
-    ManagerOrgId createOrgForUser(Email email);
 
-    Page<ManagerOrgDto> findAll(Pageable pageable);
+	ManagerOrgId createOrgForUser(Email email);
 
-    ManagerOrgDto findOne(ManagerOrgId id);
+	Page<ManagerOrgDto> findAll(Pageable pageable);
+
+	ManagerOrgDto findOne(ManagerOrgId id);
+
 }

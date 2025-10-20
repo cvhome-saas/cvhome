@@ -4,5 +4,6 @@ import com.asrevo.cvhome.order.entity.customer.attribute.CustomerOption;
 
 public interface CustomerOptionService {
 
-    CustomerOption getById(Long id);
+	CustomerOption getById(Long id);
+
 }

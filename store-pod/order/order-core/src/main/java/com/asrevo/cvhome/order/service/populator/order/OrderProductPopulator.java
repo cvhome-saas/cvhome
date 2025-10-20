@@ -24,83 +24,78 @@ import org.springframework.util.Assert;
 @Getter
 @Component
 @AllArgsConstructor
-public class OrderProductPopulator
-        extends AbstractDataPopulator<ShoppingCartItem, StoreMerchantId, OrderProduct> {
-    private final ExternalProductService externalProductService;
+public class OrderProductPopulator extends AbstractDataPopulator<ShoppingCartItem, StoreMerchantId, OrderProduct> {
 
-    @Override
-    public OrderProduct populate(
-            ShoppingCartItem source,
-            OrderProduct target,
-            StoreMerchantId store,
-            LanguageCode language)
-            throws ConversionException {
+	private final ExternalProductService externalProductService;
 
-        Assert.notNull(externalProductService, "productService must be set");
+	@Override
+	public OrderProduct populate(ShoppingCartItem source, OrderProduct target, StoreMerchantId store,
+			LanguageCode language) throws ConversionException {
 
-        try {
+		Assert.notNull(externalProductService, "productService must be set");
 
-            target.setOneTimeCharge(source.getItemPrice());
-            target.setProductName("Product " + source.getSku());
-            target.setProductQuantity(source.getQuantity());
-            target.setSku(source.getSku());
+		try {
 
-            ProductDetails detailedProduct =
-                    externalProductService.getDetailedProduct(store, source.getSku(), language);
-            FinalPrice finalPrice = detailedProduct.price();
-            if (finalPrice == null) {
-                throw new ConversionException(
-                        "Object final price not populated in shoppingCartItem (source)");
-            }
-            // Default price
-            OrderProductPrice orderProductPrice = orderProductPrice(finalPrice);
-            orderProductPrice.setOrderProduct(target);
+			target.setOneTimeCharge(source.getItemPrice());
+			target.setProductName("Product " + source.getSku());
+			target.setProductQuantity(source.getQuantity());
+			target.setSku(source.getSku());
 
-            Set<OrderProductPrice> prices = new HashSet<>();
-            prices.add(orderProductPrice);
+			ProductDetails detailedProduct = externalProductService.getDetailedProduct(store, source.getSku(),
+					language);
+			FinalPrice finalPrice = detailedProduct.price();
+			if (finalPrice == null) {
+				throw new ConversionException("Object final price not populated in shoppingCartItem (source)");
+			}
+			// Default price
+			OrderProductPrice orderProductPrice = orderProductPrice(finalPrice);
+			orderProductPrice.setOrderProduct(target);
 
-            // Other prices
-            List<FinalPrice> otherPrices = finalPrice.getAdditionalPrices();
-            if (otherPrices != null) {
-                for (FinalPrice otherPrice : otherPrices) {
-                    OrderProductPrice other = orderProductPrice(otherPrice);
-                    other.setOrderProduct(target);
-                    prices.add(other);
-                }
-            }
+			Set<OrderProductPrice> prices = new HashSet<>();
+			prices.add(orderProductPrice);
 
-            target.setPrices(prices);
+			// Other prices
+			List<FinalPrice> otherPrices = finalPrice.getAdditionalPrices();
+			if (otherPrices != null) {
+				for (FinalPrice otherPrice : otherPrices) {
+					OrderProductPrice other = orderProductPrice(otherPrice);
+					other.setOrderProduct(target);
+					prices.add(other);
+				}
+			}
 
-        } catch (Exception e) {
-            throw new ConversionException(e);
-        }
+			target.setPrices(prices);
 
-        return target;
-    }
+		}
+		catch (Exception e) {
+			throw new ConversionException(e);
+		}
 
-    @Override
-    protected OrderProduct createTarget() {
-        return null;
-    }
+		return target;
+	}
 
-    private OrderProductPrice orderProductPrice(FinalPrice price) {
+	@Override
+	protected OrderProduct createTarget() {
+		return null;
+	}
 
-        OrderProductPrice orderProductPrice = new OrderProductPrice();
+	private OrderProductPrice orderProductPrice(FinalPrice price) {
 
-        SimpleProductPrice productPrice = price.getProductPrice();
+		OrderProductPrice orderProductPrice = new OrderProductPrice();
 
-        orderProductPrice.setDefaultPrice(productPrice.isDefaultPrice());
+		SimpleProductPrice productPrice = price.getProductPrice();
 
-        orderProductPrice.setProductPrice(price.getFinalPrice());
-        orderProductPrice.setProductPriceCode(productPrice.getCode());
-        if (price.isDiscounted()) {
-            orderProductPrice.setProductPriceSpecial(productPrice.getProductPriceSpecialAmount());
-            orderProductPrice.setProductPriceSpecialStartDate(
-                    productPrice.getProductPriceSpecialStartDate());
-            orderProductPrice.setProductPriceSpecialEndDate(
-                    productPrice.getProductPriceSpecialEndDate());
-        }
+		orderProductPrice.setDefaultPrice(productPrice.isDefaultPrice());
 
-        return orderProductPrice;
-    }
+		orderProductPrice.setProductPrice(price.getFinalPrice());
+		orderProductPrice.setProductPriceCode(productPrice.getCode());
+		if (price.isDiscounted()) {
+			orderProductPrice.setProductPriceSpecial(productPrice.getProductPriceSpecialAmount());
+			orderProductPrice.setProductPriceSpecialStartDate(productPrice.getProductPriceSpecialStartDate());
+			orderProductPrice.setProductPriceSpecialEndDate(productPrice.getProductPriceSpecialEndDate());
+		}
+
+		return orderProductPrice;
+	}
+
 }

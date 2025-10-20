@@ -11,10 +11,12 @@ import lombok.Setter;
 @Getter
 public class ProductList extends EntityList {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 7267292601646149482L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 7267292601646149482L;
 
-    private List<Product> products = new ArrayList<>();
+	private List<Product> products = new ArrayList<>();
+
 }

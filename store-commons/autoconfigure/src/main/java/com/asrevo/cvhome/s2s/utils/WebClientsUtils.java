@@ -14,77 +14,57 @@ import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 
 public class WebClientsUtils {
 
-    public static <T> T build(WebClient.Builder builder, String url, Class<T> tClass) {
-        WebClient client = builder.baseUrl(url).build();
-        HttpExchangeAdapter clientAdapter = WebClientAdapter.create(client);
-        return buildClient(tClass, clientAdapter);
-    }
+	public static <T> T build(WebClient.Builder builder, String url, Class<T> tClass) {
+		WebClient client = builder.baseUrl(url).build();
+		HttpExchangeAdapter clientAdapter = WebClientAdapter.create(client);
+		return buildClient(tClass, clientAdapter);
+	}
 
-    public static <T> T build(
-            WebClient.Builder builder, String url, Class<T> tClass, ObjectMapper customMapper) {
-        ExchangeStrategies strategies =
-                ExchangeStrategies.builder()
-                        .codecs(
-                                configurer -> {
-                                    configurer
-                                            .defaultCodecs()
-                                            .jackson2JsonEncoder(
-                                                    new Jackson2JsonEncoder(customMapper));
-                                    configurer
-                                            .defaultCodecs()
-                                            .jackson2JsonDecoder(
-                                                    new Jackson2JsonDecoder(customMapper));
-                                })
-                        .build();
+	public static <T> T build(WebClient.Builder builder, String url, Class<T> tClass, ObjectMapper customMapper) {
+		ExchangeStrategies strategies = ExchangeStrategies.builder().codecs(configurer -> {
+			configurer.defaultCodecs().jackson2JsonEncoder(new Jackson2JsonEncoder(customMapper));
+			configurer.defaultCodecs().jackson2JsonDecoder(new Jackson2JsonDecoder(customMapper));
+		}).build();
 
-        WebClient client = builder.baseUrl(url).exchangeStrategies(strategies).build();
+		WebClient client = builder.baseUrl(url).exchangeStrategies(strategies).build();
 
-        HttpExchangeAdapter clientAdapter = WebClientAdapter.create(client);
-        return buildClient(tClass, clientAdapter);
-    }
+		HttpExchangeAdapter clientAdapter = WebClientAdapter.create(client);
+		return buildClient(tClass, clientAdapter);
+	}
 
-    public static <T> T build(RestClient.Builder builder, String url, Class<T> tClass) {
-        RestClient client = builder.baseUrl(url).build();
-        HttpExchangeAdapter clientAdapter = RestClientAdapter.create(client);
-        return buildClient(tClass, clientAdapter);
-    }
+	public static <T> T build(RestClient.Builder builder, String url, Class<T> tClass) {
+		RestClient client = builder.baseUrl(url).build();
+		HttpExchangeAdapter clientAdapter = RestClientAdapter.create(client);
+		return buildClient(tClass, clientAdapter);
+	}
 
-    public static <T> T build(
-            RestClient.Builder builder, String url, Class<T> tClass, ObjectMapper customMapper) {
-        MappingJackson2HttpMessageConverter customJacksonConverter =
-                new MappingJackson2HttpMessageConverter(customMapper);
-        RestClient client =
-                builder.baseUrl(url)
-                        .messageConverters(
-                                converters -> {
-                                    converters.removeIf(
-                                            converter ->
-                                                    converter
-                                                            instanceof
-                                                            MappingJackson2HttpMessageConverter);
-                                    converters.add(customJacksonConverter);
-                                })
-                        .build();
+	public static <T> T build(RestClient.Builder builder, String url, Class<T> tClass, ObjectMapper customMapper) {
+		MappingJackson2HttpMessageConverter customJacksonConverter = new MappingJackson2HttpMessageConverter(
+				customMapper);
+		RestClient client = builder.baseUrl(url).messageConverters(converters -> {
+			converters.removeIf(converter -> converter instanceof MappingJackson2HttpMessageConverter);
+			converters.add(customJacksonConverter);
+		}).build();
 
-        HttpExchangeAdapter clientAdapter = RestClientAdapter.create(client);
-        return buildClient(tClass, clientAdapter);
-    }
+		HttpExchangeAdapter clientAdapter = RestClientAdapter.create(client);
+		return buildClient(tClass, clientAdapter);
+	}
 
-    private static <T> T buildClient(Class<T> tClass, HttpExchangeAdapter clientAdapter) {
-        HttpServiceProxyFactory.Builder proxyBuilder =
-                HttpServiceProxyFactory.builderFor(clientAdapter);
-        proxyBuilder
-                .customArgumentResolver(new LanguageCodeSerializeParamArgumentResolver())
-                .customArgumentResolver(new StoreMerchantIdSerializeParamArgumentResolver())
-                .customArgumentResolver(new StoreSerializeParamArgumentResolver())
-                .customArgumentResolver(new OrgSerializeParamArgumentResolver())
-                .customArgumentResolver(new DomainSerializeParamArgumentResolver());
-        try {
-            Class.forName("org.springframework.data.domain.Pageable");
-            proxyBuilder.customArgumentResolver(new PageableSerializeParamArgumentResolver());
-        } catch (Exception ignored) {
-            // Ignore if Pageable is not on the classpath
-        }
-        return proxyBuilder.build().createClient(tClass);
-    }
+	private static <T> T buildClient(Class<T> tClass, HttpExchangeAdapter clientAdapter) {
+		HttpServiceProxyFactory.Builder proxyBuilder = HttpServiceProxyFactory.builderFor(clientAdapter);
+		proxyBuilder.customArgumentResolver(new LanguageCodeSerializeParamArgumentResolver())
+			.customArgumentResolver(new StoreMerchantIdSerializeParamArgumentResolver())
+			.customArgumentResolver(new StoreSerializeParamArgumentResolver())
+			.customArgumentResolver(new OrgSerializeParamArgumentResolver())
+			.customArgumentResolver(new DomainSerializeParamArgumentResolver());
+		try {
+			Class.forName("org.springframework.data.domain.Pageable");
+			proxyBuilder.customArgumentResolver(new PageableSerializeParamArgumentResolver());
+		}
+		catch (Exception ignored) {
+			// Ignore if Pageable is not on the classpath
+		}
+		return proxyBuilder.build().createClient(tClass);
+	}
+
 }

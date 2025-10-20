@@ -28,24 +28,23 @@ import org.springframework.web.server.ServerWebExchange;
 @Slf4j
 @AllArgsConstructor
 public class SubscriptionController {
-    private final StripeSubscriptionService stripeSubscriptionService;
-    private final ServiceDomainProperties serviceDomainProperties;
 
-    @GetMapping("subscribe")
-    @ConditionalOnApiStatus
-    public ResponseEntity<Void> subscribe(
-            ServerWebExchange exchange,
-            @OrgStorePrincipalInfo UserOrgStoreIdentity identity,
-            @RequestParam PriceId priceId) {
-        ServerHttpRequest request = exchange.getRequest();
-        ServiceDomain serviceDomain = serviceDomainProperties.getService("store-ui");
-        RedirectionUrlBuilder urlBuilder =
-                new RedirectionUrlBuilder(getScheme(request), getPort(request), serviceDomain);
-        String sessionUrl =
-                stripeSubscriptionService.createSubscriptionSession(
-                        identity.org(), priceId, urlBuilder);
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Location", sessionUrl);
-        return new ResponseEntity<>(headers, HttpStatus.FOUND);
-    }
+	private final StripeSubscriptionService stripeSubscriptionService;
+
+	private final ServiceDomainProperties serviceDomainProperties;
+
+	@GetMapping("subscribe")
+	@ConditionalOnApiStatus
+	public ResponseEntity<Void> subscribe(ServerWebExchange exchange,
+			@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam PriceId priceId) {
+		ServerHttpRequest request = exchange.getRequest();
+		ServiceDomain serviceDomain = serviceDomainProperties.getService("store-ui");
+		RedirectionUrlBuilder urlBuilder = new RedirectionUrlBuilder(getScheme(request), getPort(request),
+				serviceDomain);
+		String sessionUrl = stripeSubscriptionService.createSubscriptionSession(identity.org(), priceId, urlBuilder);
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Location", sessionUrl);
+		return new ResponseEntity<>(headers, HttpStatus.FOUND);
+	}
+
 }

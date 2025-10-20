@@ -14,16 +14,18 @@ import lombok.Setter;
 @Getter
 public class ReadableLanguage implements Serializable {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    @JsonSerialize(using = LanguageCodeSerializer.class)
-    @JsonDeserialize(using = LanguageCodeDeSerializer.class)
-    private LanguageCode code;
+	@JsonSerialize(using = LanguageCodeSerializer.class)
+	@JsonDeserialize(using = LanguageCodeDeSerializer.class)
+	private LanguageCode code;
 
-    @JsonSerialize(using = LanguageCodeSerializer.class)
-    @JsonDeserialize(using = LanguageCodeDeSerializer.class)
-    private LanguageCode id;
+	@JsonSerialize(using = LanguageCodeSerializer.class)
+	@JsonDeserialize(using = LanguageCodeDeSerializer.class)
+	private LanguageCode id;
+
 }

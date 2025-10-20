@@ -13,17 +13,15 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class MessageConverterConfig {
 
-    @Bean
-    public JsonMessageConverter jsonMessageConverter() {
-        JsonMapper mapper =
-                JsonMapper.builder()
-                        .addModules(new JavaTimeModule(), new Jdk8Module())
-                        .setDefaultTyping(
-                                new StdTypeResolverBuilder()
-                                        .init(JsonTypeInfo.Id.CLASS, null)
-                                        .inclusion(JsonTypeInfo.As.WRAPPER_OBJECT))
-                        .build();
+	@Bean
+	public JsonMessageConverter jsonMessageConverter() {
+		JsonMapper mapper = JsonMapper.builder()
+			.addModules(new JavaTimeModule(), new Jdk8Module())
+			.setDefaultTyping(new StdTypeResolverBuilder().init(JsonTypeInfo.Id.CLASS, null)
+				.inclusion(JsonTypeInfo.As.WRAPPER_OBJECT))
+			.build();
 
-        return new JsonMessageConverter(new JacksonMapper(mapper));
-    }
+		return new JsonMessageConverter(new JacksonMapper(mapper));
+	}
+
 }

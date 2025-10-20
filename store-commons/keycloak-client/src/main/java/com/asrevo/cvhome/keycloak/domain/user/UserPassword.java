@@ -8,8 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * Object containing password information
- * for change password request
+ * Object containing password information for change password request
  *
  * @author carlsamson
  */
@@ -19,11 +18,14 @@ import lombok.Setter;
 @AllArgsConstructor
 public class UserPassword implements Serializable {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private String password = null;
-    private String changePassword = null;
+	private String password = null;
+
+	private String changePassword = null;
+
 }

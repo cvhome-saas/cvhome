@@ -18,48 +18,35 @@ import org.springframework.transaction.annotation.Transactional;
 @AllArgsConstructor
 @Slf4j
 public class SubscriptionServiceImpl implements SubscriptionService {
-    private final SubscriptionRepository subscriptionRepository;
-    private final SubscriptionMapper subscriptionMapper;
 
-    @Transactional
-    @Override
-    public void createInitialSubscription(ManagerOrgId orgId) {
-        SubscriptionEntity subscription = SubscriptionEntity.createInitialSubscription(orgId);
-        subscriptionRepository.save(subscription);
-    }
+	private final SubscriptionRepository subscriptionRepository;
 
-    @Override
-    public Optional<SubscriptionPlanDetails> subscriptionPlanDetails(ManagerOrgId org) {
-        return subscriptionRepository
-                .findById(org)
-                .map(subscriptionMapper::toSubscriptionPlanDetails);
-    }
+	private final SubscriptionMapper subscriptionMapper;
 
-    @Transactional
-    @Override
-    public void deActivateSubscription(ManagerOrgId org) {
-        subscriptionRepository
-                .findById(org)
-                .map(it -> subscriptionRepository.save(it.deActivate()));
-    }
+	@Transactional
+	@Override
+	public void createInitialSubscription(ManagerOrgId orgId) {
+		SubscriptionEntity subscription = SubscriptionEntity.createInitialSubscription(orgId);
+		subscriptionRepository.save(subscription);
+	}
 
-    @Transactional
-    @Override
-    public void renew(
-            ManagerOrgId org,
-            SubscriptionPlan subscriptionPlan,
-            Instant startDate,
-            Instant endDate,
-            RecurringPlan recurringPlan) {
-        subscriptionRepository
-                .findById(org)
-                .map(
-                        it ->
-                                subscriptionRepository.save(
-                                        it.renew(
-                                                subscriptionPlan,
-                                                startDate,
-                                                endDate,
-                                                recurringPlan)));
-    }
+	@Override
+	public Optional<SubscriptionPlanDetails> subscriptionPlanDetails(ManagerOrgId org) {
+		return subscriptionRepository.findById(org).map(subscriptionMapper::toSubscriptionPlanDetails);
+	}
+
+	@Transactional
+	@Override
+	public void deActivateSubscription(ManagerOrgId org) {
+		subscriptionRepository.findById(org).map(it -> subscriptionRepository.save(it.deActivate()));
+	}
+
+	@Transactional
+	@Override
+	public void renew(ManagerOrgId org, SubscriptionPlan subscriptionPlan, Instant startDate, Instant endDate,
+			RecurringPlan recurringPlan) {
+		subscriptionRepository.findById(org)
+			.map(it -> subscriptionRepository.save(it.renew(subscriptionPlan, startDate, endDate, recurringPlan)));
+	}
+
 }

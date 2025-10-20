@@ -18,21 +18,24 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Service
 @Slf4j
 public class StorePodClientFactory {
-    private final Map<PodId, StorePodClient> clients = new ConcurrentHashMap<>();
-    private final ServiceDomainProperties serviceDomainProperties;
-    private final WebClient.Builder defaultWebMicroServiceBuilder;
-    private final Environment environment;
 
-    public StorePodClient getClient(PodId podId) {
-        return clients.computeIfAbsent(podId, this::create);
-    }
+	private final Map<PodId, StorePodClient> clients = new ConcurrentHashMap<>();
 
-    private StorePodClient create(PodId podId) {
-        // @TODO check if private or public pod and a way to resolve .get
-        Pod pod = serviceDomainProperties.getPodByPodId(podId).get();
-        String merchant =
-                new ServiceUrlBuilder(serviceDomainProperties, environment)
-                        .getServiceUrl(pod, "merchant");
-        return WebClientsUtils.build(defaultWebMicroServiceBuilder, merchant, StorePodClient.class);
-    }
+	private final ServiceDomainProperties serviceDomainProperties;
+
+	private final WebClient.Builder defaultWebMicroServiceBuilder;
+
+	private final Environment environment;
+
+	public StorePodClient getClient(PodId podId) {
+		return clients.computeIfAbsent(podId, this::create);
+	}
+
+	private StorePodClient create(PodId podId) {
+		// @TODO check if private or public pod and a way to resolve .get
+		Pod pod = serviceDomainProperties.getPodByPodId(podId).get();
+		String merchant = new ServiceUrlBuilder(serviceDomainProperties, environment).getServiceUrl(pod, "merchant");
+		return WebClientsUtils.build(defaultWebMicroServiceBuilder, merchant, StorePodClient.class);
+	}
+
 }

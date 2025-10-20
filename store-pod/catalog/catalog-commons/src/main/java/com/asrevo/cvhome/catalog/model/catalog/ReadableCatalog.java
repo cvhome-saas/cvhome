@@ -12,20 +12,19 @@ import lombok.Setter;
 @Getter
 public class ReadableCatalog extends ReadableCatalogName {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private ReadableMerchantStore store;
+	private ReadableMerchantStore store;
 
-    private List<ReadableCategory> category = new ArrayList<>();
+	private List<ReadableCategory> category = new ArrayList<>();
 
-    /*	public List<ReadableCatalogCategoryEntry> getEntry() {
-    	return entry;
-    }
-    public void setEntry(List<ReadableCatalogCategoryEntry> entry) {
-    	this.entry = entry;
-    }*/
+	/*
+	 * public List<ReadableCatalogCategoryEntry> getEntry() { return entry; } public void
+	 * setEntry(List<ReadableCatalogCategoryEntry> entry) { this.entry = entry; }
+	 */
 
 }

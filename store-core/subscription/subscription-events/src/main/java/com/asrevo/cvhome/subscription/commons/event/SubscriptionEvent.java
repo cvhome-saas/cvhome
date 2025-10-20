@@ -5,11 +5,13 @@ import com.asrevo.cvhome.commons.event.Event;
 import java.util.List;
 
 public sealed interface SubscriptionEvent extends Event
-        permits SubscriptionDeActivateEvent, SubscriptionActivateEvent, SubscriptionCreatedEvent {
-    ManagerOrgId orgId();
+		permits SubscriptionDeActivateEvent, SubscriptionActivateEvent, SubscriptionCreatedEvent {
 
-    @Override
-    default List<String> getDestinations() {
-        return List.of("events-out-0");
-    }
+	ManagerOrgId orgId();
+
+	@Override
+	default List<String> getDestinations() {
+		return List.of("events-out-0");
+	}
+
 }

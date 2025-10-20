@@ -36,141 +36,130 @@ import org.springframework.util.Assert;
 @Slf4j
 public class ReadableShoppingCartMapper implements Mapper<ShoppingCart, ReadableShoppingCart> {
 
-    private final ShoppingCartCalculationService shoppingCartCalculationService;
+	private final ShoppingCartCalculationService shoppingCartCalculationService;
 
-    private final ExternalMerchantStoreService externalMerchantStoreService;
-    private final ExternalProductService externalProductService;
+	private final ExternalMerchantStoreService externalMerchantStoreService;
 
-    public ReadableShoppingCartMapper(
-            ShoppingCartCalculationService shoppingCartCalculationService,
-            ExternalMerchantStoreService externalMerchantStoreService,
-            ExternalProductService externalProductService) {
-        this.shoppingCartCalculationService = shoppingCartCalculationService;
-        this.externalMerchantStoreService = externalMerchantStoreService;
-        this.externalProductService = externalProductService;
-    }
+	private final ExternalProductService externalProductService;
 
-    @Override
-    public ReadableShoppingCart convert(
-            ShoppingCart source, StoreMerchantId store, LanguageCode language) {
-        ReadableShoppingCart destination = new ReadableShoppingCart();
-        return this.merge(source, destination, store, language);
-    }
+	public ReadableShoppingCartMapper(ShoppingCartCalculationService shoppingCartCalculationService,
+			ExternalMerchantStoreService externalMerchantStoreService, ExternalProductService externalProductService) {
+		this.shoppingCartCalculationService = shoppingCartCalculationService;
+		this.externalMerchantStoreService = externalMerchantStoreService;
+		this.externalProductService = externalProductService;
+	}
 
-    @Override
-    public ReadableShoppingCart merge(
-            ShoppingCart source,
-            ReadableShoppingCart destination,
-            StoreMerchantId store,
-            LanguageCode language) {
-        Assert.notNull(source, "ShoppingCart cannot be null");
-        Assert.notNull(destination, "ReadableShoppingCart cannot be null");
-        Assert.notNull(store, "store cannot be null");
-        Assert.notNull(language, "Language cannot be null");
+	@Override
+	public ReadableShoppingCart convert(ShoppingCart source, StoreMerchantId store, LanguageCode language) {
+		ReadableShoppingCart destination = new ReadableShoppingCart();
+		return this.merge(source, destination, store, language);
+	}
 
-        destination.setCode(source.getShoppingCartCode());
-        int cartQuantity = 0;
+	@Override
+	public ReadableShoppingCart merge(ShoppingCart source, ReadableShoppingCart destination, StoreMerchantId store,
+			LanguageCode language) {
+		Assert.notNull(source, "ShoppingCart cannot be null");
+		Assert.notNull(destination, "ReadableShoppingCart cannot be null");
+		Assert.notNull(store, "store cannot be null");
+		Assert.notNull(language, "Language cannot be null");
 
-        destination.setCustomer(source.getCustomerId());
+		destination.setCode(source.getShoppingCartCode());
+		int cartQuantity = 0;
 
-        try {
+		destination.setCustomer(source.getCustomerId());
 
-            if (!StringUtils.isBlank(source.getPromoCode())) {
-                Date promoDateAdded = source.getPromoAdded(); // promo valid 1 day
-                if (promoDateAdded == null) {
-                    promoDateAdded = new Date();
-                }
-                Instant instant = promoDateAdded.toInstant();
-                ZonedDateTime zdt = instant.atZone(ZoneId.systemDefault());
-                LocalDate date = zdt.toLocalDate();
-                // date added < date + 1 day
-                LocalDate tomorrow = LocalDate.now().plusDays(1);
-                if (date.isBefore(tomorrow)) {
-                    destination.setPromoCode(source.getPromoCode());
-                }
-            }
+		try {
 
-            Set<ShoppingCartItem> items =
-                    Optional.ofNullable(source.getLineItems()).orElse(Set.of());
+			if (!StringUtils.isBlank(source.getPromoCode())) {
+				Date promoDateAdded = source.getPromoAdded(); // promo valid 1 day
+				if (promoDateAdded == null) {
+					promoDateAdded = new Date();
+				}
+				Instant instant = promoDateAdded.toInstant();
+				ZonedDateTime zdt = instant.atZone(ZoneId.systemDefault());
+				LocalDate date = zdt.toLocalDate();
+				// date added < date + 1 day
+				LocalDate tomorrow = LocalDate.now().plusDays(1);
+				if (date.isBefore(tomorrow)) {
+					destination.setPromoCode(source.getPromoCode());
+				}
+			}
 
-            ReadableMerchantStore merchantStore = externalMerchantStoreService.getStore(store);
-            for (ShoppingCartItem item : items) {
-                ProductDetails detailedProduct =
-                        externalProductService.getDetailedProduct(store, item.getSku(), language);
-                ReadableMinimalProduct minimalProduct = detailedProduct.product();
-                if (minimalProduct != null) {
-                    ReadableShoppingCartItem shoppingCartItem = new ReadableShoppingCartItem();
-                    BeanUtils.copyProperties(shoppingCartItem, minimalProduct);
+			Set<ShoppingCartItem> items = Optional.ofNullable(source.getLineItems()).orElse(Set.of());
 
-                    shoppingCartItem.setPrice(item.getItemPrice());
-                    shoppingCartItem.setFinalPrice(
-                            PriceUtils.getStoreFormatedAmountWithCurrency(
-                                    merchantStore, item.getItemPrice()));
+			ReadableMerchantStore merchantStore = externalMerchantStoreService.getStore(store);
+			for (ShoppingCartItem item : items) {
+				ProductDetails detailedProduct = externalProductService.getDetailedProduct(store, item.getSku(),
+						language);
+				ReadableMinimalProduct minimalProduct = detailedProduct.product();
+				if (minimalProduct != null) {
+					ReadableShoppingCartItem shoppingCartItem = new ReadableShoppingCartItem();
+					BeanUtils.copyProperties(shoppingCartItem, minimalProduct);
 
-                    shoppingCartItem.setQuantity(item.getQuantity());
+					shoppingCartItem.setPrice(item.getItemPrice());
+					shoppingCartItem.setFinalPrice(
+							PriceUtils.getStoreFormatedAmountWithCurrency(merchantStore, item.getItemPrice()));
 
-                    cartQuantity = cartQuantity + item.getQuantity();
+					shoppingCartItem.setQuantity(item.getQuantity());
 
-                    BigDecimal subTotal =
-                            PriceUtils.calculatePriceQuantity(
-                                    item.getItemPrice(), item.getQuantity());
+					cartQuantity = cartQuantity + item.getQuantity();
 
-                    // calculate sub total (price * quantity)
-                    shoppingCartItem.setSubTotal(subTotal);
+					BigDecimal subTotal = PriceUtils.calculatePriceQuantity(item.getItemPrice(), item.getQuantity());
 
-                    shoppingCartItem.setDisplaySubTotal(
-                            PriceUtils.getStoreFormatedAmountWithCurrency(merchantStore, subTotal));
-                    destination.getProducts().add(shoppingCartItem);
-                }
-            }
+					// calculate sub total (price * quantity)
+					shoppingCartItem.setSubTotal(subTotal);
 
-            // OrdetTotalSummary contains all calculations
+					shoppingCartItem
+						.setDisplaySubTotal(PriceUtils.getStoreFormatedAmountWithCurrency(merchantStore, subTotal));
+					destination.getProducts().add(shoppingCartItem);
+				}
+			}
 
-            OrderTotalSummary orderSummary =
-                    shoppingCartCalculationService.calculate(source, store, language);
+			// OrdetTotalSummary contains all calculations
 
-            if (CollectionUtils.isNotEmpty(orderSummary.getTotals())) {
+			OrderTotalSummary orderSummary = shoppingCartCalculationService.calculate(source, store, language);
 
-                if (orderSummary.getTotals().stream()
-                        .noneMatch(
-                                t -> Constants.OT_DISCOUNT_TITLE.equals(t.getOrderTotalCode()))) {
-                    // no promo coupon applied
-                    destination.setPromoCode(null);
-                }
+			if (CollectionUtils.isNotEmpty(orderSummary.getTotals())) {
 
-                List<ReadableOrderTotal> totals = new ArrayList<>();
-                for (OrderTotal t : orderSummary.getTotals()) {
-                    ReadableOrderTotal total = new ReadableOrderTotal();
-                    total.setCode(t.getOrderTotalCode());
-                    total.setValue(t.getValue());
-                    total.setText(t.getText());
-                    totals.add(total);
-                }
-                destination.setTotals(totals);
-            }
+				if (orderSummary.getTotals()
+					.stream()
+					.noneMatch(t -> Constants.OT_DISCOUNT_TITLE.equals(t.getOrderTotalCode()))) {
+					// no promo coupon applied
+					destination.setPromoCode(null);
+				}
 
-            destination.setSubtotal(orderSummary.getSubTotal());
-            destination.setDisplaySubTotal(
-                    PriceUtils.getStoreFormatedAmountWithCurrency(
-                            merchantStore, orderSummary.getSubTotal()));
+				List<ReadableOrderTotal> totals = new ArrayList<>();
+				for (OrderTotal t : orderSummary.getTotals()) {
+					ReadableOrderTotal total = new ReadableOrderTotal();
+					total.setCode(t.getOrderTotalCode());
+					total.setValue(t.getValue());
+					total.setText(t.getText());
+					totals.add(total);
+				}
+				destination.setTotals(totals);
+			}
 
-            destination.setTotal(orderSummary.getTotal());
-            destination.setDisplayTotal(
-                    PriceUtils.getStoreFormatedAmountWithCurrency(
-                            merchantStore, orderSummary.getTotal()));
+			destination.setSubtotal(orderSummary.getSubTotal());
+			destination.setDisplaySubTotal(
+					PriceUtils.getStoreFormatedAmountWithCurrency(merchantStore, orderSummary.getSubTotal()));
 
-            destination.setQuantity(cartQuantity);
-            destination.setId(source.getId());
+			destination.setTotal(orderSummary.getTotal());
+			destination
+				.setDisplayTotal(PriceUtils.getStoreFormatedAmountWithCurrency(merchantStore, orderSummary.getTotal()));
 
-            if (source.getOrderId() != null) {
-                destination.setOrder(source.getOrderId());
-            }
+			destination.setQuantity(cartQuantity);
+			destination.setId(source.getId());
 
-        } catch (Exception e) {
-            throw new ConversionRuntimeException(
-                    "An error occurred while converting ReadableShoppingCart", e);
-        }
+			if (source.getOrderId() != null) {
+				destination.setOrder(source.getOrderId());
+			}
 
-        return destination;
-    }
+		}
+		catch (Exception e) {
+			throw new ConversionRuntimeException("An error occurred while converting ReadableShoppingCart", e);
+		}
+
+		return destination;
+	}
+
 }

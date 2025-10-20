@@ -17,17 +17,26 @@ import lombok.Setter;
 @Getter
 public class ProductSpecification implements Serializable {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private BigDecimal height;
-    private BigDecimal weight;
-    private BigDecimal length;
-    private BigDecimal width;
-    private String model;
-    private String manufacturer; // manufacturer code
-    private DimensionUnitOfMeasure dimensionUnitOfMeasure;
-    private WeightUnitOfMeasure weightUnitOfMeasure;
+	private BigDecimal height;
+
+	private BigDecimal weight;
+
+	private BigDecimal length;
+
+	private BigDecimal width;
+
+	private String model;
+
+	private String manufacturer; // manufacturer code
+
+	private DimensionUnitOfMeasure dimensionUnitOfMeasure;
+
+	private WeightUnitOfMeasure weightUnitOfMeasure;
+
 }

@@ -7,56 +7,58 @@ import org.springframework.cloud.client.ServiceInstance;
 import software.amazon.awssdk.services.servicediscovery.model.HttpInstanceSummary;
 
 public class CloudMapServiceInstance implements ServiceInstance {
-    private final HttpInstanceSummary instance;
-    private final Integer port;
 
-    public CloudMapServiceInstance(HttpInstanceSummary instance, Integer port) {
-        this.instance = instance;
-        this.port = port;
-    }
+	private final HttpInstanceSummary instance;
 
-    @Override
-    public String getServiceId() {
-        return this.instance.serviceName();
-    }
+	private final Integer port;
 
-    public String getNamespace() {
-        return this.instance.namespaceName();
-    }
+	public CloudMapServiceInstance(HttpInstanceSummary instance, Integer port) {
+		this.instance = instance;
+		this.port = port;
+	}
 
-    @Override
-    public String getHost() {
-        return instance.attributes().get("AWS_INSTANCE_IPV4");
-    }
+	@Override
+	public String getServiceId() {
+		return this.instance.serviceName();
+	}
 
-    @Override
-    public int getPort() {
-        return Integer.parseInt(
-                instance.attributes().getOrDefault("AWS_INSTANCE_PORT", port.toString()));
-    }
+	public String getNamespace() {
+		return this.instance.namespaceName();
+	}
 
-    @Override
-    public boolean isSecure() {
-        return Boolean.parseBoolean(instance.attributes().getOrDefault("SECURE", "false"));
-    }
+	@Override
+	public String getHost() {
+		return instance.attributes().get("AWS_INSTANCE_IPV4");
+	}
 
-    @Override
-    public URI getUri() {
-        return DefaultServiceInstance.getUri(this);
-    }
+	@Override
+	public int getPort() {
+		return Integer.parseInt(instance.attributes().getOrDefault("AWS_INSTANCE_PORT", port.toString()));
+	}
 
-    @Override
-    public Map<String, String> getMetadata() {
-        return instance.attributes();
-    }
+	@Override
+	public boolean isSecure() {
+		return Boolean.parseBoolean(instance.attributes().getOrDefault("SECURE", "false"));
+	}
 
-    @Override
-    public String getInstanceId() {
-        return instance.instanceId();
-    }
+	@Override
+	public URI getUri() {
+		return DefaultServiceInstance.getUri(this);
+	}
 
-    @Override
-    public String getScheme() {
-        return isSecure() ? "https" : "http";
-    }
+	@Override
+	public Map<String, String> getMetadata() {
+		return instance.attributes();
+	}
+
+	@Override
+	public String getInstanceId() {
+		return instance.instanceId();
+	}
+
+	@Override
+	public String getScheme() {
+		return isSecure() ? "https" : "http";
+	}
+
 }

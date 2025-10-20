@@ -46,301 +46,166 @@ import org.springframework.web.multipart.MultipartFile;
 @AllArgsConstructor
 public class MerchantStoreApi {
 
-    private final StoreFacade storeFacade;
-    private final ImageFilePath imageFilePath;
+	private final StoreFacade storeFacade;
 
-    @GetMapping(
-            value = {"/store/{code}"},
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(
-            method = "GET",
-            description = "Get merchant store",
-            responses =
-                    @ApiResponse(
-                            content =
-                                    @Content(
-                                            schema =
-                                                    @Schema(
-                                                            implementation =
-                                                                    ReadableMerchantStore.class))))
-    @Parameters({
-        @Parameter(
-                name = "lang",
-                schema =
-                        @Schema(
-                                name = "lang",
-                                type = "string",
-                                defaultValue = Constants.DEFAULT_LANGUAGE))
-    })
-    @ConditionalOnApiStatus
-    public ReadableMerchantStore store(
-            @PathVariable String code,
-            @RequestParam(value = "lang", required = false) String lang) {
-        return storeFacade.getByMerchantStoreId(new StoreMerchantId(code), new LanguageCode(lang));
-    }
+	private final ImageFilePath imageFilePath;
 
-    @GetMapping(
-            value = {"/private/store"},
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(
-            method = "GET",
-            description = "Get merchant store full details",
-            responses =
-                    @ApiResponse(
-                            content =
-                                    @Content(
-                                            schema =
-                                                    @Schema(
-                                                            implementation =
-                                                                    ReadableMerchantStore.class))))
-    @Parameters({
-        @Parameter(
-                name = "lang",
-                schema =
-                        @Schema(
-                                name = "lang",
-                                type = "string",
-                                defaultValue = Constants.DEFAULT_LANGUAGE))
-    })
-    @ConditionalOnApiStatus
-    public ReadableMerchantStore storeFull(
-            @SecuredResource StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language) {
-        return storeFacade.getByMerchantStoreId(merchantStore, language);
-    }
+	@GetMapping(value = { "/store/{code}" }, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Operation(method = "GET", description = "Get merchant store",
+			responses = @ApiResponse(
+					content = @Content(schema = @Schema(implementation = ReadableMerchantStore.class))))
+	@Parameters({ @Parameter(name = "lang",
+			schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	@ConditionalOnApiStatus
+	public ReadableMerchantStore store(@PathVariable String code,
+			@RequestParam(value = "lang", required = false) String lang) {
+		return storeFacade.getByMerchantStoreId(new StoreMerchantId(code), new LanguageCode(lang));
+	}
 
-    @ResponseStatus(HttpStatus.OK)
-    @GetMapping(
-            value = {"/store/languages"},
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(
-            method = "GET",
-            description = "Get list of store supported languages.",
-            responses =
-                    @ApiResponse(
-                            content =
-                                    @Content(
-                                            schema =
-                                                    @Schema(
-                                                            implementation =
-                                                                    ReadableMerchantStore.class))))
-    @ConditionalOnApiStatus
-    public List<LanguageCode> supportedLanguages(
-            @Parameter(hidden = true) StoreMerchantId merchantStore) {
+	@GetMapping(value = { "/private/store" }, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Operation(method = "GET", description = "Get merchant store full details",
+			responses = @ApiResponse(
+					content = @Content(schema = @Schema(implementation = ReadableMerchantStore.class))))
+	@Parameters({ @Parameter(name = "lang",
+			schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	@ConditionalOnApiStatus
+	public ReadableMerchantStore storeFull(@SecuredResource StoreMerchantId merchantStore,
+			@Parameter(hidden = true) LanguageCode language) {
+		return storeFacade.getByMerchantStoreId(merchantStore, language);
+	}
 
-        return storeFacade.supportedLanguages(merchantStore);
-    }
+	@ResponseStatus(HttpStatus.OK)
+	@GetMapping(value = { "/store/languages" }, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Operation(method = "GET", description = "Get list of store supported languages.",
+			responses = @ApiResponse(
+					content = @Content(schema = @Schema(implementation = ReadableMerchantStore.class))))
+	@ConditionalOnApiStatus
+	public List<LanguageCode> supportedLanguages(@Parameter(hidden = true) StoreMerchantId merchantStore) {
 
-    @ResponseStatus(HttpStatus.OK)
-    @PostMapping(
-            value = {"/private/store"},
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(
-            method = "POST",
-            description = "Creates a new store",
-            responses =
-                    @ApiResponse(
-                            content =
-                                    @Content(
-                                            schema =
-                                                    @Schema(
-                                                            implementation =
-                                                                    ReadableMerchantStore.class))))
-    @ConditionalOnApiStatus
-    public void create(@Valid @RequestBody PersistableMerchantStore store) {
-        storeFacade.create(store);
-    }
+		return storeFacade.supportedLanguages(merchantStore);
+	}
 
-    @ResponseStatus(HttpStatus.OK)
-    @PutMapping(
-            value = {"/private/store"},
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(
-            method = "PUT",
-            description = "Updates a store",
-            responses =
-                    @ApiResponse(
-                            content =
-                                    @Content(
-                                            schema =
-                                                    @Schema(
-                                                            implementation =
-                                                                    ReadableMerchantStore.class))))
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-    })
-    @ConditionalOnApiStatus(usage = ApiUsage.USED)
-    public void update(
-            @SecuredResource MerchantStore merchantStore,
-            @Valid @RequestBody PersistableMerchantStore store) {
-        storeFacade.update(store);
-    }
+	@ResponseStatus(HttpStatus.OK)
+	@PostMapping(value = { "/private/store" }, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Operation(method = "POST", description = "Creates a new store",
+			responses = @ApiResponse(
+					content = @Content(schema = @Schema(implementation = ReadableMerchantStore.class))))
+	@ConditionalOnApiStatus
+	public void create(@Valid @RequestBody PersistableMerchantStore store) {
+		storeFacade.create(store);
+	}
 
-    @ResponseStatus(HttpStatus.OK)
-    @PutMapping(
-            value = {"/private/store/social-links"},
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(
-            method = "PUT",
-            description = "Updates store social links",
-            responses =
-                    @ApiResponse(
-                            content =
-                                    @Content(
-                                            schema =
-                                                    @Schema(
-                                                            implementation =
-                                                                    ReadableMerchantStore.class))))
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-    })
-    @ConditionalOnApiStatus(usage = ApiUsage.USED)
-    public void updateSocialLinks(
-            @SecuredResource MerchantStore merchantStore,
-            @RequestBody PersistableMerchantStore store) {
-        storeFacade.updateSocialLinks(merchantStore.getId(), store.getSocialLinks());
-    }
+	@ResponseStatus(HttpStatus.OK)
+	@PutMapping(value = { "/private/store" }, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Operation(method = "PUT", description = "Updates a store",
+			responses = @ApiResponse(
+					content = @Content(schema = @Schema(implementation = ReadableMerchantStore.class))))
+	@Parameters({ @Parameter(name = "store",
+			schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)), })
+	@ConditionalOnApiStatus(usage = ApiUsage.USED)
+	public void update(@SecuredResource MerchantStore merchantStore,
+			@Valid @RequestBody PersistableMerchantStore store) {
+		storeFacade.update(store);
+	}
 
-    @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping(value = {"/private/store/marketing/logo"})
-    @Operation(method = "POST", description = "Add store logo")
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-    })
-    @ConditionalOnApiStatus
-    public void addLogo(
-            @SecuredResource StoreMerchantId merchantStore,
-            @RequestParam("file") MultipartFile uploadfile) {
+	@ResponseStatus(HttpStatus.OK)
+	@PutMapping(value = { "/private/store/social-links" }, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Operation(method = "PUT", description = "Updates store social links",
+			responses = @ApiResponse(
+					content = @Content(schema = @Schema(implementation = ReadableMerchantStore.class))))
+	@Parameters({ @Parameter(name = "store",
+			schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)), })
+	@ConditionalOnApiStatus(usage = ApiUsage.USED)
+	public void updateSocialLinks(@SecuredResource MerchantStore merchantStore,
+			@RequestBody PersistableMerchantStore store) {
+		storeFacade.updateSocialLinks(merchantStore.getId(), store.getSocialLinks());
+	}
 
-        InputContentFile cmsContentImage = createInputContentFile(uploadfile, FileContentType.LOGO);
-        storeFacade.addStoreLogo(merchantStore, cmsContentImage);
-    }
+	@ResponseStatus(HttpStatus.CREATED)
+	@PostMapping(value = { "/private/store/marketing/logo" })
+	@Operation(method = "POST", description = "Add store logo")
+	@Parameters({ @Parameter(name = "store",
+			schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)), })
+	@ConditionalOnApiStatus
+	public void addLogo(@SecuredResource StoreMerchantId merchantStore,
+			@RequestParam("file") MultipartFile uploadfile) {
 
-    @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping(value = {"/private/store/marketing/banner"})
-    @Operation(method = "POST", description = "Add store banner")
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-    })
-    @ConditionalOnApiStatus
-    public void addBanner(
-            @SecuredResource StoreMerchantId merchantStore,
-            @RequestParam("file") MultipartFile uploadfile) {
+		InputContentFile cmsContentImage = createInputContentFile(uploadfile, FileContentType.LOGO);
+		storeFacade.addStoreLogo(merchantStore, cmsContentImage);
+	}
 
-        InputContentFile cmsContentImage =
-                createInputContentFile(uploadfile, FileContentType.BANNER);
-        storeFacade.addStoreBanner(merchantStore, cmsContentImage);
-    }
+	@ResponseStatus(HttpStatus.CREATED)
+	@PostMapping(value = { "/private/store/marketing/banner" })
+	@Operation(method = "POST", description = "Add store banner")
+	@Parameters({ @Parameter(name = "store",
+			schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)), })
+	@ConditionalOnApiStatus
+	public void addBanner(@SecuredResource StoreMerchantId merchantStore,
+			@RequestParam("file") MultipartFile uploadfile) {
 
-    @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping(value = {"/private/store/marketing/add-slider-image"})
-    @Operation(method = "POST", description = "Add image")
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-    })
-    @ConditionalOnApiStatus
-    public ReadableSliderImage addSliderImage(
-            @SecuredResource StoreMerchantId merchantStore,
-            @RequestParam("file") MultipartFile file) {
+		InputContentFile cmsContentImage = createInputContentFile(uploadfile, FileContentType.BANNER);
+		storeFacade.addStoreBanner(merchantStore, cmsContentImage);
+	}
 
-        InputContentFile cmsContentImage = createInputContentFile(file, FileContentType.SLIDER);
-        String extension = FilenameUtils.getExtension(file.getOriginalFilename());
-        String newFileName = UUID.randomUUID() + "." + extension;
-        cmsContentImage.setFileName(newFileName);
-        SliderImage sliderImage = storeFacade.addStoreSliderImage(merchantStore, cmsContentImage);
-        return new ReadableSliderImage(
-                sliderImage.priority(),
-                sliderImage.name(),
-                imageFilePath.buildStoreSliderFilePath(merchantStore, newFileName));
-    }
+	@ResponseStatus(HttpStatus.CREATED)
+	@PostMapping(value = { "/private/store/marketing/add-slider-image" })
+	@Operation(method = "POST", description = "Add image")
+	@Parameters({ @Parameter(name = "store",
+			schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)), })
+	@ConditionalOnApiStatus
+	public ReadableSliderImage addSliderImage(@SecuredResource StoreMerchantId merchantStore,
+			@RequestParam("file") MultipartFile file) {
 
-    @ResponseStatus(HttpStatus.CREATED)
-    @PutMapping(value = {"/private/store/marketing/slider-images"})
-    @Operation(method = "PUT", description = "Save slider images with its order")
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-    })
-    @ConditionalOnApiStatus
-    public void sliderImages(
-            @SecuredResource MerchantStore merchantStore,
-            @RequestBody PersistableMerchantStore store) {
-        storeFacade.updateSliderImages(merchantStore.getId(), store.getSliderImages());
-    }
+		InputContentFile cmsContentImage = createInputContentFile(file, FileContentType.SLIDER);
+		String extension = FilenameUtils.getExtension(file.getOriginalFilename());
+		String newFileName = UUID.randomUUID() + "." + extension;
+		cmsContentImage.setFileName(newFileName);
+		SliderImage sliderImage = storeFacade.addStoreSliderImage(merchantStore, cmsContentImage);
+		return new ReadableSliderImage(sliderImage.priority(), sliderImage.name(),
+				imageFilePath.buildStoreSliderFilePath(merchantStore, newFileName));
+	}
 
-    private InputContentFile createInputContentFile(
-            MultipartFile image, FileContentType contentType) {
+	@ResponseStatus(HttpStatus.CREATED)
+	@PutMapping(value = { "/private/store/marketing/slider-images" })
+	@Operation(method = "PUT", description = "Save slider images with its order")
+	@Parameters({ @Parameter(name = "store",
+			schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)), })
+	@ConditionalOnApiStatus
+	public void sliderImages(@SecuredResource MerchantStore merchantStore,
+			@RequestBody PersistableMerchantStore store) {
+		storeFacade.updateSliderImages(merchantStore.getId(), store.getSliderImages());
+	}
 
-        InputContentFile cmsContentImage;
+	private InputContentFile createInputContentFile(MultipartFile image, FileContentType contentType) {
 
-        try {
+		InputContentFile cmsContentImage;
 
-            InputStream input = new ByteArrayInputStream(image.getBytes());
-            cmsContentImage = new InputContentFile();
-            cmsContentImage.setFileName(image.getOriginalFilename());
-            cmsContentImage.setMimeType(image.getContentType());
-            cmsContentImage.setFileContentType(contentType);
-            cmsContentImage.setFile(input);
+		try {
 
-        } catch (IOException ioe) {
-            throw new RestApiException(ioe);
-        }
+			InputStream input = new ByteArrayInputStream(image.getBytes());
+			cmsContentImage = new InputContentFile();
+			cmsContentImage.setFileName(image.getOriginalFilename());
+			cmsContentImage.setMimeType(image.getContentType());
+			cmsContentImage.setFileContentType(contentType);
+			cmsContentImage.setFile(input);
 
-        return cmsContentImage;
-    }
+		}
+		catch (IOException ioe) {
+			throw new RestApiException(ioe);
+		}
 
-    @ResponseStatus(HttpStatus.OK)
-    @DeleteMapping(value = {"/private/store"})
-    @Operation(
-            method = "DELETE",
-            description = "Deletes a store",
-            responses = @ApiResponse(content = @Content(schema = @Schema())))
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-    })
-    @ConditionalOnApiStatus
-    public void delete(@SecuredResource StoreMerchantId merchantStore) {
-        storeFacade.delete(merchantStore);
-    }
+		return cmsContentImage;
+	}
+
+	@ResponseStatus(HttpStatus.OK)
+	@DeleteMapping(value = { "/private/store" })
+	@Operation(method = "DELETE", description = "Deletes a store",
+			responses = @ApiResponse(content = @Content(schema = @Schema())))
+	@Parameters({ @Parameter(name = "store",
+			schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)), })
+	@ConditionalOnApiStatus
+	public void delete(@SecuredResource StoreMerchantId merchantStore) {
+		storeFacade.delete(merchantStore);
+	}
+
 }

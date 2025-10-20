@@ -7,6 +7,8 @@ import org.springframework.web.service.annotation.HttpExchange;
 
 @HttpExchange("/api/v1")
 public interface ExternalMerchantStoreService {
-    @GetExchange("store")
-    ReadableMerchantStore getStore(StoreMerchantId store);
+
+	@GetExchange("store")
+	ReadableMerchantStore getStore(StoreMerchantId store);
+
 }

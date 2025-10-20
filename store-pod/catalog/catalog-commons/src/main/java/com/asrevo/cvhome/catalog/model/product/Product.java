@@ -10,17 +10,22 @@ import lombok.Setter;
 @Getter
 public class Product extends Entity implements Serializable {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private boolean productShipeable = false;
+	private boolean productShipeable = false;
 
-    private boolean available;
-    private boolean visible = true;
+	private boolean available;
 
-    private int sortOrder;
-    private String dateAvailable;
-    private String creationDate;
+	private boolean visible = true;
+
+	private int sortOrder;
+
+	private String dateAvailable;
+
+	private String creationDate;
+
 }

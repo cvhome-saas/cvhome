@@ -28,266 +28,243 @@ import software.amazon.awssdk.services.s3.model.*;
 @Slf4j
 public class S3StaticContentAssetsManagerImpl implements ContentAssetsManager {
 
-    @Serial private static final long serialVersionUID = 1L;
-    private final S3Client s3;
-    private final String bucket;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    public S3StaticContentAssetsManagerImpl(S3Client s3Client, String bucket) {
-        this.s3 = s3Client;
-        this.bucket = bucket;
-    }
+	private final S3Client s3;
 
-    @Override
-    public OutputContentFile getFile(
-            String merchantStoreCode,
-            Optional<String> folderPath,
-            FileContentType fileContentType,
-            String contentName)
-            throws ServiceException {
-        try {
-            // get buckets
-            String bucketName = bucketName();
-            GetObjectRequest getObjectRequest =
-                    GetObjectRequest.builder()
-                            .bucket(bucketName)
-                            .key(nodePath(merchantStoreCode, fileContentType) + contentName)
-                            .build();
-            ResponseInputStream<GetObjectResponse> o = s3.getObject(getObjectRequest);
+	private final String bucket;
 
-            log.info("Content getFile");
-            return getOutputContentFile(IOUtils.toByteArray(o));
-        } catch (final Exception e) {
-            log.error("Error while getting file", e);
-            throw new ServiceException(e);
-        }
-    }
+	public S3StaticContentAssetsManagerImpl(S3Client s3Client, String bucket) {
+		this.s3 = s3Client;
+		this.bucket = bucket;
+	}
 
-    @Override
-    public List<String> getFileNames(
-            String merchantStoreCode, Optional<String> folderPath, FileContentType fileContentType)
-            throws ServiceException {
-        try {
-            // get buckets
-            String bucketName = bucketName();
+	@Override
+	public OutputContentFile getFile(String merchantStoreCode, Optional<String> folderPath,
+			FileContentType fileContentType, String contentName) throws ServiceException {
+		try {
+			// get buckets
+			String bucketName = bucketName();
+			GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+				.bucket(bucketName)
+				.key(nodePath(merchantStoreCode, fileContentType) + contentName)
+				.build();
+			ResponseInputStream<GetObjectResponse> o = s3.getObject(getObjectRequest);
 
-            ListObjectsV2Request listObjectsRequest =
-                    ListObjectsV2Request.builder()
-                            .bucket(bucketName)
-                            .prefix(nodePath(merchantStoreCode, fileContentType))
-                            .build();
+			log.info("Content getFile");
+			return getOutputContentFile(IOUtils.toByteArray(o));
+		}
+		catch (final Exception e) {
+			log.error("Error while getting file", e);
+			throw new ServiceException(e);
+		}
+	}
 
-            List<String> fileNames = null;
+	@Override
+	public List<String> getFileNames(String merchantStoreCode, Optional<String> folderPath,
+			FileContentType fileContentType) throws ServiceException {
+		try {
+			// get buckets
+			String bucketName = bucketName();
 
-            ListObjectsV2Response listObjectsV2Response = s3.listObjectsV2(listObjectsRequest);
+			ListObjectsV2Request listObjectsRequest = ListObjectsV2Request.builder()
+				.bucket(bucketName)
+				.prefix(nodePath(merchantStoreCode, fileContentType))
+				.build();
 
-            List<S3Object> contents = listObjectsV2Response.contents();
-            for (S3Object os : contents) {
-                if (isInsideSubFolder(os.key())) {
-                    continue;
-                }
-                if (fileNames == null) {
-                    fileNames = new ArrayList<>();
-                }
-                String mimetype = URLConnection.guessContentTypeFromName(os.key());
-                if (!StringUtils.isBlank(mimetype)) {
-                    fileNames.add(getName(os.key()));
-                }
-            }
+			List<String> fileNames = null;
 
-            log.info("Content get file names");
-            return fileNames;
-        } catch (final Exception e) {
-            log.error("Error while getting file names", e);
-            throw new ServiceException(e);
-        }
-    }
+			ListObjectsV2Response listObjectsV2Response = s3.listObjectsV2(listObjectsRequest);
 
-    @Override
-    public List<OutputContentFile> getFiles(
-            String merchantStoreCode, Optional<String> folderPath, FileContentType fileContentType)
-            throws ServiceException {
-        try {
-            // get buckets
-            String bucketName = bucketName();
+			List<S3Object> contents = listObjectsV2Response.contents();
+			for (S3Object os : contents) {
+				if (isInsideSubFolder(os.key())) {
+					continue;
+				}
+				if (fileNames == null) {
+					fileNames = new ArrayList<>();
+				}
+				String mimetype = URLConnection.guessContentTypeFromName(os.key());
+				if (!StringUtils.isBlank(mimetype)) {
+					fileNames.add(getName(os.key()));
+				}
+			}
 
-            ListObjectsV2Request listObjectsRequest =
-                    ListObjectsV2Request.builder()
-                            .bucket(bucketName)
-                            .prefix(nodePath(merchantStoreCode, fileContentType))
-                            .build();
+			log.info("Content get file names");
+			return fileNames;
+		}
+		catch (final Exception e) {
+			log.error("Error while getting file names", e);
+			throw new ServiceException(e);
+		}
+	}
 
-            List<OutputContentFile> files = null;
+	@Override
+	public List<OutputContentFile> getFiles(String merchantStoreCode, Optional<String> folderPath,
+			FileContentType fileContentType) throws ServiceException {
+		try {
+			// get buckets
+			String bucketName = bucketName();
 
-            ListObjectsV2Response listObjectsV2Response = s3.listObjectsV2(listObjectsRequest);
-            List<S3Object> objects = listObjectsV2Response.contents();
-            for (S3Object os : objects) {
-                if (files == null) {
-                    files = new ArrayList<>();
-                }
-                String mimetype = URLConnection.guessContentTypeFromName(os.key());
-                if (!StringUtils.isBlank(mimetype)) {
-                    ResponseInputStream<GetObjectResponse> o =
-                            s3.getObject(
-                                    GetObjectRequest.builder()
-                                            .bucket(bucketName)
-                                            .key(os.key())
-                                            .build());
-                    byte[] byteArray = IOUtils.toByteArray(o);
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream(byteArray.length);
-                    baos.write(byteArray, 0, byteArray.length);
-                    OutputContentFile ct = new OutputContentFile();
-                    ct.setFile(baos);
-                    files.add(ct);
-                }
-            }
+			ListObjectsV2Request listObjectsRequest = ListObjectsV2Request.builder()
+				.bucket(bucketName)
+				.prefix(nodePath(merchantStoreCode, fileContentType))
+				.build();
 
-            log.info("Content getFiles");
-            return files;
-        } catch (final Exception e) {
-            log.error("Error while getting files", e);
-            throw new ServiceException(e);
-        }
-    }
+			List<OutputContentFile> files = null;
 
-    @Override
-    public void addFile(
-            String merchantStoreCode,
-            Optional<String> folderPath,
-            InputContentFile inputStaticContentData)
-            throws ServiceException {
+			ListObjectsV2Response listObjectsV2Response = s3.listObjectsV2(listObjectsRequest);
+			List<S3Object> objects = listObjectsV2Response.contents();
+			for (S3Object os : objects) {
+				if (files == null) {
+					files = new ArrayList<>();
+				}
+				String mimetype = URLConnection.guessContentTypeFromName(os.key());
+				if (!StringUtils.isBlank(mimetype)) {
+					ResponseInputStream<GetObjectResponse> o = s3
+						.getObject(GetObjectRequest.builder().bucket(bucketName).key(os.key()).build());
+					byte[] byteArray = IOUtils.toByteArray(o);
+					ByteArrayOutputStream baos = new ByteArrayOutputStream(byteArray.length);
+					baos.write(byteArray, 0, byteArray.length);
+					OutputContentFile ct = new OutputContentFile();
+					ct.setFile(baos);
+					files.add(ct);
+				}
+			}
 
-        try {
-            // get buckets
-            String bucketName = bucketName();
+			log.info("Content getFiles");
+			return files;
+		}
+		catch (final Exception e) {
+			log.error("Error while getting files", e);
+			throw new ServiceException(e);
+		}
+	}
 
-            String nodePath =
-                    nodePath(merchantStoreCode, inputStaticContentData.getFileContentType());
+	@Override
+	public void addFile(String merchantStoreCode, Optional<String> folderPath, InputContentFile inputStaticContentData)
+			throws ServiceException {
 
-            PutObjectRequest putObjectRequest =
-                    PutObjectRequest.builder()
-                            .bucket(bucketName)
-                            .key(nodePath + inputStaticContentData.getFileName())
-                            .metadata(Map.of("content-type", inputStaticContentData.getMimeType()))
-                            .build();
+		try {
+			// get buckets
+			String bucketName = bucketName();
 
-            s3.putObject(
-                    putObjectRequest,
-                    RequestBody.fromBytes(IOUtils.toByteArray(inputStaticContentData.getFile())));
+			String nodePath = nodePath(merchantStoreCode, inputStaticContentData.getFileContentType());
 
-            log.info("Content add file");
-        } catch (final Exception e) {
-            log.error("Error while adding file", e);
-            throw new ServiceException(e);
-        }
-    }
+			PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+				.bucket(bucketName)
+				.key(nodePath + inputStaticContentData.getFileName())
+				.metadata(Map.of("content-type", inputStaticContentData.getMimeType()))
+				.build();
 
-    @Override
-    public void addFiles(
-            String merchantStoreCode,
-            Optional<String> folderPath,
-            List<InputContentFile> inputStaticContentDataList)
-            throws ServiceException {
+			s3.putObject(putObjectRequest,
+					RequestBody.fromBytes(IOUtils.toByteArray(inputStaticContentData.getFile())));
 
-        if (inputStaticContentDataList != null && !inputStaticContentDataList.isEmpty()) {
-            for (InputContentFile inputFile : inputStaticContentDataList) {
-                this.addFile(merchantStoreCode, folderPath, inputFile);
-            }
-        }
-    }
+			log.info("Content add file");
+		}
+		catch (final Exception e) {
+			log.error("Error while adding file", e);
+			throw new ServiceException(e);
+		}
+	}
 
-    @Override
-    public void removeFile(
-            String merchantStoreCode,
-            FileContentType staticContentType,
-            String fileName,
-            Optional<String> folderPath)
-            throws ServiceException {
+	@Override
+	public void addFiles(String merchantStoreCode, Optional<String> folderPath,
+			List<InputContentFile> inputStaticContentDataList) throws ServiceException {
 
-        try {
-            // get buckets
-            String bucketName = bucketName();
+		if (inputStaticContentDataList != null && !inputStaticContentDataList.isEmpty()) {
+			for (InputContentFile inputFile : inputStaticContentDataList) {
+				this.addFile(merchantStoreCode, folderPath, inputFile);
+			}
+		}
+	}
 
-            s3.deleteObject(
-                    DeleteObjectRequest.builder()
-                            .bucket(bucketName)
-                            .key(nodePath(merchantStoreCode, staticContentType) + fileName)
-                            .build());
+	@Override
+	public void removeFile(String merchantStoreCode, FileContentType staticContentType, String fileName,
+			Optional<String> folderPath) throws ServiceException {
 
-            log.info("Remove file");
-        } catch (final Exception e) {
-            log.error("Error while removing file", e);
-            throw new ServiceException(e);
-        }
-    }
+		try {
+			// get buckets
+			String bucketName = bucketName();
 
-    @Override
-    public void removeFiles(String merchantStoreCode, Optional<String> folderPath)
-            throws ServiceException {
+			s3.deleteObject(DeleteObjectRequest.builder()
+				.bucket(bucketName)
+				.key(nodePath(merchantStoreCode, staticContentType) + fileName)
+				.build());
 
-        try {
-            // get buckets
-            String bucketName = bucketName();
+			log.info("Remove file");
+		}
+		catch (final Exception e) {
+			log.error("Error while removing file", e);
+			throw new ServiceException(e);
+		}
+	}
 
-            s3.deleteObject(
-                    DeleteObjectRequest.builder()
-                            .bucket(bucketName)
-                            .key(nodePath(merchantStoreCode))
-                            .build());
+	@Override
+	public void removeFiles(String merchantStoreCode, Optional<String> folderPath) throws ServiceException {
 
-            log.info("Remove folder");
-        } catch (final Exception e) {
-            log.error("Error while removing folder", e);
-            throw new ServiceException(e);
-        }
-    }
+		try {
+			// get buckets
+			String bucketName = bucketName();
 
-    private Bucket getBucket(String bucket_name) {
+			s3.deleteObject(DeleteObjectRequest.builder().bucket(bucketName).key(nodePath(merchantStoreCode)).build());
 
-        Bucket named_bucket = null;
-        ListBucketsResponse listBucketsResponse = s3.listBuckets();
-        for (Bucket b : listBucketsResponse.buckets()) {
-            if (b.name().equals(bucket_name)) {
-                named_bucket = b;
-            }
-        }
+			log.info("Remove folder");
+		}
+		catch (final Exception e) {
+			log.error("Error while removing folder", e);
+			throw new ServiceException(e);
+		}
+	}
 
-        if (named_bucket == null) {
-            named_bucket = createBucket(bucket_name);
-        }
+	private Bucket getBucket(String bucket_name) {
 
-        return named_bucket;
-    }
+		Bucket named_bucket = null;
+		ListBucketsResponse listBucketsResponse = s3.listBuckets();
+		for (Bucket b : listBucketsResponse.buckets()) {
+			if (b.name().equals(bucket_name)) {
+				named_bucket = b;
+			}
+		}
 
-    private Bucket createBucket(String bucket_name) {
-        try {
-            s3.createBucket(CreateBucketRequest.builder().bucket(bucket_name).build());
-        } catch (Exception e) {
-            log.error("error creating bucket", e);
-        }
-        return getBucket(bucket_name);
-    }
+		if (named_bucket == null) {
+			named_bucket = createBucket(bucket_name);
+		}
 
-    @Override
-    public void addFolder(
-            String merchantStoreCode, String folderName, Optional<String> folderPath) {
-        // TODO Auto-generated method stub
+		return named_bucket;
+	}
 
-    }
+	private Bucket createBucket(String bucket_name) {
+		try {
+			s3.createBucket(CreateBucketRequest.builder().bucket(bucket_name).build());
+		}
+		catch (Exception e) {
+			log.error("error creating bucket", e);
+		}
+		return getBucket(bucket_name);
+	}
 
-    @Override
-    public void removeFolder(
-            String merchantStoreCode, String folderName, Optional<String> folderPath) {
-        // TODO Auto-generated method stub
+	@Override
+	public void addFolder(String merchantStoreCode, String folderName, Optional<String> folderPath) {
+		// TODO Auto-generated method stub
 
-    }
+	}
 
-    @Override
-    public List<String> listFolders(String merchantStoreCode, Optional<String> path) {
-        // TODO Auto-generated method stub
-        return null;
-    }
+	@Override
+	public void removeFolder(String merchantStoreCode, String folderName, Optional<String> folderPath) {
+		// TODO Auto-generated method stub
 
-    private String bucketName() {
-        return bucket;
-    }
+	}
+
+	@Override
+	public List<String> listFolders(String merchantStoreCode, Optional<String> path) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private String bucketName() {
+		return bucket;
+	}
+
 }

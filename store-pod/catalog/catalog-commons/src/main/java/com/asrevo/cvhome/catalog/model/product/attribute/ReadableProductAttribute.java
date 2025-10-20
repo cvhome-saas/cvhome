@@ -12,15 +12,20 @@ import lombok.Setter;
 @Getter
 public class ReadableProductAttribute extends ProductAttributeEntity implements Serializable {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private String name;
-    private String lang;
-    private String code;
-    private String type;
+	private String name;
 
-    private List<ReadableProductAttributeValue> attributeValues = new ArrayList<>();
+	private String lang;
+
+	private String code;
+
+	private String type;
+
+	private List<ReadableProductAttributeValue> attributeValues = new ArrayList<>();
+
 }

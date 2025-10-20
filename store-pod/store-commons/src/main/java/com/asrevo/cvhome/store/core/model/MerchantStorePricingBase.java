@@ -12,17 +12,19 @@ import lombok.Setter;
 @Setter
 @Getter
 public class MerchantStorePricingBase {
-    private boolean currencyFormatNational;
 
-    @JsonSerialize(using = CurrencyCodeSerializer.class)
-    @JsonDeserialize(using = CurrencyCodeDeSerializer.class)
-    private CurrencyCode currency; // code
+	private boolean currencyFormatNational;
 
-    @JsonSerialize(using = LanguageCodeSerializer.class)
-    @JsonDeserialize(using = LanguageCodeDeSerializer.class)
-    private LanguageCode defaultLanguage; // code
+	@JsonSerialize(using = CurrencyCodeSerializer.class)
+	@JsonDeserialize(using = CurrencyCodeDeSerializer.class)
+	private CurrencyCode currency; // code
 
-    @JsonSerialize(using = CountryIsoCodeSerializer.class)
-    @JsonDeserialize(using = CountryIsoCodeDeSerializer.class)
-    private CountryIsoCode countryIsoCode;
+	@JsonSerialize(using = LanguageCodeSerializer.class)
+	@JsonDeserialize(using = LanguageCodeDeSerializer.class)
+	private LanguageCode defaultLanguage; // code
+
+	@JsonSerialize(using = CountryIsoCodeSerializer.class)
+	@JsonDeserialize(using = CountryIsoCodeDeSerializer.class)
+	private CountryIsoCode countryIsoCode;
+
 }

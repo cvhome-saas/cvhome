@@ -16,28 +16,31 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 @Slf4j
 public class CustomerSubscriptionDeleted implements WebhookHandler {
-    private final ToJsonObj toJsonObj = new ToJsonObj();
-    private final EventProcessor eventProcessor;
 
-    @Override
-    public void handle(Event event) {
+	private final ToJsonObj toJsonObj = new ToJsonObj();
 
-        JsonObject jo = toJsonObj(event);
+	private final EventProcessor eventProcessor;
 
-        JsonElement orgIdElement = jo.getAsJsonObject("metadata").get("orgId");
+	@Override
+	public void handle(Event event) {
 
-        ManagerOrgId orgId = new ManagerOrgId(orgIdElement.getAsString());
+		JsonObject jo = toJsonObj(event);
 
-        eventProcessor.process(CustomerSubscriptionDeletedEvent.from(orgId));
-        log.info("Customer subscription deleted for {}", orgId);
-    }
+		JsonElement orgIdElement = jo.getAsJsonObject("metadata").get("orgId");
 
-    @Override
-    public String type() {
-        return "customer.subscription.deleted";
-    }
+		ManagerOrgId orgId = new ManagerOrgId(orgIdElement.getAsString());
 
-    private JsonObject toJsonObj(Event event) {
-        return toJsonObj.exec(event.getDataObjectDeserializer().getRawJson());
-    }
+		eventProcessor.process(CustomerSubscriptionDeletedEvent.from(orgId));
+		log.info("Customer subscription deleted for {}", orgId);
+	}
+
+	@Override
+	public String type() {
+		return "customer.subscription.deleted";
+	}
+
+	private JsonObject toJsonObj(Event event) {
+		return toJsonObj.exec(event.getDataObjectDeserializer().getRawJson());
+	}
+
 }

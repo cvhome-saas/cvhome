@@ -6,5 +6,7 @@ import com.asrevo.cvhome.store.model.references.ReadableCountry;
 import java.util.List;
 
 public interface CountryFacade {
-    List<ReadableCountry> getListCountryZones(LanguageCode language, StoreMerchantId merchantStore);
+
+	List<ReadableCountry> getListCountryZones(LanguageCode language, StoreMerchantId merchantStore);
+
 }

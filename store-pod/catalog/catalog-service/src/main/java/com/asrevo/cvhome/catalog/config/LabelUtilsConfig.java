@@ -6,8 +6,10 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class LabelUtilsConfig {
-    @Bean
-    public LabelUtils labelUtils() {
-        return new LabelUtils();
-    }
+
+	@Bean
+	public LabelUtils labelUtils() {
+		return new LabelUtils();
+	}
+
 }

@@ -11,15 +11,16 @@ import lombok.Setter;
 @Setter
 public class ProductDimensions {
 
-    @Column(name = "LENGTH")
-    private BigDecimal length;
+	@Column(name = "LENGTH")
+	private BigDecimal length;
 
-    @Column(name = "WIDTH")
-    private BigDecimal width;
+	@Column(name = "WIDTH")
+	private BigDecimal width;
 
-    @Column(name = "HEIGHT")
-    private BigDecimal height;
+	@Column(name = "HEIGHT")
+	private BigDecimal height;
 
-    @Column(name = "WEIGHT")
-    private BigDecimal weight;
+	@Column(name = "WEIGHT")
+	private BigDecimal weight;
+
 }

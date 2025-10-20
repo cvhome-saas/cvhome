@@ -21,38 +21,42 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Country extends SalesManagerEntity<CountryIsoCode, Country> {
-    @Serial private static final long serialVersionUID = 1L;
 
-    @EmbeddedId
-    @JsonSerialize(using = CountryIsoCodeSerializer.class)
-    @JsonDeserialize(using = CountryIsoCodeDeSerializer.class)
-    @AttributeOverrides({
-        @AttributeOverride(name = "isoCode", column = @Column(name = "COUNTRY_ISOCODE", length = 6))
-    })
-    private CountryIsoCode isoCode;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "country", cascade = CascadeType.ALL)
-    private Set<CountryDescription> descriptions = new HashSet<>();
+	@EmbeddedId
+	@JsonSerialize(using = CountryIsoCodeSerializer.class)
+	@JsonDeserialize(using = CountryIsoCodeDeSerializer.class)
+	@AttributeOverrides({
+			@AttributeOverride(name = "isoCode", column = @Column(name = "COUNTRY_ISOCODE", length = 6)) })
+	private CountryIsoCode isoCode;
 
-    @JsonIgnore
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "country")
-    private Set<Zone> zones = new HashSet<>();
+	@JsonIgnore
+	@OneToMany(mappedBy = "country", cascade = CascadeType.ALL)
+	private Set<CountryDescription> descriptions = new HashSet<>();
 
-    @Column(name = "COUNTRY_SUPPORTED")
-    private boolean supported = true;
+	@JsonIgnore
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "country")
+	private Set<Zone> zones = new HashSet<>();
 
-    @Transient private String name;
+	@Column(name = "COUNTRY_SUPPORTED")
+	private boolean supported = true;
 
-    public Country() {}
+	@Transient
+	private String name;
 
-    @Override
-    public CountryIsoCode getId() {
-        return isoCode;
-    }
+	public Country() {
+	}
 
-    @Override
-    public void setId(CountryIsoCode id) {
-        this.isoCode = id;
-    }
+	@Override
+	public CountryIsoCode getId() {
+		return isoCode;
+	}
+
+	@Override
+	public void setId(CountryIsoCode id) {
+		this.isoCode = id;
+	}
+
 }

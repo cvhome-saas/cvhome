@@ -14,19 +14,20 @@ import java.math.BigDecimal;
  */
 public interface PricingService {
 
-    /**
-     * Calculates the FinalPrice of a Product taking into account
-     * all defined prices and possible rebates
-     */
-    FinalPrice calculateProductPrice(Product product) throws ServiceException;
+	/**
+	 * Calculates the FinalPrice of a Product taking into account all defined prices and
+	 * possible rebates
+	 */
+	FinalPrice calculateProductPrice(Product product) throws ServiceException;
 
-    /**
-     * Calculates the price on a specific inventory
-     */
-    FinalPrice calculateProductPrice(ProductAvailability product) throws ServiceException;
+	/**
+	 * Calculates the price on a specific inventory
+	 */
+	FinalPrice calculateProductPrice(ProductAvailability product) throws ServiceException;
 
-    /**
-     * Method to be used to print a displayable formated amount to the end user
-     */
-    String getDisplayAmount(BigDecimal amount, StoreMerchantId store) throws ServiceException;
+	/**
+	 * Method to be used to print a displayable formated amount to the end user
+	 */
+	String getDisplayAmount(BigDecimal amount, StoreMerchantId store) throws ServiceException;
+
 }

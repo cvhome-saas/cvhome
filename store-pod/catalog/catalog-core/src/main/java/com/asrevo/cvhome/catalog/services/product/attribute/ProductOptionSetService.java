@@ -8,12 +8,12 @@ import java.util.List;
 
 public interface ProductOptionSetService extends SalesManagerEntityService<Long, ProductOptionSet> {
 
-    List<ProductOptionSet> listByStore(StoreMerchantId store, LanguageCode language);
+	List<ProductOptionSet> listByStore(StoreMerchantId store, LanguageCode language);
 
-    ProductOptionSet getById(StoreMerchantId store, Long optionId, LanguageCode lang);
+	ProductOptionSet getById(StoreMerchantId store, Long optionId, LanguageCode lang);
 
-    ProductOptionSet getCode(StoreMerchantId store, String code);
+	ProductOptionSet getCode(StoreMerchantId store, String code);
 
-    List<ProductOptionSet> getByProductType(
-            Long productTypeId, StoreMerchantId store, LanguageCode lang);
+	List<ProductOptionSet> getByProductType(Long productTypeId, StoreMerchantId store, LanguageCode lang);
+
 }

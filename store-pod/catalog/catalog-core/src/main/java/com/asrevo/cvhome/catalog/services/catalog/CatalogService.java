@@ -7,17 +7,17 @@ import java.util.Optional;
 
 public interface CatalogService extends SalesManagerEntityService<Long, Catalog> {
 
-    /**
-     * Creates a new Catalog
-     *
-     * @return Catalog
-     */
-    Catalog saveOrUpdate(Catalog catalog, StoreMerchantId store);
+	/**
+	 * Creates a new Catalog
+	 * @return Catalog
+	 */
+	Catalog saveOrUpdate(Catalog catalog, StoreMerchantId store);
 
-    Optional<Catalog> getByCode(String code, StoreMerchantId store);
+	Optional<Catalog> getByCode(String code, StoreMerchantId store);
 
-    /**
-     * Delete a Catalog and related objects
-     */
-    void delete(Catalog catalog);
+	/**
+	 * Delete a Catalog and related objects
+	 */
+	void delete(Catalog catalog);
+
 }

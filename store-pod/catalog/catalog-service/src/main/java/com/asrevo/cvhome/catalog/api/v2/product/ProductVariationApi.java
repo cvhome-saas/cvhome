@@ -47,8 +47,7 @@ import org.springframework.web.bind.annotation.*;
  * <p>
  * The flow is the following
  * <p>
- * - create a product definition
- * - create a product variant
+ * - create a product definition - create a product variant
  *
  * @author Carl Samson
  */
@@ -58,304 +57,170 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 public class ProductVariationApi {
 
-    private final PricingService pricingService;
-    private final ProductService productService;
-    private final CategoryFacade categoryFacade;
-    private final ProductVariationFacade productVariationFacade;
+	private final PricingService pricingService;
 
-    public ProductVariationApi(
-            PricingService pricingService,
-            ProductService productService,
-            CategoryFacade categoryFacade,
-            ProductVariationFacade productVariationFacade) {
-        this.pricingService = pricingService;
-        this.productService = productService;
-        this.categoryFacade = categoryFacade;
-        this.productVariationFacade = productVariationFacade;
-    }
+	private final ProductService productService;
 
-    /**
-     * Calculates the price based on selected options if any
-     */
-    @RequestMapping(value = "/product/{id}/variation", method = RequestMethod.POST)
-    @ResponseStatus(HttpStatus.OK)
-    @Operation(
-            method = "POST",
-            description = "Get product price variation based on selected product",
-            responses =
-                    @ApiResponse(
-                            content =
-                                    @Content(
-                                            mediaType = "application/json",
-                                            schema =
-                                                    @Schema(
-                                                            implementation =
-                                                                    ReadableProductPrice.class))))
-    @ResponseBody
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-        @Parameter(
-                name = "lang",
-                schema =
-                        @Schema(
-                                name = "lang",
-                                type = "string",
-                                defaultValue = Constants.DEFAULT_LANGUAGE))
-    })
-    public ReadableProductPrice calculateVariant(
-            @PathVariable final Long id,
-            @RequestBody ReadableSelectedProductVariant options,
-            @Parameter(hidden = true) StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language,
-            HttpServletResponse response)
-            throws Exception {
+	private final CategoryFacade categoryFacade;
 
-        Product product = productService.getById(id);
+	private final ProductVariationFacade productVariationFacade;
 
-        if (product == null) {
-            response.sendError(404, "Product not fount for id " + id);
-            return null;
-        }
+	public ProductVariationApi(PricingService pricingService, ProductService productService,
+			CategoryFacade categoryFacade, ProductVariationFacade productVariationFacade) {
+		this.pricingService = pricingService;
+		this.productService = productService;
+		this.categoryFacade = categoryFacade;
+		this.productVariationFacade = productVariationFacade;
+	}
 
-        List<ReadableProductVariantValue> ids = options.getOptions();
+	/**
+	 * Calculates the price based on selected options if any
+	 */
+	@RequestMapping(value = "/product/{id}/variation", method = RequestMethod.POST)
+	@ResponseStatus(HttpStatus.OK)
+	@Operation(method = "POST", description = "Get product price variation based on selected product",
+			responses = @ApiResponse(content = @Content(mediaType = "application/json",
+					schema = @Schema(implementation = ReadableProductPrice.class))))
+	@ResponseBody
+	@Parameters({
+			@Parameter(name = "store",
+					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+			@Parameter(name = "lang",
+					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	public ReadableProductPrice calculateVariant(@PathVariable final Long id,
+			@RequestBody ReadableSelectedProductVariant options,
+			@Parameter(hidden = true) StoreMerchantId merchantStore, @Parameter(hidden = true) LanguageCode language,
+			HttpServletResponse response) throws Exception {
 
-        if (CollectionUtils.isEmpty(ids)) {
-            return null;
-        }
+		Product product = productService.getById(id);
 
-        FinalPrice price = pricingService.calculateProductPrice(product);
-        ReadableProductPrice readablePrice = new ReadableProductPrice();
-        ReadableFinalPricePopulator populator = new ReadableFinalPricePopulator();
-        populator.setPricingService(pricingService);
-        populator.populate(price, readablePrice, merchantStore, language);
-        return readablePrice;
-    }
+		if (product == null) {
+			response.sendError(404, "Product not fount for id " + id);
+			return null;
+		}
 
-    @RequestMapping(value = "/category/{id}/variations", method = RequestMethod.GET)
-    @ResponseStatus(HttpStatus.OK)
-    @Operation(
-            method = "GET",
-            description = "Get all variation for all items in a given category",
-            responses =
-                    @ApiResponse(
-                            content =
-                                    @Content(
-                                            mediaType = "application/json",
-                                            schema = @Schema(implementation = List.class))))
-    @ResponseBody
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-        @Parameter(
-                name = "lang",
-                schema =
-                        @Schema(
-                                name = "lang",
-                                type = "string",
-                                defaultValue = Constants.DEFAULT_LANGUAGE))
-    })
-    public List<ReadableProductVariant> categoryVariantList(
-            @PathVariable final Long id, // category id
-            @Parameter(hidden = true) StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language) {
+		List<ReadableProductVariantValue> ids = options.getOptions();
 
-        return categoryFacade.categoryProductVariants(id, merchantStore, language);
-    }
+		if (CollectionUtils.isEmpty(ids)) {
+			return null;
+		}
 
-    @ResponseStatus(HttpStatus.CREATED)
-    @RequestMapping(
-            value = {"/private/product/variation"},
-            method = RequestMethod.POST)
-    @Operation(
-            method = "POST",
-            description = "Creates a new product variant",
-            responses =
-                    @ApiResponse(
-                            content = @Content(mediaType = "application/json", schema = @Schema())))
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-        @Parameter(
-                name = "lang",
-                schema =
-                        @Schema(
-                                name = "lang",
-                                type = "string",
-                                defaultValue = Constants.DEFAULT_LANGUAGE))
-    })
-    public @ResponseBody Entity create(
-            @Valid @RequestBody PersistableProductVariation variation,
-            @Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language) {
+		FinalPrice price = pricingService.calculateProductPrice(product);
+		ReadableProductPrice readablePrice = new ReadableProductPrice();
+		ReadableFinalPricePopulator populator = new ReadableFinalPricePopulator();
+		populator.setPricingService(pricingService);
+		populator.populate(price, readablePrice, merchantStore, language);
+		return readablePrice;
+	}
 
-        Long variantId = productVariationFacade.create(variation, merchantStore, language);
-        return new Entity(variantId);
-    }
+	@RequestMapping(value = "/category/{id}/variations", method = RequestMethod.GET)
+	@ResponseStatus(HttpStatus.OK)
+	@Operation(method = "GET", description = "Get all variation for all items in a given category",
+			responses = @ApiResponse(
+					content = @Content(mediaType = "application/json", schema = @Schema(implementation = List.class))))
+	@ResponseBody
+	@Parameters({
+			@Parameter(name = "store",
+					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+			@Parameter(name = "lang",
+					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	public List<ReadableProductVariant> categoryVariantList(@PathVariable final Long id, // category
+																							// id
+			@Parameter(hidden = true) StoreMerchantId merchantStore, @Parameter(hidden = true) LanguageCode language) {
 
-    @ResponseStatus(HttpStatus.OK)
-    @GetMapping(
-            value = {"/private/product/variation/unique"},
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-        @Parameter(
-                name = "lang",
-                schema =
-                        @Schema(
-                                name = "lang",
-                                type = "string",
-                                defaultValue = Constants.DEFAULT_LANGUAGE))
-    })
-    @Operation(
-            method = "GET",
-            description = "Check if option set code already exists",
-            responses = {
-                @ApiResponse(
-                        content = @Content(schema = @Schema(implementation = EntityExists.class)))
-            })
-    public ResponseEntity<EntityExists> exists(
-            @RequestParam(value = "code") String code,
-            @Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language) {
+		return categoryFacade.categoryProductVariants(id, merchantStore, language);
+	}
 
-        boolean isOptionExist = productVariationFacade.exists(code, merchantStore);
-        return new ResponseEntity<>(new EntityExists(isOptionExist), HttpStatus.OK);
-    }
+	@ResponseStatus(HttpStatus.CREATED)
+	@RequestMapping(value = { "/private/product/variation" }, method = RequestMethod.POST)
+	@Operation(method = "POST", description = "Creates a new product variant",
+			responses = @ApiResponse(content = @Content(mediaType = "application/json", schema = @Schema())))
+	@Parameters({
+			@Parameter(name = "store",
+					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+			@Parameter(name = "lang",
+					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	public @ResponseBody Entity create(@Valid @RequestBody PersistableProductVariation variation,
+			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
+			@Parameter(hidden = true) LanguageCode language) {
 
-    @ResponseStatus(HttpStatus.OK)
-    @RequestMapping(
-            value = {"/private/product/variation/{variationId}"},
-            method = RequestMethod.GET)
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-        @Parameter(
-                name = "lang",
-                schema =
-                        @Schema(
-                                name = "lang",
-                                type = "string",
-                                defaultValue = Constants.DEFAULT_LANGUAGE))
-    })
-    @ResponseBody
-    public ReadableProductVariation get(
-            @PathVariable Long variationId,
-            @Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language) {
+		Long variantId = productVariationFacade.create(variation, merchantStore, language);
+		return new Entity(variantId);
+	}
 
-        return productVariationFacade.get(variationId, merchantStore, language);
-    }
+	@ResponseStatus(HttpStatus.OK)
+	@GetMapping(value = { "/private/product/variation/unique" }, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Parameters({
+			@Parameter(name = "store",
+					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+			@Parameter(name = "lang",
+					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	@Operation(method = "GET", description = "Check if option set code already exists",
+			responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = EntityExists.class))) })
+	public ResponseEntity<EntityExists> exists(@RequestParam(value = "code") String code,
+			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
+			@Parameter(hidden = true) LanguageCode language) {
 
-    @ResponseStatus(HttpStatus.OK)
-    @RequestMapping(
-            value = {"/private/product/variation/{variationId}"},
-            method = RequestMethod.PUT)
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-        @Parameter(
-                name = "lang",
-                schema =
-                        @Schema(
-                                name = "lang",
-                                type = "string",
-                                defaultValue = Constants.DEFAULT_LANGUAGE))
-    })
-    public void update(
-            @Valid @RequestBody PersistableProductVariation variation,
-            @PathVariable Long variationId,
-            @Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language) {
+		boolean isOptionExist = productVariationFacade.exists(code, merchantStore);
+		return new ResponseEntity<>(new EntityExists(isOptionExist), HttpStatus.OK);
+	}
 
-        variation.setId(variationId);
-        productVariationFacade.update(variationId, variation, merchantStore, language);
-    }
+	@ResponseStatus(HttpStatus.OK)
+	@RequestMapping(value = { "/private/product/variation/{variationId}" }, method = RequestMethod.GET)
+	@Parameters({
+			@Parameter(name = "store",
+					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+			@Parameter(name = "lang",
+					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	@ResponseBody
+	public ReadableProductVariation get(@PathVariable Long variationId,
+			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
+			@Parameter(hidden = true) LanguageCode language) {
 
-    @ResponseStatus(HttpStatus.OK)
-    @RequestMapping(
-            value = {"/private/product/variation/{variationId}"},
-            method = RequestMethod.DELETE)
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-        @Parameter(
-                name = "lang",
-                schema =
-                        @Schema(
-                                name = "lang",
-                                type = "string",
-                                defaultValue = Constants.DEFAULT_LANGUAGE))
-    })
-    public void delete(
-            @PathVariable Long variationId,
-            @Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language) {
+		return productVariationFacade.get(variationId, merchantStore, language);
+	}
 
-        productVariationFacade.delete(variationId, merchantStore);
-    }
+	@ResponseStatus(HttpStatus.OK)
+	@RequestMapping(value = { "/private/product/variation/{variationId}" }, method = RequestMethod.PUT)
+	@Parameters({
+			@Parameter(name = "store",
+					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+			@Parameter(name = "lang",
+					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	public void update(@Valid @RequestBody PersistableProductVariation variation, @PathVariable Long variationId,
+			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
+			@Parameter(hidden = true) LanguageCode language) {
 
-    @ResponseStatus(HttpStatus.OK)
-    @RequestMapping(
-            value = {"/private/product/variations"},
-            method = RequestMethod.GET)
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-        @Parameter(
-                name = "lang",
-                schema =
-                        @Schema(
-                                name = "lang",
-                                type = "string",
-                                defaultValue = Constants.DEFAULT_LANGUAGE))
-    })
-    public @ResponseBody ReadableEntityList<ReadableProductVariation> list(
-            @Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language,
-            Pageable pageable) {
+		variation.setId(variationId);
+		productVariationFacade.update(variationId, variation, merchantStore, language);
+	}
 
-        return productVariationFacade.list(merchantStore, language, pageable);
-    }
+	@ResponseStatus(HttpStatus.OK)
+	@RequestMapping(value = { "/private/product/variation/{variationId}" }, method = RequestMethod.DELETE)
+	@Parameters({
+			@Parameter(name = "store",
+					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+			@Parameter(name = "lang",
+					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	public void delete(@PathVariable Long variationId,
+			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
+			@Parameter(hidden = true) LanguageCode language) {
+
+		productVariationFacade.delete(variationId, merchantStore);
+	}
+
+	@ResponseStatus(HttpStatus.OK)
+	@RequestMapping(value = { "/private/product/variations" }, method = RequestMethod.GET)
+	@Parameters({
+			@Parameter(name = "store",
+					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+			@Parameter(name = "lang",
+					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	public @ResponseBody ReadableEntityList<ReadableProductVariation> list(
+			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
+			@Parameter(hidden = true) LanguageCode language, Pageable pageable) {
+
+		return productVariationFacade.list(merchantStore, language, pageable);
+	}
+
 }

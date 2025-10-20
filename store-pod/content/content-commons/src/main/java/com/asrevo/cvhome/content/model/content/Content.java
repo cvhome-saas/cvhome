@@ -11,22 +11,27 @@ import lombok.Setter;
 @Deprecated
 public abstract class Content implements Serializable {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    @NotEmpty private String name;
-    private String contentType;
+	@NotEmpty
+	private String name;
 
-    public Content() {}
+	private String contentType;
 
-    public Content(String name) {
-        this.name = name;
-    }
+	public Content() {
+	}
 
-    public Content(String name, String contentType) {
-        this.name = name;
-        this.contentType = contentType;
-    }
+	public Content(String name) {
+		this.name = name;
+	}
+
+	public Content(String name, String contentType) {
+		this.name = name;
+		this.contentType = contentType;
+	}
+
 }

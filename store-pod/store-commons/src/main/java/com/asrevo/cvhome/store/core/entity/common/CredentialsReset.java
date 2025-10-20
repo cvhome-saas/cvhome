@@ -13,10 +13,11 @@ import lombok.Setter;
 @Embeddable
 public class CredentialsReset {
 
-    @Column(name = "RESET_CREDENTIALS_REQ", length = 256)
-    private String credentialsRequest;
+	@Column(name = "RESET_CREDENTIALS_REQ", length = 256)
+	private String credentialsRequest;
 
-    @Temporal(TemporalType.DATE)
-    @Column(name = "RESET_CREDENTIALS_EXP")
-    private Date credentialsRequestExpiry = new Date();
+	@Temporal(TemporalType.DATE)
+	@Column(name = "RESET_CREDENTIALS_EXP")
+	private Date credentialsRequestExpiry = new Date();
+
 }

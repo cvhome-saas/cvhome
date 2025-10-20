@@ -13,28 +13,22 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 public interface PageableCategoryRepository
-        extends PagingAndSortingRepository<Category, Long>, JpaSpecificationExecutor<Category> {
+		extends PagingAndSortingRepository<Category, Long>, JpaSpecificationExecutor<Category> {
 
-    default Page<Category> listByStore(
-            StoreMerchantId storeMerchantId,
-            LanguageCode languageCode,
-            String name,
-            Pageable pageable) {
-        Specification<Category> spec =
-                (root, query, cb) -> {
-                    List<Predicate> predicates = new ArrayList<>();
-                    predicates.add(cb.equal(root.get("storeMerchantId"), storeMerchantId));
-                    if (LanguageCode.isLanguage(languageCode)) {
-                        predicates.add(
-                                cb.equal(
-                                        root.get("descriptions").get("languageCode"),
-                                        languageCode));
-                    }
-                    if (name != null && !name.trim().isEmpty()) {
-                        predicates.add(cb.like(root.get("name"), "%" + name + "%"));
-                    }
-                    return cb.and(predicates.toArray(Predicate[]::new));
-                };
-        return findAll(spec, pageable);
-    }
+	default Page<Category> listByStore(StoreMerchantId storeMerchantId, LanguageCode languageCode, String name,
+			Pageable pageable) {
+		Specification<Category> spec = (root, query, cb) -> {
+			List<Predicate> predicates = new ArrayList<>();
+			predicates.add(cb.equal(root.get("storeMerchantId"), storeMerchantId));
+			if (LanguageCode.isLanguage(languageCode)) {
+				predicates.add(cb.equal(root.get("descriptions").get("languageCode"), languageCode));
+			}
+			if (name != null && !name.trim().isEmpty()) {
+				predicates.add(cb.like(root.get("name"), "%" + name + "%"));
+			}
+			return cb.and(predicates.toArray(Predicate[]::new));
+		};
+		return findAll(spec, pageable);
+	}
+
 }

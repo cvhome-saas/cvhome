@@ -6,5 +6,6 @@ import java.util.List;
 
 public interface CategoryRepositoryCustom {
 
-    List<Category> listByProduct(StoreMerchantId store, Long product);
+	List<Category> listByProduct(StoreMerchantId store, Long product);
+
 }

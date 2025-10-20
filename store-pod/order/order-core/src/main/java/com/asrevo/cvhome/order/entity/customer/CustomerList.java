@@ -11,10 +11,12 @@ import lombok.Setter;
 @Getter
 public class CustomerList extends EntityList {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = -3108842276158069739L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = -3108842276158069739L;
 
-    private List<Customer> customers = new ArrayList<>();
+	private List<Customer> customers = new ArrayList<>();
+
 }

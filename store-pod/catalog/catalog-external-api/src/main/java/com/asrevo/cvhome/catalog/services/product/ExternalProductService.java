@@ -14,12 +14,11 @@ import org.springframework.web.service.annotation.PostExchange;
 @HttpExchange("/api/v1")
 public interface ExternalProductService {
 
-    @GetExchange("/detailed-product")
-    ProductDetails getDetailedProduct(
-            StoreMerchantId store, @RequestParam("sku") String sku, LanguageCode lang);
+	@GetExchange("/detailed-product")
+	ProductDetails getDetailedProduct(StoreMerchantId store, @RequestParam("sku") String sku, LanguageCode lang);
 
-    @PostExchange("/reserve")
-    ProductReservationStatus reserve(
-            StoreMerchantId store, @RequestBody ProductReservationList productReservation)
-            throws ServiceException;
+	@PostExchange("/reserve")
+	ProductReservationStatus reserve(StoreMerchantId store, @RequestBody ProductReservationList productReservation)
+			throws ServiceException;
+
 }

@@ -14,55 +14,48 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 @Component
-public class PersistableProductVariationMapper
-        implements Mapper<PersistableProductVariation, ProductVariation> {
+public class PersistableProductVariationMapper implements Mapper<PersistableProductVariation, ProductVariation> {
 
-    private final ProductOptionService productOptionService;
+	private final ProductOptionService productOptionService;
 
-    private final ProductOptionValueService productOptionValueService;
+	private final ProductOptionValueService productOptionValueService;
 
-    public PersistableProductVariationMapper(
-            ProductOptionService productOptionService,
-            ProductOptionValueService productOptionValueService) {
-        this.productOptionService = productOptionService;
-        this.productOptionValueService = productOptionValueService;
-    }
+	public PersistableProductVariationMapper(ProductOptionService productOptionService,
+			ProductOptionValueService productOptionValueService) {
+		this.productOptionService = productOptionService;
+		this.productOptionValueService = productOptionValueService;
+	}
 
-    @Override
-    public ProductVariation convert(
-            PersistableProductVariation source, StoreMerchantId store, LanguageCode language) {
+	@Override
+	public ProductVariation convert(PersistableProductVariation source, StoreMerchantId store, LanguageCode language) {
 
-        ProductVariation variation = new ProductVariation();
-        return this.merge(source, variation, store, language);
-    }
+		ProductVariation variation = new ProductVariation();
+		return this.merge(source, variation, store, language);
+	}
 
-    @Override
-    public ProductVariation merge(
-            PersistableProductVariation source,
-            ProductVariation destination,
-            StoreMerchantId store,
-            LanguageCode language) {
-        Assert.notNull(destination, "ProductVariation cannot be null");
+	@Override
+	public ProductVariation merge(PersistableProductVariation source, ProductVariation destination,
+			StoreMerchantId store, LanguageCode language) {
+		Assert.notNull(destination, "ProductVariation cannot be null");
 
-        destination.setId(source.getId());
-        destination.setCode(source.getCode());
-        destination.setStoreMerchantId(store);
+		destination.setId(source.getId());
+		destination.setCode(source.getCode());
+		destination.setStoreMerchantId(store);
 
-        ProductOption option = productOptionService.getById(store, source.getOption());
-        if (option == null) {
-            throw new ConversionRuntimeException(
-                    "ProductOption [" + source.getOption() + "] does not exists");
-        }
-        destination.setProductOption(option);
+		ProductOption option = productOptionService.getById(store, source.getOption());
+		if (option == null) {
+			throw new ConversionRuntimeException("ProductOption [" + source.getOption() + "] does not exists");
+		}
+		destination.setProductOption(option);
 
-        ProductOptionValue optionValue =
-                productOptionValueService.getById(store, source.getOptionValue());
-        if (optionValue == null) {
-            throw new ConversionRuntimeException(
-                    "ProductOptionValue [" + source.getOptionValue() + "] does not exists");
-        }
-        destination.setProductOptionValue(optionValue);
+		ProductOptionValue optionValue = productOptionValueService.getById(store, source.getOptionValue());
+		if (optionValue == null) {
+			throw new ConversionRuntimeException(
+					"ProductOptionValue [" + source.getOptionValue() + "] does not exists");
+		}
+		destination.setProductOptionValue(optionValue);
 
-        return destination;
-    }
+		return destination;
+	}
+
 }

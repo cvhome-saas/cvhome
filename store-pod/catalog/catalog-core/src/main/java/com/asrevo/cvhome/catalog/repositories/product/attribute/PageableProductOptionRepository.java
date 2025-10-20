@@ -7,20 +7,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
-public interface PageableProductOptionRepository
-        extends PagingAndSortingRepository<ProductOption, Long> {
+public interface PageableProductOptionRepository extends PagingAndSortingRepository<ProductOption, Long> {
 
-    @Query(
-            value =
-                    """
-                            select distinct p from ProductOption p left join
-                             fetch p.descriptions pd where p.storeMerchantId = ?1 and (?2 is null or pd.name
-                             like %?2%)""",
-            countQuery =
-                    """
-                            select count(p) from ProductOption p left join
-                             p.descriptions pd where p.storeMerchantId = ?1 and (?2 is null or pd.name like
-                             %?2%)""")
-    Page<ProductOption> listOptions(
-            StoreMerchantId storeMerchantId, String name, Pageable pageable);
+	@Query(value = """
+			select distinct p from ProductOption p left join
+			 fetch p.descriptions pd where p.storeMerchantId = ?1 and (?2 is null or pd.name
+			 like %?2%)""", countQuery = """
+			select count(p) from ProductOption p left join
+			 p.descriptions pd where p.storeMerchantId = ?1 and (?2 is null or pd.name like
+			 %?2%)""")
+	Page<ProductOption> listOptions(StoreMerchantId storeMerchantId, String name, Pageable pageable);
+
 }

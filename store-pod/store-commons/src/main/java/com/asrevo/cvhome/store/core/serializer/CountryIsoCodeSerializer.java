@@ -8,17 +8,17 @@ import java.io.IOException;
 
 public class CountryIsoCodeSerializer extends StdSerializer<CountryIsoCode> {
 
-    public CountryIsoCodeSerializer() {
-        this(null);
-    }
+	public CountryIsoCodeSerializer() {
+		this(null);
+	}
 
-    protected CountryIsoCodeSerializer(Class<CountryIsoCode> t) {
-        super(t);
-    }
+	protected CountryIsoCodeSerializer(Class<CountryIsoCode> t) {
+		super(t);
+	}
 
-    @Override
-    public void serialize(CountryIsoCode value, JsonGenerator gen, SerializerProvider provider)
-            throws IOException {
-        gen.writeString(value.isoCode());
-    }
+	@Override
+	public void serialize(CountryIsoCode value, JsonGenerator gen, SerializerProvider provider) throws IOException {
+		gen.writeString(value.isoCode());
+	}
+
 }

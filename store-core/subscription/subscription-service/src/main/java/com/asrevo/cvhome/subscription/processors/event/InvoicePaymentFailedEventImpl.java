@@ -11,16 +11,18 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Slf4j
 public class InvoicePaymentFailedEventImpl implements EventImpl<InvoicePaymentFailedEvent> {
-    private final SubscriptionService subscriptionService;
 
-    @Override
-    public void process(InvoicePaymentFailedEvent event) {
-        log.info("Invoice payment failed event received: {}", event);
-        subscriptionService.deActivateSubscription(event.org());
-    }
+	private final SubscriptionService subscriptionService;
 
-    @Override
-    public String type() {
-        return InvoicePaymentFailedEvent.class.getSimpleName();
-    }
+	@Override
+	public void process(InvoicePaymentFailedEvent event) {
+		log.info("Invoice payment failed event received: {}", event);
+		subscriptionService.deActivateSubscription(event.org());
+	}
+
+	@Override
+	public String type() {
+		return InvoicePaymentFailedEvent.class.getSimpleName();
+	}
+
 }

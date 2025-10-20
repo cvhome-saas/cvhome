@@ -8,6 +8,8 @@ import reactor.core.publisher.Mono;
 
 @HttpExchange("/api/v1")
 public interface ExternalReactiveMerchantStoreService {
-    @GetExchange("store")
-    Mono<ReadableMerchantStore> getStore(StoreMerchantId store);
+
+	@GetExchange("store")
+	Mono<ReadableMerchantStore> getStore(StoreMerchantId store);
+
 }

@@ -15,35 +15,30 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class ClientsConfig {
-    @Bean
-    public StorePodClient storePodClient(WebClientBuilder webClientBuilder) {
-        return webClientBuilder.buildClient("merchant", StorePodClient.class);
-    }
 
-    @Bean
-    public SubscriptionPlanDetailsService subscriptionPlanDetailsService(
-            WebClientBuilder webClientBuilder) {
-        return webClientBuilder.buildClient("subscription", SubscriptionPlanDetailsService.class);
-    }
+	@Bean
+	public StorePodClient storePodClient(WebClientBuilder webClientBuilder) {
+		return webClientBuilder.buildClient("merchant", StorePodClient.class);
+	}
 
-    @Bean
-    public ExternalReactiveMerchantStoreService externalMerchantStoreService(
-            WebClientBuilder webClientBuilder) {
-        return webClientBuilder.buildClient("merchant", ExternalReactiveMerchantStoreService.class);
-    }
+	@Bean
+	public SubscriptionPlanDetailsService subscriptionPlanDetailsService(WebClientBuilder webClientBuilder) {
+		return webClientBuilder.buildClient("subscription", SubscriptionPlanDetailsService.class);
+	}
 
-    @Bean
-    public SubscriptionHttpEventsService subscriptionHttpEventsService(
-            WebClientBuilder webClientBuilder) {
-        JsonMapper mapper =
-                JsonMapper.builder()
-                        .addModules(new JavaTimeModule(), new Jdk8Module())
-                        .setDefaultTyping(
-                                new StdTypeResolverBuilder()
-                                        .init(JsonTypeInfo.Id.CLASS, null)
-                                        .inclusion(JsonTypeInfo.As.WRAPPER_OBJECT))
-                        .build();
-        return webClientBuilder.buildClient(
-                "subscription", SubscriptionHttpEventsService.class, mapper);
-    }
+	@Bean
+	public ExternalReactiveMerchantStoreService externalMerchantStoreService(WebClientBuilder webClientBuilder) {
+		return webClientBuilder.buildClient("merchant", ExternalReactiveMerchantStoreService.class);
+	}
+
+	@Bean
+	public SubscriptionHttpEventsService subscriptionHttpEventsService(WebClientBuilder webClientBuilder) {
+		JsonMapper mapper = JsonMapper.builder()
+			.addModules(new JavaTimeModule(), new Jdk8Module())
+			.setDefaultTyping(new StdTypeResolverBuilder().init(JsonTypeInfo.Id.CLASS, null)
+				.inclusion(JsonTypeInfo.As.WRAPPER_OBJECT))
+			.build();
+		return webClientBuilder.buildClient("subscription", SubscriptionHttpEventsService.class, mapper);
+	}
+
 }

@@ -15,11 +15,14 @@ import lombok.Setter;
 @Getter
 public class ReadableTotal implements Serializable {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private List<ReadableOrderTotal> totals;
-    private String grandTotal;
+	private List<ReadableOrderTotal> totals;
+
+	private String grandTotal;
+
 }

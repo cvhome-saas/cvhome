@@ -8,6 +8,8 @@ import reactor.core.publisher.Mono;
 
 @HttpExchange("api/v1/http-events")
 public interface SubscriptionHttpEventsService {
-    @PostExchange("on")
-    Mono<Void> on(@RequestBody Event event);
+
+	@PostExchange("on")
+	Mono<Void> on(@RequestBody Event event);
+
 }

@@ -12,37 +12,41 @@ import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.provider.ServerInfoAwareProviderFactory;
 
 public class CommunicationEmailSenderProviderFactory
-        implements EmailSenderProviderFactory, ServerInfoAwareProviderFactory {
+		implements EmailSenderProviderFactory, ServerInfoAwareProviderFactory {
 
-    private final Map<String, String> configMap = new HashMap<>();
-    private CommunicationService communicationService;
-    private CommunicationEmailSenderProvider communicationEmailSenderProvider;
+	private final Map<String, String> configMap = new HashMap<>();
 
-    @Override
-    public EmailSenderProvider create(KeycloakSession session) {
-        this.communicationEmailSenderProvider =
-                new CommunicationEmailSenderProvider(session, communicationService);
-        return this.communicationEmailSenderProvider;
-    }
+	private CommunicationService communicationService;
 
-    @Override
-    public void init(Config.Scope config) {
-        communicationService = new CommunicationServiceImpl();
-    }
+	private CommunicationEmailSenderProvider communicationEmailSenderProvider;
 
-    @Override
-    public void postInit(KeycloakSessionFactory factory) {}
+	@Override
+	public EmailSenderProvider create(KeycloakSession session) {
+		this.communicationEmailSenderProvider = new CommunicationEmailSenderProvider(session, communicationService);
+		return this.communicationEmailSenderProvider;
+	}
 
-    @Override
-    public void close() {}
+	@Override
+	public void init(Config.Scope config) {
+		communicationService = new CommunicationServiceImpl();
+	}
 
-    @Override
-    public String getId() {
-        return "default";
-    }
+	@Override
+	public void postInit(KeycloakSessionFactory factory) {
+	}
 
-    @Override
-    public Map<String, String> getOperationalInfo() {
-        return configMap;
-    }
+	@Override
+	public void close() {
+	}
+
+	@Override
+	public String getId() {
+		return "default";
+	}
+
+	@Override
+	public Map<String, String> getOperationalInfo() {
+		return configMap;
+	}
+
 }

@@ -14,10 +14,12 @@ import lombok.Setter;
 @Deprecated
 public class ReadableContent extends Content {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private String content;
+	private String content;
+
 }

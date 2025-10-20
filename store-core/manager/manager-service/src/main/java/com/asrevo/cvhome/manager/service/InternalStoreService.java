@@ -9,34 +9,34 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface InternalStoreService {
-    ManagerStoreDto createStore(Map<Object, Object> request, ManagerOrgId orgId, PodId pod);
 
-    void completeProvisioning(ManagerStoreId store);
+	ManagerStoreDto createStore(Map<Object, Object> request, ManagerOrgId orgId, PodId pod);
 
-    void failProvisioning(ManagerStoreId store);
+	void completeProvisioning(ManagerStoreId store);
 
-    void startProvisioning(ManagerStoreId store);
+	void failProvisioning(ManagerStoreId store);
 
-    Page<ManagerStoreDto> findAll(
-            UserOrgStoreIdentity identity,
-            ListManagerStoreQuery listManagerStoreQuery,
-            Pageable pageable);
+	void startProvisioning(ManagerStoreId store);
 
-    Page<ManagerStoreDto> findAll(ManagerOrgId id, Pageable pageable);
+	Page<ManagerStoreDto> findAll(UserOrgStoreIdentity identity, ListManagerStoreQuery listManagerStoreQuery,
+			Pageable pageable);
 
-    ManagerOrgId getStoreOwner(ManagerStoreId store);
+	Page<ManagerStoreDto> findAll(ManagerOrgId id, Pageable pageable);
 
-    ManagerStoreDto findStore(ManagerStoreId store);
+	ManagerOrgId getStoreOwner(ManagerStoreId store);
 
-    Boolean checkNameExists(String name);
+	ManagerStoreDto findStore(ManagerStoreId store);
 
-    Pod getStorePod(ManagerStoreId managerStoreId);
+	Boolean checkNameExists(String name);
 
-    StoreDomainList domains(ManagerStoreId managerStoreId);
+	Pod getStorePod(ManagerStoreId managerStoreId);
 
-    ManagerStoreId getReferenceByDomain(Domain domain);
+	StoreDomainList domains(ManagerStoreId managerStoreId);
 
-    void addDomain(ManagerStoreId managerStoreId, Domain domain);
+	ManagerStoreId getReferenceByDomain(Domain domain);
 
-    void removeDomain(ManagerStoreId managerStoreId, Domain domain);
+	void addDomain(ManagerStoreId managerStoreId, Domain domain);
+
+	void removeDomain(ManagerStoreId managerStoreId, Domain domain);
+
 }

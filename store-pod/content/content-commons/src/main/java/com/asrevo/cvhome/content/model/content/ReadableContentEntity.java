@@ -9,10 +9,12 @@ import lombok.Setter;
 @Deprecated
 public class ReadableContentEntity extends ContentEntity {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private ContentDescriptionEntity description = null;
+	private ContentDescriptionEntity description = null;
+
 }

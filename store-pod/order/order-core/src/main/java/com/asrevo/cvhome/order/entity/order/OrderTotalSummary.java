@@ -16,14 +16,18 @@ import lombok.Setter;
 @Getter
 public class OrderTotalSummary implements Serializable {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private BigDecimal subTotal; // one time price for items
-    private BigDecimal total; // final price
-    private BigDecimal taxTotal; // total of taxes
+	private BigDecimal subTotal; // one time price for items
 
-    private List<OrderTotal> totals; // all other fees (tax, shipping ....)
+	private BigDecimal total; // final price
+
+	private BigDecimal taxTotal; // total of taxes
+
+	private List<OrderTotal> totals; // all other fees (tax, shipping ....)
+
 }

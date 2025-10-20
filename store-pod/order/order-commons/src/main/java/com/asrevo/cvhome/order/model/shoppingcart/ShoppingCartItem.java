@@ -11,26 +11,35 @@ import lombok.Setter;
 @Setter
 public class ShoppingCartItem extends ShopEntity implements Serializable {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private String name;
-    private String price;
-    private String image;
-    private BigDecimal productPrice;
-    private int quantity;
-    private String sku; // sku
-    private String code; // shopping cart code
-    private boolean productVirtual;
+	private String name;
 
-    private String subTotal;
+	private String price;
 
-    public int getQuantity() {
-        if (quantity <= 0) {
-            quantity = 1;
-        }
-        return quantity;
-    }
+	private String image;
+
+	private BigDecimal productPrice;
+
+	private int quantity;
+
+	private String sku; // sku
+
+	private String code; // shopping cart code
+
+	private boolean productVirtual;
+
+	private String subTotal;
+
+	public int getQuantity() {
+		if (quantity <= 0) {
+			quantity = 1;
+		}
+		return quantity;
+	}
+
 }

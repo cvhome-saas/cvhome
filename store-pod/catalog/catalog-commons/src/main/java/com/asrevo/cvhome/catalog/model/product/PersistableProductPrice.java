@@ -10,13 +10,16 @@ import lombok.Setter;
 @Getter
 public class PersistableProductPrice extends ProductPriceEntity {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private String sku;
-    private Long productAvailabilityId;
+	private String sku;
 
-    private List<ProductPriceDescription> descriptions = new ArrayList<>();
+	private Long productAvailabilityId;
+
+	private List<ProductPriceDescription> descriptions = new ArrayList<>();
+
 }

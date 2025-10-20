@@ -15,75 +15,73 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service("productAttributeService")
-public class ProductAttributeServiceImpl
-        extends SalesManagerEntityServiceImpl<Long, ProductAttribute>
-        implements ProductAttributeService {
+public class ProductAttributeServiceImpl extends SalesManagerEntityServiceImpl<Long, ProductAttribute>
+		implements ProductAttributeService {
 
-    private final ProductAttributeRepository productAttributeRepository;
-    private final PageableProductAttributeRepository pageableProductAttributeRepository;
+	private final ProductAttributeRepository productAttributeRepository;
 
-    @Autowired
-    public ProductAttributeServiceImpl(
-            ProductAttributeRepository productAttributeRepository,
-            PageableProductAttributeRepository pageableProductAttributeRepository) {
-        super(productAttributeRepository);
-        this.productAttributeRepository = productAttributeRepository;
-        this.pageableProductAttributeRepository = pageableProductAttributeRepository;
-    }
+	private final PageableProductAttributeRepository pageableProductAttributeRepository;
 
-    @Override
-    public ProductAttribute getById(Long id) {
+	@Autowired
+	public ProductAttributeServiceImpl(ProductAttributeRepository productAttributeRepository,
+			PageableProductAttributeRepository pageableProductAttributeRepository) {
+		super(productAttributeRepository);
+		this.productAttributeRepository = productAttributeRepository;
+		this.pageableProductAttributeRepository = pageableProductAttributeRepository;
+	}
 
-        return productAttributeRepository.findOne(id);
-    }
+	@Override
+	public ProductAttribute getById(Long id) {
 
-    @Override
-    public List<ProductAttribute> getByOptionId(StoreMerchantId store, Long id) {
+		return productAttributeRepository.findOne(id);
+	}
 
-        return productAttributeRepository.findByOptionId(store, id);
-    }
+	@Override
+	public List<ProductAttribute> getByOptionId(StoreMerchantId store, Long id) {
 
-    @Override
-    public List<ProductAttribute> getByOptionValueId(StoreMerchantId store, Long id) {
+		return productAttributeRepository.findByOptionId(store, id);
+	}
 
-        return productAttributeRepository.findByOptionValueId(store, id);
-    }
+	@Override
+	public List<ProductAttribute> getByOptionValueId(StoreMerchantId store, Long id) {
 
-    /**
-     * Returns all product attributes
-     */
-    @Override
-    public Page<ProductAttribute> getByProductId(
-            StoreMerchantId store, Product product, LanguageCode language, Pageable pageable) {
+		return productAttributeRepository.findByOptionValueId(store, id);
+	}
 
-        return pageableProductAttributeRepository.findByProductId(
-                store, product.getId(), language, pageable);
-    }
+	/**
+	 * Returns all product attributes
+	 */
+	@Override
+	public Page<ProductAttribute> getByProductId(StoreMerchantId store, Product product, LanguageCode language,
+			Pageable pageable) {
 
-    @Override
-    public Page<ProductAttribute> getByProductId(
-            StoreMerchantId store, Product product, Pageable pageable) {
-        return pageableProductAttributeRepository.findByProductId(store, product.getId(), pageable);
-    }
+		return pageableProductAttributeRepository.findByProductId(store, product.getId(), language, pageable);
+	}
 
-    @Override
-    public ProductAttribute saveOrUpdate(ProductAttribute productAttribute) {
-        productAttribute = productAttributeRepository.save(productAttribute);
-        return productAttribute;
-    }
+	@Override
+	public Page<ProductAttribute> getByProductId(StoreMerchantId store, Product product, Pageable pageable) {
+		return pageableProductAttributeRepository.findByProductId(store, product.getId(), pageable);
+	}
 
-    @Override
-    public void delete(ProductAttribute attribute) throws ServiceException {
+	@Override
+	public ProductAttribute saveOrUpdate(ProductAttribute productAttribute) {
+		productAttribute = productAttributeRepository.save(productAttribute);
+		return productAttribute;
+	}
 
-        // override method, this allows the error that we try to remove a detached
-        // variant
-        attribute = this.getById(attribute.getId());
-        super.delete(attribute);
-    }
+	@Override
+	public void delete(ProductAttribute attribute) throws ServiceException {
 
-    @Override
-    public List<ProductAttribute> getProductAttributesByCategoryLineage(
-            StoreMerchantId store, String lineage, LanguageCode language) {
-        return productAttributeRepository.findOptionsByCategoryLineage(store, lineage, language);
-    }
+		// override method, this allows the error that we try to remove a detached
+		// variant
+		attribute = this.getById(attribute.getId());
+		super.delete(attribute);
+	}
+
+	@Override
+	public List<ProductAttribute> getProductAttributesByCategoryLineage(StoreMerchantId store, String lineage,
+			LanguageCode language) {
+		return productAttributeRepository.findOptionsByCategoryLineage(store, lineage, language);
+	}
+
 }

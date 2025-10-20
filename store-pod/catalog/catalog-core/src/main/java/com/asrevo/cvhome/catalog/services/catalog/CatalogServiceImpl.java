@@ -10,32 +10,32 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 @Service("catalogService")
-public class CatalogServiceImpl extends SalesManagerEntityServiceImpl<Long, Catalog>
-        implements CatalogService {
+public class CatalogServiceImpl extends SalesManagerEntityServiceImpl<Long, Catalog> implements CatalogService {
 
-    private final CatalogRepository catalogRepository;
+	private final CatalogRepository catalogRepository;
 
-    @Autowired
-    public CatalogServiceImpl(CatalogRepository repository) {
-        super(repository);
-        this.catalogRepository = repository;
-    }
+	@Autowired
+	public CatalogServiceImpl(CatalogRepository repository) {
+		super(repository);
+		this.catalogRepository = repository;
+	}
 
-    @Override
-    public Catalog saveOrUpdate(Catalog catalog, StoreMerchantId store) {
-        catalog.setStoreMerchantId(store);
-        catalogRepository.save(catalog);
-        return catalog;
-    }
+	@Override
+	public Catalog saveOrUpdate(Catalog catalog, StoreMerchantId store) {
+		catalog.setStoreMerchantId(store);
+		catalogRepository.save(catalog);
+		return catalog;
+	}
 
-    @Override
-    public void delete(Catalog catalog) {
-        Assert.notNull(catalog, "Catalog must not be null");
-        catalogRepository.delete(catalog);
-    }
+	@Override
+	public void delete(Catalog catalog) {
+		Assert.notNull(catalog, "Catalog must not be null");
+		catalogRepository.delete(catalog);
+	}
 
-    @Override
-    public Optional<Catalog> getByCode(String code, StoreMerchantId storeMerchantId) {
-        return catalogRepository.findByCode(code, storeMerchantId);
-    }
+	@Override
+	public Optional<Catalog> getByCode(String code, StoreMerchantId storeMerchantId) {
+		return catalogRepository.findByCode(code, storeMerchantId);
+	}
+
 }

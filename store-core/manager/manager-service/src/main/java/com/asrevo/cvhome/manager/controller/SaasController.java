@@ -13,10 +13,12 @@ import org.springframework.web.bind.annotation.RestController;
 @AllArgsConstructor
 @Slf4j
 public class SaasController {
-    private final AppProperties appProperties;
 
-    @RequestMapping("public/saas-properties")
-    public Map<String, String> saasProperties() {
-        return Map.of("alis", Defines.SAAS_POD_SUFFIX, "domain", appProperties.getDomain());
-    }
+	private final AppProperties appProperties;
+
+	@RequestMapping("public/saas-properties")
+	public Map<String, String> saasProperties() {
+		return Map.of("alis", Defines.SAAS_POD_SUFFIX, "domain", appProperties.getDomain());
+	}
+
 }

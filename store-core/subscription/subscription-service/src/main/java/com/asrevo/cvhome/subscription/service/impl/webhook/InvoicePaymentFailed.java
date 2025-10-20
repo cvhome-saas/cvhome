@@ -16,30 +16,32 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 @Slf4j
 public class InvoicePaymentFailed implements WebhookHandler {
-    private final ToJsonObj toJsonObj = new ToJsonObj();
-    private final EventProcessor eventProcessor;
 
-    @Override
-    public void handle(Event event) {
+	private final ToJsonObj toJsonObj = new ToJsonObj();
 
-        JsonObject jo = toJsonObj(event);
+	private final EventProcessor eventProcessor;
 
-        JsonElement orgIdElement =
-                jo.getAsJsonObject("parent")
-                        .getAsJsonObject("subscription_details")
-                        .getAsJsonObject("metadata")
-                        .get("orgId");
-        ManagerOrgId orgId = new ManagerOrgId(orgIdElement.getAsString());
-        eventProcessor.process(InvoicePaymentFailedEvent.from(orgId));
-        log.info("Invoice payment failed for {}", orgId);
-    }
+	@Override
+	public void handle(Event event) {
 
-    @Override
-    public String type() {
-        return "invoice.payment_failed";
-    }
+		JsonObject jo = toJsonObj(event);
 
-    private JsonObject toJsonObj(Event event) {
-        return toJsonObj.exec(event.getDataObjectDeserializer().getRawJson());
-    }
+		JsonElement orgIdElement = jo.getAsJsonObject("parent")
+			.getAsJsonObject("subscription_details")
+			.getAsJsonObject("metadata")
+			.get("orgId");
+		ManagerOrgId orgId = new ManagerOrgId(orgIdElement.getAsString());
+		eventProcessor.process(InvoicePaymentFailedEvent.from(orgId));
+		log.info("Invoice payment failed for {}", orgId);
+	}
+
+	@Override
+	public String type() {
+		return "invoice.payment_failed";
+	}
+
+	private JsonObject toJsonObj(Event event) {
+		return toJsonObj.exec(event.getDataObjectDeserializer().getRawJson());
+	}
+
 }

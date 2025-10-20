@@ -12,24 +12,23 @@ import org.springframework.data.domain.Pageable;
 
 public interface ManufacturerService extends SalesManagerEntityService<Long, Manufacturer> {
 
-    List<Manufacturer> listByStore(StoreMerchantId store, LanguageCode language);
+	List<Manufacturer> listByStore(StoreMerchantId store, LanguageCode language);
 
-    List<Manufacturer> listByStore(StoreMerchantId store);
+	List<Manufacturer> listByStore(StoreMerchantId store);
 
-    Page<Manufacturer> listByStore(
-            StoreMerchantId store, LanguageCode language, String name, Pageable pageable);
+	Page<Manufacturer> listByStore(StoreMerchantId store, LanguageCode language, String name, Pageable pageable);
 
-    void saveOrUpdate(Manufacturer manufacturer) throws ServiceException;
+	void saveOrUpdate(Manufacturer manufacturer) throws ServiceException;
 
-    void delete(Manufacturer manufacturer) throws ServiceException;
+	void delete(Manufacturer manufacturer) throws ServiceException;
 
-    Manufacturer getByCode(StoreMerchantId store, String code);
+	Manufacturer getByCode(StoreMerchantId store, String code);
 
-    /**
-     * List by product in category lineage
-     */
-    List<Manufacturer> listByProductsInCategory(
-            StoreMerchantId store, Category category, LanguageCode language);
+	/**
+	 * List by product in category lineage
+	 */
+	List<Manufacturer> listByProductsInCategory(StoreMerchantId store, Category category, LanguageCode language);
 
-    int count(StoreMerchantId store);
+	int count(StoreMerchantId store);
+
 }

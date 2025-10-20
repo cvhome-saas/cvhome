@@ -12,6 +12,8 @@ import lombok.Setter;
 @Getter
 public class ListCriteria {
 
-    private String name;
-    private String type;
+	private String name;
+
+	private String type;
+
 }

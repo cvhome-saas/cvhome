@@ -6,10 +6,11 @@ import java.util.List;
 
 public sealed interface StoreEvent extends Event permits StoreCreatedEvent, StoreProvisionedEvent {
 
-    ManagerStoreId store();
+	ManagerStoreId store();
 
-    @Override
-    default List<String> getDestinations() {
-        return List.of("events-out-0");
-    }
+	@Override
+	default List<String> getDestinations() {
+		return List.of("events-out-0");
+	}
+
 }

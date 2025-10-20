@@ -22,19 +22,21 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @AllArgsConstructor
 public class AuthController {
-    @GetMapping("current")
-    @ConditionalOnApiStatus(usage = ApiUsage.WILL_USED)
-    public ResponseEntity<Principal> current(@AuthenticationPrincipal Principal principal) {
-        return Optional.ofNullable(principal)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.UNAUTHORIZED));
-    }
 
-    @GetMapping("me")
-    @ConditionalOnApiStatus(usage = ApiUsage.WILL_USED)
-    public Mono<JwtAuthenticationToken> me() {
-        return ReactiveSecurityContextHolder.getContext()
-                .map(SecurityContext::getAuthentication)
-                .cast(JwtAuthenticationToken.class);
-    }
+	@GetMapping("current")
+	@ConditionalOnApiStatus(usage = ApiUsage.WILL_USED)
+	public ResponseEntity<Principal> current(@AuthenticationPrincipal Principal principal) {
+		return Optional.ofNullable(principal)
+			.map(ResponseEntity::ok)
+			.orElseGet(() -> new ResponseEntity<>(HttpStatus.UNAUTHORIZED));
+	}
+
+	@GetMapping("me")
+	@ConditionalOnApiStatus(usage = ApiUsage.WILL_USED)
+	public Mono<JwtAuthenticationToken> me() {
+		return ReactiveSecurityContextHolder.getContext()
+			.map(SecurityContext::getAuthentication)
+			.cast(JwtAuthenticationToken.class);
+	}
+
 }

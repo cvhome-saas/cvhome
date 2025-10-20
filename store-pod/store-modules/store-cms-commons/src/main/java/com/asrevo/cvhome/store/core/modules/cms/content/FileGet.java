@@ -13,18 +13,13 @@ import java.util.Optional;
  */
 public interface FileGet {
 
-    OutputContentFile getFile(
-            final String merchantStoreCode,
-            Optional<String> path,
-            FileContentType fileContentType,
-            String contentName)
-            throws ServiceException;
+	OutputContentFile getFile(final String merchantStoreCode, Optional<String> path, FileContentType fileContentType,
+			String contentName) throws ServiceException;
 
-    List<String> getFileNames(
-            final String merchantStoreCode, Optional<String> path, FileContentType fileContentType)
-            throws ServiceException;
+	List<String> getFileNames(final String merchantStoreCode, Optional<String> path, FileContentType fileContentType)
+			throws ServiceException;
 
-    List<OutputContentFile> getFiles(
-            final String merchantStoreCode, Optional<String> path, FileContentType fileContentType)
-            throws ServiceException;
+	List<OutputContentFile> getFiles(final String merchantStoreCode, Optional<String> path,
+			FileContentType fileContentType) throws ServiceException;
+
 }

@@ -14,15 +14,19 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @ConditionalOnClass(WebMvcConfigurer.class)
 @Import(ServletWebConfig.InternalServletWebConfig.class)
 public class ServletWebConfig {
-    @Configuration
-    static class InternalServletWebConfig implements WebMvcConfigurer {
-        @Override
-        public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
-            PageableHandlerMethodArgumentResolver e = new PageableHandlerMethodArgumentResolver();
-            e.setPageParameterName("page");
-            e.setSizeParameterName("count");
-            argumentResolvers.add(e);
-            argumentResolvers.add(new ServletOrgStorePrincipalInfoArgumentResolver());
-        }
-    }
+
+	@Configuration
+	static class InternalServletWebConfig implements WebMvcConfigurer {
+
+		@Override
+		public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
+			PageableHandlerMethodArgumentResolver e = new PageableHandlerMethodArgumentResolver();
+			e.setPageParameterName("page");
+			e.setSizeParameterName("count");
+			argumentResolvers.add(e);
+			argumentResolvers.add(new ServletOrgStorePrincipalInfoArgumentResolver());
+		}
+
+	}
+
 }

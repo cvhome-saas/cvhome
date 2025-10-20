@@ -15,75 +15,67 @@ import org.springframework.stereotype.Component;
 @Component
 @AllArgsConstructor
 public class ReadableManufacturerMapper implements Mapper<Manufacturer, ReadableManufacturer> {
-    private final ExternalMerchantStoreService externalMerchantStoreService;
 
-    @Override
-    public ReadableManufacturer convert(
-            Manufacturer source, StoreMerchantId store, LanguageCode language) {
+	private final ExternalMerchantStoreService externalMerchantStoreService;
 
-        if (language == null) {
-            language = externalMerchantStoreService.getStore(store).getDefaultLanguage();
-        }
+	@Override
+	public ReadableManufacturer convert(Manufacturer source, StoreMerchantId store, LanguageCode language) {
 
-        ReadableManufacturer target = new ReadableManufacturer();
+		if (language == null) {
+			language = externalMerchantStoreService.getStore(store).getDefaultLanguage();
+		}
 
-        Optional<com.asrevo.cvhome.catalog.model.manufacturer.ManufacturerDescription> description =
-                getDescription(source, language, target);
-        description.ifPresent(target::setDescription);
+		ReadableManufacturer target = new ReadableManufacturer();
 
-        target.setCode(source.getCode());
-        target.setId(source.getId());
-        target.setOrder(source.getOrder());
-        Optional<com.asrevo.cvhome.catalog.model.manufacturer.ManufacturerDescription> desc =
-                this.getDescription(source, language, target);
-        if (description.isPresent()) {
-            target.setDescription(desc.orElse(null));
-        }
+		Optional<com.asrevo.cvhome.catalog.model.manufacturer.ManufacturerDescription> description = getDescription(
+				source, language, target);
+		description.ifPresent(target::setDescription);
 
-        return target;
-    }
+		target.setCode(source.getCode());
+		target.setId(source.getId());
+		target.setOrder(source.getOrder());
+		Optional<com.asrevo.cvhome.catalog.model.manufacturer.ManufacturerDescription> desc = this
+			.getDescription(source, language, target);
+		if (description.isPresent()) {
+			target.setDescription(desc.orElse(null));
+		}
 
-    private Optional<com.asrevo.cvhome.catalog.model.manufacturer.ManufacturerDescription>
-            getDescription(
-                    Manufacturer source, LanguageCode language, ReadableManufacturer target) {
+		return target;
+	}
 
-        Optional<ManufacturerDescription> description =
-                getDescription(source.getDescriptions(), language);
-        if (source.getDescriptions() != null
-                && !source.getDescriptions().isEmpty()
-                && description.isPresent()) {
-            return Optional.of(convertDescription(description.get(), source));
-        } else {
-            return Optional.empty();
-        }
-    }
+	private Optional<com.asrevo.cvhome.catalog.model.manufacturer.ManufacturerDescription> getDescription(
+			Manufacturer source, LanguageCode language, ReadableManufacturer target) {
 
-    private Optional<ManufacturerDescription> getDescription(
-            Set<ManufacturerDescription> descriptionsLang, LanguageCode language) {
-        return descriptionsLang.stream()
-                .filter(desc -> desc.getLanguageCode().equals(language))
-                .findAny();
-    }
+		Optional<ManufacturerDescription> description = getDescription(source.getDescriptions(), language);
+		if (source.getDescriptions() != null && !source.getDescriptions().isEmpty() && description.isPresent()) {
+			return Optional.of(convertDescription(description.get(), source));
+		}
+		else {
+			return Optional.empty();
+		}
+	}
 
-    private com.asrevo.cvhome.catalog.model.manufacturer.ManufacturerDescription convertDescription(
-            ManufacturerDescription description, Manufacturer source) {
-        final com.asrevo.cvhome.catalog.model.manufacturer.ManufacturerDescription desc =
-                new com.asrevo.cvhome.catalog.model.manufacturer.ManufacturerDescription();
+	private Optional<ManufacturerDescription> getDescription(Set<ManufacturerDescription> descriptionsLang,
+			LanguageCode language) {
+		return descriptionsLang.stream().filter(desc -> desc.getLanguageCode().equals(language)).findAny();
+	}
 
-        desc.setFriendlyUrl(description.getUrl());
-        desc.setId(description.getId());
-        desc.setLanguage(description.getLanguageCode());
-        desc.setName(description.getName());
-        desc.setDescription(description.getDescription());
-        return desc;
-    }
+	private com.asrevo.cvhome.catalog.model.manufacturer.ManufacturerDescription convertDescription(
+			ManufacturerDescription description, Manufacturer source) {
+		final com.asrevo.cvhome.catalog.model.manufacturer.ManufacturerDescription desc = new com.asrevo.cvhome.catalog.model.manufacturer.ManufacturerDescription();
 
-    @Override
-    public ReadableManufacturer merge(
-            Manufacturer source,
-            ReadableManufacturer destination,
-            StoreMerchantId store,
-            LanguageCode language) {
-        return destination;
-    }
+		desc.setFriendlyUrl(description.getUrl());
+		desc.setId(description.getId());
+		desc.setLanguage(description.getLanguageCode());
+		desc.setName(description.getName());
+		desc.setDescription(description.getDescription());
+		return desc;
+	}
+
+	@Override
+	public ReadableManufacturer merge(Manufacturer source, ReadableManufacturer destination, StoreMerchantId store,
+			LanguageCode language) {
+		return destination;
+	}
+
 }

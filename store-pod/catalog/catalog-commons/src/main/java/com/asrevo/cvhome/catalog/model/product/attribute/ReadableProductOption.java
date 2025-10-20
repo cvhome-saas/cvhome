@@ -12,13 +12,18 @@ import lombok.Setter;
 @Getter
 public class ReadableProductOption extends ProductPropertyOption {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private String name;
-    private LanguageCode lang;
-    private boolean variant;
-    private List<ReadableProductOptionValue> optionValues = new ArrayList<>();
+	private String name;
+
+	private LanguageCode lang;
+
+	private boolean variant;
+
+	private List<ReadableProductOptionValue> optionValues = new ArrayList<>();
+
 }

@@ -12,15 +12,20 @@ import lombok.Setter;
 @Getter
 public class ReadableInventory extends InventoryEntity {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private String creationDate;
+	private String creationDate;
 
-    private ReadableMerchantStore store;
-    private String sku;
-    private List<ReadableProductPrice> prices = new ArrayList<>();
-    private String price;
+	private ReadableMerchantStore store;
+
+	private String sku;
+
+	private List<ReadableProductPrice> prices = new ArrayList<>();
+
+	private String price;
+
 }

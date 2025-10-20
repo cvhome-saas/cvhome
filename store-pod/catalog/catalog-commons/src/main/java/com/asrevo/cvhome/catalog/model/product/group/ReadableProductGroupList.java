@@ -6,4 +6,6 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public class ReadableProductGroupList extends ReadableList<ProductGroup> {}
+public class ReadableProductGroupList extends ReadableList<ProductGroup> {
+
+}

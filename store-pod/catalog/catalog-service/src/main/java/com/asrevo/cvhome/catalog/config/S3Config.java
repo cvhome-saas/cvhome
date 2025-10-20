@@ -17,22 +17,21 @@ import software.amazon.awssdk.services.s3.S3Client;
 @Slf4j
 public class S3Config {
 
-    @Bean
-    @ConditionalOnMissingBean
-    public S3Client s3Client(CdnStorageProperties properties) throws URISyntaxException {
-        if (StorageProviderType.MINIO.equals(properties.provider())) {
-            return S3Client.builder()
-                    .endpointOverride(new URI(properties.s3Url()))
-                    .serviceConfiguration(
-                            e -> e.pathStyleAccessEnabled(true).chunkedEncodingEnabled(false))
-                    .region(Region.of(properties.region()))
-                    .credentialsProvider(
-                            StaticCredentialsProvider.create(
-                                    AwsBasicCredentials.create(
-                                            properties.s3AccessKey(), properties.s3SecretKey())))
-                    .build();
-        } else {
-            return S3Client.create();
-        }
-    }
+	@Bean
+	@ConditionalOnMissingBean
+	public S3Client s3Client(CdnStorageProperties properties) throws URISyntaxException {
+		if (StorageProviderType.MINIO.equals(properties.provider())) {
+			return S3Client.builder()
+				.endpointOverride(new URI(properties.s3Url()))
+				.serviceConfiguration(e -> e.pathStyleAccessEnabled(true).chunkedEncodingEnabled(false))
+				.region(Region.of(properties.region()))
+				.credentialsProvider(StaticCredentialsProvider
+					.create(AwsBasicCredentials.create(properties.s3AccessKey(), properties.s3SecretKey())))
+				.build();
+		}
+		else {
+			return S3Client.create();
+		}
+	}
+
 }

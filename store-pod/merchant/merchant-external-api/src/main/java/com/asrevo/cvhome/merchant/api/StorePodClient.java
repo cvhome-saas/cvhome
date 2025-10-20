@@ -11,9 +11,11 @@ import reactor.core.publisher.Mono;
 
 @HttpExchange("/api/v1")
 public interface StorePodClient {
-    @PostExchange("/private/store")
-    Mono<ResponseEntity<Void>> create(@RequestBody Map<Object, Object> dto);
 
-    @GetExchange("private/store")
-    Mono<Map<String, Object>> getStore(@RequestParam("store") String store);
+	@PostExchange("/private/store")
+	Mono<ResponseEntity<Void>> create(@RequestBody Map<Object, Object> dto);
+
+	@GetExchange("private/store")
+	Mono<Map<String, Object>> getStore(@RequestParam("store") String store);
+
 }

@@ -15,63 +15,58 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(
-        name = "PRODUCT_OPTION_VALUE",
-        indexes = {
-            @Index(name = "PRD_OPTION_VAL_CODE_IDX", columnList = "PRODUCT_OPTION_VAL_CODE")
-        },
-        uniqueConstraints =
-                @UniqueConstraint(columnNames = {"STORE_MERCHANT_ID", "PRODUCT_OPTION_VAL_CODE"}))
+@Table(name = "PRODUCT_OPTION_VALUE",
+		indexes = { @Index(name = "PRD_OPTION_VAL_CODE_IDX", columnList = "PRODUCT_OPTION_VAL_CODE") },
+		uniqueConstraints = @UniqueConstraint(columnNames = { "STORE_MERCHANT_ID", "PRODUCT_OPTION_VAL_CODE" }))
 @Getter
 @Setter
 public class ProductOptionValue extends SalesManagerEntity<Long, ProductOptionValue> {
-    @Serial private static final long serialVersionUID = 1L;
 
-    @Id
-    @Column(name = "PRODUCT_OPTION_VALUE_ID")
-    @TableGenerator(
-            name = "TABLE_GEN",
-            table = "SM_SEQUENCER",
-            pkColumnName = "SEQ_NAME",
-            valueColumnName = "SEQ_COUNT",
-            pkColumnValue = "PRODUCT_OPTION_VALUE_SEQ_NEXT_VAL",
-            allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
-            initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
-    private Long id;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    @Column(name = "PRODUCT_OPT_VAL_SORT_ORD")
-    private Integer productOptionValueSortOrder;
+	@Id
+	@Column(name = "PRODUCT_OPTION_VALUE_ID")
+	@TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME",
+			valueColumnName = "SEQ_COUNT", pkColumnValue = "PRODUCT_OPTION_VALUE_SEQ_NEXT_VAL",
+			allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
+			initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
+	@GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
+	private Long id;
 
-    @Column(name = "PRODUCT_OPT_VAL_IMAGE")
-    private String productOptionValueImage;
+	@Column(name = "PRODUCT_OPT_VAL_SORT_ORD")
+	private Integer productOptionValueSortOrder;
 
-    @Column(name = "PRODUCT_OPT_FOR_DISP")
-    private boolean productOptionDisplayOnly = false;
+	@Column(name = "PRODUCT_OPT_VAL_IMAGE")
+	private String productOptionValueImage;
 
-    @NotEmpty
-    @Pattern(regexp = "^[a-zA-Z0-9_-]*$")
-    @Column(name = "PRODUCT_OPTION_VAL_CODE")
-    private String code;
+	@Column(name = "PRODUCT_OPT_FOR_DISP")
+	private boolean productOptionDisplayOnly = false;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "productOptionValue")
-    private Set<ProductOptionValueDescription> descriptions = new HashSet<>();
+	@NotEmpty
+	@Pattern(regexp = "^[a-zA-Z0-9_-]*$")
+	@Column(name = "PRODUCT_OPTION_VAL_CODE")
+	private String code;
 
-    @Transient private List<ProductOptionValueDescription> descriptionsList = new ArrayList<>();
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "productOptionValue")
+	private Set<ProductOptionValueDescription> descriptions = new HashSet<>();
 
-    @Embedded
-    @AttributeOverrides(
-            @AttributeOverride(
-                    name = "storeMerchantId",
-                    column = @Column(name = "STORE_MERCHANT_ID", nullable = false, length = 50)))
-    private StoreMerchantId storeMerchantId;
+	@Transient
+	private List<ProductOptionValueDescription> descriptionsList = new ArrayList<>();
 
-    public ProductOptionValue() {}
+	@Embedded
+	@AttributeOverrides(@AttributeOverride(name = "storeMerchantId",
+			column = @Column(name = "STORE_MERCHANT_ID", nullable = false, length = 50)))
+	private StoreMerchantId storeMerchantId;
 
-    public List<ProductOptionValueDescription> getDescriptionsSettoList() {
-        if (descriptionsList == null || descriptionsList.isEmpty()) {
-            descriptionsList = new ArrayList<>(this.getDescriptions());
-        }
-        return descriptionsList;
-    }
+	public ProductOptionValue() {
+	}
+
+	public List<ProductOptionValueDescription> getDescriptionsSettoList() {
+		if (descriptionsList == null || descriptionsList.isEmpty()) {
+			descriptionsList = new ArrayList<>(this.getDescriptions());
+		}
+		return descriptionsList;
+	}
+
 }

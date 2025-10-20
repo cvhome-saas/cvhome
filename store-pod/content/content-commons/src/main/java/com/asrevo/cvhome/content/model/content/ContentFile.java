@@ -5,8 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * Model object used in webservice
- * when creatin files
+ * Model object used in webservice when creatin files
  *
  * @author carlsamson
  */
@@ -14,10 +13,12 @@ import lombok.Setter;
 @Getter
 public class ContentFile extends ContentPath {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private byte[] file;
+	private byte[] file;
+
 }

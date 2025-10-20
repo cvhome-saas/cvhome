@@ -11,16 +11,18 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 @Slf4j
 public class OrgCreatedEventEventImpl implements EventImpl<OrgCreatedEvent> {
-    private final SubscriptionHttpEventsService subscriptionHttpEventsService;
 
-    @Override
-    public void process(OrgCreatedEvent event) {
-        log.info("Received org created event: {}", event);
-        subscriptionHttpEventsService.on(event).subscribe();
-    }
+	private final SubscriptionHttpEventsService subscriptionHttpEventsService;
 
-    @Override
-    public String type() {
-        return OrgCreatedEvent.class.getSimpleName();
-    }
+	@Override
+	public void process(OrgCreatedEvent event) {
+		log.info("Received org created event: {}", event);
+		subscriptionHttpEventsService.on(event).subscribe();
+	}
+
+	@Override
+	public String type() {
+		return OrgCreatedEvent.class.getSimpleName();
+	}
+
 }

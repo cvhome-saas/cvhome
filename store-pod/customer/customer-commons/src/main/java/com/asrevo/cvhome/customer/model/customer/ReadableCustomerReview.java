@@ -8,10 +8,12 @@ import lombok.Setter;
 @Getter
 public class ReadableCustomerReview extends CustomerReviewEntity {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private ReadableCustomer reviewedCustomer;
+	private ReadableCustomer reviewedCustomer;
+
 }

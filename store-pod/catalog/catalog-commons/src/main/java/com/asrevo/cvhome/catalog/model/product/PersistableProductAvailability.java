@@ -10,7 +10,12 @@ import lombok.Setter;
 @Getter
 @Setter
 public class PersistableProductAvailability implements Serializable {
-    @Serial private static final long serialVersionUID = 1L;
-    private StoreMerchantId store;
-    private List<PersistableProductAvailabilityEntry> list;
+
+	@Serial
+	private static final long serialVersionUID = 1L;
+
+	private StoreMerchantId store;
+
+	private List<PersistableProductAvailabilityEntry> list;
+
 }

@@ -6,9 +6,11 @@ import org.springframework.data.convert.ReadingConverter;
 
 @ReadingConverter
 public class ManagerStoreDomainsReadingConverter
-        implements Converter<Collection<ManagerStoreDomain>, ManagerStoreDomains> {
-    @Override
-    public ManagerStoreDomains convert(Collection<ManagerStoreDomain> source) {
-        return ManagerStoreDomains.of(source);
-    }
+		implements Converter<Collection<ManagerStoreDomain>, ManagerStoreDomains> {
+
+	@Override
+	public ManagerStoreDomains convert(Collection<ManagerStoreDomain> source) {
+		return ManagerStoreDomains.of(source);
+	}
+
 }

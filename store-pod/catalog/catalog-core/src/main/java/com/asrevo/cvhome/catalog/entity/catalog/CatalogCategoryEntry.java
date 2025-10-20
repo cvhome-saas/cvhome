@@ -13,43 +13,39 @@ import lombok.Setter;
 
 @Entity
 @EntityListeners(value = AuditListener.class)
-@Table(
-        name = "CATALOG_ENTRY",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"CATEGORY_ID", "CATALOG_ID"}))
+@Table(name = "CATALOG_ENTRY", uniqueConstraints = @UniqueConstraint(columnNames = { "CATEGORY_ID", "CATALOG_ID" }))
 @Getter
 @Setter
-public class CatalogCategoryEntry extends SalesManagerEntity<Long, CatalogCategoryEntry>
-        implements Auditable {
+public class CatalogCategoryEntry extends SalesManagerEntity<Long, CatalogCategoryEntry> implements Auditable {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    @ManyToOne
-    @JoinColumn(name = "CATEGORY_ID", nullable = false)
-    Category category;
+	@ManyToOne
+	@JoinColumn(name = "CATEGORY_ID", nullable = false)
+	Category category;
 
-    @Embedded private AuditSection auditSection = new AuditSection();
+	@Embedded
+	private AuditSection auditSection = new AuditSection();
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
-    @TableGenerator(
-            name = "TABLE_GEN",
-            table = "SM_SEQUENCER",
-            pkColumnName = "SEQ_NAME",
-            valueColumnName = "SEQ_COUNT",
-            allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
-            initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE,
-            pkColumnValue = "CATALOG_CATEGORY_ENTRY_SEQ_NEXT_VAL")
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
+	@TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME",
+			valueColumnName = "SEQ_COUNT", allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
+			initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE,
+			pkColumnValue = "CATALOG_CATEGORY_ENTRY_SEQ_NEXT_VAL")
+	private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "CATALOG_ID", nullable = false)
-    private Catalog catalog;
+	@ManyToOne
+	@JoinColumn(name = "CATALOG_ID", nullable = false)
+	private Catalog catalog;
 
-    // TODO d products ????
+	// TODO d products ????
 
-    @Column(name = "VISIBLE")
-    private boolean visible;
+	@Column(name = "VISIBLE")
+	private boolean visible;
+
 }

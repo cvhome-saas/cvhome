@@ -7,5 +7,7 @@ import org.springframework.data.domain.Pageable;
 
 @Configuration
 @ConditionalOnClass(Pageable.class)
-@Import(value = {ReactiveWebConfig.class, ServletWebConfig.class})
-public class WebConfig {}
+@Import(value = { ReactiveWebConfig.class, ServletWebConfig.class })
+public class WebConfig {
+
+}

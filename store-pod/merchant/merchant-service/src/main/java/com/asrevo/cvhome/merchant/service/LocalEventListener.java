@@ -11,12 +11,14 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @AllArgsConstructor
 public class LocalEventListener {
-    private final EventProcessor eventProcessor;
 
-    // @TODO replace with @TransactionalEventListener as its not working fine now
-    @EventListener
-    void onEvent(Event event) {
-        log.info(event.eventType());
-        eventProcessor.process(event);
-    }
+	private final EventProcessor eventProcessor;
+
+	// @TODO replace with @TransactionalEventListener as its not working fine now
+	@EventListener
+	void onEvent(Event event) {
+		log.info(event.eventType());
+		eventProcessor.process(event);
+	}
+
 }

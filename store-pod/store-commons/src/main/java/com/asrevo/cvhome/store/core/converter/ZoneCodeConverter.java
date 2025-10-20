@@ -6,16 +6,18 @@ import jakarta.persistence.Converter;
 
 @Converter
 public class ZoneCodeConverter implements AttributeConverter<ZoneCode, String> {
-    @Override
-    public String convertToDatabaseColumn(ZoneCode zoneCode) {
-        if (zoneCode == null) {
-            return null;
-        }
-        return zoneCode.code();
-    }
 
-    @Override
-    public ZoneCode convertToEntityAttribute(String s) {
-        return new ZoneCode(s);
-    }
+	@Override
+	public String convertToDatabaseColumn(ZoneCode zoneCode) {
+		if (zoneCode == null) {
+			return null;
+		}
+		return zoneCode.code();
+	}
+
+	@Override
+	public ZoneCode convertToEntityAttribute(String s) {
+		return new ZoneCode(s);
+	}
+
 }

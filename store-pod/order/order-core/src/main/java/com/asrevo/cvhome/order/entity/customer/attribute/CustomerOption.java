@@ -16,66 +16,62 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(
-        name = "CUSTOMER_OPTION",
-        indexes = {@Index(name = "CUST_OPT_CODE_IDX", columnList = "CUSTOMER_OPT_CODE")},
-        uniqueConstraints =
-                @UniqueConstraint(columnNames = {"STORE_MERCHANT_ID", "CUSTOMER_OPT_CODE"}))
+@Table(name = "CUSTOMER_OPTION", indexes = { @Index(name = "CUST_OPT_CODE_IDX", columnList = "CUSTOMER_OPT_CODE") },
+		uniqueConstraints = @UniqueConstraint(columnNames = { "STORE_MERCHANT_ID", "CUSTOMER_OPT_CODE" }))
 @Getter
 @Setter
 public class CustomerOption extends SalesManagerEntity<Long, CustomerOption> {
-    @Serial private static final long serialVersionUID = -2019269055342226086L;
 
-    @Id
-    @Column(name = "CUSTOMER_OPTION_ID")
-    @TableGenerator(
-            name = "TABLE_GEN",
-            table = "SM_SEQUENCER",
-            pkColumnName = "SEQ_NAME",
-            valueColumnName = "SEQ_COUNT",
-            pkColumnValue = "CUSTOMER_OPTION_SEQ_NEXT_VAL",
-            allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
-            initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
-    private Long id;
+	@Serial
+	private static final long serialVersionUID = -2019269055342226086L;
 
-    @Column(name = "SORT_ORDER")
-    private Integer sortOrder = 0;
+	@Id
+	@Column(name = "CUSTOMER_OPTION_ID")
+	@TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME",
+			valueColumnName = "SEQ_COUNT", pkColumnValue = "CUSTOMER_OPTION_SEQ_NEXT_VAL",
+			allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
+			initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
+	@GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
+	private Long id;
 
-    @Column(name = "CUSTOMER_OPTION_TYPE", length = 10)
-    private String customerOptionType;
+	@Column(name = "SORT_ORDER")
+	private Integer sortOrder = 0;
 
-    @NotEmpty
-    @Pattern(regexp = "^[a-zA-Z0-9_-]*$")
-    @Column(name = "CUSTOMER_OPT_CODE")
-    // @Index(name="CUST_OPT_CODE_IDX")
-    private String code;
+	@Column(name = "CUSTOMER_OPTION_TYPE", length = 10)
+	private String customerOptionType;
 
-    @Column(name = "CUSTOMER_OPT_ACTIVE")
-    private boolean active;
+	@NotEmpty
+	@Pattern(regexp = "^[a-zA-Z0-9_-]*$")
+	@Column(name = "CUSTOMER_OPT_CODE")
+	// @Index(name="CUST_OPT_CODE_IDX")
+	private String code;
 
-    @Column(name = "CUSTOMER_OPT_PUBLIC")
-    private boolean publicOption;
+	@Column(name = "CUSTOMER_OPT_ACTIVE")
+	private boolean active;
 
-    @Valid
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "customerOption")
-    private Set<CustomerOptionDescription> descriptions = new HashSet<>();
+	@Column(name = "CUSTOMER_OPT_PUBLIC")
+	private boolean publicOption;
 
-    @Transient private List<CustomerOptionDescription> descriptionsList = new ArrayList<>();
+	@Valid
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "customerOption")
+	private Set<CustomerOptionDescription> descriptions = new HashSet<>();
 
-    @Embedded
-    @AttributeOverrides(
-            @AttributeOverride(
-                    name = "storeMerchantId",
-                    column = @Column(name = "STORE_MERCHANT_ID", nullable = false, length = 50)))
-    private StoreMerchantId storeMerchantId;
+	@Transient
+	private List<CustomerOptionDescription> descriptionsList = new ArrayList<>();
 
-    public CustomerOption() {}
+	@Embedded
+	@AttributeOverrides(@AttributeOverride(name = "storeMerchantId",
+			column = @Column(name = "STORE_MERCHANT_ID", nullable = false, length = 50)))
+	private StoreMerchantId storeMerchantId;
 
-    public List<CustomerOptionDescription> getDescriptionsSettoList() {
-        if (descriptionsList == null || descriptionsList.isEmpty()) {
-            descriptionsList = new ArrayList<>(this.getDescriptions());
-        }
-        return descriptionsList;
-    }
+	public CustomerOption() {
+	}
+
+	public List<CustomerOptionDescription> getDescriptionsSettoList() {
+		if (descriptionsList == null || descriptionsList.isEmpty()) {
+			descriptionsList = new ArrayList<>(this.getDescriptions());
+		}
+		return descriptionsList;
+	}
+
 }

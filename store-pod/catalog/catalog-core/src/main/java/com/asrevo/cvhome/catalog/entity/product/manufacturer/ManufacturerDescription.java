@@ -10,35 +10,34 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(
-        name = "MANUFACTURER_DESCRIPTION",
-        uniqueConstraints = {@UniqueConstraint(columnNames = {"MANUFACTURER_ID", "LANGUAGE_CODE"})})
-@TableGenerator(
-        name = "description_gen",
-        table = "SM_SEQUENCER",
-        pkColumnName = "SEQ_NAME",
-        valueColumnName = "SEQ_COUNT",
-        pkColumnValue = "MANUFACTURER_DESCRIPTION_SEQ_NEXT_VAL",
-        allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
-        initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
+@Table(name = "MANUFACTURER_DESCRIPTION",
+		uniqueConstraints = { @UniqueConstraint(columnNames = { "MANUFACTURER_ID", "LANGUAGE_CODE" }) })
+@TableGenerator(name = "description_gen", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME",
+		valueColumnName = "SEQ_COUNT", pkColumnValue = "MANUFACTURER_DESCRIPTION_SEQ_NEXT_VAL",
+		allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
+		initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
 @Getter
 @Setter
 public class ManufacturerDescription extends Description {
-    @Serial private static final long serialVersionUID = 1L;
 
-    @JsonIgnore
-    @ManyToOne(targetEntity = Manufacturer.class)
-    @JoinColumn(name = "MANUFACTURER_ID", nullable = false)
-    private Manufacturer manufacturer;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    @Column(name = "MANUFACTURERS_URL")
-    private String url;
+	@JsonIgnore
+	@ManyToOne(targetEntity = Manufacturer.class)
+	@JoinColumn(name = "MANUFACTURER_ID", nullable = false)
+	private Manufacturer manufacturer;
 
-    @Column(name = "URL_CLICKED")
-    private Integer urlClicked;
+	@Column(name = "MANUFACTURERS_URL")
+	private String url;
 
-    @Column(name = "DATE_LAST_CLICK")
-    private Date dateLastClick;
+	@Column(name = "URL_CLICKED")
+	private Integer urlClicked;
 
-    public ManufacturerDescription() {}
+	@Column(name = "DATE_LAST_CLICK")
+	private Date dateLastClick;
+
+	public ManufacturerDescription() {
+	}
+
 }

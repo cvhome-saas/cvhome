@@ -25,50 +25,49 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 @Setter
 @Slf4j
-public class Transaction extends SalesManagerEntity<Long, Transaction>
-        implements Serializable, Auditable {
+public class Transaction extends SalesManagerEntity<Long, Transaction> implements Serializable, Auditable {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    @Id
-    @Column(name = "TRANSACTION_ID")
-    @TableGenerator(
-            name = "TABLE_GEN",
-            table = "SM_SEQUENCER",
-            pkColumnName = "SEQ_NAME",
-            valueColumnName = "SEQ_COUNT",
-            pkColumnValue = "TRANSACTION_SEQ_NEXT_VAL",
-            allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
-            initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
-    private Long id;
+	@Id
+	@Column(name = "TRANSACTION_ID")
+	@TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME",
+			valueColumnName = "SEQ_COUNT", pkColumnValue = "TRANSACTION_SEQ_NEXT_VAL",
+			allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
+			initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
+	@GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
+	private Long id;
 
-    @Embedded private AuditSection auditSection = new AuditSection();
+	@Embedded
+	private AuditSection auditSection = new AuditSection();
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ORDER_ID")
-    private Order order;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "ORDER_ID")
+	private Order order;
 
-    @Column(name = "AMOUNT")
-    private BigDecimal amount;
+	@Column(name = "AMOUNT")
+	private BigDecimal amount;
 
-    @Column(name = "TRANSACTION_DATE")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date transactionDate;
+	@Column(name = "TRANSACTION_DATE")
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date transactionDate;
 
-    @Column(name = "TRANSACTION_TYPE")
-    @Enumerated(value = EnumType.STRING)
-    private TransactionType transactionType;
+	@Column(name = "TRANSACTION_TYPE")
+	@Enumerated(value = EnumType.STRING)
+	private TransactionType transactionType;
 
-    @Column(name = "PAYMENT_TYPE")
-    @Enumerated(value = EnumType.STRING)
-    private PaymentType paymentType;
+	@Column(name = "PAYMENT_TYPE")
+	@Enumerated(value = EnumType.STRING)
+	private PaymentType paymentType;
 
-    @Column(name = "DETAILS", columnDefinition = "text")
-    private String details;
+	@Column(name = "DETAILS", columnDefinition = "text")
+	private String details;
 
-    @Transient private Map<String, String> transactionDetails = new HashMap<>();
+	@Transient
+	private Map<String, String> transactionDetails = new HashMap<>();
+
 }

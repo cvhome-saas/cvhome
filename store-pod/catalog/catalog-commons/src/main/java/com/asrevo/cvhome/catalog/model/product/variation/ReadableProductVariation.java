@@ -10,11 +10,14 @@ import lombok.Setter;
 @Getter
 public class ReadableProductVariation extends ProductVariationEntity {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    ReadableProductOption option = null;
-    ReadableProductOptionValue optionValue = null;
+	ReadableProductOption option = null;
+
+	ReadableProductOptionValue optionValue = null;
+
 }

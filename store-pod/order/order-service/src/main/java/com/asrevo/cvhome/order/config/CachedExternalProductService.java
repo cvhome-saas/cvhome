@@ -9,25 +9,24 @@ import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import org.springframework.cache.annotation.Cacheable;
 
 public class CachedExternalProductService implements ExternalProductService {
-    private final ExternalProductService externalProductService;
 
-    public CachedExternalProductService(ExternalProductService externalProductService) {
-        this.externalProductService = externalProductService;
-    }
+	private final ExternalProductService externalProductService;
 
-    @Cacheable(
-            value = "MINIMAL-DETAILED-PRODUCT",
-            key = "#store.storeMerchantId()+'-'+#sku+'-'+#lang.code()",
-            unless = "#result==null")
-    @Override
-    public ProductDetails getDetailedProduct(StoreMerchantId store, String sku, LanguageCode lang) {
-        return externalProductService.getDetailedProduct(store, sku, lang);
-    }
+	public CachedExternalProductService(ExternalProductService externalProductService) {
+		this.externalProductService = externalProductService;
+	}
 
-    @Override
-    public ProductReservationStatus reserve(
-            StoreMerchantId store, ProductReservationList productReservation)
-            throws ServiceException {
-        return externalProductService.reserve(store, productReservation);
-    }
+	@Cacheable(value = "MINIMAL-DETAILED-PRODUCT", key = "#store.storeMerchantId()+'-'+#sku+'-'+#lang.code()",
+			unless = "#result==null")
+	@Override
+	public ProductDetails getDetailedProduct(StoreMerchantId store, String sku, LanguageCode lang) {
+		return externalProductService.getDetailedProduct(store, sku, lang);
+	}
+
+	@Override
+	public ProductReservationStatus reserve(StoreMerchantId store, ProductReservationList productReservation)
+			throws ServiceException {
+		return externalProductService.reserve(store, productReservation);
+	}
+
 }

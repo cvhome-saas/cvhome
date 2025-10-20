@@ -19,17 +19,19 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @AllArgsConstructor
 public class AuthController {
-    @GetMapping("current")
-    @ConditionalOnApiStatus(usage = ApiUsage.WILL_USED)
-    public ResponseEntity<Jwt> current(JwtAuthenticationToken jwtAuthenticationToken) {
-        return Optional.ofNullable((Jwt) jwtAuthenticationToken.getPrincipal())
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.UNAUTHORIZED));
-    }
 
-    @GetMapping("me")
-    @ConditionalOnApiStatus(usage = ApiUsage.WILL_USED)
-    public JwtAuthenticationToken me() {
-        return ((JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication());
-    }
+	@GetMapping("current")
+	@ConditionalOnApiStatus(usage = ApiUsage.WILL_USED)
+	public ResponseEntity<Jwt> current(JwtAuthenticationToken jwtAuthenticationToken) {
+		return Optional.ofNullable((Jwt) jwtAuthenticationToken.getPrincipal())
+			.map(ResponseEntity::ok)
+			.orElseGet(() -> new ResponseEntity<>(HttpStatus.UNAUTHORIZED));
+	}
+
+	@GetMapping("me")
+	@ConditionalOnApiStatus(usage = ApiUsage.WILL_USED)
+	public JwtAuthenticationToken me() {
+		return ((JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication());
+	}
+
 }

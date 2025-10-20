@@ -10,13 +10,16 @@ import lombok.Setter;
 @Setter
 public class PersistableCustomer extends CustomerEntity {
 
-    @Serial private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    /**
-     *
-     */
-    private String password = null;
+	/**
+	 *
+	 */
+	private String password = null;
 
-    private String repeatPassword = null;
-    private List<PersistableCustomerAttribute> attributes;
+	private String repeatPassword = null;
+
+	private List<PersistableCustomerAttribute> attributes;
+
 }

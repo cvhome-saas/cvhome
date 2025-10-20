@@ -9,11 +9,14 @@ import lombok.Setter;
 @Getter
 public class ReadableProductType extends ProductTypeEntity {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private ProductTypeDescription description;
-    private List<ProductTypeDescription> descriptions;
+	private ProductTypeDescription description;
+
+	private List<ProductTypeDescription> descriptions;
+
 }

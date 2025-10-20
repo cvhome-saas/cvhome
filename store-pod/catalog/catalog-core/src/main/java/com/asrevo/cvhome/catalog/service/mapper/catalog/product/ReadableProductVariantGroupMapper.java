@@ -17,85 +17,75 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 @Component
-public class ReadableProductVariantGroupMapper
-        implements Mapper<ProductVariantGroup, ReadableProductVariantGroup> {
+public class ReadableProductVariantGroupMapper implements Mapper<ProductVariantGroup, ReadableProductVariantGroup> {
 
-    private final ReadableProductVariantMapper readableProductVariantMapper;
+	private final ReadableProductVariantMapper readableProductVariantMapper;
 
-    private final ImageFilePath imageUtils;
+	private final ImageFilePath imageUtils;
 
-    public ReadableProductVariantGroupMapper(
-            ReadableProductVariantMapper readableProductVariantMapper, ImageFilePath imageUtils) {
-        this.readableProductVariantMapper = readableProductVariantMapper;
-        this.imageUtils = imageUtils;
-    }
+	public ReadableProductVariantGroupMapper(ReadableProductVariantMapper readableProductVariantMapper,
+			ImageFilePath imageUtils) {
+		this.readableProductVariantMapper = readableProductVariantMapper;
+		this.imageUtils = imageUtils;
+	}
 
-    @Override
-    public ReadableProductVariantGroup convert(
-            ProductVariantGroup source, StoreMerchantId store, LanguageCode language) {
-        Assert.notNull(source, "productVariantGroup cannot be null");
-        Assert.notNull(store, "store cannot be null");
-        Assert.notNull(language, "Language cannot be null");
-        return this.merge(source, new ReadableProductVariantGroup(), store, language);
-    }
+	@Override
+	public ReadableProductVariantGroup convert(ProductVariantGroup source, StoreMerchantId store,
+			LanguageCode language) {
+		Assert.notNull(source, "productVariantGroup cannot be null");
+		Assert.notNull(store, "store cannot be null");
+		Assert.notNull(language, "Language cannot be null");
+		return this.merge(source, new ReadableProductVariantGroup(), store, language);
+	}
 
-    @Override
-    public ReadableProductVariantGroup merge(
-            ProductVariantGroup source,
-            ReadableProductVariantGroup destination,
-            StoreMerchantId store,
-            LanguageCode language) {
-        Assert.notNull(source, "productVariantGroup cannot be null");
-        Assert.notNull(store, "store cannot be null");
-        Assert.notNull(language, "Language cannot be null");
-        if (destination == null) {
-            destination = new ReadableProductVariantGroup();
-        }
+	@Override
+	public ReadableProductVariantGroup merge(ProductVariantGroup source, ReadableProductVariantGroup destination,
+			StoreMerchantId store, LanguageCode language) {
+		Assert.notNull(source, "productVariantGroup cannot be null");
+		Assert.notNull(store, "store cannot be null");
+		Assert.notNull(language, "Language cannot be null");
+		if (destination == null) {
+			destination = new ReadableProductVariantGroup();
+		}
 
-        destination.setId(source.getId());
+		destination.setId(source.getId());
 
-        Set<ProductVariant> instances = source.getProductVariants();
-        destination.setProductVariants(
-                instances.stream()
-                        .map(i -> this.instance(i, store, language))
-                        .collect(Collectors.toList()));
+		Set<ProductVariant> instances = source.getProductVariants();
+		destination.setProductVariants(
+				instances.stream().map(i -> this.instance(i, store, language)).collect(Collectors.toList()));
 
-        // image id should be unique in the list
+		// image id should be unique in the list
 
-        Map<Long, ReadableImage> finalList = new HashMap<>();
+		Map<Long, ReadableImage> finalList = new HashMap<>();
 
-        List<ReadableImage> originalList =
-                source.getImages().stream()
-                        .map(i -> this.image(finalList, i, store, language))
-                        .toList();
+		List<ReadableImage> originalList = source.getImages()
+			.stream()
+			.map(i -> this.image(finalList, i, store, language))
+			.toList();
 
-        destination.setImages(new ArrayList<>(finalList.values()));
+		destination.setImages(new ArrayList<>(finalList.values()));
 
-        return destination;
-    }
+		return destination;
+	}
 
-    private ReadableProductVariant instance(
-            ProductVariant instance, StoreMerchantId store, LanguageCode language) {
+	private ReadableProductVariant instance(ProductVariant instance, StoreMerchantId store, LanguageCode language) {
 
-        return readableProductVariantMapper.convert(instance, store, language);
-    }
+		return readableProductVariantMapper.convert(instance, store, language);
+	}
 
-    private ReadableImage image(
-            Map<Long, ReadableImage> finalList,
-            ProductVariantImage img,
-            StoreMerchantId store,
-            LanguageCode language) {
-        ReadableImage readable = null;
-        if (!finalList.containsKey(img.getId())) {
-            readable = new ReadableImage();
-            readable.setId(img.getId());
-            readable.setImageName(img.getProductImage());
-            readable.setImageUrl(
-                    imageUtils.buildCustomTypeImageUtils(
-                            store, img.getProductImage(), FileContentType.VARIANT));
-            readable.setDefaultImage(img.isDefaultImage());
-            finalList.put(img.getId(), readable);
-        }
-        return readable;
-    }
+	private ReadableImage image(Map<Long, ReadableImage> finalList, ProductVariantImage img, StoreMerchantId store,
+			LanguageCode language) {
+		ReadableImage readable = null;
+		if (!finalList.containsKey(img.getId())) {
+			readable = new ReadableImage();
+			readable.setId(img.getId());
+			readable.setImageName(img.getProductImage());
+			readable.setImageUrl(
+					imageUtils.buildCustomTypeImageUtils(store, img.getProductImage(), FileContentType.VARIANT));
+			readable.setDefaultImage(img.isDefaultImage());
+			finalList.put(img.getId(), readable);
+		}
+		return readable;
+	}
+
 }

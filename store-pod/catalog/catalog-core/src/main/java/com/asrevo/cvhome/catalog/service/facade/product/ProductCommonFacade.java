@@ -10,52 +10,45 @@ import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 
 public interface ProductCommonFacade {
 
-    /**
-     * Create / Update product
-     */
-    Long saveProduct(StoreMerchantId store, PersistableProduct product, LanguageCode language);
+	/**
+	 * Create / Update product
+	 */
+	Long saveProduct(StoreMerchantId store, PersistableProduct product, LanguageCode language);
 
-    /**
-     * Update minimal product details
-     */
-    void update(
-            Long productId,
-            LightPersistableProduct product,
-            StoreMerchantId merchant,
-            LanguageCode language);
+	/**
+	 * Update minimal product details
+	 */
+	void update(Long productId, LightPersistableProduct product, StoreMerchantId merchant, LanguageCode language);
 
-    /**
-     * Patch inventory by sku
-     */
-    void update(
-            String sku,
-            LightPersistableProduct product,
-            StoreMerchantId merchant,
-            LanguageCode language);
+	/**
+	 * Patch inventory by sku
+	 */
+	void update(String sku, LightPersistableProduct product, StoreMerchantId merchant, LanguageCode language);
 
-    /**
-     * Get a Product by id and store
-     */
-    ReadableProduct getProduct(StoreMerchantId store, Long id, LanguageCode language);
+	/**
+	 * Get a Product by id and store
+	 */
+	ReadableProduct getProduct(StoreMerchantId store, Long id, LanguageCode language);
 
-    /**
-     * Delete product
-     */
-    void deleteProduct(Long id, StoreMerchantId store);
+	/**
+	 * Delete product
+	 */
+	void deleteProduct(Long id, StoreMerchantId store);
 
-    /**
-     * Adds a product to a category
-     */
-    ReadableProduct addProductToCategory(Category category, Product product, LanguageCode language);
+	/**
+	 * Adds a product to a category
+	 */
+	ReadableProduct addProductToCategory(Category category, Product product, LanguageCode language);
 
-    /**
-     * Removes item from a category
-     */
-    ReadableProduct removeProductFromCategory(
-            Category category, Product product, LanguageCode language) throws Exception;
+	/**
+	 * Removes item from a category
+	 */
+	ReadableProduct removeProductFromCategory(Category category, Product product, LanguageCode language)
+			throws Exception;
 
-    /**
-     * validates if product exists
-     */
-    boolean exists(String sku, StoreMerchantId store);
+	/**
+	 * validates if product exists
+	 */
+	boolean exists(String sku, StoreMerchantId store);
+
 }

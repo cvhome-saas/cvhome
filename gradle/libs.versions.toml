@@ -17,7 +17,7 @@ jackson = "2.19.0"
 swagger = "2.2.8"
 junit = "5.10.0"
 testcontainers = "1.19.7"
-spotless = "6.25.0"
+springJavaFormat = "0.0.43"
 keycloak = "26.0.4"
 shadow = "8.1.1"
 caffeine = "3.2.0"
@@ -129,7 +129,7 @@ commons-beanutils = { module = "commons-beanutils:commons-beanutils", version.re
 spring-boot = { id = "org.springframework.boot", version.ref = "springBoot" }
 spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "springDependencyManagement" }
 hibernate-orm = { id = "org.hibernate.orm", version.ref = "hibernate" }
-spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
+spring-javaformat = { id = "io.spring.javaformat", version.ref = "springJavaFormat" }
 shadow = { id = "com.github.johnrengelman.shadow", version.ref = "shadow" }
 graalvm = { id = "org.graalvm.buildtools.native", version.ref = "graalvm" }
 groovy-gradle-plugin = { id = "groovy-gradle-plugin" }

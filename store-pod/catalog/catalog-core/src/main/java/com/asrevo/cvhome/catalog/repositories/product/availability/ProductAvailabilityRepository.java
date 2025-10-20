@@ -8,27 +8,24 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface ProductAvailabilityRepository extends JpaRepository<ProductAvailability, Long> {
 
-    @Query(
-            value =
-                    """
-                            select distinct p from ProductAvailability p
-                            left join fetch p.prices pp
-                            left join fetch pp.descriptions ppd
-                            join fetch p.product ppr
-                            where p.id=?1""")
-    @Override
-    ProductAvailability getById(Long availabilityId);
+	@Query(value = """
+			select distinct p from ProductAvailability p
+			left join fetch p.prices pp
+			left join fetch pp.descriptions ppd
+			join fetch p.product ppr
+			where p.id=?1""")
+	@Override
+	ProductAvailability getById(Long availabilityId);
 
-    @Query(
-            value =
-                    """
-                            select distinct p from ProductAvailability p
-                            left join fetch p.prices pp
-                            left join fetch pp.descriptions ppd
-                            join fetch p.product ppr
-                            left join fetch ppr.descriptions pprd
-                            left join fetch p.productVariant ppi
-                            where ppr.sku=?1 or ppi.sku=?1
-                            and p.storeMerchantId=?2""")
-    List<ProductAvailability> getBySku(String productCode, StoreMerchantId storeMerchantId);
+	@Query(value = """
+			select distinct p from ProductAvailability p
+			left join fetch p.prices pp
+			left join fetch pp.descriptions ppd
+			join fetch p.product ppr
+			left join fetch ppr.descriptions pprd
+			left join fetch p.productVariant ppi
+			where ppr.sku=?1 or ppi.sku=?1
+			and p.storeMerchantId=?2""")
+	List<ProductAvailability> getBySku(String productCode, StoreMerchantId storeMerchantId);
+
 }

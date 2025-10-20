@@ -14,56 +14,55 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class ReadableTinyProductPopulator
-        extends AbstractDataPopulator<Product, StoreMerchantId, ReadableProduct> {
+public class ReadableTinyProductPopulator extends AbstractDataPopulator<Product, StoreMerchantId, ReadableProduct> {
 
-    @Override
-    public ReadableProduct populate(
-            Product source, ReadableProduct target, StoreMerchantId store, LanguageCode language)
-            throws ConversionException {
+	@Override
+	public ReadableProduct populate(Product source, ReadableProduct target, StoreMerchantId store,
+			LanguageCode language) throws ConversionException {
 
-        try {
+		try {
 
-            if (target == null) {
-                target = new ReadableProduct();
-            }
+			if (target == null) {
+				target = new ReadableProduct();
+			}
 
-            target.setId(source.getId());
-            target.setAvailable(source.isAvailable());
-            target.setProductShipeable(source.isProductShipeable());
+			target.setId(source.getId());
+			target.setAvailable(source.isAvailable());
+			target.setProductShipeable(source.isProductShipeable());
 
-            ProductSpecification specifications = new ProductSpecification();
-            specifications.setHeight(source.getProductHeight());
-            specifications.setLength(source.getProductLength());
-            specifications.setWeight(source.getProductWeight());
-            specifications.setWidth(source.getProductWidth());
-            target.setProductSpecifications(specifications);
+			ProductSpecification specifications = new ProductSpecification();
+			specifications.setHeight(source.getProductHeight());
+			specifications.setLength(source.getProductLength());
+			specifications.setWeight(source.getProductWeight());
+			specifications.setWidth(source.getProductWidth());
+			target.setProductSpecifications(specifications);
 
-            target.setPreOrder(source.isPreOrder());
-            target.setRefSku(source.getRefSku());
-            target.setSortOrder(source.getSortOrder());
+			target.setPreOrder(source.isPreOrder());
+			target.setRefSku(source.getRefSku());
+			target.setSortOrder(source.getSortOrder());
 
-            if (source.getDateAvailable() != null) {
-                target.setDateAvailable(DateUtil.formatDate(source.getDateAvailable()));
-            }
+			if (source.getDateAvailable() != null) {
+				target.setDateAvailable(DateUtil.formatDate(source.getDateAvailable()));
+			}
 
-            if (source.getAuditSection() != null) {
-                target.setCreationDate(
-                        DateUtil.formatDate(source.getAuditSection().getDateCreated()));
-            }
+			if (source.getAuditSection() != null) {
+				target.setCreationDate(DateUtil.formatDate(source.getAuditSection().getDateCreated()));
+			}
 
-            target.setProductVirtual(source.isProductVirtual());
-            target.setSku(source.getSku());
-            return target;
+			target.setProductVirtual(source.isProductVirtual());
+			target.setSku(source.getSku());
+			return target;
 
-        } catch (Exception e) {
-            throw new ConversionException(e);
-        }
-    }
+		}
+		catch (Exception e) {
+			throw new ConversionException(e);
+		}
+	}
 
-    @Override
-    protected ReadableProduct createTarget() {
-        // TODO Auto-generated method stub
-        return null;
-    }
+	@Override
+	protected ReadableProduct createTarget() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

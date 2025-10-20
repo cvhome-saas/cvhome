@@ -10,12 +10,16 @@ import lombok.Setter;
 @Getter
 public class ProductAttributeEntity extends ProductAttribute implements Serializable {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private int sortOrder;
-    private boolean attributeDefault = false;
-    private boolean attributeDisplayOnly = false;
+	private int sortOrder;
+
+	private boolean attributeDefault = false;
+
+	private boolean attributeDisplayOnly = false;
+
 }

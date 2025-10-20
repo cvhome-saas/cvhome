@@ -9,31 +9,23 @@ import org.springframework.data.domain.Pageable;
 
 public interface ProductVariantGroupFacade {
 
-    ReadableProductVariantGroup get(
-            Long instanceGroupId, StoreMerchantId store, LanguageCode language);
+	ReadableProductVariantGroup get(Long instanceGroupId, StoreMerchantId store, LanguageCode language);
 
-    Long create(
-            PersistableProductVariantGroup productVariantGroup,
-            StoreMerchantId store,
-            LanguageCode language);
+	Long create(PersistableProductVariantGroup productVariantGroup, StoreMerchantId store, LanguageCode language);
 
-    void update(
-            Long productVariantGroup,
-            PersistableProductVariantGroup instance,
-            StoreMerchantId store,
-            LanguageCode language);
+	void update(Long productVariantGroup, PersistableProductVariantGroup instance, StoreMerchantId store,
+			LanguageCode language);
 
-    void delete(Long productVariant, Long productId, StoreMerchantId store);
+	void delete(Long productVariant, Long productId, StoreMerchantId store);
 
-    ReadableEntityList<ReadableProductVariantGroup> list(
-            Long productId, StoreMerchantId store, LanguageCode language, Pageable pageable);
-    /*
-
-        @TODO not needed for now
-        void addImage(MultipartFile image, Long instanceGroupId,
-                      StoreMerchantId store, LanguageCode language);
-
-        void removeImage(Long imageId, Long instanceGroupId, StoreMerchantId store);
-    */
+	ReadableEntityList<ReadableProductVariantGroup> list(Long productId, StoreMerchantId store, LanguageCode language,
+			Pageable pageable);
+	/*
+	 *
+	 * @TODO not needed for now void addImage(MultipartFile image, Long instanceGroupId,
+	 * StoreMerchantId store, LanguageCode language);
+	 *
+	 * void removeImage(Long imageId, Long instanceGroupId, StoreMerchantId store);
+	 */
 
 }

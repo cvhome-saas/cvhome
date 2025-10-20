@@ -13,41 +13,42 @@ import java.util.List;
 
 public class ContentRepositoryImpl implements ContentRepositoryCustom {
 
-    @PersistenceContext private EntityManager em;
+	@PersistenceContext
+	private EntityManager em;
 
-    @Override
-    public List<ContentDescription> listNameByType(
-            List<ContentType> contentType, StoreMerchantId store, LanguageCode language) {
+	@Override
+	public List<ContentDescription> listNameByType(List<ContentType> contentType, StoreMerchantId store,
+			LanguageCode language) {
 
-        String hql =
-                """
-                        select c from Content c
-                        left join fetch c.descriptions cd
-                        where c.contentType in (:ct)
-                        and c.storeMerchantId =:cm
-                        and cd.languageCode =:cl
-                        and c.visible=true
-                        order by c.sortOrder""";
-        Query q = this.em.createQuery(hql);
+		String hql = """
+				select c from Content c
+				left join fetch c.descriptions cd
+				where c.contentType in (:ct)
+				and c.storeMerchantId =:cm
+				and cd.languageCode =:cl
+				and c.visible=true
+				order by c.sortOrder""";
+		Query q = this.em.createQuery(hql);
 
-        q.setParameter("ct", contentType);
-        q.setParameter("cm", store);
-        q.setParameter("cl", language);
+		q.setParameter("ct", contentType);
+		q.setParameter("cm", store);
+		q.setParameter("cl", language);
 
-        @SuppressWarnings("unchecked")
-        List<Content> contents = q.getResultList();
+		@SuppressWarnings("unchecked")
+		List<Content> contents = q.getResultList();
 
-        List<ContentDescription> descriptions = new ArrayList<>();
-        for (Content c : contents) {
-            String name = c.getDescription().getName();
-            String url = c.getDescription().getSeUrl();
-            ContentDescription contentDescription = new ContentDescription();
-            contentDescription.setName(name);
-            contentDescription.setSeUrl(url);
-            contentDescription.setContent(c);
-            descriptions.add(contentDescription);
-        }
+		List<ContentDescription> descriptions = new ArrayList<>();
+		for (Content c : contents) {
+			String name = c.getDescription().getName();
+			String url = c.getDescription().getSeUrl();
+			ContentDescription contentDescription = new ContentDescription();
+			contentDescription.setName(name);
+			contentDescription.setSeUrl(url);
+			contentDescription.setContent(c);
+			descriptions.add(contentDescription);
+		}
 
-        return descriptions;
-    }
+		return descriptions;
+	}
+
 }

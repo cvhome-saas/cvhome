@@ -10,10 +10,12 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 @Slf4j
 public class PricingTableInitializer implements ApplicationListener<ApplicationReadyEvent> {
-    private final PricingTableInitService pricingTableInitService;
 
-    @Override
-    public void onApplicationEvent(ApplicationReadyEvent event) {
-        pricingTableInitService.init();
-    }
+	private final PricingTableInitService pricingTableInitService;
+
+	@Override
+	public void onApplicationEvent(ApplicationReadyEvent event) {
+		pricingTableInitService.init();
+	}
+
 }

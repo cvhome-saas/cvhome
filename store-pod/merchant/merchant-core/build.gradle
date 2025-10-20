@@ -1,6 +1,6 @@
 plugins {
 	alias(libs.plugins.java.library.conventions)
-	alias(libs.plugins.spotless)
+	alias(libs.plugins.spring.javaformat)
 }
 
 dependencies {

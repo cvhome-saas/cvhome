@@ -9,14 +9,15 @@ import org.springframework.security.oauth2.client.registration.ReactiveClientReg
 @Configuration
 public class ReactiveGatewaySecurityConfig {
 
-    @Bean
-    public KeycloakLogoutSuccessHandler keycloakLogoutSuccessHandler(
-            ReactiveClientRegistrationRepository reactiveClientRegistrationRepository) {
-        return new KeycloakLogoutSuccessHandler(reactiveClientRegistrationRepository);
-    }
+	@Bean
+	public KeycloakLogoutSuccessHandler keycloakLogoutSuccessHandler(
+			ReactiveClientRegistrationRepository reactiveClientRegistrationRepository) {
+		return new KeycloakLogoutSuccessHandler(reactiveClientRegistrationRepository);
+	}
 
-    @Bean
-    public SecurityContextServerLogoutHandler logoutHandler() {
-        return new SecurityContextServerLogoutHandler();
-    }
+	@Bean
+	public SecurityContextServerLogoutHandler logoutHandler() {
+		return new SecurityContextServerLogoutHandler();
+	}
+
 }

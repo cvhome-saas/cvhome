@@ -17,37 +17,35 @@ import org.springframework.util.Assert;
 @Component
 public class ReadableTinyProductMapper implements Mapper<Product, ReadableProduct> {
 
-    @Override
-    public ReadableProduct convert(Product source, StoreMerchantId store, LanguageCode language) {
-        ReadableProduct product = new ReadableProduct();
-        return this.merge(source, product, store, language);
-    }
+	@Override
+	public ReadableProduct convert(Product source, StoreMerchantId store, LanguageCode language) {
+		ReadableProduct product = new ReadableProduct();
+		return this.merge(source, product, store, language);
+	}
 
-    @Override
-    public ReadableProduct merge(
-            Product source,
-            ReadableProduct destination,
-            StoreMerchantId store,
-            LanguageCode language) {
+	@Override
+	public ReadableProduct merge(Product source, ReadableProduct destination, StoreMerchantId store,
+			LanguageCode language) {
 
-        Assert.notNull(source, "Product cannot be null");
-        Assert.notNull(destination, "Product destination cannot be null");
+		Assert.notNull(source, "Product cannot be null");
+		Assert.notNull(destination, "Product destination cannot be null");
 
-        destination.setSku(source.getSku());
-        destination.setRefSku(source.getRefSku());
-        destination.setId(source.getId());
-        destination.setDateAvailable(DateUtil.formatDate(source.getDateAvailable()));
+		destination.setSku(source.getSku());
+		destination.setRefSku(source.getRefSku());
+		destination.setId(source.getId());
+		destination.setDateAvailable(DateUtil.formatDate(source.getDateAvailable()));
 
-        destination.setId(source.getId());
-        destination.setAvailable(source.isAvailable());
-        destination.setProductShipeable(source.isProductShipeable());
+		destination.setId(source.getId());
+		destination.setAvailable(source.isAvailable());
+		destination.setProductShipeable(source.isProductShipeable());
 
-        destination.setPreOrder(source.isPreOrder());
-        destination.setRefSku(source.getRefSku());
-        destination.setSortOrder(source.getSortOrder());
-        destination.setSku(source.getSku());
-        destination.setSortOrder(source.getSortOrder());
+		destination.setPreOrder(source.isPreOrder());
+		destination.setRefSku(source.getRefSku());
+		destination.setSortOrder(source.getSortOrder());
+		destination.setSku(source.getSku());
+		destination.setSortOrder(source.getSortOrder());
 
-        return destination;
-    }
+		return destination;
+	}
+
 }

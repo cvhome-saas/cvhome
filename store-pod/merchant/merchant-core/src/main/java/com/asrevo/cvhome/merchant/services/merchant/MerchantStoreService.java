@@ -7,14 +7,14 @@ import com.asrevo.cvhome.merchant.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
 import java.util.Set;
 
-public interface MerchantStoreService
-        extends SalesManagerEntityService<StoreMerchantId, MerchantStore> {
+public interface MerchantStoreService extends SalesManagerEntityService<StoreMerchantId, MerchantStore> {
 
-    MerchantStore getByMerchantStoreId(StoreMerchantId code);
+	MerchantStore getByMerchantStoreId(StoreMerchantId code);
 
-    void saveOrUpdate(MerchantStore store);
+	void saveOrUpdate(MerchantStore store);
 
-    void updateSocialLinks(StoreMerchantId id, Set<SocialLink> socialLinks);
+	void updateSocialLinks(StoreMerchantId id, Set<SocialLink> socialLinks);
 
-    void updateSliderImages(StoreMerchantId id, Set<SliderImage> sliderImages);
+	void updateSliderImages(StoreMerchantId id, Set<SliderImage> sliderImages);
+
 }

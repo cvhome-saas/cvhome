@@ -25,48 +25,54 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class DateUtil {
 
-    private static final String LONGDATE_FORMAT = "EEE, d MMM yyyy HH:mm:ss Z";
+	private static final String LONGDATE_FORMAT = "EEE, d MMM yyyy HH:mm:ss Z";
 
-    /**
-     * yyyy-MM-dd
-     */
-    public static String formatDate(Date dt) {
+	/**
+	 * yyyy-MM-dd
+	 */
+	public static String formatDate(Date dt) {
 
-        if (dt == null) dt = new Date();
-        SimpleDateFormat format = new SimpleDateFormat(Constants.DEFAULT_DATE_FORMAT);
-        return format.format(dt);
-    }
+		if (dt == null)
+			dt = new Date();
+		SimpleDateFormat format = new SimpleDateFormat(Constants.DEFAULT_DATE_FORMAT);
+		return format.format(dt);
+	}
 
-    public static String formatLongDate(Date date) {
+	public static String formatLongDate(Date date) {
 
-        if (date == null) return null;
-        SimpleDateFormat format = new SimpleDateFormat(LONGDATE_FORMAT);
-        return format.format(date);
-    }
+		if (date == null)
+			return null;
+		SimpleDateFormat format = new SimpleDateFormat(LONGDATE_FORMAT);
+		return format.format(date);
+	}
 
-    public static Date getDate(String date) throws Exception {
-        DateFormat myDateFormat = new SimpleDateFormat(Constants.DEFAULT_DATE_FORMAT);
-        return myDateFormat.parse(date);
-    }
+	public static Date getDate(String date) throws Exception {
+		DateFormat myDateFormat = new SimpleDateFormat(Constants.DEFAULT_DATE_FORMAT);
+		return myDateFormat.parse(date);
+	}
 
-    public static String getPresentDate() {
+	public static String getPresentDate() {
 
-        Date dt = new Date();
+		Date dt = new Date();
 
-        SimpleDateFormat format = new SimpleDateFormat(Constants.DEFAULT_DATE_FORMAT);
-        return format.format(new Date(dt.getTime()));
-    }
+		SimpleDateFormat format = new SimpleDateFormat(Constants.DEFAULT_DATE_FORMAT);
+		return format.format(new Date(dt.getTime()));
+	}
 
-    public static boolean dateBeforeEqualsDate(Date firstDate, Date compareDate) {
+	public static boolean dateBeforeEqualsDate(Date firstDate, Date compareDate) {
 
-        if (firstDate == null || compareDate == null) {
-            return true;
-        }
+		if (firstDate == null || compareDate == null) {
+			return true;
+		}
 
-        if (firstDate.compareTo(compareDate) > 0) {
-            return false;
-        } else if (firstDate.compareTo(compareDate) < 0) {
-            return true;
-        } else return firstDate.compareTo(compareDate) == 0;
-    }
+		if (firstDate.compareTo(compareDate) > 0) {
+			return false;
+		}
+		else if (firstDate.compareTo(compareDate) < 0) {
+			return true;
+		}
+		else
+			return firstDate.compareTo(compareDate) == 0;
+	}
+
 }

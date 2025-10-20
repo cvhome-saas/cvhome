@@ -12,14 +12,19 @@ import lombok.Setter;
 @Getter
 public class PersistableMerchantStore extends MerchantStoreEntity {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private PersistableAddress address;
-    // code of parent store (can be null if retailer)
-    private String retailerStore;
-    private List<String> supportedLanguages;
-    private Set<SliderImage> sliderImages;
+	private PersistableAddress address;
+
+	// code of parent store (can be null if retailer)
+	private String retailerStore;
+
+	private List<String> supportedLanguages;
+
+	private Set<SliderImage> sliderImages;
+
 }

@@ -1,3 +1,5 @@
 package com.asrevo.cvhome.subscription.api;
 
-public interface CachedSubscriptionPlanDetailsService extends SubscriptionPlanDetailsService {}
+public interface CachedSubscriptionPlanDetailsService extends SubscriptionPlanDetailsService {
+
+}

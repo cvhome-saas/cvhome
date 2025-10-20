@@ -9,60 +9,62 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Container {
-    @JsonProperty("DockerId")
-    private String dockerId;
 
-    @JsonProperty("Name")
-    private String name;
+	@JsonProperty("DockerId")
+	private String dockerId;
 
-    @JsonProperty("DockerName")
-    private String dockerName;
+	@JsonProperty("Name")
+	private String name;
 
-    @JsonProperty("Image")
-    private String image;
+	@JsonProperty("DockerName")
+	private String dockerName;
 
-    @JsonProperty("ImageID")
-    private String imageID;
+	@JsonProperty("Image")
+	private String image;
 
-    @JsonProperty("Labels")
-    private Map<String, String> labels;
+	@JsonProperty("ImageID")
+	private String imageID;
 
-    @JsonProperty("DesiredStatus")
-    private String desiredStatus;
+	@JsonProperty("Labels")
+	private Map<String, String> labels;
 
-    @JsonProperty("KnownStatus")
-    private String knownStatus;
+	@JsonProperty("DesiredStatus")
+	private String desiredStatus;
 
-    @JsonProperty("Limits")
-    private Limits limits;
+	@JsonProperty("KnownStatus")
+	private String knownStatus;
 
-    @JsonProperty("CreatedAt")
-    private String createdAt;
+	@JsonProperty("Limits")
+	private Limits limits;
 
-    @JsonProperty("StartedAt")
-    private String startedAt;
+	@JsonProperty("CreatedAt")
+	private String createdAt;
 
-    @JsonProperty("LastRestartAt")
-    private String lastRestartAt;
+	@JsonProperty("StartedAt")
+	private String startedAt;
 
-    @JsonProperty("Type")
-    private String type;
+	@JsonProperty("LastRestartAt")
+	private String lastRestartAt;
 
-    @JsonProperty("LogDriver")
-    private String logDriver;
+	@JsonProperty("Type")
+	private String type;
 
-    @JsonProperty("LogOptions")
-    private Map<String, String> logOptions;
+	@JsonProperty("LogDriver")
+	private String logDriver;
 
-    @JsonProperty("ContainerARN")
-    private String containerARN;
+	@JsonProperty("LogOptions")
+	private Map<String, String> logOptions;
 
-    @JsonProperty("Networks")
-    private ArrayList<Network> networks;
+	@JsonProperty("ContainerARN")
+	private String containerARN;
 
-    @JsonProperty("Snapshotter")
-    private String snapshotter;
+	@JsonProperty("Networks")
+	private ArrayList<Network> networks;
 
-    @JsonProperty("Health")
-    private Health health;
+	@JsonProperty("Snapshotter")
+	private String snapshotter;
+
+	@JsonProperty("Health")
+	private Health health;
+
 }

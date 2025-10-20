@@ -10,12 +10,12 @@ import org.springframework.data.domain.Pageable;
 
 public interface ProductOptionService extends SalesManagerEntityService<Long, ProductOption> {
 
-    void saveOrUpdate(ProductOption entity) throws ServiceException;
+	void saveOrUpdate(ProductOption entity) throws ServiceException;
 
-    ProductOption getByCode(StoreMerchantId store, String optionCode);
+	ProductOption getByCode(StoreMerchantId store, String optionCode);
 
-    ProductOption getById(StoreMerchantId store, Long optionId);
+	ProductOption getById(StoreMerchantId store, Long optionId);
 
-    Page<ProductOption> getByMerchant(
-            StoreMerchantId store, LanguageCode language, String name, Pageable pageable);
+	Page<ProductOption> getByMerchant(StoreMerchantId store, LanguageCode language, String name, Pageable pageable);
+
 }

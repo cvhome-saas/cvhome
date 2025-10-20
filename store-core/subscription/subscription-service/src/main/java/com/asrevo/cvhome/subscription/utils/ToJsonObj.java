@@ -5,11 +5,11 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 
 public record ToJsonObj(Gson gson) {
-    public ToJsonObj() {
-        this(new GsonBuilder().create());
-    }
+	public ToJsonObj() {
+		this(new GsonBuilder().create());
+	}
 
-    public JsonObject exec(String json) {
-        return gson.fromJson(json, JsonObject.class);
-    }
+	public JsonObject exec(String json) {
+		return gson.fromJson(json, JsonObject.class);
+	}
 }

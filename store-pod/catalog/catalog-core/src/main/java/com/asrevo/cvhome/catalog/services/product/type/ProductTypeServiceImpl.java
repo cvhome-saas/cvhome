@@ -15,51 +15,50 @@ import org.springframework.stereotype.Service;
 
 @Service("productTypeService")
 public class ProductTypeServiceImpl extends SalesManagerEntityServiceImpl<Long, ProductType>
-        implements ProductTypeService {
+		implements ProductTypeService {
 
-    private final ProductTypeRepository productTypeRepository;
+	private final ProductTypeRepository productTypeRepository;
 
-    private final PageableProductTypeRepository pageableProductTypeRepository;
+	private final PageableProductTypeRepository pageableProductTypeRepository;
 
-    @Autowired
-    public ProductTypeServiceImpl(
-            ProductTypeRepository productTypeRepository,
-            PageableProductTypeRepository pageableProductTypeRepository) {
-        super(productTypeRepository);
-        this.productTypeRepository = productTypeRepository;
-        this.pageableProductTypeRepository = pageableProductTypeRepository;
-    }
+	@Autowired
+	public ProductTypeServiceImpl(ProductTypeRepository productTypeRepository,
+			PageableProductTypeRepository pageableProductTypeRepository) {
+		super(productTypeRepository);
+		this.productTypeRepository = productTypeRepository;
+		this.pageableProductTypeRepository = pageableProductTypeRepository;
+	}
 
-    @Override
-    public ProductType getByCode(String code, StoreMerchantId store, LanguageCode language) {
-        return productTypeRepository.findByCode(code, store);
-    }
+	@Override
+	public ProductType getByCode(String code, StoreMerchantId store, LanguageCode language) {
+		return productTypeRepository.findByCode(code, store);
+	}
 
-    @Override
-    public Page<ProductType> getByMerchant(
-            StoreMerchantId store, LanguageCode language, Pageable pageable) {
-        return pageableProductTypeRepository.findByStoreMerchantId(store, pageable);
-    }
+	@Override
+	public Page<ProductType> getByMerchant(StoreMerchantId store, LanguageCode language, Pageable pageable) {
+		return pageableProductTypeRepository.findByStoreMerchantId(store, pageable);
+	}
 
-    @Override
-    public ProductType saveOrUpdate(ProductType productType) throws ServiceException {
-        if (productType.getId() != null && productType.getId() > 0) {
-            this.update(productType);
-        } else {
-            productType = super.saveAndFlush(productType);
-        }
+	@Override
+	public ProductType saveOrUpdate(ProductType productType) throws ServiceException {
+		if (productType.getId() != null && productType.getId() > 0) {
+			this.update(productType);
+		}
+		else {
+			productType = super.saveAndFlush(productType);
+		}
 
-        return productType;
-    }
+		return productType;
+	}
 
-    @Override
-    public List<ProductType> listProductTypes(
-            List<Long> ids, StoreMerchantId store, LanguageCode language) {
-        return productTypeRepository.findByIds(ids, store, language);
-    }
+	@Override
+	public List<ProductType> listProductTypes(List<Long> ids, StoreMerchantId store, LanguageCode language) {
+		return productTypeRepository.findByIds(ids, store, language);
+	}
 
-    @Override
-    public ProductType getById(Long id, StoreMerchantId store) {
-        return productTypeRepository.findById(id, store);
-    }
+	@Override
+	public ProductType getById(Long id, StoreMerchantId store) {
+		return productTypeRepository.findById(id, store);
+	}
+
 }

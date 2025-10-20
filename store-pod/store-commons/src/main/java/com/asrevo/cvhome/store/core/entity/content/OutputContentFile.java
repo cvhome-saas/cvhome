@@ -16,6 +16,10 @@ import lombok.Setter;
 @Setter
 @Getter
 public class OutputContentFile extends StaticContentFile implements Serializable {
-    @Serial private static final long serialVersionUID = 1L;
-    private ByteArrayOutputStream file;
+
+	@Serial
+	private static final long serialVersionUID = 1L;
+
+	private ByteArrayOutputStream file;
+
 }

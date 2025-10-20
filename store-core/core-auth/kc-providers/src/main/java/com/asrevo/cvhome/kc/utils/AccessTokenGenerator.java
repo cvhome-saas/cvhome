@@ -10,22 +10,18 @@ import org.keycloak.representations.AccessToken;
 
 public record AccessTokenGenerator(KeycloakSession session, String realmName) {
 
-    public String generate() {
-        AccessToken token = new AccessToken();
-        token.audience("auth");
-        token.subject("auth");
-        token.type("Bearer");
+	public String generate() {
+		AccessToken token = new AccessToken();
+		token.audience("auth");
+		token.subject("auth");
+		token.type("Bearer");
 
-        token.issuedNow();
-        RealmModel realmModel = session.realms().getRealmByName(realmName);
-        KeyWrapper rs256 = session.keys().getActiveKey(realmModel, KeyUse.SIG, "RS256");
+		token.issuedNow();
+		RealmModel realmModel = session.realms().getRealmByName(realmName);
+		KeyWrapper rs256 = session.keys().getActiveKey(realmModel, KeyUse.SIG, "RS256");
 
-        PrivateKey privateKey = (PrivateKey) rs256.getPrivateKey();
+		PrivateKey privateKey = (PrivateKey) rs256.getPrivateKey();
 
-        return new JWSBuilder()
-                .kid(rs256.getKid())
-                .type("JWT")
-                .jsonContent(token)
-                .rsa256(privateKey);
-    }
+		return new JWSBuilder().kid(rs256.getKid()).type("JWT").jsonContent(token).rsa256(privateKey);
+	}
 }

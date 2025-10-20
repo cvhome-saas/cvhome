@@ -18,24 +18,26 @@ import org.springframework.transaction.annotation.Transactional;
 @AllArgsConstructor
 @Slf4j
 public class InternalOrgServiceImpl implements InternalOrgService {
-    private final ManagerOrgRepository managerOrgRepository;
-    private final ManagerOrgMappers managerOrgMappers;
 
-    @Transactional
-    @Override
-    public ManagerOrgId createOrgForUser(Email email) {
-        ManagerOrgEntity entity =
-                managerOrgRepository.save(ManagerOrgEntity.createOrgFromUser(email));
-        return entity.getId();
-    }
+	private final ManagerOrgRepository managerOrgRepository;
 
-    @Override
-    public Page<ManagerOrgDto> findAll(Pageable pageable) {
-        return managerOrgMappers.map(managerOrgRepository.findAll(pageable));
-    }
+	private final ManagerOrgMappers managerOrgMappers;
 
-    @Override
-    public ManagerOrgDto findOne(ManagerOrgId id) {
-        return managerOrgRepository.findById(id).map(managerOrgMappers::toDto).orElseThrow();
-    }
+	@Transactional
+	@Override
+	public ManagerOrgId createOrgForUser(Email email) {
+		ManagerOrgEntity entity = managerOrgRepository.save(ManagerOrgEntity.createOrgFromUser(email));
+		return entity.getId();
+	}
+
+	@Override
+	public Page<ManagerOrgDto> findAll(Pageable pageable) {
+		return managerOrgMappers.map(managerOrgRepository.findAll(pageable));
+	}
+
+	@Override
+	public ManagerOrgDto findOne(ManagerOrgId id) {
+		return managerOrgRepository.findById(id).map(managerOrgMappers::toDto).orElseThrow();
+	}
+
 }

@@ -16,17 +16,28 @@ import lombok.Setter;
 @Getter
 public class PersistableProduct extends ProductEntity implements Serializable {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private List<ProductDescription> descriptions = new ArrayList<>();
-    private List<PersistableProductAttribute> attributes =
-            new ArrayList<>(); // persist attribute and save reference
-    private List<PersistableImage> images; // persist images and save reference
-    private List<Category> categories = new ArrayList<>();
-    private PersistableProductInventory inventory;
-    private List<PersistableProductVariant> variants = new ArrayList<>();
-    private String type;
+	private List<ProductDescription> descriptions = new ArrayList<>();
+
+	private List<PersistableProductAttribute> attributes = new ArrayList<>(); // persist
+																				// attribute
+																				// and
+																				// save
+																				// reference
+
+	private List<PersistableImage> images; // persist images and save reference
+
+	private List<Category> categories = new ArrayList<>();
+
+	private PersistableProductInventory inventory;
+
+	private List<PersistableProductVariant> variants = new ArrayList<>();
+
+	private String type;
+
 }

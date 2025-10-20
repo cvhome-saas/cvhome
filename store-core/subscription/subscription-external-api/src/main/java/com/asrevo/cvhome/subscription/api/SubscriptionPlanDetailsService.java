@@ -8,6 +8,8 @@ import reactor.core.publisher.Mono;
 
 @HttpExchange("/api/v1/subscription")
 public interface SubscriptionPlanDetailsService {
-    @GetExchange("subscription-plan-details")
-    Mono<Object> subscriptionPlanDetails(@RequestParam("org-id") ManagerOrgId orgId);
+
+	@GetExchange("subscription-plan-details")
+	Mono<Object> subscriptionPlanDetails(@RequestParam("org-id") ManagerOrgId orgId);
+
 }

@@ -36,380 +36,202 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Category management resource (Category Management Api)")
 public class CategoryApi {
 
-    private static final int DEFAULT_CATEGORY_DEPTH = 0;
+	private static final int DEFAULT_CATEGORY_DEPTH = 0;
 
-    private final CategoryFacade categoryFacade;
+	private final CategoryFacade categoryFacade;
 
-    public CategoryApi(CategoryFacade categoryFacade) {
-        this.categoryFacade = categoryFacade;
-    }
+	public CategoryApi(CategoryFacade categoryFacade) {
+		this.categoryFacade = categoryFacade;
+	}
 
-    @GetMapping(
-            value = "/private/category/{id}",
-            produces = {APPLICATION_JSON_VALUE})
-    @Operation(
-            method = "GET",
-            description = "Get category list for an given Category id",
-            summary = "List current Category and child category")
-    @ApiResponses(
-            value = {@ApiResponse(responseCode = "200", description = "List of category found")})
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-        @Parameter(
-                name = "lang",
-                schema =
-                        @Schema(
-                                name = "lang",
-                                type = "string",
-                                defaultValue = Constants.DEFAULT_LANGUAGE))
-    })
-    @ConditionalOnApiStatus
-    public ReadableCategory get(
-            @PathVariable(name = "id") Long categoryId,
-            @Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language) {
-        return categoryFacade.getById(merchantStore, categoryId, LanguageCode.allLanguage());
-    }
+	@GetMapping(value = "/private/category/{id}", produces = { APPLICATION_JSON_VALUE })
+	@Operation(method = "GET", description = "Get category list for an given Category id",
+			summary = "List current Category and child category")
+	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "List of category found") })
+	@Parameters({
+			@Parameter(name = "store",
+					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+			@Parameter(name = "lang",
+					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	@ConditionalOnApiStatus
+	public ReadableCategory get(@PathVariable(name = "id") Long categoryId,
+			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
+			@Parameter(hidden = true) LanguageCode language) {
+		return categoryFacade.getById(merchantStore, categoryId, LanguageCode.allLanguage());
+	}
 
-    @GetMapping(
-            value = "/category/{friendlyUrl}",
-            produces = {APPLICATION_JSON_VALUE})
-    @Operation(
-            method = "GET",
-            description = "Get category list for an given Category code",
-            summary = "List current Category and child category")
-    @ApiResponses(
-            value = {@ApiResponse(responseCode = "200", description = "List of category found")})
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-        @Parameter(
-                name = "lang",
-                schema =
-                        @Schema(
-                                name = "lang",
-                                type = "string",
-                                defaultValue = Constants.DEFAULT_LANGUAGE))
-    })
-    @ConditionalOnApiStatus
-    public ReadableCategory getByFriendlyUrl(
-            @PathVariable(name = "friendlyUrl") String friendlyUrl,
-            @Parameter(hidden = true) StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language)
-            throws Exception {
-        return categoryFacade.getCategoryByFriendlyUrl(merchantStore, friendlyUrl, language);
-    }
+	@GetMapping(value = "/category/{friendlyUrl}", produces = { APPLICATION_JSON_VALUE })
+	@Operation(method = "GET", description = "Get category list for an given Category code",
+			summary = "List current Category and child category")
+	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "List of category found") })
+	@Parameters({
+			@Parameter(name = "store",
+					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+			@Parameter(name = "lang",
+					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	@ConditionalOnApiStatus
+	public ReadableCategory getByFriendlyUrl(@PathVariable(name = "friendlyUrl") String friendlyUrl,
+			@Parameter(hidden = true) StoreMerchantId merchantStore, @Parameter(hidden = true) LanguageCode language)
+			throws Exception {
+		return categoryFacade.getCategoryByFriendlyUrl(merchantStore, friendlyUrl, language);
+	}
 
-    @ResponseStatus(HttpStatus.OK)
-    @GetMapping(
-            value = {"/private/category/unique"},
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-        @Parameter(
-                name = "lang",
-                schema =
-                        @Schema(
-                                name = "lang",
-                                type = "string",
-                                defaultValue = Constants.DEFAULT_LANGUAGE))
-    })
-    @Operation(
-            method = "GET",
-            description = "Check if category code already exists",
-            responses =
-                    @ApiResponse(
-                            content =
-                                    @Content(
-                                            schema = @Schema(implementation = EntityExists.class))))
-    @ConditionalOnApiStatus
-    public ResponseEntity<EntityExists> exists(
-            @RequestParam(value = "code") String code,
-            @Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language) {
-        boolean isCategoryExist = categoryFacade.existByCode(merchantStore, code);
-        return new ResponseEntity<>(new EntityExists(isCategoryExist), HttpStatus.OK);
-    }
+	@ResponseStatus(HttpStatus.OK)
+	@GetMapping(value = { "/private/category/unique" }, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Parameters({
+			@Parameter(name = "store",
+					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+			@Parameter(name = "lang",
+					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	@Operation(method = "GET", description = "Check if category code already exists",
+			responses = @ApiResponse(content = @Content(schema = @Schema(implementation = EntityExists.class))))
+	@ConditionalOnApiStatus
+	public ResponseEntity<EntityExists> exists(@RequestParam(value = "code") String code,
+			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
+			@Parameter(hidden = true) LanguageCode language) {
+		boolean isCategoryExist = categoryFacade.existByCode(merchantStore, code);
+		return new ResponseEntity<>(new EntityExists(isCategoryExist), HttpStatus.OK);
+	}
 
-    /**
-     * Get all categories starting from root filter can be used for filtering on
-     * fields only featured is supported
-     */
-    @GetMapping(
-            value = "/private/category",
-            produces = {APPLICATION_JSON_VALUE})
-    @Operation(
-            method = "GET",
-            description =
-                    "Get category hierarchy from root. Supports filtering FEATURED_CATEGORIES and"
-                            + " VISIBLE ONLY by adding ?filter=[featured] or ?filter=[visible] or ?"
-                            + " filter=[featured,visible",
-            summary = "Does not return any product attached")
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-        @Parameter(
-                name = "lang",
-                schema =
-                        @Schema(
-                                name = "lang",
-                                type = "string",
-                                defaultValue = Constants.DEFAULT_LANGUAGE))
-    })
-    @ConditionalOnApiStatus
-    public ReadableCategoryList list(
-            @RequestParam(value = "filter", required = false) List<String> filter,
-            @RequestParam(value = "name", required = false) String name,
-            @Parameter(hidden = true) StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language,
-            Pageable pageable) {
+	/**
+	 * Get all categories starting from root filter can be used for filtering on fields
+	 * only featured is supported
+	 */
+	@GetMapping(value = "/private/category", produces = { APPLICATION_JSON_VALUE })
+	@Operation(method = "GET",
+			description = "Get category hierarchy from root. Supports filtering FEATURED_CATEGORIES and"
+					+ " VISIBLE ONLY by adding ?filter=[featured] or ?filter=[visible] or ?"
+					+ " filter=[featured,visible",
+			summary = "Does not return any product attached")
+	@Parameters({
+			@Parameter(name = "store",
+					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+			@Parameter(name = "lang",
+					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	@ConditionalOnApiStatus
+	public ReadableCategoryList list(@RequestParam(value = "filter", required = false) List<String> filter,
+			@RequestParam(value = "name", required = false) String name,
+			@Parameter(hidden = true) StoreMerchantId merchantStore, @Parameter(hidden = true) LanguageCode language,
+			Pageable pageable) {
 
-        ListCriteria criteria = new ListCriteria();
-        criteria.setName(name);
-        return categoryFacade.getReadableCategoryList(
-                merchantStore,
-                criteria,
-                DEFAULT_CATEGORY_DEPTH,
-                LanguageCode.nonLanguage(),
-                filter,
-                pageable);
-    }
+		ListCriteria criteria = new ListCriteria();
+		criteria.setName(name);
+		return categoryFacade.getReadableCategoryList(merchantStore, criteria, DEFAULT_CATEGORY_DEPTH,
+				LanguageCode.nonLanguage(), filter, pageable);
+	}
 
-    /**
-     * Get all categories starting from root filter can be used for filtering on
-     * fields only featured is supported
-     */
-    @GetMapping(
-            value = "/private/category-hierarchy",
-            produces = {APPLICATION_JSON_VALUE})
-    @Operation(
-            method = "GET",
-            description =
-                    "Get category hierarchy from root. Supports filtering FEATURED_CATEGORIES and"
-                            + " VISIBLE ONLY by adding ?filter=[featured] or ?filter=[visible] or ?"
-                            + " filter=[featured,visible",
-            summary = "Does not return any product attached")
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-        @Parameter(
-                name = "lang",
-                schema =
-                        @Schema(
-                                name = "lang",
-                                type = "string",
-                                defaultValue = Constants.DEFAULT_LANGUAGE))
-    })
-    @ConditionalOnApiStatus
-    public ReadableCategoryList hierarchyList(
-            @RequestParam(value = "filter", required = false) List<String> filter,
-            @RequestParam(value = "name", required = false) String name,
-            @Parameter(hidden = true) StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language,
-            Pageable pageable) {
+	/**
+	 * Get all categories starting from root filter can be used for filtering on fields
+	 * only featured is supported
+	 */
+	@GetMapping(value = "/private/category-hierarchy", produces = { APPLICATION_JSON_VALUE })
+	@Operation(method = "GET",
+			description = "Get category hierarchy from root. Supports filtering FEATURED_CATEGORIES and"
+					+ " VISIBLE ONLY by adding ?filter=[featured] or ?filter=[visible] or ?"
+					+ " filter=[featured,visible",
+			summary = "Does not return any product attached")
+	@Parameters({
+			@Parameter(name = "store",
+					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+			@Parameter(name = "lang",
+					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	@ConditionalOnApiStatus
+	public ReadableCategoryList hierarchyList(@RequestParam(value = "filter", required = false) List<String> filter,
+			@RequestParam(value = "name", required = false) String name,
+			@Parameter(hidden = true) StoreMerchantId merchantStore, @Parameter(hidden = true) LanguageCode language,
+			Pageable pageable) {
 
-        ListCriteria criteria = new ListCriteria();
-        criteria.setName(name);
-        return categoryFacade.getCategoryHierarchy(
-                merchantStore,
-                criteria,
-                DEFAULT_CATEGORY_DEPTH,
-                LanguageCode.nonLanguage(),
-                filter,
-                pageable);
-    }
+		ListCriteria criteria = new ListCriteria();
+		criteria.setName(name);
+		return categoryFacade.getCategoryHierarchy(merchantStore, criteria, DEFAULT_CATEGORY_DEPTH,
+				LanguageCode.nonLanguage(), filter, pageable);
+	}
 
-    @GetMapping(
-            value = "/category-hierarchy",
-            produces = {APPLICATION_JSON_VALUE})
-    @Operation(
-            method = "GET",
-            description =
-                    "Get category hierarchy from root. Supports filtering FEATURED_CATEGORIES and"
-                            + " VISIBLE ONLY by adding ?filter=[featured] or ?filter=[visible] or ?"
-                            + " filter=[featured,visible",
-            summary = "Does not return any product attached")
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-        @Parameter(
-                name = "lang",
-                schema =
-                        @Schema(
-                                name = "lang",
-                                type = "string",
-                                defaultValue = Constants.DEFAULT_LANGUAGE))
-    })
-    @ConditionalOnApiStatus
-    public ReadableCategoryList getHierarchyList(
-            @RequestParam(value = "filter", required = false) List<String> filter,
-            @RequestParam(value = "name", required = false) String name,
-            @Parameter(hidden = true) StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language,
-            Pageable pageable) {
+	@GetMapping(value = "/category-hierarchy", produces = { APPLICATION_JSON_VALUE })
+	@Operation(method = "GET",
+			description = "Get category hierarchy from root. Supports filtering FEATURED_CATEGORIES and"
+					+ " VISIBLE ONLY by adding ?filter=[featured] or ?filter=[visible] or ?"
+					+ " filter=[featured,visible",
+			summary = "Does not return any product attached")
+	@Parameters({
+			@Parameter(name = "store",
+					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+			@Parameter(name = "lang",
+					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	@ConditionalOnApiStatus
+	public ReadableCategoryList getHierarchyList(@RequestParam(value = "filter", required = false) List<String> filter,
+			@RequestParam(value = "name", required = false) String name,
+			@Parameter(hidden = true) StoreMerchantId merchantStore, @Parameter(hidden = true) LanguageCode language,
+			Pageable pageable) {
 
-        ListCriteria criteria = new ListCriteria();
-        criteria.setName(name);
-        return categoryFacade.getCategoryHierarchy(
-                merchantStore, criteria, DEFAULT_CATEGORY_DEPTH, language, filter, pageable);
-    }
+		ListCriteria criteria = new ListCriteria();
+		criteria.setName(name);
+		return categoryFacade.getCategoryHierarchy(merchantStore, criteria, DEFAULT_CATEGORY_DEPTH, language, filter,
+				pageable);
+	}
 
-    @GetMapping(
-            value = "/private/category/product/{productId}",
-            produces = {APPLICATION_JSON_VALUE})
-    @Operation(method = "GET", description = "Get category by product")
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-        @Parameter(
-                name = "lang",
-                schema =
-                        @Schema(
-                                name = "lang",
-                                type = "string",
-                                defaultValue = Constants.DEFAULT_LANGUAGE))
-    })
-    @ConditionalOnApiStatus
-    public ReadableCategoryList list(
-            @PathVariable(name = "productId") Long productId,
-            @Parameter(hidden = true) StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode lang) {
+	@GetMapping(value = "/private/category/product/{productId}", produces = { APPLICATION_JSON_VALUE })
+	@Operation(method = "GET", description = "Get category by product")
+	@Parameters({
+			@Parameter(name = "store",
+					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+			@Parameter(name = "lang",
+					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	@ConditionalOnApiStatus
+	public ReadableCategoryList list(@PathVariable(name = "productId") Long productId,
+			@Parameter(hidden = true) StoreMerchantId merchantStore, @Parameter(hidden = true) LanguageCode lang) {
 
-        return categoryFacade.listByProduct(merchantStore, productId, LanguageCode.nonLanguage());
-    }
+		return categoryFacade.listByProduct(merchantStore, productId, LanguageCode.nonLanguage());
+	}
 
-    @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping(
-            value = "/private/category",
-            produces = {APPLICATION_JSON_VALUE})
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR))
-    })
-    @ConditionalOnApiStatus
-    public PersistableCategory create(
-            @Valid @RequestBody PersistableCategory category,
-            @Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore) {
-        return categoryFacade.saveCategory(merchantStore, category);
-    }
+	@ResponseStatus(HttpStatus.CREATED)
+	@PostMapping(value = "/private/category", produces = { APPLICATION_JSON_VALUE })
+	@Parameters({ @Parameter(name = "store",
+			schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)) })
+	@ConditionalOnApiStatus
+	public PersistableCategory create(@Valid @RequestBody PersistableCategory category,
+			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore) {
+		return categoryFacade.saveCategory(merchantStore, category);
+	}
 
-    @PutMapping(
-            value = "/private/category/{id}",
-            produces = {APPLICATION_JSON_VALUE})
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR))
-    })
-    @ConditionalOnApiStatus
-    public PersistableCategory update(
-            @PathVariable Long id,
-            @Valid @RequestBody PersistableCategory category,
-            @Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore) {
-        category.setId(id);
-        return categoryFacade.saveCategory(merchantStore, category);
-    }
+	@PutMapping(value = "/private/category/{id}", produces = { APPLICATION_JSON_VALUE })
+	@Parameters({ @Parameter(name = "store",
+			schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)) })
+	@ConditionalOnApiStatus
+	public PersistableCategory update(@PathVariable Long id, @Valid @RequestBody PersistableCategory category,
+			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore) {
+		category.setId(id);
+		return categoryFacade.saveCategory(merchantStore, category);
+	}
 
-    @PatchMapping(
-            value = "/private/category/{id}/visible",
-            produces = {APPLICATION_JSON_VALUE})
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR))
-    })
-    @ConditionalOnApiStatus
-    public void updateVisible(
-            @PathVariable Long id,
-            @Valid @RequestBody PersistableCategory category,
-            @Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore) {
+	@PatchMapping(value = "/private/category/{id}/visible", produces = { APPLICATION_JSON_VALUE })
+	@Parameters({ @Parameter(name = "store",
+			schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)) })
+	@ConditionalOnApiStatus
+	public void updateVisible(@PathVariable Long id, @Valid @RequestBody PersistableCategory category,
+			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore) {
 
-        category.setId(id);
-        categoryFacade.setVisible(category, merchantStore);
-    }
+		category.setId(id);
+		categoryFacade.setVisible(category, merchantStore);
+	}
 
-    @PutMapping(
-            value = "/private/category/{id}/move/{parent}",
-            produces = {APPLICATION_JSON_VALUE})
-    @Operation(
-            method = "PUT",
-            description = "Move a category under another category",
-            summary = "Move category {id} under category {parent}")
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR))
-    })
-    @ConditionalOnApiStatus
-    public void move(
-            @PathVariable Long id,
-            @PathVariable Long parent,
-            @Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore) {
-        categoryFacade.move(id, parent, merchantStore);
-    }
+	@PutMapping(value = "/private/category/{id}/move/{parent}", produces = { APPLICATION_JSON_VALUE })
+	@Operation(method = "PUT", description = "Move a category under another category",
+			summary = "Move category {id} under category {parent}")
+	@Parameters({ @Parameter(name = "store",
+			schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)) })
+	@ConditionalOnApiStatus
+	public void move(@PathVariable Long id, @PathVariable Long parent,
+			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore) {
+		categoryFacade.move(id, parent, merchantStore);
+	}
 
-    @DeleteMapping(
-            value = "/private/category/{id}",
-            produces = {APPLICATION_JSON_VALUE})
-    @ResponseStatus(OK)
-    @ConditionalOnApiStatus
-    public void delete(
-            @PathVariable("id") Long categoryId,
-            @Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore) {
-        categoryFacade.deleteCategory(categoryId, merchantStore);
-    }
+	@DeleteMapping(value = "/private/category/{id}", produces = { APPLICATION_JSON_VALUE })
+	@ResponseStatus(OK)
+	@ConditionalOnApiStatus
+	public void delete(@PathVariable("id") Long categoryId,
+			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore) {
+		categoryFacade.deleteCategory(categoryId, merchantStore);
+	}
+
 }

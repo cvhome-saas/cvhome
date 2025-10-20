@@ -15,62 +15,61 @@ import reactor.core.publisher.Mono;
 
 @Slf4j
 public class ServerCallBearerExchangeFilterFunction implements ExchangeFilterFunction {
-    private final WebClientReactiveClientCredentialsTokenResponseClient tokenClient;
-    private final ReactiveClientRegistrationRepository registrationRepository;
-    private final String registrationId;
-    private OAuth2AccessTokenResponse accessToken;
 
-    public ServerCallBearerExchangeFilterFunction(
-            WebClientReactiveClientCredentialsTokenResponseClient tokenClient,
-            ReactiveClientRegistrationRepository registrationRepository,
-            String registrationId) {
-        this.tokenClient = tokenClient;
-        this.registrationRepository = registrationRepository;
-        this.registrationId = registrationId;
-    }
+	private final WebClientReactiveClientCredentialsTokenResponseClient tokenClient;
 
-    @Override
-    public Mono<ClientResponse> filter(ClientRequest request, ExchangeFunction next) {
-        if (accessToken != null) {
-            Instant expiresAt = accessToken.getAccessToken().getExpiresAt();
-            if (expiresAt == null || !expiresAt.isBefore(Instant.now())) {
-                return next.exchange(bearer(request));
-            } else {
-                log.info("wil generate access token because expired");
-                return getNewAccessToken().flatMap(it -> next.exchange(bearer(request)));
-            }
-        } else {
-            log.info("wil generate access token for first time");
-            return getNewAccessToken().flatMap(it -> next.exchange(bearer(request)));
-        }
-    }
+	private final ReactiveClientRegistrationRepository registrationRepository;
 
-    private Mono<OAuth2AccessTokenResponse> getNewAccessToken() {
-        return getClientRegistration()
-                .flatMap(this::doGenerateAccessToken)
-                .map(
-                        accessToken -> {
-                            this.accessToken = accessToken;
-                            return accessToken;
-                        });
-    }
+	private final String registrationId;
 
-    Mono<ClientRegistration> getClientRegistration() {
-        return this.registrationRepository
-                .findByRegistrationId(this.registrationId)
-                .switchIfEmpty(Mono.error(() -> new Exception("ClientRegistration not found")));
-    }
+	private OAuth2AccessTokenResponse accessToken;
 
-    Mono<OAuth2AccessTokenResponse> doGenerateAccessToken(ClientRegistration registration) {
-        log.info("will generate access token using password Grant type");
-        return tokenClient.getTokenResponse(new OAuth2ClientCredentialsGrantRequest(registration));
-    }
+	public ServerCallBearerExchangeFilterFunction(WebClientReactiveClientCredentialsTokenResponseClient tokenClient,
+			ReactiveClientRegistrationRepository registrationRepository, String registrationId) {
+		this.tokenClient = tokenClient;
+		this.registrationRepository = registrationRepository;
+		this.registrationId = registrationId;
+	}
 
-    private ClientRequest bearer(ClientRequest request) {
-        return ClientRequest.from(request)
-                .headers(
-                        (headers) ->
-                                headers.setBearerAuth(accessToken.getAccessToken().getTokenValue()))
-                .build();
-    }
+	@Override
+	public Mono<ClientResponse> filter(ClientRequest request, ExchangeFunction next) {
+		if (accessToken != null) {
+			Instant expiresAt = accessToken.getAccessToken().getExpiresAt();
+			if (expiresAt == null || !expiresAt.isBefore(Instant.now())) {
+				return next.exchange(bearer(request));
+			}
+			else {
+				log.info("wil generate access token because expired");
+				return getNewAccessToken().flatMap(it -> next.exchange(bearer(request)));
+			}
+		}
+		else {
+			log.info("wil generate access token for first time");
+			return getNewAccessToken().flatMap(it -> next.exchange(bearer(request)));
+		}
+	}
+
+	private Mono<OAuth2AccessTokenResponse> getNewAccessToken() {
+		return getClientRegistration().flatMap(this::doGenerateAccessToken).map(accessToken -> {
+			this.accessToken = accessToken;
+			return accessToken;
+		});
+	}
+
+	Mono<ClientRegistration> getClientRegistration() {
+		return this.registrationRepository.findByRegistrationId(this.registrationId)
+			.switchIfEmpty(Mono.error(() -> new Exception("ClientRegistration not found")));
+	}
+
+	Mono<OAuth2AccessTokenResponse> doGenerateAccessToken(ClientRegistration registration) {
+		log.info("will generate access token using password Grant type");
+		return tokenClient.getTokenResponse(new OAuth2ClientCredentialsGrantRequest(registration));
+	}
+
+	private ClientRequest bearer(ClientRequest request) {
+		return ClientRequest.from(request)
+			.headers((headers) -> headers.setBearerAuth(accessToken.getAccessToken().getTokenValue()))
+			.build();
+	}
+
 }

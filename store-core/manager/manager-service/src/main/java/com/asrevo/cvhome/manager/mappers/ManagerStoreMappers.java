@@ -15,27 +15,29 @@ import org.springframework.data.domain.PageImpl;
 
 @Mapper(componentModel = "spring")
 public interface ManagerStoreMappers {
-    ManagerStoreDto toDto(ManagerStoreEntity entity);
 
-    @Mapping(target = "new", ignore = true)
-    @Mapping(target = "createdDate", ignore = true)
-    @Mapping(target = "version", ignore = true)
-    @Mapping(target = "removeDomain", ignore = true)
-    @Mapping(target = "podId", ignore = true)
-    @Mapping(target = "orgId", ignore = true)
-    @Mapping(target = "provisioningState", ignore = true)
-    @Mapping(target = "managerStoreDomains", ignore = true)
-    ManagerStoreEntity toEntity(ListManagerStoreQuery managerStoreDto);
+	ManagerStoreDto toDto(ManagerStoreEntity entity);
 
-    default Map<Object, Object> toExternalCreateRequest(
-            Map<Object, Object> request, ManagerOrgId orgId, ManagerStoreId managerStoreId) {
-        HashMap<Object, Object> newRequest = new HashMap<>(request);
-        newRequest.put("id", managerStoreId.id().toString());
-        newRequest.put("org", orgId.id().toString());
-        return newRequest;
-    }
+	@Mapping(target = "new", ignore = true)
+	@Mapping(target = "createdDate", ignore = true)
+	@Mapping(target = "version", ignore = true)
+	@Mapping(target = "removeDomain", ignore = true)
+	@Mapping(target = "podId", ignore = true)
+	@Mapping(target = "orgId", ignore = true)
+	@Mapping(target = "provisioningState", ignore = true)
+	@Mapping(target = "managerStoreDomains", ignore = true)
+	ManagerStoreEntity toEntity(ListManagerStoreQuery managerStoreDto);
 
-    default PageImpl<Object> toPage(List<Object> it, Page<ManagerStoreDto> internalStores) {
-        return new PageImpl<>(it, internalStores.getPageable(), internalStores.getTotalElements());
-    }
+	default Map<Object, Object> toExternalCreateRequest(Map<Object, Object> request, ManagerOrgId orgId,
+			ManagerStoreId managerStoreId) {
+		HashMap<Object, Object> newRequest = new HashMap<>(request);
+		newRequest.put("id", managerStoreId.id().toString());
+		newRequest.put("org", orgId.id().toString());
+		return newRequest;
+	}
+
+	default PageImpl<Object> toPage(List<Object> it, Page<ManagerStoreDto> internalStores) {
+		return new PageImpl<>(it, internalStores.getPageable(), internalStores.getTotalElements());
+	}
+
 }

@@ -13,10 +13,12 @@ import lombok.Setter;
 @Deprecated
 public class ReadableOrderList extends ReadableList<ReadableOrder> implements Serializable {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private List<ReadableOrder> content = new ArrayList<>();
+	private List<ReadableOrder> content = new ArrayList<>();
+
 }

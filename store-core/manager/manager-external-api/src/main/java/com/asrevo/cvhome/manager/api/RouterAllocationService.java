@@ -10,9 +10,11 @@ import reactor.core.publisher.Mono;
 
 @HttpExchange("/api/v1/router")
 public interface RouterAllocationService {
-    @GetExchange("store-id-by-domain")
-    Mono<ManagerStoreId> getStorePodByStoreId(Domain domain);
 
-    @GetExchange("store-pod-by-store-id")
-    Mono<Pod> getStorePodByStoreId(@RequestParam("store") ManagerStoreId store);
+	@GetExchange("store-id-by-domain")
+	Mono<ManagerStoreId> getStorePodByStoreId(Domain domain);
+
+	@GetExchange("store-pod-by-store-id")
+	Mono<Pod> getStorePodByStoreId(@RequestParam("store") ManagerStoreId store);
+
 }

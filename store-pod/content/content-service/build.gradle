@@ -3,7 +3,7 @@ plugins {
 	alias(libs.plugins.spring.boot)
 	alias(libs.plugins.spring.dependency.management)
 	alias(libs.plugins.hibernate.orm)
-	alias(libs.plugins.spotless)
+	alias(libs.plugins.spring.javaformat)
 	//    alias(libs.plugins.graalvm)
 }
 

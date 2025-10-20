@@ -5,48 +5,56 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * <p>Exception générée par les services de l'application.</p>
+ * <p>
+ * Exception générée par les services de l'application.
+ * </p>
  */
 @Setter
 @Getter
 public class ServiceException extends Exception {
 
-    public static final int EXCEPTION_ERROR = 500;
-    public static final int EXCEPTION_INVENTORY_MISMATCH = 120;
-    @Serial private static final long serialVersionUID = -6854945379036729034L;
-    private int exceptionType = 0; // regular error
-    private String messageCode = null;
+	public static final int EXCEPTION_ERROR = 500;
 
-    public ServiceException() {
-        super();
-    }
+	public static final int EXCEPTION_INVENTORY_MISMATCH = 120;
 
-    public ServiceException(String messageCode) {
-        super();
-        this.messageCode = messageCode;
-    }
+	@Serial
+	private static final long serialVersionUID = -6854945379036729034L;
 
-    public ServiceException(String message, Throwable cause) {
-        super(message, cause);
-    }
+	private int exceptionType = 0; // regular error
 
-    public ServiceException(Throwable cause) {
-        super(cause.getMessage(), cause);
-    }
+	private String messageCode = null;
 
-    public ServiceException(int exceptionType) {
-        super();
-        this.exceptionType = exceptionType;
-    }
+	public ServiceException() {
+		super();
+	}
 
-    public ServiceException(int exceptionType, String message) {
-        super(message);
-        this.exceptionType = exceptionType;
-    }
+	public ServiceException(String messageCode) {
+		super();
+		this.messageCode = messageCode;
+	}
 
-    public ServiceException(int exceptionType, String message, String messageCode) {
-        super(message);
-        this.messageCode = messageCode;
-        this.exceptionType = exceptionType;
-    }
+	public ServiceException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
+	public ServiceException(Throwable cause) {
+		super(cause.getMessage(), cause);
+	}
+
+	public ServiceException(int exceptionType) {
+		super();
+		this.exceptionType = exceptionType;
+	}
+
+	public ServiceException(int exceptionType, String message) {
+		super(message);
+		this.exceptionType = exceptionType;
+	}
+
+	public ServiceException(int exceptionType, String message, String messageCode) {
+		super(message);
+		this.messageCode = messageCode;
+		this.exceptionType = exceptionType;
+	}
+
 }

@@ -9,16 +9,25 @@ import org.springframework.data.domain.Pageable;
 @Setter
 @Getter
 public class Criteria {
-    private Pageable pageable;
 
-    private String code;
-    private String name;
-    private LanguageCode language;
-    private String user;
-    private String storeCode;
-    private List<Integer> storeIds;
+	private Pageable pageable;
 
-    private CriteriaOrderBy orderBy = CriteriaOrderBy.DESC;
-    private String criteriaOrderByField;
-    private String search;
+	private String code;
+
+	private String name;
+
+	private LanguageCode language;
+
+	private String user;
+
+	private String storeCode;
+
+	private List<Integer> storeIds;
+
+	private CriteriaOrderBy orderBy = CriteriaOrderBy.DESC;
+
+	private String criteriaOrderByField;
+
+	private String search;
+
 }

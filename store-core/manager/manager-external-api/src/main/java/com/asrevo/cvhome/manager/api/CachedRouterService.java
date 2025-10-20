@@ -1,3 +1,5 @@
 package com.asrevo.cvhome.manager.api;
 
-public interface CachedRouterService extends RouterAllocationService {}
+public interface CachedRouterService extends RouterAllocationService {
+
+}

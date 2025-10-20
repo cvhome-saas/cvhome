@@ -15,16 +15,18 @@ import org.springframework.web.bind.annotation.RestController;
 @AllArgsConstructor
 @Slf4j
 public class SubscriptionPlanController {
-    private final SubscriptionPlanTablesService subscriptionPlanTablesService;
 
-    @GetMapping("list")
-    @ConditionalOnApiStatus
-    public SubscriptionPlan[] list() {
-        return SubscriptionPlan.values();
-    }
+	private final SubscriptionPlanTablesService subscriptionPlanTablesService;
 
-    @GetMapping("tables")
-    public SubscriptionPlanTables tables() {
-        return subscriptionPlanTablesService.tables();
-    }
+	@GetMapping("list")
+	@ConditionalOnApiStatus
+	public SubscriptionPlan[] list() {
+		return SubscriptionPlan.values();
+	}
+
+	@GetMapping("tables")
+	public SubscriptionPlanTables tables() {
+		return subscriptionPlanTablesService.tables();
+	}
+
 }

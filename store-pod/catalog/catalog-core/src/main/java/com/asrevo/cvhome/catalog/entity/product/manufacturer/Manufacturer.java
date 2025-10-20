@@ -16,48 +16,45 @@ import lombok.Setter;
 
 @Entity
 @EntityListeners(value = AuditListener.class)
-@Table(
-        name = "MANUFACTURER",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"STORE_MERCHANT_ID", "CODE"}))
+@Table(name = "MANUFACTURER", uniqueConstraints = @UniqueConstraint(columnNames = { "STORE_MERCHANT_ID", "CODE" }))
 @Getter
 @Setter
 public class Manufacturer extends SalesManagerEntity<Long, Manufacturer> implements Auditable {
-    @Serial private static final long serialVersionUID = 1L;
 
-    @Id
-    @Column(name = "MANUFACTURER_ID", unique = true, nullable = false)
-    @TableGenerator(
-            name = "TABLE_GEN",
-            table = "SM_SEQUENCER",
-            pkColumnName = "SEQ_NAME",
-            valueColumnName = "SEQ_COUNT",
-            pkColumnValue = "MANUFACTURER_SEQ_NEXT_VAL",
-            allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
-            initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
-    private Long id;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    @Embedded private AuditSection auditSection = new AuditSection();
+	@Id
+	@Column(name = "MANUFACTURER_ID", unique = true, nullable = false)
+	@TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME",
+			valueColumnName = "SEQ_COUNT", pkColumnValue = "MANUFACTURER_SEQ_NEXT_VAL",
+			allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
+			initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
+	@GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
+	private Long id;
 
-    @OneToMany(mappedBy = "manufacturer", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private Set<ManufacturerDescription> descriptions = new HashSet<>();
+	@Embedded
+	private AuditSection auditSection = new AuditSection();
 
-    @Column(name = "MANUFACTURER_IMAGE")
-    private String image;
+	@OneToMany(mappedBy = "manufacturer", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	private Set<ManufacturerDescription> descriptions = new HashSet<>();
 
-    @Column(name = "SORT_ORDER")
-    private Integer order = 0;
+	@Column(name = "MANUFACTURER_IMAGE")
+	private String image;
 
-    @Embedded
-    @AttributeOverrides(
-            @AttributeOverride(
-                    name = "storeMerchantId",
-                    column = @Column(name = "STORE_MERCHANT_ID", nullable = false, length = 50)))
-    private StoreMerchantId storeMerchantId;
+	@Column(name = "SORT_ORDER")
+	private Integer order = 0;
 
-    @NotEmpty
-    @Column(name = "CODE", length = 100, nullable = false)
-    private String code;
+	@Embedded
+	@AttributeOverrides(@AttributeOverride(name = "storeMerchantId",
+			column = @Column(name = "STORE_MERCHANT_ID", nullable = false, length = 50)))
+	private StoreMerchantId storeMerchantId;
 
-    public Manufacturer() {}
+	@NotEmpty
+	@Column(name = "CODE", length = 100, nullable = false)
+	private String code;
+
+	public Manufacturer() {
+	}
+
 }

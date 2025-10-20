@@ -10,9 +10,10 @@ import java.util.Map;
 
 public interface LanguageService extends SalesManagerEntityService<LanguageCode, Language> {
 
-    Language getByCode(LanguageCode code);
+	Language getByCode(LanguageCode code);
 
-    Map<LanguageCode, Language> getLanguagesMap() throws ServiceException;
+	Map<LanguageCode, Language> getLanguagesMap() throws ServiceException;
 
-    Locale toLocale(LanguageCode language, CountryIsoCode country);
+	Locale toLocale(LanguageCode language, CountryIsoCode country);
+
 }

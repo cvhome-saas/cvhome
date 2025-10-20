@@ -2,7 +2,7 @@ plugins {
 	alias(libs.plugins.java.application.conventions)
 	alias(libs.plugins.spring.boot)
 	alias(libs.plugins.spring.dependency.management)
-	alias(libs.plugins.spotless)
+	alias(libs.plugins.spring.javaformat)
 //    alias(libs.plugins.graalvm)
 }
 group = 'com.asrevo.cvhome'

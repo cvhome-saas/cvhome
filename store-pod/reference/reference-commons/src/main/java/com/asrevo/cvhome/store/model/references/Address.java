@@ -17,22 +17,26 @@ import lombok.Setter;
 @Getter
 public class Address implements Serializable {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    @JsonSerialize(using = ZoneCodeSerializer.class)
-    @JsonDeserialize(using = ZoneCodeDeSerializer.class)
-    private ZoneCode stateProvince; // code
+	@JsonSerialize(using = ZoneCodeSerializer.class)
+	@JsonDeserialize(using = ZoneCodeDeSerializer.class)
+	private ZoneCode stateProvince; // code
 
-    @JsonSerialize(using = CountryIsoCodeSerializer.class)
-    @JsonDeserialize(using = CountryIsoCodeDeSerializer.class)
-    private CountryIsoCode country; // code
+	@JsonSerialize(using = CountryIsoCodeSerializer.class)
+	@JsonDeserialize(using = CountryIsoCodeDeSerializer.class)
+	private CountryIsoCode country; // code
 
-    private String address;
-    private String postalCode;
-    private String city;
+	private String address;
 
-    private boolean active = true;
+	private String postalCode;
+
+	private String city;
+
+	private boolean active = true;
+
 }

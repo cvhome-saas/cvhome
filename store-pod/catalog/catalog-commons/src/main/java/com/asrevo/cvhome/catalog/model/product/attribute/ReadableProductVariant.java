@@ -12,13 +12,17 @@ import lombok.Setter;
 @Getter
 public class ReadableProductVariant extends Entity implements Serializable {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    // option name
-    private String name;
-    private String code;
-    private List<ReadableProductVariantValue> options = new ArrayList<>();
+	// option name
+	private String name;
+
+	private String code;
+
+	private List<ReadableProductVariantValue> options = new ArrayList<>();
+
 }

@@ -33,88 +33,82 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 @Component
 public class ReadableOrderProductPopulator
-        extends AbstractDataPopulator<OrderProduct, StoreMerchantId, ReadableOrderProduct> {
+		extends AbstractDataPopulator<OrderProduct, StoreMerchantId, ReadableOrderProduct> {
 
-    private final ExternalProductService externalProductService;
-    private final ImageFilePath imageUtils;
-    private final ExternalMerchantStoreService externalMerchantStoreService;
+	private final ExternalProductService externalProductService;
 
-    @Override
-    public ReadableOrderProduct populate(
-            OrderProduct source,
-            ReadableOrderProduct target,
-            StoreMerchantId store,
-            LanguageCode language)
-            throws ConversionException {
+	private final ImageFilePath imageUtils;
 
-        Validate.notNull(externalProductService, "Requires ProductService");
-        Validate.notNull(imageUtils, "Requires imageUtils");
-        target.setId(source.getId());
-        target.setOrderedQuantity(source.getProductQuantity());
-        target.setPrice(
-                PriceUtils.getStoreFormatedAmountWithCurrency(
-                        externalMerchantStoreService.getStore(store), source.getOneTimeCharge()));
-        target.setProductName(source.getProductName());
-        target.setSku(source.getSku());
+	private final ExternalMerchantStoreService externalMerchantStoreService;
 
-        // subtotal = price * quantity
-        BigDecimal subTotal = source.getOneTimeCharge();
-        subTotal = subTotal.multiply(new BigDecimal(source.getProductQuantity()));
+	@Override
+	public ReadableOrderProduct populate(OrderProduct source, ReadableOrderProduct target, StoreMerchantId store,
+			LanguageCode language) throws ConversionException {
 
-        try {
-            String subTotalPrice =
-                    PriceUtils.getStoreFormatedAmountWithCurrency(
-                            externalMerchantStoreService.getStore(store), subTotal);
-            target.setSubTotal(subTotalPrice);
-        } catch (Exception e) {
-            throw new ConversionException("Cannot format price", e);
-        }
+		Validate.notNull(externalProductService, "Requires ProductService");
+		Validate.notNull(imageUtils, "Requires imageUtils");
+		target.setId(source.getId());
+		target.setOrderedQuantity(source.getProductQuantity());
+		target.setPrice(PriceUtils.getStoreFormatedAmountWithCurrency(externalMerchantStoreService.getStore(store),
+				source.getOneTimeCharge()));
+		target.setProductName(source.getProductName());
+		target.setSku(source.getSku());
 
-        if (source.getOrderAttributes() != null) {
-            List<ReadableOrderProductAttribute> attributes = new ArrayList<>();
-            for (OrderProductAttribute attr : source.getOrderAttributes()) {
-                ReadableOrderProductAttribute readableAttribute =
-                        new ReadableOrderProductAttribute();
-                String price =
-                        PriceUtils.getStoreFormatedAmountWithCurrency(
-                                externalMerchantStoreService.getStore(store),
-                                attr.getProductAttributePrice());
-                readableAttribute.setAttributePrice(price);
+		// subtotal = price * quantity
+		BigDecimal subTotal = source.getOneTimeCharge();
+		subTotal = subTotal.multiply(new BigDecimal(source.getProductQuantity()));
 
-                readableAttribute.setAttributeName(attr.getProductAttributeName());
-                readableAttribute.setAttributeValue(attr.getProductAttributeValueName());
-                attributes.add(readableAttribute);
-            }
-            target.setAttributes(attributes);
-        }
+		try {
+			String subTotalPrice = PriceUtils
+				.getStoreFormatedAmountWithCurrency(externalMerchantStoreService.getStore(store), subTotal);
+			target.setSubTotal(subTotalPrice);
+		}
+		catch (Exception e) {
+			throw new ConversionException("Cannot format price", e);
+		}
 
-        ProductDetails detailedProduct =
-                externalProductService.getDetailedProduct(store, source.getSku(), language);
-        ReadableMinimalProduct read = detailedProduct.product();
-        target.setProduct(read);
+		if (source.getOrderAttributes() != null) {
+			List<ReadableOrderProductAttribute> attributes = new ArrayList<>();
+			for (OrderProductAttribute attr : source.getOrderAttributes()) {
+				ReadableOrderProductAttribute readableAttribute = new ReadableOrderProductAttribute();
+				String price = PriceUtils.getStoreFormatedAmountWithCurrency(
+						externalMerchantStoreService.getStore(store), attr.getProductAttributePrice());
+				readableAttribute.setAttributePrice(price);
 
-        List<ReadableImage> images = read.getImages();
-        ReadableImage defaultImage = null;
-        if (images != null) {
-            for (ReadableImage image : images) {
-                if (defaultImage == null) {
-                    defaultImage = image;
-                }
-                if (image.isDefaultImage()) {
-                    defaultImage = image;
-                }
-            }
-        }
-        if (defaultImage != null) {
-            target.setImage(defaultImage.getImageUrl());
-        }
+				readableAttribute.setAttributeName(attr.getProductAttributeName());
+				readableAttribute.setAttributeValue(attr.getProductAttributeValueName());
+				attributes.add(readableAttribute);
+			}
+			target.setAttributes(attributes);
+		}
 
-        return target;
-    }
+		ProductDetails detailedProduct = externalProductService.getDetailedProduct(store, source.getSku(), language);
+		ReadableMinimalProduct read = detailedProduct.product();
+		target.setProduct(read);
 
-    @Override
-    protected ReadableOrderProduct createTarget() {
+		List<ReadableImage> images = read.getImages();
+		ReadableImage defaultImage = null;
+		if (images != null) {
+			for (ReadableImage image : images) {
+				if (defaultImage == null) {
+					defaultImage = image;
+				}
+				if (image.isDefaultImage()) {
+					defaultImage = image;
+				}
+			}
+		}
+		if (defaultImage != null) {
+			target.setImage(defaultImage.getImageUrl());
+		}
 
-        return null;
-    }
+		return target;
+	}
+
+	@Override
+	protected ReadableOrderProduct createTarget() {
+
+		return null;
+	}
+
 }

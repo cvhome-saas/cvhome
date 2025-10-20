@@ -22,27 +22,38 @@ import lombok.Setter;
 @Getter
 public class OrderEntity extends Order implements Serializable {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private List<OrderTotal> totals;
-    private List<OrderAttribute> attributes = new ArrayList<>();
+	private List<OrderTotal> totals;
 
-    private PaymentType paymentType;
-    private String paymentModule;
-    private String shippingModule;
-    private List<OrderStatus> previousOrderStatus;
-    private OrderStatus orderStatus;
-    private CreditCard creditCard;
-    private Date datePurchased;
+	private List<OrderAttribute> attributes = new ArrayList<>();
 
-    @JsonSerialize(using = CurrencyCodeSerializer.class)
-    @JsonDeserialize(using = CurrencyCodeDeSerializer.class)
-    private CurrencyCode currency; // code
+	private PaymentType paymentType;
 
-    private boolean customerAgreed;
-    private boolean confirmedAddress;
-    private String comments;
+	private String paymentModule;
+
+	private String shippingModule;
+
+	private List<OrderStatus> previousOrderStatus;
+
+	private OrderStatus orderStatus;
+
+	private CreditCard creditCard;
+
+	private Date datePurchased;
+
+	@JsonSerialize(using = CurrencyCodeSerializer.class)
+	@JsonDeserialize(using = CurrencyCodeDeSerializer.class)
+	private CurrencyCode currency; // code
+
+	private boolean customerAgreed;
+
+	private boolean confirmedAddress;
+
+	private String comments;
+
 }

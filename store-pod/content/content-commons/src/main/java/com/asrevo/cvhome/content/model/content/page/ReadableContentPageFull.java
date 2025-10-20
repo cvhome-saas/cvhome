@@ -10,10 +10,12 @@ import lombok.Setter;
 @Getter
 public class ReadableContentPageFull extends ReadableContentPage {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private List<ContentDescription> descriptions;
+	private List<ContentDescription> descriptions;
+
 }

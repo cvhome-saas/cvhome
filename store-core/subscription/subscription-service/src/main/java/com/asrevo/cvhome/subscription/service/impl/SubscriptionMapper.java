@@ -6,5 +6,7 @@ import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface SubscriptionMapper {
-    SubscriptionPlanDetails toSubscriptionPlanDetails(SubscriptionEntity subscription);
+
+	SubscriptionPlanDetails toSubscriptionPlanDetails(SubscriptionEntity subscription);
+
 }

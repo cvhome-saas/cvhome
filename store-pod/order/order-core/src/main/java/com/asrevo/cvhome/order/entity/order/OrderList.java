@@ -10,10 +10,12 @@ import lombok.Setter;
 @Getter
 public class OrderList extends EntityList {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = -6645927228659963628L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = -6645927228659963628L;
 
-    private List<Order> orders;
+	private List<Order> orders;
+
 }

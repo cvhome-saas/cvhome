@@ -31,236 +31,230 @@ import software.amazon.awssdk.services.s3.model.*;
 @Slf4j
 @AllArgsConstructor
 public class S3ProductContentFileManager implements ProductAssetsManager {
-    @Serial private static final long serialVersionUID = 1L;
-    private static final String ROOT_NAME = "products";
-    private static final char UNIX_SEPARATOR = '/';
-    private static final char WINDOWS_SEPARATOR = '\\';
-    private static final String SMALL = "SMALL";
-    private static final String LARGE = "LARGE";
-    private final S3Client s3;
-    private final String bucket;
 
-    public static String getName(String filename) {
-        if (filename == null) {
-            return null;
-        }
-        int index = indexOfLastSeparator(filename);
-        return filename.substring(index + 1);
-    }
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    public static int indexOfLastSeparator(String filename) {
-        if (filename == null) {
-            return -1;
-        }
-        int lastUnixPos = filename.lastIndexOf(UNIX_SEPARATOR);
-        int lastWindowsPos = filename.lastIndexOf(WINDOWS_SEPARATOR);
-        return Math.max(lastUnixPos, lastWindowsPos);
-    }
+	private static final String ROOT_NAME = "products";
 
-    @Override
-    public List<OutputContentFile> getImages(
-            String merchantStoreCode, FileContentType imageContentType) throws ServiceException {
-        try {
-            // get buckets
-            String bucketName = bucketName();
+	private static final char UNIX_SEPARATOR = '/';
 
-            ListObjectsV2Request listObjectsRequest =
-                    ListObjectsV2Request.builder()
-                            .bucket(bucketName)
-                            .prefix(nodePath(merchantStoreCode))
-                            .build();
+	private static final char WINDOWS_SEPARATOR = '\\';
 
-            List<OutputContentFile> files = null;
+	private static final String SMALL = "SMALL";
 
-            ListObjectsV2Response results = s3.listObjectsV2(listObjectsRequest);
-            List<S3Object> objects = results.contents();
-            for (S3Object os : objects) {
-                if (files == null) {
-                    files = new ArrayList<>();
-                }
-                String mimetype = URLConnection.guessContentTypeFromName(os.key());
-                if (!StringUtils.isBlank(mimetype)) {
+	private static final String LARGE = "LARGE";
 
-                    ResponseInputStream<GetObjectResponse> o =
-                            s3.getObject(
-                                    GetObjectRequest.builder()
-                                            .bucket(bucketName)
-                                            .key(os.key())
-                                            .build());
+	private final S3Client s3;
 
-                    byte[] byteArray = IOUtils.toByteArray(o);
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream(byteArray.length);
-                    baos.write(byteArray, 0, byteArray.length);
-                    OutputContentFile ct = new OutputContentFile();
-                    ct.setFile(baos);
-                    files.add(ct);
-                }
-            }
+	private final String bucket;
 
-            return files;
-        } catch (final Exception e) {
-            log.error("Error while getting files", e);
-            throw new ServiceException(e);
-        }
-    }
+	public static String getName(String filename) {
+		if (filename == null) {
+			return null;
+		}
+		int index = indexOfLastSeparator(filename);
+		return filename.substring(index + 1);
+	}
 
-    @Override
-    public void removeImages(String merchantStoreCode) throws ServiceException {
-        try {
-            // get buckets
-            String bucketName = bucketName();
-            s3.deleteObject(
-                    DeleteObjectRequest.builder()
-                            .bucket(bucketName)
-                            .key(nodePath(merchantStoreCode))
-                            .build());
+	public static int indexOfLastSeparator(String filename) {
+		if (filename == null) {
+			return -1;
+		}
+		int lastUnixPos = filename.lastIndexOf(UNIX_SEPARATOR);
+		int lastWindowsPos = filename.lastIndexOf(WINDOWS_SEPARATOR);
+		return Math.max(lastUnixPos, lastWindowsPos);
+	}
 
-            log.info("Remove folder");
-        } catch (final Exception e) {
-            log.error("Error while removing folder", e);
-            throw new ServiceException(e);
-        }
-    }
+	@Override
+	public List<OutputContentFile> getImages(String merchantStoreCode, FileContentType imageContentType)
+			throws ServiceException {
+		try {
+			// get buckets
+			String bucketName = bucketName();
 
-    @Override
-    public void removeProductImage(CmsProductImage productImage) throws ServiceException {
-        try {
-            // get buckets
-            String bucketName = bucketName();
-            String key =
-                    nodePath(productImage.getStoreMerchantId().getId(), productImage.getSku())
-                            + productImage.getProductImage();
-            s3.deleteObject(DeleteObjectRequest.builder().bucket(bucketName).key(key).build());
+			ListObjectsV2Request listObjectsRequest = ListObjectsV2Request.builder()
+				.bucket(bucketName)
+				.prefix(nodePath(merchantStoreCode))
+				.build();
 
-            log.info("Remove file");
-        } catch (final Exception e) {
-            log.error("Error while removing file", e);
-            throw new ServiceException(e);
-        }
-    }
+			List<OutputContentFile> files = null;
 
-    @Override
-    public OutputContentFile getProductImage(
-            String merchantStoreCode, String productCode, String imageName) {
-        // TODO Auto-generated method stub
-        return null;
-    }
+			ListObjectsV2Response results = s3.listObjectsV2(listObjectsRequest);
+			List<S3Object> objects = results.contents();
+			for (S3Object os : objects) {
+				if (files == null) {
+					files = new ArrayList<>();
+				}
+				String mimetype = URLConnection.guessContentTypeFromName(os.key());
+				if (!StringUtils.isBlank(mimetype)) {
 
-    @Override
-    public OutputContentFile getProductImage(
-            String merchantStoreCode, String productCode, String imageName, ProductImageSize size) {
-        // TODO Auto-generated method stub
-        return null;
-    }
+					ResponseInputStream<GetObjectResponse> o = s3
+						.getObject(GetObjectRequest.builder().bucket(bucketName).key(os.key()).build());
 
-    @Override
-    public OutputContentFile getProductImage(CmsProductImage productImage) {
-        // TODO Auto-generated method stub
-        return null;
-    }
+					byte[] byteArray = IOUtils.toByteArray(o);
+					ByteArrayOutputStream baos = new ByteArrayOutputStream(byteArray.length);
+					baos.write(byteArray, 0, byteArray.length);
+					OutputContentFile ct = new OutputContentFile();
+					ct.setFile(baos);
+					files.add(ct);
+				}
+			}
 
-    @Override
-    public void addProductImage(CmsProductImage productImage, ImageContentFile contentImage)
-            throws ServiceException {
+			return files;
+		}
+		catch (final Exception e) {
+			log.error("Error while getting files", e);
+			throw new ServiceException(e);
+		}
+	}
 
-        try {
-            // get buckets
-            String bucketName = bucketName();
+	@Override
+	public void removeImages(String merchantStoreCode) throws ServiceException {
+		try {
+			// get buckets
+			String bucketName = bucketName();
+			s3.deleteObject(DeleteObjectRequest.builder().bucket(bucketName).key(nodePath(merchantStoreCode)).build());
 
-            String nodePath =
-                    this.nodePath(
-                            productImage.getStoreMerchantId().getId(),
-                            productImage.getSku(),
-                            contentImage);
+			log.info("Remove folder");
+		}
+		catch (final Exception e) {
+			log.error("Error while removing folder", e);
+			throw new ServiceException(e);
+		}
+	}
 
-            PutObjectRequest putObjectRequest =
-                    PutObjectRequest.builder()
-                            .bucket(bucketName)
-                            .key(nodePath + contentImage.getFileName())
-                            .metadata(Map.of("content-type", contentImage.getMimeType()))
-                            .build();
-            //            putObjectRequest.setCannedAcl(CannedAccessControlList.PublicRead);
+	@Override
+	public void removeProductImage(CmsProductImage productImage) throws ServiceException {
+		try {
+			// get buckets
+			String bucketName = bucketName();
+			String key = nodePath(productImage.getStoreMerchantId().getId(), productImage.getSku())
+					+ productImage.getProductImage();
+			s3.deleteObject(DeleteObjectRequest.builder().bucket(bucketName).key(key).build());
 
-            s3.putObject(
-                    putObjectRequest,
-                    RequestBody.fromBytes(IOUtils.toByteArray(contentImage.getFile())));
+			log.info("Remove file");
+		}
+		catch (final Exception e) {
+			log.error("Error while removing file", e);
+			throw new ServiceException(e);
+		}
+	}
 
-            log.info("Product add file");
+	@Override
+	public OutputContentFile getProductImage(String merchantStoreCode, String productCode, String imageName) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
-        } catch (final Exception e) {
-            log.error("Error while removing file", e);
-            throw new ServiceException(e);
-        }
-    }
+	@Override
+	public OutputContentFile getProductImage(String merchantStoreCode, String productCode, String imageName,
+			ProductImageSize size) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
-    private Bucket getBucket(String bucket_name) {
+	@Override
+	public OutputContentFile getProductImage(CmsProductImage productImage) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
-        Bucket named_bucket = null;
-        ListBucketsResponse listBucketsResponse = s3.listBuckets();
-        for (Bucket b : listBucketsResponse.buckets()) {
-            if (b.name().equals(bucket_name)) {
-                named_bucket = b;
-            }
-        }
+	@Override
+	public void addProductImage(CmsProductImage productImage, ImageContentFile contentImage) throws ServiceException {
 
-        if (named_bucket == null) {
-            named_bucket = createBucket(bucket_name);
-        }
+		try {
+			// get buckets
+			String bucketName = bucketName();
 
-        return named_bucket;
-    }
+			String nodePath = this.nodePath(productImage.getStoreMerchantId().getId(), productImage.getSku(),
+					contentImage);
 
-    private Bucket createBucket(String bucket_name) {
-        try {
-            s3.createBucket(CreateBucketRequest.builder().bucket(bucket_name).build());
-        } catch (Exception e) {
-            log.error("error creating bucket", e);
-        }
-        return getBucket(bucket_name);
-    }
+			PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+				.bucket(bucketName)
+				.key(nodePath + contentImage.getFileName())
+				.metadata(Map.of("content-type", contentImage.getMimeType()))
+				.build();
+			// putObjectRequest.setCannedAcl(CannedAccessControlList.PublicRead);
 
-    private String bucketName() {
-        return bucket;
-    }
+			s3.putObject(putObjectRequest, RequestBody.fromBytes(IOUtils.toByteArray(contentImage.getFile())));
 
-    private String nodePath(String store) {
-        return new StringBuilder()
-                .append(ROOT_NAME)
-                .append(Constants.SLASH)
-                .append(store)
-                .append(Constants.SLASH)
-                .toString();
-    }
+			log.info("Product add file");
 
-    private String nodePath(String store, String product) {
+		}
+		catch (final Exception e) {
+			log.error("Error while removing file", e);
+			throw new ServiceException(e);
+		}
+	}
 
-        StringBuilder sb = new StringBuilder();
-        // node path
-        String nodePath = nodePath(store);
-        sb.append(nodePath);
+	private Bucket getBucket(String bucket_name) {
 
-        // product path
-        sb.append(product).append(Constants.SLASH);
-        return sb.toString();
-    }
+		Bucket named_bucket = null;
+		ListBucketsResponse listBucketsResponse = s3.listBuckets();
+		for (Bucket b : listBucketsResponse.buckets()) {
+			if (b.name().equals(bucket_name)) {
+				named_bucket = b;
+			}
+		}
 
-    private String nodePath(String store, String product, ImageContentFile contentImage) {
+		if (named_bucket == null) {
+			named_bucket = createBucket(bucket_name);
+		}
 
-        StringBuilder sb = new StringBuilder();
-        // node path
-        String nodePath = nodePath(store, product);
-        sb.append(nodePath);
+		return named_bucket;
+	}
 
-        // small large
-        if (contentImage.getFileContentType().name().equals(FileContentType.PRODUCT.name())) {
-            sb.append(SMALL);
-        } else if (contentImage
-                .getFileContentType()
-                .name()
-                .equals(FileContentType.PRODUCTLG.name())) {
-            sb.append(LARGE);
-        }
+	private Bucket createBucket(String bucket_name) {
+		try {
+			s3.createBucket(CreateBucketRequest.builder().bucket(bucket_name).build());
+		}
+		catch (Exception e) {
+			log.error("error creating bucket", e);
+		}
+		return getBucket(bucket_name);
+	}
 
-        return sb.append(Constants.SLASH).toString();
-    }
+	private String bucketName() {
+		return bucket;
+	}
+
+	private String nodePath(String store) {
+		return new StringBuilder().append(ROOT_NAME)
+			.append(Constants.SLASH)
+			.append(store)
+			.append(Constants.SLASH)
+			.toString();
+	}
+
+	private String nodePath(String store, String product) {
+
+		StringBuilder sb = new StringBuilder();
+		// node path
+		String nodePath = nodePath(store);
+		sb.append(nodePath);
+
+		// product path
+		sb.append(product).append(Constants.SLASH);
+		return sb.toString();
+	}
+
+	private String nodePath(String store, String product, ImageContentFile contentImage) {
+
+		StringBuilder sb = new StringBuilder();
+		// node path
+		String nodePath = nodePath(store, product);
+		sb.append(nodePath);
+
+		// small large
+		if (contentImage.getFileContentType().name().equals(FileContentType.PRODUCT.name())) {
+			sb.append(SMALL);
+		}
+		else if (contentImage.getFileContentType().name().equals(FileContentType.PRODUCTLG.name())) {
+			sb.append(LARGE);
+		}
+
+		return sb.append(Constants.SLASH).toString();
+	}
+
 }

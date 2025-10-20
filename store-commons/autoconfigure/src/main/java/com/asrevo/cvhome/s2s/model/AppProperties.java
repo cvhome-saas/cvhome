@@ -8,5 +8,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Setter
 @ConfigurationProperties("com.asrevo.cvhome.app")
 public class AppProperties {
-    private String domain;
+
+	private String domain;
+
 }

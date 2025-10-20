@@ -5,41 +5,37 @@ import java.net.URISyntaxException;
 import org.springframework.security.oauth2.jwt.JwtException;
 
 public class UrlNormalize {
-    public static String normalizeUri(String uriString) throws JwtException {
-        if (uriString == null || uriString.trim().isEmpty()) {
-            throw new JwtException("URI string cannot be null or empty for normalization.");
-        }
-        try {
-            URI uri = new URI(uriString);
 
-            String scheme = uri.getScheme();
-            String host = uri.getHost();
-            int port = uri.getPort();
+	public static String normalizeUri(String uriString) throws JwtException {
+		if (uriString == null || uriString.trim().isEmpty()) {
+			throw new JwtException("URI string cannot be null or empty for normalization.");
+		}
+		try {
+			URI uri = new URI(uriString);
 
-            if (scheme == null || host == null) {
-                throw new JwtException("Issuer URI must include scheme and host: " + uriString);
-            }
+			String scheme = uri.getScheme();
+			String host = uri.getHost();
+			int port = uri.getPort();
 
-            scheme = scheme.toLowerCase();
-            host = host.toLowerCase();
+			if (scheme == null || host == null) {
+				throw new JwtException("Issuer URI must include scheme and host: " + uriString);
+			}
 
-            if (("http".equals(scheme) && port == 80) || ("https".equals(scheme) && port == 443)) {
-                port = -1;
-            }
+			scheme = scheme.toLowerCase();
+			host = host.toLowerCase();
 
-            return new URI(
-                            scheme,
-                            uri.getUserInfo(),
-                            host,
-                            port,
-                            uri.getPath(),
-                            uri.getQuery(),
-                            uri.getFragment())
-                    .normalize()
-                    .toString();
+			if (("http".equals(scheme) && port == 80) || ("https".equals(scheme) && port == 443)) {
+				port = -1;
+			}
 
-        } catch (URISyntaxException e) {
-            throw new JwtException("Malformed issuer URI string: " + uriString, e);
-        }
-    }
+			return new URI(scheme, uri.getUserInfo(), host, port, uri.getPath(), uri.getQuery(), uri.getFragment())
+				.normalize()
+				.toString();
+
+		}
+		catch (URISyntaxException e) {
+			throw new JwtException("Malformed issuer URI string: " + uriString, e);
+		}
+	}
+
 }

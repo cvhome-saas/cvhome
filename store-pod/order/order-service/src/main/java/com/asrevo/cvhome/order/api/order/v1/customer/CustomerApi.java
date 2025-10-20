@@ -24,41 +24,29 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Customer management resource", description = "Manage customers")
 public class CustomerApi {
 
-    @Autowired private CustomerFacade customerFacade;
+	@Autowired
+	private CustomerFacade customerFacade;
 
-    /**
-     * Get all customers
-     */
-    @GetMapping("/private/customers")
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-        @Parameter(
-                name = "lang",
-                schema =
-                        @Schema(
-                                name = "lang",
-                                type = "string",
-                                defaultValue = Constants.DEFAULT_LANGUAGE))
-    })
-    @ConditionalOnApiStatus
-    public ReadableCustomerList list(
-            @Parameter(hidden = true) StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language,
-            Pageable pageable) {
-        CustomerCriteria customerCriteria = createCustomerCriteria(pageable);
-        return customerFacade.getListByStore(
-                merchantStore, customerCriteria, LanguageCode.nonLanguage());
-    }
+	/**
+	 * Get all customers
+	 */
+	@GetMapping("/private/customers")
+	@Parameters({
+			@Parameter(name = "store",
+					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+			@Parameter(name = "lang",
+					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	@ConditionalOnApiStatus
+	public ReadableCustomerList list(@Parameter(hidden = true) StoreMerchantId merchantStore,
+			@Parameter(hidden = true) LanguageCode language, Pageable pageable) {
+		CustomerCriteria customerCriteria = createCustomerCriteria(pageable);
+		return customerFacade.getListByStore(merchantStore, customerCriteria, LanguageCode.nonLanguage());
+	}
 
-    private CustomerCriteria createCustomerCriteria(Pageable pageable) {
-        CustomerCriteria customerCriteria = new CustomerCriteria();
-        customerCriteria.setPageable(pageable);
-        return customerCriteria;
-    }
+	private CustomerCriteria createCustomerCriteria(Pageable pageable) {
+		CustomerCriteria customerCriteria = new CustomerCriteria();
+		customerCriteria.setPageable(pageable);
+		return customerCriteria;
+	}
+
 }

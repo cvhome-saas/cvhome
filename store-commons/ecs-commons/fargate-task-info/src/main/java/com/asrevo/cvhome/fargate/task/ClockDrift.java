@@ -8,12 +8,14 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ClockDrift {
-    @JsonProperty("ClockErrorBound")
-    private double clockErrorBound;
 
-    @JsonProperty("ReferenceTimestamp")
-    private Date referenceTimestamp;
+	@JsonProperty("ClockErrorBound")
+	private double clockErrorBound;
 
-    @JsonProperty("ClockSynchronizationStatus")
-    private String clockSynchronizationStatus;
+	@JsonProperty("ReferenceTimestamp")
+	private Date referenceTimestamp;
+
+	@JsonProperty("ClockSynchronizationStatus")
+	private String clockSynchronizationStatus;
+
 }

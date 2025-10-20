@@ -12,7 +12,12 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PersistableProductAvailabilityEntry implements Serializable {
-    @Serial private static final long serialVersionUID = 1L;
-    private String sku;
-    private int quantity;
+
+	@Serial
+	private static final long serialVersionUID = 1L;
+
+	private String sku;
+
+	private int quantity;
+
 }
