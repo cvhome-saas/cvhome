@@ -11,18 +11,18 @@ import org.springframework.data.domain.Pageable;
 
 public interface ProductAttributeService extends SalesManagerEntityService<Long, ProductAttribute> {
 
-    ProductAttribute saveOrUpdate(ProductAttribute productAttribute);
+	ProductAttribute saveOrUpdate(ProductAttribute productAttribute);
 
-    List<ProductAttribute> getByOptionId(StoreMerchantId store, Long id);
+	List<ProductAttribute> getByOptionId(StoreMerchantId store, Long id);
 
-    List<ProductAttribute> getByOptionValueId(StoreMerchantId store, Long id);
+	List<ProductAttribute> getByOptionValueId(StoreMerchantId store, Long id);
 
-    Page<ProductAttribute> getByProductId(
-            StoreMerchantId store, Product product, LanguageCode language, Pageable pageable);
+	Page<ProductAttribute> getByProductId(StoreMerchantId store, Product product, LanguageCode language,
+			Pageable pageable);
 
-    Page<ProductAttribute> getByProductId(
-            StoreMerchantId store, Product product, Pageable pageable);
+	Page<ProductAttribute> getByProductId(StoreMerchantId store, Product product, Pageable pageable);
 
-    List<ProductAttribute> getProductAttributesByCategoryLineage(
-            StoreMerchantId store, String lineage, LanguageCode language);
+	List<ProductAttribute> getProductAttributesByCategoryLineage(StoreMerchantId store, String lineage,
+			LanguageCode language);
+
 }

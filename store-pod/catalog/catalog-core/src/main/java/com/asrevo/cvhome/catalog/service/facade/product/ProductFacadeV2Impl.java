@@ -33,138 +33,129 @@ import org.springframework.util.Assert;
 @Service("productFacadeV2")
 public class ProductFacadeV2Impl implements ProductFacade {
 
-    private final ProductService productService;
+	private final ProductService productService;
 
-    private final ReadableProductMapper readableProductMapper;
+	private final ReadableProductMapper readableProductMapper;
 
-    private final ProductVariantService productVariantService;
+	private final ProductVariantService productVariantService;
 
-    private final ReadableProductVariantMapper readableProductVariantMapper;
-    private final CategoryServiceImpl categoryService;
-    private final PricingServiceImpl pricingService;
+	private final ReadableProductVariantMapper readableProductVariantMapper;
 
-    public ProductFacadeV2Impl(
-            ProductService productService,
-            ReadableProductMapper readableProductMapper,
-            ProductVariantService productVariantService,
-            ReadableProductVariantMapper readableProductVariantMapper,
-            CategoryServiceImpl categoryService,
-            PricingServiceImpl pricingService) {
-        this.productService = productService;
-        this.readableProductMapper = readableProductMapper;
-        this.productVariantService = productVariantService;
-        this.readableProductVariantMapper = readableProductVariantMapper;
-        this.categoryService = categoryService;
-        this.pricingService = pricingService;
-    }
+	private final CategoryServiceImpl categoryService;
 
-    @Override
-    public Product getProduct(Long id, StoreMerchantId store) {
-        // same as v1
-        return productService.findOne(id, store);
-    }
+	private final PricingServiceImpl pricingService;
 
-    private ReadableProductVariant productVariant(
-            ProductVariant instance, StoreMerchantId store, LanguageCode language) {
+	public ProductFacadeV2Impl(ProductService productService, ReadableProductMapper readableProductMapper,
+			ProductVariantService productVariantService, ReadableProductVariantMapper readableProductVariantMapper,
+			CategoryServiceImpl categoryService, PricingServiceImpl pricingService) {
+		this.productService = productService;
+		this.readableProductMapper = readableProductMapper;
+		this.productVariantService = productVariantService;
+		this.readableProductVariantMapper = readableProductVariantMapper;
+		this.categoryService = categoryService;
+		this.pricingService = pricingService;
+	}
 
-        return readableProductVariantMapper.convert(instance, store, language);
-    }
+	@Override
+	public Product getProduct(Long id, StoreMerchantId store) {
+		// same as v1
+		return productService.findOne(id, store);
+	}
 
-    @Override
-    public ReadableProduct getProductBySeUrl(
-            StoreMerchantId store, String friendlyUrl, LanguageCode language) {
+	private ReadableProductVariant productVariant(ProductVariant instance, StoreMerchantId store,
+			LanguageCode language) {
 
-        Product product =
-                productService.getBySeUrl(store, friendlyUrl, LocaleUtils.getLocale(language));
+		return readableProductVariantMapper.convert(instance, store, language);
+	}
 
-        if (product == null) {
-            throw new ResourceNotFoundException(
-                    "Product [" + friendlyUrl + "] not found for merchant [" + store + "]");
-        }
+	@Override
+	public ReadableProduct getProductBySeUrl(StoreMerchantId store, String friendlyUrl, LanguageCode language) {
 
-        ReadableProduct readableProduct = readableProductMapper.convert(product, store, language);
+		Product product = productService.getBySeUrl(store, friendlyUrl, LocaleUtils.getLocale(language));
 
-        // get all instances for this product group by option
-        // limit to 15 searches
-        List<ProductVariant> instances =
-                productVariantService.getByProductId(store, product, language);
+		if (product == null) {
+			throw new ResourceNotFoundException("Product [" + friendlyUrl + "] not found for merchant [" + store + "]");
+		}
 
-        // the above get all possible images
-        List<ReadableProductVariant> readableInstances =
-                instances.stream()
-                        .map(p -> this.productVariant(p, store, language))
-                        .collect(Collectors.toList());
-        readableProduct.setVariants(readableInstances);
+		ReadableProduct readableProduct = readableProductMapper.convert(product, store, language);
 
-        return readableProduct;
-    }
+		// get all instances for this product group by option
+		// limit to 15 searches
+		List<ProductVariant> instances = productVariantService.getByProductId(store, product, language);
 
-    /**
-     * Filters on otion, optionValues and other criterias
-     */
-    @SneakyThrows
-    @Override
-    public ReadableProductList getProductListsByCriteria(
-            StoreMerchantId merchantStore, ProductCriteria searchCriteria) {
-        Assert.notNull(searchCriteria, "ProductCriteria must be set for this product");
-        return listProducts(readableProductMapper, merchantStore, searchCriteria);
-    }
+		// the above get all possible images
+		List<ReadableProductVariant> readableInstances = instances.stream()
+			.map(p -> this.productVariant(p, store, language))
+			.collect(Collectors.toList());
+		readableProduct.setVariants(readableInstances);
 
-    @Override
-    public ReadableProductList getTinyProductListsByCriteria(
-            StoreMerchantId merchantStore, ProductCriteria searchCriteria) {
-        return listProducts(new ReadableTinyProductMapper(), merchantStore, searchCriteria);
-    }
+		return readableProduct;
+	}
 
-    @Override
-    public ReadableProductList getBaseProductListsByCriteria(
-            StoreMerchantId merchantStore, ProductCriteria searchCriteria) {
-        return listProducts(
-                new ReadableBaseProductMapper(pricingService), merchantStore, searchCriteria);
-    }
+	/**
+	 * Filters on otion, optionValues and other criterias
+	 */
+	@SneakyThrows
+	@Override
+	public ReadableProductList getProductListsByCriteria(StoreMerchantId merchantStore,
+			ProductCriteria searchCriteria) {
+		Assert.notNull(searchCriteria, "ProductCriteria must be set for this product");
+		return listProducts(readableProductMapper, merchantStore, searchCriteria);
+	}
 
-    @SneakyThrows
-    ReadableProductList listProducts(
-            Mapper<Product, ReadableProduct> mapper,
-            StoreMerchantId store,
-            ProductCriteria criteria) {
-        if (CollectionUtils.isNotEmpty(criteria.getCategoryIds())) {
+	@Override
+	public ReadableProductList getTinyProductListsByCriteria(StoreMerchantId merchantStore,
+			ProductCriteria searchCriteria) {
+		return listProducts(new ReadableTinyProductMapper(), merchantStore, searchCriteria);
+	}
 
-            if (criteria.getCategoryIds().size() == 1) {
+	@Override
+	public ReadableProductList getBaseProductListsByCriteria(StoreMerchantId merchantStore,
+			ProductCriteria searchCriteria) {
+		return listProducts(new ReadableBaseProductMapper(pricingService), merchantStore, searchCriteria);
+	}
 
-                Category category = categoryService.getById(criteria.getCategoryIds().getFirst());
+	@SneakyThrows
+	ReadableProductList listProducts(Mapper<Product, ReadableProduct> mapper, StoreMerchantId store,
+			ProductCriteria criteria) {
+		if (CollectionUtils.isNotEmpty(criteria.getCategoryIds())) {
 
-                if (category != null) {
-                    String lineage = category.getLineage();
+			if (criteria.getCategoryIds().size() == 1) {
 
-                    List<Category> categories = categoryService.getListByLineage(store, lineage);
+				Category category = categoryService.getById(criteria.getCategoryIds().getFirst());
 
-                    List<Long> ids = new ArrayList<>();
-                    if (categories != null && !categories.isEmpty()) {
-                        for (Category c : categories) {
-                            ids.add(c.getId());
-                        }
-                    }
-                    ids.add(category.getId());
-                    criteria.setCategoryIds(ids);
-                }
-            }
-        }
+				if (category != null) {
+					String lineage = category.getLineage();
 
-        Page<Product> all = productService.findAll(criteria, store);
+					List<Category> categories = categoryService.getListByLineage(store, lineage);
 
-        ReadableProductList readableProductList = new ReadableProductList();
-        List<ReadableProduct> readableProducts =
-                all.getContent().stream()
-                        .map(p -> mapper.convert(p, store, criteria.getLanguage()))
-                        .sorted(Comparator.comparing(ReadableProduct::getSortOrder))
-                        .collect(Collectors.toList());
+					List<Long> ids = new ArrayList<>();
+					if (categories != null && !categories.isEmpty()) {
+						for (Category c : categories) {
+							ids.add(c.getId());
+						}
+					}
+					ids.add(category.getId());
+					criteria.setCategoryIds(ids);
+				}
+			}
+		}
 
-        readableProductList.setTotalElements(all.getTotalElements());
-        readableProductList.setSize(all.getNumberOfElements());
-        readableProductList.setContent(readableProducts);
-        readableProductList.setTotalPages(all.getTotalPages());
+		Page<Product> all = productService.findAll(criteria, store);
 
-        return readableProductList;
-    }
+		ReadableProductList readableProductList = new ReadableProductList();
+		List<ReadableProduct> readableProducts = all.getContent()
+			.stream()
+			.map(p -> mapper.convert(p, store, criteria.getLanguage()))
+			.sorted(Comparator.comparing(ReadableProduct::getSortOrder))
+			.collect(Collectors.toList());
+
+		readableProductList.setTotalElements(all.getTotalElements());
+		readableProductList.setSize(all.getNumberOfElements());
+		readableProductList.setContent(readableProducts);
+		readableProductList.setTotalPages(all.getTotalPages());
+
+		return readableProductList;
+	}
+
 }

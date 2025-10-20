@@ -10,54 +10,51 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(
-        name = "FILE_HISTORY",
-        uniqueConstraints = {@UniqueConstraint(columnNames = {"STORE_MERCHANT_ID", "FILE_ID"})})
+@Table(name = "FILE_HISTORY",
+		uniqueConstraints = { @UniqueConstraint(columnNames = { "STORE_MERCHANT_ID", "FILE_ID" }) })
 @Getter
 @Setter
 public class FileHistory implements Serializable {
-    @Serial private static final long serialVersionUID = 1321251632883237664L;
 
-    @Id
-    @Column(name = "FILE_HISTORY_ID", unique = true, nullable = false)
-    @TableGenerator(
-            name = "TABLE_GEN",
-            table = "SM_SEQUENCER",
-            pkColumnName = "SEQ_NAME",
-            valueColumnName = "SEQ_COUNT",
-            pkColumnValue = "FILE_HISTORY_SEQ_NEXT_VAL",
-            allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
-            initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
-    private Long id;
+	@Serial
+	private static final long serialVersionUID = 1321251632883237664L;
 
-    @Embedded
-    @AttributeOverrides(
-            @AttributeOverride(
-                    name = "storeMerchantId",
-                    column = @Column(name = "STORE_MERCHANT_ID", nullable = false, length = 50)))
-    private StoreMerchantId storeMerchantId;
+	@Id
+	@Column(name = "FILE_HISTORY_ID", unique = true, nullable = false)
+	@TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME",
+			valueColumnName = "SEQ_COUNT", pkColumnValue = "FILE_HISTORY_SEQ_NEXT_VAL",
+			allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
+			initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
+	@GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
+	private Long id;
 
-    @Column(name = "FILE_ID")
-    private Long fileId;
+	@Embedded
+	@AttributeOverrides(@AttributeOverride(name = "storeMerchantId",
+			column = @Column(name = "STORE_MERCHANT_ID", nullable = false, length = 50)))
+	private StoreMerchantId storeMerchantId;
 
-    @Column(name = "FILESIZE", nullable = false)
-    private Integer filesize;
+	@Column(name = "FILE_ID")
+	private Long fileId;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "DATE_ADDED", length = 0, nullable = false)
-    private Date dateAdded;
+	@Column(name = "FILESIZE", nullable = false)
+	private Integer filesize;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "DATE_DELETED", length = 0)
-    private Date dateDeleted;
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "DATE_ADDED", length = 0, nullable = false)
+	private Date dateAdded;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "ACCOUNTED_DATE", length = 0)
-    private Date accountedDate;
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "DATE_DELETED", length = 0)
+	private Date dateDeleted;
 
-    @Column(name = "DOWNLOAD_COUNT", nullable = false)
-    private Integer downloadCount;
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "ACCOUNTED_DATE", length = 0)
+	private Date accountedDate;
 
-    public FileHistory() {}
+	@Column(name = "DOWNLOAD_COUNT", nullable = false)
+	private Integer downloadCount;
+
+	public FileHistory() {
+	}
+
 }

@@ -12,15 +12,22 @@ import lombok.Setter;
 @Setter
 public class PersistableUser extends UserEntity implements Serializable {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private String password;
-    private String repeatPassword;
-    private String store;
-    private String userName;
-    private boolean active;
-    private List<PersistableGroup> groups = new ArrayList<>();
+	private String password;
+
+	private String repeatPassword;
+
+	private String store;
+
+	private String userName;
+
+	private boolean active;
+
+	private List<PersistableGroup> groups = new ArrayList<>();
+
 }

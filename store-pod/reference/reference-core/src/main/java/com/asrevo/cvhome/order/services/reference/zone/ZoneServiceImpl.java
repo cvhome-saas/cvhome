@@ -17,38 +17,38 @@ import org.springframework.util.Assert;
 
 @Service("zoneService")
 @Slf4j
-public class ZoneServiceImpl extends SalesManagerEntityServiceImpl<ZoneCode, Zone>
-        implements ZoneService {
+public class ZoneServiceImpl extends SalesManagerEntityServiceImpl<ZoneCode, Zone> implements ZoneService {
 
-    private static final String ZONE_CACHE_PREFIX = "ZONES_";
-    private final ZoneRepository zoneRepository;
+	private static final String ZONE_CACHE_PREFIX = "ZONES_";
 
-    @Autowired
-    public ZoneServiceImpl(ZoneRepository zoneRepository) {
-        super(zoneRepository);
-        this.zoneRepository = zoneRepository;
-    }
+	private final ZoneRepository zoneRepository;
 
-    @Override
-    @Cacheable("zoneByCode")
-    public Zone getByCode(ZoneCode code) {
-        return zoneRepository.findByCode(code);
-    }
+	@Autowired
+	public ZoneServiceImpl(ZoneRepository zoneRepository) {
+		super(zoneRepository);
+		this.zoneRepository = zoneRepository;
+	}
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public List<Zone> getZones(CountryIsoCode countryCode, LanguageCode language) {
+	@Override
+	@Cacheable("zoneByCode")
+	public Zone getByCode(ZoneCode code) {
+		return zoneRepository.findByCode(code);
+	}
 
-        Assert.notNull(countryCode, "countryCode cannot be null");
-        Assert.notNull(language, "Language cannot be null");
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Zone> getZones(CountryIsoCode countryCode, LanguageCode language) {
 
-        return zoneRepository.listByLanguageAndCountry(countryCode, language);
-    }
+		Assert.notNull(countryCode, "countryCode cannot be null");
+		Assert.notNull(language, "Language cannot be null");
 
-    @Override
-    @SuppressWarnings("unchecked")
-    public Map<ZoneCode, Zone> getZones(LanguageCode language) {
-        return zoneRepository.listByLanguage(language).stream()
-                .collect(Collectors.toMap(Zone::getCode, z -> z));
-    }
+		return zoneRepository.listByLanguageAndCountry(countryCode, language);
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public Map<ZoneCode, Zone> getZones(LanguageCode language) {
+		return zoneRepository.listByLanguage(language).stream().collect(Collectors.toMap(Zone::getCode, z -> z));
+	}
+
 }

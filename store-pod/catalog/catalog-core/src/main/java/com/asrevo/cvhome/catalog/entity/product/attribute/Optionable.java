@@ -2,11 +2,12 @@ package com.asrevo.cvhome.catalog.entity.product.attribute;
 
 public interface Optionable {
 
-    ProductOption getProductOption();
+	ProductOption getProductOption();
 
-    void setProductOption(ProductOption option);
+	void setProductOption(ProductOption option);
 
-    ProductOptionValue getProductOptionValue();
+	ProductOptionValue getProductOptionValue();
 
-    void setProductOptionValue(ProductOptionValue optionValue);
+	void setProductOptionValue(ProductOptionValue optionValue);
+
 }

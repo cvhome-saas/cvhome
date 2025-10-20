@@ -9,11 +9,12 @@ import java.util.Map;
 
 public interface CountryService extends SalesManagerEntityService<CountryIsoCode, Country> {
 
-    Country getByCode(CountryIsoCode code);
+	Country getByCode(CountryIsoCode code);
 
-    List<Country> getCountries(LanguageCode language);
+	List<Country> getCountries(LanguageCode language);
 
-    Map<CountryIsoCode, Country> getCountriesMap(LanguageCode language);
+	Map<CountryIsoCode, Country> getCountriesMap(LanguageCode language);
 
-    List<Country> listCountryZones(LanguageCode language);
+	List<Country> listCountryZones(LanguageCode language);
+
 }

@@ -22,71 +22,51 @@ import org.springframework.transaction.annotation.Transactional;
 @AllArgsConstructor
 @Slf4j
 public class PricingTableInitServiceImpl implements PricingTableInitService {
-    private static final String CURRENCY = "usd";
-    private final SubscriptionPricePlanRepository subscriptionPricePlanRepository;
-    private final StripeInitService stripeInitService;
 
-    @Transactional
-    @Override
-    public void init() {
-        if (stripeInitService.isConfigured()) {
-            List<ProductPriceDetails> productPriceDetails = stripeInitService.loadTable();
-            int expectedPlans = getPaidSubscriptionPlans().size() * RecurringPlan.values().length;
-            if (productPriceDetails.size() != expectedPlans
-                    || subscriptionPricePlanRepository.count() != expectedPlans) {
-                log.info("will create subscription plan table");
-                createNewPricingTable();
-            }
-        }
-    }
+	private static final String CURRENCY = "usd";
 
-    private void createNewPricingTable() {
-        List<SubscriptionPlan> subscriptionPlans = getPaidSubscriptionPlans();
+	private final SubscriptionPricePlanRepository subscriptionPricePlanRepository;
 
-        List<RecurringPlan> recurringPlans = Arrays.stream(RecurringPlan.values()).toList();
+	private final StripeInitService stripeInitService;
 
-        Map<SubscriptionPlan, ProductId> productBySubscriptionPlan = new HashMap<>();
+	@Transactional
+	@Override
+	public void init() {
+		if (stripeInitService.isConfigured()) {
+			List<ProductPriceDetails> productPriceDetails = stripeInitService.loadTable();
+			int expectedPlans = getPaidSubscriptionPlans().size() * RecurringPlan.values().length;
+			if (productPriceDetails.size() != expectedPlans
+					|| subscriptionPricePlanRepository.count() != expectedPlans) {
+				log.info("will create subscription plan table");
+				createNewPricingTable();
+			}
+		}
+	}
 
-        List<SubscriptionPricePlanEntity> list =
-                subscriptionPlans.stream()
-                        .flatMap(
-                                it ->
-                                        recurringPlans.stream()
-                                                .map(
-                                                        rp -> {
-                                                            PricePlanCost pricePlanCost =
-                                                                    PricePlanCost.fromUsingFactor(
-                                                                            CURRENCY, it, rp);
+	private void createNewPricingTable() {
+		List<SubscriptionPlan> subscriptionPlans = getPaidSubscriptionPlans();
 
-                                                            ProductId productId =
-                                                                    productBySubscriptionPlan
-                                                                            .computeIfAbsent(
-                                                                                    it,
-                                                                                    stripeInitService
-                                                                                            ::createProduct);
-                                                            PriceId priceId =
-                                                                    stripeInitService
-                                                                            .createProductPrice(
-                                                                                    new ProductPriceDetails(
-                                                                                            productId,
-                                                                                            it,
-                                                                                            rp,
-                                                                                            pricePlanCost));
+		List<RecurringPlan> recurringPlans = Arrays.stream(RecurringPlan.values()).toList();
 
-                                                            return SubscriptionPricePlanEntity
-                                                                    .create(
-                                                                            priceId,
-                                                                            productId,
-                                                                            pricePlanCost,
-                                                                            it,
-                                                                            rp);
-                                                        }))
-                        .toList();
-        subscriptionPricePlanRepository.deleteAll();
-        subscriptionPricePlanRepository.saveAll(list);
-    }
+		Map<SubscriptionPlan, ProductId> productBySubscriptionPlan = new HashMap<>();
 
-    private static List<SubscriptionPlan> getPaidSubscriptionPlans() {
-        return Arrays.stream(SubscriptionPlan.values()).filter(it -> it.getCost() > 0).toList();
-    }
+		List<SubscriptionPricePlanEntity> list = subscriptionPlans.stream()
+			.flatMap(it -> recurringPlans.stream().map(rp -> {
+				PricePlanCost pricePlanCost = PricePlanCost.fromUsingFactor(CURRENCY, it, rp);
+
+				ProductId productId = productBySubscriptionPlan.computeIfAbsent(it, stripeInitService::createProduct);
+				PriceId priceId = stripeInitService
+					.createProductPrice(new ProductPriceDetails(productId, it, rp, pricePlanCost));
+
+				return SubscriptionPricePlanEntity.create(priceId, productId, pricePlanCost, it, rp);
+			}))
+			.toList();
+		subscriptionPricePlanRepository.deleteAll();
+		subscriptionPricePlanRepository.saveAll(list);
+	}
+
+	private static List<SubscriptionPlan> getPaidSubscriptionPlans() {
+		return Arrays.stream(SubscriptionPlan.values()).filter(it -> it.getCost() > 0).toList();
+	}
+
 }

@@ -20,54 +20,37 @@ import org.testcontainers.utility.DockerImageName;
 @ConditionalOnProperty(prefix = "mock", name = "dcm.enabled")
 public class MockDomainCertificateManagerServerConfig {
 
-    @Bean
-    public MockServerContainer domainCertificateManagerMockServer() {
-        DockerImageName MOCKSERVER_IMAGE =
-                DockerImageName.parse("mockserver/mockserver")
-                        .withTag(
-                                "mockserver-"
-                                        + MockServerClient.class
-                                                .getPackage()
-                                                .getImplementationVersion());
-        MockServerContainer container = new MockServerContainer(MOCKSERVER_IMAGE);
-        container.setPortBindings(List.of("8082:1080"));
-        return container;
-    }
+	@Bean
+	public MockServerContainer domainCertificateManagerMockServer() {
+		DockerImageName MOCKSERVER_IMAGE = DockerImageName.parse("mockserver/mockserver")
+			.withTag("mockserver-" + MockServerClient.class.getPackage().getImplementationVersion());
+		MockServerContainer container = new MockServerContainer(MOCKSERVER_IMAGE);
+		container.setPortBindings(List.of("8082:1080"));
+		return container;
+	}
 
-    @Bean
-    public CommandLineRunner domainCertificateManagerRunner(
-            @Qualifier("domainCertificateManagerMockServer") MockServerContainer domainCertificateManagerMockServer) {
-        return args -> {
-            MockServerClient mockServerClient =
-                    new MockServerClient(
-                            domainCertificateManagerMockServer.getHost(),
-                            domainCertificateManagerMockServer.getServerPort());
-            mockServerClient
-                    .when(
-                            request()
-                                    .withMethod("POST")
-                                    .withPath("/api/v1/domain-ownership/get-reference")
-                                    .withBody(
-                                            new JsonBody(
-                                                    """
-                                               {
-                                                  "domain":"ashraf.gateway.me",
-                                               }
-                                            """)))
-                    .respond(
-                            response()
-                                    .withContentType(MediaType.APPLICATION_JSON)
-                                    .withBody(
-                                            """
-                                               {
-                                                  "id": 1,
-                                                  "domain":"ashraf.gateway.me",
-                                                  "reference":"{DEFAULT_STORE}"
-                                               }
-                                            """
-                                                    .replace(
-                                                            "{DEFAULT_STORE}",
-                                                            DEFAULT_ORG1_STORE1_STR)));
-        };
-    }
+	@Bean
+	public CommandLineRunner domainCertificateManagerRunner(
+			@Qualifier("domainCertificateManagerMockServer") MockServerContainer domainCertificateManagerMockServer) {
+		return args -> {
+			MockServerClient mockServerClient = new MockServerClient(domainCertificateManagerMockServer.getHost(),
+					domainCertificateManagerMockServer.getServerPort());
+			mockServerClient
+				.when(request().withMethod("POST")
+					.withPath("/api/v1/domain-ownership/get-reference")
+					.withBody(new JsonBody("""
+							   {
+							      "domain":"ashraf.gateway.me",
+							   }
+							""")))
+				.respond(response().withContentType(MediaType.APPLICATION_JSON).withBody("""
+						   {
+						      "id": 1,
+						      "domain":"ashraf.gateway.me",
+						      "reference":"{DEFAULT_STORE}"
+						   }
+						""".replace("{DEFAULT_STORE}", DEFAULT_ORG1_STORE1_STR)));
+		};
+	}
+
 }

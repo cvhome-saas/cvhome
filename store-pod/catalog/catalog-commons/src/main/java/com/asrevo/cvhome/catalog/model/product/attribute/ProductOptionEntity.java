@@ -9,12 +9,14 @@ import lombok.Setter;
 @Getter
 public class ProductOptionEntity extends ProductPropertyOption implements Serializable {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private int order;
+	private int order;
 
-    private String type;
+	private String type;
+
 }

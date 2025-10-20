@@ -10,6 +10,8 @@ import org.springframework.context.annotation.Import;
 @Tag("integration-test")
 class OrderApplicationTests {
 
-    @Test
-    void contextLoads() {}
+	@Test
+	void contextLoads() {
+	}
+
 }

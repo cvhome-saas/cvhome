@@ -48,408 +48,261 @@ import org.springframework.web.bind.annotation.*;
  */
 @Controller
 @RequestMapping("/api/v1")
-@Tag(
-        name =
-                "Product definition resource (Create udtate and delete product definition. Serves"
-                        + " api v1 and v2 with backward compatibility)")
+@Tag(name = "Product definition resource (Create udtate and delete product definition. Serves"
+		+ " api v1 and v2 with backward compatibility)")
 @Slf4j
 public class ProductApi {
 
-    private final CategoryService categoryService;
-    private final ProductService productService;
-    private final ProductFacade productFacade;
-    private final ProductCommonFacade productCommonFacade;
+	private final CategoryService categoryService;
 
-    public ProductApi(
-            CategoryService categoryService,
-            ProductService productService,
-            ProductFacade productFacade,
-            ProductCommonFacade productCommonFacade,
-            ImageFilePath imageUtils) {
-        this.categoryService = categoryService;
-        this.productService = productService;
-        this.productFacade = productFacade;
-        this.productCommonFacade = productCommonFacade;
-    }
+	private final ProductService productService;
 
-    /**
-     * Create product
-     *
-     * @return Entity
-     */
-    @ResponseStatus(HttpStatus.CREATED)
-    @RequestMapping(value = "/private/product", method = RequestMethod.POST)
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-        @Parameter(
-                name = "lang",
-                schema =
-                        @Schema(
-                                name = "lang",
-                                type = "string",
-                                defaultValue = Constants.DEFAULT_LANGUAGE))
-    })
-    @ResponseBody
-    @ConditionalOnApiStatus
-    public Entity create(
-            @Valid @RequestBody PersistableProduct product,
-            @Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language) {
+	private final ProductFacade productFacade;
 
-        Long id = productCommonFacade.saveProduct(merchantStore, product, language);
-        Entity returnEntity = new Entity();
-        returnEntity.setId(id);
-        return returnEntity;
-    }
+	private final ProductCommonFacade productCommonFacade;
 
-    /**
-     * updates price quantity
-     **/
-    @ResponseStatus(HttpStatus.OK)
-    @PatchMapping(
-            value = "/private/product/{id}",
-            produces = {APPLICATION_JSON_VALUE})
-    @Operation(
-            method = "PATCH",
-            description = "Update product inventory",
-            summary = "Updates product inventory",
-            responses = @ApiResponse(content = @Content(schema = @Schema())))
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-        @Parameter(
-                name = "lang",
-                schema =
-                        @Schema(
-                                name = "lang",
-                                type = "string",
-                                defaultValue = Constants.DEFAULT_LANGUAGE))
-    })
-    @ConditionalOnApiStatus
-    public void update(
-            @PathVariable Long id,
-            @Valid @RequestBody LightPersistableProduct product,
-            @Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language) {
-        productCommonFacade.update(id, product, merchantStore, language);
-    }
+	public ProductApi(CategoryService categoryService, ProductService productService, ProductFacade productFacade,
+			ProductCommonFacade productCommonFacade, ImageFilePath imageUtils) {
+		this.categoryService = categoryService;
+		this.productService = productService;
+		this.productFacade = productFacade;
+		this.productCommonFacade = productCommonFacade;
+	}
 
-    @ResponseStatus(HttpStatus.OK)
-    @RequestMapping(value = "/private/product/{id}", method = RequestMethod.DELETE)
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-        @Parameter(
-                name = "lang",
-                schema =
-                        @Schema(
-                                name = "lang",
-                                type = "string",
-                                defaultValue = Constants.DEFAULT_LANGUAGE))
-    })
-    public void delete(
-            @PathVariable Long id,
-            @Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language) {
+	/**
+	 * Create product
+	 * @return Entity
+	 */
+	@ResponseStatus(HttpStatus.CREATED)
+	@RequestMapping(value = "/private/product", method = RequestMethod.POST)
+	@Parameters({
+			@Parameter(name = "store",
+					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+			@Parameter(name = "lang",
+					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	@ResponseBody
+	@ConditionalOnApiStatus
+	public Entity create(@Valid @RequestBody PersistableProduct product,
+			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
+			@Parameter(hidden = true) LanguageCode language) {
 
-        productCommonFacade.deleteProduct(id, merchantStore);
-    }
+		Long id = productCommonFacade.saveProduct(merchantStore, product, language);
+		Entity returnEntity = new Entity();
+		returnEntity.setId(id);
+		return returnEntity;
+	}
 
-    /**
-     * API for getting a product
-     *
-     * @param lang ?lang=fr|en
-     * @return ReadableProduct
-     * @throws Exception <p>
-     *                   /api/product/123
-     */
-    @RequestMapping(
-            value = {"/product/{friendlyUrl}", "/product/friendly/{friendlyUrl}"},
-            method = RequestMethod.GET)
-    @Operation(
-            method = "GET",
-            description = "Get a product by friendlyUrl (slug)",
-            summary =
-                    "For administration and shop purpose. Specifying ?merchant is "
-                            + "required otherwise it falls back to DEFAULT")
-    @ApiResponses(
-            value = {@ApiResponse(responseCode = "200", description = "Single product found")})
-    @ResponseBody
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-        @Parameter(
-                name = "lang",
-                schema =
-                        @Schema(
-                                name = "lang",
-                                type = "string",
-                                defaultValue = Constants.DEFAULT_LANGUAGE))
-    })
-    @ConditionalOnApiStatus
-    // @TODO check if the friendlyUrl is id because frontend use it with id param
-    // @TODO make private api for this
-    public ReadableProduct getByfriendlyUrl(
-            @PathVariable final String friendlyUrl,
-            @RequestParam(value = "lang", required = false) String lang,
-            @Parameter(hidden = true) StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language,
-            HttpServletResponse response)
-            throws Exception {
-        ReadableProduct product =
-                productFacade.getProductBySeUrl(merchantStore, friendlyUrl, language);
+	/**
+	 * updates price quantity
+	 **/
+	@ResponseStatus(HttpStatus.OK)
+	@PatchMapping(value = "/private/product/{id}", produces = { APPLICATION_JSON_VALUE })
+	@Operation(method = "PATCH", description = "Update product inventory", summary = "Updates product inventory",
+			responses = @ApiResponse(content = @Content(schema = @Schema())))
+	@Parameters({
+			@Parameter(name = "store",
+					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+			@Parameter(name = "lang",
+					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	@ConditionalOnApiStatus
+	public void update(@PathVariable Long id, @Valid @RequestBody LightPersistableProduct product,
+			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
+			@Parameter(hidden = true) LanguageCode language) {
+		productCommonFacade.update(id, product, merchantStore, language);
+	}
 
-        if (product == null) {
-            response.sendError(404, "Product not fount for id " + friendlyUrl);
-            return null;
-        }
+	@ResponseStatus(HttpStatus.OK)
+	@RequestMapping(value = "/private/product/{id}", method = RequestMethod.DELETE)
+	@Parameters({
+			@Parameter(name = "store",
+					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+			@Parameter(name = "lang",
+					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	public void delete(@PathVariable Long id, @Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
+			@Parameter(hidden = true) LanguageCode language) {
 
-        return product;
-    }
+		productCommonFacade.deleteProduct(id, merchantStore);
+	}
 
-    @ResponseStatus(HttpStatus.OK)
-    @GetMapping(
-            value = {"/private/product/unique"},
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-        @Parameter(
-                name = "lang",
-                schema =
-                        @Schema(
-                                name = "lang",
-                                type = "string",
-                                defaultValue = Constants.DEFAULT_LANGUAGE))
-    })
-    @Operation(
-            method = "GET",
-            description = "Check if product code already exists",
-            responses =
-                    @ApiResponse(
-                            content =
-                                    @Content(
-                                            schema = @Schema(implementation = EntityExists.class))))
-    @ConditionalOnApiStatus
-    public ResponseEntity<EntityExists> exists(
-            @RequestParam(value = "code") String code,
-            @Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language) {
+	/**
+	 * API for getting a product
+	 * @param lang ?lang=fr|en
+	 * @return ReadableProduct
+	 * @throws Exception
+	 * <p>
+	 * /api/product/123
+	 */
+	@RequestMapping(value = { "/product/{friendlyUrl}", "/product/friendly/{friendlyUrl}" }, method = RequestMethod.GET)
+	@Operation(method = "GET", description = "Get a product by friendlyUrl (slug)",
+			summary = "For administration and shop purpose. Specifying ?merchant is "
+					+ "required otherwise it falls back to DEFAULT")
+	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Single product found") })
+	@ResponseBody
+	@Parameters({
+			@Parameter(name = "store",
+					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+			@Parameter(name = "lang",
+					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	@ConditionalOnApiStatus
+	// @TODO check if the friendlyUrl is id because frontend use it with id param
+	// @TODO make private api for this
+	public ReadableProduct getByfriendlyUrl(@PathVariable final String friendlyUrl,
+			@RequestParam(value = "lang", required = false) String lang,
+			@Parameter(hidden = true) StoreMerchantId merchantStore, @Parameter(hidden = true) LanguageCode language,
+			HttpServletResponse response) throws Exception {
+		ReadableProduct product = productFacade.getProductBySeUrl(merchantStore, friendlyUrl, language);
 
-        boolean exists = productCommonFacade.exists(code, merchantStore);
-        return new ResponseEntity<>(new EntityExists(exists), HttpStatus.OK);
-    }
+		if (product == null) {
+			response.sendError(404, "Product not fount for id " + friendlyUrl);
+			return null;
+		}
 
-    @ResponseStatus(HttpStatus.CREATED)
-    @RequestMapping(
-            value = {"/private/product/{productId}/category/{categoryId}"},
-            method = RequestMethod.POST)
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-        @Parameter(
-                name = "lang",
-                schema =
-                        @Schema(
-                                name = "lang",
-                                type = "string",
-                                defaultValue = Constants.DEFAULT_LANGUAGE))
-    })
-    @ConditionalOnApiStatus
-    public void addProductToCategory(
-            @PathVariable Long productId,
-            @PathVariable Long categoryId,
-            @Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language) {
+		return product;
+	}
 
-        try {
-            // get the product
-            Product product = productService.getById(productId);
+	@ResponseStatus(HttpStatus.OK)
+	@GetMapping(value = { "/private/product/unique" }, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Parameters({
+			@Parameter(name = "store",
+					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+			@Parameter(name = "lang",
+					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	@Operation(method = "GET", description = "Check if product code already exists",
+			responses = @ApiResponse(content = @Content(schema = @Schema(implementation = EntityExists.class))))
+	@ConditionalOnApiStatus
+	public ResponseEntity<EntityExists> exists(@RequestParam(value = "code") String code,
+			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
+			@Parameter(hidden = true) LanguageCode language) {
 
-            if (product == null) {
-                throw new ResourceNotFoundException("Product id [" + productId + "] is not found");
-            }
+		boolean exists = productCommonFacade.exists(code, merchantStore);
+		return new ResponseEntity<>(new EntityExists(exists), HttpStatus.OK);
+	}
 
-            if (!Objects.equals(product.getStore(), merchantStore)) {
-                throw new UnauthorizedException(
-                        "Product id ["
-                                + productId
-                                + "] does not belong to store ["
-                                + merchantStore
-                                + "]");
-            }
+	@ResponseStatus(HttpStatus.CREATED)
+	@RequestMapping(value = { "/private/product/{productId}/category/{categoryId}" }, method = RequestMethod.POST)
+	@Parameters({
+			@Parameter(name = "store",
+					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+			@Parameter(name = "lang",
+					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	@ConditionalOnApiStatus
+	public void addProductToCategory(@PathVariable Long productId, @PathVariable Long categoryId,
+			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
+			@Parameter(hidden = true) LanguageCode language) {
 
-            Category category = categoryService.getById(categoryId);
+		try {
+			// get the product
+			Product product = productService.getById(productId);
 
-            if (category == null) {
-                throw new ResourceNotFoundException(
-                        "Category id [" + categoryId + "] is not found");
-            }
+			if (product == null) {
+				throw new ResourceNotFoundException("Product id [" + productId + "] is not found");
+			}
 
-            if (!Objects.equals(category.getStoreMerchantId(), merchantStore)) {
-                throw new UnauthorizedException(
-                        "Category id ["
-                                + categoryId
-                                + "] does not belong to store ["
-                                + merchantStore
-                                + "]");
-            }
+			if (!Objects.equals(product.getStore(), merchantStore)) {
+				throw new UnauthorizedException(
+						"Product id [" + productId + "] does not belong to store [" + merchantStore + "]");
+			}
 
-            productCommonFacade.addProductToCategory(category, product, language);
+			Category category = categoryService.getById(categoryId);
 
-        } catch (Exception e) {
-            throw new ServiceRuntimeException(e);
-        }
-    }
+			if (category == null) {
+				throw new ResourceNotFoundException("Category id [" + categoryId + "] is not found");
+			}
 
-    @ResponseStatus(HttpStatus.OK)
-    @RequestMapping(
-            value = {"/private/product/{productId}/category/{categoryId}"},
-            method = RequestMethod.DELETE)
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-        @Parameter(
-                name = "lang",
-                schema =
-                        @Schema(
-                                name = "lang",
-                                type = "string",
-                                defaultValue = Constants.DEFAULT_LANGUAGE))
-    })
-    @ConditionalOnApiStatus
-    public void removeProductFromCategory(
-            @PathVariable Long productId,
-            @PathVariable Long categoryId,
-            @Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language) {
+			if (!Objects.equals(category.getStoreMerchantId(), merchantStore)) {
+				throw new UnauthorizedException(
+						"Category id [" + categoryId + "] does not belong to store [" + merchantStore + "]");
+			}
 
-        try {
-            Product product = productService.getById(productId);
+			productCommonFacade.addProductToCategory(category, product, language);
 
-            if (product == null) {
-                throw new ResourceNotFoundException("Product id [" + productId + "] is not found");
-            }
+		}
+		catch (Exception e) {
+			throw new ServiceRuntimeException(e);
+		}
+	}
 
-            if (!Objects.equals(product.getStore(), merchantStore)) {
-                throw new UnauthorizedException(
-                        "Product id ["
-                                + productId
-                                + "] does not belong to store ["
-                                + merchantStore
-                                + "]");
-            }
+	@ResponseStatus(HttpStatus.OK)
+	@RequestMapping(value = { "/private/product/{productId}/category/{categoryId}" }, method = RequestMethod.DELETE)
+	@Parameters({
+			@Parameter(name = "store",
+					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+			@Parameter(name = "lang",
+					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	@ConditionalOnApiStatus
+	public void removeProductFromCategory(@PathVariable Long productId, @PathVariable Long categoryId,
+			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
+			@Parameter(hidden = true) LanguageCode language) {
 
-            Category category = categoryService.getById(categoryId);
+		try {
+			Product product = productService.getById(productId);
 
-            if (category == null) {
-                throw new ResourceNotFoundException(
-                        "Category id [" + categoryId + "] is not found");
-            }
+			if (product == null) {
+				throw new ResourceNotFoundException("Product id [" + productId + "] is not found");
+			}
 
-            if (!Objects.equals(category.getStoreMerchantId(), merchantStore)) {
-                throw new UnauthorizedException(
-                        "Category id ["
-                                + categoryId
-                                + "] does not belong to store ["
-                                + merchantStore
-                                + "]");
-            }
+			if (!Objects.equals(product.getStore(), merchantStore)) {
+				throw new UnauthorizedException(
+						"Product id [" + productId + "] does not belong to store [" + merchantStore + "]");
+			}
 
-            productCommonFacade.removeProductFromCategory(category, product, language);
+			Category category = categoryService.getById(categoryId);
 
-        } catch (Exception e) {
-            throw new ServiceRuntimeException(e);
-        }
-    }
+			if (category == null) {
+				throw new ResourceNotFoundException("Category id [" + categoryId + "] is not found");
+			}
 
-    /**
-     * Change product sort order
-     */
-    @ResponseStatus(HttpStatus.OK)
-    @RequestMapping(value = "/private/product/{id}", method = RequestMethod.PATCH)
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-        @Parameter(
-                name = "lang",
-                schema =
-                        @Schema(
-                                name = "lang",
-                                type = "string",
-                                defaultValue = Constants.DEFAULT_LANGUAGE))
-    })
-    @Operation(
-            method = "POST",
-            description = "Patch product sort order",
-            summary = "Change product sortOrder")
-    @ConditionalOnApiStatus
-    public void changeProductOrder(
-            @PathVariable Long id,
-            @RequestParam(value = "order", required = false, defaultValue = "0") Integer position,
-            @Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language) {
+			if (!Objects.equals(category.getStoreMerchantId(), merchantStore)) {
+				throw new UnauthorizedException(
+						"Category id [" + categoryId + "] does not belong to store [" + merchantStore + "]");
+			}
 
-        try {
+			productCommonFacade.removeProductFromCategory(category, product, language);
 
-            Product p = productService.getById(id);
+		}
+		catch (Exception e) {
+			throw new ServiceRuntimeException(e);
+		}
+	}
 
-            if (p == null) {
-                throw new ResourceNotFoundException(
-                        "Product [" + id + "] not found for merchant [" + merchantStore + "]");
-            }
+	/**
+	 * Change product sort order
+	 */
+	@ResponseStatus(HttpStatus.OK)
+	@RequestMapping(value = "/private/product/{id}", method = RequestMethod.PATCH)
+	@Parameters({
+			@Parameter(name = "store",
+					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+			@Parameter(name = "lang",
+					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	@Operation(method = "POST", description = "Patch product sort order", summary = "Change product sortOrder")
+	@ConditionalOnApiStatus
+	public void changeProductOrder(@PathVariable Long id,
+			@RequestParam(value = "order", required = false, defaultValue = "0") Integer position,
+			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
+			@Parameter(hidden = true) LanguageCode language) {
 
-            if (!p.getStore().equals(merchantStore)) {
-                throw new ResourceNotFoundException(
-                        "Product [" + id + "] not found for merchant [" + merchantStore + "]");
-            }
+		try {
 
-            p.setSortOrder(position);
+			Product p = productService.getById(id);
 
-        } catch (Exception e) {
-            log.error("Error while updating Product position", e);
-            throw new ServiceRuntimeException("Product [" + id + "] cannot be edited");
-        }
-    }
+			if (p == null) {
+				throw new ResourceNotFoundException(
+						"Product [" + id + "] not found for merchant [" + merchantStore + "]");
+			}
+
+			if (!p.getStore().equals(merchantStore)) {
+				throw new ResourceNotFoundException(
+						"Product [" + id + "] not found for merchant [" + merchantStore + "]");
+			}
+
+			p.setSortOrder(position);
+
+		}
+		catch (Exception e) {
+			log.error("Error while updating Product position", e);
+			throw new ServiceRuntimeException("Product [" + id + "] cannot be edited");
+		}
+	}
+
 }

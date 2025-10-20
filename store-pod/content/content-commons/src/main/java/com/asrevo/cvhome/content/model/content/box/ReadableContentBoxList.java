@@ -9,8 +9,11 @@ import lombok.Setter;
 @Setter
 @Deprecated
 public class ReadableContentBoxList extends ReadableList<ReadableContentBox> {
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
+
 }

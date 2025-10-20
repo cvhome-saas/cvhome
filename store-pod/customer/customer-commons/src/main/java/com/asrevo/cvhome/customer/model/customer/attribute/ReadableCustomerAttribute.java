@@ -8,11 +8,14 @@ import lombok.Setter;
 @Getter
 public class ReadableCustomerAttribute extends CustomerAttributeEntity {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private ReadableCustomerOption customerOption;
-    private ReadableCustomerOptionValue customerOptionValue;
+	private ReadableCustomerOption customerOption;
+
+	private ReadableCustomerOptionValue customerOptionValue;
+
 }

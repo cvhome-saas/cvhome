@@ -17,46 +17,46 @@ import lombok.Setter;
 @Getter
 @Setter
 public class OrderStatusHistory implements Serializable {
-    @Serial private static final long serialVersionUID = 3438730310126102187L;
 
-    @Id
-    @Column(name = "ORDER_STATUS_HISTORY_ID")
-    @TableGenerator(
-            name = "TABLE_GEN",
-            table = "SM_SEQUENCER",
-            pkColumnName = "SEQ_NAME",
-            valueColumnName = "SEQ_COUNT",
-            pkColumnValue = "ORDER_STATUS_HISTORY_SEQ_NEXT_VAL",
-            allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
-            initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
-    private Long id;
+	@Serial
+	private static final long serialVersionUID = 3438730310126102187L;
 
-    @JsonIgnore
-    @ManyToOne(targetEntity = Order.class)
-    @JoinColumn(name = "ORDER_ID", nullable = false)
-    private Order order;
+	@Id
+	@Column(name = "ORDER_STATUS_HISTORY_ID")
+	@TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME",
+			valueColumnName = "SEQ_COUNT", pkColumnValue = "ORDER_STATUS_HISTORY_SEQ_NEXT_VAL",
+			allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
+			initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
+	@GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
+	private Long id;
 
-    @Enumerated(value = EnumType.STRING)
-    private OrderStatus status;
+	@JsonIgnore
+	@ManyToOne(targetEntity = Order.class)
+	@JoinColumn(name = "ORDER_ID", nullable = false)
+	private Order order;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "DATE_ADDED", nullable = false)
-    private Date dateAdded;
+	@Enumerated(value = EnumType.STRING)
+	private OrderStatus status;
 
-    @Column(name = "CUSTOMER_NOTIFIED")
-    private java.lang.Integer customerNotified;
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "DATE_ADDED", nullable = false)
+	private Date dateAdded;
 
-    @Column(name = "COMMENTS", columnDefinition = "text")
-    private String comments;
+	@Column(name = "CUSTOMER_NOTIFIED")
+	private java.lang.Integer customerNotified;
 
-    public OrderStatusHistory() {}
+	@Column(name = "COMMENTS", columnDefinition = "text")
+	private String comments;
 
-    public Date getDateAdded() {
-        return CloneUtils.clone(dateAdded);
-    }
+	public OrderStatusHistory() {
+	}
 
-    public void setDateAdded(Date dateAdded) {
-        this.dateAdded = CloneUtils.clone(dateAdded);
-    }
+	public Date getDateAdded() {
+		return CloneUtils.clone(dateAdded);
+	}
+
+	public void setDateAdded(Date dateAdded) {
+		this.dateAdded = CloneUtils.clone(dateAdded);
+	}
+
 }

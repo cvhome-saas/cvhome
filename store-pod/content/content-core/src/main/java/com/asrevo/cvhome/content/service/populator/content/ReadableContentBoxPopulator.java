@@ -9,60 +9,57 @@ import com.asrevo.cvhome.store.core.populator.AbstractDataPopulator;
 import java.util.List;
 import java.util.Optional;
 
-public class ReadableContentBoxPopulator
-        extends AbstractDataPopulator<Content, StoreMerchantId, ReadableContentBox> {
-    @Override
-    public ReadableContentBox populate(
-            Content source,
-            ReadableContentBox target,
-            StoreMerchantId store,
-            LanguageCode language) {
+public class ReadableContentBoxPopulator extends AbstractDataPopulator<Content, StoreMerchantId, ReadableContentBox> {
 
-        if (target == null) {
-            target = new ReadableContentBox();
-        }
-        target.setId(source.getId());
-        target.setCode(source.getCode());
-        target.setVisible(source.isVisible());
+	@Override
+	public ReadableContentBox populate(Content source, ReadableContentBox target, StoreMerchantId store,
+			LanguageCode language) {
 
-        if (LanguageCode.isAllLanguage(language)) {
-            var descriptionSet = Optional.ofNullable(source.getDescriptions()).orElse(List.of());
-            target.setDescriptions(descriptionSet.stream().map(this::populateDescription).toList());
-        }
-        if (LanguageCode.isLanguage(language)) {
-            var descriptionSet = Optional.ofNullable(source.getDescriptions()).orElse(List.of());
-            var description =
-                    descriptionSet.stream()
-                            .filter(it -> language.equals(it.getLanguageCode()))
-                            .findFirst()
-                            .map(this::populateDescription)
-                            .orElse(null);
-            target.setDescription(description);
-        }
+		if (target == null) {
+			target = new ReadableContentBox();
+		}
+		target.setId(source.getId());
+		target.setCode(source.getCode());
+		target.setVisible(source.isVisible());
 
-        return target;
-    }
+		if (LanguageCode.isAllLanguage(language)) {
+			var descriptionSet = Optional.ofNullable(source.getDescriptions()).orElse(List.of());
+			target.setDescriptions(descriptionSet.stream().map(this::populateDescription).toList());
+		}
+		if (LanguageCode.isLanguage(language)) {
+			var descriptionSet = Optional.ofNullable(source.getDescriptions()).orElse(List.of());
+			var description = descriptionSet.stream()
+				.filter(it -> language.equals(it.getLanguageCode()))
+				.findFirst()
+				.map(this::populateDescription)
+				.orElse(null);
+			target.setDescription(description);
+		}
 
-    @Override
-    protected ReadableContentBox createTarget() {
-        return null;
-    }
+		return target;
+	}
 
-    com.asrevo.cvhome.content.model.content.common.ContentDescription populateDescription(
-            ContentDescription description) {
-        if (description == null) {
-            return null;
-        }
-        var d = new com.asrevo.cvhome.content.model.content.common.ContentDescription();
-        d.setName(description.getName());
-        d.setDescription(description.getDescription());
-        d.setMetaDescription(description.getMetatagDescription());
-        d.setId(description.getId());
-        d.setFriendlyUrl(description.getSeUrl());
-        d.setTitle(description.getTitle());
-        if (description.getLanguageCode() != null) {
-            d.setLanguage(description.getLanguageCode());
-        }
-        return d;
-    }
+	@Override
+	protected ReadableContentBox createTarget() {
+		return null;
+	}
+
+	com.asrevo.cvhome.content.model.content.common.ContentDescription populateDescription(
+			ContentDescription description) {
+		if (description == null) {
+			return null;
+		}
+		var d = new com.asrevo.cvhome.content.model.content.common.ContentDescription();
+		d.setName(description.getName());
+		d.setDescription(description.getDescription());
+		d.setMetaDescription(description.getMetatagDescription());
+		d.setId(description.getId());
+		d.setFriendlyUrl(description.getSeUrl());
+		d.setTitle(description.getTitle());
+		if (description.getLanguageCode() != null) {
+			d.setLanguage(description.getLanguageCode());
+		}
+		return d;
+	}
+
 }

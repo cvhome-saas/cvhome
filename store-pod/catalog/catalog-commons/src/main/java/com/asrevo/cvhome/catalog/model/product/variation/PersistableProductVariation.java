@@ -13,11 +13,14 @@ import lombok.Setter;
 @Getter
 public class PersistableProductVariation extends ProductVariationEntity {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private Long option = null;
-    private Long optionValue = null;
+	private Long option = null;
+
+	private Long optionValue = null;
+
 }

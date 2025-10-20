@@ -5,5 +5,6 @@ import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 
 public interface CatalogFacade {
 
-    Catalog getCatalog(String code, StoreMerchantId store);
+	Catalog getCatalog(String code, StoreMerchantId store);
+
 }

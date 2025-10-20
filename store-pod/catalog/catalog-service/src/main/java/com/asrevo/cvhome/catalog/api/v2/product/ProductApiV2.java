@@ -42,311 +42,190 @@ import org.springframework.web.bind.annotation.*;
  */
 @Controller
 @RequestMapping("/api/v2")
-@Tags(
-        value =
-                @Tag(
-                        name =
-                                "Product display and management resource (Product display and"
-                                    + " Management Api such as adding a product to category. Serves"
-                                    + " api v1 and v2 with backward compatibility)"))
+@Tags(value = @Tag(name = "Product display and management resource (Product display and"
+		+ " Management Api such as adding a product to category. Serves"
+		+ " api v1 and v2 with backward compatibility)"))
 @Slf4j
 public class ProductApiV2 {
 
-    private final ProductDefinitionFacade productDefinitionFacade;
-    private final ProductFacade productFacadeV2;
-    private final ProductCommonFacade productCommonFacade;
+	private final ProductDefinitionFacade productDefinitionFacade;
 
-    public ProductApiV2(
-            ProductDefinitionFacade productDefinitionFacade,
-            ProductFacade productFacadeV2,
-            ProductCommonFacade productCommonFacade) {
-        this.productDefinitionFacade = productDefinitionFacade;
-        this.productFacadeV2 = productFacadeV2;
-        this.productCommonFacade = productCommonFacade;
-    }
+	private final ProductFacade productFacadeV2;
 
-    /**
-     * ------------ V2
-     * <p>
-     * --- product definition
-     */
-    @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping(value = {"/private/product"})
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-        @Parameter(
-                name = "lang",
-                schema =
-                        @Schema(
-                                name = "lang",
-                                type = "string",
-                                defaultValue = Constants.DEFAULT_LANGUAGE))
-    })
-    @ResponseBody
-    @ConditionalOnApiStatus
-    public Entity createV2(
-            @Valid @RequestBody PersistableProductDefinition product,
-            @Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language) {
+	private final ProductCommonFacade productCommonFacade;
 
-        // make sure product id is null
-        product.setId(null);
-        Long id = productDefinitionFacade.saveProductDefinition(merchantStore, product, language);
-        Entity returnEntity = new Entity();
-        returnEntity.setId(id);
-        return returnEntity;
-    }
+	public ProductApiV2(ProductDefinitionFacade productDefinitionFacade, ProductFacade productFacadeV2,
+			ProductCommonFacade productCommonFacade) {
+		this.productDefinitionFacade = productDefinitionFacade;
+		this.productFacadeV2 = productFacadeV2;
+		this.productCommonFacade = productCommonFacade;
+	}
 
-    @ResponseStatus(HttpStatus.OK)
-    @PutMapping(value = {"/private/product/{id}"})
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-        @Parameter(
-                name = "lang",
-                schema =
-                        @Schema(
-                                name = "lang",
-                                type = "string",
-                                defaultValue = Constants.DEFAULT_LANGUAGE))
-    })
-    @ConditionalOnApiStatus
-    public void updateV2(
-            @PathVariable Long id,
-            @Valid @RequestBody PersistableProductDefinition product,
-            @Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language) {
+	/**
+	 * ------------ V2
+	 * <p>
+	 * --- product definition
+	 */
+	@ResponseStatus(HttpStatus.CREATED)
+	@PostMapping(value = { "/private/product" })
+	@Parameters({
+			@Parameter(name = "store",
+					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+			@Parameter(name = "lang",
+					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	@ResponseBody
+	@ConditionalOnApiStatus
+	public Entity createV2(@Valid @RequestBody PersistableProductDefinition product,
+			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
+			@Parameter(hidden = true) LanguageCode language) {
 
-        productDefinitionFacade.update(id, product, merchantStore, language);
-    }
+		// make sure product id is null
+		product.setId(null);
+		Long id = productDefinitionFacade.saveProductDefinition(merchantStore, product, language);
+		Entity returnEntity = new Entity();
+		returnEntity.setId(id);
+		return returnEntity;
+	}
 
-    @ResponseStatus(HttpStatus.OK)
-    @GetMapping(value = {"/private/product/{id}"})
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-        @Parameter(
-                name = "lang",
-                schema =
-                        @Schema(
-                                name = "lang",
-                                type = "string",
-                                defaultValue = Constants.DEFAULT_LANGUAGE))
-    })
-    @ResponseBody
-    @ConditionalOnApiStatus
-    public ReadableProductDefinition getV2(
-            @PathVariable Long id,
-            @Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language) {
+	@ResponseStatus(HttpStatus.OK)
+	@PutMapping(value = { "/private/product/{id}" })
+	@Parameters({
+			@Parameter(name = "store",
+					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+			@Parameter(name = "lang",
+					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	@ConditionalOnApiStatus
+	public void updateV2(@PathVariable Long id, @Valid @RequestBody PersistableProductDefinition product,
+			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
+			@Parameter(hidden = true) LanguageCode language) {
 
-        return productDefinitionFacade.getProduct(merchantStore, id, LanguageCode.allLanguage());
-    }
+		productDefinitionFacade.update(id, product, merchantStore, language);
+	}
 
-    /**
-     * API for getting a product
-     *
-     * @param lang ?lang=fr|en
-     * @return ReadableProduct
-     * @throws Exception <p>
-     *                   /api/product/123
-     */
-    @RequestMapping(
-            value = {"/product/name/{friendlyUrl}", "/product/friendly/{friendlyUrl}"},
-            method = RequestMethod.GET)
-    @Operation(
-            method = "GET",
-            description = "Get a product by friendlyUrl (slug) version 2",
-            summary =
-                    "For shop purpose. Specifying ?merchant is "
-                            + "required otherwise it falls back to DEFAULT")
-    @ApiResponse(
-            responseCode = "200",
-            description = "Single product found",
-            content = @Content(schema = @Schema(implementation = ReadableProduct.class)))
-    @ResponseBody
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-        @Parameter(
-                name = "lang",
-                schema =
-                        @Schema(
-                                name = "lang",
-                                type = "string",
-                                defaultValue = Constants.DEFAULT_LANGUAGE))
-    })
-    @ConditionalOnApiStatus(usage = ApiUsage.NOT_USED)
-    public ReadableProduct getByfriendlyUrl(
-            @PathVariable final String friendlyUrl,
-            @RequestParam(value = "lang", required = false) String lang,
-            @Parameter(hidden = true) StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language,
-            HttpServletResponse response)
-            throws Exception {
+	@ResponseStatus(HttpStatus.OK)
+	@GetMapping(value = { "/private/product/{id}" })
+	@Parameters({
+			@Parameter(name = "store",
+					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+			@Parameter(name = "lang",
+					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	@ResponseBody
+	@ConditionalOnApiStatus
+	public ReadableProductDefinition getV2(@PathVariable Long id,
+			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
+			@Parameter(hidden = true) LanguageCode language) {
 
-        ReadableProduct product =
-                productFacadeV2.getProductBySeUrl(merchantStore, friendlyUrl, language);
+		return productDefinitionFacade.getProduct(merchantStore, id, LanguageCode.allLanguage());
+	}
 
-        if (product == null) {
-            response.sendError(404, "Product not fount for id " + friendlyUrl);
-            return null;
-        }
+	/**
+	 * API for getting a product
+	 * @param lang ?lang=fr|en
+	 * @return ReadableProduct
+	 * @throws Exception
+	 * <p>
+	 * /api/product/123
+	 */
+	@RequestMapping(value = { "/product/name/{friendlyUrl}", "/product/friendly/{friendlyUrl}" },
+			method = RequestMethod.GET)
+	@Operation(method = "GET", description = "Get a product by friendlyUrl (slug) version 2",
+			summary = "For shop purpose. Specifying ?merchant is " + "required otherwise it falls back to DEFAULT")
+	@ApiResponse(responseCode = "200", description = "Single product found",
+			content = @Content(schema = @Schema(implementation = ReadableProduct.class)))
+	@ResponseBody
+	@Parameters({
+			@Parameter(name = "store",
+					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+			@Parameter(name = "lang",
+					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	@ConditionalOnApiStatus(usage = ApiUsage.NOT_USED)
+	public ReadableProduct getByfriendlyUrl(@PathVariable final String friendlyUrl,
+			@RequestParam(value = "lang", required = false) String lang,
+			@Parameter(hidden = true) StoreMerchantId merchantStore, @Parameter(hidden = true) LanguageCode language,
+			HttpServletResponse response) throws Exception {
 
-        return product;
-    }
+		ReadableProduct product = productFacadeV2.getProductBySeUrl(merchantStore, friendlyUrl, language);
 
-    @RequestMapping(value = "/private/tiny-products", method = RequestMethod.GET)
-    @ResponseBody
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-        @Parameter(
-                name = "lang",
-                schema =
-                        @Schema(
-                                name = "lang",
-                                type = "string",
-                                defaultValue = Constants.DEFAULT_LANGUAGE))
-    })
-    @ConditionalOnApiStatus
-    public ReadableProductList tiny(
-            ProductCriteria searchCriteria,
-            @Parameter(hidden = true) StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language,
-            Pageable pageable) {
+		if (product == null) {
+			response.sendError(404, "Product not fount for id " + friendlyUrl);
+			return null;
+		}
 
-        searchCriteria.setPageable(pageable);
-        searchCriteria.setLanguage(language);
+		return product;
+	}
 
-        return productFacadeV2.getBaseProductListsByCriteria(merchantStore, searchCriteria);
-    }
+	@RequestMapping(value = "/private/tiny-products", method = RequestMethod.GET)
+	@ResponseBody
+	@Parameters({
+			@Parameter(name = "store",
+					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+			@Parameter(name = "lang",
+					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	@ConditionalOnApiStatus
+	public ReadableProductList tiny(ProductCriteria searchCriteria,
+			@Parameter(hidden = true) StoreMerchantId merchantStore, @Parameter(hidden = true) LanguageCode language,
+			Pageable pageable) {
 
-    @RequestMapping(value = "/private/base-products", method = RequestMethod.GET)
-    @ResponseBody
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-        @Parameter(
-                name = "lang",
-                schema =
-                        @Schema(
-                                name = "lang",
-                                type = "string",
-                                defaultValue = Constants.DEFAULT_LANGUAGE))
-    })
-    @ConditionalOnApiStatus
-    public ReadableProductList base(
-            ProductCriteria searchCriteria,
-            @Parameter(hidden = true) StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language,
-            Pageable pageable) {
+		searchCriteria.setPageable(pageable);
+		searchCriteria.setLanguage(language);
 
-        searchCriteria.setPageable(pageable);
-        searchCriteria.setLanguage(language);
+		return productFacadeV2.getBaseProductListsByCriteria(merchantStore, searchCriteria);
+	}
 
-        return productFacadeV2.getBaseProductListsByCriteria(merchantStore, searchCriteria);
-    }
+	@RequestMapping(value = "/private/base-products", method = RequestMethod.GET)
+	@ResponseBody
+	@Parameters({
+			@Parameter(name = "store",
+					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+			@Parameter(name = "lang",
+					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	@ConditionalOnApiStatus
+	public ReadableProductList base(ProductCriteria searchCriteria,
+			@Parameter(hidden = true) StoreMerchantId merchantStore, @Parameter(hidden = true) LanguageCode language,
+			Pageable pageable) {
 
-    @RequestMapping(value = "/products", method = RequestMethod.GET)
-    @ResponseBody
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-        @Parameter(
-                name = "lang",
-                schema =
-                        @Schema(
-                                name = "lang",
-                                type = "string",
-                                defaultValue = Constants.DEFAULT_LANGUAGE))
-    })
-    @ConditionalOnApiStatus
-    public ReadableProductList getList(
-            ProductCriteria searchCriteria,
-            @Parameter(hidden = true) StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language,
-            Pageable pageable) {
+		searchCriteria.setPageable(pageable);
+		searchCriteria.setLanguage(language);
 
-        searchCriteria.setPageable(pageable);
-        searchCriteria.setLanguage(language);
+		return productFacadeV2.getBaseProductListsByCriteria(merchantStore, searchCriteria);
+	}
 
-        return productFacadeV2.getProductListsByCriteria(merchantStore, searchCriteria);
-    }
+	@RequestMapping(value = "/products", method = RequestMethod.GET)
+	@ResponseBody
+	@Parameters({
+			@Parameter(name = "store",
+					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+			@Parameter(name = "lang",
+					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	@ConditionalOnApiStatus
+	public ReadableProductList getList(ProductCriteria searchCriteria,
+			@Parameter(hidden = true) StoreMerchantId merchantStore, @Parameter(hidden = true) LanguageCode language,
+			Pageable pageable) {
 
-    /**
-     * updates price quantity
-     **/
-    @ResponseStatus(HttpStatus.OK)
-    @PatchMapping(
-            value = "/private/product/{sku}",
-            produces = {APPLICATION_JSON_VALUE})
-    @Operation(
-            method = "PATCH",
-            description = "Update product inventory",
-            summary = "Updates product inventory",
-            responses =
-                    @ApiResponse(
-                            content = @Content(mediaType = "application/json", schema = @Schema())))
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-        @Parameter(
-                name = "lang",
-                schema =
-                        @Schema(
-                                name = "lang",
-                                type = "string",
-                                defaultValue = Constants.DEFAULT_LANGUAGE))
-    })
-    @ConditionalOnApiStatus
-    // @TODO check if sku is id or string
-    public void update(
-            @PathVariable String sku,
-            @Valid @RequestBody LightPersistableProduct product,
-            @Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language) {
-        productCommonFacade.update(sku, product, merchantStore, language);
-    }
+		searchCriteria.setPageable(pageable);
+		searchCriteria.setLanguage(language);
+
+		return productFacadeV2.getProductListsByCriteria(merchantStore, searchCriteria);
+	}
+
+	/**
+	 * updates price quantity
+	 **/
+	@ResponseStatus(HttpStatus.OK)
+	@PatchMapping(value = "/private/product/{sku}", produces = { APPLICATION_JSON_VALUE })
+	@Operation(method = "PATCH", description = "Update product inventory", summary = "Updates product inventory",
+			responses = @ApiResponse(content = @Content(mediaType = "application/json", schema = @Schema())))
+	@Parameters({
+			@Parameter(name = "store",
+					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+			@Parameter(name = "lang",
+					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	@ConditionalOnApiStatus
+	// @TODO check if sku is id or string
+	public void update(@PathVariable String sku, @Valid @RequestBody LightPersistableProduct product,
+			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
+			@Parameter(hidden = true) LanguageCode language) {
+		productCommonFacade.update(sku, product, merchantStore, language);
+	}
+
 }

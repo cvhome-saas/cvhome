@@ -10,10 +10,12 @@ import lombok.Setter;
 @Getter
 public class ReadableProductPriceFull extends ReadableProductPrice {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private List<ProductPriceDescription> descriptions = new ArrayList<>();
+	private List<ProductPriceDescription> descriptions = new ArrayList<>();
+
 }

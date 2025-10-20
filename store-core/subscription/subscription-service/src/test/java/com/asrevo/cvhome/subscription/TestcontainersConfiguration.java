@@ -12,15 +12,17 @@ import org.testcontainers.utility.DockerImageName;
 @TestConfiguration(proxyBeanMethods = false)
 @Import(ReactiveTestCustomSecurityConfig.class)
 public class TestcontainersConfiguration {
-    @Bean
-    @ServiceConnection
-    PostgreSQLContainer<?> postgresContainer() {
-        return new PostgreSQLContainer<>(DockerImageName.parse("postgres:15-alpine"));
-    }
 
-    @Bean
-    @ServiceConnection
-    RabbitMQContainer rabbitContainer() {
-        return new RabbitMQContainer(DockerImageName.parse("rabbitmq:4.0.2-management"));
-    }
+	@Bean
+	@ServiceConnection
+	PostgreSQLContainer<?> postgresContainer() {
+		return new PostgreSQLContainer<>(DockerImageName.parse("postgres:15-alpine"));
+	}
+
+	@Bean
+	@ServiceConnection
+	RabbitMQContainer rabbitContainer() {
+		return new RabbitMQContainer(DockerImageName.parse("rabbitmq:4.0.2-management"));
+	}
+
 }

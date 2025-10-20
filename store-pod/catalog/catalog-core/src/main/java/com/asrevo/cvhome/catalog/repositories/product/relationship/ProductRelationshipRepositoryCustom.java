@@ -7,13 +7,14 @@ import java.util.List;
 
 public interface ProductRelationshipRepositoryCustom {
 
-    List<ProductRelationship> getByGroup(StoreMerchantId store, String group);
+	List<ProductRelationship> getByGroup(StoreMerchantId store, String group);
 
-    List<ProductRelationship> getGroups(StoreMerchantId store);
+	List<ProductRelationship> getGroups(StoreMerchantId store);
 
-    ProductRelationship getGroup(StoreMerchantId store, String code);
+	ProductRelationship getGroup(StoreMerchantId store, String code);
 
-    List<ProductRelationship> getByType(StoreMerchantId store, String type);
+	List<ProductRelationship> getByType(StoreMerchantId store, String type);
 
-    List<ProductRelationship> listByProducts(Product product);
+	List<ProductRelationship> listByProducts(Product product);
+
 }

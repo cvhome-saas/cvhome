@@ -8,17 +8,17 @@ import java.io.IOException;
 
 public class CurrencyCodeSerializer extends StdSerializer<CurrencyCode> {
 
-    public CurrencyCodeSerializer() {
-        this(null);
-    }
+	public CurrencyCodeSerializer() {
+		this(null);
+	}
 
-    protected CurrencyCodeSerializer(Class<CurrencyCode> t) {
-        super(t);
-    }
+	protected CurrencyCodeSerializer(Class<CurrencyCode> t) {
+		super(t);
+	}
 
-    @Override
-    public void serialize(CurrencyCode value, JsonGenerator gen, SerializerProvider provider)
-            throws IOException {
-        gen.writeString(value.code());
-    }
+	@Override
+	public void serialize(CurrencyCode value, JsonGenerator gen, SerializerProvider provider) throws IOException {
+		gen.writeString(value.code());
+	}
+
 }

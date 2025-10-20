@@ -9,8 +9,11 @@ import lombok.Setter;
 @Setter
 @Deprecated
 public class ReadableContentPageList extends ReadableList<ReadableContentPage> {
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
+
 }

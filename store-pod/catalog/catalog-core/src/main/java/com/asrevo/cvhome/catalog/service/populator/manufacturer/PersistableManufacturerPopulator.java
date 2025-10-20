@@ -19,63 +19,55 @@ import org.apache.commons.collections.CollectionUtils;
 @Setter
 @Getter
 public class PersistableManufacturerPopulator
-        extends AbstractDataPopulator<PersistableManufacturer, StoreMerchantId, Manufacturer> {
+		extends AbstractDataPopulator<PersistableManufacturer, StoreMerchantId, Manufacturer> {
 
-    @Override
-    public Manufacturer populate(
-            PersistableManufacturer source,
-            Manufacturer target,
-            StoreMerchantId store,
-            LanguageCode language)
-            throws ConversionException {
+	@Override
+	public Manufacturer populate(PersistableManufacturer source, Manufacturer target, StoreMerchantId store,
+			LanguageCode language) throws ConversionException {
 
-        try {
+		try {
 
-            target.setStoreMerchantId(store);
-            target.setCode(source.getCode());
+			target.setStoreMerchantId(store);
+			target.setCode(source.getCode());
 
-            if (!CollectionUtils.isEmpty(source.getDescriptions())) {
-                Set<com.asrevo.cvhome.catalog.entity.product.manufacturer.ManufacturerDescription>
-                        descriptions = new HashSet<>();
-                for (ManufacturerDescription description : source.getDescriptions()) {
-                    com.asrevo.cvhome.catalog.entity.product.manufacturer.ManufacturerDescription
-                            desc =
-                                    new com.asrevo.cvhome.catalog.entity.product.manufacturer
-                                            .ManufacturerDescription();
-                    if (desc.getId() != null && desc.getId() > 0) {
-                        desc.setId(description.getId());
-                    }
-                    if (target.getDescriptions() != null) {
-                        for (com.asrevo.cvhome.catalog.entity.product.manufacturer
-                                        .ManufacturerDescription
-                                d : target.getDescriptions()) {
-                            if (d.getLanguageCode().equals(description.getLanguage())
-                                    || desc.getId() != null
-                                            && d.getId().longValue() == desc.getId().longValue()) {
-                                desc = d;
-                            }
-                        }
-                    }
+			if (!CollectionUtils.isEmpty(source.getDescriptions())) {
+				Set<com.asrevo.cvhome.catalog.entity.product.manufacturer.ManufacturerDescription> descriptions = new HashSet<>();
+				for (ManufacturerDescription description : source.getDescriptions()) {
+					com.asrevo.cvhome.catalog.entity.product.manufacturer.ManufacturerDescription desc = new com.asrevo.cvhome.catalog.entity.product.manufacturer.ManufacturerDescription();
+					if (desc.getId() != null && desc.getId() > 0) {
+						desc.setId(description.getId());
+					}
+					if (target.getDescriptions() != null) {
+						for (com.asrevo.cvhome.catalog.entity.product.manufacturer.ManufacturerDescription d : target
+							.getDescriptions()) {
+							if (d.getLanguageCode().equals(description.getLanguage())
+									|| desc.getId() != null && d.getId().longValue() == desc.getId().longValue()) {
+								desc = d;
+							}
+						}
+					}
 
-                    desc.setManufacturer(target);
-                    desc.setDescription(description.getDescription());
-                    desc.setName(description.getName());
-                    desc.setLanguageCode(description.getLanguage());
-                    descriptions.add(desc);
-                }
-                target.setDescriptions(descriptions);
-            }
+					desc.setManufacturer(target);
+					desc.setDescription(description.getDescription());
+					desc.setName(description.getName());
+					desc.setLanguageCode(description.getLanguage());
+					descriptions.add(desc);
+				}
+				target.setDescriptions(descriptions);
+			}
 
-        } catch (Exception e) {
-            throw new ConversionException(e);
-        }
+		}
+		catch (Exception e) {
+			throw new ConversionException(e);
+		}
 
-        return target;
-    }
+		return target;
+	}
 
-    @Override
-    protected Manufacturer createTarget() {
-        // TODO Auto-generated method stub
-        return null;
-    }
+	@Override
+	protected Manufacturer createTarget() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

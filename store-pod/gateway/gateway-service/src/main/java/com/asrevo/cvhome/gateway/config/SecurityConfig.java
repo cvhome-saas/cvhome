@@ -39,13 +39,12 @@ import reactor.core.publisher.Mono;
 @Configuration
 @EnableWebFluxSecurity
 public class SecurityConfig {
-    private final RedirectingServerAuthenticationSuccessHandler
-            redirectingServerAuthenticationSuccessHandler =
-                    new RedirectingServerAuthenticationSuccessHandler();
 
-    private static Mono<ServerWebExchangeMatcher.MatchResult> matches(ServerWebExchange exchange) {
-        ServerHttpRequest request = exchange.getRequest();
-        // @formatter:off
+	private final RedirectingServerAuthenticationSuccessHandler redirectingServerAuthenticationSuccessHandler = new RedirectingServerAuthenticationSuccessHandler();
+
+	private static Mono<ServerWebExchangeMatcher.MatchResult> matches(ServerWebExchange exchange) {
+		ServerHttpRequest request = exchange.getRequest();
+		// @formatter:off
         return (request.getMethod() != HttpMethod.GET
                         && !request.getPath().toString().startsWith("/auth")
                         && !request.getPath().toString().startsWith("/realms")
@@ -54,104 +53,83 @@ public class SecurityConfig {
                 ? match()
                 : notMatch();
         // @formatter:on
-    }
+	}
 
-    @SneakyThrows
-    private static Set<GrantedAuthority> extractAuthority(OAuth2AccessToken accessToken) {
-        SignedJWT parsed = SignedJWT.parse(accessToken.getTokenValue());
-        Map<String, List<String>> realmAccess =
-                (Map<String, List<String>>) parsed.getPayload().toJSONObject().get("realm_access");
-        return KeyClockJwtGrantedAuthoritiesConverter.getRolesAuthorities(realmAccess).stream()
-                .map(SimpleGrantedAuthority::new)
-                .collect(Collectors.toSet());
-    }
+	@SneakyThrows
+	private static Set<GrantedAuthority> extractAuthority(OAuth2AccessToken accessToken) {
+		SignedJWT parsed = SignedJWT.parse(accessToken.getTokenValue());
+		Map<String, List<String>> realmAccess = (Map<String, List<String>>) parsed.getPayload()
+			.toJSONObject()
+			.get("realm_access");
+		return KeyClockJwtGrantedAuthoritiesConverter.getRolesAuthorities(realmAccess)
+			.stream()
+			.map(SimpleGrantedAuthority::new)
+			.collect(Collectors.toSet());
+	}
 
-    @Bean
-    public SecurityWebFilterChain springSecurityFilterChain(
-            ServerHttpSecurity http,
-            ReactiveClientRegistrationRepository clientRegistrationRepository) {
-        // Instantiate your custom resolver
-        CapturingServerOAuth2AuthorizationRequestResolver customAuthorizationRequestResolver =
-                new CapturingServerOAuth2AuthorizationRequestResolver(clientRegistrationRepository);
+	@Bean
+	public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http,
+			ReactiveClientRegistrationRepository clientRegistrationRepository) {
+		// Instantiate your custom resolver
+		CapturingServerOAuth2AuthorizationRequestResolver customAuthorizationRequestResolver = new CapturingServerOAuth2AuthorizationRequestResolver(
+				clientRegistrationRepository);
 
-        return http.authorizeExchange(it -> it.anyExchange().permitAll())
-                .oauth2Login(
-                        oauth2 ->
-                                oauth2
-                                        // Use the custom resolver here
-                                        .authorizationRequestResolver(
-                                                customAuthorizationRequestResolver)
-                                        .authenticationSuccessHandler(
-                                                this.redirectingServerAuthenticationSuccessHandler)
-                        // You can also customize authenticationSuccessHandler or
-                        // authenticationFailureHandler if needed
-                        )
-                .oauth2Client(withDefaults())
-                .logout(ServerHttpSecurity.LogoutSpec::disable)
-                .csrf(
-                        ServerHttpSecurity.CsrfSpec::disable
-                        //                                .csrfTokenRequestHandler(new
-                        // ServerCsrfTokenRequestAttributeHandler())
-                        //                                .csrfTokenRepository(tokenRepository)
-                        //
-                        // .requireCsrfProtectionMatcher(SecurityConfig::matches)
-                        )
-                /*
-                                .cors(httpSecurityCorsConfigurer ->
-                                        httpSecurityCorsConfigurer.configurationSource(request ->
-                                                buildReactivCorsConfiguration()
-                                        )
-                                )
-                */
-                .build();
-        // @formatter:on
-    }
+		return http.authorizeExchange(it -> it.anyExchange().permitAll())
+			.oauth2Login(oauth2 -> oauth2
+				// Use the custom resolver here
+				.authorizationRequestResolver(customAuthorizationRequestResolver)
+				.authenticationSuccessHandler(this.redirectingServerAuthenticationSuccessHandler)
+			// You can also customize authenticationSuccessHandler or
+			// authenticationFailureHandler if needed
+			)
+			.oauth2Client(withDefaults())
+			.logout(ServerHttpSecurity.LogoutSpec::disable)
+			.csrf(ServerHttpSecurity.CsrfSpec::disable
+			// .csrfTokenRequestHandler(new
+			// ServerCsrfTokenRequestAttributeHandler())
+			// .csrfTokenRepository(tokenRepository)
+			//
+			// .requireCsrfProtectionMatcher(SecurityConfig::matches)
+			)
+			/*
+			 * .cors(httpSecurityCorsConfigurer ->
+			 * httpSecurityCorsConfigurer.configurationSource(request ->
+			 * buildReactivCorsConfiguration() ) )
+			 */
+			.build();
+		// @formatter:on
+	}
 
-    @Bean
-    public CookieServerCsrfTokenRepository cookieServerCsrfTokenRepository() {
-        return CookieServerCsrfTokenRepository.withHttpOnlyFalse();
-    }
+	@Bean
+	public CookieServerCsrfTokenRepository cookieServerCsrfTokenRepository() {
+		return CookieServerCsrfTokenRepository.withHttpOnlyFalse();
+	}
 
-    @Bean
-    public WebSessionIdResolver webSessionIdResolver() {
-        CookieWebSessionIdResolver resolver = new CookieWebSessionIdResolver();
-        resolver.setCookieName("STORE-POD-GATEWAY-JSESSIONID");
-        resolver.addCookieInitializer((builder) -> builder.path("/"));
-        return resolver;
-    }
+	@Bean
+	public WebSessionIdResolver webSessionIdResolver() {
+		CookieWebSessionIdResolver resolver = new CookieWebSessionIdResolver();
+		resolver.setCookieName("STORE-POD-GATEWAY-JSESSIONID");
+		resolver.addCookieInitializer((builder) -> builder.path("/"));
+		return resolver;
+	}
 
-    @Bean
-    public ReactiveOAuth2UserService<OidcUserRequest, OidcUser> oidcUserService() {
-        final OidcReactiveOAuth2UserService delegate = new OidcReactiveOAuth2UserService();
-        return (userRequest) ->
-                delegate.loadUser(userRequest)
-                        .flatMap(
-                                (oidcUser) -> {
-                                    OAuth2AccessToken accessToken = userRequest.getAccessToken();
-                                    Set<GrantedAuthority> r = extractAuthority(accessToken);
-                                    ClientRegistration.ProviderDetails providerDetails =
-                                            userRequest
-                                                    .getClientRegistration()
-                                                    .getProviderDetails();
-                                    String userNameAttributeName =
-                                            providerDetails
-                                                    .getUserInfoEndpoint()
-                                                    .getUserNameAttributeName();
-                                    if (StringUtils.hasText(userNameAttributeName)) {
-                                        oidcUser =
-                                                new DefaultOidcUser(
-                                                        r,
-                                                        oidcUser.getIdToken(),
-                                                        oidcUser.getUserInfo(),
-                                                        userNameAttributeName);
-                                    } else {
-                                        oidcUser =
-                                                new DefaultOidcUser(
-                                                        r,
-                                                        oidcUser.getIdToken(),
-                                                        oidcUser.getUserInfo());
-                                    }
-                                    return Mono.just(oidcUser);
-                                });
-    }
+	@Bean
+	public ReactiveOAuth2UserService<OidcUserRequest, OidcUser> oidcUserService() {
+		final OidcReactiveOAuth2UserService delegate = new OidcReactiveOAuth2UserService();
+		return (userRequest) -> delegate.loadUser(userRequest).flatMap((oidcUser) -> {
+			OAuth2AccessToken accessToken = userRequest.getAccessToken();
+			Set<GrantedAuthority> r = extractAuthority(accessToken);
+			ClientRegistration.ProviderDetails providerDetails = userRequest.getClientRegistration()
+				.getProviderDetails();
+			String userNameAttributeName = providerDetails.getUserInfoEndpoint().getUserNameAttributeName();
+			if (StringUtils.hasText(userNameAttributeName)) {
+				oidcUser = new DefaultOidcUser(r, oidcUser.getIdToken(), oidcUser.getUserInfo(), userNameAttributeName);
+			}
+			else {
+				oidcUser = new DefaultOidcUser(r, oidcUser.getIdToken(), oidcUser.getUserInfo());
+			}
+			return Mono.just(oidcUser);
+		});
+	}
+
 }

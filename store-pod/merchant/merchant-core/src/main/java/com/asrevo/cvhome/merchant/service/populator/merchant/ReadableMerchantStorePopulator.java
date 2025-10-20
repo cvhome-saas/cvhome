@@ -26,133 +26,123 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class ReadableMerchantStorePopulator
-        extends AbstractDataPopulator<MerchantStore, MerchantStore, ReadableMerchantStore> {
+		extends AbstractDataPopulator<MerchantStore, MerchantStore, ReadableMerchantStore> {
 
-    private final ImageFilePath filePath;
+	private final ImageFilePath filePath;
 
-    public ReadableMerchantStorePopulator(ImageFilePath filePath) {
-        this.filePath = filePath;
-    }
+	public ReadableMerchantStorePopulator(ImageFilePath filePath) {
+		this.filePath = filePath;
+	}
 
-    @Override
-    public ReadableMerchantStore populate(
-            MerchantStore source,
-            ReadableMerchantStore target,
-            MerchantStore store,
-            LanguageCode language) {
+	@Override
+	public ReadableMerchantStore populate(MerchantStore source, ReadableMerchantStore target, MerchantStore store,
+			LanguageCode language) {
 
-        if (target == null) {
-            target = new ReadableMerchantStore();
-        }
+		if (target == null) {
+			target = new ReadableMerchantStore();
+		}
 
-        target.setId(source.getId().getId());
-        target.setDefaultLanguage(source.getDefaultLanguageCode());
-        target.setCountryIsoCode(source.getCountry());
+		target.setId(source.getId().getId());
+		target.setDefaultLanguage(source.getDefaultLanguageCode());
+		target.setCountryIsoCode(source.getCountry());
 
-        target.setCurrency(source.getCurrency());
-        target.setPhone(source.getStorephone());
+		target.setCurrency(source.getCurrency());
+		target.setPhone(source.getStorephone());
 
-        ReadableAddress address = new ReadableAddress();
-        address.setAddress(source.getStoreaddress());
-        address.setCity(source.getStorecity());
-        if (source.getCountry() != null) {
-            address.setCountry(source.getCountry());
-        }
+		ReadableAddress address = new ReadableAddress();
+		address.setAddress(source.getStoreaddress());
+		address.setCity(source.getStorecity());
+		if (source.getCountry() != null) {
+			address.setCountry(source.getCountry());
+		}
 
-        target.setDimension(MeasureUnit.valueOf(source.getSeizeunitcode()));
-        target.setWeight(WeightUnit.valueOf(source.getWeightunitcode()));
+		target.setDimension(MeasureUnit.valueOf(source.getSeizeunitcode()));
+		target.setWeight(WeightUnit.valueOf(source.getWeightunitcode()));
 
-        if (source.getZone() != null) {
-            address.setStateProvince(source.getZone());
-            address.setStateProvince(source.getZone());
-        }
+		if (source.getZone() != null) {
+			address.setStateProvince(source.getZone());
+			address.setStateProvince(source.getZone());
+		}
 
-        if (source.getStorestateprovince() != null) {
-            address.setStateProvince(source.getStorestateprovince());
-        }
+		if (source.getStorestateprovince() != null) {
+			address.setStateProvince(source.getStorestateprovince());
+		}
 
-        if (source.getStoreLogo() != null && !source.getStoreLogo().trim().isEmpty()) {
-            ReadableImage image = new ReadableImage();
-            image.setName(source.getStoreLogo());
-            if (filePath != null) {
-                image.setPath(
-                        filePath.buildStoreLogoFilePath(source.getId(), source.getStoreLogo()));
-            }
-            target.setLogo(image);
-        }
+		if (source.getStoreLogo() != null && !source.getStoreLogo().trim().isEmpty()) {
+			ReadableImage image = new ReadableImage();
+			image.setName(source.getStoreLogo());
+			if (filePath != null) {
+				image.setPath(filePath.buildStoreLogoFilePath(source.getId(), source.getStoreLogo()));
+			}
+			target.setLogo(image);
+		}
 
-        if (source.getStoreBanner() != null && !source.getStoreBanner().trim().isEmpty()) {
-            ReadableImage image = new ReadableImage();
-            image.setName(source.getStoreBanner());
-            if (filePath != null) {
-                image.setPath(
-                        filePath.buildStoreBannerFilePath(source.getId(), source.getStoreBanner()));
-            }
-            target.setBanner(image);
-        }
+		if (source.getStoreBanner() != null && !source.getStoreBanner().trim().isEmpty()) {
+			ReadableImage image = new ReadableImage();
+			image.setName(source.getStoreBanner());
+			if (filePath != null) {
+				image.setPath(filePath.buildStoreBannerFilePath(source.getId(), source.getStoreBanner()));
+			}
+			target.setBanner(image);
+		}
 
-        address.setPostalCode(source.getStorepostalcode());
+		address.setPostalCode(source.getStorepostalcode());
 
-        target.setAddress(address);
+		target.setAddress(address);
 
-        target.setCurrencyFormatNational(source.isCurrencyFormatNational());
-        target.setEmail(source.getStoreEmailAddress());
-        target.setName(source.getStorename());
-        target.setOrg(source.getOrg());
-        target.setTheme(source.getTheme());
-        target.setColorTheme(source.getColorTheme());
-        target.setId(source.getId().getId());
-        target.setInBusinessSince(DateUtil.formatDate(source.getInBusinessSince()));
-        target.setUseCache(source.isUseCache());
+		target.setCurrencyFormatNational(source.isCurrencyFormatNational());
+		target.setEmail(source.getStoreEmailAddress());
+		target.setName(source.getStorename());
+		target.setOrg(source.getOrg());
+		target.setTheme(source.getTheme());
+		target.setColorTheme(source.getColorTheme());
+		target.setId(source.getId().getId());
+		target.setInBusinessSince(DateUtil.formatDate(source.getInBusinessSince()));
+		target.setUseCache(source.isUseCache());
 
-        if (source.getSliderImages() != null && !source.getSliderImages().isEmpty()) {
-            Set<ReadableSliderImage> images =
-                    source.getSliderImages().stream()
-                            .map(
-                                    it ->
-                                            new ReadableSliderImage(
-                                                    it.priority(),
-                                                    it.name(),
-                                                    filePath.buildStoreSliderFilePath(
-                                                            source.getId(), it.name())))
-                            .collect(Collectors.toSet());
-            target.setSliderImages(images);
-        }
-        target.setSocialLinks(source.getSocialLinks());
+		if (source.getSliderImages() != null && !source.getSliderImages().isEmpty()) {
+			Set<ReadableSliderImage> images = source.getSliderImages()
+				.stream()
+				.map(it -> new ReadableSliderImage(it.priority(), it.name(),
+						filePath.buildStoreSliderFilePath(source.getId(), it.name())))
+				.collect(Collectors.toSet());
+			target.setSliderImages(images);
+		}
+		target.setSocialLinks(source.getSocialLinks());
 
-        if (source.getLanguages() != null && !source.getLanguages().isEmpty()) {
-            List<ReadableLanguage> supported = new ArrayList<>();
-            for (LanguageCode lang : source.getLanguages()) {
-                ReadableLanguage l = new ReadableLanguage();
-                l.setId(lang);
-                l.setCode(lang);
-                supported.add(l);
-            }
-            target.setSupportedLanguages(
-                    supported.stream()
-                            .map(ReadableLanguage::getCode)
-                            .map(LanguageCode::code)
-                            .collect(Collectors.toList()));
-        }
+		if (source.getLanguages() != null && !source.getLanguages().isEmpty()) {
+			List<ReadableLanguage> supported = new ArrayList<>();
+			for (LanguageCode lang : source.getLanguages()) {
+				ReadableLanguage l = new ReadableLanguage();
+				l.setId(lang);
+				l.setCode(lang);
+				supported.add(l);
+			}
+			target.setSupportedLanguages(supported.stream()
+				.map(ReadableLanguage::getCode)
+				.map(LanguageCode::code)
+				.collect(Collectors.toList()));
+		}
 
-        if (source.getAuditSection() != null) {
-            ReadableAudit audit = new ReadableAudit();
-            if (source.getAuditSection().getDateCreated() != null) {
-                audit.setCreated(DateUtil.formatDate(source.getAuditSection().getDateCreated()));
-            }
-            if (source.getAuditSection().getDateModified() != null) {
-                audit.setModified(DateUtil.formatDate(source.getAuditSection().getDateCreated()));
-            }
-            audit.setUser(source.getAuditSection().getModifiedBy());
-            target.setReadableAudit(audit);
-        }
+		if (source.getAuditSection() != null) {
+			ReadableAudit audit = new ReadableAudit();
+			if (source.getAuditSection().getDateCreated() != null) {
+				audit.setCreated(DateUtil.formatDate(source.getAuditSection().getDateCreated()));
+			}
+			if (source.getAuditSection().getDateModified() != null) {
+				audit.setModified(DateUtil.formatDate(source.getAuditSection().getDateCreated()));
+			}
+			audit.setUser(source.getAuditSection().getModifiedBy());
+			target.setReadableAudit(audit);
+		}
 
-        return target;
-    }
+		return target;
+	}
 
-    @Override
-    protected ReadableMerchantStore createTarget() {
-        // TODO Auto-generated method stub
-        return null;
-    }
+	@Override
+	protected ReadableMerchantStore createTarget() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

@@ -8,8 +8,10 @@ import org.springframework.context.annotation.Import;
 @SpringBootApplication
 @Import(CvhomeSharedConfig.class)
 public class StoreCoreGatewayApplication {
-    @lombok.Generated
-    public static void main(String[] args) {
-        SpringApplication.run(StoreCoreGatewayApplication.class, args);
-    }
+
+	@lombok.Generated
+	public static void main(String[] args) {
+		SpringApplication.run(StoreCoreGatewayApplication.class, args);
+	}
+
 }

@@ -11,17 +11,18 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 @Slf4j
 public class ManagerStoreCreatedEventImpl implements EventImpl<StoreCreatedEvent> {
-    private final StoreProvisioningService storeProvisioningService;
 
-    @Override
-    public void process(StoreCreatedEvent event) {
-        log.info("Received store created event: {}", event);
-        storeProvisioningService.provisioning(
-                event.orgId(), event.store(), event.podId(), event.request());
-    }
+	private final StoreProvisioningService storeProvisioningService;
 
-    @Override
-    public String type() {
-        return StoreCreatedEvent.class.getSimpleName();
-    }
+	@Override
+	public void process(StoreCreatedEvent event) {
+		log.info("Received store created event: {}", event);
+		storeProvisioningService.provisioning(event.orgId(), event.store(), event.podId(), event.request());
+	}
+
+	@Override
+	public String type() {
+		return StoreCreatedEvent.class.getSimpleName();
+	}
+
 }

@@ -9,23 +9,22 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-public interface ProductAvailabilityService
-        extends SalesManagerEntityService<Long, ProductAvailability> {
+public interface ProductAvailabilityService extends SalesManagerEntityService<Long, ProductAvailability> {
 
-    ProductAvailability saveOrUpdate(ProductAvailability availability) throws ServiceException;
+	ProductAvailability saveOrUpdate(ProductAvailability availability) throws ServiceException;
 
-    Page<ProductAvailability> listByProduct(
-            Long productId, StoreMerchantId store, Pageable pageable);
+	Page<ProductAvailability> listByProduct(Long productId, StoreMerchantId store, Pageable pageable);
 
-    /**
-     * Get by sku
-     */
-    Page<ProductAvailability> getBySku(String sku, Pageable pageable);
+	/**
+	 * Get by sku
+	 */
+	Page<ProductAvailability> getBySku(String sku, Pageable pageable);
 
-    /**
-     * All availability by product / product variant sku and store
-     */
-    List<ProductAvailability> getBySku(String sku, StoreMerchantId store);
+	/**
+	 * All availability by product / product variant sku and store
+	 */
+	List<ProductAvailability> getBySku(String sku, StoreMerchantId store);
 
-    Optional<ProductAvailability> getById(Long availabilityId, StoreMerchantId store);
+	Optional<ProductAvailability> getById(Long availabilityId, StoreMerchantId store);
+
 }

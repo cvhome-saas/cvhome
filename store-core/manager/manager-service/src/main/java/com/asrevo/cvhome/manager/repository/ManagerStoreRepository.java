@@ -11,24 +11,21 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.QueryByExampleExecutor;
 
 public interface ManagerStoreRepository
-        extends CrudRepository<ManagerStoreEntity, ManagerStoreId>,
-                QueryByExampleExecutor<ManagerStoreEntity> {
+		extends CrudRepository<ManagerStoreEntity, ManagerStoreId>, QueryByExampleExecutor<ManagerStoreEntity> {
 
-    Boolean existsByName(String name);
+	Boolean existsByName(String name);
 
-    @Query(
-            """
-             select date(m.created_date) as date,count(date(m.created_date)) as value
-             from manager.manager_store m
-             where m.created_date between  :from and :to
-            group by date(m.created_date)""")
-    List<StatisticEntry> storeStatistic(Instant from, Instant to);
+	@Query("""
+			 select date(m.created_date) as date,count(date(m.created_date)) as value
+			 from manager.manager_store m
+			 where m.created_date between  :from and :to
+			group by date(m.created_date)""")
+	List<StatisticEntry> storeStatistic(Instant from, Instant to);
 
-    @Query(
-            "SELECT ms.* from manager.manager_store ms left join manager.manager_store_domain msd"
-                    + " on ms.id = msd.manager_store_id  where (msd.domain=:domain and"
-                    + " msd.domain_type='CUSTOM_DOMAIN') or ((msd.domain || '.' ||"
-                    + " :prefix||'-'||ms.pod_id ||'.' ||:base )=:domain  and"
-                    + " msd.domain_type='SUB_DOMAIN') ")
-    Optional<ManagerStoreEntity> findByDomain(String domain, String base, String prefix);
+	@Query("SELECT ms.* from manager.manager_store ms left join manager.manager_store_domain msd"
+			+ " on ms.id = msd.manager_store_id  where (msd.domain=:domain and"
+			+ " msd.domain_type='CUSTOM_DOMAIN') or ((msd.domain || '.' ||"
+			+ " :prefix||'-'||ms.pod_id ||'.' ||:base )=:domain  and" + " msd.domain_type='SUB_DOMAIN') ")
+	Optional<ManagerStoreEntity> findByDomain(String domain, String base, String prefix);
+
 }

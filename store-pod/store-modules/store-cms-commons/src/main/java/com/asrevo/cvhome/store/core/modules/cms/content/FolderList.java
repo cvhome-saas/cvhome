@@ -5,5 +5,6 @@ import java.util.Optional;
 
 public interface FolderList {
 
-    List<String> listFolders(final String merchantStoreCode, Optional<String> path);
+	List<String> listFolders(final String merchantStoreCode, Optional<String> path);
+
 }

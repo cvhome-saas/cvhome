@@ -27,39 +27,23 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Customer statistic resource", description = "Customer statistic")
 @Slf4j
 public class CustomerStatisticApi {
-    private final OrderRepository orderRepository;
 
-    @RequestMapping(
-            value = {"/private/customer-statistic"},
-            method = RequestMethod.POST)
-    @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-        @Parameter(
-                name = "lang",
-                schema =
-                        @Schema(
-                                name = "lang",
-                                type = "string",
-                                defaultValue = Constants.DEFAULT_LANGUAGE))
-    })
-    @ConditionalOnApiStatus
-    public StatisticList customerStatistic(
-            @Parameter(hidden = true) StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language,
-            @RequestBody StatisticRange range) {
-        List<StatisticEntry> entries =
-                orderRepository.customerStatistic(
-                        Date.from(range.fromDate().toInstant()),
-                        Date.from(range.toDate().toInstant()),
-                        merchantStore);
-        return new StatisticList(entries);
-    }
+	private final OrderRepository orderRepository;
+
+	@RequestMapping(value = { "/private/customer-statistic" }, method = RequestMethod.POST)
+	@ResponseStatus(HttpStatus.OK)
+	@ResponseBody
+	@Parameters({
+			@Parameter(name = "store",
+					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+			@Parameter(name = "lang",
+					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	@ConditionalOnApiStatus
+	public StatisticList customerStatistic(@Parameter(hidden = true) StoreMerchantId merchantStore,
+			@Parameter(hidden = true) LanguageCode language, @RequestBody StatisticRange range) {
+		List<StatisticEntry> entries = orderRepository.customerStatistic(Date.from(range.fromDate().toInstant()),
+				Date.from(range.toDate().toInstant()), merchantStore);
+		return new StatisticList(entries);
+	}
+
 }

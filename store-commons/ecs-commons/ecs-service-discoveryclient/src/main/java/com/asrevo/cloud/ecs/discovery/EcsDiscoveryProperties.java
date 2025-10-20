@@ -12,11 +12,19 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Getter
 @Setter
 public class EcsDiscoveryProperties {
-    public static final String PREFIX = "spring.cloud.ecs.discovery";
-    private String namespace;
-    private String namespaceId;
-    private boolean enabled = true;
-    private Integer defaultPort = 8080;
-    private Map<String, Integer> servicePorts = new HashMap<>();
-    private List<String> includeServices = new ArrayList<>();
+
+	public static final String PREFIX = "spring.cloud.ecs.discovery";
+
+	private String namespace;
+
+	private String namespaceId;
+
+	private boolean enabled = true;
+
+	private Integer defaultPort = 8080;
+
+	private Map<String, Integer> servicePorts = new HashMap<>();
+
+	private List<String> includeServices = new ArrayList<>();
+
 }

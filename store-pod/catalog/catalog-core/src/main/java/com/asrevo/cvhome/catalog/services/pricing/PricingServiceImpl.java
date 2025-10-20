@@ -21,35 +21,36 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class PricingServiceImpl implements PricingService {
 
-    private final ProductPriceUtils priceUtil;
-    private final ExternalMerchantStoreService externalMerchantStoreService;
+	private final ProductPriceUtils priceUtil;
 
-    public PricingServiceImpl(ExternalMerchantStoreService externalMerchantStoreService) {
-        this.externalMerchantStoreService = externalMerchantStoreService;
-        this.priceUtil = new ProductPriceUtils();
-    }
+	private final ExternalMerchantStoreService externalMerchantStoreService;
 
-    @Override
-    public FinalPrice calculateProductPrice(Product product) throws ServiceException {
-        return priceUtil.getFinalPrice(product);
-    }
+	public PricingServiceImpl(ExternalMerchantStoreService externalMerchantStoreService) {
+		this.externalMerchantStoreService = externalMerchantStoreService;
+		this.priceUtil = new ProductPriceUtils();
+	}
 
-    @Override
-    public String getDisplayAmount(BigDecimal amount, StoreMerchantId store)
-            throws ServiceException {
-        try {
-            MerchantStorePricingBase merchantStore = externalMerchantStoreService.getStore(store);
-            return PriceUtils.getStoreFormatedAmountWithCurrency(merchantStore, amount);
-        } catch (Exception e) {
-            log.error("An error occured when trying to format an amount {}", amount.toString());
-            throw new ServiceException(e);
-        }
-    }
+	@Override
+	public FinalPrice calculateProductPrice(Product product) throws ServiceException {
+		return priceUtil.getFinalPrice(product);
+	}
 
-    @Override
-    public FinalPrice calculateProductPrice(ProductAvailability availability)
-            throws ServiceException {
+	@Override
+	public String getDisplayAmount(BigDecimal amount, StoreMerchantId store) throws ServiceException {
+		try {
+			MerchantStorePricingBase merchantStore = externalMerchantStoreService.getStore(store);
+			return PriceUtils.getStoreFormatedAmountWithCurrency(merchantStore, amount);
+		}
+		catch (Exception e) {
+			log.error("An error occured when trying to format an amount {}", amount.toString());
+			throw new ServiceException(e);
+		}
+	}
 
-        return priceUtil.getFinalPrice(availability);
-    }
+	@Override
+	public FinalPrice calculateProductPrice(ProductAvailability availability) throws ServiceException {
+
+		return priceUtil.getFinalPrice(availability);
+	}
+
 }

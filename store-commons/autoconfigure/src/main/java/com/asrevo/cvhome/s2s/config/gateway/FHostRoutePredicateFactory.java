@@ -14,50 +14,52 @@ import org.springframework.web.server.ServerWebExchange;
 /**
  * @author Spencer Gibb
  */
-public class FHostRoutePredicateFactory
-        extends AbstractRoutePredicateFactory<FHostRoutePredicateFactory.Config> {
+public class FHostRoutePredicateFactory extends AbstractRoutePredicateFactory<FHostRoutePredicateFactory.Config> {
 
-    public FHostRoutePredicateFactory() {
-        super(Config.class);
-    }
+	public FHostRoutePredicateFactory() {
+		super(Config.class);
+	}
 
-    @Override
-    public List<String> shortcutFieldOrder() {
-        return Collections.singletonList("host");
-    }
+	@Override
+	public List<String> shortcutFieldOrder() {
+		return Collections.singletonList("host");
+	}
 
-    @Override
-    public ShortcutType shortcutType() {
-        return ShortcutType.GATHER_LIST;
-    }
+	@Override
+	public ShortcutType shortcutType() {
+		return ShortcutType.GATHER_LIST;
+	}
 
-    @Override
-    public Predicate<ServerWebExchange> apply(Config config) {
-        return new GatewayPredicate() {
-            @Override
-            public boolean test(ServerWebExchange exchange) {
-                return Optional.ofNullable(exchange.getRequest().getHeaders().getHost())
-                        .map(address -> config.host.contains(address.getHostName()))
-                        .orElse(false);
-            }
+	@Override
+	public Predicate<ServerWebExchange> apply(Config config) {
+		return new GatewayPredicate() {
+			@Override
+			public boolean test(ServerWebExchange exchange) {
+				return Optional.ofNullable(exchange.getRequest().getHeaders().getHost())
+					.map(address -> config.host.contains(address.getHostName()))
+					.orElse(false);
+			}
 
-            @Override
-            public Object getConfig() {
-                return config;
-            }
+			@Override
+			public Object getConfig() {
+				return config;
+			}
 
-            @Override
-            public String toString() {
-                return String.format("Hosts: %s", config.getHost());
-            }
-        };
-    }
+			@Override
+			public String toString() {
+				return String.format("Hosts: %s", config.getHost());
+			}
+		};
+	}
 
-    @Setter
-    @Getter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static final class Config {
-        private Set<String> host;
-    }
+	@Setter
+	@Getter
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static final class Config {
+
+		private Set<String> host;
+
+	}
+
 }

@@ -21,116 +21,112 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 @Component
-public class PersistableProductAttributeMapper
-        implements Mapper<PersistableProductAttribute, ProductAttribute> {
+public class PersistableProductAttributeMapper implements Mapper<PersistableProductAttribute, ProductAttribute> {
 
-    private final ProductOptionService productOptionService;
-    private final ProductOptionValueService productOptionValueService;
-    private final ProductService productService;
-    private final PersistableProductOptionValueMapper persistableProductOptionValueMapper;
+	private final ProductOptionService productOptionService;
 
-    public PersistableProductAttributeMapper(
-            ProductOptionService productOptionService,
-            ProductOptionValueService productOptionValueService,
-            ProductService productService,
-            PersistableProductOptionValueMapper persistableProductOptionValueMapper) {
-        this.productOptionService = productOptionService;
-        this.productOptionValueService = productOptionValueService;
-        this.productService = productService;
-        this.persistableProductOptionValueMapper = persistableProductOptionValueMapper;
-    }
+	private final ProductOptionValueService productOptionValueService;
 
-    @Override
-    public ProductAttribute convert(
-            PersistableProductAttribute source, StoreMerchantId store, LanguageCode language) {
-        ProductAttribute attribute = new ProductAttribute();
-        return merge(source, attribute, store, language);
-    }
+	private final ProductService productService;
 
-    @Override
-    public ProductAttribute merge(
-            PersistableProductAttribute source,
-            ProductAttribute destination,
-            StoreMerchantId store,
-            LanguageCode language) {
+	private final PersistableProductOptionValueMapper persistableProductOptionValueMapper;
 
-        ProductOption productOption;
+	public PersistableProductAttributeMapper(ProductOptionService productOptionService,
+			ProductOptionValueService productOptionValueService, ProductService productService,
+			PersistableProductOptionValueMapper persistableProductOptionValueMapper) {
+		this.productOptionService = productOptionService;
+		this.productOptionValueService = productOptionValueService;
+		this.productService = productService;
+		this.persistableProductOptionValueMapper = persistableProductOptionValueMapper;
+	}
 
-        if (!StringUtils.isBlank(source.getOption().getCode())) {
-            productOption = productOptionService.getByCode(store, source.getOption().getCode());
-        } else {
-            Assert.notNull(source.getOption().getId(), "Product option id is null");
-            productOption = productOptionService.getById(source.getOption().getId());
-        }
+	@Override
+	public ProductAttribute convert(PersistableProductAttribute source, StoreMerchantId store, LanguageCode language) {
+		ProductAttribute attribute = new ProductAttribute();
+		return merge(source, attribute, store, language);
+	}
 
-        if (productOption == null) {
-            throw new ConversionRuntimeException(
-                    "Product option id " + source.getOption().getId() + " does not exist");
-        }
+	@Override
+	public ProductAttribute merge(PersistableProductAttribute source, ProductAttribute destination,
+			StoreMerchantId store, LanguageCode language) {
 
-        ProductOptionValue productOptionValue;
+		ProductOption productOption;
 
-        if (!StringUtils.isBlank(source.getOptionValue().getCode())) {
-            productOptionValue =
-                    productOptionValueService.getByCode(store, source.getOptionValue().getCode());
-        } else if (source.getProductId() != null && source.getOptionValue().getId() > 0) {
-            productOptionValue = productOptionValueService.getById(source.getOptionValue().getId());
-        } else {
-            // ProductOption value is text
-            productOptionValue = new ProductOptionValue();
-            productOptionValue.setProductOptionDisplayOnly(true);
-            productOptionValue.setCode(UUID.randomUUID().toString());
-            productOptionValue.setStoreMerchantId(store);
-        }
+		if (!StringUtils.isBlank(source.getOption().getCode())) {
+			productOption = productOptionService.getByCode(store, source.getOption().getCode());
+		}
+		else {
+			Assert.notNull(source.getOption().getId(), "Product option id is null");
+			productOption = productOptionService.getById(source.getOption().getId());
+		}
 
-        if (!CollectionUtils.isEmpty((source.getOptionValue().getDescriptions()))) {
-            productOptionValue =
-                    persistableProductOptionValueMapper.merge(
-                            source.getOptionValue(), productOptionValue, store, language);
-            try {
-                productOptionValueService.saveOrUpdate(productOptionValue);
-            } catch (ServiceException e) {
-                throw new ConversionRuntimeException("Error converting ProductOptionValue", e);
-            }
-        }
+		if (productOption == null) {
+			throw new ConversionRuntimeException("Product option id " + source.getOption().getId() + " does not exist");
+		}
 
-        if (productOptionValue == null && !source.isAttributeDisplayOnly()) {
-            throw new ConversionRuntimeException(
-                    "Product option value id "
-                            + source.getOptionValue().getId()
-                            + " does not exist");
-        }
+		ProductOptionValue productOptionValue;
 
-        if (!Objects.equals(productOption.getStoreMerchantId(), store)) {
-            throw new ConversionRuntimeException("Invalid product option id ");
-        }
+		if (!StringUtils.isBlank(source.getOptionValue().getCode())) {
+			productOptionValue = productOptionValueService.getByCode(store, source.getOptionValue().getCode());
+		}
+		else if (source.getProductId() != null && source.getOptionValue().getId() > 0) {
+			productOptionValue = productOptionValueService.getById(source.getOptionValue().getId());
+		}
+		else {
+			// ProductOption value is text
+			productOptionValue = new ProductOptionValue();
+			productOptionValue.setProductOptionDisplayOnly(true);
+			productOptionValue.setCode(UUID.randomUUID().toString());
+			productOptionValue.setStoreMerchantId(store);
+		}
 
-        if (productOptionValue != null
-                && !Objects.equals(productOptionValue.getStoreMerchantId(), store)) {
-            throw new ConversionRuntimeException("Invalid product option value id ");
-        }
+		if (!CollectionUtils.isEmpty((source.getOptionValue().getDescriptions()))) {
+			productOptionValue = persistableProductOptionValueMapper.merge(source.getOptionValue(), productOptionValue,
+					store, language);
+			try {
+				productOptionValueService.saveOrUpdate(productOptionValue);
+			}
+			catch (ServiceException e) {
+				throw new ConversionRuntimeException("Error converting ProductOptionValue", e);
+			}
+		}
 
-        if (source.getProductId() != null && source.getProductId() > 0) {
-            Product p = productService.getById(source.getProductId());
-            if (p == null) {
-                throw new ConversionRuntimeException("Invalid product id ");
-            }
-            destination.setProduct(p);
-        }
+		if (productOptionValue == null && !source.isAttributeDisplayOnly()) {
+			throw new ConversionRuntimeException(
+					"Product option value id " + source.getOptionValue().getId() + " does not exist");
+		}
 
-        if (destination.getId() != null && destination.getId() > 0) {
-            destination.setId(destination.getId());
-        } else {
-            destination.setId(null);
-        }
+		if (!Objects.equals(productOption.getStoreMerchantId(), store)) {
+			throw new ConversionRuntimeException("Invalid product option id ");
+		}
 
-        destination.setProductOption(productOption);
-        destination.setProductOptionValue(productOptionValue);
-        destination.setProductAttributePrice(source.getProductAttributePrice());
-        destination.setProductAttributeWeight(source.getProductAttributeWeight());
-        destination.setProductAttributePrice(source.getProductAttributePrice());
-        destination.setAttributeDisplayOnly(source.isAttributeDisplayOnly());
+		if (productOptionValue != null && !Objects.equals(productOptionValue.getStoreMerchantId(), store)) {
+			throw new ConversionRuntimeException("Invalid product option value id ");
+		}
 
-        return destination;
-    }
+		if (source.getProductId() != null && source.getProductId() > 0) {
+			Product p = productService.getById(source.getProductId());
+			if (p == null) {
+				throw new ConversionRuntimeException("Invalid product id ");
+			}
+			destination.setProduct(p);
+		}
+
+		if (destination.getId() != null && destination.getId() > 0) {
+			destination.setId(destination.getId());
+		}
+		else {
+			destination.setId(null);
+		}
+
+		destination.setProductOption(productOption);
+		destination.setProductOptionValue(productOptionValue);
+		destination.setProductAttributePrice(source.getProductAttributePrice());
+		destination.setProductAttributeWeight(source.getProductAttributeWeight());
+		destination.setProductAttributePrice(source.getProductAttributePrice());
+		destination.setAttributeDisplayOnly(source.isAttributeDisplayOnly());
+
+		return destination;
+	}
+
 }

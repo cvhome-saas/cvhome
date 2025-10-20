@@ -8,10 +8,10 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface CatalogRepository extends JpaRepository<Catalog, Long> {
 
-    @Query(
-            """
-                    select c from Catalog c
-                    left join fetch c.entry ce
-                    left join fetch ce.category cec where c.code=?1 and c.storeMerchantId = ?2""")
-    Optional<Catalog> findByCode(String code, StoreMerchantId storeMerchantId);
+	@Query("""
+			select c from Catalog c
+			left join fetch c.entry ce
+			left join fetch ce.category cec where c.code=?1 and c.storeMerchantId = ?2""")
+	Optional<Catalog> findByCode(String code, StoreMerchantId storeMerchantId);
+
 }

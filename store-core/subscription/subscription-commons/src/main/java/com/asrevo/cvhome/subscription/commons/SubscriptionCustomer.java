@@ -1,3 +1,4 @@
 package com.asrevo.cvhome.subscription.commons;
 
-public record SubscriptionCustomer(String orgId, String name) {}
+public record SubscriptionCustomer(String orgId, String name) {
+}

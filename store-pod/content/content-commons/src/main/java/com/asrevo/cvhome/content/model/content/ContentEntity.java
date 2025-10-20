@@ -10,9 +10,15 @@ import lombok.Setter;
 @Setter
 public class ContentEntity extends Entity {
 
-    @Serial private static final long serialVersionUID = 1L;
-    private String code;
-    private String contentType = "BOX";
-    private boolean isDisplayedInMenu;
-    private boolean visible;
+	@Serial
+	private static final long serialVersionUID = 1L;
+
+	private String code;
+
+	private String contentType = "BOX";
+
+	private boolean isDisplayedInMenu;
+
+	private boolean visible;
+
 }

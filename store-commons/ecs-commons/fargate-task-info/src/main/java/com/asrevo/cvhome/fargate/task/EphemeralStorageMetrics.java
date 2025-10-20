@@ -7,9 +7,11 @@ import lombok.Setter;
 @Getter
 @Setter
 public class EphemeralStorageMetrics {
-    @JsonProperty("Utilized")
-    private int utilized;
 
-    @JsonProperty("Reserved")
-    private int reserved;
+	@JsonProperty("Utilized")
+	private int utilized;
+
+	@JsonProperty("Reserved")
+	private int reserved;
+
 }

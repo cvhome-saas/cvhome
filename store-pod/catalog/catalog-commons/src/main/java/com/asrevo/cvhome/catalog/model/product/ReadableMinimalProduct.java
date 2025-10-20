@@ -12,15 +12,22 @@ import lombok.Setter;
 @Getter
 public class ReadableMinimalProduct extends ProductEntity implements Serializable {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private ReadableDescription description;
-    private ReadableProductPrice productPrice;
-    private String finalPrice = "0";
-    private String originalPrice = null;
-    private ReadableImage image;
-    private List<ReadableImage> images;
+	private ReadableDescription description;
+
+	private ReadableProductPrice productPrice;
+
+	private String finalPrice = "0";
+
+	private String originalPrice = null;
+
+	private ReadableImage image;
+
+	private List<ReadableImage> images;
+
 }

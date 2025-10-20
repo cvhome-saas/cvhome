@@ -10,9 +10,10 @@ import java.util.Map;
 
 public interface ZoneService extends SalesManagerEntityService<ZoneCode, Zone> {
 
-    Zone getByCode(ZoneCode code);
+	Zone getByCode(ZoneCode code);
 
-    Map<ZoneCode, Zone> getZones(LanguageCode language);
+	Map<ZoneCode, Zone> getZones(LanguageCode language);
 
-    List<Zone> getZones(CountryIsoCode countryCode, LanguageCode language);
+	List<Zone> getZones(CountryIsoCode countryCode, LanguageCode language);
+
 }

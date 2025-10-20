@@ -11,14 +11,20 @@ import lombok.Setter;
 @Getter
 public class PersistableProductAttribute extends ProductAttributeEntity implements Serializable {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private BigDecimal productAttributeWeight;
-    private BigDecimal productAttributePrice;
-    private Long productId;
-    private ProductPropertyOption option;
-    private PersistableProductOptionValue optionValue;
+	private BigDecimal productAttributeWeight;
+
+	private BigDecimal productAttributePrice;
+
+	private Long productId;
+
+	private ProductPropertyOption option;
+
+	private PersistableProductOptionValue optionValue;
+
 }

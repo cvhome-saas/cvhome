@@ -11,11 +11,13 @@ import org.springframework.transaction.event.TransactionalEventListener;
 @RequiredArgsConstructor
 @Slf4j
 public class LocalEventListener {
-    private final EventProcessor eventProcessor;
 
-    @TransactionalEventListener
-    void on(Event event) {
-        log.info("firing event {}", event);
-        eventProcessor.process(event);
-    }
+	private final EventProcessor eventProcessor;
+
+	@TransactionalEventListener
+	void on(Event event) {
+		log.info("firing event {}", event);
+		eventProcessor.process(event);
+	}
+
 }

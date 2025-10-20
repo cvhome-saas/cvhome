@@ -18,51 +18,47 @@ import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 
 @Configuration
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.REACTIVE)
-@Import(
-        IssuerUriSetReactiveJwtDecoderConfiguration.IssuerUriSetReactiveJwtDecoderConfigurationImpl
-                .class)
+@Import(IssuerUriSetReactiveJwtDecoderConfiguration.IssuerUriSetReactiveJwtDecoderConfigurationImpl.class)
 public class IssuerUriSetReactiveJwtDecoderConfiguration {
-    static class IssuerUriSetReactiveJwtDecoderConfigurationImpl {
-        private final IssuerUriSetConfigrationProperties properties;
 
-        private final List<OAuth2TokenValidator<Jwt>> additionalValidators;
+	static class IssuerUriSetReactiveJwtDecoderConfigurationImpl {
 
-        IssuerUriSetReactiveJwtDecoderConfigurationImpl(
-                IssuerUriSetConfigrationProperties properties,
-                ObjectProvider<OAuth2TokenValidator<Jwt>> additionalValidators) {
-            this.properties = properties;
-            this.additionalValidators = additionalValidators.orderedStream().toList();
-        }
+		private final IssuerUriSetConfigrationProperties properties;
 
-        @Bean
-        @Conditional(IssuerUriSetCondition.class)
-        MultiIssuerReactiveJwtDecoder jwtDecoderByIssuerUri(
-                ObjectProvider<JwkSetUriReactiveJwtDecoderBuilderCustomizer> customizers) {
-            Function<String, ReactiveJwtDecoder> stringReactiveJwtDecoderFunction =
-                    issuer -> {
-                        NimbusReactiveJwtDecoder.JwkSetUriReactiveJwtDecoderBuilder builder =
-                                NimbusReactiveJwtDecoder.withIssuerLocation(issuer);
-                        customizers
-                                .orderedStream()
-                                .forEach((customizer) -> customizer.customize(builder));
-                        NimbusReactiveJwtDecoder jwtDecoder = builder.build();
-                        jwtDecoder.setJwtValidator(
-                                getValidators(JwtValidators.createDefaultWithIssuer(issuer)));
-                        return jwtDecoder;
-                    };
+		private final List<OAuth2TokenValidator<Jwt>> additionalValidators;
 
-            return new MultiIssuerReactiveJwtDecoder(
-                    this.properties.getIssuerUriSet(), stringReactiveJwtDecoderFunction);
-        }
+		IssuerUriSetReactiveJwtDecoderConfigurationImpl(IssuerUriSetConfigrationProperties properties,
+				ObjectProvider<OAuth2TokenValidator<Jwt>> additionalValidators) {
+			this.properties = properties;
+			this.additionalValidators = additionalValidators.orderedStream().toList();
+		}
 
-        private OAuth2TokenValidator<Jwt> getValidators(
-                OAuth2TokenValidator<Jwt> defaultValidator) {
+		@Bean
+		@Conditional(IssuerUriSetCondition.class)
+		MultiIssuerReactiveJwtDecoder jwtDecoderByIssuerUri(
+				ObjectProvider<JwkSetUriReactiveJwtDecoderBuilderCustomizer> customizers) {
+			Function<String, ReactiveJwtDecoder> stringReactiveJwtDecoderFunction = issuer -> {
+				NimbusReactiveJwtDecoder.JwkSetUriReactiveJwtDecoderBuilder builder = NimbusReactiveJwtDecoder
+					.withIssuerLocation(issuer);
+				customizers.orderedStream().forEach((customizer) -> customizer.customize(builder));
+				NimbusReactiveJwtDecoder jwtDecoder = builder.build();
+				jwtDecoder.setJwtValidator(getValidators(JwtValidators.createDefaultWithIssuer(issuer)));
+				return jwtDecoder;
+			};
 
-            List<OAuth2TokenValidator<Jwt>> validators = new ArrayList<>();
-            validators.add(defaultValidator);
+			return new MultiIssuerReactiveJwtDecoder(this.properties.getIssuerUriSet(),
+					stringReactiveJwtDecoderFunction);
+		}
 
-            validators.addAll(this.additionalValidators);
-            return new DelegatingOAuth2TokenValidator<>(validators);
-        }
-    }
+		private OAuth2TokenValidator<Jwt> getValidators(OAuth2TokenValidator<Jwt> defaultValidator) {
+
+			List<OAuth2TokenValidator<Jwt>> validators = new ArrayList<>();
+			validators.add(defaultValidator);
+
+			validators.addAll(this.additionalValidators);
+			return new DelegatingOAuth2TokenValidator<>(validators);
+		}
+
+	}
+
 }

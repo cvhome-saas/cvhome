@@ -6,9 +6,11 @@ import com.asrevo.cvhome.commons.domain.PodId;
 import java.util.List;
 
 public interface PodSelection {
-    PodId next(ManagerOrgId orgId, PodId prefaredPodId);
 
-    List<Pod> listPrivatePods(ManagerOrgId orgId);
+	PodId next(ManagerOrgId orgId, PodId prefaredPodId);
 
-    List<Pod> listAllPods();
+	List<Pod> listPrivatePods(ManagerOrgId orgId);
+
+	List<Pod> listAllPods();
+
 }

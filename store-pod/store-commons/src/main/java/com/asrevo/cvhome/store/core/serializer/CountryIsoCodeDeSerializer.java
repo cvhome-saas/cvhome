@@ -8,18 +8,18 @@ import java.io.IOException;
 
 public class CountryIsoCodeDeSerializer extends StdDeserializer<CountryIsoCode> {
 
-    public CountryIsoCodeDeSerializer() {
-        this(null);
-    }
+	public CountryIsoCodeDeSerializer() {
+		this(null);
+	}
 
-    protected CountryIsoCodeDeSerializer(Class<CountryIsoCode> t) {
-        super(t);
-    }
+	protected CountryIsoCodeDeSerializer(Class<CountryIsoCode> t) {
+		super(t);
+	}
 
-    @Override
-    public CountryIsoCode deserialize(JsonParser p, DeserializationContext ctxt)
-            throws IOException {
-        String code = p.getText();
-        return new CountryIsoCode(code);
-    }
+	@Override
+	public CountryIsoCode deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
+		String code = p.getText();
+		return new CountryIsoCode(code);
+	}
+
 }

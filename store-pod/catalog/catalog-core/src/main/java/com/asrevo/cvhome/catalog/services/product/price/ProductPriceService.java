@@ -7,12 +7,12 @@ import java.util.List;
 
 public interface ProductPriceService extends SalesManagerEntityService<Long, ProductPrice> {
 
-    ProductPrice saveOrUpdate(ProductPrice price);
+	ProductPrice saveOrUpdate(ProductPrice price);
 
-    List<ProductPrice> findByProductSku(String sku, StoreMerchantId store);
+	List<ProductPrice> findByProductSku(String sku, StoreMerchantId store);
 
-    ProductPrice findById(Long priceId, String sku, StoreMerchantId store);
+	ProductPrice findById(Long priceId, String sku, StoreMerchantId store);
 
-    List<ProductPrice> findByInventoryId(
-            Long productInventoryId, String sku, StoreMerchantId store);
+	List<ProductPrice> findByInventoryId(Long productInventoryId, String sku, StoreMerchantId store);
+
 }

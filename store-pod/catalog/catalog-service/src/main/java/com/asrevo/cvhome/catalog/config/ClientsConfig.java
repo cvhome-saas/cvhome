@@ -7,11 +7,12 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class ClientsConfig {
-    @Bean
-    public ExternalMerchantStoreService externalMerchantStoreService(
-            RestClientBuilder restClientBuilder) {
-        ExternalMerchantStoreService externalMerchantStoreService =
-                restClientBuilder.buildClient("merchant", ExternalMerchantStoreService.class);
-        return new CachedExternalMerchantStoreService(externalMerchantStoreService);
-    }
+
+	@Bean
+	public ExternalMerchantStoreService externalMerchantStoreService(RestClientBuilder restClientBuilder) {
+		ExternalMerchantStoreService externalMerchantStoreService = restClientBuilder.buildClient("merchant",
+				ExternalMerchantStoreService.class);
+		return new CachedExternalMerchantStoreService(externalMerchantStoreService);
+	}
+
 }

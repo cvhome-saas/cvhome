@@ -8,20 +8,22 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class LocaleUtils {
 
-    public static Locale getLocale(LanguageCode language) {
-        Locale defaultLocale = Constants.DEFAULT_LOCALE;
-        Locale[] locales = Locale.getAvailableLocales();
-        for (Locale l : locales) {
-            try {
-                if (l.toLanguageTag().equals(language.code())) {
-                    defaultLocale = l;
-                    break;
-                }
-            } catch (Exception e) {
-                log.error("An error occurred while getting ISO code for locale {}", l.toString());
-            }
-        }
+	public static Locale getLocale(LanguageCode language) {
+		Locale defaultLocale = Constants.DEFAULT_LOCALE;
+		Locale[] locales = Locale.getAvailableLocales();
+		for (Locale l : locales) {
+			try {
+				if (l.toLanguageTag().equals(language.code())) {
+					defaultLocale = l;
+					break;
+				}
+			}
+			catch (Exception e) {
+				log.error("An error occurred while getting ISO code for locale {}", l.toString());
+			}
+		}
 
-        return defaultLocale;
-    }
+		return defaultLocale;
+	}
+
 }

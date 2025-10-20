@@ -9,11 +9,14 @@ import lombok.Setter;
 @Getter
 public class PaymentEntity implements Serializable {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private String paymentModule; // stripe|paypal|braintree|moneyorder ...
-    private String amount;
+	private String paymentModule; // stripe|paypal|braintree|moneyorder ...
+
+	private String amount;
+
 }

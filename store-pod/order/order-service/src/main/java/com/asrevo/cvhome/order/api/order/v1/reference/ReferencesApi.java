@@ -29,36 +29,37 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1")
 @Slf4j
 public class ReferencesApi {
-    private final ZoneFacade zoneFacade;
-    private final CountryFacade countryFacade;
 
-    public ReferencesApi(ZoneFacade zoneFacade, CountryFacade countryFacade) {
-        this.zoneFacade = zoneFacade;
-        this.countryFacade = countryFacade;
-    }
+	private final ZoneFacade zoneFacade;
 
-    @GetMapping("/zones")
-    @ConditionalOnApiStatus
-    public List<ReadableZone> getZones(
-            @RequestParam("code") String code,
-            @Parameter(hidden = true) LanguageCode language,
-            HttpServletRequest request) {
-        StoreMerchantId merchantId = getByMerchantStoreId(request);
-        return zoneFacade.getZones(new CountryIsoCode(code), language, merchantId);
-    }
+	private final CountryFacade countryFacade;
 
-    @GetMapping("/country")
-    public List<ReadableCountry> getCountry(
-            @Parameter(hidden = true) LanguageCode language, HttpServletRequest request) {
-        StoreMerchantId merchantId = getByMerchantStoreId(request);
-        return countryFacade.getListCountryZones(language, merchantId);
-    }
+	public ReferencesApi(ZoneFacade zoneFacade, CountryFacade countryFacade) {
+		this.zoneFacade = zoneFacade;
+		this.countryFacade = countryFacade;
+	}
 
-    private StoreMerchantId getByMerchantStoreId(HttpServletRequest request) {
-        String merchantStoreId = request.getParameter("store");
-        if (StringUtils.isEmpty(merchantStoreId)) {
-            return DEFAULT_ORG1_STORE1;
-        }
-        return new StoreMerchantId(merchantStoreId);
-    }
+	@GetMapping("/zones")
+	@ConditionalOnApiStatus
+	public List<ReadableZone> getZones(@RequestParam("code") String code,
+			@Parameter(hidden = true) LanguageCode language, HttpServletRequest request) {
+		StoreMerchantId merchantId = getByMerchantStoreId(request);
+		return zoneFacade.getZones(new CountryIsoCode(code), language, merchantId);
+	}
+
+	@GetMapping("/country")
+	public List<ReadableCountry> getCountry(@Parameter(hidden = true) LanguageCode language,
+			HttpServletRequest request) {
+		StoreMerchantId merchantId = getByMerchantStoreId(request);
+		return countryFacade.getListCountryZones(language, merchantId);
+	}
+
+	private StoreMerchantId getByMerchantStoreId(HttpServletRequest request) {
+		String merchantStoreId = request.getParameter("store");
+		if (StringUtils.isEmpty(merchantStoreId)) {
+			return DEFAULT_ORG1_STORE1;
+		}
+		return new StoreMerchantId(merchantStoreId);
+	}
+
 }

@@ -23,30 +23,27 @@ import reactor.core.publisher.Mono;
 @AllArgsConstructor
 @Slf4j
 public class RedirectionController {
-    private final ServiceDomainProperties serviceDomainProperties;
 
-    @GetMapping(
-            value = "internal",
-            params = {"serviceName"})
-    public Mono<Void> redirect(
-            @RequestParam() String serviceName,
-            @RequestParam(required = false, defaultValue = "") String path,
-            ServerWebExchange exchange) {
+	private final ServiceDomainProperties serviceDomainProperties;
 
-        ServerHttpRequest request = exchange.getRequest();
+	@GetMapping(value = "internal", params = { "serviceName" })
+	public Mono<Void> redirect(@RequestParam() String serviceName,
+			@RequestParam(required = false, defaultValue = "") String path, ServerWebExchange exchange) {
 
-        ServiceDomain serviceDomain = serviceDomainProperties.getService(serviceName);
+		ServerHttpRequest request = exchange.getRequest();
 
-        if (serviceDomain == null) {
-            throw new RuntimeException(serviceName + " not defined");
-        }
+		ServiceDomain serviceDomain = serviceDomainProperties.getService(serviceName);
 
-        String fullUrl =
-                new RedirectionUrlBuilder(getScheme(request), getPort(request), serviceDomain)
-                        .getRedirectionUrl(path);
-        ServerHttpResponse response = exchange.getResponse();
-        response.setStatusCode(HttpStatus.PERMANENT_REDIRECT);
-        response.getHeaders().add("Location", fullUrl);
-        return response.setComplete();
-    }
+		if (serviceDomain == null) {
+			throw new RuntimeException(serviceName + " not defined");
+		}
+
+		String fullUrl = new RedirectionUrlBuilder(getScheme(request), getPort(request), serviceDomain)
+			.getRedirectionUrl(path);
+		ServerHttpResponse response = exchange.getResponse();
+		response.setStatusCode(HttpStatus.PERMANENT_REDIRECT);
+		response.getHeaders().add("Location", fullUrl);
+		return response.setComplete();
+	}
+
 }

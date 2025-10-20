@@ -10,11 +10,14 @@ import lombok.Setter;
 @Getter
 public class ReadableCountry extends CountryEntity {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private String name;
-    private List<ReadableZone> zones = new ArrayList<>();
+	private String name;
+
+	private List<ReadableZone> zones = new ArrayList<>();
+
 }

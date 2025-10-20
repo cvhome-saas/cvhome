@@ -19,76 +19,64 @@ import org.springframework.data.domain.Pageable;
  */
 public interface ContentFacade {
 
-    ContentFolder getContentFolder(String folder, StoreMerchantId store);
+	ContentFolder getContentFolder(String folder, StoreMerchantId store);
 
-    /**
-     * File pth
-     */
-    String absolutePath(StoreMerchantId store, String file);
+	/**
+	 * File pth
+	 */
+	String absolutePath(StoreMerchantId store, String file);
 
-    /**
-     * Deletes a file from CMS
-     */
-    void delete(StoreMerchantId store, String fileName, String fileType);
+	/**
+	 * Deletes a file from CMS
+	 */
+	void delete(StoreMerchantId store, String fileName, String fileType);
 
-    /**
-     * Delete content page
-     */
-    void delete(StoreMerchantId store, Long id);
+	/**
+	 * Delete content page
+	 */
+	void delete(StoreMerchantId store, Long id);
 
-    /**
-     * Returns page names and urls configured for a given StoreMerchantId
-     */
-    ReadableContentPageList getContentPages(
-            StoreMerchantId store, LanguageCode language, Pageable pageable);
+	/**
+	 * Returns page names and urls configured for a given StoreMerchantId
+	 */
+	ReadableContentPageList getContentPages(StoreMerchantId store, LanguageCode language, Pageable pageable);
 
-    /**
-     * Returns page name by code
-     */
-    ReadableContentPage getContentPage(String code, StoreMerchantId store, LanguageCode language);
+	/**
+	 * Returns page name by code
+	 */
+	ReadableContentPage getContentPage(String code, StoreMerchantId store, LanguageCode language);
 
-    /**
-     * Returns page by name
-     */
-    ReadableContentPage getContentPageByName(
-            String name, StoreMerchantId store, LanguageCode language);
+	/**
+	 * Returns page by name
+	 */
+	ReadableContentPage getContentPageByName(String name, StoreMerchantId store, LanguageCode language);
 
-    /**
-     * Returns a content box for a given code and merchant store
-     */
-    ReadableContentBox getContentBox(String code, StoreMerchantId store, LanguageCode language);
+	/**
+	 * Returns a content box for a given code and merchant store
+	 */
+	ReadableContentBox getContentBox(String code, StoreMerchantId store, LanguageCode language);
 
-    /**
-     *
-     */
-    boolean codeExist(String code, String type, StoreMerchantId store);
+	/**
+	 *
+	 */
+	boolean codeExist(String code, String type, StoreMerchantId store);
 
-    ReadableContentBoxList getContentBoxes(
-            StoreMerchantId store, LanguageCode language, Pageable pageable);
+	ReadableContentBoxList getContentBoxes(StoreMerchantId store, LanguageCode language, Pageable pageable);
 
-    void addContentFile(ContentFile file, String merchantStoreCode);
+	void addContentFile(ContentFile file, String merchantStoreCode);
 
-    /**
-     * Creates content page
-     */
-    Long saveContentPage(
-            PersistableContentPage page, StoreMerchantId merchantStore, LanguageCode language);
+	/**
+	 * Creates content page
+	 */
+	Long saveContentPage(PersistableContentPage page, StoreMerchantId merchantStore, LanguageCode language);
 
-    void updateContentPage(
-            Long id,
-            PersistableContentPage page,
-            StoreMerchantId merchantStore,
-            LanguageCode language);
+	void updateContentPage(Long id, PersistableContentPage page, StoreMerchantId merchantStore, LanguageCode language);
 
-    /**
-     * Creates content box
-     */
-    Long saveContentBox(
-            PersistableContentBox box, StoreMerchantId merchantStore, LanguageCode language);
+	/**
+	 * Creates content box
+	 */
+	Long saveContentBox(PersistableContentBox box, StoreMerchantId merchantStore, LanguageCode language);
 
-    void updateContentBox(
-            Long id,
-            PersistableContentBox box,
-            StoreMerchantId merchantStore,
-            LanguageCode language);
+	void updateContentBox(Long id, PersistableContentBox box, StoreMerchantId merchantStore, LanguageCode language);
+
 }

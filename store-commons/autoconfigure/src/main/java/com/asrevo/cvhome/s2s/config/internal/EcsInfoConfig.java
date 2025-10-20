@@ -10,14 +10,15 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConditionalOnProperty(name = "AWS_EXECUTION_ENV", havingValue = "AWS_ECS_FARGATE")
 public class EcsInfoConfig {
-    @Bean
-    public EcsTask ecsTask() {
-        return EcsTaskFetcher.fetch();
-    }
 
-    @Bean
-    public EcsTaskHealthIndicator ecsTaskHealthIndicator(
-            EcsTask ecsTask, ObjectMapper objectMapper) {
-        return new EcsTaskHealthIndicator(ecsTask, objectMapper);
-    }
+	@Bean
+	public EcsTask ecsTask() {
+		return EcsTaskFetcher.fetch();
+	}
+
+	@Bean
+	public EcsTaskHealthIndicator ecsTaskHealthIndicator(EcsTask ecsTask, ObjectMapper objectMapper) {
+		return new EcsTaskHealthIndicator(ecsTask, objectMapper);
+	}
+
 }

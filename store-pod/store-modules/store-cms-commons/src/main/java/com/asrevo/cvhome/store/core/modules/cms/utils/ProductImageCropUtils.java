@@ -9,122 +9,124 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ProductImageCropUtils {
 
-    // o is width, 1 is height
-    @Setter @Getter private boolean cropeable = true;
-    @Getter private double cropAreaWidth = 0;
-    @Getter private double cropAreaHeight = 0;
-    private BufferedImage originalFile = null;
+	// o is width, 1 is height
+	@Setter
+	@Getter
+	private boolean cropeable = true;
 
-    public ProductImageCropUtils(BufferedImage file, int largeImageWidth, int largeImageHeight) {
+	@Getter
+	private double cropAreaWidth = 0;
 
-        try {
+	@Getter
+	private double cropAreaHeight = 0;
 
-            this.originalFile = file;
+	private BufferedImage originalFile = null;
 
-            // get original image size
+	public ProductImageCropUtils(BufferedImage file, int largeImageWidth, int largeImageHeight) {
 
-            int width = originalFile.getWidth();
-            int height = originalFile.getHeight();
+		try {
 
-            determineCropeable(width, largeImageWidth, height, largeImageHeight);
+			this.originalFile = file;
 
-            // this.determineBaseline(width, height);
+			// get original image size
 
-            determineCropArea(width, largeImageWidth, height, largeImageHeight);
+			int width = originalFile.getWidth();
+			int height = originalFile.getHeight();
 
-        } catch (Exception e) {
-            log.error("Image Utils error in constructor", e);
-        }
-    }
+			determineCropeable(width, largeImageWidth, height, largeImageHeight);
 
-    private void determineCropeable(
-            int width, int specificationsWidth, int height, int specificationsHeight) {
-        // height
-        int y = height - specificationsHeight;
-        // width
-        int x = width - specificationsWidth;
+			// this.determineBaseline(width, height);
 
-        if (x < 0 || y < 0) {
-            setCropeable(false);
-        }
+			determineCropArea(width, largeImageWidth, height, largeImageHeight);
 
-        if (x == 0 && y == 0) {
-            setCropeable(false);
-        }
+		}
+		catch (Exception e) {
+			log.error("Image Utils error in constructor", e);
+		}
+	}
 
-        if ((height % specificationsHeight) == 0 && (width % specificationsWidth) == 0) {
-            setCropeable(false);
-        }
-    }
+	private void determineCropeable(int width, int specificationsWidth, int height, int specificationsHeight) {
+		// height
+		int y = height - specificationsHeight;
+		// width
+		int x = width - specificationsWidth;
 
-    private void determineCropArea(
-            int width, int specificationsWidth, int height, int specificationsHeight) {
+		if (x < 0 || y < 0) {
+			setCropeable(false);
+		}
 
-        cropAreaWidth = specificationsWidth;
-        cropAreaHeight = specificationsHeight;
+		if (x == 0 && y == 0) {
+			setCropeable(false);
+		}
 
-        double factorWidth =
-                Integer.valueOf(width).doubleValue()
-                        / Integer.valueOf(specificationsWidth).doubleValue();
-        double factorHeight =
-                Integer.valueOf(height).doubleValue()
-                        / Integer.valueOf(specificationsHeight).doubleValue();
+		if ((height % specificationsHeight) == 0 && (width % specificationsWidth) == 0) {
+			setCropeable(false);
+		}
+	}
 
-        double factor = Math.min(factorWidth, factorHeight);
+	private void determineCropArea(int width, int specificationsWidth, int height, int specificationsHeight) {
 
-        // crop factor
-        /*		double factor = 1;
-        if (this.getCropeBaseline() == 0) {// width
-        	factor = new Integer(width).doubleValue()
-        			/ new Integer(specificationsWidth).doubleValue();
-        } else {// height
-        	factor = new Integer(height).doubleValue()
-        			/ new Integer(specificationsHeight).doubleValue();
-        }*/
+		cropAreaWidth = specificationsWidth;
+		cropAreaHeight = specificationsHeight;
 
-        double w = factor * specificationsWidth;
-        double h = factor * specificationsHeight;
+		double factorWidth = Integer.valueOf(width).doubleValue() / Integer.valueOf(specificationsWidth).doubleValue();
+		double factorHeight = Integer.valueOf(height).doubleValue()
+				/ Integer.valueOf(specificationsHeight).doubleValue();
 
-        if (w == h) {
-            setCropeable(false);
-        }
+		double factor = Math.min(factorWidth, factorHeight);
 
-        cropAreaWidth = w;
+		// crop factor
+		/*
+		 * double factor = 1; if (this.getCropeBaseline() == 0) {// width factor = new
+		 * Integer(width).doubleValue() / new Integer(specificationsWidth).doubleValue();
+		 * } else {// height factor = new Integer(height).doubleValue() / new
+		 * Integer(specificationsHeight).doubleValue(); }
+		 */
 
-        if (cropAreaWidth > width) cropAreaWidth = width;
+		double w = factor * specificationsWidth;
+		double h = factor * specificationsHeight;
 
-        cropAreaHeight = h;
+		if (w == h) {
+			setCropeable(false);
+		}
 
-        if (cropAreaHeight > height) cropAreaHeight = height;
+		cropAreaWidth = w;
 
-        /*
-         * if(factor>1) { //determine croping section for(double
-         * i=factor;i>1;i--) { //multiply specifications by factor int newWidth
-         * = (int)(i * specificationsWidth); int newHeight = (int)(i *
-         * specificationsHeight); //check if new size >= original image
-         * if(width>=newWidth && height>=newHeight) { cropAreaWidth = newWidth;
-         * cropAreaHeight = newHeight; break; } } }
-         */
+		if (cropAreaWidth > width)
+			cropAreaWidth = width;
 
-    }
+		cropAreaHeight = h;
 
-    public BufferedImage getCroppedImage() {
+		if (cropAreaHeight > height)
+			cropAreaHeight = height;
 
-        // out if croppedArea == 0 or file is null
+		/*
+		 * if(factor>1) { //determine croping section for(double i=factor;i>1;i--) {
+		 * //multiply specifications by factor int newWidth = (int)(i *
+		 * specificationsWidth); int newHeight = (int)(i * specificationsHeight); //check
+		 * if new size >= original image if(width>=newWidth && height>=newHeight) {
+		 * cropAreaWidth = newWidth; cropAreaHeight = newHeight; break; } } }
+		 */
 
-        Rectangle goal =
-                new Rectangle((int) this.getCropAreaWidth(), (int) this.getCropAreaHeight());
+	}
 
-        // Then intersect it with the dimensions of your image:
+	public BufferedImage getCroppedImage() {
 
-        Rectangle clip =
-                goal.intersection(new Rectangle(originalFile.getWidth(), originalFile.getHeight()));
+		// out if croppedArea == 0 or file is null
 
-        // Now, clip corresponds to the portion of bi that will fit within your goal. In this case
-        // 100 x50.
+		Rectangle goal = new Rectangle((int) this.getCropAreaWidth(), (int) this.getCropAreaHeight());
 
-        // Now get the subImage using the value of clip.
+		// Then intersect it with the dimensions of your image:
 
-        return originalFile.getSubimage(clip.x, clip.y, clip.width, clip.height);
-    }
+		Rectangle clip = goal.intersection(new Rectangle(originalFile.getWidth(), originalFile.getHeight()));
+
+		// Now, clip corresponds to the portion of bi that will fit within your goal. In
+		// this case
+		// 100 x50.
+
+		// Now get the subImage using the value of clip.
+
+		return originalFile.getSubimage(clip.x, clip.y, clip.width, clip.height);
+	}
+
 }

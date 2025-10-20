@@ -12,10 +12,12 @@ import lombok.Setter;
 @Deprecated
 public class ReadableUserList extends ReadableList<ReadableUser> {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private List<ReadableUser> content = new ArrayList<>();
+	private List<ReadableUser> content = new ArrayList<>();
+
 }

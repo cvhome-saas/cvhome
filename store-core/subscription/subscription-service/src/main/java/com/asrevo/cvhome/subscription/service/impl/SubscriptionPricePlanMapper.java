@@ -13,23 +13,24 @@ import org.mapstruct.Named;
 @Mapper(componentModel = "spring")
 public interface SubscriptionPricePlanMapper {
 
-    @Mapping(source = "subscriptionPlan.limits", target = "limits")
-    @Mapping(source = "subscriptionPlan.feature", target = "feature")
-    @Mapping(source = "it", target = "previousCost", qualifiedByName = "toPreviousCost")
-    SubscriptionPlanOption toOption(SubscriptionPricePlanEntity it);
+	@Mapping(source = "subscriptionPlan.limits", target = "limits")
+	@Mapping(source = "subscriptionPlan.feature", target = "feature")
+	@Mapping(source = "it", target = "previousCost", qualifiedByName = "toPreviousCost")
+	SubscriptionPlanOption toOption(SubscriptionPricePlanEntity it);
 
-    @Named("toPreviousCost")
-    default PricePlanCost toPreviousCost(SubscriptionPricePlanEntity it) {
-        if (RecurringPlan.YEAR.equals(it.getRecurringPlan())) {
-            return PricePlanCost.from(
-                    it.getCost().currency(), it.getSubscriptionPlan(), it.getRecurringPlan());
-        } else {
-            return it.getCost();
-        }
-    }
+	@Named("toPreviousCost")
+	default PricePlanCost toPreviousCost(SubscriptionPricePlanEntity it) {
+		if (RecurringPlan.YEAR.equals(it.getRecurringPlan())) {
+			return PricePlanCost.from(it.getCost().currency(), it.getSubscriptionPlan(), it.getRecurringPlan());
+		}
+		else {
+			return it.getCost();
+		}
+	}
 
-    default SubscriptionPlanTable toTable(List<SubscriptionPricePlanEntity> list) {
-        List<SubscriptionPlanOption> tableOptions = list.stream().map(this::toOption).toList();
-        return new SubscriptionPlanTable(tableOptions);
-    }
+	default SubscriptionPlanTable toTable(List<SubscriptionPricePlanEntity> list) {
+		List<SubscriptionPlanOption> tableOptions = list.stream().map(this::toOption).toList();
+		return new SubscriptionPlanTable(tableOptions);
+	}
+
 }

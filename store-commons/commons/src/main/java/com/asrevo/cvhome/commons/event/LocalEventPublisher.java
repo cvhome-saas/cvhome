@@ -8,15 +8,17 @@ import org.springframework.context.ApplicationEventPublisher;
 @AllArgsConstructor
 @Slf4j
 public class LocalEventPublisher implements EventPublisher {
-    private final ApplicationEventPublisher publisher;
 
-    @Override
-    public <T extends Event> void publish(T event) {
-        publisher.publishEvent(event);
-    }
+	private final ApplicationEventPublisher publisher;
 
-    @Override
-    public <T extends Event> List<String> getEventDestinations(T event) {
-        return event.getDestinations();
-    }
+	@Override
+	public <T extends Event> void publish(T event) {
+		publisher.publishEvent(event);
+	}
+
+	@Override
+	public <T extends Event> List<String> getEventDestinations(T event) {
+		return event.getDestinations();
+	}
+
 }

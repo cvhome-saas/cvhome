@@ -6,16 +6,18 @@ import jakarta.persistence.Converter;
 
 @Converter
 public class CountryIsoCodeConverter implements AttributeConverter<CountryIsoCode, String> {
-    @Override
-    public String convertToDatabaseColumn(CountryIsoCode countryIsoCode) {
-        if (countryIsoCode == null) {
-            return null;
-        }
-        return countryIsoCode.isoCode();
-    }
 
-    @Override
-    public CountryIsoCode convertToEntityAttribute(String s) {
-        return new CountryIsoCode(s);
-    }
+	@Override
+	public String convertToDatabaseColumn(CountryIsoCode countryIsoCode) {
+		if (countryIsoCode == null) {
+			return null;
+		}
+		return countryIsoCode.isoCode();
+	}
+
+	@Override
+	public CountryIsoCode convertToEntityAttribute(String s) {
+		return new CountryIsoCode(s);
+	}
+
 }

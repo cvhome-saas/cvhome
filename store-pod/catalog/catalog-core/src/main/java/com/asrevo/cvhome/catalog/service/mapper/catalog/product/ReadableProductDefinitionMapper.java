@@ -35,184 +35,171 @@ import org.springframework.util.Assert;
 @Component
 public class ReadableProductDefinitionMapper implements Mapper<Product, ReadableProductDefinition> {
 
-    private final ReadableCategoryMapper readableCategoryMapper;
+	private final ReadableCategoryMapper readableCategoryMapper;
 
-    private final ReadableProductTypeMapper readableProductTypeMapper;
+	private final ReadableProductTypeMapper readableProductTypeMapper;
 
-    private final ReadableManufacturerMapper readableManufacturerMapper;
+	private final ReadableManufacturerMapper readableManufacturerMapper;
 
-    private final ReadableInventoryMapper readableInventoryMapper;
+	private final ReadableInventoryMapper readableInventoryMapper;
 
-    private final ImageFilePath imageUtils;
-    private final ExternalMerchantStoreService externalMerchantStoreService;
+	private final ImageFilePath imageUtils;
 
-    public ReadableProductDefinitionMapper(
-            ReadableCategoryMapper readableCategoryMapper,
-            ReadableProductTypeMapper readableProductTypeMapper,
-            ReadableManufacturerMapper readableManufacturerMapper,
-            ReadableInventoryMapper readableInventoryMapper,
-            ImageFilePath imageUtils,
-            ExternalMerchantStoreService externalMerchantStoreService) {
-        this.readableCategoryMapper = readableCategoryMapper;
-        this.readableProductTypeMapper = readableProductTypeMapper;
-        this.readableManufacturerMapper = readableManufacturerMapper;
-        this.readableInventoryMapper = readableInventoryMapper;
-        this.imageUtils = imageUtils;
-        this.externalMerchantStoreService = externalMerchantStoreService;
-    }
+	private final ExternalMerchantStoreService externalMerchantStoreService;
 
-    @Override
-    public ReadableProductDefinition convert(
-            Product source, StoreMerchantId store, LanguageCode language) {
-        ReadableProductDefinition target = new ReadableProductDefinition();
-        return this.merge(source, target, store, language);
-    }
+	public ReadableProductDefinitionMapper(ReadableCategoryMapper readableCategoryMapper,
+			ReadableProductTypeMapper readableProductTypeMapper, ReadableManufacturerMapper readableManufacturerMapper,
+			ReadableInventoryMapper readableInventoryMapper, ImageFilePath imageUtils,
+			ExternalMerchantStoreService externalMerchantStoreService) {
+		this.readableCategoryMapper = readableCategoryMapper;
+		this.readableProductTypeMapper = readableProductTypeMapper;
+		this.readableManufacturerMapper = readableManufacturerMapper;
+		this.readableInventoryMapper = readableInventoryMapper;
+		this.imageUtils = imageUtils;
+		this.externalMerchantStoreService = externalMerchantStoreService;
+	}
 
-    @Override
-    public ReadableProductDefinition merge(
-            Product source,
-            ReadableProductDefinition target,
-            StoreMerchantId store,
-            LanguageCode language) {
-        Assert.notNull(source, "Product cannot be null");
-        Assert.notNull(target, "Product destination cannot be null");
+	@Override
+	public ReadableProductDefinition convert(Product source, StoreMerchantId store, LanguageCode language) {
+		ReadableProductDefinition target = new ReadableProductDefinition();
+		return this.merge(source, target, store, language);
+	}
 
-        target.setIdentifier(source.getSku());
-        target.setId(source.getId());
-        target.setVisible(source.isAvailable());
-        target.setDateAvailable(DateUtil.formatDate(source.getDateAvailable()));
-        target.setSku(source.getSku());
+	@Override
+	public ReadableProductDefinition merge(Product source, ReadableProductDefinition target, StoreMerchantId store,
+			LanguageCode language) {
+		Assert.notNull(source, "Product cannot be null");
+		Assert.notNull(target, "Product destination cannot be null");
 
-        if (LanguageCode.isAllLanguage(language)) {
-            var descriptionSet = Optional.ofNullable(source.getDescriptions()).orElse(Set.of());
-            target.setDescriptions(descriptionSet.stream().map(this::populateDescription).toList());
-        }
-        if (LanguageCode.isLanguage(language)) {
-            var descriptionSet = Optional.ofNullable(source.getDescriptions()).orElse(Set.of());
-            var description =
-                    descriptionSet.stream()
-                            .filter(it -> language.equals(it.getLanguageCode()))
-                            .findFirst()
-                            .map(this::populateDescription)
-                            .orElse(null);
-            target.setDescription(description);
-        }
+		target.setIdentifier(source.getSku());
+		target.setId(source.getId());
+		target.setVisible(source.isAvailable());
+		target.setDateAvailable(DateUtil.formatDate(source.getDateAvailable()));
+		target.setSku(source.getSku());
 
-        if (source.getManufacturer() != null) {
-            ReadableManufacturer manufacturer =
-                    readableManufacturerMapper.convert(source.getManufacturer(), store, language);
-            target.setManufacturer(manufacturer);
-        }
+		if (LanguageCode.isAllLanguage(language)) {
+			var descriptionSet = Optional.ofNullable(source.getDescriptions()).orElse(Set.of());
+			target.setDescriptions(descriptionSet.stream().map(this::populateDescription).toList());
+		}
+		if (LanguageCode.isLanguage(language)) {
+			var descriptionSet = Optional.ofNullable(source.getDescriptions()).orElse(Set.of());
+			var description = descriptionSet.stream()
+				.filter(it -> language.equals(it.getLanguageCode()))
+				.findFirst()
+				.map(this::populateDescription)
+				.orElse(null);
+			target.setDescription(description);
+		}
 
-        if (!CollectionUtils.isEmpty(source.getCategories())) {
-            List<ReadableCategory> categoryList = new ArrayList<>();
-            for (Category category : source.getCategories()) {
-                ReadableCategory readableCategory =
-                        readableCategoryMapper.convert(category, store, language);
-                categoryList.add(readableCategory);
-            }
-            target.setCategories(categoryList);
-        }
+		if (source.getManufacturer() != null) {
+			ReadableManufacturer manufacturer = readableManufacturerMapper.convert(source.getManufacturer(), store,
+					language);
+			target.setManufacturer(manufacturer);
+		}
 
-        ReadableMerchantStore baseStore = externalMerchantStoreService.getStore(store);
-        ProductSpecification specifications = new ProductSpecification();
-        specifications.setHeight(source.getProductHeight());
-        specifications.setLength(source.getProductLength());
-        specifications.setWeight(source.getProductWeight());
-        specifications.setWidth(source.getProductWidth());
-        specifications.setDimensionUnitOfMeasure(
-                DimensionUnitOfMeasure.valueOf(baseStore.getDimension().name().toLowerCase()));
-        specifications.setWeightUnitOfMeasure(
-                WeightUnitOfMeasure.valueOf(baseStore.getWeight().name().toLowerCase()));
+		if (!CollectionUtils.isEmpty(source.getCategories())) {
+			List<ReadableCategory> categoryList = new ArrayList<>();
+			for (Category category : source.getCategories()) {
+				ReadableCategory readableCategory = readableCategoryMapper.convert(category, store, language);
+				categoryList.add(readableCategory);
+			}
+			target.setCategories(categoryList);
+		}
 
-        target.setProductSpecifications(specifications);
+		ReadableMerchantStore baseStore = externalMerchantStoreService.getStore(store);
+		ProductSpecification specifications = new ProductSpecification();
+		specifications.setHeight(source.getProductHeight());
+		specifications.setLength(source.getProductLength());
+		specifications.setWeight(source.getProductWeight());
+		specifications.setWidth(source.getProductWidth());
+		specifications
+			.setDimensionUnitOfMeasure(DimensionUnitOfMeasure.valueOf(baseStore.getDimension().name().toLowerCase()));
+		specifications.setWeightUnitOfMeasure(WeightUnitOfMeasure.valueOf(baseStore.getWeight().name().toLowerCase()));
 
-        if (source.getType() != null) {
-            ReadableProductType readableType =
-                    readableProductTypeMapper.convert(source.getType(), store, language);
-            target.setType(readableType);
-        }
+		target.setProductSpecifications(specifications);
 
-        target.setSortOrder(source.getSortOrder());
+		if (source.getType() != null) {
+			ReadableProductType readableType = readableProductTypeMapper.convert(source.getType(), store, language);
+			target.setType(readableType);
+		}
 
-        // images
-        Set<ProductImage> images = source.getImages();
-        if (CollectionUtils.isNotEmpty(images)) {
+		target.setSortOrder(source.getSortOrder());
 
-            List<ReadableImage> imageList =
-                    images.stream()
-                            .map(i -> this.convertImage(source, i, store))
-                            .collect(Collectors.toList());
-            target.setImages(imageList);
-        }
+		// images
+		Set<ProductImage> images = source.getImages();
+		if (CollectionUtils.isNotEmpty(images)) {
 
-        // quantity
-        ProductAvailability availability = null;
-        for (ProductAvailability a : source.getAvailabilities()) {
-            availability = a;
-        }
+			List<ReadableImage> imageList = images.stream()
+				.map(i -> this.convertImage(source, i, store))
+				.collect(Collectors.toList());
+			target.setImages(imageList);
+		}
 
-        if (availability != null) {
-            target.setCanBePurchased(availability.isProductStatus());
-            ReadableInventory inventory =
-                    readableInventoryMapper.convert(availability, store, language);
-            target.setInventory(inventory);
-        }
+		// quantity
+		ProductAvailability availability = null;
+		for (ProductAvailability a : source.getAvailabilities()) {
+			availability = a;
+		}
 
-        return target;
-    }
+		if (availability != null) {
+			target.setCanBePurchased(availability.isProductStatus());
+			ReadableInventory inventory = readableInventoryMapper.convert(availability, store, language);
+			target.setInventory(inventory);
+		}
 
-    private ReadableImage convertImage(Product product, ProductImage image, StoreMerchantId store) {
-        ReadableImage prdImage = new ReadableImage();
-        prdImage.setImageName(image.getProductImage());
-        prdImage.setDefaultImage(image.isDefaultImage());
+		return target;
+	}
 
-        StringBuilder imgPath = new StringBuilder();
-        imgPath.append(imageUtils.getContextPath())
-                .append(
-                        imageUtils.buildProductImageUtils(
-                                store, product.getSku(), image.getProductImage()));
+	private ReadableImage convertImage(Product product, ProductImage image, StoreMerchantId store) {
+		ReadableImage prdImage = new ReadableImage();
+		prdImage.setImageName(image.getProductImage());
+		prdImage.setDefaultImage(image.isDefaultImage());
 
-        prdImage.setImageUrl(imgPath.toString());
-        prdImage.setId(image.getId());
-        prdImage.setImageType(image.getImageType());
-        if (image.getProductImageUrl() != null) {
-            prdImage.setExternalUrl(image.getProductImageUrl());
-        }
-        if (image.getImageType() == 1 && image.getProductImageUrl() != null) { // video
-            prdImage.setVideoUrl(image.getProductImageUrl());
-        }
+		StringBuilder imgPath = new StringBuilder();
+		imgPath.append(imageUtils.getContextPath())
+			.append(imageUtils.buildProductImageUtils(store, product.getSku(), image.getProductImage()));
 
-        if (prdImage.isDefaultImage()) {
-            prdImage.setDefaultImage(true);
-        }
+		prdImage.setImageUrl(imgPath.toString());
+		prdImage.setId(image.getId());
+		prdImage.setImageType(image.getImageType());
+		if (image.getProductImageUrl() != null) {
+			prdImage.setExternalUrl(image.getProductImageUrl());
+		}
+		if (image.getImageType() == 1 && image.getProductImageUrl() != null) { // video
+			prdImage.setVideoUrl(image.getProductImageUrl());
+		}
 
-        return prdImage;
-    }
+		if (prdImage.isDefaultImage()) {
+			prdImage.setDefaultImage(true);
+		}
 
-    private com.asrevo.cvhome.catalog.model.product.ProductDescription populateDescription(
-            ProductDescription description) {
-        if (description == null) {
-            return null;
-        }
+		return prdImage;
+	}
 
-        com.asrevo.cvhome.catalog.model.product.ProductDescription tragetDescription =
-                new com.asrevo.cvhome.catalog.model.product.ProductDescription();
-        tragetDescription.setFriendlyUrl(description.getSeUrl());
-        tragetDescription.setName(description.getName());
-        tragetDescription.setId(description.getId());
-        if (!StringUtils.isBlank(description.getMetatagTitle())) {
-            tragetDescription.setTitle(description.getMetatagTitle());
-        } else {
-            tragetDescription.setTitle(description.getName());
-        }
-        tragetDescription.setMetaDescription(description.getMetatagDescription());
-        tragetDescription.setDescription(description.getDescription());
-        tragetDescription.setHighlights(description.getProductHighlight());
-        tragetDescription.setLanguage(description.getLanguageCode());
-        tragetDescription.setKeyWords(description.getMetatagKeywords());
+	private com.asrevo.cvhome.catalog.model.product.ProductDescription populateDescription(
+			ProductDescription description) {
+		if (description == null) {
+			return null;
+		}
 
-        tragetDescription.setLanguage(description.getLanguageCode());
-        return tragetDescription;
-    }
+		com.asrevo.cvhome.catalog.model.product.ProductDescription tragetDescription = new com.asrevo.cvhome.catalog.model.product.ProductDescription();
+		tragetDescription.setFriendlyUrl(description.getSeUrl());
+		tragetDescription.setName(description.getName());
+		tragetDescription.setId(description.getId());
+		if (!StringUtils.isBlank(description.getMetatagTitle())) {
+			tragetDescription.setTitle(description.getMetatagTitle());
+		}
+		else {
+			tragetDescription.setTitle(description.getName());
+		}
+		tragetDescription.setMetaDescription(description.getMetatagDescription());
+		tragetDescription.setDescription(description.getDescription());
+		tragetDescription.setHighlights(description.getProductHighlight());
+		tragetDescription.setLanguage(description.getLanguageCode());
+		tragetDescription.setKeyWords(description.getMetatagKeywords());
+
+		tragetDescription.setLanguage(description.getLanguageCode());
+		return tragetDescription;
+	}
+
 }

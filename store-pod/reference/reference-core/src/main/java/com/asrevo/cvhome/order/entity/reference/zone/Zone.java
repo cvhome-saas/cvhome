@@ -21,36 +21,39 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Zone extends SalesManagerEntity<ZoneCode, Zone> {
-    @Serial private static final long serialVersionUID = 1L;
 
-    @EmbeddedId
-    @JsonSerialize(using = ZoneCodeSerializer.class)
-    @JsonDeserialize(using = ZoneCodeDeSerializer.class)
-    @AttributeOverrides({
-        @AttributeOverride(name = "code", column = @Column(name = "zone_code", length = 100))
-    })
-    private ZoneCode code;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "zone", cascade = CascadeType.ALL)
-    private List<ZoneDescription> descriptions = new ArrayList<>();
+	@EmbeddedId
+	@JsonSerialize(using = ZoneCodeSerializer.class)
+	@JsonDeserialize(using = ZoneCodeDeSerializer.class)
+	@AttributeOverrides({ @AttributeOverride(name = "code", column = @Column(name = "zone_code", length = 100)) })
+	private ZoneCode code;
 
-    @JsonIgnore
-    @Column(name = "COUNTRY_ID", length = 6)
-    @Convert(converter = CountryIsoCodeConverter.class)
-    private CountryIsoCode country;
+	@JsonIgnore
+	@OneToMany(mappedBy = "zone", cascade = CascadeType.ALL)
+	private List<ZoneDescription> descriptions = new ArrayList<>();
 
-    @Transient private String name;
+	@JsonIgnore
+	@Column(name = "COUNTRY_ID", length = 6)
+	@Convert(converter = CountryIsoCodeConverter.class)
+	private CountryIsoCode country;
 
-    public Zone() {}
+	@Transient
+	private String name;
 
-    @Override
-    public ZoneCode getId() {
-        return code;
-    }
+	public Zone() {
+	}
 
-    @Override
-    public void setId(ZoneCode id) {
-        this.code = id;
-    }
+	@Override
+	public ZoneCode getId() {
+		return code;
+	}
+
+	@Override
+	public void setId(ZoneCode id) {
+		this.code = id;
+	}
+
 }

@@ -14,18 +14,16 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 @Component
 public class LanguageCodeArgumentResolver implements HandlerMethodArgumentResolver {
 
-    @Override
-    public boolean supportsParameter(MethodParameter parameter) {
-        return parameter.getParameterType().equals(LanguageCode.class);
-    }
+	@Override
+	public boolean supportsParameter(MethodParameter parameter) {
+		return parameter.getParameterType().equals(LanguageCode.class);
+	}
 
-    @Override
-    public Object resolveArgument(
-            MethodParameter parameter,
-            ModelAndViewContainer mavContainer,
-            NativeWebRequest webRequest,
-            WebDataBinderFactory binderFactory) {
-        HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
-        return LanguageUtils.getRESTLanguageCode(request.getParameter(Constants.LANG));
-    }
+	@Override
+	public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
+			NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
+		HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
+		return LanguageUtils.getRESTLanguageCode(request.getParameter(Constants.LANG));
+	}
+
 }

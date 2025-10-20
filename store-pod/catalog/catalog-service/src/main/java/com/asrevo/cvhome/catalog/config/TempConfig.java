@@ -14,33 +14,28 @@ import software.amazon.awssdk.services.s3.S3Client;
 
 @Configuration
 public class TempConfig {
-    @Bean
-    public S3ProductContentFileManager s3ProductContentFileManager(
-            S3Client s3Client, CdnStorageProperties properties) {
-        return new S3ProductContentFileManager(s3Client, properties.bucket());
-    }
 
-    @Bean
-    public ProductFileManager productFileManager(
-            S3ProductContentFileManager s3ProductContentFileManager,
-            StoreProductImageProperties imageProperties) {
-        return new ProductFileManagerImpl(
-                s3ProductContentFileManager,
-                s3ProductContentFileManager,
-                s3ProductContentFileManager,
-                imageProperties.cropUploads(),
-                imageProperties.height(),
-                imageProperties.width());
-    }
+	@Bean
+	public S3ProductContentFileManager s3ProductContentFileManager(S3Client s3Client, CdnStorageProperties properties) {
+		return new S3ProductContentFileManager(s3Client, properties.bucket());
+	}
 
-    @Bean
-    public ContentAssetsManager staticContentFileManager(
-            S3Client s3Client, CdnStorageProperties properties) {
-        return new S3StaticContentAssetsManagerImpl(s3Client, properties.bucket());
-    }
+	@Bean
+	public ProductFileManager productFileManager(S3ProductContentFileManager s3ProductContentFileManager,
+			StoreProductImageProperties imageProperties) {
+		return new ProductFileManagerImpl(s3ProductContentFileManager, s3ProductContentFileManager,
+				s3ProductContentFileManager, imageProperties.cropUploads(), imageProperties.height(),
+				imageProperties.width());
+	}
 
-    @Bean
-    public LabelUtils messages() {
-        return new LabelUtils();
-    }
+	@Bean
+	public ContentAssetsManager staticContentFileManager(S3Client s3Client, CdnStorageProperties properties) {
+		return new S3StaticContentAssetsManagerImpl(s3Client, properties.bucket());
+	}
+
+	@Bean
+	public LabelUtils messages() {
+		return new LabelUtils();
+	}
+
 }

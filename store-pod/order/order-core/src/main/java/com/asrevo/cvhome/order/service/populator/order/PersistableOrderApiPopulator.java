@@ -28,108 +28,106 @@ import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Component;
 
 @Component
-public class PersistableOrderApiPopulator
-        extends AbstractDataPopulator<PersistableOrder, StoreMerchantId, Order> {
+public class PersistableOrderApiPopulator extends AbstractDataPopulator<PersistableOrder, StoreMerchantId, Order> {
 
-    private final CustomerService customerService;
-    private final CustomerPopulator customerPopulator;
-    private final CurrencyService currencyService;
-    private final ExternalMerchantStoreService externalMerchantStoreService;
+	private final CustomerService customerService;
 
-    public PersistableOrderApiPopulator(
-            CustomerService customerService,
-            CustomerPopulator customerPopulator,
-            CurrencyService currencyService,
-            ExternalMerchantStoreService externalMerchantStoreService) {
-        this.customerService = customerService;
-        this.customerPopulator = customerPopulator;
-        this.currencyService = currencyService;
-        this.externalMerchantStoreService = externalMerchantStoreService;
-    }
+	private final CustomerPopulator customerPopulator;
 
-    @Override
-    public Order populate(
-            PersistableOrder source, Order target, StoreMerchantId store, LanguageCode language)
-            throws ConversionException {
+	private final CurrencyService currencyService;
 
-        Validate.notNull(source.getPayment(), "Payment cannot be null");
+	private final ExternalMerchantStoreService externalMerchantStoreService;
 
-        try {
+	public PersistableOrderApiPopulator(CustomerService customerService, CustomerPopulator customerPopulator,
+			CurrencyService currencyService, ExternalMerchantStoreService externalMerchantStoreService) {
+		this.customerService = customerService;
+		this.customerPopulator = customerPopulator;
+		this.currencyService = currencyService;
+		this.externalMerchantStoreService = externalMerchantStoreService;
+	}
 
-            if (target == null) {
-                target = new Order();
-            }
+	@Override
+	public Order populate(PersistableOrder source, Order target, StoreMerchantId store, LanguageCode language)
+			throws ConversionException {
 
-            // target.setLocale(LocaleUtils.getLocale(store));
+		Validate.notNull(source.getPayment(), "Payment cannot be null");
 
-            ReadableMerchantStore baseStore = externalMerchantStoreService.getStore(store);
-            target.setLocale(LocaleUtils.getLocale(baseStore.getDefaultLanguage()));
+		try {
 
-            // Customer
-            Customer customer;
-            if (source.getCustomerId() != null && source.getCustomerId() > 0) {
-                Long customerId = source.getCustomerId();
-                customer = customerService.getById(customerId);
+			if (target == null) {
+				target = new Order();
+			}
 
-                if (customer == null) {
-                    throw new ConversionException(
-                            "Customer with id " + source.getCustomerId() + " does not exist");
-                }
-                target.setCustomerId(customerId);
+			// target.setLocale(LocaleUtils.getLocale(store));
 
-            } else {
-                if (source instanceof PersistableAnonymousOrder) {
-                    PersistableCustomer persistableCustomer =
-                            ((PersistableAnonymousOrder) source).getCustomer();
-                    customer = new Customer();
-                    customer =
-                            customerPopulator.populate(
-                                    persistableCustomer, customer, store, language);
-                } else {
-                    throw new ConversionException("Customer details or id not set in request");
-                }
-            }
+			ReadableMerchantStore baseStore = externalMerchantStoreService.getStore(store);
+			target.setLocale(LocaleUtils.getLocale(baseStore.getDefaultLanguage()));
 
-            target.setCustomerEmailAddress(customer.getEmailAddress());
+			// Customer
+			Customer customer;
+			if (source.getCustomerId() != null && source.getCustomerId() > 0) {
+				Long customerId = source.getCustomerId();
+				customer = customerService.getById(customerId);
 
-            Delivery delivery = customer.getDelivery();
-            target.setDelivery(delivery);
+				if (customer == null) {
+					throw new ConversionException("Customer with id " + source.getCustomerId() + " does not exist");
+				}
+				target.setCustomerId(customerId);
 
-            Billing billing = customer.getBilling();
-            target.setBilling(billing);
+			}
+			else {
+				if (source instanceof PersistableAnonymousOrder) {
+					PersistableCustomer persistableCustomer = ((PersistableAnonymousOrder) source).getCustomer();
+					customer = new Customer();
+					customer = customerPopulator.populate(persistableCustomer, customer, store, language);
+				}
+				else {
+					throw new ConversionException("Customer details or id not set in request");
+				}
+			}
 
-            target.setDatePurchased(new Date());
-            target.setCurrency(baseStore.getCurrency());
-            target.setCurrencyValue(new BigDecimal(0));
-            target.setStore(store);
-            target.setChannel(OrderChannel.API);
-            // need this
-            target.setStatus(OrderStatus.ORDERED);
-            target.setPaymentModuleCode(source.getPayment().getPaymentModule());
-            target.setPaymentType(PaymentType.valueOf(source.getPayment().getPaymentType()));
+			target.setCustomerEmailAddress(customer.getEmailAddress());
 
-            target.setCustomerAgreement(source.isCustomerAgreement());
-            target.setConfirmedAddress(
-                    true); // force this to true, cannot perform this activity from the API
+			Delivery delivery = customer.getDelivery();
+			target.setDelivery(delivery);
 
-            if (!StringUtils.isBlank(source.getComments())) {
-                OrderStatusHistory statusHistory = new OrderStatusHistory();
-                statusHistory.setStatus(null);
-                statusHistory.setOrder(target);
-                statusHistory.setComments(source.getComments());
-                target.getOrderHistory().add(statusHistory);
-            }
+			Billing billing = customer.getBilling();
+			target.setBilling(billing);
 
-            return target;
+			target.setDatePurchased(new Date());
+			target.setCurrency(baseStore.getCurrency());
+			target.setCurrencyValue(new BigDecimal(0));
+			target.setStore(store);
+			target.setChannel(OrderChannel.API);
+			// need this
+			target.setStatus(OrderStatus.ORDERED);
+			target.setPaymentModuleCode(source.getPayment().getPaymentModule());
+			target.setPaymentType(PaymentType.valueOf(source.getPayment().getPaymentType()));
 
-        } catch (Exception e) {
-            throw new ConversionException(e);
-        }
-    }
+			target.setCustomerAgreement(source.isCustomerAgreement());
+			target.setConfirmedAddress(true); // force this to true, cannot perform this
+												// activity from the API
 
-    @Override
-    protected Order createTarget() {
-        // TODO Auto-generated method stub
-        return null;
-    }
+			if (!StringUtils.isBlank(source.getComments())) {
+				OrderStatusHistory statusHistory = new OrderStatusHistory();
+				statusHistory.setStatus(null);
+				statusHistory.setOrder(target);
+				statusHistory.setComments(source.getComments());
+				target.getOrderHistory().add(statusHistory);
+			}
+
+			return target;
+
+		}
+		catch (Exception e) {
+			throw new ConversionException(e);
+		}
+	}
+
+	@Override
+	protected Order createTarget() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

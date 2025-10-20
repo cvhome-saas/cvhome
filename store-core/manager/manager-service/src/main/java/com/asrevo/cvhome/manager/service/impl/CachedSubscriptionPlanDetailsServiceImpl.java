@@ -12,34 +12,27 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 @Service
-public class CachedSubscriptionPlanDetailsServiceImpl
-        implements CachedSubscriptionPlanDetailsService {
-    private final Function<ManagerOrgId, Mono<Object>> subscriptionPlanDetailsCache;
+public class CachedSubscriptionPlanDetailsServiceImpl implements CachedSubscriptionPlanDetailsService {
 
-    public CachedSubscriptionPlanDetailsServiceImpl(
-            SubscriptionPlanDetailsService subscriptionPlanDetailsService) {
-        this.subscriptionPlanDetailsCache =
-                ofMono(
-                        Duration.ofMinutes(10),
-                        subscriptionPlanDetailsService::subscriptionPlanDetails);
-    }
+	private final Function<ManagerOrgId, Mono<Object>> subscriptionPlanDetailsCache;
 
-    public static <T, R> Function<R, Mono<T>> ofMono(Duration duration, Function<R, Mono<T>> fn) {
-        final AsyncLoadingCache<R, T> cache =
-                Caffeine.newBuilder()
-                        .expireAfterWrite(duration.multipliedBy(2))
-                        .refreshAfterWrite(duration)
-                        .buildAsync(
-                                (k, e) ->
-                                        fn.apply(k)
-                                                .subscribeOn(Schedulers.fromExecutor(e))
-                                                .toFuture());
+	public CachedSubscriptionPlanDetailsServiceImpl(SubscriptionPlanDetailsService subscriptionPlanDetailsService) {
+		this.subscriptionPlanDetailsCache = ofMono(Duration.ofMinutes(10),
+				subscriptionPlanDetailsService::subscriptionPlanDetails);
+	}
 
-        return (k) -> Mono.fromFuture(cache.get(k));
-    }
+	public static <T, R> Function<R, Mono<T>> ofMono(Duration duration, Function<R, Mono<T>> fn) {
+		final AsyncLoadingCache<R, T> cache = Caffeine.newBuilder()
+			.expireAfterWrite(duration.multipliedBy(2))
+			.refreshAfterWrite(duration)
+			.buildAsync((k, e) -> fn.apply(k).subscribeOn(Schedulers.fromExecutor(e)).toFuture());
 
-    @Override
-    public Mono<Object> subscriptionPlanDetails(ManagerOrgId orgId) {
-        return subscriptionPlanDetailsCache.apply(orgId);
-    }
+		return (k) -> Mono.fromFuture(cache.get(k));
+	}
+
+	@Override
+	public Mono<Object> subscriptionPlanDetails(ManagerOrgId orgId) {
+		return subscriptionPlanDetailsCache.apply(orgId);
+	}
+
 }

@@ -2,7 +2,8 @@ package com.asrevo.cvhome.store.core.model.entity;
 
 public interface ReadableAuditable {
 
-    ReadableAudit getReadableAudit();
+	ReadableAudit getReadableAudit();
 
-    void setReadableAudit(ReadableAudit audit);
+	void setReadableAudit(ReadableAudit audit);
+
 }

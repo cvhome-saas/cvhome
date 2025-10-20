@@ -8,17 +8,18 @@ import java.io.IOException;
 
 public class LanguageCodeDeSerializer extends StdDeserializer<LanguageCode> {
 
-    public LanguageCodeDeSerializer() {
-        this(null);
-    }
+	public LanguageCodeDeSerializer() {
+		this(null);
+	}
 
-    protected LanguageCodeDeSerializer(Class<LanguageCode> t) {
-        super(t);
-    }
+	protected LanguageCodeDeSerializer(Class<LanguageCode> t) {
+		super(t);
+	}
 
-    @Override
-    public LanguageCode deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
-        String code = p.getText();
-        return new LanguageCode(code);
-    }
+	@Override
+	public LanguageCode deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
+		String code = p.getText();
+		return new LanguageCode(code);
+	}
+
 }

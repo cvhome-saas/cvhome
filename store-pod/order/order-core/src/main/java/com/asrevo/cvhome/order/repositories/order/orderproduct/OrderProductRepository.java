@@ -11,17 +11,15 @@ import org.springframework.data.repository.query.Param;
 
 public interface OrderProductRepository extends JpaRepository<OrderProduct, Long> {
 
-    @Query(
-            """
-                    select new com.asrevo.cvhome.commons.domain.StatisticEntry(null ,op.sku ,count(o.id))
-                    from OrderProduct op
-                    join op.order o
-                    where o.store=:storeId
-                    and o.datePurchased between :from and :to
-                    group by op.sku
-                    """)
-    List<StatisticEntry> productStatistic(
-            @Param("from") Date from,
-            @Param("to") Date to,
-            @Param("storeId") StoreMerchantId storeMerchantId);
+	@Query("""
+			select new com.asrevo.cvhome.commons.domain.StatisticEntry(null ,op.sku ,count(o.id))
+			from OrderProduct op
+			join op.order o
+			where o.store=:storeId
+			and o.datePurchased between :from and :to
+			group by op.sku
+			""")
+	List<StatisticEntry> productStatistic(@Param("from") Date from, @Param("to") Date to,
+			@Param("storeId") StoreMerchantId storeMerchantId);
+
 }

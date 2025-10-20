@@ -20,20 +20,19 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @AllArgsConstructor
 public class HttpEventsController {
-    private final EventProcessor eventProcessor;
 
-    private final JsonMapper mapper =
-            JsonMapper.builder()
-                    .addModules(new JavaTimeModule(), new Jdk8Module())
-                    .setDefaultTyping(
-                            new StdTypeResolverBuilder()
-                                    .init(JsonTypeInfo.Id.CLASS, null)
-                                    .inclusion(JsonTypeInfo.As.WRAPPER_OBJECT))
-                    .build();
+	private final EventProcessor eventProcessor;
 
-    @PostMapping(value = "on", consumes = "application/json")
-    public void on(@RequestBody String rawEvent) throws JsonProcessingException {
-        Event event = mapper.readValue(rawEvent, Event.class);
-        eventProcessor.process(event);
-    }
+	private final JsonMapper mapper = JsonMapper.builder()
+		.addModules(new JavaTimeModule(), new Jdk8Module())
+		.setDefaultTyping(new StdTypeResolverBuilder().init(JsonTypeInfo.Id.CLASS, null)
+			.inclusion(JsonTypeInfo.As.WRAPPER_OBJECT))
+		.build();
+
+	@PostMapping(value = "on", consumes = "application/json")
+	public void on(@RequestBody String rawEvent) throws JsonProcessingException {
+		Event event = mapper.readValue(rawEvent, Event.class);
+		eventProcessor.process(event);
+	}
+
 }

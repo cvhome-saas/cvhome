@@ -8,17 +8,18 @@ import java.io.IOException;
 
 public class ZoneCodeDeSerializer extends StdDeserializer<ZoneCode> {
 
-    public ZoneCodeDeSerializer() {
-        this(null);
-    }
+	public ZoneCodeDeSerializer() {
+		this(null);
+	}
 
-    protected ZoneCodeDeSerializer(Class<ZoneCode> t) {
-        super(t);
-    }
+	protected ZoneCodeDeSerializer(Class<ZoneCode> t) {
+		super(t);
+	}
 
-    @Override
-    public ZoneCode deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
-        String code = p.getText();
-        return new ZoneCode(code);
-    }
+	@Override
+	public ZoneCode deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
+		String code = p.getText();
+		return new ZoneCode(code);
+	}
+
 }

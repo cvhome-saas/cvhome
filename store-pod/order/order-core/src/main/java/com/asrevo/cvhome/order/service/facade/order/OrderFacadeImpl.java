@@ -58,397 +58,377 @@ import org.springframework.util.Assert;
 @Slf4j
 public class OrderFacadeImpl implements OrderFacade {
 
-    private final ShoppingCartService shoppingCartService;
-    private final ShoppingCartFacade shoppingCartFacade;
-
-    private final OrderService orderService;
-    private final ExternalProductService externalProductService;
-    private final PersistableOrderApiPopulator persistableOrderApiPopulator;
-    private final CustomerFacade customerFacade;
-    private final LabelUtils messages;
-    private final ReadableOrderTotalMapper readableOrderTotalMapper;
-    private final LanguageService languageService;
-    private final ReadableCustomerMapper readableCustomerMapper;
-    private final ReadableOrderProductMapper readableOrderProductMapper;
-    private final ReadableOrderPopulator readableOrderPopulator;
-    private final ImageFilePath imageUtils;
-    private final ShoppingCartCalculationService shoppingCartCalculationService;
-    private final ExternalMerchantStoreService externalMerchantStoreService;
-    private final PersistablePaymentPopulator paymentPopulator;
-    private final OrderProductPopulator orderProductPopulator;
-
-    public OrderFacadeImpl(
-            ShoppingCartFacade shoppingCartFacade,
-            ShoppingCartService shoppingCartService,
-            OrderService orderService,
-            ExternalProductService externalProductService,
-            PersistableOrderApiPopulator persistableOrderApiPopulator,
-            ReadableOrderProductMapper readableOrderProductMapper,
-            LabelUtils messages,
-            CustomerFacade customerFacade,
-            ReadableCustomerMapper readableCustomerMapper,
-            ReadableOrderTotalMapper readableOrderTotalMapper,
-            LanguageService languageService,
-            ReadableOrderPopulator readableOrderPopulator,
-            ImageFilePath imageUtils,
-            ShoppingCartCalculationService shoppingCartCalculationService,
-            ExternalMerchantStoreService externalMerchantStoreService,
-            PersistablePaymentPopulator paymentPopulator,
-            OrderProductPopulator orderProductPopulator) {
-        this.shoppingCartFacade = shoppingCartFacade;
-        this.shoppingCartService = shoppingCartService;
-        this.orderService = orderService;
-        this.externalProductService = externalProductService;
-        this.persistableOrderApiPopulator = persistableOrderApiPopulator;
-        this.readableOrderProductMapper = readableOrderProductMapper;
-        this.messages = messages;
-        this.customerFacade = customerFacade;
-        this.readableCustomerMapper = readableCustomerMapper;
-        this.readableOrderTotalMapper = readableOrderTotalMapper;
-        this.languageService = languageService;
-        this.readableOrderPopulator = readableOrderPopulator;
-        this.imageUtils = imageUtils;
-        this.shoppingCartCalculationService = shoppingCartCalculationService;
-        this.externalMerchantStoreService = externalMerchantStoreService;
-        this.paymentPopulator = paymentPopulator;
-        this.orderProductPopulator = orderProductPopulator;
-    }
-
-    @Override
-    public Order processOrder(
-            PersistableOrder order,
-            Customer customer,
-            StoreMerchantId store,
-            LanguageCode language,
-            Locale locale)
-            throws ServiceException {
-
-        Assert.notNull(order, "Order cannot be null");
-        Assert.notNull(customer, "Customer cannot be null");
-        Assert.notNull(store, "store cannot be null");
-        Assert.notNull(language, "Language cannot be null");
-        Assert.notNull(locale, "Locale cannot be null");
-
-        try {
-
-            Order modelOrder = new Order();
-            persistableOrderApiPopulator.populate(order, modelOrder, store, language);
-
-            Long shoppingCartId = order.getShoppingCartId();
-            ShoppingCart cart = shoppingCartService.findCart(shoppingCartId, store);
-
-            if (cart == null) {
-                throw new ServiceException(
-                        "Shopping cart with id " + shoppingCartId + " does not exist");
-            }
-            OrderTotalSummary calculate =
-                    shoppingCartCalculationService.calculate(cart, customer, store, language);
-            order.getPayment().setAmount(calculate.getTotal().toString());
-            Set<ShoppingCartItem> shoppingCartItems = cart.getLineItems();
-
-            List<ShoppingCartItem> items = new ArrayList<>(shoppingCartItems);
-
-            Set<OrderProduct> orderProducts = new LinkedHashSet<>();
-
-            for (ShoppingCartItem item : shoppingCartItems) {
-                OrderProduct orderProduct = new OrderProduct();
-                orderProduct = orderProductPopulator.populate(item, orderProduct, store, language);
-                orderProduct.setOrder(modelOrder);
-                orderProducts.add(orderProduct);
-            }
-
-            modelOrder.setOrderProducts(orderProducts);
-
-            // requires Order Totals, this needs recalculation and then compare
-            // total with the amount sent as part
-            // of process order request. If totals does not match, an error
-            // should be thrown.
-
-            OrderTotalSummary orderTotalSummary;
-
-            OrderSummary orderSummary = new OrderSummary();
-            List<ShoppingCartItem> itemsSet = new ArrayList<>(cart.getLineItems());
-            orderSummary.setProducts(itemsSet);
-
-            orderTotalSummary =
-                    orderService.caculateOrderTotal(orderSummary, customer, store, language);
-
-            if (order.getPayment().getAmount() == null) {
-                throw new ConversionException("Requires Payment.amount");
-            }
-
-            String submitedAmount = order.getPayment().getAmount();
-
-            BigDecimal formattedSubmittedAmount = PriceUtils.getAmount(submitedAmount);
-
-            BigDecimal calculatedAmount = orderTotalSummary.getTotal();
-            String strCalculatedTotal = calculatedAmount.toPlainString();
-
-            // compare both prices
-            if (calculatedAmount.compareTo(formattedSubmittedAmount) != 0) {
-
-                throw new ConversionException(
-                        "Payment.amount does not match what the system has calculated "
-                                + strCalculatedTotal
-                                + " (received "
-                                + submitedAmount
-                                + ") please recalculate the order and submit again");
-            }
-
-            modelOrder.setTotal(calculatedAmount);
-            List<OrderTotal> totals = orderTotalSummary.getTotals();
-            Set<OrderTotal> set = new HashSet<>();
-
-            if (!CollectionUtils.isEmpty(totals)) {
-                for (OrderTotal total : totals) {
-                    total.setOrder(modelOrder);
-                    set.add(total);
-                }
-            }
-            modelOrder.setOrderTotal(set);
-
-            Payment paymentModel = new Payment();
-            paymentPopulator.populate(order.getPayment(), paymentModel, store, language);
-
-            modelOrder.setShoppingCartCode(cart.getShoppingCartCode());
-
-            // lookup existing customer
-            // if customer exist then do not set authentication for this customer and send an
-            // instructions email
-            if (!StringUtils.isBlank(customer.getNick()) && !customer.isAnonymous()) {
-                if (order.getCustomerId() == null
-                        && (customerFacade.checkIfUserExists(customer.getNick(), store))) {
-                    customer.setAnonymous(true);
-                    customer.setNick(null);
-                    // send email instructions
-                }
-            }
-
-            // order service
-            modelOrder =
-                    orderService.processOrder(
-                            modelOrder, customer, items, orderTotalSummary, paymentModel, store);
-
-            // update cart
-            try {
-                cart.setOrderId(modelOrder.getId());
-                shoppingCartFacade.saveOrUpdateShoppingCart(cart);
-            } catch (Exception e) {
-                log.error("Cannot delete cart {}", cart.getId(), e);
-            }
-
-            // email management
-            /*
-                        if (this.storeProperties.enableOrderMailApi()) {
-                            // send email
-                            try {
-
-                                notify(modelOrder, customer, store, language, locale);
-
-
-                            } catch (Exception e) {
-                                log.error("Cannot send order confirmation email", e);
-                            }
-                        }
-            */
-
-            return modelOrder;
-
-        } catch (Exception e) {
-
-            throw new ServiceException(e);
-        }
-    }
-
-    @Override
-    public ReadableOrderConfirmation orderConfirmation(
-            Order order, Customer customer, StoreMerchantId store, LanguageCode language) {
-        Validate.notNull(order, "Order cannot be null");
-        Validate.notNull(customer, "Customer cannot be null");
-        Validate.notNull(store, "store cannot be null");
-
-        ReadableOrderConfirmation orderConfirmation = new ReadableOrderConfirmation();
-
-        ReadableCustomer readableCustomer =
-                readableCustomerMapper.convert(customer, store, language);
-        orderConfirmation.setBilling(readableCustomer.getBilling());
-        orderConfirmation.setDelivery(readableCustomer.getDelivery());
-
-        ReadableTotal readableTotal = new ReadableTotal();
-
-        Set<OrderTotal> totals = order.getOrderTotal();
-        List<ReadableOrderTotal> readableTotals =
-                totals.stream()
-                        .sorted(Comparator.comparingInt(OrderTotal::getSortOrder))
-                        .map(tot -> readableOrderTotalMapper.convert(tot, store, language))
-                        .collect(Collectors.toList());
-
-        readableTotal.setTotals(readableTotals);
-
-        Optional<ReadableOrderTotal> grandTotal =
-                readableTotals.stream()
-                        .filter(tot -> tot.getCode().equals("order.total.total"))
-                        .findFirst();
-
-        grandTotal.ifPresent(
-                readableOrderTotal -> readableTotal.setGrandTotal(readableOrderTotal.getText()));
-        orderConfirmation.setTotal(readableTotal);
-
-        List<ReadableOrderProduct> products =
-                order.getOrderProducts().stream()
-                        .map(pr -> readableOrderProductMapper.convert(pr, store, language))
-                        .collect(Collectors.toList());
-        orderConfirmation.setProducts(products);
-
-        if (order.getPaymentType() != null) {
-            orderConfirmation.setPayment(order.getPaymentType().name());
-        }
-
-        orderConfirmation.setId(order.getId());
-
-        return orderConfirmation;
-    }
-
-    @Override
-    public ReadableOrderList getReadableOrderList(OrderCriteria criteria, StoreMerchantId store) {
-        try {
-            OrderList orderList = orderService.getOrders(criteria, store);
-
-            List<Order> orders = orderList.getOrders();
-            ReadableOrderList returnList = new ReadableOrderList();
-
-            if (CollectionUtils.isEmpty(orders)) {
-                returnList.setTotalElements(0);
-                return returnList;
-            }
-
-            List<ReadableOrder> readableOrders = new ArrayList<>();
-            for (Order order : orders) {
-                ReadableOrder readableOrder = new ReadableOrder();
-                readableOrderPopulator.populate(order, readableOrder, null, null);
-                readableOrders.add(readableOrder);
-            }
-            returnList.setContent(readableOrders);
-
-            returnList.setTotalElements(orderList.getTotalCount());
-            returnList.setTotalPages(orderList.getTotalPages());
-            returnList.setSize(orderList.getOrders().size());
-            returnList.setRecordsFiltered(orderList.getOrders().size());
-
-            return returnList;
-
-        } catch (Exception e) {
-            throw new ServiceRuntimeException("Error while getting orders", e);
-        }
-    }
-
-    @Override
-    public ReadableOrder getReadableOrder(
-            Long orderId, StoreMerchantId store, LanguageCode language) {
-        Validate.notNull(store, "store cannot be null");
-        Order modelOrder = orderService.getOrder(orderId, store);
-        if (modelOrder == null) {
-            throw new ResourceNotFoundException("Order not found with id " + orderId);
-        }
-
-        ReadableOrder readableOrder = new ReadableOrder();
-
-        Long customerId = modelOrder.getCustomerId();
-        if (customerId != null) {
-            ReadableCustomer readableCustomer =
-                    customerFacade.getCustomerById(customerId, store, language);
-            if (readableCustomer == null) {
-                log.warn("Customer id {} not found in order {}", customerId, orderId);
-            } else {
-                readableOrder.setCustomer(readableCustomer);
-            }
-        }
-
-        try {
-            readableOrderPopulator.populate(modelOrder, readableOrder, store, language);
-
-            // order products
-            List<ReadableOrderProduct> orderProducts = new ArrayList<>();
-            for (OrderProduct p : modelOrder.getOrderProducts()) {
-                ReadableOrderProductPopulator orderProductPopulator =
-                        new ReadableOrderProductPopulator(
-                                externalProductService, imageUtils, externalMerchantStoreService);
-
-                ReadableOrderProduct orderProduct = new ReadableOrderProduct();
-                orderProductPopulator.populate(p, orderProduct, store, language);
-                orderProducts.add(orderProduct);
-            }
-
-            readableOrder.setProducts(orderProducts);
-        } catch (Exception e) {
-            throw new ServiceRuntimeException("Error while getting order [" + orderId + "]");
-        }
-
-        return readableOrder;
-    }
-
-    @Override
-    public List<ReadableOrderStatusHistory> getReadableOrderHistory(
-            Long orderId, StoreMerchantId store, LanguageCode language) {
-
-        Order order = orderService.getOrder(orderId, store);
-        if (order == null) {
-            throw new ResourceNotFoundException(
-                    "Order id [" + orderId + "] not found for merchand [" + store + "]");
-        }
-
-        Set<OrderStatusHistory> historyList = order.getOrderHistory();
-        return historyList.stream()
-                .map(this::mapToReadbleOrderStatusHistory)
-                .collect(Collectors.toList());
-    }
-
-    ReadableOrderStatusHistory mapToReadbleOrderStatusHistory(OrderStatusHistory source) {
-        ReadableOrderStatusHistory readable = new ReadableOrderStatusHistory();
-        readable.setComments(source.getComments());
-        readable.setDate(DateUtil.formatLongDate(source.getDateAdded()));
-        readable.setId(source.getId());
-        readable.setOrderId(source.getOrder().getId());
-        readable.setOrderStatus(source.getStatus());
-
-        return readable;
-    }
-
-    @Override
-    public void createOrderStatus(
-            PersistableOrderStatusHistory status, Long id, StoreMerchantId store) {
-        Validate.notNull(status, "OrderStatusHistory must not be null");
-        Validate.notNull(id, "Order id must not be null");
-        Validate.notNull(store, "store cannot be null");
-
-        // retrieve original order
-        Order order = orderService.getOrder(id, store);
-        if (order == null) {
-            throw new ResourceNotFoundException(
-                    "Order with id [" + id + "] does not exist for merchant [" + store + "]");
-        }
-
-        try {
-            OrderStatusHistory history = new OrderStatusHistory();
-            history.setComments(status.getComments());
-            history.setDateAdded(DateUtil.getDate(status.getDate()));
-            history.setOrder(order);
-            history.setStatus(status.getOrderStatus());
-
-            orderService.addOrderStatusHistory(order, history);
-
-        } catch (Exception e) {
-            throw new ServiceRuntimeException(
-                    "An error occured while converting orderstatushistory", e);
-        }
-    }
-
-    private void notify(
-            Order modelOrder,
-            Customer customer,
-            StoreMerchantId store,
-            LanguageCode language,
-            Locale locale) {
-        // @TODO ASHRAF
-    }
+	private final ShoppingCartService shoppingCartService;
+
+	private final ShoppingCartFacade shoppingCartFacade;
+
+	private final OrderService orderService;
+
+	private final ExternalProductService externalProductService;
+
+	private final PersistableOrderApiPopulator persistableOrderApiPopulator;
+
+	private final CustomerFacade customerFacade;
+
+	private final LabelUtils messages;
+
+	private final ReadableOrderTotalMapper readableOrderTotalMapper;
+
+	private final LanguageService languageService;
+
+	private final ReadableCustomerMapper readableCustomerMapper;
+
+	private final ReadableOrderProductMapper readableOrderProductMapper;
+
+	private final ReadableOrderPopulator readableOrderPopulator;
+
+	private final ImageFilePath imageUtils;
+
+	private final ShoppingCartCalculationService shoppingCartCalculationService;
+
+	private final ExternalMerchantStoreService externalMerchantStoreService;
+
+	private final PersistablePaymentPopulator paymentPopulator;
+
+	private final OrderProductPopulator orderProductPopulator;
+
+	public OrderFacadeImpl(ShoppingCartFacade shoppingCartFacade, ShoppingCartService shoppingCartService,
+			OrderService orderService, ExternalProductService externalProductService,
+			PersistableOrderApiPopulator persistableOrderApiPopulator,
+			ReadableOrderProductMapper readableOrderProductMapper, LabelUtils messages, CustomerFacade customerFacade,
+			ReadableCustomerMapper readableCustomerMapper, ReadableOrderTotalMapper readableOrderTotalMapper,
+			LanguageService languageService, ReadableOrderPopulator readableOrderPopulator, ImageFilePath imageUtils,
+			ShoppingCartCalculationService shoppingCartCalculationService,
+			ExternalMerchantStoreService externalMerchantStoreService, PersistablePaymentPopulator paymentPopulator,
+			OrderProductPopulator orderProductPopulator) {
+		this.shoppingCartFacade = shoppingCartFacade;
+		this.shoppingCartService = shoppingCartService;
+		this.orderService = orderService;
+		this.externalProductService = externalProductService;
+		this.persistableOrderApiPopulator = persistableOrderApiPopulator;
+		this.readableOrderProductMapper = readableOrderProductMapper;
+		this.messages = messages;
+		this.customerFacade = customerFacade;
+		this.readableCustomerMapper = readableCustomerMapper;
+		this.readableOrderTotalMapper = readableOrderTotalMapper;
+		this.languageService = languageService;
+		this.readableOrderPopulator = readableOrderPopulator;
+		this.imageUtils = imageUtils;
+		this.shoppingCartCalculationService = shoppingCartCalculationService;
+		this.externalMerchantStoreService = externalMerchantStoreService;
+		this.paymentPopulator = paymentPopulator;
+		this.orderProductPopulator = orderProductPopulator;
+	}
+
+	@Override
+	public Order processOrder(PersistableOrder order, Customer customer, StoreMerchantId store, LanguageCode language,
+			Locale locale) throws ServiceException {
+
+		Assert.notNull(order, "Order cannot be null");
+		Assert.notNull(customer, "Customer cannot be null");
+		Assert.notNull(store, "store cannot be null");
+		Assert.notNull(language, "Language cannot be null");
+		Assert.notNull(locale, "Locale cannot be null");
+
+		try {
+
+			Order modelOrder = new Order();
+			persistableOrderApiPopulator.populate(order, modelOrder, store, language);
+
+			Long shoppingCartId = order.getShoppingCartId();
+			ShoppingCart cart = shoppingCartService.findCart(shoppingCartId, store);
+
+			if (cart == null) {
+				throw new ServiceException("Shopping cart with id " + shoppingCartId + " does not exist");
+			}
+			OrderTotalSummary calculate = shoppingCartCalculationService.calculate(cart, customer, store, language);
+			order.getPayment().setAmount(calculate.getTotal().toString());
+			Set<ShoppingCartItem> shoppingCartItems = cart.getLineItems();
+
+			List<ShoppingCartItem> items = new ArrayList<>(shoppingCartItems);
+
+			Set<OrderProduct> orderProducts = new LinkedHashSet<>();
+
+			for (ShoppingCartItem item : shoppingCartItems) {
+				OrderProduct orderProduct = new OrderProduct();
+				orderProduct = orderProductPopulator.populate(item, orderProduct, store, language);
+				orderProduct.setOrder(modelOrder);
+				orderProducts.add(orderProduct);
+			}
+
+			modelOrder.setOrderProducts(orderProducts);
+
+			// requires Order Totals, this needs recalculation and then compare
+			// total with the amount sent as part
+			// of process order request. If totals does not match, an error
+			// should be thrown.
+
+			OrderTotalSummary orderTotalSummary;
+
+			OrderSummary orderSummary = new OrderSummary();
+			List<ShoppingCartItem> itemsSet = new ArrayList<>(cart.getLineItems());
+			orderSummary.setProducts(itemsSet);
+
+			orderTotalSummary = orderService.caculateOrderTotal(orderSummary, customer, store, language);
+
+			if (order.getPayment().getAmount() == null) {
+				throw new ConversionException("Requires Payment.amount");
+			}
+
+			String submitedAmount = order.getPayment().getAmount();
+
+			BigDecimal formattedSubmittedAmount = PriceUtils.getAmount(submitedAmount);
+
+			BigDecimal calculatedAmount = orderTotalSummary.getTotal();
+			String strCalculatedTotal = calculatedAmount.toPlainString();
+
+			// compare both prices
+			if (calculatedAmount.compareTo(formattedSubmittedAmount) != 0) {
+
+				throw new ConversionException(
+						"Payment.amount does not match what the system has calculated " + strCalculatedTotal
+								+ " (received " + submitedAmount + ") please recalculate the order and submit again");
+			}
+
+			modelOrder.setTotal(calculatedAmount);
+			List<OrderTotal> totals = orderTotalSummary.getTotals();
+			Set<OrderTotal> set = new HashSet<>();
+
+			if (!CollectionUtils.isEmpty(totals)) {
+				for (OrderTotal total : totals) {
+					total.setOrder(modelOrder);
+					set.add(total);
+				}
+			}
+			modelOrder.setOrderTotal(set);
+
+			Payment paymentModel = new Payment();
+			paymentPopulator.populate(order.getPayment(), paymentModel, store, language);
+
+			modelOrder.setShoppingCartCode(cart.getShoppingCartCode());
+
+			// lookup existing customer
+			// if customer exist then do not set authentication for this customer and send
+			// an
+			// instructions email
+			if (!StringUtils.isBlank(customer.getNick()) && !customer.isAnonymous()) {
+				if (order.getCustomerId() == null && (customerFacade.checkIfUserExists(customer.getNick(), store))) {
+					customer.setAnonymous(true);
+					customer.setNick(null);
+					// send email instructions
+				}
+			}
+
+			// order service
+			modelOrder = orderService.processOrder(modelOrder, customer, items, orderTotalSummary, paymentModel, store);
+
+			// update cart
+			try {
+				cart.setOrderId(modelOrder.getId());
+				shoppingCartFacade.saveOrUpdateShoppingCart(cart);
+			}
+			catch (Exception e) {
+				log.error("Cannot delete cart {}", cart.getId(), e);
+			}
+
+			// email management
+			/*
+			 * if (this.storeProperties.enableOrderMailApi()) { // send email try {
+			 *
+			 * notify(modelOrder, customer, store, language, locale);
+			 *
+			 *
+			 * } catch (Exception e) { log.error("Cannot send order confirmation email",
+			 * e); } }
+			 */
+
+			return modelOrder;
+
+		}
+		catch (Exception e) {
+
+			throw new ServiceException(e);
+		}
+	}
+
+	@Override
+	public ReadableOrderConfirmation orderConfirmation(Order order, Customer customer, StoreMerchantId store,
+			LanguageCode language) {
+		Validate.notNull(order, "Order cannot be null");
+		Validate.notNull(customer, "Customer cannot be null");
+		Validate.notNull(store, "store cannot be null");
+
+		ReadableOrderConfirmation orderConfirmation = new ReadableOrderConfirmation();
+
+		ReadableCustomer readableCustomer = readableCustomerMapper.convert(customer, store, language);
+		orderConfirmation.setBilling(readableCustomer.getBilling());
+		orderConfirmation.setDelivery(readableCustomer.getDelivery());
+
+		ReadableTotal readableTotal = new ReadableTotal();
+
+		Set<OrderTotal> totals = order.getOrderTotal();
+		List<ReadableOrderTotal> readableTotals = totals.stream()
+			.sorted(Comparator.comparingInt(OrderTotal::getSortOrder))
+			.map(tot -> readableOrderTotalMapper.convert(tot, store, language))
+			.collect(Collectors.toList());
+
+		readableTotal.setTotals(readableTotals);
+
+		Optional<ReadableOrderTotal> grandTotal = readableTotals.stream()
+			.filter(tot -> tot.getCode().equals("order.total.total"))
+			.findFirst();
+
+		grandTotal.ifPresent(readableOrderTotal -> readableTotal.setGrandTotal(readableOrderTotal.getText()));
+		orderConfirmation.setTotal(readableTotal);
+
+		List<ReadableOrderProduct> products = order.getOrderProducts()
+			.stream()
+			.map(pr -> readableOrderProductMapper.convert(pr, store, language))
+			.collect(Collectors.toList());
+		orderConfirmation.setProducts(products);
+
+		if (order.getPaymentType() != null) {
+			orderConfirmation.setPayment(order.getPaymentType().name());
+		}
+
+		orderConfirmation.setId(order.getId());
+
+		return orderConfirmation;
+	}
+
+	@Override
+	public ReadableOrderList getReadableOrderList(OrderCriteria criteria, StoreMerchantId store) {
+		try {
+			OrderList orderList = orderService.getOrders(criteria, store);
+
+			List<Order> orders = orderList.getOrders();
+			ReadableOrderList returnList = new ReadableOrderList();
+
+			if (CollectionUtils.isEmpty(orders)) {
+				returnList.setTotalElements(0);
+				return returnList;
+			}
+
+			List<ReadableOrder> readableOrders = new ArrayList<>();
+			for (Order order : orders) {
+				ReadableOrder readableOrder = new ReadableOrder();
+				readableOrderPopulator.populate(order, readableOrder, null, null);
+				readableOrders.add(readableOrder);
+			}
+			returnList.setContent(readableOrders);
+
+			returnList.setTotalElements(orderList.getTotalCount());
+			returnList.setTotalPages(orderList.getTotalPages());
+			returnList.setSize(orderList.getOrders().size());
+			returnList.setRecordsFiltered(orderList.getOrders().size());
+
+			return returnList;
+
+		}
+		catch (Exception e) {
+			throw new ServiceRuntimeException("Error while getting orders", e);
+		}
+	}
+
+	@Override
+	public ReadableOrder getReadableOrder(Long orderId, StoreMerchantId store, LanguageCode language) {
+		Validate.notNull(store, "store cannot be null");
+		Order modelOrder = orderService.getOrder(orderId, store);
+		if (modelOrder == null) {
+			throw new ResourceNotFoundException("Order not found with id " + orderId);
+		}
+
+		ReadableOrder readableOrder = new ReadableOrder();
+
+		Long customerId = modelOrder.getCustomerId();
+		if (customerId != null) {
+			ReadableCustomer readableCustomer = customerFacade.getCustomerById(customerId, store, language);
+			if (readableCustomer == null) {
+				log.warn("Customer id {} not found in order {}", customerId, orderId);
+			}
+			else {
+				readableOrder.setCustomer(readableCustomer);
+			}
+		}
+
+		try {
+			readableOrderPopulator.populate(modelOrder, readableOrder, store, language);
+
+			// order products
+			List<ReadableOrderProduct> orderProducts = new ArrayList<>();
+			for (OrderProduct p : modelOrder.getOrderProducts()) {
+				ReadableOrderProductPopulator orderProductPopulator = new ReadableOrderProductPopulator(
+						externalProductService, imageUtils, externalMerchantStoreService);
+
+				ReadableOrderProduct orderProduct = new ReadableOrderProduct();
+				orderProductPopulator.populate(p, orderProduct, store, language);
+				orderProducts.add(orderProduct);
+			}
+
+			readableOrder.setProducts(orderProducts);
+		}
+		catch (Exception e) {
+			throw new ServiceRuntimeException("Error while getting order [" + orderId + "]");
+		}
+
+		return readableOrder;
+	}
+
+	@Override
+	public List<ReadableOrderStatusHistory> getReadableOrderHistory(Long orderId, StoreMerchantId store,
+			LanguageCode language) {
+
+		Order order = orderService.getOrder(orderId, store);
+		if (order == null) {
+			throw new ResourceNotFoundException("Order id [" + orderId + "] not found for merchand [" + store + "]");
+		}
+
+		Set<OrderStatusHistory> historyList = order.getOrderHistory();
+		return historyList.stream().map(this::mapToReadbleOrderStatusHistory).collect(Collectors.toList());
+	}
+
+	ReadableOrderStatusHistory mapToReadbleOrderStatusHistory(OrderStatusHistory source) {
+		ReadableOrderStatusHistory readable = new ReadableOrderStatusHistory();
+		readable.setComments(source.getComments());
+		readable.setDate(DateUtil.formatLongDate(source.getDateAdded()));
+		readable.setId(source.getId());
+		readable.setOrderId(source.getOrder().getId());
+		readable.setOrderStatus(source.getStatus());
+
+		return readable;
+	}
+
+	@Override
+	public void createOrderStatus(PersistableOrderStatusHistory status, Long id, StoreMerchantId store) {
+		Validate.notNull(status, "OrderStatusHistory must not be null");
+		Validate.notNull(id, "Order id must not be null");
+		Validate.notNull(store, "store cannot be null");
+
+		// retrieve original order
+		Order order = orderService.getOrder(id, store);
+		if (order == null) {
+			throw new ResourceNotFoundException(
+					"Order with id [" + id + "] does not exist for merchant [" + store + "]");
+		}
+
+		try {
+			OrderStatusHistory history = new OrderStatusHistory();
+			history.setComments(status.getComments());
+			history.setDateAdded(DateUtil.getDate(status.getDate()));
+			history.setOrder(order);
+			history.setStatus(status.getOrderStatus());
+
+			orderService.addOrderStatusHistory(order, history);
+
+		}
+		catch (Exception e) {
+			throw new ServiceRuntimeException("An error occured while converting orderstatushistory", e);
+		}
+	}
+
+	private void notify(Order modelOrder, Customer customer, StoreMerchantId store, LanguageCode language,
+			Locale locale) {
+		// @TODO ASHRAF
+	}
+
 }

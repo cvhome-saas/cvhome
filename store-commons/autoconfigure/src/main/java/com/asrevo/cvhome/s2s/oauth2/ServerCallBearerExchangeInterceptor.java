@@ -16,74 +16,72 @@ import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenRespon
 
 @Slf4j
 public class ServerCallBearerExchangeInterceptor implements ClientHttpRequestInterceptor {
-    private final PasswordTokenResponseClient tokenClient;
-    private final RefreshTokenTokenResponseClient refreshTokenClient;
-    private final String username;
-    private final String password;
-    private final ClientRegistration registration;
-    private OAuth2AccessTokenResponse accessToken;
 
-    public ServerCallBearerExchangeInterceptor(
-            PasswordTokenResponseClient tokenClient,
-            RefreshTokenTokenResponseClient refreshTokenClient,
-            ClientRegistrationRepository registrationRepository,
-            String registrationId,
-            String username,
-            String password) {
-        this.tokenClient = tokenClient;
-        this.refreshTokenClient = refreshTokenClient;
-        this.username = username;
-        this.password = password;
-        this.registration = registrationRepository.findByRegistrationId(registrationId);
-    }
+	private final PasswordTokenResponseClient tokenClient;
 
-    private ClientHttpResponse bearer(
-            HttpRequest request, byte[] body, ClientHttpRequestExecution execution)
-            throws IOException {
-        if (this.accessToken != null) {
-            request.getHeaders()
-                    .add(
-                            HttpHeaders.AUTHORIZATION,
-                            "Bearer " + this.accessToken.getAccessToken().getTokenValue());
-        }
-        return execution.execute(request, body);
-    }
+	private final RefreshTokenTokenResponseClient refreshTokenClient;
 
-    @Override
-    public ClientHttpResponse intercept(
-            HttpRequest request, byte[] body, ClientHttpRequestExecution execution)
-            throws IOException {
-        if (accessToken != null) {
-            Instant expiresAt = accessToken.getAccessToken().getExpiresAt();
-            if (expiresAt == null || !expiresAt.isBefore(Instant.now())) {
-                return bearer(request, body, execution);
-            } else if (this.accessToken.getRefreshToken() != null) {
-                log.info("will re generate access token using refresh token");
-                this.accessToken = this.generateNewAccessToken();
-                return bearer(request, body, execution);
-            } else {
-                log.error("token expired and refresh token not exist");
-                return bearer(request, body, execution);
-            }
-        } else {
-            log.info("wil generate access token");
-            this.accessToken = generateAccessToken(registration);
-            return bearer(request, body, execution);
-        }
-    }
+	private final String username;
 
-    OAuth2AccessTokenResponse generateAccessToken(ClientRegistration registration) {
-        log.info("will generate access token using password Grant type");
-        return tokenClient.getTokenResponse(
-                new OAuth2PasswordGrantRequest(registration, username, password));
-    }
+	private final String password;
 
-    OAuth2AccessTokenResponse generateNewAccessToken() {
-        log.info("will generate access token using refresh Grant type");
-        return refreshTokenClient.getTokenResponse(
-                new OAuth2RefreshTokenGrantRequest(
-                        this.registration,
-                        this.accessToken.getAccessToken(),
-                        this.accessToken.getRefreshToken()));
-    }
+	private final ClientRegistration registration;
+
+	private OAuth2AccessTokenResponse accessToken;
+
+	public ServerCallBearerExchangeInterceptor(PasswordTokenResponseClient tokenClient,
+			RefreshTokenTokenResponseClient refreshTokenClient, ClientRegistrationRepository registrationRepository,
+			String registrationId, String username, String password) {
+		this.tokenClient = tokenClient;
+		this.refreshTokenClient = refreshTokenClient;
+		this.username = username;
+		this.password = password;
+		this.registration = registrationRepository.findByRegistrationId(registrationId);
+	}
+
+	private ClientHttpResponse bearer(HttpRequest request, byte[] body, ClientHttpRequestExecution execution)
+			throws IOException {
+		if (this.accessToken != null) {
+			request.getHeaders()
+				.add(HttpHeaders.AUTHORIZATION, "Bearer " + this.accessToken.getAccessToken().getTokenValue());
+		}
+		return execution.execute(request, body);
+	}
+
+	@Override
+	public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution)
+			throws IOException {
+		if (accessToken != null) {
+			Instant expiresAt = accessToken.getAccessToken().getExpiresAt();
+			if (expiresAt == null || !expiresAt.isBefore(Instant.now())) {
+				return bearer(request, body, execution);
+			}
+			else if (this.accessToken.getRefreshToken() != null) {
+				log.info("will re generate access token using refresh token");
+				this.accessToken = this.generateNewAccessToken();
+				return bearer(request, body, execution);
+			}
+			else {
+				log.error("token expired and refresh token not exist");
+				return bearer(request, body, execution);
+			}
+		}
+		else {
+			log.info("wil generate access token");
+			this.accessToken = generateAccessToken(registration);
+			return bearer(request, body, execution);
+		}
+	}
+
+	OAuth2AccessTokenResponse generateAccessToken(ClientRegistration registration) {
+		log.info("will generate access token using password Grant type");
+		return tokenClient.getTokenResponse(new OAuth2PasswordGrantRequest(registration, username, password));
+	}
+
+	OAuth2AccessTokenResponse generateNewAccessToken() {
+		log.info("will generate access token using refresh Grant type");
+		return refreshTokenClient.getTokenResponse(new OAuth2RefreshTokenGrantRequest(this.registration,
+				this.accessToken.getAccessToken(), this.accessToken.getRefreshToken()));
+	}
+
 }

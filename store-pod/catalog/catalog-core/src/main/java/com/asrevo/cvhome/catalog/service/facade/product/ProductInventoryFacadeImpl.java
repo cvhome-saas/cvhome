@@ -33,217 +33,180 @@ import org.springframework.util.Assert;
 @Service("productInventoryFacade")
 public class ProductInventoryFacadeImpl implements ProductInventoryFacade {
 
-    private final ProductAvailabilityService productAvailabilityService;
+	private final ProductAvailabilityService productAvailabilityService;
 
-    private final ProductService productService;
+	private final ProductService productService;
 
-    private final ProductVariantService productVariantService;
+	private final ProductVariantService productVariantService;
 
-    private final ReadableInventoryMapper readableInventoryMapper;
+	private final ReadableInventoryMapper readableInventoryMapper;
 
-    private final PersistableInventoryMapper productInventoryMapper;
-    private final ExternalMerchantStoreService externalMerchantStoreService;
+	private final PersistableInventoryMapper productInventoryMapper;
 
-    public ProductInventoryFacadeImpl(
-            ProductAvailabilityService productAvailabilityService,
-            ProductService productService,
-            ProductVariantService productVariantService,
-            ReadableInventoryMapper readableInventoryMapper,
-            PersistableInventoryMapper productInventoryMapper,
-            ExternalMerchantStoreService externalMerchantStoreService) {
-        this.productAvailabilityService = productAvailabilityService;
-        this.productService = productService;
-        this.productVariantService = productVariantService;
-        this.readableInventoryMapper = readableInventoryMapper;
-        this.productInventoryMapper = productInventoryMapper;
-        this.externalMerchantStoreService = externalMerchantStoreService;
-    }
+	private final ExternalMerchantStoreService externalMerchantStoreService;
 
-    @Override
-    public void delete(Long productId, Long inventoryId, StoreMerchantId store) {
-        Optional<ProductAvailability> availability =
-                productAvailabilityService.getById(inventoryId, store);
-        try {
-            if (availability.isPresent()) {
-                if (availability.get().getProduct().getId().equals(productId)) {
-                    productAvailabilityService.delete(availability.get());
-                } else {
-                    throw new ResourceNotFoundException(
-                            "Product with id ["
-                                    + productId
-                                    + "] and inventory id ["
-                                    + inventoryId
-                                    + "] not found for store id ["
-                                    + store
-                                    + "]");
-                }
-            } else {
-                throw new ResourceNotFoundException(
-                        "Product with id ["
-                                + productId
-                                + "] and inventory id ["
-                                + inventoryId
-                                + "] not found for store id ["
-                                + store
-                                + "]");
-            }
-        } catch (ServiceException e) {
-            throw new ServiceRuntimeException("Error while deleting inventory", e);
-        }
-    }
+	public ProductInventoryFacadeImpl(ProductAvailabilityService productAvailabilityService,
+			ProductService productService, ProductVariantService productVariantService,
+			ReadableInventoryMapper readableInventoryMapper, PersistableInventoryMapper productInventoryMapper,
+			ExternalMerchantStoreService externalMerchantStoreService) {
+		this.productAvailabilityService = productAvailabilityService;
+		this.productService = productService;
+		this.productVariantService = productVariantService;
+		this.readableInventoryMapper = readableInventoryMapper;
+		this.productInventoryMapper = productInventoryMapper;
+		this.externalMerchantStoreService = externalMerchantStoreService;
+	}
 
-    private Product getProductById(Long productId, StoreMerchantId store) {
-        return productService
-                .retrieveById(productId, store)
-                .orElseThrow(
-                        () ->
-                                new ResourceNotFoundException(
-                                        "Product with id [" + productId + "] not found"));
-    }
+	@Override
+	public void delete(Long productId, Long inventoryId, StoreMerchantId store) {
+		Optional<ProductAvailability> availability = productAvailabilityService.getById(inventoryId, store);
+		try {
+			if (availability.isPresent()) {
+				if (availability.get().getProduct().getId().equals(productId)) {
+					productAvailabilityService.delete(availability.get());
+				}
+				else {
+					throw new ResourceNotFoundException("Product with id [" + productId + "] and inventory id ["
+							+ inventoryId + "] not found for store id [" + store + "]");
+				}
+			}
+			else {
+				throw new ResourceNotFoundException("Product with id [" + productId + "] and inventory id ["
+						+ inventoryId + "] not found for store id [" + store + "]");
+			}
+		}
+		catch (ServiceException e) {
+			throw new ServiceRuntimeException("Error while deleting inventory", e);
+		}
+	}
 
-    private ProductVariant getProductByInstance(Long instanceId, StoreMerchantId store) {
-        return productVariantService
-                .getById(instanceId, store)
-                .orElseThrow(
-                        () ->
-                                new ResourceNotFoundException(
-                                        "Product with instance [" + instanceId + "] not found"));
-    }
+	private Product getProductById(Long productId, StoreMerchantId store) {
+		return productService.retrieveById(productId, store)
+			.orElseThrow(() -> new ResourceNotFoundException("Product with id [" + productId + "] not found"));
+	}
 
-    @Override
-    public ReadableInventory add(
-            PersistableInventory inventory, StoreMerchantId store, LanguageCode language) {
-        Assert.notNull(store, "store cannot be null");
-        ProductAvailability availability = getProductAvailabilityToSave(inventory, store);
+	private ProductVariant getProductByInstance(Long instanceId, StoreMerchantId store) {
+		return productVariantService.getById(instanceId, store)
+			.orElseThrow(() -> new ResourceNotFoundException("Product with instance [" + instanceId + "] not found"));
+	}
 
-        // add inventory to the product
+	@Override
+	public ReadableInventory add(PersistableInventory inventory, StoreMerchantId store, LanguageCode language) {
+		Assert.notNull(store, "store cannot be null");
+		ProductAvailability availability = getProductAvailabilityToSave(inventory, store);
 
-        saveOrUpdate(availability);
-        return readableInventoryMapper.convert(availability, store, language);
-    }
+		// add inventory to the product
 
-    private void saveOrUpdate(ProductAvailability availability) {
-        try {
-            productAvailabilityService.saveOrUpdate(availability);
-        } catch (ServiceException e) {
-            throw new ServiceRuntimeException("Cannot create Inventory", e);
-        }
-    }
+		saveOrUpdate(availability);
+		return readableInventoryMapper.convert(availability, store, language);
+	}
 
-    private ProductAvailability getProductAvailabilityToSave(
-            PersistableInventory inventory, StoreMerchantId store) {
-        LanguageCode defaultLanguage =
-                externalMerchantStoreService.getStore(store).getDefaultLanguage();
-        return productInventoryMapper.convert(inventory, store, defaultLanguage);
-    }
+	private void saveOrUpdate(ProductAvailability availability) {
+		try {
+			productAvailabilityService.saveOrUpdate(availability);
+		}
+		catch (ServiceException e) {
+			throw new ServiceRuntimeException("Cannot create Inventory", e);
+		}
+	}
 
-    @Override
-    public ReadableInventory get(Long inventoryId, StoreMerchantId store, LanguageCode language) {
+	private ProductAvailability getProductAvailabilityToSave(PersistableInventory inventory, StoreMerchantId store) {
+		LanguageCode defaultLanguage = externalMerchantStoreService.getStore(store).getDefaultLanguage();
+		return productInventoryMapper.convert(inventory, store, defaultLanguage);
+	}
 
-        ProductAvailability availability =
-                productAvailabilityService
-                        .getById(inventoryId, store)
-                        .orElseThrow(
-                                () ->
-                                        new ResourceNotFoundException(
-                                                "Inventory with id ["
-                                                        + inventoryId
-                                                        + "] not found"));
-        return readableInventoryMapper.convert(availability, store, language);
-    }
+	@Override
+	public ReadableInventory get(Long inventoryId, StoreMerchantId store, LanguageCode language) {
 
-    @Override
-    public void update(
-            PersistableInventory inventory, StoreMerchantId store, LanguageCode language) {
+		ProductAvailability availability = productAvailabilityService.getById(inventoryId, store)
+			.orElseThrow(() -> new ResourceNotFoundException("Inventory with id [" + inventoryId + "] not found"));
+		return readableInventoryMapper.convert(availability, store, language);
+	}
 
-        Assert.notNull(inventory, "Inventory cannot be null");
-        Assert.notNull(store, "store cannot be null");
+	@Override
+	public void update(PersistableInventory inventory, StoreMerchantId store, LanguageCode language) {
 
-        Set<ProductAvailability> originAvailability = null;
-        Product product = null;
+		Assert.notNull(inventory, "Inventory cannot be null");
+		Assert.notNull(store, "store cannot be null");
 
-        if (inventory.getProductId() != null && inventory.getProductId() > 0) {
-            product = this.getProductById(inventory.getProductId(), store);
-            originAvailability = product.getAvailabilities();
-        } else {
-            if (inventory.getVariant() != null && inventory.getId() > 0) {
-                ProductVariant instance = this.getProductByInstance(inventory.getVariant(), store);
-                originAvailability = instance.getAvailabilities();
-                product = instance.getProduct();
-            }
-        }
+		Set<ProductAvailability> originAvailability = null;
+		Product product = null;
 
-        ProductAvailability avail =
-                Optional.ofNullable(originAvailability)
-                        .flatMap(
-                                it ->
-                                        it.stream()
-                                                .filter(a -> a.getId().equals(inventory.getId()))
-                                                .findAny())
-                        .orElse(null);
-        if (avail == null) {
-            throw new ResourceNotFoundException(
-                    "Inventory with id [" + inventory.getId() + "] not found");
-        }
+		if (inventory.getProductId() != null && inventory.getProductId() > 0) {
+			product = this.getProductById(inventory.getProductId(), store);
+			originAvailability = product.getAvailabilities();
+		}
+		else {
+			if (inventory.getVariant() != null && inventory.getId() > 0) {
+				ProductVariant instance = this.getProductByInstance(inventory.getVariant(), store);
+				originAvailability = instance.getAvailabilities();
+				product = instance.getProduct();
+			}
+		}
 
-        if (product != null) {
+		ProductAvailability avail = Optional.ofNullable(originAvailability)
+			.flatMap(it -> it.stream().filter(a -> a.getId().equals(inventory.getId())).findAny())
+			.orElse(null);
+		if (avail == null) {
+			throw new ResourceNotFoundException("Inventory with id [" + inventory.getId() + "] not found");
+		}
 
-            inventory.setProductId(product.getId());
-        }
+		if (product != null) {
 
-        avail = productInventoryMapper.merge(inventory, avail, store, language);
-        avail.setProduct(product);
-        avail.setStoreMerchantId(store);
-        saveOrUpdate(avail);
-    }
+			inventory.setProductId(product.getId());
+		}
 
-    @Override
-    public ReadableEntityList<ReadableInventory> get(
-            String sku, StoreMerchantId store, LanguageCode language, Pageable pageable) {
-        Assert.notNull(sku, "Product sku cannot be null");
-        Assert.notNull(store, "StoreMerchantId code cannot be null");
-        Assert.notNull(language, "LanguageCode cannot be null");
+		avail = productInventoryMapper.merge(inventory, avail, store, language);
+		avail.setProduct(product);
+		avail.setStoreMerchantId(store);
+		saveOrUpdate(avail);
+	}
 
-        Page<ProductAvailability> availabilities =
-                productAvailabilityService.getBySku(sku, pageable);
+	@Override
+	public ReadableEntityList<ReadableInventory> get(String sku, StoreMerchantId store, LanguageCode language,
+			Pageable pageable) {
+		Assert.notNull(sku, "Product sku cannot be null");
+		Assert.notNull(store, "StoreMerchantId code cannot be null");
+		Assert.notNull(language, "LanguageCode cannot be null");
 
-        if (availabilities.isEmpty()) {
-            // get parent product
-            try {
-                Product singleProduct = productService.getBySku(sku, store);
-                if (singleProduct != null) {
-                    availabilities =
-                            new PageImpl<>(new ArrayList<>(singleProduct.getAvailabilities()));
-                }
-            } catch (ServiceException e) {
-                throw new ServiceRuntimeException(
-                        "An error occured while getting product with sku " + sku, e);
-            }
-        }
+		Page<ProductAvailability> availabilities = productAvailabilityService.getBySku(sku, pageable);
 
-        List<ReadableInventory> returnList =
-                availabilities.getContent().stream()
-                        .map(i -> this.readableInventoryMapper.convert(i, store, language))
-                        .collect(Collectors.toList());
+		if (availabilities.isEmpty()) {
+			// get parent product
+			try {
+				Product singleProduct = productService.getBySku(sku, store);
+				if (singleProduct != null) {
+					availabilities = new PageImpl<>(new ArrayList<>(singleProduct.getAvailabilities()));
+				}
+			}
+			catch (ServiceException e) {
+				throw new ServiceRuntimeException("An error occured while getting product with sku " + sku, e);
+			}
+		}
 
-        return createReadableList(availabilities, returnList);
-    }
+		List<ReadableInventory> returnList = availabilities.getContent()
+			.stream()
+			.map(i -> this.readableInventoryMapper.convert(i, store, language))
+			.collect(Collectors.toList());
 
-    @Override
-    public ReadableEntityList<ReadableInventory> get(
-            Long productId, StoreMerchantId store, LanguageCode language, Pageable pageable) {
+		return createReadableList(availabilities, returnList);
+	}
 
-        Assert.notNull(productId, "Product id cannot be null");
-        Assert.notNull(store, "StoreMerchantId code cannot be null");
+	@Override
+	public ReadableEntityList<ReadableInventory> get(Long productId, StoreMerchantId store, LanguageCode language,
+			Pageable pageable) {
 
-        Page<ProductAvailability> availabilities =
-                productAvailabilityService.listByProduct(productId, store, pageable);
+		Assert.notNull(productId, "Product id cannot be null");
+		Assert.notNull(store, "StoreMerchantId code cannot be null");
 
-        List<ReadableInventory> returnList =
-                availabilities.getContent().stream()
-                        .map(i -> this.readableInventoryMapper.convert(i, store, language))
-                        .collect(Collectors.toList());
+		Page<ProductAvailability> availabilities = productAvailabilityService.listByProduct(productId, store, pageable);
 
-        return createReadableList(availabilities, returnList);
-    }
+		List<ReadableInventory> returnList = availabilities.getContent()
+			.stream()
+			.map(i -> this.readableInventoryMapper.convert(i, store, language))
+			.collect(Collectors.toList());
+
+		return createReadableList(availabilities, returnList);
+	}
+
 }

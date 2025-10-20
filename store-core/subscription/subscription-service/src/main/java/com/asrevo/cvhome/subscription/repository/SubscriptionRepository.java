@@ -9,6 +9,6 @@ import org.springframework.data.repository.CrudRepository;
 
 public interface SubscriptionRepository extends CrudRepository<SubscriptionEntity, ManagerOrgId> {
 
-    List<SubscriptionEntity> findAllByStatusAndEndDateBefore(
-            SubscriptionStatus status, Instant endDateBefore);
+	List<SubscriptionEntity> findAllByStatusAndEndDateBefore(SubscriptionStatus status, Instant endDateBefore);
+
 }

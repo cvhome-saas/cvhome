@@ -41,742 +41,370 @@ import org.springframework.web.multipart.MultipartFile;
 @Slf4j
 public class ContentApi {
 
-    private static final String BOX = "BOX";
-    private static final String PAGE = "PAGE";
+	private static final String BOX = "BOX";
 
-    private final ContentFacade contentFacade;
+	private static final String PAGE = "PAGE";
 
-    public ContentApi(ContentFacade contentFacade) {
-        this.contentFacade = contentFacade;
-    }
+	private final ContentFacade contentFacade;
 
-    /**
-     * List content pages
-     */
-    @GetMapping(value = "/private/content/pages", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(
-            method = "GET",
-            description = "Get page names created for a given MerchantStore",
-            responses =
-                    @ApiResponse(
-                            content =
-                                    @io.swagger.v3.oas.annotations.media.Content(
-                                            schema = @Schema(implementation = List.class))))
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-        @Parameter(
-                name = "lang",
-                schema =
-                        @Schema(
-                                name = "lang",
-                                type = "string",
-                                defaultValue = Constants.DEFAULT_LANGUAGE))
-    })
-    @ConditionalOnApiStatus
-    public ReadableContentPageList pages(
-            @Parameter(hidden = true) StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language,
-            Pageable pageable) {
-        return contentFacade.getContentPages(merchantStore, LanguageCode.nonLanguage(), pageable);
-    }
+	public ContentApi(ContentFacade contentFacade) {
+		this.contentFacade = contentFacade;
+	}
 
-    /**
-     * List content pages
-     */
-    @GetMapping(value = "/content/pages", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(
-            method = "GET",
-            description = "Get page names created for a given MerchantStore",
-            responses =
-                    @ApiResponse(
-                            content =
-                                    @io.swagger.v3.oas.annotations.media.Content(
-                                            schema = @Schema(implementation = List.class))))
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-        @Parameter(
-                name = "lang",
-                schema =
-                        @Schema(
-                                name = "lang",
-                                type = "string",
-                                defaultValue = Constants.DEFAULT_LANGUAGE))
-    })
-    @ConditionalOnApiStatus
-    public ReadableContentPageList getPages(
-            @Parameter(hidden = true) StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language,
-            Pageable pageable) {
-        return contentFacade.getContentPages(merchantStore, language, pageable);
-    }
+	/**
+	 * List content pages
+	 */
+	@GetMapping(value = "/private/content/pages", produces = MediaType.APPLICATION_JSON_VALUE)
+	@Operation(method = "GET", description = "Get page names created for a given MerchantStore",
+			responses = @ApiResponse(content = @io.swagger.v3.oas.annotations.media.Content(
+					schema = @Schema(implementation = List.class))))
+	@Parameters({
+			@Parameter(name = "store",
+					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+			@Parameter(name = "lang",
+					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	@ConditionalOnApiStatus
+	public ReadableContentPageList pages(@Parameter(hidden = true) StoreMerchantId merchantStore,
+			@Parameter(hidden = true) LanguageCode language, Pageable pageable) {
+		return contentFacade.getContentPages(merchantStore, LanguageCode.nonLanguage(), pageable);
+	}
 
-    /**
-     * List all boxes
-     */
-    @GetMapping(value = "/private/content/boxes", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(
-            method = "GET",
-            description = "Get boxes for a given MerchantStore",
-            responses =
-                    @ApiResponse(
-                            content =
-                                    @io.swagger.v3.oas.annotations.media.Content(
-                                            schema = @Schema(implementation = List.class))))
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-        @Parameter(
-                name = "lang",
-                schema =
-                        @Schema(
-                                name = "lang",
-                                type = "string",
-                                defaultValue = Constants.DEFAULT_LANGUAGE))
-    })
-    @ConditionalOnApiStatus
-    public ReadableContentBoxList boxes(
-            @Parameter(hidden = true) StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language,
-            Pageable pageable) {
-        return contentFacade.getContentBoxes(merchantStore, LanguageCode.nonLanguage(), pageable);
-    }
+	/**
+	 * List content pages
+	 */
+	@GetMapping(value = "/content/pages", produces = MediaType.APPLICATION_JSON_VALUE)
+	@Operation(method = "GET", description = "Get page names created for a given MerchantStore",
+			responses = @ApiResponse(content = @io.swagger.v3.oas.annotations.media.Content(
+					schema = @Schema(implementation = List.class))))
+	@Parameters({
+			@Parameter(name = "store",
+					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+			@Parameter(name = "lang",
+					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	@ConditionalOnApiStatus
+	public ReadableContentPageList getPages(@Parameter(hidden = true) StoreMerchantId merchantStore,
+			@Parameter(hidden = true) LanguageCode language, Pageable pageable) {
+		return contentFacade.getContentPages(merchantStore, language, pageable);
+	}
 
-    /**
-     * List all boxes
-     */
-    @GetMapping(value = "/content/boxes", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(
-            method = "GET",
-            description = "Get boxes for a given MerchantStore",
-            responses =
-                    @ApiResponse(
-                            content =
-                                    @io.swagger.v3.oas.annotations.media.Content(
-                                            schema = @Schema(implementation = List.class))))
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-        @Parameter(
-                name = "lang",
-                schema =
-                        @Schema(
-                                name = "lang",
-                                type = "string",
-                                defaultValue = Constants.DEFAULT_LANGUAGE))
-    })
-    @ConditionalOnApiStatus
-    public ReadableContentBoxList getBoxes(
-            @Parameter(hidden = true) StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language,
-            Pageable pageable) {
-        return contentFacade.getContentBoxes(merchantStore, language, pageable);
-    }
+	/**
+	 * List all boxes
+	 */
+	@GetMapping(value = "/private/content/boxes", produces = MediaType.APPLICATION_JSON_VALUE)
+	@Operation(method = "GET", description = "Get boxes for a given MerchantStore", responses = @ApiResponse(
+			content = @io.swagger.v3.oas.annotations.media.Content(schema = @Schema(implementation = List.class))))
+	@Parameters({
+			@Parameter(name = "store",
+					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+			@Parameter(name = "lang",
+					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	@ConditionalOnApiStatus
+	public ReadableContentBoxList boxes(@Parameter(hidden = true) StoreMerchantId merchantStore,
+			@Parameter(hidden = true) LanguageCode language, Pageable pageable) {
+		return contentFacade.getContentBoxes(merchantStore, LanguageCode.nonLanguage(), pageable);
+	}
 
-    /**
-     * List specific content page
-     */
-    @GetMapping(
-            value = "/private/content/pages/{code}",
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(
-            method = "GET",
-            description = "Get page content by code for a given MerchantStore",
-            responses =
-                    @ApiResponse(
-                            content =
-                                    @io.swagger.v3.oas.annotations.media.Content(
-                                            schema =
-                                                    @Schema(
-                                                            implementation =
-                                                                    ReadableContentPage.class))))
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-        @Parameter(
-                name = "lang",
-                schema =
-                        @Schema(
-                                name = "lang",
-                                type = "string",
-                                defaultValue = Constants.DEFAULT_LANGUAGE))
-    })
-    @ConditionalOnApiStatus
-    public ReadableContentPage page(
-            @PathVariable("code") String code,
-            @Parameter(hidden = true) StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language) {
+	/**
+	 * List all boxes
+	 */
+	@GetMapping(value = "/content/boxes", produces = MediaType.APPLICATION_JSON_VALUE)
+	@Operation(method = "GET", description = "Get boxes for a given MerchantStore", responses = @ApiResponse(
+			content = @io.swagger.v3.oas.annotations.media.Content(schema = @Schema(implementation = List.class))))
+	@Parameters({
+			@Parameter(name = "store",
+					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+			@Parameter(name = "lang",
+					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	@ConditionalOnApiStatus
+	public ReadableContentBoxList getBoxes(@Parameter(hidden = true) StoreMerchantId merchantStore,
+			@Parameter(hidden = true) LanguageCode language, Pageable pageable) {
+		return contentFacade.getContentBoxes(merchantStore, language, pageable);
+	}
 
-        return contentFacade.getContentPage(code, merchantStore, LanguageCode.allLanguage());
-    }
+	/**
+	 * List specific content page
+	 */
+	@GetMapping(value = "/private/content/pages/{code}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@Operation(method = "GET", description = "Get page content by code for a given MerchantStore",
+			responses = @ApiResponse(content = @io.swagger.v3.oas.annotations.media.Content(
+					schema = @Schema(implementation = ReadableContentPage.class))))
+	@Parameters({
+			@Parameter(name = "store",
+					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+			@Parameter(name = "lang",
+					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	@ConditionalOnApiStatus
+	public ReadableContentPage page(@PathVariable("code") String code,
+			@Parameter(hidden = true) StoreMerchantId merchantStore, @Parameter(hidden = true) LanguageCode language) {
 
-    /**
-     * List specific content page
-     */
-    @GetMapping(value = "/content/pages/{code}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(
-            method = "GET",
-            description = "Get page content by code for a given MerchantStore",
-            responses =
-                    @ApiResponse(
-                            content =
-                                    @io.swagger.v3.oas.annotations.media.Content(
-                                            schema =
-                                                    @Schema(
-                                                            implementation =
-                                                                    ReadableContentPage.class))))
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-        @Parameter(
-                name = "lang",
-                schema =
-                        @Schema(
-                                name = "lang",
-                                type = "string",
-                                defaultValue = Constants.DEFAULT_LANGUAGE))
-    })
-    @ConditionalOnApiStatus
-    public ReadableContentPage getPage(
-            @PathVariable("code") String code,
-            @Parameter(hidden = true) StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language) {
+		return contentFacade.getContentPage(code, merchantStore, LanguageCode.allLanguage());
+	}
 
-        return contentFacade.getContentPage(code, merchantStore, language);
-    }
+	/**
+	 * List specific content page
+	 */
+	@GetMapping(value = "/content/pages/{code}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@Operation(method = "GET", description = "Get page content by code for a given MerchantStore",
+			responses = @ApiResponse(content = @io.swagger.v3.oas.annotations.media.Content(
+					schema = @Schema(implementation = ReadableContentPage.class))))
+	@Parameters({
+			@Parameter(name = "store",
+					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+			@Parameter(name = "lang",
+					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	@ConditionalOnApiStatus
+	public ReadableContentPage getPage(@PathVariable("code") String code,
+			@Parameter(hidden = true) StoreMerchantId merchantStore, @Parameter(hidden = true) LanguageCode language) {
 
-    @GetMapping(
-            value = "/private/content/boxes/{code}",
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(
-            method = "GET",
-            description = "Manage box content by code for a code and a given MerchantStore",
-            responses =
-                    @ApiResponse(
-                            content =
-                                    @io.swagger.v3.oas.annotations.media.Content(
-                                            schema = @Schema(implementation = List.class))))
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-        @Parameter(
-                name = "lang",
-                schema =
-                        @Schema(
-                                name = "lang",
-                                type = "string",
-                                defaultValue = Constants.DEFAULT_LANGUAGE))
-    })
-    @ConditionalOnApiStatus
-    public ReadableContentBox box(
-            @PathVariable("code") String code,
-            @Parameter(hidden = true) StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language) {
-        return contentFacade.getContentBox(code, merchantStore, LanguageCode.allLanguage());
-    }
+		return contentFacade.getContentPage(code, merchantStore, language);
+	}
 
-    @GetMapping(value = "/content/boxes/{code}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(
-            method = "GET",
-            description = "Get box content by code for a code and a given MerchantStore",
-            responses =
-                    @ApiResponse(
-                            content =
-                                    @io.swagger.v3.oas.annotations.media.Content(
-                                            schema = @Schema(implementation = List.class))))
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-        @Parameter(
-                name = "lang",
-                schema =
-                        @Schema(
-                                name = "lang",
-                                type = "string",
-                                defaultValue = Constants.DEFAULT_LANGUAGE))
-    })
-    @ConditionalOnApiStatus
-    public ReadableContentBox getBox(
-            @PathVariable("code") String code,
-            @Parameter(hidden = true) StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language) {
-        return contentFacade.getContentBox(code, merchantStore, language);
-    }
+	@GetMapping(value = "/private/content/boxes/{code}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@Operation(method = "GET", description = "Manage box content by code for a code and a given MerchantStore",
+			responses = @ApiResponse(content = @io.swagger.v3.oas.annotations.media.Content(
+					schema = @Schema(implementation = List.class))))
+	@Parameters({
+			@Parameter(name = "store",
+					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+			@Parameter(name = "lang",
+					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	@ConditionalOnApiStatus
+	public ReadableContentBox box(@PathVariable("code") String code,
+			@Parameter(hidden = true) StoreMerchantId merchantStore, @Parameter(hidden = true) LanguageCode language) {
+		return contentFacade.getContentBox(code, merchantStore, LanguageCode.allLanguage());
+	}
 
-    /**
-     * Get content page by name
-     */
-    @GetMapping(value = "/content/pages/name/{name}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(
-            method = "GET",
-            description = "Get page content by code for a given MerchantStore",
-            responses =
-                    @ApiResponse(
-                            content =
-                                    @io.swagger.v3.oas.annotations.media.Content(
-                                            schema =
-                                                    @Schema(
-                                                            implementation =
-                                                                    ReadableContentPage.class))))
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-        @Parameter(
-                name = "lang",
-                schema =
-                        @Schema(
-                                name = "lang",
-                                type = "string",
-                                defaultValue = Constants.DEFAULT_LANGUAGE))
-    })
-    @ConditionalOnApiStatus
-    public ReadableContentPage pageByName(
-            @PathVariable("name") String name,
-            @Parameter(hidden = true) StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language) {
+	@GetMapping(value = "/content/boxes/{code}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@Operation(method = "GET", description = "Get box content by code for a code and a given MerchantStore",
+			responses = @ApiResponse(content = @io.swagger.v3.oas.annotations.media.Content(
+					schema = @Schema(implementation = List.class))))
+	@Parameters({
+			@Parameter(name = "store",
+					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+			@Parameter(name = "lang",
+					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	@ConditionalOnApiStatus
+	public ReadableContentBox getBox(@PathVariable("code") String code,
+			@Parameter(hidden = true) StoreMerchantId merchantStore, @Parameter(hidden = true) LanguageCode language) {
+		return contentFacade.getContentBox(code, merchantStore, language);
+	}
 
-        return contentFacade.getContentPageByName(name, merchantStore, language);
-    }
+	/**
+	 * Get content page by name
+	 */
+	@GetMapping(value = "/content/pages/name/{name}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@Operation(method = "GET", description = "Get page content by code for a given MerchantStore",
+			responses = @ApiResponse(content = @io.swagger.v3.oas.annotations.media.Content(
+					schema = @Schema(implementation = ReadableContentPage.class))))
+	@Parameters({
+			@Parameter(name = "store",
+					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+			@Parameter(name = "lang",
+					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	@ConditionalOnApiStatus
+	public ReadableContentPage pageByName(@PathVariable("name") String name,
+			@Parameter(hidden = true) StoreMerchantId merchantStore, @Parameter(hidden = true) LanguageCode language) {
 
-    /**
-     * Create content box
-     */
-    @PostMapping(value = "/private/content/box")
-    @ResponseStatus(HttpStatus.CREATED)
-    @Operation(
-            method = "POST",
-            description = "Create content box",
-            responses =
-                    @ApiResponse(
-                            content =
-                                    @io.swagger.v3.oas.annotations.media.Content(
-                                            schema = @Schema(implementation = Entity.class))))
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-        @Parameter(
-                name = "lang",
-                schema =
-                        @Schema(
-                                name = "lang",
-                                type = "string",
-                                defaultValue = Constants.DEFAULT_LANGUAGE))
-    })
-    @ConditionalOnApiStatus
-    public Entity createBox(
-            @RequestBody @Valid PersistableContentBox box,
-            @Parameter(hidden = true) StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language) {
+		return contentFacade.getContentPageByName(name, merchantStore, language);
+	}
 
-        Long id = contentFacade.saveContentBox(box, merchantStore, language);
-        Entity entity = new Entity();
-        entity.setId(id);
-        return entity;
-    }
+	/**
+	 * Create content box
+	 */
+	@PostMapping(value = "/private/content/box")
+	@ResponseStatus(HttpStatus.CREATED)
+	@Operation(method = "POST", description = "Create content box", responses = @ApiResponse(
+			content = @io.swagger.v3.oas.annotations.media.Content(schema = @Schema(implementation = Entity.class))))
+	@Parameters({
+			@Parameter(name = "store",
+					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+			@Parameter(name = "lang",
+					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	@ConditionalOnApiStatus
+	public Entity createBox(@RequestBody @Valid PersistableContentBox box,
+			@Parameter(hidden = true) StoreMerchantId merchantStore, @Parameter(hidden = true) LanguageCode language) {
 
-    @GetMapping(value = "/private/content/box/{code}/exists")
-    @ResponseStatus(HttpStatus.OK)
-    @Operation(
-            method = "GET",
-            description = "Check unique content box",
-            responses =
-                    @ApiResponse(
-                            content =
-                                    @Content(
-                                            schema = @Schema(implementation = EntityExists.class))))
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-        @Parameter(
-                name = "lang",
-                schema =
-                        @Schema(
-                                name = "lang",
-                                type = "string",
-                                defaultValue = Constants.DEFAULT_LANGUAGE))
-    })
-    @ConditionalOnApiStatus
-    public EntityExists boxExists(
-            @PathVariable String code,
-            @Parameter(hidden = true) StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language) {
+		Long id = contentFacade.saveContentBox(box, merchantStore, language);
+		Entity entity = new Entity();
+		entity.setId(id);
+		return entity;
+	}
 
-        boolean exists = contentFacade.codeExist(code, BOX, merchantStore);
-        return new EntityExists(exists);
-    }
+	@GetMapping(value = "/private/content/box/{code}/exists")
+	@ResponseStatus(HttpStatus.OK)
+	@Operation(method = "GET", description = "Check unique content box",
+			responses = @ApiResponse(content = @Content(schema = @Schema(implementation = EntityExists.class))))
+	@Parameters({
+			@Parameter(name = "store",
+					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+			@Parameter(name = "lang",
+					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	@ConditionalOnApiStatus
+	public EntityExists boxExists(@PathVariable String code, @Parameter(hidden = true) StoreMerchantId merchantStore,
+			@Parameter(hidden = true) LanguageCode language) {
 
-    @GetMapping(value = "/private/content/page/{code}/exists")
-    @ResponseStatus(HttpStatus.OK)
-    @Operation(
-            method = "GET",
-            description = "Check unique content page",
-            responses =
-                    @ApiResponse(
-                            content =
-                                    @io.swagger.v3.oas.annotations.media.Content(
-                                            schema =
-                                                    @Schema(
-                                                            implementation =
-                                                                    ResponseEntity.class))))
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-        @Parameter(
-                name = "lang",
-                schema =
-                        @Schema(
-                                name = "lang",
-                                type = "string",
-                                defaultValue = Constants.DEFAULT_LANGUAGE))
-    })
-    @ConditionalOnApiStatus
-    public EntityExists pageExists(
-            @PathVariable String code,
-            @Parameter(hidden = true) StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language) {
+		boolean exists = contentFacade.codeExist(code, BOX, merchantStore);
+		return new EntityExists(exists);
+	}
 
-        boolean exists = contentFacade.codeExist(code, PAGE, merchantStore);
-        return new EntityExists(exists);
-    }
+	@GetMapping(value = "/private/content/page/{code}/exists")
+	@ResponseStatus(HttpStatus.OK)
+	@Operation(method = "GET", description = "Check unique content page",
+			responses = @ApiResponse(content = @io.swagger.v3.oas.annotations.media.Content(
+					schema = @Schema(implementation = ResponseEntity.class))))
+	@Parameters({
+			@Parameter(name = "store",
+					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+			@Parameter(name = "lang",
+					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	@ConditionalOnApiStatus
+	public EntityExists pageExists(@PathVariable String code, @Parameter(hidden = true) StoreMerchantId merchantStore,
+			@Parameter(hidden = true) LanguageCode language) {
 
-    /**
-     * Create content page
-     */
-    @PostMapping(value = "/private/content/page")
-    @ResponseStatus(HttpStatus.CREATED)
-    @Operation(
-            method = "POST",
-            description = "Create content page",
-            responses =
-                    @ApiResponse(
-                            content =
-                                    @io.swagger.v3.oas.annotations.media.Content(
-                                            schema = @Schema(implementation = Entity.class))))
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-        @Parameter(
-                name = "lang",
-                schema =
-                        @Schema(
-                                name = "lang",
-                                type = "string",
-                                defaultValue = Constants.DEFAULT_LANGUAGE))
-    })
-    @ConditionalOnApiStatus
-    public Entity createPage(
-            @RequestBody @Valid PersistableContentPage page,
-            @Parameter(hidden = true) StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language) {
+		boolean exists = contentFacade.codeExist(code, PAGE, merchantStore);
+		return new EntityExists(exists);
+	}
 
-        Long id = contentFacade.saveContentPage(page, merchantStore, language);
-        Entity entity = new Entity();
-        entity.setId(id);
-        return entity;
-    }
+	/**
+	 * Create content page
+	 */
+	@PostMapping(value = "/private/content/page")
+	@ResponseStatus(HttpStatus.CREATED)
+	@Operation(method = "POST", description = "Create content page", responses = @ApiResponse(
+			content = @io.swagger.v3.oas.annotations.media.Content(schema = @Schema(implementation = Entity.class))))
+	@Parameters({
+			@Parameter(name = "store",
+					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+			@Parameter(name = "lang",
+					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	@ConditionalOnApiStatus
+	public Entity createPage(@RequestBody @Valid PersistableContentPage page,
+			@Parameter(hidden = true) StoreMerchantId merchantStore, @Parameter(hidden = true) LanguageCode language) {
 
-    @PutMapping(value = "/private/content/page/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    @Operation(
-            method = "PUT",
-            description = "Update content page",
-            responses =
-                    @ApiResponse(
-                            content =
-                                    @io.swagger.v3.oas.annotations.media.Content(
-                                            schema = @Schema())))
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-        @Parameter(
-                name = "lang",
-                schema =
-                        @Schema(
-                                name = "lang",
-                                type = "string",
-                                defaultValue = Constants.DEFAULT_LANGUAGE))
-    })
-    @ConditionalOnApiStatus
-    public void updatePage(
-            @RequestBody @Valid PersistableContentPage page,
-            @PathVariable Long id,
-            @Parameter(hidden = true) StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language) {
+		Long id = contentFacade.saveContentPage(page, merchantStore, language);
+		Entity entity = new Entity();
+		entity.setId(id);
+		return entity;
+	}
 
-        contentFacade.updateContentPage(id, page, merchantStore, language);
-    }
+	@PutMapping(value = "/private/content/page/{id}")
+	@ResponseStatus(HttpStatus.OK)
+	@Operation(method = "PUT", description = "Update content page",
+			responses = @ApiResponse(content = @io.swagger.v3.oas.annotations.media.Content(schema = @Schema())))
+	@Parameters({
+			@Parameter(name = "store",
+					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+			@Parameter(name = "lang",
+					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	@ConditionalOnApiStatus
+	public void updatePage(@RequestBody @Valid PersistableContentPage page, @PathVariable Long id,
+			@Parameter(hidden = true) StoreMerchantId merchantStore, @Parameter(hidden = true) LanguageCode language) {
 
-    @PutMapping(value = "/private/content/box/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    @Operation(
-            method = "PUT",
-            description = "Update content box",
-            responses =
-                    @ApiResponse(
-                            content =
-                                    @io.swagger.v3.oas.annotations.media.Content(
-                                            schema = @Schema())))
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-        @Parameter(
-                name = "lang",
-                schema =
-                        @Schema(
-                                name = "lang",
-                                type = "string",
-                                defaultValue = Constants.DEFAULT_LANGUAGE))
-    })
-    @ConditionalOnApiStatus
-    public void updateBox(
-            @RequestBody @Valid PersistableContentBox box,
-            @PathVariable Long id,
-            @Parameter(hidden = true) StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language) {
+		contentFacade.updateContentPage(id, page, merchantStore, language);
+	}
 
-        contentFacade.updateContentBox(id, box, merchantStore, language);
-    }
+	@PutMapping(value = "/private/content/box/{id}")
+	@ResponseStatus(HttpStatus.OK)
+	@Operation(method = "PUT", description = "Update content box",
+			responses = @ApiResponse(content = @io.swagger.v3.oas.annotations.media.Content(schema = @Schema())))
+	@Parameters({
+			@Parameter(name = "store",
+					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+			@Parameter(name = "lang",
+					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	@ConditionalOnApiStatus
+	public void updateBox(@RequestBody @Valid PersistableContentBox box, @PathVariable Long id,
+			@Parameter(hidden = true) StoreMerchantId merchantStore, @Parameter(hidden = true) LanguageCode language) {
 
-    /**
-     *
-     */
-    @GetMapping(value = "/content/images", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(
-            method = "GET",
-            description = "Get store content images",
-            responses =
-                    @ApiResponse(
-                            content =
-                                    @io.swagger.v3.oas.annotations.media.Content(
-                                            schema =
-                                                    @Schema(implementation = ContentFolder.class))))
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-        @Parameter(
-                name = "lang",
-                schema =
-                        @Schema(
-                                name = "lang",
-                                type = "string",
-                                defaultValue = Constants.DEFAULT_LANGUAGE))
-    })
-    @ConditionalOnApiStatus
-    // @TODO create another one for private so store-ui call it in private
-    public ContentFolder images(
-            @Parameter(hidden = true) StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language,
-            @RequestParam(value = "path", required = false) String path)
-            throws Exception {
+		contentFacade.updateContentBox(id, box, merchantStore, language);
+	}
 
-        return contentFacade.getContentFolder(path, merchantStore);
-    }
+	/**
+	 *
+	 */
+	@GetMapping(value = "/content/images", produces = MediaType.APPLICATION_JSON_VALUE)
+	@Operation(method = "GET", description = "Get store content images",
+			responses = @ApiResponse(content = @io.swagger.v3.oas.annotations.media.Content(
+					schema = @Schema(implementation = ContentFolder.class))))
+	@Parameters({
+			@Parameter(name = "store",
+					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+			@Parameter(name = "lang",
+					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	@ConditionalOnApiStatus
+	// @TODO create another one for private so store-ui call it in private
+	public ContentFolder images(@Parameter(hidden = true) StoreMerchantId merchantStore,
+			@Parameter(hidden = true) LanguageCode language,
+			@RequestParam(value = "path", required = false) String path) throws Exception {
 
-    @PostMapping(
-            value = "/private/files",
-            consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    @ResponseStatus(HttpStatus.CREATED)
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-        @Parameter(
-                name = "lang",
-                schema =
-                        @Schema(
-                                name = "lang",
-                                type = "string",
-                                defaultValue = Constants.DEFAULT_LANGUAGE))
-    })
-    @ConditionalOnApiStatus
-    public void uploadMultipleFiles(
-            @RequestParam(value = "files") MultipartFile[] files,
-            @Parameter(hidden = true) StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language) {
+		return contentFacade.getContentFolder(path, merchantStore);
+	}
 
-        for (MultipartFile f : files) {
-            ContentFile cf = new ContentFile();
-            cf.setContentType(f.getContentType());
-            cf.setName(f.getOriginalFilename());
-            try {
-                cf.setFile(f.getBytes());
-                contentFacade.addContentFile(cf, merchantStore.getId());
-            } catch (IOException e) {
-                throw new ServiceRuntimeException("Error while getting file bytes");
-            }
-        }
-    }
+	@PostMapping(value = "/private/files", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+	@ResponseStatus(HttpStatus.CREATED)
+	@Parameters({
+			@Parameter(name = "store",
+					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+			@Parameter(name = "lang",
+					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	@ConditionalOnApiStatus
+	public void uploadMultipleFiles(@RequestParam(value = "files") MultipartFile[] files,
+			@Parameter(hidden = true) StoreMerchantId merchantStore, @Parameter(hidden = true) LanguageCode language) {
 
-    @Deprecated
-    @PutMapping(value = "/private/content/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    @Operation(
-            method = "PUT",
-            description = "Update content page",
-            summary = "Updates a content page",
-            responses =
-                    @ApiResponse(
-                            content =
-                                    @io.swagger.v3.oas.annotations.media.Content(
-                                            schema = @Schema())))
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-        @Parameter(
-                name = "lang",
-                schema =
-                        @Schema(
-                                name = "lang",
-                                type = "string",
-                                defaultValue = Constants.DEFAULT_LANGUAGE))
-    })
-    @ConditionalOnApiStatus
-    // @TODO please check why this is used and not have body
-    public void updatePage(
-            @PathVariable Long id,
-            @RequestBody @Valid PersistableContentEntity page,
-            @Parameter(hidden = true) StoreMerchantId merchantStore,
-            @Parameter(hidden = true) LanguageCode language) {
-        page.setId(id);
-        // contentFacade.saveContentPage(page, merchantStore, language);
-    }
+		for (MultipartFile f : files) {
+			ContentFile cf = new ContentFile();
+			cf.setContentType(f.getContentType());
+			cf.setName(f.getOriginalFilename());
+			try {
+				cf.setFile(f.getBytes());
+				contentFacade.addContentFile(cf, merchantStore.getId());
+			}
+			catch (IOException e) {
+				throw new ServiceRuntimeException("Error while getting file bytes");
+			}
+		}
+	}
 
-    /**
-     * Deletes a content from CMS
-     */
-    @Deprecated
-    @DeleteMapping(value = "/private/content/{id}")
-    @Operation(
-            method = "DELETE",
-            description = "Deletes a content from CMS",
-            summary = "Delete a content box or page",
-            responses =
-                    @ApiResponse(
-                            content =
-                                    @io.swagger.v3.oas.annotations.media.Content(
-                                            schema = @Schema())))
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-    })
-    @ConditionalOnApiStatus
-    public void deleteContent(Long id, @Parameter(hidden = true) StoreMerchantId merchantStore) {
-        contentFacade.delete(merchantStore, id);
-    }
+	@Deprecated
+	@PutMapping(value = "/private/content/{id}")
+	@ResponseStatus(HttpStatus.OK)
+	@Operation(method = "PUT", description = "Update content page", summary = "Updates a content page",
+			responses = @ApiResponse(content = @io.swagger.v3.oas.annotations.media.Content(schema = @Schema())))
+	@Parameters({
+			@Parameter(name = "store",
+					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+			@Parameter(name = "lang",
+					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	@ConditionalOnApiStatus
+	// @TODO please check why this is used and not have body
+	public void updatePage(@PathVariable Long id, @RequestBody @Valid PersistableContentEntity page,
+			@Parameter(hidden = true) StoreMerchantId merchantStore, @Parameter(hidden = true) LanguageCode language) {
+		page.setId(id);
+		// contentFacade.saveContentPage(page, merchantStore, language);
+	}
 
-    @DeleteMapping(value = "/private/content/")
-    @Operation(
-            method = "DELETE",
-            description = "Deletes a file from CMS",
-            summary = "Delete a file from server",
-            responses = @ApiResponse(content = @Content(schema = @Schema())))
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR))
-    })
-    @ConditionalOnApiStatus
-    public void deleteFile(
-            @Valid ContentName name, @Parameter(hidden = true) StoreMerchantId merchantStore) {
-        contentFacade.delete(merchantStore, name.getName(), name.getContentType());
-    }
+	/**
+	 * Deletes a content from CMS
+	 */
+	@Deprecated
+	@DeleteMapping(value = "/private/content/{id}")
+	@Operation(method = "DELETE", description = "Deletes a content from CMS", summary = "Delete a content box or page",
+			responses = @ApiResponse(content = @io.swagger.v3.oas.annotations.media.Content(schema = @Schema())))
+	@Parameters({ @Parameter(name = "store",
+			schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)), })
+	@ConditionalOnApiStatus
+	public void deleteContent(Long id, @Parameter(hidden = true) StoreMerchantId merchantStore) {
+		contentFacade.delete(merchantStore, id);
+	}
+
+	@DeleteMapping(value = "/private/content/")
+	@Operation(method = "DELETE", description = "Deletes a file from CMS", summary = "Delete a file from server",
+			responses = @ApiResponse(content = @Content(schema = @Schema())))
+	@Parameters({ @Parameter(name = "store",
+			schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)) })
+	@ConditionalOnApiStatus
+	public void deleteFile(@Valid ContentName name, @Parameter(hidden = true) StoreMerchantId merchantStore) {
+		contentFacade.delete(merchantStore, name.getName(), name.getContentType());
+	}
+
 }

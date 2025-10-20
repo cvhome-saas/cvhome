@@ -6,7 +6,9 @@ import com.asrevo.cvhome.subscription.commons.SubscriptionPlanTables;
 import java.util.Optional;
 
 public interface SubscriptionPlanTablesService {
-    SubscriptionPlanTables tables();
 
-    Optional<SubscriptionPlanOption> getSubscriptionPlanOption(PriceId priceId);
+	SubscriptionPlanTables tables();
+
+	Optional<SubscriptionPlanOption> getSubscriptionPlanOption(PriceId priceId);
+
 }

@@ -7,5 +7,6 @@ import lombok.Setter;
 @Getter
 public abstract class StaticContentFile extends ContentFile {
 
-    private FileContentType fileContentType;
+	private FileContentType fileContentType;
+
 }

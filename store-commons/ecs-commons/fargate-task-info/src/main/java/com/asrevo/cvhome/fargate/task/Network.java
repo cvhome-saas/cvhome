@@ -8,30 +8,32 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Network {
-    @JsonProperty("NetworkMode")
-    private String networkMode;
 
-    @JsonProperty("IPv4Addresses")
-    private ArrayList<String> iPv4Addresses;
+	@JsonProperty("NetworkMode")
+	private String networkMode;
 
-    @JsonProperty("AttachmentIndex")
-    private int attachmentIndex;
+	@JsonProperty("IPv4Addresses")
+	private ArrayList<String> iPv4Addresses;
 
-    @JsonProperty("MACAddress")
-    private String mACAddress;
+	@JsonProperty("AttachmentIndex")
+	private int attachmentIndex;
 
-    @JsonProperty("IPv4SubnetCIDRBlock")
-    private String iPv4SubnetCIDRBlock;
+	@JsonProperty("MACAddress")
+	private String mACAddress;
 
-    @JsonProperty("DomainNameServers")
-    private ArrayList<String> domainNameServers;
+	@JsonProperty("IPv4SubnetCIDRBlock")
+	private String iPv4SubnetCIDRBlock;
 
-    @JsonProperty("DomainNameSearchList")
-    private ArrayList<String> domainNameSearchList;
+	@JsonProperty("DomainNameServers")
+	private ArrayList<String> domainNameServers;
 
-    @JsonProperty("PrivateDNSName")
-    private String privateDNSName;
+	@JsonProperty("DomainNameSearchList")
+	private ArrayList<String> domainNameSearchList;
 
-    @JsonProperty("SubnetGatewayIpv4Address")
-    private String subnetGatewayIpv4Address;
+	@JsonProperty("PrivateDNSName")
+	private String privateDNSName;
+
+	@JsonProperty("SubnetGatewayIpv4Address")
+	private String subnetGatewayIpv4Address;
+
 }

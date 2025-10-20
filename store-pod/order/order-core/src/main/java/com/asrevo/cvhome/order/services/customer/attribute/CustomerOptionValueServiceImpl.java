@@ -8,16 +8,16 @@ import org.springframework.stereotype.Service;
 @Service("customerOptionValueService")
 public class CustomerOptionValueServiceImpl implements CustomerOptionValueService {
 
-    private final CustomerOptionValueRepository customerOptionValueRepository;
+	private final CustomerOptionValueRepository customerOptionValueRepository;
 
-    @Autowired
-    public CustomerOptionValueServiceImpl(
-            CustomerOptionValueRepository customerOptionValueRepository) {
-        this.customerOptionValueRepository = customerOptionValueRepository;
-    }
+	@Autowired
+	public CustomerOptionValueServiceImpl(CustomerOptionValueRepository customerOptionValueRepository) {
+		this.customerOptionValueRepository = customerOptionValueRepository;
+	}
 
-    @Override
-    public CustomerOptionValue getById(Long id) {
-        return customerOptionValueRepository.findById(id).orElse(null);
-    }
+	@Override
+	public CustomerOptionValue getById(Long id) {
+		return customerOptionValueRepository.findById(id).orElse(null);
+	}
+
 }

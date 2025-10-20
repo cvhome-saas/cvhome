@@ -22,178 +22,178 @@ import org.springframework.util.Assert;
 @Service("shoppingCartService")
 @Slf4j
 public class ShoppingCartServiceImpl extends SalesManagerEntityServiceImpl<Long, ShoppingCart>
-        implements ShoppingCartService {
+		implements ShoppingCartService {
 
-    private final ShoppingCartRepository shoppingCartRepository;
-    private final ExternalProductService externalProductService;
-    private final ShoppingCartItemRepository shoppingCartItemRepository;
+	private final ShoppingCartRepository shoppingCartRepository;
 
-    @Autowired
-    public ShoppingCartServiceImpl(
-            ShoppingCartRepository shoppingCartRepository,
-            ExternalProductService externalProductService,
-            ShoppingCartItemRepository shoppingCartItemRepository) {
-        super(shoppingCartRepository);
-        this.shoppingCartRepository = shoppingCartRepository;
+	private final ExternalProductService externalProductService;
 
-        this.externalProductService = externalProductService;
-        this.shoppingCartItemRepository = shoppingCartItemRepository;
-    }
+	private final ShoppingCartItemRepository shoppingCartItemRepository;
 
-    /**
-     * Save or update a {@link ShoppingCart} for a given customer
-     */
-    @Override
-    public void saveOrUpdate(ShoppingCart shoppingCart) throws ServiceException {
+	@Autowired
+	public ShoppingCartServiceImpl(ShoppingCartRepository shoppingCartRepository,
+			ExternalProductService externalProductService, ShoppingCartItemRepository shoppingCartItemRepository) {
+		super(shoppingCartRepository);
+		this.shoppingCartRepository = shoppingCartRepository;
 
-        Assert.notNull(shoppingCart, "ShoppingCart must not be null");
-        Assert.notNull(
-                shoppingCart.getStoreMerchantId(), "ShoppingCart.merchantStore must not be null");
+		this.externalProductService = externalProductService;
+		this.shoppingCartItemRepository = shoppingCartItemRepository;
+	}
 
-        // @TODO check if we can store ip address
-        // shoppingCart.setIpAddress(userContext.getIpAddress());
-        if (shoppingCart.getId() == null || shoppingCart.getId() == 0) {
-            super.create(shoppingCart);
-        } else {
-            super.update(shoppingCart);
-        }
-    }
+	/**
+	 * Save or update a {@link ShoppingCart} for a given customer
+	 */
+	@Override
+	public void saveOrUpdate(ShoppingCart shoppingCart) throws ServiceException {
 
-    /**
-     * Get a {@link ShoppingCart} for a given id and Store. Will update the
-     * shopping cart prices and items based on the actual inventory. This method
-     * will remove the shopping cart if no items are attached.
-     */
-    @Override
-    public ShoppingCart findCart(Long id, StoreMerchantId store) {
-        return shoppingCartRepository.findById(store, id);
-    }
+		Assert.notNull(shoppingCart, "ShoppingCart must not be null");
+		Assert.notNull(shoppingCart.getStoreMerchantId(), "ShoppingCart.merchantStore must not be null");
 
-    @Override
-    public ShoppingCart findCart(String code, StoreMerchantId store) {
-        return shoppingCartRepository.findByCode(store, code);
-    }
+		// @TODO check if we can store ip address
+		// shoppingCart.setIpAddress(userContext.getIpAddress());
+		if (shoppingCart.getId() == null || shoppingCart.getId() == 0) {
+			super.create(shoppingCart);
+		}
+		else {
+			super.update(shoppingCart);
+		}
+	}
 
-    /*
-     * @Override
-     *
-     * @Transactional public ShoppingCart getById(final Long id, MerchantStore
-     * store) throws {
-     *
-     * try { ShoppingCart shoppingCart = shoppingCartRepository.findOne(id); if
-     * (shoppingCart == null) { return null; }
-     * getPopulatedShoppingCart(shoppingCart);
-     *
-     * if (shoppingCart.isObsolete()) { delete(shoppingCart); return null; } else {
-     * return shoppingCart; } } catch (Exception e) { // TODO Auto-generated catch
-     * block e.printStackTrace(); } return null;
-     *
-     * }
-     */
+	/**
+	 * Get a {@link ShoppingCart} for a given id and Store. Will update the shopping cart
+	 * prices and items based on the actual inventory. This method will remove the
+	 * shopping cart if no items are attached.
+	 */
+	@Override
+	public ShoppingCart findCart(Long id, StoreMerchantId store) {
+		return shoppingCartRepository.findById(store, id);
+	}
 
-    /**
-     * Get a {@link ShoppingCart} for a given code. Will update the shopping cart
-     * prices and items based on the actual inventory. This method will remove the
-     * shopping cart if no items are attached.
-     */
-    @Override
-    @Transactional
-    public ShoppingCart loadCartByCode(
-            final String code, final StoreMerchantId store, LanguageCode languageCode)
-            throws ServiceException {
+	@Override
+	public ShoppingCart findCart(String code, StoreMerchantId store) {
+		return shoppingCartRepository.findByCode(store, code);
+	}
 
-        try {
-            ShoppingCart shoppingCart = shoppingCartRepository.findByCode(store, code);
-            if (shoppingCart == null) {
-                return null;
-            }
-            getPopulatedShoppingCart(shoppingCart, store, languageCode);
+	/*
+	 * @Override
+	 *
+	 * @Transactional public ShoppingCart getById(final Long id, MerchantStore store)
+	 * throws {
+	 *
+	 * try { ShoppingCart shoppingCart = shoppingCartRepository.findOne(id); if
+	 * (shoppingCart == null) { return null; } getPopulatedShoppingCart(shoppingCart);
+	 *
+	 * if (shoppingCart.isObsolete()) { delete(shoppingCart); return null; } else { return
+	 * shoppingCart; } } catch (Exception e) { // TODO Auto-generated catch block
+	 * e.printStackTrace(); } return null;
+	 *
+	 * }
+	 */
 
-            if (shoppingCart.isObsolete()) {
-                delete(shoppingCart);
-                return null;
-            } else {
-                return shoppingCart;
-            }
+	/**
+	 * Get a {@link ShoppingCart} for a given code. Will update the shopping cart prices
+	 * and items based on the actual inventory. This method will remove the shopping cart
+	 * if no items are attached.
+	 */
+	@Override
+	@Transactional
+	public ShoppingCart loadCartByCode(final String code, final StoreMerchantId store, LanguageCode languageCode)
+			throws ServiceException {
 
-        } catch (jakarta.persistence.NoResultException nre) {
-            return null;
-        } catch (Throwable e) {
-            throw new ServiceException(e);
-        }
-    }
+		try {
+			ShoppingCart shoppingCart = shoppingCartRepository.findByCode(store, code);
+			if (shoppingCart == null) {
+				return null;
+			}
+			getPopulatedShoppingCart(shoppingCart, store, languageCode);
 
-    private ShoppingCart getPopulatedShoppingCart(
-            final ShoppingCart shoppingCart, StoreMerchantId store, LanguageCode language)
-            throws Exception {
+			if (shoppingCart.isObsolete()) {
+				delete(shoppingCart);
+				return null;
+			}
+			else {
+				return shoppingCart;
+			}
 
-        try {
+		}
+		catch (jakarta.persistence.NoResultException nre) {
+			return null;
+		}
+		catch (Throwable e) {
+			throw new ServiceException(e);
+		}
+	}
 
-            boolean cartIsObsolete = false;
-            if (shoppingCart != null) {
+	private ShoppingCart getPopulatedShoppingCart(final ShoppingCart shoppingCart, StoreMerchantId store,
+			LanguageCode language) throws Exception {
 
-                Set<ShoppingCartItem> items = shoppingCart.getLineItems();
-                if (items == null || items.isEmpty()) {
-                    shoppingCart.setObsolete(true);
-                    return shoppingCart;
-                }
+		try {
 
-                for (ShoppingCartItem item : items) {
-                    log.debug("Populate item {}", item.getId());
-                    ProductDetails detailedProduct =
-                            externalProductService.getDetailedProduct(
-                                    store, item.getSku(), language);
-                    item.setItemPrice(detailedProduct.price().getFinalPrice());
+			boolean cartIsObsolete = false;
+			if (shoppingCart != null) {
 
-                    BigDecimal subTotal =
-                            item.getItemPrice().multiply(new BigDecimal(item.getQuantity()));
-                    item.setSubTotal(subTotal);
+				Set<ShoppingCartItem> items = shoppingCart.getLineItems();
+				if (items == null || items.isEmpty()) {
+					shoppingCart.setObsolete(true);
+					return shoppingCart;
+				}
 
-                    log.debug("Obsolete item ? {}", item.isObsolete());
-                    if (item.isObsolete()) {
-                        cartIsObsolete = true;
-                    }
-                }
+				for (ShoppingCartItem item : items) {
+					log.debug("Populate item {}", item.getId());
+					ProductDetails detailedProduct = externalProductService.getDetailedProduct(store, item.getSku(),
+							language);
+					item.setItemPrice(detailedProduct.price().getFinalPrice());
 
-                Set<ShoppingCartItem> refreshedItems = new HashSet<>(items);
+					BigDecimal subTotal = item.getItemPrice().multiply(new BigDecimal(item.getQuantity()));
+					item.setSubTotal(subTotal);
 
-                shoppingCart.setLineItems(refreshedItems);
-                update(shoppingCart);
+					log.debug("Obsolete item ? {}", item.isObsolete());
+					if (item.isObsolete()) {
+						cartIsObsolete = true;
+					}
+				}
 
-                if (cartIsObsolete) {
-                    shoppingCart.setObsolete(true);
-                }
-                return shoppingCart;
-            }
+				Set<ShoppingCartItem> refreshedItems = new HashSet<>(items);
 
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            throw new ServiceException(e);
-        }
+				shoppingCart.setLineItems(refreshedItems);
+				update(shoppingCart);
 
-        return shoppingCart;
-    }
+				if (cartIsObsolete) {
+					shoppingCart.setObsolete(true);
+				}
+				return shoppingCart;
+			}
 
-    @Override
-    public ShoppingCartItem populateShoppingCartItem(
-            String sku, BigDecimal price, StoreMerchantId store) throws ServiceException {
-        Assert.notNull(sku, "Product should not be null");
-        Assert.notNull(store, "Store should not be null");
+		}
+		catch (Exception e) {
+			log.error(e.getMessage());
+			throw new ServiceException(e);
+		}
 
-        ShoppingCartItem item = new ShoppingCartItem(sku);
-        item.setItemPrice(price);
-        return item;
-    }
+		return shoppingCart;
+	}
 
-    @Override
-    @Transactional
-    public void deleteShoppingCartItem(Long id) {
+	@Override
+	public ShoppingCartItem populateShoppingCartItem(String sku, BigDecimal price, StoreMerchantId store)
+			throws ServiceException {
+		Assert.notNull(sku, "Product should not be null");
+		Assert.notNull(store, "Store should not be null");
 
-        ShoppingCartItem item = shoppingCartItemRepository.findOne(id);
-        if (item != null) {
+		ShoppingCartItem item = new ShoppingCartItem(sku);
+		item.setItemPrice(price);
+		return item;
+	}
 
-            // delete
-            shoppingCartItemRepository.deleteById(id);
-        }
-    }
+	@Override
+	@Transactional
+	public void deleteShoppingCartItem(Long id) {
+
+		ShoppingCartItem item = shoppingCartItemRepository.findOne(id);
+		if (item != null) {
+
+			// delete
+			shoppingCartItemRepository.deleteById(id);
+		}
+	}
+
 }

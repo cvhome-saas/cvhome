@@ -20,155 +20,132 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 @Component
-public class PersistableProductVariantMapper
-        implements Mapper<PersistableProductVariant, ProductVariant> {
+public class PersistableProductVariantMapper implements Mapper<PersistableProductVariant, ProductVariant> {
 
-    private final ProductVariationService productVariationService;
+	private final ProductVariationService productVariationService;
 
-    private final PersistableProductAvailabilityMapper persistableProductAvailabilityMapper;
+	private final PersistableProductAvailabilityMapper persistableProductAvailabilityMapper;
 
-    private final ProductService productService;
+	private final ProductService productService;
 
-    public PersistableProductVariantMapper(
-            ProductVariationService productVariationService,
-            PersistableProductAvailabilityMapper persistableProductAvailabilityMapper,
-            ProductService productService) {
-        this.productVariationService = productVariationService;
-        this.persistableProductAvailabilityMapper = persistableProductAvailabilityMapper;
-        this.productService = productService;
-    }
+	public PersistableProductVariantMapper(ProductVariationService productVariationService,
+			PersistableProductAvailabilityMapper persistableProductAvailabilityMapper, ProductService productService) {
+		this.productVariationService = productVariationService;
+		this.persistableProductAvailabilityMapper = persistableProductAvailabilityMapper;
+		this.productService = productService;
+	}
 
-    @Override
-    public ProductVariant convert(
-            PersistableProductVariant source, StoreMerchantId store, LanguageCode language) {
-        ProductVariant productVariantModel = new ProductVariant();
-        return this.merge(source, productVariantModel, store, language);
-    }
+	@Override
+	public ProductVariant convert(PersistableProductVariant source, StoreMerchantId store, LanguageCode language) {
+		ProductVariant productVariantModel = new ProductVariant();
+		return this.merge(source, productVariantModel, store, language);
+	}
 
-    @Override
-    public ProductVariant merge(
-            PersistableProductVariant source,
-            ProductVariant destination,
-            StoreMerchantId store,
-            LanguageCode language) {
+	@Override
+	public ProductVariant merge(PersistableProductVariant source, ProductVariant destination, StoreMerchantId store,
+			LanguageCode language) {
 
-        //
-        Long productVariation = source.getVariation();
-        Long productVariationValue = source.getVariationValue();
+		//
+		Long productVariation = source.getVariation();
+		Long productVariationValue = source.getVariationValue();
 
-        String productVariationCode = source.getVariationCode();
-        String productVariationValueCode = source.getVariationValueCode();
+		String productVariationCode = source.getVariationCode();
+		String productVariationValueCode = source.getVariationValueCode();
 
-        Optional<ProductVariation> variation;
-        Optional<ProductVariation> variationValue = Optional.empty();
+		Optional<ProductVariation> variation;
+		Optional<ProductVariation> variationValue = Optional.empty();
 
-        if (StringUtils.isEmpty(productVariationCode)) {
+		if (StringUtils.isEmpty(productVariationCode)) {
 
-            variation = productVariationService.getById(store, productVariation);
-            if (productVariationValue != null) {
-                variationValue = productVariationService.getById(store, productVariationValue);
-                if (variationValue.isEmpty()) {
-                    throw new ResourceNotFoundException(
-                            "ProductVaritionValue ["
-                                    + productVariationValue
-                                    + "] + not found for store ["
-                                    + store
-                                    + "]");
-                }
-            }
-        } else {
-            variation = productVariationService.getByCode(store, productVariationCode);
-            if (productVariationValueCode != null) {
-                variationValue =
-                        productVariationService.getByCode(store, productVariationValueCode);
-                if (variationValue.isEmpty()) {
-                    throw new ResourceNotFoundException(
-                            "ProductVaritionValue ["
-                                    + productVariationValue
-                                    + "] + not found for store ["
-                                    + store
-                                    + "]");
-                }
-            }
-        }
+			variation = productVariationService.getById(store, productVariation);
+			if (productVariationValue != null) {
+				variationValue = productVariationService.getById(store, productVariationValue);
+				if (variationValue.isEmpty()) {
+					throw new ResourceNotFoundException("ProductVaritionValue [" + productVariationValue
+							+ "] + not found for store [" + store + "]");
+				}
+			}
+		}
+		else {
+			variation = productVariationService.getByCode(store, productVariationCode);
+			if (productVariationValueCode != null) {
+				variationValue = productVariationService.getByCode(store, productVariationValueCode);
+				if (variationValue.isEmpty()) {
+					throw new ResourceNotFoundException("ProductVaritionValue [" + productVariationValue
+							+ "] + not found for store [" + store + "]");
+				}
+			}
+		}
 
-        if (variation.isEmpty()) {
-            throw new ResourceNotFoundException(
-                    "ProductVarition ["
-                            + productVariation
-                            + "] + not found for store ["
-                            + store
-                            + "]");
-        }
+		if (variation.isEmpty()) {
+			throw new ResourceNotFoundException(
+					"ProductVarition [" + productVariation + "] + not found for store [" + store + "]");
+		}
 
-        destination.setVariation(variation.get());
+		destination.setVariation(variation.get());
 
-        if (productVariationValue != null) {
-            destination.setVariationValue(variationValue.orElse(null));
-        }
+		if (productVariationValue != null) {
+			destination.setVariationValue(variationValue.orElse(null));
+		}
 
-        StringBuilder instanceCode = new StringBuilder();
-        instanceCode.append(variation.get().getCode());
-        if (productVariationValue != null) {
-            instanceCode.append(":").append(variationValue.get().getCode());
-        }
+		StringBuilder instanceCode = new StringBuilder();
+		instanceCode.append(variation.get().getCode());
+		if (productVariationValue != null) {
+			instanceCode.append(":").append(variationValue.get().getCode());
+		}
 
-        destination.setCode(instanceCode.toString());
+		destination.setCode(instanceCode.toString());
 
-        destination.setAvailable(source.isAvailable());
-        destination.setDefaultSelection(source.isDefaultSelection());
-        destination.setSku(source.getSku());
+		destination.setAvailable(source.isAvailable());
+		destination.setDefaultSelection(source.isDefaultSelection());
+		destination.setSku(source.getSku());
 
-        if (StringUtils.isBlank(source.getDateAvailable())) {
-            source.setDateAvailable(DateUtil.formatDate(new Date()));
-        }
+		if (StringUtils.isBlank(source.getDateAvailable())) {
+			source.setDateAvailable(DateUtil.formatDate(new Date()));
+		}
 
-        if (source.getDateAvailable() != null) {
-            try {
-                destination.setDateAvailable(DateUtil.getDate(source.getDateAvailable()));
-            } catch (Exception e) {
-                throw new ServiceRuntimeException(
-                        "Cant format date [" + source.getDateAvailable() + "]");
-            }
-        }
+		if (source.getDateAvailable() != null) {
+			try {
+				destination.setDateAvailable(DateUtil.getDate(source.getDateAvailable()));
+			}
+			catch (Exception e) {
+				throw new ServiceRuntimeException("Cant format date [" + source.getDateAvailable() + "]");
+			}
+		}
 
-        destination.setSortOrder(source.getSortOrder());
+		destination.setSortOrder(source.getSortOrder());
 
-        if (source.getInventory() != null) {
-            ProductAvailability availability =
-                    persistableProductAvailabilityMapper.convert(
-                            source.getInventory(), store, language);
-            availability.setProductVariant(destination);
-            destination.getAvailabilities().add(availability);
-        }
+		if (source.getInventory() != null) {
+			ProductAvailability availability = persistableProductAvailabilityMapper.convert(source.getInventory(),
+					store, language);
+			availability.setProductVariant(destination);
+			destination.getAvailabilities().add(availability);
+		}
 
-        Product product;
+		Product product;
 
-        if (source.getProductId() != null && source.getProductId() > 0) {
-            product = productService.findOne(source.getProductId(), store);
+		if (source.getProductId() != null && source.getProductId() > 0) {
+			product = productService.findOne(source.getProductId(), store);
 
-            if (product == null) {
-                throw new ResourceNotFoundException(
-                        "Product [" + source.getId() + "] + not found for store [" + store + "]");
-            }
+			if (product == null) {
+				throw new ResourceNotFoundException(
+						"Product [" + source.getId() + "] + not found for store [" + store + "]");
+			}
 
-            if (!product.getStore().equals(store)) {
-                throw new ResourceNotFoundException(
-                        "Product [" + source.getId() + "] + not found for store [" + store + "]");
-            }
+			if (!product.getStore().equals(store)) {
+				throw new ResourceNotFoundException(
+						"Product [" + source.getId() + "] + not found for store [" + store + "]");
+			}
 
-            if (product.getSku() != null && product.getSku().equals(source.getSku())) {
-                throw new OperationNotAllowedException(
-                        "Product variant sku ["
-                                + source.getSku()
-                                + "] + must be different than product instance sku ["
-                                + product.getSku()
-                                + "]");
-            }
+			if (product.getSku() != null && product.getSku().equals(source.getSku())) {
+				throw new OperationNotAllowedException("Product variant sku [" + source.getSku()
+						+ "] + must be different than product instance sku [" + product.getSku() + "]");
+			}
 
-            destination.setProduct(product);
-        }
+			destination.setProduct(product);
+		}
 
-        return destination;
-    }
+		return destination;
+	}
+
 }

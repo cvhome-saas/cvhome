@@ -16,72 +16,71 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 @Service("productOptionValueService")
-public class ProductOptionValueServiceImpl
-        extends SalesManagerEntityServiceImpl<Long, ProductOptionValue>
-        implements ProductOptionValueService {
+public class ProductOptionValueServiceImpl extends SalesManagerEntityServiceImpl<Long, ProductOptionValue>
+		implements ProductOptionValueService {
 
-    private final ProductAttributeService productAttributeService;
+	private final ProductAttributeService productAttributeService;
 
-    private final PageableProductOptionValueRepository pageableProductOptionValueRepository;
+	private final PageableProductOptionValueRepository pageableProductOptionValueRepository;
 
-    private final ProductOptionValueRepository productOptionValueRepository;
+	private final ProductOptionValueRepository productOptionValueRepository;
 
-    @Autowired
-    public ProductOptionValueServiceImpl(
-            ProductOptionValueRepository productOptionValueRepository,
-            ProductAttributeService productAttributeService,
-            PageableProductOptionValueRepository pageableProductOptionValueRepository) {
-        super(productOptionValueRepository);
-        this.productOptionValueRepository = productOptionValueRepository;
-        this.productAttributeService = productAttributeService;
-        this.pageableProductOptionValueRepository = pageableProductOptionValueRepository;
-    }
+	@Autowired
+	public ProductOptionValueServiceImpl(ProductOptionValueRepository productOptionValueRepository,
+			ProductAttributeService productAttributeService,
+			PageableProductOptionValueRepository pageableProductOptionValueRepository) {
+		super(productOptionValueRepository);
+		this.productOptionValueRepository = productOptionValueRepository;
+		this.productAttributeService = productAttributeService;
+		this.pageableProductOptionValueRepository = pageableProductOptionValueRepository;
+	}
 
-    @Override
-    public void saveOrUpdate(ProductOptionValue entity) throws ServiceException {
+	@Override
+	public void saveOrUpdate(ProductOptionValue entity) throws ServiceException {
 
-        // save or update (persist and attach entities
-        if (entity.getId() != null && entity.getId() > 0) {
+		// save or update (persist and attach entities
+		if (entity.getId() != null && entity.getId() > 0) {
 
-            super.update(entity);
+			super.update(entity);
 
-        } else {
+		}
+		else {
 
-            super.save(entity);
-        }
-    }
+			super.save(entity);
+		}
+	}
 
-    public void delete(ProductOptionValue entity) throws ServiceException {
+	public void delete(ProductOptionValue entity) throws ServiceException {
 
-        // remove all attributes having this option
-        List<ProductAttribute> attributes =
-                productAttributeService.getByOptionValueId(
-                        entity.getStoreMerchantId(), entity.getId());
+		// remove all attributes having this option
+		List<ProductAttribute> attributes = productAttributeService.getByOptionValueId(entity.getStoreMerchantId(),
+				entity.getId());
 
-        for (ProductAttribute attribute : attributes) {
-            productAttributeService.delete(attribute);
-        }
+		for (ProductAttribute attribute : attributes) {
+			productAttributeService.delete(attribute);
+		}
 
-        ProductOptionValue option = getById(entity.getId());
+		ProductOptionValue option = getById(entity.getId());
 
-        // remove option
-        super.delete(option);
-    }
+		// remove option
+		super.delete(option);
+	}
 
-    @Override
-    public ProductOptionValue getByCode(StoreMerchantId store, String optionValueCode) {
-        return productOptionValueRepository.findByCode(store, optionValueCode);
-    }
+	@Override
+	public ProductOptionValue getByCode(StoreMerchantId store, String optionValueCode) {
+		return productOptionValueRepository.findByCode(store, optionValueCode);
+	}
 
-    @Override
-    public ProductOptionValue getById(StoreMerchantId store, Long optionValueId) {
-        return productOptionValueRepository.findOne(store, optionValueId);
-    }
+	@Override
+	public ProductOptionValue getById(StoreMerchantId store, Long optionValueId) {
+		return productOptionValueRepository.findOne(store, optionValueId);
+	}
 
-    @Override
-    public Page<ProductOptionValue> getByMerchant(
-            StoreMerchantId store, LanguageCode language, String name, Pageable pageable) {
-        Assert.notNull(store, "Store cannot be null");
-        return pageableProductOptionValueRepository.listOptionValues(store, name, pageable);
-    }
+	@Override
+	public Page<ProductOptionValue> getByMerchant(StoreMerchantId store, LanguageCode language, String name,
+			Pageable pageable) {
+		Assert.notNull(store, "Store cannot be null");
+		return pageableProductOptionValueRepository.listOptionValues(store, name, pageable);
+	}
+
 }

@@ -18,18 +18,17 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Store statistic resource", description = "Store statistic")
 @Slf4j
 public class StoreStatisticApi {
-    private final ManagerStoreRepository managerStoreRepository;
 
-    @RequestMapping(
-            value = {"/private/store-statistic"},
-            method = RequestMethod.POST)
-    @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
-    @ConditionalOnApiStatus
-    public StatisticList storeStatistic(@RequestBody StatisticRange range) {
-        List<StatisticEntry> entries =
-                managerStoreRepository.storeStatistic(
-                        range.fromDate().toInstant(), range.toDate().toInstant());
-        return new StatisticList(entries);
-    }
+	private final ManagerStoreRepository managerStoreRepository;
+
+	@RequestMapping(value = { "/private/store-statistic" }, method = RequestMethod.POST)
+	@ResponseStatus(HttpStatus.OK)
+	@ResponseBody
+	@ConditionalOnApiStatus
+	public StatisticList storeStatistic(@RequestBody StatisticRange range) {
+		List<StatisticEntry> entries = managerStoreRepository.storeStatistic(range.fromDate().toInstant(),
+				range.toDate().toInstant());
+		return new StatisticList(entries);
+	}
+
 }

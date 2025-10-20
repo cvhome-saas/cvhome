@@ -13,30 +13,23 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Slf4j
 public class InvoicePaymentSucceededEventImpl implements EventImpl<InvoicePaymentSucceededEvent> {
-    private final SubscriptionService subscriptionService;
-    private final SubscriptionPlanTablesService subscriptionPlanTablesService;
 
-    @Override
-    public void process(InvoicePaymentSucceededEvent event) {
-        log.info("Invoice payment succeeded event: {}", event);
-        SubscriptionPlanOption option =
-                subscriptionPlanTablesService
-                        .getSubscriptionPlanOption(event.priceId())
-                        .orElseThrow(
-                                () ->
-                                        new IllegalArgumentException(
-                                                "Invalid subscription price id: "
-                                                        + event.priceId()));
-        subscriptionService.renew(
-                event.org(),
-                option.subscriptionPlan(),
-                event.startDate(),
-                event.endDate(),
-                option.recurringPlan());
-    }
+	private final SubscriptionService subscriptionService;
 
-    @Override
-    public String type() {
-        return InvoicePaymentSucceededEvent.class.getSimpleName();
-    }
+	private final SubscriptionPlanTablesService subscriptionPlanTablesService;
+
+	@Override
+	public void process(InvoicePaymentSucceededEvent event) {
+		log.info("Invoice payment succeeded event: {}", event);
+		SubscriptionPlanOption option = subscriptionPlanTablesService.getSubscriptionPlanOption(event.priceId())
+			.orElseThrow(() -> new IllegalArgumentException("Invalid subscription price id: " + event.priceId()));
+		subscriptionService.renew(event.org(), option.subscriptionPlan(), event.startDate(), event.endDate(),
+				option.recurringPlan());
+	}
+
+	@Override
+	public String type() {
+		return InvoicePaymentSucceededEvent.class.getSimpleName();
+	}
+
 }

@@ -47,322 +47,301 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
 
-    private final ShoppingCartService shoppingCartService;
+	private final ShoppingCartService shoppingCartService;
 
-    private final ReadableShoppingCartMapper readableShoppingCartMapper;
-    private final ExternalProductService externalProductService;
+	private final ReadableShoppingCartMapper readableShoppingCartMapper;
 
-    // KEEP -- ENTRY
-    private ShoppingCartItem createCartItem(
-            ShoppingCart cartModel,
-            PersistableShoppingCartItem shoppingCartItem,
-            StoreMerchantId store,
-            LanguageCode language)
-            throws Exception {
+	private final ExternalProductService externalProductService;
 
-        // @TODO we need to merge availability+price in one call
-        ProductDetails detailedProduct =
-                externalProductService.getDetailedProduct(
-                        store, shoppingCartItem.getProduct(), language);
-        ReadableProductAvailability availability = detailedProduct.availability();
+	// KEEP -- ENTRY
+	private ShoppingCartItem createCartItem(ShoppingCart cartModel, PersistableShoppingCartItem shoppingCartItem,
+			StoreMerchantId store, LanguageCode language) throws Exception {
 
-        if (!availability.isCanBePurchased()) {
-            throw new Exception(
-                    "Product with sku "
-                            + availability.getSku()
-                            + " is not available or is not properly configured. It contains no"
-                            + " inventory");
-        }
+		// @TODO we need to merge availability+price in one call
+		ProductDetails detailedProduct = externalProductService.getDetailedProduct(store, shoppingCartItem.getProduct(),
+				language);
+		ReadableProductAvailability availability = detailedProduct.availability();
 
-        if (!DateUtil.dateBeforeEqualsDate(
-                DateUtil.getDate(availability.getDateAvailable()), new Date())) {
-            throw new Exception("Item with sku " + availability.getSku() + " is not available");
-        }
+		if (!availability.isCanBePurchased()) {
+			throw new Exception("Product with sku " + availability.getSku()
+					+ " is not available or is not properly configured. It contains no" + " inventory");
+		}
 
-        FinalPrice price = detailedProduct.price();
+		if (!DateUtil.dateBeforeEqualsDate(DateUtil.getDate(availability.getDateAvailable()), new Date())) {
+			throw new Exception("Item with sku " + availability.getSku() + " is not available");
+		}
 
-        ShoppingCartItem item =
-                shoppingCartService.populateShoppingCartItem(
-                        availability.getSku(), price.getFinalPrice(), store);
+		FinalPrice price = detailedProduct.price();
 
-        item.setQuantity(shoppingCartItem.getQuantity());
-        item.setShoppingCart(cartModel);
-        item.setSku(availability.getSku());
+		ShoppingCartItem item = shoppingCartService.populateShoppingCartItem(availability.getSku(),
+				price.getFinalPrice(), store);
 
-        return item;
-    }
+		item.setQuantity(shoppingCartItem.getQuantity());
+		item.setShoppingCart(cartModel);
+		item.setSku(availability.getSku());
 
-    private ShoppingCartItem getEntryToUpdate(final long entryId, final ShoppingCart cartModel) {
-        if (CollectionUtils.isNotEmpty(cartModel.getLineItems())) {
-            for (ShoppingCartItem shoppingCartItem : cartModel.getLineItems()) {
-                if (shoppingCartItem.getId() == entryId) {
-                    log.info("Found line item  for given entry id: {}", entryId);
-                    return shoppingCartItem;
-                }
-            }
-        }
-        log.info("Unable to find any entry for given Id: {}", entryId);
-        return null;
-    }
+		return item;
+	}
 
-    private ShoppingCart getCartModel(
-            final String cartId, final StoreMerchantId store, LanguageCode language) {
-        if (StringUtils.isNotBlank(cartId)) {
-            try {
-                return shoppingCartService.loadCartByCode(cartId, store, language);
-            } catch (ServiceException e) {
-                log.error("unable to find any cart asscoiated with this Id: {}", cartId);
-                log.error("error while fetching cart model...", e);
-                return null;
-            } catch (NoResultException nre) {
-                // nothing
-            }
-        }
-        return null;
-    }
+	private ShoppingCartItem getEntryToUpdate(final long entryId, final ShoppingCart cartModel) {
+		if (CollectionUtils.isNotEmpty(cartModel.getLineItems())) {
+			for (ShoppingCartItem shoppingCartItem : cartModel.getLineItems()) {
+				if (shoppingCartItem.getId() == entryId) {
+					log.info("Found line item  for given entry id: {}", entryId);
+					return shoppingCartItem;
+				}
+			}
+		}
+		log.info("Unable to find any entry for given Id: {}", entryId);
+		return null;
+	}
 
-    @Override
-    public void saveOrUpdateShoppingCart(ShoppingCart cart) throws Exception {
-        shoppingCartService.saveOrUpdate(cart);
-    }
+	private ShoppingCart getCartModel(final String cartId, final StoreMerchantId store, LanguageCode language) {
+		if (StringUtils.isNotBlank(cartId)) {
+			try {
+				return shoppingCartService.loadCartByCode(cartId, store, language);
+			}
+			catch (ServiceException e) {
+				log.error("unable to find any cart asscoiated with this Id: {}", cartId);
+				log.error("error while fetching cart model...", e);
+				return null;
+			}
+			catch (NoResultException nre) {
+				// nothing
+			}
+		}
+		return null;
+	}
 
-    @Override
-    // KEEP ** ENTRY POINT **
-    public ReadableShoppingCart addToCart(
-            PersistableShoppingCartItem item, StoreMerchantId store, LanguageCode language) {
+	@Override
+	public void saveOrUpdateShoppingCart(ShoppingCart cart) throws Exception {
+		shoppingCartService.saveOrUpdate(cart);
+	}
 
-        Validate.notNull(item, "PersistableShoppingCartItem cannot be null");
+	@Override
+	// KEEP ** ENTRY POINT **
+	public ReadableShoppingCart addToCart(PersistableShoppingCartItem item, StoreMerchantId store,
+			LanguageCode language) {
 
-        // if cart does not exist create a new one
+		Validate.notNull(item, "PersistableShoppingCartItem cannot be null");
 
-        ShoppingCart cartModel = new ShoppingCart();
-        cartModel.setStoreMerchantId(store);
-        cartModel.setShoppingCartCode(uniqueShoppingCartCode());
+		// if cart does not exist create a new one
 
-        if (!StringUtils.isBlank(item.getPromoCode())) {
-            cartModel.setPromoCode(item.getPromoCode());
-            cartModel.setPromoAdded(new Date());
-        }
+		ShoppingCart cartModel = new ShoppingCart();
+		cartModel.setStoreMerchantId(store);
+		cartModel.setShoppingCartCode(uniqueShoppingCartCode());
 
-        try {
-            return readableShoppingCart(cartModel, item, store, language);
-        } catch (Exception e) {
-            if (e instanceof ResourceNotFoundException) {
-                throw (ResourceNotFoundException) e;
-            } else {
-                throw new ServiceRuntimeException(e.getMessage(), e);
-            }
-        }
-    }
+		if (!StringUtils.isBlank(item.getPromoCode())) {
+			cartModel.setPromoCode(item.getPromoCode());
+			cartModel.setPromoAdded(new Date());
+		}
 
-    @Override
-    // KEEP
-    public @Nullable ReadableShoppingCart removeShoppingCartItem(
-            String cartCode,
-            String sku,
-            StoreMerchantId merchant,
-            LanguageCode language,
-            boolean returnCart)
-            throws Exception {
-        Validate.notNull(cartCode, "Shopping cart code must not be null");
-        Validate.notNull(sku, "product sku must not be null");
-        Validate.notNull(merchant, "store cannot be null");
+		try {
+			return readableShoppingCart(cartModel, item, store, language);
+		}
+		catch (Exception e) {
+			if (e instanceof ResourceNotFoundException) {
+				throw (ResourceNotFoundException) e;
+			}
+			else {
+				throw new ServiceRuntimeException(e.getMessage(), e);
+			}
+		}
+	}
 
-        // get cart
-        ShoppingCart cart = getCartModel(cartCode, merchant, language);
+	@Override
+	// KEEP
+	public @Nullable ReadableShoppingCart removeShoppingCartItem(String cartCode, String sku, StoreMerchantId merchant,
+			LanguageCode language, boolean returnCart) throws Exception {
+		Validate.notNull(cartCode, "Shopping cart code must not be null");
+		Validate.notNull(sku, "product sku must not be null");
+		Validate.notNull(merchant, "store cannot be null");
 
-        if (cart == null) {
-            throw new ResourceNotFoundException("Cart code [ " + cartCode + " ] not found");
-        }
+		// get cart
+		ShoppingCart cart = getCartModel(cartCode, merchant, language);
 
-        Set<ShoppingCartItem> items = new HashSet<>();
-        ShoppingCartItem itemToDelete = null;
-        for (ShoppingCartItem shoppingCartItem : cart.getLineItems()) {
-            if (shoppingCartItem.getSku().equals(sku)) {
-                // get cart item
-                itemToDelete = getEntryToUpdate(shoppingCartItem.getId(), cart);
+		if (cart == null) {
+			throw new ResourceNotFoundException("Cart code [ " + cartCode + " ] not found");
+		}
 
-                // break;
+		Set<ShoppingCartItem> items = new HashSet<>();
+		ShoppingCartItem itemToDelete = null;
+		for (ShoppingCartItem shoppingCartItem : cart.getLineItems()) {
+			if (shoppingCartItem.getSku().equals(sku)) {
+				// get cart item
+				itemToDelete = getEntryToUpdate(shoppingCartItem.getId(), cart);
 
-            } else {
-                items.add(shoppingCartItem);
-            }
-        }
-        // delete item
-        if (itemToDelete != null) {
-            shoppingCartService.deleteShoppingCartItem(itemToDelete.getId());
-        }
+				// break;
 
-        // remaining items
-        if (!items.isEmpty()) {
-            cart.setLineItems(items);
-        } else {
-            cart.getLineItems().clear();
-        }
+			}
+			else {
+				items.add(shoppingCartItem);
+			}
+		}
+		// delete item
+		if (itemToDelete != null) {
+			shoppingCartService.deleteShoppingCartItem(itemToDelete.getId());
+		}
 
-        shoppingCartService.saveOrUpdate(cart); // update cart with remaining items
-        if (!items.isEmpty() & returnCart) {
-            return this.getByCode(cartCode, merchant, language);
-        }
-        return null;
-    }
+		// remaining items
+		if (!items.isEmpty()) {
+			cart.setLineItems(items);
+		}
+		else {
+			cart.getLineItems().clear();
+		}
 
-    // KEEP
-    private ReadableShoppingCart readableShoppingCart(
-            ShoppingCart cartModel,
-            PersistableShoppingCartItem item,
-            StoreMerchantId store,
-            LanguageCode language)
-            throws Exception {
+		shoppingCartService.saveOrUpdate(cart); // update cart with remaining items
+		if (!items.isEmpty() & returnCart) {
+			return this.getByCode(cartCode, merchant, language);
+		}
+		return null;
+	}
 
-        ShoppingCartItem itemModel = createCartItem(cartModel, item, store, language);
+	// KEEP
+	private ReadableShoppingCart readableShoppingCart(ShoppingCart cartModel, PersistableShoppingCartItem item,
+			StoreMerchantId store, LanguageCode language) throws Exception {
 
-        // need to check if the item is already in the cart
-        boolean duplicateFound = false;
+		ShoppingCartItem itemModel = createCartItem(cartModel, item, store, language);
 
-        if (!duplicateFound) {
-            cartModel.getLineItems().add(itemModel);
-        }
+		// need to check if the item is already in the cart
+		boolean duplicateFound = false;
 
-        saveShoppingCart(cartModel);
+		if (!duplicateFound) {
+			cartModel.getLineItems().add(itemModel);
+		}
 
-        return readableShoppingCartMapper.convert(cartModel, store, language);
-    }
+		saveShoppingCart(cartModel);
 
-    private ReadableShoppingCart modifyCart(
-            ShoppingCart cartModel,
-            PersistableShoppingCartItem item,
-            StoreMerchantId store,
-            LanguageCode language)
-            throws Exception {
+		return readableShoppingCartMapper.convert(cartModel, store, language);
+	}
 
-        ShoppingCartItem itemModel = createCartItem(cartModel, item, store, language);
+	private ReadableShoppingCart modifyCart(ShoppingCart cartModel, PersistableShoppingCartItem item,
+			StoreMerchantId store, LanguageCode language) throws Exception {
 
-        boolean itemModified = false;
-        // check if existing product
-        Set<ShoppingCartItem> items = cartModel.getLineItems();
-        if (!CollectionUtils.isEmpty(items)) {
-            Set<ShoppingCartItem> newItems = new HashSet<>();
-            Set<ShoppingCartItem> removeItems = new HashSet<>();
-            for (ShoppingCartItem anItem : items) { // take care of existing
-                // product
-                if (itemModel.getSku().equals(anItem.getSku())) {
-                    if (item.getQuantity() == 0) {
-                        // left aside item to be removed
-                        // don't add it to new list of item
-                        removeItems.add(anItem);
-                    } else {
-                        // new quantity
-                        anItem.setQuantity(item.getQuantity());
-                        newItems.add(anItem);
-                    }
-                    itemModified = true;
-                } else {
-                    newItems.add(anItem);
-                }
-            }
+		ShoppingCartItem itemModel = createCartItem(cartModel, item, store, language);
 
-            if (!removeItems.isEmpty()) {
-                for (ShoppingCartItem emptyItem : removeItems) {
-                    shoppingCartService.deleteShoppingCartItem(emptyItem.getId());
-                }
-            }
+		boolean itemModified = false;
+		// check if existing product
+		Set<ShoppingCartItem> items = cartModel.getLineItems();
+		if (!CollectionUtils.isEmpty(items)) {
+			Set<ShoppingCartItem> newItems = new HashSet<>();
+			Set<ShoppingCartItem> removeItems = new HashSet<>();
+			for (ShoppingCartItem anItem : items) { // take care of existing
+				// product
+				if (itemModel.getSku().equals(anItem.getSku())) {
+					if (item.getQuantity() == 0) {
+						// left aside item to be removed
+						// don't add it to new list of item
+						removeItems.add(anItem);
+					}
+					else {
+						// new quantity
+						anItem.setQuantity(item.getQuantity());
+						newItems.add(anItem);
+					}
+					itemModified = true;
+				}
+				else {
+					newItems.add(anItem);
+				}
+			}
 
-            if (!itemModified) {
-                newItems.add(itemModel);
-            }
+			if (!removeItems.isEmpty()) {
+				for (ShoppingCartItem emptyItem : removeItems) {
+					shoppingCartService.deleteShoppingCartItem(emptyItem.getId());
+				}
+			}
 
-            if (newItems.isEmpty()) {
-                newItems = null;
-            }
+			if (!itemModified) {
+				newItems.add(itemModel);
+			}
 
-            cartModel.setLineItems(newItems);
-        } else {
-            // new item
-            if (item.getQuantity() > 0) {
-                cartModel.getLineItems().add(itemModel);
-            }
-        }
+			if (newItems.isEmpty()) {
+				newItems = null;
+			}
 
-        // if cart items are null just return cart with no items
+			cartModel.setLineItems(newItems);
+		}
+		else {
+			// new item
+			if (item.getQuantity() > 0) {
+				cartModel.getLineItems().add(itemModel);
+			}
+		}
 
-        // promo code added to the cart but no promo cart exists
-        if (!StringUtils.isBlank(item.getPromoCode())
-                && StringUtils.isBlank(cartModel.getPromoCode())) {
-            cartModel.setPromoCode(item.getPromoCode());
-            cartModel.setPromoAdded(new Date());
-        }
+		// if cart items are null just return cart with no items
 
-        saveShoppingCart(cartModel);
+		// promo code added to the cart but no promo cart exists
+		if (!StringUtils.isBlank(item.getPromoCode()) && StringUtils.isBlank(cartModel.getPromoCode())) {
+			cartModel.setPromoCode(item.getPromoCode());
+			cartModel.setPromoAdded(new Date());
+		}
 
-        // refresh cart
-        cartModel =
-                shoppingCartService.loadCartByCode(
-                        cartModel.getShoppingCartCode(), store, language);
+		saveShoppingCart(cartModel);
 
-        if (cartModel == null) {
-            return null;
-        }
+		// refresh cart
+		cartModel = shoppingCartService.loadCartByCode(cartModel.getShoppingCartCode(), store, language);
 
-        return readableShoppingCartMapper.convert(cartModel, store, language);
-    }
+		if (cartModel == null) {
+			return null;
+		}
 
-    @Override
-    // KEEP
-    public ReadableShoppingCart modifyCart(
-            String cartCode,
-            PersistableShoppingCartItem item,
-            StoreMerchantId store,
-            LanguageCode language)
-            throws Exception {
+		return readableShoppingCartMapper.convert(cartModel, store, language);
+	}
 
-        Validate.notNull(cartCode, "String cart code cannot be null");
-        Validate.notNull(item, "PersistableShoppingCartItem cannot be null");
+	@Override
+	// KEEP
+	public ReadableShoppingCart modifyCart(String cartCode, PersistableShoppingCartItem item, StoreMerchantId store,
+			LanguageCode language) throws Exception {
 
-        ShoppingCart cartModel = shoppingCartService.findCart(cartCode, store);
-        if (cartModel == null) {
-            throw new ResourceNotFoundException("Cart code [" + cartCode + "] not found");
-        }
+		Validate.notNull(cartCode, "String cart code cannot be null");
+		Validate.notNull(item, "PersistableShoppingCartItem cannot be null");
 
-        return modifyCart(cartModel, item, store, language);
-    }
+		ShoppingCart cartModel = shoppingCartService.findCart(cartCode, store);
+		if (cartModel == null) {
+			throw new ResourceNotFoundException("Cart code [" + cartCode + "] not found");
+		}
 
-    private void saveShoppingCart(ShoppingCart shoppingCart) {
-        shoppingCartService.save(shoppingCart);
-    }
+		return modifyCart(cartModel, item, store, language);
+	}
 
-    private String uniqueShoppingCartCode() {
-        return UUID.randomUUID().toString().replaceAll("-", "");
-    }
+	private void saveShoppingCart(ShoppingCart shoppingCart) {
+		shoppingCartService.save(shoppingCart);
+	}
 
-    @Override
-    // KEEP
-    public ReadableShoppingCart getByCode(String code, StoreMerchantId store, LanguageCode language)
-            throws Exception {
+	private String uniqueShoppingCartCode() {
+		return UUID.randomUUID().toString().replaceAll("-", "");
+	}
 
-        ShoppingCart cart = shoppingCartService.loadCartByCode(code, store, language);
-        ReadableShoppingCart readableCart = null;
+	@Override
+	// KEEP
+	public ReadableShoppingCart getByCode(String code, StoreMerchantId store, LanguageCode language) throws Exception {
 
-        if (cart != null) {
+		ShoppingCart cart = shoppingCartService.loadCartByCode(code, store, language);
+		ReadableShoppingCart readableCart = null;
 
-            readableCart = readableShoppingCartMapper.convert(cart, store, language);
+		if (cart != null) {
 
-            if (!StringUtils.isBlank(cart.getPromoCode())) {
-                Date promoDateAdded = cart.getPromoAdded(); // promo valid 1 day
-                if (promoDateAdded == null) {
-                    promoDateAdded = new Date();
-                }
-                Instant instant = promoDateAdded.toInstant();
-                ZonedDateTime zdt = instant.atZone(ZoneId.systemDefault());
-                LocalDate date = zdt.toLocalDate();
-                // date added < date + 1 day
-                LocalDate tomorrow = LocalDate.now().plusDays(1);
-                if (date.isBefore(tomorrow)) {
-                    readableCart.setPromoCode(cart.getPromoCode());
-                }
-            }
-        }
+			readableCart = readableShoppingCartMapper.convert(cart, store, language);
 
-        return readableCart;
-    }
+			if (!StringUtils.isBlank(cart.getPromoCode())) {
+				Date promoDateAdded = cart.getPromoAdded(); // promo valid 1 day
+				if (promoDateAdded == null) {
+					promoDateAdded = new Date();
+				}
+				Instant instant = promoDateAdded.toInstant();
+				ZonedDateTime zdt = instant.atZone(ZoneId.systemDefault());
+				LocalDate date = zdt.toLocalDate();
+				// date added < date + 1 day
+				LocalDate tomorrow = LocalDate.now().plusDays(1);
+				if (date.isBefore(tomorrow)) {
+					readableCart.setPromoCode(cart.getPromoCode());
+				}
+			}
+		}
+
+		return readableCart;
+	}
+
 }

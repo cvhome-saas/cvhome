@@ -22,17 +22,19 @@ import reactor.core.publisher.Mono;
 @AllArgsConstructor
 @PreAuthorize("isAuthenticated()")
 public class AuthController {
-    @GetMapping("current")
-    public ResponseEntity<Principal> current(@AuthenticationPrincipal Principal principal) {
-        return Optional.ofNullable(principal)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.UNAUTHORIZED));
-    }
 
-    @GetMapping("me")
-    public Mono<OAuth2AuthenticationToken> me() {
-        return ReactiveSecurityContextHolder.getContext()
-                .map(SecurityContext::getAuthentication)
-                .cast(OAuth2AuthenticationToken.class);
-    }
+	@GetMapping("current")
+	public ResponseEntity<Principal> current(@AuthenticationPrincipal Principal principal) {
+		return Optional.ofNullable(principal)
+			.map(ResponseEntity::ok)
+			.orElseGet(() -> new ResponseEntity<>(HttpStatus.UNAUTHORIZED));
+	}
+
+	@GetMapping("me")
+	public Mono<OAuth2AuthenticationToken> me() {
+		return ReactiveSecurityContextHolder.getContext()
+			.map(SecurityContext::getAuthentication)
+			.cast(OAuth2AuthenticationToken.class);
+	}
+
 }

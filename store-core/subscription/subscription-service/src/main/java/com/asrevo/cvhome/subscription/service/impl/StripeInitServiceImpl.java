@@ -29,108 +29,101 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 @Slf4j
 public class StripeInitServiceImpl implements StripeInitService {
-    private final StripeProperties stripeProperties;
 
-    @PostConstruct
-    public void init() {
-        Stripe.apiKey = stripeProperties.key();
-    }
+	private final StripeProperties stripeProperties;
 
-    @Override
-    public boolean isConfigured() {
-        try {
-            Product.list(ProductListParams.builder().build());
-            return true;
-        } catch (StripeException e) {
-            return false;
-        }
-    }
+	@PostConstruct
+	public void init() {
+		Stripe.apiKey = stripeProperties.key();
+	}
 
-    @SneakyThrows
-    @Override
-    public ProductId createProduct(SubscriptionPlan plan) {
-        String productName = plan.name();
-        ProductCreateParams productParams =
-                ProductCreateParams.builder()
-                        .setName(productName)
-                        .setDescription(productName + " Plan")
-                        .build();
-        Product product = Product.create(productParams);
-        return new ProductId(product.getId());
-    }
+	@Override
+	public boolean isConfigured() {
+		try {
+			Product.list(ProductListParams.builder().build());
+			return true;
+		}
+		catch (StripeException e) {
+			return false;
+		}
+	}
 
-    @SneakyThrows
-    @Override
-    public PriceId createProductPrice(ProductPriceDetails details) {
-        String productName = details.subscriptionPlan().name();
-        PriceCreateParams priceParams =
-                PriceCreateParams.builder()
-                        .setNickname(productName + " " + details.recurringPlan().name())
-                        .setCurrency(details.pricePlanCost().currency())
-                        .setUnitAmount(details.pricePlanCost().price())
-                        .setRecurring(
-                                PriceCreateParams.Recurring.builder()
-                                        .setInterval(
-                                                Interval.valueOf(details.recurringPlan().name()))
-                                        .build())
-                        .setProduct(details.productId().productId())
-                        .build();
-        Price price = Price.create(priceParams);
-        return new PriceId(price.getId());
-    }
+	@SneakyThrows
+	@Override
+	public ProductId createProduct(SubscriptionPlan plan) {
+		String productName = plan.name();
+		ProductCreateParams productParams = ProductCreateParams.builder()
+			.setName(productName)
+			.setDescription(productName + " Plan")
+			.build();
+		Product product = Product.create(productParams);
+		return new ProductId(product.getId());
+	}
 
-    @Override
-    public boolean exist(PriceId priceId) {
-        try {
-            Price ignored = Price.retrieve(priceId.id());
-            return true;
-        } catch (StripeException e) {
-            return false;
-        }
-    }
+	@SneakyThrows
+	@Override
+	public PriceId createProductPrice(ProductPriceDetails details) {
+		String productName = details.subscriptionPlan().name();
+		PriceCreateParams priceParams = PriceCreateParams.builder()
+			.setNickname(productName + " " + details.recurringPlan().name())
+			.setCurrency(details.pricePlanCost().currency())
+			.setUnitAmount(details.pricePlanCost().price())
+			.setRecurring(PriceCreateParams.Recurring.builder()
+				.setInterval(Interval.valueOf(details.recurringPlan().name()))
+				.build())
+			.setProduct(details.productId().productId())
+			.build();
+		Price price = Price.create(priceParams);
+		return new PriceId(price.getId());
+	}
 
-    @SneakyThrows
-    @Override
-    public List<ProductPriceDetails> loadTable() {
-        List<ProductPriceDetails> productPriceDetails = new ArrayList<>();
+	@Override
+	public boolean exist(PriceId priceId) {
+		try {
+			Price ignored = Price.retrieve(priceId.id());
+			return true;
+		}
+		catch (StripeException e) {
+			return false;
+		}
+	}
 
-        ProductCollection list = Product.list(ProductListParams.builder().setActive(true).build());
-        for (Product product : list.getData()) {
+	@SneakyThrows
+	@Override
+	public List<ProductPriceDetails> loadTable() {
+		List<ProductPriceDetails> productPriceDetails = new ArrayList<>();
 
-            List<Price> prices =
-                    Price.list(PriceListParams.builder().setProduct(product.getId()).build())
-                            .getData();
-            for (Price price : prices) {
-                try {
-                    ProductId productId = new ProductId(product.getId());
-                    SubscriptionPlan subscriptionPlan =
-                            SubscriptionPlan.valueOf(product.getName().toUpperCase());
-                    RecurringPlan recurringPlan =
-                            RecurringPlan.valueOf(price.getRecurring().getInterval().toUpperCase());
-                    PricePlanCost pricePlanCost =
-                            new PricePlanCost(price.getCurrency(), price.getUnitAmount());
+		ProductCollection list = Product.list(ProductListParams.builder().setActive(true).build());
+		for (Product product : list.getData()) {
 
-                    PricePlanCost expectedPriceCost =
-                            PricePlanCost.fromUsingFactor(
-                                    price.getCurrency(), subscriptionPlan, recurringPlan);
+			List<Price> prices = Price.list(PriceListParams.builder().setProduct(product.getId()).build()).getData();
+			for (Price price : prices) {
+				try {
+					ProductId productId = new ProductId(product.getId());
+					SubscriptionPlan subscriptionPlan = SubscriptionPlan.valueOf(product.getName().toUpperCase());
+					RecurringPlan recurringPlan = RecurringPlan
+						.valueOf(price.getRecurring().getInterval().toUpperCase());
+					PricePlanCost pricePlanCost = new PricePlanCost(price.getCurrency(), price.getUnitAmount());
 
-                    if (expectedPriceCost.equals(pricePlanCost)) {
-                        ProductPriceDetails e =
-                                new ProductPriceDetails(
-                                        productId, subscriptionPlan, recurringPlan, pricePlanCost);
-                        productPriceDetails.add(e);
-                    } else {
-                        log.warn(
-                                "ignore price  {} not matched {}",
-                                pricePlanCost,
-                                expectedPriceCost);
-                    }
+					PricePlanCost expectedPriceCost = PricePlanCost.fromUsingFactor(price.getCurrency(),
+							subscriptionPlan, recurringPlan);
 
-                } catch (Exception e) {
-                    log.warn("ignore product price for failing with error ", e);
-                }
-            }
-        }
-        return productPriceDetails;
-    }
+					if (expectedPriceCost.equals(pricePlanCost)) {
+						ProductPriceDetails e = new ProductPriceDetails(productId, subscriptionPlan, recurringPlan,
+								pricePlanCost);
+						productPriceDetails.add(e);
+					}
+					else {
+						log.warn("ignore price  {} not matched {}", pricePlanCost, expectedPriceCost);
+					}
+
+				}
+				catch (Exception e) {
+					log.warn("ignore product price for failing with error ", e);
+				}
+			}
+		}
+		return productPriceDetails;
+	}
+
 }

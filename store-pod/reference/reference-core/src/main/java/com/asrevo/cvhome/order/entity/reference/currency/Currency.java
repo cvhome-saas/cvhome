@@ -18,31 +18,33 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Currency extends SalesManagerEntity<CurrencyCode, Currency> implements Serializable {
-    @Serial private static final long serialVersionUID = -999926410367685145L;
 
-    @EmbeddedId
-    @JsonSerialize(using = LanguageCodeSerializer.class)
-    @JsonDeserialize(using = LanguageCodeDeSerializer.class)
-    @AttributeOverrides({
-        @AttributeOverride(name = "code", column = @Column(name = "CURRENCY_CODE", length = 6))
-    })
-    private CurrencyCode code;
+	@Serial
+	private static final long serialVersionUID = -999926410367685145L;
 
-    @Column(name = "CURRENCY_SUPPORTED")
-    private Boolean supported = true;
+	@EmbeddedId
+	@JsonSerialize(using = LanguageCodeSerializer.class)
+	@JsonDeserialize(using = LanguageCodeDeSerializer.class)
+	@AttributeOverrides({ @AttributeOverride(name = "code", column = @Column(name = "CURRENCY_CODE", length = 6)) })
+	private CurrencyCode code;
 
-    @Column(name = "CURRENCY_NAME", unique = true)
-    private String name;
+	@Column(name = "CURRENCY_SUPPORTED")
+	private Boolean supported = true;
 
-    public Currency() {}
+	@Column(name = "CURRENCY_NAME", unique = true)
+	private String name;
 
-    @Override
-    public CurrencyCode getId() {
-        return this.code;
-    }
+	public Currency() {
+	}
 
-    @Override
-    public void setId(CurrencyCode id) {
-        this.code = id;
-    }
+	@Override
+	public CurrencyCode getId() {
+		return this.code;
+	}
+
+	@Override
+	public void setId(CurrencyCode id) {
+		this.code = id;
+	}
+
 }

@@ -22,42 +22,42 @@ import org.springframework.util.Assert;
 @Getter
 @Component
 @AllArgsConstructor
-public class PersistablePaymentPopulator
-        extends AbstractDataPopulator<PersistablePayment, StoreMerchantId, Payment> {
+public class PersistablePaymentPopulator extends AbstractDataPopulator<PersistablePayment, StoreMerchantId, Payment> {
 
-    private final ExternalProductService externalProductService;
+	private final ExternalProductService externalProductService;
 
-    @Override
-    public Payment populate(
-            PersistablePayment source, Payment target, StoreMerchantId store, LanguageCode language)
-            throws ConversionException {
+	@Override
+	public Payment populate(PersistablePayment source, Payment target, StoreMerchantId store, LanguageCode language)
+			throws ConversionException {
 
-        Assert.notNull(source, "PersistablePayment cannot be null");
-        if (target == null) {
-            target = new Payment();
-        }
+		Assert.notNull(source, "PersistablePayment cannot be null");
+		if (target == null) {
+			target = new Payment();
+		}
 
-        try {
+		try {
 
-            target.setAmount(PriceUtils.getAmount(source.getAmount()));
-            target.setModuleName(source.getPaymentModule());
-            target.setPaymentType(PaymentType.valueOf(source.getPaymentType()));
-            target.setTransactionType(TransactionType.valueOf(source.getTransactionType()));
+			target.setAmount(PriceUtils.getAmount(source.getAmount()));
+			target.setModuleName(source.getPaymentModule());
+			target.setPaymentType(PaymentType.valueOf(source.getPaymentType()));
+			target.setTransactionType(TransactionType.valueOf(source.getTransactionType()));
 
-            Map<String, String> metadata = new HashMap<>();
-            metadata.put("paymentToken", source.getPaymentToken());
-            target.setPaymentMetaData(metadata);
+			Map<String, String> metadata = new HashMap<>();
+			metadata.put("paymentToken", source.getPaymentToken());
+			target.setPaymentMetaData(metadata);
 
-            return target;
+			return target;
 
-        } catch (Exception e) {
-            throw new ConversionException(e);
-        }
-    }
+		}
+		catch (Exception e) {
+			throw new ConversionException(e);
+		}
+	}
 
-    @Override
-    protected Payment createTarget() {
-        // TODO Auto-generated method stub
-        return null;
-    }
+	@Override
+	protected Payment createTarget() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

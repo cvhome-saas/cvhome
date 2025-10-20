@@ -17,14 +17,18 @@ import lombok.Setter;
 @Getter
 public class ReadableShoppingCartItem extends ReadableMinimalProduct implements Serializable {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private BigDecimal subTotal;
-    private String displaySubTotal;
+	private BigDecimal subTotal;
 
-    private ReadableProductVariation variant = null;
-    private ReadableProductVariation variantValue = null;
+	private String displaySubTotal;
+
+	private ReadableProductVariation variant = null;
+
+	private ReadableProductVariation variantValue = null;
+
 }

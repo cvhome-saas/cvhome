@@ -19,49 +19,39 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 @Component
 public class StoreMerchantIdArgumentResolver implements HandlerMethodArgumentResolver {
 
-    public static final String REQUEST_PARAMETER_STORE = "store";
-    private final AccessEvaluator accessEvaluator;
+	public static final String REQUEST_PARAMETER_STORE = "store";
 
-    public StoreMerchantIdArgumentResolver(AccessEvaluator accessEvaluator) {
-        this.accessEvaluator = accessEvaluator;
-    }
+	private final AccessEvaluator accessEvaluator;
 
-    @Override
-    public boolean supportsParameter(MethodParameter parameter) {
-        return parameter.getParameterType().equals(StoreMerchantId.class);
-    }
+	public StoreMerchantIdArgumentResolver(AccessEvaluator accessEvaluator) {
+		this.accessEvaluator = accessEvaluator;
+	}
 
-    @Override
-    public Object resolveArgument(
-            MethodParameter parameter,
-            ModelAndViewContainer mavContainer,
-            NativeWebRequest webRequest,
-            WebDataBinderFactory binderFactory) {
-        String storeCode =
-                Optional.ofNullable(webRequest.getParameter(REQUEST_PARAMETER_STORE))
-                        .filter(StringUtils::isNotBlank)
-                        .orElseThrow(
-                                () ->
-                                        new IllegalArgumentException(
-                                                "Missing required parameter 'store'"));
+	@Override
+	public boolean supportsParameter(MethodParameter parameter) {
+		return parameter.getParameterType().equals(StoreMerchantId.class);
+	}
 
-        if (isSecuredResource(webRequest)) {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            boolean hasAccess =
-                    accessEvaluator.hasAccessOnStoreFindOne(
-                            authentication, new ManagerStoreId(storeCode));
-            if (!hasAccess) {
-                throw new UnauthorizedException("Cannot authorize user for store " + storeCode);
-            }
-        }
+	@Override
+	public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
+			NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
+		String storeCode = Optional.ofNullable(webRequest.getParameter(REQUEST_PARAMETER_STORE))
+			.filter(StringUtils::isNotBlank)
+			.orElseThrow(() -> new IllegalArgumentException("Missing required parameter 'store'"));
 
-        return new StoreMerchantId(storeCode);
-    }
+		if (isSecuredResource(webRequest)) {
+			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+			boolean hasAccess = accessEvaluator.hasAccessOnStoreFindOne(authentication, new ManagerStoreId(storeCode));
+			if (!hasAccess) {
+				throw new UnauthorizedException("Cannot authorize user for store " + storeCode);
+			}
+		}
 
-    private boolean isSecuredResource(NativeWebRequest webRequest) {
-        return ((StandardServletAsyncWebRequest) webRequest)
-                .getRequest()
-                .getRequestURI()
-                .contains("/private/");
-    }
+		return new StoreMerchantId(storeCode);
+	}
+
+	private boolean isSecuredResource(NativeWebRequest webRequest) {
+		return ((StandardServletAsyncWebRequest) webRequest).getRequest().getRequestURI().contains("/private/");
+	}
+
 }

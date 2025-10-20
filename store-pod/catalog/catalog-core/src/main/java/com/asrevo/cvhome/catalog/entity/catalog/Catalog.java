@@ -16,63 +16,53 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * Allows grouping products and category
- * Catalog
- * - category 1
- * - category 2
+ * Allows grouping products and category Catalog - category 1 - category 2
  * <p>
- * - product 1
- * - product 2
- * - product 3
- * - product 4
+ * - product 1 - product 2 - product 3 - product 4
  *
  * @author carlsamson
  */
 @Entity
 @EntityListeners(value = AuditListener.class)
-@Table(
-        name = "CATALOG",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"STORE_MERCHANT_ID", "CODE"}))
+@Table(name = "CATALOG", uniqueConstraints = @UniqueConstraint(columnNames = { "STORE_MERCHANT_ID", "CODE" }))
 @Getter
 @Setter
 public class Catalog extends SalesManagerEntity<Long, Catalog> implements Auditable {
-    @Serial private static final long serialVersionUID = 1L;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
-    @TableGenerator(
-            name = "TABLE_GEN",
-            table = "SM_SEQUENCER",
-            pkColumnName = "SEQ_NAME",
-            valueColumnName = "SEQ_COUNT",
-            pkColumnValue = "CATALOG_SEQ_NEXT_VAL",
-            allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
-            initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
-    private Long id;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    @Embedded private AuditSection auditSection = new AuditSection();
+	@Id
+	@GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
+	@TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME",
+			valueColumnName = "SEQ_COUNT", pkColumnValue = "CATALOG_SEQ_NEXT_VAL",
+			allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
+			initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
+	private Long id;
 
-    @Valid
-    @OneToMany(mappedBy = "catalog", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<CatalogCategoryEntry> entry = new HashSet<>();
+	@Embedded
+	private AuditSection auditSection = new AuditSection();
 
-    @Embedded
-    @AttributeOverrides(
-            @AttributeOverride(
-                    name = "storeMerchantId",
-                    column = @Column(name = "STORE_MERCHANT_ID", nullable = false, length = 50)))
-    private StoreMerchantId storeMerchantId;
+	@Valid
+	@OneToMany(mappedBy = "catalog", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	private Set<CatalogCategoryEntry> entry = new HashSet<>();
 
-    @Column(name = "VISIBLE")
-    private boolean visible;
+	@Embedded
+	@AttributeOverrides(@AttributeOverride(name = "storeMerchantId",
+			column = @Column(name = "STORE_MERCHANT_ID", nullable = false, length = 50)))
+	private StoreMerchantId storeMerchantId;
 
-    @Column(name = "DEFAULT_CATALOG")
-    private boolean defaultCatalog;
+	@Column(name = "VISIBLE")
+	private boolean visible;
 
-    @NotEmpty
-    @Column(name = "CODE", length = 100, nullable = false)
-    private String code;
+	@Column(name = "DEFAULT_CATALOG")
+	private boolean defaultCatalog;
 
-    @Column(name = "SORT_ORDER")
-    private Integer sortOrder = 0;
+	@NotEmpty
+	@Column(name = "CODE", length = 100, nullable = false)
+	private String code;
+
+	@Column(name = "SORT_ORDER")
+	private Integer sortOrder = 0;
+
 }

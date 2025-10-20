@@ -14,17 +14,16 @@ import org.springframework.web.multipart.MaxUploadSizeExceededException;
 @Slf4j
 public class FileUploadExceptionAdvice {
 
-    @ExceptionHandler(MaxUploadSizeExceededException.class)
-    @ResponseStatus(HttpStatus.PAYLOAD_TOO_LARGE)
-    public @ResponseBody ErrorEntity handleFileException(Exception exception) {
-        log.error(exception.getMessage(), exception);
-        ErrorEntity errorEntity = new ErrorEntity();
+	@ExceptionHandler(MaxUploadSizeExceededException.class)
+	@ResponseStatus(HttpStatus.PAYLOAD_TOO_LARGE)
+	public @ResponseBody ErrorEntity handleFileException(Exception exception) {
+		log.error(exception.getMessage(), exception);
+		ErrorEntity errorEntity = new ErrorEntity();
 
-        String resultMessage =
-                exception.getLocalizedMessage() != null
-                        ? exception.getLocalizedMessage()
-                        : exception.getMessage();
-        Optional.ofNullable(resultMessage).ifPresent(errorEntity::setMessage);
-        return errorEntity;
-    }
+		String resultMessage = exception.getLocalizedMessage() != null ? exception.getLocalizedMessage()
+				: exception.getMessage();
+		Optional.ofNullable(resultMessage).ifPresent(errorEntity::setMessage);
+		return errorEntity;
+	}
+
 }

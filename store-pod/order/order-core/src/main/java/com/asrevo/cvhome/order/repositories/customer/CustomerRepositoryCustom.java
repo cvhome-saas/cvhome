@@ -6,5 +6,6 @@ import com.asrevo.cvhome.order.entity.customer.CustomerList;
 
 public interface CustomerRepositoryCustom {
 
-    CustomerList listByStore(StoreMerchantId store, CustomerCriteria criteria);
+	CustomerList listByStore(StoreMerchantId store, CustomerCriteria criteria);
+
 }

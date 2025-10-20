@@ -8,22 +8,18 @@ import java.util.List;
 
 public interface ProductOptionSetFacade {
 
-    ReadableProductOptionSet get(Long id, StoreMerchantId store, LanguageCode language);
+	ReadableProductOptionSet get(Long id, StoreMerchantId store, LanguageCode language);
 
-    boolean exists(String code, StoreMerchantId store);
+	boolean exists(String code, StoreMerchantId store);
 
-    List<ReadableProductOptionSet> list(StoreMerchantId store, LanguageCode language);
+	List<ReadableProductOptionSet> list(StoreMerchantId store, LanguageCode language);
 
-    List<ReadableProductOptionSet> list(StoreMerchantId store, LanguageCode language, String type);
+	List<ReadableProductOptionSet> list(StoreMerchantId store, LanguageCode language, String type);
 
-    void create(
-            PersistableProductOptionSet optionSet, StoreMerchantId store, LanguageCode language);
+	void create(PersistableProductOptionSet optionSet, StoreMerchantId store, LanguageCode language);
 
-    void update(
-            Long id,
-            PersistableProductOptionSet optionSet,
-            StoreMerchantId store,
-            LanguageCode language);
+	void update(Long id, PersistableProductOptionSet optionSet, StoreMerchantId store, LanguageCode language);
 
-    void delete(Long id, StoreMerchantId store);
+	void delete(Long id, StoreMerchantId store);
+
 }

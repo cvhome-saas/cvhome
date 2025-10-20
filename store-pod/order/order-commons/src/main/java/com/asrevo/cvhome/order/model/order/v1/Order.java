@@ -9,12 +9,16 @@ import lombok.Setter;
 @Getter
 public class Order extends Entity {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private boolean customerAgreement;
-    private String comments;
-    private String currency;
+	private boolean customerAgreement;
+
+	private String comments;
+
+	private String currency;
+
 }

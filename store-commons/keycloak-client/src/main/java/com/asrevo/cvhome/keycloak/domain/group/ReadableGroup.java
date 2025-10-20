@@ -13,10 +13,12 @@ import lombok.Setter;
 @Setter
 public class ReadableGroup extends GroupEntity {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private Long id = 0L;
+	private Long id = 0L;
+
 }

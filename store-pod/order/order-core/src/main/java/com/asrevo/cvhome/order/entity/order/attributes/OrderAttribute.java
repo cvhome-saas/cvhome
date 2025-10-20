@@ -19,31 +19,29 @@ import lombok.Setter;
 @Setter
 public class OrderAttribute extends SalesManagerEntity<Long, OrderAttribute> {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    @Id
-    @Column(name = "ORDER_ATTRIBUTE_ID", unique = true, nullable = false)
-    @TableGenerator(
-            name = "TABLE_GEN",
-            table = "SM_SEQUENCER",
-            pkColumnName = "SEQ_NAME",
-            valueColumnName = "SEQ_COUNT",
-            pkColumnValue = "ORDER_ATTRIBUTE_SEQ_NEXT_VAL",
-            allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
-            initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
-    private Long id;
+	@Id
+	@Column(name = "ORDER_ATTRIBUTE_ID", unique = true, nullable = false)
+	@TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME",
+			valueColumnName = "SEQ_COUNT", pkColumnValue = "ORDER_ATTRIBUTE_SEQ_NEXT_VAL",
+			allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
+			initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
+	@GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
+	private Long id;
 
-    @Column(name = "IDENTIFIER", nullable = false)
-    private String key;
+	@Column(name = "IDENTIFIER", nullable = false)
+	private String key;
 
-    @Column(name = "VALUE", nullable = false)
-    private String value;
+	@Column(name = "VALUE", nullable = false)
+	private String value;
 
-    @ManyToOne(targetEntity = Order.class)
-    @JoinColumn(name = "ORDER_ID", nullable = false)
-    private Order order;
+	@ManyToOne(targetEntity = Order.class)
+	@JoinColumn(name = "ORDER_ID", nullable = false)
+	private Order order;
+
 }

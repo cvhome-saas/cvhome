@@ -13,42 +13,37 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 
 public class ServletOrgStorePrincipalInfoArgumentResolver implements HandlerMethodArgumentResolver {
 
-    @Override
-    public boolean supportsParameter(MethodParameter parameter) {
-        return findMethodAnnotation(OrgStorePrincipalInfo.class, parameter) != null;
-    }
+	@Override
+	public boolean supportsParameter(MethodParameter parameter) {
+		return findMethodAnnotation(OrgStorePrincipalInfo.class, parameter) != null;
+	}
 
-    @Override
-    public Object resolveArgument(
-            MethodParameter parameter,
-            ModelAndViewContainer mavContainer,
-            NativeWebRequest webRequest,
-            WebDataBinderFactory binderFactory) {
-        return SecurityUtils.getOrgStoreIdentity(
-                SecurityContextHolder.getContext().getAuthentication());
-    }
+	@Override
+	public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
+			NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
+		return SecurityUtils.getOrgStoreIdentity(SecurityContextHolder.getContext().getAuthentication());
+	}
 
-    /**
-     * Obtains the specified {@link Annotation} on the specified {@link MethodParameter}.
-     *
-     * @param annotationClass the class of the {@link Annotation} to find on the
-     *                        {@link MethodParameter}
-     * @param parameter       the {@link MethodParameter} to search for an {@link Annotation}
-     * @return the {@link Annotation} that was found or null.
-     */
-    private <T extends Annotation> T findMethodAnnotation(
-            Class<T> annotationClass, MethodParameter parameter) {
-        T annotation = parameter.getParameterAnnotation(annotationClass);
-        if (annotation != null) {
-            return annotation;
-        }
-        Annotation[] annotationsToSearch = parameter.getParameterAnnotations();
-        for (Annotation toSearch : annotationsToSearch) {
-            annotation = AnnotationUtils.findAnnotation(toSearch.annotationType(), annotationClass);
-            if (annotation != null) {
-                return annotation;
-            }
-        }
-        return null;
-    }
+	/**
+	 * Obtains the specified {@link Annotation} on the specified {@link MethodParameter}.
+	 * @param annotationClass the class of the {@link Annotation} to find on the
+	 * {@link MethodParameter}
+	 * @param parameter the {@link MethodParameter} to search for an {@link Annotation}
+	 * @return the {@link Annotation} that was found or null.
+	 */
+	private <T extends Annotation> T findMethodAnnotation(Class<T> annotationClass, MethodParameter parameter) {
+		T annotation = parameter.getParameterAnnotation(annotationClass);
+		if (annotation != null) {
+			return annotation;
+		}
+		Annotation[] annotationsToSearch = parameter.getParameterAnnotations();
+		for (Annotation toSearch : annotationsToSearch) {
+			annotation = AnnotationUtils.findAnnotation(toSearch.annotationType(), annotationClass);
+			if (annotation != null) {
+				return annotation;
+			}
+		}
+		return null;
+	}
+
 }

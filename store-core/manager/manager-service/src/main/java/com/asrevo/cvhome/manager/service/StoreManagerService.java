@@ -10,12 +10,12 @@ import org.springframework.data.domain.Pageable;
 import reactor.core.publisher.Mono;
 
 public interface StoreManagerService {
-    void createStore(ManagerOrgId orgId, Map<Object, Object> request);
 
-    Mono<PageImpl<Object>> findAll(
-            UserOrgStoreIdentity identity,
-            ListManagerStoreQuery listManagerStoreQuery,
-            Pageable pageable);
+	void createStore(ManagerOrgId orgId, Map<Object, Object> request);
 
-    Mono<Object> getStore(ManagerStoreId managerStoreId);
+	Mono<PageImpl<Object>> findAll(UserOrgStoreIdentity identity, ListManagerStoreQuery listManagerStoreQuery,
+			Pageable pageable);
+
+	Mono<Object> getStore(ManagerStoreId managerStoreId);
+
 }

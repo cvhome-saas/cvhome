@@ -21,61 +21,59 @@ import org.springframework.util.Assert;
  * @author carlsamson
  */
 @Service("productAvailabilityService")
-public class ProductAvailabilityServiceImpl
-        extends SalesManagerEntityServiceImpl<Long, ProductAvailability>
-        implements ProductAvailabilityService {
+public class ProductAvailabilityServiceImpl extends SalesManagerEntityServiceImpl<Long, ProductAvailability>
+		implements ProductAvailabilityService {
 
-    private final ProductAvailabilityRepository productAvailabilityRepository;
+	private final ProductAvailabilityRepository productAvailabilityRepository;
 
-    private final PageableProductAvailabilityRepository pageableProductAvailabilityRepository;
+	private final PageableProductAvailabilityRepository pageableProductAvailabilityRepository;
 
-    @Autowired
-    public ProductAvailabilityServiceImpl(
-            ProductAvailabilityRepository productAvailabilityRepository,
-            PageableProductAvailabilityRepository pageableProductAvailabilityRepository) {
-        super(productAvailabilityRepository);
-        this.productAvailabilityRepository = productAvailabilityRepository;
-        this.pageableProductAvailabilityRepository = pageableProductAvailabilityRepository;
-    }
+	@Autowired
+	public ProductAvailabilityServiceImpl(ProductAvailabilityRepository productAvailabilityRepository,
+			PageableProductAvailabilityRepository pageableProductAvailabilityRepository) {
+		super(productAvailabilityRepository);
+		this.productAvailabilityRepository = productAvailabilityRepository;
+		this.pageableProductAvailabilityRepository = pageableProductAvailabilityRepository;
+	}
 
-    @Override
-    public ProductAvailability saveOrUpdate(ProductAvailability availability)
-            throws ServiceException {
-        if (isPositive(availability.getId())) {
-            update(availability);
-        } else {
-            create(availability);
-        }
+	@Override
+	public ProductAvailability saveOrUpdate(ProductAvailability availability) throws ServiceException {
+		if (isPositive(availability.getId())) {
+			update(availability);
+		}
+		else {
+			create(availability);
+		}
 
-        return availability;
-    }
+		return availability;
+	}
 
-    private boolean isPositive(Long id) {
-        return Objects.nonNull(id) && id > 0;
-    }
+	private boolean isPositive(Long id) {
+		return Objects.nonNull(id) && id > 0;
+	}
 
-    @Override
-    public Page<ProductAvailability> listByProduct(
-            Long productId, StoreMerchantId store, Pageable pageable) {
-        Assert.notNull(productId, "Product cannot be null");
-        Assert.notNull(store, "MercantStore cannot be null");
-        return pageableProductAvailabilityRepository.getByProductId(productId, store, pageable);
-    }
+	@Override
+	public Page<ProductAvailability> listByProduct(Long productId, StoreMerchantId store, Pageable pageable) {
+		Assert.notNull(productId, "Product cannot be null");
+		Assert.notNull(store, "MercantStore cannot be null");
+		return pageableProductAvailabilityRepository.getByProductId(productId, store, pageable);
+	}
 
-    @Override
-    public Optional<ProductAvailability> getById(Long availabilityId, StoreMerchantId store) {
-        Assert.notNull(store, "Merchant must not be null");
-        return Optional.ofNullable(productAvailabilityRepository.getById(availabilityId));
-    }
+	@Override
+	public Optional<ProductAvailability> getById(Long availabilityId, StoreMerchantId store) {
+		Assert.notNull(store, "Merchant must not be null");
+		return Optional.ofNullable(productAvailabilityRepository.getById(availabilityId));
+	}
 
-    @Override
-    public Page<ProductAvailability> getBySku(String sku, Pageable pageable) {
-        return pageableProductAvailabilityRepository.getBySku(sku, pageable);
-    }
+	@Override
+	public Page<ProductAvailability> getBySku(String sku, Pageable pageable) {
+		return pageableProductAvailabilityRepository.getBySku(sku, pageable);
+	}
 
-    @Override
-    public List<ProductAvailability> getBySku(String sku, StoreMerchantId store) {
-        Assert.notNull(store, "Store cannot be null");
-        return productAvailabilityRepository.getBySku(sku, store);
-    }
+	@Override
+	public List<ProductAvailability> getBySku(String sku, StoreMerchantId store) {
+		Assert.notNull(store, "Store cannot be null");
+		return productAvailabilityRepository.getBySku(sku, store);
+	}
+
 }

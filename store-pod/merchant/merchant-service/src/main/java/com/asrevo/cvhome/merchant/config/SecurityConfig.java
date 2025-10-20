@@ -20,55 +20,51 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 public class SecurityConfig {
 
-    @Bean
-    SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests(
-                        it ->
-                                it.requestMatchers("api/v1/test/sign")
-                                        .permitAll()
-                                        .requestMatchers("api/*/private/**")
-                                        .authenticated()
-                                        .anyRequest()
-                                        .permitAll())
-                .oauth2ResourceServer(it -> it.jwt(Customizer.withDefaults()))
-                .csrf(AbstractHttpConfigurer::disable);
-        return http.build();
-    }
+	@Bean
+	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+		http.authorizeHttpRequests(it -> it.requestMatchers("api/v1/test/sign")
+			.permitAll()
+			.requestMatchers("api/*/private/**")
+			.authenticated()
+			.anyRequest()
+			.permitAll())
+			.oauth2ResourceServer(it -> it.jwt(Customizer.withDefaults()))
+			.csrf(AbstractHttpConfigurer::disable);
+		return http.build();
+	}
 
-    @Bean
-    public JwtAuthenticationConverter converter() {
-        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
-        KeyClockJwtGrantedAuthoritiesConverter keyClockJwtGrantedAuthoritiesConverter =
-                new KeyClockJwtGrantedAuthoritiesConverter();
-        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(
-                keyClockJwtGrantedAuthoritiesConverter);
-        return jwtAuthenticationConverter;
-    }
+	@Bean
+	public JwtAuthenticationConverter converter() {
+		JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
+		KeyClockJwtGrantedAuthoritiesConverter keyClockJwtGrantedAuthoritiesConverter = new KeyClockJwtGrantedAuthoritiesConverter();
+		jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(keyClockJwtGrantedAuthoritiesConverter);
+		return jwtAuthenticationConverter;
+	}
 
-    @Bean
-    @Lazy
-    public AccessEvaluator accessEvaluator(StoreFacade storeFacade) {
-        return new AccessEvaluatorImpl(
-                new StoreSecurityServiceImpl(
-                        (it) -> {
-                            MerchantStore merchantStore =
-                                    storeFacade.get(new StoreMerchantId(it.getId().toString()));
-                            return new ManagerOrgId(merchantStore.getOrg());
-                        }));
-    }
-    /*    @Bean
-        public CorsConfigurationSource corsConfigurationSource() {
-            final CorsConfiguration configuration = new CorsConfiguration();
+	@Bean
+	@Lazy
+	public AccessEvaluator accessEvaluator(StoreFacade storeFacade) {
+		return new AccessEvaluatorImpl(new StoreSecurityServiceImpl((it) -> {
+			MerchantStore merchantStore = storeFacade.get(new StoreMerchantId(it.getId().toString()));
+			return new ManagerOrgId(merchantStore.getOrg());
+		}));
+	}
+	/*
+	 * @Bean public CorsConfigurationSource corsConfigurationSource() { final
+	 * CorsConfiguration configuration = new CorsConfiguration();
+	 *
+	 * configuration.setAllowedOrigins(List.of("http://localhost")); // www - obligatory
+	 * // configuration.setAllowedOrigins(ImmutableList.of("*")); //set access from all
+	 * domains configuration.setAllowedMethods(List.of("OPTIONS","GET", "POST", "PUT",
+	 * "DELETE")); configuration.setAllowCredentials(true);
+	 * configuration.setAllowedHeaders(List.of("Authorization", "Cache-Control",
+	 * "Content-Type"));
+	 *
+	 * final UrlBasedCorsConfigurationSource source = new
+	 * UrlBasedCorsConfigurationSource(); source.registerCorsConfiguration("/**",
+	 * configuration);
+	 *
+	 * return source; }
+	 */
 
-            configuration.setAllowedOrigins(List.of("http://localhost")); // www - obligatory
-    //        configuration.setAllowedOrigins(ImmutableList.of("*"));  //set access from all domains
-            configuration.setAllowedMethods(List.of("OPTIONS","GET", "POST", "PUT", "DELETE"));
-            configuration.setAllowCredentials(true);
-            configuration.setAllowedHeaders(List.of("Authorization", "Cache-Control", "Content-Type"));
-
-            final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-            source.registerCorsConfiguration("/**", configuration);
-
-            return source;
-        }*/
 }

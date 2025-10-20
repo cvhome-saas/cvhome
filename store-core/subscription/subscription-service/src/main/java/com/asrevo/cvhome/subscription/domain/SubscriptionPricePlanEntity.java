@@ -14,35 +14,33 @@ import org.springframework.data.relational.core.mapping.Table;
 @Getter
 @Table("subscription_price_plan")
 public class SubscriptionPricePlanEntity extends BaseEntity<SubscriptionPricePlanEntity, PriceId> {
-    @Embedded(onEmpty = Embedded.OnEmpty.USE_NULL)
-    private ProductId productId;
 
-    @Embedded(onEmpty = Embedded.OnEmpty.USE_NULL)
-    private PricePlanCost cost;
+	@Embedded(onEmpty = Embedded.OnEmpty.USE_NULL)
+	private ProductId productId;
 
-    @Column("subscription_plan")
-    private SubscriptionPlan subscriptionPlan;
+	@Embedded(onEmpty = Embedded.OnEmpty.USE_NULL)
+	private PricePlanCost cost;
 
-    @Column("recurring_plan")
-    private RecurringPlan recurringPlan;
+	@Column("subscription_plan")
+	private SubscriptionPlan subscriptionPlan;
 
-    public static SubscriptionPricePlanEntity create(
-            PriceId id,
-            ProductId productId,
-            PricePlanCost cost,
-            SubscriptionPlan subscriptionPlan,
-            RecurringPlan recurringPlan) {
-        SubscriptionPricePlanEntity entity = new SubscriptionPricePlanEntity();
-        entity.id = id;
-        entity.productId = productId;
-        entity.cost = cost;
-        entity.subscriptionPlan = subscriptionPlan;
-        entity.recurringPlan = recurringPlan;
-        return entity;
-    }
+	@Column("recurring_plan")
+	private RecurringPlan recurringPlan;
 
-    @Override
-    protected PriceId generateId() {
-        return id;
-    }
+	public static SubscriptionPricePlanEntity create(PriceId id, ProductId productId, PricePlanCost cost,
+			SubscriptionPlan subscriptionPlan, RecurringPlan recurringPlan) {
+		SubscriptionPricePlanEntity entity = new SubscriptionPricePlanEntity();
+		entity.id = id;
+		entity.productId = productId;
+		entity.cost = cost;
+		entity.subscriptionPlan = subscriptionPlan;
+		entity.recurringPlan = recurringPlan;
+		return entity;
+	}
+
+	@Override
+	protected PriceId generateId() {
+		return id;
+	}
+
 }

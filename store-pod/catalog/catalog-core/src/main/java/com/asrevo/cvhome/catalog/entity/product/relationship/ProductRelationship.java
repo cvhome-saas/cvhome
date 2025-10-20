@@ -14,43 +14,40 @@ import lombok.Setter;
 @Table(name = "PRODUCT_RELATIONSHIP")
 @Getter
 @Setter
-public class ProductRelationship extends SalesManagerEntity<Long, ProductRelationship>
-        implements Serializable {
-    @Serial private static final long serialVersionUID = 1L;
+public class ProductRelationship extends SalesManagerEntity<Long, ProductRelationship> implements Serializable {
 
-    @Id
-    @Column(name = "PRODUCT_RELATIONSHIP_ID", unique = true, nullable = false)
-    @TableGenerator(
-            name = "TABLE_GEN",
-            table = "SM_SEQUENCER",
-            pkColumnName = "SEQ_NAME",
-            valueColumnName = "SEQ_COUNT",
-            pkColumnValue = "PRODUCT_RELATIONSHIP_SEQ_NEXT_VAL",
-            allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
-            initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
-    private Long id;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    @Embedded
-    @AttributeOverrides(
-            @AttributeOverride(
-                    name = "storeMerchantId",
-                    column = @Column(name = "STORE_MERCHANT_ID", nullable = false, length = 50)))
-    private StoreMerchantId storeMerchantId;
+	@Id
+	@Column(name = "PRODUCT_RELATIONSHIP_ID", unique = true, nullable = false)
+	@TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME",
+			valueColumnName = "SEQ_COUNT", pkColumnValue = "PRODUCT_RELATIONSHIP_SEQ_NEXT_VAL",
+			allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
+			initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
+	@GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
+	private Long id;
 
-    @ManyToOne(targetEntity = Product.class)
-    @JoinColumn(name = "PRODUCT_ID", updatable = false)
-    private Product product = null;
+	@Embedded
+	@AttributeOverrides(@AttributeOverride(name = "storeMerchantId",
+			column = @Column(name = "STORE_MERCHANT_ID", nullable = false, length = 50)))
+	private StoreMerchantId storeMerchantId;
 
-    @ManyToOne(targetEntity = Product.class)
-    @JoinColumn(name = "RELATED_PRODUCT_ID", updatable = false)
-    private Product relatedProduct = null;
+	@ManyToOne(targetEntity = Product.class)
+	@JoinColumn(name = "PRODUCT_ID", updatable = false)
+	private Product product = null;
 
-    @Column(name = "CODE")
-    private String code;
+	@ManyToOne(targetEntity = Product.class)
+	@JoinColumn(name = "RELATED_PRODUCT_ID", updatable = false)
+	private Product relatedProduct = null;
 
-    @Column(name = "ACTIVE")
-    private boolean active = true;
+	@Column(name = "CODE")
+	private String code;
 
-    public ProductRelationship() {}
+	@Column(name = "ACTIVE")
+	private boolean active = true;
+
+	public ProductRelationship() {
+	}
+
 }

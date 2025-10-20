@@ -11,16 +11,16 @@ import jakarta.persistence.Query;
  */
 public class RepositoryHelper {
 
-    @SuppressWarnings("rawtypes")
-    public static Query paginateQuery(
-            Query q, Number count, GenericEntityList entityList, Criteria criteria) {
+	@SuppressWarnings("rawtypes")
+	public static Query paginateQuery(Query q, Number count, GenericEntityList entityList, Criteria criteria) {
 
-        if (entityList == null) {
-            entityList = new GenericEntityList();
-        }
-        q.setFirstResult((int) criteria.getPageable().getOffset());
-        q.setMaxResults(criteria.getPageable().getPageSize());
+		if (entityList == null) {
+			entityList = new GenericEntityList();
+		}
+		q.setFirstResult((int) criteria.getPageable().getOffset());
+		q.setMaxResults(criteria.getPageable().getPageSize());
 
-        return q;
-    }
+		return q;
+	}
+
 }

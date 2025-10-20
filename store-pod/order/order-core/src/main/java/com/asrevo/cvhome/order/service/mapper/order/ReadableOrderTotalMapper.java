@@ -19,64 +19,58 @@ import org.springframework.stereotype.Component;
 @Component
 public class ReadableOrderTotalMapper implements Mapper<OrderTotal, ReadableOrderTotal> {
 
-    private final ExternalMerchantStoreService externalMerchantStoreService;
+	private final ExternalMerchantStoreService externalMerchantStoreService;
 
-    private final LabelUtils messages;
+	private final LabelUtils messages;
 
-    public ReadableOrderTotalMapper(
-            ExternalMerchantStoreService externalMerchantStoreService, LabelUtils messages) {
-        this.externalMerchantStoreService = externalMerchantStoreService;
-        this.messages = messages;
-    }
+	public ReadableOrderTotalMapper(ExternalMerchantStoreService externalMerchantStoreService, LabelUtils messages) {
+		this.externalMerchantStoreService = externalMerchantStoreService;
+		this.messages = messages;
+	}
 
-    @Override
-    public ReadableOrderTotal convert(
-            OrderTotal source, StoreMerchantId store, LanguageCode language) {
-        ReadableOrderTotal destination = new ReadableOrderTotal();
-        return this.merge(source, destination, store, language);
-    }
+	@Override
+	public ReadableOrderTotal convert(OrderTotal source, StoreMerchantId store, LanguageCode language) {
+		ReadableOrderTotal destination = new ReadableOrderTotal();
+		return this.merge(source, destination, store, language);
+	}
 
-    @Override
-    public ReadableOrderTotal merge(
-            OrderTotal source,
-            ReadableOrderTotal target,
-            StoreMerchantId store,
-            LanguageCode language) {
+	@Override
+	public ReadableOrderTotal merge(OrderTotal source, ReadableOrderTotal target, StoreMerchantId store,
+			LanguageCode language) {
 
-        Validate.notNull(source, "OrderTotal must not be null");
-        Validate.notNull(target, "ReadableTotal must not be null");
-        Validate.notNull(store, "MerchantStore must not be null");
-        Validate.notNull(language, "Language must not be null");
+		Validate.notNull(source, "OrderTotal must not be null");
+		Validate.notNull(target, "ReadableTotal must not be null");
+		Validate.notNull(store, "MerchantStore must not be null");
+		Validate.notNull(language, "Language must not be null");
 
-        Locale locale = LocaleUtils.getLocale(language);
+		Locale locale = LocaleUtils.getLocale(language);
 
-        try {
+		try {
 
-            target.setCode(source.getOrderTotalCode());
-            target.setId(source.getId());
-            target.setModule(source.getModule());
-            target.setOrder(source.getSortOrder());
+			target.setCode(source.getOrderTotalCode());
+			target.setId(source.getId());
+			target.setModule(source.getModule());
+			target.setOrder(source.getSortOrder());
 
-            target.setTitle(
-                    messages.getMessage(
-                            source.getOrderTotalCode(), locale, source.getOrderTotalCode()));
-            target.setText(source.getText());
+			target.setTitle(messages.getMessage(source.getOrderTotalCode(), locale, source.getOrderTotalCode()));
+			target.setText(source.getText());
 
-            target.setValue(source.getValue());
-            target.setTotal(
-                    PriceUtils.getStoreFormatedAmountWithCurrency(
-                            externalMerchantStoreService.getStore(store), source.getValue()));
+			target.setValue(source.getValue());
+			target.setTotal(PriceUtils.getStoreFormatedAmountWithCurrency(externalMerchantStoreService.getStore(store),
+					source.getValue()));
 
-            if (!StringUtils.isBlank(source.getOrderTotalCode())) {
-                if (Constants.OT_DISCOUNT_TITLE.equals(source.getOrderTotalCode())) {
-                    target.setDiscounted(true);
-                }
-            }
+			if (!StringUtils.isBlank(source.getOrderTotalCode())) {
+				if (Constants.OT_DISCOUNT_TITLE.equals(source.getOrderTotalCode())) {
+					target.setDiscounted(true);
+				}
+			}
 
-        } catch (Exception e) {
-            throw new ConversionRuntimeException(e);
-        }
+		}
+		catch (Exception e) {
+			throw new ConversionRuntimeException(e);
+		}
 
-        return target;
-    }
+		return target;
+	}
+
 }

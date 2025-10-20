@@ -8,12 +8,12 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface ProductVariantGroupRepository extends JpaRepository<ProductVariantGroup, Long> {
 
-    @Query(
-            """
-                    select distinct p from ProductVariantGroup p
-                     left join fetch p.productVariants pp
-                     left join fetch p.images ppi
-                     left join fetch ppi.descriptions ppid
-                     where p.id = ?1 and p.storeMerchantId = ?2""")
-    Optional<ProductVariantGroup> findOne(Long id, StoreMerchantId storeMerchantId);
+	@Query("""
+			select distinct p from ProductVariantGroup p
+			 left join fetch p.productVariants pp
+			 left join fetch p.images ppi
+			 left join fetch ppi.descriptions ppid
+			 where p.id = ?1 and p.storeMerchantId = ?2""")
+	Optional<ProductVariantGroup> findOne(Long id, StoreMerchantId storeMerchantId);
+
 }

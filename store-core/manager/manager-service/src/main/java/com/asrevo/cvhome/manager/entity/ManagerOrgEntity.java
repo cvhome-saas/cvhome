@@ -15,23 +15,25 @@ import org.springframework.data.relational.core.mapping.Table;
 @Setter
 @Table("manager_org")
 public class ManagerOrgEntity extends BaseEntity<ManagerOrgEntity, ManagerOrgId> {
-    @Column("created_date")
-    private Instant createdDate;
 
-    @Embedded(onEmpty = Embedded.OnEmpty.USE_NULL)
-    private Email email;
+	@Column("created_date")
+	private Instant createdDate;
 
-    public static ManagerOrgEntity createOrgFromUser(Email email) {
-        ManagerOrgEntity entity = new ManagerOrgEntity();
-        entity.id = entity.generateId();
-        entity.setCreatedDate(Instant.now());
-        entity.setEmail(email);
-        entity.registerEvent(OrgCreatedEvent.from(entity.getId()));
-        return entity;
-    }
+	@Embedded(onEmpty = Embedded.OnEmpty.USE_NULL)
+	private Email email;
 
-    @Override
-    protected ManagerOrgId generateId() {
-        return ManagerOrgId.newId();
-    }
+	public static ManagerOrgEntity createOrgFromUser(Email email) {
+		ManagerOrgEntity entity = new ManagerOrgEntity();
+		entity.id = entity.generateId();
+		entity.setCreatedDate(Instant.now());
+		entity.setEmail(email);
+		entity.registerEvent(OrgCreatedEvent.from(entity.getId()));
+		return entity;
+	}
+
+	@Override
+	protected ManagerOrgId generateId() {
+		return ManagerOrgId.newId();
+	}
+
 }

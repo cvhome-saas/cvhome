@@ -9,12 +9,16 @@ import lombok.Setter;
 @Getter
 public class CustomerOptionEntity extends CustomerOption implements Serializable {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private int order;
-    private String code;
-    private String type; // TEXT|SELECT|RADIO|CHECKBOX
+	private int order;
+
+	private String code;
+
+	private String type; // TEXT|SELECT|RADIO|CHECKBOX
+
 }

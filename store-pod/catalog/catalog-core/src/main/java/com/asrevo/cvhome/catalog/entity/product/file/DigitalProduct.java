@@ -14,32 +14,28 @@ import lombok.Setter;
  * @author csamson777
  */
 @Entity
-@Table(
-        name = "PRODUCT_DIGITAL",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"PRODUCT_ID", "FILE_NAME"}))
+@Table(name = "PRODUCT_DIGITAL", uniqueConstraints = @UniqueConstraint(columnNames = { "PRODUCT_ID", "FILE_NAME" }))
 @Getter
 @Setter
 public class DigitalProduct extends SalesManagerEntity<Long, DigitalProduct> {
 
-    @Serial private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    @Id
-    @Column(name = "PRODUCT_DIGITAL_ID")
-    @TableGenerator(
-            name = "TABLE_GEN",
-            table = "SM_SEQUENCER",
-            pkColumnName = "SEQ_NAME",
-            valueColumnName = "SEQ_COUNT",
-            pkColumnValue = "PRODUCT_DIGITAL_SEQ_NEXT_VAL",
-            allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
-            initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
-    private Long id;
+	@Id
+	@Column(name = "PRODUCT_DIGITAL_ID")
+	@TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME",
+			valueColumnName = "SEQ_COUNT", pkColumnValue = "PRODUCT_DIGITAL_SEQ_NEXT_VAL",
+			allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
+			initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
+	@GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
+	private Long id;
 
-    @ManyToOne(targetEntity = Product.class)
-    @JoinColumn(name = "PRODUCT_ID", nullable = false)
-    private Product product;
+	@ManyToOne(targetEntity = Product.class)
+	@JoinColumn(name = "PRODUCT_ID", nullable = false)
+	private Product product;
 
-    @Column(name = "FILE_NAME", nullable = false)
-    private String productFileName;
+	@Column(name = "FILE_NAME", nullable = false)
+	private String productFileName;
+
 }

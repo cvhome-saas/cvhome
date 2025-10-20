@@ -10,10 +10,10 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 @EnableReactiveMethodSecurity
 public class PermissionConfig {
 
-    @Autowired
-    public void configurePermissionEvaluator(
-            DefaultMethodSecurityExpressionHandler handler,
-            PermissionEvaluator permissionEvaluator) {
-        handler.setPermissionEvaluator(permissionEvaluator);
-    }
+	@Autowired
+	public void configurePermissionEvaluator(DefaultMethodSecurityExpressionHandler handler,
+			PermissionEvaluator permissionEvaluator) {
+		handler.setPermissionEvaluator(permissionEvaluator);
+	}
+
 }

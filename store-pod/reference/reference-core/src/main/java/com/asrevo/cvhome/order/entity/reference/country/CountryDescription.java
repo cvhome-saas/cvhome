@@ -11,26 +11,25 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(
-        name = "COUNTRY_DESCRIPTION",
-        uniqueConstraints = {@UniqueConstraint(columnNames = {"COUNTRY_ID", "LANGUAGE_CODE"})})
-@TableGenerator(
-        name = "description_gen",
-        table = "SM_SEQUENCER",
-        pkColumnName = "SEQ_NAME",
-        valueColumnName = "SEQ_COUNT",
-        pkColumnValue = "COUNTRY_DESCRIPTION_SEQ_NEXT_VAL",
-        allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
-        initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
+@Table(name = "COUNTRY_DESCRIPTION",
+		uniqueConstraints = { @UniqueConstraint(columnNames = { "COUNTRY_ID", "LANGUAGE_CODE" }) })
+@TableGenerator(name = "description_gen", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME",
+		valueColumnName = "SEQ_COUNT", pkColumnValue = "COUNTRY_DESCRIPTION_SEQ_NEXT_VAL",
+		allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
+		initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
 @Getter
 @Setter
 public class CountryDescription extends Description {
-    @Serial private static final long serialVersionUID = 1L;
 
-    @JsonIgnore
-    @Column(name = "COUNTRY_ID", length = 6)
-    @Convert(converter = CountryIsoCodeConverter.class)
-    private CountryIsoCode country;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    public CountryDescription() {}
+	@JsonIgnore
+	@Column(name = "COUNTRY_ID", length = 6)
+	@Convert(converter = CountryIsoCodeConverter.class)
+	private CountryIsoCode country;
+
+	public CountryDescription() {
+	}
+
 }

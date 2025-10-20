@@ -10,15 +10,22 @@ import lombok.Setter;
 @Getter
 public abstract class ReadableList<T> implements Serializable {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private int totalPages; // totalPages
-    private int size; // number of record in current page
-    private long totalElements; // total number of records in db
-    private int recordsFiltered;
-    private int pageNumber = 1;
-    private List<T> content;
+	private int totalPages; // totalPages
+
+	private int size; // number of record in current page
+
+	private long totalElements; // total number of records in db
+
+	private int recordsFiltered;
+
+	private int pageNumber = 1;
+
+	private List<T> content;
+
 }

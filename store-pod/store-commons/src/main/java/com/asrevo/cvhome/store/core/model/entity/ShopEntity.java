@@ -15,12 +15,14 @@ import lombok.Setter;
 @Getter
 public abstract class ShopEntity extends Entity implements Serializable {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    @JsonSerialize(using = LanguageCodeSerializer.class)
-    @JsonDeserialize(using = LanguageCodeDeSerializer.class)
-    private LanguageCode language;
+	@JsonSerialize(using = LanguageCodeSerializer.class)
+	@JsonDeserialize(using = LanguageCodeDeSerializer.class)
+	private LanguageCode language;
+
 }

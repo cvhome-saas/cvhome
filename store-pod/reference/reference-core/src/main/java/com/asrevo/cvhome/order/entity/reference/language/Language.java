@@ -17,52 +17,56 @@ import lombok.Setter;
 
 @Entity
 @EntityListeners(value = AuditListener.class)
-@Table(
-        name = "LANGUAGE",
-        indexes = {@Index(name = "CODE_IDX2", columnList = "CODE")})
+@Table(name = "LANGUAGE", indexes = { @Index(name = "CODE_IDX2", columnList = "CODE") })
 @Cacheable
 @Getter
 @Setter
 public class Language extends SalesManagerEntity<LanguageCode, Language> implements Auditable {
-    @Serial private static final long serialVersionUID = 1L;
 
-    @EmbeddedId
-    @JsonSerialize(using = LanguageCodeSerializer.class)
-    @JsonDeserialize(using = LanguageCodeDeSerializer.class)
-    @AttributeOverrides({
-        @AttributeOverride(name = "code", column = @Column(name = "CODE", length = 6))
-    })
-    private LanguageCode code;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    @JsonIgnore @Embedded private AuditSection auditSection = new AuditSection();
+	@EmbeddedId
+	@JsonSerialize(using = LanguageCodeSerializer.class)
+	@JsonDeserialize(using = LanguageCodeDeSerializer.class)
+	@AttributeOverrides({ @AttributeOverride(name = "code", column = @Column(name = "CODE", length = 6)) })
+	private LanguageCode code;
 
-    @JsonIgnore
-    @Column(name = "SORT_ORDER")
-    private Integer sortOrder;
+	@JsonIgnore
+	@Embedded
+	private AuditSection auditSection = new AuditSection();
 
-    public Language() {}
+	@JsonIgnore
+	@Column(name = "SORT_ORDER")
+	private Integer sortOrder;
 
-    public Language(LanguageCode code) {
-        this.setCode(code);
-    }
+	public Language() {
+	}
 
-    @Override
-    public LanguageCode getId() {
-        return code;
-    }
+	public Language(LanguageCode code) {
+		this.setCode(code);
+	}
 
-    @Override
-    public void setId(LanguageCode id) {
-        this.code = id;
-    }
+	@Override
+	public LanguageCode getId() {
+		return code;
+	}
 
-    @Override
-    public boolean equals(Object obj) {
-        if (null == obj) return false;
-        if (!(obj instanceof Language language)) {
-            return false;
-        } else {
-            return (this.getId().equals(language.getId()));
-        }
-    }
+	@Override
+	public void setId(LanguageCode id) {
+		this.code = id;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (null == obj)
+			return false;
+		if (!(obj instanceof Language language)) {
+			return false;
+		}
+		else {
+			return (this.getId().equals(language.getId()));
+		}
+	}
+
 }

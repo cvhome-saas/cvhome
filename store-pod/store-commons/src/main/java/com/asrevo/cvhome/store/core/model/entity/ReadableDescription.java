@@ -5,8 +5,10 @@ import java.io.Serial;
 
 public class ReadableDescription extends NamedEntity {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
+
 }

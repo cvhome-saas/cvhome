@@ -19,16 +19,19 @@ import reactor.core.publisher.Mono;
 @AllArgsConstructor
 @Slf4j
 public class PodController {
-    private final PodSelection podSelection;
 
-    @GetMapping("list")
-    @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN','ROLE_ORG_ADMIN')")
-    @ConditionalOnApiStatus
-    public Mono<List<Pod>> findAllPods(@OrgStorePrincipalInfo UserOrgStoreIdentity identity) {
-        if (identity.isSuperAdmin()) {
-            return Mono.just(podSelection.listAllPods());
-        } else {
-            return Mono.just(podSelection.listPrivatePods(identity.org()));
-        }
-    }
+	private final PodSelection podSelection;
+
+	@GetMapping("list")
+	@PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN','ROLE_ORG_ADMIN')")
+	@ConditionalOnApiStatus
+	public Mono<List<Pod>> findAllPods(@OrgStorePrincipalInfo UserOrgStoreIdentity identity) {
+		if (identity.isSuperAdmin()) {
+			return Mono.just(podSelection.listAllPods());
+		}
+		else {
+			return Mono.just(podSelection.listPrivatePods(identity.org()));
+		}
+	}
+
 }

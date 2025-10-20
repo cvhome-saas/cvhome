@@ -22,30 +22,36 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Description implements Auditable, Serializable {
-    @Serial private static final long serialVersionUID = 1L;
 
-    @Id
-    @Column(name = "DESCRIPTION_ID")
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "description_gen")
-    private Long id;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    @JsonIgnore @Embedded private AuditSection auditSection = new AuditSection();
+	@Id
+	@Column(name = "DESCRIPTION_ID")
+	@GeneratedValue(strategy = GenerationType.TABLE, generator = "description_gen")
+	private Long id;
 
-    @Column(name = "LANGUAGE_CODE", length = 6)
-    @Convert(converter = LanguageCodeConverter.class)
-    @JsonSerialize(using = LanguageCodeSerializer.class)
-    @JsonDeserialize(using = LanguageCodeDeSerializer.class)
-    private LanguageCode languageCode;
+	@JsonIgnore
+	@Embedded
+	private AuditSection auditSection = new AuditSection();
 
-    @NotEmpty
-    @Column(name = "NAME", nullable = false, length = 120)
-    private String name;
+	@Column(name = "LANGUAGE_CODE", length = 6)
+	@Convert(converter = LanguageCodeConverter.class)
+	@JsonSerialize(using = LanguageCodeSerializer.class)
+	@JsonDeserialize(using = LanguageCodeDeSerializer.class)
+	private LanguageCode languageCode;
 
-    @Column(name = "TITLE", length = 100)
-    private String title;
+	@NotEmpty
+	@Column(name = "NAME", nullable = false, length = 120)
+	private String name;
 
-    @Column(name = "DESCRIPTION", columnDefinition = "text")
-    private String description;
+	@Column(name = "TITLE", length = 100)
+	private String title;
 
-    public Description() {}
+	@Column(name = "DESCRIPTION", columnDefinition = "text")
+	private String description;
+
+	public Description() {
+	}
+
 }

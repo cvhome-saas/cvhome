@@ -12,19 +12,19 @@ import org.springframework.data.domain.Pageable;
 
 public interface ProductVariantService extends SalesManagerEntityService<Long, ProductVariant> {
 
-    Optional<ProductVariant> getById(Long id, Long productId, StoreMerchantId store);
+	Optional<ProductVariant> getById(Long id, Long productId, StoreMerchantId store);
 
-    List<ProductVariant> getByIds(List<Long> ids, StoreMerchantId store);
+	List<ProductVariant> getByIds(List<Long> ids, StoreMerchantId store);
 
-    Optional<ProductVariant> getById(Long id, StoreMerchantId store);
+	Optional<ProductVariant> getById(Long id, StoreMerchantId store);
 
-    List<ProductVariant> getByProductId(
-            StoreMerchantId store, Product product, LanguageCode language);
+	List<ProductVariant> getByProductId(StoreMerchantId store, Product product, LanguageCode language);
 
-    Page<ProductVariant> getByProductId(
-            StoreMerchantId store, Product product, LanguageCode language, Pageable pageable);
+	Page<ProductVariant> getByProductId(StoreMerchantId store, Product product, LanguageCode language,
+			Pageable pageable);
 
-    boolean exist(String sku, Long productId);
+	boolean exist(String sku, Long productId);
 
-    ProductVariant saveProductVariant(ProductVariant variant);
+	ProductVariant saveProductVariant(ProductVariant variant);
+
 }

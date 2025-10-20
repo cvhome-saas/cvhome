@@ -13,35 +13,34 @@ import lombok.Setter;
 @Table(name = "ORDER_PRODUCT_DOWNLOAD")
 @Getter
 @Setter
-public class OrderProductDownload extends SalesManagerEntity<Long, OrderProductDownload>
-        implements Serializable {
-    public static final int DEFAULT_DOWNLOAD_MAX_DAYS = 31;
-    @Serial private static final long serialVersionUID = -8935511990745477240L;
+public class OrderProductDownload extends SalesManagerEntity<Long, OrderProductDownload> implements Serializable {
 
-    @Id
-    @Column(name = "ORDER_PRODUCT_DOWNLOAD_ID")
-    @TableGenerator(
-            name = "TABLE_GEN",
-            table = "SM_SEQUENCER",
-            pkColumnName = "SEQ_NAME",
-            valueColumnName = "SEQ_COUNT",
-            pkColumnValue = "ORDER_PRODUCT_DOWNLOAD_SEQ_NEXT_VAL",
-            allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
-            initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
-    private Long id;
+	public static final int DEFAULT_DOWNLOAD_MAX_DAYS = 31;
 
-    @JsonIgnore
-    @ManyToOne
-    @JoinColumn(name = "ORDER_PRODUCT_ID", nullable = false)
-    private OrderProduct orderProduct;
+	@Serial
+	private static final long serialVersionUID = -8935511990745477240L;
 
-    @Column(name = "ORDER_PRODUCT_FILENAME", nullable = false)
-    private String orderProductFilename;
+	@Id
+	@Column(name = "ORDER_PRODUCT_DOWNLOAD_ID")
+	@TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME",
+			valueColumnName = "SEQ_COUNT", pkColumnValue = "ORDER_PRODUCT_DOWNLOAD_SEQ_NEXT_VAL",
+			allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
+			initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
+	@GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
+	private Long id;
 
-    @Column(name = "DOWNLOAD_MAXDAYS", nullable = false)
-    private Integer maxdays = DEFAULT_DOWNLOAD_MAX_DAYS;
+	@JsonIgnore
+	@ManyToOne
+	@JoinColumn(name = "ORDER_PRODUCT_ID", nullable = false)
+	private OrderProduct orderProduct;
 
-    @Column(name = "DOWNLOAD_COUNT", nullable = false)
-    private Integer downloadCount;
+	@Column(name = "ORDER_PRODUCT_FILENAME", nullable = false)
+	private String orderProductFilename;
+
+	@Column(name = "DOWNLOAD_MAXDAYS", nullable = false)
+	private Integer maxdays = DEFAULT_DOWNLOAD_MAX_DAYS;
+
+	@Column(name = "DOWNLOAD_COUNT", nullable = false)
+	private Integer downloadCount;
+
 }

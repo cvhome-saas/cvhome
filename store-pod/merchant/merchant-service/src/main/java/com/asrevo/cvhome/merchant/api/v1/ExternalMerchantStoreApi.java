@@ -26,32 +26,19 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @AllArgsConstructor
 public class ExternalMerchantStoreApi implements ExternalMerchantStoreService {
-    private final StoreFacade storeFacade;
 
-    @GetMapping(value = "/store")
-    @Operation(
-            method = "GET",
-            description = "Get merchant store",
-            responses =
-                    @ApiResponse(
-                            content =
-                                    @Content(
-                                            schema =
-                                                    @Schema(
-                                                            implementation =
-                                                                    ReadableMerchantStore.class))))
-    @Parameters({
-        @Parameter(
-                name = "store",
-                schema =
-                        @Schema(
-                                name = "store",
-                                type = "string",
-                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
-    })
-    @ConditionalOnApiStatus
-    @Override
-    public ReadableMerchantStore getStore(StoreMerchantId merchantStore) {
-        return storeFacade.getReadableMerchantStoreId(merchantStore);
-    }
+	private final StoreFacade storeFacade;
+
+	@GetMapping(value = "/store")
+	@Operation(method = "GET", description = "Get merchant store",
+			responses = @ApiResponse(
+					content = @Content(schema = @Schema(implementation = ReadableMerchantStore.class))))
+	@Parameters({ @Parameter(name = "store",
+			schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)), })
+	@ConditionalOnApiStatus
+	@Override
+	public ReadableMerchantStore getStore(StoreMerchantId merchantStore) {
+		return storeFacade.getReadableMerchantStoreId(merchantStore);
+	}
+
 }
