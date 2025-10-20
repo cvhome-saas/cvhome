@@ -22,64 +22,61 @@ import reactor.core.publisher.Mono;
 @AllArgsConstructor
 @Slf4j
 public class RouterController {
-    public final InternalStoreService internalStoreService;
 
-    @GetMapping("public/ask-for-tls")
-    @ConditionalOnApiStatus
-    public ResponseEntity<Object> ask(Domain domain) {
-        log.info("tls ask: {}", domain);
-        return Optional.ofNullable(internalStoreService.getReferenceByDomain(domain))
-                .map(it -> ResponseEntity.ok().build())
-                .orElseGet(() -> ResponseEntity.badRequest().build());
-    }
+	public final InternalStoreService internalStoreService;
 
-    @GetMapping("public/lookup-by-domain")
-    @ConditionalOnApiStatus
-    public Map<String, String> getLookupHeadersByDomain(Domain domain) {
-        log.info("header lookup: {}", domain);
-        return internalStoreService.getLookupHeadersByDomain(domain);
-    }
+	@GetMapping("public/ask-for-tls")
+	@ConditionalOnApiStatus
+	public ResponseEntity<Object> ask(Domain domain) {
+		log.info("tls ask: {}", domain);
+		return Optional.ofNullable(internalStoreService.getReferenceByDomain(domain))
+			.map(it -> ResponseEntity.ok().build())
+			.orElseGet(() -> ResponseEntity.badRequest().build());
+	}
 
-    @GetMapping("store-id-by-domain")
-    @ConditionalOnApiStatus
-    public ManagerStoreId getStoreIdByDomain(@RequestParam Domain domain) {
-        return internalStoreService.getReferenceByDomain(domain);
-    }
+	@GetMapping("public/lookup-by-domain")
+	@ConditionalOnApiStatus
+	public Map<String, String> getLookupHeadersByDomain(Domain domain) {
+		log.info("header lookup: {}", domain);
+		return internalStoreService.getLookupHeadersByDomain(domain);
+	}
 
-    @GetMapping("store-pod-by-store-id")
-    @ConditionalOnApiStatus
-    public Pod getStorePodByStoreId(@RequestParam ManagerStoreId store) {
-        return internalStoreService.getStorePod(store);
-    }
+	@GetMapping("store-id-by-domain")
+	@ConditionalOnApiStatus
+	public ManagerStoreId getStoreIdByDomain(@RequestParam Domain domain) {
+		return internalStoreService.getReferenceByDomain(domain);
+	}
 
-    @GetMapping("allocates")
-    @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE.DOMAIN.LIST')")
-    @ConditionalOnApiStatus
-    public Mono<StoreDomainList> allocatedDomains(
-            @OrgStorePrincipalInfo UserOrgStoreIdentity identity,
-            @RequestParam ManagerStoreId store) {
-        return Mono.just(internalStoreService.domains(store));
-    }
+	@GetMapping("store-pod-by-store-id")
+	@ConditionalOnApiStatus
+	public Pod getStorePodByStoreId(@RequestParam ManagerStoreId store) {
+		return internalStoreService.getStorePod(store);
+	}
 
-    @PostMapping("allocate")
-    @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE.DOMAIN.CREATE')")
-    @ConditionalOnApiStatus
-    public Mono<Void> allocate(
-            @OrgStorePrincipalInfo UserOrgStoreIdentity identity,
-            @RequestParam ManagerStoreId store,
-            Domain domain) {
-        internalStoreService.addDomain(store, domain);
-        return Mono.empty();
-    }
+	@GetMapping("allocates")
+	@PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE.DOMAIN.LIST')")
+	@ConditionalOnApiStatus
+	public Mono<StoreDomainList> allocatedDomains(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
+			@RequestParam ManagerStoreId store) {
+		return Mono.just(internalStoreService.domains(store));
+	}
 
-    @DeleteMapping("remove")
-    @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE.DOMAIN.DELETE')")
-    @ConditionalOnApiStatus
-    public Mono<Void> remove(
-            @OrgStorePrincipalInfo UserOrgStoreIdentity identity,
-            @RequestParam ManagerStoreId store,
-            Domain domain) {
-        internalStoreService.removeDomain(store, domain);
-        return Mono.empty();
-    }
+	@PostMapping("allocate")
+	@PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE.DOMAIN.CREATE')")
+	@ConditionalOnApiStatus
+	public Mono<Void> allocate(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store,
+			Domain domain) {
+		internalStoreService.addDomain(store, domain);
+		return Mono.empty();
+	}
+
+	@DeleteMapping("remove")
+	@PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE.DOMAIN.DELETE')")
+	@ConditionalOnApiStatus
+	public Mono<Void> remove(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store,
+			Domain domain) {
+		internalStoreService.removeDomain(store, domain);
+		return Mono.empty();
+	}
+
 }
