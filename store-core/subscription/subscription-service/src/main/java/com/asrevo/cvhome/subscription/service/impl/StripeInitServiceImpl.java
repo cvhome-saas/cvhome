@@ -18,13 +18,12 @@ import com.stripe.param.PriceListParams;
 import com.stripe.param.ProductCreateParams;
 import com.stripe.param.ProductListParams;
 import jakarta.annotation.PostConstruct;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -47,13 +46,13 @@ public class StripeInitServiceImpl implements StripeInitService {
         }
     }
 
-
     @SneakyThrows
     @Override
     public ProductId createProduct(SubscriptionPlan plan) {
         String productName = plan.name();
         ProductCreateParams productParams =
-                ProductCreateParams.builder().setName(productName)
+                ProductCreateParams.builder()
+                        .setName(productName)
                         .setDescription(productName + " Plan")
                         .build();
         Product product = Product.create(productParams);
@@ -71,9 +70,9 @@ public class StripeInitServiceImpl implements StripeInitService {
                         .setUnitAmount(details.pricePlanCost().price())
                         .setRecurring(
                                 PriceCreateParams.Recurring.builder()
-                                        .setInterval(Interval.valueOf(details.recurringPlan().name()))
-                                        .build()
-                        )
+                                        .setInterval(
+                                                Interval.valueOf(details.recurringPlan().name()))
+                                        .build())
                         .setProduct(details.productId().productId())
                         .build();
         Price price = Price.create(priceParams);
@@ -90,40 +89,42 @@ public class StripeInitServiceImpl implements StripeInitService {
         }
     }
 
-
     @SneakyThrows
     @Override
     public List<ProductPriceDetails> loadTable() {
         List<ProductPriceDetails> productPriceDetails = new ArrayList<>();
 
-        ProductCollection list = Product.list(ProductListParams
-                .builder()
-                .setActive(true)
-                .build());
+        ProductCollection list = Product.list(ProductListParams.builder().setActive(true).build());
         for (Product product : list.getData()) {
 
-            List<Price> prices = Price.list(PriceListParams
-                            .builder()
-                            .setProduct(product.getId())
-                            .build())
-                    .getData();
+            List<Price> prices =
+                    Price.list(PriceListParams.builder().setProduct(product.getId()).build())
+                            .getData();
             for (Price price : prices) {
                 try {
                     ProductId productId = new ProductId(product.getId());
-                    SubscriptionPlan subscriptionPlan = SubscriptionPlan.valueOf(product.getName().toUpperCase());
-                    RecurringPlan recurringPlan = RecurringPlan.valueOf(price.getRecurring().getInterval().toUpperCase());
-                    PricePlanCost pricePlanCost = new PricePlanCost(price.getCurrency(), price.getUnitAmount());
+                    SubscriptionPlan subscriptionPlan =
+                            SubscriptionPlan.valueOf(product.getName().toUpperCase());
+                    RecurringPlan recurringPlan =
+                            RecurringPlan.valueOf(price.getRecurring().getInterval().toUpperCase());
+                    PricePlanCost pricePlanCost =
+                            new PricePlanCost(price.getCurrency(), price.getUnitAmount());
 
-
-                    PricePlanCost expectedPriceCost = PricePlanCost.fromUsingFactor(price.getCurrency(), subscriptionPlan, recurringPlan);
+                    PricePlanCost expectedPriceCost =
+                            PricePlanCost.fromUsingFactor(
+                                    price.getCurrency(), subscriptionPlan, recurringPlan);
 
                     if (expectedPriceCost.equals(pricePlanCost)) {
-                        ProductPriceDetails e = new ProductPriceDetails(productId, subscriptionPlan, recurringPlan, pricePlanCost);
+                        ProductPriceDetails e =
+                                new ProductPriceDetails(
+                                        productId, subscriptionPlan, recurringPlan, pricePlanCost);
                         productPriceDetails.add(e);
                     } else {
-                        log.warn("ignore price  {} not matched {}", pricePlanCost, expectedPriceCost);
+                        log.warn(
+                                "ignore price  {} not matched {}",
+                                pricePlanCost,
+                                expectedPriceCost);
                     }
-
 
                 } catch (Exception e) {
                     log.warn("ignore product price for failing with error ", e);

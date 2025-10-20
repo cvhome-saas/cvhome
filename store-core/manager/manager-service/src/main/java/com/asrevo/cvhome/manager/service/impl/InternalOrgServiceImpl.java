@@ -21,11 +21,11 @@ public class InternalOrgServiceImpl implements InternalOrgService {
     private final ManagerOrgRepository managerOrgRepository;
     private final ManagerOrgMappers managerOrgMappers;
 
-
     @Transactional
     @Override
     public ManagerOrgId createOrgForUser(Email email) {
-        ManagerOrgEntity entity = managerOrgRepository.save(ManagerOrgEntity.createOrgFromUser(email));
+        ManagerOrgEntity entity =
+                managerOrgRepository.save(ManagerOrgEntity.createOrgFromUser(email));
         return entity.getId();
     }
 
@@ -36,9 +36,6 @@ public class InternalOrgServiceImpl implements InternalOrgService {
 
     @Override
     public ManagerOrgDto findOne(ManagerOrgId id) {
-        return managerOrgRepository.findById(id)
-                .map(managerOrgMappers::toDto)
-                .orElseThrow();
+        return managerOrgRepository.findById(id).map(managerOrgMappers::toDto).orElseThrow();
     }
-
 }

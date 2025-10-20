@@ -13,19 +13,13 @@ public class LoggingEventListenerProviderFactory implements EventListenerProvide
     }
 
     @Override
-    public void init(Config.Scope scope) {
-
-    }
+    public void init(Config.Scope scope) {}
 
     @Override
-    public void postInit(KeycloakSessionFactory keycloakSessionFactory) {
-
-    }
+    public void postInit(KeycloakSessionFactory keycloakSessionFactory) {}
 
     @Override
-    public void close() {
-
-    }
+    public void close() {}
 
     @Override
     public String getId() {

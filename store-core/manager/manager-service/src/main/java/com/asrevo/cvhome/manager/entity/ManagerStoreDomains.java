@@ -1,11 +1,11 @@
 package com.asrevo.cvhome.manager.entity;
 
 import com.asrevo.cvhome.commons.domain.Domain;
-
 import java.util.*;
 import java.util.stream.Collectors;
 
-class ManagerStoreDomains extends AbstractSet<ManagerStoreDomain> implements Set<ManagerStoreDomain> {
+class ManagerStoreDomains extends AbstractSet<ManagerStoreDomain>
+        implements Set<ManagerStoreDomain> {
     private final Set<ManagerStoreDomain> domains;
 
     private ManagerStoreDomains(Collection<ManagerStoreDomain> domains) {
@@ -37,11 +37,10 @@ class ManagerStoreDomains extends AbstractSet<ManagerStoreDomain> implements Set
     }
 
     public ManagerStoreDomains removeDomain(Domain domain) {
-        Set<ManagerStoreDomain> temp = this.domains.stream()
-                .filter(it -> !it.domain().equals(domain.domain()))
-                .collect(Collectors.toSet());
+        Set<ManagerStoreDomain> temp =
+                this.domains.stream()
+                        .filter(it -> !it.domain().equals(domain.domain()))
+                        .collect(Collectors.toSet());
         return of(temp);
     }
-
 }
-

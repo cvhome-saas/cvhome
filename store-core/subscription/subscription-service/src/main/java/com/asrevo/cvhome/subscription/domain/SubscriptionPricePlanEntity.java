@@ -11,20 +11,27 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Embedded;
 import org.springframework.data.relational.core.mapping.Table;
 
-
 @Getter
 @Table("subscription_price_plan")
 public class SubscriptionPricePlanEntity extends BaseEntity<SubscriptionPricePlanEntity, PriceId> {
     @Embedded(onEmpty = Embedded.OnEmpty.USE_NULL)
     private ProductId productId;
+
     @Embedded(onEmpty = Embedded.OnEmpty.USE_NULL)
     private PricePlanCost cost;
+
     @Column("subscription_plan")
     private SubscriptionPlan subscriptionPlan;
+
     @Column("recurring_plan")
     private RecurringPlan recurringPlan;
 
-    public static SubscriptionPricePlanEntity create(PriceId id, ProductId productId, PricePlanCost cost, SubscriptionPlan subscriptionPlan, RecurringPlan recurringPlan) {
+    public static SubscriptionPricePlanEntity create(
+            PriceId id,
+            ProductId productId,
+            PricePlanCost cost,
+            SubscriptionPlan subscriptionPlan,
+            RecurringPlan recurringPlan) {
         SubscriptionPricePlanEntity entity = new SubscriptionPricePlanEntity();
         entity.id = id;
         entity.productId = productId;

@@ -23,14 +23,21 @@ public class SubscriptionPlanDetailsController {
 
     @GetMapping("subscription-plan-details")
     @ConditionalOnApiStatus
-    public ResponseEntity<SubscriptionPlanDetails> currentSubscriptionPlanDetails(@OrgStorePrincipalInfo UserOrgStoreIdentity identity) {
-        return subscriptionService.subscriptionPlanDetails(identity.org()).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<SubscriptionPlanDetails> currentSubscriptionPlanDetails(
+            @OrgStorePrincipalInfo UserOrgStoreIdentity identity) {
+        return subscriptionService
+                .subscriptionPlanDetails(identity.org())
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @GetMapping(value = "subscription-plan-details", params = "org-id")
     @ConditionalOnApiStatus
-    public ResponseEntity<SubscriptionPlanDetails> subscriptionPlanDetails(@RequestParam("org-id") ManagerOrgId orgId) {
-        return subscriptionService.subscriptionPlanDetails(orgId).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<SubscriptionPlanDetails> subscriptionPlanDetails(
+            @RequestParam("org-id") ManagerOrgId orgId) {
+        return subscriptionService
+                .subscriptionPlanDetails(orgId)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
-
 }

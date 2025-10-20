@@ -19,8 +19,20 @@ public class InvoicePaymentSucceededEventImpl implements EventImpl<InvoicePaymen
     @Override
     public void process(InvoicePaymentSucceededEvent event) {
         log.info("Invoice payment succeeded event: {}", event);
-        SubscriptionPlanOption option = subscriptionPlanTablesService.getSubscriptionPlanOption(event.priceId()).orElseThrow(() -> new IllegalArgumentException("Invalid subscription price id: " + event.priceId()));
-        subscriptionService.renew(event.org(), option.subscriptionPlan(), event.startDate(), event.endDate(), option.recurringPlan());
+        SubscriptionPlanOption option =
+                subscriptionPlanTablesService
+                        .getSubscriptionPlanOption(event.priceId())
+                        .orElseThrow(
+                                () ->
+                                        new IllegalArgumentException(
+                                                "Invalid subscription price id: "
+                                                        + event.priceId()));
+        subscriptionService.renew(
+                event.org(),
+                option.subscriptionPlan(),
+                event.startDate(),
+                event.endDate(),
+                option.recurringPlan());
     }
 
     @Override
@@ -28,4 +40,3 @@ public class InvoicePaymentSucceededEventImpl implements EventImpl<InvoicePaymen
         return InvoicePaymentSucceededEvent.class.getSimpleName();
     }
 }
-

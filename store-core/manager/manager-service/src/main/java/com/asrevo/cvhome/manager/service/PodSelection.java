@@ -3,7 +3,6 @@ package com.asrevo.cvhome.manager.service;
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
 import com.asrevo.cvhome.commons.domain.Pod;
 import com.asrevo.cvhome.commons.domain.PodId;
-
 import java.util.List;
 
 public interface PodSelection {

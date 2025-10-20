@@ -5,14 +5,13 @@ import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.manager.commons.dto.ListManagerStoreQuery;
 import com.asrevo.cvhome.manager.commons.dto.ManagerStoreDto;
 import com.asrevo.cvhome.manager.entity.ManagerStoreEntity;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @Mapper(componentModel = "spring")
 public interface ManagerStoreMappers {
@@ -28,7 +27,8 @@ public interface ManagerStoreMappers {
     @Mapping(target = "managerStoreDomains", ignore = true)
     ManagerStoreEntity toEntity(ListManagerStoreQuery managerStoreDto);
 
-    default Map<Object, Object> toExternalCreateRequest(Map<Object, Object> request, ManagerOrgId orgId, ManagerStoreId managerStoreId) {
+    default Map<Object, Object> toExternalCreateRequest(
+            Map<Object, Object> request, ManagerOrgId orgId, ManagerStoreId managerStoreId) {
         HashMap<Object, Object> newRequest = new HashMap<>(request);
         newRequest.put("id", managerStoreId.id().toString());
         newRequest.put("org", orgId.id().toString());
@@ -38,5 +38,4 @@ public interface ManagerStoreMappers {
     default PageImpl<Object> toPage(List<Object> it, Page<ManagerStoreDto> internalStores) {
         return new PageImpl<>(it, internalStores.getPageable(), internalStores.getTotalElements());
     }
-
 }

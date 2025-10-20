@@ -11,6 +11,5 @@ import org.springframework.context.annotation.Import;
 class ContentApplicationTests {
 
     @Test
-    void contextLoads() {
-    }
+    void contextLoads() {}
 }

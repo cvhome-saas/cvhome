@@ -11,7 +11,9 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 public class PermissionConfig {
 
     @Autowired
-    public void configurePermissionEvaluator(DefaultMethodSecurityExpressionHandler handler, PermissionEvaluator permissionEvaluator) {
+    public void configurePermissionEvaluator(
+            DefaultMethodSecurityExpressionHandler handler,
+            PermissionEvaluator permissionEvaluator) {
         handler.setPermissionEvaluator(permissionEvaluator);
     }
 }

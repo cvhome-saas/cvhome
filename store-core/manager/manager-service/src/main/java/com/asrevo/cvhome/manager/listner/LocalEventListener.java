@@ -2,7 +2,6 @@ package com.asrevo.cvhome.manager.listner;
 
 import com.asrevo.cvhome.commons.event.Event;
 import com.asrevo.cvhome.commons.event.EventProcessor;
-import com.asrevo.cvhome.commons.event.EventPublisher;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -19,5 +18,4 @@ public class LocalEventListener {
         log.info("firing event {}", event);
         eventProcessor.process(event);
     }
-
 }

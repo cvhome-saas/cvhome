@@ -4,6 +4,11 @@ import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.merchant.service.facade.merchant.StoreFacade;
 import com.asrevo.cvhome.store.core.entity.content.FileContentType;
 import com.asrevo.cvhome.store.core.entity.content.ImageContentFile;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -11,12 +16,6 @@ import org.springframework.boot.web.servlet.context.AnnotationConfigServletWebSe
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
-
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Objects;
 
 @Component
 @AllArgsConstructor
@@ -27,20 +26,23 @@ public class AssetsInitService {
 
     @SneakyThrows
     public void loadAssets() {
-        Resource[] resources = ((AnnotationConfigServletWebServerApplicationContext) resourceLoader).getResources("classpath:/assets/**");
+        Resource[] resources =
+                ((AnnotationConfigServletWebServerApplicationContext) resourceLoader)
+                        .getResources("classpath:/assets/**");
         Arrays.stream(resources)
                 .filter(resource -> !isDirectory(resource))
-                .forEach(r -> {
-                    if (r.toString().contains("/logo/")) {
-                        uploadLogoFile(r);
-                    }
-                    if (r.toString().contains("/banner/")) {
-                        uploadBanner(r);
-                    }
-                    if (r.toString().contains("/slider/")) {
-                        uploadSlider(r);
-                    }
-                });
+                .forEach(
+                        r -> {
+                            if (r.toString().contains("/logo/")) {
+                                uploadLogoFile(r);
+                            }
+                            if (r.toString().contains("/banner/")) {
+                                uploadBanner(r);
+                            }
+                            if (r.toString().contains("/slider/")) {
+                                uploadSlider(r);
+                            }
+                        });
     }
 
     @SneakyThrows
@@ -84,7 +86,8 @@ public class AssetsInitService {
         ImageContentFile file = new ImageContentFile();
         file.setFile(resource.getInputStream());
         file.setFileName(resource.getFilename());
-        file.setMimeType(Files.probeContentType(Paths.get(Objects.requireNonNull(resource.getFilename()))));
+        file.setMimeType(
+                Files.probeContentType(Paths.get(Objects.requireNonNull(resource.getFilename()))));
         file.setFileContentType(contentType);
         return file;
     }

@@ -10,7 +10,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class ExceptionHandlerAdvice {
     @ExceptionHandler(OperationExecution.class)
     public ProblemDetail handleNotFoundException(OperationExecution e) {
-        ProblemDetail detail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, e.getMessage());
+        ProblemDetail detail =
+                ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, e.getMessage());
         detail.setTitle("Bad Request please verify your request");
         detail.setProperty("code", e.getErrorCode().code());
         return detail;

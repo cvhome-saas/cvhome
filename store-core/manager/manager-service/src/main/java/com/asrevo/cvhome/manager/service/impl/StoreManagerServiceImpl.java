@@ -9,14 +9,13 @@ import com.asrevo.cvhome.manager.service.PodSelection;
 import com.asrevo.cvhome.manager.service.StoreManagerService;
 import com.asrevo.cvhome.manager.service.StorePodClientFactory;
 import com.asrevo.cvhome.merchant.api.StorePodClient;
+import java.util.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.util.*;
 
 @Service
 public class StoreManagerServiceImpl implements StoreManagerService {
@@ -25,7 +24,11 @@ public class StoreManagerServiceImpl implements StoreManagerService {
     private final StorePodClientFactory podClientFactory;
     private final PodSelection podSelection;
 
-    public StoreManagerServiceImpl(InternalStoreService internalStoreService, ManagerStoreMappers managerStoreMappers, StorePodClientFactory podClientFactory, PodSelection podSelection) {
+    public StoreManagerServiceImpl(
+            InternalStoreService internalStoreService,
+            ManagerStoreMappers managerStoreMappers,
+            StorePodClientFactory podClientFactory,
+            PodSelection podSelection) {
         this.internalStoreService = internalStoreService;
         this.managerStoreMappers = managerStoreMappers;
         this.podClientFactory = podClientFactory;
@@ -34,23 +37,29 @@ public class StoreManagerServiceImpl implements StoreManagerService {
 
     @Override
     public void createStore(ManagerOrgId orgId, Map<Object, Object> request) {
-        PodId prefaredPodId = Optional.ofNullable(request.get("pod"))
-                .map(it -> ((Map<String, String>) it))
-                .filter(it -> it.containsKey("id"))
-                .map(it -> it.get("id"))
-                .filter(it -> !it.trim().isEmpty())
-                .map(PodId::new)
-                .orElse(null);
+        PodId prefaredPodId =
+                Optional.ofNullable(request.get("pod"))
+                        .map(it -> ((Map<String, String>) it))
+                        .filter(it -> it.containsKey("id"))
+                        .map(it -> it.get("id"))
+                        .filter(it -> !it.trim().isEmpty())
+                        .map(PodId::new)
+                        .orElse(null);
         PodId podId = podSelection.next(orgId, prefaredPodId);
         internalStoreService.createStore(request, orgId, podId);
     }
 
     @Override
-    public Mono<PageImpl<Object>> findAll(UserOrgStoreIdentity identity, ListManagerStoreQuery listManagerStoreQuery, Pageable pageable) {
-        Page<ManagerStoreDto> internalStores = internalStoreService.findAll(identity, listManagerStoreQuery, pageable);
-        Mono<List<Object>> listMono = Flux.fromIterable(internalStores.getContent())
-                .flatMap(it -> getStore(it.id()))
-                .collectList();
+    public Mono<PageImpl<Object>> findAll(
+            UserOrgStoreIdentity identity,
+            ListManagerStoreQuery listManagerStoreQuery,
+            Pageable pageable) {
+        Page<ManagerStoreDto> internalStores =
+                internalStoreService.findAll(identity, listManagerStoreQuery, pageable);
+        Mono<List<Object>> listMono =
+                Flux.fromIterable(internalStores.getContent())
+                        .flatMap(it -> getStore(it.id()))
+                        .collectList();
         return listMono.map(it -> managerStoreMappers.toPage(it, internalStores));
     }
 
@@ -59,12 +68,12 @@ public class StoreManagerServiceImpl implements StoreManagerService {
         Pod pod = internalStoreService.getStorePod(managerStoreId);
         StorePodClient client = podClientFactory.getClient(pod.id());
         Mono<Map<String, Object>> store = client.getStore(managerStoreId.getId().toString());
-        return store
-                .map(it -> {
-                    HashMap<String, Object> newIt = new HashMap<>(it);
-                    newIt.put("pod", Map.of("id", pod.id().id()));
-                    return newIt;
-                })
+        return store.map(
+                        it -> {
+                            HashMap<String, Object> newIt = new HashMap<>(it);
+                            newIt.put("pod", Map.of("id", pod.id().id()));
+                            return newIt;
+                        })
                 .cast(Object.class);
     }
 }

@@ -24,5 +24,4 @@ public class SignUpController {
     public Mono<ReadableUser> create(@RequestBody CreateOrgRequest request) {
         return Mono.just(signupService.createOrgUser(request));
     }
-
 }

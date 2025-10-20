@@ -54,15 +54,16 @@ public class OrgManagerController {
     @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN')")
     @PostMapping("change-password")
     @ConditionalOnApiStatus
-    public Mono<Void> changePassword(@RequestParam ManagerOrgId id, @RequestBody UserPassword request) {
+    public Mono<Void> changePassword(
+            @RequestParam ManagerOrgId id, @RequestBody UserPassword request) {
         userAccountService.changePassword(id, request);
         return Mono.empty();
     }
 
     @GetMapping("stores")
     @ConditionalOnApiStatus
-    public Mono<Page<ManagerStoreDto>> findAllStores(@RequestParam ManagerOrgId id, Pageable pageable) {
+    public Mono<Page<ManagerStoreDto>> findAllStores(
+            @RequestParam ManagerOrgId id, Pageable pageable) {
         return Mono.just(internalStoreService.findAll(id, pageable));
     }
-
 }

@@ -1,5 +1,7 @@
 package com.asrevo.cvhome.order.api.order.v1.order;
 
+import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1_STR;
+
 import com.asrevo.cvhome.commons.annotation.ConditionalOnApiStatus;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.order.entity.customer.Customer;
@@ -31,14 +33,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
-import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1_STR;
-
 @RestController
 @RequestMapping("/api/v1")
 @Tag(name = "Order flow resource", description = "Manage orders (create, list, get)")
 @Slf4j
 public class OrderApi {
-
 
     private static final String DEFAULT_ORDER_LIST_COUNT = "25";
     private final OrderFacade orderFacade;
@@ -46,7 +45,10 @@ public class OrderApi {
     private final ShoppingCartService shoppingCartService;
     private final CustomerFacade customerFacade;
 
-    public OrderApi(OrderFacade orderFacade, ShoppingCartService shoppingCartService, CustomerFacade customerFacade) {
+    public OrderApi(
+            OrderFacade orderFacade,
+            ShoppingCartService shoppingCartService,
+            CustomerFacade customerFacade) {
         this.orderFacade = orderFacade;
         this.shoppingCartService = shoppingCartService;
         this.customerFacade = customerFacade;
@@ -55,42 +57,60 @@ public class OrderApi {
     /**
      * Main checkout resource that will complete the order flow
      */
-    @RequestMapping(value = {"/cart/{code}/checkout"}, method = RequestMethod.POST)
+    @RequestMapping(
+            value = {"/cart/{code}/checkout"},
+            method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
+        @Parameter(
+                name = "store",
+                schema =
+                        @Schema(
+                                name = "store",
+                                type = "string",
+                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
+        @Parameter(
+                name = "lang",
+                schema =
+                        @Schema(
+                                name = "lang",
+                                type = "string",
+                                defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     @ConditionalOnApiStatus
     public ReadableOrderConfirmation checkout(
-            @PathVariable final String code,//shopping cart
-            @Valid @RequestBody PersistableAnonymousOrder order,//order
+            @PathVariable final String code, // shopping cart
+            @Valid @RequestBody PersistableAnonymousOrder order, // order
             @Parameter(hidden = true) StoreMerchantId merchantStore,
             @Parameter(hidden = true) LanguageCode language) {
 
         Assert.notNull(order.getCustomer(), "Customer must not be null");
 
-
         ShoppingCart cart;
         try {
-            cart = shoppingCartService.loadCartByCode(code, merchantStore,language);
+            cart = shoppingCartService.loadCartByCode(code, merchantStore, language);
 
             if (cart == null) {
                 throw new ResourceNotFoundException("Cart code " + code + " does not exist");
             }
 
-
             Customer customer = new Customer();
-            customer = customerFacade.populateCustomerModel(customer, order.getCustomer(), merchantStore, language);
-
+            customer =
+                    customerFacade.populateCustomerModel(
+                            customer, order.getCustomer(), merchantStore, language);
 
             order.setShoppingCartId(cart.getId());
 
-            Order modelOrder = orderFacade.processOrder(order, customer, merchantStore, language,
-                    LocaleUtils.getLocale(language));
+            Order modelOrder =
+                    orderFacade.processOrder(
+                            order,
+                            customer,
+                            merchantStore,
+                            language,
+                            LocaleUtils.getLocale(language));
             Long orderId = modelOrder.getId();
-            //populate order confirmation
+            // populate order confirmation
             order.setId(orderId);
             // set customer id
             order.getCustomer().setId(modelOrder.getCustomerId());
@@ -100,7 +120,7 @@ public class OrderApi {
         } catch (Exception e) {
 
             String message = e.getMessage();
-            if (StringUtils.isBlank(message)) {//exception type
+            if (StringUtils.isBlank(message)) { // exception type
                 message = "APP-BACKEND";
                 if (e.getCause() instanceof IntegrationException) {
                     message = "Integration problen occured to complete order";
@@ -108,10 +128,11 @@ public class OrderApi {
             }
             throw new ServiceRuntimeException("Error during checkout [" + message + "]", e);
         }
-
     }
 
-    @RequestMapping(value = {"/private/orders"}, method = RequestMethod.GET)
+    @RequestMapping(
+            value = {"/private/orders"},
+            method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     @ConditionalOnApiStatus
@@ -134,15 +155,28 @@ public class OrderApi {
         orderCriteria.setEmail(email);
         orderCriteria.setId(id);
         return orderFacade.getReadableOrderList(orderCriteria, merchantStore);
-
     }
 
-    @RequestMapping(value = {"/private/orders/{id}"}, method = RequestMethod.GET)
+    @RequestMapping(
+            value = {"/private/orders/{id}"},
+            method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     @Parameters({
-            @Parameter(name = "store", schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang", schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
+        @Parameter(
+                name = "store",
+                schema =
+                        @Schema(
+                                name = "store",
+                                type = "string",
+                                defaultValue = DEFAULT_ORG1_STORE1_STR)),
+        @Parameter(
+                name = "lang",
+                schema =
+                        @Schema(
+                                name = "lang",
+                                type = "string",
+                                defaultValue = Constants.DEFAULT_LANGUAGE))
     })
     @ConditionalOnApiStatus
     public ReadableOrder get(

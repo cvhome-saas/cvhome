@@ -21,7 +21,8 @@ public class TestcontainersConfiguration {
     }
 
     @Bean
-    public CommandLineRunner runner(PostgreSQLContainer<?> postgresContainer, MinIOContainer minIOContainer) {
+    public CommandLineRunner runner(
+            PostgreSQLContainer<?> postgresContainer, MinIOContainer minIOContainer) {
         return args -> {
             System.out.println(minIOContainer.getS3URL());
             System.out.println(minIOContainer.getUserName());

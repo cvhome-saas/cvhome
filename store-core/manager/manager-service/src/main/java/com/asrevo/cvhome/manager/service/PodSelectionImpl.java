@@ -4,19 +4,18 @@ import com.asrevo.cvhome.commons.domain.ManagerOrgId;
 import com.asrevo.cvhome.commons.domain.Pod;
 import com.asrevo.cvhome.commons.domain.PodId;
 import com.asrevo.cvhome.s2s.model.ServiceDomainProperties;
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
 @Slf4j
 public class PodSelectionImpl implements PodSelection {
-    private final static Random rnd = new Random();
+    private static final Random rnd = new Random();
     private final ServiceDomainProperties properties;
 
     @Override
@@ -30,9 +29,13 @@ public class PodSelectionImpl implements PodSelection {
             return findPrivatePod(orgId, preferredPodId, myPrivatePods);
         }
 
-        List<Pod> publicNamespaces = properties.pods().stream()
-                .filter(it -> Objects.isNull(it.orgId()) || Objects.isNull(it.orgId().getId()))
-                .toList();
+        List<Pod> publicNamespaces =
+                properties.pods().stream()
+                        .filter(
+                                it ->
+                                        Objects.isNull(it.orgId())
+                                                || Objects.isNull(it.orgId().getId()))
+                        .toList();
 
         log.info("find {} public namespaces valid for org {}", publicNamespaces.size(), orgId);
         Pod pod = random(publicNamespaces);
@@ -42,9 +45,7 @@ public class PodSelectionImpl implements PodSelection {
 
     @Override
     public List<Pod> listPrivatePods(ManagerOrgId orgId) {
-        return properties.pods().stream()
-                .filter(it -> orgId.equals(it.orgId()))
-                .toList();
+        return properties.pods().stream().filter(it -> orgId.equals(it.orgId())).toList();
     }
 
     @Override
@@ -52,8 +53,13 @@ public class PodSelectionImpl implements PodSelection {
         return properties.pods();
     }
 
-    private PodId findPrivatePod(ManagerOrgId orgId, PodId preferredPodId, List<Pod> myPrivatePods) {
-        Pod preferredPod = myPrivatePods.stream().filter(it -> it.id().equals(preferredPodId)).findFirst().orElse(null);
+    private PodId findPrivatePod(
+            ManagerOrgId orgId, PodId preferredPodId, List<Pod> myPrivatePods) {
+        Pod preferredPod =
+                myPrivatePods.stream()
+                        .filter(it -> it.id().equals(preferredPodId))
+                        .findFirst()
+                        .orElse(null);
         if (preferredPod != null) {
             log.info("will select private preferred pod {} for org {}", preferredPod, orgId);
             return preferredPod.id();
@@ -62,7 +68,6 @@ public class PodSelectionImpl implements PodSelection {
             Pod pod = random(myPrivatePods);
             log.info("will select private pod {} for org {}", pod, orgId);
             return pod.id();
-
         }
     }
 

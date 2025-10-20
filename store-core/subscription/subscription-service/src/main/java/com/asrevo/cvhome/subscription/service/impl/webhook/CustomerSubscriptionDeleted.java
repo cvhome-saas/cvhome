@@ -40,5 +40,4 @@ public class CustomerSubscriptionDeleted implements WebhookHandler {
     private JsonObject toJsonObj(Event event) {
         return toJsonObj.exec(event.getDataObjectDeserializer().getRawJson());
     }
-
 }

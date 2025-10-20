@@ -5,11 +5,10 @@ import com.asrevo.cvhome.subscription.commons.RecurringPlan;
 import com.asrevo.cvhome.subscription.commons.SubscriptionPlanOption;
 import com.asrevo.cvhome.subscription.commons.SubscriptionPlanTable;
 import com.asrevo.cvhome.subscription.domain.SubscriptionPricePlanEntity;
+import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
-
-import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface SubscriptionPricePlanMapper {
@@ -22,7 +21,8 @@ public interface SubscriptionPricePlanMapper {
     @Named("toPreviousCost")
     default PricePlanCost toPreviousCost(SubscriptionPricePlanEntity it) {
         if (RecurringPlan.YEAR.equals(it.getRecurringPlan())) {
-            return PricePlanCost.from(it.getCost().currency(), it.getSubscriptionPlan(), it.getRecurringPlan());
+            return PricePlanCost.from(
+                    it.getCost().currency(), it.getSubscriptionPlan(), it.getRecurringPlan());
         } else {
             return it.getCost();
         }
@@ -32,5 +32,4 @@ public interface SubscriptionPricePlanMapper {
         List<SubscriptionPlanOption> tableOptions = list.stream().map(this::toOption).toList();
         return new SubscriptionPlanTable(tableOptions);
     }
-
 }

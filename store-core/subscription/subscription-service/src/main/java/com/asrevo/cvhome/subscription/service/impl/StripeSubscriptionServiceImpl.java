@@ -52,34 +52,30 @@ public class StripeSubscriptionServiceImpl implements StripeSubscriptionService 
         return customer;
     }
 
-
     @Override
     @SneakyThrows
-    public String createSubscriptionSession(ManagerOrgId managerOrgId, PriceId priceId, RedirectionUrlBuilder redirectionUrl) {
+    public String createSubscriptionSession(
+            ManagerOrgId managerOrgId, PriceId priceId, RedirectionUrlBuilder redirectionUrl) {
         Customer customer = findOrCreateCustomer(managerOrgId);
 
-
-        SessionCreateParams.Builder sessionCreateParamsBuilder = SessionCreateParams.builder()
-                .setMode(SessionCreateParams.Mode.SUBSCRIPTION)
-                .setCustomer(customer.getId())
-                .setSuccessUrl(redirectionUrl.getRedirectionUrl("/public/subscription/success"))
-                .setCancelUrl(redirectionUrl.getRedirectionUrl("/public/subscription/fail"))
-                .addLineItem(
-                        SessionCreateParams.LineItem.builder()
-                                .setQuantity(1L)
-                                .setPrice(priceId.id())
-                                .build()
-                )
-                .setSubscriptionData(
-                        SessionCreateParams.SubscriptionData.builder()
-                                .putMetadata("orgId", managerOrgId.id().toString())
-                                .build()
-                );
-
+        SessionCreateParams.Builder sessionCreateParamsBuilder =
+                SessionCreateParams.builder()
+                        .setMode(SessionCreateParams.Mode.SUBSCRIPTION)
+                        .setCustomer(customer.getId())
+                        .setSuccessUrl(
+                                redirectionUrl.getRedirectionUrl("/public/subscription/success"))
+                        .setCancelUrl(redirectionUrl.getRedirectionUrl("/public/subscription/fail"))
+                        .addLineItem(
+                                SessionCreateParams.LineItem.builder()
+                                        .setQuantity(1L)
+                                        .setPrice(priceId.id())
+                                        .build())
+                        .setSubscriptionData(
+                                SessionCreateParams.SubscriptionData.builder()
+                                        .putMetadata("orgId", managerOrgId.id().toString())
+                                        .build());
 
         Session session = Session.create(sessionCreateParamsBuilder.build());
         return session.getUrl();
     }
-
-
 }

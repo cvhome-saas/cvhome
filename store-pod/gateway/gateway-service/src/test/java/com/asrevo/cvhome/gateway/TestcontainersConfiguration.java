@@ -6,5 +6,4 @@ import org.springframework.context.annotation.Import;
 
 @TestConfiguration(proxyBeanMethods = false)
 @Import(ReactiveTestCustomSecurityConfig.class)
-public class TestcontainersConfiguration {
-}
+public class TestcontainersConfiguration {}
