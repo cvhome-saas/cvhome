@@ -20,10 +20,12 @@ public class LanguageCodeArgumentResolver implements HandlerMethodArgumentResolv
     }
 
     @Override
-    public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
-                                  NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
+    public Object resolveArgument(
+            MethodParameter parameter,
+            ModelAndViewContainer mavContainer,
+            NativeWebRequest webRequest,
+            WebDataBinderFactory binderFactory) {
         HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
         return LanguageUtils.getRESTLanguageCode(request.getParameter(Constants.LANG));
     }
-
 }

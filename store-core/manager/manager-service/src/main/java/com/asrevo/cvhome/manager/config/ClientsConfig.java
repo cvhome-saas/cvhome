@@ -13,7 +13,6 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-
 @Configuration
 public class ClientsConfig {
     @Bean
@@ -22,17 +21,20 @@ public class ClientsConfig {
     }
 
     @Bean
-    public SubscriptionPlanDetailsService subscriptionPlanDetailsService(WebClientBuilder webClientBuilder) {
+    public SubscriptionPlanDetailsService subscriptionPlanDetailsService(
+            WebClientBuilder webClientBuilder) {
         return webClientBuilder.buildClient("subscription", SubscriptionPlanDetailsService.class);
     }
 
     @Bean
-    public ExternalReactiveMerchantStoreService externalMerchantStoreService(WebClientBuilder webClientBuilder) {
+    public ExternalReactiveMerchantStoreService externalMerchantStoreService(
+            WebClientBuilder webClientBuilder) {
         return webClientBuilder.buildClient("merchant", ExternalReactiveMerchantStoreService.class);
     }
 
     @Bean
-    public SubscriptionHttpEventsService subscriptionHttpEventsService(WebClientBuilder webClientBuilder) {
+    public SubscriptionHttpEventsService subscriptionHttpEventsService(
+            WebClientBuilder webClientBuilder) {
         JsonMapper mapper =
                 JsonMapper.builder()
                         .addModules(new JavaTimeModule(), new Jdk8Module())
@@ -41,6 +43,7 @@ public class ClientsConfig {
                                         .init(JsonTypeInfo.Id.CLASS, null)
                                         .inclusion(JsonTypeInfo.As.WRAPPER_OBJECT))
                         .build();
-        return webClientBuilder.buildClient("subscription", SubscriptionHttpEventsService.class, mapper);
+        return webClientBuilder.buildClient(
+                "subscription", SubscriptionHttpEventsService.class, mapper);
     }
 }

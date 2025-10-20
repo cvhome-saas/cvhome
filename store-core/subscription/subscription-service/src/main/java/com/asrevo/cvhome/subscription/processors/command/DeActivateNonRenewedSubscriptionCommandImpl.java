@@ -10,7 +10,8 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class DeActivateNonRenewedSubscriptionCommandImpl implements EventImpl<DeActivateNonRenewedSubscriptionCommand> {
+public class DeActivateNonRenewedSubscriptionCommandImpl
+        implements EventImpl<DeActivateNonRenewedSubscriptionCommand> {
     private final SubscriptionService subscriptionService;
 
     @Override

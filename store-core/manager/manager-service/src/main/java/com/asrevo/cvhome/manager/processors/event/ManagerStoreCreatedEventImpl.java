@@ -7,7 +7,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-
 @Service
 @AllArgsConstructor
 @Slf4j
@@ -17,7 +16,8 @@ public class ManagerStoreCreatedEventImpl implements EventImpl<StoreCreatedEvent
     @Override
     public void process(StoreCreatedEvent event) {
         log.info("Received store created event: {}", event);
-        storeProvisioningService.provisioning(event.orgId(), event.store(), event.podId(), event.request());
+        storeProvisioningService.provisioning(
+                event.orgId(), event.store(), event.podId(), event.request());
     }
 
     @Override

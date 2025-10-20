@@ -22,7 +22,8 @@ public class SignupServiceImpl implements SignupService {
     public ReadableUser createOrgUser(CreateOrgRequest request) {
         request.user().setActive(true);
         request.user().setUserName(request.user().getEmailAddress());
-        ManagerOrgId org = internalOrgService.createOrgForUser(new Email(request.user().getEmailAddress()));
+        ManagerOrgId org =
+                internalOrgService.createOrgForUser(new Email(request.user().getEmailAddress()));
         return userAccountService.createOrgUser(org, request.user());
     }
 }

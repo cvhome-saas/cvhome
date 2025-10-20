@@ -4,5 +4,5 @@ import com.asrevo.cvhome.subscription.commons.PriceId;
 import com.asrevo.cvhome.subscription.domain.SubscriptionPricePlanEntity;
 import org.springframework.data.repository.CrudRepository;
 
-public interface SubscriptionPricePlanRepository extends CrudRepository<SubscriptionPricePlanEntity, PriceId> {
-}
+public interface SubscriptionPricePlanRepository
+        extends CrudRepository<SubscriptionPricePlanEntity, PriceId> {}

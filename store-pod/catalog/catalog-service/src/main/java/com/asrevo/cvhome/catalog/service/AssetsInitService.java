@@ -5,6 +5,11 @@ import com.asrevo.cvhome.store.core.entity.content.FileContentType;
 import com.asrevo.cvhome.store.core.entity.content.ImageContentFile;
 import com.asrevo.cvhome.store.core.modules.cms.model.CmsProductImage;
 import com.asrevo.cvhome.store.core.modules.cms.product.ProductFileManager;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -12,12 +17,6 @@ import org.springframework.boot.web.servlet.context.AnnotationConfigServletWebSe
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
-
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Objects;
 
 @Component
 @AllArgsConstructor
@@ -28,15 +27,17 @@ public class AssetsInitService {
 
     @SneakyThrows
     public void loadAssets() {
-        Resource[] resources = ((AnnotationConfigServletWebServerApplicationContext) resourceLoader).getResources("classpath:/assets/**");
+        Resource[] resources =
+                ((AnnotationConfigServletWebServerApplicationContext) resourceLoader)
+                        .getResources("classpath:/assets/**");
         Arrays.stream(resources)
                 .filter(resource -> !isDirectory(resource))
-                .forEach(r -> {
-                    if (r.toString().contains("/products/")) {
-                        uploadProduct(r);
-                    }
-                });
-
+                .forEach(
+                        r -> {
+                            if (r.toString().contains("/products/")) {
+                                uploadProduct(r);
+                            }
+                        });
     }
 
     @SneakyThrows
@@ -48,9 +49,12 @@ public class AssetsInitService {
         String product = p.getParent().getFileName().toString();
         String productId = product.split("-")[0];
         String productSku = product.split("-")[1];
-        storeMerchantId = new StoreMerchantId(p.getParent().getParent().getParent().getFileName().toString());
+        storeMerchantId =
+                new StoreMerchantId(p.getParent().getParent().getParent().getFileName().toString());
         log.info("Store merchant id: {} , product: {}", storeMerchantId, fileName);
-        CmsProductImage pm = new CmsProductImage(Long.parseLong(productId), storeMerchantId, productSku, fileName);
+        CmsProductImage pm =
+                new CmsProductImage(
+                        Long.parseLong(productId), storeMerchantId, productSku, fileName);
         productFileManager.addProductImage(pm, loadFile(r, type));
     }
 
@@ -59,7 +63,8 @@ public class AssetsInitService {
         ImageContentFile file = new ImageContentFile();
         file.setFile(resource.getInputStream());
         file.setFileName(resource.getFilename());
-        file.setMimeType(Files.probeContentType(Paths.get(Objects.requireNonNull(resource.getFilename()))));
+        file.setMimeType(
+                Files.probeContentType(Paths.get(Objects.requireNonNull(resource.getFilename()))));
         file.setFileContentType(contentType);
         return file;
     }

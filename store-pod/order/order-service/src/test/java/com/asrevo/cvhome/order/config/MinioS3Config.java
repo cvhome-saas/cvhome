@@ -1,14 +1,13 @@
 package com.asrevo.cvhome.order.config;
 
 import com.asrevo.cvhome.commons.domain.StorageProviderType;
+import java.util.UUID;
+import java.util.function.Supplier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.DynamicPropertyRegistrar;
 import org.testcontainers.containers.MinIOContainer;
 import software.amazon.awssdk.regions.Region;
-
-import java.util.UUID;
-import java.util.function.Supplier;
 
 @Configuration
 public class MinioS3Config {
@@ -35,5 +34,4 @@ public class MinioS3Config {
         minio.start();
         return minio;
     }
-
 }

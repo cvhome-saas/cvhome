@@ -19,7 +19,6 @@ public class S3InitConfigurer implements ApplicationListener<ApplicationReadyEve
     private final S3Client s3Client;
     private final CdnStorageProperties cdnStorageProperties;
 
-
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {
         if (StorageProviderType.MINIO.equals(cdnStorageProperties.provider())) {
@@ -30,14 +29,16 @@ public class S3InitConfigurer implements ApplicationListener<ApplicationReadyEve
 
     private void configureBucket() {
         try {
-            s3Client.createBucket(CreateBucketRequest.builder().bucket(cdnStorageProperties.bucket()).build());
+            s3Client.createBucket(
+                    CreateBucketRequest.builder().bucket(cdnStorageProperties.bucket()).build());
         } catch (Exception e) {
             log.error("error creating bucket", e);
         }
     }
 
     public void configurePolicy() {
-        String policy = """
+        String policy =
+                """
                 {
                     "Version": "2012-10-17",
                     "Statement": [
@@ -53,15 +54,14 @@ public class S3InitConfigurer implements ApplicationListener<ApplicationReadyEve
                     ]
                 }
                 """;
-        String finalPolicy = policy
-                .replace("${BUCKET}", cdnStorageProperties.bucket());
+        String finalPolicy = policy.replace("${BUCKET}", cdnStorageProperties.bucket());
         try {
-            PutBucketPolicyResponse putBucketPolicyResponse = s3Client.putBucketPolicy(PutBucketPolicyRequest.builder()
-                    .bucket(cdnStorageProperties.bucket())
-                    .policy(
-                            finalPolicy
-                    )
-                    .build());
+            PutBucketPolicyResponse putBucketPolicyResponse =
+                    s3Client.putBucketPolicy(
+                            PutBucketPolicyRequest.builder()
+                                    .bucket(cdnStorageProperties.bucket())
+                                    .policy(finalPolicy)
+                                    .build());
         } catch (Exception e) {
             log.error("error putting policy", e);
         }

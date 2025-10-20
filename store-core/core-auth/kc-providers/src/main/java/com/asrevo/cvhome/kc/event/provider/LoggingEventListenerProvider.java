@@ -5,16 +5,12 @@ import org.keycloak.events.Event;
 import org.keycloak.events.EventListenerProvider;
 import org.keycloak.events.admin.AdminEvent;
 
-
 public class LoggingEventListenerProvider implements EventListenerProvider {
 
     private static final Logger log = Logger.getLogger(LoggingEventListenerProvider.class);
 
-
     @Override
-    public void close() {
-
-    }
+    public void close() {}
 
     @Override
     public void onEvent(Event event) {
@@ -25,6 +21,4 @@ public class LoggingEventListenerProvider implements EventListenerProvider {
     public void onEvent(AdminEvent adminEvent, boolean includeRepresentation) {
         log.info("********************* Received admin event: " + adminEvent);
     }
-
-
 }

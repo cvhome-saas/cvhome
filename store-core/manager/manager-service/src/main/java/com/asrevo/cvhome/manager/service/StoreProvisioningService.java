@@ -4,11 +4,10 @@ import com.asrevo.cvhome.commons.domain.ManagerOrgId;
 import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.commons.domain.PodId;
 import com.asrevo.cvhome.manager.mappers.ManagerStoreMappers;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-
-import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -18,18 +17,26 @@ public class StoreProvisioningService {
     private final StorePodClientFactory podClientFactory;
     private final InternalStoreService internalStoreService;
 
-    public void provisioning(ManagerOrgId managerOrgId, ManagerStoreId store, PodId pod, Map<Object, Object> payload) {
-        Map<Object, Object> newRequest = managerStoreMappers.toExternalCreateRequest(payload, managerOrgId, store);
+    public void provisioning(
+            ManagerOrgId managerOrgId,
+            ManagerStoreId store,
+            PodId pod,
+            Map<Object, Object> payload) {
+        Map<Object, Object> newRequest =
+                managerStoreMappers.toExternalCreateRequest(payload, managerOrgId, store);
         internalStoreService.startProvisioning(store);
-        podClientFactory.getClient(pod).create(newRequest)
-                .subscribe((it) -> {
-                    internalStoreService.completeProvisioning(store);
-                    log.info("Successfully created new Store {} in Pod {}", store, pod);
-                }, (err) -> {
-                    internalStoreService.failProvisioning(store);
-                    log.error("Error creating Store in pod {}", pod, err);
-                }, () -> {
-                });
-
+        podClientFactory
+                .getClient(pod)
+                .create(newRequest)
+                .subscribe(
+                        (it) -> {
+                            internalStoreService.completeProvisioning(store);
+                            log.info("Successfully created new Store {} in Pod {}", store, pod);
+                        },
+                        (err) -> {
+                            internalStoreService.failProvisioning(store);
+                            log.error("Error creating Store in pod {}", pod, err);
+                        },
+                        () -> {});
     }
 }

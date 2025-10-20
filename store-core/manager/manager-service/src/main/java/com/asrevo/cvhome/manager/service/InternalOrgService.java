@@ -12,5 +12,4 @@ public interface InternalOrgService {
     Page<ManagerOrgDto> findAll(Pageable pageable);
 
     ManagerOrgDto findOne(ManagerOrgId id);
-
 }

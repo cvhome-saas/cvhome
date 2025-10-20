@@ -1,5 +1,8 @@
 package com.asrevo.cvhome.subscription.controller;
 
+import static com.asrevo.cvhome.s2s.utils.RedirectionUrlBuilder.getPort;
+import static com.asrevo.cvhome.s2s.utils.RedirectionUrlBuilder.getScheme;
+
 import com.asrevo.cvhome.commons.annotation.ConditionalOnApiStatus;
 import com.asrevo.cvhome.commons.annotation.OrgStorePrincipalInfo;
 import com.asrevo.cvhome.commons.domain.ServiceDomain;
@@ -20,9 +23,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ServerWebExchange;
 
-import static com.asrevo.cvhome.s2s.utils.RedirectionUrlBuilder.getPort;
-import static com.asrevo.cvhome.s2s.utils.RedirectionUrlBuilder.getScheme;
-
 @Controller
 @RequestMapping("api/v1/subscription")
 @Slf4j
@@ -33,16 +33,19 @@ public class SubscriptionController {
 
     @GetMapping("subscribe")
     @ConditionalOnApiStatus
-    public ResponseEntity<Void> subscribe(ServerWebExchange exchange, @OrgStorePrincipalInfo UserOrgStoreIdentity identity,
-                                          @RequestParam PriceId priceId) {
+    public ResponseEntity<Void> subscribe(
+            ServerWebExchange exchange,
+            @OrgStorePrincipalInfo UserOrgStoreIdentity identity,
+            @RequestParam PriceId priceId) {
         ServerHttpRequest request = exchange.getRequest();
         ServiceDomain serviceDomain = serviceDomainProperties.getService("store-ui");
-        RedirectionUrlBuilder urlBuilder = new RedirectionUrlBuilder(getScheme(request), getPort(request), serviceDomain);
-        String sessionUrl = stripeSubscriptionService.createSubscriptionSession(identity.org(), priceId, urlBuilder);
+        RedirectionUrlBuilder urlBuilder =
+                new RedirectionUrlBuilder(getScheme(request), getPort(request), serviceDomain);
+        String sessionUrl =
+                stripeSubscriptionService.createSubscriptionSession(
+                        identity.org(), priceId, urlBuilder);
         HttpHeaders headers = new HttpHeaders();
         headers.add("Location", sessionUrl);
         return new ResponseEntity<>(headers, HttpStatus.FOUND);
     }
-
 }
-

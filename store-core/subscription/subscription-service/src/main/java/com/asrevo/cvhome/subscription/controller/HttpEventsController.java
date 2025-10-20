@@ -31,7 +31,6 @@ public class HttpEventsController {
                                     .inclusion(JsonTypeInfo.As.WRAPPER_OBJECT))
                     .build();
 
-
     @PostMapping(value = "on", consumes = "application/json")
     public void on(@RequestBody String rawEvent) throws JsonProcessingException {
         Event event = mapper.readValue(rawEvent, Event.class);

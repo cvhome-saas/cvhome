@@ -10,12 +10,15 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class CustomerSubscriptionDeletedEventImpl implements EventImpl<CustomerSubscriptionDeletedEvent> {
+public class CustomerSubscriptionDeletedEventImpl
+        implements EventImpl<CustomerSubscriptionDeletedEvent> {
     private final SubscriptionService subscriptionService;
 
     @Override
     public void process(CustomerSubscriptionDeletedEvent event) {
-        log.info("Received CustomerSubscriptionDeletedEvent from CustomerSubscriptionService {}", event);
+        log.info(
+                "Received CustomerSubscriptionDeletedEvent from CustomerSubscriptionService {}",
+                event);
         subscriptionService.deActivateSubscription(event.org());
     }
 
@@ -24,4 +27,3 @@ public class CustomerSubscriptionDeletedEventImpl implements EventImpl<CustomerS
         return CustomerSubscriptionDeletedEvent.class.getSimpleName();
     }
 }
-

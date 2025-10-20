@@ -2,6 +2,8 @@ package com.asrevo.cvhome.kc.email.provider;
 
 import com.asrevo.cvhome.kc.service.CommunicationService;
 import com.asrevo.cvhome.kc.service.impl.CommunicationServiceImpl;
+import java.util.HashMap;
+import java.util.Map;
 import org.keycloak.Config;
 import org.keycloak.email.EmailSenderProvider;
 import org.keycloak.email.EmailSenderProviderFactory;
@@ -9,11 +11,8 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.provider.ServerInfoAwareProviderFactory;
 
-import java.util.HashMap;
-import java.util.Map;
-
-
-public class CommunicationEmailSenderProviderFactory implements EmailSenderProviderFactory, ServerInfoAwareProviderFactory {
+public class CommunicationEmailSenderProviderFactory
+        implements EmailSenderProviderFactory, ServerInfoAwareProviderFactory {
 
     private final Map<String, String> configMap = new HashMap<>();
     private CommunicationService communicationService;
@@ -21,7 +20,8 @@ public class CommunicationEmailSenderProviderFactory implements EmailSenderProvi
 
     @Override
     public EmailSenderProvider create(KeycloakSession session) {
-        this.communicationEmailSenderProvider = new CommunicationEmailSenderProvider(session, communicationService);
+        this.communicationEmailSenderProvider =
+                new CommunicationEmailSenderProvider(session, communicationService);
         return this.communicationEmailSenderProvider;
     }
 
@@ -31,12 +31,10 @@ public class CommunicationEmailSenderProviderFactory implements EmailSenderProvi
     }
 
     @Override
-    public void postInit(KeycloakSessionFactory factory) {
-    }
+    public void postInit(KeycloakSessionFactory factory) {}
 
     @Override
-    public void close() {
-    }
+    public void close() {}
 
     @Override
     public String getId() {

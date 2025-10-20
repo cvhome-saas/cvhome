@@ -4,10 +4,9 @@ import com.asrevo.cvhome.commons.domain.*;
 import com.asrevo.cvhome.manager.commons.dto.ListManagerStoreQuery;
 import com.asrevo.cvhome.manager.commons.dto.ManagerStoreDto;
 import com.asrevo.cvhome.manager.dto.StoreDomainList;
+import java.util.Map;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
-import java.util.Map;
 
 public interface InternalStoreService {
     ManagerStoreDto createStore(Map<Object, Object> request, ManagerOrgId orgId, PodId pod);
@@ -18,7 +17,10 @@ public interface InternalStoreService {
 
     void startProvisioning(ManagerStoreId store);
 
-    Page<ManagerStoreDto> findAll(UserOrgStoreIdentity identity, ListManagerStoreQuery listManagerStoreQuery, Pageable pageable);
+    Page<ManagerStoreDto> findAll(
+            UserOrgStoreIdentity identity,
+            ListManagerStoreQuery listManagerStoreQuery,
+            Pageable pageable);
 
     Page<ManagerStoreDto> findAll(ManagerOrgId id, Pageable pageable);
 
@@ -37,5 +39,4 @@ public interface InternalStoreService {
     void addDomain(ManagerStoreId managerStoreId, Domain domain);
 
     void removeDomain(ManagerStoreId managerStoreId, Domain domain);
-
 }

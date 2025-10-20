@@ -16,20 +16,24 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Order(Ordered.HIGHEST_PRECEDENCE + 2)
 public class ApiUsageAop {
-    @Autowired
-    private Environment environment;
+    @Autowired private Environment environment;
 
     @Around("@annotation(status)")
-    public Object allow(ProceedingJoinPoint joinPoint, ConditionalOnApiStatus status) throws Throwable {
-        String calling = joinPoint.getSignature().getDeclaringTypeName() + "." + joinPoint.getSignature().getName();
-        boolean isDisabled = switch (status.usage()) {
-            case UNKNOWN -> isUnknownDisabled();
-            case USED -> isUsedDisabled();
-            case WILL_USED -> isWillUsedDisabled();
-            case NOT_USED -> isNotUsedDisabled();
-            case WILL_NOT_USED -> isWillNotUsedDisabled();
-            case null -> isUnknownDisabled();
-        };
+    public Object allow(ProceedingJoinPoint joinPoint, ConditionalOnApiStatus status)
+            throws Throwable {
+        String calling =
+                joinPoint.getSignature().getDeclaringTypeName()
+                        + "."
+                        + joinPoint.getSignature().getName();
+        boolean isDisabled =
+                switch (status.usage()) {
+                    case UNKNOWN -> isUnknownDisabled();
+                    case USED -> isUsedDisabled();
+                    case WILL_USED -> isWillUsedDisabled();
+                    case NOT_USED -> isNotUsedDisabled();
+                    case WILL_NOT_USED -> isWillNotUsedDisabled();
+                    case null -> isUnknownDisabled();
+                };
 
         if (isDisabled) {
             log.info("will disable api for {}", calling);
@@ -39,7 +43,8 @@ public class ApiUsageAop {
     }
 
     private boolean isWillUsedDisabled() {
-        return environment.getProperty("com.asrevo.endpoints.will-used.disabled", Boolean.class, false);
+        return environment.getProperty(
+                "com.asrevo.endpoints.will-used.disabled", Boolean.class, false);
     }
 
     private boolean isUsedDisabled() {
@@ -47,15 +52,17 @@ public class ApiUsageAop {
     }
 
     private boolean isNotUsedDisabled() {
-        return environment.getProperty("com.asrevo.endpoints.not-used.disabled", Boolean.class, false);
+        return environment.getProperty(
+                "com.asrevo.endpoints.not-used.disabled", Boolean.class, false);
     }
 
     private boolean isWillNotUsedDisabled() {
-        return environment.getProperty("com.asrevo.endpoints.will-not-used.disabled", Boolean.class, false);
+        return environment.getProperty(
+                "com.asrevo.endpoints.will-not-used.disabled", Boolean.class, false);
     }
 
     private boolean isUnknownDisabled() {
-        return environment.getProperty("com.asrevo.endpoints.unknown.disabled", Boolean.class, false);
+        return environment.getProperty(
+                "com.asrevo.endpoints.unknown.disabled", Boolean.class, false);
     }
-
 }

@@ -8,19 +8,14 @@ import com.asrevo.cvhome.commons.domain.Pod;
 import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
 import com.asrevo.cvhome.manager.dto.StoreDomainList;
 import com.asrevo.cvhome.manager.service.InternalStoreService;
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.server.reactive.ServerHttpRequest;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ServerWebExchange;
-import reactor.core.publisher.Mono;
-
-import java.net.URI;
 import java.util.Map;
 import java.util.Optional;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("api/v1/router")
@@ -43,8 +38,8 @@ public class RouterController {
     public Map<String, String> getLookupHeadersByDomain(Domain domain) {
         log.info("header lookup: {}", domain);
         return Optional.ofNullable(internalStoreService.getReferenceByDomain(domain))
-                .map(it -> Map.of("Store-Id",it.id().toString()))
-                .orElseGet(() -> Map.of("",""));
+                .map(it -> Map.of("Store-Id", it.id().toString()))
+                .orElseGet(() -> Map.of("", ""));
     }
 
     @GetMapping("store-id-by-domain")
@@ -62,14 +57,19 @@ public class RouterController {
     @GetMapping("allocates")
     @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE.DOMAIN.LIST')")
     @ConditionalOnApiStatus
-    public Mono<StoreDomainList> allocatedDomains(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store) {
+    public Mono<StoreDomainList> allocatedDomains(
+            @OrgStorePrincipalInfo UserOrgStoreIdentity identity,
+            @RequestParam ManagerStoreId store) {
         return Mono.just(internalStoreService.domains(store));
     }
 
     @PostMapping("allocate")
     @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE.DOMAIN.CREATE')")
     @ConditionalOnApiStatus
-    public Mono<Void> allocate(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store, Domain domain) {
+    public Mono<Void> allocate(
+            @OrgStorePrincipalInfo UserOrgStoreIdentity identity,
+            @RequestParam ManagerStoreId store,
+            Domain domain) {
         internalStoreService.addDomain(store, domain);
         return Mono.empty();
     }
@@ -77,9 +77,11 @@ public class RouterController {
     @DeleteMapping("remove")
     @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE.DOMAIN.DELETE')")
     @ConditionalOnApiStatus
-    public Mono<Void> remove(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store, Domain domain) {
+    public Mono<Void> remove(
+            @OrgStorePrincipalInfo UserOrgStoreIdentity identity,
+            @RequestParam ManagerStoreId store,
+            Domain domain) {
         internalStoreService.removeDomain(store, domain);
         return Mono.empty();
     }
-
 }

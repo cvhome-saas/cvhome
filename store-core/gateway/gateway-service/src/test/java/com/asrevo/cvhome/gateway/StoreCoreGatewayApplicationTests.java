@@ -10,7 +10,5 @@ import org.springframework.context.annotation.Import;
 @Tag("integration-test")
 class StoreCoreGatewayApplicationTests {
     @Test
-    void contextLoads() {
-    }
-
+    void contextLoads() {}
 }

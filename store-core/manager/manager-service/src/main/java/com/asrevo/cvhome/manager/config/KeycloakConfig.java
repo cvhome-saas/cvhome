@@ -15,5 +15,4 @@ public class KeycloakConfig {
     public UserAccountService userAccountService(KeycloakCredentialsProperties properties) {
         return new KeycloakUserAccountServiceImpl(properties.credentials());
     }
-
 }

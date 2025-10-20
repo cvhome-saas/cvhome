@@ -6,14 +6,13 @@ import com.asrevo.cvhome.manager.commons.event.store.StoreCreatedEvent;
 import com.asrevo.cvhome.manager.commons.event.store.StoreProvisionedEvent;
 import com.asrevo.cvhome.manager.dto.StoreDomainDto;
 import com.asrevo.cvhome.manager.dto.StoreDomainList;
+import java.time.Instant;
+import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
-
-import java.time.Instant;
-import java.util.Map;
 
 @Getter
 @Setter
@@ -21,18 +20,24 @@ import java.util.Map;
 public class ManagerStoreEntity extends BaseEntity<ManagerStoreEntity, ManagerStoreId> {
     @Column("name")
     private String name;
+
     @Column("org_id")
     private ManagerOrgId orgId;
+
     @Column("created_date")
     private Instant createdDate;
+
     @Column("pod_id")
     private PodId podId;
+
     @Column("provisioning_state")
     private ProvisioningState provisioningState;
+
     @MappedCollection(idColumn = "manager_store_id")
     private ManagerStoreDomains managerStoreDomains;
 
-    public static ManagerStoreEntity createStore(Map<Object, Object> request, ManagerOrgId orgId, PodId podId) {
+    public static ManagerStoreEntity createStore(
+            Map<Object, Object> request, ManagerOrgId orgId, PodId podId) {
         ManagerStoreEntity entity = new ManagerStoreEntity();
         entity.id = entity.generateId();
         String storeName = request.get("name").toString();
@@ -41,7 +46,8 @@ public class ManagerStoreEntity extends BaseEntity<ManagerStoreEntity, ManagerSt
         entity.setOrgId(orgId);
         entity.setPodId(podId);
         entity.provisioningState = ProvisioningState.NOT_STARTED_PROVISIONING;
-        entity.managerStoreDomains = ManagerStoreDomains.of(new ManagerStoreDomain(storeName, AlisType.SUB_DOMAIN));
+        entity.managerStoreDomains =
+                ManagerStoreDomains.of(new ManagerStoreDomain(storeName, AlisType.SUB_DOMAIN));
         entity.registerEvent(StoreCreatedEvent.from(entity.getId(), orgId, podId, request));
         return entity;
     }
@@ -57,7 +63,10 @@ public class ManagerStoreEntity extends BaseEntity<ManagerStoreEntity, ManagerSt
     }
 
     public StoreDomainList domains() {
-        return new StoreDomainList(this.managerStoreDomains.stream().map(it -> new StoreDomainDto(it.domain(), it.domainType())).toList());
+        return new StoreDomainList(
+                this.managerStoreDomains.stream()
+                        .map(it -> new StoreDomainDto(it.domain(), it.domainType()))
+                        .toList());
     }
 
     @Override

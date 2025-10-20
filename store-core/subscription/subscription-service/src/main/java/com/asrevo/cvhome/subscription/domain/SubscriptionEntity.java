@@ -8,28 +8,32 @@ import com.asrevo.cvhome.subscription.commons.SubscriptionStatus;
 import com.asrevo.cvhome.subscription.commons.event.SubscriptionActivateEvent;
 import com.asrevo.cvhome.subscription.commons.event.SubscriptionCreatedEvent;
 import com.asrevo.cvhome.subscription.commons.event.SubscriptionDeActivateEvent;
+import java.time.Instant;
 import lombok.Getter;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
-
-import java.time.Instant;
-
 
 @Getter
 @Table("subscription")
 public class SubscriptionEntity extends BaseEntity<SubscriptionEntity, ManagerOrgId> {
     @Column("created_date")
     private Instant createdDate;
+
     @Column("last_renewed_date")
     private Instant lastRenewedDate;
+
     @Column("end_date")
     private Instant endDate;
+
     @Column("de_activated_date")
     private Instant deActivatedDate;
+
     @Column("subscription_plan")
     private SubscriptionPlan subscriptionPlan;
+
     @Column("subscription_status")
     private SubscriptionStatus status;
+
     @Column("recurring_plan")
     private RecurringPlan recurringPlan;
 
@@ -58,7 +62,11 @@ public class SubscriptionEntity extends BaseEntity<SubscriptionEntity, ManagerOr
         return this;
     }
 
-    public SubscriptionEntity renew(SubscriptionPlan subscriptionPlan, Instant startDate, Instant endDate, RecurringPlan recurringPlan) {
+    public SubscriptionEntity renew(
+            SubscriptionPlan subscriptionPlan,
+            Instant startDate,
+            Instant endDate,
+            RecurringPlan recurringPlan) {
         this.deActivatedDate = null;
         this.subscriptionPlan = subscriptionPlan;
         this.lastRenewedDate = startDate;
