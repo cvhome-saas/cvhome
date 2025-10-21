@@ -35,7 +35,10 @@ public class StorePodClientFactory {
 		// @TODO check if private or public pod and a way to resolve .get
 		Pod pod = serviceDomainProperties.getPodByPodId(podId).get();
 		String merchant = new ServiceUrlBuilder(serviceDomainProperties, environment).getServiceUrl(pod, "merchant");
-		return WebClientsUtils.build(defaultWebMicroServiceBuilder, merchant, StorePodClient.class);
+		// return WebClientsUtils.build(defaultWebMicroServiceBuilder, merchant,
+		// StorePodClient.class);
+		ProxyClient proxyClient = new ProxyClient(defaultWebMicroServiceBuilder.baseUrl(merchant).build());
+		return new StorePodClientImpl(proxyClient);
 	}
 
 }
