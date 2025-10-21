@@ -9,10 +9,14 @@ import com.asrevo.cvhome.manager.service.PodSelection;
 import com.asrevo.cvhome.manager.service.StoreManagerService;
 import com.asrevo.cvhome.manager.service.StorePodClientFactory;
 import com.asrevo.cvhome.merchant.api.StorePodClient;
+
 import java.util.*;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -63,8 +67,8 @@ public class StoreManagerServiceImpl implements StoreManagerService {
 	public Mono<Object> getStore(ManagerStoreId managerStoreId) {
 		Pod pod = internalStoreService.getStorePod(managerStoreId);
 		StorePodClient client = podClientFactory.getClient(pod.id());
-		Mono<Map<String, Object>> store = client.getStore(managerStoreId.getId().toString());
-		return store.map(it -> {
+		Mono<ResponseEntity<Map<String, Object>>> store = client.getStore(managerStoreId.getId().toString());
+		return store.mapNotNull(HttpEntity::getBody).map(it -> {
 			HashMap<String, Object> newIt = new HashMap<>(it);
 			newIt.put("pod", Map.of("id", pod.id().id()));
 			return newIt;
