@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.manager.service;
 
 import com.asrevo.cvhome.merchant.api.StorePodClient;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
@@ -18,13 +19,15 @@ import java.util.function.Supplier;
 @RequiredArgsConstructor
 public class StorePodClientImpl implements StorePodClient {
 
+	@Getter
 	private final ProxyClient proxyClient;
 
 	@Override
 	public Mono<ResponseEntity<Void>> create(Map<Object, Object> dto) {
 		Supplier<BodyInserter<?, ? super ClientHttpRequest>> bodyExtractor = () -> BodyInserters.fromValue(dto);
 		Function<ClientResponse, Mono<ResponseEntity<Void>>> responseType = it -> it.toEntity(Void.class);
-		return proxyClient.forward(HttpMethod.POST, "/api/v1/private/store", bodyExtractor, responseType);
+		return proxyClient.forward(HttpMethod.POST, "/merchant/api/v1/private/store", Map.of(), bodyExtractor,
+				responseType);
 	}
 
 	@Override
@@ -34,7 +37,8 @@ public class StorePodClientImpl implements StorePodClient {
 		Supplier<BodyInserter<?, ? super ClientHttpRequest>> bodyExtractor = () -> BodyInserters.fromValue(Map.of());
 		Function<ClientResponse, Mono<ResponseEntity<Map<String, Object>>>> responseType = it -> it
 			.toEntity(typeReference);
-		return proxyClient.forward(HttpMethod.GET, "/api/v1/private/store?store=" + store, bodyExtractor, responseType);
+		return proxyClient.forward(HttpMethod.GET, "/merchant/api/v1/private/store?store=" + store, Map.of(),
+				bodyExtractor, responseType);
 	}
 
 }
