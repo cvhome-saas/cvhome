@@ -18,9 +18,11 @@ public record ProxyClient(WebClient storeProxyClient) {
 			Supplier<BodyInserter<?, ? super ClientHttpRequest>> bodyExtractor,
 			Function<ClientResponse, Mono<ResponseEntity<T>>> bodyMapper) {
 
-		WebClient.RequestBodySpec requestSpec = storeProxyClient.method(method).uri(uri);
-		requestSpec.headers(httpHeaders -> headers.forEach(httpHeaders::add));
-		return requestSpec.body(bodyExtractor.get()).exchangeToMono(bodyMapper);
+		return storeProxyClient.method(method)
+			.uri(uri)
+			.headers(httpHeaders -> headers.forEach(httpHeaders::add))
+			.body(bodyExtractor.get())
+			.exchangeToMono(bodyMapper);
 	}
 
 }
