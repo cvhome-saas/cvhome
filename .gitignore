@@ -35,5 +35,8 @@ bin/
 .vscode/
 **/package-lock.json
 **/node_modules/
+**/dist/
+**/.next/
 /extra/test-data/generated/
 /store-core/core-auth/keycloak/providers/*.jar
+*.d.ts
