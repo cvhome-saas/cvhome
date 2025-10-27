@@ -32,7 +32,6 @@ include(
         'store-pod:store-commons',
         'store-pod:store-modules:store-cms-commons',
         'store-pod:landing-ui',
-        'store-pod:store-front',
         'store-pod:merchant-ui',
         'store-pod:catalog:catalog-commons',
         'store-pod:catalog:catalog-external-api',
