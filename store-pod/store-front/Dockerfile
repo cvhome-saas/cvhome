@@ -1,8 +1,7 @@
 # Use a specific and lightweight Node.js image for the runtime
-FROM node:20-alpine
+FROM gcr.io/distroless/nodejs20
 ENV NODE_ENV=production
 
-COPY package.json package.json
 
 # Copy all dist directories from the dist folder
 COPY dist ./dist/
@@ -15,4 +14,4 @@ COPY templates ./templates/
 
 COPY node_modules ./node_modules/
 
-CMD ["npm", "start"]
+CMD ["node", "dist/server.js"]
