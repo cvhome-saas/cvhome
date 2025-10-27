@@ -1,5 +1,5 @@
 # Use a specific and lightweight Node.js image for the runtime
-FROM gcr.io/distroless/nodejs20
+FROM node:20-alpine
 ENV NODE_ENV=production
 
 COPY package.json package.json
