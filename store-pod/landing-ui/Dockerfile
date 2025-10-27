@@ -14,4 +14,4 @@ COPY templates ./templates/
 
 COPY node_modules ./node_modules/
 
-CMD ["node", "dist/server.js"]
+CMD ["dist/server.js"]
