@@ -1,14 +1,14 @@
 export interface Order {
     id: number
-    billing: Address
-    delivery: Address
+    billing: OrderAddress
+    delivery: OrderAddress
     shipping: any
     payment: string
-    total: Total | undefined
+    total: OrderTotal | undefined
     products: ProductItem[] | undefined
 }
 
-export interface Address {
+export interface OrderAddress {
     postalCode: string
     countryCode: any
     firstName: string
@@ -26,7 +26,7 @@ export interface Address {
     country: string
 }
 
-export interface Total {
+export interface OrderTotal {
     totals: TotalItem[] | undefined
     grandTotal: any
 }

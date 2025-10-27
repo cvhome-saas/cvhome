@@ -1,4 +1,5 @@
 import {Description} from "./description";
+import {Category} from "./category";
 
 export interface ProductGroupPage {
     totalPages: number
@@ -97,22 +98,6 @@ export interface Manufacturer {
     code: string
     order: number
     description: Description
-}
-
-
-export interface Category {
-    id: number
-    code: string
-    sortOrder: number
-    visible: boolean
-    featured: boolean
-    lineage: string
-    depth: number
-    parent?: Parent
-    description: Description
-    productCount: number
-    store: any
-    children: any[]
 }
 
 export interface Parent {

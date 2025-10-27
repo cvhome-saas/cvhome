@@ -17,7 +17,7 @@ export interface Store {
     dimension: string
     weight: string
     currentUserLanguage: any
-    address: Address | undefined
+    address: StoreAddress | undefined
     logo: ImageFile | undefined
     banner: ImageFile | undefined
     parent: any
@@ -28,7 +28,7 @@ export interface Store {
     socialLinks: SocialLink[] | undefined
 }
 
-export interface Address {
+export interface StoreAddress {
     stateProvince: string
     country: string
     address: string
