@@ -39,3 +39,4 @@ bin/
 **/.next/
 /extra/test-data/generated/
 /store-core/core-auth/keycloak/providers/*.jar
+*.d.ts
