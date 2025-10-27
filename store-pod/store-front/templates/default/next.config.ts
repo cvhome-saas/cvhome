@@ -4,18 +4,7 @@ import createNextIntlPlugin from 'next-intl/plugin';
 const nextConfig: NextConfig = {
     reactStrictMode: true,
     images: {
-        remotePatterns: [
-            {
-                protocol: 'http',
-                hostname: 'localhost',
-                pathname: '**',
-            },
-            {
-                protocol: 'https',
-                hostname: '**',
-                pathname: '**',
-            },
-        ]
+        unoptimized: true
     },
 
 };

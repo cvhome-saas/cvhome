@@ -4,7 +4,6 @@ import {NextIntlClientProvider} from "next-intl";
 import {ColorSchema, ColorTheme, getThemeColors} from "@/types/color-schema";
 import Header from "@/layout/Header";
 import Footer from "@/layout/Footer";
-import Head from "next/head";
 import {toRootStyle} from "@/services/color-utils";
 
 export const StoreLayout = ({p, children,}: {
@@ -17,7 +16,7 @@ export const StoreLayout = ({p, children,}: {
 
     return (
         <html lang={p.locale} dir={dir}>
-        <Head>
+        <head>
             <title>{p.store.name}</title>
             <style
                 dangerouslySetInnerHTML={{
@@ -28,7 +27,7 @@ export const StoreLayout = ({p, children,}: {
                         `,
                 }}
             />
-        </Head>
+        </head>
         <body className={`flex flex-col min-h-screen ${isRtl(p.locale) ? 'rtl' : 'ltr'}`}>
         <NextIntlClientProvider>
             <Header params={p as unknown as LayoutParams}/>
