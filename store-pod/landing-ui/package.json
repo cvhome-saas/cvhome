@@ -8,8 +8,8 @@
     "templates/*"
   ],
   "scripts": {
-    "start": "node dist/server.js",
-    "dev": "node server.ts",
+    "start": "node dist/src/server.js",
+    "dev": "node src/server.ts",
     "build": "tsc -b && npm run build:libs-types && npm run build:libs-services && npm run build:templates",
     "build:libs-types": "npm run build --workspace=libs/types",
     "build:libs-services": "npm run build --workspace=libs/services",

@@ -12,7 +12,7 @@
     "lib": ["ES2022"]
   },
   "include": [
-    "server.ts",
+    "src/**/*.ts",
     "main/**/*.ts"
   ],
   "exclude": [
