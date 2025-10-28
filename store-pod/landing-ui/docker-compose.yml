@@ -151,6 +151,8 @@ services:
       SPRING_PROFILES_ACTIVE: lcl
       STORE_POD_GATEWAY: http://store-pod-1.gateway.com:8100
       ASK_TLS_URL: http://gateway.com:8000/manager/api/v1/router/public/ask-for-tls
+      CERT_BUCKET: random-bucket
+      CERT_BUCKET_REGION: eu-central-1
     ports:
       - "80:80"
       - "443:443"
