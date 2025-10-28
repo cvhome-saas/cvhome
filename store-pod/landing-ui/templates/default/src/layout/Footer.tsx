@@ -17,7 +17,7 @@ export default async function Footer({params}: { params: LayoutParams }) {
             <div className="mx-auto w-full max-w-screen-xl p-4 py-6 lg:py-8">
                 <div className="md:flex md:justify-between">
                     <div className="mb-6 md:mb-0">
-                        <Link prefetch={false} href={"/templates/default/public"} className="flex items-center">
+                        <Link prefetch={false} href={"/"} className="flex items-center">
                             {
                                 params.store.logo &&
                                 <Image src={params.store.logo.path}

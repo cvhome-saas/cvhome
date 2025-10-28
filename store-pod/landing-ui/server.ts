@@ -4,20 +4,6 @@ import type {NextFunction, Request, Response} from "express";
 import express from "express";
 import next from "next";
 
-interface TenantConfig {
-    [host: string]: {
-        templateName: string;
-        theme: string;
-    };
-}
-
-const tenantConfig: TenantConfig = {
-    default: {
-        templateName: "default",
-        theme: "default",
-    },
-};
-
 const __dirname = process.cwd();
 
 
@@ -86,15 +72,18 @@ function getInitPromise(templateName: string): Promise<any> {
     })();
 }
 
+function getTheme(req: Request) {
+    const rawTheme = req.headers['Theme'];
+    return Array.isArray(rawTheme) ? rawTheme[0] : rawTheme ?? "default";
+}
+
 app.get("*", async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const host = req.headers.host ?? "default";
-        const config = tenantConfig[host] || tenantConfig.default;
-        const {templateName} = config;
 
-        console.log(`TemplateName: ${templateName} | Request URL: ${req.originalUrl}`);
+        const theme = getTheme(req);
+        console.log(`ThemeName: ${theme} | Request URL: ${req.originalUrl}`);
 
-        const nextApp = await getNextApp(templateName);
+        const nextApp = await getNextApp(theme);
         const handle = nextApp.getRequestHandler();
 
         await handle(req, res);

@@ -51,7 +51,7 @@ export const NavHeader = ({params}: { params: LayoutParams }) => {
 
             <nav aria-label="Global" className="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8">
                 <div className="flex lg:flex-1">
-                    <Link prefetch={false} href={"/templates/default/public"} className="-m-1.5 p-1.5 group">
+                    <Link prefetch={false} href={"/"} className="-m-1.5 p-1.5 group">
                         <span className="sr-only">{params.store.name}</span>
                         {
                             params.store.logo &&
@@ -76,7 +76,7 @@ export const NavHeader = ({params}: { params: LayoutParams }) => {
                     </button>
                 </div>
                 <PopoverGroup className="hidden lg:flex lg:gap-x-12">
-                    <Link prefetch={false} href={`/templates/default/public`}
+                    <Link prefetch={false} href={`/`}
                           className="text-sm/6 font-semibold text-foreground hover:text-primary">
                         {t('HOME_TITLE')}
                     </Link>
@@ -172,7 +172,7 @@ export const NavHeader = ({params}: { params: LayoutParams }) => {
                 <DialogPanel
                     className="fixed inset-y-0 inset-e-0 z-10 w-full overflow-y-auto bg-background px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-border">
                     <div className="flex items-center justify-between">
-                        <Link prefetch={false} href={"/templates/default/public"} className="-m-1.5 p-1.5 group">
+                        <Link prefetch={false} href={"/"} className="-m-1.5 p-1.5 group">
                             <span className="sr-only">
                                 {params.store.name}
                             </span>
@@ -199,7 +199,7 @@ export const NavHeader = ({params}: { params: LayoutParams }) => {
                     <div className="mt-6 flow-root">
                         <div className="-my-6 divide-y divide-border">
                             <div className="space-y-2 py-6">
-                                <Link prefetch={false} href={`/templates/default/public`}
+                                <Link prefetch={false} href={`/`}
                                       className="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-foreground hover:bg-hover-neutral">
                                     {t('HOME_TITLE')}
                                 </Link>

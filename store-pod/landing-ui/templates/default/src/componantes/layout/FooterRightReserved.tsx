@@ -8,7 +8,7 @@ export async function FooterRightReserved({params}: { params: LayoutParams }) {
     const year = date.getFullYear();
     return <span className="text-sm text-neutral sm:text-center dark:text-neutral">
         © {year} &nbsp;
-        <Link prefetch={false} href={"/templates/default/public"} className="hover:underline">{params.store.name}</Link>
+        <Link prefetch={false} href={"/"} className="hover:underline">{params.store.name}</Link>
         {t('RIGHT_RESERVED')}
               </span>
 }
