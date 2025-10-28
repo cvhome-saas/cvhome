@@ -6,10 +6,14 @@ import com.asrevo.cvhome.commons.domain.Domain;
 import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.commons.domain.Pod;
 import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
+import com.asrevo.cvhome.commons.utils.OperationExecution;
 import com.asrevo.cvhome.manager.dto.StoreDomainList;
+import com.asrevo.cvhome.manager.service.AskTlsService;
 import com.asrevo.cvhome.manager.service.InternalStoreService;
 import java.util.Map;
 import java.util.Optional;
+
+import com.asrevo.cvhome.manager.utils.ErrorCodes;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -25,20 +29,25 @@ public class RouterController {
 
 	public final InternalStoreService internalStoreService;
 
+	private final AskTlsService askTlsService;
+
 	@GetMapping("public/ask-for-tls")
 	@ConditionalOnApiStatus
 	public ResponseEntity<Object> ask(Domain domain) {
 		log.info("tls ask: {}", domain);
-		return Optional.ofNullable(internalStoreService.getReferenceByDomain(domain))
-			.map(it -> ResponseEntity.ok().build())
-			.orElseGet(() -> ResponseEntity.badRequest().build());
+		if (askTlsService.ask(domain)) {
+			return ResponseEntity.ok().build();
+		}
+		else {
+			return ResponseEntity.badRequest().build();
+		}
 	}
 
 	@GetMapping("public/lookup-by-domain")
 	@ConditionalOnApiStatus
 	public Map<String, String> getLookupHeadersByDomain(Domain domain) {
 		log.info("header lookup: {}", domain);
-		return Optional.ofNullable(internalStoreService.getReferenceByDomain(domain))
+		return internalStoreService.getReferenceByDomain(domain)
 			.map(it -> Map.of("Store-Id", it.id().toString()))
 			.orElseGet(() -> Map.of("", ""));
 	}
@@ -46,7 +55,8 @@ public class RouterController {
 	@GetMapping("store-id-by-domain")
 	@ConditionalOnApiStatus
 	public ManagerStoreId getStoreIdByDomain(@RequestParam Domain domain) {
-		return internalStoreService.getReferenceByDomain(domain);
+		return internalStoreService.getReferenceByDomain(domain)
+			.orElseThrow(() -> new OperationExecution(ErrorCodes.store_not_found));
 	}
 
 	@GetMapping("store-pod-by-store-id")
