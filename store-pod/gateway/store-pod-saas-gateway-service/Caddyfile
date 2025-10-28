@@ -46,7 +46,7 @@
             cache_ttl  5m
         }
 
-        reverse_proxy {$STORE_POD_GATEWAY}
+        reverse_proxy http://landing-ui.{$NAMESPACE}:8110
     }
     
 }
