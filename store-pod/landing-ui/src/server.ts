@@ -74,7 +74,8 @@ function getInitPromise(templateName: string): Promise<any> {
 
 function getTheme(req: Request) {
     const rawTheme = req.headers['Theme'];
-    return Array.isArray(rawTheme) ? rawTheme[0] : rawTheme ?? "default";
+    const themeName = Array.isArray(rawTheme) ? rawTheme[0] : rawTheme ?? "default";
+    return themeName.toLowerCase();
 }
 
 app.get("*", async (req: Request, res: Response, next: NextFunction) => {
