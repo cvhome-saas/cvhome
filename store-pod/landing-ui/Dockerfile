@@ -3,8 +3,8 @@ FROM gcr.io/distroless/nodejs20
 ENV NODE_ENV=production
 
 
-# Copy all dist directories from the dist folder
-COPY dist ./dist/
+# Copy app dist directory
+COPY app/dist ./app/dist/
 
 # Copy all dist directories from the libs folder
 COPY libs ./libs/
@@ -14,4 +14,4 @@ COPY templates ./templates/
 
 COPY node_modules ./node_modules/
 
-CMD ["dist/src/server.js"]
+CMD ["app/dist/src/server.js"]
