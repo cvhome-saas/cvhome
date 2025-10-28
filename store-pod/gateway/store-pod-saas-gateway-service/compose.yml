@@ -1,9 +1,10 @@
 version: '3'
 services:
-  gateway-service-v2:
+  saas-gateway-service:
     build:
       context: .
       dockerfile: Dockerfile
+      no_cache: true
     network_mode: "host"
     ports:
       - "80:80"
