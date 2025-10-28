@@ -137,19 +137,11 @@ services:
       SPRING_PROFILES_ACTIVE: lcl
     ports:
       - "8111:8111"
-  store-pod-gateway:
-    image: store-pod/store-pod-gateway
-    network_mode: host
-    environment:
-      SPRING_PROFILES_ACTIVE: lcl
-    ports:
-      - "8100:8100"
   store-pod-saas-gateway:
     image: store-pod/store-pod-saas-gateway
     network_mode: host
     environment:
       NAMESPACE: gateway.com
-      STORE_POD_GATEWAY: http://store-pod-1.gateway.com:8100
       ASK_TLS_URL: http://gateway.com:8000/manager/api/v1/router/public/ask-for-tls
       DOMAIN_LOOKUP_URL: http://gateway.com:8000/manager/api/v1/router/public/lookup-by-domain
       CERT_BUCKET: random-bucket
@@ -158,8 +150,6 @@ services:
       - "80:80"
       - "443:443"
       - "2019:2019"
-    depends_on:
-      - store-pod-gateway
 
   manager:
     image: store-core/manager

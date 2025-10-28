@@ -32,7 +32,6 @@ spring:
           "welcome-ui": 8011
           "manager": 8020
           "subscription": 8021
-          "store-pod-gateway": 8100
           "pod-auth": 8101
           "landing-ui": 8110
           "merchant-ui": 8111
