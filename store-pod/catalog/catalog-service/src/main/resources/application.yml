@@ -16,3 +16,7 @@ spring:
     init:
       schema-locations: classpath:init-sql/schema.sql
       data-locations: classpath:init-sql/data-common.sql
+  jpa:
+    properties:
+      hibernate:
+        default_schema: ${spring.application.name}
