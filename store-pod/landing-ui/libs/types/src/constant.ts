@@ -15,5 +15,5 @@ export const focusDefaultClass = "focus:ring-primary";
 export const locales = ['en', 'fr', 'ar', 'es', 'ru'];
 export const FALLBACK_LOCALE = 'en';
 export const STORE_DEFAULT_LOCALE_COOKIE_NAME = 'STORE-DEFAULT-LOCALE';
-export const DEFAULT_STORE_POD_GATEWAY = "http://store-pod-1.gateway.com:8100"
+export const DEFAULT_STORE_POD_GATEWAY = "http://store-pod-saas-gateway-1.gateway.com"
 export const FALLBACK_STORE_ID = "65f023632bc26470c104b75f";

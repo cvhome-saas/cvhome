@@ -1,9 +1,10 @@
 version: '3'
 services:
-  gateway-service-v2:
+  saas-gateway-service:
     build:
       context: .
       dockerfile: Dockerfile
+      no_cache: true
     network_mode: "host"
     ports:
       - "80:80"
@@ -11,7 +12,6 @@ services:
       - "2019:2019"
     environment:
       NAMESPACE: gateway.com
-      STORE_POD_GATEWAY: http://store-pod-1.gateway.com:8100
       ASK_TLS_URL: http://gateway.com:8000/manager/api/v1/router/public/ask-for-tls
       DOMAIN_LOOKUP_URL: http://gateway.com:8000/manager/api/v1/router/public/lookup-by-domain
       CERT_BUCKET: random-bucket

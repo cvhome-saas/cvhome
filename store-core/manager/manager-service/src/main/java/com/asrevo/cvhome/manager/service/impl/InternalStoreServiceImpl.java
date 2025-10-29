@@ -14,6 +14,8 @@ import com.asrevo.cvhome.manager.utils.ErrorCodes;
 import com.asrevo.cvhome.s2s.model.AppProperties;
 import com.asrevo.cvhome.s2s.model.ServiceDomainProperties;
 import java.util.Map;
+import java.util.Optional;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Example;
@@ -119,10 +121,9 @@ public class InternalStoreServiceImpl implements InternalStoreService {
 	}
 
 	@Override
-	public ManagerStoreId getReferenceByDomain(Domain domain) {
+	public Optional<ManagerStoreId> getReferenceByDomain(Domain domain) {
 		return storeRepository.findByDomain(domain.domain(), appProperties.getDomain(), Defines.SAAS_POD_SUFFIX)
-			.map(BaseEntity::getId)
-			.orElseThrow(() -> new OperationExecution(ErrorCodes.store_not_found));
+			.map(BaseEntity::getId);
 	}
 
 	@Transactional

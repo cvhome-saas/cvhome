@@ -5,6 +5,8 @@ import com.asrevo.cvhome.manager.commons.dto.ListManagerStoreQuery;
 import com.asrevo.cvhome.manager.commons.dto.ManagerStoreDto;
 import com.asrevo.cvhome.manager.dto.StoreDomainList;
 import java.util.Map;
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -33,7 +35,7 @@ public interface InternalStoreService {
 
 	StoreDomainList domains(ManagerStoreId managerStoreId);
 
-	ManagerStoreId getReferenceByDomain(Domain domain);
+	Optional<ManagerStoreId> getReferenceByDomain(Domain domain);
 
 	void addDomain(ManagerStoreId managerStoreId, Domain domain);
 

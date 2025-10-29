@@ -17,17 +17,43 @@
 	}
 }
 
+(routes) {
+
+    handle_path /merchant* {
+        reverse_proxy http://merchant.{$NAMESPACE}:8120
+    }
+
+    handle_path /content* {
+        reverse_proxy http://content.{$NAMESPACE}:8121
+    }
+
+    handle_path /catalog* {
+        reverse_proxy http://catalog.{$NAMESPACE}:8122
+    }
+
+    handle_path /order* {
+        reverse_proxy http://order.{$NAMESPACE}:8123
+    }
+
+    handle_path /merchant-ui* {
+        reverse_proxy http://merchant-ui.{$NAMESPACE}:8111
+    }
+
+
+    route {
+        domain_lookup {
+            lookup_url {$DOMAIN_LOOKUP_URL}
+            cache_ttl  5m
+        }
+
+        reverse_proxy http://landing-ui.{$NAMESPACE}:8110
+    }
+    
+}
+
 http:// {
 	log
-
-	route {
-		domain_lookup {
-			lookup_url {$DOMAIN_LOOKUP_URL}
-			cache_ttl  5m
-		}
-
-		reverse_proxy {$STORE_POD_GATEWAY}
-	}
+    import routes
 }
 
 https:// {
@@ -37,11 +63,5 @@ https:// {
 		on_demand
 	}
 
-	route {
-		domain_lookup {
-			lookup_url {$DOMAIN_LOOKUP_URL}
-		}
-
-		reverse_proxy {$STORE_POD_GATEWAY}
-	}
+    import routes
 }
