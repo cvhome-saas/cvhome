@@ -24,25 +24,19 @@ import org.springframework.context.annotation.Configuration;
 public class JacksonConfig {
 
 	@Getter
-	// @formatter:off
-    private static final JsonMapper ployJson =
-            JsonMapper.builder()
-                    .visibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY)
-                    .serializationInclusion(JsonInclude.Include.ALWAYS)
-                    .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
-                    .configure(MapperFeature.DEFAULT_VIEW_INCLUSION, false)
-                    .addModules(new JavaTimeModule(), new Jdk8Module())
-                    .defaultDateFormat(new StdDateFormat())
-                    .activateDefaultTyping(
-                            BasicPolymorphicTypeValidator.builder()
-                                    .allowIfBaseType(Event.class)
-                                    .allowIfBaseType(Object.class)
-                                    .build(),
-                            ObjectMapper.DefaultTyping.NON_FINAL,
-                            JsonTypeInfo.As.WRAPPER_OBJECT)
-                    .build();
+	private static final JsonMapper ployJson = JsonMapper.builder()
+		.visibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY)
+		.serializationInclusion(JsonInclude.Include.ALWAYS)
+		.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
+		.configure(MapperFeature.DEFAULT_VIEW_INCLUSION, false)
+		.addModules(new JavaTimeModule(), new Jdk8Module())
+		.defaultDateFormat(new StdDateFormat())
+		.activateDefaultTyping(BasicPolymorphicTypeValidator.builder()
+			.allowIfBaseType(Event.class)
+			.allowIfBaseType(Object.class)
+			.build(), ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.WRAPPER_OBJECT)
+		.build();
 
-    // @formatter:on
 	@Bean
 	public Jackson2ObjectMapperBuilderCustomizer customizer() {
 

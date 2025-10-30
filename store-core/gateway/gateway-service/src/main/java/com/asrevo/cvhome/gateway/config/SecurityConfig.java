@@ -44,15 +44,10 @@ public class SecurityConfig {
 
 	private static Mono<ServerWebExchangeMatcher.MatchResult> matches(ServerWebExchange exchange) {
 		ServerHttpRequest request = exchange.getRequest();
-		// @formatter:off
-        return (request.getMethod() != HttpMethod.GET
-                        && !request.getPath().toString().startsWith("/auth")
-                        && !request.getPath().toString().startsWith("/realms")
-                        && !request.getPath().toString().startsWith("/resources")
-                        && !request.getURI().getHost().startsWith("auth."))
-                ? match()
-                : notMatch();
-        // @formatter:on
+		return (request.getMethod() != HttpMethod.GET && !request.getPath().toString().startsWith("/auth")
+				&& !request.getPath().toString().startsWith("/realms")
+				&& !request.getPath().toString().startsWith("/resources")
+				&& !request.getURI().getHost().startsWith("auth.")) ? match() : notMatch();
 	}
 
 	@SneakyThrows
@@ -70,41 +65,32 @@ public class SecurityConfig {
 	@Bean
 	public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http,
 			ReactiveClientRegistrationRepository clientRegistrationRepository) {
-		// @formatter:off
-        CapturingServerOAuth2AuthorizationRequestResolver customAuthorizationRequestResolver =
-                new CapturingServerOAuth2AuthorizationRequestResolver(clientRegistrationRepository);
+		CapturingServerOAuth2AuthorizationRequestResolver customAuthorizationRequestResolver = new CapturingServerOAuth2AuthorizationRequestResolver(
+				clientRegistrationRepository);
 
-        return http.authorizeExchange(it -> it.anyExchange().permitAll())
-                .oauth2Login(
-                        oauth2 ->
-                                oauth2
-                                        // Use the custom resolver here
-                                        .authorizationRequestResolver(
-                                                customAuthorizationRequestResolver)
-                                        .authenticationSuccessHandler(
-                                                this.redirectingServerAuthenticationSuccessHandler)
-                        // You can also customize authenticationSuccessHandler or
-                        // authenticationFailureHandler if needed
-                        )
-                .oauth2Client(withDefaults())
-                .logout(ServerHttpSecurity.LogoutSpec::disable)
-                .csrf(
-                        ServerHttpSecurity.CsrfSpec::disable
-                        //                                .csrfTokenRequestHandler(new
-                        // ServerCsrfTokenRequestAttributeHandler())
-                        //                                .csrfTokenRepository(tokenRepository)
-                        //
-                        // .requireCsrfProtectionMatcher(SecurityConfig::matches)
-                        )
-                /*
-                                .cors(httpSecurityCorsConfigurer ->
-                                        httpSecurityCorsConfigurer.configurationSource(request ->
-                                                buildReactivCorsConfiguration()
-                                        )
-                                )
-                */
-                .build();
-        // @formatter:on
+		return http.authorizeExchange(it -> it.anyExchange().permitAll())
+			.oauth2Login(oauth2 -> oauth2
+				// Use the custom resolver here
+				.authorizationRequestResolver(customAuthorizationRequestResolver)
+				.authenticationSuccessHandler(this.redirectingServerAuthenticationSuccessHandler)
+			// You can also customize authenticationSuccessHandler or
+			// authenticationFailureHandler if needed
+			)
+			.oauth2Client(withDefaults())
+			.logout(ServerHttpSecurity.LogoutSpec::disable)
+			.csrf(ServerHttpSecurity.CsrfSpec::disable
+			// .csrfTokenRequestHandler(new
+			// ServerCsrfTokenRequestAttributeHandler())
+			// .csrfTokenRepository(tokenRepository)
+			//
+			// .requireCsrfProtectionMatcher(SecurityConfig::matches)
+			)
+			/*
+			 * .cors(httpSecurityCorsConfigurer ->
+			 * httpSecurityCorsConfigurer.configurationSource(request ->
+			 * buildReactivCorsConfiguration() ) )
+			 */
+			.build();
 	}
 
 	@Bean

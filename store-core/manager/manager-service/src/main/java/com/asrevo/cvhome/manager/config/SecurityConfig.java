@@ -22,27 +22,20 @@ public class SecurityConfig {
 
 	@Bean
 	SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
-		// @formatter:off
-        return http.authorizeExchange(
-                        it ->
-                                it.pathMatchers("/actuator", "/actuator/*/**")
-                                        .permitAll()
-                                        .pathMatchers(
-                                                "swagger-ui.html",
-                                                "webjars/swagger-ui/**",
-                                                "api-docs",
-                                                "api-docs/**")
-                                        .permitAll()
-                                        .pathMatchers("api/v1/*/public/**")
-                                        .permitAll()
-                                        .pathMatchers("api/v1/test/sign")
-                                        .permitAll()
-                                        .anyExchange()
-                                        .authenticated())
-                .oauth2ResourceServer(it -> it.jwt(withDefaults()))
-                .csrf(ServerHttpSecurity.CsrfSpec::disable)
-                .build();
-        // @formatter:on
+		return http
+			.authorizeExchange(it -> it.pathMatchers("/actuator", "/actuator/*/**")
+				.permitAll()
+				.pathMatchers("swagger-ui.html", "webjars/swagger-ui/**", "api-docs", "api-docs/**")
+				.permitAll()
+				.pathMatchers("api/v1/*/public/**")
+				.permitAll()
+				.pathMatchers("api/v1/test/sign")
+				.permitAll()
+				.anyExchange()
+				.authenticated())
+			.oauth2ResourceServer(it -> it.jwt(withDefaults()))
+			.csrf(ServerHttpSecurity.CsrfSpec::disable)
+			.build();
 	}
 
 	@Bean
