@@ -33,7 +33,7 @@ public class LookupDomainHeadersService {
 			.orElseThrow(() -> new OperationExecution(ErrorCodes.store_not_found));
 
 		HashMap<String, String> headers = new HashMap<>();
-        
+
 		if (Objects.nonNull(entity.getId())) {
 			headers.put("Store-Id", entity.getId().id().toString());
 		}

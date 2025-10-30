@@ -48,7 +48,7 @@ public class ManagerStoreEntity extends BaseEntity<ManagerStoreEntity, ManagerSt
 		entity.setCreatedDate(Instant.now());
 		entity.setOrgId(orgId);
 		entity.setPodId(podId);
-        entity.preferences = ManagerStorePreferences.of(request);
+		entity.preferences = ManagerStorePreferences.of(request);
 		entity.provisioningState = ProvisioningState.NOT_STARTED_PROVISIONING;
 		entity.managerStoreDomains = ManagerStoreDomains.of(new ManagerStoreDomain(storeName, AlisType.SUB_DOMAIN));
 		entity.registerEvent(StoreCreatedEvent.from(entity.getId(), orgId, podId, request));
