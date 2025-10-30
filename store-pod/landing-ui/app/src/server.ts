@@ -16,6 +16,7 @@ const templateManager = new TemplateManager(dir, env, port);
 
 
 function getTheme(req: Request) {
+    console.log(`Request Headers: ${JSON.stringify(req.headers)}`);
     const rawTheme = req.headers[THEME_HEADER_NAME];
     const themeName = Array.isArray(rawTheme) ? rawTheme[0] : rawTheme ?? DEFAULT_THEME_NAME;
     return themeName.toLowerCase();
