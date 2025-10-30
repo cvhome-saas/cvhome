@@ -5,6 +5,7 @@ import com.asrevo.cvhome.commons.domain.ManagerOrgId;
 import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.commons.domain.PodId;
 import com.asrevo.cvhome.manager.entity.ManagerStoreDomainsReadingConverter;
+import com.asrevo.cvhome.manager.entity.ManagerStorePreferencesConverter;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.context.annotation.Configuration;
@@ -21,6 +22,8 @@ public class JdbcConfig extends AbstractJdbcConfiguration {
 	protected List<?> userConverters() {
 		List<Converter<?, ?>> converters = new ArrayList<>();
 		converters.add(new ManagerStoreDomainsReadingConverter());
+		converters.add(new ManagerStorePreferencesConverter.ManagerStorePreferencesWrittingConverter());
+		converters.add(new ManagerStorePreferencesConverter.ManagerStorePreferencesReadingConverter());
 		converters.add(new Converter<Identifier, String>() {
 			@Override
 			public String convert(Identifier source) {

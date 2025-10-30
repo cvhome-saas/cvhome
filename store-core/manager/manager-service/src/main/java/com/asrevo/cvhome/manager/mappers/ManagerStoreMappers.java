@@ -26,6 +26,7 @@ public interface ManagerStoreMappers {
 	@Mapping(target = "orgId", ignore = true)
 	@Mapping(target = "provisioningState", ignore = true)
 	@Mapping(target = "managerStoreDomains", ignore = true)
+	@Mapping(target = "preferences", ignore = true)
 	ManagerStoreEntity toEntity(ListManagerStoreQuery managerStoreDto);
 
 	default Map<Object, Object> toExternalCreateRequest(Map<Object, Object> request, ManagerOrgId orgId,
