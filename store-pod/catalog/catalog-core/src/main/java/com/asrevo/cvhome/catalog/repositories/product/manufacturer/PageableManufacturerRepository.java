@@ -13,29 +13,22 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 public interface PageableManufacturerRepository
-        extends PagingAndSortingRepository<Manufacturer, Long>,
-                JpaSpecificationExecutor<Manufacturer> {
+		extends PagingAndSortingRepository<Manufacturer, Long>, JpaSpecificationExecutor<Manufacturer> {
 
-    default Page<Manufacturer> findByStore(
-            StoreMerchantId storeMerchantId,
-            LanguageCode languageCode,
-            String name,
-            Pageable pageable) {
-        Specification<Manufacturer> specification =
-                (root, query, cb) -> {
-                    List<Predicate> predicates = new ArrayList<>();
-                    predicates.add(cb.equal(root.get("storeMerchantId"), storeMerchantId));
-                    if (LanguageCode.isLanguage(languageCode)) {
-                        predicates.add(
-                                cb.equal(
-                                        root.get("descriptions").get("languageCode"),
-                                        languageCode));
-                    }
-                    if (name != null && !name.trim().isEmpty()) {
-                        predicates.add(cb.like(root.get("name"), "%" + name + "%"));
-                    }
-                    return cb.and(predicates.toArray(Predicate[]::new));
-                };
-        return findAll(specification, pageable);
-    }
+	default Page<Manufacturer> findByStore(StoreMerchantId storeMerchantId, LanguageCode languageCode, String name,
+			Pageable pageable) {
+		Specification<Manufacturer> specification = (root, query, cb) -> {
+			List<Predicate> predicates = new ArrayList<>();
+			predicates.add(cb.equal(root.get("storeMerchantId"), storeMerchantId));
+			if (LanguageCode.isLanguage(languageCode)) {
+				predicates.add(cb.equal(root.get("descriptions").get("languageCode"), languageCode));
+			}
+			if (name != null && !name.trim().isEmpty()) {
+				predicates.add(cb.like(root.get("name"), "%" + name + "%"));
+			}
+			return cb.and(predicates.toArray(Predicate[]::new));
+		};
+		return findAll(specification, pageable);
+	}
+
 }

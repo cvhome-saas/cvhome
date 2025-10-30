@@ -10,12 +10,16 @@ import lombok.Setter;
 @Getter
 public class CatalogEntity extends Entity implements Serializable {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private boolean visible;
-    private boolean defaultCatalog;
-    private String code;
+	private boolean visible;
+
+	private boolean defaultCatalog;
+
+	private String code;
+
 }

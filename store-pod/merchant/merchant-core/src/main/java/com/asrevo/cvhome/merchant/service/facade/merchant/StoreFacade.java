@@ -18,52 +18,52 @@ import java.util.Set;
  * @author carlsamson
  */
 public interface StoreFacade {
-    MerchantStore get(StoreMerchantId storeMerchantId);
 
-    List<LanguageCode> supportedLanguages(StoreMerchantId storeMerchantId);
+	MerchantStore get(StoreMerchantId storeMerchantId);
 
-    ReadableMerchantStore getReadableMerchantStoreId(StoreMerchantId storeMerchantId);
+	List<LanguageCode> supportedLanguages(StoreMerchantId storeMerchantId);
 
-    ReadableMerchantStore getByMerchantStoreId(StoreMerchantId storeMerchantId, LanguageCode lang);
+	ReadableMerchantStore getReadableMerchantStoreId(StoreMerchantId storeMerchantId);
 
-    /**
-     * Creates a brand new MerchantStore
-     */
-    // ReadableMerchantStore create(PersistableMerchantStore store);
-    void create(PersistableMerchantStore store);
+	ReadableMerchantStore getByMerchantStoreId(StoreMerchantId storeMerchantId, LanguageCode lang);
 
-    /**
-     * Deletes a MerchantStore based on store code
-     */
-    void delete(StoreMerchantId storeMerchantId);
+	/**
+	 * Creates a brand new MerchantStore
+	 */
+	// ReadableMerchantStore create(PersistableMerchantStore store);
+	void create(PersistableMerchantStore store);
 
-    /**
-     * Add MerchantStore logo
-     */
-    void addStoreLogo(StoreMerchantId storeMerchantId, InputContentFile cmsContentImage);
+	/**
+	 * Deletes a MerchantStore based on store code
+	 */
+	void delete(StoreMerchantId storeMerchantId);
 
-    /**
-     * Add MerchantStore banner
-     */
-    void addStoreBanner(StoreMerchantId storeMerchantId, InputContentFile cmsContentImage);
+	/**
+	 * Add MerchantStore logo
+	 */
+	void addStoreLogo(StoreMerchantId storeMerchantId, InputContentFile cmsContentImage);
 
-    /**
-     * Add MerchantStore banner
-     *
-     * @return
-     */
-    SliderImage addStoreSliderImage(
-            StoreMerchantId storeMerchantId, InputContentFile cmsContentImage);
+	/**
+	 * Add MerchantStore banner
+	 */
+	void addStoreBanner(StoreMerchantId storeMerchantId, InputContentFile cmsContentImage);
 
-    void update(PersistableMerchantStore store);
+	/**
+	 * Add MerchantStore banner
+	 * @return
+	 */
+	SliderImage addStoreSliderImage(StoreMerchantId storeMerchantId, InputContentFile cmsContentImage);
 
-    void addLogo(String s, InputContentFile content) throws ServiceException;
+	void update(PersistableMerchantStore store);
 
-    void addBanner(String s, InputContentFile content) throws ServiceException;
+	void addLogo(String s, InputContentFile content) throws ServiceException;
 
-    void addSlider(String s, InputContentFile content) throws ServiceException;
+	void addBanner(String s, InputContentFile content) throws ServiceException;
 
-    void updateSocialLinks(StoreMerchantId id, Set<SocialLink> socialLinks);
+	void addSlider(String s, InputContentFile content) throws ServiceException;
 
-    void updateSliderImages(StoreMerchantId id, Set<SliderImage> sliderImages);
+	void updateSocialLinks(StoreMerchantId id, Set<SocialLink> socialLinks);
+
+	void updateSliderImages(StoreMerchantId id, Set<SliderImage> sliderImages);
+
 }

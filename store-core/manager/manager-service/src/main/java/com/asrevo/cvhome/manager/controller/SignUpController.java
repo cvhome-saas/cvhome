@@ -17,12 +17,13 @@ import reactor.core.publisher.Mono;
 @AllArgsConstructor
 @Slf4j
 public class SignUpController {
-    private final SignupService signupService;
 
-    @PostMapping("public/create")
-    @ConditionalOnApiStatus
-    public Mono<ReadableUser> create(@RequestBody CreateOrgRequest request) {
-        return Mono.just(signupService.createOrgUser(request));
-    }
+	private final SignupService signupService;
+
+	@PostMapping("public/create")
+	@ConditionalOnApiStatus
+	public Mono<ReadableUser> create(@RequestBody CreateOrgRequest request) {
+		return Mono.just(signupService.createOrgUser(request));
+	}
 
 }

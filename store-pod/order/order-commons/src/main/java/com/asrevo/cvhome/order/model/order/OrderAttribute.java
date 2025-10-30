@@ -7,6 +7,8 @@ import lombok.Setter;
 @Getter
 public class OrderAttribute {
 
-    private String key;
-    private String value;
+	private String key;
+
+	private String value;
+
 }

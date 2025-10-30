@@ -8,9 +8,14 @@ import lombok.Setter;
 @Getter
 public class CustomerCriteria extends Criteria {
 
-    private String firstName;
-    private String lastName;
-    private String name;
-    private String email;
-    private String country;
+	private String firstName;
+
+	private String lastName;
+
+	private String name;
+
+	private String email;
+
+	private String country;
+
 }

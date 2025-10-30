@@ -8,20 +8,20 @@ import org.springframework.context.annotation.Bean;
 
 public class LocalEventProcessorConfig {
 
-    @Bean
-    public EventProcessor eventProcessor(List<EventImpl<?>> eventsImpl) {
-        //noinspection unchecked
-        return new DefaultEventProcessor(
-                eventsImpl.stream().map(it -> (EventImpl<Event>) it).toList());
-    }
+	@Bean
+	public EventProcessor eventProcessor(List<EventImpl<?>> eventsImpl) {
+		// noinspection unchecked
+		return new DefaultEventProcessor(eventsImpl.stream().map(it -> (EventImpl<Event>) it).toList());
+	}
 
-    @Bean
-    public Consumer<Event> events(EventProcessor eventProcessor) {
-        return eventProcessor::process;
-    }
+	@Bean
+	public Consumer<Event> events(EventProcessor eventProcessor) {
+		return eventProcessor::process;
+	}
 
-    @Bean
-    public EventPublisher eventPublisher(ApplicationEventPublisher publisher) {
-        return new LocalEventPublisher(publisher);
-    }
+	@Bean
+	public EventPublisher eventPublisher(ApplicationEventPublisher publisher) {
+		return new LocalEventPublisher(publisher);
+	}
+
 }

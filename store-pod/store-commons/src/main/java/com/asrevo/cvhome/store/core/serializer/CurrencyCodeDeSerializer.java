@@ -8,17 +8,18 @@ import java.io.IOException;
 
 public class CurrencyCodeDeSerializer extends StdDeserializer<CurrencyCode> {
 
-    public CurrencyCodeDeSerializer() {
-        this(null);
-    }
+	public CurrencyCodeDeSerializer() {
+		this(null);
+	}
 
-    protected CurrencyCodeDeSerializer(Class<CurrencyCode> t) {
-        super(t);
-    }
+	protected CurrencyCodeDeSerializer(Class<CurrencyCode> t) {
+		super(t);
+	}
 
-    @Override
-    public CurrencyCode deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
-        String code = p.getText();
-        return new CurrencyCode(code);
-    }
+	@Override
+	public CurrencyCode deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
+		String code = p.getText();
+		return new CurrencyCode(code);
+	}
+
 }

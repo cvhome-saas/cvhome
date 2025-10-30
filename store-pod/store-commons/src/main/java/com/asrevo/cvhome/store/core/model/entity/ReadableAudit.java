@@ -7,7 +7,10 @@ import lombok.Setter;
 @Getter
 public class ReadableAudit {
 
-    private String created;
-    private String modified;
-    private String user;
+	private String created;
+
+	private String modified;
+
+	private String user;
+
 }

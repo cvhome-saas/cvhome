@@ -17,54 +17,54 @@ import lombok.Setter;
 @Getter
 @Setter
 public class OrderAccount extends SalesManagerEntity<Long, OrderAccount> {
-    @Serial private static final long serialVersionUID = -2429388347536330540L;
 
-    @Id
-    @Column(name = "ORDER_ACCOUNT_ID", unique = true, nullable = false)
-    @TableGenerator(
-            name = "TABLE_GEN",
-            table = "SM_SEQUENCER",
-            pkColumnName = "SEQ_NAME",
-            valueColumnName = "SEQ_COUNT",
-            pkColumnValue = "ORDER_ACCOUNT_SEQ_NEXT_VAL",
-            allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
-            initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
-    private Long id;
+	@Serial
+	private static final long serialVersionUID = -2429388347536330540L;
 
-    @ManyToOne
-    @JoinColumn(name = "ORDER_ID", nullable = false)
-    private Order order;
+	@Id
+	@Column(name = "ORDER_ACCOUNT_ID", unique = true, nullable = false)
+	@TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME",
+			valueColumnName = "SEQ_COUNT", pkColumnValue = "ORDER_ACCOUNT_SEQ_NEXT_VAL",
+			allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
+			initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
+	@GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
+	private Long id;
 
-    @Temporal(TemporalType.DATE)
-    @Column(name = "ORDER_ACCOUNT_START_DATE", nullable = false, length = 0)
-    private Date orderAccountStartDate;
+	@ManyToOne
+	@JoinColumn(name = "ORDER_ID", nullable = false)
+	private Order order;
 
-    @Temporal(TemporalType.DATE)
-    @Column(name = "ORDER_ACCOUNT_END_DATE", length = 0)
-    private Date orderAccountEndDate;
+	@Temporal(TemporalType.DATE)
+	@Column(name = "ORDER_ACCOUNT_START_DATE", nullable = false, length = 0)
+	private Date orderAccountStartDate;
 
-    @Column(name = "ORDER_ACCOUNT_BILL_DAY", nullable = false)
-    private Integer orderAccountBillDay;
+	@Temporal(TemporalType.DATE)
+	@Column(name = "ORDER_ACCOUNT_END_DATE", length = 0)
+	private Date orderAccountEndDate;
 
-    @OneToMany(mappedBy = "orderAccount", cascade = CascadeType.ALL)
-    private Set<OrderAccountProduct> orderAccountProducts = new HashSet<>();
+	@Column(name = "ORDER_ACCOUNT_BILL_DAY", nullable = false)
+	private Integer orderAccountBillDay;
 
-    public OrderAccount() {}
+	@OneToMany(mappedBy = "orderAccount", cascade = CascadeType.ALL)
+	private Set<OrderAccountProduct> orderAccountProducts = new HashSet<>();
 
-    public Date getOrderAccountStartDate() {
-        return CloneUtils.clone(orderAccountStartDate);
-    }
+	public OrderAccount() {
+	}
 
-    public void setOrderAccountStartDate(Date orderAccountStartDate) {
-        this.orderAccountStartDate = CloneUtils.clone(orderAccountStartDate);
-    }
+	public Date getOrderAccountStartDate() {
+		return CloneUtils.clone(orderAccountStartDate);
+	}
 
-    public Date getOrderAccountEndDate() {
-        return CloneUtils.clone(orderAccountEndDate);
-    }
+	public void setOrderAccountStartDate(Date orderAccountStartDate) {
+		this.orderAccountStartDate = CloneUtils.clone(orderAccountStartDate);
+	}
 
-    public void setOrderAccountEndDate(Date orderAccountEndDate) {
-        this.orderAccountEndDate = CloneUtils.clone(orderAccountEndDate);
-    }
+	public Date getOrderAccountEndDate() {
+		return CloneUtils.clone(orderAccountEndDate);
+	}
+
+	public void setOrderAccountEndDate(Date orderAccountEndDate) {
+		this.orderAccountEndDate = CloneUtils.clone(orderAccountEndDate);
+	}
+
 }

@@ -9,8 +9,9 @@ import org.springframework.context.annotation.Import;
 @Import(CvhomeSharedConfig.class)
 public class SubscriptionApplication {
 
-    @lombok.Generated
-    public static void main(String[] args) {
-        SpringApplication.run(SubscriptionApplication.class, args);
-    }
+	@lombok.Generated
+	public static void main(String[] args) {
+		SpringApplication.run(SubscriptionApplication.class, args);
+	}
+
 }

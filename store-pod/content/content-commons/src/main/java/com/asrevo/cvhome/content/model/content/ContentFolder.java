@@ -6,8 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * Folder containing content
- * images and other files
+ * Folder containing content images and other files
  *
  * @author carlsamson
  */
@@ -15,6 +14,8 @@ import lombok.Setter;
 @Getter
 public class ContentFolder {
 
-    List<Content> content = new ArrayList<>();
-    private String path;
+	List<Content> content = new ArrayList<>();
+
+	private String path;
+
 }

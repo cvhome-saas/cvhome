@@ -8,11 +8,14 @@ import lombok.Setter;
 @Getter
 public class PersistableCustomerAttribute extends CustomerAttributeEntity {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private CustomerOption customerOption;
-    private CustomerOptionValue customerOptionValue;
+	private CustomerOption customerOption;
+
+	private CustomerOptionValue customerOptionValue;
+
 }

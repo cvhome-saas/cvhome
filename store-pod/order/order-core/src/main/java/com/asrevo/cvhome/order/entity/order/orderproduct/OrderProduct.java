@@ -17,46 +17,46 @@ import lombok.Setter;
 @Getter
 @Setter
 public class OrderProduct extends SalesManagerEntity<Long, OrderProduct> {
-    @Serial private static final long serialVersionUID = 1L;
 
-    @Id
-    @Column(name = "ORDER_PRODUCT_ID")
-    @TableGenerator(
-            name = "TABLE_GEN",
-            table = "SM_SEQUENCER",
-            pkColumnName = "SEQ_NAME",
-            valueColumnName = "SEQ_COUNT",
-            pkColumnValue = "ORDER_PRODUCT_SEQ_NEXT_VAL",
-            allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
-            initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
-    private Long id;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    @Column(name = "PRODUCT_SKU")
-    private String sku;
+	@Id
+	@Column(name = "ORDER_PRODUCT_ID")
+	@TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME",
+			valueColumnName = "SEQ_COUNT", pkColumnValue = "ORDER_PRODUCT_SEQ_NEXT_VAL",
+			allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
+			initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
+	@GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
+	private Long id;
 
-    @Column(name = "PRODUCT_NAME", length = 64, nullable = false)
-    private String productName;
+	@Column(name = "PRODUCT_SKU")
+	private String sku;
 
-    @Column(name = "PRODUCT_QUANTITY")
-    private int productQuantity;
+	@Column(name = "PRODUCT_NAME", length = 64, nullable = false)
+	private String productName;
 
-    @Column(name = "ONETIME_CHARGE", nullable = false)
-    private BigDecimal oneTimeCharge;
+	@Column(name = "PRODUCT_QUANTITY")
+	private int productQuantity;
 
-    @JsonIgnore
-    @ManyToOne(targetEntity = Order.class)
-    @JoinColumn(name = "ORDER_ID", nullable = false)
-    private Order order;
+	@Column(name = "ONETIME_CHARGE", nullable = false)
+	private BigDecimal oneTimeCharge;
 
-    @OneToMany(mappedBy = "orderProduct", cascade = CascadeType.ALL)
-    private Set<OrderProductAttribute> orderAttributes = new HashSet<>();
+	@JsonIgnore
+	@ManyToOne(targetEntity = Order.class)
+	@JoinColumn(name = "ORDER_ID", nullable = false)
+	private Order order;
 
-    @OneToMany(mappedBy = "orderProduct", cascade = CascadeType.ALL)
-    private Set<OrderProductPrice> prices = new HashSet<>();
+	@OneToMany(mappedBy = "orderProduct", cascade = CascadeType.ALL)
+	private Set<OrderProductAttribute> orderAttributes = new HashSet<>();
 
-    @OneToMany(mappedBy = "orderProduct", cascade = CascadeType.ALL)
-    private Set<OrderProductDownload> downloads = new HashSet<>();
+	@OneToMany(mappedBy = "orderProduct", cascade = CascadeType.ALL)
+	private Set<OrderProductPrice> prices = new HashSet<>();
 
-    public OrderProduct() {}
+	@OneToMany(mappedBy = "orderProduct", cascade = CascadeType.ALL)
+	private Set<OrderProductDownload> downloads = new HashSet<>();
+
+	public OrderProduct() {
+	}
+
 }

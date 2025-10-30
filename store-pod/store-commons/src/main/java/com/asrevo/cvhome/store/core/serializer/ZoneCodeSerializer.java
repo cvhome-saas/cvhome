@@ -8,17 +8,17 @@ import java.io.IOException;
 
 public class ZoneCodeSerializer extends StdSerializer<ZoneCode> {
 
-    public ZoneCodeSerializer() {
-        this(null);
-    }
+	public ZoneCodeSerializer() {
+		this(null);
+	}
 
-    protected ZoneCodeSerializer(Class<ZoneCode> t) {
-        super(t);
-    }
+	protected ZoneCodeSerializer(Class<ZoneCode> t) {
+		super(t);
+	}
 
-    @Override
-    public void serialize(ZoneCode value, JsonGenerator gen, SerializerProvider provider)
-            throws IOException {
-        gen.writeString(value.code());
-    }
+	@Override
+	public void serialize(ZoneCode value, JsonGenerator gen, SerializerProvider provider) throws IOException {
+		gen.writeString(value.code());
+	}
+
 }

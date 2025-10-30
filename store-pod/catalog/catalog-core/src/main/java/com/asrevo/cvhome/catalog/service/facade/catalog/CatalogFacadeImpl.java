@@ -10,19 +10,18 @@ import org.springframework.util.Assert;
 @Service("catalogFacade")
 public class CatalogFacadeImpl implements CatalogFacade {
 
-    private final CatalogService catalogService;
+	private final CatalogService catalogService;
 
-    public CatalogFacadeImpl(CatalogService catalogService) {
-        this.catalogService = catalogService;
-    }
+	public CatalogFacadeImpl(CatalogService catalogService) {
+		this.catalogService = catalogService;
+	}
 
-    @Override
-    public Catalog getCatalog(String code, StoreMerchantId store) {
-        Assert.notNull(code, "Catalog code cannot be null");
-        Assert.notNull(store, "store cannot be null");
+	@Override
+	public Catalog getCatalog(String code, StoreMerchantId store) {
+		Assert.notNull(code, "Catalog code cannot be null");
+		Assert.notNull(store, "store cannot be null");
 
-        return catalogService
-                .getByCode(code, store)
-                .orElseThrow(() -> new ServiceException("Catalog not found"));
-    }
+		return catalogService.getByCode(code, store).orElseThrow(() -> new ServiceException("Catalog not found"));
+	}
+
 }

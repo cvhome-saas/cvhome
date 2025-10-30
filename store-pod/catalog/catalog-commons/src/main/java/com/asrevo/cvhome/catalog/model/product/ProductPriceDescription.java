@@ -9,10 +9,12 @@ import lombok.Setter;
 @Getter
 public class ProductPriceDescription extends NamedEntity {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private String priceAppender;
+	private String priceAppender;
+
 }

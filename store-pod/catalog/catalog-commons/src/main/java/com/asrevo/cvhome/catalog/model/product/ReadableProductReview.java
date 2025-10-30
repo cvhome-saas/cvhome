@@ -10,10 +10,12 @@ import lombok.Setter;
 @Getter
 public class ReadableProductReview extends ProductReviewEntity implements Serializable {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private ReadableCustomer customer;
+	private ReadableCustomer customer;
+
 }

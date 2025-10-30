@@ -9,41 +9,40 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(
-        name = "CATEGORY_DESCRIPTION",
-        uniqueConstraints = {@UniqueConstraint(columnNames = {"CATEGORY_ID", "LANGUAGE_CODE"})})
-@TableGenerator(
-        name = "description_gen",
-        table = "SM_SEQUENCER",
-        pkColumnName = "SEQ_NAME",
-        valueColumnName = "SEQ_COUNT",
-        pkColumnValue = "CATEGORY_DESCRIPTION_SEQ_NEXT_VAL",
-        allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
-        initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
+@Table(name = "CATEGORY_DESCRIPTION",
+		uniqueConstraints = { @UniqueConstraint(columnNames = { "CATEGORY_ID", "LANGUAGE_CODE" }) })
+@TableGenerator(name = "description_gen", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME",
+		valueColumnName = "SEQ_COUNT", pkColumnValue = "CATEGORY_DESCRIPTION_SEQ_NEXT_VAL",
+		allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
+		initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
 @Getter
 @Setter
 public class CategoryDescription extends Description {
-    @Serial private static final long serialVersionUID = 1L;
 
-    @JsonIgnore
-    @ManyToOne(targetEntity = Category.class)
-    @JoinColumn(name = "CATEGORY_ID", nullable = false)
-    private Category category;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    @Column(name = "SEF_URL", length = 120)
-    private String seUrl;
+	@JsonIgnore
+	@ManyToOne(targetEntity = Category.class)
+	@JoinColumn(name = "CATEGORY_ID", nullable = false)
+	private Category category;
 
-    @Column(name = "CATEGORY_HIGHLIGHT")
-    private String categoryHighlight;
+	@Column(name = "SEF_URL", length = 120)
+	private String seUrl;
 
-    @Column(name = "META_TITLE", length = 120)
-    private String metatagTitle;
+	@Column(name = "CATEGORY_HIGHLIGHT")
+	private String categoryHighlight;
 
-    @Column(name = "META_KEYWORDS")
-    private String metatagKeywords;
+	@Column(name = "META_TITLE", length = 120)
+	private String metatagTitle;
 
-    @Column(name = "META_DESCRIPTION")
-    private String metatagDescription;
+	@Column(name = "META_KEYWORDS")
+	private String metatagKeywords;
 
-    public CategoryDescription() {}
+	@Column(name = "META_DESCRIPTION")
+	private String metatagDescription;
+
+	public CategoryDescription() {
+	}
+
 }

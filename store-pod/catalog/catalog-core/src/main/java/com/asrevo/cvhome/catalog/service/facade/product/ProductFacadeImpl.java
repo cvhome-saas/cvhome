@@ -19,69 +19,65 @@ import org.springframework.stereotype.Service;
 // @Profile({"default", "cloud", "gcp", "aws", "mysql", "local"})
 public class ProductFacadeImpl implements ProductFacade {
 
-    private final CategoryService categoryService;
+	private final CategoryService categoryService;
 
-    private final ProductService productService;
+	private final ProductService productService;
 
-    private final PricingService pricingService;
+	private final PricingService pricingService;
 
-    private final ImageFilePath imageUtils;
-    private final ExternalMerchantStoreService externalMerchantStoreService;
+	private final ImageFilePath imageUtils;
 
-    public ProductFacadeImpl(
-            CategoryService categoryService,
-            ProductService productService,
-            PricingService pricingService,
-            ImageFilePath imageUtils,
-            ExternalMerchantStoreService externalStoreMerchantIdService) {
-        this.categoryService = categoryService;
-        this.productService = productService;
-        this.pricingService = pricingService;
-        this.imageUtils = imageUtils;
-        this.externalMerchantStoreService = externalStoreMerchantIdService;
-    }
+	private final ExternalMerchantStoreService externalMerchantStoreService;
 
-    @Override
-    public ReadableProductList getProductListsByCriteria(
-            StoreMerchantId store, ProductCriteria criteria) {
-        return null;
-    }
+	public ProductFacadeImpl(CategoryService categoryService, ProductService productService,
+			PricingService pricingService, ImageFilePath imageUtils,
+			ExternalMerchantStoreService externalStoreMerchantIdService) {
+		this.categoryService = categoryService;
+		this.productService = productService;
+		this.pricingService = pricingService;
+		this.imageUtils = imageUtils;
+		this.externalMerchantStoreService = externalStoreMerchantIdService;
+	}
 
-    @Override
-    public ReadableProductList getTinyProductListsByCriteria(
-            StoreMerchantId merchantStore, ProductCriteria searchCriteria) {
-        return null;
-    }
+	@Override
+	public ReadableProductList getProductListsByCriteria(StoreMerchantId store, ProductCriteria criteria) {
+		return null;
+	}
 
-    @Override
-    public ReadableProductList getBaseProductListsByCriteria(
-            StoreMerchantId merchantStore, ProductCriteria searchCriteria) {
-        return null;
-    }
+	@Override
+	public ReadableProductList getTinyProductListsByCriteria(StoreMerchantId merchantStore,
+			ProductCriteria searchCriteria) {
+		return null;
+	}
 
-    @Override
-    public ReadableProduct getProductBySeUrl(
-            StoreMerchantId store, String friendlyUrl, LanguageCode language) throws Exception {
+	@Override
+	public ReadableProductList getBaseProductListsByCriteria(StoreMerchantId merchantStore,
+			ProductCriteria searchCriteria) {
+		return null;
+	}
 
-        Product product =
-                productService.getBySeUrl(store, friendlyUrl, LocaleUtils.getLocale(language));
+	@Override
+	public ReadableProduct getProductBySeUrl(StoreMerchantId store, String friendlyUrl, LanguageCode language)
+			throws Exception {
 
-        if (product == null) {
-            return null;
-        }
+		Product product = productService.getBySeUrl(store, friendlyUrl, LocaleUtils.getLocale(language));
 
-        ReadableProduct readableProduct = new ReadableProduct();
+		if (product == null) {
+			return null;
+		}
 
-        ReadableProductPopulator populator =
-                new ReadableProductPopulator(
-                        pricingService, imageUtils, externalMerchantStoreService);
-        populator.populate(product, readableProduct, store, language);
+		ReadableProduct readableProduct = new ReadableProduct();
 
-        return readableProduct;
-    }
+		ReadableProductPopulator populator = new ReadableProductPopulator(pricingService, imageUtils,
+				externalMerchantStoreService);
+		populator.populate(product, readableProduct, store, language);
 
-    @Override
-    public Product getProduct(Long id, StoreMerchantId store) {
-        return productService.findOne(id, store);
-    }
+		return readableProduct;
+	}
+
+	@Override
+	public Product getProduct(Long id, StoreMerchantId store) {
+		return productService.findOne(id, store);
+	}
+
 }

@@ -1,4 +1,6 @@
 spring:
+  application:
+    name: manager
   config:
     import: "classpath:common-config.yml"
   security:
@@ -10,30 +12,6 @@ spring:
             client-id: manager@service.store-core.internal
             client-secret: VobDxIhAGZz8hyhzz7p9G7QpfixjFjzW
             authorization-grant-type: client_credentials
-          keycloak:
-            client-id: web-app
-            client-authentication-method: client_secret_basic
-            authorization-grant-type: authorization_code
-            scope: openid, profile, email
-            redirect-uri: "{baseUrl}/login/oauth2/code/keycloak"
-            provider: keycloak
-            client-secret: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
-        provider:
-          keycloak:
-            #            comment issuer-uri to skip validation
-            #            issuer-uri: https://gateway.com:8443/realms/cvhome
-            jwk-set-uri: ${com.asrevo.cvhome.services.core-auth.schema}://${com.asrevo.cvhome.services.core-auth.domain}:${com.asrevo.cvhome.services.core-auth.port}/realms/cvhome/protocol/openid-connect/certs
-            authorization-uri: ${com.asrevo.cvhome.services.core-auth.schema}://${com.asrevo.cvhome.services.core-auth.domain}:${com.asrevo.cvhome.services.core-auth.port}/realms/cvhome/protocol/openid-connect/auth
-            token-uri: ${com.asrevo.cvhome.services.core-auth.schema}://${com.asrevo.cvhome.services.core-auth.domain}:${com.asrevo.cvhome.services.core-auth.port}/realms/cvhome/protocol/openid-connect/token
-
-      #            need to trace why getting 401 error=invalid_token, auth_method=validate_access_token is by issuer?
-      #            user-info-uri: https://core-auth.gateway.com:8443/realms/cvhome/protocol/openid-connect/userinfo
-      #            user-name-attribute: sub
-      resourceserver:
-        jwt:
-          #          jwk-set-uri: ${com.asrevo.cvhome.services.core-auth.schema}://${com.asrevo.cvhome.services.core-auth.domain}:${com.asrevo.cvhome.services.core-auth.port}/realms/cvhome/protocol/openid-connect/certs
-          #          issuer-uri: ${com.asrevo.cvhome.services.core-auth.schema}://${com.asrevo.cvhome.services.core-auth.domain}:${com.asrevo.cvhome.services.core-auth.port}/realms/cvhome
-          issuer-uri-set: ${com.asrevo.cvhome.services.core-auth.schema}://${com.asrevo.cvhome.services.core-auth.domain}:${com.asrevo.cvhome.services.core-auth.port}/realms/cvhome
 com:
   asrevo:
     cvhome:
@@ -43,33 +21,3 @@ com:
           realm: cvhome
           client-id: internal-client
           client-secret: aKl0AKjjQ6zp2bnWhKOsnTOzl3J8Vqd0
----
-spring:
-  application:
-    name: manager
-  datasource:
-    driver-class-name: org.postgresql.Driver
-    hikari:
-      schema: manager
-  cloud:
-    function:
-      definition: events
-    stream:
-      input-bindings: events
-      bindings:
-        events-in-0:
-          destination: events
-          group: ${spring.application.name}
-        events-out-0:
-          content-type: application/json
-          destination: events
-server:
-  forward-headers-strategy: NATIVE
-  port: ${com.asrevo.cvhome.services.manager.port}
-info:
-  app:
-    name: ${spring.application.name}
-management:
-  observations:
-    key-values:
-      application: ${spring.application.name}

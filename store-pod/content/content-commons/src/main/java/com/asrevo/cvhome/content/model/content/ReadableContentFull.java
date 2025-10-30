@@ -12,14 +12,20 @@ import lombok.Setter;
 @Setter
 public class ReadableContentFull extends Entity {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private String code;
-    private boolean visible;
-    private String contentType;
-    private boolean isDisplayedInMenu;
-    private List<ContentDescriptionEntity> descriptions = new ArrayList<>();
+	private String code;
+
+	private boolean visible;
+
+	private String contentType;
+
+	private boolean isDisplayedInMenu;
+
+	private List<ContentDescriptionEntity> descriptions = new ArrayList<>();
+
 }

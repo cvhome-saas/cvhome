@@ -23,86 +23,79 @@ import org.springframework.stereotype.Component;
 @Component
 public class ReadableOrderProductMapper implements Mapper<OrderProduct, ReadableOrderProduct> {
 
-    final ExternalProductService externalProductService;
-    private final ExternalMerchantStoreService externalMerchantStoreService;
+	final ExternalProductService externalProductService;
 
-    public ReadableOrderProductMapper(
-            ExternalProductService externalProductService,
-            ExternalMerchantStoreService externalMerchantStoreService) {
-        this.externalProductService = externalProductService;
-        this.externalMerchantStoreService = externalMerchantStoreService;
-    }
+	private final ExternalMerchantStoreService externalMerchantStoreService;
 
-    @Override
-    public ReadableOrderProduct convert(
-            OrderProduct source, StoreMerchantId store, LanguageCode language) {
-        ReadableOrderProduct orderProduct = new ReadableOrderProduct();
-        return this.merge(source, orderProduct, store, language);
-    }
+	public ReadableOrderProductMapper(ExternalProductService externalProductService,
+			ExternalMerchantStoreService externalMerchantStoreService) {
+		this.externalProductService = externalProductService;
+		this.externalMerchantStoreService = externalMerchantStoreService;
+	}
 
-    @SneakyThrows
-    @Override
-    public ReadableOrderProduct merge(
-            OrderProduct source,
-            ReadableOrderProduct target,
-            StoreMerchantId store,
-            LanguageCode language) {
+	@Override
+	public ReadableOrderProduct convert(OrderProduct source, StoreMerchantId store, LanguageCode language) {
+		ReadableOrderProduct orderProduct = new ReadableOrderProduct();
+		return this.merge(source, orderProduct, store, language);
+	}
 
-        Validate.notNull(source, "OrderProduct cannot be null");
-        Validate.notNull(target, "ReadableOrderProduct cannot be null");
-        Validate.notNull(store, "store cannot be null");
-        Validate.notNull(language, "Language cannot be null");
+	@SneakyThrows
+	@Override
+	public ReadableOrderProduct merge(OrderProduct source, ReadableOrderProduct target, StoreMerchantId store,
+			LanguageCode language) {
 
-        target.setId(source.getId());
-        target.setOrderedQuantity(source.getProductQuantity());
-        try {
-            target.setPrice(
-                    PriceUtils.getStoreFormatedAmountWithCurrency(
-                            externalMerchantStoreService.getStore(store),
-                            source.getOneTimeCharge()));
-        } catch (Exception e) {
-            throw new ConversionRuntimeException("Cannot convert price", e);
-        }
-        target.setProductName(source.getProductName());
-        target.setSku(source.getSku());
+		Validate.notNull(source, "OrderProduct cannot be null");
+		Validate.notNull(target, "ReadableOrderProduct cannot be null");
+		Validate.notNull(store, "store cannot be null");
+		Validate.notNull(language, "Language cannot be null");
 
-        // subtotal = price * quantity
-        BigDecimal subTotal = source.getOneTimeCharge();
-        subTotal = subTotal.multiply(new BigDecimal(source.getProductQuantity()));
+		target.setId(source.getId());
+		target.setOrderedQuantity(source.getProductQuantity());
+		try {
+			target.setPrice(PriceUtils.getStoreFormatedAmountWithCurrency(externalMerchantStoreService.getStore(store),
+					source.getOneTimeCharge()));
+		}
+		catch (Exception e) {
+			throw new ConversionRuntimeException("Cannot convert price", e);
+		}
+		target.setProductName(source.getProductName());
+		target.setSku(source.getSku());
 
-        try {
-            String subTotalPrice =
-                    PriceUtils.getStoreFormatedAmountWithCurrency(
-                            externalMerchantStoreService.getStore(store), subTotal);
-            target.setSubTotal(subTotalPrice);
-        } catch (Exception e) {
-            throw new ConversionRuntimeException("Cannot format price", e);
-        }
+		// subtotal = price * quantity
+		BigDecimal subTotal = source.getOneTimeCharge();
+		subTotal = subTotal.multiply(new BigDecimal(source.getProductQuantity()));
 
-        if (source.getOrderAttributes() != null) {
-            List<ReadableOrderProductAttribute> attributes = new ArrayList<>();
-            for (OrderProductAttribute attr : source.getOrderAttributes()) {
-                ReadableOrderProductAttribute readableAttribute =
-                        new ReadableOrderProductAttribute();
-                String price =
-                        PriceUtils.getStoreFormatedAmountWithCurrency(
-                                externalMerchantStoreService.getStore(store),
-                                attr.getProductAttributePrice());
-                readableAttribute.setAttributePrice(price);
+		try {
+			String subTotalPrice = PriceUtils
+				.getStoreFormatedAmountWithCurrency(externalMerchantStoreService.getStore(store), subTotal);
+			target.setSubTotal(subTotalPrice);
+		}
+		catch (Exception e) {
+			throw new ConversionRuntimeException("Cannot format price", e);
+		}
 
-                readableAttribute.setAttributeName(attr.getProductAttributeName());
-                readableAttribute.setAttributeValue(attr.getProductAttributeValueName());
-                attributes.add(readableAttribute);
-            }
-            target.setAttributes(attributes);
-        }
+		if (source.getOrderAttributes() != null) {
+			List<ReadableOrderProductAttribute> attributes = new ArrayList<>();
+			for (OrderProductAttribute attr : source.getOrderAttributes()) {
+				ReadableOrderProductAttribute readableAttribute = new ReadableOrderProductAttribute();
+				String price = PriceUtils.getStoreFormatedAmountWithCurrency(
+						externalMerchantStoreService.getStore(store), attr.getProductAttributePrice());
+				readableAttribute.setAttributePrice(price);
 
-        if (!StringUtils.isBlank(source.getSku())) {
-            ProductDetails detailedProduct =
-                    externalProductService.getDetailedProduct(store, source.getSku(), language);
-            target.setProduct(detailedProduct.product());
-        }
+				readableAttribute.setAttributeName(attr.getProductAttributeName());
+				readableAttribute.setAttributeValue(attr.getProductAttributeValueName());
+				attributes.add(readableAttribute);
+			}
+			target.setAttributes(attributes);
+		}
 
-        return target;
-    }
+		if (!StringUtils.isBlank(source.getSku())) {
+			ProductDetails detailedProduct = externalProductService.getDetailedProduct(store, source.getSku(),
+					language);
+			target.setProduct(detailedProduct.product());
+		}
+
+		return target;
+	}
+
 }

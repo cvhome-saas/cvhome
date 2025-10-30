@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 @Configuration
-@Import({LocalEventProcessorConfig.class})
+@Import({ LocalEventProcessorConfig.class })
 public class StreamConfig {
+
 }

@@ -14,29 +14,36 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ReadableMerchantStore extends MerchantStoreEntity
-        implements ReadableAuditable, Serializable {
+public class ReadableMerchantStore extends MerchantStoreEntity implements ReadableAuditable, Serializable {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private String currentUserLanguage;
-    private ReadableAddress address;
-    private ReadableImage logo;
-    private ReadableImage banner;
-    private ReadableAudit audit;
-    private ReadableMerchantStore parent;
-    private Set<ReadableSliderImage> sliderImages;
+	private String currentUserLanguage;
 
-    private List<String> supportedLanguages;
+	private ReadableAddress address;
 
-    public ReadableAudit getReadableAudit() {
-        return this.audit;
-    }
+	private ReadableImage logo;
 
-    public void setReadableAudit(ReadableAudit audit) {
-        this.audit = audit;
-    }
+	private ReadableImage banner;
+
+	private ReadableAudit audit;
+
+	private ReadableMerchantStore parent;
+
+	private Set<ReadableSliderImage> sliderImages;
+
+	private List<String> supportedLanguages;
+
+	public ReadableAudit getReadableAudit() {
+		return this.audit;
+	}
+
+	public void setReadableAudit(ReadableAudit audit) {
+		this.audit = audit;
+	}
+
 }

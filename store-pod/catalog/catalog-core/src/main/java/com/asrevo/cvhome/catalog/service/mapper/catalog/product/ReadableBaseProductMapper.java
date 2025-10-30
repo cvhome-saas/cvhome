@@ -25,101 +25,95 @@ import org.springframework.util.Assert;
 @Component
 public class ReadableBaseProductMapper implements Mapper<Product, ReadableProduct> {
 
-    private final PricingService pricingService;
+	private final PricingService pricingService;
 
-    public ReadableBaseProductMapper(PricingService pricingService) {
-        this.pricingService = pricingService;
-    }
+	public ReadableBaseProductMapper(PricingService pricingService) {
+		this.pricingService = pricingService;
+	}
 
-    @Override
-    public ReadableProduct convert(Product source, StoreMerchantId store, LanguageCode language) {
-        ReadableProduct product = new ReadableProduct();
-        return this.merge(source, product, store, language);
-    }
+	@Override
+	public ReadableProduct convert(Product source, StoreMerchantId store, LanguageCode language) {
+		ReadableProduct product = new ReadableProduct();
+		return this.merge(source, product, store, language);
+	}
 
-    @Override
-    public ReadableProduct merge(
-            Product source,
-            ReadableProduct destination,
-            StoreMerchantId store,
-            LanguageCode language) {
+	@Override
+	public ReadableProduct merge(Product source, ReadableProduct destination, StoreMerchantId store,
+			LanguageCode language) {
 
-        Assert.notNull(source, "Product cannot be null");
-        Assert.notNull(destination, "Product destination cannot be null");
+		Assert.notNull(source, "Product cannot be null");
+		Assert.notNull(destination, "Product destination cannot be null");
 
-        // read only product values
-        // will contain options
-        TreeMap<Long, ReadableProductOption> selectableOptions = new TreeMap<>();
+		// read only product values
+		// will contain options
+		TreeMap<Long, ReadableProductOption> selectableOptions = new TreeMap<>();
 
-        destination.setSku(source.getSku());
-        destination.setRefSku(source.getRefSku());
-        destination.setId(source.getId());
-        destination.setDateAvailable(DateUtil.formatDate(source.getDateAvailable()));
+		destination.setSku(source.getSku());
+		destination.setRefSku(source.getRefSku());
+		destination.setId(source.getId());
+		destination.setDateAvailable(DateUtil.formatDate(source.getDateAvailable()));
 
-        destination.setId(source.getId());
-        destination.setAvailable(source.isAvailable());
-        destination.setProductShipeable(source.isProductShipeable());
+		destination.setId(source.getId());
+		destination.setAvailable(source.isAvailable());
+		destination.setProductShipeable(source.isProductShipeable());
 
-        destination.setPreOrder(source.isPreOrder());
-        destination.setRefSku(source.getRefSku());
-        destination.setSortOrder(source.getSortOrder());
+		destination.setPreOrder(source.isPreOrder());
+		destination.setRefSku(source.getRefSku());
+		destination.setSortOrder(source.getSortOrder());
 
-        if (source.getDateAvailable() != null) {
-            destination.setDateAvailable(DateUtil.formatDate(source.getDateAvailable()));
-        }
+		if (source.getDateAvailable() != null) {
+			destination.setDateAvailable(DateUtil.formatDate(source.getDateAvailable()));
+		}
 
-        if (source.getAuditSection() != null) {
-            destination.setCreationDate(
-                    DateUtil.formatDate(source.getAuditSection().getDateCreated()));
-        }
+		if (source.getAuditSection() != null) {
+			destination.setCreationDate(DateUtil.formatDate(source.getAuditSection().getDateCreated()));
+		}
 
-        destination.setProductVirtual(source.isProductVirtual());
+		destination.setProductVirtual(source.isProductVirtual());
 
-        if (source.getProductReviewCount() != null) {
-            destination.setRatingCount(source.getProductReviewCount());
-        }
+		if (source.getProductReviewCount() != null) {
+			destination.setRatingCount(source.getProductReviewCount());
+		}
 
-        for (ProductAvailability a : source.getAvailabilities()) {
+		for (ProductAvailability a : source.getAvailabilities()) {
 
-            destination.setQuantity(Optional.ofNullable(a.getProductQuantity()).orElse(1));
-            destination.setQuantityOrderMaximum(
-                    Optional.ofNullable(a.getProductQuantityOrderMax()).orElse(1));
-            destination.setQuantityOrderMinimum(
-                    Optional.ofNullable(a.getProductQuantityOrderMin()).orElse(1));
-            if (a.getProductQuantity() > 0 && destination.isAvailable()) {
-                destination.setCanBePurchased(true);
-            }
+			destination.setQuantity(Optional.ofNullable(a.getProductQuantity()).orElse(1));
+			destination.setQuantityOrderMaximum(Optional.ofNullable(a.getProductQuantityOrderMax()).orElse(1));
+			destination.setQuantityOrderMinimum(Optional.ofNullable(a.getProductQuantityOrderMin()).orElse(1));
+			if (a.getProductQuantity() > 0 && destination.isAvailable()) {
+				destination.setCanBePurchased(true);
+			}
 
-            if (a.getProductVariant() == null && StringUtils.isEmpty(a.getRegionVariant())) {
-                break;
-            }
-        }
+			if (a.getProductVariant() == null && StringUtils.isEmpty(a.getRegionVariant())) {
+				break;
+			}
+		}
 
-        // if default instance
+		// if default instance
 
-        destination.setSku(source.getSku());
+		destination.setSku(source.getSku());
 
-        try {
-            FinalPrice price = pricingService.calculateProductPrice(source);
-            if (price != null) {
+		try {
+			FinalPrice price = pricingService.calculateProductPrice(source);
+			if (price != null) {
 
-                destination.setFinalPrice(
-                        pricingService.getDisplayAmount(price.getFinalPrice(), store));
-                destination.setPrice(price.getFinalPrice());
-                destination.setOriginalPrice(
-                        pricingService.getDisplayAmount(price.getOriginalPrice(), store));
+				destination.setFinalPrice(pricingService.getDisplayAmount(price.getFinalPrice(), store));
+				destination.setPrice(price.getFinalPrice());
+				destination.setOriginalPrice(pricingService.getDisplayAmount(price.getOriginalPrice(), store));
 
-                if (price.isDiscounted()) {
-                    destination.setDiscounted(true);
-                }
-            }
+				if (price.isDiscounted()) {
+					destination.setDiscounted(true);
+				}
+			}
 
-        } catch (Exception e) {
-            throw new ConversionRuntimeException("An error while converting product price", e);
-        }
+		}
+		catch (Exception e) {
+			throw new ConversionRuntimeException("An error while converting product price", e);
+		}
 
-        destination.setSortOrder(source.getSortOrder());
+		destination.setSortOrder(source.getSortOrder());
 
-        return destination;
-    }
+		return destination;
+	}
+
 }

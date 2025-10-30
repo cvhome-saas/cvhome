@@ -10,12 +10,16 @@ import lombok.Setter;
 @Getter
 public class OrderStatusHistory extends Entity {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private long orderId;
-    private OrderStatus orderStatus;
-    private String comments;
+	private long orderId;
+
+	private OrderStatus orderStatus;
+
+	private String comments;
+
 }

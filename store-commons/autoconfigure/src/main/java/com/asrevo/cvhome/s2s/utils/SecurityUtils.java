@@ -12,43 +12,47 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
 
 public class SecurityUtils {
-    private static boolean hasSuperAdminRole(Authentication authentication) {
-        return hasRole(authentication, Roles.ROLE_SUPER_ADMIN);
-    }
 
-    private static boolean hasMicroServiceRole(Authentication authentication) {
-        return hasRole(authentication, Roles.ROLE_MICROSERVICE);
-    }
+	private static boolean hasSuperAdminRole(Authentication authentication) {
+		return hasRole(authentication, Roles.ROLE_SUPER_ADMIN);
+	}
 
-    private static boolean hasOrgAdminRole(Authentication authentication) {
-        return hasRole(authentication, Roles.ROLE_ORG_ADMIN);
-    }
+	private static boolean hasMicroServiceRole(Authentication authentication) {
+		return hasRole(authentication, Roles.ROLE_MICROSERVICE);
+	}
 
-    private static boolean hasRole(Authentication authentication, Roles role) {
-        return authentication.getAuthorities().stream()
-                .anyMatch(it -> it.getAuthority().contains(role.name()));
-    }
+	private static boolean hasOrgAdminRole(Authentication authentication) {
+		return hasRole(authentication, Roles.ROLE_ORG_ADMIN);
+	}
 
-    public static UserOrgStoreIdentity getOrgStoreIdentity(Authentication authentication) {
-        Set<Roles> roles =
-                authentication.getAuthorities().stream()
-                        .map(GrantedAuthority::getAuthority)
-                        .map(Roles::parse)
-                        .filter(Objects::nonNull)
-                        .collect(Collectors.toSet());
-        if (hasSuperAdminRole(authentication)) {
-            return new UserOrgStoreIdentity(null, "*", roles);
-        } else if (hasMicroServiceRole(authentication)) {
-            return new UserOrgStoreIdentity(null, "*", roles);
-        } else if (hasOrgAdminRole(authentication)) {
-            Map<String, Object> claims = ((Jwt) authentication.getPrincipal()).getClaims();
-            String adminOrg = ((String) claims.get("org"));
-            return new UserOrgStoreIdentity(new ManagerOrgId(adminOrg), "*", roles);
-        } else {
-            Map<String, Object> claims = ((Jwt) authentication.getPrincipal()).getClaims();
-            String adminOrg = ((String) claims.get("org"));
-            String adminStore = ((String) claims.get("store"));
-            return new UserOrgStoreIdentity(new ManagerOrgId(adminOrg), adminStore, roles);
-        }
-    }
+	private static boolean hasRole(Authentication authentication, Roles role) {
+		return authentication.getAuthorities().stream().anyMatch(it -> it.getAuthority().contains(role.name()));
+	}
+
+	public static UserOrgStoreIdentity getOrgStoreIdentity(Authentication authentication) {
+		Set<Roles> roles = authentication.getAuthorities()
+			.stream()
+			.map(GrantedAuthority::getAuthority)
+			.map(Roles::parse)
+			.filter(Objects::nonNull)
+			.collect(Collectors.toSet());
+		if (hasSuperAdminRole(authentication)) {
+			return new UserOrgStoreIdentity(null, "*", roles);
+		}
+		else if (hasMicroServiceRole(authentication)) {
+			return new UserOrgStoreIdentity(null, "*", roles);
+		}
+		else if (hasOrgAdminRole(authentication)) {
+			Map<String, Object> claims = ((Jwt) authentication.getPrincipal()).getClaims();
+			String adminOrg = ((String) claims.get("org"));
+			return new UserOrgStoreIdentity(new ManagerOrgId(adminOrg), "*", roles);
+		}
+		else {
+			Map<String, Object> claims = ((Jwt) authentication.getPrincipal()).getClaims();
+			String adminOrg = ((String) claims.get("org"));
+			String adminStore = ((String) claims.get("store"));
+			return new UserOrgStoreIdentity(new ManagerOrgId(adminOrg), adminStore, roles);
+		}
+	}
+
 }

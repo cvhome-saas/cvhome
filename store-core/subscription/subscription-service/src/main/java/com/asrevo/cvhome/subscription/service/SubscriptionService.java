@@ -4,16 +4,18 @@ import com.asrevo.cvhome.commons.domain.ManagerOrgId;
 import com.asrevo.cvhome.commons.domain.SubscriptionPlan;
 import com.asrevo.cvhome.subscription.commons.RecurringPlan;
 import com.asrevo.cvhome.subscription.commons.SubscriptionPlanDetails;
-
 import java.time.Instant;
 import java.util.Optional;
 
 public interface SubscriptionService {
-    void createInitialSubscription(ManagerOrgId orgId);
 
-    Optional<SubscriptionPlanDetails> subscriptionPlanDetails(ManagerOrgId org);
+	void createInitialSubscription(ManagerOrgId orgId);
 
-    void deActivateSubscription(ManagerOrgId org);
+	Optional<SubscriptionPlanDetails> subscriptionPlanDetails(ManagerOrgId org);
 
-    void renew(ManagerOrgId org, SubscriptionPlan subscriptionPlan, Instant startDate, Instant endDate, RecurringPlan recurringPlan);
+	void deActivateSubscription(ManagerOrgId org);
+
+	void renew(ManagerOrgId org, SubscriptionPlan subscriptionPlan, Instant startDate, Instant endDate,
+			RecurringPlan recurringPlan);
+
 }

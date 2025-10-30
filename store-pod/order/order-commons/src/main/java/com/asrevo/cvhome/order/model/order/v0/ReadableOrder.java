@@ -17,19 +17,26 @@ import lombok.Setter;
 @Getter
 public class ReadableOrder extends OrderEntity implements Serializable {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private ReadableCustomer customer;
-    private List<ReadableOrderProduct> products;
+	private ReadableCustomer customer;
 
-    private ReadableBilling billing;
-    private ReadableDelivery delivery;
-    private StoreMerchantId store;
+	private List<ReadableOrderProduct> products;
 
-    private OrderTotal total;
-    private OrderTotal tax;
-    private OrderTotal shipping;
+	private ReadableBilling billing;
+
+	private ReadableDelivery delivery;
+
+	private StoreMerchantId store;
+
+	private OrderTotal total;
+
+	private OrderTotal tax;
+
+	private OrderTotal shipping;
+
 }

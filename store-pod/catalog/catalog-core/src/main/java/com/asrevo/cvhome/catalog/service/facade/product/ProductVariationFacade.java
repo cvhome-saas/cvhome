@@ -9,21 +9,16 @@ import org.springframework.data.domain.Pageable;
 
 public interface ProductVariationFacade {
 
-    ReadableProductVariation get(Long variationId, StoreMerchantId store, LanguageCode language);
+	ReadableProductVariation get(Long variationId, StoreMerchantId store, LanguageCode language);
 
-    boolean exists(String code, StoreMerchantId store);
+	boolean exists(String code, StoreMerchantId store);
 
-    Long create(
-            PersistableProductVariation optionSet, StoreMerchantId store, LanguageCode language);
+	Long create(PersistableProductVariation optionSet, StoreMerchantId store, LanguageCode language);
 
-    void update(
-            Long variationId,
-            PersistableProductVariation variation,
-            StoreMerchantId store,
-            LanguageCode language);
+	void update(Long variationId, PersistableProductVariation variation, StoreMerchantId store, LanguageCode language);
 
-    void delete(Long variation, StoreMerchantId store);
+	void delete(Long variation, StoreMerchantId store);
 
-    ReadableEntityList<ReadableProductVariation> list(
-            StoreMerchantId store, LanguageCode language, Pageable pageable);
+	ReadableEntityList<ReadableProductVariation> list(StoreMerchantId store, LanguageCode language, Pageable pageable);
+
 }

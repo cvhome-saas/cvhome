@@ -16,23 +16,20 @@ import java.util.List;
 import java.util.Locale;
 
 public interface OrderFacade {
-    Order processOrder(
-            PersistableOrder order,
-            Customer customer,
-            StoreMerchantId store,
-            LanguageCode language,
-            Locale locale)
-            throws ServiceException;
 
-    ReadableOrderConfirmation orderConfirmation(
-            Order order, Customer customer, StoreMerchantId store, LanguageCode language);
+	Order processOrder(PersistableOrder order, Customer customer, StoreMerchantId store, LanguageCode language,
+			Locale locale) throws ServiceException;
 
-    ReadableOrderList getReadableOrderList(OrderCriteria criteria, StoreMerchantId store);
+	ReadableOrderConfirmation orderConfirmation(Order order, Customer customer, StoreMerchantId store,
+			LanguageCode language);
 
-    ReadableOrder getReadableOrder(Long orderId, StoreMerchantId store, LanguageCode language);
+	ReadableOrderList getReadableOrderList(OrderCriteria criteria, StoreMerchantId store);
 
-    List<ReadableOrderStatusHistory> getReadableOrderHistory(
-            Long orderId, StoreMerchantId store, LanguageCode language);
+	ReadableOrder getReadableOrder(Long orderId, StoreMerchantId store, LanguageCode language);
 
-    void createOrderStatus(PersistableOrderStatusHistory status, Long id, StoreMerchantId store);
+	List<ReadableOrderStatusHistory> getReadableOrderHistory(Long orderId, StoreMerchantId store,
+			LanguageCode language);
+
+	void createOrderStatus(PersistableOrderStatusHistory status, Long id, StoreMerchantId store);
+
 }

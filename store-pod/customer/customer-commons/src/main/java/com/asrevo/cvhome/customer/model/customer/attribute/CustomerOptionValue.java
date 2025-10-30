@@ -6,8 +6,10 @@ import java.io.Serializable;
 
 public class CustomerOptionValue extends Entity implements Serializable {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
+
 }

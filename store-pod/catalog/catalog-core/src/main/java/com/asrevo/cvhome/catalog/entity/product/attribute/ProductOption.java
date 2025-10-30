@@ -15,61 +15,57 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(
-        name = "PRODUCT_OPTION",
-        indexes = {@Index(name = "PRD_OPTION_CODE_IDX", columnList = "PRODUCT_OPTION_CODE")},
-        uniqueConstraints =
-                @UniqueConstraint(columnNames = {"STORE_MERCHANT_ID", "PRODUCT_OPTION_CODE"}))
+@Table(name = "PRODUCT_OPTION", indexes = { @Index(name = "PRD_OPTION_CODE_IDX", columnList = "PRODUCT_OPTION_CODE") },
+		uniqueConstraints = @UniqueConstraint(columnNames = { "STORE_MERCHANT_ID", "PRODUCT_OPTION_CODE" }))
 @Getter
 @Setter
 public class ProductOption extends SalesManagerEntity<Long, ProductOption> {
-    @Serial private static final long serialVersionUID = 1L;
 
-    @Id
-    @Column(name = "PRODUCT_OPTION_ID")
-    @TableGenerator(
-            name = "TABLE_GEN",
-            table = "SM_SEQUENCER",
-            pkColumnName = "SEQ_NAME",
-            valueColumnName = "SEQ_COUNT",
-            pkColumnValue = "PRODUCT_OPTION_SEQ_NEXT_VAL",
-            allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
-            initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
-    private Long id;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    @Column(name = "PRODUCT_OPTION_SORT_ORD")
-    private Integer productOptionSortOrder;
+	@Id
+	@Column(name = "PRODUCT_OPTION_ID")
+	@TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME",
+			valueColumnName = "SEQ_COUNT", pkColumnValue = "PRODUCT_OPTION_SEQ_NEXT_VAL",
+			allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
+			initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
+	@GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
+	private Long id;
 
-    @Column(name = "PRODUCT_OPTION_TYPE", length = 10)
-    private String productOptionType;
+	@Column(name = "PRODUCT_OPTION_SORT_ORD")
+	private Integer productOptionSortOrder;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "productOption")
-    private Set<ProductOptionDescription> descriptions = new HashSet<>();
+	@Column(name = "PRODUCT_OPTION_TYPE", length = 10)
+	private String productOptionType;
 
-    @Transient private List<ProductOptionDescription> descriptionsList = new ArrayList<>();
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "productOption")
+	private Set<ProductOptionDescription> descriptions = new HashSet<>();
 
-    @Embedded
-    @AttributeOverrides(
-            @AttributeOverride(
-                    name = "storeMerchantId",
-                    column = @Column(name = "STORE_MERCHANT_ID", nullable = false, length = 50)))
-    private StoreMerchantId storeMerchantId;
+	@Transient
+	private List<ProductOptionDescription> descriptionsList = new ArrayList<>();
 
-    @Column(name = "PRODUCT_OPTION_READ")
-    private boolean readOnly;
+	@Embedded
+	@AttributeOverrides(@AttributeOverride(name = "storeMerchantId",
+			column = @Column(name = "STORE_MERCHANT_ID", nullable = false, length = 50)))
+	private StoreMerchantId storeMerchantId;
 
-    @NotEmpty
-    @Pattern(regexp = "^[a-zA-Z0-9_-]*$")
-    @Column(name = "PRODUCT_OPTION_CODE")
-    private String code;
+	@Column(name = "PRODUCT_OPTION_READ")
+	private boolean readOnly;
 
-    public ProductOption() {}
+	@NotEmpty
+	@Pattern(regexp = "^[a-zA-Z0-9_-]*$")
+	@Column(name = "PRODUCT_OPTION_CODE")
+	private String code;
 
-    public List<ProductOptionDescription> getDescriptionsSettoList() {
-        if (descriptionsList == null || descriptionsList.isEmpty()) {
-            descriptionsList = new ArrayList<>(this.getDescriptions());
-        }
-        return descriptionsList;
-    }
+	public ProductOption() {
+	}
+
+	public List<ProductOptionDescription> getDescriptionsSettoList() {
+		if (descriptionsList == null || descriptionsList.isEmpty()) {
+			descriptionsList = new ArrayList<>(this.getDescriptions());
+		}
+		return descriptionsList;
+	}
+
 }

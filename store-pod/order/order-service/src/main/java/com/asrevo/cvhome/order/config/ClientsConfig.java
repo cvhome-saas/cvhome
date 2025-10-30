@@ -6,18 +6,21 @@ import com.asrevo.cvhome.s2s.config.internal.RestClientBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-
 @Configuration
 public class ClientsConfig {
-    @Bean
-    public ExternalMerchantStoreService externalMerchantStoreService(RestClientBuilder restClientBuilder) {
-        ExternalMerchantStoreService externalMerchantStoreService = restClientBuilder.buildClient("merchant", ExternalMerchantStoreService.class);
-        return new CachedExternalMerchantStoreService(externalMerchantStoreService);
-    }
 
-    @Bean
-    public ExternalProductService externalProductService(RestClientBuilder restClientBuilder) {
-        ExternalProductService externalProductService = restClientBuilder.buildClient("catalog", ExternalProductService.class);
-        return new CachedExternalProductService(externalProductService);
-    }
+	@Bean
+	public ExternalMerchantStoreService externalMerchantStoreService(RestClientBuilder restClientBuilder) {
+		ExternalMerchantStoreService externalMerchantStoreService = restClientBuilder.buildClient("merchant",
+				ExternalMerchantStoreService.class);
+		return new CachedExternalMerchantStoreService(externalMerchantStoreService);
+	}
+
+	@Bean
+	public ExternalProductService externalProductService(RestClientBuilder restClientBuilder) {
+		ExternalProductService externalProductService = restClientBuilder.buildClient("catalog",
+				ExternalProductService.class);
+		return new CachedExternalProductService(externalProductService);
+	}
+
 }

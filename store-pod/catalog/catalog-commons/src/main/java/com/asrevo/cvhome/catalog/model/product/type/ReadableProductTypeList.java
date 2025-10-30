@@ -12,10 +12,12 @@ import lombok.Setter;
 @Deprecated
 public class ReadableProductTypeList extends ReadableList<ReadableProductType> {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    List<ReadableProductType> content = new ArrayList<>();
+	List<ReadableProductType> content = new ArrayList<>();
+
 }

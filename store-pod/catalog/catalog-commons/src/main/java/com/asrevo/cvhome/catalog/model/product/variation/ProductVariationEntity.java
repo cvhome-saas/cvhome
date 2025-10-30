@@ -9,13 +9,18 @@ import lombok.Setter;
 @Getter
 public class ProductVariationEntity extends Entity {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private String code; // sku
-    private String date;
-    private int sortOrder;
-    private boolean defaultValue = false;
+	private String code; // sku
+
+	private String date;
+
+	private int sortOrder;
+
+	private boolean defaultValue = false;
+
 }

@@ -23,41 +23,42 @@ import org.springframework.stereotype.Service;
 @Service("languageService")
 @Slf4j
 public class LanguageServiceImpl extends SalesManagerEntityServiceImpl<LanguageCode, Language>
-        implements LanguageService {
+		implements LanguageService {
 
-    private final LanguageRepository languageRepository;
+	private final LanguageRepository languageRepository;
 
-    @Autowired
-    public LanguageServiceImpl(LanguageRepository languageRepository) {
-        super(languageRepository);
-        this.languageRepository = languageRepository;
-    }
+	@Autowired
+	public LanguageServiceImpl(LanguageRepository languageRepository) {
+		super(languageRepository);
+		this.languageRepository = languageRepository;
+	}
 
-    @Override
-    @Cacheable("languageByCode")
-    public Language getByCode(LanguageCode code) {
-        return languageRepository.findByCode(code);
-    }
+	@Override
+	@Cacheable("languageByCode")
+	public Language getByCode(LanguageCode code) {
+		return languageRepository.findByCode(code);
+	}
 
-    @Override
-    public Locale toLocale(LanguageCode language, CountryIsoCode country) {
-        return Locale.of(language.code(), country.isoCode());
-    }
+	@Override
+	public Locale toLocale(LanguageCode language, CountryIsoCode country) {
+		return Locale.of(language.code(), country.isoCode());
+	}
 
-    @Override
-    public Map<LanguageCode, Language> getLanguagesMap() throws ServiceException {
+	@Override
+	public Map<LanguageCode, Language> getLanguagesMap() throws ServiceException {
 
-        List<Language> langs = this.getLanguages();
-        Map<LanguageCode, Language> returnMap = new LinkedHashMap<>();
+		List<Language> langs = this.getLanguages();
+		Map<LanguageCode, Language> returnMap = new LinkedHashMap<>();
 
-        for (Language lang : langs) {
-            returnMap.put(lang.getCode(), lang);
-        }
-        return returnMap;
-    }
+		for (Language lang : langs) {
+			returnMap.put(lang.getCode(), lang);
+		}
+		return returnMap;
+	}
 
-    @SuppressWarnings("unchecked")
-    private List<Language> getLanguages() {
-        return this.list();
-    }
+	@SuppressWarnings("unchecked")
+	private List<Language> getLanguages() {
+		return this.list();
+	}
+
 }

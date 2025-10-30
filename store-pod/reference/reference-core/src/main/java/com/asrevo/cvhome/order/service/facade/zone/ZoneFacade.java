@@ -8,6 +8,6 @@ import java.util.List;
 
 public interface ZoneFacade {
 
-    List<ReadableZone> getZones(
-            CountryIsoCode countryCode, LanguageCode language, StoreMerchantId merchantStore);
+	List<ReadableZone> getZones(CountryIsoCode countryCode, LanguageCode language, StoreMerchantId merchantStore);
+
 }

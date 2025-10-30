@@ -14,20 +14,24 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @AllArgsConstructor
 public class StripeWebhookController {
-    public static final String STRIPE_SIGNATURE_HEADER = "Stripe-Signature";
-    private final WebhookRouterService webhookRouterService;
-    private final StripeProperties stripeProperties;
 
-    // http://localhost:7002/api/v1/stripe-webhook/public/events
-    // https://gateway.com/subscription/api/v1/stripe-webhook/public/events
-    @PostMapping("public/events")
-    public void events(@RequestBody String eventStr, @RequestHeader(STRIPE_SIGNATURE_HEADER) String sigHeader) {
-        try {
-            Event event = Webhook.constructEvent(eventStr, sigHeader, stripeProperties.webhookSigningKey());
-            webhookRouterService.route(event);
-        } catch (SignatureVerificationException e) {
-            log.error(e.getMessage(), e);
-        }
+	public static final String STRIPE_SIGNATURE_HEADER = "Stripe-Signature";
 
-    }
+	private final WebhookRouterService webhookRouterService;
+
+	private final StripeProperties stripeProperties;
+
+	// http://localhost:7002/api/v1/stripe-webhook/public/events
+	// https://gateway.com/subscription/api/v1/stripe-webhook/public/events
+	@PostMapping("public/events")
+	public void events(@RequestBody String eventStr, @RequestHeader(STRIPE_SIGNATURE_HEADER) String sigHeader) {
+		try {
+			Event event = Webhook.constructEvent(eventStr, sigHeader, stripeProperties.webhookSigningKey());
+			webhookRouterService.route(event);
+		}
+		catch (SignatureVerificationException e) {
+			log.error(e.getMessage(), e);
+		}
+	}
+
 }

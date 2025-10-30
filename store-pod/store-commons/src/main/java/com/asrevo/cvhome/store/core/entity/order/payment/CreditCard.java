@@ -13,19 +13,20 @@ import lombok.Setter;
 @Embeddable
 public class CreditCard {
 
-    @Column(name = "CARD_TYPE")
-    @Enumerated(value = EnumType.STRING)
-    private CreditCardType cardType;
+	@Column(name = "CARD_TYPE")
+	@Enumerated(value = EnumType.STRING)
+	private CreditCardType cardType;
 
-    @Column(name = "CC_OWNER")
-    private String ccOwner;
+	@Column(name = "CC_OWNER")
+	private String ccOwner;
 
-    @Column(name = "CC_NUMBER")
-    private String ccNumber;
+	@Column(name = "CC_NUMBER")
+	private String ccNumber;
 
-    @Column(name = "CC_EXPIRES")
-    private String ccExpires;
+	@Column(name = "CC_EXPIRES")
+	private String ccExpires;
 
-    @Column(name = "CC_CVV")
-    private String ccCvv;
+	@Column(name = "CC_CVV")
+	private String ccCvv;
+
 }

@@ -16,54 +16,53 @@ import software.amazon.awssdk.services.s3.model.PutBucketPolicyResponse;
 @AllArgsConstructor
 @Slf4j
 public class S3InitConfigurer implements ApplicationListener<ApplicationReadyEvent> {
-    private final S3Client s3Client;
-    private final CdnStorageProperties cdnStorageProperties;
 
+	private final S3Client s3Client;
 
-    @Override
-    public void onApplicationEvent(ApplicationReadyEvent event) {
-        if (StorageProviderType.MINIO.equals(cdnStorageProperties.provider())) {
-            configureBucket();
-            configurePolicy();
-        }
-    }
+	private final CdnStorageProperties cdnStorageProperties;
 
-    private void configureBucket() {
-        try {
-            s3Client.createBucket(CreateBucketRequest.builder().bucket(cdnStorageProperties.bucket()).build());
-        } catch (Exception e) {
-            log.error("error creating bucket", e);
-        }
-    }
+	@Override
+	public void onApplicationEvent(ApplicationReadyEvent event) {
+		if (StorageProviderType.MINIO.equals(cdnStorageProperties.provider())) {
+			configureBucket();
+			configurePolicy();
+		}
+	}
 
-    public void configurePolicy() {
-        String policy = """
-                {
-                    "Version": "2012-10-17",
-                    "Statement": [
-                        {
-                            "Sid": "AllowPublicRead",
-                            "Effect": "Allow",
-                            "Principal": {
-                                "AWS": "*"
-                            },
-                            "Action": "s3:GetObject",
-                            "Resource": "arn:aws:s3:::${BUCKET}/*"
-                        }
-                    ]
-                }
-                """;
-        String finalPolicy = policy
-                .replace("${BUCKET}", cdnStorageProperties.bucket());
-        try {
-            PutBucketPolicyResponse putBucketPolicyResponse = s3Client.putBucketPolicy(PutBucketPolicyRequest.builder()
-                    .bucket(cdnStorageProperties.bucket())
-                    .policy(
-                            finalPolicy
-                    )
-                    .build());
-        } catch (Exception e) {
-            log.error("error putting policy", e);
-        }
-    }
+	private void configureBucket() {
+		try {
+			s3Client.createBucket(CreateBucketRequest.builder().bucket(cdnStorageProperties.bucket()).build());
+		}
+		catch (Exception e) {
+			log.error("error creating bucket", e);
+		}
+	}
+
+	public void configurePolicy() {
+		String policy = """
+				{
+				    "Version": "2012-10-17",
+				    "Statement": [
+				        {
+				            "Sid": "AllowPublicRead",
+				            "Effect": "Allow",
+				            "Principal": {
+				                "AWS": "*"
+				            },
+				            "Action": "s3:GetObject",
+				            "Resource": "arn:aws:s3:::${BUCKET}/*"
+				        }
+				    ]
+				}
+				""";
+		String finalPolicy = policy.replace("${BUCKET}", cdnStorageProperties.bucket());
+		try {
+			PutBucketPolicyResponse putBucketPolicyResponse = s3Client.putBucketPolicy(
+					PutBucketPolicyRequest.builder().bucket(cdnStorageProperties.bucket()).policy(finalPolicy).build());
+		}
+		catch (Exception e) {
+			log.error("error putting policy", e);
+		}
+	}
+
 }

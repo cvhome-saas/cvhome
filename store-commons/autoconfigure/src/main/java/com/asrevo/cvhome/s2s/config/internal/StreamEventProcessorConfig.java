@@ -8,20 +8,20 @@ import org.springframework.context.annotation.Bean;
 
 public class StreamEventProcessorConfig {
 
-    @Bean
-    public EventProcessor eventProcessor(List<EventImpl<?>> eventsImpl) {
-        //noinspection unchecked
-        return new DefaultEventProcessor(
-                eventsImpl.stream().map(it -> (EventImpl<Event>) it).toList());
-    }
+	@Bean
+	public EventProcessor eventProcessor(List<EventImpl<?>> eventsImpl) {
+		// noinspection unchecked
+		return new DefaultEventProcessor(eventsImpl.stream().map(it -> (EventImpl<Event>) it).toList());
+	}
 
-    @Bean
-    public Consumer<Event> events(EventProcessor eventProcessor) {
-        return eventProcessor::process;
-    }
+	@Bean
+	public Consumer<Event> events(EventProcessor eventProcessor) {
+		return eventProcessor::process;
+	}
 
-    @Bean
-    public EventPublisher eventPublisher(StreamBridge streamBridge) {
-        return new StreamEventPublisher(streamBridge);
-    }
+	@Bean
+	public EventPublisher eventPublisher(StreamBridge streamBridge) {
+		return new StreamEventPublisher(streamBridge);
+	}
+
 }

@@ -9,14 +9,16 @@ import lombok.Setter;
 @Getter
 public class BillingEntity extends Address {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private String email;
+	private String email;
 
-    private String countryName;
+	private String countryName;
 
-    private String provinceName;
+	private String provinceName;
+
 }

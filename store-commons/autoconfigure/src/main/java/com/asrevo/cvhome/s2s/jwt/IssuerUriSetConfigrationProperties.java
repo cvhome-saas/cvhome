@@ -9,5 +9,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Getter
 @Setter
 public class IssuerUriSetConfigrationProperties {
-    private Set<String> issuerUriSet;
+
+	private Set<String> issuerUriSet;
+
 }

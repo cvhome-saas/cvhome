@@ -10,45 +10,44 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(
-        name = "PRODUCT_DESCRIPTION",
-        uniqueConstraints = {@UniqueConstraint(columnNames = {"PRODUCT_ID", "LANGUAGE_CODE"})},
-        indexes = {@Index(name = "PRODUCT_DESCRIPTION_SEF_URL", columnList = "SEF_URL")})
-@TableGenerator(
-        name = "description_gen",
-        table = "SM_SEQUENCER",
-        pkColumnName = "SEQ_NAME",
-        valueColumnName = "SEQ_COUNT",
-        pkColumnValue = "PRODUCT_DESCRIPTION_SEQ_NEXT_VAL",
-        allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
-        initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
+@Table(name = "PRODUCT_DESCRIPTION",
+		uniqueConstraints = { @UniqueConstraint(columnNames = { "PRODUCT_ID", "LANGUAGE_CODE" }) },
+		indexes = { @Index(name = "PRODUCT_DESCRIPTION_SEF_URL", columnList = "SEF_URL") })
+@TableGenerator(name = "description_gen", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME",
+		valueColumnName = "SEQ_COUNT", pkColumnValue = "PRODUCT_DESCRIPTION_SEQ_NEXT_VAL",
+		allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
+		initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
 @Getter
 @Setter
 public class ProductDescription extends Description {
-    @Serial private static final long serialVersionUID = 1L;
 
-    @JsonIgnore
-    @ManyToOne(targetEntity = Product.class)
-    @JoinColumn(name = "PRODUCT_ID", nullable = false)
-    private Product product;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    @Column(name = "PRODUCT_HIGHLIGHT")
-    private String productHighlight;
+	@JsonIgnore
+	@ManyToOne(targetEntity = Product.class)
+	@JoinColumn(name = "PRODUCT_ID", nullable = false)
+	private Product product;
 
-    @Column(name = "DOWNLOAD_LNK")
-    private String productExternalDl;
+	@Column(name = "PRODUCT_HIGHLIGHT")
+	private String productHighlight;
 
-    @Column(name = "SEF_URL")
-    private String seUrl;
+	@Column(name = "DOWNLOAD_LNK")
+	private String productExternalDl;
 
-    @Column(name = "META_TITLE")
-    private String metatagTitle;
+	@Column(name = "SEF_URL")
+	private String seUrl;
 
-    @Column(name = "META_KEYWORDS")
-    private String metatagKeywords;
+	@Column(name = "META_TITLE")
+	private String metatagTitle;
 
-    @Column(name = "META_DESCRIPTION")
-    private String metatagDescription;
+	@Column(name = "META_KEYWORDS")
+	private String metatagKeywords;
 
-    public ProductDescription() {}
+	@Column(name = "META_DESCRIPTION")
+	private String metatagDescription;
+
+	public ProductDescription() {
+	}
+
 }

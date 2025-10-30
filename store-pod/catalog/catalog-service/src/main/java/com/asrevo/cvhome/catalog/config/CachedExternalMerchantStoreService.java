@@ -6,16 +6,17 @@ import com.asrevo.cvhome.merchant.model.merchant.ReadableMerchantStore;
 import org.springframework.cache.annotation.Cacheable;
 
 public class CachedExternalMerchantStoreService implements ExternalMerchantStoreService {
-    private final ExternalMerchantStoreService externalMerchantStoreService;
 
-    public CachedExternalMerchantStoreService(ExternalMerchantStoreService externalMerchantStoreService) {
-        this.externalMerchantStoreService = externalMerchantStoreService;
-    }
+	private final ExternalMerchantStoreService externalMerchantStoreService;
 
-    @Cacheable(value = "STORE",key = "#store.storeMerchantId()", unless = "#result==null")
-    @Override
-    public ReadableMerchantStore getStore(StoreMerchantId store) {
-        return externalMerchantStoreService.getStore(store);
-    }
+	public CachedExternalMerchantStoreService(ExternalMerchantStoreService externalMerchantStoreService) {
+		this.externalMerchantStoreService = externalMerchantStoreService;
+	}
+
+	@Cacheable(value = "STORE", key = "#store.storeMerchantId()", unless = "#result==null")
+	@Override
+	public ReadableMerchantStore getStore(StoreMerchantId store) {
+		return externalMerchantStoreService.getStore(store);
+	}
 
 }

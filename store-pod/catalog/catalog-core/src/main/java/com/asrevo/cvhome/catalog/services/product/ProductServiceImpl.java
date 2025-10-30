@@ -34,265 +34,271 @@ import org.springframework.util.Assert;
 
 @Service("productService")
 @Slf4j
-public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Product>
-        implements ProductService {
+public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Product> implements ProductService {
 
-    private final ProductRepository productRepository;
+	private final ProductRepository productRepository;
 
-    @Autowired ProductRelationshipService productRelationshipService;
+	@Autowired
+	ProductRelationshipService productRelationshipService;
 
-    @Autowired ProductImageService productImageService;
-    @Autowired private PricingServiceImpl pricingService;
-    @Autowired private ReadableMinimalProductMapper readableMinimalProductMapper;
-    @Autowired private ReadableProductAvailabilityMapper readableProductAvailabilityMapper;
+	@Autowired
+	ProductImageService productImageService;
 
-    @Autowired
-    public ProductServiceImpl(ProductRepository productRepository) {
-        super(productRepository);
-        this.productRepository = productRepository;
-    }
+	@Autowired
+	private PricingServiceImpl pricingService;
 
-    @Override
-    public Optional<Product> retrieveById(Long id, StoreMerchantId store) {
-        return Optional.ofNullable(findOne(id, store));
-    }
+	@Autowired
+	private ReadableMinimalProductMapper readableMinimalProductMapper;
 
-    @Override
-    public List<Product> getProducts(List<Long> categoryIds) {
-        Set<Long> ids = new HashSet<>(categoryIds);
-        return productRepository.getProductsListByCategories(ids);
-    }
+	@Autowired
+	private ReadableProductAvailabilityMapper readableProductAvailabilityMapper;
 
-    @Override
-    public Product getBySeUrl(StoreMerchantId store, String seUrl, Locale locale) {
-        return productRepository.getByFriendlyUrl(store, seUrl, locale);
-    }
+	@Autowired
+	public ProductServiceImpl(ProductRepository productRepository) {
+		super(productRepository);
+		this.productRepository = productRepository;
+	}
 
-    @Override
-    public ProductList listByStore(
-            StoreMerchantId store, LanguageCode language, ProductCriteria criteria) {
+	@Override
+	public Optional<Product> retrieveById(Long id, StoreMerchantId store) {
+		return Optional.ofNullable(findOne(id, store));
+	}
 
-        return productRepository.listByStore(store, language, criteria);
-    }
+	@Override
+	public List<Product> getProducts(List<Long> categoryIds) {
+		Set<Long> ids = new HashSet<>(categoryIds);
+		return productRepository.getProductsListByCategories(ids);
+	}
 
-    @Override
-    public List<Product> listByStore(StoreMerchantId store) {
+	@Override
+	public Product getBySeUrl(StoreMerchantId store, String seUrl, Locale locale) {
+		return productRepository.getByFriendlyUrl(store, seUrl, locale);
+	}
 
-        return productRepository.listByStore(store);
-    }
+	@Override
+	public ProductList listByStore(StoreMerchantId store, LanguageCode language, ProductCriteria criteria) {
 
-    @Override
-    public void delete(Product product) throws ServiceException {
-        Assert.notNull(product, "Product cannot be null");
-        product = this.getById(product.getId()); // Prevents detached entity
-        // error
-        product.setCategories(null);
+		return productRepository.listByStore(store, language, criteria);
+	}
 
-        Set<ProductImage> images = product.getImages();
+	@Override
+	public List<Product> listByStore(StoreMerchantId store) {
 
-        for (ProductImage image : images) {
-            productImageService.removeProductImage(image);
-        }
+		return productRepository.listByStore(store);
+	}
 
-        product.setImages(null);
+	@Override
+	public void delete(Product product) throws ServiceException {
+		Assert.notNull(product, "Product cannot be null");
+		product = this.getById(product.getId()); // Prevents detached entity
+		// error
+		product.setCategories(null);
 
-        // related - featured
-        List<ProductRelationship> relationships = productRelationshipService.listByProduct(product);
-        for (ProductRelationship relationship : relationships) {
-            productRelationshipService.deleteRelationship(relationship);
-        }
+		Set<ProductImage> images = product.getImages();
 
-        super.delete(product);
-        // searchService.deleteIndex(product.getMerchantStore(), product);
+		for (ProductImage image : images) {
+			productImageService.removeProductImage(image);
+		}
 
-    }
+		product.setImages(null);
 
-    @Override
-    public void create(Product product) throws ServiceException {
-        saveOrUpdate(product);
-    }
+		// related - featured
+		List<ProductRelationship> relationships = productRelationshipService.listByProduct(product);
+		for (ProductRelationship relationship : relationships) {
+			productRelationshipService.deleteRelationship(relationship);
+		}
 
-    @Override
-    public void update(Product product) throws ServiceException {
-        saveOrUpdate(product);
-    }
+		super.delete(product);
+		// searchService.deleteIndex(product.getMerchantStore(), product);
 
-    private Product saveOrUpdate(Product product) throws ServiceException {
-        Assert.notNull(product, "product cannot be null");
-        Assert.notNull(product.getAvailabilities(), "product must have at least one availability");
-        Assert.notEmpty(product.getAvailabilities(), "product must have at least one availability");
+	}
 
-        // take care of product images separately
-        Set<ProductImage> originalProductImages = new HashSet<>(product.getImages());
+	@Override
+	public void create(Product product) throws ServiceException {
+		saveOrUpdate(product);
+	}
 
-        if (product.getId() != null && product.getId() > 0) {
-            super.update(product);
-        } else {
-            super.create(product);
-        }
+	@Override
+	public void update(Product product) throws ServiceException {
+		saveOrUpdate(product);
+	}
 
-        List<Long> newImageIds = new ArrayList<>();
-        Set<ProductImage> images = product.getImages();
+	private Product saveOrUpdate(Product product) throws ServiceException {
+		Assert.notNull(product, "product cannot be null");
+		Assert.notNull(product.getAvailabilities(), "product must have at least one availability");
+		Assert.notEmpty(product.getAvailabilities(), "product must have at least one availability");
 
-        try {
+		// take care of product images separately
+		Set<ProductImage> originalProductImages = new HashSet<>(product.getImages());
 
-            if (images != null && !images.isEmpty()) {
-                for (ProductImage image : images) {
-                    if (image.getImage() != null
-                            && (image.getId() == null || image.getId() == 0L)) {
-                        image.setProduct(product);
+		if (product.getId() != null && product.getId() > 0) {
+			super.update(product);
+		}
+		else {
+			super.create(product);
+		}
 
-                        InputStream inputStream = image.getImage();
-                        ImageContentFile cmsContentImage = new ImageContentFile();
-                        cmsContentImage.setFileName(image.getProductImage());
-                        cmsContentImage.setFile(inputStream);
-                        cmsContentImage.setFileContentType(FileContentType.PRODUCT);
+		List<Long> newImageIds = new ArrayList<>();
+		Set<ProductImage> images = product.getImages();
 
-                        productImageService.addProductImage(product, image, cmsContentImage);
-                        newImageIds.add(image.getId());
-                    } else {
-                        if (image.getId() != null) {
-                            productImageService.save(image);
-                            newImageIds.add(image.getId());
-                        }
-                    }
-                }
-            }
+		try {
 
-            // cleanup old and new images
-            for (ProductImage image : originalProductImages) {
+			if (images != null && !images.isEmpty()) {
+				for (ProductImage image : images) {
+					if (image.getImage() != null && (image.getId() == null || image.getId() == 0L)) {
+						image.setProduct(product);
 
-                if (image.getImage() != null && image.getId() == null) {
-                    image.setProduct(product);
+						InputStream inputStream = image.getImage();
+						ImageContentFile cmsContentImage = new ImageContentFile();
+						cmsContentImage.setFileName(image.getProductImage());
+						cmsContentImage.setFile(inputStream);
+						cmsContentImage.setFileContentType(FileContentType.PRODUCT);
 
-                    InputStream inputStream = image.getImage();
-                    ImageContentFile cmsContentImage = new ImageContentFile();
-                    cmsContentImage.setFileName(image.getProductImage());
-                    cmsContentImage.setFile(inputStream);
-                    cmsContentImage.setFileContentType(FileContentType.PRODUCT);
+						productImageService.addProductImage(product, image, cmsContentImage);
+						newImageIds.add(image.getId());
+					}
+					else {
+						if (image.getId() != null) {
+							productImageService.save(image);
+							newImageIds.add(image.getId());
+						}
+					}
+				}
+			}
 
-                    productImageService.addProductImage(product, image, cmsContentImage);
-                    newImageIds.add(image.getId());
-                } else {
-                    if (!newImageIds.contains(image.getId())) {
-                        productImageService.delete(image);
-                    }
-                }
-            }
+			// cleanup old and new images
+			for (ProductImage image : originalProductImages) {
 
-        } catch (Exception e) {
-            log.error("Cannot save images {}", e.getMessage());
-        }
+				if (image.getImage() != null && image.getId() == null) {
+					image.setProduct(product);
 
-        return product;
-    }
+					InputStream inputStream = image.getImage();
+					ImageContentFile cmsContentImage = new ImageContentFile();
+					cmsContentImage.setFileName(image.getProductImage());
+					cmsContentImage.setFile(inputStream);
+					cmsContentImage.setFileContentType(FileContentType.PRODUCT);
 
-    @Override
-    public Product findOne(Long id, StoreMerchantId merchant) {
-        Assert.notNull(merchant, "Store must not be null");
-        Assert.notNull(id, "id must not be null");
-        return productRepository.getById(id, merchant);
-    }
+					productImageService.addProductImage(product, image, cmsContentImage);
+					newImageIds.add(image.getId());
+				}
+				else {
+					if (!newImageIds.contains(image.getId())) {
+						productImageService.delete(image);
+					}
+				}
+			}
 
-    @Transactional
-    @Override
-    public ProductReservationStatus reserve(
-            StoreMerchantId store, ProductReservationList productReservation)
-            throws ServiceException {
-        if (Objects.isNull(productReservation.entries())
-                || productReservation.entries().isEmpty()) {
-            throw new ServiceException(
-                    "Cannot update product availability because no new availabilities exists");
-        }
+		}
+		catch (Exception e) {
+			log.error("Cannot save images {}", e.getMessage());
+		}
 
-        for (ReserveProductEntry entry : productReservation.entries()) {
-            Product product =
-                    productRepository.getByProductIdFetchAvailabilities(
-                            findProductIdByCode(entry.sku(), store), store);
-            for (ProductAvailability availability : product.getAvailabilities()) {
-                int qty = availability.getProductQuantity();
-                if (qty < entry.reserveQty()) {
-                    throw new ServiceException(ServiceException.EXCEPTION_INVENTORY_MISMATCH);
-                }
-                qty = qty - entry.reserveQty();
-                availability.setProductQuantity(qty);
-            }
-            productRepository.save(product);
-        }
-        return new ProductReservationStatus(true);
-    }
+		return product;
+	}
 
-    @Override
-    public Page<Product> findAll(ProductCriteria criteria, StoreMerchantId store) {
-        return productRepository.findAll(criteria, store);
-    }
+	@Override
+	public Product findOne(Long id, StoreMerchantId merchant) {
+		Assert.notNull(merchant, "Store must not be null");
+		Assert.notNull(id, "id must not be null");
+		return productRepository.getById(id, merchant);
+	}
 
-    @SneakyThrows
-    @Override
-    public ProductDetails getDetailedProduct(
-            StoreMerchantId store, String sku, LanguageCode language) {
-        Product p = getMinimalProductBySku(sku, store, language);
-        ReadableMinimalProduct product = readableMinimalProductMapper.convert(p, store, language);
-        FinalPrice price = pricingService.calculateProductPrice(p);
-        ReadableProductAvailability availability =
-                readableProductAvailabilityMapper.convert(p, store, null);
-        return new ProductDetails(product, price, availability);
-    }
+	@Transactional
+	@Override
+	public ProductReservationStatus reserve(StoreMerchantId store, ProductReservationList productReservation)
+			throws ServiceException {
+		if (Objects.isNull(productReservation.entries()) || productReservation.entries().isEmpty()) {
+			throw new ServiceException("Cannot update product availability because no new availabilities exists");
+		}
 
-    @Override
-    public Product saveProduct(Product product) throws ServiceException {
-        try {
-            return this.saveOrUpdate(product);
-        } catch (ServiceException e) {
-            throw new ServiceException("Cannot create product [" + product.getId() + "]", e);
-        }
-    }
+		for (ReserveProductEntry entry : productReservation.entries()) {
+			Product product = productRepository
+				.getByProductIdFetchAvailabilities(findProductIdByCode(entry.sku(), store), store);
+			for (ProductAvailability availability : product.getAvailabilities()) {
+				int qty = availability.getProductQuantity();
+				if (qty < entry.reserveQty()) {
+					throw new ServiceException(ServiceException.EXCEPTION_INVENTORY_MISMATCH);
+				}
+				qty = qty - entry.reserveQty();
+				availability.setProductQuantity(qty);
+			}
+			productRepository.save(product);
+		}
+		return new ProductReservationStatus(true);
+	}
 
-    public Product getMinimalProductBySku(
-            String productCode, StoreMerchantId merchant, LanguageCode language)
-            throws ServiceException {
+	@Override
+	public Page<Product> findAll(ProductCriteria criteria, StoreMerchantId store) {
+		return productRepository.findAll(criteria, store);
+	}
 
-        try {
-            Long productId = findProductIdByCode(productCode, merchant);
-            return productRepository.getMinimalProductById(productId, merchant, language);
-        } catch (Exception e) {
-            throw new ServiceException("Cannot get product with sku [" + productCode + "]", e);
-        }
-    }
+	@SneakyThrows
+	@Override
+	public ProductDetails getDetailedProduct(StoreMerchantId store, String sku, LanguageCode language) {
+		Product p = getMinimalProductBySku(sku, store, language);
+		ReadableMinimalProduct product = readableMinimalProductMapper.convert(p, store, language);
+		FinalPrice price = pricingService.calculateProductPrice(p);
+		ReadableProductAvailability availability = readableProductAvailabilityMapper.convert(p, store, null);
+		return new ProductDetails(product, price, availability);
+	}
 
-    @Override
-    public Product getBySku(String productCode, StoreMerchantId merchant, LanguageCode language)
-            throws ServiceException {
+	@Override
+	public Product saveProduct(Product product) throws ServiceException {
+		try {
+			return this.saveOrUpdate(product);
+		}
+		catch (ServiceException e) {
+			throw new ServiceException("Cannot create product [" + product.getId() + "]", e);
+		}
+	}
 
-        try {
-            Long productId = findProductIdByCode(productCode, merchant);
-            return productRepository.getById(productId, merchant, language);
-        } catch (Exception e) {
-            throw new ServiceException("Cannot get product with sku [" + productCode + "]", e);
-        }
-    }
+	public Product getMinimalProductBySku(String productCode, StoreMerchantId merchant, LanguageCode language)
+			throws ServiceException {
 
-    public Product getBySku(String productCode, StoreMerchantId merchant) throws ServiceException {
+		try {
+			Long productId = findProductIdByCode(productCode, merchant);
+			return productRepository.getMinimalProductById(productId, merchant, language);
+		}
+		catch (Exception e) {
+			throw new ServiceException("Cannot get product with sku [" + productCode + "]", e);
+		}
+	}
 
-        try {
-            Long productId = findProductIdByCode(productCode, merchant);
-            return this.findOne(productId, merchant);
-        } catch (Exception e) {
-            throw new ServiceException("Cannot get product with sku [" + productCode + "]", e);
-        }
-    }
+	@Override
+	public Product getBySku(String productCode, StoreMerchantId merchant, LanguageCode language)
+			throws ServiceException {
 
-    private Long findProductIdByCode(String productCode, StoreMerchantId merchant)
-            throws ServiceException {
-        List<Long> products = productRepository.findBySku(productCode, merchant);
-        if (products.isEmpty()) {
-            throw new ServiceException("Cannot get product with sku [" + productCode + "]");
-        }
-        return products.getFirst();
-    }
+		try {
+			Long productId = findProductIdByCode(productCode, merchant);
+			return productRepository.getById(productId, merchant, language);
+		}
+		catch (Exception e) {
+			throw new ServiceException("Cannot get product with sku [" + productCode + "]", e);
+		}
+	}
 
-    @Override
-    public boolean exists(String sku, StoreMerchantId store) {
-        return productRepository.existsBySku(sku, store);
-    }
+	public Product getBySku(String productCode, StoreMerchantId merchant) throws ServiceException {
+
+		try {
+			Long productId = findProductIdByCode(productCode, merchant);
+			return this.findOne(productId, merchant);
+		}
+		catch (Exception e) {
+			throw new ServiceException("Cannot get product with sku [" + productCode + "]", e);
+		}
+	}
+
+	private Long findProductIdByCode(String productCode, StoreMerchantId merchant) throws ServiceException {
+		List<Long> products = productRepository.findBySku(productCode, merchant);
+		if (products.isEmpty()) {
+			throw new ServiceException("Cannot get product with sku [" + productCode + "]");
+		}
+		return products.getFirst();
+	}
+
+	@Override
+	public boolean exists(String sku, StoreMerchantId store) {
+		return productRepository.existsBySku(sku, store);
+	}
+
 }

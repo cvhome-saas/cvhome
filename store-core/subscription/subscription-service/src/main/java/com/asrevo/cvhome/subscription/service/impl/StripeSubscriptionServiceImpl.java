@@ -22,64 +22,54 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 @Slf4j
 public class StripeSubscriptionServiceImpl implements StripeSubscriptionService {
-    private final StripeProperties stripeProperties;
 
-    @PostConstruct
-    public void init() {
-        Stripe.apiKey = stripeProperties.key();
-    }
+	private final StripeProperties stripeProperties;
 
-    @SneakyThrows
-    private Customer findOrCreateCustomer(ManagerOrgId managerOrgId) {
-        CustomerSearchParams params =
-                CustomerSearchParams.builder()
-                        .setQuery("metadata[\"orgId\"]:\"" + managerOrgId.id().toString() + "\"")
-                        .build();
+	@PostConstruct
+	public void init() {
+		Stripe.apiKey = stripeProperties.key();
+	}
 
-        CustomerSearchResult search = Customer.search(params);
-        Customer customer;
-        if (search.getData().isEmpty()) {
+	@SneakyThrows
+	private Customer findOrCreateCustomer(ManagerOrgId managerOrgId) {
+		CustomerSearchParams params = CustomerSearchParams.builder()
+			.setQuery("metadata[\"orgId\"]:\"" + managerOrgId.id().toString() + "\"")
+			.build();
 
-            CustomerCreateParams customerCreateParams =
-                    CustomerCreateParams.builder()
-                            .putMetadata("orgId", managerOrgId.id().toString())
-                            .build();
-            customer = Customer.create(customerCreateParams);
-        } else {
-            customer = search.getData().getFirst();
-        }
+		CustomerSearchResult search = Customer.search(params);
+		Customer customer;
+		if (search.getData().isEmpty()) {
 
-        return customer;
-    }
+			CustomerCreateParams customerCreateParams = CustomerCreateParams.builder()
+				.putMetadata("orgId", managerOrgId.id().toString())
+				.build();
+			customer = Customer.create(customerCreateParams);
+		}
+		else {
+			customer = search.getData().getFirst();
+		}
 
+		return customer;
+	}
 
-    @Override
-    @SneakyThrows
-    public String createSubscriptionSession(ManagerOrgId managerOrgId, PriceId priceId, RedirectionUrlBuilder redirectionUrl) {
-        Customer customer = findOrCreateCustomer(managerOrgId);
+	@Override
+	@SneakyThrows
+	public String createSubscriptionSession(ManagerOrgId managerOrgId, PriceId priceId,
+			RedirectionUrlBuilder redirectionUrl) {
+		Customer customer = findOrCreateCustomer(managerOrgId);
 
+		SessionCreateParams.Builder sessionCreateParamsBuilder = SessionCreateParams.builder()
+			.setMode(SessionCreateParams.Mode.SUBSCRIPTION)
+			.setCustomer(customer.getId())
+			.setSuccessUrl(redirectionUrl.getRedirectionUrl("/public/subscription/success"))
+			.setCancelUrl(redirectionUrl.getRedirectionUrl("/public/subscription/fail"))
+			.addLineItem(SessionCreateParams.LineItem.builder().setQuantity(1L).setPrice(priceId.id()).build())
+			.setSubscriptionData(SessionCreateParams.SubscriptionData.builder()
+				.putMetadata("orgId", managerOrgId.id().toString())
+				.build());
 
-        SessionCreateParams.Builder sessionCreateParamsBuilder = SessionCreateParams.builder()
-                .setMode(SessionCreateParams.Mode.SUBSCRIPTION)
-                .setCustomer(customer.getId())
-                .setSuccessUrl(redirectionUrl.getRedirectionUrl("/public/subscription/success"))
-                .setCancelUrl(redirectionUrl.getRedirectionUrl("/public/subscription/fail"))
-                .addLineItem(
-                        SessionCreateParams.LineItem.builder()
-                                .setQuantity(1L)
-                                .setPrice(priceId.id())
-                                .build()
-                )
-                .setSubscriptionData(
-                        SessionCreateParams.SubscriptionData.builder()
-                                .putMetadata("orgId", managerOrgId.id().toString())
-                                .build()
-                );
-
-
-        Session session = Session.create(sessionCreateParamsBuilder.build());
-        return session.getUrl();
-    }
-
+		Session session = Session.create(sessionCreateParamsBuilder.build());
+		return session.getUrl();
+	}
 
 }

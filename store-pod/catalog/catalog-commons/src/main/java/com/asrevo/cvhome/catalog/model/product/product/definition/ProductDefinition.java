@@ -15,18 +15,28 @@ import lombok.Setter;
 @Getter
 public class ProductDefinition extends Entity {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private boolean visible = true;
-    private boolean shipeable = true;
-    private boolean virtual = false;
-    private boolean canBePurchased = true;
-    private String dateAvailable;
-    private String identifier;
-    private String sku; // to match v1 api
-    private ProductSpecification productSpecifications;
-    private int sortOrder;
+	private boolean visible = true;
+
+	private boolean shipeable = true;
+
+	private boolean virtual = false;
+
+	private boolean canBePurchased = true;
+
+	private String dateAvailable;
+
+	private String identifier;
+
+	private String sku; // to match v1 api
+
+	private ProductSpecification productSpecifications;
+
+	private int sortOrder;
+
 }

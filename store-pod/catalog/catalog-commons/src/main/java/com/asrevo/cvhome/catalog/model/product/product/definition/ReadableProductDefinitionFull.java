@@ -8,8 +8,10 @@ import lombok.Setter;
 @Getter
 public class ReadableProductDefinitionFull extends ReadableProductDefinition {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
+
 }

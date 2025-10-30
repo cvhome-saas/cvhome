@@ -20,85 +20,81 @@ import org.springframework.stereotype.Component;
 
 @Component
 @AllArgsConstructor
-public class PersistableProductAvailabilityMapper
-        implements Mapper<PersistableProductInventory, ProductAvailability> {
-    private final ExternalMerchantStoreService externalMerchantStoreService;
+public class PersistableProductAvailabilityMapper implements Mapper<PersistableProductInventory, ProductAvailability> {
 
-    @Override
-    public ProductAvailability convert(
-            PersistableProductInventory source, StoreMerchantId store, LanguageCode language) {
-        return this.merge(source, new ProductAvailability(), store, language);
-    }
+	private final ExternalMerchantStoreService externalMerchantStoreService;
 
-    @Override
-    public ProductAvailability merge(
-            PersistableProductInventory source,
-            ProductAvailability destination,
-            StoreMerchantId store,
-            LanguageCode language) {
+	@Override
+	public ProductAvailability convert(PersistableProductInventory source, StoreMerchantId store,
+			LanguageCode language) {
+		return this.merge(source, new ProductAvailability(), store, language);
+	}
 
-        try {
+	@Override
+	public ProductAvailability merge(PersistableProductInventory source, ProductAvailability destination,
+			StoreMerchantId store, LanguageCode language) {
 
-            destination.setRegion(Constants.ALL_REGIONS);
+		try {
 
-            destination.setProductQuantity(source.getQuantity());
-            destination.setProductQuantityOrderMin(1);
-            destination.setProductQuantityOrderMax(1);
+			destination.setRegion(Constants.ALL_REGIONS);
 
-            if (source.getPrice() != null) {
+			destination.setProductQuantity(source.getQuantity());
+			destination.setProductQuantityOrderMin(1);
+			destination.setProductQuantityOrderMax(1);
 
-                ProductPrice price = new ProductPrice();
-                price.setProductAvailability(destination);
-                price.setDefaultPrice(source.getPrice().isDefaultPrice());
-                price.setProductPriceAmount(source.getPrice().getPrice());
-                price.setCode(source.getPrice().getCode());
-                price.setProductPriceSpecialAmount(source.getPrice().getDiscountedPrice());
-                if (source.getPrice().getDiscountStartDate() != null) {
-                    Date startDate;
+			if (source.getPrice() != null) {
 
-                    startDate = DateUtil.getDate(source.getPrice().getDiscountStartDate());
+				ProductPrice price = new ProductPrice();
+				price.setProductAvailability(destination);
+				price.setDefaultPrice(source.getPrice().isDefaultPrice());
+				price.setProductPriceAmount(source.getPrice().getPrice());
+				price.setCode(source.getPrice().getCode());
+				price.setProductPriceSpecialAmount(source.getPrice().getDiscountedPrice());
+				if (source.getPrice().getDiscountStartDate() != null) {
+					Date startDate;
 
-                    price.setProductPriceSpecialStartDate(startDate);
-                }
-                if (source.getPrice().getDiscountEndDate() != null) {
-                    Date endDate = DateUtil.getDate(source.getPrice().getDiscountEndDate());
-                    price.setProductPriceSpecialEndDate(endDate);
-                }
+					startDate = DateUtil.getDate(source.getPrice().getDiscountStartDate());
 
-                destination.getPrices().add(price);
-                ReadableMerchantStore baseStore = externalMerchantStoreService.getStore(store);
+					price.setProductPriceSpecialStartDate(startDate);
+				}
+				if (source.getPrice().getDiscountEndDate() != null) {
+					Date endDate = DateUtil.getDate(source.getPrice().getDiscountEndDate());
+					price.setProductPriceSpecialEndDate(endDate);
+				}
 
-                List<LanguageCode> supportedLanguages =
-                        baseStore.getSupportedLanguages().stream().map(LanguageCode::new).toList();
+				destination.getPrices().add(price);
+				ReadableMerchantStore baseStore = externalMerchantStoreService.getStore(store);
 
-                for (LanguageCode lang : supportedLanguages) {
-                    ProductPriceDescription ppd = new ProductPriceDescription();
-                    ppd.setProductPrice(price);
-                    ppd.setLanguageCode(lang);
-                    ppd.setName(Constants.DEFAULT_PRICE_DESCRIPTION);
+				List<LanguageCode> supportedLanguages = baseStore.getSupportedLanguages()
+					.stream()
+					.map(LanguageCode::new)
+					.toList();
 
-                    // price appender
-                    Optional<com.asrevo.cvhome.catalog.model.product.ProductPriceDescription>
-                            description =
-                                    source.getPrice().getDescriptions().stream()
-                                            .filter(
-                                                    d ->
-                                                            d.getLanguage() != null
-                                                                    && d.getLanguage().equals(lang))
-                                            .findFirst();
-                    description.ifPresent(
-                            productPriceDescription ->
-                                    ppd.setPriceAppender(
-                                            productPriceDescription.getPriceAppender()));
-                    price.getDescriptions().add(ppd);
-                }
-            }
+				for (LanguageCode lang : supportedLanguages) {
+					ProductPriceDescription ppd = new ProductPriceDescription();
+					ppd.setProductPrice(price);
+					ppd.setLanguageCode(lang);
+					ppd.setName(Constants.DEFAULT_PRICE_DESCRIPTION);
 
-        } catch (Exception e) {
-            throw new ServiceRuntimeException(
-                    "An error occured while mapping product availability", e);
-        }
+					// price appender
+					Optional<com.asrevo.cvhome.catalog.model.product.ProductPriceDescription> description = source
+						.getPrice()
+						.getDescriptions()
+						.stream()
+						.filter(d -> d.getLanguage() != null && d.getLanguage().equals(lang))
+						.findFirst();
+					description.ifPresent(productPriceDescription -> ppd
+						.setPriceAppender(productPriceDescription.getPriceAppender()));
+					price.getDescriptions().add(ppd);
+				}
+			}
 
-        return destination;
-    }
+		}
+		catch (Exception e) {
+			throw new ServiceRuntimeException("An error occured while mapping product availability", e);
+		}
+
+		return destination;
+	}
+
 }

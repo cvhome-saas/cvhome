@@ -7,7 +7,8 @@ import java.util.List;
 
 public interface CustomerAttributeService {
 
-    List<CustomerAttribute> getByCustomer(StoreMerchantId store, Customer customer);
+	List<CustomerAttribute> getByCustomer(StoreMerchantId store, Customer customer);
 
-    void delete(CustomerAttribute attribute);
+	void delete(CustomerAttribute attribute);
+
 }

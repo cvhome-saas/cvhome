@@ -6,5 +6,6 @@ import com.asrevo.cvhome.order.model.order.OrderCriteria;
 
 public interface OrderRepositoryCustom {
 
-    OrderList listOrders(StoreMerchantId store, OrderCriteria criteria);
+	OrderList listOrders(StoreMerchantId store, OrderCriteria criteria);
+
 }

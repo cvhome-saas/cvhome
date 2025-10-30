@@ -8,12 +8,16 @@ import lombok.Setter;
 @Getter
 public class ReadableProductOptionValue extends ProductOptionValue {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private String price;
-    private String image;
-    private String description;
+	private String price;
+
+	private String image;
+
+	private String description;
+
 }

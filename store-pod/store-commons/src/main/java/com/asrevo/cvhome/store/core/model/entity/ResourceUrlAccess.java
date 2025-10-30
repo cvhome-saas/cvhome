@@ -7,7 +7,8 @@ package com.asrevo.cvhome.store.core.model.entity;
  */
 public interface ResourceUrlAccess {
 
-    String getSlug();
+	String getSlug();
 
-    void setSlug(String slug);
+	void setSlug(String slug);
+
 }

@@ -9,10 +9,12 @@ import lombok.Setter;
 @Getter
 public class PersistableProductType extends ProductTypeEntity {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private List<ProductTypeDescription> descriptions;
+	private List<ProductTypeDescription> descriptions;
+
 }

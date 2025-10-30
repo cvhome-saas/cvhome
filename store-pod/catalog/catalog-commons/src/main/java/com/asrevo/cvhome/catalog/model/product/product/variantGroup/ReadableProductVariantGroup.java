@@ -12,9 +12,11 @@ import lombok.Setter;
 @Getter
 public class ReadableProductVariantGroup extends ProductVariantGroup {
 
-    @Serial private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    List<ReadableImage> images = new ArrayList<>();
+	List<ReadableImage> images = new ArrayList<>();
 
-    private List<ReadableProductVariant> productVariants = new ArrayList<>();
+	private List<ReadableProductVariant> productVariants = new ArrayList<>();
+
 }

@@ -16,59 +16,56 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(
-        name = "CUSTOMER_OPTION_VALUE",
-        indexes = {@Index(name = "CUST_OPT_VAL_CODE_IDX", columnList = "CUSTOMER_OPT_VAL_CODE")},
-        uniqueConstraints =
-                @UniqueConstraint(columnNames = {"STORE_MERCHANT_ID", "CUSTOMER_OPT_VAL_CODE"}))
+@Table(name = "CUSTOMER_OPTION_VALUE",
+		indexes = { @Index(name = "CUST_OPT_VAL_CODE_IDX", columnList = "CUSTOMER_OPT_VAL_CODE") },
+		uniqueConstraints = @UniqueConstraint(columnNames = { "STORE_MERCHANT_ID", "CUSTOMER_OPT_VAL_CODE" }))
 @Getter
 @Setter
 public class CustomerOptionValue extends SalesManagerEntity<Long, CustomerOptionValue> {
-    @Serial private static final long serialVersionUID = 3736085877929910891L;
 
-    @Id
-    @Column(name = "CUSTOMER_OPTION_VALUE_ID")
-    @TableGenerator(
-            name = "TABLE_GEN",
-            table = "SM_SEQUENCER",
-            pkColumnName = "SEQ_NAME",
-            valueColumnName = "SEQ_COUNT",
-            pkColumnValue = "CUSTOMER_OPTION_VALUE_SEQ_NEXT_VAL",
-            allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
-            initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
-    private Long id;
+	@Serial
+	private static final long serialVersionUID = 3736085877929910891L;
 
-    @Column(name = "SORT_ORDER")
-    private Integer sortOrder = 0;
+	@Id
+	@Column(name = "CUSTOMER_OPTION_VALUE_ID")
+	@TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME",
+			valueColumnName = "SEQ_COUNT", pkColumnValue = "CUSTOMER_OPTION_VALUE_SEQ_NEXT_VAL",
+			allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
+			initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
+	@GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
+	private Long id;
 
-    @Column(name = "CUSTOMER_OPT_VAL_IMAGE")
-    private String customerOptionValueImage;
+	@Column(name = "SORT_ORDER")
+	private Integer sortOrder = 0;
 
-    @NotEmpty
-    @Pattern(regexp = "^[a-zA-Z0-9_-]*$")
-    @Column(name = "CUSTOMER_OPT_VAL_CODE")
-    private String code;
+	@Column(name = "CUSTOMER_OPT_VAL_IMAGE")
+	private String customerOptionValueImage;
 
-    @Valid
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "customerOptionValue")
-    private Set<CustomerOptionValueDescription> descriptions = new HashSet<>();
+	@NotEmpty
+	@Pattern(regexp = "^[a-zA-Z0-9_-]*$")
+	@Column(name = "CUSTOMER_OPT_VAL_CODE")
+	private String code;
 
-    @Transient private List<CustomerOptionValueDescription> descriptionsList = new ArrayList<>();
+	@Valid
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "customerOptionValue")
+	private Set<CustomerOptionValueDescription> descriptions = new HashSet<>();
 
-    @Embedded
-    @AttributeOverrides(
-            @AttributeOverride(
-                    name = "storeMerchantId",
-                    column = @Column(name = "STORE_MERCHANT_ID", nullable = false, length = 50)))
-    private StoreMerchantId storeMerchantId;
+	@Transient
+	private List<CustomerOptionValueDescription> descriptionsList = new ArrayList<>();
 
-    public CustomerOptionValue() {}
+	@Embedded
+	@AttributeOverrides(@AttributeOverride(name = "storeMerchantId",
+			column = @Column(name = "STORE_MERCHANT_ID", nullable = false, length = 50)))
+	private StoreMerchantId storeMerchantId;
 
-    public List<CustomerOptionValueDescription> getDescriptionsSettoList() {
-        if (descriptionsList == null || descriptionsList.isEmpty()) {
-            descriptionsList = new ArrayList<>(this.getDescriptions());
-        }
-        return descriptionsList;
-    }
+	public CustomerOptionValue() {
+	}
+
+	public List<CustomerOptionValueDescription> getDescriptionsSettoList() {
+		if (descriptionsList == null || descriptionsList.isEmpty()) {
+			descriptionsList = new ArrayList<>(this.getDescriptions());
+		}
+		return descriptionsList;
+	}
+
 }

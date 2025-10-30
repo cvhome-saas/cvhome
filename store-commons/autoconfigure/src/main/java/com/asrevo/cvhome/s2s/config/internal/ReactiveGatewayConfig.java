@@ -14,15 +14,16 @@ import org.springframework.context.annotation.Configuration;
 @ConditionalOnClass(AbstractRoutePredicateFactory.class)
 public class ReactiveGatewayConfig {
 
-    @ConditionalOnClass(RoutePredicateHandlerMapping.class)
-    @Bean
-    public FHostRoutePredicateFactory fHostRoutePredicateFactory() {
-        return new FHostRoutePredicateFactory();
-    }
+	@ConditionalOnClass(RoutePredicateHandlerMapping.class)
+	@Bean
+	public FHostRoutePredicateFactory fHostRoutePredicateFactory() {
+		return new FHostRoutePredicateFactory();
+	}
 
-    @ConditionalOnClass(RoutePredicateHandlerMapping.class)
-    @Bean
-    public FNotServiceRoutePredicateFactory fPathNotApiRoutePredicateFactory() {
-        return new FNotServiceRoutePredicateFactory();
-    }
+	@ConditionalOnClass(RoutePredicateHandlerMapping.class)
+	@Bean
+	public FNotServiceRoutePredicateFactory fPathNotApiRoutePredicateFactory() {
+		return new FNotServiceRoutePredicateFactory();
+	}
+
 }

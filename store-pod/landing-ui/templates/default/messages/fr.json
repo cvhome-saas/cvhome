@@ -1,0 +1,116 @@
+{
+  "PAGE": {
+    "HOME": {
+      "TITLE": "Accueil",
+      "FEATURED_ITEMS": "Articles en vedette",
+      "NEWLY_ADDED": "Nouveautés",
+      "HOME_PRODUCT": "Produit d'accueil",
+      "RECOMMENDED": "Recommandé"
+    },
+    "PRODUCT": {
+      "HOME_TITLE": "Détails du produit",
+      "ADD_TO_CART": "Ajouter au panier",
+      "PRODUCT_DESCRIPTION": "Description du produit",
+      "SUCCESSFULLY_ADDED_PRODUCT_TO_CART": "Produit ajouté au panier avec succès !",
+      "FAILED_TO_ADD_PRODUCT_TO_CART": "Échec de l'ajout du produit au panier.",
+      "RELATED_PRODUCTS": "Produits connexes"
+    },
+    "CHECKOUT": {
+      "TITLE": "Paiement",
+      "HOME_TITLE": "Paiement",
+      "CART_DETAILS": "Détails du panier",
+      "FORM_TITLE": "Informations de livraison",
+      "PAYMENT_TYPE_REQUIRED": "Le type de paiement est requis.",
+      "TRANSACTION_TYPE_REQUIRED": "Le type de transaction est requis.",
+      "EMAIL_REQUIRED": "L'e-mail est requis.",
+      "EMAIL_INVALID": "Veuillez entrer une adresse e-mail valide.",
+      "FIRST_NAME_REQUIRED": "Le prénom est requis.",
+      "LAST_NAME_REQUIRED": "Le nom de famille est requis.",
+      "PHONE_REQUIRED": "Le numéro de téléphone est requis.",
+      "PHONE_INVALID": "Veuillez entrer un numéro de téléphone valide.",
+      "COUNTRY_REQUIRED": "Le pays est requis.",
+      "CITY_REQUIRED": "La ville est requise.",
+      "POSTAL_CODE_REQUIRED": "Le code postal est requis.",
+      "POSTAL_CODE_INVALID": "Veuillez entrer un code postal valide.",
+      "ADDRESS_REQUIRED": "L'adresse est requise.",
+      "AGREEMENT_AGREE_REQUIRED": "Vous devez accepter les termes et conditions.",
+      "FIRST_NAME": "Prénom",
+      "LAST_NAME": "Nom de famille",
+      "EMAIL": "E-mail",
+      "PHONE": "Téléphone",
+      "COUNTRY": "Pays",
+      "SELECT_COUNTRY": "Sélectionner un pays",
+      "CITY": "Ville",
+      "POSTAL_CODE": "Code Postal",
+      "ADDRESS": "Adresse",
+      "AGREEMENT": "J'accepte les",
+      "PLACE_ORDER": "Passer la commande",
+      "ORDER_PLACED_SUCCESSFULLY": "Commande passée avec succès !",
+      "NO_ORDER_DETAILED": "Aucun détail de commande disponible.",
+      "CONTINUE_SHOPPING": "Continuer les achats",
+      "TERMS_AND_CONDITIONS": "Termes et Conditions",
+      "AGREE": "Accepter",
+      "REJECT": "Refuser",
+      "ORDER_ID": "ID de commande",
+      "FAILED_TO_PLACE_ORDER": "Échec de la passation de la commande"
+    },
+    "CONTENT": {
+      "HOME_TITLE": "Contenu"
+    },
+    "CATEGORY": {
+      "HOME_TITLE": "Catégorie",
+      "FILTER_BY_MANUFACTURER": "Filtrer par fabricant",
+      "ALL": "Tout",
+      "NO_PRODUCTS_FOUND": "Aucun produit trouvé."
+    }
+  },
+  "COMPONENTS": {
+    "PRODUCT": {
+      "SUCCESSFULLY_ADDED_PRODUCT_TO_CART": "Produit ajouté au panier avec succès !",
+      "FAILED_TO_ADD_PRODUCT_TO_CART": "Échec de l'ajout du produit au panier.",
+      "IN_STOCK": "En stock",
+      "OUT_OF_STOCK": "En rupture de stock"
+    },
+    "HEADER": {
+      "HOME_TITLE": "Accueil",
+      "OPEN_MENU": "Ouvrir le menu principal",
+      "CLOSE_MENU": "Fermer le menu",
+      "OPEN_CART": "Ouvrir le panier",
+      "CLOSE_CART": "Fermer le panier",
+      "LANGUAGE": {
+        "CHANGE_LANGUAGE": "Changer de langue",
+        "EN": "Anglais",
+        "AR": "Arabe",
+        "FR": "Français",
+        "RU": "Russe"
+      }
+    },
+    "FOOTER": {
+      "SOCIAL_FACEBOOK": "Facebook",
+      "SOCIAL_X": "X (Twitter)",
+      "SOCIAL_GITHUB": "GitHub",
+      "SOCIAL_INSTAGRAM": "Instagram",
+      "SOCIAL_TIKTOK": "TikTok",
+      "LEGAL": "Légal",
+      "RIGHT_RESERVED": "Tous droits réservés."
+    },
+    "CART": {
+      "QTY": "Qté",
+      "REMOVE": "Retirer",
+      "SUB_TOTAL": "Sous-total",
+      "CART_DETAILS": "Panier d'achats",
+      "SHOPPING_AND_TAX_CALCULATION_MESSAGE": "Frais de port et taxes calculés au moment du paiement.",
+      "CHECKOUT": "Paiement",
+      "CONTINUE_SHOPPING": "Continuer les achats",
+      "OR": "ou"
+    },
+    "CHECKOUT": {},
+    "CONTENT": {},
+    "CATEGORY": {}
+  },
+  "HOME": {},
+  "PRODUCT": {},
+  "CHECKOUT": {},
+  "CONTENT": {},
+  "CATEGORY": {}
+}

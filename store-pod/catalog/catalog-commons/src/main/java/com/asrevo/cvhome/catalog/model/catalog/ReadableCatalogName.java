@@ -8,10 +8,12 @@ import lombok.Setter;
 @Getter
 public class ReadableCatalogName extends CatalogEntity {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private String creationDate;
+	private String creationDate;
+
 }

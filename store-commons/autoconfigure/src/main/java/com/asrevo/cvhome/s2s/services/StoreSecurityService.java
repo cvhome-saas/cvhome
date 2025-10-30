@@ -4,13 +4,15 @@ import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import org.springframework.security.core.Authentication;
 
 public interface StoreSecurityService {
-    boolean isSuperAdmin(Authentication authentication, ManagerStoreId requestedStoreId);
 
-    boolean isOrgAdmin(Authentication authentication, ManagerStoreId requestedStoreId);
+	boolean isSuperAdmin(Authentication authentication, ManagerStoreId requestedStoreId);
 
-    boolean isStoreAdmin(Authentication authentication, ManagerStoreId requestedStoreId);
+	boolean isOrgAdmin(Authentication authentication, ManagerStoreId requestedStoreId);
 
-    boolean isStoreModerator(Authentication authentication, ManagerStoreId requestedStoreId);
+	boolean isStoreAdmin(Authentication authentication, ManagerStoreId requestedStoreId);
 
-    boolean isMicroService(Authentication authentication, ManagerStoreId requestedStoreId);
+	boolean isStoreModerator(Authentication authentication, ManagerStoreId requestedStoreId);
+
+	boolean isMicroService(Authentication authentication, ManagerStoreId requestedStoreId);
+
 }

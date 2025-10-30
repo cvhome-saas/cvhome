@@ -8,45 +8,47 @@ import lombok.Setter;
 @Getter
 @Setter
 public class EcsTask {
-    @JsonProperty("Cluster")
-    private String cluster;
 
-    @JsonProperty("TaskARN")
-    private String taskARN;
+	@JsonProperty("Cluster")
+	private String cluster;
 
-    @JsonProperty("Family")
-    private String family;
+	@JsonProperty("TaskARN")
+	private String taskARN;
 
-    @JsonProperty("Revision")
-    private String revision;
+	@JsonProperty("Family")
+	private String family;
 
-    @JsonProperty("DesiredStatus")
-    private String desiredStatus;
+	@JsonProperty("Revision")
+	private String revision;
 
-    @JsonProperty("KnownStatus")
-    private String knownStatus;
+	@JsonProperty("DesiredStatus")
+	private String desiredStatus;
 
-    @JsonProperty("Limits")
-    private Limits limits;
+	@JsonProperty("KnownStatus")
+	private String knownStatus;
 
-    @JsonProperty("PullStartedAt")
-    private String pullStartedAt;
+	@JsonProperty("Limits")
+	private Limits limits;
 
-    @JsonProperty("PullStoppedAt")
-    private String pullStoppedAt;
+	@JsonProperty("PullStartedAt")
+	private String pullStartedAt;
 
-    @JsonProperty("AvailabilityZone")
-    private String availabilityZone;
+	@JsonProperty("PullStoppedAt")
+	private String pullStoppedAt;
 
-    @JsonProperty("LaunchType")
-    private String launchType;
+	@JsonProperty("AvailabilityZone")
+	private String availabilityZone;
 
-    @JsonProperty("Containers")
-    private ArrayList<Container> containers;
+	@JsonProperty("LaunchType")
+	private String launchType;
 
-    @JsonProperty("ClockDrift")
-    private ClockDrift clockDrift;
+	@JsonProperty("Containers")
+	private ArrayList<Container> containers;
 
-    @JsonProperty("EphemeralStorageMetrics")
-    private EphemeralStorageMetrics ephemeralStorageMetrics;
+	@JsonProperty("ClockDrift")
+	private ClockDrift clockDrift;
+
+	@JsonProperty("EphemeralStorageMetrics")
+	private EphemeralStorageMetrics ephemeralStorageMetrics;
+
 }

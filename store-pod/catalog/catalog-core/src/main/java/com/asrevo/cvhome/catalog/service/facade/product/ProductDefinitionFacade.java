@@ -7,23 +7,19 @@ import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 
 public interface ProductDefinitionFacade {
 
-    /**
-     *
-     */
-    Long saveProductDefinition(
-            StoreMerchantId store, PersistableProductDefinition product, LanguageCode language);
+	/**
+	 *
+	 */
+	Long saveProductDefinition(StoreMerchantId store, PersistableProductDefinition product, LanguageCode language);
 
-    /**
-     *
-     */
-    void update(
-            Long productId,
-            PersistableProductDefinition product,
-            StoreMerchantId merchant,
-            LanguageCode language);
+	/**
+	 *
+	 */
+	void update(Long productId, PersistableProductDefinition product, StoreMerchantId merchant, LanguageCode language);
 
-    /**
-     *
-     */
-    ReadableProductDefinition getProduct(StoreMerchantId store, Long id, LanguageCode language);
+	/**
+	 *
+	 */
+	ReadableProductDefinition getProduct(StoreMerchantId store, Long id, LanguageCode language);
+
 }

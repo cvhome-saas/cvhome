@@ -15,61 +15,40 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-public interface ProductRelationshipRepository
-        extends JpaRepository<ProductRelationship, Long>,
-                ProductRelationshipRepositoryCustom,
-                JpaSpecificationExecutor<ProductRelationship> {
-    @Modifying
-    @Query(
-            "delete from ProductRelationship  pr where pr.relatedProduct.id=:relatedProduct  and"
-                    + " pr.code=:code and pr.storeMerchantId=:storeMerchantId")
-    int deleteAllByRelatedProduct_IdAndCodeAndStoreMerchantId(
-            @Param("relatedProduct") Long relatedProduct,
-            @Param("code") String code,
-            @Param("storeMerchantId") StoreMerchantId storeMerchantId);
+public interface ProductRelationshipRepository extends JpaRepository<ProductRelationship, Long>,
+		ProductRelationshipRepositoryCustom, JpaSpecificationExecutor<ProductRelationship> {
 
-    @Modifying
-    @Query(
-            "delete from ProductRelationship  pr where pr.relatedProduct.id=:relatedProduct and"
-                    + " pr.product.id=:productId and pr.code=:code and"
-                    + " pr.storeMerchantId=:storeMerchantId")
-    int deleteAllByRelatedProduct_IdAndProduct_IdAndCodeAndStoreMerchantId(
-            @Param("relatedProduct") Long relatedProduct,
-            @Param("productId") Long productId,
-            @Param("code") String code,
-            @Param("storeMerchantId") StoreMerchantId storeMerchantId);
+	@Modifying
+	@Query("delete from ProductRelationship  pr where pr.relatedProduct.id=:relatedProduct  and"
+			+ " pr.code=:code and pr.storeMerchantId=:storeMerchantId")
+	int deleteAllByRelatedProduct_IdAndCodeAndStoreMerchantId(@Param("relatedProduct") Long relatedProduct,
+			@Param("code") String code, @Param("storeMerchantId") StoreMerchantId storeMerchantId);
 
-    default List<ProductRelationship> getByGroup(
-            StoreMerchantId storeMerchantId,
-            String type,
-            Product relatedProduct,
-            Product product,
-            LanguageCode languageCode) {
-        return findAll(
-                (Specification<ProductRelationship>)
-                        (root, query, cb) -> {
-                            List<Predicate> predicates = new ArrayList<>();
-                            predicates.add(cb.equal(root.get("storeMerchantId"), storeMerchantId));
-                            if (LanguageCode.isLanguage(languageCode)) {
-                                predicates.add(
-                                        cb.equal(
-                                                root.get("relatedProduct")
-                                                        .get("descriptions")
-                                                        .get("languageCode"),
-                                                languageCode));
-                            }
-                            predicates.add(cb.equal(root.get("code"), type));
-                            if (Objects.nonNull(relatedProduct)) {
-                                predicates.add(
-                                        cb.equal(
-                                                root.get("relatedProduct").get("id"),
-                                                relatedProduct.getId()));
-                            }
-                            if (Objects.nonNull(product)) {
-                                predicates.add(
-                                        cb.equal(root.get("product").get("id"), product.getId()));
-                            }
-                            return cb.and(predicates.toArray(Predicate[]::new));
-                        });
-    }
+	@Modifying
+	@Query("delete from ProductRelationship  pr where pr.relatedProduct.id=:relatedProduct and"
+			+ " pr.product.id=:productId and pr.code=:code and" + " pr.storeMerchantId=:storeMerchantId")
+	int deleteAllByRelatedProduct_IdAndProduct_IdAndCodeAndStoreMerchantId(@Param("relatedProduct") Long relatedProduct,
+			@Param("productId") Long productId, @Param("code") String code,
+			@Param("storeMerchantId") StoreMerchantId storeMerchantId);
+
+	default List<ProductRelationship> getByGroup(StoreMerchantId storeMerchantId, String type, Product relatedProduct,
+			Product product, LanguageCode languageCode) {
+		return findAll((Specification<ProductRelationship>) (root, query, cb) -> {
+			List<Predicate> predicates = new ArrayList<>();
+			predicates.add(cb.equal(root.get("storeMerchantId"), storeMerchantId));
+			if (LanguageCode.isLanguage(languageCode)) {
+				predicates
+					.add(cb.equal(root.get("relatedProduct").get("descriptions").get("languageCode"), languageCode));
+			}
+			predicates.add(cb.equal(root.get("code"), type));
+			if (Objects.nonNull(relatedProduct)) {
+				predicates.add(cb.equal(root.get("relatedProduct").get("id"), relatedProduct.getId()));
+			}
+			if (Objects.nonNull(product)) {
+				predicates.add(cb.equal(root.get("product").get("id"), product.getId()));
+			}
+			return cb.and(predicates.toArray(Predicate[]::new));
+		});
+	}
+
 }

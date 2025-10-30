@@ -9,10 +9,12 @@ import lombok.Setter;
 @Getter
 public class GenericEntityList<T> extends EntityList {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private List<T> list;
+	private List<T> list;
+
 }

@@ -11,17 +11,20 @@ import lombok.Setter;
 @Getter
 public class ReadableContentBox extends Content {
 
-    private static final String BOX = "BOX";
+	private static final String BOX = "BOX";
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private ContentDescription description;
-    private List<ContentDescription> descriptions;
+	private ContentDescription description;
 
-    public ReadableContentBox() {
-        super.setContentType(BOX);
-    }
+	private List<ContentDescription> descriptions;
+
+	public ReadableContentBox() {
+		super.setContentType(BOX);
+	}
+
 }

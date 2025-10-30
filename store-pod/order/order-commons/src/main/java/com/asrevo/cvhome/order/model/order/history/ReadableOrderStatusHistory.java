@@ -8,13 +8,15 @@ import lombok.Setter;
 @Getter
 public class ReadableOrderStatusHistory extends OrderStatusHistory {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    /**
-     * YYYY-mm-DD:HH mm SSS
-     */
-    private String date;
+	/**
+	 * YYYY-mm-DD:HH mm SSS
+	 */
+	private String date;
+
 }

@@ -85,6 +85,7 @@ Authorization: Bearer {{access_token}}
     "en"
   ],
   "defaultLanguage": "en",
+  "theme": "DEFAULT",
   "currency": "EGP",
   "currencyFormatNational": true,
   "weight": "KG",

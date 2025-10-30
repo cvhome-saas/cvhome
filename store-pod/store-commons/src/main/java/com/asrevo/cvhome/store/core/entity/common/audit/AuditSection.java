@@ -13,44 +13,47 @@ import lombok.Getter;
 @Embeddable
 public class AuditSection implements Serializable {
 
-    @Serial private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "DATE_CREATED")
-    private Date dateCreated;
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "DATE_CREATED")
+	private Date dateCreated;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "DATE_MODIFIED")
-    private Date dateModified;
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "DATE_MODIFIED")
+	private Date dateModified;
 
-    @Getter
-    @Column(name = "UPDT_ID", length = 60)
-    private String modifiedBy;
+	@Getter
+	@Column(name = "UPDT_ID", length = 60)
+	private String modifiedBy;
 
-    public AuditSection() {}
+	public AuditSection() {
+	}
 
-    public Date getDateCreated() {
-        return CloneUtils.clone(dateCreated);
-    }
+	public Date getDateCreated() {
+		return CloneUtils.clone(dateCreated);
+	}
 
-    public void setDateCreated(Date dateCreated) {
-        this.dateCreated = CloneUtils.clone(dateCreated);
-    }
+	public void setDateCreated(Date dateCreated) {
+		this.dateCreated = CloneUtils.clone(dateCreated);
+	}
 
-    public Date getDateModified() {
-        return CloneUtils.clone(dateModified);
-    }
+	public Date getDateModified() {
+		return CloneUtils.clone(dateModified);
+	}
 
-    public void setDateModified(Date dateModified) {
-        this.dateModified = CloneUtils.clone(dateModified);
-    }
+	public void setDateModified(Date dateModified) {
+		this.dateModified = CloneUtils.clone(dateModified);
+	}
 
-    public void setModifiedBy(String modifiedBy) {
-        if (!modifiedBy.isBlank()) { // TODO
-            if (modifiedBy.length() > 20) {
-                modifiedBy = modifiedBy.substring(0, 20);
-            }
-        }
-        this.modifiedBy = modifiedBy;
-    }
+	public void setModifiedBy(String modifiedBy) {
+		if (!modifiedBy.isBlank()) { // TODO
+			if (modifiedBy.length() > 20) {
+				modifiedBy = modifiedBy.substring(0, 20);
+			}
+		}
+		this.modifiedBy = modifiedBy;
+	}
+
 }

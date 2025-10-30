@@ -22,37 +22,43 @@ import lombok.Setter;
 @Getter
 public class Address extends AddressLocation implements Serializable {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    // @NotEmpty(message="{NotEmpty.customer.firstName}")
-    private String firstName;
+	// @NotEmpty(message="{NotEmpty.customer.firstName}")
+	private String firstName;
 
-    // @NotEmpty(message="{NotEmpty.customer.lastName}")
-    private String lastName;
+	// @NotEmpty(message="{NotEmpty.customer.lastName}")
+	private String lastName;
 
-    private String bilstateOther;
+	private String bilstateOther;
 
-    private String company;
+	private String company;
 
-    private String phone;
-    private String address;
-    private String city;
+	private String phone;
 
-    private String stateProvince;
-    private boolean billingAddress;
+	private String address;
 
-    private String latitude;
-    private String longitude;
+	private String city;
 
-    @JsonSerialize(using = ZoneCodeSerializer.class)
-    @JsonDeserialize(using = ZoneCodeDeSerializer.class)
-    private ZoneCode zone; // code
+	private String stateProvince;
 
-    // @NotEmpty(message="{NotEmpty.customer.billing.country}")
-    @JsonSerialize(using = CountryIsoCodeSerializer.class)
-    @JsonDeserialize(using = CountryIsoCodeDeSerializer.class)
-    private CountryIsoCode country;
+	private boolean billingAddress;
+
+	private String latitude;
+
+	private String longitude;
+
+	@JsonSerialize(using = ZoneCodeSerializer.class)
+	@JsonDeserialize(using = ZoneCodeDeSerializer.class)
+	private ZoneCode zone; // code
+
+	// @NotEmpty(message="{NotEmpty.customer.billing.country}")
+	@JsonSerialize(using = CountryIsoCodeSerializer.class)
+	@JsonDeserialize(using = CountryIsoCodeDeSerializer.class)
+	private CountryIsoCode country;
+
 }

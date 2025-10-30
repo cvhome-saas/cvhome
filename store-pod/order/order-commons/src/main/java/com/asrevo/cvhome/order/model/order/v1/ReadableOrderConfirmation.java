@@ -13,15 +13,22 @@ import lombok.Setter;
 @Getter
 public class ReadableOrderConfirmation extends Entity {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private Address billing;
-    private Address delivery;
-    private String shipping;
-    private String payment;
-    private ReadableTotal total;
-    private List<ReadableOrderProduct> products;
+	private Address billing;
+
+	private Address delivery;
+
+	private String shipping;
+
+	private String payment;
+
+	private ReadableTotal total;
+
+	private List<ReadableOrderProduct> products;
+
 }

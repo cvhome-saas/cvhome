@@ -15,46 +15,45 @@ import lombok.Setter;
 @Getter
 @Setter
 public class OrderProductPrice implements Serializable {
-    @Serial private static final long serialVersionUID = 3734737890163564311L;
 
-    @Id
-    @Column(name = "ORDER_PRODUCT_PRICE_ID")
-    @TableGenerator(
-            name = "TABLE_GEN",
-            table = "SM_SEQUENCER",
-            pkColumnName = "SEQ_NAME",
-            valueColumnName = "SEQ_COUNT",
-            pkColumnValue = "ORDER_PRODUCT_PRICE_SEQ_NEXT_VAL",
-            allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
-            initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
-    private Long id;
+	@Serial
+	private static final long serialVersionUID = 3734737890163564311L;
 
-    @JsonIgnore
-    @ManyToOne
-    @JoinColumn(name = "ORDER_PRODUCT_ID", nullable = false)
-    private OrderProduct orderProduct;
+	@Id
+	@Column(name = "ORDER_PRODUCT_PRICE_ID")
+	@TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME",
+			valueColumnName = "SEQ_COUNT", pkColumnValue = "ORDER_PRODUCT_PRICE_SEQ_NEXT_VAL",
+			allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
+			initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
+	@GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
+	private Long id;
 
-    @Column(name = "PRODUCT_PRICE_CODE", nullable = false, length = 64)
-    private String productPriceCode;
+	@JsonIgnore
+	@ManyToOne
+	@JoinColumn(name = "ORDER_PRODUCT_ID", nullable = false)
+	private OrderProduct orderProduct;
 
-    @Column(name = "PRODUCT_PRICE", nullable = false)
-    private BigDecimal productPrice;
+	@Column(name = "PRODUCT_PRICE_CODE", nullable = false, length = 64)
+	private String productPriceCode;
 
-    @Column(name = "PRODUCT_PRICE_SPECIAL")
-    private BigDecimal productPriceSpecial;
+	@Column(name = "PRODUCT_PRICE", nullable = false)
+	private BigDecimal productPrice;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "PRD_PRICE_SPECIAL_ST_DT", length = 0)
-    private Date productPriceSpecialStartDate;
+	@Column(name = "PRODUCT_PRICE_SPECIAL")
+	private BigDecimal productPriceSpecial;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "PRD_PRICE_SPECIAL_END_DT", length = 0)
-    private Date productPriceSpecialEndDate;
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "PRD_PRICE_SPECIAL_ST_DT", length = 0)
+	private Date productPriceSpecialStartDate;
 
-    @Column(name = "DEFAULT_PRICE", nullable = false)
-    private Boolean defaultPrice;
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "PRD_PRICE_SPECIAL_END_DT", length = 0)
+	private Date productPriceSpecialEndDate;
 
-    @Column(name = "PRODUCT_PRICE_NAME")
-    private String productPriceName;
+	@Column(name = "DEFAULT_PRICE", nullable = false)
+	private Boolean defaultPrice;
+
+	@Column(name = "PRODUCT_PRICE_NAME")
+	private String productPriceName;
+
 }

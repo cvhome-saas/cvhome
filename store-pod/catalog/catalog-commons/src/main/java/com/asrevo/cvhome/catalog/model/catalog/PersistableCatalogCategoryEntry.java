@@ -8,11 +8,14 @@ import lombok.Setter;
 @Getter
 public class PersistableCatalogCategoryEntry extends CatalogEntryEntity {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private String productCode;
-    private String categoryCode;
+	private String productCode;
+
+	private String categoryCode;
+
 }

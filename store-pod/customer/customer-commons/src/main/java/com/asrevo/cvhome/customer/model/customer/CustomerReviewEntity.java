@@ -14,16 +14,22 @@ import lombok.Setter;
 @Getter
 public class CustomerReviewEntity extends ShopEntity implements Serializable {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    @NotEmpty private String description;
-    private Long customerId; // review creator
-    private String date;
+	@NotEmpty
+	private String description;
 
-    @NotNull @Min(1)
-    @Max(5)
-    private Double rating;
+	private Long customerId; // review creator
+
+	private String date;
+
+	@NotNull
+	@Min(1)
+	@Max(5)
+	private Double rating;
+
 }

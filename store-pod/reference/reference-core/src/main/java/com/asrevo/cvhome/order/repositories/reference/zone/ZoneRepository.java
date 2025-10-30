@@ -10,19 +10,18 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface ZoneRepository extends JpaRepository<Zone, ZoneCode> {
 
-    Zone findByCode(ZoneCode code);
+	Zone findByCode(ZoneCode code);
 
-    @Query(
-            """
-                    select z from Zone z
-                    left join fetch z.descriptions zd
-                    where zd.languageCode=?1""")
-    List<Zone> listByLanguage(LanguageCode id);
+	@Query("""
+			select z from Zone z
+			left join fetch z.descriptions zd
+			where zd.languageCode=?1""")
+	List<Zone> listByLanguage(LanguageCode id);
 
-    @Query(
-            """
-                    select z from Zone z
-                    left join fetch z.descriptions zd
-                    where z.country=?1 and zd.languageCode=?2""")
-    List<Zone> listByLanguageAndCountry(CountryIsoCode isoCode, LanguageCode code);
+	@Query("""
+			select z from Zone z
+			left join fetch z.descriptions zd
+			where z.country=?1 and zd.languageCode=?2""")
+	List<Zone> listByLanguageAndCountry(CountryIsoCode isoCode, LanguageCode code);
+
 }

@@ -9,18 +9,18 @@ import org.springframework.data.domain.Pageable;
 
 public interface ProductInventoryFacade {
 
-    ReadableInventory get(Long inventoryId, StoreMerchantId store, LanguageCode language);
+	ReadableInventory get(Long inventoryId, StoreMerchantId store, LanguageCode language);
 
-    ReadableEntityList<ReadableInventory> get(
-            String sku, StoreMerchantId store, LanguageCode language, Pageable pageable);
+	ReadableEntityList<ReadableInventory> get(String sku, StoreMerchantId store, LanguageCode language,
+			Pageable pageable);
 
-    ReadableInventory add(
-            PersistableInventory inventory, StoreMerchantId store, LanguageCode language);
+	ReadableInventory add(PersistableInventory inventory, StoreMerchantId store, LanguageCode language);
 
-    void update(PersistableInventory inventory, StoreMerchantId store, LanguageCode language);
+	void update(PersistableInventory inventory, StoreMerchantId store, LanguageCode language);
 
-    void delete(Long productId, Long inventoryId, StoreMerchantId store);
+	void delete(Long productId, Long inventoryId, StoreMerchantId store);
 
-    ReadableEntityList<ReadableInventory> get(
-            Long productId, StoreMerchantId store, LanguageCode language, Pageable pageable);
+	ReadableEntityList<ReadableInventory> get(Long productId, StoreMerchantId store, LanguageCode language,
+			Pageable pageable);
+
 }

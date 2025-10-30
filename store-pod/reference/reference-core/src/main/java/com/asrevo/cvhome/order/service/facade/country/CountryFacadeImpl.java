@@ -14,23 +14,24 @@ import org.springframework.stereotype.Service;
 @Service
 @AllArgsConstructor
 public class CountryFacadeImpl implements CountryFacade {
-    private CountryService countryService;
 
-    @Override
-    public List<ReadableCountry> getListCountryZones(
-            LanguageCode language, StoreMerchantId merchantStore) {
-        return getListOfCountryZones(language).stream()
-                .map(country -> convertToReadableCountry(country, language, merchantStore))
-                .collect(Collectors.toList());
-    }
+	private CountryService countryService;
 
-    private ReadableCountry convertToReadableCountry(
-            Country country, LanguageCode language, StoreMerchantId merchantStore) {
-        ReadableCountryPopulator populator = new ReadableCountryPopulator();
-        return populator.populate(country, new ReadableCountry(), merchantStore, language);
-    }
+	@Override
+	public List<ReadableCountry> getListCountryZones(LanguageCode language, StoreMerchantId merchantStore) {
+		return getListOfCountryZones(language).stream()
+			.map(country -> convertToReadableCountry(country, language, merchantStore))
+			.collect(Collectors.toList());
+	}
 
-    private List<Country> getListOfCountryZones(LanguageCode language) {
-        return countryService.listCountryZones(language);
-    }
+	private ReadableCountry convertToReadableCountry(Country country, LanguageCode language,
+			StoreMerchantId merchantStore) {
+		ReadableCountryPopulator populator = new ReadableCountryPopulator();
+		return populator.populate(country, new ReadableCountry(), merchantStore, language);
+	}
+
+	private List<Country> getListOfCountryZones(LanguageCode language) {
+		return countryService.listCountryZones(language);
+	}
+
 }

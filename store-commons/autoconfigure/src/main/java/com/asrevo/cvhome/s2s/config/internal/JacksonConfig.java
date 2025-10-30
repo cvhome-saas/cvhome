@@ -23,8 +23,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class JacksonConfig {
 
-    @Getter
-    // @formatter:off
+	@Getter
+	// @formatter:off
     private static final JsonMapper ployJson =
             JsonMapper.builder()
                     .visibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY)
@@ -43,10 +43,11 @@ public class JacksonConfig {
                     .build();
 
     // @formatter:on
-    @Bean
-    public Jackson2ObjectMapperBuilderCustomizer customizer() {
+	@Bean
+	public Jackson2ObjectMapperBuilderCustomizer customizer() {
 
-        return jacksonObjectMapperBuilder ->
-                jacksonObjectMapperBuilder.deserializers(new ObjectIdDeserializer(ObjectId.class));
-    }
+		return jacksonObjectMapperBuilder -> jacksonObjectMapperBuilder
+			.deserializers(new ObjectIdDeserializer(ObjectId.class));
+	}
+
 }

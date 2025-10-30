@@ -6,80 +6,89 @@ import com.asrevo.cvhome.commons.domain.Domain;
 import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.commons.domain.Pod;
 import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
+import com.asrevo.cvhome.commons.utils.OperationExecution;
 import com.asrevo.cvhome.manager.dto.StoreDomainList;
+import com.asrevo.cvhome.manager.service.AskTlsService;
 import com.asrevo.cvhome.manager.service.InternalStoreService;
+import java.util.Map;
+
+import com.asrevo.cvhome.manager.service.LookupDomainHeadersService;
+import com.asrevo.cvhome.manager.utils.ErrorCodes;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
-
-import java.net.URI;
-import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("api/v1/router")
 @AllArgsConstructor
 @Slf4j
 public class RouterController {
-    public final InternalStoreService internalStoreService;
 
-    @GetMapping("public/ask-for-tls")
-    @ConditionalOnApiStatus
-    public ResponseEntity<Object> ask(Domain domain) {
-        log.info("tls ask: {}", domain);
-        return Optional.ofNullable(internalStoreService.getReferenceByDomain(domain))
-                .map(it -> ResponseEntity.ok().build())
-                .orElseGet(() -> ResponseEntity.badRequest().build());
-    }
+	public final InternalStoreService internalStoreService;
 
-    @GetMapping("public/lookup-by-domain")
-    @ConditionalOnApiStatus
-    public Map<String, String> getLookupHeadersByDomain(Domain domain) {
-        log.info("header lookup: {}", domain);
-        return Optional.ofNullable(internalStoreService.getReferenceByDomain(domain))
-                .map(it -> Map.of("Store-Id",it.id().toString()))
-                .orElseGet(() -> Map.of("",""));
-    }
+	private final AskTlsService askTlsService;
 
-    @GetMapping("store-id-by-domain")
-    @ConditionalOnApiStatus
-    public ManagerStoreId getStoreIdByDomain(@RequestParam Domain domain) {
-        return internalStoreService.getReferenceByDomain(domain);
-    }
+	private final LookupDomainHeadersService lookupDomainHeadersService;
 
-    @GetMapping("store-pod-by-store-id")
-    @ConditionalOnApiStatus
-    public Pod getStorePodByStoreId(@RequestParam ManagerStoreId store) {
-        return internalStoreService.getStorePod(store);
-    }
+	@GetMapping("public/ask-for-tls")
+	@ConditionalOnApiStatus
+	public ResponseEntity<Object> ask(Domain domain) {
+		log.info("tls ask: {}", domain);
+		if (askTlsService.ask(domain)) {
+			return ResponseEntity.ok().build();
+		}
+		else {
+			return ResponseEntity.badRequest().build();
+		}
+	}
 
-    @GetMapping("allocates")
-    @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE.DOMAIN.LIST')")
-    @ConditionalOnApiStatus
-    public Mono<StoreDomainList> allocatedDomains(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store) {
-        return Mono.just(internalStoreService.domains(store));
-    }
+	@GetMapping("public/lookup-by-domain")
+	@ConditionalOnApiStatus
+	public Map<String, String> getLookupHeadersByDomain(Domain domain) {
+		log.info("header lookup: {}", domain);
+		return lookupDomainHeadersService.lookupHeaders(domain);
+	}
 
-    @PostMapping("allocate")
-    @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE.DOMAIN.CREATE')")
-    @ConditionalOnApiStatus
-    public Mono<Void> allocate(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store, Domain domain) {
-        internalStoreService.addDomain(store, domain);
-        return Mono.empty();
-    }
+	@GetMapping("store-id-by-domain")
+	@ConditionalOnApiStatus
+	public ManagerStoreId getStoreIdByDomain(@RequestParam Domain domain) {
+		return internalStoreService.getReferenceByDomain(domain)
+			.orElseThrow(() -> new OperationExecution(ErrorCodes.store_not_found));
+	}
 
-    @DeleteMapping("remove")
-    @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE.DOMAIN.DELETE')")
-    @ConditionalOnApiStatus
-    public Mono<Void> remove(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store, Domain domain) {
-        internalStoreService.removeDomain(store, domain);
-        return Mono.empty();
-    }
+	@GetMapping("store-pod-by-store-id")
+	@ConditionalOnApiStatus
+	public Pod getStorePodByStoreId(@RequestParam ManagerStoreId store) {
+		return internalStoreService.getStorePod(store);
+	}
+
+	@GetMapping("allocates")
+	@PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE.DOMAIN.LIST')")
+	@ConditionalOnApiStatus
+	public Mono<StoreDomainList> allocatedDomains(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
+			@RequestParam ManagerStoreId store) {
+		return Mono.just(internalStoreService.domains(store));
+	}
+
+	@PostMapping("allocate")
+	@PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE.DOMAIN.CREATE')")
+	@ConditionalOnApiStatus
+	public Mono<Void> allocate(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store,
+			Domain domain) {
+		internalStoreService.addDomain(store, domain);
+		return Mono.empty();
+	}
+
+	@DeleteMapping("remove")
+	@PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE.DOMAIN.DELETE')")
+	@ConditionalOnApiStatus
+	public Mono<Void> remove(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store,
+			Domain domain) {
+		internalStoreService.removeDomain(store, domain);
+		return Mono.empty();
+	}
 
 }

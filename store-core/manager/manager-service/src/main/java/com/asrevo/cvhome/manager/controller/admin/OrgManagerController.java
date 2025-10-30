@@ -24,45 +24,49 @@ import reactor.core.publisher.Mono;
 @AllArgsConstructor
 @Slf4j
 public class OrgManagerController {
-    private final InternalOrgService internalOrgService;
-    private final SignupService signupService;
-    private final UserAccountService userAccountService;
-    private final InternalStoreService internalStoreService;
 
-    @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN')")
-    @GetMapping("find-all")
-    @ConditionalOnApiStatus
-    public Mono<Page<ManagerOrgDto>> findAllOrg(Pageable pageable) {
-        log.info("findAllOrg {}", pageable);
-        return Mono.just(internalOrgService.findAll(pageable));
-    }
+	private final InternalOrgService internalOrgService;
 
-    @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN')")
-    @GetMapping("find-one")
-    @ConditionalOnApiStatus
-    public Mono<ManagerOrgDto> findOne(@RequestParam ManagerOrgId id) {
-        return Mono.just(internalOrgService.findOne(id));
-    }
+	private final SignupService signupService;
 
-    @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN')")
-    @PostMapping("create")
-    @ConditionalOnApiStatus
-    public Mono<ReadableUser> create(@RequestBody CreateOrgRequest request) {
-        return Mono.just(signupService.createOrgUser(request));
-    }
+	private final UserAccountService userAccountService;
 
-    @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN')")
-    @PostMapping("change-password")
-    @ConditionalOnApiStatus
-    public Mono<Void> changePassword(@RequestParam ManagerOrgId id, @RequestBody UserPassword request) {
-        userAccountService.changePassword(id, request);
-        return Mono.empty();
-    }
+	private final InternalStoreService internalStoreService;
 
-    @GetMapping("stores")
-    @ConditionalOnApiStatus
-    public Mono<Page<ManagerStoreDto>> findAllStores(@RequestParam ManagerOrgId id, Pageable pageable) {
-        return Mono.just(internalStoreService.findAll(id, pageable));
-    }
+	@PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN')")
+	@GetMapping("find-all")
+	@ConditionalOnApiStatus
+	public Mono<Page<ManagerOrgDto>> findAllOrg(Pageable pageable) {
+		log.info("findAllOrg {}", pageable);
+		return Mono.just(internalOrgService.findAll(pageable));
+	}
+
+	@PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN')")
+	@GetMapping("find-one")
+	@ConditionalOnApiStatus
+	public Mono<ManagerOrgDto> findOne(@RequestParam ManagerOrgId id) {
+		return Mono.just(internalOrgService.findOne(id));
+	}
+
+	@PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN')")
+	@PostMapping("create")
+	@ConditionalOnApiStatus
+	public Mono<ReadableUser> create(@RequestBody CreateOrgRequest request) {
+		return Mono.just(signupService.createOrgUser(request));
+	}
+
+	@PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN')")
+	@PostMapping("change-password")
+	@ConditionalOnApiStatus
+	public Mono<Void> changePassword(@RequestParam ManagerOrgId id, @RequestBody UserPassword request) {
+		userAccountService.changePassword(id, request);
+		return Mono.empty();
+	}
+
+	@GetMapping("stores")
+	@ConditionalOnApiStatus
+	public Mono<Page<ManagerStoreDto>> findAllStores(@RequestParam ManagerOrgId id, Pageable pageable) {
+		return Mono.just(internalStoreService.findAll(id, pageable));
+	}
 
 }

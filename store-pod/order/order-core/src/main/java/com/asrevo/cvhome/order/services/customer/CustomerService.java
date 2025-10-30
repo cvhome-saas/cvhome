@@ -9,9 +9,10 @@ import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
 
 public interface CustomerService extends SalesManagerEntityService<Long, Customer> {
 
-    void saveOrUpdate(Customer customer) throws ServiceException;
+	void saveOrUpdate(Customer customer) throws ServiceException;
 
-    CustomerList getListByStore(StoreMerchantId store, CustomerCriteria criteria);
+	CustomerList getListByStore(StoreMerchantId store, CustomerCriteria criteria);
 
-    Customer getByNick(String nick, StoreMerchantId storeMerchantId);
+	Customer getByNick(String nick, StoreMerchantId storeMerchantId);
+
 }

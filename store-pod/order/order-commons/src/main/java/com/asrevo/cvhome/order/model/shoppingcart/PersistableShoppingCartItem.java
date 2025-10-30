@@ -14,12 +14,16 @@ import lombok.Setter;
 @Getter
 public class PersistableShoppingCartItem implements Serializable {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private String product; // or product sku (instance or product)
-    private int quantity;
-    private String promoCode;
+	private String product; // or product sku (instance or product)
+
+	private int quantity;
+
+	private String promoCode;
+
 }

@@ -9,22 +9,20 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 @Service("productVariantImageService")
-public class ProductVariantImageServiceImpl
-        extends SalesManagerEntityServiceImpl<Long, ProductVariantImage>
-        implements ProductVariantImageService {
+public class ProductVariantImageServiceImpl extends SalesManagerEntityServiceImpl<Long, ProductVariantImage>
+		implements ProductVariantImageService {
 
-    private final ProductVariantImageRepository productVariantImageRepository;
+	private final ProductVariantImageRepository productVariantImageRepository;
 
-    public ProductVariantImageServiceImpl(
-            ProductVariantImageRepository productVariantImageRepository) {
-        super(productVariantImageRepository);
-        this.productVariantImageRepository = productVariantImageRepository;
-    }
+	public ProductVariantImageServiceImpl(ProductVariantImageRepository productVariantImageRepository) {
+		super(productVariantImageRepository);
+		this.productVariantImageRepository = productVariantImageRepository;
+	}
 
-    @Override
-    public List<ProductVariantImage> listByProductVariantGroup(
-            Long productVariantGroupId, StoreMerchantId store) {
-        Assert.notNull(store, "Store cannot be null");
-        return productVariantImageRepository.finByProductVariantGroup(productVariantGroupId, store);
-    }
+	@Override
+	public List<ProductVariantImage> listByProductVariantGroup(Long productVariantGroupId, StoreMerchantId store) {
+		Assert.notNull(store, "Store cannot be null");
+		return productVariantImageRepository.finByProductVariantGroup(productVariantGroupId, store);
+	}
+
 }

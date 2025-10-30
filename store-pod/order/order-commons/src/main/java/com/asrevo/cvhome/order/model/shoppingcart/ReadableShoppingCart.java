@@ -18,21 +18,34 @@ import lombok.Setter;
 @Getter
 public class ReadableShoppingCart extends ShoppingCartEntity {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    List<ReadableShoppingCartItem> products = new ArrayList<>();
-    List<ReadableOrderTotal> totals;
-    private String code;
-    private BigDecimal subtotal;
-    private String displaySubTotal;
-    private BigDecimal total;
-    private String displayTotal;
-    private int quantity;
-    private Long order;
-    private String promoCode;
-    private ReadableProductVariant variant;
-    private Long customer;
+	List<ReadableShoppingCartItem> products = new ArrayList<>();
+
+	List<ReadableOrderTotal> totals;
+
+	private String code;
+
+	private BigDecimal subtotal;
+
+	private String displaySubTotal;
+
+	private BigDecimal total;
+
+	private String displayTotal;
+
+	private int quantity;
+
+	private Long order;
+
+	private String promoCode;
+
+	private ReadableProductVariant variant;
+
+	private Long customer;
+
 }

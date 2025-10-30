@@ -10,9 +10,13 @@ import lombok.Setter;
 @Getter
 public class PersistableProductInventory implements Serializable {
 
-    @Serial private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private String sku;
-    private int quantity = 0;
-    private PersistableProductPrice price;
+	private String sku;
+
+	private int quantity = 0;
+
+	private PersistableProductPrice price;
+
 }

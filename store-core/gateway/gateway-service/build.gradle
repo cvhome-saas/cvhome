@@ -1,53 +1,54 @@
 plugins {
-    alias(libs.plugins.java.application.conventions)
-    alias(libs.plugins.spring.boot)
-    alias(libs.plugins.spring.dependency.management)
+	alias(libs.plugins.java.application.conventions)
+	alias(libs.plugins.spring.boot)
+	alias(libs.plugins.spring.dependency.management)
+	alias(libs.plugins.spring.javaformat)
 //    alias(libs.plugins.graalvm)
 }
 group = 'com.asrevo.cvhome'
 
 
 springBoot {
-    buildInfo()
+	buildInfo()
 }
 
 bootBuildImage {
 /*
-    builder = "bellsoft/buildpacks.builder:musl"
+	builder = "bellsoft/buildpacks.builder:musl"
 */
-    environment["BP_JVM_JLINK_ENABLED"] = "true"
-    environment["BP_JVM_JLINK_ARGS"] = " --compress zip-6 --no-header-files --no-man-pages --vm client --add-modules java.base,java.se,jdk.unsupported,jdk.crypto.ec"
-    imageName = createImageName("store-core/store-core-gateway", project.version)
-    tags = createImageTags("store-core/store-core-gateway", project.version)
-    docker {
-        publishRegistry {
-            url = System.getenv("REGISTRY")
-            username = System.getenv("ECR_TOKEN") ? 'AWS' : null
-            password = System.getenv("ECR_TOKEN")
-        }
-    }
+	environment["BP_JVM_JLINK_ENABLED"] = "true"
+	environment["BP_JVM_JLINK_ARGS"] = " --compress zip-6 --no-header-files --no-man-pages --vm client --add-modules java.base,java.se,jdk.unsupported,jdk.crypto.ec"
+	imageName = createImageName("store-core/store-core-gateway", project.version)
+	tags = createImageTags("store-core/store-core-gateway", project.version)
+	docker {
+		publishRegistry {
+			url = System.getenv("REGISTRY")
+			username = System.getenv("ECR_TOKEN") ? 'AWS' : null
+			password = System.getenv("ECR_TOKEN")
+		}
+	}
 }
 
 dependencies {
-    implementation libs.spring.cloud.starter.gateway.server.webflux
-    implementation libs.spring.cloud.starter.loadbalancer
-    implementation libs.spring.boot.starter.actuator
-    implementation libs.spring.boot.starter.oauth2.client
+	implementation libs.spring.cloud.starter.gateway.server.webflux
+	implementation libs.spring.cloud.starter.loadbalancer
+	implementation libs.spring.boot.starter.actuator
+	implementation libs.spring.boot.starter.oauth2.client
 
-    implementation libs.caffeine
+	implementation libs.caffeine
 
 
-    implementation project(':store-commons:commons')
-    implementation project(':store-core:manager:manager-external-api')
-    implementation project(':store-commons:autoconfigure')
-    implementation project(':store-commons:ecs-commons:fargate-task-info')
-    implementation project(':store-commons:ecs-commons:ecs-service-discoveryclient')
-    compileOnly libs.lombok
-    annotationProcessor libs.lombok
-    testImplementation libs.spring.boot.starter.test
-    testImplementation libs.reactor.test
-    testImplementation libs.spring.boot.testcontainers
-    testImplementation libs.testcontainers.junit.jupiter
+	implementation project(':store-commons:commons')
+	implementation project(':store-core:manager:manager-external-api')
+	implementation project(':store-commons:autoconfigure')
+	implementation project(':store-commons:ecs-commons:fargate-task-info')
+	implementation project(':store-commons:ecs-commons:ecs-service-discoveryclient')
+	compileOnly libs.lombok
+	annotationProcessor libs.lombok
+	testImplementation libs.spring.boot.starter.test
+	testImplementation libs.reactor.test
+	testImplementation libs.spring.boot.testcontainers
+	testImplementation libs.testcontainers.junit.jupiter
 }
 
 //tasks.withType(org.springframework.boot.gradle.tasks.aot.ProcessAot).configureEach {
@@ -55,7 +56,7 @@ dependencies {
 //}
 
 dependencyManagement {
-    imports {
+	imports {
 //        mavenBom libs.spring.cloud.dependencies
-    }
+	}
 }

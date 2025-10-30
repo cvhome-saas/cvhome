@@ -8,15 +8,15 @@ import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-public interface ProductOptionValueService
-        extends SalesManagerEntityService<Long, ProductOptionValue> {
+public interface ProductOptionValueService extends SalesManagerEntityService<Long, ProductOptionValue> {
 
-    void saveOrUpdate(ProductOptionValue entity) throws ServiceException;
+	void saveOrUpdate(ProductOptionValue entity) throws ServiceException;
 
-    ProductOptionValue getByCode(StoreMerchantId store, String optionValueCode);
+	ProductOptionValue getByCode(StoreMerchantId store, String optionValueCode);
 
-    ProductOptionValue getById(StoreMerchantId store, Long optionValueId);
+	ProductOptionValue getById(StoreMerchantId store, Long optionValueId);
 
-    Page<ProductOptionValue> getByMerchant(
-            StoreMerchantId store, LanguageCode language, String name, Pageable pageable);
+	Page<ProductOptionValue> getByMerchant(StoreMerchantId store, LanguageCode language, String name,
+			Pageable pageable);
+
 }

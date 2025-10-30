@@ -8,19 +8,15 @@ import com.asrevo.cvhome.store.core.modules.cms.model.CmsProductImage;
 
 public interface ProductImageGet extends ImageGet {
 
-    /**
-     * Used for accessing the path directly
-     */
-    OutputContentFile getProductImage(
-            final String merchantStoreCode, final String productCode, final String imageName)
-            throws ServiceException;
+	/**
+	 * Used for accessing the path directly
+	 */
+	OutputContentFile getProductImage(final String merchantStoreCode, final String productCode, final String imageName)
+			throws ServiceException;
 
-    OutputContentFile getProductImage(
-            final String merchantStoreCode,
-            final String productCode,
-            final String imageName,
-            final ProductImageSize size)
-            throws ServiceException;
+	OutputContentFile getProductImage(final String merchantStoreCode, final String productCode, final String imageName,
+			final ProductImageSize size) throws ServiceException;
 
-    OutputContentFile getProductImage(CmsProductImage productImage) throws ServiceException;
+	OutputContentFile getProductImage(CmsProductImage productImage) throws ServiceException;
+
 }

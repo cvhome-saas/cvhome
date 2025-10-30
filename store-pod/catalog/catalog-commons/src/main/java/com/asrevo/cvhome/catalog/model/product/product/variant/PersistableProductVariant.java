@@ -9,13 +9,17 @@ import lombok.Setter;
 @Getter
 public class PersistableProductVariant extends ProductVariant {
 
-    @Serial private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private Long variation;
-    private Long variationValue;
+	private Long variation;
 
-    private String variationCode;
-    private String variationValueCode;
+	private Long variationValue;
 
-    private PersistableProductInventory inventory;
+	private String variationCode;
+
+	private String variationValueCode;
+
+	private PersistableProductInventory inventory;
+
 }

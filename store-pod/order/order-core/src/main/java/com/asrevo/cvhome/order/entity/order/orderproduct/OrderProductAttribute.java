@@ -14,46 +14,46 @@ import lombok.Setter;
 @Getter
 @Setter
 public class OrderProductAttribute implements Serializable {
-    @Serial private static final long serialVersionUID = 6037571119918073015L;
 
-    @Id
-    @Column(name = "ORDER_PRODUCT_ATTRIBUTE_ID", nullable = false, unique = true)
-    @TableGenerator(
-            name = "TABLE_GEN",
-            table = "SM_SEQUENCER",
-            pkColumnName = "SEQ_NAME",
-            valueColumnName = "SEQ_COUNT",
-            pkColumnValue = "ORDER_PRODUCT_ATTRIBUTE_SEQ_NEXT_VAL",
-            allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
-            initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
-    private Long id;
+	@Serial
+	private static final long serialVersionUID = 6037571119918073015L;
 
-    @Column(name = "PRODUCT_ATTRIBUTE_PRICE", nullable = false, precision = 15, scale = 4)
-    private BigDecimal productAttributePrice;
+	@Id
+	@Column(name = "ORDER_PRODUCT_ATTRIBUTE_ID", nullable = false, unique = true)
+	@TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME",
+			valueColumnName = "SEQ_COUNT", pkColumnValue = "ORDER_PRODUCT_ATTRIBUTE_SEQ_NEXT_VAL",
+			allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
+			initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
+	@GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
+	private Long id;
 
-    @Column(name = "PRODUCT_ATTRIBUTE_IS_FREE", nullable = false)
-    private boolean productAttributeIsFree;
+	@Column(name = "PRODUCT_ATTRIBUTE_PRICE", nullable = false, precision = 15, scale = 4)
+	private BigDecimal productAttributePrice;
 
-    @Column(name = "PRODUCT_ATTRIBUTE_WEIGHT", precision = 15, scale = 4)
-    private java.math.BigDecimal productAttributeWeight;
+	@Column(name = "PRODUCT_ATTRIBUTE_IS_FREE", nullable = false)
+	private boolean productAttributeIsFree;
 
-    @JsonIgnore
-    @ManyToOne
-    @JoinColumn(name = "ORDER_PRODUCT_ID", nullable = false)
-    private OrderProduct orderProduct;
+	@Column(name = "PRODUCT_ATTRIBUTE_WEIGHT", precision = 15, scale = 4)
+	private java.math.BigDecimal productAttributeWeight;
 
-    @Column(name = "PRODUCT_OPTION_ID", nullable = false)
-    private Long productOptionId;
+	@JsonIgnore
+	@ManyToOne
+	@JoinColumn(name = "ORDER_PRODUCT_ID", nullable = false)
+	private OrderProduct orderProduct;
 
-    @Column(name = "PRODUCT_OPTION_VALUE_ID", nullable = false)
-    private Long productOptionValueId;
+	@Column(name = "PRODUCT_OPTION_ID", nullable = false)
+	private Long productOptionId;
 
-    @Column(name = "PRODUCT_ATTRIBUTE_NAME")
-    private String productAttributeName;
+	@Column(name = "PRODUCT_OPTION_VALUE_ID", nullable = false)
+	private Long productOptionValueId;
 
-    @Column(name = "PRODUCT_ATTRIBUTE_VAL_NAME")
-    private String productAttributeValueName;
+	@Column(name = "PRODUCT_ATTRIBUTE_NAME")
+	private String productAttributeName;
 
-    public OrderProductAttribute() {}
+	@Column(name = "PRODUCT_ATTRIBUTE_VAL_NAME")
+	private String productAttributeValueName;
+
+	public OrderProductAttribute() {
+	}
+
 }

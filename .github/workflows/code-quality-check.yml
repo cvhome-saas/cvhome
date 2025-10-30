@@ -27,4 +27,4 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
 
       - name: Run Check with Gradle
-        run: ./gradlew spotlessCheck
+        run: ./gradlew checkFormat

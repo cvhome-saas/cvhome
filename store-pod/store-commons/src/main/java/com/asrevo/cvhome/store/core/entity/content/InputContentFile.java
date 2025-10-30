@@ -10,8 +10,11 @@ import lombok.Setter;
 @Getter
 public class InputContentFile extends StaticContentFile implements Serializable {
 
-    @Serial private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private InputStream file;
-    private String path;
+	private InputStream file;
+
+	private String path;
+
 }

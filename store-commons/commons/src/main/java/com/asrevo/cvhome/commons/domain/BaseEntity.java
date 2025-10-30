@@ -10,14 +10,19 @@ import org.springframework.data.domain.Persistable;
 @Getter
 @Setter
 public abstract class BaseEntity<E extends AbstractAggregateRoot<E>, T extends Identifier>
-        extends AbstractAggregateRoot<E> implements Persistable<T> {
-    @Id protected T id;
-    @Version private Integer version;
+		extends AbstractAggregateRoot<E> implements Persistable<T> {
 
-    protected abstract T generateId();
+	@Id
+	protected T id;
 
-    @Override
-    public boolean isNew() {
-        return version == null;
-    }
+	@Version
+	private Integer version;
+
+	protected abstract T generateId();
+
+	@Override
+	public boolean isNew() {
+		return version == null;
+	}
+
 }

@@ -4,4 +4,3 @@ import java.util.Collection;
 
 public record StoreDomainList(Collection<StoreDomainDto> data) {
 }
-

@@ -19,41 +19,40 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ProductType extends SalesManagerEntity<Long, ProductType> implements Auditable {
-    @Serial private static final long serialVersionUID = 1L;
 
-    @Id
-    @Column(name = "PRODUCT_TYPE_ID", unique = true, nullable = false)
-    @TableGenerator(
-            name = "TABLE_GEN",
-            table = "SM_SEQUENCER",
-            pkColumnName = "SEQ_NAME",
-            valueColumnName = "SEQ_COUNT",
-            pkColumnValue = "PRODUCT_TYPE_SEQ_NEXT_VAL",
-            allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
-            initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
-    private Long id;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    @Embedded private AuditSection auditSection = new AuditSection();
+	@Id
+	@Column(name = "PRODUCT_TYPE_ID", unique = true, nullable = false)
+	@TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME",
+			valueColumnName = "SEQ_COUNT", pkColumnValue = "PRODUCT_TYPE_SEQ_NEXT_VAL",
+			allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
+			initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
+	@GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
+	private Long id;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "productType")
-    private Set<ProductTypeDescription> descriptions = new HashSet<>();
+	@Embedded
+	private AuditSection auditSection = new AuditSection();
 
-    @Column(name = "PRD_TYPE_CODE")
-    private String code;
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "productType")
+	private Set<ProductTypeDescription> descriptions = new HashSet<>();
 
-    @Column(name = "PRD_TYPE_ADD_TO_CART")
-    private Boolean allowAddToCart;
+	@Column(name = "PRD_TYPE_CODE")
+	private String code;
 
-    @Column(name = "PRD_TYPE_VISIBLE")
-    private Boolean visible;
+	@Column(name = "PRD_TYPE_ADD_TO_CART")
+	private Boolean allowAddToCart;
 
-    @Embedded
-    @AttributeOverrides(
-            @AttributeOverride(
-                    name = "storeMerchantId",
-                    column = @Column(name = "STORE_MERCHANT_ID", nullable = false, length = 50)))
-    private StoreMerchantId storeMerchantId;
+	@Column(name = "PRD_TYPE_VISIBLE")
+	private Boolean visible;
 
-    public ProductType() {}
+	@Embedded
+	@AttributeOverrides(@AttributeOverride(name = "storeMerchantId",
+			column = @Column(name = "STORE_MERCHANT_ID", nullable = false, length = 50)))
+	private StoreMerchantId storeMerchantId;
+
+	public ProductType() {
+	}
+
 }

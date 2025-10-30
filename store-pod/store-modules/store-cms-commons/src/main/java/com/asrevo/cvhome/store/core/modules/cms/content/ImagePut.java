@@ -5,7 +5,8 @@ import java.util.List;
 
 public interface ImagePut {
 
-    void addImage(final String merchantStoreCode, InputContentFile image);
+	void addImage(final String merchantStoreCode, InputContentFile image);
 
-    void addImages(final String merchantStoreCode, List<InputContentFile> imagesList);
+	void addImages(final String merchantStoreCode, List<InputContentFile> imagesList);
+
 }

@@ -11,13 +11,19 @@ import lombok.Setter;
 @Getter
 public class PersistableInventory extends InventoryEntity {
 
-    /**
-     * An inventory for a given product and possibly a given variant
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 * An inventory for a given product and possibly a given variant
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private String store;
-    @NotNull private Long productId;
-    private Long variant;
-    private List<PersistableProductPrice> prices;
+	private String store;
+
+	@NotNull
+	private Long productId;
+
+	private Long variant;
+
+	private List<PersistableProductPrice> prices;
+
 }

@@ -14,16 +14,24 @@ import lombok.Setter;
 @Getter
 public class PersistableProductDefinition extends ProductDefinition {
 
-    /**
-     * type and manufacturer are String type corresponding to the unique code
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 * type and manufacturer are String type corresponding to the unique code
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private List<ProductDescription> descriptions = new ArrayList<>();
-    private List<PersistableProductAttribute> properties = new ArrayList<>();
-    private List<Category> categories = new ArrayList<>();
-    private String type;
-    private String manufacturer;
-    private BigDecimal price;
-    private int quantity;
+	private List<ProductDescription> descriptions = new ArrayList<>();
+
+	private List<PersistableProductAttribute> properties = new ArrayList<>();
+
+	private List<Category> categories = new ArrayList<>();
+
+	private String type;
+
+	private String manufacturer;
+
+	private BigDecimal price;
+
+	private int quantity;
+
 }

@@ -16,121 +16,130 @@ import org.apache.commons.validator.routines.BigDecimalValidator;
 import org.apache.commons.validator.routines.CurrencyValidator;
 
 public class PriceUtils {
-    private static final char DECIMALCOUNT = '2';
-    private static final char DECIMALPOINT = '.';
-    private static final char THOUSANDPOINT = ',';
 
-    public static String getStringAmount(BigDecimal amount) {
+	private static final char DECIMALCOUNT = '2';
 
-        if (amount == null) {
-            return "";
-        }
+	private static final char DECIMALPOINT = '.';
 
-        NumberFormat nf = NumberFormat.getInstance(Constants.DEFAULT_LOCALE);
+	private static final char THOUSANDPOINT = ',';
 
-        nf.setMaximumFractionDigits(Integer.parseInt(Character.toString(DECIMALCOUNT)));
-        nf.setMinimumFractionDigits(Integer.parseInt(Character.toString(DECIMALCOUNT)));
+	public static String getStringAmount(BigDecimal amount) {
 
-        return nf.format(amount);
-    }
+		if (amount == null) {
+			return "";
+		}
 
-    public static Locale ofLocal(LanguageCode languageCode, CountryIsoCode countryIsoCode) {
-        return Locale.of(languageCode.code(), countryIsoCode.isoCode());
-    }
+		NumberFormat nf = NumberFormat.getInstance(Constants.DEFAULT_LOCALE);
 
-    public static String getStoreFormatedAmountWithCurrency(
-            MerchantStorePricingBase store, BigDecimal amount) {
-        if (amount == null) {
-            return "";
-        }
+		nf.setMaximumFractionDigits(Integer.parseInt(Character.toString(DECIMALCOUNT)));
+		nf.setMinimumFractionDigits(Integer.parseInt(Character.toString(DECIMALCOUNT)));
 
-        Currency currency;
-        Locale locale;
-        NumberFormat currencyInstance;
+		return nf.format(amount);
+	}
 
-        try {
-            currency = store.getCurrency().getCurrencyInstance();
-            locale = ofLocal(store.getDefaultLanguage(), store.getCountryIsoCode());
-        } catch (Exception e) {
-            currency = Constants.DEFAULT_CURRENCY.getCurrencyInstance();
-            locale = Constants.DEFAULT_LOCALE;
-        }
+	public static Locale ofLocal(LanguageCode languageCode, CountryIsoCode countryIsoCode) {
+		return Locale.of(languageCode.code(), countryIsoCode.isoCode());
+	}
 
-        if (store.isCurrencyFormatNational()) {
-            currencyInstance = NumberFormat.getCurrencyInstance(locale); // national
-        } else {
-            currencyInstance = NumberFormat.getCurrencyInstance(); // international
-        }
+	public static String getStoreFormatedAmountWithCurrency(MerchantStorePricingBase store, BigDecimal amount) {
+		if (amount == null) {
+			return "";
+		}
 
-        currencyInstance.setCurrency(currency);
+		Currency currency;
+		Locale locale;
+		NumberFormat currencyInstance;
 
-        return currencyInstance.format(amount.doubleValue());
-    }
+		try {
+			currency = store.getCurrency().getCurrencyInstance();
+			locale = ofLocal(store.getDefaultLanguage(), store.getCountryIsoCode());
+		}
+		catch (Exception e) {
+			currency = Constants.DEFAULT_CURRENCY.getCurrencyInstance();
+			locale = Constants.DEFAULT_LOCALE;
+		}
 
-    public static BigDecimal getAmount(String amount) throws ServiceException {
+		if (store.isCurrencyFormatNational()) {
+			currencyInstance = NumberFormat.getCurrencyInstance(locale); // national
+		}
+		else {
+			currencyInstance = NumberFormat.getCurrencyInstance(); // international
+		}
 
-        // validations
-        StringBuilder newAmount = new StringBuilder();
-        for (int i = 0; i < amount.length(); i++) {
-            if (amount.charAt(i) != DECIMALPOINT && amount.charAt(i) != THOUSANDPOINT) {
-                newAmount.append(amount.charAt(i));
-            }
-        }
+		currencyInstance.setCurrency(currency);
 
-        try {
-            Integer.parseInt(newAmount.toString());
-        } catch (Exception e) {
-            throw new ServiceException("Cannot parse " + amount);
-        }
+		return currencyInstance.format(amount.doubleValue());
+	}
 
-        if (!amount.contains(Character.toString(DECIMALPOINT))
-                && !amount.contains(Character.toString(THOUSANDPOINT))
-                && !amount.contains(" ")) {
+	public static BigDecimal getAmount(String amount) throws ServiceException {
 
-            if (matchPositiveInteger(amount)) {
-                BigDecimalValidator validator = CurrencyValidator.getInstance();
-                BigDecimal bdamount = validator.validate(amount, Locale.US);
-                if (bdamount == null) {
-                    throw new ServiceException("Cannot parse " + amount);
-                } else {
-                    return bdamount;
-                }
-            } else {
-                throw new ServiceException("Not a positive integer " + amount);
-            }
+		// validations
+		StringBuilder newAmount = new StringBuilder();
+		for (int i = 0; i < amount.length(); i++) {
+			if (amount.charAt(i) != DECIMALPOINT && amount.charAt(i) != THOUSANDPOINT) {
+				newAmount.append(amount.charAt(i));
+			}
+		}
 
-        } else {
-            // TODO should not go this path in this current release
-            StringBuilder pat = new StringBuilder();
+		try {
+			Integer.parseInt(newAmount.toString());
+		}
+		catch (Exception e) {
+			throw new ServiceException("Cannot parse " + amount);
+		}
 
-            if (!StringUtils.isBlank(Character.toString(THOUSANDPOINT))) {
-                pat.append("\\d{1,3}(" + THOUSANDPOINT + "?\\d{3})*");
-            }
+		if (!amount.contains(Character.toString(DECIMALPOINT)) && !amount.contains(Character.toString(THOUSANDPOINT))
+				&& !amount.contains(" ")) {
 
-            pat.append("(\\" + DECIMALPOINT + "\\d{1," + DECIMALCOUNT + "})");
+			if (matchPositiveInteger(amount)) {
+				BigDecimalValidator validator = CurrencyValidator.getInstance();
+				BigDecimal bdamount = validator.validate(amount, Locale.US);
+				if (bdamount == null) {
+					throw new ServiceException("Cannot parse " + amount);
+				}
+				else {
+					return bdamount;
+				}
+			}
+			else {
+				throw new ServiceException("Not a positive integer " + amount);
+			}
 
-            Pattern pattern = Pattern.compile(pat.toString());
-            Matcher matcher = pattern.matcher(amount);
+		}
+		else {
+			// TODO should not go this path in this current release
+			StringBuilder pat = new StringBuilder();
 
-            if (matcher.matches()) {
+			if (!StringUtils.isBlank(Character.toString(THOUSANDPOINT))) {
+				pat.append("\\d{1,3}(" + THOUSANDPOINT + "?\\d{3})*");
+			}
 
-                Locale locale = Constants.DEFAULT_LOCALE;
-                BigDecimalValidator validator = CurrencyValidator.getInstance();
+			pat.append("(\\" + DECIMALPOINT + "\\d{1," + DECIMALCOUNT + "})");
 
-                return validator.validate(amount, locale);
-            } else {
-                throw new ServiceException("Cannot parse " + amount);
-            }
-        }
-    }
+			Pattern pattern = Pattern.compile(pat.toString());
+			Matcher matcher = pattern.matcher(amount);
 
-    public static boolean matchPositiveInteger(String amount) {
-        Pattern pattern = Pattern.compile("^[+]?\\d*$");
-        Matcher matcher = pattern.matcher(amount);
-        return matcher.matches();
-    }
+			if (matcher.matches()) {
 
-    public static BigDecimal calculatePriceQuantity(BigDecimal price, int quantity) {
-        return price.multiply(new BigDecimal(quantity));
-    }
+				Locale locale = Constants.DEFAULT_LOCALE;
+				BigDecimalValidator validator = CurrencyValidator.getInstance();
+
+				return validator.validate(amount, locale);
+			}
+			else {
+				throw new ServiceException("Cannot parse " + amount);
+			}
+		}
+	}
+
+	public static boolean matchPositiveInteger(String amount) {
+		Pattern pattern = Pattern.compile("^[+]?\\d*$");
+		Matcher matcher = pattern.matcher(amount);
+		return matcher.matches();
+	}
+
+	public static BigDecimal calculatePriceQuantity(BigDecimal price, int quantity) {
+		return price.multiply(new BigDecimal(quantity));
+	}
+
 }

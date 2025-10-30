@@ -10,34 +10,30 @@ import com.asrevo.cvhome.keycloak.domain.user.UserPassword;
 import java.security.Principal;
 
 public interface UserAccountService {
-    ReadableUser createOrgUser(ManagerOrgId org, PersistableUser user);
 
-    ReadableUser current(String id);
+	ReadableUser createOrgUser(ManagerOrgId org, PersistableUser user);
 
-    ReadableUserList list(Principal principal, UserOrgStoreIdentity identity, ManagerStoreId store);
+	ReadableUser current(String id);
 
-    ReadableUser createManagedUser(
-            UserOrgStoreIdentity identity, ManagerStoreId store, PersistableUser create);
+	ReadableUserList list(Principal principal, UserOrgStoreIdentity identity, ManagerStoreId store);
 
-    ReadableUser updateManagedUser(
-            UserOrgStoreIdentity identity, ManagerStoreId store, PersistableUser user);
+	ReadableUser createManagedUser(UserOrgStoreIdentity identity, ManagerStoreId store, PersistableUser create);
 
-    void resetPassword(
-            UserOrgStoreIdentity userOrgStoreInfo,
-            ManagerStoreId store,
-            UserPassword passwordRequestDto,
-            String userId,
-            boolean temporary);
+	ReadableUser updateManagedUser(UserOrgStoreIdentity identity, ManagerStoreId store, PersistableUser user);
 
-    boolean usernameExist(String username);
+	void resetPassword(UserOrgStoreIdentity userOrgStoreInfo, ManagerStoreId store, UserPassword passwordRequestDto,
+			String userId, boolean temporary);
 
-    void deleteUser(UserOrgStoreIdentity userOrgStoreInfo, ManagerStoreId store, String userId);
+	boolean usernameExist(String username);
 
-    void enableUser(UserOrgStoreIdentity userOrgStoreInfo, ManagerStoreId store, String userId);
+	void deleteUser(UserOrgStoreIdentity userOrgStoreInfo, ManagerStoreId store, String userId);
 
-    void disableUser(UserOrgStoreIdentity userOrgStoreInfo, ManagerStoreId store, String userId);
+	void enableUser(UserOrgStoreIdentity userOrgStoreInfo, ManagerStoreId store, String userId);
 
-    ReadableUser findOne(UserOrgStoreIdentity identity, String userId);
+	void disableUser(UserOrgStoreIdentity userOrgStoreInfo, ManagerStoreId store, String userId);
 
-    void changePassword(ManagerOrgId managerOrgId, UserPassword request);
+	ReadableUser findOne(UserOrgStoreIdentity identity, String userId);
+
+	void changePassword(ManagerOrgId managerOrgId, UserPassword request);
+
 }

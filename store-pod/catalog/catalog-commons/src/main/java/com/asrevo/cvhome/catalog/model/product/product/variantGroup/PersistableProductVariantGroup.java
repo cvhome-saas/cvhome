@@ -9,7 +9,9 @@ import lombok.Setter;
 @Getter
 public class PersistableProductVariantGroup extends ProductVariantGroup {
 
-    @Serial private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    List<Long> productVariants = null;
+	List<Long> productVariants = null;
+
 }

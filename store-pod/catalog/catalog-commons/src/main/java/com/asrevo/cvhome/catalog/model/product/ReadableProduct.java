@@ -19,27 +19,43 @@ import lombok.Setter;
 @Getter
 public class ReadableProduct extends ProductEntity implements Serializable {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private ProductDescription description;
-    private ReadableProductPrice productPrice;
-    private String finalPrice = "0";
-    private String originalPrice = null;
-    private boolean discounted = false;
-    private ReadableImage image;
-    private List<ReadableImage> images = new ArrayList<>();
-    private ReadableManufacturer manufacturer;
-    private List<ReadableProductAttribute> attributes = new ArrayList<>();
-    private List<ReadableProductOption> options = new ArrayList<>();
-    private List<ReadableProductVariant> variants = new ArrayList<>();
-    private List<ReadableProductProperty> properties = new ArrayList<>();
-    private List<ReadableCategory> categories = new ArrayList<>();
-    private ReadableProductType type;
-    private boolean canBePurchased = false;
+	private ProductDescription description;
 
-    // RENTAL
-    private RentalOwner owner;
+	private ReadableProductPrice productPrice;
+
+	private String finalPrice = "0";
+
+	private String originalPrice = null;
+
+	private boolean discounted = false;
+
+	private ReadableImage image;
+
+	private List<ReadableImage> images = new ArrayList<>();
+
+	private ReadableManufacturer manufacturer;
+
+	private List<ReadableProductAttribute> attributes = new ArrayList<>();
+
+	private List<ReadableProductOption> options = new ArrayList<>();
+
+	private List<ReadableProductVariant> variants = new ArrayList<>();
+
+	private List<ReadableProductProperty> properties = new ArrayList<>();
+
+	private List<ReadableCategory> categories = new ArrayList<>();
+
+	private ReadableProductType type;
+
+	private boolean canBePurchased = false;
+
+	// RENTAL
+	private RentalOwner owner;
+
 }

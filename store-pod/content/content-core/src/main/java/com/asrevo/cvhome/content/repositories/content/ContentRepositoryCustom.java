@@ -8,6 +8,7 @@ import java.util.List;
 
 public interface ContentRepositoryCustom {
 
-    List<ContentDescription> listNameByType(
-            List<ContentType> contentType, StoreMerchantId store, LanguageCode language);
+	List<ContentDescription> listNameByType(List<ContentType> contentType, StoreMerchantId store,
+			LanguageCode language);
+
 }

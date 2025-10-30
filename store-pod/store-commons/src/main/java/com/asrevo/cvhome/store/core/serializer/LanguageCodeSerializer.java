@@ -8,17 +8,17 @@ import java.io.IOException;
 
 public class LanguageCodeSerializer extends StdSerializer<LanguageCode> {
 
-    public LanguageCodeSerializer() {
-        this(null);
-    }
+	public LanguageCodeSerializer() {
+		this(null);
+	}
 
-    protected LanguageCodeSerializer(Class<LanguageCode> t) {
-        super(t);
-    }
+	protected LanguageCodeSerializer(Class<LanguageCode> t) {
+		super(t);
+	}
 
-    @Override
-    public void serialize(LanguageCode value, JsonGenerator gen, SerializerProvider provider)
-            throws IOException {
-        gen.writeString(value.code());
-    }
+	@Override
+	public void serialize(LanguageCode value, JsonGenerator gen, SerializerProvider provider) throws IOException {
+		gen.writeString(value.code());
+	}
+
 }

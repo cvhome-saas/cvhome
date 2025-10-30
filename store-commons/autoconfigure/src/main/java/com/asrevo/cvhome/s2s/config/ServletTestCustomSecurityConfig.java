@@ -28,64 +28,72 @@ import org.springframework.web.bind.annotation.RestController;
 @Configuration
 @Profile("signer")
 public class ServletTestCustomSecurityConfig {
-    @Configuration
-    @Profile("signer")
-    public static class SignerConfig {
-        @Bean
-        public RSAKey rsaKey() throws JOSEException {
-            return new RSAKeyGenerator(2048)
-                    .keyUse(KeyUse.SIGNATURE) // indicate the intended use of the key (optional)
-                    .keyID(UUID.randomUUID().toString()) // give the key a unique ID (optional)
-                    .generate();
-        }
 
-        @Bean
-        public JwtDecoder jwtDecoder(RSAKey rsaKey) throws JOSEException {
-            return NimbusJwtDecoder.withPublicKey(rsaKey.toRSAPublicKey()).build();
-        }
-    }
+	@Configuration
+	@Profile("signer")
+	public static class SignerConfig {
 
-    @Component
-    @Profile("signer")
-    public static class JwtSigner {
-        private final RSAKey rsaKey;
-        private final PrivateKey rsaPrivateKey;
+		@Bean
+		public RSAKey rsaKey() throws JOSEException {
+			return new RSAKeyGenerator(2048).keyUse(KeyUse.SIGNATURE) // indicate the
+																		// intended use of
+																		// the key
+																		// (optional)
+				.keyID(UUID.randomUUID().toString()) // give the key a unique ID
+														// (optional)
+				.generate();
+		}
 
-        public JwtSigner(RSAKey rsaKey) throws JOSEException {
-            this.rsaKey = rsaKey;
-            this.rsaPrivateKey = rsaKey.toRSAPrivateKey();
-        }
+		@Bean
+		public JwtDecoder jwtDecoder(RSAKey rsaKey) throws JOSEException {
+			return NimbusJwtDecoder.withPublicKey(rsaKey.toRSAPublicKey()).build();
+		}
 
-        public String createJwt(Map<String, Object> claims) throws JOSEException {
-            JWSHeader header =
-                    new JWSHeader.Builder(JWSAlgorithm.RS256)
-                            .type(JOSEObjectType.JWT)
-                            .keyID(rsaKey.getKeyID())
-                            .build();
-            JWTClaimsSet.Builder builder =
-                    new JWTClaimsSet.Builder().issueTime(Date.from(Instant.now()));
+	}
 
-            claims.forEach(builder::claim);
+	@Component
+	@Profile("signer")
+	public static class JwtSigner {
 
-            var signedJWT = new SignedJWT(header, builder.build());
-            signedJWT.sign(new RSASSASigner(rsaPrivateKey));
-            return signedJWT.serialize();
-        }
-    }
+		private final RSAKey rsaKey;
 
-    @RestController
-    @Profile("signer")
-    public static class SignerController {
-        private final JwtSigner jwtSigner;
+		private final PrivateKey rsaPrivateKey;
 
-        public SignerController(JwtSigner jwtSigner) {
-            this.jwtSigner = jwtSigner;
-        }
+		public JwtSigner(RSAKey rsaKey) throws JOSEException {
+			this.rsaKey = rsaKey;
+			this.rsaPrivateKey = rsaKey.toRSAPrivateKey();
+		}
 
-        @PostMapping("api/v1/test/sign")
-        public Map<String, String> sign(@RequestBody Map<String, Object> claims)
-                throws JOSEException {
-            return Map.of("access_token", jwtSigner.createJwt(claims));
-        }
-    }
+		public String createJwt(Map<String, Object> claims) throws JOSEException {
+			JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.RS256).type(JOSEObjectType.JWT)
+				.keyID(rsaKey.getKeyID())
+				.build();
+			JWTClaimsSet.Builder builder = new JWTClaimsSet.Builder().issueTime(Date.from(Instant.now()));
+
+			claims.forEach(builder::claim);
+
+			var signedJWT = new SignedJWT(header, builder.build());
+			signedJWT.sign(new RSASSASigner(rsaPrivateKey));
+			return signedJWT.serialize();
+		}
+
+	}
+
+	@RestController
+	@Profile("signer")
+	public static class SignerController {
+
+		private final JwtSigner jwtSigner;
+
+		public SignerController(JwtSigner jwtSigner) {
+			this.jwtSigner = jwtSigner;
+		}
+
+		@PostMapping("api/v1/test/sign")
+		public Map<String, String> sign(@RequestBody Map<String, Object> claims) throws JOSEException {
+			return Map.of("access_token", jwtSigner.createJwt(claims));
+		}
+
+	}
+
 }

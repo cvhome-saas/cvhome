@@ -1,5 +1,8 @@
 package com.asrevo.cvhome.gateway.controller;
 
+import static com.asrevo.cvhome.s2s.utils.RedirectionUrlBuilder.getPort;
+import static com.asrevo.cvhome.s2s.utils.RedirectionUrlBuilder.getScheme;
+
 import com.asrevo.cvhome.commons.domain.ServiceDomain;
 import com.asrevo.cvhome.s2s.model.ServiceDomainProperties;
 import com.asrevo.cvhome.s2s.utils.RedirectionUrlBuilder;
@@ -15,35 +18,32 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
-import static com.asrevo.cvhome.s2s.utils.RedirectionUrlBuilder.getPort;
-import static com.asrevo.cvhome.s2s.utils.RedirectionUrlBuilder.getScheme;
-
 @Controller
 @RequestMapping("redirect")
 @AllArgsConstructor
 @Slf4j
 public class RedirectionController {
-    private final ServiceDomainProperties serviceDomainProperties;
 
-    @GetMapping(value = "internal", params = {"serviceName"})
-    public Mono<Void> redirect(
-            @RequestParam() String serviceName,
-            @RequestParam(required = false, defaultValue = "") String path,
-            ServerWebExchange exchange) {
+	private final ServiceDomainProperties serviceDomainProperties;
 
-        ServerHttpRequest request = exchange.getRequest();
+	@GetMapping(value = "internal", params = { "serviceName" })
+	public Mono<Void> redirect(@RequestParam() String serviceName,
+			@RequestParam(required = false, defaultValue = "") String path, ServerWebExchange exchange) {
 
-        ServiceDomain serviceDomain = serviceDomainProperties.getService(serviceName);
+		ServerHttpRequest request = exchange.getRequest();
 
-        if (serviceDomain == null) {
-            throw new RuntimeException(serviceName + " not defined");
-        }
+		ServiceDomain serviceDomain = serviceDomainProperties.getService(serviceName);
 
-        String fullUrl = new RedirectionUrlBuilder(getScheme(request), getPort(request), serviceDomain).getRedirectionUrl(path);
-        ServerHttpResponse response = exchange.getResponse();
-        response.setStatusCode(HttpStatus.PERMANENT_REDIRECT);
-        response.getHeaders().add("Location", fullUrl);
-        return response.setComplete();
-    }
+		if (serviceDomain == null) {
+			throw new RuntimeException(serviceName + " not defined");
+		}
+
+		String fullUrl = new RedirectionUrlBuilder(getScheme(request), getPort(request), serviceDomain)
+			.getRedirectionUrl(path);
+		ServerHttpResponse response = exchange.getResponse();
+		response.setStatusCode(HttpStatus.PERMANENT_REDIRECT);
+		response.getHeaders().add("Location", fullUrl);
+		return response.setComplete();
+	}
+
 }
-

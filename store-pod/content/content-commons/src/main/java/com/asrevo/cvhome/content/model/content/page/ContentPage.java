@@ -9,10 +9,12 @@ import lombok.Setter;
 @Getter
 public class ContentPage extends Content {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private boolean linkToMenu;
+	private boolean linkToMenu;
+
 }

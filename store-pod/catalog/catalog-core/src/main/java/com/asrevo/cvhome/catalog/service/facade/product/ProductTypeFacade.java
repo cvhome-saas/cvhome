@@ -9,18 +9,18 @@ import org.springframework.data.domain.Pageable;
 
 public interface ProductTypeFacade {
 
-    ReadableProductTypeList getByMerchant(
-            StoreMerchantId store, LanguageCode language, Pageable pageable);
+	ReadableProductTypeList getByMerchant(StoreMerchantId store, LanguageCode language, Pageable pageable);
 
-    ReadableProductType get(StoreMerchantId store, Long id, LanguageCode language);
+	ReadableProductType get(StoreMerchantId store, Long id, LanguageCode language);
 
-    ReadableProductType get(StoreMerchantId store, String code, LanguageCode language);
+	ReadableProductType get(StoreMerchantId store, String code, LanguageCode language);
 
-    Long save(PersistableProductType type, StoreMerchantId store, LanguageCode language);
+	Long save(PersistableProductType type, StoreMerchantId store, LanguageCode language);
 
-    void update(PersistableProductType type, Long id, StoreMerchantId store, LanguageCode language);
+	void update(PersistableProductType type, Long id, StoreMerchantId store, LanguageCode language);
 
-    void delete(Long id, StoreMerchantId store, LanguageCode language);
+	void delete(Long id, StoreMerchantId store, LanguageCode language);
 
-    boolean exists(String code, StoreMerchantId store, LanguageCode language);
+	boolean exists(String code, StoreMerchantId store, LanguageCode language);
+
 }

@@ -16,61 +16,57 @@ import org.springframework.util.Assert;
 
 @Component
 public class PersistableProductVariantGroupMapper
-        implements Mapper<PersistableProductVariantGroup, ProductVariantGroup> {
+		implements Mapper<PersistableProductVariantGroup, ProductVariantGroup> {
 
-    private final ProductVariantService productVariantService;
+	private final ProductVariantService productVariantService;
 
-    private final ProductVariantImageService productVariantImageService;
+	private final ProductVariantImageService productVariantImageService;
 
-    public PersistableProductVariantGroupMapper(
-            ProductVariantService productVariantService,
-            ProductVariantImageService productVariantImageService) {
-        this.productVariantService = productVariantService;
-        this.productVariantImageService = productVariantImageService;
-    }
+	public PersistableProductVariantGroupMapper(ProductVariantService productVariantService,
+			ProductVariantImageService productVariantImageService) {
+		this.productVariantService = productVariantService;
+		this.productVariantImageService = productVariantImageService;
+	}
 
-    @Override
-    public ProductVariantGroup convert(
-            PersistableProductVariantGroup source, StoreMerchantId store, LanguageCode language) {
-        Assert.notNull(source, "PersistableproductVariantGroup cannot be null");
-        Assert.notNull(store, "store cannot be null");
-        Assert.notNull(language, "Language cannot be null");
-        return this.merge(source, new ProductVariantGroup(), store, language);
-    }
+	@Override
+	public ProductVariantGroup convert(PersistableProductVariantGroup source, StoreMerchantId store,
+			LanguageCode language) {
+		Assert.notNull(source, "PersistableproductVariantGroup cannot be null");
+		Assert.notNull(store, "store cannot be null");
+		Assert.notNull(language, "Language cannot be null");
+		return this.merge(source, new ProductVariantGroup(), store, language);
+	}
 
-    @Override
-    public ProductVariantGroup merge(
-            PersistableProductVariantGroup source,
-            ProductVariantGroup destination,
-            StoreMerchantId store,
-            LanguageCode language) {
+	@Override
+	public ProductVariantGroup merge(PersistableProductVariantGroup source, ProductVariantGroup destination,
+			StoreMerchantId store, LanguageCode language) {
 
-        Assert.notNull(source, "PersistableproductVariantGroup cannot be null");
-        Assert.notNull(store, "store cannot be null");
-        Assert.notNull(language, "Language cannot be null");
-        Assert.notNull(source.getProductVariants(), "Product instances cannot be null");
+		Assert.notNull(source, "PersistableproductVariantGroup cannot be null");
+		Assert.notNull(store, "store cannot be null");
+		Assert.notNull(language, "Language cannot be null");
+		Assert.notNull(source.getProductVariants(), "Product instances cannot be null");
 
-        if (destination == null) {
-            destination = new ProductVariantGroup();
-        }
+		if (destination == null) {
+			destination = new ProductVariantGroup();
+		}
 
-        destination.setId(source.getId());
+		destination.setId(source.getId());
 
-        List<ProductVariant> productVariants =
-                productVariantService.getByIds(source.getProductVariants(), store);
+		List<ProductVariant> productVariants = productVariantService.getByIds(source.getProductVariants(), store);
 
-        for (ProductVariant p : productVariants) {
-            p.setProductVariantGroup(destination);
-        }
+		for (ProductVariant p : productVariants) {
+			p.setProductVariantGroup(destination);
+		}
 
-        // images are not managed from this object
-        if (source.getId() != null) {
-            List<ProductVariantImage> images =
-                    productVariantImageService.listByProductVariantGroup(source.getId(), store);
-            destination.setImages(images);
-        }
-        destination.setStoreMerchantId(store);
-        destination.setProductVariants(new HashSet<>(productVariants));
-        return destination;
-    }
+		// images are not managed from this object
+		if (source.getId() != null) {
+			List<ProductVariantImage> images = productVariantImageService.listByProductVariantGroup(source.getId(),
+					store);
+			destination.setImages(images);
+		}
+		destination.setStoreMerchantId(store);
+		destination.setProductVariants(new HashSet<>(productVariants));
+		return destination;
+	}
+
 }

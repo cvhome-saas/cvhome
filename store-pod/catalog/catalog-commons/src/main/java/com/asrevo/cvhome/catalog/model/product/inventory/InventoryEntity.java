@@ -9,17 +9,26 @@ import lombok.Setter;
 @Getter
 public class InventoryEntity extends Entity {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private int quantity;
-    private String region;
-    private String regionVariant;
-    private String owner;
-    private String dateAvailable;
-    private boolean available;
-    private int productQuantityOrderMin = 0;
-    private int productQuantityOrderMax = 0;
+	private int quantity;
+
+	private String region;
+
+	private String regionVariant;
+
+	private String owner;
+
+	private String dateAvailable;
+
+	private boolean available;
+
+	private int productQuantityOrderMin = 0;
+
+	private int productQuantityOrderMax = 0;
+
 }

@@ -6,6 +6,6 @@ import com.asrevo.cvhome.store.core.modules.cms.model.CmsProductImage;
 
 public interface ProductImagePut {
 
-    void addProductImage(CmsProductImage productImage, ImageContentFile contentImage)
-            throws ServiceException;
+	void addProductImage(CmsProductImage productImage, ImageContentFile contentImage) throws ServiceException;
+
 }

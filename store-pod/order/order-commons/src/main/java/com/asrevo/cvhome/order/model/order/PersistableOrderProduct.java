@@ -12,11 +12,14 @@ import lombok.Setter;
 @Getter
 public class PersistableOrderProduct extends OrderProductEntity implements Serializable {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    private BigDecimal price; // specify final price
-    private List<ProductAttribute> attributes; // may have attributes
+	private BigDecimal price; // specify final price
+
+	private List<ProductAttribute> attributes; // may have attributes
+
 }

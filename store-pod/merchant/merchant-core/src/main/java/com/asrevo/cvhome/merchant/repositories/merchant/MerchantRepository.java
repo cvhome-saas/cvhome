@@ -7,9 +7,9 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface MerchantRepository extends JpaRepository<MerchantStore, StoreMerchantId> {
 
-    @Query(
-            """
-                    select m from MerchantStore m
-                    left join fetch m.languages mls where m.id = ?1""")
-    MerchantStore findByMerchantStoreId(StoreMerchantId storeMerchantId);
+	@Query("""
+			select m from MerchantStore m
+			left join fetch m.languages mls where m.id = ?1""")
+	MerchantStore findByMerchantStoreId(StoreMerchantId storeMerchantId);
+
 }

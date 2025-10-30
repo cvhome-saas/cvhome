@@ -16,55 +16,56 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ProductImage extends SalesManagerEntity<Long, ProductImage> {
-    @Serial private static final long serialVersionUID = 1L;
 
-    @Id
-    @Column(name = "PRODUCT_IMAGE_ID")
-    @TableGenerator(
-            name = "TABLE_GEN",
-            table = "SM_SEQUENCER",
-            pkColumnName = "SEQ_NAME",
-            valueColumnName = "SEQ_COUNT",
-            pkColumnValue = "PRODUCT_IMAGE_SEQ_NEXT_VAL",
-            allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
-            initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
-    private Long id;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "productImage", cascade = CascadeType.ALL)
-    private List<ProductImageDescription> descriptions = new ArrayList<>();
+	@Id
+	@Column(name = "PRODUCT_IMAGE_ID")
+	@TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME",
+			valueColumnName = "SEQ_COUNT", pkColumnValue = "PRODUCT_IMAGE_SEQ_NEXT_VAL",
+			allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
+			initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
+	@GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
+	private Long id;
 
-    @Column(name = "PRODUCT_IMAGE")
-    private String productImage;
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "productImage", cascade = CascadeType.ALL)
+	private List<ProductImageDescription> descriptions = new ArrayList<>();
 
-    @Column(name = "DEFAULT_IMAGE")
-    private boolean defaultImage = true;
+	@Column(name = "PRODUCT_IMAGE")
+	private String productImage;
 
-    /**
-     * default to 0 for images managed by the system
-     */
-    @Column(name = "IMAGE_TYPE")
-    private int imageType;
+	@Column(name = "DEFAULT_IMAGE")
+	private boolean defaultImage = true;
 
-    /**
-     * Refers to images not accessible through the system. It may also be a video.
-     */
-    @Column(name = "PRODUCT_IMAGE_URL")
-    private String productImageUrl;
+	/**
+	 * default to 0 for images managed by the system
+	 */
+	@Column(name = "IMAGE_TYPE")
+	private int imageType;
 
-    @Column(name = "IMAGE_CROP")
-    private boolean imageCrop;
+	/**
+	 * Refers to images not accessible through the system. It may also be a video.
+	 */
+	@Column(name = "PRODUCT_IMAGE_URL")
+	private String productImageUrl;
 
-    @ManyToOne(targetEntity = Product.class)
-    @JoinColumn(name = "PRODUCT_ID", nullable = false)
-    private Product product;
+	@Column(name = "IMAGE_CROP")
+	private boolean imageCrop;
 
-    @Column(name = "SORT_ORDER")
-    private Integer sortOrder = 0;
+	@ManyToOne(targetEntity = Product.class)
+	@JoinColumn(name = "PRODUCT_ID", nullable = false)
+	private Product product;
 
-    @Transient private InputStream image = null;
+	@Column(name = "SORT_ORDER")
+	private Integer sortOrder = 0;
 
-    // private MultiPartFile image
+	@Transient
+	private InputStream image = null;
 
-    public ProductImage() {}
+	// private MultiPartFile image
+
+	public ProductImage() {
+	}
+
 }

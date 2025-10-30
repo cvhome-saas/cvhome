@@ -10,25 +10,28 @@ import org.springframework.boot.actuate.health.HealthIndicator;
 
 @Slf4j
 public class EcsTaskHealthIndicator implements HealthIndicator {
-    private final EcsTask ecsTask;
-    private final ObjectMapper objectMapper;
 
-    public EcsTaskHealthIndicator(EcsTask ecsTask, ObjectMapper objectMapper) {
-        this.ecsTask = ecsTask;
-        this.objectMapper = objectMapper;
-    }
+	private final EcsTask ecsTask;
 
-    @Override
-    public Health health() {
-        Health.Builder status = Health.up();
-        try {
-            status.withDetails(
-                    objectMapper.convertValue(
-                            ecsTask, new TypeReference<Map<String, Object>>() {}));
-        } catch (Exception e) {
-            status = Health.down(e);
-            log.error("error EcsTaskHealthIndicator", e);
-        }
-        return status.build();
-    }
+	private final ObjectMapper objectMapper;
+
+	public EcsTaskHealthIndicator(EcsTask ecsTask, ObjectMapper objectMapper) {
+		this.ecsTask = ecsTask;
+		this.objectMapper = objectMapper;
+	}
+
+	@Override
+	public Health health() {
+		Health.Builder status = Health.up();
+		try {
+			status.withDetails(objectMapper.convertValue(ecsTask, new TypeReference<Map<String, Object>>() {
+			}));
+		}
+		catch (Exception e) {
+			status = Health.down(e);
+			log.error("error EcsTaskHealthIndicator", e);
+		}
+		return status.build();
+	}
+
 }

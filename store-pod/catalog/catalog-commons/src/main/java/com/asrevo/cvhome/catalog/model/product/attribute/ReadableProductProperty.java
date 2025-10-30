@@ -8,15 +8,17 @@ import lombok.Setter;
 @Getter
 public class ReadableProductProperty extends ProductPropertyOption {
 
-    /**
-     *
-     */
-    @Serial private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    /**
-     * Property use option objects
-     */
-    private ReadableProductOption property = null;
+	/**
+	 * Property use option objects
+	 */
+	private ReadableProductOption property = null;
 
-    private ReadableProductPropertyValue propertyValue = null;
+	private ReadableProductPropertyValue propertyValue = null;
+
 }

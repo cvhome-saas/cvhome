@@ -8,4 +8,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 @Documented
 @Inherited
 @ConditionalOnProperty(value = "spring.cloud.ecs.discovery.enabled")
-public @interface ConditionalOnEcsDiscoveryEnabled {}
+public @interface ConditionalOnEcsDiscoveryEnabled {
+
+}
