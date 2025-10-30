@@ -33,9 +33,10 @@ public record ManagerStorePreferences(Theme theme, LanguageCode defaultLanguage,
 			.orElseThrow(() -> new IllegalArgumentException("Default language cannot be null"));
 
 		List<LanguageCode> supportedLanguages = Optional.ofNullable(request.get("supportedLanguages"))
-			.map(it -> ((List<String>) it))
+			.filter(List.class::isInstance)
+			.map(it -> (List<?>) it)
 			.filter(it -> !it.isEmpty())
-			.map(it -> it.stream().map(LanguageCode::new).toList())
+			.map(it -> it.stream().map(Object::toString).map(LanguageCode::new).toList())
 			.orElseThrow(() -> new IllegalArgumentException("supportedLanguages cannot be null"));
 
 		return new ManagerStorePreferences(theme, defaultLanguage, supportedLanguages);

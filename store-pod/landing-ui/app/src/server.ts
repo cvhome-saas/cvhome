@@ -4,7 +4,7 @@ import {TemplateManager} from "./template-manager";
 
 const port = 8110;
 const dir = process.cwd();
-const THEME_HEADER_NAME = 'Theme';
+const THEME_HEADER_NAME = 'theme';
 const DEFAULT_THEME_NAME = 'default';
 const env: string = process.env.NODE_ENV || "development";
 
