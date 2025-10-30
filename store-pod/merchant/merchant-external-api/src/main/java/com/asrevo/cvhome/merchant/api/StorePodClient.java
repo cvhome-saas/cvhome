@@ -16,6 +16,6 @@ public interface StorePodClient {
 	Mono<ResponseEntity<Void>> create(@RequestBody Map<Object, Object> dto);
 
 	@GetExchange("private/store")
-	Mono<Map<String, Object>> getStore(@RequestParam("store") String store);
+	Mono<ResponseEntity<Map<String, Object>>> getStore(@RequestParam("store") String store);
 
 }

@@ -37,6 +37,9 @@ public class ManagerStoreEntity extends BaseEntity<ManagerStoreEntity, ManagerSt
 	@MappedCollection(idColumn = "manager_store_id")
 	private ManagerStoreDomains managerStoreDomains;
 
+	@Column("preferences")
+	private ManagerStorePreferences preferences;
+
 	public static ManagerStoreEntity createStore(Map<Object, Object> request, ManagerOrgId orgId, PodId podId) {
 		ManagerStoreEntity entity = new ManagerStoreEntity();
 		entity.id = entity.generateId();
@@ -45,6 +48,7 @@ public class ManagerStoreEntity extends BaseEntity<ManagerStoreEntity, ManagerSt
 		entity.setCreatedDate(Instant.now());
 		entity.setOrgId(orgId);
 		entity.setPodId(podId);
+        entity.preferences = ManagerStorePreferences.of(request);
 		entity.provisioningState = ProvisioningState.NOT_STARTED_PROVISIONING;
 		entity.managerStoreDomains = ManagerStoreDomains.of(new ManagerStoreDomain(storeName, AlisType.SUB_DOMAIN));
 		entity.registerEvent(StoreCreatedEvent.from(entity.getId(), orgId, podId, request));

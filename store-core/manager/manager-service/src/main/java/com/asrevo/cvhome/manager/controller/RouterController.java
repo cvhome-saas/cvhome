@@ -11,8 +11,8 @@ import com.asrevo.cvhome.manager.dto.StoreDomainList;
 import com.asrevo.cvhome.manager.service.AskTlsService;
 import com.asrevo.cvhome.manager.service.InternalStoreService;
 import java.util.Map;
-import java.util.Optional;
 
+import com.asrevo.cvhome.manager.service.LookupDomainHeadersService;
 import com.asrevo.cvhome.manager.utils.ErrorCodes;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +31,8 @@ public class RouterController {
 
 	private final AskTlsService askTlsService;
 
+	private final LookupDomainHeadersService lookupDomainHeadersService;
+
 	@GetMapping("public/ask-for-tls")
 	@ConditionalOnApiStatus
 	public ResponseEntity<Object> ask(Domain domain) {
@@ -47,9 +49,7 @@ public class RouterController {
 	@ConditionalOnApiStatus
 	public Map<String, String> getLookupHeadersByDomain(Domain domain) {
 		log.info("header lookup: {}", domain);
-		return internalStoreService.getReferenceByDomain(domain)
-			.map(it -> Map.of("Store-Id", it.id().toString()))
-			.orElseGet(() -> Map.of("", ""));
+		return lookupDomainHeadersService.lookupHeaders(domain);
 	}
 
 	@GetMapping("store-id-by-domain")
