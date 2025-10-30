@@ -1,0 +1,116 @@
+{
+  "PAGE": {
+    "HOME": {
+      "TITLE": "Home",
+      "FEATURED_ITEMS": "Featured Items",
+      "NEWLY_ADDED": "Newly Added",
+      "HOME_PRODUCT": "Home Product",
+      "RECOMMENDED": "Recommended"
+    },
+    "PRODUCT": {
+      "HOME_TITLE": "Product Details",
+      "ADD_TO_CART": "Add to Cart",
+      "PRODUCT_DESCRIPTION": "Product Description",
+      "SUCCESSFULLY_ADDED_PRODUCT_TO_CART": "Product added to cart successfully!",
+      "FAILED_TO_ADD_PRODUCT_TO_CART": "Failed to add product to cart.",
+      "RELATED_PRODUCTS": "Related Products"
+    },
+    "CHECKOUT": {
+      "TITLE": "Checkout",
+      "HOME_TITLE": "Checkout",
+      "CART_DETAILS": "Cart Details",
+      "FORM_TITLE": "Shipping Information",
+      "PAYMENT_TYPE_REQUIRED": "Payment type is required.",
+      "TRANSACTION_TYPE_REQUIRED": "Transaction type is required.",
+      "EMAIL_REQUIRED": "Email is required.",
+      "EMAIL_INVALID": "Please enter a valid email address.",
+      "FIRST_NAME_REQUIRED": "First name is required.",
+      "LAST_NAME_REQUIRED": "Last name is required.",
+      "PHONE_REQUIRED": "Phone number is required.",
+      "PHONE_INVALID": "Please enter a valid phone number.",
+      "COUNTRY_REQUIRED": "Country is required.",
+      "CITY_REQUIRED": "City is required.",
+      "POSTAL_CODE_REQUIRED": "Postal code is required.",
+      "POSTAL_CODE_INVALID": "Please enter a valid postal code.",
+      "ADDRESS_REQUIRED": "Address is required.",
+      "AGREEMENT_AGREE_REQUIRED": "You must agree to the terms and conditions.",
+      "FIRST_NAME": "First Name",
+      "LAST_NAME": "Last Name",
+      "EMAIL": "Email",
+      "PHONE": "Phone",
+      "COUNTRY": "Country",
+      "SELECT_COUNTRY": "Select Country",
+      "CITY": "City",
+      "POSTAL_CODE": "Postal Code",
+      "ADDRESS": "Address",
+      "AGREEMENT": "I agree to the",
+      "PLACE_ORDER": "Place Order",
+      "ORDER_PLACED_SUCCESSFULLY": "Order placed successfully!",
+      "NO_ORDER_DETAILED": "No order details available.",
+      "CONTINUE_SHOPPING": "Continue Shopping",
+      "TERMS_AND_CONDITIONS": "Terms and Conditions",
+      "AGREE": "Agree",
+      "REJECT": "Reject",
+      "ORDER_ID": "Order Id",
+      "FAILED_TO_PLACE_ORDER": "Failed to place order"
+    },
+    "CONTENT": {
+      "HOME_TITLE": "Content"
+    },
+    "CATEGORY": {
+      "HOME_TITLE": "Category",
+      "FILTER_BY_MANUFACTURER": "Filter by Manufacturer",
+      "ALL": "All",
+      "NO_PRODUCTS_FOUND": "No products found."
+    }
+  },
+  "COMPONENTS": {
+    "PRODUCT": {
+      "SUCCESSFULLY_ADDED_PRODUCT_TO_CART": "Product added to cart successfully!",
+      "FAILED_TO_ADD_PRODUCT_TO_CART": "Failed to add product to cart.",
+      "IN_STOCK": "In Stock",
+      "OUT_OF_STOCK": "Out Of Stock"
+    },
+    "HEADER": {
+      "HOME_TITLE": "Home",
+      "OPEN_MENU": "Open main menu",
+      "CLOSE_MENU": "Close menu",
+      "OPEN_CART": "Open shopping cart",
+      "CLOSE_CART": "Close shopping cart",
+      "LANGUAGE": {
+        "CHANGE_LANGUAGE": "Change language",
+        "EN": "English",
+        "AR": "Arabic",
+        "FR": "French",
+        "RU": "Russian"
+      }
+    },
+    "FOOTER": {
+      "SOCIAL_FACEBOOK": "Facebook",
+      "SOCIAL_X": "X (Twitter)",
+      "SOCIAL_GITHUB": "GitHub",
+      "SOCIAL_INSTAGRAM": "Instagram",
+      "SOCIAL_TIKTOK": "TikTok",
+      "LEGAL": "Legal",
+      "RIGHT_RESERVED": "All Rights Reserved."
+    },
+    "CART": {
+      "QTY": "Qty",
+      "REMOVE": "Remove",
+      "SUB_TOTAL": "Subtotal",
+      "CART_DETAILS": "Shopping Cart",
+      "SHOPPING_AND_TAX_CALCULATION_MESSAGE": "Shipping and taxes calculated at checkout.",
+      "CHECKOUT": "Checkout",
+      "CONTINUE_SHOPPING": "Continue Shopping",
+      "OR": "or"
+    },
+    "CHECKOUT": {},
+    "CONTENT": {},
+    "CATEGORY": {}
+  },
+  "HOME": {},
+  "PRODUCT": {},
+  "CHECKOUT": {},
+  "CONTENT": {},
+  "CATEGORY": {}
+}
