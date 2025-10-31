@@ -4,12 +4,12 @@ plugins {
 }
 
 dependencies {
-	api project(':store-pod:store-commons')
-	implementation project(':store-pod:reference:reference-commons')
+	api project(':store-pod:commons:store-commons')
+	api project(':store-pod:commons:reference:reference-commons')
 	compileOnly libs.spring.data.jpa
 	compileOnly libs.jakarta.validation.api
-	compileOnly libs.jackson.databind
 	compileOnly libs.jackson.annotations
+	compileOnly libs.jackson.databind
 	compileOnly libs.lombok
 	compileOnly libs.hibernate.core
 	annotationProcessor libs.lombok
