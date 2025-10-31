@@ -4,7 +4,7 @@ plugins {
 }
 
 dependencies {
-	api project(':store-pod:store-commons')
+	api project(':store-pod:commons:store-commons')
 	api project(':store-pod:content:content-commons')
 	implementation project(':store-pod:store-modules:store-cms-commons')
 	compileOnly libs.spring.data.jpa

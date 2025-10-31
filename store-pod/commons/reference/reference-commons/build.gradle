@@ -4,8 +4,7 @@ plugins {
 }
 
 dependencies {
-	api project(':store-pod:store-commons')
-	api project(':store-pod:reference:reference-commons')
+	api project(':store-pod:commons:store-commons')
 	compileOnly libs.spring.data.jpa
 	compileOnly libs.jakarta.validation.api
 	compileOnly libs.jackson.annotations

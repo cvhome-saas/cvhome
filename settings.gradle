@@ -27,8 +27,8 @@ include(
         'store-commons:keycloak-client',
         'store-commons:autoconfigure',
 
-        'store-pod:gateway:store-pod-saas-gateway-service',
-        'store-pod:store-commons',
+        'store-pod:store-pod-saas-gateway',
+        'store-pod:commons:store-commons',
         'store-pod:store-modules:store-cms-commons',
         'store-pod:landing-ui',
         'store-pod:merchant-ui',
@@ -46,9 +46,9 @@ include(
         'store-pod:merchant:merchant-core',
         'store-pod:merchant:merchant-service',
         'store-pod:merchant:merchant-external-api',
-        'store-pod:customer:customer-commons',
-        'store-pod:reference:reference-commons',
-        'store-pod:reference:reference-core',
+        'store-pod:commons:customer:customer-commons',
+        'store-pod:commons:reference:reference-commons',
+        'store-pod:commons:reference:reference-core',
 
         "store-core:core-auth:kc-providers",
         'store-core:core-auth',
@@ -64,4 +64,3 @@ include(
         'store-core:store-ui',
         'store-core:welcome-ui',
 )
-project(":store-pod:gateway:store-pod-saas-gateway-service").name = "store-pod-saas-gateway"

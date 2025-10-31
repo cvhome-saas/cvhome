@@ -4,7 +4,7 @@ plugins {
 }
 
 dependencies {
-	api project(':store-pod:store-commons')
+	api project(':store-pod:commons:store-commons')
 	api project(':store-pod:catalog:catalog-commons')
 	api project(':store-pod:merchant:merchant-external-api')
 	implementation project(':store-pod:store-modules:store-cms-commons')
