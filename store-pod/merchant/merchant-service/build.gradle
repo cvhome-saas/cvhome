@@ -50,7 +50,7 @@ dependencies {
 	implementation libs.commons.io
 
 	implementation project(':store-pod:merchant:merchant-external-api')
-	implementation project(':store-pod:store-modules:store-cms-commons')
+	implementation project(':store-pod:commons:store-modules:store-cms-commons')
 	implementation project(':store-pod:merchant:merchant-core')
 	implementation project(':store-commons:ecs-commons:fargate-task-info')
 	implementation project(':store-commons:ecs-commons:ecs-service-discoveryclient')
