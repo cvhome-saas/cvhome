@@ -8,7 +8,7 @@ import com.asrevo.cvhome.manager.service.InternalStoreService;
 import com.asrevo.cvhome.manager.service.PodSelection;
 import com.asrevo.cvhome.manager.service.StoreManagerService;
 import com.asrevo.cvhome.manager.service.StorePodClientFactory;
-import com.asrevo.cvhome.merchant.api.StorePodClient;
+import com.asrevo.cvhome.merchant.api.MerchantStorePodClient;
 
 import java.util.*;
 
@@ -66,7 +66,7 @@ public class StoreManagerServiceImpl implements StoreManagerService {
 	@Override
 	public Mono<Object> getStore(ManagerStoreId managerStoreId) {
 		Pod pod = internalStoreService.getStorePod(managerStoreId);
-		StorePodClient client = podClientFactory.getClient(pod.id());
+		MerchantStorePodClient client = podClientFactory.getMerchantStorePodClient(pod.id());
 		Mono<ResponseEntity<Map<String, Object>>> store = client.getStore(managerStoreId.getId().toString());
 		return store.mapNotNull(HttpEntity::getBody).map(it -> {
 			HashMap<String, Object> newIt = new HashMap<>(it);

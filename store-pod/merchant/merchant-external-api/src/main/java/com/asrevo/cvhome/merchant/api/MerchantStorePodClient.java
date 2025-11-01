@@ -10,7 +10,7 @@ import org.springframework.web.service.annotation.PostExchange;
 import reactor.core.publisher.Mono;
 
 @HttpExchange("/api/v1")
-public interface StorePodClient {
+public interface MerchantStorePodClient {
 
 	@PostExchange("/private/store")
 	Mono<ResponseEntity<Void>> create(@RequestBody Map<Object, Object> dto);
