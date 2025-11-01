@@ -8,6 +8,8 @@ import com.asrevo.cvhome.s2s.model.ServiceDomainProperties;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import com.asrevo.cvhome.s2s.services.ProxyClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;

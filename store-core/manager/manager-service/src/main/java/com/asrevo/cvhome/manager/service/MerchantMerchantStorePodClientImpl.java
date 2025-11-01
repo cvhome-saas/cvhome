@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.manager.service;
 
 import com.asrevo.cvhome.merchant.api.MerchantStorePodClient;
+import com.asrevo.cvhome.s2s.services.ProxyClient;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.ParameterizedTypeReference;

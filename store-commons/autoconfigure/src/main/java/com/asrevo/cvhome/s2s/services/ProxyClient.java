@@ -1,4 +1,4 @@
-package com.asrevo.cvhome.manager.service;
+package com.asrevo.cvhome.s2s.services;
 
 import org.reactivestreams.Publisher;
 import org.springframework.core.ParameterizedTypeReference;
