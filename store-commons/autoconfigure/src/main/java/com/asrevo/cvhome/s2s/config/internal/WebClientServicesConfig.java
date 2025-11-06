@@ -124,44 +124,6 @@ public class WebClientServicesConfig {
 		}
 
 		@Bean
-		public PasswordTokenResponseClient passwordTokenResponseClient() {
-			return new PasswordTokenResponseClient();
-		}
-
-		@Bean
-		public RefreshTokenTokenResponseClient refreshTokenTokenResponseClient() {
-			return new RefreshTokenTokenResponseClient();
-		}
-
-		ClientRegistrationRepository getClientRegistrationRepository(OAuth2ClientProperties properties) {
-			List<ClientRegistration> registrations = new ArrayList<>(
-					new OAuth2ClientPropertiesMapper(properties).asClientRegistrations().values());
-			return new InMemoryClientRegistrationRepository(registrations);
-		}
-
-		@Bean
-		public RestTemplate restTemplate(PasswordTokenResponseClient responseClient,
-				RefreshTokenTokenResponseClient refreshTokenTokenResponseClient, OAuth2ClientProperties properties) {
-			RestTemplate restTemplate = new RestTemplate();
-			ClientRegistrationRepository registrationRepository = getClientRegistrationRepository(properties);
-			restTemplate.setInterceptors(
-					List.of(new ServerCallBearerExchangeInterceptor(responseClient, refreshTokenTokenResponseClient,
-							registrationRepository, "microservice", "microservice-gateway", "microservice-gateway")));
-			return restTemplate;
-		}
-
-		@Bean("microClientBuilder")
-		@LoadBalanced
-		public RestClient.Builder microClientBuilder(PasswordTokenResponseClient responseClient,
-				RefreshTokenTokenResponseClient refreshTokenTokenResponseClient, OAuth2ClientProperties properties) {
-			ClientRegistrationRepository registrationRepository = getClientRegistrationRepository(properties);
-			ServerCallBearerExchangeInterceptor e1 = new ServerCallBearerExchangeInterceptor(responseClient,
-					refreshTokenTokenResponseClient, registrationRepository, "microservice", "microservice-gateway",
-					"microservice-gateway");
-			return RestClient.builder().requestInterceptor(e1);
-		}
-
-		@Bean
 		public WebClientReactiveClientCredentialsTokenResponseClient reactivePasswordTokenResponseClient(
 				@Qualifier("defaultBuilder") WebClient.Builder defaultBuilder) {
 			WebClientReactiveClientCredentialsTokenResponseClient client = new WebClientReactiveClientCredentialsTokenResponseClient();
@@ -205,15 +167,35 @@ public class WebClientServicesConfig {
 
 		@Bean
 		public RestClientBuilder restClientBuilder(Environment environment,
-				@Qualifier("restBClientBuilder") RestClient.Builder restBClientBuilder,
+				@Qualifier("microClientBuilder") RestClient.Builder microClientBuilder,
 				ServiceDomainProperties serviceDomainProperties) {
-			return new RestClientBuilder(environment, restBClientBuilder, serviceDomainProperties);
+			return new RestClientBuilder(environment, microClientBuilder, serviceDomainProperties);
 		}
 
-		@Bean("restBClientBuilder")
+		@Bean
+		public PasswordTokenResponseClient passwordTokenResponseClient() {
+			return new PasswordTokenResponseClient();
+		}
+
+		@Bean
+		public RefreshTokenTokenResponseClient refreshTokenTokenResponseClient() {
+			return new RefreshTokenTokenResponseClient();
+		}
+
+		ClientRegistrationRepository getClientRegistrationRepository(OAuth2ClientProperties properties) {
+			List<ClientRegistration> registrations = new ArrayList<>(
+					new OAuth2ClientPropertiesMapper(properties).asClientRegistrations().values());
+			return new InMemoryClientRegistrationRepository(registrations);
+		}
+
+		@Bean("microClientBuilder")
 		@LoadBalanced
-		public RestClient.Builder restBClientBuilder() {
-			return RestClient.builder();
+		public RestClient.Builder microClientBuilder(PasswordTokenResponseClient responseClient,
+				RefreshTokenTokenResponseClient refreshTokenTokenResponseClient, OAuth2ClientProperties properties) {
+			ClientRegistrationRepository registrationRepository = getClientRegistrationRepository(properties);
+			ServerCallBearerExchangeInterceptor e1 = new ServerCallBearerExchangeInterceptor(responseClient,
+					refreshTokenTokenResponseClient, registrationRepository, "s2s");
+			return RestClient.builder().requestInterceptor(e1);
 		}
 
 	}

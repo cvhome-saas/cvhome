@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.order.services.order;
 
 import com.asrevo.cvhome.catalog.model.product.ProductReservationStatus;
-import com.asrevo.cvhome.catalog.services.product.ExternalProductService;
+import com.asrevo.cvhome.catalog.services.product.ExternalProductReservationService;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.order.entity.customer.Customer;
 import com.asrevo.cvhome.order.entity.order.*;
@@ -44,17 +44,17 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
 
 	private final ShoppingCartService shoppingCartService;
 
-	private final ExternalProductService externalProductService;
+	private final ExternalProductReservationService externalProductReservationService;
 
 	private final CustomerService customerService;
 
 	private final OrderRepository orderRepository;
 
 	public OrderServiceImpl(OrderRepository orderRepository, ShoppingCartService shoppingCartService,
-			ExternalProductService externalProductService, CustomerService customerService) {
+			ExternalProductReservationService externalProductReservationService, CustomerService customerService) {
 		super(orderRepository);
 		this.shoppingCartService = shoppingCartService;
-		this.externalProductService = externalProductService;
+		this.externalProductReservationService = externalProductReservationService;
 		this.customerService = customerService;
 		this.orderRepository = orderRepository;
 	}
@@ -259,7 +259,8 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
 			.map(it -> new ReserveProductEntry(it.getSku(), it.getProductQuantity()))
 			.collect(Collectors.collectingAndThen(Collectors.toSet(), ProductReservationList::new));
 
-		ProductReservationStatus reservationStatus = externalProductService.reserve(store, productReservation);
+		ProductReservationStatus reservationStatus = externalProductReservationService.reserve(store,
+				productReservation);
 		if (!reservationStatus.status()) {
 			throw new ServiceException("error updating inventory with new qty");
 		}

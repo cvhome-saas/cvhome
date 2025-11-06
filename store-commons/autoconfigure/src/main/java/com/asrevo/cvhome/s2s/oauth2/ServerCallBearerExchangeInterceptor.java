@@ -8,7 +8,7 @@ import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.security.oauth2.client.endpoint.OAuth2PasswordGrantRequest;
+import org.springframework.security.oauth2.client.endpoint.OAuth2ClientCredentialsGrantRequest;
 import org.springframework.security.oauth2.client.endpoint.OAuth2RefreshTokenGrantRequest;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
@@ -31,12 +31,12 @@ public class ServerCallBearerExchangeInterceptor implements ClientHttpRequestInt
 
 	public ServerCallBearerExchangeInterceptor(PasswordTokenResponseClient tokenClient,
 			RefreshTokenTokenResponseClient refreshTokenClient, ClientRegistrationRepository registrationRepository,
-			String registrationId, String username, String password) {
+			String registrationId) {
 		this.tokenClient = tokenClient;
 		this.refreshTokenClient = refreshTokenClient;
-		this.username = username;
-		this.password = password;
 		this.registration = registrationRepository.findByRegistrationId(registrationId);
+		this.username = this.registration.getClientId();
+		this.password = this.registration.getClientSecret();
 	}
 
 	private ClientHttpResponse bearer(HttpRequest request, byte[] body, ClientHttpRequestExecution execution)
@@ -75,7 +75,8 @@ public class ServerCallBearerExchangeInterceptor implements ClientHttpRequestInt
 
 	OAuth2AccessTokenResponse generateAccessToken(ClientRegistration registration) {
 		log.info("will generate access token using password Grant type");
-		return tokenClient.getTokenResponse(new OAuth2PasswordGrantRequest(registration, username, password));
+
+		return tokenClient.getTokenResponse(new OAuth2ClientCredentialsGrantRequest(registration));
 	}
 
 	OAuth2AccessTokenResponse generateNewAccessToken() {
