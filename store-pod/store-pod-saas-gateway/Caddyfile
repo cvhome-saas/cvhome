@@ -16,7 +16,7 @@
 		ask {$ASK_TLS_URL}
 	}
     
-    acme_ca {$ACME_CA_URL:https://acme-v02.api.letsencrypt.org/directory}
+    acme_ca {$ACME_CA_URL:https://acme-staging-v02.api.letsencrypt.org/directory}
 
     
 }
