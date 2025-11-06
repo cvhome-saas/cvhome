@@ -15,6 +15,10 @@
 	on_demand_tls {
 		ask {$ASK_TLS_URL}
 	}
+    
+    acme_ca {$ACME_CA_URL:https://acme-v02.api.letsencrypt.org/directory}
+
+    
 }
 
 (routes) {
