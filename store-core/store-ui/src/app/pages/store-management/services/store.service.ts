@@ -35,7 +35,7 @@ export class StoreService {
   }
 
   removeDomain(store, domain): Observable<any> {
-    return this.crudService.delete(`/manager/api/v1/router/remove?domain=${domain}&store=${store}`);
+    return this.crudService.delete(`/store-pod-gateway/merchant/api/v1/router/private/remove?domain=${domain}&store=${store}`);
   }
 
   getListOfStores(params): Observable<any> {

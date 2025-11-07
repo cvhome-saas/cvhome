@@ -2,9 +2,7 @@ package com.asrevo.cvhome.merchant.service.facade.merchant;
 
 import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1;
 
-import com.asrevo.cvhome.commons.domain.SliderImage;
-import com.asrevo.cvhome.commons.domain.SocialLink;
-import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.commons.domain.*;
 import com.asrevo.cvhome.merchant.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.merchant.model.merchant.PersistableMerchantStore;
 import com.asrevo.cvhome.merchant.model.merchant.ReadableMerchantStore;
@@ -101,7 +99,7 @@ public class StoreFacadeImpl implements StoreFacade {
 	private MerchantStore convertPersistableMerchantStoreToMerchantStore(PersistableMerchantStore store,
 			LanguageCode language) {
 		MerchantStore mStore = new MerchantStore();
-
+        mStore.setStoreDomains(Set.of(new ManagerStoreDomain(mStore.getStorename(), DomainType.SUB_DOMAIN)));
 		// set default values
 		mStore.setWeightunitcode(MeasureUnit.KG.name());
 		mStore.setSeizeunitcode(MeasureUnit.IN.name());
