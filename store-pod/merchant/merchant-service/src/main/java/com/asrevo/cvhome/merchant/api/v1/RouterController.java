@@ -56,14 +56,14 @@ public class RouterController {
 
 	@PostMapping("private/allocate")
 	@ConditionalOnApiStatus
-	public Mono<Void> allocate(@SecuredResource  StoreMerchantId store, Domain domain) {
+	public Mono<Void> allocate(@SecuredResource StoreMerchantId store, Domain domain) {
 		routingService.addDomain(store, domain);
 		return Mono.empty();
 	}
 
 	@DeleteMapping("private/remove")
 	@ConditionalOnApiStatus
-	public Mono<Void> remove(@SecuredResource  StoreMerchantId store, Domain domain) {
+	public Mono<Void> remove(@SecuredResource StoreMerchantId store, Domain domain) {
 		routingService.removeDomain(store, domain);
 		return Mono.empty();
 	}
