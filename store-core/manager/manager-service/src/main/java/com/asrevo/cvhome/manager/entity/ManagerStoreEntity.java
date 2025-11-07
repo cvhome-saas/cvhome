@@ -1,18 +1,19 @@
 package com.asrevo.cvhome.manager.entity;
 
-import com.asrevo.cvhome.commons.domain.*;
+import com.asrevo.cvhome.commons.domain.BaseEntity;
+import com.asrevo.cvhome.commons.domain.ManagerOrgId;
+import com.asrevo.cvhome.commons.domain.ManagerStoreId;
+import com.asrevo.cvhome.commons.domain.PodId;
 import com.asrevo.cvhome.manager.commons.dto.ProvisioningState;
 import com.asrevo.cvhome.manager.commons.event.store.StoreCreatedEvent;
 import com.asrevo.cvhome.manager.commons.event.store.StoreProvisionedEvent;
-import com.asrevo.cvhome.manager.dto.StoreDomainDto;
-import com.asrevo.cvhome.manager.dto.StoreDomainList;
-import java.time.Instant;
-import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
+
+import java.time.Instant;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -34,12 +35,6 @@ public class ManagerStoreEntity extends BaseEntity<ManagerStoreEntity, ManagerSt
 	@Column("provisioning_state")
 	private ProvisioningState provisioningState;
 
-	@MappedCollection(idColumn = "manager_store_id")
-	private ManagerStoreDomains managerStoreDomains;
-
-	@Column("preferences")
-	private ManagerStorePreferences preferences;
-
 	public static ManagerStoreEntity createStore(Map<Object, Object> request, ManagerOrgId orgId, PodId podId) {
 		ManagerStoreEntity entity = new ManagerStoreEntity();
 		entity.id = entity.generateId();
@@ -48,26 +43,9 @@ public class ManagerStoreEntity extends BaseEntity<ManagerStoreEntity, ManagerSt
 		entity.setCreatedDate(Instant.now());
 		entity.setOrgId(orgId);
 		entity.setPodId(podId);
-		entity.preferences = ManagerStorePreferences.of(request);
 		entity.provisioningState = ProvisioningState.NOT_STARTED_PROVISIONING;
-		entity.managerStoreDomains = ManagerStoreDomains.of(new ManagerStoreDomain(storeName, AlisType.SUB_DOMAIN));
 		entity.registerEvent(StoreCreatedEvent.from(entity.getId(), orgId, podId, request));
 		return entity;
-	}
-
-	public ManagerStoreEntity addDomain(Domain domain) {
-		this.managerStoreDomains = managerStoreDomains.addDomain(domain);
-		return this;
-	}
-
-	public ManagerStoreEntity removeDomain(Domain domain) {
-		this.managerStoreDomains = managerStoreDomains.removeDomain(domain);
-		return this;
-	}
-
-	public StoreDomainList domains() {
-		return new StoreDomainList(
-				this.managerStoreDomains.stream().map(it -> new StoreDomainDto(it.domain(), it.domainType())).toList());
 	}
 
 	@Override

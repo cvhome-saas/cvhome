@@ -79,6 +79,9 @@ public class PersistableMerchantStorePopulator
 		if (source.getSocialLinks() != null) {
 			target.setSocialLinks(source.getSocialLinks());
 		}
+		if (source.getStoreDomains() != null) {
+			target.setStoreDomains(source.getStoreDomains());
+		}
 		if (source.getSliderImages() != null) {
 			Set<SliderImage> sliderImages = source.getSliderImages()
 				.stream()

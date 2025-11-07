@@ -21,12 +21,9 @@ public interface ManagerStoreMappers {
 	@Mapping(target = "new", ignore = true)
 	@Mapping(target = "createdDate", ignore = true)
 	@Mapping(target = "version", ignore = true)
-	@Mapping(target = "removeDomain", ignore = true)
 	@Mapping(target = "podId", ignore = true)
 	@Mapping(target = "orgId", ignore = true)
 	@Mapping(target = "provisioningState", ignore = true)
-	@Mapping(target = "managerStoreDomains", ignore = true)
-	@Mapping(target = "preferences", ignore = true)
 	ManagerStoreEntity toEntity(ListManagerStoreQuery managerStoreDto);
 
 	default Map<Object, Object> toExternalCreateRequest(Map<Object, Object> request, ManagerOrgId orgId,

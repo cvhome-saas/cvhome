@@ -62,3 +62,15 @@ VALUES ('65f023632bc26470c104b75f', 'INSTAGRAM', 'https://instagram.com/egyptcar
 
 INSERT INTO merchant.social_links (store_merchant_id, provider, url)
 VALUES ('65f023632bc26470c104b75f', 'TIKTOK', 'https://tiktok.com/@egyptcarsales');
+
+
+
+
+INSERT INTO merchant.store_domains(domain, domain_type, store_merchant_id)
+VALUES ('org2-store2.asrevo.com', 'CUSTOM_DOMAIN', '65f023632bc26470c104b75f')
+ON CONFLICT DO NOTHING;
+
+INSERT INTO merchant.store_domains(domain, domain_type, store_merchant_id)
+VALUES ('org2-store2', 'SUB_DOMAIN', '65f023632bc26470c104b75f')
+ON CONFLICT DO NOTHING;
+

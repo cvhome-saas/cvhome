@@ -50,3 +50,15 @@ VALUES ('65f020632bc46470c104b76f', 'INSTAGRAM', 'https://www.instagram.com/beau
 
 INSERT INTO merchant.social_links (store_merchant_id, provider, url)
 VALUES ('65f020632bc46470c104b76f', 'TIKTOK', 'https://www.tiktok.com/@beauteelegante');
+
+
+
+
+INSERT INTO merchant.store_domains(domain, domain_type, store_merchant_id)
+VALUES ('org2-store1.asrevo.com', 'CUSTOM_DOMAIN', '65f020632bc46470c104b76f')
+ON CONFLICT DO NOTHING;
+
+INSERT INTO merchant.store_domains(domain, domain_type, store_merchant_id)
+VALUES ('org2-store1', 'SUB_DOMAIN', '65f020632bc46470c104b76f')
+ON CONFLICT DO NOTHING;
+
