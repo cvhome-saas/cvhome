@@ -60,7 +60,7 @@ create table if not exists merchant.social_links
     url               varchar(100)
 );
 
-create table merchant.store_domains
+create table if not exists merchant.store_domains
 (
     store_merchant_id varchar(50) not null,
     domain            varchar(100),
