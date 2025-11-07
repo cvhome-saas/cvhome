@@ -12,7 +12,7 @@ services:
       - "2019:2019"
     environment:
       NAMESPACE: gateway.com
-      ASK_TLS_URL: http://gateway.com:8000/manager/api/v1/router/public/ask-for-tls
-      DOMAIN_LOOKUP_URL: http://gateway.com:8000/manager/api/v1/router/public/lookup-by-domain
+      ASK_TLS_URL: http://store-pod-saas-gateway-1.gateway.com:80/merchant/api/v1/router/public/ask-for-tls
+      DOMAIN_LOOKUP_URL: http://store-pod-saas-gateway-1.gateway.com:80/merchant/api/v1/router/public/lookup-by-domain
       CERT_BUCKET: random-bucket
       CERT_BUCKET_REGION: eu-central-1

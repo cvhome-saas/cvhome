@@ -22,4 +22,4 @@ com:
           endpoint:
             endpoint: http://store-pod-saas-gateway-1.gateway.com
             type: EXTERNAL
-          pod: store-pod-saas-gateway-1.gateway.com
+          domain: store-pod-saas-gateway-1.gateway.com

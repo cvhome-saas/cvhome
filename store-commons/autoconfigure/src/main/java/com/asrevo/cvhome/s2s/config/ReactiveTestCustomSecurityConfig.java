@@ -35,13 +35,7 @@ public class ReactiveTestCustomSecurityConfig {
 
 		@Bean
 		public RSAKey rsaKey() throws JOSEException {
-			return new RSAKeyGenerator(2048).keyUse(KeyUse.SIGNATURE) // indicate the
-																		// intended use of
-																		// the key
-																		// (optional)
-				.keyID(UUID.randomUUID().toString()) // give the key a unique ID
-														// (optional)
-				.generate();
+			return new RSAKeyGenerator(2048).keyUse(KeyUse.SIGNATURE).keyID(UUID.randomUUID().toString()).generate();
 		}
 
 		@Bean
