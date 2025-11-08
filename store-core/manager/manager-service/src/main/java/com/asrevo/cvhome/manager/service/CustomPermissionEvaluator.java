@@ -42,13 +42,6 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
 				rolesEvaluator.hasAccessOnStoreUsersEnable(authentication, ((ManagerStoreId) targetId));
 			case "STORE.USERS.DISABLE" ->
 				rolesEvaluator.hasAccessOnStoreUsersDisable(authentication, ((ManagerStoreId) targetId));
-			// domains
-			case "STORE.DOMAIN.LIST" ->
-				rolesEvaluator.hasAccessOnStoreDomainList(authentication, ((ManagerStoreId) targetId));
-			case "STORE.DOMAIN.CREATE" ->
-				rolesEvaluator.hasAccessOnStoreDomainCreate(authentication, ((ManagerStoreId) targetId));
-			case "STORE.DOMAIN.DELETE" ->
-				rolesEvaluator.hasAccessOnStoreDomainDelete(authentication, ((ManagerStoreId) targetId));
 			default -> false;
 		};
 	}

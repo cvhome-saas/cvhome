@@ -8,6 +8,10 @@ on:
       - '0.*.*'
       - '1.*.*'
       - '2.*.*'
+  push:
+    branches:
+      - 'develop'
+      - 'main'
 
 jobs:
   build:
