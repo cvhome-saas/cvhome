@@ -99,10 +99,7 @@ public class StoreFacadeImpl implements StoreFacade {
 	private MerchantStore convertPersistableMerchantStoreToMerchantStore(PersistableMerchantStore store,
 			LanguageCode language) {
 		MerchantStore mStore = new MerchantStore();
-        mStore.setStoreDomains(Set.of(new ManagerStoreDomain(mStore.getStorename(), DomainType.SUB_DOMAIN)));
-		// set default values
-		mStore.setWeightunitcode(MeasureUnit.KG.name());
-		mStore.setSeizeunitcode(MeasureUnit.IN.name());
+		store.setStoreDomains(Set.of(new ManagerStoreDomain(store.getName(), DomainType.SUB_DOMAIN)));
 
 		try {
 			mStore = persistableMerchantStorePopulator.populate(store, mStore, language);
