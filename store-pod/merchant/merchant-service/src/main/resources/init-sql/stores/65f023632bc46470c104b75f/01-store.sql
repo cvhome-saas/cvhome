@@ -60,3 +60,14 @@ VALUES ('65f023632bc46470c104b75f', 'INSTAGRAM', 'https://instagram.com/usaelect
 
 INSERT INTO merchant.social_links (store_merchant_id, provider, url)
 VALUES ('65f023632bc46470c104b75f', 'TIKTOK', 'https://tiktok.com/@usaelectronics');
+
+
+
+
+INSERT INTO merchant.store_domains(domain, domain_type, store_merchant_id)
+VALUES ('org1-store2.asrevo.com', 'CUSTOM_DOMAIN', '65f023632bc46470c104b75f')
+ON CONFLICT DO NOTHING;
+
+INSERT INTO merchant.store_domains(domain, domain_type, store_merchant_id)
+VALUES ('org1-store2', 'SUB_DOMAIN', '65f023632bc46470c104b75f')
+ON CONFLICT DO NOTHING;

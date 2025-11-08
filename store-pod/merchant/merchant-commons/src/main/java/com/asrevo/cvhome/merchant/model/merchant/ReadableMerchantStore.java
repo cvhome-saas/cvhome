@@ -1,6 +1,8 @@
 package com.asrevo.cvhome.merchant.model.merchant;
 
+import com.asrevo.cvhome.commons.domain.ManagerStoreDomain;
 import com.asrevo.cvhome.commons.domain.ReadableSliderImage;
+import com.asrevo.cvhome.commons.domain.SocialLink;
 import com.asrevo.cvhome.store.core.model.content.ReadableImage;
 import com.asrevo.cvhome.store.core.model.entity.ReadableAudit;
 import com.asrevo.cvhome.store.core.model.entity.ReadableAuditable;
@@ -35,6 +37,10 @@ public class ReadableMerchantStore extends MerchantStoreEntity implements Readab
 	private ReadableMerchantStore parent;
 
 	private Set<ReadableSliderImage> sliderImages;
+
+	private Set<SocialLink> socialLinks;
+
+	private Set<ManagerStoreDomain> storeDomains;
 
 	private List<String> supportedLanguages;
 

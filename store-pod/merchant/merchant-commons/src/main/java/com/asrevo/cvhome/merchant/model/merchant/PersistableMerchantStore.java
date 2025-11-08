@@ -1,6 +1,8 @@
 package com.asrevo.cvhome.merchant.model.merchant;
 
+import com.asrevo.cvhome.commons.domain.ManagerStoreDomain;
 import com.asrevo.cvhome.commons.domain.SliderImage;
+import com.asrevo.cvhome.commons.domain.SocialLink;
 import com.asrevo.cvhome.store.model.references.PersistableAddress;
 import java.io.Serial;
 import java.util.List;
@@ -25,6 +27,10 @@ public class PersistableMerchantStore extends MerchantStoreEntity {
 
 	private List<String> supportedLanguages;
 
+	private Set<SocialLink> socialLinks;
+
 	private Set<SliderImage> sliderImages;
+
+	private Set<ManagerStoreDomain> storeDomains;
 
 }

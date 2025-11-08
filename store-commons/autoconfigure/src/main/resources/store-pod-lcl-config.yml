@@ -2,15 +2,24 @@ spring:
   sql:
     init:
       data-locations: classpath:init-sql/data-common.sql, classpath:init-sql/data-test-stores.sql, classpath:init-sql/stores/*/*.sql
-  com:
-    asrevo:
-      cvhome:
-        cdn:
-          storage:
-            provider: MINIO
-            bucket: "d0dd4299-963a-4458-b31f-8efe31c35e8e"
-            s3-url: "http://localhost:9000"
-            s3-access-key: "minioadmin"
-            s3-secret-key: "minioadmin"
-            region: "eu-central-1"
-          base-path: "http://localhost:9000/d0dd4299-963a-4458-b31f-8efe31c35e8e"
+com:
+  asrevo:
+    cvhome:
+      cdn:
+        storage:
+          provider: MINIO
+          bucket: "d0dd4299-963a-4458-b31f-8efe31c35e8e"
+          s3-url: "http://localhost:9000"
+          s3-access-key: "minioadmin"
+          s3-secret-key: "minioadmin"
+          region: "eu-central-1"
+        base-path: "http://localhost:9000/d0dd4299-963a-4458-b31f-8efe31c35e8e"
+      pod-info:
+        pod:
+          id:
+            id: 1
+          name: pod-0
+          endpoint:
+            endpoint: http://store-pod-saas-gateway-1.gateway.com
+            type: EXTERNAL
+          domain: store-pod-saas-gateway-1.gateway.com

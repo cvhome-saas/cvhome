@@ -22,10 +22,4 @@ public interface ManagerStoreRepository
 			group by date(m.created_date)""")
 	List<StatisticEntry> storeStatistic(Instant from, Instant to);
 
-	@Query("SELECT ms.* from manager.manager_store ms left join manager.manager_store_domain msd"
-			+ " on ms.id = msd.manager_store_id  where (msd.domain=:domain and"
-			+ " msd.domain_type='CUSTOM_DOMAIN') or ((msd.domain || '.' ||"
-			+ " :prefix||'-'||ms.pod_id ||'.' ||:base )=:domain  and" + " msd.domain_type='SUB_DOMAIN') ")
-	Optional<ManagerStoreEntity> findByDomain(String domain, String base, String prefix);
-
 }
