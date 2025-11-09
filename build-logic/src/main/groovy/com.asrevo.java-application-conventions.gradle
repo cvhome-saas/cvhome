@@ -47,10 +47,7 @@ jacocoTestReport {
 
 
 static List<String> createImageTags(String repo, String version) {
-    if (!version.contains("-SNAPSHOT"))
-        return [createImageName(repo, "latest")]
-    else
-        return [];
+    return [createImageName(repo, "latest")]
 }
 static String createImageName(String repo, String version) {
     String registry = System.getenv("REGISTRY")

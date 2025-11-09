@@ -5,71 +5,70 @@ plugins {
 }
 
 abstract class BootBuildImageTask extends DefaultTask {
-  @Input
-  @Option(option = "publishImage", description = "Configures PublishImage.")
-  abstract Property<Boolean> getPublishImage()
-  @Input
-  abstract Property<String> getImageGroup()
-  @Inject
-  protected abstract ExecOperations getExecOperations()
+    @Input
+    @Option(option = "publishImage", description = "Configures PublishImage.")
+    abstract Property<Boolean> getPublishImage()
 
-  BootBuildImageTask() {
-    getPublishImage().convention(false)
-  }
+    @Input
+    abstract Property<String> getImageGroup()
 
+    @Inject
+    protected abstract ExecOperations getExecOperations()
 
-  @TaskAction
-  void bootBuildImage() {
-    getExecOperations().exec {
-      workingDir '.'
-      commandLine createBuildCmd("${imageGroup.get()}/${project.name}", project.version as String) as List<String>
+    BootBuildImageTask() {
+        getPublishImage().convention(false)
     }
-    if (publishImage.getOrElse(false)) {
-      getExecOperations().exec {
-        workingDir '.'
-        commandLine createPushCmd("${imageGroup.get()}/${project.name}") as List<String>
-      }
+
+
+    @TaskAction
+    void bootBuildImage() {
+        getExecOperations().exec {
+            workingDir '.'
+            commandLine createBuildCmd("${imageGroup.get()}/${project.name}", project.version as String) as List<String>
+        }
+        if (publishImage.getOrElse(false)) {
+            getExecOperations().exec {
+                workingDir '.'
+                commandLine createPushCmd("${imageGroup.get()}/${project.name}") as List<String>
+            }
+        }
     }
-  }
 
-  static String createImageName(String repo, String version) {
-    String registry = System.getenv("REGISTRY")
-    return registry ? "${registry}/${repo}:${version}" : "${repo}:${version}"
-  }
-
-  static String createBaseImageName(String repo) {
-    String registry = System.getenv("REGISTRY")
-    return registry ? "${registry}/${repo}" : "${repo}}"
-  }
-
-  static List<String> createImageTags(String repo, String version) {
-    if (!version.contains("-SNAPSHOT"))
-      return [createImageName(repo, "latest")]
-    else
-      return [];
-  }
-
-  static List<String> createBuildCmd(String repo, String version) {
-    String image = createImageName(repo, version)
-    List<String> tags = createImageTags(repo, version)
-    List<String> commands = ["docker", "build", "-t", image]
-    tags.forEach {
-      commands.add("-t")
-      commands.add(it)
+    static String createImageName(String repo, String version) {
+        String registry = System.getenv("REGISTRY")
+        return registry ? "${registry}/${repo}:${version}" : "${repo}:${version}"
     }
-    commands.add(".")
-    return commands
-  }
 
-  static List<String> createPushCmd(String repo) {
-    String image = createBaseImageName(repo)
-    return ["docker", "push", image, "--all-tags"]
-  }
+    static String createBaseImageName(String repo) {
+        String registry = System.getenv("REGISTRY")
+        return registry ? "${registry}/${repo}" : "${repo}}"
+    }
+
+    static List<String> createImageTags(String repo, String version) {
+        return [createImageName(repo, "latest")]
+    }
+
+    static List<String> createBuildCmd(String repo, String version) {
+        String image = createImageName(repo, version)
+        List<String> tags = createImageTags(repo, version)
+        List<String> commands = ["docker", "build", "-t", image]
+        tags.forEach {
+            commands.add("-t")
+            commands.add(it)
+        }
+        commands.add(".")
+        return commands
+    }
+
+    static List<String> createPushCmd(String repo) {
+        String image = createBaseImageName(repo)
+        return ["docker", "push", image, "--all-tags"]
+    }
 
 }
 
 tasks.register('bootBuildImage', BootBuildImageTask) {
-  dependsOn('build')
-  group = 'build'
-  description = 'Builds the docker image for the UI application.'
+    dependsOn('build')
+    group = 'build'
+    description = 'Builds the docker image for the UI application.'
 }
