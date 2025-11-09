@@ -19,7 +19,7 @@ export class StoreService {
   }
 
   getAllocations(store): Observable<any> {
-    return this.crudService.get(`/manager/api/v1/router/allocates?store=${store}`);
+    return this.crudService.get(`/store-pod-gateway/merchant/api/v1/router/private/allocates?store=${store}`);
   }
 
   storePodByStoreId(store): Observable<any> {
@@ -31,11 +31,11 @@ export class StoreService {
   }
 
   allocateDomain(store, domain): Observable<any> {
-    return this.crudService.post(`/manager/api/v1/router/allocate?domain=${domain}&store=${store}`, {});
+    return this.crudService.post(`/store-pod-gateway/merchant/api/v1/router/private/allocate?domain=${domain}&store=${store}`, {});
   }
 
   removeDomain(store, domain): Observable<any> {
-    return this.crudService.delete(`/manager/api/v1/router/remove?domain=${domain}&store=${store}`);
+    return this.crudService.delete(`/store-pod-gateway/merchant/api/v1/router/private/remove?domain=${domain}&store=${store}`);
   }
 
   getListOfStores(params): Observable<any> {

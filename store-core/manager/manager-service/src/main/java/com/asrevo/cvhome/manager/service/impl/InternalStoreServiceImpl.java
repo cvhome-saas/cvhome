@@ -4,18 +4,12 @@ import com.asrevo.cvhome.commons.domain.*;
 import com.asrevo.cvhome.commons.utils.OperationExecution;
 import com.asrevo.cvhome.manager.commons.dto.ListManagerStoreQuery;
 import com.asrevo.cvhome.manager.commons.dto.ManagerStoreDto;
-import com.asrevo.cvhome.manager.dto.StoreDomainList;
 import com.asrevo.cvhome.manager.entity.ManagerStoreEntity;
 import com.asrevo.cvhome.manager.mappers.ManagerStoreMappers;
 import com.asrevo.cvhome.manager.repository.ManagerStoreRepository;
 import com.asrevo.cvhome.manager.service.InternalStoreService;
-import com.asrevo.cvhome.manager.utils.Defines;
 import com.asrevo.cvhome.manager.utils.ErrorCodes;
-import com.asrevo.cvhome.s2s.model.AppProperties;
 import com.asrevo.cvhome.s2s.model.ServiceDomainProperties;
-import java.util.Map;
-import java.util.Optional;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Example;
@@ -25,6 +19,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Map;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -33,8 +29,6 @@ public class InternalStoreServiceImpl implements InternalStoreService {
 	private final ManagerStoreRepository storeRepository;
 
 	private final ServiceDomainProperties serviceDomainProperties;
-
-	private final AppProperties appProperties;
 
 	private final ManagerStoreMappers storeMappers;
 
@@ -111,37 +105,6 @@ public class InternalStoreServiceImpl implements InternalStoreService {
 		ManagerStoreEntity store = getManagerStoreEntity(managerStoreId);
 		return serviceDomainProperties.getPodByPodId(store.getPodId())
 			.orElseThrow(() -> new OperationExecution(ErrorCodes.store_pod_not_match_any));
-	}
-
-	@Override
-	public StoreDomainList domains(ManagerStoreId managerStoreId) {
-		return storeRepository.findById(managerStoreId)
-			.map(ManagerStoreEntity::domains)
-			.orElseThrow(() -> new OperationExecution(ErrorCodes.store_not_found));
-	}
-
-	@Override
-	public Optional<ManagerStoreId> getReferenceByDomain(Domain domain) {
-		return storeRepository.findByDomain(domain.domain(), appProperties.getDomain(), Defines.SAAS_POD_SUFFIX)
-			.map(BaseEntity::getId);
-	}
-
-	@Transactional
-	@Override
-	public void addDomain(ManagerStoreId managerStoreId, Domain domain) {
-		storeRepository.findById(managerStoreId)
-			.map(it -> it.addDomain(domain))
-			.map(storeRepository::save)
-			.orElseThrow(() -> new OperationExecution(ErrorCodes.store_not_found));
-	}
-
-	@Transactional
-	@Override
-	public void removeDomain(ManagerStoreId managerStoreId, Domain domain) {
-		storeRepository.findById(managerStoreId)
-			.map(it -> it.removeDomain(domain))
-			.map(storeRepository::save)
-			.orElseThrow(() -> new OperationExecution(ErrorCodes.store_not_found));
 	}
 
 }

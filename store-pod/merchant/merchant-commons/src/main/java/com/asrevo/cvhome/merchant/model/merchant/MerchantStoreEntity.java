@@ -33,8 +33,6 @@ public class MerchantStoreEntity extends MerchantStorePricingBase implements Ser
 
 	private ColorTheme colorTheme;
 
-	private Set<SocialLink> socialLinks;
-
 	private String inBusinessSince;
 
 	@NotNull

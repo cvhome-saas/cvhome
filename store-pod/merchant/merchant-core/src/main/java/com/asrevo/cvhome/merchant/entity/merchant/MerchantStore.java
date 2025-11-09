@@ -24,7 +24,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "MERCHANT_STORE", indexes = @Index(columnList = "LINEAGE"))
+@Table(name = "MERCHANT_STORE")
 @Getter
 @Setter
 public class MerchantStore extends SalesManagerEntity<StoreMerchantId, MerchantStore> implements Auditable {
@@ -128,6 +128,15 @@ public class MerchantStore extends SalesManagerEntity<StoreMerchantId, MerchantS
 			value = { @AttributeOverride(name = "provider", column = @Column(name = "PROVIDER", length = 10)),
 					@AttributeOverride(name = "url", column = @Column(name = "URL", length = 100)) })
 	private Set<SocialLink> socialLinks = new HashSet<>();
+
+	@JsonIgnore
+	@ElementCollection(targetClass = ManagerStoreDomain.class, fetch = FetchType.LAZY)
+	@CollectionTable(name = "STORE_DOMAINS", joinColumns = { @JoinColumn(name = "STORE_MERCHANT_ID") })
+	@AttributeOverrides(value = {
+			@AttributeOverride(name = "domain", column = @Column(name = "DOMAIN", length = 100, unique = true)),
+			@AttributeOverride(name = "domainType", column = @Column(name = "DOMAIN_TYPE", length = 15)) })
+	@Convert(attributeName = "domainType", converter = DomainTypeConverter.class)
+	private Set<ManagerStoreDomain> storeDomains = new HashSet<>();
 
 	@Column(name = "USE_CACHE")
 	private boolean useCache = false;

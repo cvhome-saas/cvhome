@@ -11,9 +11,9 @@ import org.springframework.context.annotation.Import;
 @Import({ EcsInfoConfig.class, JacksonConfig.class, SwaggerConfig.class, WebConfig.class, WebClientServicesConfig.class,
 		ReactiveGatewayConfig.class, IssuerUriSetJwtDecoderConfiguration.class,
 		IssuerUriSetReactiveJwtDecoderConfiguration.class })
-@EnableConfigurationProperties({ ServiceDomainProperties.class, SaasProperties.class, AppProperties.class,
-		CdnProperties.class, StoreProperties.class, StripeProperties.class, StoreProductImageProperties.class,
-		CdnStorageProperties.class, KeycloakCredentialsProperties.class, IssuerUriSetConfigrationProperties.class })
+@EnableConfigurationProperties({ PodInfoProperties.class, ServiceDomainProperties.class, AppProperties.class,
+		CdnProperties.class, StripeProperties.class, StoreProductImageProperties.class, CdnStorageProperties.class,
+		KeycloakCredentialsProperties.class, IssuerUriSetConfigrationProperties.class })
 public class CvhomeSharedConfig {
 
 }

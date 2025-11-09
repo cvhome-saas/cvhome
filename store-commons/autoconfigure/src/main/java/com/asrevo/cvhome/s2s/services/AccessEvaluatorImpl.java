@@ -44,21 +44,6 @@ public class AccessEvaluatorImpl implements AccessEvaluator {
 		return hasReadAccessOnStore(authentication, requestedStoreId);
 	}
 
-	@Override
-	public boolean hasAccessOnStoreDomainList(Authentication authentication, ManagerStoreId requestedStoreId) {
-		return hasReadAccessOnStore(authentication, requestedStoreId);
-	}
-
-	@Override
-	public boolean hasAccessOnStoreDomainCreate(Authentication authentication, ManagerStoreId requestedStoreId) {
-		return hasMaintainAccessOnStoreDomain(authentication, requestedStoreId);
-	}
-
-	@Override
-	public boolean hasAccessOnStoreDomainDelete(Authentication authentication, ManagerStoreId requestedStoreId) {
-		return hasMaintainAccessOnStoreDomain(authentication, requestedStoreId);
-	}
-
 	private boolean hasReadAccessOnStore(Authentication authentication, ManagerStoreId requestedStoreId) {
 		if (securityRoleCheckService.isOrgAdmin(authentication, requestedStoreId)) {
 			return true;
@@ -78,18 +63,6 @@ public class AccessEvaluatorImpl implements AccessEvaluator {
 	}
 
 	private boolean hasMaintainAccessOnUsers(Authentication authentication, ManagerStoreId requestedStoreId) {
-		if (securityRoleCheckService.isOrgAdmin(authentication, requestedStoreId)) {
-			return true;
-		}
-		else if (securityRoleCheckService.isStoreAdmin(authentication, requestedStoreId)) {
-			return true;
-		}
-		else {
-			return false;
-		}
-	}
-
-	private boolean hasMaintainAccessOnStoreDomain(Authentication authentication, ManagerStoreId requestedStoreId) {
 		if (securityRoleCheckService.isOrgAdmin(authentication, requestedStoreId)) {
 			return true;
 		}

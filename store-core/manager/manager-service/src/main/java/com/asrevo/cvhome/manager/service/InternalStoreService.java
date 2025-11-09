@@ -3,9 +3,7 @@ package com.asrevo.cvhome.manager.service;
 import com.asrevo.cvhome.commons.domain.*;
 import com.asrevo.cvhome.manager.commons.dto.ListManagerStoreQuery;
 import com.asrevo.cvhome.manager.commons.dto.ManagerStoreDto;
-import com.asrevo.cvhome.manager.dto.StoreDomainList;
 import java.util.Map;
-import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,13 +30,5 @@ public interface InternalStoreService {
 	Boolean checkNameExists(String name);
 
 	Pod getStorePod(ManagerStoreId managerStoreId);
-
-	StoreDomainList domains(ManagerStoreId managerStoreId);
-
-	Optional<ManagerStoreId> getReferenceByDomain(Domain domain);
-
-	void addDomain(ManagerStoreId managerStoreId, Domain domain);
-
-	void removeDomain(ManagerStoreId managerStoreId, Domain domain);
 
 }

@@ -15,6 +15,10 @@
 	on_demand_tls {
 		ask {$ASK_TLS_URL}
 	}
+    
+    acme_ca {$ACME_CA_URL:https://acme-staging-v02.api.letsencrypt.org/directory}
+
+    
 }
 
 (routes) {
@@ -43,7 +47,7 @@
     route {
         domain_lookup {
             lookup_url {$DOMAIN_LOOKUP_URL}
-            cache_ttl  5m
+            cache_ttl  {$DOMAIN_LOOKUP_TTL:5m}
         }
 
         reverse_proxy http://landing-ui.{$NAMESPACE}:8110

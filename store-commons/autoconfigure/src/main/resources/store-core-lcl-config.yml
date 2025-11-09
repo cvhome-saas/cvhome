@@ -4,7 +4,8 @@ com:
       pods:
         - id:
             id: 1
-          name: default
+          name: pod-0
           endpoint:
             endpoint: http://store-pod-saas-gateway-1.gateway.com
             type: EXTERNAL
+          domain: store-pod-saas-gateway-1.gateway.com

@@ -26,12 +26,10 @@ public class DefaultEventProcessor implements EventProcessor {
 
 	@Override
 	public List<EventImpl<Event>> getProcessors(Event event) {
-		// @formatter:off
-        return eventsImpl.stream()
-                .filter(it -> it.type().equals(event.eventType()))
-                .sorted(Comparator.comparing(EventImpl::order))
-                .collect(Collectors.toList());
-        // @formatter:on
+		return eventsImpl.stream()
+			.filter(it -> it.type().equals(event.eventType()))
+			.sorted(Comparator.comparing(EventImpl::order))
+			.collect(Collectors.toList());
 	}
 
 	@Override

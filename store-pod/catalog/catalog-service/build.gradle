@@ -48,7 +48,7 @@ dependencies {
 	implementation libs.commons.validator
 	implementation libs.commons.io
 
-	implementation project(':store-pod:store-modules:store-cms-commons')
+	implementation project(':store-pod:commons:store-modules:store-cms-commons')
 	implementation project(':store-pod:merchant:merchant-external-api')
 	implementation project(':store-pod:catalog:catalog-external-api')
 	implementation project(':store-pod:catalog:catalog-core')

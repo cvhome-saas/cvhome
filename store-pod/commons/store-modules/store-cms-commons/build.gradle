@@ -4,7 +4,7 @@ plugins {
 }
 
 dependencies {
-	api project(':store-pod:store-commons')
+	api project(':store-pod:commons:store-commons')
 	implementation libs.aws.sdk.s3
 	implementation libs.commons.io
 	compileOnly libs.apache.commons.lang3

@@ -50,7 +50,7 @@ create table if not exists merchant.merchant_slider_images
     store_merchant_id varchar(50)  not null
         constraint fk6qg1wx3ow5v07pswgwf8dbguf references merchant.merchant_store,
     priority          int,
-    name               varchar(100) not null
+    name              varchar(100) not null
 );
 create table if not exists merchant.social_links
 (
@@ -59,3 +59,12 @@ create table if not exists merchant.social_links
     provider          varchar(10),
     url               varchar(100)
 );
+
+create table if not exists merchant.store_domains
+(
+    store_merchant_id varchar(50) not null,
+    domain            varchar(100),
+    domain_type       varchar(15) not null,
+    constraint FKpw0mfwlhf9uay27vw3sbal8ao foreign key (store_merchant_id) references merchant.merchant_store
+);
+

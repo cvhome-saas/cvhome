@@ -110,6 +110,8 @@ public class ReadableMerchantStorePopulator
 		}
 		target.setSocialLinks(source.getSocialLinks());
 
+		target.setStoreDomains(source.getStoreDomains());
+
 		if (source.getLanguages() != null && !source.getLanguages().isEmpty()) {
 			List<ReadableLanguage> supported = new ArrayList<>();
 			for (LanguageCode lang : source.getLanguages()) {

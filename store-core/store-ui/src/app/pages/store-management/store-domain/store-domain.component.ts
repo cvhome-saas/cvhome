@@ -19,7 +19,7 @@ import {dnsPointsToPodValidatorFactory, StoreDomainComponentValidatorContext} fr
   styleUrls: ['./store-domain.component.scss']
 })
 export class StoreDomainComponent implements OnInit , StoreDomainComponentValidatorContext{
-  isSubmited = false
+  isSubmited = false;
   store;
   loading = false;
   page: Page = new Page();
@@ -108,11 +108,11 @@ export class StoreDomainComponent implements OnInit , StoreDomainComponentValida
           this.loading = false;
           this.saasProperties = it[0];
           this.podId = it[2].id;
-          if (it && it[1].data && it[1].data.length > 0) {
-            this.rows = it[1].data
-            this.page.totalPages = 1
-            this.page.totalElements = it[1].data.length
-            this.page.size = it[1].data.length
+          if (it[1].length > 0) {
+            this.rows = it[1];
+            this.page.totalPages = 1;
+            this.page.totalElements = it[1].length;
+            this.page.size = it[1].length;
           }
         },
         error: (err) => {
@@ -122,7 +122,7 @@ export class StoreDomainComponent implements OnInit , StoreDomainComponentValida
         complete: () => {
           this.loading = false;
         }
-      })
+      });
   }
 
   onAccess(row: any) {
@@ -142,7 +142,7 @@ export class StoreDomainComponent implements OnInit , StoreDomainComponentValida
           this.errorService.error('ERROR.SYSTEM_ERROR', err);
         }
       }
-    )
+    );
   }
 
   createDomain(domain: string) {
@@ -162,7 +162,7 @@ export class StoreDomainComponent implements OnInit , StoreDomainComponentValida
           this.isSubmited = false;
         }
       }
-    )
+    );
   }
 
   save() {

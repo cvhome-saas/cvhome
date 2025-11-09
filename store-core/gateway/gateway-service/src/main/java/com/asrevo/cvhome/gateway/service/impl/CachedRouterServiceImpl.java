@@ -1,27 +1,24 @@
 package com.asrevo.cvhome.gateway.service.impl;
 
-import com.asrevo.cvhome.commons.domain.Domain;
 import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.commons.domain.Pod;
 import com.asrevo.cvhome.manager.api.CachedRouterService;
 import com.asrevo.cvhome.manager.api.RouterAllocationService;
 import com.github.benmanes.caffeine.cache.AsyncLoadingCache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import java.time.Duration;
-import java.util.function.Function;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+import java.time.Duration;
+import java.util.function.Function;
+
 @Service
 public class CachedRouterServiceImpl implements CachedRouterService {
-
-	private final Function<Domain, Mono<ManagerStoreId>> domainCache;
 
 	private final Function<ManagerStoreId, Mono<Pod>> podCache;
 
 	public CachedRouterServiceImpl(RouterAllocationService routerAllocationService) {
-		this.domainCache = ofMono(Duration.ofMinutes(10), routerAllocationService::getStorePodByStoreId);
 		this.podCache = ofMono(Duration.ofMinutes(10), routerAllocationService::getStorePodByStoreId);
 	}
 
@@ -32,11 +29,6 @@ public class CachedRouterServiceImpl implements CachedRouterService {
 			.buildAsync((k, e) -> fn.apply(k).subscribeOn(Schedulers.fromExecutor(e)).toFuture());
 
 		return (k) -> Mono.fromFuture(cache.get(k));
-	}
-
-	@Override
-	public Mono<ManagerStoreId> getStorePodByStoreId(Domain domain) {
-		return domainCache.apply(domain);
 	}
 
 	@Override
