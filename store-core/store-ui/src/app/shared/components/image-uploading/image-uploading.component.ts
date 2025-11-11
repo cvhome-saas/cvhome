@@ -1,7 +1,7 @@
 import {Component, EventEmitter, Input, OnInit, Output,} from "@angular/core";
 import {HttpClient, HttpErrorResponse} from "@angular/common/http";
-import {ImageUploadingAdapter} from "./image-uploading-adapter";
-import {FilePreviewModel, ValidationError,} from "ngx-awesome-uploader";
+// import {ImageUploadingAdapter} from "./image-uploading-adapter";
+// import {FilePreviewModel, ValidationError,} from "ngx-awesome-uploader";
 
 @Component({
   selector: "ngx-image-uploading",
@@ -10,7 +10,7 @@ import {FilePreviewModel, ValidationError,} from "ngx-awesome-uploader";
   styleUrls: ["./image-uploading.component.scss"],
 })
 export class ImageUploadingComponent implements OnInit {
-  public adapter;
+  // public adapter;
 
   @Input() images;
   @Input() addImageUrl;
@@ -36,7 +36,7 @@ export class ImageUploadingComponent implements OnInit {
 
   ngOnInit() {
     this.addUrl = this.addImageUrl;
-    this.adapter = new ImageUploadingAdapter(this.http, this.addUrl);
+    // this.adapter = new ImageUploadingAdapter(this.http, this.addUrl);
   }
 
   public itemTrackBy(item) {
@@ -56,27 +56,27 @@ export class ImageUploadingComponent implements OnInit {
     this.remove.emit(image.id);
   }
 
-  public onValidationError(error: ValidationError): void {
-    this.errorImage(error.error);
-  }
-
-  public onUploadSuccess(e: FilePreviewModel): void {
-    var me = this;
-    this.timer = setTimeout(() => {
-      me.success.emit(e.fileName);
-      me.details = false;
-    }, 2000);
-  }
+  // public onValidationError(error: ValidationError): void {
+  //   this.errorImage(error.error);
+  // }
+  //
+  // public onUploadSuccess(e: FilePreviewModel): void {
+  //   var me = this;
+  //   this.timer = setTimeout(() => {
+  //     me.success.emit(e.fileName);
+  //     me.details = false;
+  //   }, 2000);
+  // }
 
   /* remove success */
-  public onRemoveSuccess(e: FilePreviewModel) {
-    console.log("Remove");
-    console.log(e);
-  }
-
-  public onFileAdded(file: FilePreviewModel) {
-    console.log("File added ", file);
-    this.fileAdded.emit(true);
-    clearTimeout(this.timer);
-  }
+  // public onRemoveSuccess(e: FilePreviewModel) {
+  //   console.log("Remove");
+  //   console.log(e);
+  // }
+  //
+  // public onFileAdded(file: FilePreviewModel) {
+  //   console.log("File added ", file);
+  //   this.fileAdded.emit(true);
+  //   clearTimeout(this.timer);
+  // }
 }
