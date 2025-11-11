@@ -2,14 +2,13 @@ import {Component} from '@angular/core';
 import {SignUpService} from "../../service/sign-up.service";
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {ToastrService} from "ngx-toastr";
-import {NgFor} from "@angular/common";
 
 @Component({
   selector: 'app-sign-up-form',
   standalone: true,
   imports: [
     ReactiveFormsModule
-    , NgFor
+
   ],
   templateUrl: './sign-up-form.component.html',
   styleUrl: './sign-up-form.component.css'

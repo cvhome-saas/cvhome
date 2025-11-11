@@ -1,8 +1,6 @@
 import {Component} from '@angular/core';
 import {ContactComponent} from "../../sections/contact/contact.component";
 import {FeaturesComponent} from "../../sections/features/features.component";
-import {FooterComponent} from "../../components/footer/footer.component";
-import {HeaderComponent} from "../../components/header/header.component";
 import {PricingComponent} from "../../sections/pricing/pricing.component";
 import {SubscribeComponent} from "../../sections/subscribe/subscribe.component";
 import {WelcomeComponent} from "../../sections/welcome/welcome.component";
@@ -13,8 +11,6 @@ import {WelcomeComponent} from "../../sections/welcome/welcome.component";
   imports: [
     ContactComponent,
     FeaturesComponent,
-    FooterComponent,
-    HeaderComponent,
     PricingComponent,
     SubscribeComponent,
     WelcomeComponent
