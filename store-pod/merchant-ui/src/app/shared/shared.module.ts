@@ -29,7 +29,6 @@ import {ImageUploadingComponent} from './components/image-uploading/image-upload
 import {ImageBrowserComponent} from './components/image-browser/image-browser.component';
 import {NgxDatatableModule} from '@swimlane/ngx-datatable';
 import {QuillModule} from 'ngx-quill';
-import {FilePickerModule} from "ngx-awesome-uploader";
 import {NgcxTreeComponent} from "@cluetec/ngcx-tree";
 import {ProductAutoCompleteComponent} from "./components/product-autocomplete/product-auto-complete.component";
 
@@ -65,7 +64,6 @@ export const MODULES = [
 
   NgxDatatableModule,
   QuillModule,
-  FilePickerModule,
   NgcxTreeComponent
 ];
 

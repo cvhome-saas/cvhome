@@ -2,26 +2,26 @@
   <div class="col-md-6">
     <div>
 
-      <ngx-awesome-uploader (fileAdded)="onFileAdded($event)" (removeSuccess)="onRemoveSuccess($event)"
-                            (uploadFail)="onUploadError($event)"
-                            (uploadSuccess)="onUploadSuccess($event)" (validationError)="onValidationError($event)"
-                            [accept]="'.jpg, .png, .gif, .webp, .jpeg'"
-                            [adapter]="adapter"
-                            [enableCropper]="false"
-                            [fileExtensions]="['jpg', 'jpeg', 'png', 'gif', 'webp']" [fileMaxCount]="10"
-                            [fileMaxSize]="4" [itemTemplate]="uploadItemTemplate"
-                            [showPreviewContainer]="false"
-                            [uploadType]="'multi'">
-        <div class="dropzoneTemplate">
-          <div class="content">
-            <img src="../../../../../assets/img/cloud-computing.png" width="80">
-            <div class="content-top-text"> {{ 'COMMON.DRAG_DROP' | translate }}</div>
-            <div class="content-center-text"> {{ 'COMMON.OR' | translate }}</div>
-            <button class="file-browse-button" type="button"> {{ 'COMMON.BROWSE_FILES' | translate }}</button>
-          </div>
-        </div>
+<!--      <ngx-awesome-uploader (fileAdded)="onFileAdded($event)" (removeSuccess)="onRemoveSuccess($event)"-->
+<!--                            (uploadFail)="onUploadError($event)"-->
+<!--                            (uploadSuccess)="onUploadSuccess($event)" (validationError)="onValidationError($event)"-->
+<!--                            [accept]="'.jpg, .png, .gif, .webp, .jpeg'"-->
+<!--                            [adapter]="adapter"-->
+<!--                            [enableCropper]="false"-->
+<!--                            [fileExtensions]="['jpg', 'jpeg', 'png', 'gif', 'webp']" [fileMaxCount]="10"-->
+<!--                            [fileMaxSize]="4" [itemTemplate]="uploadItemTemplate"-->
+<!--                            [showPreviewContainer]="false"-->
+<!--                            [uploadType]="'multi'">-->
+<!--        <div class="dropzoneTemplate">-->
+<!--          <div class="content">-->
+<!--            <img src="../../../../../assets/img/cloud-computing.png" width="80">-->
+<!--            <div class="content-top-text"> {{ 'COMMON.DRAG_DROP' | translate }}</div>-->
+<!--            <div class="content-center-text"> {{ 'COMMON.OR' | translate }}</div>-->
+<!--            <button class="file-browse-button" type="button"> {{ 'COMMON.BROWSE_FILES' | translate }}</button>-->
+<!--          </div>-->
+<!--        </div>-->
 
-      </ngx-awesome-uploader>
+<!--      </ngx-awesome-uploader>-->
 
     </div>
 

@@ -25,7 +25,6 @@ import {TranslateModule} from '@ngx-translate/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {NgxDatatableModule} from '@swimlane/ngx-datatable';
 import {QuillModule} from 'ngx-quill';
-import {FilePickerModule} from "ngx-awesome-uploader";
 import {ShowcaseDialogComponent} from "./components/showcase-dialog/showcase-dialog.component";
 
 export const MODULES = [
@@ -59,13 +58,12 @@ export const MODULES = [
   ReactiveFormsModule,
 
   NgxDatatableModule,
-  QuillModule,
-  FilePickerModule
+  QuillModule
 ];
 
 const COMPONENTS = [
-  ShowcaseDialogComponent,
-]
+  ShowcaseDialogComponent
+];
 
 @NgModule({
   declarations: [

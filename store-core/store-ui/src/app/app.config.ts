@@ -3,8 +3,7 @@ import {provideRouter} from '@angular/router';
 
 import {routes} from './app.routes';
 import {BrowserModule, provideClientHydration} from '@angular/platform-browser';
-import {HttpClient, provideHttpClient, withFetch} from '@angular/common/http';
-import {BrowserAnimationsModule, provideAnimations} from '@angular/platform-browser/animations';
+import {provideHttpClient, withFetch} from '@angular/common/http';
 import {
   NbChatModule,
   NbDatepickerModule,
@@ -15,12 +14,11 @@ import {
   NbToastrModule,
   NbWindowModule
 } from '@nebular/theme';
-import {TranslateLoader, TranslateModule} from '@ngx-translate/core';
-import {TranslateHttpLoader} from '@ngx-translate/http-loader';
+import {provideTranslateHttpLoader} from '@ngx-translate/http-loader';
 import {QuillModule} from 'ngx-quill';
 import {DEFAULT_THEME} from "./theme/styles/theme.default";
-import {FilePickerModule} from "ngx-awesome-uploader";
 import {CookieService} from "ngx-cookie-service";
+import {provideTranslateService} from '@ngx-translate/core';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -28,17 +26,16 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideClientHydration(),
     provideHttpClient(withFetch()),
-    provideAnimations(),
+    provideTranslateService({
+      defaultLanguage: 'en',
+      loader: provideTranslateHttpLoader({
+        prefix: './assets/i18n/',
+        suffix: '.json'
+      }),
+    }),
+
     importProvidersFrom(
       BrowserModule,
-      BrowserAnimationsModule,
-      TranslateModule.forRoot({
-        loader: {
-          provide: TranslateLoader,
-          useFactory: HttpLoaderFactory,
-          deps: [HttpClient]
-        }
-      }),
       NbThemeModule.forRoot({
           name: 'default',
         },
@@ -55,12 +52,7 @@ export const appConfig: ApplicationConfig = {
         messageGoogleMapKey: 'AIzaSyA_wNuCzia92MAmdLRzmqitRGvCF7wCZPY',
       }),
       QuillModule.forRoot(),
-      FilePickerModule,
       CookieService
     ),
   ],
 };
-
-export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
-  return new TranslateHttpLoader(http);
-}
