@@ -10,9 +10,13 @@ import { fileURLToPath } from 'node:url';
 
 const serverDistFolder = dirname(fileURLToPath(import.meta.url));
 const browserDistFolder = resolve(serverDistFolder, '../browser');
+const indexHtml = resolve(browserDistFolder, 'index.html');
 
 const app = express();
 const angularApp = new AngularNodeAppEngine();
+
+// Add the routes you want to be server-side rendered here.
+const ssrRoutes = ['/', '/terms', '/privacy-policy'];
 
 /**
  * Example Express Rest API endpoints can be defined here.
@@ -32,15 +36,14 @@ const angularApp = new AngularNodeAppEngine();
 app.use(
   express.static(browserDistFolder, {
     maxAge: '1y',
-    index: false,
     redirect: false,
   }),
 );
 
 /**
- * Handle all other requests by rendering the Angular application.
+ * Handle SSR requests.
  */
-app.use('/**', (req, res, next) => {
+app.get(ssrRoutes, (req, res, next) => {
   angularApp
     .handle(req)
     .then((response) =>
@@ -48,6 +51,15 @@ app.use('/**', (req, res, next) => {
     )
     .catch(next);
 });
+
+/**
+ * Handle all other requests by serving the client-side application.
+ * This enables Client-Side Rendering (CSR) for the rest of the app.
+ */
+app.get('*', (req, res) => {
+  res.sendFile(indexHtml);
+});
+
 
 /**
  * Start the server if this module is the main entry point.
