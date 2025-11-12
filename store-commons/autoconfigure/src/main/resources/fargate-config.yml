@@ -18,7 +18,6 @@ spring:
           - "catalog"
           - "order"
           - "landing-ui"
-          - "merchant-ui"
     ecs:
       discovery:
         namespace: "store-pod-1.cvhome.lcl"
@@ -34,7 +33,6 @@ spring:
           "subscription": 8021
           "pod-auth": 8101
           "landing-ui": 8110
-          "merchant-ui": 8111
           "merchant": 8120
           "content": 8121
           "catalog": 8122

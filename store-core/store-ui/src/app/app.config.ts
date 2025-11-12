@@ -19,6 +19,8 @@ import {QuillModule} from 'ngx-quill';
 import {DEFAULT_THEME} from "./theme/styles/theme.default";
 import {CookieService} from "ngx-cookie-service";
 import {provideTranslateService} from '@ngx-translate/core';
+import {provideAnimations, provideNoopAnimations} from "@angular/platform-browser/animations";
+import {provideAnimationsAsync} from "@angular/platform-browser/animations/async";
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -26,6 +28,9 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideClientHydration(),
     provideHttpClient(withFetch()),
+    provideAnimations(),
+    provideNoopAnimations(),
+    provideAnimationsAsync(),
     provideTranslateService({
       defaultLanguage: 'en',
       loader: provideTranslateHttpLoader({

@@ -130,13 +130,6 @@ services:
       SPRING_PROFILES_ACTIVE: lcl
     ports:
       - "8110:8110"
-  merchant-ui:
-    image: store-pod/merchant-ui
-    network_mode: host
-    environment:
-      SPRING_PROFILES_ACTIVE: lcl
-    ports:
-      - "8111:8111"
   store-pod-saas-gateway:
     image: store-pod/store-pod-saas-gateway
     network_mode: host

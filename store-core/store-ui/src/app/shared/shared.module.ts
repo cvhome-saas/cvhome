@@ -25,7 +25,12 @@ import {TranslateModule} from '@ngx-translate/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {NgxDatatableModule} from '@swimlane/ngx-datatable';
 import {QuillModule} from 'ngx-quill';
+import {NgcxTreeComponent} from "@cluetec/ngcx-tree";
 import {ShowcaseDialogComponent} from "./components/showcase-dialog/showcase-dialog.component";
+import {StoreAutocompleteComponent} from "./components/store-autocomplete/store-autocomplete.component";
+import {ProductAutoCompleteComponent} from "./components/product-autocomplete/product-auto-complete.component";
+import {ImageUploadingComponent} from "./components/image-uploading/image-uploading.component";
+import {ImageBrowserComponent} from "./components/image-browser/image-browser.component";
 
 export const MODULES = [
   NbLayoutModule,
@@ -58,11 +63,16 @@ export const MODULES = [
   ReactiveFormsModule,
 
   NgxDatatableModule,
-  QuillModule
+  QuillModule,
+  NgcxTreeComponent
 ];
 
 const COMPONENTS = [
-  ShowcaseDialogComponent
+  StoreAutocompleteComponent,
+  ProductAutoCompleteComponent,
+  ShowcaseDialogComponent,
+  ImageUploadingComponent,
+  ImageBrowserComponent
 ];
 
 @NgModule({

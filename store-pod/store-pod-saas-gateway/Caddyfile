@@ -39,10 +39,6 @@
         reverse_proxy http://order.{$NAMESPACE}:8123
     }
 
-    handle_path /merchant-ui* {
-        reverse_proxy http://merchant-ui.{$NAMESPACE}:8111
-    }
-
 
     route {
         domain_lookup {
