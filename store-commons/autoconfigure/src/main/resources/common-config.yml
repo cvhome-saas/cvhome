@@ -198,3 +198,10 @@ management:
 info:
   app:
     name: ${spring.application.name}
+otel:
+  sdk:
+    disabled: true
+  resource:
+    attributes:
+      service:
+        name: ${spring.application.name}
