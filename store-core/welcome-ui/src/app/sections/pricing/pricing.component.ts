@@ -1,5 +1,5 @@
-import {Component, OnInit} from '@angular/core';
-import {NgFor, NgIf} from "@angular/common";
+import {Component, Inject, OnInit, PLATFORM_ID} from '@angular/core';
+import {isPlatformBrowser, NgFor, NgIf} from "@angular/common";
 import {RouterLink} from "@angular/router";
 import {Option, SubscriptionService, Table} from "../../service/subscription.service";
 
@@ -21,15 +21,19 @@ export class PricingComponent implements OnInit {
   freePricing: Pricing | undefined;
   flag: boolean = false;
 
-  constructor(private subscriptionService: SubscriptionService) {
+  constructor(@Inject(PLATFORM_ID) private platformId: Object,
+              private subscriptionService: SubscriptionService) {
   }
 
   ngOnInit(): void {
-    this.subscriptionService.table().subscribe(it => {
-      this.table = it;
-      this.constructFreePricing();
-      this.displayTable();
-    });
+    if (isPlatformBrowser(this.platformId)) {
+
+      this.subscriptionService.table().subscribe(it => {
+        this.table = it;
+        this.constructFreePricing();
+        this.displayTable();
+      });
+    }
   }
 
   toggle() {
