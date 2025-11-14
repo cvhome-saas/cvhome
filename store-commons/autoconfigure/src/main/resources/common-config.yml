@@ -205,3 +205,10 @@ otel:
     attributes:
       service:
         name: ${spring.application.name}
+  instrumentation:
+    spring-webmvc:
+      experimental-span-attributes: true
+    spring-cloud-gateway:
+      experimental-span-attributes: true
+    spring-webflux:
+      experimental-span-attributes: true
