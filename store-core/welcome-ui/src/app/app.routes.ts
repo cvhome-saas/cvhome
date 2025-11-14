@@ -1,8 +1,8 @@
 import {Routes} from '@angular/router';
-import {IndexComponent} from "./pages/index/index.component";
-import {SignUpComponent} from "./pages/sign-up/sign-up.component";
-import {TermsComponent} from "./pages/terms/terms.component";
-import {PrivacyPolicyComponent} from "./pages/privacy-policy/privacy-policy.component";
+import {IndexComponent} from "./public/index/index.component";
+import {SignUpComponent} from "./public/sign-up/sign-up.component";
+import {TermsComponent} from "./public/terms/terms.component";
+import {PrivacyPolicyComponent} from "./public/privacy-policy/privacy-policy.component";
 
 export const routes: Routes = [
   {
