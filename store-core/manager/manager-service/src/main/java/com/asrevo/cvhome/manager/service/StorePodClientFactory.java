@@ -25,7 +25,7 @@ public class StorePodClientFactory {
 
 	private final ServiceDomainProperties serviceDomainProperties;
 
-	private final WebClient.Builder defaultWebMicroServiceBuilder;
+	private final WebClient.Builder defaultBuilder;
 
 	private final Environment environment;
 
@@ -38,7 +38,7 @@ public class StorePodClientFactory {
 		// @TODO check if private or public pod and a way to resolve .get
 		Pod pod = serviceDomainProperties.getPodByPodId(podId).get();
 		String podGateway = new ServiceUrlBuilder(serviceDomainProperties, environment).getServiceUrl(pod);
-		return new ProxyClient(defaultWebMicroServiceBuilder.baseUrl(podGateway).build());
+		return new ProxyClient(defaultBuilder.baseUrl(podGateway).build());
 	}
 
 }
