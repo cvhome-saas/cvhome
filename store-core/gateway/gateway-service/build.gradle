@@ -37,8 +37,6 @@ dependencies {
 
     implementation libs.io.opentelemetry.instrumentation.opentelemetry.spring.boot.starter
 
-    implementation libs.caffeine
-
 	implementation project(':store-commons:commons')
 	implementation project(':store-core:manager:manager-external-api')
 	implementation project(':store-commons:autoconfigure')

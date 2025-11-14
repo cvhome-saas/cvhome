@@ -2,7 +2,7 @@ package com.asrevo.cvhome.gateway.config;
 
 import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.commons.domain.Pod;
-import com.asrevo.cvhome.manager.api.CachedRouterService;
+import com.asrevo.cvhome.manager.api.RouterAllocationService;
 import com.asrevo.cvhome.s2s.config.gateway.FHostRoutePredicateFactory;
 import com.asrevo.cvhome.s2s.config.gateway.FNotServiceRoutePredicateFactory;
 import com.asrevo.cvhome.s2s.config.internal.ServiceUrlBuilder;
@@ -34,7 +34,7 @@ public class GatewayRouteLocatorImpl implements RouteLocator {
 
 	private final FHostRoutePredicateFactory hostRoutePredicate;
 
-	private final CachedRouterService router;
+	private final RouterAllocationService router;
 
 	private final Environment environment;
 

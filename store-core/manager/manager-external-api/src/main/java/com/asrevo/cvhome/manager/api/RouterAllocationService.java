@@ -1,6 +1,5 @@
 package com.asrevo.cvhome.manager.api;
 
-import com.asrevo.cvhome.commons.domain.Domain;
 import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.commons.domain.Pod;
 import org.springframework.web.bind.annotation.RequestParam;
