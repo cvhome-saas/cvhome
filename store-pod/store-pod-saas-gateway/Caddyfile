@@ -24,27 +24,69 @@
 (routes) {
 
     handle_path /merchant* {
+        tracing {
+            span merchant
+        }
+        header {
+            response X-Trace-Id {http.vars.trace_id}
+            response X-Span-Id {http.vars.span_id}
+        }
         reverse_proxy http://merchant.{$NAMESPACE}:8120
     }
 
     handle_path /content* {
+        tracing {
+            span content
+        }
+        header {
+            response X-Trace-Id {http.vars.trace_id}
+            response X-Span-Id {http.vars.span_id}
+        }
         reverse_proxy http://content.{$NAMESPACE}:8121
     }
 
     handle_path /catalog* {
+        tracing {
+            span catalog
+        }
+        header {
+            response X-Trace-Id {http.vars.trace_id}
+            response X-Span-Id {http.vars.span_id}
+        }
         reverse_proxy http://catalog.{$NAMESPACE}:8122
     }
 
     handle_path /order* {
+        tracing {
+            span order
+        }
+        header {
+            response X-Trace-Id {http.vars.trace_id}
+            response X-Span-Id {http.vars.span_id}
+        }
         reverse_proxy http://order.{$NAMESPACE}:8123
     }
 
     handle_path /merchant-ui* {
+        tracing {
+            span merchant-ui
+        }
+        header {
+            response X-Trace-Id {http.vars.trace_id}
+            response X-Span-Id {http.vars.span_id}
+        }
         reverse_proxy http://merchant-ui.{$NAMESPACE}:8111
     }
 
 
     route {
+        tracing {
+            span landing-ui
+        }
+        header {
+            response X-Trace-Id {http.vars.trace_id}
+            response X-Span-Id {http.vars.span_id}
+        }
         domain_lookup {
             lookup_url {$DOMAIN_LOOKUP_URL}
             cache_ttl  {$DOMAIN_LOOKUP_TTL:5m}
