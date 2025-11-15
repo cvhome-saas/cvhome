@@ -10,6 +10,8 @@ services:
       - "80:80"
       - "443:443"
       - "2019:2019"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
     environment:
       NAMESPACE: gateway.com
       ASK_TLS_URL: http://store-pod-saas-gateway-1.gateway.com:80/merchant/api/v1/router/public/ask-for-tls
