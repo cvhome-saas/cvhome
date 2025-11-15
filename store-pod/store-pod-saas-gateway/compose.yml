@@ -1,10 +1,7 @@
 version: '3'
 services:
-  saas-gateway-service:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      no_cache: true
+  store-pod-saas-gateway:
+    image: ashraf1abdelrasool/saas-gateway:sha-8eed986
     network_mode: "host"
     ports:
       - "80:80"
@@ -20,4 +17,4 @@ services:
       CERT_BUCKET_REGION: eu-central-1
       OTEL_EXPORTER_OTLP_ENDPOINT: http://localhost:4317
       OTEL_EXPORTER_OTLP_PROTOCOL: grpc
-      OTEL_SERVICE_NAME: saas-gateway-service
+      OTEL_SERVICE_NAME: store-pod-saas-gateway
