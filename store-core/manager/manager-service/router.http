@@ -1,8 +1,0 @@
-GET http://localhost:8020/api/v1/router/public/ask-for-tls?domain=org1-store1.store-pod-saas-gateway-1.gateway.com
-Accept: application/json
-
-###
-GET http://localhost:8020/api/v1/router/public/lookup-by-domain?domain=org1-store1.store-pod-saas-gateway-1.gateway.com
-Accept: application/json
-
-###
