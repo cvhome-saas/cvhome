@@ -4,20 +4,6 @@ import {NgModule} from '@angular/core';
 import {PagesComponent} from './pages.component';
 import {canAccessSecuredPages} from "../shared/services/auth-guard.service";
 import {NotFoundComponent} from "./not-found/not-found.component";
-import {loadRemoteModule} from '@angular-architects/module-federation';
-import {SelectedStoreService} from "../shared/services/selected-store.service";
-
-interface RemoteRoute {
-  path: string;
-  module: string;
-}
-
-const remoteRoutes: RemoteRoute[] = [
-  {path: 'orders', module: "OrdersModule"},
-  {path: 'catalogue', module: "CatalogueModule"},
-  {path: 'content', module: "ContentModule"},
-  {path: 'customer', module: "CustomersModule"},
-];
 
 
 const routes: Routes = [{
@@ -46,22 +32,24 @@ const routes: Routes = [{
       loadChildren: () => import('./subscription-and-usage/subscription-and-usage.module')
         .then(m => m.SubscriptionAndUsageModule),
     },
-    ...remoteRoutes.map(it => {
-      return {
-        path: it.path,
-        loadChildren: () => {
-          let store = localStorage.getItem(SelectedStoreService.STORE_ID_KEY);
-          let url = `/store-pod-gateway-v2/${store}/merchant-ui/remoteEntry.js`;
-          return loadRemoteModule({
-            remoteEntry: url,
-            type: 'module',
-            exposedModule: `./${it.module}`
-          })
-            .then((m) => m[it.module])
-            .catch(handleRemoteModuleFailure);
-        },
-      }
-    }),
+    {
+      path: 'orders',
+      loadChildren: () => import('./orders/orders.module')
+        .then(m => m.OrdersModule),
+    }, {
+      path: 'catalogue',
+      loadChildren: () => import('./catalogue/catalogue.module')
+        .then(m => m.CatalogueModule),
+
+    }, {
+      path: 'content',
+      loadChildren: () => import('./content/content.module')
+        .then(m => m.ContentModule),
+    }, {
+      path: 'customer',
+      loadChildren: () => import('./customer/customer.module')
+        .then(m => m.CustomersModule),
+    },
     {
       path: '**',
       component: NotFoundComponent
@@ -75,23 +63,3 @@ const routes: Routes = [{
 })
 export class PagesRoutingModule {
 }
-
-// async function routedLoadRemoteModule(options: any, module: string) {
-//   const storeId = localStorage.getItem(SelectedStoreService.STORE_ID_KEY)
-//   if (storeId) {
-//     options = {
-//       ...options,
-//       remoteEntry: options.remoteEntry + "?store=" + storeId
-//     }
-//   }
-//   return loadRemoteModule(options)
-//     .then((m) => m[module])
-//     .catch(handleRemoteModuleFailure)
-// }
-
-async function handleRemoteModuleFailure() {
-  return import(
-    '../remote-module-placeholder/remote-module-placeholder.module'
-    ).then((m) => m.RemoteModulePlaceholderModule);
-}
-
