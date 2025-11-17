@@ -56,6 +56,7 @@ include(
         'store-core:manager:manager-events',
         'store-core:manager:manager-external-api',
         'store-core:manager:manager-service',
+        'store-core:control-plane:control-plane-service',
         'store-core:subscription:subscription-commons',
         'store-core:subscription:subscription-events',
         'store-core:subscription:subscription-external-api',

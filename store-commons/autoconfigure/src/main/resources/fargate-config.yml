@@ -7,8 +7,7 @@ spring:
         clients:
           - "store-core-gateway"
           - "core-auth"
-          - "manager"
-          - "subscription"
+          - "control-plane"
           - "store-ui"
           - "welcome-ui"
           - "store-pod-gateway"
@@ -29,8 +28,7 @@ spring:
           "store-core-gateway": 8000
           "store-ui": 8010
           "welcome-ui": 8011
-          "manager": 8020
-          "subscription": 8021
+          "control-plane": 8020
           "pod-auth": 8101
           "landing-ui": 8110
           "merchant": 8120

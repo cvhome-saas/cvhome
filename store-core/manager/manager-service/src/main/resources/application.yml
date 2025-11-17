@@ -9,7 +9,7 @@ spring:
         registration:
           s2s:
             provider: keycloak
-            client-id: manager@service.store-core.internal
+            client-id: control-plane@service.store-core.internal
             client-secret: VobDxIhAGZz8hyhzz7p9G7QpfixjFjzW
             authorization-grant-type: client_credentials
 com:

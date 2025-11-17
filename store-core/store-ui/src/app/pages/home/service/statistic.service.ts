@@ -23,15 +23,15 @@ export class StatisticService {
   }
 
   getNewStoreCreatedStatistic(params: StatisticsParams) {
-    return this.crudService.post(`/manager/api/v2/private/store-statistic`, params);
+    return this.crudService.post(`/control-plane/api/v2/private/store-statistic`, params);
   }
 
   getNewOrgJoinerStatistic(params: StatisticsParams) {
-    return this.crudService.post(`/manager/api/v2/private/org-statistic`, params);
+    return this.crudService.post(`/control-plane/api/v2/private/org-statistic`, params);
   }
 
   getSubscriptionStatistic(params: StatisticsParams) {
-    return this.crudService.post(`/manager/api/v2/private/subscription-statistic`, params);
+    return this.crudService.post(`/control-plane/api/v2/private/subscription-statistic`, params);
   }
 }
 

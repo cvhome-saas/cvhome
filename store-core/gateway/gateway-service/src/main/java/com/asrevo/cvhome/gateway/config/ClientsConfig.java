@@ -10,7 +10,7 @@ public class ClientsConfig {
 
 	@Bean
 	public RouterAllocationService routerAllocationService(WebClientBuilder webClientBuilder) {
-		return webClientBuilder.buildClient("manager", RouterAllocationService.class);
+		return webClientBuilder.buildClient("control-plane", RouterAllocationService.class);
 	}
 
 }

@@ -11,7 +11,7 @@ export class SubscriptionService {
   }
 
   table(): Observable<Table> {
-    return this.httpClient.get<Table>("subscription/api/v1/subscription-plan/public/tables");
+    return this.httpClient.get<Table>("control-plane/api/v1/subscription-plan/public/tables");
   }
 }
 

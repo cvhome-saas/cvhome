@@ -72,7 +72,7 @@
           <nb-card-footer>
             <div class="row justify-content-center">
               <a nbButton size="medium" status="primary"
-                 [href]="'/subscription/api/v1/subscription/subscribe?priceId='+p.id.id"
+                 [href]="'/control-plane/api/v1/subscription/subscribe?priceId='+p.id.id"
                  [disabled]="p.name==currentSubscriptionDetails.subscriptionPlan">
                 {{ 'SUBSCRIPTION.SUBSCRIBE' | translate }}
               </a>
