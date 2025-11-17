@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: subscription
+  config:
+    import: "classpath:common-config.yml"
+  security:
+    oauth2:
+      client:
+        registration:
+          s2s:
+            provider: keycloak
+            client-id: subscription@service.store-core.internal
+            client-secret: TxbDxIhATuz8hyhzz899G7QpfixjFjzW
+            authorization-grant-type: client_credentials
