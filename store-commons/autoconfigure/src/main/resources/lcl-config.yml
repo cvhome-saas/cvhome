@@ -80,13 +80,6 @@ spring:
                 metadata:
                   service-name: landing-ui
                   instance: landing-ui-1
-            merchant-ui:
-              - uri: "http://localhost:8111"
-                instance-id: merchant-ui-1
-                metadata:
-                  service-name: merchant-ui
-                  instance: merchant-ui-1
-
     gateway:
       server:
         webflux:

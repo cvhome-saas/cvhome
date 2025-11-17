@@ -2,7 +2,6 @@ import {ApplicationConfig, importProvidersFrom, provideZoneChangeDetection} from
 import {provideRouter} from '@angular/router';
 
 import {routes} from './app.routes';
-import {BrowserModule, provideClientHydration} from '@angular/platform-browser';
 import {provideHttpClient, withFetch} from '@angular/common/http';
 import {
   NbChatModule,
@@ -19,17 +18,13 @@ import {QuillModule} from 'ngx-quill';
 import {DEFAULT_THEME} from "./theme/styles/theme.default";
 import {CookieService} from "ngx-cookie-service";
 import {provideTranslateService} from '@ngx-translate/core';
-import {provideAnimations, provideNoopAnimations} from "@angular/platform-browser/animations";
 import {provideAnimationsAsync} from "@angular/platform-browser/animations/async";
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({eventCoalescing: true}),
     provideRouter(routes),
-    provideClientHydration(),
     provideHttpClient(withFetch()),
-    provideAnimations(),
-    provideNoopAnimations(),
     provideAnimationsAsync(),
     provideTranslateService({
       defaultLanguage: 'en',
@@ -40,7 +35,6 @@ export const appConfig: ApplicationConfig = {
     }),
 
     importProvidersFrom(
-      BrowserModule,
       NbThemeModule.forRoot({
           name: 'default',
         },

@@ -67,17 +67,6 @@
         reverse_proxy http://order.{$NAMESPACE}:8123
     }
 
-    handle_path /merchant-ui* {
-        tracing {
-            span merchant-ui
-        }
-        header {
-            response X-Trace-Id {http.vars.trace_id}
-            response X-Span-Id {http.vars.span_id}
-        }
-        reverse_proxy http://merchant-ui.{$NAMESPACE}:8111
-    }
-
 
     route {
         tracing {
