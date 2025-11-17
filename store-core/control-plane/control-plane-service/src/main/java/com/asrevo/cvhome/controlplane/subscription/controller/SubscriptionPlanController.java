@@ -2,7 +2,7 @@ package com.asrevo.cvhome.controlplane.subscription.controller;
 
 import com.asrevo.cvhome.commons.annotation.ConditionalOnApiStatus;
 import com.asrevo.cvhome.commons.domain.SubscriptionPlan;
-import com.asrevo.cvhome.subscription.commons.SubscriptionPlanTables;
+import com.asrevo.cvhome.controlplane.subscription.commons.SubscriptionPlanTables;
 import com.asrevo.cvhome.controlplane.subscription.service.SubscriptionPlanTablesService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

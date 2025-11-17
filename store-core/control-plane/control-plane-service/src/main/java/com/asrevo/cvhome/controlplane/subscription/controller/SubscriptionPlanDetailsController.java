@@ -4,7 +4,7 @@ import com.asrevo.cvhome.commons.annotation.ConditionalOnApiStatus;
 import com.asrevo.cvhome.commons.annotation.OrgStorePrincipalInfo;
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
 import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
-import com.asrevo.cvhome.subscription.commons.SubscriptionPlanDetails;
+import com.asrevo.cvhome.controlplane.subscription.commons.SubscriptionPlanDetails;
 import com.asrevo.cvhome.controlplane.subscription.service.SubscriptionService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

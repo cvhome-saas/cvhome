@@ -38,7 +38,7 @@ dependencies {
     implementation libs.io.opentelemetry.instrumentation.opentelemetry.spring.boot.starter
 
 	implementation project(':store-commons:commons')
-	implementation project(':store-core:manager:manager-external-api')
+	implementation project(':store-core:control-plane:manager-external-api')
 	implementation project(':store-commons:autoconfigure')
 	implementation project(':store-commons:ecs-commons:fargate-task-info')
 	implementation project(':store-commons:ecs-commons:ecs-service-discoveryclient')

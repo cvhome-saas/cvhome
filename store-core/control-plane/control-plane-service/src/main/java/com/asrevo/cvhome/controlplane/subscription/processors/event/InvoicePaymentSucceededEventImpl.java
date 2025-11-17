@@ -1,8 +1,8 @@
 package com.asrevo.cvhome.controlplane.subscription.processors.event;
 
 import com.asrevo.cvhome.commons.event.EventImpl;
-import com.asrevo.cvhome.stripe.event.InvoicePaymentSucceededEvent;
-import com.asrevo.cvhome.subscription.commons.SubscriptionPlanOption;
+import com.asrevo.cvhome.controlplane.stripe.event.InvoicePaymentSucceededEvent;
+import com.asrevo.cvhome.controlplane.subscription.commons.SubscriptionPlanOption;
 import com.asrevo.cvhome.controlplane.subscription.service.SubscriptionPlanTablesService;
 import com.asrevo.cvhome.controlplane.subscription.service.SubscriptionService;
 import lombok.RequiredArgsConstructor;

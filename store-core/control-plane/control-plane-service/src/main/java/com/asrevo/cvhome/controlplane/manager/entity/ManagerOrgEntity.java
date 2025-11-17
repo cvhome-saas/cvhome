@@ -3,7 +3,7 @@ package com.asrevo.cvhome.controlplane.manager.entity;
 import com.asrevo.cvhome.commons.domain.BaseEntity;
 import com.asrevo.cvhome.commons.domain.Email;
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
-import com.asrevo.cvhome.manager.commons.event.store.OrgCreatedEvent;
+import com.asrevo.cvhome.controlplane.manager.commons.event.store.OrgCreatedEvent;
 import java.time.Instant;
 import lombok.Getter;
 import lombok.Setter;

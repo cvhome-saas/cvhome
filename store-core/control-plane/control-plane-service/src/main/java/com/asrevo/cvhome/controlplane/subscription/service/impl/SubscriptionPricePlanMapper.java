@@ -1,9 +1,9 @@
 package com.asrevo.cvhome.controlplane.subscription.service.impl;
 
-import com.asrevo.cvhome.subscription.commons.PricePlanCost;
-import com.asrevo.cvhome.subscription.commons.RecurringPlan;
-import com.asrevo.cvhome.subscription.commons.SubscriptionPlanOption;
-import com.asrevo.cvhome.subscription.commons.SubscriptionPlanTable;
+import com.asrevo.cvhome.controlplane.subscription.commons.PricePlanCost;
+import com.asrevo.cvhome.controlplane.subscription.commons.RecurringPlan;
+import com.asrevo.cvhome.controlplane.subscription.commons.SubscriptionPlanOption;
+import com.asrevo.cvhome.controlplane.subscription.commons.SubscriptionPlanTable;
 import com.asrevo.cvhome.controlplane.subscription.domain.SubscriptionPricePlanEntity;
 import java.util.List;
 import org.mapstruct.Mapper;

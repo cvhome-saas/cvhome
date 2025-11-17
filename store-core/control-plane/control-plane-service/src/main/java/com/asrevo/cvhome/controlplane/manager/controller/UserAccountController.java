@@ -11,7 +11,7 @@ import com.asrevo.cvhome.keycloak.domain.user.ReadableUser;
 import com.asrevo.cvhome.keycloak.domain.user.ReadableUserList;
 import com.asrevo.cvhome.keycloak.domain.user.UserPassword;
 import com.asrevo.cvhome.keycloak.service.UserAccountService;
-import com.asrevo.cvhome.manager.commons.dto.ManagerStoreDto;
+import com.asrevo.cvhome.controlplane.manager.commons.dto.ManagerStoreDto;
 import com.asrevo.cvhome.controlplane.manager.service.InternalStoreService;
 import java.security.Principal;
 import lombok.AllArgsConstructor;

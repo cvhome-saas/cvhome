@@ -1,8 +1,8 @@
 package com.asrevo.cvhome.controlplane.manager.service.impl;
 
 import com.asrevo.cvhome.commons.domain.*;
-import com.asrevo.cvhome.manager.commons.dto.ListManagerStoreQuery;
-import com.asrevo.cvhome.manager.commons.dto.ManagerStoreDto;
+import com.asrevo.cvhome.controlplane.manager.commons.dto.ListManagerStoreQuery;
+import com.asrevo.cvhome.controlplane.manager.commons.dto.ManagerStoreDto;
 import com.asrevo.cvhome.controlplane.manager.mappers.ManagerStoreMappers;
 import com.asrevo.cvhome.controlplane.manager.service.InternalStoreService;
 import com.asrevo.cvhome.controlplane.manager.service.PodSelection;

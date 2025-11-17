@@ -1,8 +1,8 @@
 package com.asrevo.cvhome.controlplane.subscription.service.jobs;
 
 import com.asrevo.cvhome.commons.event.EventProcessor;
-import com.asrevo.cvhome.subscription.commons.SubscriptionStatus;
-import com.asrevo.cvhome.subscription.commons.command.DeActivateNonRenewedSubscriptionCommand;
+import com.asrevo.cvhome.controlplane.subscription.commons.SubscriptionStatus;
+import com.asrevo.cvhome.controlplane.subscription.commons.command.DeActivateNonRenewedSubscriptionCommand;
 import com.asrevo.cvhome.controlplane.subscription.domain.SubscriptionEntity;
 import com.asrevo.cvhome.controlplane.subscription.repository.SubscriptionRepository;
 import java.time.Instant;

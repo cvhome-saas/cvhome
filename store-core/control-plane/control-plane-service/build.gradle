@@ -63,10 +63,10 @@ dependencies {
 	annotationProcessor libs.mapstruct.processor
 	implementation libs.springdoc.openapi.starter.webflux.ui
 
-	implementation project(':store-core:manager:manager-events')
-	implementation project(':store-core:subscription:subscription-events')
+	implementation project(':store-core:control-plane:manager-events')
+	implementation project(':store-core:control-plane:subscription-events')
 	implementation project(':store-pod:merchant:merchant-external-api')
-	implementation project(':store-core:subscription:subscription-external-api')
+	implementation project(':store-core:control-plane:subscription-external-api')
 	implementation project(':store-commons:autoconfigure')
 	implementation project(':store-commons:keycloak-client')
 

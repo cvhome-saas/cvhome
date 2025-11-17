@@ -2,7 +2,7 @@ package com.asrevo.cvhome.controlplane.subscription.service;
 
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
 import com.asrevo.cvhome.s2s.utils.RedirectionUrlBuilder;
-import com.asrevo.cvhome.subscription.commons.PriceId;
+import com.asrevo.cvhome.controlplane.subscription.commons.PriceId;
 
 public interface StripeSubscriptionService {
 

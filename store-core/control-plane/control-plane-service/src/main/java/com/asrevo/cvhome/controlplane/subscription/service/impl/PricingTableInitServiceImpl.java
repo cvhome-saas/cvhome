@@ -1,10 +1,10 @@
 package com.asrevo.cvhome.controlplane.subscription.service.impl;
 
 import com.asrevo.cvhome.commons.domain.SubscriptionPlan;
-import com.asrevo.cvhome.subscription.commons.PriceId;
-import com.asrevo.cvhome.subscription.commons.PricePlanCost;
-import com.asrevo.cvhome.subscription.commons.ProductId;
-import com.asrevo.cvhome.subscription.commons.RecurringPlan;
+import com.asrevo.cvhome.controlplane.subscription.commons.PriceId;
+import com.asrevo.cvhome.controlplane.subscription.commons.PricePlanCost;
+import com.asrevo.cvhome.controlplane.subscription.commons.ProductId;
+import com.asrevo.cvhome.controlplane.subscription.commons.RecurringPlan;
 import com.asrevo.cvhome.controlplane.subscription.domain.SubscriptionPricePlanEntity;
 import com.asrevo.cvhome.controlplane.subscription.repository.SubscriptionPricePlanRepository;
 import com.asrevo.cvhome.controlplane.subscription.service.PricingTableInitService;

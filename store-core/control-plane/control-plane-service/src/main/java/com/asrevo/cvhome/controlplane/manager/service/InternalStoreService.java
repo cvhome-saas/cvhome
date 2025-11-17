@@ -1,8 +1,8 @@
 package com.asrevo.cvhome.controlplane.manager.service;
 
 import com.asrevo.cvhome.commons.domain.*;
-import com.asrevo.cvhome.manager.commons.dto.ListManagerStoreQuery;
-import com.asrevo.cvhome.manager.commons.dto.ManagerStoreDto;
+import com.asrevo.cvhome.controlplane.manager.commons.dto.ListManagerStoreQuery;
+import com.asrevo.cvhome.controlplane.manager.commons.dto.ManagerStoreDto;
 import java.util.Map;
 
 import org.springframework.data.domain.Page;

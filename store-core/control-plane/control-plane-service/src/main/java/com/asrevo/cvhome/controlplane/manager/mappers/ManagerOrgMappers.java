@@ -1,6 +1,6 @@
 package com.asrevo.cvhome.controlplane.manager.mappers;
 
-import com.asrevo.cvhome.manager.commons.dto.ManagerOrgDto;
+import com.asrevo.cvhome.controlplane.manager.commons.dto.ManagerOrgDto;
 import com.asrevo.cvhome.controlplane.manager.entity.ManagerOrgEntity;
 import org.mapstruct.Mapper;
 import org.springframework.data.domain.Page;

@@ -2,7 +2,7 @@ package com.asrevo.cvhome.gateway.config;
 
 import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.commons.domain.Pod;
-import com.asrevo.cvhome.manager.api.RouterAllocationService;
+import com.asrevo.cvhome.controlplane.manager.api.RouterAllocationService;
 import com.asrevo.cvhome.s2s.config.gateway.FHostRoutePredicateFactory;
 import com.asrevo.cvhome.s2s.config.gateway.FNotServiceRoutePredicateFactory;
 import com.asrevo.cvhome.s2s.config.internal.ServiceUrlBuilder;

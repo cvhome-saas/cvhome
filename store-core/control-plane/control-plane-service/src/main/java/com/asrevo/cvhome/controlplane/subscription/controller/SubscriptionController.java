@@ -9,7 +9,7 @@ import com.asrevo.cvhome.commons.domain.ServiceDomain;
 import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
 import com.asrevo.cvhome.s2s.model.ServiceDomainProperties;
 import com.asrevo.cvhome.s2s.utils.RedirectionUrlBuilder;
-import com.asrevo.cvhome.subscription.commons.PriceId;
+import com.asrevo.cvhome.controlplane.subscription.commons.PriceId;
 import com.asrevo.cvhome.controlplane.subscription.service.StripeSubscriptionService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

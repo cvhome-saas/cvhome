@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.controlplane.subscription.processors.event;
 
 import com.asrevo.cvhome.commons.event.EventImpl;
-import com.asrevo.cvhome.stripe.event.InvoicePaymentFailedEvent;
+import com.asrevo.cvhome.controlplane.stripe.event.InvoicePaymentFailedEvent;
 import com.asrevo.cvhome.controlplane.subscription.service.SubscriptionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

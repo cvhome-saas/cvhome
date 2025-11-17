@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.controlplane.subscription.repository;
 
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
-import com.asrevo.cvhome.subscription.commons.SubscriptionStatus;
+import com.asrevo.cvhome.controlplane.subscription.commons.SubscriptionStatus;
 import com.asrevo.cvhome.controlplane.subscription.domain.SubscriptionEntity;
 import java.time.Instant;
 import java.util.List;

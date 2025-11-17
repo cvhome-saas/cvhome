@@ -2,7 +2,7 @@ package com.asrevo.cvhome.controlplane.manager.service.impl;
 
 import com.asrevo.cvhome.commons.domain.Email;
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
-import com.asrevo.cvhome.manager.commons.dto.ManagerOrgDto;
+import com.asrevo.cvhome.controlplane.manager.commons.dto.ManagerOrgDto;
 import com.asrevo.cvhome.controlplane.manager.entity.ManagerOrgEntity;
 import com.asrevo.cvhome.controlplane.manager.mappers.ManagerOrgMappers;
 import com.asrevo.cvhome.controlplane.manager.repository.ManagerOrgRepository;

@@ -2,10 +2,10 @@ package com.asrevo.cvhome.controlplane.subscription.service.impl;
 
 import com.asrevo.cvhome.commons.domain.SubscriptionPlan;
 import com.asrevo.cvhome.s2s.model.StripeProperties;
-import com.asrevo.cvhome.subscription.commons.PriceId;
-import com.asrevo.cvhome.subscription.commons.PricePlanCost;
-import com.asrevo.cvhome.subscription.commons.ProductId;
-import com.asrevo.cvhome.subscription.commons.RecurringPlan;
+import com.asrevo.cvhome.controlplane.subscription.commons.PriceId;
+import com.asrevo.cvhome.controlplane.subscription.commons.PricePlanCost;
+import com.asrevo.cvhome.controlplane.subscription.commons.ProductId;
+import com.asrevo.cvhome.controlplane.subscription.commons.RecurringPlan;
 import com.asrevo.cvhome.controlplane.subscription.service.StripeInitService;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;

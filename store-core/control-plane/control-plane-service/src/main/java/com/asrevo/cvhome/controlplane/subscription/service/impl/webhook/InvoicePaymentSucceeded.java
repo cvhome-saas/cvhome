@@ -2,8 +2,8 @@ package com.asrevo.cvhome.controlplane.subscription.service.impl.webhook;
 
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
 import com.asrevo.cvhome.commons.event.EventProcessor;
-import com.asrevo.cvhome.stripe.event.InvoicePaymentSucceededEvent;
-import com.asrevo.cvhome.subscription.commons.PriceId;
+import com.asrevo.cvhome.controlplane.stripe.event.InvoicePaymentSucceededEvent;
+import com.asrevo.cvhome.controlplane.subscription.commons.PriceId;
 import com.asrevo.cvhome.controlplane.subscription.service.WebhookHandler;
 import com.asrevo.cvhome.controlplane.subscription.utils.ToJsonObj;
 import com.google.gson.JsonElement;

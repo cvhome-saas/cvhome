@@ -2,10 +2,10 @@ package com.asrevo.cvhome.controlplane.subscription.domain;
 
 import com.asrevo.cvhome.commons.domain.BaseEntity;
 import com.asrevo.cvhome.commons.domain.SubscriptionPlan;
-import com.asrevo.cvhome.subscription.commons.PriceId;
-import com.asrevo.cvhome.subscription.commons.PricePlanCost;
-import com.asrevo.cvhome.subscription.commons.ProductId;
-import com.asrevo.cvhome.subscription.commons.RecurringPlan;
+import com.asrevo.cvhome.controlplane.subscription.commons.PriceId;
+import com.asrevo.cvhome.controlplane.subscription.commons.PricePlanCost;
+import com.asrevo.cvhome.controlplane.subscription.commons.ProductId;
+import com.asrevo.cvhome.controlplane.subscription.commons.RecurringPlan;
 import lombok.Getter;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Embedded;

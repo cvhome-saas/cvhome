@@ -2,8 +2,8 @@ package com.asrevo.cvhome.controlplane.subscription.service.impl;
 
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
 import com.asrevo.cvhome.commons.domain.SubscriptionPlan;
-import com.asrevo.cvhome.subscription.commons.RecurringPlan;
-import com.asrevo.cvhome.subscription.commons.SubscriptionPlanDetails;
+import com.asrevo.cvhome.controlplane.subscription.commons.RecurringPlan;
+import com.asrevo.cvhome.controlplane.subscription.commons.SubscriptionPlanDetails;
 import com.asrevo.cvhome.controlplane.subscription.domain.SubscriptionEntity;
 import com.asrevo.cvhome.controlplane.subscription.repository.SubscriptionRepository;
 import com.asrevo.cvhome.controlplane.subscription.service.SubscriptionService;
