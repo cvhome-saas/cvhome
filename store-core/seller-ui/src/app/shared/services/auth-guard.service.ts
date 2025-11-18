@@ -1,19 +1,24 @@
-import {inject} from '@angular/core';
-import {ActivatedRouteSnapshot, CanActivateFn, Router, RouterStateSnapshot} from "@angular/router";
+import {inject, PLATFORM_ID} from '@angular/core';
+import {ActivatedRouteSnapshot, CanActivateFn,  RouterStateSnapshot} from "@angular/router";
 import {AuthService} from "./auth.service";
 import {catchError, map, of} from "rxjs";
+import {isPlatformBrowser} from "@angular/common";
+import {environment} from "../../../environments/environment";
 
-const PREV_PAGE_KEY = "PREV_PAGE";
 
 export const canAccessSecuredPages: CanActivateFn = (
   route: ActivatedRouteSnapshot,
   state: RouterStateSnapshot,
 ) => {
   const oauthService: AuthService = inject(AuthService);
-  const router: Router = inject(Router);
+  const platformId = inject(PLATFORM_ID);
+
   return oauthService.getAuthUser().pipe(map(it => true), catchError(
     it => {
-      localStorage.setItem(PREV_PAGE_KEY, state.url);
-      return of(router.parseUrl('external-login-link'));
+      if (isPlatformBrowser(platformId)) {
+        const redirectTo = encodeURIComponent(state.url);
+        window.location.href = `${environment.LOGIN_URL}?redirectTo=${redirectTo}`;
+      }
+      return of(false);
     }));
 };

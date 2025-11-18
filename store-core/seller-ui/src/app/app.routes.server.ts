@@ -16,17 +16,16 @@ export const serverRoutes: ServerRoute[] = [
   {
     path: "privacy-policy",
     renderMode: RenderMode.Server
+  }, {
+    path: "external-logout-link",
+    renderMode: RenderMode.Client
   },
   {
     path: "pages/**",
     renderMode: RenderMode.Client
   },
   {
-    path: "external-login-link",
-    renderMode: RenderMode.Client
-  },
-  {
-    path: "external-logout-link",
+    path: "subscription/**",
     renderMode: RenderMode.Client
   }
 ];
