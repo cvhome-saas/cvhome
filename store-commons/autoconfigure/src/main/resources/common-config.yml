@@ -20,17 +20,10 @@ com:
           schema: http
           namespace: store-core.cvhome.lcl
           gateway-service-name: store-core-gateway
-        manager:
-          name: manager
+        control-plane:
+          name: control-plane
           domain: ${com.asrevo.cvhome.app.domain}
           port: 8020
-          schema: http
-          namespace: store-core.cvhome.lcl
-          gateway-service-name: store-core-gateway
-        subscription:
-          name: subscription
-          domain: ${com.asrevo.cvhome.app.domain}
-          port: 8021
           schema: http
           namespace: store-core.cvhome.lcl
           gateway-service-name: store-core-gateway

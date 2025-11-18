@@ -9,7 +9,7 @@ import {environment} from "../../../environments/environment";
   providedIn: 'root'
 })
 export class StoreService {
-  private readonly STORE_MANAGER_BASE_URL: string = '/manager/api/v1/store-manager';
+  private readonly STORE_MANAGER_BASE_URL: string = '/control-plane/api/v1/store-manager';
 
   constructor(private httpClient: HttpClient) {
   }

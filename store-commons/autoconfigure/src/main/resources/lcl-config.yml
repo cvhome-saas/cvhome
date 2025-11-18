@@ -14,18 +14,12 @@ spring:
                 metadata:
                   service-name: core-auth
                   instance: core-auth-1
-            manager:
+            control-plane:
               - uri: "http://localhost:8020"
-                instance-id: manager-1
+                instance-id: control-plane-1
                 metadata:
-                  service-name: manager
-                  instance: manager-1
-            subscription:
-              - uri: "http://localhost:8021"
-                instance-id: subscription-1
-                metadata:
-                  service-name: subscription
-                  instance: subscription-1
+                  service-name: control-plane
+                  instance: control-plane-1
             welcome-ui:
               - uri: "http://localhost:8011"
                 instance-id: welcome-ui-1

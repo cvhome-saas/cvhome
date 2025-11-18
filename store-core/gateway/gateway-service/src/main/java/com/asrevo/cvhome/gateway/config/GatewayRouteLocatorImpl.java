@@ -2,7 +2,7 @@ package com.asrevo.cvhome.gateway.config;
 
 import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.commons.domain.Pod;
-import com.asrevo.cvhome.manager.api.RouterAllocationService;
+import com.asrevo.cvhome.controlplane.manager.api.RouterAllocationService;
 import com.asrevo.cvhome.s2s.config.gateway.FHostRoutePredicateFactory;
 import com.asrevo.cvhome.s2s.config.gateway.FNotServiceRoutePredicateFactory;
 import com.asrevo.cvhome.s2s.config.internal.ServiceUrlBuilder;
@@ -41,8 +41,7 @@ public class GatewayRouteLocatorImpl implements RouteLocator {
 	@Override
 	public Flux<Route> getRoutes() {
 		String storeCoreGatewayDomain = serviceDomainProperties.getService("store-core-gateway").domain();
-		Set<String> backendServices = Set.of("manager", "subscription", "core-auth", "store-pod-gateway",
-				"store-pod-gateway-v2");
+		Set<String> backendServices = Set.of("control-plane", "core-auth", "store-pod-gateway", "store-pod-gateway-v2");
 		Predicate<ServerWebExchange> notBackendService = notServicePredicate
 			.apply(new FNotServiceRoutePredicateFactory.Config(backendServices));
 		Predicate<ServerWebExchange> storeUiHostPredicate = hostRoutePredicate
@@ -51,12 +50,9 @@ public class GatewayRouteLocatorImpl implements RouteLocator {
 				new FHostRoutePredicateFactory.Config(Set.of(storeCoreGatewayDomain, "www." + storeCoreGatewayDomain)));
 
 		RouteLocatorBuilder.Builder route = routeLocatorBuilder.routes()
-			.route(r -> r.path("/manager/**")
+			.route(r -> r.path("/control-plane/**")
 				.filters(f -> f.stripPrefix(1).tokenRelay().preserveHostHeader())
-				.uri("lb://manager"))
-			.route(r -> r.path("/subscription/**")
-				.filters(f -> f.stripPrefix(1).tokenRelay().preserveHostHeader())
-				.uri("lb://subscription"))
+				.uri("lb://control-plane"))
 			.route(r -> {
 				return r.predicate(notBackendService).and().predicate(storeUiHostPredicate).uri("lb://store-ui");
 			})

@@ -15,7 +15,7 @@ export class StoreService {
 
 
   getStore(store): Observable<any> {
-    return this.crudService.get(`/manager/api/v1/store-manager/private/store/${store}?store=${store}`);
+    return this.crudService.get(`/control-plane/api/v1/store-manager/private/store/${store}?store=${store}`);
   }
 
   getAllocations(store): Observable<any> {
@@ -23,11 +23,11 @@ export class StoreService {
   }
 
   storePodByStoreId(store): Observable<any> {
-    return this.crudService.get(`/manager/api/v1/router/store-pod-by-store-id?store=${store}`);
+    return this.crudService.get(`/control-plane/api/v1/router/store-pod-by-store-id?store=${store}`);
   }
 
   saasProperties(): Observable<any> {
-    return this.crudService.get(`/manager/api/v1/saas/public/saas-properties`);
+    return this.crudService.get(`/control-plane/api/v1/saas/public/saas-properties`);
   }
 
   allocateDomain(store, domain): Observable<any> {
@@ -39,7 +39,7 @@ export class StoreService {
   }
 
   getListOfStores(params): Observable<any> {
-    return this.crudService.get(`/manager/api/v1/store-manager/private/store`, params);
+    return this.crudService.get(`/control-plane/api/v1/store-manager/private/store`, params);
   }
 
   getListOfMerchantStoreNames(params): Observable<any> {
@@ -50,11 +50,11 @@ export class StoreService {
     const params = {
       name
     };
-    return this.crudService.get(`/manager/api/v1/store-manager/private/store/unique`, params);
+    return this.crudService.get(`/control-plane/api/v1/store-manager/private/store/unique`, params);
   }
 
   createStore(store: any): Observable<any> {
-    return this.crudService.post(`/manager/api/v1/store-manager/private/store`, store);
+    return this.crudService.post(`/control-plane/api/v1/store-manager/private/store`, store);
   }
 
   deleteStore(store: any): Observable<any> {
@@ -120,15 +120,15 @@ export class StoreService {
   }
 
   getSupportedThemes(): Observable<string[]> {
-    return this.crudService.get(`/manager/api/v1/store-manager/public/themes`);
+    return this.crudService.get(`/control-plane/api/v1/store-manager/public/themes`);
   }
 
   getSupportedColorThemes(): Observable<string[]> {
-    return this.crudService.get(`/manager/api/v1/store-manager/public/color-themes`);
+    return this.crudService.get(`/control-plane/api/v1/store-manager/public/color-themes`);
   }
 
   getSupportedSocialLinkProviders(): Observable<string[]> {
-    return this.crudService.get(`/manager/api/v1/store-manager/public/social-links-providers`);
+    return this.crudService.get(`/control-plane/api/v1/store-manager/public/social-links-providers`);
   }
 
   updateStoreSocialLinks(storeId,request) {

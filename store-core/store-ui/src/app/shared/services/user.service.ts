@@ -30,38 +30,38 @@ export class UserService {
 
 
   getCurrentAccount(): Observable<any> {
-    return this.crudService.get(`/manager/api/v1/user-account/current`);
+    return this.crudService.get(`/control-plane/api/v1/user-account/current`);
   }
 
   createUser(user: any, store: any): Observable<any> {
-    return this.crudService.post(`/manager/api/v1/user-account/create?store=${store}`, user);
+    return this.crudService.post(`/control-plane/api/v1/user-account/create?store=${store}`, user);
   }
 
   updateUser(user: any, store: any): Observable<any> {
-    return this.crudService.put(`/manager/api/v1/user-account/update?store=${store}`, user);
+    return this.crudService.put(`/control-plane/api/v1/user-account/update?store=${store}`, user);
   }
 
   getUser(userId: any): Observable<any> {
-    return this.crudService.get(`/manager/api/v1/user-account/find-one?userId=${userId}`);
+    return this.crudService.get(`/control-plane/api/v1/user-account/find-one?userId=${userId}`);
   }
 
   groups(): Observable<string[]> {
-    return this.crudService.get(`/manager/api/v1/user-account/groups`);
+    return this.crudService.get(`/control-plane/api/v1/user-account/groups`);
   }
 
   getUsersList(params): Observable<any> {
-    return this.crudService.get(`/manager/api/v1/user-account/list`, params);
+    return this.crudService.get(`/control-plane/api/v1/user-account/list`, params);
   }
 
   deleteUser(userId: any, store: any): Observable<any> {
-    return this.crudService.delete(`/manager/api/v1/user-account/delete?store=${store}&userId=${userId}`, {});
+    return this.crudService.delete(`/control-plane/api/v1/user-account/delete?store=${store}&userId=${userId}`, {});
   }
 
   disable(userId, store: string) {
-    return this.crudService.post(`/manager/api/v1/user-account/disable?store=${store}&userId=${userId}`, {});
+    return this.crudService.post(`/control-plane/api/v1/user-account/disable?store=${store}&userId=${userId}`, {});
   }
 
   enable(userId, store: string) {
-    return this.crudService.post(`/manager/api/v1/user-account/enable?store=${store}&userId=${userId}`, {});
+    return this.crudService.post(`/control-plane/api/v1/user-account/enable?store=${store}&userId=${userId}`, {});
   }
 }

@@ -1147,31 +1147,12 @@
     },
     {
       "id": "b18372aa-5a25-4768-a6f9-d0cb67b7a94c",
-      "username": "service-account-manager@service.store-core.internal",
+      "username": "service-account-control-plane@service.store-core.internal",
       "emailVerified": false,
       "createdTimestamp": 1721806483874,
       "enabled": true,
       "totp": false,
-      "serviceAccountClientId": "manager@service.store-core.internal",
-      "credentials": [],
-      "disableableCredentialTypes": [],
-      "requiredActions": [],
-      "realmRoles": [
-        "default-roles-cvhome"
-      ],
-      "notBefore": 0,
-      "groups": [
-        "/MICROSERVICE"
-      ]
-    },
-    {
-      "id": "b18372aa-5225-4768-a6f9-d0cb67b7a94c",
-      "username": "service-account-subscription@service.store-core.internal",
-      "emailVerified": false,
-      "createdTimestamp": 1721806483874,
-      "enabled": true,
-      "totp": false,
-      "serviceAccountClientId": "subscription@service.store-core.internal",
+      "serviceAccountClientId": "control-plane@service.store-core.internal",
       "credentials": [],
       "disableableCredentialTypes": [],
       "requiredActions": [],
@@ -1848,7 +1829,7 @@
     },
     {
       "id": "663afc1b-b823-4e14-881a-136412fd87f5",
-      "clientId": "manager@service.store-core.internal",
+      "clientId": "control-plane@service.store-core.internal",
       "name": "",
       "description": "",
       "rootUrl": "",
@@ -1922,112 +1903,6 @@
         },
         {
           "id": "f831efab-dde3-4a28-b970-9eb5001a8f49",
-          "name": "Client IP Address",
-          "protocol": "openid-connect",
-          "protocolMapper": "oidc-usersessionmodel-note-mapper",
-          "consentRequired": false,
-          "config": {
-            "user.session.note": "clientAddress",
-            "introspection.token.claim": "true",
-            "userinfo.token.claim": "true",
-            "id.token.claim": "true",
-            "access.token.claim": "true",
-            "claim.name": "clientAddress",
-            "jsonType.label": "String"
-          }
-        }
-      ],
-      "defaultClientScopes": [
-        "web-origins",
-        "acr",
-        "profile",
-        "roles",
-        "basic",
-        "email"
-      ],
-      "optionalClientScopes": [
-        "address",
-        "phone",
-        "offline_access",
-        "microprofile-jwt"
-      ]
-    },
-    {
-      "id": "663afc1b-b823-4e13-881a-136412fd87f5",
-      "clientId": "subscription@service.store-core.internal",
-      "name": "",
-      "description": "",
-      "rootUrl": "",
-      "adminUrl": "",
-      "baseUrl": "",
-      "surrogateAuthRequired": false,
-      "enabled": true,
-      "alwaysDisplayInConsole": false,
-      "clientAuthenticatorType": "client-secret",
-      "secret": "TxbDxIhATuz8hyhzz899G7QpfixjFjzW",
-      "redirectUris": [
-        "/*"
-      ],
-      "webOrigins": [
-        "/*"
-      ],
-      "notBefore": 0,
-      "bearerOnly": false,
-      "consentRequired": false,
-      "standardFlowEnabled": false,
-      "implicitFlowEnabled": false,
-      "directAccessGrantsEnabled": false,
-      "serviceAccountsEnabled": true,
-      "publicClient": false,
-      "frontchannelLogout": true,
-      "protocol": "openid-connect",
-      "attributes": {
-        "oidc.ciba.grant.enabled": "false",
-        "client.secret.creation.time": "1721493579",
-        "backchannel.logout.session.required": "true",
-        "post.logout.redirect.uris": "+",
-        "oauth2.device.authorization.grant.enabled": "false",
-        "display.on.consent.screen": "false",
-        "backchannel.logout.revoke.offline.tokens": "false"
-      },
-      "authenticationFlowBindingOverrides": {},
-      "fullScopeAllowed": true,
-      "nodeReRegistrationTimeout": -1,
-      "protocolMappers": [
-        {
-          "id": "d34338fe-8768-4a70-be14-5ef0be631030",
-          "name": "Client Host",
-          "protocol": "openid-connect",
-          "protocolMapper": "oidc-usersessionmodel-note-mapper",
-          "consentRequired": false,
-          "config": {
-            "user.session.note": "clientHost",
-            "introspection.token.claim": "true",
-            "userinfo.token.claim": "true",
-            "id.token.claim": "true",
-            "access.token.claim": "true",
-            "claim.name": "clientHost",
-            "jsonType.label": "String"
-          }
-        },
-        {
-          "id": "a3c82fdb-2af3-46fd-8ff9-02c98825706a",
-          "name": "Client ID",
-          "protocol": "openid-connect",
-          "protocolMapper": "oidc-usersessionmodel-note-mapper",
-          "consentRequired": false,
-          "config": {
-            "user.session.note": "client_id",
-            "introspection.token.claim": "true",
-            "userinfo.token.claim": "true",
-            "id.token.claim": "true",
-            "access.token.claim": "true",
-            "claim.name": "client_id",
-            "jsonType.label": "String"
-          }
-        },
-        {
-          "id": "f331efab-dde3-4a28-b970-9eb5001a8f49",
           "name": "Client IP Address",
           "protocol": "openid-connect",
           "protocolMapper": "oidc-usersessionmodel-note-mapper",

@@ -12,6 +12,6 @@ export class SignUpService {
   }
 
   signUp(signUpForm: SignUpForm): Observable<SignUpResponse> {
-    return this.httpClient.post<SignUpResponse>("/manager/api/v1/user-account/public/create", signUpForm);
+    return this.httpClient.post<SignUpResponse>("/control-plane/api/v1/user-account/public/create", signUpForm);
   }
 }

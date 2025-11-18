@@ -1,5 +1,0 @@
-spring:
-  config:
-    import:
-      - "classpath:lcl-config.yml"
-      - "classpath:store-core-lcl-config.yml"
