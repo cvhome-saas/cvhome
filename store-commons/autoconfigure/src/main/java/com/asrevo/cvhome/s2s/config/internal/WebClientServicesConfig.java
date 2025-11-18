@@ -42,7 +42,8 @@ public class WebClientServicesConfig {
 		}
 
 		@Bean("defaultBuilder")
-		public WebClient.Builder defaultBuilder(AuthorizedClientServiceReactiveOAuth2AuthorizedClientManager authorizedClientManager) {
+		public WebClient.Builder defaultBuilder(
+				AuthorizedClientServiceReactiveOAuth2AuthorizedClientManager authorizedClientManager) {
 			ServerOAuth2AuthorizedClientExchangeFilterFunction oauth2Filter = new ServerOAuth2AuthorizedClientExchangeFilterFunction(
 					authorizedClientManager);
 			oauth2Filter.setDefaultClientRegistrationId("s2s");
@@ -72,7 +73,8 @@ public class WebClientServicesConfig {
 
 		@Bean("microClientBuilder")
 		@LoadBalanced
-		public RestClient.Builder microClientBuilder(AuthorizedClientServiceOAuth2AuthorizedClientManager authorizedClientManager) {
+		public RestClient.Builder microClientBuilder(
+				AuthorizedClientServiceOAuth2AuthorizedClientManager authorizedClientManager) {
 
 			OAuth2ClientHttpRequestInterceptor requestInterceptor = new OAuth2ClientHttpRequestInterceptor(
 					authorizedClientManager);
