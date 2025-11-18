@@ -1,17 +1,17 @@
-# curl '{{STORE-UI_URL}}/api/v1/auth/me'
-GET {{STORE-UI_URL}}/api/v1/auth/me
+# curl '{{SELLER-UI_URL}}/api/v1/auth/me'
+GET {{SELLER-UI_URL}}/api/v1/auth/me
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
 
 ###
 
-# curl '{{STORE-UI_URL}}/api/v1/auth/me'
-GET {{STORE-UI_URL}}/api/v1/auth/me
+# curl '{{SELLER-UI_URL}}/api/v1/auth/me'
+GET {{SELLER-UI_URL}}/api/v1/auth/me
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
 
 ###
 
-# curl '{{STORE-UI_URL}}/manager/api/v1/store-manager/list'
-POST {{STORE-UI_URL}}/manager/api/v1/store-manager/list
+# curl '{{SELLER-UI_URL}}/manager/api/v1/store-manager/list'
+POST {{SELLER-UI_URL}}/manager/api/v1/store-manager/list
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
 Content-Type: application/json
 
@@ -19,9 +19,9 @@ Content-Type: application/json
 
 ###
 
-# curl '{{STORE-UI_URL}}/manager/api/v1/user-account/current' 
+# curl '{{SELLER-UI_URL}}/manager/api/v1/user-account/current' 
 #-H 'Cookie: STORE-CORE-GATEWAY-JSESSIONID=f7cdfa5c-7931-425a-be0d-0cc3ac0d09ad' \
-GET {{STORE-UI_URL}}/manager/api/v1/user-account/current
+GET {{SELLER-UI_URL}}/manager/api/v1/user-account/current
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
 
 ###
