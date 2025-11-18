@@ -3,4 +3,4 @@ ADD  /dist/seller-ui/ /usr/app
 WORKDIR /usr/app
 
 CMD node server/server.mjs
-EXPOSE 8011
+EXPOSE 8010

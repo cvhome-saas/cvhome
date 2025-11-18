@@ -1,4 +1,4 @@
-// /home/ashraf-revo/IdeaProjects/cvhome-saas/cvhome/store-core/store-ui/src/app/pages/store-management/services/dns-check.service.ts
+// /home/ashraf-revo/IdeaProjects/cvhome-saas/cvhome/store-core/seller-ui/src/app/pages/store-management/services/dns-check.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http'; // Removed HttpHeaders import
 import { Observable, of } from 'rxjs';

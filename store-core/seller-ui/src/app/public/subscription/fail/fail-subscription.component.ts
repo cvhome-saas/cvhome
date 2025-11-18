@@ -2,7 +2,7 @@ import {Component} from '@angular/core';
 import {Router} from "@angular/router";
 
 @Component({
-    selector: 'store-ui-fail-subscription',
+    selector: 'app-seller-ui-fail-subscription',
     standalone: false,
     styles: `
       .flex-centered {

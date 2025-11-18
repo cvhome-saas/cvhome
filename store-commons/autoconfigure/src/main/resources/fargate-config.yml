@@ -8,8 +8,7 @@ spring:
           - "store-core-gateway"
           - "core-auth"
           - "control-plane"
-          - "store-ui"
-          - "welcome-ui"
+          - "seller-ui"
           - "store-pod-gateway"
           - "pod-auth"
           - "merchant"
@@ -26,8 +25,7 @@ spring:
         service-ports:
           "core-auth": 8001
           "store-core-gateway": 8000
-          "store-ui": 8010
-          "welcome-ui": 8011
+          "seller-ui": 8010
           "control-plane": 8020
           "pod-auth": 8101
           "landing-ui": 8110

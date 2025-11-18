@@ -332,7 +332,7 @@ public class ContentApi {
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	@ConditionalOnApiStatus
-	// @TODO create another one for private so store-ui call it in private
+	// @TODO create another one for private so seller-ui call it in private
 	public ContentFolder images(@Parameter(hidden = true) StoreMerchantId merchantStore,
 			@Parameter(hidden = true) LanguageCode language,
 			@RequestParam(value = "path", required = false) String path) throws Exception {

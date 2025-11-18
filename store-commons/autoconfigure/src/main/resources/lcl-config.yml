@@ -20,12 +20,12 @@ spring:
                 metadata:
                   service-name: control-plane
                   instance: control-plane-1
-            welcome-ui:
-              - uri: "http://localhost:8011"
-                instance-id: welcome-ui-1
+            seller-ui:
+              - uri: "http://localhost:8010"
+                instance-id: seller-ui-1
                 metadata:
-                  service-name: welcome-ui
-                  instance: welcome-ui-1
+                  service-name: seller-ui
+                  instance: seller-ui-1
             store-core-gateway:
               - uri: "http://localhost:8000"
                 instance-id: store-core-gateway-1
@@ -38,12 +38,6 @@ spring:
                 metadata:
                   service-name: pod-auth
                   instance: pod-auth-1
-            store-ui:
-              - uri: "http://localhost:8010"
-                instance-id: store-ui-1
-                metadata:
-                  service-name: store-ui
-                  instance: store-ui-1
             merchant:
               - uri: "http://localhost:8120"
                 instance-id: merchant-1

@@ -1,7 +1,7 @@
 import {Component} from '@angular/core';
 
 @Component({
-    selector: 'store-ui-public',
+    selector: 'app-seller-ui-public',
     standalone: false,
     styleUrls: ['public.component.scss'],
     template: `

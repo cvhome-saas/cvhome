@@ -4,6 +4,7 @@ import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/
 import {ToastrService} from "ngx-toastr";
 import { isPlatformBrowser } from '@angular/common';
 import { Inject, PLATFORM_ID } from '@angular/core';
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-sign-up-form',
@@ -19,7 +20,7 @@ export class SignUpFormComponent {
   title: string = 'Sign Up';
   userForm: any;
 
-    constructor(@Inject(PLATFORM_ID) private platformId: Object,
+    constructor(@Inject(PLATFORM_ID) private platformId: Object,private router:Router,
     private signUpService: SignUpService, private formBuilder: FormBuilder, private toastr: ToastrService) {
     this.userForm = this.formBuilder.group({
       user: this.formBuilder.group({
@@ -58,7 +59,7 @@ export class SignUpFormComponent {
   doLazyRedirect() {
     setTimeout(() => {
       if (isPlatformBrowser(this.platformId)) {
-        window.location.href = window.location.origin + "/redirect/internal?serviceName=store-ui&path=/oauth2/authorization/keycloak";
+        this.router.navigate(["/pages"])
       }
     }, 2000);
   }

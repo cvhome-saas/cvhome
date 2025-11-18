@@ -38,7 +38,7 @@ public class SubscriptionController {
 	public ResponseEntity<Void> subscribe(ServerWebExchange exchange,
 			@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam PriceId priceId) {
 		ServerHttpRequest request = exchange.getRequest();
-		ServiceDomain serviceDomain = serviceDomainProperties.getService("store-ui");
+		ServiceDomain serviceDomain = serviceDomainProperties.getService("seller-ui");
 		RedirectionUrlBuilder urlBuilder = new RedirectionUrlBuilder(getScheme(request), getPort(request),
 				serviceDomain);
 		String sessionUrl = stripeSubscriptionService.createSubscriptionSession(identity.org(), priceId, urlBuilder);
