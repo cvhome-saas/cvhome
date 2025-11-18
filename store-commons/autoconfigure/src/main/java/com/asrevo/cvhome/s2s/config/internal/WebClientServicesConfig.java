@@ -10,8 +10,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.env.Environment;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
-import org.springframework.security.oauth2.client.ReactiveOAuth2AuthorizedClientManager;
+import org.springframework.security.oauth2.client.AuthorizedClientServiceOAuth2AuthorizedClientManager;
+import org.springframework.security.oauth2.client.AuthorizedClientServiceReactiveOAuth2AuthorizedClientManager;
 import org.springframework.security.oauth2.client.web.client.OAuth2ClientHttpRequestInterceptor;
 import org.springframework.security.oauth2.client.web.reactive.function.client.ServerOAuth2AuthorizedClientExchangeFilterFunction;
 import org.springframework.web.client.RestClient;
@@ -33,7 +33,7 @@ public class WebClientServicesConfig {
 		@Bean("defaultMicroServiceBuilder")
 		@LoadBalanced
 		public WebClient.Builder defaultMicroServiceBuilder(
-				ReactiveOAuth2AuthorizedClientManager authorizedClientManager) {
+				AuthorizedClientServiceReactiveOAuth2AuthorizedClientManager authorizedClientManager) {
 			ServerOAuth2AuthorizedClientExchangeFilterFunction oauth2Filter = new ServerOAuth2AuthorizedClientExchangeFilterFunction(
 					authorizedClientManager);
 			oauth2Filter.setDefaultClientRegistrationId("s2s");
@@ -42,7 +42,7 @@ public class WebClientServicesConfig {
 		}
 
 		@Bean("defaultBuilder")
-		public WebClient.Builder defaultBuilder(ReactiveOAuth2AuthorizedClientManager authorizedClientManager) {
+		public WebClient.Builder defaultBuilder(AuthorizedClientServiceReactiveOAuth2AuthorizedClientManager authorizedClientManager) {
 			ServerOAuth2AuthorizedClientExchangeFilterFunction oauth2Filter = new ServerOAuth2AuthorizedClientExchangeFilterFunction(
 					authorizedClientManager);
 			oauth2Filter.setDefaultClientRegistrationId("s2s");
@@ -72,7 +72,7 @@ public class WebClientServicesConfig {
 
 		@Bean("microClientBuilder")
 		@LoadBalanced
-		public RestClient.Builder microClientBuilder(OAuth2AuthorizedClientManager authorizedClientManager) {
+		public RestClient.Builder microClientBuilder(AuthorizedClientServiceOAuth2AuthorizedClientManager authorizedClientManager) {
 
 			OAuth2ClientHttpRequestInterceptor requestInterceptor = new OAuth2ClientHttpRequestInterceptor(
 					authorizedClientManager);
