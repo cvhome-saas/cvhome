@@ -10,8 +10,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.env.Environment;
-import org.springframework.security.oauth2.client.AuthorizedClientServiceOAuth2AuthorizedClientManager;
-import org.springframework.security.oauth2.client.AuthorizedClientServiceReactiveOAuth2AuthorizedClientManager;
+import org.springframework.security.oauth2.client.*;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
 import org.springframework.security.oauth2.client.web.client.OAuth2ClientHttpRequestInterceptor;
 import org.springframework.security.oauth2.client.web.reactive.function.client.ServerOAuth2AuthorizedClientExchangeFilterFunction;
 import org.springframework.web.client.RestClient;
@@ -29,6 +30,19 @@ public class WebClientServicesConfig {
 	@Configuration
 	@ConditionalOnWebApplication(type = REACTIVE)
 	static class ReactiveWebClientServicesConfig {
+
+		@Bean
+		public AuthorizedClientServiceReactiveOAuth2AuthorizedClientManager authorizedClientServiceReactiveOAuth2AuthorizedClientManager(
+				ReactiveClientRegistrationRepository clientRegistrationRepository,
+				ReactiveOAuth2AuthorizedClientService authorizedClientService) {
+
+			AuthorizedClientServiceReactiveOAuth2AuthorizedClientManager manager = new AuthorizedClientServiceReactiveOAuth2AuthorizedClientManager(
+					clientRegistrationRepository, authorizedClientService);
+			manager.setAuthorizedClientProvider(
+					ReactiveOAuth2AuthorizedClientProviderBuilder.builder().clientCredentials().refreshToken().build());
+
+			return manager;
+		}
 
 		@Bean("defaultMicroServiceBuilder")
 		@LoadBalanced
@@ -63,6 +77,19 @@ public class WebClientServicesConfig {
 	@Configuration
 	@ConditionalOnWebApplication(type = SERVLET)
 	static class ServletWebClientServicesConfig {
+
+		@Bean
+		public AuthorizedClientServiceOAuth2AuthorizedClientManager authorizedClientServiceOAuth2AuthorizedClientManager(
+				ClientRegistrationRepository clientRegistrationRepository,
+				OAuth2AuthorizedClientService authorizedClientService) {
+
+			AuthorizedClientServiceOAuth2AuthorizedClientManager manager = new AuthorizedClientServiceOAuth2AuthorizedClientManager(
+					clientRegistrationRepository, authorizedClientService);
+			manager.setAuthorizedClientProvider(
+					OAuth2AuthorizedClientProviderBuilder.builder().clientCredentials().refreshToken().build());
+
+			return manager;
+		}
 
 		@Bean
 		public RestClientBuilder restClientBuilder(Environment environment,
