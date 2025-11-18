@@ -1,0 +1,69 @@
+<nb-card status="basic" accent="info">
+  <nb-card-header>
+    <div class="row">
+      <h1 class="page_title">{{ 'COMPONENTS.PRODUCTS_GROUPS_LIST' | translate }}</h1>
+    </div>
+
+    <div class="row">
+      <div class="col">
+      </div>
+      <div class="col col-lg-2">
+        <button nbButton status="success" [routerLink]="['/pages/catalogue/products-groups/create-products-group']"
+                [disabled]="params.store==undefined||params.store==''">
+          <label>{{ 'COMPONENTS.CREATE_PRODUCTS_GROUPS' | translate }}</label>
+        </button>
+
+      </div>
+    </div>
+  </nb-card-header>
+
+  <nb-card-body [nbSpinner]="isLoading" nbSpinnerSize="large" nbSpinnerStatus="primary">
+    <ngx-datatable
+      (page)="onPageEvent($event)"
+      [columnMode]="ColumnMode.force"
+      [count]="page.totalElements"
+      [externalPaging]="true"
+      [footerHeight]="50"
+      [headerHeight]="50"
+      [limit]="page.size"
+      [offset]="page.pageNumber"
+      [rows]="page.content"
+      class="material"
+      rowHeight="auto">
+
+      <ngx-datatable-column name="code">
+        <ng-template let-column="column" ngx-datatable-header-template> {{ 'CONTENT.CODE' |translate }}</ng-template>
+        <ng-template let-value="value" ngx-datatable-cell-template>
+          <strong>{{ value }}</strong>
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column name="active">
+        <ng-template let-column="column" ngx-datatable-header-template> {{ 'COMMON.ACTIVE' |translate }}
+        </ng-template>
+        <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+          <ngx-product-groups-active *ngIf="row.id" [rowData]="row" [store]="params.store"
+                                     [value]="row.active"></ngx-product-groups-active>
+        </ng-template>
+      </ngx-datatable-column>
+
+
+      <ngx-datatable-column name="actions">
+        <ng-template let-column="column" ngx-datatable-header-template>
+          {{ 'COMMON.ACTIONS' |translate }}
+        </ng-template>
+        <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+          <button (click)="onCreate(row)" nbButton shape="round" size="small" status="success" *ngIf="!row.id">
+            <nb-icon icon="external-link"></nb-icon>
+          </button>
+          <button (click)="onEdit(row)" nbButton shape="round" size="small" status="primary" *ngIf="row.id">
+            <nb-icon icon="edit"></nb-icon>
+          </button>
+          <button (click)="onDelete(row)" nbButton shape="round" size="small" status="danger" *ngIf="row.id">
+            <nb-icon icon="trash"></nb-icon>
+          </button>
+        </ng-template>
+      </ngx-datatable-column>
+    </ngx-datatable>
+  </nb-card-body>
+</nb-card>

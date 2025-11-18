@@ -1,0 +1,111 @@
+<nb-card status="basic" accent="info">
+  <nb-card-header>
+    <div class="row">
+      <h1 class="page_title">{{ 'STORE.STORE_DOMAIN' | translate }}</h1>
+    </div>
+    <div class="row">
+      <div class="col">
+      </div>
+      <div class="col col-lg-2">
+        <nb-select fullWidth [(selected)]="selectedItem" outline shape="rectangle">
+          <nb-option (click)="route(item.link)" *ngFor="let item of sidemenuLinks" [value]="item.id">{{ item.title }}
+          </nb-option>
+        </nb-select>
+
+      </div>
+      <div class="col col-lg-2">
+      </div>
+    </div>
+  </nb-card-header>
+  <nb-card-body>
+
+    <form [formGroup]='form' (ngSubmit)="save()" class="mx-auto" style="max-width: 600px;">
+      <div class="card border-0 shadow-sm rounded-3 p-4">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="form-group">
+              <label for="domain" class="label required">{{ 'STORE.DOMAIN' | translate }}</label>
+              <input type="text" nbInput fullWidth id="domain" formControlName="domain"
+                     [placeholder]="'STORE.DOMAIN_PLACEHOLDER' | translate">
+              <ng-container *ngIf="(domain.dirty || domain.touched || isSubmited) && domain.invalid">
+                <p class="caption status-danger" *ngIf="domain.errors?.required">
+                  {{ 'STORE.DOMAIN_REQUIRED' | translate }}
+                </p>
+                <p class="caption status-danger" *ngIf="domain.errors?.pattern">
+                  {{ 'STORE.DOMAIN_INVALID_PATTERN' | translate }}
+                </p>
+                <p class="caption status-danger" *ngIf="domain.errors?.dnsNotPointingToCname">
+                  {{
+                    'STORE.DOMAIN_DNS_CNAME_HINT' | translate: {
+                      domain: domain.errors.dnsNotPointingToCname.domainChecked,
+                      target: domain.errors.dnsNotPointingToCname.requiredTarget
+                    }
+                  }}
+                </p>
+                <p class="caption status-warning" *ngIf="domain.errors?.dnsCheckServiceError">
+                  {{ 'STORE.DOMAIN_DNS_CHECK_ERROR' | translate }}
+                </p>
+                <p class="caption text-hint" *ngIf="domain.errors?.waitingForInfraInfo">
+                  {{ 'STORE.DOMAIN_DNS_WAITING_INFO' | translate }}
+                </p>
+              </ng-container>
+              <p class="caption text-hint" *ngIf="domain.pending">
+                {{ 'STORE.DOMAIN_DNS_CHECKING' | translate }}
+              </p>
+              <p class="caption">
+                {{ 'STORE.DOMAIN_HELP_TEXT' | translate: {podDomain: podServerDomain()} }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-center">
+          <button nbButton
+                  status="primary"
+                  class="text-uppercase fw-bold">
+            {{ 'STORE.SAVE' | translate }}
+          </button>
+        </div>
+      </div>
+    </form>
+    <hr class="my-4">
+    <ngx-datatable
+      (page)="setPage($event)"
+      [columnMode]="ColumnMode.force"
+      [count]="page.totalElements"
+      [externalPaging]="true"
+      [footerHeight]="50"
+      [headerHeight]="50"
+      [limit]="page.size"
+      [offset]="page.pageNumber"
+      [rows]="rows"
+      class="material"
+      rowHeight="auto">
+
+
+      <ngx-datatable-column name="domain">
+        <ng-template let-column="column" ngx-datatable-header-template> {{ 'STORE.STORE_DOMAIN' |translate }}
+        </ng-template>
+        <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+          {{ generateDomain(row) }}
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column name="actions">
+        <ng-template let-column="column" ngx-datatable-header-template>
+          {{ 'ORDER.ACTIONS' |translate }}
+        </ng-template>
+        <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+          <button (click)="onAccess(row)" nbButton shape="round" size="small" status="success">
+            <nb-icon icon="external-link"></nb-icon>
+          </button>
+          <button (click)="onDelete(row.domain)" nbButton shape="round" size="small" status="danger" *ngIf="row.domainType!='SUB_DOMAIN'">
+            <nb-icon icon="trash"></nb-icon>
+          </button>
+        </ng-template>
+      </ngx-datatable-column>
+    </ngx-datatable>
+
+  </nb-card-body>
+</nb-card>
+

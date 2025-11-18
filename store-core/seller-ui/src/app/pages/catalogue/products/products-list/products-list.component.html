@@ -1,0 +1,111 @@
+<nb-card status="basic" accent="info">
+  <nb-card-header>
+    <div class="row">
+      <h1 class="page_title">{{ 'COMPONENTS.PRODUCTS' | translate }}</h1>
+    </div>
+
+    <div class="row">
+      <div class="col">
+      </div>
+      <div class="col col-lg-2">
+        <button nbButton status="success" [routerLink]="['/pages/catalogue/products/create-product']"
+                [disabled]="params.store==undefined||params.store==''">
+          <label>{{ 'COMPONENTS.CREATE_PRODUCT' | translate }}</label>
+        </button>
+
+      </div>
+    </div>
+  </nb-card-header>
+
+  <nb-card-body [nbSpinner]="isLoading" nbSpinnerSize="large" nbSpinnerStatus="primary">
+    <ngx-datatable
+      (page)="onPageEvent($event)"
+      [columnMode]="ColumnMode.force"
+      [count]="page.totalElements"
+      [externalPaging]="true"
+      [footerHeight]="50"
+      [headerHeight]="50"
+      [limit]="page.size"
+      [offset]="page.pageNumber"
+      [rows]="page.content"
+      class="material"
+      rowHeight="auto">
+
+      <ngx-datatable-column name="Id">
+        <ng-template let-column="column" ngx-datatable-header-template> {{ 'COMMON.ID' |translate }}</ng-template>
+        <ng-template let-value="value" ngx-datatable-cell-template>
+          <strong>{{ value }}</strong>
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column name="sku">
+        <ng-template let-column="column" ngx-datatable-header-template> {{ 'PRODUCT.SKU' |translate }}</ng-template>
+        <ng-template let-value="value" ngx-datatable-cell-template>
+          <strong>{{ value }}</strong>
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column name="quantity">
+        <ng-template let-column="column" ngx-datatable-header-template> {{ 'PRODUCT.QTY' |translate }}</ng-template>
+        <ng-template let-row="row" let-rowIndex="rowIndex" let-value="value" ngx-datatable-cell-template>
+            <span
+              (dblclick)="editing[rowIndex + '-quantity'] = true"
+              *ngIf="!editing[rowIndex + '-quantity']"
+              title="Double click to edit"
+            >
+              {{ value }}
+            </span>
+          <input (blur)="updateValue($event, 'quantity', rowIndex)" *ngIf="editing[rowIndex + '-quantity']"
+                 [value]="value" autofocus
+                 fieldSize="tiny" max="1000000" min="0" nbInput type="number"/>
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column name="available">
+        <ng-template let-column="column" ngx-datatable-header-template> {{ 'COMMON.AVAILABLE' |translate }}
+        </ng-template>
+        <ng-template let-rowIndex="rowIndex" let-value="value" ngx-datatable-cell-template>
+          <input (click)="updateValue($event,'available',rowIndex)" [checked]="value" [value]="value"
+                 type="checkbox"/>
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column name="price">
+        <ng-template let-column="column" ngx-datatable-header-template> {{ 'PRODUCT.PRICE' |translate }}</ng-template>
+        <ng-template let-row="row" let-rowIndex="rowIndex" let-value="value" ngx-datatable-cell-template>
+            <span
+              (dblclick)="editing[rowIndex + '-price'] = true"
+              *ngIf="!editing[rowIndex + '-price']"
+              title="Double click to edit"
+            >
+              {{ value }}
+            </span>
+          <input (blur)="updateValue($event, 'price', rowIndex)" *ngIf="editing[rowIndex + '-price']" [value]="value"
+                 autofocus
+                 fieldSize="tiny" max="1000000" min="0" nbInput type="number"/>
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column name="creationDate">
+        <ng-template let-column="column" ngx-datatable-header-template> {{ 'PRODUCT.CREATION_DATE' |translate }}
+        </ng-template>
+        <ng-template let-value="value" ngx-datatable-cell-template>
+          <strong>{{ value }}</strong>
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column name="actions">
+        <ng-template let-column="column" ngx-datatable-header-template>
+          {{ 'ORDER.ACTIONS' |translate }}
+        </ng-template>
+        <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+          <button (click)="onEdit(row)" nbButton shape="round" size="small" status="primary"><nb-icon icon="edit"></nb-icon>
+          </button>
+          <button (click)="onDelete(row)" nbButton shape="round" size="small" status="danger"><nb-icon icon="trash"></nb-icon>
+          </button>
+        </ng-template>
+      </ngx-datatable-column>
+    </ngx-datatable>
+  </nb-card-body>
+</nb-card>
+

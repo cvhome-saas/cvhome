@@ -1,0 +1,41 @@
+import {Injectable} from '@angular/core';
+
+import {CrudService} from '../../../../shared/services/crud.service';
+import {Observable} from 'rxjs';
+import {map} from "rxjs/operators";
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ProductImageService {
+
+  constructor(
+    private crudService: CrudService
+  ) {
+  }
+
+  addImageUrl(store, id) {//post
+    return this.crudService.getBaseUrl() + `/store-pod-gateway/catalog/api/v1/private/product/${id}/image?store=${store}`;
+  }
+
+  removeImageUrl(store, id) {//delete
+    return this.crudService.getBaseUrl() + `/store-pod-gateway/catalog/api/v1/private/product/${id}/image?store=${store}`;
+  }
+
+  getImages(store, productId): Observable<any> {
+    return this.crudService.get(`/store-pod-gateway/catalog/api/v1/product/${productId}/images?store=${store}`);
+  }
+
+  removeImage(productId, imageId): Observable<any> {
+    return this.crudService.delete(`/v1/private/product/${productId}/image/${imageId}`);
+  }
+
+  createImage(id, uploadData): Observable<any> {
+    return this.crudService.post(`/v1/private/product/${id}/images`, uploadData);
+  }
+
+  updateImage(productId, event): Observable<any> {
+    return this.crudService.patch(`/v1/private/product/${productId}/image/${event.id}?order=${event.position}`, []);
+  }
+
+}

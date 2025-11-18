@@ -61,4 +61,5 @@ include(
         'store-core:control-plane:subscription-external-api',
         'store-core:store-ui',
         'store-core:welcome-ui',
+        'store-core:seller-ui',
 )

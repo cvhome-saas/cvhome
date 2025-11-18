@@ -1,0 +1,52 @@
+<div class="row">
+  <div class="col-md-6">
+    <div>
+
+      <ngx-awesome-uploader (fileAdded)="onFileAdded($event)" (removeSuccess)="onRemoveSuccess($event)"
+                            (uploadFail)="onUploadError($event)"
+                            (uploadSuccess)="onUploadSuccess($event)" (validationError)="onValidationError($event)"
+                            [accept]="'.jpg, .png, .gif, .webp, .jpeg'"
+                            [adapter]="adapter"
+                            [enableCropper]="false"
+                            [fileExtensions]="['jpg', 'jpeg', 'png', 'gif', 'webp']" [fileMaxCount]="10"
+                            [fileMaxSize]="4" [itemTemplate]="uploadItemTemplate"
+                            [showPreviewContainer]="false"
+                            [uploadType]="'multi'">
+        <div class="dropzoneTemplate">
+          <div class="content">
+            <img src="../../../../../assets/img/cloud-computing.png" width="80">
+            <div class="content-top-text"> {{ 'COMMON.DRAG_DROP' | translate }}</div>
+            <div class="content-center-text"> {{ 'COMMON.OR' | translate }}</div>
+            <button class="file-browse-button" type="button"> {{ 'COMMON.BROWSE_FILES' | translate }}</button>
+          </div>
+        </div>
+
+      </ngx-awesome-uploader>
+
+    </div>
+
+    <ng-template #uploadItemTemplate *ngIf="details == true" let-fileItem="fileItem"
+                 let-uploadProgress="uploadProgress">
+      <p>File Size: {{ fileItem.file.size }}</p>
+      <p>File Name: {{ fileItem.fileName }}</p>
+      <p>Upload Progress: {{ uploadProgress }} % </p>
+    </ng-template>
+  </div>
+
+
+  <div class="col-md-6">
+    <div *ngIf="images.length">
+      <div class="item-container">
+        <div *ngFor="let image of images; trackBy: itemTrackBy">
+          <div class="example-box">
+            <img [alt]="image?.path" [src]="image?.imageUrl" width="250">
+            <span id="clickableDeleteIcon">
+              <span><i (click)="removeImage(image)" class="fas fa-times"></i></span>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
