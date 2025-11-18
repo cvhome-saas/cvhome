@@ -40,10 +40,6 @@ export class OrdersService {
     return this.crudService.patch(`/store-pod-gateway/order/api/v1/private/orders/${orderID}/customer?store=${store}`, param);
   }
 
-  getNextTransaction(store, orderID): Observable<any> {
-    return this.crudService.get(`/store-pod-gateway/order/api/v1/private/orders/${orderID}/payment/nextTransaction?store=${store}`);
-  }
-
   refundOrder(store, orderID): Observable<any> {
     return this.crudService.post(`/store-pod-gateway/order/api/v1/private/orders/${orderID}/refund?store=${store}`, {});
   }
@@ -52,7 +48,4 @@ export class OrdersService {
     return this.crudService.post(`/store-pod-gateway/order/api/v1/private/orders/${orderID}/capture?store=${store}`, {});
   }
 
-  getTransactions(store, orderID): Observable<any> {
-    return this.crudService.get(`/store-pod-gateway/order/api/v1/private/orders/${orderID}/payment/transactions?store=${store}`);
-  }
 }

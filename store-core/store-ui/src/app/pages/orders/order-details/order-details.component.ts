@@ -127,7 +127,6 @@ export class OrderDetailsComponent implements OnInit {
           this.getCountry();
           this.getOrderDetails();
           this.getHistory();
-          this.getNextTransaction();
         },
         error: (err) => {
           this.loader = false;
@@ -138,15 +137,6 @@ export class OrderDetailsComponent implements OnInit {
       });
   }
 
-  getNextTransaction() {
-    this.ordersService.getNextTransaction(this.storeID, this.orderID)
-      .subscribe(data => {
-        this.transactionType = data.transactionType;
-      }, err => {
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
-      });
-  }
-
   getHistory() {
     this.ordersService.getHistory(this.storeID, this.orderID)
       .subscribe(data => {
@@ -154,21 +144,8 @@ export class OrderDetailsComponent implements OnInit {
       }, err => {
         this.errorService.error('ERROR.SYSTEM_ERROR', err);
       });
-    this.geTransactions()
   }
 
-  geTransactions() {
-    this.ordersService.getTransactions(this.storeID, this.orderID)
-      .subscribe({
-        next: (data) => {
-          this.transactionListData = data;
-        },
-        error: (err) => {
-          this.errorService.error('ERROR.SYSTEM_ERROR', err);
-        }
-      });
-
-  }
 
   getStore() {
     this.storeService.getStore(this.storeID)
