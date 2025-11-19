@@ -44,8 +44,9 @@ public class GatewayRouteLocatorImpl implements RouteLocator {
 		Set<String> backendServices = Set.of("control-plane", "core-auth", "store-pod-gateway", "store-pod-gateway-v2");
 		Predicate<ServerWebExchange> notBackendService = notServicePredicate
 			.apply(new FNotServiceRoutePredicateFactory.Config(backendServices));
-		Predicate<ServerWebExchange> wwwHostPredicate = hostRoutePredicate.apply(
-				new FHostRoutePredicateFactory.Config(Set.of(storeCoreGatewayDomain, "www." + storeCoreGatewayDomain, "seller-ui." + storeCoreGatewayDomain)));
+		Predicate<ServerWebExchange> wwwHostPredicate = hostRoutePredicate
+			.apply(new FHostRoutePredicateFactory.Config(Set.of(storeCoreGatewayDomain, "www." + storeCoreGatewayDomain,
+					"seller-ui." + storeCoreGatewayDomain)));
 
 		RouteLocatorBuilder.Builder route = routeLocatorBuilder.routes()
 			.route(r -> r.path("/control-plane/**")
