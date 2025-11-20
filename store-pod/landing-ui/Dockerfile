@@ -1,24 +1,35 @@
 ###############################################
 # Stage 1 — Build dependencies
 ###############################################
-FROM node:20-alpine AS builder
+FROM node:20-slim AS builder
 WORKDIR /build
-COPY node_modules ./node_modules
-RUN apk add --no-cache findutils && \
-    find node_modules -type d -name "test" -prune -exec rm -rf '{}' + && \
-    find node_modules -type d -name "tests" -prune -exec rm -rf '{}' + && \
-    find node_modules -type d -name "__tests__" -prune -exec rm -rf '{}' + && \
-    find node_modules -type d -name "example" -prune -exec rm -rf '{}' + && \
-    find node_modules -type d -name "examples" -prune -exec rm -rf '{}' + && \
-    find node_modules -type d -name "docs" -prune -exec rm -rf '{}' + && \
-    find node_modules -type d -name "doc" -prune -exec rm -rf '{}' + && \
-    find node_modules -type f -name "*.md" -delete && \
-    find node_modules -type f -name "*.map" -delete && \
-    find node_modules -type f -name "*.ts" -delete && \
-    find node_modules -type f -name "*.tsx" -delete && \
-    rm -rf node_modules/.bin && \
-    find node_modules -type f -name "*.coffee" -delete && \
-    find node_modules -type f -name "*.markdown" -delete
+
+RUN npm init -y
+
+RUN npm i --omit=dev \
+  express@5.1.0 \
+  next@16.0.0 \
+  react@19.2.0 \
+  react-dom@19.2.0 \
+  next-intl@4.4.0 \
+  typescript@5.9.3
+
+
+RUN apt-get update && apt-get install -y findutils && \
+    find node_modules -type d \( \
+        -name "test" -o \
+        -name "tests" -o \
+        -name "__tests__" -o \
+        -name "bench" -o \
+        -name "benchmark" -o \
+        -name "coverage" \
+    \) -prune -exec rm -rf '{}' + && \
+    find node_modules -type f \( \
+        -name "*.coffee" -o \
+        -name "*.markdown" -o \
+        -name "*.log" -o \
+        -name "*.orig" \
+    \) -delete
 
 
 ###############################################
@@ -29,14 +40,12 @@ FROM gcr.io/distroless/nodejs20
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# Copy the node_modules and package structure from builder
-COPY --from=builder /build/node_modules ./node_modules/
 
-# Copy local application directories
-COPY app /deployment/app
-COPY libs /deployment/libs
-COPY templates /deployment/templates
+COPY --from=builder /build/node_modules ./node_modules
+COPY app ./app
+COPY libs ./libs
+COPY templates ./templates
 
 EXPOSE 8110
 
-CMD ["app/dist/server.js"]
+CMD ["./app/dist/server.js"]
