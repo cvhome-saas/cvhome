@@ -1,31 +1,31 @@
 ###
 
-# curl 'GET {{STORE-UI_URL}}/store-pod-gateway/order/api/v1/private/orders?store=65f023632bc46470c104b76f&store=65f023632bc46470c104b76f&lang=en&count=20&page=0'
-GET {{STORE-UI_URL}}/store-pod-gateway/order/api/v1/private/orders?store=65f023632bc46470c104b76f&store=65f023632bc46470c104b76f&lang=en&count=20&page=0
+# curl 'GET {{SELLER-UI_URL}}/store-pod-gateway/order/api/v1/private/orders?store=65f023632bc46470c104b76f&store=65f023632bc46470c104b76f&lang=en&count=20&page=0'
+GET {{SELLER-UI_URL}}/store-pod-gateway/order/api/v1/private/orders?store=65f023632bc46470c104b76f&store=65f023632bc46470c104b76f&lang=en&count=20&page=0
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
 
 ###
 
-# curl 'GET {{STORE-UI_URL}}/store-pod-gateway/order/api/v1/private/orders/2?store=65f023632bc46470c104b76f'
-GET {{STORE-UI_URL}}/store-pod-gateway/order/api/v1/private/orders/2?store=65f023632bc46470c104b76f
+# curl 'GET {{SELLER-UI_URL}}/store-pod-gateway/order/api/v1/private/orders/2?store=65f023632bc46470c104b76f'
+GET {{SELLER-UI_URL}}/store-pod-gateway/order/api/v1/private/orders/2?store=65f023632bc46470c104b76f
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
 
 ###
 
-# curl 'GET {{STORE-UI_URL}}/store-pod-gateway/order/api/v1/private/orders/2/history?store=65f023632bc46470c104b76f'
-GET {{STORE-UI_URL}}/store-pod-gateway/order/api/v1/private/orders/2/history?store=65f023632bc46470c104b76f
+# curl 'GET {{SELLER-UI_URL}}/store-pod-gateway/order/api/v1/private/orders/2/history?store=65f023632bc46470c104b76f'
+GET {{SELLER-UI_URL}}/store-pod-gateway/order/api/v1/private/orders/2/history?store=65f023632bc46470c104b76f
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
 
 ###
 
-# curl 'GET {{STORE-UI_URL}}/store-pod-gateway/order/api/v1/zones?code=CA&store=65f023632bc46470c104b76f'
-GET {{STORE-UI_URL}}/store-pod-gateway/order/api/v1/zones?code=CA&store=65f023632bc46470c104b76f
+# curl 'GET {{SELLER-UI_URL}}/store-pod-gateway/order/api/v1/zones?code=CA&store=65f023632bc46470c104b76f'
+GET {{SELLER-UI_URL}}/store-pod-gateway/order/api/v1/zones?code=CA&store=65f023632bc46470c104b76f
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
 
 ###
 
-# curl 'GET {{STORE-UI_URL}}/store-pod-gateway/order/api/v1/private/orders/2/history?store=65f023632bc46470c104b76f' 
-POST {{STORE-UI_URL}}/store-pod-gateway/order/api/v1/private/orders/2/history?store=65f023632bc46470c104b76f
+# curl 'GET {{SELLER-UI_URL}}/store-pod-gateway/order/api/v1/private/orders/2/history?store=65f023632bc46470c104b76f' 
+POST {{SELLER-UI_URL}}/store-pod-gateway/order/api/v1/private/orders/2/history?store=65f023632bc46470c104b76f
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
 Content-Type: application/json
 

@@ -1,19 +1,19 @@
 ###
 
-# curl 'GET {{STORE-UI_URL}}/store-pod-gateway/catalog/api/v1/private/product/types?store=65f023632bc46470c104b76f&lang=en&count=15&page=0'
-GET {{STORE-UI_URL}}/store-pod-gateway/catalog/api/v1/private/product/types?store=65f023632bc46470c104b76f&lang=en&count=15&page=0
+# curl 'GET {{SELLER-UI_URL}}/store-pod-gateway/catalog/api/v1/private/product/types?store=65f023632bc46470c104b76f&lang=en&count=15&page=0'
+GET {{SELLER-UI_URL}}/store-pod-gateway/catalog/api/v1/private/product/types?store=65f023632bc46470c104b76f&lang=en&count=15&page=0
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
 
 ###
 
-# curl 'GET {{STORE-UI_URL}}/store-pod-gateway/catalog/api/v1/private/product/type/1?store=65f023632bc46470c104b76f&lang=_all'
-GET {{STORE-UI_URL}}/store-pod-gateway/catalog/api/v1/private/product/type/1?store=65f023632bc46470c104b76f&lang=_all
+# curl 'GET {{SELLER-UI_URL}}/store-pod-gateway/catalog/api/v1/private/product/type/1?store=65f023632bc46470c104b76f&lang=_all'
+GET {{SELLER-UI_URL}}/store-pod-gateway/catalog/api/v1/private/product/type/1?store=65f023632bc46470c104b76f&lang=_all
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
 
 ###
 
-# curl 'GET {{STORE-UI_URL}}/store-pod-gateway/catalog/api/v1/store/languages?store=65f023632bc46470c104b76f'
-GET {{STORE-UI_URL}}/store-pod-gateway/merchant/api/v1/store/languages?store=65f023632bc46470c104b76f
+# curl 'GET {{SELLER-UI_URL}}/store-pod-gateway/catalog/api/v1/store/languages?store=65f023632bc46470c104b76f'
+GET {{SELLER-UI_URL}}/store-pod-gateway/merchant/api/v1/store/languages?store=65f023632bc46470c104b76f
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
 
 ###

@@ -44,20 +44,16 @@ public class GatewayRouteLocatorImpl implements RouteLocator {
 		Set<String> backendServices = Set.of("control-plane", "core-auth", "store-pod-gateway", "store-pod-gateway-v2");
 		Predicate<ServerWebExchange> notBackendService = notServicePredicate
 			.apply(new FNotServiceRoutePredicateFactory.Config(backendServices));
-		Predicate<ServerWebExchange> storeUiHostPredicate = hostRoutePredicate
-			.apply(new FHostRoutePredicateFactory.Config(Set.of("store-ui." + storeCoreGatewayDomain)));
-		Predicate<ServerWebExchange> wwwHostPredicate = hostRoutePredicate.apply(
-				new FHostRoutePredicateFactory.Config(Set.of(storeCoreGatewayDomain, "www." + storeCoreGatewayDomain)));
+		Predicate<ServerWebExchange> wwwHostPredicate = hostRoutePredicate
+			.apply(new FHostRoutePredicateFactory.Config(Set.of(storeCoreGatewayDomain, "www." + storeCoreGatewayDomain,
+					"seller-ui." + storeCoreGatewayDomain)));
 
 		RouteLocatorBuilder.Builder route = routeLocatorBuilder.routes()
 			.route(r -> r.path("/control-plane/**")
 				.filters(f -> f.stripPrefix(1).tokenRelay().preserveHostHeader())
 				.uri("lb://control-plane"))
 			.route(r -> {
-				return r.predicate(notBackendService).and().predicate(storeUiHostPredicate).uri("lb://store-ui");
-			})
-			.route(r -> {
-				return r.predicate(notBackendService).and().predicate(wwwHostPredicate).uri("lb://welcome-ui");
+				return r.predicate(notBackendService).and().predicate(wwwHostPredicate).uri("lb://seller-ui");
 			});
 
 		List<Pod> allPods = Optional.ofNullable(serviceDomainProperties.pods()).orElse(List.of());
