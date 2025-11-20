@@ -21,7 +21,7 @@ function getTheme(req: Request) {
     return themeName.toLowerCase();
 }
 
-app.get("*", async (req: Request, res: Response, next: NextFunction) => {
+app.get(/(.*)/, async (req: Request, res: Response, next: NextFunction) => {
     try {
 
         const theme = getTheme(req);
