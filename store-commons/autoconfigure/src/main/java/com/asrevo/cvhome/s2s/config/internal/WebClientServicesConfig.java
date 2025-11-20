@@ -44,9 +44,9 @@ public class WebClientServicesConfig {
 			return manager;
 		}
 
-		@Bean("defaultMicroServiceBuilder")
+		@Bean("microServiceWebClientBuilder")
 		@LoadBalanced
-		public WebClient.Builder defaultMicroServiceBuilder(
+		public WebClient.Builder microServiceWebClientBuilder(
 				AuthorizedClientServiceReactiveOAuth2AuthorizedClientManager authorizedClientManager) {
 			ServerOAuth2AuthorizedClientExchangeFilterFunction oauth2Filter = new ServerOAuth2AuthorizedClientExchangeFilterFunction(
 					authorizedClientManager);
@@ -55,21 +55,34 @@ public class WebClientServicesConfig {
 			return WebClient.builder().filter(oauth2Filter);
 		}
 
-		@Bean("defaultBuilder")
-		public WebClient.Builder defaultBuilder(
+		@Bean("microServiceWebClient")
+		public WebClient microServiceWebClient(
+				@Qualifier("microServiceWebClientBuilder") WebClient.Builder microServiceWebClientBuilder) {
+			return microServiceWebClientBuilder.build();
+		}
+
+		@Bean("defaultWebClientBuilder")
+		public WebClient.Builder defaultWebClientBuilder(
 				AuthorizedClientServiceReactiveOAuth2AuthorizedClientManager authorizedClientManager) {
 			ServerOAuth2AuthorizedClientExchangeFilterFunction oauth2Filter = new ServerOAuth2AuthorizedClientExchangeFilterFunction(
 					authorizedClientManager);
 			oauth2Filter.setDefaultClientRegistrationId("s2s");
 
 			return WebClient.builder().filter(oauth2Filter);
+		}
+
+		@Bean("defaultWebClient")
+		public WebClient defaultWebClient(
+				@Qualifier("defaultWebClientBuilder") WebClient.Builder defaultWebClientBuilder) {
+			return defaultWebClientBuilder.build();
 		}
 
 		@Bean
 		public WebClientBuilder webClientBuilder(Environment environment,
-				@Qualifier("defaultMicroServiceBuilder") WebClient.Builder defaultMicroServiceBuilder,
+				@Qualifier("microServiceWebClient") WebClient microServiceWebClient,
 				ServiceDomainProperties serviceDomainProperties, ObjectMapper objectMapper) {
-			return new WebClientBuilder(environment, defaultMicroServiceBuilder, serviceDomainProperties, objectMapper);
+			return new WebClientBuilder(environment, microServiceWebClient.mutate(), serviceDomainProperties,
+					objectMapper);
 		}
 
 	}
@@ -91,16 +104,9 @@ public class WebClientServicesConfig {
 			return manager;
 		}
 
-		@Bean
-		public RestClientBuilder restClientBuilder(Environment environment,
-				@Qualifier("microClientBuilder") RestClient.Builder microClientBuilder,
-				ServiceDomainProperties serviceDomainProperties) {
-			return new RestClientBuilder(environment, microClientBuilder, serviceDomainProperties);
-		}
-
-		@Bean("microClientBuilder")
+		@Bean("microServiceRestClientBuilder")
 		@LoadBalanced
-		public RestClient.Builder microClientBuilder(
+		public RestClient.Builder microServiceRestClientBuilder(
 				AuthorizedClientServiceOAuth2AuthorizedClientManager authorizedClientManager) {
 
 			OAuth2ClientHttpRequestInterceptor requestInterceptor = new OAuth2ClientHttpRequestInterceptor(
@@ -109,6 +115,17 @@ public class WebClientServicesConfig {
 			requestInterceptor.setClientRegistrationIdResolver(clientRequest -> "s2s");
 
 			return RestClient.builder().requestInterceptor(requestInterceptor);
+		}
+
+		@Bean("microServiceRestClient")
+		public RestClient microServiceRestClient(RestClient.Builder microServiceRestClientBuilder) {
+			return microServiceRestClientBuilder.build();
+		}
+
+		@Bean
+		public RestClientBuilder restClientBuilder(Environment environment, RestClient microServiceRestClient,
+				ServiceDomainProperties serviceDomainProperties) {
+			return new RestClientBuilder(environment, microServiceRestClient.mutate(), serviceDomainProperties);
 		}
 
 	}
