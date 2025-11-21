@@ -56,28 +56,30 @@ export class PricingComponent implements OnInit {
   }
 
   displayTable() {
-    this.prices = [];
-    let options: Option[] | undefined;
-    if (!this.flag) {
-      options = this.table?.tables.MONTH.options;
-    } else {
-      options = this.table?.tables.YEAR.options;
-    }
-    if (options && options.length > 0) {
+    if (this.table?.tables.YEAR || this.table?.tables.MONTH) {
+      this.prices = [];
+      let options: Option[] | undefined;
+      if (!this.flag) {
+        options = this.table?.tables.MONTH.options;
+      } else {
+        options = this.table?.tables.YEAR.options;
+      }
+      if (options && options.length > 0) {
 
-      this.prices = options.map(it => {
-        return {
-          id: it.id,
-          name: it.subscriptionPlan,
-          cost: `${it.cost.price / 100}`,
-          previousCost: `${it.previousCost.price / 100}`,
-          url: "",
-          icon: `${this.BASE_IMG_PATH}${it.subscriptionPlan.toLowerCase()}.png`,
-          pricingFeatures: it.feature.features.map(it => {
-            return {desc: it.code} as PricingFeature
-          }),
-        } as Pricing
-      })
+        this.prices = options.map(it => {
+          return {
+            id: it.id,
+            name: it.subscriptionPlan,
+            cost: `${it.cost.price / 100}`,
+            previousCost: `${it.previousCost.price / 100}`,
+            url: "",
+            icon: `${this.BASE_IMG_PATH}${it.subscriptionPlan.toLowerCase()}.png`,
+            pricingFeatures: it.feature.features.map(it => {
+              return {desc: it.code} as PricingFeature
+            }),
+          } as Pricing
+        })
+      }
     }
   }
 
