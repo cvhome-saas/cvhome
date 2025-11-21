@@ -12,6 +12,12 @@ RUN npm i --omit=dev \
   react@19.2.0 \
   react-dom@19.2.0 \
   next-intl@4.4.0 \
+  @vercel/otel@2.1.0 \
+  @opentelemetry/sdk-node@0.208.0 \
+  @opentelemetry/api@1.9.0 \
+  @opentelemetry/auto-instrumentations-node@0.67.0 \
+  @opentelemetry/sdk-metrics@2.2.0 \
+  @opentelemetry/sdk-trace-node@2.2.0 \
   typescript@5.9.3
 
 
