@@ -16,6 +16,7 @@
     "nextjs-toast-notify": "^1.54.0",
     "swiper": "^12.0.3",
     "yup": "^1.7.1",
+    "@vercel/otel": "2.1.0",
     "@store-front/types": "0.0.0",
     "@store-front/services": "0.0.0"
   },
