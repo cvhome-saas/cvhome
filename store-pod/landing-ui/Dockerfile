@@ -38,8 +38,6 @@ RUN apt-get update && apt-get install -y findutils && \
 FROM gcr.io/distroless/nodejs20
 
 ENV NODE_ENV=production
-ENV NEXT_TELEMETRY_DISABLED=1
-
 
 COPY --from=builder /build/node_modules ./node_modules
 COPY app ./app
