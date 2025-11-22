@@ -1,12 +1,12 @@
 import {Component, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
 
-import {UserService} from '../../../shared/services/user.service';
+import {UserService} from '../../shared/services/user.service';
 import {ColumnMode} from "@swimlane/ngx-datatable";
-import {ShowcaseDialogComponent} from "../../../shared/components/showcase-dialog/showcase-dialog.component";
+import {ShowcaseDialogComponent} from "../../shared/components/showcase-dialog/showcase-dialog.component";
 import {NbDialogService, NbToastrService} from "@nebular/theme";
-import {ErrorService} from "../../../shared/services/error.service";
-import {SelectedStoreService} from '../../../shared/services/selected-store.service';
+import {ErrorService} from "../../shared/services/error.service";
+import {SelectedStoreService} from '../../shared/services/selected-store.service';
 import {BaseTable, PageT, StorePageRequest} from "../../common/BaseTable";
 import {Observable, of} from "rxjs";
 import {TranslateService} from "@ngx-translate/core";

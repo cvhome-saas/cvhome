@@ -1,5 +1,5 @@
 import {Component} from '@angular/core';
-import {ShapeComponent} from "../../components/shape/shape.component";
+import {ShapeComponent} from "../components/shape/shape.component";
 
 @Component({
   selector: 'app-privacy-policy',

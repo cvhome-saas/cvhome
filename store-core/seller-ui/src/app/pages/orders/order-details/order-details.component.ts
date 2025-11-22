@@ -8,9 +8,9 @@ import {OrderTransactionComponent} from '../order-transaction/order-transaction'
 
 import {ActivatedRoute, Router} from '@angular/router';
 import {AsYouType} from 'libphonenumber-js';
-import {ErrorService} from "../../../shared/services/error.service";
+import {ErrorService} from "../../shared/services/error.service";
 import {StoreService} from "../../store-management/services/store.service";
-import {SelectedStoreService} from "../../../shared/services/selected-store.service";
+import {SelectedStoreService} from "../../shared/services/selected-store.service";
 import {zip} from "rxjs";
 
 @Component({

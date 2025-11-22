@@ -1,8 +1,8 @@
 import {Component, OnInit} from '@angular/core';
 import {OrdersService} from "../services/orders.service";
 import {ColumnMode} from "@swimlane/ngx-datatable";
-import {ErrorService} from "../../../shared/services/error.service";
-import {SelectedStoreService} from "../../../shared/services/selected-store.service";
+import {ErrorService} from "../../shared/services/error.service";
+import {SelectedStoreService} from "../../shared/services/selected-store.service";
 import {BaseTable, PageT, StorePageRequest} from "../../common/BaseTable";
 import {Observable, of} from "rxjs";
 

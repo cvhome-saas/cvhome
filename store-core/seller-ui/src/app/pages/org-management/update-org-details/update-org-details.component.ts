@@ -1,7 +1,7 @@
 import {ChangeDetectorRef, Component, Input, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {map, mergeMap} from "rxjs/operators";
-import {ErrorService} from "../../../shared/services/error.service";
+import {ErrorService} from "../../shared/services/error.service";
 import {OrgService} from "../services/org.service";
 import {Org} from "../model/org";
 import {FormBuilder, FormControl, FormGroup} from "@angular/forms";

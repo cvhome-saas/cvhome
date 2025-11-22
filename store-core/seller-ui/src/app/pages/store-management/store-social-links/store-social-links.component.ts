@@ -4,7 +4,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {StoreService} from '../services/store.service';
 import {NbToastrService} from "@nebular/theme";
 import {TranslateService} from '@ngx-translate/core';
-import {ErrorService} from "../../../shared/services/error.service";
+import {ErrorService} from "../../shared/services/error.service";
 import {zip} from "rxjs";
 
 @Component({

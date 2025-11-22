@@ -1,7 +1,6 @@
-import {AfterViewInit, Component, EventEmitter, OnInit} from '@angular/core';
+import {AfterViewInit, Component, EventEmitter} from '@angular/core';
 import {StatisticsParams} from "../service/statistic.service";
 import {FormControl} from "@angular/forms";
-import {TranslateService} from "@ngx-translate/core";
 
 @Component({
   selector: 'ngx-admin-dashboard',
@@ -9,7 +8,7 @@ import {TranslateService} from "@ngx-translate/core";
   templateUrl: './admin-dashboard.component.html',
   styleUrl: './admin-dashboard.component.scss'
 })
-export class AdminDashboardComponent implements OnInit, AfterViewInit {
+export class AdminDashboardComponent implements AfterViewInit {
   loading = false;
   loader: boolean = false;
   params: StatisticsParams;
@@ -34,9 +33,6 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit {
     let d = new Date();
     d.setDate(d.getDate() - days);
     return d;
-  }
-
-  ngOnInit() {
   }
 
   ngAfterViewInit(): void {

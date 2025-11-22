@@ -2,8 +2,8 @@ import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 
 import {BrandService} from '../services/brand.service';
-import {ErrorService} from "../../../../shared/services/error.service";
-import {SelectedStoreService} from "../../../../shared/services/selected-store.service";
+import {ErrorService} from "../../../shared/services/error.service";
+import {SelectedStoreService} from "../../../shared/services/selected-store.service";
 import {mergeMap, of, zip} from "rxjs";
 import {StoreService} from "../../../store-management/services/store.service";
 import {Store} from "../../../store-management/models/store";

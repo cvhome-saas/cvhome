@@ -1,8 +1,8 @@
 import {Injectable} from '@angular/core';
 
 import {Observable} from 'rxjs';
-import {environment} from '../../../environments/environment';
-import {HttpClient} from '@angular/common/http';
+import {environment} from '../../../../environments/environment';
+import {HttpClient, HttpParams, HttpRequest} from '@angular/common/http';
 import {SelectedStoreService} from "./selected-store.service";
 import {Store} from "../models/commons";
 
@@ -40,7 +40,7 @@ export class CrudService {
     return `${this.url}`;
   }
 
-  private getParams(p?: Record<string, string>): Record<string, string> {
+  private getParams(p?: Record<string, string>): HttpParams {
     const params = p ? {...p} : {};
     let store: Store;
 
@@ -55,8 +55,16 @@ export class CrudService {
       params['store'] = store.id.id;
       params['pod'] = store.podId.id;
     }
-
-    return params;
+    let result = new HttpParams();
+    Object.keys(params).forEach(key => result = result.append(key, params[key]));
+    return result;
   }
 
+  request(method: string, url: string, body: any | null, p?: any) {
+    let options = p ? {...p} : {};
+    const req = new HttpRequest(method, url, body, {
+      params: this.getParams(options.params ? options.params : {})
+    });
+    return this.http.request(req);
+  }
 }

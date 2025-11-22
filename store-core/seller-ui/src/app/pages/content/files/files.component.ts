@@ -2,11 +2,11 @@ import {Component, OnInit} from '@angular/core';
 import {NbDialogService} from '@nebular/theme';
 import {Lightbox} from 'ngx-lightbox';
 import {IAlbum} from "ngx-lightbox/lightbox-event.service";
-import {ShowcaseDialogComponent} from "../../../shared/components/showcase-dialog/showcase-dialog.component";
+import {ShowcaseDialogComponent} from "../../shared/components/showcase-dialog/showcase-dialog.component";
 import {FileSystemFileEntry, NgxFileDropEntry} from "ngx-file-drop";
-import {ErrorService} from "../../../shared/services/error.service";
+import {ErrorService} from "../../shared/services/error.service";
 import {ContentService} from "../services/content.service";
-import {SelectedStoreService} from "../../../shared/services/selected-store.service";
+import {SelectedStoreService} from "../../shared/services/selected-store.service";
 
 @Component({
   selector: 'files-content',

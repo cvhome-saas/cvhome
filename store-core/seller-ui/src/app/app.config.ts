@@ -14,7 +14,7 @@ import {
 } from '@nebular/theme';
 import {provideTranslateHttpLoader} from '@ngx-translate/http-loader';
 import {QuillModule} from 'ngx-quill';
-import {DEFAULT_THEME} from "./theme/styles/theme.default";
+import {DEFAULT_THEME} from "./pages/theme/styles/theme.default";
 import {CookieService} from "ngx-cookie-service";
 import {provideTranslateService} from '@ngx-translate/core';
 import {provideAnimationsAsync} from "@angular/platform-browser/animations/async";

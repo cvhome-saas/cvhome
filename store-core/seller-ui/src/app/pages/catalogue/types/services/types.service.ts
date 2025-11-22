@@ -1,8 +1,8 @@
 import {Injectable} from '@angular/core';
 
-import {CrudService} from '../../../../shared/services/crud.service';
+import {CrudService} from '../../../shared/services/crud.service';
 import {Observable} from 'rxjs';
-import {StorageService} from '../../../../shared/services/storage.service';
+import {StorageService} from '../../../shared/services/storage.service';
 
 @Injectable({
   providedIn: 'root'

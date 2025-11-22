@@ -4,7 +4,7 @@ import {Router} from '@angular/router';
 import {OrgService} from '../services/org.service';
 import {TranslateService} from '@ngx-translate/core';
 import {ColumnMode} from "@swimlane/ngx-datatable";
-import {ErrorService} from "../../../shared/services/error.service";
+import {ErrorService} from "../../shared/services/error.service";
 import {BaseTable, PageT, StorePageRequest} from "../../common/BaseTable";
 import {Observable, of} from "rxjs";
 

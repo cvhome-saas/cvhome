@@ -2,11 +2,11 @@ import {Component, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {ActivatedRoute, Router} from '@angular/router';
 
-import {UserService} from '../../../shared/services/user.service';
-import {User} from '../../../shared/models/user';
+import {UserService} from '../../shared/services/user.service';
+import {User} from '../../shared/models/user';
 import {NbToastrService} from '@nebular/theme';
 import {TranslateService} from '@ngx-translate/core';
-import {ErrorService} from "../../../shared/services/error.service";
+import {ErrorService} from "../../shared/services/error.service";
 import {map} from "rxjs/operators";
 
 @Component({

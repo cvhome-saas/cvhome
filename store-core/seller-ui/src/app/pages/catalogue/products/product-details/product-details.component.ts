@@ -1,8 +1,8 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {ProductService} from '../services/product.service';
-import {ErrorService} from "../../../../shared/services/error.service";
-import {SelectedStoreService} from "../../../../shared/services/selected-store.service";
+import {ErrorService} from "../../../shared/services/error.service";
+import {SelectedStoreService} from "../../../shared/services/selected-store.service";
 import {zip} from "rxjs";
 
 @Component({

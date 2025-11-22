@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 
-import {CrudService} from '../../../shared/services/crud.service';
+import {CrudService} from '../../shared/services/crud.service';
 import {Observable} from 'rxjs';
 import {Org} from "../model/org";
 

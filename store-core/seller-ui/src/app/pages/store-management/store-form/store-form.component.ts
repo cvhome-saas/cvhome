@@ -2,13 +2,13 @@ import {ChangeDetectorRef, Component, Input, OnInit} from '@angular/core';
 import {AbstractControl, FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {Router} from '@angular/router';
 
-import {ConfigService} from '../../../shared/services/config.service';
+import {ConfigService} from '../../shared/services/config.service';
 import {StoreService} from '../services/store.service';
 import {NbToastrService} from "@nebular/theme";
 import {TranslateService} from '@ngx-translate/core';
-import {validators} from '../../../shared/validation/validators';
+import {validators} from '../../shared/validation/validators';
 import {forkJoin} from 'rxjs';
-import {ErrorService} from "../../../shared/services/error.service";
+import {ErrorService} from "../../shared/services/error.service";
 import {Pods, PodService} from "../services/pod.service";
 
 @Component({

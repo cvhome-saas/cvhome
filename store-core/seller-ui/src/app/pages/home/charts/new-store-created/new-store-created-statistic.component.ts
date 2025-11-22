@@ -3,7 +3,7 @@ import {NbJSThemeVariable, NbThemeService} from '@nebular/theme';
 import {combineLatest, mergeMap, Observable, of, Subscription} from "rxjs";
 import {map} from "rxjs/operators";
 import {StatisticList, StatisticService, StatisticsParams} from "../../service/statistic.service";
-import {ErrorService} from '../../../../shared/services/error.service';
+import {ErrorService} from '../../../shared/services/error.service';
 
 @Component({
   selector: 'ngx-new-store-created-statistic',

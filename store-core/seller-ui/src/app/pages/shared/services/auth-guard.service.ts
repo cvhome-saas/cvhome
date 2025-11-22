@@ -3,7 +3,7 @@ import {ActivatedRouteSnapshot, CanActivateFn,  RouterStateSnapshot} from "@angu
 import {AuthService} from "./auth.service";
 import {catchError, map, of} from "rxjs";
 import {isPlatformBrowser} from "@angular/common";
-import {environment} from "../../../environments/environment";
+import {environment} from "../../../../environments/environment";
 
 
 export const canAccessSecuredPages: CanActivateFn = (

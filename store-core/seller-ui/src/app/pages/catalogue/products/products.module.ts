@@ -9,7 +9,7 @@ import {ProductToCategoryComponent} from './product-to-category/product-to-categ
 import {ProductsRoutingModule} from './routing/products-routing.module';
 import {ProductsImagesComponent} from './products-images/products-images.component';
 import {NbDialogModule} from '@nebular/theme';
-import {SharedModule} from "../../../shared/shared.module";
+import {SharedModule} from "../../shared/shared.module";
 import {ProductDetailsComponent} from "./product-details/product-details.component";
 import {ProductRelatedComponent} from "./product-related/product-related.component";
 

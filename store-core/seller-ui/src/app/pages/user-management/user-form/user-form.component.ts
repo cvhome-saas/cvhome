@@ -2,11 +2,11 @@ import {ChangeDetectorRef, Component, Input, OnInit} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {Router} from '@angular/router';
 
-import {UserService} from '../../../shared/services/user.service';
-import {User} from '../../../shared/models/user';
+import {UserService} from '../../shared/services/user.service';
+import {User} from '../../shared/models/user';
 import {NbToastrService} from '@nebular/theme';
 import {TranslateService} from '@ngx-translate/core';
-import {ErrorService} from "../../../shared/services/error.service";
+import {ErrorService} from "../../shared/services/error.service";
 
 @Component({
   selector: 'ngx-user-form',

@@ -3,13 +3,13 @@ import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 
 import {ProductGroupsService} from '../services/product-groups.service';
 import {ActivatedRoute, Router} from '@angular/router';
-import {validators} from '../../../../shared/validation/validators';
+import {validators} from '../../../shared/validation/validators';
 import {TranslateService} from '@ngx-translate/core';
 import {ColumnMode} from "@swimlane/ngx-datatable";
-import {Page} from "../../../../shared/models/Page";
+import {Page} from "../../../shared/models/Page";
 import {NbToastrService} from "@nebular/theme";
-import {ErrorService} from "../../../../shared/services/error.service";
-import {SelectedStoreService} from "../../../../shared/services/selected-store.service";
+import {ErrorService} from "../../../shared/services/error.service";
+import {SelectedStoreService} from "../../../shared/services/selected-store.service";
 import {zip} from "rxjs";
 
 @Component({

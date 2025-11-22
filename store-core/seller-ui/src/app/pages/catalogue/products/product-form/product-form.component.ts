@@ -3,16 +3,16 @@ import {FormArray, FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {ActivatedRoute, Router} from '@angular/router';
 
 import {ManufactureService} from '../../brands/services/manufacture.service';
-import {ConfigService} from '../../../../shared/services/config.service';
+import {ConfigService} from '../../../shared/services/config.service';
 import moment from 'moment';
 import {NbRouteTab, NbToastrService} from '@nebular/theme';
 import {ProductService} from '../services/product.service';
 import {TranslateService} from '@ngx-translate/core';
-import {validators} from '../../../../shared/validation/validators';
-import {slugify} from '../../../../shared/utils/slugifying';
+import {validators} from '../../../shared/validation/validators';
+import {slugify} from '../../../shared/utils/slugifying';
 import {forkJoin, zip} from 'rxjs';
-import {ErrorService} from "../../../../shared/services/error.service";
-import {SelectedStoreService} from "../../../../shared/services/selected-store.service";
+import {ErrorService} from "../../../shared/services/error.service";
+import {SelectedStoreService} from "../../../shared/services/selected-store.service";
 import {StoreService} from "../../../store-management/services/store.service";
 
 @Component({

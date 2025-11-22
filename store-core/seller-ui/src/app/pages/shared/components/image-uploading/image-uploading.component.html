@@ -1,0 +1,59 @@
+<div class="row">
+  <div class="col-md-6">
+
+    <!-- Drop Zone -->
+    <div class="upload-drop-zone p-4 border-dashed text-center mb-3"
+         (dragover)="onDragOver($event)"
+         (drop)="onDrop($event)"
+         style="border: 2px dashed #ccc; border-radius: 5px; cursor: pointer;">
+
+      <img src="../../../../../assets/img/cloud-computing.png" width="80" class="mb-3">
+      <div class="mb-2">{{ 'COMMON.DRAG_DROP' | translate }}</div>
+      <div class="mb-2">{{ 'COMMON.OR' | translate }}</div>
+
+      <input type="file" #fileInput multiple (change)="onFileSelected($event)" style="display: none" accept=".jpg, .png, .gif, .webp, .jpeg">
+      <button nbButton status="primary" (click)="fileInput.click()">
+        {{ 'COMMON.BROWSE_FILES' | translate }}
+      </button>
+    </div>
+
+    <!-- Upload Queue / Progress -->
+    <div *ngIf="uploadQueue.length > 0" class="mt-3">
+      <div *ngFor="let item of uploadQueue" class="mb-2 p-2 border rounded">
+        <div class="d-flex justify-content-between mb-1">
+          <small>{{ item.file.name }}</small>
+          <small>{{ item.progress }}%</small>
+        </div>
+        <div class="progress" style="height: 5px; background-color: #e9ecef;">
+          <div class="progress-bar"
+               [style.width.%]="item.progress"
+               [style.backgroundColor]="item.error ? '#dc3545' : '#0d6efd'">
+          </div>
+        </div>
+        <small *ngIf="item.error" class="text-danger">Error uploading file</small>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Existing Images List -->
+  <div class="col-md-6">
+    <div *ngIf="images && images.length">
+      <div class="item-container" style="display: flex; flex-wrap: wrap; gap: 10px;">
+        <div *ngFor="let image of images; trackBy: itemTrackBy">
+          <div class="example-box position-relative" style="position: relative;">
+            <img [alt]="image?.path" [src]="image?.imageUrl" width="250" class="img-thumbnail">
+            <span
+              class="position-absolute top-0 end-0 p-1"
+              style="cursor: pointer; background: rgba(255,255,255,0.8); border-radius: 50%;"
+              (click)="removeImage(image)"
+            >
+            <i class="fas fa-times text-danger"></i>
+          </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

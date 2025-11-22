@@ -2,13 +2,13 @@ import {AfterViewInit, Component, Input, OnInit} from '@angular/core';
 import {FormArray, FormBuilder, FormGroup, Validators} from '@angular/forms';
 
 import {BrandService} from '../services/brand.service';
-import {ConfigService} from '../../../../shared/services/config.service';
+import {ConfigService} from '../../../shared/services/config.service';
 import {TranslateService} from '@ngx-translate/core';
 import {Router} from '@angular/router';
-import {validators} from '../../../../shared/validation/validators';
-import {slugify} from '../../../../shared/utils/slugifying';
+import {validators} from '../../../shared/validation/validators';
+import {slugify} from '../../../shared/utils/slugifying';
 import {NbToastrService} from "@nebular/theme";
-import {ErrorService} from "../../../../shared/services/error.service";
+import {ErrorService} from "../../../shared/services/error.service";
 import {Store} from "../../../store-management/models/store";
 
 @Component({

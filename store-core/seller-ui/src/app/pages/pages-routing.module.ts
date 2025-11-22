@@ -2,7 +2,7 @@ import {RouterModule, Routes} from '@angular/router';
 import {NgModule} from '@angular/core';
 
 import {PagesComponent} from './pages.component';
-import {canAccessSecuredPages} from "../shared/services/auth-guard.service";
+import {canAccessSecuredPages} from "./shared/services/auth-guard.service";
 import {NotFoundComponent} from "./not-found/not-found.component";
 
 

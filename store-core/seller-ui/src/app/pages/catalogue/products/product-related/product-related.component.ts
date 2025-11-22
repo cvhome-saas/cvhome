@@ -2,12 +2,12 @@ import {AfterViewInit, Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {TranslateService} from '@ngx-translate/core';
 import {NbToastrService} from "@nebular/theme";
-import {ErrorService} from "../../../../shared/services/error.service";
+import {ErrorService} from "../../../shared/services/error.service";
 import {ColumnMode} from "@swimlane/ngx-datatable";
-import {Page} from "../../../../shared/models/Page";
+import {Page} from "../../../shared/models/Page";
 import {ProductGroupsService} from "../../products-groups/services/product-groups.service";
 import {zip} from "rxjs";
-import {SelectedStoreService} from "../../../../shared/services/selected-store.service";
+import {SelectedStoreService} from "../../../shared/services/selected-store.service";
 
 @Component({
   selector: 'ngx-product-to-category',

@@ -1,9 +1,9 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 
-import {UserService} from '../../../shared/services/user.service';
+import {UserService} from '../../shared/services/user.service';
 import {map, mergeMap} from "rxjs/operators";
-import {ErrorService} from "../../../shared/services/error.service";
+import {ErrorService} from "../../shared/services/error.service";
 
 @Component({
   selector: 'ngx-user-details',
