@@ -171,7 +171,7 @@ export class AddPageComponent implements OnInit {
 
   focusOutFunction(event) {
     const code = event.target.value.trim();
-    this.contentService.checkCodePageExist(code, this.params.store)
+    this.contentService.checkCodePageExist(code)
       .subscribe(res => {
         this.isCodeExists = res.exists;
       }, err => {
@@ -197,7 +197,7 @@ export class AddPageComponent implements OnInit {
 
     if (object.id) {
 
-      this.contentService.updatePage(object.id, this.params.store, object)
+      this.contentService.updatePage(object.id, object)
         .subscribe({
           next: (data) => {
             this.loadingList = false;
@@ -210,7 +210,7 @@ export class AddPageComponent implements OnInit {
           },
         });
     } else {
-      this.contentService.createPage(this.params.store, object)
+      this.contentService.createPage( object)
         .subscribe({
           next: (data) => {
             this.loadingList = false;
@@ -231,7 +231,7 @@ export class AddPageComponent implements OnInit {
   }
 
   private getPage() {
-    this.contentService.getPage(this.uniqueCode, this.params.store)
+    this.contentService.getPage(this.uniqueCode)
       .subscribe({
         next: (data) => {
           this.content = data;

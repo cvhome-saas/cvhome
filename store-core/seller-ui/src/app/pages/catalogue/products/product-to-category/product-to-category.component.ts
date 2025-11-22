@@ -81,7 +81,7 @@ export class ProductToCategoryComponent implements OnInit, AfterViewInit {
   }
 
   addProductToCategory(store, productId, groupCode) {
-    this.productService.addProductToCategory(store, productId, groupCode)
+    this.productService.addProductToCategory( productId, groupCode)
       .subscribe({
         next: () => {
           this.toastr.success(this.translate.instant('PRODUCT.PRODUCT_TO_CATEGORY_ADDED'));
@@ -94,7 +94,7 @@ export class ProductToCategoryComponent implements OnInit, AfterViewInit {
   }
 
   removeProductFromCategory(store, productId, groupCode) {
-    this.productService.removeProductFromCategory(store, productId, groupCode)
+    this.productService.removeProductFromCategory( productId, groupCode)
       .subscribe({
         next: () => {
           this.toastr.success(this.translate.instant('PRODUCT.PRODUCT_TO_CATEGORY_REMOVED'));
@@ -114,7 +114,7 @@ export class ProductToCategoryComponent implements OnInit, AfterViewInit {
   private load() {
     this.loading = true;
 
-    const p$ = this.categoryService.getCategoryByProductId(this.uniqueCode, this.params.store)
+    const p$ = this.categoryService.getCategoryByProductId(this.uniqueCode)
     const c$ = this.categoryService.getListOfCategories(this.params)
 
     forkJoin([p$, c$])

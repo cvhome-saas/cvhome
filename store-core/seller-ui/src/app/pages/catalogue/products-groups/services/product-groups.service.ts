@@ -15,20 +15,20 @@ export class ProductGroupsService {
   }
 
 
-  createProductGroup(store, group): Observable<any> {
-    return this.crudService.post(`/store-pod-gateway/catalog/api/v1/private/products/group?store=${store}`, group);
+  createProductGroup( group): Observable<any> {
+    return this.crudService.post(`/store-pod-gateway/catalog/api/v1/private/products/group`, group);
   }
 
-  updateGroupActiveValue(store, group): Observable<any> {
-    return this.crudService.patch(`/store-pod-gateway/catalog/api/v1/private/products/group/${group.code}?store=${store}`, group);
+  updateGroupActiveValue( group): Observable<any> {
+    return this.crudService.patch(`/store-pod-gateway/catalog/api/v1/private/products/group/${group.code}`, group);
   }
 
-  addProductToGroup(store, productId, groupCode): Observable<any> {
-    return this.crudService.post(`/store-pod-gateway/catalog/api/v1/private/products/${productId}/group/${groupCode}?store=${store}`, {});
+  addProductToGroup(productId, groupCode): Observable<any> {
+    return this.crudService.post(`/store-pod-gateway/catalog/api/v1/private/products/${productId}/group/${groupCode}`, {});
   }
 
-  removeProductFromGroup(store, productId, groupCode) {
-    return this.crudService.delete(`/store-pod-gateway/catalog/api/v1/private/products/${productId}/group/${groupCode}?store=${store}`);
+  removeProductFromGroup( productId, groupCode) {
+    return this.crudService.delete(`/store-pod-gateway/catalog/api/v1/private/products/${productId}/group/${groupCode}`);
   }
 
   getProductsByGroup(groupCode, params) {
@@ -39,16 +39,16 @@ export class ProductGroupsService {
     return this.crudService.get(`/store-pod-gateway/catalog/api/v1/private/products/${product}/related`, params);
   }
 
-  removeProductGroup(store, groupCode) {
-    return this.crudService.delete(`/store-pod-gateway/catalog/api/v1/private/products/group/${groupCode}?store=${store}`);
+  removeProductGroup( groupCode) {
+    return this.crudService.delete(`/store-pod-gateway/catalog/api/v1/private/products/group/${groupCode}`);
   }
 
-  addProductToRelated(store, product: string, item) {
-    return this.crudService.post(`/store-pod-gateway/catalog/api/v1/private/products/${product}/related/${item}?store=${store}`, {});
+  addProductToRelated( product: string, item) {
+    return this.crudService.post(`/store-pod-gateway/catalog/api/v1/private/products/${product}/related/${item}`, {});
   }
 
-  removeProductFromRelated(store, product: string, item) {
-    return this.crudService.delete(`/store-pod-gateway/catalog/api/v1/private/products/${product}/related/${item}?store=${store}`, {});
+  removeProductFromRelated(product: string, item) {
+    return this.crudService.delete(`/store-pod-gateway/catalog/api/v1/private/products/${product}/related/${item}`, {});
 
   }
 }

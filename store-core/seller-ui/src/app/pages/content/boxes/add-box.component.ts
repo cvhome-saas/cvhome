@@ -200,7 +200,7 @@ export class AddBoxComponent implements OnInit {
   checkCode(event) {
     //check if box code already exists
     const code = event.target.value.trim();
-    this.contentService.checkCodeBoxExist(this.params.store, code, this.param())
+    this.contentService.checkCodeBoxExist( code, this.param())
       .subscribe(res => {
         this.isCodeExists = res.exists;
       }, err => {
@@ -278,7 +278,7 @@ export class AddBoxComponent implements OnInit {
 
     if (object.id > 0) {//update
       //set content name required field
-      this.contentService.updateBox(this.content.id, this.params.store, object, this.param())
+      this.contentService.updateBox(this.content.id, object, this.param())
         .subscribe(data => {
           this.loader = false;
           this.toastr.success(this.translate.instant('CONTENT.CONTENT_UPDATED'));
@@ -289,7 +289,7 @@ export class AddBoxComponent implements OnInit {
         });
 
     } else {
-      this.contentService.createBox(this.params.store, object)
+      this.contentService.createBox( object)
         .subscribe(data => {
           this.loader = false;
           this.toastr.success(this.translate.instant('PRODUCT.PRODUCT_UPDATED'));

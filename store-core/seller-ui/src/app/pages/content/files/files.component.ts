@@ -44,7 +44,7 @@ export class FilesComponent implements OnInit {
 
   getFiles() {
     this.loader = true;
-    this.contentService.images(this.store)
+    this.contentService.images()
       .subscribe({
         next: (data: any) => {
           this.images = data.content.map(img => {
@@ -80,7 +80,7 @@ export class FilesComponent implements OnInit {
       .subscribe(res => {
         if (res) {
           this.loader = true;
-          this.contentService.deleteImage(this.store, e)
+          this.contentService.deleteImage( e)
             .subscribe({
               next: (data) => {
                 this.loader = false;
@@ -143,7 +143,7 @@ export class FilesComponent implements OnInit {
       formData.append("files", item.file);
     });
     if (this.files.length > 0) {
-      this.contentService.saveImage(this.store, formData)
+      this.contentService.saveImage( formData)
         .subscribe({
           next: (data) => {
             console.log(data);

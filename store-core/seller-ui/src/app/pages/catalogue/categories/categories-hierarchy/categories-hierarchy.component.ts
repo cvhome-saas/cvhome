@@ -91,7 +91,7 @@ export class CategoriesHierarchyComponent implements OnInit {
       parentId = event.parent.id;
     }
 
-    this.categoryService.updateHierarchy(event.node.id, parentId, this.params.store)
+    this.categoryService.updateHierarchy(event.node.id, parentId)
       .subscribe({
         next: (ignored) => {
           this.toastr.success(this.translate.instant('CATEGORY.HIERARCHY_UPDATED'));

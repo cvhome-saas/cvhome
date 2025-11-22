@@ -55,7 +55,7 @@ export class TypesListComponent extends BaseTable<any> implements OnInit {
       .onClose.subscribe(res => {
       if (res) {
 
-        this.typesService.deleteType(this.params.store, row.id)
+        this.typesService.deleteType( row.id)
           .subscribe(result => {
             this.toastr.success(this.translate.instant('OPTION.OPTION_REMOVED'));
             this.trigger();

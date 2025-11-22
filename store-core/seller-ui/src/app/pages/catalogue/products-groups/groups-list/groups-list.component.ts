@@ -70,7 +70,7 @@ export class GroupsListComponent extends BaseTable<any> implements OnInit {
     this.dialogService.open(ShowcaseDialogComponent, {})
       .onClose.subscribe(res => {
       if (res) {
-        this.productGroupsService.removeProductGroup(this.params.store, row.code)
+        this.productGroupsService.removeProductGroup(row.code)
           .subscribe(result => {
             this.trigger();
           }, err => {

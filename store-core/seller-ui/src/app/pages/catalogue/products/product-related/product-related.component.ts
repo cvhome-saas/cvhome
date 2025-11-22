@@ -75,7 +75,7 @@ export class ProductRelatedComponent implements OnInit, AfterViewInit {
   }
 
   onItemSelect(item: any) {
-    this.productGroupsService.addProductToRelated(this.params.store, this.product, item.id)
+    this.productGroupsService.addProductToRelated( this.product, item.id)
       .subscribe({
         next: (data) => {
           this.rows.push(item)
@@ -92,7 +92,7 @@ export class ProductRelatedComponent implements OnInit, AfterViewInit {
   }
 
   onItemDeSelect(item) {
-    this.productGroupsService.removeProductFromRelated(this.params.store, this.product, item.id)
+    this.productGroupsService.removeProductFromRelated(this.product, item.id)
       .subscribe({
         next: (data) => {
           this.rows = this.rows.filter(it => it.id != item.id)

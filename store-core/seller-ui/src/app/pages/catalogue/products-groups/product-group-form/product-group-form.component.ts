@@ -101,13 +101,13 @@ export class ProductGroupFormComponent implements OnInit {
   }
 
   save() {
-    this.productGroupsService.createProductGroup(this.params.store, this.form.value).subscribe(res => {
+    this.productGroupsService.createProductGroup(this.form.value).subscribe(res => {
       this.router.navigate(['pages/catalogue/products-groups/groups-list']);
     });
   }
 
   update() {
-    this.productGroupsService.updateGroupActiveValue(this.params.store, this.form.value)
+    this.productGroupsService.updateGroupActiveValue( this.form.value)
       .subscribe(res => {
         this.router.navigate(['pages/catalogue/products-groups/groups-list']);
       }, err => {
@@ -121,7 +121,7 @@ export class ProductGroupFormComponent implements OnInit {
 
   onItemSelect(item: any, groupCode: string) {
     this.loader = true;
-    this.productGroupsService.addProductToGroup(this.params.store, item.id, groupCode)
+    this.productGroupsService.addProductToGroup( item.id, groupCode)
       .subscribe({
         next: (it) => {
           this.loader = false;
@@ -141,7 +141,7 @@ export class ProductGroupFormComponent implements OnInit {
 
   onItemDeSelect(item, groupCode) {
     this.loader = true;
-    this.productGroupsService.removeProductFromGroup(this.params.store, item.id, groupCode)
+    this.productGroupsService.removeProductFromGroup( item.id, groupCode)
       .subscribe({
         next: (data) => {
           this.loader = false;

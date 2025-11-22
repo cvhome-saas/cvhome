@@ -197,7 +197,7 @@ export class ProductFormComponent implements OnInit {
 
   checkSku(event) {
     this.loader = true;
-    this.productService.checkProductSku(this.store, event.target.value)
+    this.productService.checkProductSku( event.target.value)
       .subscribe(res => {
         this.isCodeUnique = !(res.exists && (this.product.sku !== event.target.value));
         this.loader = false;
@@ -278,7 +278,7 @@ export class ProductFormComponent implements OnInit {
       });
       delete productObject.selectedLanguage;
       if (this.product.id) {
-        this.productService.updateProduct(this.store, this.product.id, productObject)
+        this.productService.updateProduct( this.product.id, productObject)
           .subscribe({
             next: (data) => {
               this.loader = false;
@@ -290,7 +290,7 @@ export class ProductFormComponent implements OnInit {
             }
           });
       } else {
-        this.productService.createProduct(this.store, productObject)
+        this.productService.createProduct( productObject)
           .subscribe({
             next: (data) => {
               this.loader = false;
@@ -373,8 +373,8 @@ export class ProductFormComponent implements OnInit {
 
   private loadProduct() {
     this.loadEvent();
-    const manufacture = this.manufactureService.getManufacturers(this.store);
-    const types = this.productService.getProductTypes(this.store);
+    const manufacture = this.manufactureService.getManufacturers();
+    const types = this.productService.getProductTypes();
     const config = this.configService.getListOfSupportedLanguages(this.store);
     forkJoin([this.storeService.getStore(this.store), manufacture, types, config])
       .subscribe(([store, manufacturers, productTypes, languages]) => {
