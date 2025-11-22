@@ -71,7 +71,7 @@ export class StoreService {
     const params = {
       store
     };
-    return this.crudService.getWithEmpty(`/store-pod-gateway/content/api/v1/private/content/any/${pageCode}`, params);
+    return this.crudService.get(`/store-pod-gateway/content/api/v1/private/content/any/${pageCode}`, params);
   }
 
   updatePageContent(store, id, content: any): Observable<any> {
@@ -80,7 +80,7 @@ export class StoreService {
 
   createPageContent(content: any, store: string): Observable<any> {
 
-    return this.crudService.postWithStoreParam(`/store-pod-gateway/content/api/v1/private/content`, content, store);
+    return this.crudService.post(`/store-pod-gateway/content/api/v1/private/content`, content, {store});
   }
 
   updateSocialNetworks(store: string, body: any): Observable<any> {

@@ -61,4 +61,7 @@ export class SelectedStoreService {
   }
 
 
+  getStore(store: string): Store | undefined {
+    return this._stores.find(it => it.id.id == store);
+  }
 }
