@@ -7,33 +7,47 @@ import {map, Observable, of, tap} from 'rxjs';
   providedIn: 'root'
 })
 export class SelectedStoreService {
-  public static STORE_ID_KEY = "Store-Id";
+  public static SELECTED_STORE_ID_KEY = "Selected-Store-Id";
   private _stores: Store[] | undefined = undefined;
 
   constructor(private storeService: StoreService) {
   }
 
   public select(storeId: string): void {
-    localStorage.setItem(SelectedStoreService.STORE_ID_KEY, storeId);
+    const selectedStore = this._stores.find(it => it.id.id == storeId);
+    if (selectedStore) {
+      localStorage.setItem(SelectedStoreService.SELECTED_STORE_ID_KEY, JSON.stringify(selectedStore));
+    }
+  }
+
+  public currentSelectedStore(): Store | undefined {
+    const currentStoreStr = localStorage.getItem(SelectedStoreService.SELECTED_STORE_ID_KEY);
+    if (currentStoreStr) {
+      const parsedStore = JSON.parse(currentStoreStr);
+      if (this._stores && this._stores.some(store => store.id.id === parsedStore.id.id)) {
+        return parsedStore;
+      }
+      return undefined;
+    }
+    return undefined;
+  }
+
+  public selectFirstStore(): Store | undefined {
+    if (this._stores && this._stores.length > 0) {
+      this.select(this._stores[0].id.id);
+      return this._stores[0];
+    }
+    return undefined;
   }
 
   current(): Observable<string> {
     return this.getAllStores().pipe(map(it => {
-      let current = localStorage.getItem(SelectedStoreService.STORE_ID_KEY);
-      if (current && current != '') {
-        if (it.filter(s => s.id.id == current).length > 0) {
-          return current;
-        }
+      let current: Store | undefined = this.currentSelectedStore();
+      if (current) {
+        return current.id.id;
       }
-      let newCurrent = undefined;
-      if (it.length > 0) {
-        newCurrent = it[0].id.id;
-      }
-      this.select(newCurrent);
-      return newCurrent
+      return this.selectFirstStore()?.id.id;
     }));
-
-
   }
 
   private getAllStores(): Observable<Store[]> {
