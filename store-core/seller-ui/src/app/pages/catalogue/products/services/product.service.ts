@@ -22,48 +22,43 @@ export class ProductService {
     return this.crudService.get(`/store-pod-gateway/catalog/api/v2/private/tiny-products`, params);
   }
 
-  updateProductFromTable(store, id, product): Observable<any> {
-    return this.crudService.patch(`/store-pod-gateway/catalog/api/v1/private/product/${id}?store=${store}`, product);
+  updateProductFromTable(id, product): Observable<any> {
+    return this.crudService.patch(`/store-pod-gateway/catalog/api/v1/private/product/${id}`, product);
   }
 
-  updateProduct(store, id, product): Observable<any> {
-    return this.crudService.put(`/store-pod-gateway/catalog/api/v2/private/product/${id}?store=${store}`, product);
+  updateProduct(id, product): Observable<any> {
+    return this.crudService.put(`/store-pod-gateway/catalog/api/v2/private/product/${id}`, product);
   }
 
-  getProductDefinitionById(store, id): Observable<any> {
-    const params = {
-      store,
-    };
-    return this.crudService.get(`/store-pod-gateway/catalog/api/v2/private/product/${id}`, params);
+  getProductDefinitionById( id): Observable<any> {
+    return this.crudService.get(`/store-pod-gateway/catalog/api/v2/private/product/${id}`);
   }
 
-  createProduct(store, product): Observable<any> {
-
-    return this.crudService.post(`/store-pod-gateway/catalog/api/v2/private/product?store=${store}`, product);
+  createProduct( product): Observable<any> {
+    return this.crudService.post(`/store-pod-gateway/catalog/api/v2/private/product`, product);
   }
 
   deleteProduct(id): Observable<any> {
     return this.crudService.delete(`/store-pod-gateway/catalog/api/v1/private/product/${id}`);
   }
 
-  getProductTypes(store): Observable<any> {
-    return this.crudService.get(`/store-pod-gateway/catalog/api/v1/private/product/types?store=${store}`);
+  getProductTypes(): Observable<any> {
+    return this.crudService.get(`/store-pod-gateway/catalog/api/v1/private/product/types`);
   }
 
-  checkProductSku(store, code): Observable<any> {
+  checkProductSku( code): Observable<any> {
     const params = {
-      'store': store,
       'code': code,
     };
     return this.crudService.get(`/store-pod-gateway/catalog/api/v1/private/product/unique`, params);
   }
 
-  addProductToCategory(store, productId, categoryId): Observable<any> {
-    return this.crudService.post(`/store-pod-gateway/catalog/api/v1/private/product/${productId}/category/${categoryId}?store=${store}`, {});
+  addProductToCategory( productId, categoryId): Observable<any> {
+    return this.crudService.post(`/store-pod-gateway/catalog/api/v1/private/product/${productId}/category/${categoryId}}`, {});
   }
 
-  removeProductFromCategory(store, productId, categoryId): Observable<any> {
-    return this.crudService.delete(`/store-pod-gateway/catalog/api/v1/private/product/${productId}/category/${categoryId}?store=${store}`);
+  removeProductFromCategory( productId, categoryId): Observable<any> {
+    return this.crudService.delete(`/store-pod-gateway/catalog/api/v1/private/product/${productId}/category/${categoryId}`);
   }
 
 }

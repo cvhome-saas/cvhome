@@ -23,12 +23,12 @@ export class ImageBrowserComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.getImages(this.store);
+    this.getImages();
   }
 
-  getImages(store: string) {
+  getImages() {
     this.loadingList = true;
-    this.crudService.get('/store-pod-gateway/content/api/v1/content/images?store=' + store)
+    this.crudService.get('/store-pod-gateway/content/api/v1/content/images')
       .subscribe({
         next: (data) => {
           this.uploadedFiles = data.content;

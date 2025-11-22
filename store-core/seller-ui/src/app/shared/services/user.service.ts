@@ -33,12 +33,12 @@ export class UserService {
     return this.crudService.get(`/control-plane/api/v1/user-account/current`);
   }
 
-  createUser(user: any, store: any): Observable<any> {
-    return this.crudService.post(`/control-plane/api/v1/user-account/create?store=${store}`, user);
+  createUser(user: any,store:string): Observable<any> {
+    return this.crudService.post(`/control-plane/api/v1/user-account/create`, user,{store});
   }
 
-  updateUser(user: any, store: any): Observable<any> {
-    return this.crudService.put(`/control-plane/api/v1/user-account/update?store=${store}`, user);
+  updateUser(user: any,store:string): Observable<any> {
+    return this.crudService.put(`/control-plane/api/v1/user-account/update`, user,{store});
   }
 
   getUser(userId: any): Observable<any> {
@@ -53,15 +53,15 @@ export class UserService {
     return this.crudService.get(`/control-plane/api/v1/user-account/list`, params);
   }
 
-  deleteUser(userId: any, store: any): Observable<any> {
-    return this.crudService.delete(`/control-plane/api/v1/user-account/delete?store=${store}&userId=${userId}`, {});
+  deleteUser(userId: string, store: string): Observable<any> {
+    return this.crudService.delete(`/control-plane/api/v1/user-account/delete?userId=${userId}`, {store});
   }
 
-  disable(userId, store: string) {
-    return this.crudService.post(`/control-plane/api/v1/user-account/disable?store=${store}&userId=${userId}`, {});
+  disable(userId: string, store: string) {
+    return this.crudService.post(`/control-plane/api/v1/user-account/disable?userId=${userId}`, {});
   }
 
-  enable(userId, store: string) {
-    return this.crudService.post(`/control-plane/api/v1/user-account/enable?store=${store}&userId=${userId}`, {});
+  enable(userId: string, store: string) {
+    return this.crudService.post(`/control-plane/api/v1/user-account/enable?userId=${userId}`, {store});
   }
 }

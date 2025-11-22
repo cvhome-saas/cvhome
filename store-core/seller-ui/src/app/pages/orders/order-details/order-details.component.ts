@@ -26,7 +26,6 @@ export class OrderDetailsComponent implements OnInit {
   billingStateData: Array<any> = []
   billingCountry: Array<any> = []
   groups: Array<any> = []
-  selectedGroups: Array<any> = []
   loader = false;
   orderDetailsData: any;
   historyListData: Array<any> = [];
@@ -78,8 +77,6 @@ export class OrderDetailsComponent implements OnInit {
   transactionType: string = ''
   orderID: any;
   storeID: any;
-  defaultCountry: any;
-  buttonText: any = 'Update Order'
   languages: Array<any> = [{'code': 'en', 'name': 'English'}, {'code': 'fr', 'name': 'French'}]
   store: any;
 
@@ -91,7 +88,7 @@ export class OrderDetailsComponent implements OnInit {
 
   getOrderDetails() {
     this.loader = true;
-    this.ordersService.getOrderDetails(this.storeID, this.orderID)
+    this.ordersService.getOrderDetails(this.orderID)
       .subscribe({
         next: (data) => {
           this.loader = false;
@@ -138,7 +135,7 @@ export class OrderDetailsComponent implements OnInit {
   }
 
   getHistory() {
-    this.ordersService.getHistory(this.storeID, this.orderID)
+    this.ordersService.getHistory(this.orderID)
       .subscribe(data => {
         this.historyListData = data;
       }, err => {
@@ -160,7 +157,7 @@ export class OrderDetailsComponent implements OnInit {
   }
 
   getCountry() {
-    this.ordersService.getCountry(this.storeID)
+    this.ordersService.getCountry()
       .subscribe({
         next: (data) => {
           this.shippingCountry = data;
@@ -172,7 +169,7 @@ export class OrderDetailsComponent implements OnInit {
   }
 
   onBillingChange(value, flag) {
-    this.ordersService.getBillingZone(this.storeID, value)
+    this.ordersService.getBillingZone( value)
       .subscribe({
         next: (data) => {
           if (data.length > 0) {
@@ -191,7 +188,7 @@ export class OrderDetailsComponent implements OnInit {
   }
 
   onShippingChange(value, flag) {
-    this.ordersService.getBillingZone(this.storeID, value)
+    this.ordersService.getBillingZone( value)
       .subscribe({
         next: (data) => {
           if (data.length > 0) {
@@ -216,7 +213,7 @@ export class OrderDetailsComponent implements OnInit {
       date: moment().format('yyyy-MM-DD'),
       orderStatus: this.statusFields.status
     }
-    this.ordersService.addHistory(this.storeID, this.orderID, param)
+    this.ordersService.addHistory( this.orderID, param)
       .subscribe({
         next: (data) => {
           this.loader = false;
@@ -262,7 +259,7 @@ export class OrderDetailsComponent implements OnInit {
         "country": this.shipping.country
       }
     }
-    this.ordersService.updateOrder(this.storeID, this.orderID, param)
+    this.ordersService.updateOrder( this.orderID, param)
       .subscribe({
         next: (data) => {
           this.loader = false;
@@ -289,7 +286,7 @@ export class OrderDetailsComponent implements OnInit {
 
   onClickRefund() {
     this.loader = true;
-    this.ordersService.refundOrder(this.storeID, this.orderID)
+    this.ordersService.refundOrder(this.orderID)
       .subscribe({
         next: (data) => {
           console.log(data)
@@ -305,7 +302,7 @@ export class OrderDetailsComponent implements OnInit {
 
   onClickCapture() {
     this.loader = true;
-    this.ordersService.captureOrder(this.storeID, this.orderID)
+    this.ordersService.captureOrder( this.orderID)
       .subscribe({
         next: (data) => {
           this.loader = false;

@@ -80,7 +80,7 @@ export class PageComponent extends BaseTable<any> implements OnInit {
       }
     }).onClose.subscribe(res => {
       if (res) {
-        this.contentService.deleteContent(event.id, this.params.store)
+        this.contentService.deleteContent(event.id)
           .subscribe({
             next: (data) => {
               this.toastr.success('Content page deleted successfully');

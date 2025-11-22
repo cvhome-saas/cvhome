@@ -24,7 +24,14 @@ export class StoreService {
         id: {
           id: environment.defaultStore
         },
-        name: "default"
+        name: "default",
+        provisioningState: "SUCCESSFULLY_PROVISIONING",
+        orgId: {
+          id: "org-id"
+        },
+        podId: {
+          id: "pod-id"
+        }
       }],
     };
     return this.httpClient.post<Page<Store>>(`${this.STORE_MANAGER_BASE_URL}/list`, {})

@@ -50,8 +50,8 @@ export class ProductsImagesComponent implements OnInit, AfterViewInit {
         this.store = selectedStore
         this.uniqueCode = params['code'];
         this.load();
-        this.addImageUrl = this.productImageService.addImageUrl(this.store, this.uniqueCode)
-        this.removeImageUrl = this.productImageService.removeImageUrl(this.store, this.uniqueCode)
+        this.addImageUrl = this.productImageService.addImageUrl( this.uniqueCode)
+        this.removeImageUrl = this.productImageService.removeImageUrl( this.uniqueCode)
       })
     })
 
@@ -59,7 +59,7 @@ export class ProductsImagesComponent implements OnInit, AfterViewInit {
 
   load() {
     this.loading = true;
-    this.productImageService.getImages(this.store, this.uniqueCode)
+    this.productImageService.getImages( this.uniqueCode)
       .subscribe(res => {
         this.images = res;
         this.loading = false;

@@ -16,36 +16,36 @@ export class OrdersService {
     return this.crudService.get(`/store-pod-gateway/order/api/v1/private/orders`, params);
   }
 
-  getOrderDetails(store, orderID): Observable<any> {
-    return this.crudService.get(`/store-pod-gateway/order/api/v1/private/orders/${orderID}?store=${store}`);
+  getOrderDetails( orderID): Observable<any> {
+    return this.crudService.get(`/store-pod-gateway/order/api/v1/private/orders/${orderID}`);
   }
 
-  getCountry(store): Observable<any> {
-    return this.crudService.get(`/store-pod-gateway/order/api/v1/country?store=${store}`)
+  getCountry(): Observable<any> {
+    return this.crudService.get(`/store-pod-gateway/order/api/v1/country`)
   }
 
-  getBillingZone(store, value): Observable<any> {
-    return this.crudService.get(`/store-pod-gateway/order/api/v1/zones?code=${value}&store=${store}`)
+  getBillingZone( value): Observable<any> {
+    return this.crudService.get(`/store-pod-gateway/order/api/v1/zones?code=${value}`)
   }
 
-  getHistory(store, orderID): Observable<any> {
-    return this.crudService.get(`/store-pod-gateway/order/api/v1/private/orders/${orderID}/history?store=${store}`)
+  getHistory( orderID): Observable<any> {
+    return this.crudService.get(`/store-pod-gateway/order/api/v1/private/orders/${orderID}/history`)
   }
 
-  addHistory(store, orderID, param): Observable<any> {
-    return this.crudService.post(`/store-pod-gateway/order/api/v1/private/orders/${orderID}/history?store=${store}`, param);
+  addHistory( orderID, param): Observable<any> {
+    return this.crudService.post(`/store-pod-gateway/order/api/v1/private/orders/${orderID}/history`, param);
   }
 
-  updateOrder(store, orderID, param): Observable<any> {
-    return this.crudService.patch(`/store-pod-gateway/order/api/v1/private/orders/${orderID}/customer?store=${store}`, param);
+  updateOrder(orderID,  param): Observable<any> {
+    return this.crudService.patch(`/store-pod-gateway/order/api/v1/private/orders/${orderID}/customer`, param);
   }
 
-  refundOrder(store, orderID): Observable<any> {
-    return this.crudService.post(`/store-pod-gateway/order/api/v1/private/orders/${orderID}/refund?store=${store}`, {});
+  refundOrder( orderID): Observable<any> {
+    return this.crudService.post(`/store-pod-gateway/order/api/v1/private/orders/${orderID}/refund`, {});
   }
 
-  captureOrder(store, orderID): Observable<any> {
-    return this.crudService.post(`/store-pod-gateway/order/api/v1/private/orders/${orderID}/capture?store=${store}`, {});
+  captureOrder(orderID): Observable<any> {
+    return this.crudService.post(`/store-pod-gateway/order/api/v1/private/orders/${orderID}/capture`, {});
   }
 
 }

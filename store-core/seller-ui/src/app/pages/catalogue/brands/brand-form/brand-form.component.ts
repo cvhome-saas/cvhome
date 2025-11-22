@@ -149,7 +149,7 @@ export class BrandFormComponent implements AfterViewInit, OnInit {
 
   checkCode(event) {
     const code = event.target.value;
-    this.brandService.checkBrandCode(this.store.id, code)
+    this.brandService.checkBrandCode(code)
       .subscribe(res => {
         this.isCodeUnique = !(res.exists && (this.brand.code !== code));
       }, err => {
@@ -212,14 +212,14 @@ export class BrandFormComponent implements AfterViewInit, OnInit {
       }
 
       if (this.brand.id) {
-        this.brandService.updateBrand(this.store.id, this.brand.id, brandObject)
+        this.brandService.updateBrand(this.brand.id, brandObject)
           .subscribe(result => {
             this.toastr.success(this.translate.instant('BRAND.BRAND_UPDATED'));
           }, err => {
             this.errorService.error('ERROR.SYSTEM_ERROR', err);
           });
       } else {
-        this.brandService.createBrand(this.store.id, brandObject)
+        this.brandService.createBrand(brandObject)
           .subscribe(result => {
             this.toastr.success(this.translate.instant('BRAND.BRAND_CREATED'));
             this.router.navigate(['pages/catalogue/brands/brands-list']);

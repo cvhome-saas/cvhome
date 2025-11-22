@@ -201,7 +201,7 @@ export class CategoryFormComponent implements AfterViewInit, OnInit {
 
   checkCode(event) {
     const code = event.target.value;
-    this.categoryService.checkCategoryCode(code, this.store.id)
+    this.categoryService.checkCategoryCode(code)
       .subscribe(res => {
         this.isCodeUnique = !(res.exists && (this.category.code !== code));
       }, err => {
@@ -275,7 +275,7 @@ export class CategoryFormComponent implements AfterViewInit, OnInit {
         return;
       }
       if (this.category.id) {
-        this.categoryService.updateCategory(this.category.id, categoryObject, this.store.id)
+        this.categoryService.updateCategory(this.category.id, categoryObject)
           .subscribe(result => {
             this.loading = false;
             this.toastr.success(this.translate.instant('CATEGORY_FORM.CATEGORY_UPDATED'));
@@ -283,7 +283,7 @@ export class CategoryFormComponent implements AfterViewInit, OnInit {
             this.errorService.error('ERROR.SYSTEM_ERROR', err);
           });
       } else {
-        this.categoryService.addCategory(categoryObject, this.store.id)
+        this.categoryService.addCategory(categoryObject)
           .subscribe(result => {
             this.loading = false;
             this.toastr.success(this.translate.instant('CATEGORY_FORM.CATEGORY_CREATED'));

@@ -13,9 +13,11 @@ export interface CreateStoreRequest {
 }
 
 export interface Store {
-  id?: ManagerStoreId;
-  name?: string;
-  owner?: IdentityId;
+  id: ManagerStoreId
+  name: string
+  orgId: IdentityId
+  podId: PodId
+  provisioningState: string
 }
 
 export interface Page<T> {
@@ -30,4 +32,8 @@ export enum Country {
 
 export interface Email {
   email: string;
+}
+
+export interface PodId {
+  id: string
 }

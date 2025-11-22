@@ -11,15 +11,15 @@ export class StatisticService {
   }
 
   getOrderStatistic(params: StatisticsParams): Observable<StatisticList> {
-    return this.crudService.post(`/store-pod-gateway/order/api/v2/private/order-statistic?store=${params.store}`, params);
+    return this.crudService.post(`/store-pod-gateway/order/api/v2/private/order-statistic`, params);
   }
 
   getCustomerStatistic(params: StatisticsParams): Observable<StatisticList> {
-    return this.crudService.post(`/store-pod-gateway/order/api/v2/private/customer-statistic?store=${params.store}`, params);
+    return this.crudService.post(`/store-pod-gateway/order/api/v2/private/customer-statistic`, params);
   }
 
   getProductStatistic(params: StatisticsParams): Observable<StatisticList> {
-    return this.crudService.post(`/store-pod-gateway/order/api/v2/private/product-statistic?store=${params.store}`, params);
+    return this.crudService.post(`/store-pod-gateway/order/api/v2/private/product-statistic`, params);
   }
 
   getNewStoreCreatedStatistic(params: StatisticsParams) {

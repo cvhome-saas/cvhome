@@ -33,7 +33,7 @@ export class CategoryDetailComponent implements OnInit {
     this.loadingInfo = true;
     zip([this.selectedStoreService.current(), this.activatedRoute.params])
       .pipe(mergeMap(([selectedStore, params]) => {
-        return zip(of(selectedStore), of(params), this.storeService.getStore(selectedStore), this.categoryService.getCategoryById(params['id'], selectedStore));
+        return zip(of(selectedStore), of(params), this.storeService.getStore(selectedStore), this.categoryService.getCategoryById(params['id']));
       }))
       .subscribe({
         next: ([selectedStore, params, store, category]) => {

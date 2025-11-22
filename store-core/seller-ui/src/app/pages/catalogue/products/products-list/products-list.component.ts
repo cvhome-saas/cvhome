@@ -69,7 +69,7 @@ export class ProductsListComponent extends BaseTable<any> implements OnInit {
       price: newData.price,
       quantity: newData.quantity
     };
-    this.productService.updateProductFromTable(this.params.store, newData.id, product)
+    this.productService.updateProductFromTable( newData.id, product)
       .subscribe({
         next: (data) => {
           this.toastr.success(this.translate.instant('PRODUCT.PRODUCT_UPDATED'));

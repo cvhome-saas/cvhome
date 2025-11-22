@@ -79,7 +79,7 @@ export class BoxesComponent extends BaseTable<any> implements OnInit {
       },
     }).onClose.subscribe(res => {
       if (res) {
-        this.contentService.deleteContent(event.id, this.params.store)
+        this.contentService.deleteContent(event.id)
           .subscribe({
             next: (data) => {
               this.toastr.success(this.translate.instant('CONTENT.BOX_DELETED'));

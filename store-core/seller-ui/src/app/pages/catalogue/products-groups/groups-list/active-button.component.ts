@@ -29,7 +29,7 @@ export class ActiveButtonComponent {
       active: this.value,
       code: this.rowData.code,
     };
-    this.productGroupsService.updateGroupActiveValue(this.store, group)
+    this.productGroupsService.updateGroupActiveValue( group)
       .subscribe(res => {
         this.toastr.success(this.translate.instant('PRODUCT_GROUP.GROUP_ACTIVATION'));
       }, err => {

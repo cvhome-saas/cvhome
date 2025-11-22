@@ -60,7 +60,7 @@ export class CategoriesListComponent extends BaseTable<any> implements OnInit {
     })
       .onClose.subscribe(res => {
       if (res) {
-        this.categoryService.deleteCategory(event.id, event.store)
+        this.categoryService.deleteCategory(event.id)
           .subscribe(data => {
             this.toastr.success(this.translate.instant('CATEGORY_FORM.CATEGORY_REMOVED'));
             this.trigger();

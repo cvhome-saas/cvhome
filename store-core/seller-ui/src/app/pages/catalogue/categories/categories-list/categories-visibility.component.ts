@@ -27,7 +27,7 @@ export class CategoriesVisibilityComponent {
 
   clicked() {
     this.rowData.visible = !this.value;
-    this.categoryService.updateCategoryVisibility(this.rowData, this.store)
+    this.categoryService.updateCategoryVisibility(this.rowData)
       .subscribe(res => {
         this.toastr.success(this.translate.instant('CATEGORY.CATEGORY_VISIBILITY'));
       }, err => {

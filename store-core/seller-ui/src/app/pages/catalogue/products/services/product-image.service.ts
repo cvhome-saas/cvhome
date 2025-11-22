@@ -2,7 +2,6 @@ import {Injectable} from '@angular/core';
 
 import {CrudService} from '../../../../shared/services/crud.service';
 import {Observable} from 'rxjs';
-import {map} from "rxjs/operators";
 
 @Injectable({
   providedIn: 'root'
@@ -14,16 +13,16 @@ export class ProductImageService {
   ) {
   }
 
-  addImageUrl(store, id) {//post
-    return this.crudService.getBaseUrl() + `/store-pod-gateway/catalog/api/v1/private/product/${id}/image?store=${store}`;
+  addImageUrl( id) {//post
+    return this.crudService.getBaseUrl() + `/store-pod-gateway/catalog/api/v1/private/product/${id}/image`;
   }
 
-  removeImageUrl(store, id) {//delete
-    return this.crudService.getBaseUrl() + `/store-pod-gateway/catalog/api/v1/private/product/${id}/image?store=${store}`;
+  removeImageUrl( id) {//delete
+    return this.crudService.getBaseUrl() + `/store-pod-gateway/catalog/api/v1/private/product/${id}/image`;
   }
 
-  getImages(store, productId): Observable<any> {
-    return this.crudService.get(`/store-pod-gateway/catalog/api/v1/product/${productId}/images?store=${store}`);
+  getImages(productId): Observable<any> {
+    return this.crudService.get(`/store-pod-gateway/catalog/api/v1/product/${productId}/images`);
   }
 
   removeImage(productId, imageId): Observable<any> {
