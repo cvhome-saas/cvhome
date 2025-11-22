@@ -10,7 +10,7 @@ import {SelectedStoreService} from "../../../shared/services/selected-store.serv
 
 @Component({
   selector: 'ngx-products-images',
-  standalone:false,
+  standalone: false,
   templateUrl: './products-images.component.html',
   styleUrls: ['./products-images.component.css']
 })
@@ -29,7 +29,7 @@ export class ProductsImagesComponent implements OnInit, AfterViewInit {
 
   // loading = true;
   addImageUrl = '';
-  removeImageUrl = '';
+  deleteImageUrl = '';
 
   constructor(
     private toastr: NbToastrService,
@@ -38,8 +38,8 @@ export class ProductsImagesComponent implements OnInit, AfterViewInit {
     private location: Location,
     private errorService: ErrorService,
     private activatedRoute: ActivatedRoute,
-    private selectedStoreService:SelectedStoreService
-    ) {
+    private selectedStoreService: SelectedStoreService
+  ) {
 
 
   }
@@ -50,8 +50,10 @@ export class ProductsImagesComponent implements OnInit, AfterViewInit {
         this.store = selectedStore
         this.uniqueCode = params['code'];
         this.load();
-        this.addImageUrl = this.productImageService.addImageUrl( this.uniqueCode)
-        this.removeImageUrl = this.productImageService.removeImageUrl( this.uniqueCode)
+        this.addImageUrl = this.productImageService.addImageUrl(this.uniqueCode)
+        this.deleteImageUrl = this.productImageService.removeImageUrl(this.uniqueCode)
+        console.log(this.addImageUrl)
+        console.log(this.deleteImageUrl)
       })
     })
 
@@ -59,7 +61,7 @@ export class ProductsImagesComponent implements OnInit, AfterViewInit {
 
   load() {
     this.loading = true;
-    this.productImageService.getImages( this.uniqueCode)
+    this.productImageService.getImages(this.uniqueCode)
       .subscribe(res => {
         this.images = res;
         this.loading = false;
@@ -72,7 +74,7 @@ export class ProductsImagesComponent implements OnInit, AfterViewInit {
   /** image component */
   removeImage(event) {
     this.loading = true;
-    this.productImageService.removeImage(this.id, event)
+    this.productImageService.removeImage(this.uniqueCode, event)
       .subscribe({
         next: (data) => {
           this.load();
@@ -87,7 +89,7 @@ export class ProductsImagesComponent implements OnInit, AfterViewInit {
 
   updateImage(event) {
     this.loading = true;
-    this.productImageService.updateImage(this.id, event)
+    this.productImageService.updateImage(this.uniqueCode, event)
       .subscribe({
         next: (data) => {
           this.load();

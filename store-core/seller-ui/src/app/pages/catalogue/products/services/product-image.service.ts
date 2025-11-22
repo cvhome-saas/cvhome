@@ -26,15 +26,15 @@ export class ProductImageService {
   }
 
   removeImage(productId, imageId): Observable<any> {
-    return this.crudService.delete(`/v1/private/product/${productId}/image/${imageId}`);
+    return this.crudService.delete(`/store-pod-gateway/catalog/api/v1/private/product/${productId}/image/${imageId}`);
   }
 
   createImage(id, uploadData): Observable<any> {
-    return this.crudService.post(`/v1/private/product/${id}/images`, uploadData);
+    return this.crudService.post(`/store-pod-gateway/catalog/api/v1/private/product/${id}/images`, uploadData);
   }
 
   updateImage(productId, event): Observable<any> {
-    return this.crudService.patch(`/v1/private/product/${productId}/image/${event.id}?order=${event.position}`, []);
+    return this.crudService.patch(`/store-pod-gateway/catalog/api/v1/private/product/${productId}/image/${event.id}?order=${event.position}`, []);
   }
 
 }

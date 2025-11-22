@@ -30,6 +30,7 @@ import {NgxDatatableModule} from '@swimlane/ngx-datatable';
 import {QuillModule} from 'ngx-quill';
 import {NgcxTreeComponent} from "@cluetec/ngcx-tree";
 import {ProductAutoCompleteComponent} from "./components/product-autocomplete/product-auto-complete.component";
+import {ImageUploadingComponent} from "./components/image-uploading/image-uploading.component";
 
 export const MODULES = [
   NbLayoutModule,
@@ -70,7 +71,8 @@ const COMPONENTS = [
   StoreAutocompleteComponent,
   ProductAutoCompleteComponent,
   ShowcaseDialogComponent,
-  ImageBrowserComponent
+  ImageBrowserComponent,
+  ImageUploadingComponent
 ];
 
 @NgModule({

@@ -156,7 +156,7 @@ public class ProductImageApi {
 
 	@ResponseStatus(HttpStatus.OK)
 	@RequestMapping(value = { "/private/product/{id}/image/{imageId}" }, method = RequestMethod.DELETE)
-	public void deleteImage(@PathVariable Long id, @PathVariable Long imageId, @Valid NameEntity imageName,
+	public void deleteImage(@PathVariable Long id, @PathVariable Long imageId,
 			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
 			@Parameter(hidden = true) LanguageCode language) {
 
