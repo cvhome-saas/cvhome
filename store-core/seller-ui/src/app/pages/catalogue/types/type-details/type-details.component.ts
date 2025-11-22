@@ -1,13 +1,13 @@
 import {Component, OnInit} from '@angular/core';
 import {FormArray, FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {TranslateService} from '@ngx-translate/core';
-import {validators} from '../../../../shared/validation/validators';
+import {validators} from '../../../shared/validation/validators';
 import {TypesService} from '../services/types.service';
 import {NbToastrService} from '@nebular/theme';
 import {ActivatedRoute, Router} from '@angular/router';
-import {ConfigService} from '../../../../shared/services/config.service';
-import {ErrorService} from "../../../../shared/services/error.service";
-import {SelectedStoreService} from "../../../../shared/services/selected-store.service";
+import {ConfigService} from '../../../shared/services/config.service';
+import {ErrorService} from "../../../shared/services/error.service";
+import {SelectedStoreService} from "../../../shared/services/selected-store.service";
 import {mergeMap, of, zip} from "rxjs";
 import {StoreService} from "../../../store-management/services/store.service";
 

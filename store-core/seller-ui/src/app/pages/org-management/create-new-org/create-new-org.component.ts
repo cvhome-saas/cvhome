@@ -3,7 +3,7 @@ import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {Router} from '@angular/router';
 import {NbToastrService} from '@nebular/theme';
 import {TranslateService} from '@ngx-translate/core';
-import {ErrorService} from "../../../shared/services/error.service";
+import {ErrorService} from "../../shared/services/error.service";
 import {OrgService} from "../services/org.service";
 
 @Component({

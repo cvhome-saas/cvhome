@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {Option, SubscriptionDetails, SubscriptionService, Table} from "../service/subscription.service";
 import {zip} from "rxjs";
-import {ErrorService} from "../../../shared/services/error.service";
+import {ErrorService} from "../../shared/services/error.service";
 
 @Component({
   selector: 'ngx-subscription',

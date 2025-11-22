@@ -4,7 +4,7 @@ import {TranslateService} from "@ngx-translate/core";
 import {StoreService} from "../services/store.service";
 import {NbToastrService} from "@nebular/theme";
 import {Logo} from "../models/logo";
-import {ErrorService} from "../../../shared/services/error.service";
+import {ErrorService} from "../../shared/services/error.service";
 
 @Component({
   selector: 'ngx-store-branding-logo',

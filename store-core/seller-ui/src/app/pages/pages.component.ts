@@ -3,9 +3,9 @@ import {Component, OnInit} from '@angular/core';
 import {MENU_ITEMS} from './pages-menu';
 import {MenuItem} from "./menu-item";
 import {TranslateService} from "@ngx-translate/core";
-import {AuthService} from '../shared/services/auth.service';
-import {Roles} from "../shared/models/roles";
-import {SelectedStoreService} from "../shared/services/selected-store.service";
+import {AuthService} from './shared/services/auth.service';
+import {Roles} from "./shared/models/roles";
+import {SelectedStoreService} from "./shared/services/selected-store.service";
 
 @Component({
   selector: 'ngx-pages',

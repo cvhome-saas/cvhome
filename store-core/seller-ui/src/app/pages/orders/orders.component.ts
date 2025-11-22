@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {SelectedLanguageService} from '../../shared/services/selected-language.service';
+import {SelectedLanguageService} from '../shared/services/selected-language.service';
 import {TranslateService} from '@ngx-translate/core';
 
 @Component({

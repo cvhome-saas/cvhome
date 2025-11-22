@@ -5,10 +5,10 @@ import {DomSanitizer} from '@angular/platform-browser';
 import {CategoryService} from '../services/category.service';
 import {NbDialogService, NbToastrService} from '@nebular/theme';
 import {TranslateService} from '@ngx-translate/core';
-import {ShowcaseDialogComponent} from "../../../../shared/components/showcase-dialog/showcase-dialog.component";
+import {ShowcaseDialogComponent} from "../../../shared/components/showcase-dialog/showcase-dialog.component";
 import {ColumnMode} from "@swimlane/ngx-datatable";
-import {ErrorService} from "../../../../shared/services/error.service";
-import {SelectedStoreService} from "../../../../shared/services/selected-store.service";
+import {ErrorService} from "../../../shared/services/error.service";
+import {SelectedStoreService} from "../../../shared/services/selected-store.service";
 import {BaseTable, PageT, StorePageRequest} from "../../../common/BaseTable";
 import {Observable, of} from "rxjs";
 

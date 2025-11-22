@@ -5,7 +5,7 @@ import {StoreService} from '../services/store.service';
 import {NbToastrService} from "@nebular/theme";
 import {TranslateService} from '@ngx-translate/core';
 import {forkJoin} from 'rxjs';
-import {ErrorService} from "../../../shared/services/error.service";
+import {ErrorService} from "../../shared/services/error.service";
 
 
 @Component({

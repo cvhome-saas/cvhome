@@ -8,7 +8,7 @@ import {CategoriesHierarchyComponent} from './categories-hierarchy/categories-hi
 import {CategoryFormComponent} from './category-form/category-form.component';
 import {CategoryDetailComponent} from './category-detail/category-detail.component';
 import {NbDialogModule} from '@nebular/theme';
-import {SharedModule} from "../../../shared/shared.module";
+import {SharedModule} from "../../shared/shared.module";
 import {CategoriesVisibilityComponent} from "./categories-list/categories-visibility.component";
 
 

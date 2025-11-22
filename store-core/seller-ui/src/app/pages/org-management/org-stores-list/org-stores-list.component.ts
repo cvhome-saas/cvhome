@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {ColumnMode} from "@swimlane/ngx-datatable";
-import {ErrorService} from "../../../shared/services/error.service";
+import {ErrorService} from "../../shared/services/error.service";
 import {OrgService} from "../services/org.service";
 import {Org} from "../model/org";
 import {ActivatedRoute, Router} from "@angular/router";

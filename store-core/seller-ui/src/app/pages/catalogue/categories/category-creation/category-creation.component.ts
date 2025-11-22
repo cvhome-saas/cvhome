@@ -1,9 +1,9 @@
 import {Component, OnInit} from '@angular/core';
 import {mergeMap, of, zip} from "rxjs";
 import {StoreService} from "../../../store-management/services/store.service";
-import {SelectedStoreService} from "../../../../shared/services/selected-store.service";
+import {SelectedStoreService} from "../../../shared/services/selected-store.service";
 import {Store} from "../../../store-management/models/store";
-import {ErrorService} from "../../../../shared/services/error.service";
+import {ErrorService} from "../../../shared/services/error.service";
 
 @Component({
   selector: 'ngx-category-creation',

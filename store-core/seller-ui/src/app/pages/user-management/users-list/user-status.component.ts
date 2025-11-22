@@ -2,8 +2,8 @@ import {Component, Input} from '@angular/core';
 
 import {TranslateService} from '@ngx-translate/core';
 import {NbToastrService} from "@nebular/theme";
-import {UserService} from "../../../shared/services/user.service";
-import {ErrorService} from "../../../shared/services/error.service";
+import {UserService} from "../../shared/services/user.service";
+import {ErrorService} from "../../shared/services/error.service";
 
 @Component({
   selector: 'ngx-user-status',

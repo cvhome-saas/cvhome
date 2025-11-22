@@ -3,11 +3,11 @@ import {FormArray, FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {Router} from '@angular/router';
 import {NbToastrService} from '@nebular/theme';
 import {CategoryService} from '../services/category.service';
-import {ConfigService} from '../../../../shared/services/config.service';
+import {ConfigService} from '../../../shared/services/config.service';
 import {TranslateService} from '@ngx-translate/core';
-import {validators} from '../../../../shared/validation/validators';
-import {slugify} from '../../../../shared/utils/slugifying';
-import {ErrorService} from "../../../../shared/services/error.service";
+import {validators} from '../../../shared/validation/validators';
+import {slugify} from '../../../shared/utils/slugifying';
+import {ErrorService} from "../../../shared/services/error.service";
 import {Store} from "../../../store-management/models/store";
 import {zip} from "rxjs";
 

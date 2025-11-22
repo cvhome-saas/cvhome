@@ -11,7 +11,7 @@ import {AdminDashboardComponent} from "./admin-dashboard/admin-dashboard.compone
 import {NewOrgJoinerStatisticComponent} from "./charts/new-org-joiner/new-org-joiner-statistic.component";
 import {NewStoreCreatedStatisticComponent} from "./charts/new-store-created/new-store-created-statistic.component";
 import {SubscriptionStatisticComponent} from "./charts/subscription/subscription-statistic.component";
-import {SharedModule} from '../../shared/shared.module';
+import {SharedModule} from '../shared/shared.module';
 
 @NgModule({
   declarations: [

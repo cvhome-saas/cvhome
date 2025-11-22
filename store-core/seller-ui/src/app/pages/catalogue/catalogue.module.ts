@@ -3,7 +3,7 @@ import {NgModule} from '@angular/core';
 import {CatalogueRoutingModule} from './catalogue-routing.module';
 import {CatalogueComponent} from './catalogue.component';
 import {NbDialogModule} from '@nebular/theme';
-import {SharedModule} from "../../shared/shared.module";
+import {SharedModule} from "../shared/shared.module";
 
 @NgModule({
   declarations: [

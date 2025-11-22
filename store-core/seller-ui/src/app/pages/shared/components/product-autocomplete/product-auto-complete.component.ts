@@ -1,6 +1,6 @@
 import {AfterViewInit, Component, ElementRef, EventEmitter, Input, Output, ViewChild} from '@angular/core';
 import {Observable, of} from "rxjs";
-import {ProductService} from "../../../pages/catalogue/products/services/product.service";
+import {ProductService} from "../../../catalogue/products/services/product.service";
 import {map} from "rxjs/operators";
 import {ErrorService} from "../../services/error.service";
 

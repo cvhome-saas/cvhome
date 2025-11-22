@@ -1,8 +1,8 @@
 import {PageEvent} from "@swimlane/ngx-datatable";
 import {Observable} from "rxjs";
-import {SelectedStoreService} from "../../shared/services/selected-store.service";
+import {SelectedStoreService} from "../shared/services/selected-store.service";
 import {TranslateService} from "@ngx-translate/core";
-import {ErrorService} from "../../shared/services/error.service";
+import {ErrorService} from "../shared/services/error.service";
 
 export abstract class BaseTable<T> {
     private perPageSize = 15;

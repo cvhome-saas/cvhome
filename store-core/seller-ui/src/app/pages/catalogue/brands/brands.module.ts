@@ -7,7 +7,7 @@ import {BrandCreationComponent} from './brand-creation/brand-creation.component'
 import {BrandDetailsComponent} from './brand-details/brand-details.component';
 import {BrandsListComponent} from './brands-list/brands-list.component';
 import {NbDialogModule} from '@nebular/theme';
-import {SharedModule} from "../../../shared/shared.module";
+import {SharedModule} from "../../shared/shared.module";
 
 @NgModule({
   declarations: [

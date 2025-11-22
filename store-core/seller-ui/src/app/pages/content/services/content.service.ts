@@ -1,5 +1,5 @@
 import {Injectable} from "@angular/core";
-import {CrudService} from "../../../shared/services/crud.service";
+import {CrudService} from "../../shared/services/crud.service";
 
 @Injectable({
   providedIn: 'root'

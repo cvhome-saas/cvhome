@@ -4,9 +4,9 @@ import {NbToastrService} from '@nebular/theme';
 import {TranslateService} from '@ngx-translate/core';
 import {ProductImageService} from '../services/product-image.service';
 import {Location} from '@angular/common';
-import {ErrorService} from "../../../../shared/services/error.service";
+import {ErrorService} from "../../../shared/services/error.service";
 import {zip} from "rxjs";
-import {SelectedStoreService} from "../../../../shared/services/selected-store.service";
+import {SelectedStoreService} from "../../../shared/services/selected-store.service";
 
 @Component({
   selector: 'ngx-products-images',

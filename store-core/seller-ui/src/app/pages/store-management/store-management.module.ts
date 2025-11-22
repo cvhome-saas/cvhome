@@ -9,7 +9,7 @@ import {StoreLandingPageComponent} from './store-landing-page/store-landing-page
 import {StoreDetailInfoComponent} from './store-detail-info/store-detail-info.component';
 import {StoreBrandingComponent} from './store-branding/store-branding.component';
 import {NbDialogModule} from '@nebular/theme';
-import {SharedModule} from "../../shared/shared.module";
+import {SharedModule} from "../shared/shared.module";
 import {StoreBrandingBannerComponent} from "./store-branding/store-branding-banner.componants";
 import {StoreBrandingLogoComponent} from "./store-branding/store-branding-logo.componants";
 import {StoreDomainComponent} from "./store-domain/store-domain.component";

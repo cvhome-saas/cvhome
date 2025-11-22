@@ -1,5 +1,5 @@
 import {MenuItem} from './menu-item';
-import {Roles} from "../shared/models/roles";
+import {Roles} from "./shared/models/roles";
 
 const CanAccessOrders = (roles: Roles) => {
   return roles.isOrgAdmin || roles.isStoreAdmin || roles.isStoreModerator;

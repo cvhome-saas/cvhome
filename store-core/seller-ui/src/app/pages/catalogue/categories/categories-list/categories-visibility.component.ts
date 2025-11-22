@@ -3,7 +3,7 @@ import {Component, Input} from '@angular/core';
 import {CategoryService} from '../services/category.service';
 import {TranslateService} from '@ngx-translate/core';
 import {NbToastrService} from "@nebular/theme";
-import {ErrorService} from "../../../../shared/services/error.service";
+import {ErrorService} from "../../../shared/services/error.service";
 
 @Component({
   selector: 'ngx-categories-visibility',
