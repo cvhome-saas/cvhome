@@ -1,8 +1,0 @@
-plugins {
-  alias(libs.plugins.ui.conventions)
-  alias(libs.plugins.node)
-}
-
-bootBuildImage {
-  imageGroup = "store-core"
-}

@@ -1,19 +1,19 @@
 ###
 
-# curl '{{STORE-UI_URL}}/manager/api/v1/user-account/list?lang=en&store=65f023632bc46470c104b76f&count=15&page=0'
-GET {{STORE-UI_URL}}/manager/api/v1/user-account/list?lang=en&store=65f023632bc46470c104b76f&count=15&page=0
+# curl '{{SELLER-UI_URL}}/manager/api/v1/user-account/list?lang=en&store=65f023632bc46470c104b76f&count=15&page=0'
+GET {{SELLER-UI_URL}}/manager/api/v1/user-account/list?lang=en&store=65f023632bc46470c104b76f&count=15&page=0
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
 
 ###
 
-# curl '{{STORE-UI_URL}}/manager/api/v1/user-account/find-one?userId=3dea29fd-f6b2-48b1-8231-f4b5f1c68714'
-GET {{STORE-UI_URL}}/manager/api/v1/user-account/find-one?userId=3dea29fd-f6b2-48b1-8231-f4b5f1c68714
+# curl '{{SELLER-UI_URL}}/manager/api/v1/user-account/find-one?userId=3dea29fd-f6b2-48b1-8231-f4b5f1c68714'
+GET {{SELLER-UI_URL}}/manager/api/v1/user-account/find-one?userId=3dea29fd-f6b2-48b1-8231-f4b5f1c68714
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
 
 ###
 
-# curl '{{STORE-UI_URL}}/manager/api/v1/user-account/groups'
-GET {{STORE-UI_URL}}/manager/api/v1/user-account/groups
+# curl '{{SELLER-UI_URL}}/manager/api/v1/user-account/groups'
+GET {{SELLER-UI_URL}}/manager/api/v1/user-account/groups
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
 
 ###

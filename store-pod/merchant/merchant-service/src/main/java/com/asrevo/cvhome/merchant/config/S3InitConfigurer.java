@@ -1,7 +1,6 @@
 package com.asrevo.cvhome.merchant.config;
 
 import com.asrevo.cvhome.commons.domain.StorageProviderType;
-import com.asrevo.cvhome.merchant.service.AssetsInitService;
 import com.asrevo.cvhome.s2s.model.CdnStorageProperties;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,15 +21,12 @@ public class S3InitConfigurer implements ApplicationListener<ApplicationReadyEve
 
 	private final CdnStorageProperties cdnStorageProperties;
 
-	private final AssetsInitService assetsInitService;
-
 	@Override
 	public void onApplicationEvent(ApplicationReadyEvent event) {
 		if (StorageProviderType.MINIO.equals(cdnStorageProperties.provider())) {
 			configureBucket();
 			configurePolicy();
 		}
-		assetsInitService.loadAssets();
 	}
 
 	private void configureBucket() {

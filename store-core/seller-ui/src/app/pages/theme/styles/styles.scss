@@ -1,0 +1,32 @@
+@import url('https://fonts.googleapis.com/css?family=Open+Sans:400,600,700&display=swap');
+
+// themes - our custom or/and out of the box themes
+@import 'app/pages/theme/styles/themes';
+
+// framework component themes (styles tied to theme variables)
+@import 'globals';
+
+@import '../../../../../node_modules/bootstrap/scss/functions';
+@import '../../../../../node_modules/bootstrap/scss/variables';
+@import '../../../../../node_modules/bootstrap/scss/mixins';
+@import '../../../../../node_modules/bootstrap/scss/grid';
+
+// loading progress bar theme
+@import 'app/pages/theme/styles/pace.theme';
+
+@import 'app/pages/theme/styles/layout';
+@import 'app/pages/theme/styles/overrides';
+
+// install the framework and custom global styles
+@include nb-install() {
+
+  // framework global styles
+  @include nb-theme-global();
+
+  @include ngx-layout();
+  // loading progress bar
+  @include ngx-pace-theme();
+
+  @include nb-overrides();
+}
+

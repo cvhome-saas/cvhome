@@ -1,0 +1,25 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+      http:
+
+exporters:
+  debug:
+    verbosity: detailed
+  zipkin:
+    endpoint: "http://localhost:9411/api/v2/spans"
+
+service:
+  pipelines:
+    traces:
+      receivers: [ otlp ]
+      exporters: [ zipkin ]
+
+    metrics:
+      receivers: [ otlp ]
+      exporters: [ debug ]
+
+    logs:
+      receivers: [ otlp ]
+      exporters: [ debug ]

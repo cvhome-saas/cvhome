@@ -20,31 +20,17 @@ com:
           schema: http
           namespace: store-core.cvhome.lcl
           gateway-service-name: store-core-gateway
-        manager:
-          name: manager
+        control-plane:
+          name: control-plane
           domain: ${com.asrevo.cvhome.app.domain}
           port: 8020
           schema: http
           namespace: store-core.cvhome.lcl
           gateway-service-name: store-core-gateway
-        subscription:
-          name: subscription
-          domain: ${com.asrevo.cvhome.app.domain}
-          port: 8021
-          schema: http
-          namespace: store-core.cvhome.lcl
-          gateway-service-name: store-core-gateway
-        store-ui:
-          name: store-ui
-          domain: store-ui.${com.asrevo.cvhome.app.domain}
+        seller-ui:
+          name: seller-ui
+          domain: seller-ui.${com.asrevo.cvhome.app.domain}
           port: 8010
-          schema: http
-          namespace: store-core.cvhome.lcl
-          gateway-service-name: store-core-gateway
-        welcome-ui:
-          name: welcome-ui
-          domain: welcome-ui.${com.asrevo.cvhome.app.domain}
-          port: 8011
           schema: http
           namespace: store-core.cvhome.lcl
           gateway-service-name: store-core-gateway
@@ -94,13 +80,6 @@ com:
           name: landing-ui
           domain: store-pod-1.${com.asrevo.cvhome.app.domain}
           port: 8110
-          schema: http
-          namespace: store-pod-1.cvhome.lcl
-          gateway-service-name: store-pod-gateway
-        merchant-ui:
-          name: merchant-ui
-          domain: store-pod-1.${com.asrevo.cvhome.app.domain}
-          port: 8111
           schema: http
           namespace: store-pod-1.cvhome.lcl
           gateway-service-name: store-pod-gateway
@@ -198,3 +177,17 @@ management:
 info:
   app:
     name: ${spring.application.name}
+otel:
+  sdk:
+    disabled: true
+  resource:
+    attributes:
+      service:
+        name: ${spring.application.name}
+  instrumentation:
+    spring-webmvc:
+      experimental-span-attributes: true
+    spring-cloud-gateway:
+      experimental-span-attributes: true
+    spring-webflux:
+      experimental-span-attributes: true

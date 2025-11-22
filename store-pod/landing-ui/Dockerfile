@@ -1,17 +1,55 @@
-# Use a specific and lightweight Node.js image for the runtime
+###############################################
+# Stage 1 — Build dependencies
+###############################################
+FROM node:20-slim AS builder
+WORKDIR /build
+
+RUN npm init -y
+
+RUN npm i --omit=dev \
+  express@5.1.0 \
+  next@16.0.0 \
+  react@19.2.0 \
+  react-dom@19.2.0 \
+  next-intl@4.4.0 \
+  @vercel/otel@2.1.0 \
+  @opentelemetry/sdk-node@0.208.0 \
+  @opentelemetry/api@1.9.0 \
+  @opentelemetry/auto-instrumentations-node@0.67.0 \
+  @opentelemetry/sdk-metrics@2.2.0 \
+  @opentelemetry/sdk-trace-node@2.2.0 \
+  typescript@5.9.3
+
+
+RUN apt-get update && apt-get install -y findutils && \
+    find node_modules -type d \( \
+        -name "test" -o \
+        -name "tests" -o \
+        -name "__tests__" -o \
+        -name "bench" -o \
+        -name "benchmark" -o \
+        -name "coverage" \
+    \) -prune -exec rm -rf '{}' + && \
+    find node_modules -type f \( \
+        -name "*.coffee" -o \
+        -name "*.markdown" -o \
+        -name "*.log" -o \
+        -name "*.orig" \
+    \) -delete
+
+
+###############################################
+# Stage 2 — Distroless Runtime
+###############################################
 FROM gcr.io/distroless/nodejs20
+
 ENV NODE_ENV=production
 
+COPY --from=builder /build/node_modules ./node_modules
+COPY app ./app
+COPY libs ./libs
+COPY templates ./templates
 
-# Copy app dist directory
-COPY app/dist ./app/dist/
+EXPOSE 8110
 
-# Copy all dist directories from the libs folder
-COPY libs ./libs/
-
-# Copy all .next directories from the templates folder
-COPY templates ./templates/
-
-COPY node_modules ./node_modules/
-
-CMD ["app/dist/server.js"]
+CMD ["./app/dist/server.js"]

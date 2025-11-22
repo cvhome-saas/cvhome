@@ -3,8 +3,8 @@ plugins {
     id 'com.github.node-gradle.node'
 }
 node {
-    version = '20.11.1'
-    npmVersion = '10.2.4'
+    version = '23.8.0'
+    npmVersion = '11.6.1'
     download = true
 }
 

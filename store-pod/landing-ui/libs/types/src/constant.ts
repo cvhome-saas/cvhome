@@ -1,4 +1,4 @@
-export const CART_DATA_KEY: string = "store-ui-cart-data";
+export const CART_DATA_KEY: string = "seller-ui-cart-data";
 export const HOME_PAGE_PATH = "pages/page";
 export const PRODUCT_PAGE_PATH = "pages/product/[url]/page";
 export const CONTENT_PAGE_PATH = "pages/content/[url]/page";

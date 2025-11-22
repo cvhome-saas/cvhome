@@ -1,36 +1,25 @@
 package com.asrevo.cvhome.s2s.config.internal;
 
-import static org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication.Type.REACTIVE;
-import static org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication.Type.SERVLET;
-
 import com.asrevo.cvhome.s2s.model.ServiceDomainProperties;
-import com.asrevo.cvhome.s2s.oauth2.PasswordTokenResponseClient;
-import com.asrevo.cvhome.s2s.oauth2.RefreshTokenTokenResponseClient;
-import com.asrevo.cvhome.s2s.oauth2.ServerCallBearerExchangeFilterFunction;
-import com.asrevo.cvhome.s2s.oauth2.ServerCallBearerExchangeInterceptor;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
-import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
-import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientPropertiesMapper;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.env.Environment;
-import org.springframework.security.oauth2.client.endpoint.WebClientReactiveClientCredentialsTokenResponseClient;
-import org.springframework.security.oauth2.client.registration.ClientRegistration;
+import org.springframework.security.oauth2.client.*;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
-import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
 import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
+import org.springframework.security.oauth2.client.web.client.OAuth2ClientHttpRequestInterceptor;
 import org.springframework.security.oauth2.client.web.reactive.function.client.ServerOAuth2AuthorizedClientExchangeFilterFunction;
-import org.springframework.security.oauth2.client.web.server.ServerOAuth2AuthorizedClientRepository;
 import org.springframework.web.client.RestClient;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
+
+import static org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication.Type.REACTIVE;
+import static org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication.Type.SERVLET;
 
 @Configuration
 @Slf4j
@@ -42,121 +31,58 @@ public class WebClientServicesConfig {
 	@ConditionalOnWebApplication(type = REACTIVE)
 	static class ReactiveWebClientServicesConfig {
 
-		// @TODO CHECK DefaultClientCredentialsTokenResponseClient
-
-		/**
-		 * used for inside and outside cluster call for secured c-2-s calls without client
-		 * load balancing
-		 */
-		@Bean("webBuilder")
-		@LoadBalanced
-		public WebClient.Builder webBuilder(ReactiveClientRegistrationRepository clientRegistrationRepository,
-				ServerOAuth2AuthorizedClientRepository serverOAuth2AuthorizedClientRepository) {
-			ServerOAuth2AuthorizedClientExchangeFilterFunction oauth = new ServerOAuth2AuthorizedClientExchangeFilterFunction(
-					clientRegistrationRepository, serverOAuth2AuthorizedClientRepository /*
-																							 * new
-																							 * UnAuthenticatedServerOAuth2AuthorizedClientRepository
-																							 * ()
-																							 */);
-			oauth.setDefaultClientRegistrationId("keycloak");
-			return WebClient.builder().filter(oauth);
-		}
-
-		/**
-		 * used for inside cluster call for secured c-2-s calls with client load balancing
-		 */
-		@Bean("defaultWebBuilder")
-		@LoadBalanced
-		public WebClient.Builder defaultWebBuilder(ReactiveClientRegistrationRepository clientRegistrationRepository,
-				ServerOAuth2AuthorizedClientRepository serverOAuth2AuthorizedClientRepository) {
-			ServerOAuth2AuthorizedClientExchangeFilterFunction oauth = new ServerOAuth2AuthorizedClientExchangeFilterFunction(
-					clientRegistrationRepository, serverOAuth2AuthorizedClientRepository /*
-																							 * new
-																							 * UnAuthenticatedServerOAuth2AuthorizedClientRepository
-																							 * ()
-																							 */);
-			oauth.setDefaultClientRegistrationId("keycloak");
-			return WebClient.builder().filter(oauth);
-		}
-
-		/**
-		 * used for inside and outside cluster call for secured s-2-s calls without client
-		 * load balancing
-		 */
-		@Bean("defaultWebMicroServiceBuilder")
-		public WebClient.Builder defaultWebMicroServiceBuilder(
-				WebClientReactiveClientCredentialsTokenResponseClient tokenClient,
-				ReactiveClientRegistrationRepository repository) {
-			ServerCallBearerExchangeFilterFunction filter = new ServerCallBearerExchangeFilterFunction(tokenClient,
-					repository, "s2s");
-			return WebClient.builder().filter(filter);
-		}
-
-		/**
-		 * used for inside cluster call for secured s-2-s calls with client load balancing
-		 */
-		@Bean("defaultMicroServiceBuilder")
-		@LoadBalanced
-		public WebClient.Builder defaultMicroServiceBuilder(
-				WebClientReactiveClientCredentialsTokenResponseClient tokenClient,
-				ReactiveClientRegistrationRepository repository) {
-			ServerCallBearerExchangeFilterFunction filter = new ServerCallBearerExchangeFilterFunction(tokenClient,
-					repository, "s2s");
-			return WebClient.builder().filter(filter);
-		}
-
-		/**
-		 * used for inside and outside cluster call for non-secured calls without client
-		 * load balancing
-		 */
-		@Bean("defaultBuilder")
-		public WebClient.Builder defaultBuilder() {
-			return WebClient.builder();
-		}
-
-		/**
-		 * used for inside cluster call for non-secured calls with client load balancing
-		 */
-		@Bean("defaultBalancedBuilder")
-		@LoadBalanced
-		public WebClient.Builder defaultBalancedBuilder() {
-			return WebClient.builder();
-		}
-
 		@Bean
-		public WebClientReactiveClientCredentialsTokenResponseClient reactivePasswordTokenResponseClient(
-				@Qualifier("defaultBuilder") WebClient.Builder defaultBuilder) {
-			WebClientReactiveClientCredentialsTokenResponseClient client = new WebClientReactiveClientCredentialsTokenResponseClient();
-			client.setWebClient(defaultBuilder.build());
-			return client;
+		public AuthorizedClientServiceReactiveOAuth2AuthorizedClientManager authorizedClientServiceReactiveOAuth2AuthorizedClientManager(
+				ReactiveClientRegistrationRepository clientRegistrationRepository,
+				ReactiveOAuth2AuthorizedClientService authorizedClientService) {
+
+			AuthorizedClientServiceReactiveOAuth2AuthorizedClientManager manager = new AuthorizedClientServiceReactiveOAuth2AuthorizedClientManager(
+					clientRegistrationRepository, authorizedClientService);
+			manager.setAuthorizedClientProvider(
+					ReactiveOAuth2AuthorizedClientProviderBuilder.builder().clientCredentials().refreshToken().build());
+
+			return manager;
 		}
 
-		/*
-		 * issue with this i cant disable https validation and the validation fail
-		 *
-		 * @Bean public DefaultReactiveOAuth2UserService
-		 * defaultReactiveOAuth2UserService(WebClient.Builder defaultMicroServiceBuilder)
-		 * { DefaultReactiveOAuth2UserService defaultReactiveOAuth2UserService = new
-		 * DefaultReactiveOAuth2UserService();
-		 * defaultReactiveOAuth2UserService.setWebClient(defaultMicroServiceBuilder.build(
-		 * )); return defaultReactiveOAuth2UserService; }
-		 */
+		@Bean("microServiceWebClientBuilder")
+		@LoadBalanced
+		public WebClient.Builder microServiceWebClientBuilder(
+				AuthorizedClientServiceReactiveOAuth2AuthorizedClientManager authorizedClientManager) {
+			ServerOAuth2AuthorizedClientExchangeFilterFunction oauth2Filter = new ServerOAuth2AuthorizedClientExchangeFilterFunction(
+					authorizedClientManager);
+			oauth2Filter.setDefaultClientRegistrationId("s2s");
 
-		/*
-		 * @Bean public WebClientReactiveAuthorizationCodeTokenResponseClient
-		 * webClientReactiveAuthorizationCodeTokenResponseClient(WebClient.Builder
-		 * defaultBalancedBuilder) { WebClientReactiveAuthorizationCodeTokenResponseClient
-		 * webClientReactiveAuthorizationCodeTokenResponseClient = new
-		 * WebClientReactiveAuthorizationCodeTokenResponseClient();
-		 * webClientReactiveAuthorizationCodeTokenResponseClient.setWebClient(
-		 * defaultBalancedBuilder.build()); return
-		 * webClientReactiveAuthorizationCodeTokenResponseClient; }
-		 */
+			return WebClient.builder().filter(oauth2Filter);
+		}
+
+		@Bean("microServiceWebClient")
+		public WebClient microServiceWebClient(
+				@Qualifier("microServiceWebClientBuilder") WebClient.Builder microServiceWebClientBuilder) {
+			return microServiceWebClientBuilder.build();
+		}
+
+		@Bean("defaultWebClientBuilder")
+		public WebClient.Builder defaultWebClientBuilder(
+				AuthorizedClientServiceReactiveOAuth2AuthorizedClientManager authorizedClientManager) {
+			ServerOAuth2AuthorizedClientExchangeFilterFunction oauth2Filter = new ServerOAuth2AuthorizedClientExchangeFilterFunction(
+					authorizedClientManager);
+			oauth2Filter.setDefaultClientRegistrationId("s2s");
+
+			return WebClient.builder().filter(oauth2Filter);
+		}
+
+		@Bean("defaultWebClient")
+		public WebClient defaultWebClient(
+				@Qualifier("defaultWebClientBuilder") WebClient.Builder defaultWebClientBuilder) {
+			return defaultWebClientBuilder.build();
+		}
+
 		@Bean
 		public WebClientBuilder webClientBuilder(Environment environment,
-				@Qualifier("defaultMicroServiceBuilder") WebClient.Builder defaultMicroServiceBuilder,
+				@Qualifier("microServiceWebClient") WebClient microServiceWebClient,
 				ServiceDomainProperties serviceDomainProperties, ObjectMapper objectMapper) {
-			return new WebClientBuilder(environment, defaultMicroServiceBuilder, serviceDomainProperties, objectMapper);
+			return new WebClientBuilder(environment, microServiceWebClient.mutate(), serviceDomainProperties,
+					objectMapper);
 		}
 
 	}
@@ -166,36 +92,40 @@ public class WebClientServicesConfig {
 	static class ServletWebClientServicesConfig {
 
 		@Bean
-		public RestClientBuilder restClientBuilder(Environment environment,
-				@Qualifier("microClientBuilder") RestClient.Builder microClientBuilder,
-				ServiceDomainProperties serviceDomainProperties) {
-			return new RestClientBuilder(environment, microClientBuilder, serviceDomainProperties);
+		public AuthorizedClientServiceOAuth2AuthorizedClientManager authorizedClientServiceOAuth2AuthorizedClientManager(
+				ClientRegistrationRepository clientRegistrationRepository,
+				OAuth2AuthorizedClientService authorizedClientService) {
+
+			AuthorizedClientServiceOAuth2AuthorizedClientManager manager = new AuthorizedClientServiceOAuth2AuthorizedClientManager(
+					clientRegistrationRepository, authorizedClientService);
+			manager.setAuthorizedClientProvider(
+					OAuth2AuthorizedClientProviderBuilder.builder().clientCredentials().refreshToken().build());
+
+			return manager;
 		}
 
-		@Bean
-		public PasswordTokenResponseClient passwordTokenResponseClient() {
-			return new PasswordTokenResponseClient();
-		}
-
-		@Bean
-		public RefreshTokenTokenResponseClient refreshTokenTokenResponseClient() {
-			return new RefreshTokenTokenResponseClient();
-		}
-
-		ClientRegistrationRepository getClientRegistrationRepository(OAuth2ClientProperties properties) {
-			List<ClientRegistration> registrations = new ArrayList<>(
-					new OAuth2ClientPropertiesMapper(properties).asClientRegistrations().values());
-			return new InMemoryClientRegistrationRepository(registrations);
-		}
-
-		@Bean("microClientBuilder")
+		@Bean("microServiceRestClientBuilder")
 		@LoadBalanced
-		public RestClient.Builder microClientBuilder(PasswordTokenResponseClient responseClient,
-				RefreshTokenTokenResponseClient refreshTokenTokenResponseClient, OAuth2ClientProperties properties) {
-			ClientRegistrationRepository registrationRepository = getClientRegistrationRepository(properties);
-			ServerCallBearerExchangeInterceptor e1 = new ServerCallBearerExchangeInterceptor(responseClient,
-					refreshTokenTokenResponseClient, registrationRepository, "s2s");
-			return RestClient.builder().requestInterceptor(e1);
+		public RestClient.Builder microServiceRestClientBuilder(
+				AuthorizedClientServiceOAuth2AuthorizedClientManager authorizedClientManager) {
+
+			OAuth2ClientHttpRequestInterceptor requestInterceptor = new OAuth2ClientHttpRequestInterceptor(
+					authorizedClientManager);
+
+			requestInterceptor.setClientRegistrationIdResolver(clientRequest -> "s2s");
+
+			return RestClient.builder().requestInterceptor(requestInterceptor);
+		}
+
+		@Bean("microServiceRestClient")
+		public RestClient microServiceRestClient(RestClient.Builder microServiceRestClientBuilder) {
+			return microServiceRestClientBuilder.build();
+		}
+
+		@Bean
+		public RestClientBuilder restClientBuilder(Environment environment, RestClient microServiceRestClient,
+				ServiceDomainProperties serviceDomainProperties) {
+			return new RestClientBuilder(environment, microServiceRestClient.mutate(), serviceDomainProperties);
 		}
 
 	}

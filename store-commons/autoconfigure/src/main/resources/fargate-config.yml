@@ -7,10 +7,8 @@ spring:
         clients:
           - "store-core-gateway"
           - "core-auth"
-          - "manager"
-          - "subscription"
-          - "store-ui"
-          - "welcome-ui"
+          - "control-plane"
+          - "seller-ui"
           - "store-pod-gateway"
           - "pod-auth"
           - "merchant"
@@ -18,7 +16,6 @@ spring:
           - "catalog"
           - "order"
           - "landing-ui"
-          - "merchant-ui"
     ecs:
       discovery:
         namespace: "store-pod-1.cvhome.lcl"
@@ -28,13 +25,10 @@ spring:
         service-ports:
           "core-auth": 8001
           "store-core-gateway": 8000
-          "store-ui": 8010
-          "welcome-ui": 8011
-          "manager": 8020
-          "subscription": 8021
+          "seller-ui": 8010
+          "control-plane": 8020
           "pod-auth": 8101
           "landing-ui": 8110
-          "merchant-ui": 8111
           "merchant": 8120
           "content": 8121
           "catalog": 8122

@@ -1,3 +1,4 @@
+import './instrumentation';
 import type { NextFunction, Request, Response } from "express";
 import express from "express";
 import {TemplateManager} from "./template-manager";
@@ -21,7 +22,7 @@ function getTheme(req: Request) {
     return themeName.toLowerCase();
 }
 
-app.get("*", async (req: Request, res: Response, next: NextFunction) => {
+app.get(/(.*)/, async (req: Request, res: Response, next: NextFunction) => {
     try {
 
         const theme = getTheme(req);

@@ -1,7 +1,7 @@
 ###
 
-# curl 'GET {{STORE-UI_URL}}/store-pod-gateway/order/api/v1/private/customers?store=65f023632bc46470c104b76f&lang=en&count=10&page=0'
-GET {{STORE-UI_URL}}/store-pod-gateway/order/api/v1/private/customers?store=65f023632bc46470c104b76f&lang=en&count=10&page=0
+# curl 'GET {{SELLER-UI_URL}}/store-pod-gateway/order/api/v1/private/customers?store=65f023632bc46470c104b76f&lang=en&count=10&page=0'
+GET {{SELLER-UI_URL}}/store-pod-gateway/order/api/v1/private/customers?store=65f023632bc46470c104b76f&lang=en&count=10&page=0
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
 
 ###

@@ -1,35 +1,35 @@
-# curl '{{STORE-UI_URL}}/manager/api/v1/org-manager/find-all?lang=en&count=10&page=0'
-GET {{STORE-UI_URL}}/manager/api/v1/org-manager/find-all?lang=en&count=10&page=0
+# curl '{{SELLER-UI_URL}}/manager/api/v1/org-manager/find-all?lang=en&count=10&page=0'
+GET {{SELLER-UI_URL}}/manager/api/v1/org-manager/find-all?lang=en&count=10&page=0
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
 
 ###
 
-# curl '{{STORE-UI_URL}}/manager/api/v1/org-manager/find-one?id=21f023932bc66470c104b76f'
-GET {{STORE-UI_URL}}/manager/api/v1/org-manager/find-one?id=21f023932bc66470c104b76f
+# curl '{{SELLER-UI_URL}}/manager/api/v1/org-manager/find-one?id=21f023932bc66470c104b76f'
+GET {{SELLER-UI_URL}}/manager/api/v1/org-manager/find-one?id=21f023932bc66470c104b76f
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
 
 ###
 
-# curl '{{STORE-UI_URL}}/subscription/api/v1/subscription-plan/public/list'
-GET {{STORE-UI_URL}}/subscription/api/v1/subscription-plan/public/list
+# curl '{{SELLER-UI_URL}}/subscription/api/v1/subscription-plan/public/list'
+GET {{SELLER-UI_URL}}/subscription/api/v1/subscription-plan/public/list
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
 
 ###
 
-# curl '{{STORE-UI_URL}}/manager/api/v1/org-manager/find-one?id=21f023932bc66470c104b76f'
-GET {{STORE-UI_URL}}/manager/api/v1/org-manager/find-one?id=21f023932bc66470c104b76f
+# curl '{{SELLER-UI_URL}}/manager/api/v1/org-manager/find-one?id=21f023932bc66470c104b76f'
+GET {{SELLER-UI_URL}}/manager/api/v1/org-manager/find-one?id=21f023932bc66470c104b76f
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
 
 ###
 
-# curl '{{STORE-UI_URL}}/manager/api/v1/org-manager/stores?id=21f023932bc66470c104b76f&lang=en&count=10&page=0'
-GET {{STORE-UI_URL}}/manager/api/v1/org-manager/stores?id=21f023932bc66470c104b76f&lang=en&count=10&page=0
+# curl '{{SELLER-UI_URL}}/manager/api/v1/org-manager/stores?id=21f023932bc66470c104b76f&lang=en&count=10&page=0'
+GET {{SELLER-UI_URL}}/manager/api/v1/org-manager/stores?id=21f023932bc66470c104b76f&lang=en&count=10&page=0
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
 
 ###
 
-# curl '{{STORE-UI_URL}}/manager/api/v1/org-manager/create'
-POST {{STORE-UI_URL}}/manager/api/v1/org-manager/create
+# curl '{{SELLER-UI_URL}}/manager/api/v1/org-manager/create'
+POST {{SELLER-UI_URL}}/manager/api/v1/org-manager/create
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
 Content-Type: application/json
 
@@ -46,8 +46,8 @@ Content-Type: application/json
 
 ###
 
-# curl '{{STORE-UI_URL}}/manager/api/v1/org-manager/update?id=21f023932bc66470c104b76f'
-PUT {{STORE-UI_URL}}/manager/api/v1/org-manager/update?id=21f023932bc66470c104b76f
+# curl '{{SELLER-UI_URL}}/manager/api/v1/org-manager/update?id=21f023932bc66470c104b76f'
+PUT {{SELLER-UI_URL}}/manager/api/v1/org-manager/update?id=21f023932bc66470c104b76f
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
 Content-Type: application/json
 
@@ -57,8 +57,8 @@ Content-Type: application/json
 
 ###
 
-# curl '{{STORE-UI_URL}}/manager/api/v1/org-manager/change-password?id=21f023932bc66470c104b76f' 
-POST {{STORE-UI_URL}}/manager/api/v1/org-manager/change-password?id=21f023932bc66470c104b76f
+# curl '{{SELLER-UI_URL}}/manager/api/v1/org-manager/change-password?id=21f023932bc66470c104b76f' 
+POST {{SELLER-UI_URL}}/manager/api/v1/org-manager/change-password?id=21f023932bc66470c104b76f
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
 Content-Type: application/json
 
