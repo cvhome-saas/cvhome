@@ -21,16 +21,18 @@ import {provideAnimationsAsync} from "@angular/platform-browser/animations/async
 import {provideServerRendering, withRoutes} from "@angular/ssr";
 import {serverRoutes} from "./app.routes.server";
 import {provideRouter} from "@angular/router";
+import {provideClientHydration} from "@angular/platform-browser";
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({eventCoalescing: true}),
     provideRouter(routes),
+    provideClientHydration(),
     provideServerRendering(withRoutes(serverRoutes)),
     provideHttpClient(withFetch()),
     provideAnimationsAsync(),
     provideTranslateService({
-      defaultLanguage: 'en',
+      fallbackLang: 'en',
       loader: provideTranslateHttpLoader({
         prefix: './assets/i18n/',
         suffix: '.json'
