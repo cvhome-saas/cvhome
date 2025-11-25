@@ -1,6 +1,6 @@
-import {Store} from "@/types/store";
 import type {ReadonlyHeaders} from "next/dist/server/web/spec-extension/adapters/headers";
 import {redirect} from 'next/navigation';
+import {Store} from "@store-front/types";
 
 export function buildDefaultLangRedirectionUrl(store: Store, headers: ReadonlyHeaders, urlLocale: string): string {
     let newPath: string;

@@ -1,7 +1,6 @@
 import {headers} from "next/headers";
 import {getLocale} from "next-intl/server";
-import {StoreContext} from "@/types/store-context";
-import {FALLBACK_STORE_ID} from "@/types/constant";
+import {FALLBACK_STORE_ID, StoreContext} from "@store-front/types";
 
 export const extractSsrContext = async (): Promise<StoreContext> => {
     const h = await headers();

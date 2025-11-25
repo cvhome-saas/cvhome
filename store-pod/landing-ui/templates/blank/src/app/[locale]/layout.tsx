@@ -1,14 +1,14 @@
 import "./globals.css";
 import {DefaultParams, LocaleParam} from "@/types/params";
 import {StoreService} from "@/services/store-service";
-import {extractSsrContext} from "@/utils/store-context-ssr-utils";
+import {extractSsrContext} from "@/services/store-context-ssr-utils"
 import {Store} from "@/types/store";
 import {StoreNotFoundLayout} from "@/layout/StoreNotFoundLayout";
 import {StoreLayout} from "@/layout/StoreLayout";
 import {Metadata} from "next";
 import {headers} from 'next/headers';
 import {ContentService} from "@/services/content-service";
-import {redirectToSupportedLang} from "@/utils/locale-utils";
+import {redirectToSupportedLang} from "@/services/locale-utils";
 
 const svgIcon = `<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦊</text></svg>`;
 

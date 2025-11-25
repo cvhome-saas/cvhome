@@ -4,7 +4,7 @@ import {CheckoutForm} from "@/componantes/Checkout/CheckoutForm";
 import {CheckoutCartBox} from "@/componantes/Checkout/CheckoutCartBox";
 import {getTranslations} from "next-intl/server";
 import {BreadcrumbItem} from "@/types/bread-crumb";
-import {extractSsrContext} from "@/utils/store-context-ssr-utils";
+import {extractSsrContext} from "@/services/store-context-ssr-utils";
 
 export default async function Page({params}: { params: Promise<CheckoutPageParams> }) {
     const aparams = await params;

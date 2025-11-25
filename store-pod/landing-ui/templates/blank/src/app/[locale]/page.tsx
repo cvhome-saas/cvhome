@@ -1,7 +1,7 @@
 import {HomePageParams} from "@/types/params";
 import React from 'react';
 import {getTranslations} from "next-intl/server";
-import {extractSsrContext} from "@/utils/store-context-ssr-utils";
+import {extractSsrContext} from "@/services/store-context-ssr-utils"
 
 
 export default async function Page({params}: { params: HomePageParams }) {
