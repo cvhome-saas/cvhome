@@ -7,7 +7,7 @@ import {SectionTitle} from "@/componantes/common/SectionTitle";
 import ProductSwiperGrid from "@/componantes/ProductGrid/ProductSwiperGrid";
 import React from "react";
 import {BreadcrumbItem} from "@/types/bread-crumb";
-import {extractSsrContext} from "@/utils/store-context-ssr-utils";
+import {extractSsrContext} from "@/services/store-context-ssr-utils";
 
 
 export default async function Page({params}: { params: Promise<ProductPageParams> }) {

@@ -4,7 +4,7 @@ import {Breadcrumb} from "@/componantes/Breadcrumb/Breadcrumb";
 import {parseDescription} from "@/services/description-view-util";
 import {getTranslations} from "next-intl/server";
 import {BreadcrumbItem} from "@/types/bread-crumb";
-import {extractSsrContext} from "@/utils/store-context-ssr-utils";
+import {extractSsrContext} from "@/services/store-context-ssr-utils";
 
 export default async function Page({params}: { params: Promise<ContentPageParams> }) {
     const aparams = await params;

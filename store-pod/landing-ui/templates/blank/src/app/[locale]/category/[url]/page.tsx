@@ -1,7 +1,7 @@
 import {CategoryPageParams} from "@/types/params";
 import {CategoryService} from "@/services/category-service";
 import {Category} from "@/types/category";
-import {extractSsrContext} from "@/utils/store-context-ssr-utils";
+import {extractSsrContext} from "@/services/store-context-ssr-utils"
 
 export default async function Page({params}: { params: Promise<CategoryPageParams> }) {
     const aparams = await params;

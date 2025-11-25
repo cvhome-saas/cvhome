@@ -7,7 +7,7 @@ import {StoreService} from "@/services/store-service";
 import React from 'react';
 import {SectionTitle} from "@/componantes/common/SectionTitle";
 import {getTranslations} from "next-intl/server";
-import {extractSsrContext} from "@/utils/store-context-ssr-utils";
+import {extractSsrContext} from "@/services/store-context-ssr-utils";
 
 
 export default async function Page({params}: { params: HomePageParams }) {
