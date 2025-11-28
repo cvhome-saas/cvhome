@@ -60,8 +60,7 @@ public class ContentApi {
 	 */
 	@GetMapping(value = "/private/content/pages", produces = MediaType.APPLICATION_JSON_VALUE)
 	@Operation(method = "GET", description = "Get page names created for a given MerchantStore",
-			responses = @ApiResponse(content = @Content(
-					schema = @Schema(implementation = List.class))))
+			responses = @ApiResponse(content = @Content(schema = @Schema(implementation = List.class))))
 	@Parameters({
 			@Parameter(name = "store",
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
@@ -78,8 +77,7 @@ public class ContentApi {
 	 */
 	@GetMapping(value = "/content/pages", produces = MediaType.APPLICATION_JSON_VALUE)
 	@Operation(method = "GET", description = "Get page names created for a given MerchantStore",
-			responses = @ApiResponse(content = @Content(
-					schema = @Schema(implementation = List.class))))
+			responses = @ApiResponse(content = @Content(schema = @Schema(implementation = List.class))))
 	@Parameters({
 			@Parameter(name = "store",
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
@@ -95,8 +93,8 @@ public class ContentApi {
 	 * List all boxes
 	 */
 	@GetMapping(value = "/private/content/boxes", produces = MediaType.APPLICATION_JSON_VALUE)
-	@Operation(method = "GET", description = "Get boxes for a given MerchantStore", responses = @ApiResponse(
-			content = @Content(schema = @Schema(implementation = List.class))))
+	@Operation(method = "GET", description = "Get boxes for a given MerchantStore",
+			responses = @ApiResponse(content = @Content(schema = @Schema(implementation = List.class))))
 	@Parameters({
 			@Parameter(name = "store",
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
@@ -112,8 +110,8 @@ public class ContentApi {
 	 * List all boxes
 	 */
 	@GetMapping(value = "/content/boxes", produces = MediaType.APPLICATION_JSON_VALUE)
-	@Operation(method = "GET", description = "Get boxes for a given MerchantStore", responses = @ApiResponse(
-			content = @Content(schema = @Schema(implementation = List.class))))
+	@Operation(method = "GET", description = "Get boxes for a given MerchantStore",
+			responses = @ApiResponse(content = @Content(schema = @Schema(implementation = List.class))))
 	@Parameters({
 			@Parameter(name = "store",
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
@@ -130,8 +128,7 @@ public class ContentApi {
 	 */
 	@GetMapping(value = "/private/content/pages/{code}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@Operation(method = "GET", description = "Get page content by code for a given MerchantStore",
-			responses = @ApiResponse(content = @Content(
-					schema = @Schema(implementation = ReadableContentPage.class))))
+			responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ReadableContentPage.class))))
 	@Parameters({
 			@Parameter(name = "store",
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
@@ -149,8 +146,7 @@ public class ContentApi {
 	 */
 	@GetMapping(value = "/content/pages/{code}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@Operation(method = "GET", description = "Get page content by code for a given MerchantStore",
-			responses = @ApiResponse(content = @Content(
-					schema = @Schema(implementation = ReadableContentPage.class))))
+			responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ReadableContentPage.class))))
 	@Parameters({
 			@Parameter(name = "store",
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
@@ -165,8 +161,7 @@ public class ContentApi {
 
 	@GetMapping(value = "/private/content/boxes/{code}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@Operation(method = "GET", description = "Manage box content by code for a code and a given MerchantStore",
-			responses = @ApiResponse(content = @Content(
-					schema = @Schema(implementation = List.class))))
+			responses = @ApiResponse(content = @Content(schema = @Schema(implementation = List.class))))
 	@Parameters({
 			@Parameter(name = "store",
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
@@ -180,8 +175,7 @@ public class ContentApi {
 
 	@GetMapping(value = "/content/boxes/{code}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@Operation(method = "GET", description = "Get box content by code for a code and a given MerchantStore",
-			responses = @ApiResponse(content = @Content(
-					schema = @Schema(implementation = List.class))))
+			responses = @ApiResponse(content = @Content(schema = @Schema(implementation = List.class))))
 	@Parameters({
 			@Parameter(name = "store",
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
@@ -198,8 +192,7 @@ public class ContentApi {
 	 */
 	@GetMapping(value = "/content/pages/name/{name}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@Operation(method = "GET", description = "Get page content by code for a given MerchantStore",
-			responses = @ApiResponse(content = @Content(
-					schema = @Schema(implementation = ReadableContentPage.class))))
+			responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ReadableContentPage.class))))
 	@Parameters({
 			@Parameter(name = "store",
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
@@ -217,8 +210,8 @@ public class ContentApi {
 	 */
 	@PostMapping(value = "/private/content/box")
 	@ResponseStatus(HttpStatus.CREATED)
-	@Operation(method = "POST", description = "Create content box", responses = @ApiResponse(
-			content = @Content(schema = @Schema(implementation = Entity.class))))
+	@Operation(method = "POST", description = "Create content box",
+			responses = @ApiResponse(content = @Content(schema = @Schema(implementation = Entity.class))))
 	@Parameters({
 			@Parameter(name = "store",
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
@@ -254,8 +247,7 @@ public class ContentApi {
 	@GetMapping(value = "/private/content/page/{code}/exists")
 	@ResponseStatus(HttpStatus.OK)
 	@Operation(method = "GET", description = "Check unique content page",
-			responses = @ApiResponse(content = @Content(
-					schema = @Schema(implementation = ResponseEntity.class))))
+			responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ResponseEntity.class))))
 	@Parameters({
 			@Parameter(name = "store",
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
@@ -274,8 +266,8 @@ public class ContentApi {
 	 */
 	@PostMapping(value = "/private/content/page")
 	@ResponseStatus(HttpStatus.CREATED)
-	@Operation(method = "POST", description = "Create content page", responses = @ApiResponse(
-			content = @Content(schema = @Schema(implementation = Entity.class))))
+	@Operation(method = "POST", description = "Create content page",
+			responses = @ApiResponse(content = @Content(schema = @Schema(implementation = Entity.class))))
 	@Parameters({
 			@Parameter(name = "store",
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
@@ -328,8 +320,7 @@ public class ContentApi {
 	 */
 	@GetMapping(value = "/content/images", produces = MediaType.APPLICATION_JSON_VALUE)
 	@Operation(method = "GET", description = "Get store content images",
-			responses = @ApiResponse(content = @Content(
-					schema = @Schema(implementation = ContentFolder.class))))
+			responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ContentFolder.class))))
 	@Parameters({
 			@Parameter(name = "store",
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
