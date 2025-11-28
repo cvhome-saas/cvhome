@@ -11,63 +11,63 @@ export class ContentService {
 
 
   getBoxes(params: any) {
-    return this.crudService.get('/store-pod-gateway/content/api/v1/private/content/boxes', params);
+    return this.crudService.get('/store-pod-gateway/merchant/api/v1/private/content/boxes', params);
   }
 
   getBox(uniqueCode: string, params: any) {
-    return this.crudService.get('/store-pod-gateway/content/api/v1/private/content/boxes/' + uniqueCode, params);
+    return this.crudService.get('/store-pod-gateway/merchant/api/v1/private/content/boxes/' + uniqueCode, params);
   }
 
   checkCodeBoxExist(code, params: any) {
-    return this.crudService.get('/store-pod-gateway/content/api/v1/private/content/box/' + code + '/exists', params);
+    return this.crudService.get('/store-pod-gateway/merchant/api/v1/private/content/box/' + code + '/exists', params);
   }
 
   updateBox(id,  object: any, param: any) {
-    return this.crudService.put('/store-pod-gateway/content/api/v1/private/content/box/' + id , object, param)
+    return this.crudService.put('/store-pod-gateway/merchant/api/v1/private/content/box/' + id , object, param)
 
   }
 
   createBox( object: any) {
-    return this.crudService.post('/store-pod-gateway/content/api/v1/private/content/box', object)
+    return this.crudService.post('/store-pod-gateway/merchant/api/v1/private/content/box', object)
   }
 
   images() {
-    return this.crudService.get('/store-pod-gateway/content/api/v1/content/images')
+    return this.crudService.get('/store-pod-gateway/merchant/api/v1/content/images')
   }
 
   deleteImage( e) {
-    return this.crudService.delete(`/store-pod-gateway/content/api/v1/private/content/?contentType=IMAGE&name=${e}`);
+    return this.crudService.delete(`/store-pod-gateway/merchant/api/v1/private/content/?contentType=IMAGE&name=${e}`);
   }
 
   saveImage(formData: FormData) {
-    return this.crudService.post(`/store-pod-gateway/content/api/v1/private/files`, formData)
+    return this.crudService.post(`/store-pod-gateway/merchant/api/v1/private/files`, formData)
 
   }
 
   checkCodePageExist(code: string) {
-    return this.crudService.get('/store-pod-gateway/content/api/v1/private/content/page/' + code + '/exists');
+    return this.crudService.get('/store-pod-gateway/merchant/api/v1/private/content/page/' + code + '/exists');
   }
 
   updatePage(id,  object: any) {
-    return this.crudService.put('/store-pod-gateway/content/api/v1/private/content/page/' + id, object)
+    return this.crudService.put('/store-pod-gateway/merchant/api/v1/private/content/page/' + id, object)
 
   }
 
   createPage( object: any) {
-    return this.crudService.post('/store-pod-gateway/content/api/v1/private/content/page', object);
+    return this.crudService.post('/store-pod-gateway/merchant/api/v1/private/content/page', object);
   }
 
   getPage(uniqueCode: string) {
-    return this.crudService.get('/store-pod-gateway/content/api/v1/private/content/pages/' + uniqueCode )
+    return this.crudService.get('/store-pod-gateway/merchant/api/v1/private/content/pages/' + uniqueCode )
 
   }
 
   pages(params: any) {
-    return this.crudService.get('/store-pod-gateway/content/api/v1/private/content/pages', params)
+    return this.crudService.get('/store-pod-gateway/merchant/api/v1/private/content/pages', params)
   }
 
   deleteContent(id) {
-    return this.crudService.delete('/store-pod-gateway/content/api/v1/private/content/' + id + '?id=' + id)
+    return this.crudService.delete('/store-pod-gateway/merchant/api/v1/private/content/' + id + '?id=' + id)
 
   }
 }
