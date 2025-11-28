@@ -64,16 +64,16 @@ export class StoreService {
   // PAGE CONTENT
 
   getPageContent(store:string,pageCode: string): Observable<any> {
-    return this.crudService.get(`/store-pod-gateway/content/api/v1/private/content/any/${pageCode}`,{store});
+    return this.crudService.get(`/store-pod-gateway/merchant/api/v1/private/content/any/${pageCode}`,{store});
   }
 
   updatePageContent(store:string, code:string, content: any): Observable<any> {
-    return this.crudService.put(`/store-pod-gateway/content/api/v1/private/content/${code}`, content,{store});
+    return this.crudService.put(`/store-pod-gateway/merchant/api/v1/private/content/${code}`, content,{store});
   }
 
   createPageContent(content: any, store: string): Observable<any> {
 
-    return this.crudService.post(`/store-pod-gateway/content/api/v1/private/content`, content, {store});
+    return this.crudService.post(`/store-pod-gateway/merchant/api/v1/private/content`, content, {store});
   }
 
   updateSocialNetworks(store: string, body: any): Observable<any> {

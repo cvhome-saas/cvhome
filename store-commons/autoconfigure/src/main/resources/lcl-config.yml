@@ -44,12 +44,6 @@ spring:
                 metadata:
                   service-name: merchant
                   instance: merchant-1
-            content:
-              - uri: "http://localhost:8121"
-                instance-id: content-1
-                metadata:
-                  service-name: content
-                  instance: content-1
             catalog:
               - uri: "http://localhost:8122"
                 instance-id: catalog-1

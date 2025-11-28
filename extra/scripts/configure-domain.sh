@@ -26,7 +26,6 @@ function run-append() {
     append "127.0.0.1 store-pod-saas-gateway-1.gateway.com" "$file"
     append "127.0.0.1 pod-auth.gateway.com" "$file"
     append "127.0.0.1 catalog.gateway.com" "$file"
-    append "127.0.0.1 content.gateway.com" "$file"
     append "127.0.0.1 merchant.gateway.com" "$file"
     append "127.0.0.1 order.gateway.com" "$file"
     append "127.0.0.1 landing-ui.gateway.com" "$file"
