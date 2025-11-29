@@ -136,7 +136,8 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
 		ReadableProductOptionValueList valueList = new ReadableProductOptionValueList();
 		valueList.setTotalPages(options.getTotalPages());
 		valueList.setTotalElements(options.getTotalElements());
-		valueList.setSize(options.getNumber());
+		valueList.setSize(options.getSize());
+		valueList.setPageNumber(options.getNumber());
 
 		List<ReadableProductOptionValue> values = options.getContent()
 			.stream()
@@ -157,7 +158,8 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
 		ReadableProductOptionList valueList = new ReadableProductOptionList();
 		valueList.setTotalPages(options.getTotalPages());
 		valueList.setTotalElements(options.getTotalElements());
-		valueList.setSize(options.getNumber());
+		valueList.setSize(options.getSize());
+		valueList.setPageNumber(options.getNumber());
 
 		List<ReadableProductOptionEntity> values = options.getContent()
 			.stream()
@@ -346,8 +348,9 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
 			attr = productAttributeService.getByProductId(store, product, pageable);
 		}
 		attrList.setTotalElements(attr.getTotalElements());
-		attrList.setSize(attr.getNumberOfElements());
+		attrList.setSize(attr.getSize());
 		attrList.setTotalPages(attr.getTotalPages());
+		attrList.setPageNumber(attr.getNumber());
 
 		List<ReadableProductAttributeEntity> values = attr.getContent()
 			.stream()

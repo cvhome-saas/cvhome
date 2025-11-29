@@ -102,6 +102,7 @@ public class CategoryFacadeImpl implements CategoryFacade {
 		returnList.setTotalElements(page.getTotalElements());
 		returnList.setTotalPages(page.getTotalPages());
 		returnList.setSize(categories.size());
+		returnList.setPageNumber(page.getNumber());
 
 		List<ReadableCategory> categoryList = categories.stream()
 			.map(cat -> readableCategoryMapper.convert(cat, store, language))

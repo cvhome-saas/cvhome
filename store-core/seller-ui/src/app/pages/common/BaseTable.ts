@@ -5,7 +5,7 @@ import {TranslateService} from "@ngx-translate/core";
 import {ErrorService} from "../shared/services/error.service";
 
 export abstract class BaseTable<T> {
-    private perPageSize = 15;
+    public perPageSize = 10;
     private _params: StorePageRequest = {
         page: 0,
         count: this.perPageSize

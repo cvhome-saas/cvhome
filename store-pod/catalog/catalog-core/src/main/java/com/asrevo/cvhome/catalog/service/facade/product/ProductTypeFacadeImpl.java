@@ -50,6 +50,7 @@ public class ProductTypeFacadeImpl implements ProductTypeFacade {
 		returnList.setTotalPages(types.getTotalPages());
 		returnList.setTotalElements(types.getTotalElements());
 		returnList.setSize(types.getSize());
+		returnList.setPageNumber(types.getNumber());
 
 		return returnList;
 	}

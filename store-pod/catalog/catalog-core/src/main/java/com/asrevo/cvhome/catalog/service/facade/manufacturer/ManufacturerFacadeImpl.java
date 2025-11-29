@@ -147,6 +147,7 @@ public class ManufacturerFacadeImpl implements ManufacturerFacade {
 			readableList.setTotalPages(m.getTotalPages());
 			readableList.setTotalElements(m.getTotalElements());
 			readableList.setSize(m.getNumberOfElements());
+			readableList.setPageNumber(m.getNumber());
 
 			ReadableManufacturerPopulator populator = new ReadableManufacturerPopulator();
 			List<ReadableManufacturer> returnList = new ArrayList<>();

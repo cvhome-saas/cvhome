@@ -154,6 +154,7 @@ public class ProductFacadeV2Impl implements ProductFacade {
 		readableProductList.setSize(all.getNumberOfElements());
 		readableProductList.setContent(readableProducts);
 		readableProductList.setTotalPages(all.getTotalPages());
+		readableProductList.setPageNumber(all.getNumber());
 
 		return readableProductList;
 	}

@@ -23,7 +23,7 @@ export class ProductGroupFormComponent implements OnInit {
   isCodeUnique = true;
   uniqueCode: string;
   loader: boolean = false;
-  perPage = 50;
+  perPageSize = 50;
   params: any;
   products: Array<any> = [];
   rows: Array<any> = [];
@@ -52,7 +52,7 @@ export class ProductGroupFormComponent implements OnInit {
   loadParams() {
     return {
       store: "",
-      count: this.perPage,
+      count: this.perPageSize,
       page: 0
     };
   }
