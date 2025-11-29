@@ -10,6 +10,7 @@ import {validators} from '../../shared/validation/validators';
 import {forkJoin} from 'rxjs';
 import {ErrorService} from "../../shared/services/error.service";
 import {Pods, PodService} from "../services/pod.service";
+import {SelectedStoreService} from "../../shared/services/selected-store.service";
 
 @Component({
   selector: 'ngx-store-form',
@@ -87,6 +88,7 @@ export class StoreFormComponent implements OnInit {
     private toastr: NbToastrService,
     private translate: TranslateService,
     private errorService: ErrorService,
+    private selectedStoreService:SelectedStoreService,
     private podService: PodService) {
   }
 
@@ -248,6 +250,7 @@ export class StoreFormComponent implements OnInit {
             } else {
               this.storeService.createStore(storeObj)
                 .subscribe(store => {
+                  this.selectedStoreService.newStore(store);
                   this.toastr.success(this.translate.instant('STORE_FORM.STORE_CREATED'));
                   this.router.navigate(['pages/store-management/stores-list']);
                 }, err => {

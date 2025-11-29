@@ -41,7 +41,7 @@ public class StoreManagerServiceImpl implements StoreManagerService {
 	}
 
 	@Override
-	public void createStore(ManagerOrgId orgId, Map<Object, Object> request) {
+	public ManagerStoreDto createStore(ManagerOrgId orgId, Map<Object, Object> request) {
 		PodId prefaredPodId = Optional.ofNullable(request.get("pod"))
 			.map(it -> ((Map<String, String>) it))
 			.filter(it -> it.containsKey("id"))
@@ -50,7 +50,7 @@ public class StoreManagerServiceImpl implements StoreManagerService {
 			.map(PodId::new)
 			.orElse(null);
 		PodId podId = podSelection.next(orgId, prefaredPodId);
-		internalStoreService.createStore(request, orgId, podId);
+		return internalStoreService.createStore(request, orgId, podId);
 	}
 
 	@Override
