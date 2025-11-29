@@ -18,7 +18,7 @@ import {SelectedStoreService} from "../../../shared/services/selected-store.serv
 export class ProductRelatedComponent implements OnInit, AfterViewInit {
 
   product: string;
-  perPage = 50;
+  perPageSize = 50;
   params: any;
   products: Array<any> = [];
   rows: Array<any> = [];
@@ -57,7 +57,7 @@ export class ProductRelatedComponent implements OnInit, AfterViewInit {
   loadParams() {
     return {
       store: "",
-      count: this.perPage,
+      count: this.perPageSize,
       page: 0
     };
   }

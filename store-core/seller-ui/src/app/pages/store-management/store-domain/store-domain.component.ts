@@ -21,6 +21,7 @@ import {dnsPointsToPodValidatorFactory, StoreDomainComponentValidatorContext} fr
 export class StoreDomainComponent implements OnInit , StoreDomainComponentValidatorContext{
   isSubmited = false;
   store;
+  perPageSize = 50;
   loading = false;
   page: Page = new Page();
   rows = [];
