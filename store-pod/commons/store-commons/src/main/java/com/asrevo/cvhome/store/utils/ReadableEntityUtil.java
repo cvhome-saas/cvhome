@@ -15,6 +15,7 @@ public final class ReadableEntityUtil {
 		readableList.setTotalPages(entityList.getTotalPages());
 		readableList.setTotalElements(entityList.getTotalElements());
 		readableList.setSize(items.size());
+		readableList.setPageNumber(entityList.getNumber());
 		return readableList;
 	}
 

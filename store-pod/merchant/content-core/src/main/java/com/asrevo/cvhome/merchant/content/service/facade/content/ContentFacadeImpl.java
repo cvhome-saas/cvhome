@@ -120,6 +120,7 @@ public class ContentFacadeImpl implements ContentFacade {
 		items.setTotalPages(contentPages.getTotalPages());
 		items.setSize(contentPages.getNumberOfElements());
 		items.setTotalElements(contentPages.getTotalElements());
+		items.setPageNumber(contentPages.getNumber());
 		ReadableContentPagePopulator populator = new ReadableContentPagePopulator();
 		List<ReadableContentPage> pages = contentPages.getContent().stream().map(content -> {
 			try {
@@ -244,6 +245,7 @@ public class ContentFacadeImpl implements ContentFacade {
 		items.setTotalPages(contentBoxes.getTotalPages());
 		items.setSize(contentBoxes.getNumberOfElements());
 		items.setTotalElements(contentBoxes.getTotalElements());
+		items.setPageNumber(contentBoxes.getNumber());
 		ReadableContentBoxPopulator readableContentBoxPopulator = new ReadableContentBoxPopulator();
 		List<ReadableContentBox> boxes = contentBoxes.getContent().stream().map(content -> {
 			try {

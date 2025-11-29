@@ -19,6 +19,4 @@ public class ReadableOrderList extends ReadableList<ReadableOrder> implements Se
 	@Serial
 	private static final long serialVersionUID = 1L;
 
-	private List<ReadableOrder> content = new ArrayList<>();
-
 }
