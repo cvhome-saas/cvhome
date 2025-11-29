@@ -18,6 +18,41 @@
   </nb-card-header>
 
   <nb-card-body [nbSpinner]="isLoading" nbSpinnerSize="large" nbSpinnerStatus="primary">
+    <div class="filter-section">
+      <div class="row">
+        <div class="col-md-3">
+          <nb-form-field>
+            <nb-icon icon="person-outline" nbPrefix></nb-icon>
+            <input [(ngModel)]="filter.sku" fullWidth nbInput placeholder="{{ 'PRODUCT.FILTER_SKU' | translate }}"
+                   type="text">
+          </nb-form-field>
+        </div>
+        <div class="col-md-3">
+          <nb-form-field>
+            <nb-icon icon="bookmark-outline" nbPrefix></nb-icon>
+            <nb-select [(ngModel)]="filter.available" fullWidth placeholder="{{ 'PRODUCT.FILTER_AVAILABLE' | translate }}">
+              <nb-option value="">{{ 'PRODUCT.FILTER_AVAILABLE' | translate }}</nb-option>
+              <nb-option value="true">{{ 'PRODUCT.IS_AVAILABLE' | translate }}</nb-option>
+              <nb-option value="false">{{ 'PRODUCT.IS_NOT_AVAILABLE' | translate }}</nb-option>
+            </nb-select>
+          </nb-form-field>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+      </div>
+      <div class="col col-lg-4">
+        <button (click)="onFilterChange()"  nbButton status="primary">
+          <nb-icon icon="search-outline"></nb-icon>
+          {{ 'COMMON.SEARCH' | translate }}
+        </button>
+        <button (click)="resetFilters()" nbButton outline status="danger">
+          <nb-icon icon="refresh-outline"></nb-icon>
+          {{ 'ORDER.RESET_FILTER' | translate }}
+        </button>
+      </div>
+    </div>
     <ngx-datatable
       (page)="onPageEvent($event)"
       [columnMode]="ColumnMode.force"
