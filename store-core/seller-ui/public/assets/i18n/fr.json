@@ -348,7 +348,11 @@
     "PRODUCT_TO_CATEGORY_ADDED": "Produit ajouté à la catégorie",
     "PRODUCT_TO_CATEGORY_ADDED_ERROR": "Erreur lors de l'ajout du produit à la catégorie",
     "PRODUCT_TO_CATEGORY_REMOVED": "Produit retiré de la catégorie",
-    "PRODUCT_TO_CATEGORY_REMOVED_ERROR": "Erreur lors de la suppression de la catégorie de formulaire de produit"
+    "PRODUCT_TO_CATEGORY_REMOVED_ERROR": "Erreur lors de la suppression de la catégorie de formulaire de produit",
+    "FILTER_SKU": "Filtrer par SKU",
+    "FILTER_AVAILABLE": "Filtrer par disponibilité",
+    "IS_AVAILABLE": "Disponible",
+    "IS_NOT_AVAILABLE": "Non disponible"
   },
   "PRODUCT_ATTRIBUTES": {
     "PRODUCT_OPTIONS_ATTRIBUTES": "Options et attributs du produit",
@@ -507,7 +511,17 @@
     "DELIVERED": "Livré",
     "REFUNDED": "Remboursé",
     "CANCELED": "Annulé",
-    "SHOWALL": "Tout"
+    "SHOWALL": "Tout",
+    "FILTER_PHONE": "Filtrer par téléphone",
+    "FILTER_EMAIL": "Filtrer par e-mail",
+    "FILTER_NAME": "Filtrer par nom",
+    "FILTER_STATUS": "Filtrer par statut",
+    "STATUS_ORDERED": "Commandé",
+    "STATUS_PROCESSED": "Traité",
+    "STATUS_DELIVERED": "Livré",
+    "STATUS_REFUNDED": "Remboursé",
+    "STATUS_CANCELED": "Annulé",
+    "RESET_FILTER": "Réinitialiser le filtre"
   },
   "ORDER_FORM": {
     "MORE_OPTIONS": "Plus d'options ...",

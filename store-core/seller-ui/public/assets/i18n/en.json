@@ -348,7 +348,11 @@
     "PRODUCT_TO_CATEGORY_ADDED": "Product added to the category",
     "PRODUCT_TO_CATEGORY_ADDED_ERROR": "Error while adding product to category",
     "PRODUCT_TO_CATEGORY_REMOVED": "Product removed from the category",
-    "PRODUCT_TO_CATEGORY_REMOVED_ERROR": "Error while removing product form category"
+    "PRODUCT_TO_CATEGORY_REMOVED_ERROR": "Error while removing product form category",
+    "FILTER_SKU": "Filter by SKU",
+    "FILTER_AVAILABLE": "Filter by Availability",
+    "IS_AVAILABLE": "Available",
+    "IS_NOT_AVAILABLE": "Not Available"
   },
   "PRODUCT_ATTRIBUTES": {
     "PRODUCT_OPTIONS_ATTRIBUTES": "Product options / attributes",
@@ -507,7 +511,17 @@
     "DELIVERED": "Delivered",
     "REFUNDED": "Refunded",
     "CANCELED": "Canceled",
-    "SHOWALL": "All"
+    "SHOWALL": "All",
+    "FILTER_PHONE": "Filter by Phone",
+    "FILTER_EMAIL": "Filter by Email",
+    "FILTER_NAME": "Filter by Name",
+    "FILTER_STATUS": "Filter by Status",
+    "STATUS_ORDERED": "Ordered",
+    "STATUS_PROCESSED": "Processed",
+    "STATUS_DELIVERED": "Delivered",
+    "STATUS_REFUNDED": "Refunded",
+    "STATUS_CANCELED": "Canceled",
+    "RESET_FILTER": "Reset Filter"
   },
   "ORDER_FORM": {
     "MORE_OPTIONS": "More Options ...",

@@ -42,6 +42,9 @@ public interface ProductRepository
 			if (Objects.nonNull(productCriteria.getAvailable())) {
 				predicates.add(cb.equal(root.get("available"), productCriteria.getAvailable()));
 			}
+			if (Objects.nonNull(productCriteria.getSku()) && !productCriteria.getSku().isEmpty()) {
+				predicates.add(cb.like(root.get("sku"), "%" + productCriteria.getSku() + "%"));
+			}
 			if (Objects.nonNull(productCriteria.getManufacturerId())) {
 				predicates.add(cb.equal(root.get("manufacturer").get("id"), productCriteria.getManufacturerId()));
 			}
