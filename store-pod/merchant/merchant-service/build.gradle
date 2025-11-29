@@ -4,7 +4,7 @@ plugins {
 	alias(libs.plugins.spring.dependency.management)
 	alias(libs.plugins.hibernate.orm)
 	alias(libs.plugins.spring.javaformat)
-	//    alias(libs.plugins.graalvm)
+    alias(libs.plugins.graalvm)
 }
 
 group = 'com.asrevo.cvhome'
@@ -84,8 +84,8 @@ dependencyManagement {
     }
 }
 
-//hibernate {
-//    enhancement {
-//        enableAssociationManagement = true
-//    }
-//}
+hibernate {
+    enhancement {
+        enableAssociationManagement = true
+    }
+}

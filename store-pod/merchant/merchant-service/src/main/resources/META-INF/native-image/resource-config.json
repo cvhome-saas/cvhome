@@ -1,6 +1,21 @@
 {
   "resources": {
     "includes": [
+      {
+        "pattern": "common-config.yml"
+      },
+      {
+        "pattern": "fargate-config.yml"
+      },
+      {
+        "pattern": "lcl-config.yml"
+      },
+      {
+        "pattern": "store-core-lcl-config.yml"
+      },
+      {
+        "pattern": "store-pod-lcl-config.yml"
+      }
     ]
   }
 }
