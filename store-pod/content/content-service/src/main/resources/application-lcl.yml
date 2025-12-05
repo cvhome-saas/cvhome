@@ -1,5 +1,0 @@
-spring:
-  config:
-    import:
-      - "classpath:lcl-config.yml"
-      - "classpath:store-pod-lcl-config.yml"

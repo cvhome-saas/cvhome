@@ -73,7 +73,9 @@ public class ProductItemsFacadeImpl implements ProductItemsFacade {
 
 			list.setContent(productList);
 			list.setTotalPages(1); // no paging
+			list.setTotalElements(groups.size());
 			list.setSize(groups.size());
+			list.setPageNumber(0);
 			return list;
 		}
 
@@ -181,6 +183,8 @@ public class ProductItemsFacadeImpl implements ProductItemsFacade {
 		list.setContent(productList);
 		list.setTotalPages(1);
 		list.setSize(groups.size());
+		list.setPageNumber(0);
+		list.setTotalElements(groups.size());
 		list.setProductGroup(productGroup);
 		return list;
 	}

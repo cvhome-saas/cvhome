@@ -8,7 +8,7 @@ import {
   NbCheckboxModule,
   NbContextMenuModule,
   NbDatepickerModule,
-  NbDialogModule,
+  NbDialogModule, NbFormFieldModule,
   NbIconModule, NbInputModule,
   NbLayoutModule,
   NbMenuModule,
@@ -58,6 +58,7 @@ export const MODULES = [
   NbAutocompleteModule,
   NbInputModule,
   NbRouteTabsetModule,
+  NbFormFieldModule,
 
   FormsModule,
   ReactiveFormsModule,

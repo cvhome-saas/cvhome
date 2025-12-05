@@ -66,6 +66,7 @@ public class ProductVariationFacadeImpl implements ProductVariationFacade {
 		returnList.setSize(variations.size());
 		returnList.setTotalElements(vars.getTotalElements());
 		returnList.setTotalPages(vars.getTotalPages());
+		returnList.setPageNumber(vars.getNumber());
 		return returnList;
 	}
 

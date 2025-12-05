@@ -6,6 +6,58 @@
   </nb-card-header>
 
   <nb-card-body [nbSpinner]="isLoading" nbSpinnerSize="large" nbSpinnerStatus="primary">
+    <div class="filter-section">
+      <div class="row">
+        <div class="col-md-3">
+          <nb-form-field>
+            <nb-icon icon="person-outline" nbPrefix></nb-icon>
+            <input [(ngModel)]="filter.name" fullWidth nbInput placeholder="{{ 'ORDER.FILTER_NAME' | translate }}"
+                   type="text">
+          </nb-form-field>
+        </div>
+        <div class="col-md-3">
+          <nb-form-field>
+            <nb-icon icon="email-outline" nbPrefix></nb-icon>
+            <input [(ngModel)]="filter.email" fullWidth nbInput placeholder="{{ 'ORDER.FILTER_EMAIL' | translate }}"
+                   type="text">
+          </nb-form-field>
+        </div>
+        <div class="col-md-3">
+          <nb-form-field>
+            <nb-icon icon="phone-outline" nbPrefix></nb-icon>
+            <input [(ngModel)]="filter.phone" fullWidth nbInput placeholder="{{ 'ORDER.FILTER_PHONE' | translate }}"
+                   type="text">
+          </nb-form-field>
+        </div>
+        <div class="col-md-3">
+          <nb-form-field>
+            <nb-icon icon="bookmark-outline" nbPrefix></nb-icon>
+            <nb-select [(ngModel)]="filter.status" fullWidth placeholder="{{ 'ORDER.FILTER_STATUS' | translate }}">
+              <nb-option value="">{{ 'ORDER.FILTER_STATUS' | translate }}</nb-option>
+              <nb-option value="ORDERED">{{ 'ORDER.STATUS_ORDERED' | translate }}</nb-option>
+              <nb-option value="PROCESSED">{{ 'ORDER.STATUS_PROCESSED' | translate }}</nb-option>
+              <nb-option value="DELIVERED">{{ 'ORDER.STATUS_DELIVERED' | translate }}</nb-option>
+              <nb-option value="REFUNDED">{{ 'ORDER.STATUS_REFUNDED' | translate }}</nb-option>
+              <nb-option value="CANCELED">{{ 'ORDER.STATUS_CANCELED' | translate }}</nb-option>
+            </nb-select>
+          </nb-form-field>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+      </div>
+      <div class="col col-lg-4">
+        <button (click)="onFilterChange()"  nbButton status="primary">
+          <nb-icon icon="search-outline"></nb-icon>
+          {{ 'COMMON.SEARCH' | translate }}
+        </button>
+        <button (click)="resetFilters()" nbButton outline status="danger">
+          <nb-icon icon="refresh-outline"></nb-icon>
+          {{ 'ORDER.RESET_FILTER' | translate }}
+        </button>
+      </div>
+    </div>
     <ngx-datatable
       (page)="onPageEvent($event)"
       [columnMode]="ColumnMode.force"
@@ -13,7 +65,7 @@
       [externalPaging]="true"
       [footerHeight]="50"
       [headerHeight]="50"
-      [limit]="page.size"
+      [limit]="perPageSize"
       [offset]="page.pageNumber"
       [rows]="page.content"
       class="material"

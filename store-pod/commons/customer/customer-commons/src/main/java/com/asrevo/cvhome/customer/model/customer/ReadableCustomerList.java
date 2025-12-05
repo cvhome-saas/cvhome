@@ -19,6 +19,4 @@ public class ReadableCustomerList extends ReadableList<ReadableCustomer> impleme
 	@Serial
 	private static final long serialVersionUID = 1L;
 
-	private List<ReadableCustomer> content = new ArrayList<>();
-
 }

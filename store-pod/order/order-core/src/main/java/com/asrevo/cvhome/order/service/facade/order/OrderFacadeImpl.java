@@ -321,6 +321,7 @@ public class OrderFacadeImpl implements OrderFacade {
 			returnList.setTotalPages(orderList.getTotalPages());
 			returnList.setSize(orderList.getOrders().size());
 			returnList.setRecordsFiltered(orderList.getOrders().size());
+			returnList.setPageNumber(0);
 
 			return returnList;
 

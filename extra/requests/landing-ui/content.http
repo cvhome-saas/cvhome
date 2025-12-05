@@ -1,15 +1,15 @@
-# curl '{{LANDING_UI_URL}}/content/api/v1/content/pages?page=0&count=20&store=65f023632bc46470c104b76f&lang=en'
-GET {{LANDING_UI_URL}}/content/api/v1/content/pages?page=0&count=20&store=65f023632bc46470c104b76f&lang=en
+# curl '{{LANDING_UI_URL}}/merchant/api/v1/content/pages?page=0&count=20&store=65f023632bc46470c104b76f&lang=en'
+GET {{LANDING_UI_URL}}/merchant/api/v1/content/pages?page=0&count=20&store=65f023632bc46470c104b76f&lang=en
 
 ###
 
-# curl '{{LANDING_UI_URL}}/content/api/v1/content/pages/name/about-us?store=65f023632bc46470c104b76f&lang=en'
-GET {{LANDING_UI_URL}}/content/api/v1/content/pages/name/about-us?store=65f023632bc46470c104b76f&lang=en
+# curl '{{LANDING_UI_URL}}/merchant/api/v1/content/pages/name/about-us?store=65f023632bc46470c104b76f&lang=en'
+GET {{LANDING_UI_URL}}/merchant/api/v1/content/pages/name/about-us?store=65f023632bc46470c104b76f&lang=en
 
 ###
 
-# curl '{{LANDING_UI_URL}}/content/api/v1/content/pages/name/callus?store=65f023632bc46470c104b76f&lang=en'
-GET {{LANDING_UI_URL}}/content/api/v1/content/pages/name/callus?store=65f023632bc46470c104b76f&lang=en
+# curl '{{LANDING_UI_URL}}/merchant/api/v1/content/pages/name/callus?store=65f023632bc46470c104b76f&lang=en'
+GET {{LANDING_UI_URL}}/merchant/api/v1/content/pages/name/callus?store=65f023632bc46470c104b76f&lang=en
 
 ###
 

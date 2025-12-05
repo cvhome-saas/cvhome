@@ -1,5 +1,5 @@
 import {CheckoutPageParams} from "@/types/params";
-import {extractSsrContext} from "@/utils/store-context-ssr-utils";
+import {extractSsrContext} from "@/services/store-context-ssr-utils"
 
 export default async function Page({params}: { params: Promise<CheckoutPageParams> }) {
     const aparams = await params;

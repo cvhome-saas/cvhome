@@ -18,6 +18,4 @@ public class ReadableProductOptionList extends ReadableList<ReadableProductOptio
 	@Serial
 	private static final long serialVersionUID = 1L;
 
-	private List<ReadableProductOptionEntity> content = new ArrayList<>();
-
 }

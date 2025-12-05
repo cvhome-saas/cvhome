@@ -97,6 +97,8 @@ public class CustomerFacadeImpl implements CustomerFacade {
 			.collect(Collectors.toList());
 
 		ReadableCustomerList readableCustomerList = new ReadableCustomerList();
+		readableCustomerList.setTotalPages(1);
+		readableCustomerList.setPageNumber(0);
 		readableCustomerList.setContent(readableCustomers);
 		readableCustomerList.setTotalElements(customerList.getTotalCount());
 		readableCustomerList.setSize(customerList.getCustomers().size());

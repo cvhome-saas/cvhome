@@ -37,10 +37,9 @@ public class StoreManagerController {
 	@PostMapping("private/store")
 	@PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN','ROLE_ORG_ADMIN')")
 	@ConditionalOnApiStatus
-	public Mono<Void> create(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
+	public Mono<ManagerStoreDto> create(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
 			@RequestBody Map<Object, Object> request) {
-		this.managerService.createStore(identity.org(), request);
-		return Mono.empty();
+		return Mono.just(this.managerService.createStore(identity.org(), request));
 	}
 
 	@GetMapping(value = "private/store/unique", params = "name")

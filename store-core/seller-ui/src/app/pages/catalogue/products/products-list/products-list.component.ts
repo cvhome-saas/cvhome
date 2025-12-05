@@ -10,6 +10,11 @@ import {SelectedStoreService} from "../../../shared/services/selected-store.serv
 import {BaseTable, PageT, StorePageRequest} from "../../../common/BaseTable";
 import {Observable, of} from "rxjs";
 
+export interface ProductFilterPageRequest extends StorePageRequest {
+  sku?: string;
+  available?: string;
+}
+
 @Component({
   selector: 'ngx-products-list',
   standalone: false,
@@ -20,6 +25,12 @@ export class ProductsListComponent extends BaseTable<any> implements OnInit {
   editing = {};
   protected readonly ColumnMode = ColumnMode;
   private isInitialized: boolean = false;
+  filter = {
+    sku: '',
+    available: '',
+    categoryIds: '',
+    manufacturerId: ''
+  };
 
   constructor(
     private productService: ProductService,
@@ -38,10 +49,11 @@ export class ProductsListComponent extends BaseTable<any> implements OnInit {
     this.trigger();
   }
 
-  override list(request: StorePageRequest): Observable<PageT<any>> {
+  override list(request: ProductFilterPageRequest): Observable<PageT<any>> {
     if (!super.params.store || !this.isInitialized) {
       return of();
     }
+    Object.assign(request, this.filter);
     return this.productService.getListOfProducts(request)
   }
 
@@ -69,7 +81,7 @@ export class ProductsListComponent extends BaseTable<any> implements OnInit {
       price: newData.price,
       quantity: newData.quantity
     };
-    this.productService.updateProductFromTable( newData.id, product)
+    this.productService.updateProductFromTable(newData.id, product)
       .subscribe({
         next: (data) => {
           this.toastr.success(this.translate.instant('PRODUCT.PRODUCT_UPDATED'));
@@ -100,4 +112,14 @@ export class ProductsListComponent extends BaseTable<any> implements OnInit {
       }
     });
   }
+
+  onFilterChange(): void {
+    this.trigger();
+  }
+
+  resetFilters(): void {
+    this.filter = {sku: '', available: '', categoryIds: '', manufacturerId: ''};
+    this.trigger();
+  }
+
 }

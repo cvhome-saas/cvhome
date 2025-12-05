@@ -24,7 +24,7 @@ public abstract class ReadableList<T> implements Serializable {
 
 	private int recordsFiltered;
 
-	private int pageNumber = 1;
+	private int pageNumber;
 
 	private List<T> content;
 
