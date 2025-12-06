@@ -24,7 +24,7 @@ export default async function Page({params}: { params: Promise<CheckoutPageParam
                 <CheckoutForm storeContext={aparams.storeContext}/>
 
                 {/* Cart Details */}
-                <div className="p-6 rounded-lg shadow-md col-span-4 sticky top-5 self-start border-2 border-border">
+                <div className=" rounded-lg shadow-md col-span-4 sticky top-5 self-start  ">
                     <CheckoutCartBox storeContext={aparams.storeContext}/>
                 </div>
             </div>
