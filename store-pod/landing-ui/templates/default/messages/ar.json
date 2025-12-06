@@ -69,7 +69,10 @@
       "SUCCESSFULLY_ADDED_PRODUCT_TO_CART": "تمت إضافة المنتج إلى السلة بنجاح!",
       "FAILED_TO_ADD_PRODUCT_TO_CART": "فشل إضافة المنتج إلى السلة.",
       "IN_STOCK": "متوفر",
-      "OUT_OF_STOCK": "غير متوفر"
+      "OUT_OF_STOCK": "غير متوفر",
+      "ADD_TO_CART": "أضف إلى السلة",
+      "QUICK_VIEW": "عرض سريع",
+      "VIEW_DETAILS": "عرض التفاصيل"
     },
     "HEADER": {
       "HOME_TITLE": "الرئيسية",

@@ -1,8 +1,7 @@
 'use client'
 import {useEffect, useState} from "react";
-import {FieldValues, useForm} from "react-hook-form";
+import {useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers/yup";
-import {CheckoutCart} from "@/types/checkout-cart";
 import {StoreContext} from "@/types/store-context";
 import {CartService} from "@/services/cart-service";
 import {getCartCode, setCartData} from "@/services/cart-utils";
@@ -11,21 +10,27 @@ import {ReadableCountryList} from "@/types/country";
 import {showToast} from "nextjs-toast-notify";
 import {OrderPlacedSuccessfullyDialog} from "@/componantes/Checkout/OrderPlacedSuccessfullyDialog";
 import {Order} from "@/types/order";
-import {defaultCheckoutValue} from "@/types/checkout-constants";
-import {defaultClass, errorClass, focusDefaultClass, focusErrorClass} from "@/types/constant";
 import {ContentService} from "@/services/content-service";
 import {Box} from "@/types/content";
 import {CheckoutAgreementDialog} from "@/componantes/Checkout/CheckoutAgreementDialog";
 import {useTranslations} from "next-intl";
 import * as Yup from "yup";
+import {Input} from "@/components/ui/input";
+import {Label} from "@/components/ui/label";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
+import {Textarea} from "@/components/ui/textarea";
+import {Checkbox} from "@/components/ui/checkbox";
+import {Button} from "@/components/ui/button";
+import {Separator} from "@/components/ui/separator";
+import {defaultCheckoutValue} from "@/types/checkout-constants";
 
 export const CheckoutForm = ({storeContext}: { storeContext: StoreContext }) => {
     const t = useTranslations('PAGE.CHECKOUT');
-    let [successDialogOpen, setSuccessDialogOpen] = useState(false);
-    let [agreeDialogOpen, setAgreeDialogOpen] = useState(false);
-    let [agreement, setAgreement] = useState<Box | undefined>();
-    let [order, setOrder] = useState<Order | undefined>();
-    let [isAgree, setIsAgree] = useState(false);
+    const [successDialogOpen, setSuccessDialogOpen] = useState(false);
+    const [agreeDialogOpen, setAgreeDialogOpen] = useState(false);
+    const [agreement, setAgreement] = useState<Box | undefined>();
+    const [order, setOrder] = useState<Order | undefined>();
+    const [isAgree, setIsAgree] = useState(false);
     const [readableCountryList, setReadableCountryList] = useState<ReadableCountryList | undefined>();
 
     function getSchema() {
@@ -41,6 +46,7 @@ export const CheckoutForm = ({storeContext}: { storeContext: StoreContext }) => 
                 billing: Yup.object().shape({
                     firstName: Yup.string().required(t('FIRST_NAME_REQUIRED')),
                     lastName: Yup.string().required(t('LAST_NAME_REQUIRED')),
+                    company: Yup.string().optional().default(''),
                     phone: Yup.string()
                         .required(t('PHONE_REQUIRED'))
                         .matches(/^\d{10,15}$/, t('PHONE_INVALID')),
@@ -59,6 +65,7 @@ export const CheckoutForm = ({storeContext}: { storeContext: StoreContext }) => 
     const {
         register,
         setValue,
+        control,
         handleSubmit,
         reset,
         formState: {errors},
@@ -88,16 +95,15 @@ export const CheckoutForm = ({storeContext}: { storeContext: StoreContext }) => 
         });
     }, []);
 
-    const handleClickOnAgreement = (event: React.MouseEvent<HTMLInputElement>) => {
+    const handleClickOnAgreement = (event: React.UIEvent) => {
         event.preventDefault();
         setAgreeDialogOpen(true);
     };
 
-    const onSubmit = async (data: FieldValues) => {
-        const checkoutCart = data as unknown as CheckoutCart;
-        let cartCode = getCartCode();
+    const onSubmit = async (checkoutCart: any) => {
+        const cartCode: string|undefined = getCartCode();
         if (cartCode) {
-            let o = await CartService.checkout(storeContext, cartCode, checkoutCart);
+            const o = await CartService.checkout(storeContext, cartCode, checkoutCart);
             setOrder(o);
             if (o) {
                 setCartData(undefined);
@@ -122,215 +128,178 @@ export const CheckoutForm = ({storeContext}: { storeContext: StoreContext }) => 
             <CheckoutAgreementDialog box={agreement} isOpen={agreeDialogOpen} setIsOpen={setAgreeDialogOpen}
                                      isAgree={isAgree} setIsAgree={setIsAgree}/>
             <form
-                onSubmit={handleSubmit(onSubmit)}
-                className="p-6 rounded-lg shadow-md col-span-8 border-2 border-border"
+                onSubmit={handleSubmit(onSubmit)} noValidate
+                className="p-6 rounded-lg shadow-md col-span-8 border border-border"
             >
                 <h2 className="text-2xl font-bold mb-6 text-foreground">
                     {t('FORM_TITLE')}
                 </h2>
                 <div className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label htmlFor="firstName" className="block text-sm font-medium text-foreground">
+                        <div className="space-y-2">
+                            <Label htmlFor="firstName">
                                 {t('FIRST_NAME')}
-                            </label>
-                            <input
+                            </Label>
+                            <Input
                                 id="firstName"
                                 {...register("customer.billing.firstName")}
                                 type="text"
                                 placeholder={t('FIRST_NAME')}
-                                className={`border ${
-                                    errors?.customer?.billing?.firstName ? errorClass : defaultClass
-                                } p-2 rounded-md w-full focus:outline-none focus:ring-2 ${
-                                    errors?.customer?.billing?.firstName ? focusErrorClass : focusDefaultClass
-                                }`}
+                                aria-invalid={!!errors.customer?.billing?.firstName}
                             />
                             {errors?.customer?.billing?.firstName && (
-                                <p className="text-error text-sm">{errors?.customer?.billing?.firstName.message}</p>
+                                <p className="text-sm font-medium text-destructive">{errors.customer.billing.firstName.message}</p>
                             )}
                         </div>
-                        <div>
-                            <label htmlFor="lastName" className="block text-sm font-medium text-foreground">
+                        <div className="space-y-2">
+                            <Label htmlFor="lastName">
                                 {t('LAST_NAME')}
-                            </label>
-                            <input
+                            </Label>
+                            <Input
                                 id="lastName"
                                 {...register("customer.billing.lastName")}
                                 type="text"
                                 placeholder={t('LAST_NAME')}
-                                className={`border ${
-                                    errors?.customer?.billing?.lastName ? errorClass : defaultClass
-                                } p-2 rounded-md w-full focus:outline-none focus:ring-2 ${
-                                    errors?.customer?.billing?.lastName ? focusErrorClass : focusDefaultClass
-                                }`}
+                                aria-invalid={!!errors.customer?.billing?.lastName}
                             />
                             {errors?.customer?.billing?.lastName && (
-                                <p className="text-error text-sm">{errors?.customer?.billing?.lastName.message}</p>
+                                <p className="text-sm font-medium text-destructive">{errors.customer.billing.lastName.message}</p>
                             )}
                         </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label htmlFor="email" className="block text-sm font-medium text-foreground">
+                        <div className="space-y-2">
+                            <Label htmlFor="emailAddress">
                                 {t('EMAIL')}
-                            </label>
-                            <input
+                            </Label>
+                            <Input
                                 id="emailAddress"
                                 {...register("customer.emailAddress")}
                                 type="email"
                                 placeholder={t('EMAIL')}
-                                className={`border ${
-                                    errors?.customer?.emailAddress ? errorClass : defaultClass
-                                } p-2 rounded-md w-full focus:outline-none focus:ring-2 ${
-                                    errors?.customer?.emailAddress ? focusErrorClass : focusDefaultClass
-                                }`}
+                                aria-invalid={!!errors.customer?.emailAddress}
                             />
                             {errors?.customer?.emailAddress && (
-                                <p className="text-error text-sm">{errors?.customer?.emailAddress.message}</p>
+                                <p className="text-sm font-medium text-destructive">{errors.customer.emailAddress.message}</p>
                             )}
                         </div>
-                        <div>
-                            <label htmlFor="phone" className="block text-sm font-medium text-foreground">
+                        <div className="space-y-2">
+                            <Label htmlFor="phone">
                                 {t('PHONE')}
-                            </label>
-                            <input
+                            </Label>
+                            <Input
                                 id="phone"
                                 {...register("customer.billing.phone")}
                                 type="tel"
                                 placeholder={t('PHONE')}
-                                className={`border ${
-                                    errors?.customer?.billing?.phone ? errorClass : defaultClass
-                                } p-2 rounded-md w-full focus:outline-none focus:ring-2 ${
-                                    errors?.customer?.billing?.phone ? focusErrorClass : focusDefaultClass
-                                }`}
+                                aria-invalid={!!errors.customer?.billing?.phone}
                             />
                             {errors?.customer?.billing?.phone && (
-                                <p className="text-error text-sm">{errors?.customer?.billing?.phone.message}</p>
+                                <p className="text-sm font-medium text-destructive">{errors.customer.billing.phone.message}</p>
                             )}
                         </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div>
-                            <label htmlFor="country" className="block text-sm font-medium text-foreground">
+                        <div className="space-y-2">
+                            <Label htmlFor="country">
                                 {t('COUNTRY')}
-                            </label>
-                            <select
-                                id="country"
-                                {...register("customer.billing.country")}
-                                className={`border ${
-                                    errors?.customer?.billing?.country ? errorClass : defaultClass
-                                } p-2 rounded-md w-full focus:outline-none focus:ring-2 ${
-                                    errors?.customer?.billing?.country ? focusErrorClass : focusDefaultClass
-                                }`}
-                            >
-                                <option value="">{t('SELECT_COUNTRY')}</option>
-                                {readableCountryList &&
-                                    readableCountryList.map((country) => (
-                                        <option key={country.code} value={country.code}>
+                            </Label>
+                            <Select onValueChange={(value) => setValue("customer.billing.country", value)}
+                                    defaultValue={defaultCheckoutValue.customer.billing.country}>
+                                <SelectTrigger id="country" aria-invalid={!!errors.customer?.billing?.country}>
+                                    <SelectValue placeholder={t('SELECT_COUNTRY')}/>
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {readableCountryList?.map((country) => (
+                                        <SelectItem key={country.code} value={country.code}>
                                             {country.name}
-                                        </option>
+                                        </SelectItem>
                                     ))}
-                            </select>
+                                </SelectContent>
+                            </Select>
                             {errors?.customer?.billing?.country && (
-                                <p className="text-error text-sm">{errors?.customer?.billing?.country.message}</p>
+                                <p className="text-sm font-medium text-destructive">{errors.customer.billing.country.message}</p>
                             )}
                         </div>
-                        <div>
-                            <label htmlFor="city" className="block text-sm font-medium text-foreground">
+                        <div className="space-y-2">
+                            <Label htmlFor="city">
                                 {t('CITY')}
-                            </label>
-                            <input
+                            </Label>
+                            <Input
                                 id="city"
                                 {...register("customer.billing.city")}
                                 type="text"
                                 placeholder={t('CITY')}
-                                className={`border ${
-                                    errors?.customer?.billing?.city ? errorClass : defaultClass
-                                } p-2 rounded-md w-full focus:outline-none focus:ring-2 ${
-                                    errors?.customer?.billing?.city ? focusErrorClass : focusDefaultClass
-                                }`}
+                                aria-invalid={!!errors.customer?.billing?.city}
                             />
                             {errors?.customer?.billing?.city && (
-                                <p className="text-error text-sm">{errors?.customer?.billing?.city.message}</p>
+                                <p className="text-sm font-medium text-destructive">{errors.customer.billing.city.message}</p>
                             )}
                         </div>
-                        <div>
-                            <label htmlFor="postalCode" className="block text-sm font-medium text-foreground">
+                        <div className="space-y-2">
+                            <Label htmlFor="postalCode">
                                 {t('POSTAL_CODE')}
-                            </label>
-                            <input
+                            </Label>
+                            <Input
                                 id="postalCode"
                                 {...register("customer.billing.postalCode")}
                                 type="text"
                                 placeholder={t('POSTAL_CODE')}
-                                className={`border ${
-                                    errors?.customer?.billing?.postalCode ? errorClass : defaultClass
-                                } p-2 rounded-md w-full focus:outline-none focus:ring-2 ${
-                                    errors?.customer?.billing?.postalCode ? focusErrorClass : focusDefaultClass
-                                }`}
+                                aria-invalid={!!errors.customer?.billing?.postalCode}
                             />
                             {errors?.customer?.billing?.postalCode && (
-                                <p className="text-error text-sm">{errors?.customer?.billing?.postalCode.message}</p>
+                                <p className="text-sm font-medium text-destructive">{errors.customer.billing.postalCode.message}</p>
                             )}
                         </div>
                     </div>
 
-                    <div>
-                        <label htmlFor="address" className="block text-sm font-medium text-foreground">
+                    <div className="space-y-2">
+                        <Label htmlFor="address">
                             {t('ADDRESS')}
-                        </label>
-                        <textarea
+                        </Label>
+                        <Textarea
                             id="address"
                             {...register("customer.billing.address")}
                             placeholder={t('ADDRESS')}
-                            className={`border ${
-                                errors?.customer?.billing?.address ? errorClass : defaultClass
-                            } p-2 rounded-md w-full focus:outline-none focus:ring-2 ${
-                                errors?.customer?.billing?.address ? focusErrorClass : focusDefaultClass
-                            }`}
+                            aria-invalid={!!errors.customer?.billing?.address}
                         />
                         {errors?.customer?.billing?.address && (
-                            <p className="text-error text-sm">{errors?.customer?.billing?.address.message}</p>
+                            <p className="text-sm font-medium text-destructive">{errors.customer.billing.address.message}</p>
                         )}
                     </div>
                 </div>
                 {
                     agreement && (
                         <div className="mt-4 flex items-center">
-                            <input
+                            <Checkbox
                                 onClick={handleClickOnAgreement}
                                 id="isAgree"
                                 {...register("customer.billing.isAgree")}
                                 checked={isAgree}
-                                onChange={(e) => setIsAgree(e.target.checked)}
-                                type="checkbox"
-                                className={`border ${
-                                    errors?.customer?.billing?.isAgree ? errorClass : defaultClass
-                                } p-2 rounded focus:outline-none focus:ring-2 ${
-                                    errors?.customer?.billing?.isAgree ? focusErrorClass : focusDefaultClass
-                                } accent-primary`}
+                                onCheckedChange={(checked) => setIsAgree(!!checked)}
+                                aria-invalid={!!errors.customer?.billing?.isAgree}
                             />
-                            <label htmlFor="isAgree" className="ms-2 text-sm font-medium text-foreground cursor-pointer">
+                            <Label htmlFor="isAgree" className="ms-2 text-sm font-medium text-foreground cursor-pointer">
                                 {t('AGREEMENT')}
-                            </label>
+                            </Label>
                             {errors?.customer?.billing?.isAgree && !isAgree && (
-                                <p className="text-error text-sm ms-2">{errors?.customer?.billing?.isAgree.message}</p>
+                                <p className="text-sm font-medium text-destructive ms-2">{errors.customer.billing.isAgree.message}</p>
                             )}
                         </div>
                     )
                 }
 
                 <div className="mt-6">
-                    <hr className="my-4 border-border"/>
+                    <Separator className="my-4"/>
                     <div className="flex justify-center">
-                        <button
+                        <Button
                             type="submit"
-                            className="bg-primary text-foreground font-bold py-2 px-6 rounded-lg w-auto hover:bg-hover-primary transition duration-200"
+                            size="lg"
                         >
                             {t('PLACE_ORDER')}
-                        </button>
+                        </Button>
                     </div>
                 </div>
             </form>

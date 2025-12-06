@@ -3,6 +3,13 @@ import {ProductDetailedAddToCart} from "@/componantes/ProductDetails/ProductDeta
 import {parseDescription} from "@/services/description-view-util";
 import {ProductDetailsImageGallery} from "@/componantes/ProductDetails/ProductDetailsImageGallery";
 import {StoreContext} from "@/types/store-context";
+import { Separator } from "@/components/ui/separator";
+import {
+    Accordion,
+    AccordionContent,
+    AccordionItem,
+    AccordionTrigger,
+} from "@/components/ui/accordion";
 
 export const ProductDetails = ({storeContext, p, t}: {
     storeContext: StoreContext,
@@ -11,63 +18,56 @@ export const ProductDetails = ({storeContext, p, t}: {
 }) => {
 
     return (
-        <div className="grid items-start grid-cols-1 lg:grid-cols-2 gap-8 max-lg:gap-12 max-sm:gap-8">
+        <div className="grid items-start grid-cols-1 lg:grid-cols-2 gap-8">
 
-            <div className="w-full top-0">
-                <div className="flex flex-row gap-2">
-                    <ProductDetailsImageGallery product={p}/>
-                </div>
+            <div className="w-full top-0 self-start">
+                <ProductDetailsImageGallery product={p}/>
             </div>
 
 
-            <div className="w-full">
-                <div>
+            <div className="w-full space-y-6">
+                <div className="space-y-4">
                     {
                         p.description &&
-                        <h3 className="text-lg sm:text-xl font-semibold text-foreground">{p.description.name}</h3>
+                        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">{p.description.name}</h1>
                     }
 
                     {
                         p.productPrice &&
-                        <div className="flex items-center flex-wrap gap-4 mt-6">
-                            <h4 className="text-foreground text-2xl sm:text-3xl font-semibold">
+                        <div className="flex items-baseline flex-wrap gap-4">
+                            <p className="text-foreground text-3xl sm:text-4xl font-bold">
                                 {p.productPrice.finalPrice}
-                            </h4>
+                            </p>
                             {p.productPrice.discounted &&
-                                <p className="text-neutral text-lg line-through">
+                                <p className="text-xl text-muted-foreground line-through">
                                     {p.productPrice.originalPrice}
                                 </p>
                             }
                         </div>
                     }
                 </div>
-
-
-                <hr className="my-6 border-border"/>
+                
+                <Separator />
+                
                 <div>
                     <ProductDetailedAddToCart storeContext={storeContext} product={p}/>
                 </div>
 
 
                 {p.description && (
-                    <>
-                        <hr className="my-6 border-border"/>
-                        <div>
-                            <h3 className="text-lg sm:text-xl font-semibold text-foreground">
+                    <Accordion type="single" collapsible defaultValue="item-1" className="w-full">
+                        <AccordionItem value="item-1">
+                            <AccordionTrigger className="text-lg font-semibold">
                                 {t('PRODUCT_DESCRIPTION')}
-                            </h3>
-                            <div className="mt-4">
-                                <div className="transition-all">
-                                    <div className="pb-4 px-4">
-                                        <div
-                                            className="text-sm text-neutral leading-relaxed"
-                                            dangerouslySetInnerHTML={{__html: `${parseDescription(p.description)}`}}
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </>
+                            </AccordionTrigger>
+                            <AccordionContent>
+                                <div
+                                    className="prose prose-sm dark:prose-invert text-muted-foreground"
+                                    dangerouslySetInnerHTML={{__html: `${parseDescription(p.description)}`}}
+                                />
+                            </AccordionContent>
+                        </AccordionItem>
+                    </Accordion>
                 )}
             </div>
         </div>

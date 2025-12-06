@@ -69,7 +69,10 @@
       "SUCCESSFULLY_ADDED_PRODUCT_TO_CART": "Product added to cart successfully!",
       "FAILED_TO_ADD_PRODUCT_TO_CART": "Failed to add product to cart.",
       "IN_STOCK": "In Stock",
-      "OUT_OF_STOCK": "Out Of Stock"
+      "OUT_OF_STOCK": "Out Of Stock",
+      "ADD_TO_CART": "Add to Cart",
+      "QUICK_VIEW": "Quick View",
+      "VIEW_DETAILS": "View Details"
     },
     "HEADER": {
       "HOME_TITLE": "Home",

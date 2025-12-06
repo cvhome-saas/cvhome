@@ -7,28 +7,42 @@ import {StoreContext} from "@/types/store-context";
 import {CartSummary} from "@/componantes/Cart/CartSummary";
 import {emitter} from "next/client";
 import {useTranslations} from "next-intl";
+import {Card, CardContent, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
+import {ScrollArea} from "@/components/ui/scroll-area";
+import {Separator} from "@/components/ui/separator";
 
 export const CheckoutCartBox = ({storeContext}: { storeContext: StoreContext }) => {
     const t = useTranslations('PAGE.CHECKOUT');
     const [cart, setCart] = useState<Cart | undefined>()
 
     useEffect(() => {
-        setCart(getCartData());
-        emitter.on("CART_STORAGE_CHANGED", data => {
-            setCart(getCartData())
-        });
+        const handleCartChange = () => {
+            setCart(getCartData());
+        };
+
+        handleCartChange(); // Set initial cart data
+        emitter.on("CART_STORAGE_CHANGED", handleCartChange);
+
+        // Cleanup listener on component unmount
+        return () => {
+            emitter.off("CART_STORAGE_CHANGED", handleCartChange);
+        };
     }, []);
 
     return (
-        <>
-            <h2 className="text-xl font-bold mb-4 text-foreground">{t('CART_DETAILS')}</h2>
-            <div className="max-h-96 overflow-y-auto">
-                <CartProductList storeContext={storeContext} cart={cart} setCart={setCart}/>
-            </div>
-            <div className="mt-6">
-                <hr className="my-4 border-border"/>
+        <Card>
+            <CardHeader>
+                <CardTitle>{t('CART_DETAILS')}</CardTitle>
+            </CardHeader>
+            <CardContent>
+                <ScrollArea className="h-96">
+                    <CartProductList storeContext={storeContext} cart={cart} setCart={setCart}/>
+                </ScrollArea>
+            </CardContent>
+            <CardFooter className="flex-col items-start">
+                <Separator className="mb-4"/>
                 <CartSummary cart={cart}/>
-            </div>
-        </>
+            </CardFooter>
+        </Card>
     )
 }

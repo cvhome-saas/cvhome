@@ -1,14 +1,24 @@
-import {LayoutParams} from "@/types/params";
-import {Link} from "@/i18n/navigation";
-import {getTranslations} from "next-intl/server";
+import * as React from "react";
+import { Link } from "@/i18n/navigation";
+import { getTranslations } from "next-intl/server";
+import { LayoutParams } from "@/types/params";
+import { cn } from "@/lib/utils";
 
-export async function FooterRightReserved({params}: { params: LayoutParams }) {
-    const t = await getTranslations('COMPONENTS.FOOTER');
-    const date = new Date();
-    const year = date.getFullYear();
-    return <span className="text-sm text-neutral sm:text-center dark:text-neutral">
-        © {year} &nbsp;
-        <Link prefetch={false} href={"/"} className="hover:underline">{params.store.name}</Link>
-        {t('RIGHT_RESERVED')}
-              </span>
+export interface FooterRightReservedProps extends React.HTMLAttributes<HTMLSpanElement> {
+  params: LayoutParams;
+}
+
+export async function FooterRightReserved({
+  params,
+  className,
+  ...props
+}: FooterRightReservedProps) {
+  const t = await getTranslations("COMPONENTS.FOOTER");
+  const year = new Date().getFullYear();
+
+  return (
+    <span className={cn("text-sm text-muted-foreground sm:text-center", className)} {...props}>
+      © {year} <Link href="/" className="hover:underline font-semibold text-foreground">{params.store.name}</Link>. {t("RIGHT_RESERVED")}
+    </span>
+  );
 }
