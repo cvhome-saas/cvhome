@@ -1,10 +1,8 @@
 'use client'
-import {useEffect, useState, forwardRef} from 'react'
+import {forwardRef, useEffect, useState} from 'react'
 import {LayoutParams} from "@/types/params";
 import {Link, usePathname} from "@/i18n/navigation";
 import {Cart} from "@/types/cart";
-import {getCartData} from "@/services/cart-utils";
-import {emitter} from "next/client";
 import {NavCartDialog} from "@/componantes/Nav/NavCartDialog";
 import Image from 'next/image';
 import {useTranslations} from "next-intl";
@@ -22,6 +20,7 @@ import {Sheet, SheetContent, SheetTrigger} from "@/components/ui/sheet";
 import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from "@/components/ui/accordion";
 import {cn} from "@/lib/utils";
 import {Menu, ShoppingBag} from "lucide-react";
+import {getCartManager} from "@/componantes/CartManager";
 
 
 export const NavHeader = ({params}: { params: LayoutParams }) => {
@@ -29,8 +28,8 @@ export const NavHeader = ({params}: { params: LayoutParams }) => {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
     const [cartOpen, setCartOpen] = useState(false)
     const [cart, setCart] = useState<Cart | undefined>()
-
-
+    const storeContext = params.storeContext;
+    const cartManager = getCartManager(storeContext);
     const pathname = usePathname();
 
     useEffect(() => {
@@ -39,17 +38,14 @@ export const NavHeader = ({params}: { params: LayoutParams }) => {
     }, [pathname]);
 
     useEffect(() => {
-        setCart(getCartData());
         const handleCartChange = () => {
-            setCart(getCartData());
+            cartManager.consumeCart(setCart)
         };
-
-        emitter.on("CART_STORAGE_CHANGED", handleCartChange);
-
+        cartManager.subscribe(handleCartChange)
         return () => {
-            emitter.off("CART_STORAGE_CHANGED", handleCartChange);
+            cartManager.unsubscribe(handleCartChange)
         };
-    }, []);
+    }, [cartManager]);
 
 
     return (

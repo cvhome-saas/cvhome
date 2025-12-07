@@ -4,8 +4,6 @@ import {useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers/yup";
 import {StoreContext} from "@/types/store-context";
 import {CartService} from "@/services/cart-service";
-import {getCartCode, setCartData} from "@/services/cart-utils";
-import {emitter} from "next/client";
 import {ReadableCountryList} from "@/types/country";
 import {showToast} from "nextjs-toast-notify";
 import {OrderPlacedSuccessfullyDialog} from "@/componantes/Checkout/OrderPlacedSuccessfullyDialog";
@@ -23,6 +21,7 @@ import {Checkbox} from "@/components/ui/checkbox";
 import {Button} from "@/components/ui/button";
 import {Separator} from "@/components/ui/separator";
 import {defaultCheckoutValue} from "@/types/checkout-constants";
+import {getCartManager} from "@/componantes/CartManager";
 
 export const CheckoutForm = ({storeContext}: { storeContext: StoreContext }) => {
     const t = useTranslations('PAGE.CHECKOUT');
@@ -32,6 +31,7 @@ export const CheckoutForm = ({storeContext}: { storeContext: StoreContext }) => 
     const [order, setOrder] = useState<Order | undefined>();
     const [isAgree, setIsAgree] = useState(false);
     const [readableCountryList, setReadableCountryList] = useState<ReadableCountryList | undefined>();
+    const cartManager = getCartManager(storeContext);
 
     function getSchema() {
         return Yup.object().shape({
@@ -93,7 +93,7 @@ export const CheckoutForm = ({storeContext}: { storeContext: StoreContext }) => 
             }
             setAgreement(it);
         });
-    }, []);
+    }, [storeContext]);
 
     const handleClickOnAgreement = (event: React.UIEvent) => {
         event.preventDefault();
@@ -101,15 +101,14 @@ export const CheckoutForm = ({storeContext}: { storeContext: StoreContext }) => 
     };
 
     const onSubmit = async (checkoutCart: any) => {
-        const cartCode: string|undefined = getCartCode();
+        const cartCode: string | undefined = cartManager.getCartCode();
         if (cartCode) {
             const o = await CartService.checkout(storeContext, cartCode, checkoutCart);
             setOrder(o);
             if (o) {
-                setCartData(undefined);
+                cartManager.setCartData(undefined)
                 setSuccessDialogOpen(true);
                 reset();
-                emitter.emit("CART_STORAGE_CHANGED", "");
             } else {
                 showToast.error(t('FAILED_TO_PLACE_ORDER'), {
                     duration: 3000,

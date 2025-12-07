@@ -2,26 +2,24 @@
 import {Cart} from "@/types/cart";
 import {Link} from "@/i18n/navigation";
 import {CartService} from "@/services/cart-service";
-import {setCartData} from "@/services/cart-utils";
-import {emitter} from "next/client";
 import {StoreContext} from "@/types/store-context";
 import Image from 'next/image';
 import {useTranslations} from "next-intl";
 import {Button} from "@/components/ui/button";
 import React from "react";
 import {Product} from "@store-front/types";
+import {getCartManager} from "@/componantes/CartManager";
 
 export const CartProductList = ({storeContext, cart, setCart}: {
     storeContext: StoreContext,
     cart: Cart | undefined,
     setCart: (cart: Cart | undefined) => void
 }) => {
+    const cartManager = getCartManager(storeContext);
     const removeItem = (sku: string) => {
         if (cart) {
             CartService.removeFromCartThenGetCart(storeContext, cart.code, sku).then((cart) => {
-                setCartData(cart)
-                setCart(cart);
-                emitter.emit("CART_STORAGE_CHANGED", "");
+                cartManager.setCartData(cart)
             });
         }
     }

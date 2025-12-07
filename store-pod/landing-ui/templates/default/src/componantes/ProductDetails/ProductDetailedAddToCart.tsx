@@ -2,13 +2,12 @@
 import {Product} from "@/types/product-groups";
 import {Minus, Plus} from "lucide-react";
 import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {getCartCode, getMatchedProductsInCart, setCartData} from "@/services/cart-utils";
 import {CartService} from "@/services/cart-service";
-import {emitter} from "next/client";
 import {StoreContext} from "@/types/store-context";
 import {showToast} from "nextjs-toast-notify";
 import {useTranslations} from "next-intl";
 import {Button} from "@/components/ui/button";
+import {getCartManager} from "@/componantes/CartManager";
 
 export const ProductDetailedAddToCart = ({storeContext, product}: {
     storeContext: StoreContext,
@@ -17,14 +16,13 @@ export const ProductDetailedAddToCart = ({storeContext, product}: {
     const t = useTranslations('PAGE.PRODUCT');
     const [quantity, setQuantity] = useState(product.quantity > 0 ? 1 : 0);
     const inCartRef = useRef(false);
-
+    const cartManager = getCartManager(storeContext);
     const updateCart = useCallback(async (newQty: number) => {
         try {
-            const newCartData = await CartService.addToCart(storeContext, getCartCode(), product.sku, newQty);
+            const newCartData = await CartService.addToCart(storeContext, cartManager.getCartCode(), product.sku, newQty);
             if (newCartData) {
                 inCartRef.current = true;
-                setCartData(newCartData);
-                emitter.emit("CART_STORAGE_CHANGED", "");
+                cartManager.setCartData(newCartData);
                 showToast.success(t('SUCCESSFULLY_ADDED_PRODUCT_TO_CART'), {
                     duration: 3000,
                     progress: false,
@@ -45,11 +43,11 @@ export const ProductDetailedAddToCart = ({storeContext, product}: {
                 sound: false,
             });
         }
-    }, [storeContext, product.sku, t]);
+    }, [cartManager,storeContext, product.sku, t]);
 
     useEffect(() => {
         const syncWithCart = () => {
-            const matchedProduct = getMatchedProductsInCart(product);
+            const matchedProduct = cartManager.getMatchedProductsInCart(product.id);
             if (matchedProduct) {
                 setQuantity(matchedProduct.quantity);
                 inCartRef.current = true;
@@ -59,14 +57,12 @@ export const ProductDetailedAddToCart = ({storeContext, product}: {
             }
         };
 
-        syncWithCart(); // Initial sync
-
-        emitter.on("CART_STORAGE_CHANGED", syncWithCart);
+        cartManager.subscribe(syncWithCart);
 
         return () => {
-            emitter.off("CART_STORAGE_CHANGED", syncWithCart);
+            cartManager.unsubscribe(syncWithCart)
         };
-    }, [product]);
+    }, [cartManager,product]);
 
     const incrementQuantity = () => {
         const newQty = quantity + 1;

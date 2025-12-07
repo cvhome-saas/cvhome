@@ -1,24 +1,24 @@
 'use client'
 import {Product} from "@/types/product-groups";
-import {getCartCode, setCartData} from "@/services/cart-utils";
 import {CartService} from "@/services/cart-service";
-import {emitter} from "next/client";
 import {StoreContext} from "@/types/store-context";
 import {showToast} from "nextjs-toast-notify";
 import {Link} from "@/i18n/navigation";
-import {useState, useCallback} from "react";
+import {useCallback, useState} from "react";
 import ProductQuickVIew from "@/componantes/ProductItem/ProductQuickVIew";
 import {isRtl} from "@/services/direction-utils";
 import {useTranslations} from "next-intl";
 import {Button} from "@/components/ui/button";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
-import {Eye, ExternalLink, ShoppingCart} from "lucide-react";
+import {ExternalLink, Eye, ShoppingCart} from "lucide-react";
+import {getCartManager} from "@/componantes/CartManager";
 
 export default function ProductItemButtonGroup({storeContext, product}: {
     storeContext: StoreContext,
     product: Product
 }) {
     const t = useTranslations('COMPONENTS.PRODUCT');
+    const cartManager = getCartManager(storeContext);
 
     const [showQuickView, setShowQuickView] = useState(false);
     const toastPosition = isRtl(storeContext.locale) ? "bottom-left" : "bottom-right";
@@ -27,10 +27,9 @@ export default function ProductItemButtonGroup({storeContext, product}: {
 
     const addToCart = useCallback(async () => {
         try {
-            const newCartData = await CartService.addToCart(storeContext, getCartCode(), product.sku, 1);
+            const newCartData = await CartService.addToCart(storeContext, cartManager.getCartCode(), product.sku, 1);
             if (newCartData) {
-                setCartData(newCartData);
-                emitter.emit("CART_STORAGE_CHANGED", "");
+                cartManager.setCartData(newCartData)
                 showToast.success(t('SUCCESSFULLY_ADDED_PRODUCT_TO_CART'), {
                     duration: 3000,
                     progress: false,
@@ -51,7 +50,7 @@ export default function ProductItemButtonGroup({storeContext, product}: {
                 sound: false,
             });
         }
-    }, [storeContext, product.sku, t, toastPosition]);
+    }, [cartManager,storeContext, product.sku, t, toastPosition]);
 
     return <>
         <ProductQuickVIew storeContext={storeContext} product={product} open={showQuickView} setOpen={setShowQuickView}/>
