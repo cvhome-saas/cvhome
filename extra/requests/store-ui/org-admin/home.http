@@ -1,5 +1,5 @@
-# curl 'GET {{SELLER-UI_URL}}/store-pod-gateway/order/api/v2/private/order-statistic?store=65f023632bc46470c104b76f&lang=en'
-POST {{SELLER-UI_URL}}/store-pod-gateway/order/api/v2/private/order-statistic?store=65f023632bc46470c104b76f&lang=en
+# curl 'GET {{SELLER-UI_URL}}/store-pod-gateway/checkout/api/v2/private/order-statistic?store=65f023632bc46470c104b76f&lang=en'
+POST {{SELLER-UI_URL}}/store-pod-gateway/checkout/api/v2/private/order-statistic?store=65f023632bc46470c104b76f&lang=en
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
 Content-Type: application/json
 
@@ -12,8 +12,8 @@ Content-Type: application/json
 
 ###
 
-# curl 'GET {{SELLER-UI_URL}}/store-pod-gateway/order/api/v2/private/customer-statistic?store=65f023632bc46470c104b76f&lang=en'
-POST {{SELLER-UI_URL}}/store-pod-gateway/order/api/v2/private/customer-statistic?store=65f023632bc46470c104b76f&lang=en
+# curl 'GET {{SELLER-UI_URL}}/store-pod-gateway/checkout/api/v2/private/customer-statistic?store=65f023632bc46470c104b76f&lang=en'
+POST {{SELLER-UI_URL}}/store-pod-gateway/checkout/api/v2/private/customer-statistic?store=65f023632bc46470c104b76f&lang=en
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
 Content-Type: application/json
 
@@ -26,8 +26,8 @@ Content-Type: application/json
 
 ###
 
-# curl 'GET {{SELLER-UI_URL}}/store-pod-gateway/order/api/v2/private/product-statistic?store=65f023632bc46470c104b76f&lang=en'
-POST {{SELLER-UI_URL}}/store-pod-gateway/order/api/v2/private/product-statistic?store=65f023632bc46470c104b76f&lang=en
+# curl 'GET {{SELLER-UI_URL}}/store-pod-gateway/checkout/api/v2/private/product-statistic?store=65f023632bc46470c104b76f&lang=en'
+POST {{SELLER-UI_URL}}/store-pod-gateway/checkout/api/v2/private/product-statistic?store=65f023632bc46470c104b76f&lang=en
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
 Content-Type: application/json
 

@@ -1,9 +1,9 @@
-# curl '{{LANDING_UI_URL}}/order/api/v1/cart/23a52597bc1f49c996a1b4ad8a29006a?store=65f023632bc46470c104b76f'
-GET {{LANDING_UI_URL}}/order/api/v1/cart/23a52597bc1f49c996a1b4ad8a29006a?store=65f023632bc46470c104b76f
+# curl '{{LANDING_UI_URL}}/checkout/api/v1/cart/23a52597bc1f49c996a1b4ad8a29006a?store=65f023632bc46470c104b76f'
+GET {{LANDING_UI_URL}}/checkout/api/v1/cart/23a52597bc1f49c996a1b4ad8a29006a?store=65f023632bc46470c104b76f
 
 ###
 
-POST {{LANDING_UI_URL}}/order/api/v1/cart?store=65f023632bc46470c104b76f&lang=en
+POST {{LANDING_UI_URL}}/checkout/api/v1/cart?store=65f023632bc46470c104b76f&lang=en
 Content-Type: application/json
 
 {
@@ -13,7 +13,7 @@ Content-Type: application/json
 
 ###
 
-PUT {{LANDING_UI_URL}}/order/api/v1/cart/a74ae65c99dd4448b69e4bb0eaec05f5?store=65f023632bc46470c104b76f&lang=en
+PUT {{LANDING_UI_URL}}/checkout/api/v1/cart/a74ae65c99dd4448b69e4bb0eaec05f5?store=65f023632bc46470c104b76f&lang=en
 Content-Type: application/json
 
 {
@@ -23,7 +23,7 @@ Content-Type: application/json
 
 
 ###
-POST {{LANDING_UI_URL}}/order/api/v1/cart/23a52597bc1f49c996a1b4ad8a29006a/checkout?store=65f023632bc46470c104b76f&lang=ar
+POST {{LANDING_UI_URL}}/checkout/api/v1/cart/23a52597bc1f49c996a1b4ad8a29006a/checkout?store=65f023632bc46470c104b76f&lang=ar
 Content-Type: application/json
 
 {
