@@ -1,6 +1,6 @@
 import {ContentService} from "@/services/content-service";
 import {ContentPageParams} from "@/types/params";
-import {Breadcrumb} from "@/componantes/Breadcrumb/Breadcrumb";
+import {Breadcrumb} from "@/componantes/Common/Breadcrumb";
 import {parseDescription} from "@/services/description-view-util";
 import {getTranslations} from "next-intl/server";
 import {BreadcrumbItem} from "@/types/bread-crumb";

@@ -9,7 +9,7 @@ import {Button} from "@/components/ui/button";
 import {getCartManager} from "@/services/cart-manager";
 import {toastDirection} from "@/services/direction-utils";
 
-export const ProductDetailedAddToCart = ({storeContext, product}: {
+export const ProductDetailedAddToCartBox = ({storeContext, product}: {
     storeContext: StoreContext,
     product: Product
 }) => {

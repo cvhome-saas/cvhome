@@ -6,11 +6,9 @@ import {StoreContext} from "@/types/store-context";
 import {CartService} from "@/services/cart-service";
 import {ReadableCountryList} from "@/types/country";
 import {showToast} from "nextjs-toast-notify";
-import {OrderPlacedSuccessfullyDialog} from "@/componantes/Checkout/OrderPlacedSuccessfullyDialog";
 import {Order} from "@/types/order";
 import {ContentService} from "@/services/content-service";
 import {Box} from "@/types/content";
-import {CheckoutAgreementDialog} from "@/componantes/Checkout/CheckoutAgreementDialog";
 import {useTranslations} from "next-intl";
 import * as Yup from "yup";
 import {Input} from "@/components/ui/input";
@@ -23,6 +21,19 @@ import {Separator} from "@/components/ui/separator";
 import {defaultCheckoutValue} from "@/types/checkout-constants";
 import {getCartManager} from "@/services/cart-manager";
 import {toastDirection} from "@/services/direction-utils";
+import {CheckCircle, HelpCircle} from "lucide-react";
+import {parseDescription} from "@/services/description-view-util";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle
+} from "@/components/ui/alert-dialog";
+import {useRouter} from "@/i18n/navigation";
 
 export const CheckoutForm = ({storeContext}: { storeContext: StoreContext }) => {
     const t = useTranslations('PAGE.CHECKOUT');
@@ -300,5 +311,100 @@ export const CheckoutForm = ({storeContext}: { storeContext: StoreContext }) => 
                 </div>
             </form>
         </>
+    );
+};
+
+
+const CheckoutAgreementDialog = ({box, isOpen, setIsOpen, isAgree, setIsAgree}: {
+    box: Box | undefined
+    isOpen: boolean,
+    setIsOpen: (x: boolean) => void,
+    isAgree: boolean,
+    setIsAgree: (x: boolean) => void,
+}) => {
+
+    const t = useTranslations('PAGE.CHECKOUT');
+    const handleAgree = () => {
+        setIsAgree(true);
+        setIsOpen(false);
+    };
+
+    const handleReject = () => {
+        setIsAgree(false);
+        setIsOpen(false);
+    };
+
+    return (
+        <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
+            <AlertDialogContent>
+                <AlertDialogHeader>
+                    <div className="flex justify-center">
+                        <HelpCircle className="h-16 w-16 text-primary"/>
+                    </div>
+                    <AlertDialogTitle className="text-center">
+                        {t('TERMS_AND_CONDITIONS')}
+                    </AlertDialogTitle>
+                    {box && <AlertDialogDescription
+                        className="max-h-60 overflow-y-auto text-foreground"
+                        dangerouslySetInnerHTML={{__html: parseDescription(box.description)}}/>
+                    }
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                    <AlertDialogCancel asChild>
+                        <Button variant="destructive" className="text-destructive-foreground"
+                                onClick={handleReject}>{t('REJECT')}</Button>
+                    </AlertDialogCancel>
+                    <AlertDialogAction asChild>
+                        <Button onClick={handleAgree}>{t('AGREE')}</Button>
+                    </AlertDialogAction>
+                </AlertDialogFooter>
+            </AlertDialogContent>
+        </AlertDialog>
+    );
+};
+
+export const OrderPlacedSuccessfullyDialog = ({order, isOpen, setIsOpen}: {
+    order: Order | undefined
+    isOpen: boolean,
+    setIsOpen: (x: boolean) => void
+}) => {
+    const t = useTranslations('PAGE.CHECKOUT');
+    const router = useRouter();
+
+    const handleContinueShopping = () => {
+        setIsOpen(false);
+        router.push("/");
+    };
+
+    return (
+        <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
+            <AlertDialogContent>
+                <AlertDialogHeader className="items-center text-center">
+                    <CheckCircle className="h-16 w-16 text-green-500"/>
+                    <AlertDialogTitle className="text-lg">
+                        {t('ORDER_PLACED_SUCCESSFULLY')}
+                    </AlertDialogTitle>
+                    <AlertDialogDescription className="space-y-2 !mt-4">
+                        {order ? (
+                            <>
+                                <p>
+                                    {t('ORDER_PLACED_SUCCESSFULLY')}
+                                </p>
+                                <p>
+                                    <strong>{t('ORDER_ID')}:</strong> {order.id}
+                                </p>
+                            </>
+                        ) : (
+                            <p>{t('NO_ORDER_DETAILED')}</p>
+                        )}
+                    </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                    <AlertDialogAction onClick={handleContinueShopping} className="w-full">
+                        {t('CONTINUE_SHOPPING')}
+                    </AlertDialogAction>
+                </AlertDialogFooter>
+            </AlertDialogContent>
+        </AlertDialog>
     );
 };

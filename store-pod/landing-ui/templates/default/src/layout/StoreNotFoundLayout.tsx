@@ -1,15 +1,14 @@
 import {DefaultParams} from "@/types/params";
 import {NextIntlClientProvider} from "next-intl";
 
-import { AlertCircle } from "lucide-react";
-import Head from "next/head";
+import {AlertCircle} from "lucide-react";
 
 export const StoreNotFoundLayout = ({p}: { p: DefaultParams }) => {
     return (
         <html lang={p.locale}>
-        <Head>
+        <head>
             <title>store not found</title>
-        </Head>
+        </head>
         <body>
         <NextIntlClientProvider>
             <div className="flex flex-col items-center justify-center min-h-screen bg-white px-6">

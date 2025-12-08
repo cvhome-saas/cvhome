@@ -1,9 +1,9 @@
 'use client'
+import * as React from 'react'
 import {forwardRef, useEffect, useState} from 'react'
 import {LayoutParams} from "@/types/params";
-import {Link, usePathname} from "@/i18n/navigation";
+import {Link, usePathname, useRouter} from "@/i18n/navigation";
 import {Cart} from "@/types/cart";
-import {NavCartDialog} from "@/componantes/Nav/NavCartDialog";
 import Image from 'next/image';
 import {useTranslations} from "next-intl";
 import {
@@ -16,14 +16,21 @@ import {
     navigationMenuTriggerStyle
 } from "@/components/ui/navigation-menu";
 import {Button} from "@/components/ui/button";
-import {Sheet, SheetContent, SheetTrigger} from "@/components/ui/sheet";
+import {Sheet, SheetClose, SheetContent, SheetHeader, SheetTitle, SheetTrigger} from "@/components/ui/sheet";
 import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from "@/components/ui/accordion";
 import {cn} from "@/lib/utils";
-import {Menu, ShoppingBag} from "lucide-react";
+import {Globe, Menu, ShoppingBag, X} from "lucide-react";
 import {getCartManager} from "@/services/cart-manager";
+import {Box} from "@/types/content";
+import {Store} from "@/types/store";
+import {parseDescription} from "@/services/description-view-util";
+import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "@/components/ui/dropdown-menu";
+import {StoreContext} from "@/types/store-context";
+import {CartProductList} from "@/componantes/Cart/CartProductList";
+import {CartSummary} from "@/componantes/Cart/CartSummary";
+import {isRtl} from "@/services/direction-utils";
 
-
-export const NavHeader = ({params}: { params: LayoutParams }) => {
+export const HeaderBox = ({params, headerBox}: { params: LayoutParams, headerBox: Box | undefined }) => {
     const t = useTranslations('COMPONENTS.HEADER');
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
     const [cartOpen, setCartOpen] = useState(false)
@@ -39,13 +46,13 @@ export const NavHeader = ({params}: { params: LayoutParams }) => {
 
     useEffect(cartManager.fullSubscribe(setCart), [cartManager]);
 
-
     return (
         <>
-
+        <HeaderTop store={params.store} box={headerBox} locale={params.locale}/>
+        <header className="bg-background">
             <nav aria-label="Global" className="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8">
                 <div className="flex lg:flex-1">
-                    <Link prefetch={false} href={"/"} className="-m-1.5 p-1.5 group">
+                    <Link prefetch={false} href={"/templates/default/public"} className="-m-1.5 p-1.5 group">
                         <span className="sr-only">{params.store.name}</span>
                         {
                             params.store.logo &&
@@ -86,7 +93,8 @@ export const NavHeader = ({params}: { params: LayoutParams }) => {
                             <NavigationMenuItem key={category.code}>
                                 {category.children && category.children.length > 0 ? (
                                     <>
-                                        <Link href={`/category/${category.description.friendlyUrl}`} legacyBehavior passHref>
+                                        <Link href={`/category/${category.description.friendlyUrl}`} legacyBehavior
+                                              passHref>
                                             <NavigationMenuTrigger className="cursor-pointer">
                                                 {category.description.name}
                                             </NavigationMenuTrigger>
@@ -104,7 +112,8 @@ export const NavHeader = ({params}: { params: LayoutParams }) => {
                                         </NavigationMenuContent>
                                     </>
                                 ) : (
-                                    <Link href={`/category/${category.description.friendlyUrl}`} legacyBehavior passHref>
+                                    <Link href={`/category/${category.description.friendlyUrl}`} legacyBehavior
+                                          passHref>
                                         <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                                             {category.description.name}
                                         </NavigationMenuLink>
@@ -143,6 +152,7 @@ export const NavHeader = ({params}: { params: LayoutParams }) => {
             </nav>
             <NavCartDialog storeContext={params.storeContext} cart={cart} setCart={setCart} cartOpen={cartOpen}
                            setCartOpen={setCartOpen}/>
+        </header>
         </>
     )
 }
@@ -167,10 +177,11 @@ const MobileNavContent = ({params, cart, setCartOpen}: {
                             category.children && category.children.length > 0 ? (
                                 <AccordionItem value={category.code} key={category.code} className="border-b-0">
                                     <div className="flex items-center justify-between rounded-lg hover:bg-accent">
-                                        <Link href={`/category/${category.description.friendlyUrl}`} className="flex-grow px-3 py-2 text-base font-semibold leading-7 text-foreground">
+                                        <Link href={`/category/${category.description.friendlyUrl}`}
+                                              className="flex-grow px-3 py-2 text-base font-semibold leading-7 text-foreground">
                                             {category.description.name}
                                         </Link>
-                                        <AccordionTrigger className="p-2 me-1.5" />
+                                        <AccordionTrigger className="p-2 me-1.5"/>
                                     </div>
                                     <AccordionContent className="pl-6">
                                         {category.children.filter(child => child.description).map((child) => (
@@ -238,3 +249,159 @@ const ListItem = forwardRef<React.ElementRef<"a">, React.ComponentPropsWithoutRe
     }
 );
 ListItem.displayName = "ListItem";
+
+
+interface HeaderTopProps extends React.HTMLAttributes<HTMLDivElement> {
+    store: Store;
+    box: Box | undefined;
+    locale: string;
+}
+
+const HeaderTop = React.forwardRef<HTMLDivElement, HeaderTopProps>(
+    ({store, box, locale, className, ...props}, ref) => {
+        return (
+            <div
+                ref={ref}
+                className={cn("relative flex items-center justify-center", className)}
+                {...props}
+            >
+                {box?.visible && (
+                    <div
+                        className="flex-grow h-10 flex items-center justify-center bg-primary px-4 text-sm font-medium text-foreground text-center sm:px-6 lg:px-8"
+                        dangerouslySetInnerHTML={{__html: parseDescription(box.description)}}
+                    />
+                )}
+                <div className="absolute end-4">
+                    <LanguageSelector store={store} locale={locale}/>
+                </div>
+            </div>
+        );
+    }
+);
+HeaderTop.displayName = "HeaderTop";
+
+export const LanguageSelector = ({store, locale}: { store: Store, locale: string }) => {
+    const t = useTranslations('COMPONENTS.HEADER.LANGUAGE');
+    const router = useRouter();
+    const pathname = usePathname();
+
+    if (!store.supportedLanguages || store.supportedLanguages.length <= 1) {
+        return null;
+    }
+
+    const currentLocale = store.supportedLanguages.includes(locale) ? locale : 'en';
+
+    return (
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon">
+                    <Globe className="size-6"/>
+                    <span className="sr-only">{t('CHANGE_LANGUAGE')}</span>
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+                {store.supportedLanguages.map((lang) => (
+                    <DropdownMenuItem
+                        key={lang}
+                        onClick={() => router.push(pathname, {locale: lang})}
+                        className="cursor-pointer"
+                        disabled={lang === currentLocale}
+                    >
+                        {t(lang.toUpperCase())}
+                    </DropdownMenuItem>
+                ))}
+            </DropdownMenuContent>
+        </DropdownMenu>
+    );
+}
+
+export const NavCartDialog = (
+    {
+        storeContext,
+        cart,
+        setCart,
+        cartOpen,
+        setCartOpen
+    }: {
+        storeContext: StoreContext,
+        cart: Cart | undefined,
+        setCart: (cart: Cart | undefined) => void
+        cartOpen: boolean,
+        setCartOpen: (cart: boolean) => void
+    },
+) => {
+    const t = useTranslations("COMPONENTS.CART");
+    const isRtlLayout = isRtl(storeContext.locale);
+
+    return (
+        <Sheet open={cartOpen} onOpenChange={setCartOpen}>
+            <SheetContent
+                side={isRtlLayout ? "left" : "right"}
+                className="flex h-full flex-col p-0 bg-background shadow-xl max-w-md w-full"
+            >
+                <div className="flex-1 overflow-y-auto px-4 py-6 sm:px-6">
+                    <SheetHeader className="flex flex-row items-start justify-between space-y-0">
+                        <SheetTitle className="text-lg font-medium text-foreground">
+                            {t('CART_DETAILS')}
+                        </SheetTitle>
+
+                        <div className={`${isRtlLayout ? 'me-3' : 'ms-3'} flex h-7 items-center`}>
+                            <SheetClose
+                                type="button"
+                                className="relative -m-2 p-2 text-neutral hover:text-hover-neutral rounded-md"
+                            >
+                                <span className="sr-only">Close panel</span>
+                                <X aria-hidden="true" className="size-6"/>
+                            </SheetClose>
+                        </div>
+                    </SheetHeader>
+
+                    <div className="mt-8">
+                        <CartProductList storeContext={storeContext} cart={cart} setCart={setCart}/>
+                    </div>
+                </div>
+
+                <div className="border-t border-border px-4 py-6 sm:px-6">
+                    {
+                        cart && cart.products && cart.products.length > 0 && (
+                            <>
+                                <CartSummary cart={cart}/>
+                                <p className="mt-0.5 text-sm text-neutral">
+                                    {t('SHOPPING_AND_TAX_CALCULATION_MESSAGE')}
+                                </p>
+                                <div className="mt-6">
+                                    <Link
+                                        prefetch={false}
+                                        href="/checkout"
+                                        className="flex items-center justify-center rounded-md border border-transparent bg-primary px-6 py-3 text-base font-medium text-foreground shadow-xs"
+                                    >
+                                        {t('CHECKOUT')}
+                                    </Link>
+                                </div>
+                            </>
+                        )
+                    }
+
+                    <div className="mt-6 flex justify-center text-center text-sm text-neutral">
+                        <p>
+                            {t('OR')}{' '}
+                            <SheetClose
+                                type="button"
+                                className="font-medium text-primary"
+                            >
+                                {t('CONTINUE_SHOPPING')}
+                                <span
+                                    aria-hidden="true"
+                                    className="inline-block rtl:-scale-x-100"
+                                >
+                  {' '}
+                                    &rarr;
+                </span>
+                            </SheetClose>
+                        </p>
+                    </div>
+                </div>
+            </SheetContent>
+        </Sheet>
+    );
+}

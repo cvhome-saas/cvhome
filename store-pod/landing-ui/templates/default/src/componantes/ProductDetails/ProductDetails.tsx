@@ -1,5 +1,5 @@
 import {Product} from "@/types/product-groups";
-import {ProductDetailedAddToCart} from "@/componantes/ProductDetails/ProductDetailedAddToCart";
+import {ProductDetailedAddToCartBox} from "@/componantes/ProductDetails/ProductDetailedAddToCartBox";
 import {parseDescription} from "@/services/description-view-util";
 import {ProductDetailsImageGallery} from "@/componantes/ProductDetails/ProductDetailsImageGallery";
 import {StoreContext} from "@/types/store-context";
@@ -50,7 +50,7 @@ export const ProductDetails = ({storeContext, p, t}: {
                 <Separator />
                 
                 <div>
-                    <ProductDetailedAddToCart storeContext={storeContext} product={p}/>
+                    <ProductDetailedAddToCartBox storeContext={storeContext} product={p}/>
                 </div>
 
 

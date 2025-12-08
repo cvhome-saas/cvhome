@@ -5,7 +5,7 @@ import ProductSwiperGrid from "@/componantes/ProductGrid/ProductSwiperGrid";
 import ProductGrid from "@/componantes/ProductGrid/ProductGrid";
 import {StoreService} from "@/services/store-service";
 import React from 'react';
-import {SectionTitle} from "@/componantes/common/SectionTitle";
+import {SectionTitle} from "@/componantes/Common/SectionTitle";
 import {getTranslations} from "next-intl/server";
 import {extractSsrContext} from "@/services/store-context-ssr-utils";
 
