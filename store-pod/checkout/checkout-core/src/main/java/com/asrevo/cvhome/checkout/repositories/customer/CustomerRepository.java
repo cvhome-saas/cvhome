@@ -9,21 +9,11 @@ public interface CustomerRepository extends JpaRepository<Customer, Long>, Custo
 
 	@Query("""
 			select c from Customer c
-			left join fetch c.attributes ca
-			left join fetch ca.customerOption cao
-			left join fetch ca.customerOptionValue cav
-			left join fetch cao.descriptions caod
-			left join fetch cav.descriptions
 			where c.id = ?1""")
 	Customer findOne(Long id);
 
 	@Query("""
 			select c from Customer c
-			left join fetch c.attributes ca
-			left join fetch ca.customerOption cao
-			left join fetch ca.customerOptionValue cav
-			left join fetch cao.descriptions caod
-			left join fetch cav.descriptions
 			left join fetch c.delivery cd
 			left join fetch c.billing cb
 			where c.nick = ?1 and c.storeMerchantId = ?2""")

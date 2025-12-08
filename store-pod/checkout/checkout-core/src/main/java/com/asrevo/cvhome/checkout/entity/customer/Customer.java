@@ -1,7 +1,6 @@
 package com.asrevo.cvhome.checkout.entity.customer;
 
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.checkout.entity.customer.attribute.CustomerAttribute;
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
 import com.asrevo.cvhome.store.core.converter.LanguageCodeConverter;
 import com.asrevo.cvhome.store.core.entity.common.Billing;
@@ -19,8 +18,6 @@ import jakarta.validation.constraints.NotEmpty;
 import java.io.Serial;
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -45,9 +42,6 @@ public class Customer extends SalesManagerEntity<Long, Customer> implements Audi
 	@JsonIgnore
 	@Embedded
 	private AuditSection auditSection = new AuditSection();
-
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "customer")
-	private Set<CustomerAttribute> attributes = new HashSet<>();
 
 	@Column(name = "CUSTOMER_GENDER", length = 1)
 	@Enumerated(value = EnumType.STRING)

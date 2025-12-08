@@ -3,16 +3,10 @@ package com.asrevo.cvhome.checkout.service.populator.customer;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.customer.model.customer.PersistableCustomer;
 import com.asrevo.cvhome.customer.model.customer.address.Address;
-import com.asrevo.cvhome.customer.model.customer.attribute.PersistableCustomerAttribute;
 import com.asrevo.cvhome.checkout.entity.customer.Customer;
 import com.asrevo.cvhome.checkout.entity.customer.CustomerGender;
-import com.asrevo.cvhome.checkout.entity.customer.attribute.CustomerAttribute;
-import com.asrevo.cvhome.checkout.entity.customer.attribute.CustomerOption;
-import com.asrevo.cvhome.checkout.entity.customer.attribute.CustomerOptionValue;
 import com.asrevo.cvhome.checkout.entity.reference.country.Country;
 import com.asrevo.cvhome.checkout.entity.reference.zone.Zone;
-import com.asrevo.cvhome.checkout.services.customer.attribute.CustomerOptionService;
-import com.asrevo.cvhome.checkout.services.customer.attribute.CustomerOptionValueService;
 import com.asrevo.cvhome.checkout.services.reference.country.CountryService;
 import com.asrevo.cvhome.checkout.services.reference.zone.ZoneService;
 import com.asrevo.cvhome.store.core.entity.common.Billing;
@@ -38,16 +32,9 @@ public class CustomerPopulator extends AbstractDataPopulator<PersistableCustomer
 
 	private final ZoneService zoneService;
 
-	private final CustomerOptionService customerOptionService;
-
-	private final CustomerOptionValueService customerOptionValueService;
-
-	public CustomerPopulator(CountryService countryService, ZoneService zoneService,
-			CustomerOptionService customerOptionService, CustomerOptionValueService customerOptionValueService) {
+	public CustomerPopulator(CountryService countryService, ZoneService zoneService) {
 		this.countryService = countryService;
 		this.zoneService = zoneService;
-		this.customerOptionService = customerOptionService;
-		this.customerOptionValueService = customerOptionValueService;
 	}
 
 	/**
@@ -61,13 +48,6 @@ public class CustomerPopulator extends AbstractDataPopulator<PersistableCustomer
 
 			if (source.getId() != null && source.getId() > 0) {
 				target.setId(source.getId());
-			}
-
-			if (!StringUtils.isBlank(source.getPassword())) {
-				target.setPassword(
-						/* @TODO ASHRAF passwordEncoder.encode(source.getPassword()) */ source.getPassword());
-				target.setNick(source.getUserName());
-				target.setAnonymous(false);
 			}
 
 			if (source.getBilling() != null) {
@@ -200,40 +180,6 @@ public class CustomerPopulator extends AbstractDataPopulator<PersistableCustomer
 					}
 					delivery.setCountry(deliveryCountry.getIsoCode());
 					target.setDelivery(delivery);
-				}
-			}
-
-			if (source.getAttributes() != null) {
-				for (PersistableCustomerAttribute attr : source.getAttributes()) {
-
-					CustomerOption customerOption = customerOptionService.getById(attr.getCustomerOption().getId());
-					if (customerOption == null) {
-						throw new ConversionException(
-								"Customer option id " + attr.getCustomerOption().getId() + " does not exist");
-					}
-
-					CustomerOptionValue customerOptionValue = customerOptionValueService
-						.getById(attr.getCustomerOptionValue().getId());
-					if (customerOptionValue == null) {
-						throw new ConversionException("Customer option value id "
-								+ attr.getCustomerOptionValue().getId() + " does not exist");
-					}
-
-					if (!Objects.equals(customerOption.getStoreMerchantId(), store)) {
-						throw new ConversionException("Invalid customer option id ");
-					}
-
-					if (!Objects.equals(customerOptionValue.getStoreMerchantId(), store)) {
-						throw new ConversionException("Invalid customer option value id ");
-					}
-
-					CustomerAttribute attribute = new CustomerAttribute();
-					attribute.setCustomer(target);
-					attribute.setCustomerOption(customerOption);
-					attribute.setCustomerOptionValue(customerOptionValue);
-					attribute.setTextValue(attr.getTextValue());
-
-					target.getAttributes().add(attribute);
 				}
 			}
 

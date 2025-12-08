@@ -129,83 +129,6 @@ create table if not exists checkout.customer_group
         constraint fkbopjkmu9mriivehbk9yd6rbvw references checkout.customer,
     group_id    integer not null
 );
-create table if not exists checkout.customer_option
-(
-    customer_option_id   bigint      not null primary key,
-    customer_opt_active  boolean,
-    customer_opt_code    varchar(255),
-    customer_option_type varchar(10),
-    customer_opt_public  boolean,
-    sort_order           integer,
-    store_merchant_id    varchar(50) not null,
-    constraint UKe0v0628sjv6kcme4jqtkhk1lt unique (store_merchant_id, customer_opt_code)
-);
-create index if not exists cust_opt_code_idx on checkout.customer_option (customer_opt_code);
-create table if not exists checkout.customer_option_desc
-(
-    description_id          bigint       not null primary key,
-    date_created            timestamp(6),
-    date_modified           timestamp(6),
-    updt_id                 varchar(60),
-    description             text,
-    name                    varchar(120) not null,
-    title                   varchar(100),
-    customer_option_comment varchar(4000),
-    language_code           varchar(6)   not null,
-    customer_option_id      bigint       not null
-        constraint fk201v4egnnqx20q6qky676mks2 references checkout.customer_option,
-    constraint UKq3l77dsrwyrmm10bct1tbl4dw unique (customer_option_id, language_code)
-);
-create table if not exists checkout.customer_option_value
-(
-    customer_option_value_id bigint      not null primary key,
-    customer_opt_val_code    varchar(255),
-    customer_opt_val_image   varchar(255),
-    sort_order               integer,
-    store_merchant_id        varchar(50) not null,
-    constraint UKi3whyloen8xy3nimesr70jah unique (
-                                                  store_merchant_id, customer_opt_val_code
-        )
-);
-create table if not exists checkout.customer_attribute
-(
-    customer_attribute_id bigint not null primary key,
-    customer_attr_txt_val varchar(255),
-    customer_id           bigint not null
-        constraint fkkt9jyeddekdvrhcx806k7os0g references checkout.customer,
-    option_id             bigint not null
-        constraint fkm7j9jcewyjmeh5ai9nsuuvi8i references checkout.customer_option,
-    option_value_id       bigint not null
-        constraint fksipgdm09ffity5b9g5c50jx3w references checkout.customer_option_value,
-    constraint uksoy0ia28b7ehe2rru8c5q5v87 unique (option_id, customer_id)
-);
-create table if not exists checkout.customer_opt_val_description
-(
-    description_id      bigint       not null primary key,
-    date_created        timestamp(6),
-    date_modified       timestamp(6),
-    updt_id             varchar(60),
-    description         text,
-    name                varchar(120) not null,
-    title               varchar(100),
-    language_code       varchar(6)   not null,
-    customer_opt_val_id bigint
-        constraint fkmej30yqti7y4t4iqsq15t9yc3 references checkout.customer_option_value,
-    constraint UKf0c1ffdlvc2a6k0dqqvmucjjy unique (customer_opt_val_id, language_code)
-);
-create table if not exists checkout.customer_option_set
-(
-    customer_optionset_id    bigint not null primary key,
-    sort_order               integer,
-    customer_option_id       bigint not null
-        constraint fkiuve99ti5qr9j3qvth1yujjmh references checkout.customer_option,
-    customer_option_value_id bigint not null
-        constraint fko2ohdbcnl065c2u3icfya9688 references checkout.customer_option_value,
-    constraint uk1lqrcukylq7x2te82cai3t7y9 unique (
-                                                   customer_option_id, customer_option_value_id
-        )
-);
-create index if not exists cust_opt_val_code_idx on checkout.customer_option_value (customer_opt_val_code);
 create table if not exists checkout.customer_review
 (
     customer_review_id   bigint not null primary key,
@@ -269,19 +192,6 @@ create table if not exists checkout.optin
     start_date        timestamp(6),
     store_merchant_id varchar(50),
     constraint UKre6g495jxc6apfyo4dyvw7yuy unique (store_merchant_id, code)
-);
-create table if not exists checkout.customer_optin
-(
-    customer_optin_id bigint       not null primary key,
-    email             varchar(255) not null,
-    first             varchar(255),
-    last              varchar(255),
-    optin_date        timestamp(6),
-    value             text,
-    store_merchant_id varchar(50)  not null,
-    optin_id          bigint
-        constraint fkr1uwied13q1bdptgap3vdu8xb references checkout.optin,
-    constraint ukmaibabrcxys6ij7ifc1iqggb unique (email, optin_id)
 );
 create table if not exists checkout.orders
 (

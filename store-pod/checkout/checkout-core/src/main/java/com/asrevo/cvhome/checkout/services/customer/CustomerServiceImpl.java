@@ -4,12 +4,9 @@ import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.checkout.entity.customer.Customer;
 import com.asrevo.cvhome.checkout.entity.customer.CustomerCriteria;
 import com.asrevo.cvhome.checkout.entity.customer.CustomerList;
-import com.asrevo.cvhome.checkout.entity.customer.attribute.CustomerAttribute;
 import com.asrevo.cvhome.checkout.repositories.customer.CustomerRepository;
-import com.asrevo.cvhome.checkout.services.customer.attribute.CustomerAttributeService;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
-import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,14 +17,10 @@ public class CustomerServiceImpl extends SalesManagerEntityServiceImpl<Long, Cus
 
 	private final CustomerRepository customerRepository;
 
-	private final CustomerAttributeService customerAttributeService;
-
 	@Autowired
-	public CustomerServiceImpl(CustomerRepository customerRepository,
-			CustomerAttributeService customerAttributeService) {
+	public CustomerServiceImpl(CustomerRepository customerRepository) {
 		super(customerRepository);
 		this.customerRepository = customerRepository;
-		this.customerAttributeService = customerAttributeService;
 	}
 
 	@Override
@@ -60,16 +53,6 @@ public class CustomerServiceImpl extends SalesManagerEntityServiceImpl<Long, Cus
 	}
 
 	public void delete(Customer customer) {
-		customer = getById(customer.getId());
-
-		// delete attributes
-		List<CustomerAttribute> attributes = customerAttributeService.getByCustomer(customer.getStoreMerchantId(),
-				customer);
-		if (attributes != null) {
-			for (CustomerAttribute attribute : attributes) {
-				customerAttributeService.delete(attribute);
-			}
-		}
 		customerRepository.delete(customer);
 	}
 

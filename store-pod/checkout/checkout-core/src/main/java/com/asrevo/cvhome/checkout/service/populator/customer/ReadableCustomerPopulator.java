@@ -3,9 +3,7 @@ package com.asrevo.cvhome.checkout.service.populator.customer;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.customer.model.customer.ReadableCustomer;
 import com.asrevo.cvhome.customer.model.customer.address.Address;
-import com.asrevo.cvhome.customer.model.customer.attribute.*;
 import com.asrevo.cvhome.checkout.entity.customer.Customer;
-import com.asrevo.cvhome.checkout.entity.customer.attribute.CustomerAttribute;
 import com.asrevo.cvhome.store.core.exception.ConversionException;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import com.asrevo.cvhome.store.core.populator.AbstractDataPopulator;
@@ -97,37 +95,6 @@ public class ReadableCustomerPopulator extends AbstractDataPopulator<Customer, S
 				}
 
 				target.setDelivery(address);
-			}
-
-			if (source.getAttributes() != null) {
-				for (CustomerAttribute attribute : source.getAttributes()) {
-					ReadableCustomerAttribute readableAttribute = new ReadableCustomerAttribute();
-					readableAttribute.setId(attribute.getId());
-					readableAttribute.setTextValue(attribute.getTextValue());
-					ReadableCustomerOption option = new ReadableCustomerOption();
-					option.setId(attribute.getCustomerOption().getId());
-					option.setCode(attribute.getCustomerOption().getCode());
-
-					CustomerOptionDescription d = new CustomerOptionDescription();
-					d.setDescription(
-							attribute.getCustomerOption().getDescriptionsSettoList().getFirst().getDescription());
-					d.setName(attribute.getCustomerOption().getDescriptionsSettoList().getFirst().getName());
-					option.setDescription(d);
-
-					readableAttribute.setCustomerOption(option);
-
-					ReadableCustomerOptionValue optionValue = new ReadableCustomerOptionValue();
-					optionValue.setId(attribute.getCustomerOptionValue().getId());
-					CustomerOptionValueDescription vd = new CustomerOptionValueDescription();
-					vd.setDescription(
-							attribute.getCustomerOptionValue().getDescriptionsSettoList().getFirst().getDescription());
-					vd.setName(attribute.getCustomerOptionValue().getDescriptionsSettoList().getFirst().getName());
-					optionValue.setCode(attribute.getCustomerOptionValue().getCode());
-					optionValue.setDescription(vd);
-
-					readableAttribute.setCustomerOptionValue(optionValue);
-					target.getAttributes().add(readableAttribute);
-				}
 			}
 
 		}
