@@ -14,19 +14,7 @@ export const CheckoutCartBox = ({storeContext}: { storeContext: StoreContext }) 
     const t = useTranslations('PAGE.CHECKOUT');
     const [cart, setCart] = useState<Cart | undefined>()
     const cartManager = getCartManager(storeContext);
-    useEffect(() => {
-        const handleCartChange = () => {
-            cartManager.consumeCart(setCart)
-        };
-
-        cartManager.subscribe(handleCartChange);
-
-        // Cleanup listener on component unmount
-        return () => {
-            cartManager.unsubscribe(handleCartChange);
-
-        };
-    }, [cartManager]);
+    useEffect(cartManager.fullSubscribe(setCart), [cartManager]);
 
     return (
         <Card>

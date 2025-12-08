@@ -43,26 +43,20 @@ export const ProductDetailedAddToCart = ({storeContext, product}: {
                 sound: false,
             });
         }
-    }, [cartManager,storeContext, product.sku, t]);
+    }, [cartManager, storeContext, product.sku, t]);
 
-    useEffect(() => {
-        const syncWithCart = () => {
-            const matchedProduct = cartManager.getMatchedProductsInCart(product.id);
-            if (matchedProduct) {
-                setQuantity(matchedProduct.quantity);
-                inCartRef.current = true;
-            } else {
-                setQuantity(product.quantity > 0 ? 1 : 0);
-                inCartRef.current = false;
-            }
-        };
+    const syncWithCart = () => {
+        const matchedProduct = cartManager.getMatchedProductsInCart(product.id);
+        if (matchedProduct) {
+            setQuantity(matchedProduct.quantity);
+            inCartRef.current = true;
+        } else {
+            setQuantity(product.quantity > 0 ? 1 : 0);
+            inCartRef.current = false;
+        }
+    };
 
-        cartManager.subscribe(syncWithCart);
-
-        return () => {
-            cartManager.unsubscribe(syncWithCart)
-        };
-    }, [cartManager,product]);
+    useEffect(cartManager.fullSubscribe(syncWithCart), [cartManager, product]);
 
     const incrementQuantity = () => {
         const newQty = quantity + 1;

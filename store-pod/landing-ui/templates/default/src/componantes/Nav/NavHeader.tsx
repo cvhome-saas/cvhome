@@ -37,15 +37,7 @@ export const NavHeader = ({params}: { params: LayoutParams }) => {
         setMobileMenuOpen(false);
     }, [pathname]);
 
-    useEffect(() => {
-        const handleCartChange = () => {
-            cartManager.consumeCart(setCart)
-        };
-        cartManager.subscribe(handleCartChange)
-        return () => {
-            cartManager.unsubscribe(handleCartChange)
-        };
-    }, [cartManager]);
+    useEffect(cartManager.fullSubscribe(setCart), [cartManager]);
 
 
     return (
