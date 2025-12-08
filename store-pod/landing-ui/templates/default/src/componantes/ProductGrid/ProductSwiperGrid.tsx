@@ -1,59 +1,81 @@
 'use client'
-import {Product} from "@/types/product-groups";
-import {Swiper, SwiperSlide} from 'swiper/react';
-import {EffectCoverflow, Navigation, Pagination} from "swiper/modules";
-import {StoreContext} from "@/types/store-context";
-import ProductItem from "@/componantes/ProductItem/ProductItem";
-import {useState} from "react";
+import * as React from "react";
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { EffectCoverflow, Navigation, Pagination } from "swiper/modules";
 
-export default function ProductSwiperGrid({storeContext, products}: {
-    storeContext: StoreContext
-    products: Product[]
-}) {
-    const [swiperLoaded, setSwiperLoaded] = useState(false);
+import { Product } from "@/types/product-groups";
+import { StoreContext } from "@/types/store-context";
+import ProductItem from "@/componantes/ProductItem/ProductItem";
+import { cn } from "@/lib/utils";
+
+export interface ProductSwiperGridProps extends React.HTMLAttributes<HTMLDivElement> {
+  storeContext: StoreContext;
+  products: Product[];
+  emptyStateMessage?: string;
+}
+
+const ProductSwiperGrid = React.forwardRef<HTMLDivElement, ProductSwiperGridProps>(
+  ({ storeContext, products, className, emptyStateMessage, ...props }, ref) => {
+
+    if (!products || products.length === 0) {
+      return (
+        <div
+          ref={ref}
+          className={cn("flex items-center justify-center py-20 text-muted-foreground", className)}
+          {...props}
+        >
+          <p>{emptyStateMessage || "No products found."}</p>
+        </div>
+      );
+    }
 
     return (
-        <div className={`relative flex items-center justify-center min-h-[550px]`}>
-
-            <Swiper
-                modules={[EffectCoverflow, Pagination, Navigation]}
-                slidesPerView={3}
-                spaceBetween={30}
-                navigation={true}
-                pagination={{clickable: true}}
-                breakpoints={{
-                    320: {slidesPerView: 1, spaceBetween: 20},
-                    640: {slidesPerView: 1, spaceBetween: 20},
-                    768: {slidesPerView: 2, spaceBetween: 30},
-                    1024: {slidesPerView: 3, spaceBetween: 40},
-                }}
-                effect={'coverflow'}
-                loop={true}
-                centeredSlides={true}
-                grabCursor={true}
-                coverflowEffect={{
-                    rotate: 0,
-                    stretch: 0,
-                    depth: 100,
-                    modifier: 1,
-                    slideShadows: false,
-                }}
-                className={`coverflow w-full h-full transition-opacity duration-500 ${swiperLoaded ? 'opacity-100' : 'opacity-0'}`}
-                onSwiper={(swiper) => {
-                    setTimeout(() => {
-                        setSwiperLoaded(true);
-                    }, 100);
-                }}
-            >
-                {products.map((product, index) =>
-                    <SwiperSlide key={product.id} className="flex justify-center">
-                        <ProductItem
-                            storeContext={storeContext}
-                            product={product}
-                        />
-                    </SwiperSlide>
-                )}
-            </Swiper>
-        </div>
+      <div
+        ref={ref}
+        className={cn("relative flex items-center justify-center min-h-[550px]", className)}
+        {...props}
+      >
+        <Swiper
+          modules={[EffectCoverflow, Pagination, Navigation]}
+          slidesPerView={3}
+          spaceBetween={30}
+          navigation={true}
+          pagination={{ clickable: true }}
+          breakpoints={{
+            320: { slidesPerView: 1, spaceBetween: 20 },
+            640: { slidesPerView: 1, spaceBetween: 20 },
+            768: { slidesPerView: 2, spaceBetween: 30 },
+            1024: { slidesPerView: 3, spaceBetween: 40 },
+          }}
+          effect={'coverflow'}
+          loop={true}
+          centeredSlides={true}
+          grabCursor={true}
+          coverflowEffect={{
+            rotate: 0,
+            stretch: 0,
+            depth: 100,
+            modifier: 1,
+            slideShadows: false,
+          }}
+          className="coverflow w-full h-full opacity-0 transition-opacity duration-500"
+          onSwiper={(swiper) => {
+            // A small timeout ensures styles are applied before fading in, preventing a flash of unstyled content.
+            setTimeout(() => {
+              swiper.el.style.opacity = '1';
+            }, 0);
+          }}
+        >
+          {products.map((product) =>
+            <SwiperSlide key={product.id} className="flex justify-center">
+              <ProductItem storeContext={storeContext} product={product} />
+            </SwiperSlide>
+          )}
+        </Swiper>
+      </div>
     );
-}
+  }
+);
+ProductSwiperGrid.displayName = "ProductSwiperGrid";
+
+export default ProductSwiperGrid;

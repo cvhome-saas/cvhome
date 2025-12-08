@@ -69,7 +69,10 @@
       "SUCCESSFULLY_ADDED_PRODUCT_TO_CART": "Товар успешно добавлен в корзину!",
       "FAILED_TO_ADD_PRODUCT_TO_CART": "Не удалось добавить товар в корзину.",
       "IN_STOCK": "В наличии",
-      "OUT_OF_STOCK": "Нет в наличии"
+      "OUT_OF_STOCK": "Нет в наличии",
+      "ADD_TO_CART": "Добавить в корзину",
+      "QUICK_VIEW": "Быстрый просмотр",
+      "VIEW_DETAILS": "Просмотреть детали"
     },
     "HEADER": {
       "HOME_TITLE": "Главная",

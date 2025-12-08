@@ -1,31 +1,43 @@
-import {SocialIcons} from "@/componantes/common/SocialIcons";
 import {LayoutParams} from "@/types/params";
-import {isRtl} from "@/services/direction-utils";
-import {getTranslations} from "next-intl/server";
+import {Button} from "@/components/ui/button";
+import {cn} from "@/lib/utils";
+import * as React from "react";
+import {Facebook, Github, Instagram, Twitter} from "lucide-react";
 
-export async function FooterSocialLinks({
-                                            params
-                                        }: {
-    params: LayoutParams
-}) {
-    const t = await getTranslations('COMPONENTS.FOOTER');
-    const isRtlLayout = isRtl(params.storeContext.locale);
-    return <div className="flex mt-4 sm:justify-center sm:mt-0">
-        {
-            params.store.socialLinks && params.store.socialLinks.length > 0 &&
-            params.store.socialLinks.map(it => {
+export interface FooterSocialLinksProps extends React.HTMLAttributes<HTMLDivElement> {
+    params: LayoutParams;
+}
 
-                const url = it.url.startsWith('http://') || it.url.startsWith('https://')
-                    ? it.url
-                    : `https://${it.url}`
+export async function FooterSocialLinks({params, className, ...props}: FooterSocialLinksProps) {
+    const iconMap: Record<string, React.ElementType> = {
+        facebook: Facebook,
+        twitter: Twitter,
+        x: Twitter,
+        instagram: Instagram,
+        github: Github
+    };
 
-                return <a key={it.provider} href={url} target="_blank"
-                          className={`text-neutral hover:text-neutral dark:hover:text-foreground ${isRtlLayout ? 'me-5' : 'ms-5'}`}>
-                    <SocialIcons icon={it.provider.toLowerCase()}/>
-                    <span className="sr-only">{it.provider.toLowerCase()}</span>
-                </a>
+    if (!params.store.socialLinks || params.store.socialLinks.length === 0) {
+        return null;
+    }
 
-            })
-        }
-    </div>;
+    return (
+        <div className={cn("flex items-center space-x-4 mt-4 sm:justify-center sm:mt-0", className)} {...props}>
+            {params.store.socialLinks.map((link) => {
+                const url = link.url.startsWith("http") ? link.url : `https://${link.url}`;
+                const IconComponent = iconMap[link.provider.toLowerCase()];
+
+                if (!IconComponent) return null;
+
+                return (
+                    <Button key={link.provider} variant="ghost" size="icon" asChild>
+                        <a href={url} target="_blank" rel="noopener noreferrer">
+                            <IconComponent className="h-4 w-4"/>
+                            <span className="sr-only">{link.provider}</span>
+                        </a>
+                    </Button>
+                );
+            })}
+        </div>
+    );
 }

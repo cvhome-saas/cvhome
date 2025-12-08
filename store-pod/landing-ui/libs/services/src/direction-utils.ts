@@ -12,6 +12,9 @@ export const getDirection = ((locale: string) => {
 export const isRtl = (locale: string) => {
     return getDirection(locale) === "rtl";
 };
+
+export const toastDirection = (locale: string) => isRtl(locale) ? "bottom-left" : "bottom-right";
+
 export const isLtr = (locale: string) => {
     return getDirection(locale) === "ltr";
 };

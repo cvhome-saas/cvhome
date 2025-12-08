@@ -1,136 +1,98 @@
 'use client'
 import {Product} from "@/types/product-groups";
-import {MinusIcon, PlusIcon} from "@heroicons/react/16/solid";
-import React, {useEffect, useRef, useState} from 'react';
-import {getCartCode, getMatchedProductsInCart, setCartData} from "@/services/cart-utils";
-import {CartService} from "@/services/cart-service";
-import {emitter} from "next/client";
+import {Minus, Plus} from "lucide-react";
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {StoreContext} from "@/types/store-context";
 import {showToast} from "nextjs-toast-notify";
 import {useTranslations} from "next-intl";
+import {Button} from "@/components/ui/button";
+import {getCartManager} from "@/services/cart-manager";
+import {toastDirection} from "@/services/direction-utils";
 
 export const ProductDetailedAddToCart = ({storeContext, product}: {
     storeContext: StoreContext,
     product: Product
 }) => {
     const t = useTranslations('PAGE.PRODUCT');
-    const [quantity, setQuantity] = useState(1);
+    const [quantity, setQuantity] = useState(product.quantity > 0 ? 1 : 0);
     const inCartRef = useRef(false);
-
-    const updateCart = async (newQty: number) => {
-        return await CartService.addToCart(storeContext, getCartCode(), product.sku, newQty)
-            .then(newCartData => {
-                if (newCartData) {
-                    inCartRef.current = true;
-                    setCartData(newCartData);
-                    emitter.emit("CART_STORAGE_CHANGED", "");
-                    showToast.success(t('SUCCESSFULLY_ADDED_PRODUCT_TO_CART'), {
-                        duration: 3000,
-                        progress: false,
-                        position: "bottom-right",
-                        transition: "bounceIn",
-                        sound: false,
-                    });
-                } else {
-                    showToast.error(t('FAILED_TO_ADD_PRODUCT_TO_CART'), {
-                        duration: 3000,
-                        progress: false,
-                        position: "bottom-right",
-                        transition: "bounceIn",
-                        sound: false,
-                    });
-                }
-            });
-    };
-
-
-    const copyCartMatchedProducts = (cartMatchedCartProduct: Product) => {
-        setQuantity(cartMatchedCartProduct.quantity)
-        inCartRef.current = true;
-    }
-    const setDefaultQuantity = () => {
-        if (product.quantity == 0) {
-            setQuantity(0);
-        } else {
-            setQuantity(1);
-        }
-        inCartRef.current = false;
-    }
-
-
-    useEffect(() => {
-        let matchedProducts = getMatchedProductsInCart(product);
-        if (matchedProducts) {
-            copyCartMatchedProducts(matchedProducts);
-        } else {
-            setDefaultQuantity()
-        }
-        emitter.on("CART_STORAGE_CHANGED", data => {
-            let matchedProducts = getMatchedProductsInCart(product);
-            if (matchedProducts == undefined) {
-                setDefaultQuantity();
+    const cartManager = getCartManager(storeContext);
+    const updateCart = useCallback(async (newQty: number) => {
+        cartManager.addProductToCart(product.sku, newQty, (cart) => {
+            if (cart) {
+                inCartRef.current = true;
+                showToast.success(t('SUCCESSFULLY_ADDED_PRODUCT_TO_CART'), {
+                    duration: 3000,
+                    progress: false,
+                    position: toastDirection(storeContext.locale),
+                    transition: "bounceIn",
+                    sound: false,
+                });
             }
+        }, (err) => {
+            showToast.error(t('FAILED_TO_ADD_PRODUCT_TO_CART'), {
+                duration: 3000,
+                progress: false,
+                position: toastDirection(storeContext.locale),
+                transition: "bounceIn",
+                sound: false,
+            });
         });
-    }, []);
+    }, [cartManager, storeContext.locale, product.sku, t]);
 
-    const changeQuantity = (fn: (x: number) => number): number => {
-        const newQty = fn(quantity);
-        setQuantity(newQty);
-        return newQty;
+    const syncWithCart = () => {
+        const matchedProduct = cartManager.getMatchedProductsInCart(product.id);
+        if (matchedProduct) {
+            setQuantity(matchedProduct.quantity);
+            inCartRef.current = true;
+        } else {
+            setQuantity(product.quantity > 0 ? 1 : 0);
+            inCartRef.current = false;
+        }
     };
+
+    useEffect(cartManager.fullSubscribe(syncWithCart), [cartManager, product]);
 
     const incrementQuantity = () => {
-        const newQty = changeQuantity(prevQuantity => {
-            if (product.quantity > prevQuantity) {
-                return prevQuantity + 1;
-            } else {
-                return prevQuantity;
-            }
-        });
+        const newQty = quantity + 1;
+        if (product.quantity < newQty) return;
+
+        setQuantity(newQty);
         if (inCartRef.current) {
-            updateCart(newQty).then()
+            updateCart(newQty);
         }
     };
 
     const decrementQuantity = () => {
-        const newQty = changeQuantity(prevQuantity => {
-            return prevQuantity > 1 ? prevQuantity - 1 : prevQuantity;
-        });
+        const newQty = quantity - 1;
+        if (newQty < 1) return;
+
+        setQuantity(newQty);
         if (inCartRef.current) {
-            updateCart(newQty).then()
+            updateCart(newQty);
         }
     };
 
     const addToCart = async () => {
         if (!inCartRef.current) {
-            updateCart(quantity).then();
+            updateCart(quantity);
         }
     };
 
-    return <div className="mt-10">
-        <div className="flex items-center mt-4 w-full">
-            <button
-                type="button"
-                onClick={decrementQuantity}
-                className="p-2 rounded-full me-2 hover:bg-neutral disabled:opacity-50"
-            >
-                <MinusIcon className="size-5 text-neutral"/>
-            </button>
-            <span className="mx-2">{quantity}</span>
-            <button
-                type="button"
-                onClick={incrementQuantity}
-                className="p-2 rounded-full me-4 hover:bg-neutral"
-            >
-                <PlusIcon className="size-5 text-neutral"/>
-            </button>
-            <button
-                type="button"
-                onClick={addToCart}
-                className="bg-primary text-foreground py-1 px-4 rounded"
-            >
+    return <div className="mt-10 flex items-center gap-4">
+        <div className="flex items-center gap-2">
+            <Button variant="outline" size="icon" onClick={decrementQuantity} disabled={quantity <= 1}>
+                <Minus className="size-4"/>
+            </Button>
+            <span className="w-10 text-center font-semibold">{quantity}</span>
+            <Button variant="outline" size="icon" onClick={incrementQuantity} disabled={quantity >= product.quantity}>
+                <Plus className="size-4"/>
+            </Button>
+        </div>
+        <div className="flex-1">
+            <Button type="button" onClick={addToCart} className="w-full" size="lg" disabled={inCartRef.current}>
                 {t('ADD_TO_CART')}
-            </button>
+            </Button>
         </div>
     </div>
 };
