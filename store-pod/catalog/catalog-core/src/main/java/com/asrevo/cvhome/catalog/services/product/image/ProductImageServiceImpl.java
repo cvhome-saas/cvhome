@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -30,8 +29,7 @@ public class ProductImageServiceImpl extends SalesManagerEntityServiceImpl<Long,
 	private final ProductFileManager productFileManager;
 
 	@Autowired
-	public ProductImageServiceImpl(ProductImageRepository productImageRepository, ProductFileManager productFileManager,
-			ApplicationEventPublisher eventPublisher) {
+	public ProductImageServiceImpl(ProductImageRepository productImageRepository, ProductFileManager productFileManager) {
 		super(productImageRepository);
 		this.productImageRepository = productImageRepository;
 		this.productFileManager = productFileManager;
@@ -81,7 +79,7 @@ public class ProductImageServiceImpl extends SalesManagerEntityServiceImpl<Long,
 			}
 
 			// insert ProductImage
-			ProductImage img = saveOrUpdate(productImage);
+			saveOrUpdate(productImage);
 
 		}
 		catch (Exception e) {

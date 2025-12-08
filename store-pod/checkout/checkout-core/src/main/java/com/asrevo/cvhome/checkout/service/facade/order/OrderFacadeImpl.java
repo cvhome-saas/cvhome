@@ -1,11 +1,8 @@
 package com.asrevo.cvhome.checkout.service.facade.order;
 
 import com.asrevo.cvhome.catalog.services.product.ExternalProductService;
-import com.asrevo.cvhome.checkout.entity.order.*;
-import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.customer.model.customer.ReadableCustomer;
-import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
 import com.asrevo.cvhome.checkout.entity.customer.Customer;
+import com.asrevo.cvhome.checkout.entity.order.*;
 import com.asrevo.cvhome.checkout.entity.order.orderproduct.OrderProduct;
 import com.asrevo.cvhome.checkout.entity.order.orderstatus.OrderStatusHistory;
 import com.asrevo.cvhome.checkout.entity.shoppingcart.ShoppingCart;
@@ -32,9 +29,11 @@ import com.asrevo.cvhome.checkout.service.populator.order.ReadableOrderPopulator
 import com.asrevo.cvhome.checkout.service.populator.order.ReadableOrderProductPopulator;
 import com.asrevo.cvhome.checkout.service.populator.order.transaction.PersistablePaymentPopulator;
 import com.asrevo.cvhome.checkout.services.order.OrderService;
-import com.asrevo.cvhome.checkout.services.reference.language.LanguageService;
 import com.asrevo.cvhome.checkout.services.shoppingcart.ShoppingCartCalculationService;
 import com.asrevo.cvhome.checkout.services.shoppingcart.ShoppingCartService;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.customer.model.customer.ReadableCustomer;
+import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
 import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
 import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
 import com.asrevo.cvhome.store.core.exception.ConversionException;
@@ -42,17 +41,17 @@ import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import com.asrevo.cvhome.store.utils.DateUtil;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
-import com.asrevo.cvhome.store.utils.LabelUtils;
 import com.asrevo.cvhome.store.utils.PriceUtils;
-import java.math.BigDecimal;
-import java.util.*;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+
+import java.math.BigDecimal;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service("orderFacade")
 @Slf4j
@@ -70,11 +69,7 @@ public class OrderFacadeImpl implements OrderFacade {
 
 	private final CustomerFacade customerFacade;
 
-	private final LabelUtils messages;
-
 	private final ReadableOrderTotalMapper readableOrderTotalMapper;
-
-	private final LanguageService languageService;
 
 	private final ReadableCustomerMapper readableCustomerMapper;
 
@@ -95,9 +90,9 @@ public class OrderFacadeImpl implements OrderFacade {
 	public OrderFacadeImpl(ShoppingCartFacade shoppingCartFacade, ShoppingCartService shoppingCartService,
 			OrderService orderService, ExternalProductService externalProductService,
 			PersistableOrderApiPopulator persistableOrderApiPopulator,
-			ReadableOrderProductMapper readableOrderProductMapper, LabelUtils messages, CustomerFacade customerFacade,
+			ReadableOrderProductMapper readableOrderProductMapper, CustomerFacade customerFacade,
 			ReadableCustomerMapper readableCustomerMapper, ReadableOrderTotalMapper readableOrderTotalMapper,
-			LanguageService languageService, ReadableOrderPopulator readableOrderPopulator, ImageFilePath imageUtils,
+			ReadableOrderPopulator readableOrderPopulator, ImageFilePath imageUtils,
 			ShoppingCartCalculationService shoppingCartCalculationService,
 			ExternalMerchantStoreService externalMerchantStoreService, PersistablePaymentPopulator paymentPopulator,
 			OrderProductPopulator orderProductPopulator) {
@@ -107,11 +102,9 @@ public class OrderFacadeImpl implements OrderFacade {
 		this.externalProductService = externalProductService;
 		this.persistableOrderApiPopulator = persistableOrderApiPopulator;
 		this.readableOrderProductMapper = readableOrderProductMapper;
-		this.messages = messages;
 		this.customerFacade = customerFacade;
 		this.readableCustomerMapper = readableCustomerMapper;
 		this.readableOrderTotalMapper = readableOrderTotalMapper;
-		this.languageService = languageService;
 		this.readableOrderPopulator = readableOrderPopulator;
 		this.imageUtils = imageUtils;
 		this.shoppingCartCalculationService = shoppingCartCalculationService;

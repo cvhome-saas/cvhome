@@ -10,7 +10,6 @@ import com.asrevo.cvhome.catalog.model.product.product.variant.ReadableProductVa
 import com.asrevo.cvhome.catalog.service.mapper.catalog.product.ReadableBaseProductMapper;
 import com.asrevo.cvhome.catalog.service.mapper.catalog.product.ReadableProductMapper;
 import com.asrevo.cvhome.catalog.service.mapper.catalog.product.ReadableProductVariantMapper;
-import com.asrevo.cvhome.catalog.service.mapper.catalog.product.ReadableTinyProductMapper;
 import com.asrevo.cvhome.catalog.services.category.CategoryServiceImpl;
 import com.asrevo.cvhome.catalog.services.pricing.PricingServiceImpl;
 import com.asrevo.cvhome.catalog.services.product.ProductService;
@@ -101,12 +100,6 @@ public class ProductFacadeV2Impl implements ProductFacade {
 			ProductCriteria searchCriteria) {
 		Assert.notNull(searchCriteria, "ProductCriteria must be set for this product");
 		return listProducts(readableProductMapper, merchantStore, searchCriteria);
-	}
-
-	@Override
-	public ReadableProductList getTinyProductListsByCriteria(StoreMerchantId merchantStore,
-			ProductCriteria searchCriteria) {
-		return listProducts(new ReadableTinyProductMapper(), merchantStore, searchCriteria);
 	}
 
 	@Override

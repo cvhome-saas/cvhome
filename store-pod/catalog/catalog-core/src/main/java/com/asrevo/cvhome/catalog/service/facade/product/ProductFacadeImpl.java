@@ -5,7 +5,6 @@ import com.asrevo.cvhome.catalog.entity.product.ProductCriteria;
 import com.asrevo.cvhome.catalog.model.product.ReadableProduct;
 import com.asrevo.cvhome.catalog.model.product.ReadableProductList;
 import com.asrevo.cvhome.catalog.service.populator.catalog.ReadableProductPopulator;
-import com.asrevo.cvhome.catalog.services.category.CategoryService;
 import com.asrevo.cvhome.catalog.services.pricing.PricingService;
 import com.asrevo.cvhome.catalog.services.product.ProductService;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
@@ -19,8 +18,6 @@ import org.springframework.stereotype.Service;
 // @Profile({"default", "cloud", "gcp", "aws", "mysql", "local"})
 public class ProductFacadeImpl implements ProductFacade {
 
-	private final CategoryService categoryService;
-
 	private final ProductService productService;
 
 	private final PricingService pricingService;
@@ -29,10 +26,8 @@ public class ProductFacadeImpl implements ProductFacade {
 
 	private final ExternalMerchantStoreService externalMerchantStoreService;
 
-	public ProductFacadeImpl(CategoryService categoryService, ProductService productService,
-			PricingService pricingService, ImageFilePath imageUtils,
+	public ProductFacadeImpl(ProductService productService, PricingService pricingService, ImageFilePath imageUtils,
 			ExternalMerchantStoreService externalStoreMerchantIdService) {
-		this.categoryService = categoryService;
 		this.productService = productService;
 		this.pricingService = pricingService;
 		this.imageUtils = imageUtils;
@@ -41,12 +36,6 @@ public class ProductFacadeImpl implements ProductFacade {
 
 	@Override
 	public ReadableProductList getProductListsByCriteria(StoreMerchantId store, ProductCriteria criteria) {
-		return null;
-	}
-
-	@Override
-	public ReadableProductList getTinyProductListsByCriteria(StoreMerchantId merchantStore,
-			ProductCriteria searchCriteria) {
 		return null;
 	}
 

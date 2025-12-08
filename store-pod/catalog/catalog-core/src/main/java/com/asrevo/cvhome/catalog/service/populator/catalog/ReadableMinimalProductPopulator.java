@@ -77,8 +77,6 @@ public class ReadableMinimalProductPopulator extends AbstractDataPopulator<Produ
 				language = baseStore.getDefaultLanguage();
 			}
 
-			final LanguageCode lang = language;
-
 			target.setId(source.getId());
 			target.setAvailable(source.isAvailable());
 			target.setProductShipeable(source.isProductShipeable());

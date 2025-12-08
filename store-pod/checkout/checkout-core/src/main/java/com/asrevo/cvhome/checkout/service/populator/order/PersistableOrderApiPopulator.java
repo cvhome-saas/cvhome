@@ -12,7 +12,6 @@ import com.asrevo.cvhome.checkout.model.order.v1.PersistableAnonymousOrder;
 import com.asrevo.cvhome.checkout.model.order.v1.PersistableOrder;
 import com.asrevo.cvhome.checkout.service.populator.customer.CustomerPopulator;
 import com.asrevo.cvhome.checkout.services.customer.CustomerService;
-import com.asrevo.cvhome.checkout.services.reference.currency.CurrencyService;
 import com.asrevo.cvhome.store.core.entity.common.Billing;
 import com.asrevo.cvhome.store.core.entity.common.Delivery;
 import com.asrevo.cvhome.store.core.entity.order.orderstatus.OrderStatus;
@@ -34,15 +33,12 @@ public class PersistableOrderApiPopulator extends AbstractDataPopulator<Persista
 
 	private final CustomerPopulator customerPopulator;
 
-	private final CurrencyService currencyService;
-
 	private final ExternalMerchantStoreService externalMerchantStoreService;
 
 	public PersistableOrderApiPopulator(CustomerService customerService, CustomerPopulator customerPopulator,
-			CurrencyService currencyService, ExternalMerchantStoreService externalMerchantStoreService) {
+			ExternalMerchantStoreService externalMerchantStoreService) {
 		this.customerService = customerService;
 		this.customerPopulator = customerPopulator;
-		this.currencyService = currencyService;
 		this.externalMerchantStoreService = externalMerchantStoreService;
 	}
 

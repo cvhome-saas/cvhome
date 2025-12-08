@@ -19,8 +19,6 @@ import org.springframework.util.Assert;
 @Slf4j
 public class ZoneServiceImpl extends SalesManagerEntityServiceImpl<ZoneCode, Zone> implements ZoneService {
 
-	private static final String ZONE_CACHE_PREFIX = "ZONES_";
-
 	private final ZoneRepository zoneRepository;
 
 	@Autowired

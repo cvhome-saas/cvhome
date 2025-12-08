@@ -39,8 +39,6 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 public class OrderApi {
 
-	private static final String DEFAULT_ORDER_LIST_COUNT = "25";
-
 	private final OrderFacade orderFacade;
 
 	private final ShoppingCartService shoppingCartService;

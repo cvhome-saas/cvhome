@@ -3,7 +3,6 @@ package com.asrevo.cvhome.catalog.service.mapper.catalog.product;
 import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.entity.product.availability.ProductAvailability;
 import com.asrevo.cvhome.catalog.model.product.ReadableProduct;
-import com.asrevo.cvhome.catalog.model.product.attribute.ReadableProductOption;
 import com.asrevo.cvhome.catalog.model.product.product.price.FinalPrice;
 import com.asrevo.cvhome.catalog.services.pricing.PricingService;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
@@ -12,7 +11,6 @@ import com.asrevo.cvhome.store.core.mapper.Mapper;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import com.asrevo.cvhome.store.utils.DateUtil;
 import java.util.Optional;
-import java.util.TreeMap;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
@@ -46,8 +44,6 @@ public class ReadableBaseProductMapper implements Mapper<Product, ReadableProduc
 
 		// read only product values
 		// will contain options
-		TreeMap<Long, ReadableProductOption> selectableOptions = new TreeMap<>();
-
 		destination.setSku(source.getSku());
 		destination.setRefSku(source.getRefSku());
 		destination.setId(source.getId());
