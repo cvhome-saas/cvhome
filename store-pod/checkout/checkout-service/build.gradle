@@ -20,8 +20,8 @@ bootBuildImage {
 */
 	environment["BP_JVM_JLINK_ENABLED"] = "true"
 	environment["BP_JVM_JLINK_ARGS"] = " --compress zip-6 --no-header-files --no-man-pages --vm client --add-modules java.base,java.se,jdk.unsupported,jdk.crypto.ec"
-	imageName = createImageName("store-pod/order", project.version)
-	tags = createImageTags("store-pod/order", project.version)
+	imageName = createImageName("store-pod/checkout", project.version)
+	tags = createImageTags("store-pod/checkout", project.version)
 	docker {
 		publishRegistry {
 			url = System.getenv("REGISTRY")
