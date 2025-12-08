@@ -29,7 +29,8 @@ public class ProductImageServiceImpl extends SalesManagerEntityServiceImpl<Long,
 	private final ProductFileManager productFileManager;
 
 	@Autowired
-	public ProductImageServiceImpl(ProductImageRepository productImageRepository, ProductFileManager productFileManager) {
+	public ProductImageServiceImpl(ProductImageRepository productImageRepository,
+			ProductFileManager productFileManager) {
 		super(productImageRepository);
 		this.productImageRepository = productImageRepository;
 		this.productFileManager = productFileManager;
