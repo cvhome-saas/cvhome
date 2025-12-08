@@ -44,15 +44,15 @@ export const CheckoutAgreementDialog = ({box, isOpen, setIsOpen, isAgree, setIsA
                     <AlertDialogTitle className="text-center">
                         {t('TERMS_AND_CONDITIONS')}
                     </AlertDialogTitle>
-                    <AlertDialogDescription
+                    {box && <AlertDialogDescription
                         className="max-h-60 overflow-y-auto text-foreground"
-                    >
-                        {box && <div dangerouslySetInnerHTML={{__html: parseDescription(box.description)}}/>}
-                    </AlertDialogDescription>
+                        dangerouslySetInnerHTML={{__html: parseDescription(box.description)}}/>
+                    }
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                     <AlertDialogCancel asChild>
-                        <Button variant="destructive" className="text-destructive-foreground" onClick={handleReject}>{t('REJECT')}</Button>
+                        <Button variant="destructive" className="text-destructive-foreground"
+                                onClick={handleReject}>{t('REJECT')}</Button>
                     </AlertDialogCancel>
                     <AlertDialogAction asChild>
                         <Button onClick={handleAgree}>{t('AGREE')}</Button>

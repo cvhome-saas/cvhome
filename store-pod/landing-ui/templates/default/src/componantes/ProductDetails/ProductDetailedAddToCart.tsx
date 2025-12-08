@@ -2,12 +2,12 @@
 import {Product} from "@/types/product-groups";
 import {Minus, Plus} from "lucide-react";
 import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {CartService} from "@/services/cart-service";
 import {StoreContext} from "@/types/store-context";
 import {showToast} from "nextjs-toast-notify";
 import {useTranslations} from "next-intl";
 import {Button} from "@/components/ui/button";
-import {getCartManager} from "@/componantes/CartManager";
+import {getCartManager} from "@/services/cart-manager";
+import {toastDirection} from "@/services/direction-utils";
 
 export const ProductDetailedAddToCart = ({storeContext, product}: {
     storeContext: StoreContext,
@@ -18,32 +18,27 @@ export const ProductDetailedAddToCart = ({storeContext, product}: {
     const inCartRef = useRef(false);
     const cartManager = getCartManager(storeContext);
     const updateCart = useCallback(async (newQty: number) => {
-        try {
-            const newCartData = await CartService.addToCart(storeContext, cartManager.getCartCode(), product.sku, newQty);
-            if (newCartData) {
+        cartManager.addProductToCart(product.sku, newQty, (cart) => {
+            if (cart) {
                 inCartRef.current = true;
-                cartManager.setCartData(newCartData);
                 showToast.success(t('SUCCESSFULLY_ADDED_PRODUCT_TO_CART'), {
                     duration: 3000,
                     progress: false,
-                    position: "bottom-right",
+                    position: toastDirection(storeContext.locale),
                     transition: "bounceIn",
                     sound: false,
                 });
-            } else {
-                throw new Error("No cart data returned");
             }
-        } catch (error) {
-            console.error("Failed to update cart:", error);
+        }, (err) => {
             showToast.error(t('FAILED_TO_ADD_PRODUCT_TO_CART'), {
                 duration: 3000,
                 progress: false,
-                position: "bottom-right",
+                position: toastDirection(storeContext.locale),
                 transition: "bounceIn",
                 sound: false,
             });
-        }
-    }, [cartManager, storeContext, product.sku, t]);
+        });
+    }, [cartManager, storeContext.locale, product.sku, t]);
 
     const syncWithCart = () => {
         const matchedProduct = cartManager.getMatchedProductsInCart(product.id);

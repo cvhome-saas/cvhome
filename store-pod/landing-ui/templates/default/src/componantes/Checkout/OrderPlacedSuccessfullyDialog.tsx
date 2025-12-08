@@ -39,7 +39,7 @@ export const OrderPlacedSuccessfullyDialog = ({order, isOpen, setIsOpen}: {
                         {order ? (
                             <>
                                 <p>
-                                    {t('YOUR_ORDER_HAS_BEEN_PLACED')}
+                                    {t('ORDER_PLACED_SUCCESSFULLY')}
                                 </p>
                                 <p>
                                     <strong>{t('ORDER_ID')}:</strong> {order.id}

@@ -20,7 +20,7 @@ import {Sheet, SheetContent, SheetTrigger} from "@/components/ui/sheet";
 import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from "@/components/ui/accordion";
 import {cn} from "@/lib/utils";
 import {Menu, ShoppingBag} from "lucide-react";
-import {getCartManager} from "@/componantes/CartManager";
+import {getCartManager} from "@/services/cart-manager";
 
 
 export const NavHeader = ({params}: { params: LayoutParams }) => {

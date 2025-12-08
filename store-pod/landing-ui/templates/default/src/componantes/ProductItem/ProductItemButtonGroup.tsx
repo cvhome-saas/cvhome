@@ -1,17 +1,17 @@
 'use client'
 import {Product} from "@/types/product-groups";
-import {CartService} from "@/services/cart-service";
 import {StoreContext} from "@/types/store-context";
 import {showToast} from "nextjs-toast-notify";
 import {Link} from "@/i18n/navigation";
 import {useCallback, useState} from "react";
 import ProductQuickVIew from "@/componantes/ProductItem/ProductQuickVIew";
-import {isRtl} from "@/services/direction-utils";
+import {toastDirection} from "@/services/direction-utils";
 import {useTranslations} from "next-intl";
 import {Button} from "@/components/ui/button";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
 import {ExternalLink, Eye, ShoppingCart} from "lucide-react";
-import {getCartManager} from "@/componantes/CartManager";
+import {getCartManager} from "@/services/cart-manager";
+
 
 export default function ProductItemButtonGroup({storeContext, product}: {
     storeContext: StoreContext,
@@ -21,39 +21,34 @@ export default function ProductItemButtonGroup({storeContext, product}: {
     const cartManager = getCartManager(storeContext);
 
     const [showQuickView, setShowQuickView] = useState(false);
-    const toastPosition = isRtl(storeContext.locale) ? "bottom-left" : "bottom-right";
 
     const isAddToCartDisabled = !product.available || product.quantity == null || product.quantity < 1;
 
     const addToCart = useCallback(async () => {
-        try {
-            const newCartData = await CartService.addToCart(storeContext, cartManager.getCartCode(), product.sku, 1);
-            if (newCartData) {
-                cartManager.setCartData(newCartData)
+        cartManager.addProductToCart(product.sku, 1, (cart) => {
+            if (cart) {
                 showToast.success(t('SUCCESSFULLY_ADDED_PRODUCT_TO_CART'), {
                     duration: 3000,
                     progress: false,
-                    position: toastPosition,
+                    position: toastDirection(storeContext.locale),
                     transition: "bounceIn",
                     sound: false,
                 });
-            } else {
-                throw new Error("No cart data returned");
             }
-        } catch (error) {
-            console.error("Failed to add product to cart:", error);
+        }, (err) => {
             showToast.error(t('FAILED_TO_ADD_PRODUCT_TO_CART'), {
                 duration: 3000,
                 progress: false,
-                position: toastPosition,
+                position: toastDirection(storeContext.locale),
                 transition: "bounceIn",
                 sound: false,
             });
-        }
-    }, [cartManager,storeContext, product.sku, t, toastPosition]);
+        });
+    }, [cartManager, storeContext.locale, product.sku, t]);
 
     return <>
-        <ProductQuickVIew storeContext={storeContext} product={product} open={showQuickView} setOpen={setShowQuickView}/>
+        <ProductQuickVIew storeContext={storeContext} product={product} open={showQuickView}
+                          setOpen={setShowQuickView}/>
         <TooltipProvider>
             <div
                 className="absolute bottom-0 w-full flex items-center justify-center gap-2 py-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">

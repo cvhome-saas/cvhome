@@ -21,7 +21,8 @@ import {Checkbox} from "@/components/ui/checkbox";
 import {Button} from "@/components/ui/button";
 import {Separator} from "@/components/ui/separator";
 import {defaultCheckoutValue} from "@/types/checkout-constants";
-import {getCartManager} from "@/componantes/CartManager";
+import {getCartManager} from "@/services/cart-manager";
+import {toastDirection} from "@/services/direction-utils";
 
 export const CheckoutForm = ({storeContext}: { storeContext: StoreContext }) => {
     const t = useTranslations('PAGE.CHECKOUT');
@@ -101,24 +102,20 @@ export const CheckoutForm = ({storeContext}: { storeContext: StoreContext }) => 
     };
 
     const onSubmit = async (checkoutCart: any) => {
-        const cartCode: string | undefined = cartManager.getCartCode();
-        if (cartCode) {
-            const o = await CartService.checkout(storeContext, cartCode, checkoutCart);
-            setOrder(o);
-            if (o) {
-                cartManager.setCartData(undefined)
-                setSuccessDialogOpen(true);
-                reset();
-            } else {
-                showToast.error(t('FAILED_TO_PLACE_ORDER'), {
-                    duration: 3000,
-                    progress: false,
-                    position: "bottom-right",
-                    transition: "bounceIn",
-                    sound: false,
-                });
-            }
-        }
+        cartManager.checkout(checkoutCart, (o) => {
+                setOrder(o);
+                if (o) {
+                    setSuccessDialogOpen(true);
+                    reset();
+                }
+            }, (err) => showToast.error(t('FAILED_TO_PLACE_ORDER'), {
+                duration: 3000,
+                progress: false,
+                position: toastDirection(storeContext.locale),
+                transition: "bounceIn",
+                sound: false,
+            })
+        );
     };
 
     return (

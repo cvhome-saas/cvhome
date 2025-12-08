@@ -8,7 +8,7 @@ import {useTranslations} from "next-intl";
 import {Card, CardContent, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
 import {ScrollArea} from "@/components/ui/scroll-area";
 import {Separator} from "@/components/ui/separator";
-import {getCartManager} from "@/componantes/CartManager";
+import {getCartManager} from "@/services/cart-manager";
 
 export const CheckoutCartBox = ({storeContext}: { storeContext: StoreContext }) => {
     const t = useTranslations('PAGE.CHECKOUT');

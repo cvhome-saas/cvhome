@@ -1,8 +1,7 @@
 import {emitter} from "next/client";
-import {Cart} from "@/types/cart";
-import {StoreContext} from "@/types/store-context";
-import {CART_DATA_KEY} from "@/types/constant";
 import {v4 as uuidv4} from 'uuid';
+import {Cart, CART_DATA_KEY, CheckoutCart, Order, StoreContext} from "@store-front/types";
+import {CartService} from "./cart-service";
 
 
 const CART_CHANGED_EVENT = "CART_STORAGE_CHANGED";
@@ -10,7 +9,7 @@ const CART_CHANGED_EVENT = "CART_STORAGE_CHANGED";
 class CartManager {
     private static instance: CartManager;
     private cart: Cart | undefined = undefined;
-    private storeContext: StoreContext | undefined = undefined;
+    private storeContext: StoreContext;
     private subscribers: Map<string, CartCallbackSubscriberWrapper> = new Map();
 
     private constructor(storeContext: StoreContext) {
@@ -86,9 +85,44 @@ class CartManager {
         };
     }
 
+    addProductToCart(productSku: string, newQty: number, onSuccess?: OnSuccessCallback<Cart | undefined>, onError?: OnErrorCallback) {
+        CartService.addToCart(this.storeContext, this.cart?.code, productSku, newQty).then((cart) => {
+            this.setCartData(cart);
+            if (onSuccess) onSuccess(cart);
+        }).catch(err => {
+            if (onError) onError(err);
+        });
+    }
+    
+    
+    removeProductFromCart(productSku: string, onSuccess?: OnSuccessCallback<Cart | undefined>, onError?: OnErrorCallback) {
+        if (this.cart) {
+            CartService.removeFromCartThenGetCart(this.storeContext, this.cart.code, productSku).then((cart) => {
+                this.setCartData(cart);
+                if (onSuccess) onSuccess(cart);
+            }).catch(err => {
+                if (onError) onError(err);
+            });
+        }
+    }
+
+    checkout(checkoutCart: CheckoutCart, onSuccess?: OnSuccessCallback<Order | undefined>, onError?: OnErrorCallback) {
+        if (this.cart) {
+            CartService.checkout(this.storeContext, this.cart.code, checkoutCart).then((order) => {
+                this.setCartData(undefined);
+                if (onSuccess) onSuccess(order);
+            }).catch(err => {
+                if (onError) onError(err);
+            });
+        }
+    }
+
 }
 
 export type CartSubscriber = (cart: Cart | undefined) => void;
 export type CartCallbackSubscriberWrapper = () => void;
 
 export const getCartManager = (storeContext: StoreContext) => CartManager.getInstance(storeContext)
+
+export type OnSuccessCallback<T> = (t:T) => void;
+export type OnErrorCallback = (err:Error) => void;

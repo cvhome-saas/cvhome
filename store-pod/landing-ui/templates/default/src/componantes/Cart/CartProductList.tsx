@@ -1,14 +1,13 @@
 'use client'
 import {Cart} from "@/types/cart";
 import {Link} from "@/i18n/navigation";
-import {CartService} from "@/services/cart-service";
 import {StoreContext} from "@/types/store-context";
 import Image from 'next/image';
 import {useTranslations} from "next-intl";
 import {Button} from "@/components/ui/button";
 import React from "react";
 import {Product} from "@store-front/types";
-import {getCartManager} from "@/componantes/CartManager";
+import {getCartManager} from "@/services/cart-manager";
 
 export const CartProductList = ({storeContext, cart, setCart}: {
     storeContext: StoreContext,
@@ -16,13 +15,7 @@ export const CartProductList = ({storeContext, cart, setCart}: {
     setCart: (cart: Cart | undefined) => void
 }) => {
     const cartManager = getCartManager(storeContext);
-    const removeItem = (sku: string) => {
-        if (cart) {
-            CartService.removeFromCartThenGetCart(storeContext, cart.code, sku).then((cart) => {
-                cartManager.setCartData(cart)
-            });
-        }
-    }
+    const removeItem = (sku: string) => cartManager.removeProductFromCart(sku)
 
     return <div className="flow-root">
         <ul role="list" className="-my-6 divide-y divide-border">
