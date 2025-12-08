@@ -69,7 +69,7 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
 
 	@Override
 	public OrderTotalSummary caculateOrderTotal(OrderSummary orderSummary, Customer customer, StoreMerchantId store,
-                                                LanguageCode language) throws ServiceException {
+			LanguageCode language) throws ServiceException {
 		Assert.notNull(orderSummary, "Order summary cannot be null");
 		Assert.notNull(orderSummary.getProducts(), "Order summary.products cannot be null");
 		Assert.notNull(store, "Store cannot be null");

@@ -32,7 +32,7 @@ import com.asrevo.cvhome.checkout.service.populator.order.ReadableOrderPopulator
 import com.asrevo.cvhome.checkout.service.populator.order.ReadableOrderProductPopulator;
 import com.asrevo.cvhome.checkout.service.populator.order.transaction.PersistablePaymentPopulator;
 import com.asrevo.cvhome.checkout.services.order.OrderService;
-import com.asrevo.cvhome.order.services.reference.language.LanguageService;
+import com.asrevo.cvhome.checkout.services.reference.language.LanguageService;
 import com.asrevo.cvhome.checkout.services.shoppingcart.ShoppingCartCalculationService;
 import com.asrevo.cvhome.checkout.services.shoppingcart.ShoppingCartService;
 import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
@@ -122,7 +122,7 @@ public class OrderFacadeImpl implements OrderFacade {
 
 	@Override
 	public Order processOrder(PersistableOrder order, Customer customer, StoreMerchantId store, LanguageCode language,
-							  Locale locale) throws ServiceException {
+			Locale locale) throws ServiceException {
 
 		Assert.notNull(order, "Order cannot be null");
 		Assert.notNull(customer, "Customer cannot be null");

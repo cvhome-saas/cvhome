@@ -4,8 +4,8 @@ import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1;
 
 import com.asrevo.cvhome.commons.annotation.ConditionalOnApiStatus;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.order.service.facade.country.CountryFacade;
-import com.asrevo.cvhome.order.service.facade.zone.ZoneFacade;
+import com.asrevo.cvhome.checkout.service.facade.country.CountryFacade;
+import com.asrevo.cvhome.checkout.service.facade.zone.ZoneFacade;
 import com.asrevo.cvhome.store.core.model.reference.CountryIsoCode;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import com.asrevo.cvhome.store.model.references.ReadableCountry;
