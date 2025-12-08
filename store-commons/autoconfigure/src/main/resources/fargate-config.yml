@@ -13,7 +13,7 @@ spring:
           - "pod-auth"
           - "merchant"
           - "catalog"
-          - "order"
+          - "checkout"
           - "landing-ui"
     ecs:
       discovery:
@@ -30,7 +30,7 @@ spring:
           "landing-ui": 8110
           "merchant": 8120
           "catalog": 8122
-          "order": 8123
+          "checkout": 8123
     gateway:
       server:
         webflux:

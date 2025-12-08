@@ -61,11 +61,6 @@ public class CategoryServiceImpl extends SalesManagerEntityServiceImpl<Long, Cat
 	}
 
 	@Override
-	public Category getOneByLanguage(long categoryId, LanguageCode language) {
-		return categoryRepository.findByIdAndLanguage(categoryId, language);
-	}
-
-	@Override
 	public void saveOrUpdate(Category category) throws ServiceException {
 
 		// save or update (persist and attach entities

@@ -25,8 +25,6 @@ public interface ProductFacade {
 	 */
 	ReadableProductList getProductListsByCriteria(StoreMerchantId store, ProductCriteria criteria);
 
-	ReadableProductList getTinyProductListsByCriteria(StoreMerchantId merchantStore, ProductCriteria searchCriteria);
-
 	ReadableProductList getBaseProductListsByCriteria(StoreMerchantId merchantStore, ProductCriteria searchCriteria);
 
 }

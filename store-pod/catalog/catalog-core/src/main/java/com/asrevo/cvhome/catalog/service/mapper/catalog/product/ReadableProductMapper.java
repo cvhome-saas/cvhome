@@ -166,11 +166,7 @@ public class ReadableProductMapper implements Mapper<Product, ReadableProduct> {
 
 				for (ProductAttribute attribute : attributes) {
 					ReadableProductOption opt;
-					ReadableProductAttribute attr = null;
 					ReadableProductProperty property;
-					ReadableProductPropertyValue propertyValue = null;
-					ReadableProductAttributeValue attrValue = new ReadableProductAttributeValue();
-
 					ProductOptionValue optionValue = attribute.getProductOptionValue();
 
 					// we need to set readonly attributes only
@@ -288,8 +284,6 @@ public class ReadableProductMapper implements Mapper<Product, ReadableProduct> {
 			}
 		}
 
-		ReadableProductVariant defaultInstance = null;
-
 		// variants
 		if (!CollectionUtils.isEmpty(source.getVariants())) {
 			List<ReadableProductVariant> instances = source.getVariants()
@@ -297,12 +291,6 @@ public class ReadableProductMapper implements Mapper<Product, ReadableProduct> {
 				.map(i -> readableProductVariantMapper.convert(i, store, language))
 				.collect(Collectors.toList());
 			destination.setVariants(instances);
-
-			// get default instance
-			defaultInstance = instances.stream()
-				.filter(com.asrevo.cvhome.catalog.model.product.product.variant.ProductVariant::isDefaultSelection)
-				.findAny()
-				.orElse(null);
 
 			for (ProductVariant instance : source.getVariants()) {
 				instanceToOption(selectableOptions, instance, store, language);
