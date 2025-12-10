@@ -52,7 +52,7 @@ export const HeaderBox = ({params, headerBox}: { params: LayoutParams, headerBox
         <header className="bg-background">
             <nav aria-label="Global" className="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8">
                 <div className="flex lg:flex-1">
-                    <Link prefetch={false} href={"/templates/default/public"} className="-m-1.5 p-1.5 group">
+                    <Link prefetch={false} href={"/"} className="-m-1.5 p-1.5 group">
                         <span className="sr-only">{params.store.name}</span>
                         {
                             params.store.logo &&
