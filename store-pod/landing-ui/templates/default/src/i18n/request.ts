@@ -11,7 +11,7 @@ export default getRequestConfig(async ({requestLocale}) => {
 
     return {
         locale,
-        messages: (await import(`../../messages/${locale}.json`)).default,
+        messages: (await import(`../../../../locales/${locale}.json`)).default,
         getMessageFallback: ({namespace, key, error}) => {
             return `-*${key}*-`;
         }
