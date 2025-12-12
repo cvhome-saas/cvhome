@@ -11,11 +11,11 @@ import {ColorSchema, ColorTheme, getThemeColors} from "@/types/color-schema";
 import {getDirection, isRtl} from "@/services/direction-utils";
 import {toRootStyle} from "@/services/color-utils";
 import {NextIntlClientProvider} from "next-intl";
-import {Footer} from "@/layout/Footer";
 import * as React from "react";
 import {CategoryService} from "@/services/category-service";
 import {Box} from "@/types/content";
-import {Header} from "@/layout/Header";
+import {Header} from "@/shared/Layout/Header";
+import {Footer} from "@/shared/Layout/Footer";
 
 const svgIcon = `<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦊</text></svg>`;
 
