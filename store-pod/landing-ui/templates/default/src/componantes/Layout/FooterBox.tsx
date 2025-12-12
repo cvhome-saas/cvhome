@@ -68,10 +68,7 @@ export const FooterBox = ({params}: { params: LayoutParams }) => {
                 <hr className="my-6 border-neutral sm:mx-auto dark:border-neutral lg:my-8"/>
                 <div className="sm:flex sm:items-center sm:justify-between">
                     <FooterRightReserved params={params}/>
-                    {
-                        params.store.socialLinks && params.store.socialLinks.length > 0 &&
-                        <FooterSocialLinks params={params}/>
-                    }
+                    <FooterSocialLinks params={params}/>
                 </div>
             </div>
         </footer>

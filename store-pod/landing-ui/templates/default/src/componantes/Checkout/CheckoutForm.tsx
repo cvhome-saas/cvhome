@@ -182,7 +182,7 @@ export const CheckoutForm = ({storeContext}: { storeContext: StoreContext }) => 
                     <div className="space-y-2">
                         <Label htmlFor="address">
                             {t('ADDRESS')}
-                        </Label>
+                            </Label>
                         <Textarea
                             id="address"
                             {...register("customer.billing.address")}

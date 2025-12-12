@@ -1,6 +1,6 @@
 'use client'
 import * as React from 'react'
-import {forwardRef, useEffect, useState} from 'react'
+import {useEffect, useState} from 'react'
 import {LayoutParams} from "@/types/params";
 import {Link, usePathname, useRouter} from "@/i18n/navigation";
 import {Cart} from "@/types/cart";
@@ -29,7 +29,9 @@ import {CartProductList} from "@/componantes/Cart/CartProductList";
 import {isRtl} from "@/services/direction-utils";
 import {useCart} from "@/hooks/use-cart";
 
-export const HeaderBox = ({params, headerBox}: { params: LayoutParams, headerBox: Box | undefined }) => {
+export const HeaderBox = ({params, headerBox}: {
+    params: LayoutParams,
+    headerBox: Box | undefined,}) => {
     const t = useTranslations('COMPONENTS.HEADER');
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
     const [cartOpen, setCartOpen] = useState(false)
@@ -174,7 +176,7 @@ const MobileNavContent = ({params, cart, setCartOpen}: {
                                 <AccordionItem value={category.code} key={category.code} className="border-b-0">
                                     <div className="flex items-center justify-between rounded-lg hover:bg-accent">
                                         <Link href={`/category/${category.description.friendlyUrl}`}
-                                              className="flex-grow px-3 py-2 text-base font-semibold leading-7 text-foreground">
+                                              className="grow px-3 py-2 text-base font-semibold leading-7 text-foreground">
                                             {category.description.name}
                                         </Link>
                                         <AccordionTrigger className="p-2 me-1.5"/>
@@ -221,7 +223,7 @@ const MobileNavContent = ({params, cart, setCartOpen}: {
     );
 }
 
-const ListItem = forwardRef<React.ElementRef<"a">, React.ComponentPropsWithoutRef<"a">>(
+const ListItem = React.forwardRef<HTMLAnchorElement, React.ComponentPropsWithoutRef<"a">>(
     ({className, title, children, ...props}, ref) => {
         return (
             <li>
@@ -263,7 +265,7 @@ const HeaderTop = React.forwardRef<HTMLDivElement, HeaderTopProps>(
             >
                 {box?.visible && (
                     <div
-                        className="flex-grow h-10 flex items-center justify-center bg-primary px-4 text-sm font-medium text-foreground text-center sm:px-6 lg:px-8"
+                        className="grow h-10 flex items-center justify-center bg-primary px-4 text-sm font-medium text-foreground text-center sm:px-6 lg:px-8"
                         dangerouslySetInnerHTML={{__html: parseDescription(box.description)}}
                     />
                 )}
