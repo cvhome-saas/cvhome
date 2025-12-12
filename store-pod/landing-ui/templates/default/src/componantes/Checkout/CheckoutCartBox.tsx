@@ -5,7 +5,7 @@ import {useTranslations} from "next-intl";
 import {Card, CardContent, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
 import {ScrollArea} from "@/components/ui/scroll-area";
 import {Separator} from "@/components/ui/separator";
-import {useCart} from "@/hooks/use-cart";
+import {useCart} from "@store-front/hooks/use-cart";
 
 export const CheckoutCartBox = ({storeContext}: { storeContext: StoreContext }) => {
     const t = useTranslations('PAGE.CHECKOUT');

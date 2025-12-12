@@ -5,7 +5,7 @@ import React from 'react';
 import {StoreContext} from "@/types/store-context";
 import {useTranslations} from "next-intl";
 import {Button} from "@/components/ui/button";
-import {useProductDetailedAddToCart} from "@/hooks/use-product-detailed-add-to-cart";
+import {useProductDetailedAddToCart} from "@store-front/hooks/use-product-detailed-add-to-cart";
 
 export const ProductDetailedAddToCartBox = ({storeContext, product}: {
     storeContext: StoreContext,

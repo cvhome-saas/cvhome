@@ -6,7 +6,7 @@ import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
 import {Label} from "@/components/ui/label";
 import ProductGrid from "@/componantes/ProductGrid/ProductGrid";
-import {useProductCategoryFilter} from "@/hooks/use-product-category-filter";
+import {useProductCategoryFilter} from "@store-front/hooks/use-product-category-filter";
 
 export const ProductCategoryFilter = ({storeContext, category}: { storeContext: StoreContext, category: Category }) => {
     const t = useTranslations('PAGE.CATEGORY');

@@ -6,7 +6,7 @@ import {CartService} from "./cart-service";
 
 const CART_CHANGED_EVENT = "CART_STORAGE_CHANGED";
 
-class CartManager {
+export class CartManager {
     private static instance: CartManager;
     private cart: Cart | undefined = undefined;
     private storeContext: StoreContext;

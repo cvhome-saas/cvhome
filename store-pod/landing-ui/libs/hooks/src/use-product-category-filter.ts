@@ -1,8 +1,8 @@
 import {useCallback, useEffect, useState} from "react";
-import {Category} from "@/types/category";
-import {Manufacturer, ProductGroupPage} from "@/types/product-groups";
-import {StoreContext} from "@/types/store-context";
-import {ProductCategory} from "@/services/product-category";
+import {Category} from "@store-front/types";
+import {Manufacturer, ProductGroupPage} from "@store-front/types";
+import {StoreContext} from "@store-front/types";
+import {ProductCategory} from "@store-front/services/product-category";
 
 export const useProductCategoryFilter = (storeContext: StoreContext, category: Category) => {
     const [productGroup, setProductGroup] = useState<ProductGroupPage | undefined>();

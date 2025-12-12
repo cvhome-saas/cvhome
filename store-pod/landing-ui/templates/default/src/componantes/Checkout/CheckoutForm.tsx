@@ -24,7 +24,7 @@ import {
 import {useRouter} from "@/i18n/navigation";
 import {Box} from "@/types/content";
 import {Order} from "@/types/order";
-import {useCheckoutForm} from "@/hooks/use-checkout-form";
+import {useCheckoutForm} from "@store-front/hooks/use-checkout-form";
 
 export const CheckoutForm = ({storeContext}: { storeContext: StoreContext }) => {
     const t = useTranslations('PAGE.CHECKOUT');

@@ -3,16 +3,16 @@ import {useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import {useTranslations} from "next-intl";
-import {StoreContext} from "@/types/store-context";
-import {Box} from "@/types/content";
-import {Order} from "@/types/order";
-import {ReadableCountryList} from "@/types/country";
-import {defaultCheckoutValue} from "@/types/checkout-constants";
-import {CartService} from "@/services/cart-service";
-import {ContentService} from "@/services/content-service";
-import {getCartManager} from "@/services/cart-manager";
+import {StoreContext} from "@store-front/types";
+import {Box} from "@store-front/types";
+import {Order} from "@store-front/types";
+import {ReadableCountryList} from "@store-front/types";
+import {defaultCheckoutValue} from "@store-front/types";
+import {CartService} from "@store-front/services/cart-service";
+import {ContentService} from "@store-front/services/content-service";
+import {getCartManager} from "@store-front/services/cart-manager";
 import {showToast} from "nextjs-toast-notify";
-import {toastDirection} from "@/services/direction-utils";
+import {toastDirection} from "@store-front/services/direction-utils";
 
 export const useCheckoutForm = (storeContext: StoreContext) => {
     const t = useTranslations('PAGE.CHECKOUT');

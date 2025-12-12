@@ -1,10 +1,10 @@
 import {useCallback, useEffect, useState} from "react";
-import {Cart} from "@/types/cart";
-import {StoreContext} from "@/types/store-context";
-import {getCartManager} from "@/services/cart-manager";
+import {Cart} from "@store-front/types/cart";
+import {getCartManager} from "@store-front/services/cart-manager";
 import {showToast} from "nextjs-toast-notify";
-import {toastDirection} from "@/services/direction-utils";
+import {toastDirection} from "@store-front/services/direction-utils";
 import {useTranslations} from "next-intl";
+import {StoreContext} from "@store-front/types/store-context";
 
 export const useCart = (storeContext: StoreContext) => {
     const t = useTranslations('COMPONENTS.PRODUCT');

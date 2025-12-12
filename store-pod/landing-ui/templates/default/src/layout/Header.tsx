@@ -27,7 +27,7 @@ import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger
 import {StoreContext} from "@/types/store-context";
 import {CartProductList} from "@/componantes/Cart/CartProductList";
 import {isRtl} from "@/services/direction-utils";
-import {useCart} from "@/hooks/use-cart";
+import {useCart} from "@store-front/hooks/use-cart";
 
 export const Header = ({params, headerBox}: {
     params: LayoutParams,

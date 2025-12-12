@@ -7,7 +7,7 @@ import {useTranslations} from "next-intl";
 import {Button} from "@/components/ui/button";
 import React from "react";
 import {Product} from "@store-front/types";
-import {useCart} from "@/hooks/use-cart";
+import {useCart} from "@store-front/hooks/use-cart";
 
 export const CartProductList = ({storeContext, cart}: {
     storeContext: StoreContext,

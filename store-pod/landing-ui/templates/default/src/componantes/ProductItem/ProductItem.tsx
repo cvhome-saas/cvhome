@@ -12,7 +12,7 @@ import {ExternalLink, Eye, ShoppingCart} from "lucide-react";
 import Image from 'next/image';
 import {Card, CardContent, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
 import {Badge} from "@/components/ui/badge";
-import {useCart} from "@/hooks/use-cart";
+import {useCart} from "@store-front/hooks/use-cart";
 
 export default function ProductItem({storeContext, product}: { storeContext: StoreContext, product: Product }) {
 
