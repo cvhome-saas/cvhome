@@ -17,6 +17,7 @@
     },
     "CHECKOUT": {
       "TITLE": "الدفع",
+      "SUB_TOTAL": "المجموع الفرعي",
       "HOME_TITLE": "الدفع",
       "CART_DETAILS": "تفاصيل السلة",
       "FORM_TITLE": "معلومات الشحن",

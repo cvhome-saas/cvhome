@@ -17,6 +17,7 @@
     },
     "CHECKOUT": {
       "TITLE": "Paiement",
+      "SUB_TOTAL": "Sous-total",
       "HOME_TITLE": "Paiement",
       "CART_DETAILS": "Détails du panier",
       "FORM_TITLE": "Informations de livraison",

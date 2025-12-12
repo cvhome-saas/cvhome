@@ -2,6 +2,7 @@ import './instrumentation';
 import type {NextFunction, Request, Response} from "express";
 import express from "express";
 import {TemplateManager} from "./template-manager";
+import path from "path";
 
 const port = 8110;
 const dir = process.cwd();
@@ -24,14 +25,15 @@ function getTheme(req: Request) {
 
 app.get(/(.*)/, async (req: Request, res: Response, next: NextFunction) => {
     try {
-
-        const theme = getTheme(req);
-        console.log(`ThemeName: ${theme} | Request URL: ${req.originalUrl}`);
-
-        const nextApp = await templateManager.getApp(theme);
-        const handle = nextApp.getRequestHandler();
-
-        await handle(req, res);
+        const storeId = req.headers['store-id'];
+        if (storeId) {
+            const theme = getTheme(req);
+            const nextApp = await templateManager.getApp(theme);
+            const handle = nextApp.getRequestHandler();
+            await handle(req, res);
+        } else {
+            res.status(404).sendFile(path.join(dir, 'public', '404.html'));
+        }
     } catch (err) {
         next(err);
     }

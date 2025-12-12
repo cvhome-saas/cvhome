@@ -17,6 +17,7 @@
     },
     "CHECKOUT": {
       "TITLE": "Checkout",
+      "SUB_TOTAL": "Subtotal",
       "HOME_TITLE": "Checkout",
       "CART_DETAILS": "Cart Details",
       "FORM_TITLE": "Shipping Information",
