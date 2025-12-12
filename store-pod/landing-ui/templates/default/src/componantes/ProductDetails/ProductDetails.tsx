@@ -3,13 +3,8 @@ import {ProductDetailedAddToCartBox} from "@/componantes/ProductDetails/ProductD
 import {parseDescription} from "@/services/description-view-util";
 import {ProductDetailsImageGallery} from "@/componantes/ProductDetails/ProductDetailsImageGallery";
 import {StoreContext} from "@/types/store-context";
-import { Separator } from "@/components/ui/separator";
-import {
-    Accordion,
-    AccordionContent,
-    AccordionItem,
-    AccordionTrigger,
-} from "@/components/ui/accordion";
+import {Separator} from "@/components/ui/separator";
+import {Accordion, AccordionContent, AccordionItem, AccordionTrigger,} from "@/components/ui/accordion";
 
 export const ProductDetails = ({storeContext, p, t}: {
     storeContext: StoreContext,
@@ -46,9 +41,9 @@ export const ProductDetails = ({storeContext, p, t}: {
                         </div>
                     }
                 </div>
-                
-                <Separator />
-                
+
+                <Separator/>
+
                 <div>
                     <ProductDetailedAddToCartBox storeContext={storeContext} product={p}/>
                 </div>

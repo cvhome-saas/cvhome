@@ -1,6 +1,6 @@
-import { storeBaseServiceUrl, StoreContext } from "@store-front/types/store-context";
-import { Store } from "@store-front/types/store";
-import { handleResponse } from "./http-utils";
+import {storeBaseServiceUrl, StoreContext} from "@store-front/types/store-context";
+import {Store} from "@store-front/types/store";
+import {handleResponse} from "./http-utils";
 
 export class StoreService {
 

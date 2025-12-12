@@ -6,12 +6,10 @@ import {PeriodicExportingMetricReader} from '@opentelemetry/sdk-metrics';
 
 
 // Configure the trace exporter
-const traceExporter = new OTLPTraceExporter({
-});
+const traceExporter = new OTLPTraceExporter({});
 
 // Configure the metric exporter
-const metricExporter = new OTLPMetricExporter({
-});
+const metricExporter = new OTLPMetricExporter({});
 
 // Create the OpenTelemetry SDK
 const sdk = new NodeSDK({

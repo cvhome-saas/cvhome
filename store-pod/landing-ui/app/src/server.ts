@@ -1,5 +1,5 @@
 import './instrumentation';
-import type { NextFunction, Request, Response } from "express";
+import type {NextFunction, Request, Response} from "express";
 import express from "express";
 import {TemplateManager} from "./template-manager";
 

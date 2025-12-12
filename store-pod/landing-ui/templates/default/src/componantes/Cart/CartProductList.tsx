@@ -7,20 +7,18 @@ import {useTranslations} from "next-intl";
 import {Button} from "@/components/ui/button";
 import React from "react";
 import {Product} from "@store-front/types";
-import {getCartManager} from "@/services/cart-manager";
+import {useCart} from "@/hooks/use-cart";
 
-export const CartProductList = ({storeContext, cart, setCart}: {
+export const CartProductList = ({storeContext, cart}: {
     storeContext: StoreContext,
     cart: Cart | undefined,
-    setCart: (cart: Cart | undefined) => void
 }) => {
-    const cartManager = getCartManager(storeContext);
-    const removeItem = (sku: string) => cartManager.removeProductFromCart(sku)
+    const {removeProduct} = useCart(storeContext);
 
     return <div className="flow-root">
         <ul role="list" className="-my-6 divide-y divide-border">
             {cart && cart.products && cart.products.map((product) => (
-                <CartProductItem key={product.id} product={product} onRemove={removeItem}/>
+                <CartProductItem key={product.id} product={product} onRemove={removeProduct}/>
             ))}
         </ul>
     </div>;

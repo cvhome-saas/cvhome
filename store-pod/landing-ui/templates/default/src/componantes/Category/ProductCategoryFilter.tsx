@@ -1,38 +1,21 @@
 'use client'
 import {StoreContext} from "@/types/store-context";
 import {Category} from "@/types/category";
-import {Manufacturer, ProductGroupPage} from "@/types/product-groups";
-import {ProductCategory} from "@/services/product-category";
-import {useEffect, useState} from "react";
 import {useTranslations} from "next-intl";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
 import {Label} from "@/components/ui/label";
 import ProductGrid from "@/componantes/ProductGrid/ProductGrid";
+import {useProductCategoryFilter} from "@/hooks/use-product-category-filter";
 
 export const ProductCategoryFilter = ({storeContext, category}: { storeContext: StoreContext, category: Category }) => {
     const t = useTranslations('PAGE.CATEGORY');
-    const [productGroup, setProductGroup] = useState<ProductGroupPage | undefined>();
-    const [manufacturers, setManufacturers] = useState<Manufacturer[] | undefined>();
-    const [selectedManufacturerId, setSelectedManufacturerId] = useState<number | null>(null);
-
-    useEffect(() => {
-        ProductCategory.getProducts(storeContext, category.id).then(it => {
-            setProductGroup(it);
-        });
-        ProductCategory.getManufacturers(storeContext, category.id).then(it => {
-            setManufacturers(it);
-        })
-    }, [storeContext, category.id]);
-
-    const handleManufacturerChange = (manufacturerId: number | null) => {
-        setSelectedManufacturerId(manufacturerId); // Update the selected ID state
-
-        ProductCategory.getProducts(storeContext, category.id, manufacturerId ?? undefined)
-            .then(it => {
-                setProductGroup(it);
-            });
-    };
+    const {
+        productGroup,
+        manufacturers,
+        selectedManufacturerId,
+        handleManufacturerChange
+    } = useProductCategoryFilter(storeContext, category);
 
     return (
         <div className="flex flex-col lg:flex-row gap-6">
@@ -54,7 +37,8 @@ export const ProductCategoryFilter = ({storeContext, category}: { storeContext: 
                         </div>
                         {manufacturers?.map((manufacturer) => (
                             <div key={manufacturer.id} className="flex items-center space-x-2">
-                                <RadioGroupItem value={manufacturer.id.toString()} id={`manufacturer-${manufacturer.id}`}/>
+                                <RadioGroupItem value={manufacturer.id.toString()}
+                                                id={`manufacturer-${manufacturer.id}`}/>
                                 <Label htmlFor={`manufacturer-${manufacturer.id}`}>
                                     {manufacturer.description.name}
                                 </Label>

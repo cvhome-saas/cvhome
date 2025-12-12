@@ -1,83 +1,24 @@
 'use client'
 import {Product} from "@/types/product-groups";
 import {Minus, Plus} from "lucide-react";
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import React from 'react';
 import {StoreContext} from "@/types/store-context";
-import {showToast} from "nextjs-toast-notify";
 import {useTranslations} from "next-intl";
 import {Button} from "@/components/ui/button";
-import {getCartManager} from "@/services/cart-manager";
-import {toastDirection} from "@/services/direction-utils";
+import {useProductDetailedAddToCart} from "@/hooks/use-product-detailed-add-to-cart";
 
 export const ProductDetailedAddToCartBox = ({storeContext, product}: {
     storeContext: StoreContext,
     product: Product
 }) => {
     const t = useTranslations('PAGE.PRODUCT');
-    const [quantity, setQuantity] = useState(product.quantity > 0 ? 1 : 0);
-    const inCartRef = useRef(false);
-    const cartManager = getCartManager(storeContext);
-    const updateCart = useCallback(async (newQty: number) => {
-        cartManager.addProductToCart(product.sku, newQty, (cart) => {
-            if (cart) {
-                inCartRef.current = true;
-                showToast.success(t('SUCCESSFULLY_ADDED_PRODUCT_TO_CART'), {
-                    duration: 3000,
-                    progress: false,
-                    position: toastDirection(storeContext.locale),
-                    transition: "bounceIn",
-                    sound: false,
-                });
-            }
-        }, (err) => {
-            showToast.error(t('FAILED_TO_ADD_PRODUCT_TO_CART'), {
-                duration: 3000,
-                progress: false,
-                position: toastDirection(storeContext.locale),
-                transition: "bounceIn",
-                sound: false,
-            });
-        });
-    }, [cartManager, storeContext.locale, product.sku, t]);
-
-    const syncWithCart = () => {
-        const matchedProduct = cartManager.getMatchedProductsInCart(product.id);
-        if (matchedProduct) {
-            setQuantity(matchedProduct.quantity);
-            inCartRef.current = true;
-        } else {
-            setQuantity(product.quantity > 0 ? 1 : 0);
-            inCartRef.current = false;
-        }
-    };
-
-    useEffect(cartManager.fullSubscribe(syncWithCart), [cartManager, product]);
-
-    const incrementQuantity = () => {
-        const newQty = quantity + 1;
-        if (product.quantity < newQty) return;
-
-        setQuantity(newQty);
-        if (inCartRef.current) {
-            updateCart(newQty);
-        }
-    };
-
-    const decrementQuantity = () => {
-        const newQty = quantity - 1;
-        if (newQty < 1) return;
-
-        setQuantity(newQty);
-        if (inCartRef.current) {
-            updateCart(newQty);
-        }
-    };
-
-    const addToCart = async () => {
-        if (!inCartRef.current) {
-            updateCart(quantity);
-        }
-    };
+    const {
+        quantity,
+        incrementQuantity,
+        decrementQuantity,
+        addToCart,
+        isInCart
+    } = useProductDetailedAddToCart(storeContext, product);
 
     return <div className="mt-10 flex items-center gap-4">
         <div className="flex items-center gap-2">
@@ -90,7 +31,7 @@ export const ProductDetailedAddToCartBox = ({storeContext, product}: {
             </Button>
         </div>
         <div className="flex-1">
-            <Button type="button" onClick={addToCart} className="w-full" size="lg" disabled={inCartRef.current}>
+            <Button type="button" onClick={addToCart} className="w-full" size="lg" disabled={isInCart}>
                 {t('ADD_TO_CART')}
             </Button>
         </div>

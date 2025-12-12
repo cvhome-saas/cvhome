@@ -25,17 +25,18 @@ class CartManager {
     }
 
     private static loadFromStorage(): Cart | undefined {
-        let cart: Cart | undefined = undefined;
+        if (typeof window === "undefined") {
+            return undefined;
+        }
         try {
             const storedCart = localStorage.getItem(CART_DATA_KEY);
             if (storedCart) {
-                cart = JSON.parse(storedCart);
+                return JSON.parse(storedCart);
             }
         } catch (error) {
             console.error("Failed to load cart from storage", error);
-            cart = undefined;
         }
-        return cart;
+        return undefined;
     }
 
     public subscribe(callback: CartSubscriber): string {
@@ -56,17 +57,15 @@ class CartManager {
     }
 
     public setCartData(cart: Cart | undefined) {
-        if (cart && cart.code && typeof window !== "undefined") {
-            localStorage.setItem(CART_DATA_KEY, JSON.stringify(cart))
-        } else {
-            localStorage.removeItem(CART_DATA_KEY);
+        if (typeof window !== "undefined") {
+            if (cart && cart.code) {
+                localStorage.setItem(CART_DATA_KEY, JSON.stringify(cart));
+            } else {
+                localStorage.removeItem(CART_DATA_KEY);
+            }
         }
         this.cart = cart;
         emitter.emit(CART_CHANGED_EVENT, "");
-    }
-
-    getCartCode() {
-        return this.cart?.code;
     }
 
     getMatchedProductsInCart(productId: number) {
@@ -86,21 +85,21 @@ class CartManager {
     }
 
     addProductToCart(productSku: string, newQty: number, onSuccess?: OnSuccessCallback<Cart | undefined>, onError?: OnErrorCallback) {
-        CartService.addToCart(this.storeContext, this.cart?.code, productSku, newQty).then((cart) => {
+        CartService.addToCart(this.storeContext, this.cart?.code, productSku, newQty).then((cart: Cart | undefined) => {
             this.setCartData(cart);
             if (onSuccess) onSuccess(cart);
-        }).catch(err => {
+        }).catch((err: Error) => {
             if (onError) onError(err);
         });
     }
-    
-    
-    removeProductFromCart(productSku: string, onSuccess?: OnSuccessCallback<Cart | undefined>, onError?: OnErrorCallback) {
+
+
+    removeProduct(productSku: string, onSuccess?: OnSuccessCallback<Cart | undefined>, onError?: OnErrorCallback) {
         if (this.cart) {
-            CartService.removeFromCartThenGetCart(this.storeContext, this.cart.code, productSku).then((cart) => {
+            CartService.removeFromCartThenGetCart(this.storeContext, this.cart.code, productSku).then((cart: Cart | undefined) => {
                 this.setCartData(cart);
                 if (onSuccess) onSuccess(cart);
-            }).catch(err => {
+            }).catch((err: Error) => {
                 if (onError) onError(err);
             });
         }
@@ -108,10 +107,10 @@ class CartManager {
 
     checkout(checkoutCart: CheckoutCart, onSuccess?: OnSuccessCallback<Order | undefined>, onError?: OnErrorCallback) {
         if (this.cart) {
-            CartService.checkout(this.storeContext, this.cart.code, checkoutCart).then((order) => {
+            CartService.checkout(this.storeContext, this.cart.code, checkoutCart).then((order: Order | undefined) => {
                 this.setCartData(undefined);
                 if (onSuccess) onSuccess(order);
-            }).catch(err => {
+            }).catch((err: Error) => {
                 if (onError) onError(err);
             });
         }
@@ -121,8 +120,7 @@ class CartManager {
 
 export type CartSubscriber = (cart: Cart | undefined) => void;
 export type CartCallbackSubscriberWrapper = () => void;
+export type OnSuccessCallback<T> = (t: T) => void;
+export type OnErrorCallback = (err: Error) => void;
 
 export const getCartManager = (storeContext: StoreContext) => CartManager.getInstance(storeContext)
-
-export type OnSuccessCallback<T> = (t:T) => void;
-export type OnErrorCallback = (err:Error) => void;
