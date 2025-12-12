@@ -7,7 +7,7 @@ import path from "path";
 const port = 8110;
 const dir = process.cwd();
 const THEME_HEADER_NAME = 'theme';
-const DEFAULT_THEME_NAME = 'default';
+const DEFAULT_THEME_NAME = 'basis';
 const env: string = process.env.NODE_ENV || "development";
 
 // Express app setup
