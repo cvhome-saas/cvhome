@@ -13,7 +13,12 @@
       "PRODUCT_DESCRIPTION": "وصف المنتج",
       "SUCCESSFULLY_ADDED_PRODUCT_TO_CART": "تمت إضافة المنتج إلى السلة بنجاح!",
       "FAILED_TO_ADD_PRODUCT_TO_CART": "فشل إضافة المنتج إلى السلة.",
-      "RELATED_PRODUCTS": "المنتجات ذات الصلة"
+      "RELATED_PRODUCTS": "المنتجات ذات الصلة",
+      "QTY": "الكمية",
+      "AVAILABLE": "متوفر",
+      "PRODUCT_ALREADY_EXIST_IN_CART": "المنتج موجود بالفعل في سلتك",
+      "ADD_TO_SECURE_CHECKOUT": "أضف إلى السلة للدفع الآمن",
+      "OUT_OF_STOCK": "نفدت الكمية"
     },
     "CHECKOUT": {
       "TITLE": "الدفع",
@@ -107,7 +112,8 @@
       "SHOPPING_AND_TAX_CALCULATION_MESSAGE": "سيتم حساب الشحن والضرائب عند الدفع.",
       "CHECKOUT": "الدفع",
       "CONTINUE_SHOPPING": "متابعة التسوق",
-      "OR": "أو"
+      "OR": "أو",
+      "CART_IS_EMPTY": "سلة التسوق الخاصة بك فارغة."
     },
     "CHECKOUT": {},
     "CONTENT": {},

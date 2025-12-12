@@ -13,7 +13,12 @@
       "PRODUCT_DESCRIPTION": "Product Description",
       "SUCCESSFULLY_ADDED_PRODUCT_TO_CART": "Product added to cart successfully!",
       "FAILED_TO_ADD_PRODUCT_TO_CART": "Failed to add product to cart.",
-      "RELATED_PRODUCTS": "Related Products"
+      "RELATED_PRODUCTS": "Related Products",
+      "QTY": "Quantity",
+      "AVAILABLE": "available",
+      "PRODUCT_ALREADY_EXIST_IN_CART": "Already in your cart.",
+      "ADD_TO_SECURE_CHECKOUT": "Add to cart for secure checkout.",
+      "OUT_OF_STOCK": "Out of stock"
     },
     "CHECKOUT": {
       "TITLE": "Checkout",
@@ -107,7 +112,8 @@
       "SHOPPING_AND_TAX_CALCULATION_MESSAGE": "Shipping and taxes calculated at checkout.",
       "CHECKOUT": "Checkout",
       "CONTINUE_SHOPPING": "Continue Shopping",
-      "OR": "or"
+      "OR": "or",
+      "CART_IS_EMPTY": "Your cart is empty."
     },
     "CHECKOUT": {},
     "CONTENT": {},

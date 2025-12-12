@@ -13,7 +13,12 @@
       "PRODUCT_DESCRIPTION": "Descripción del Producto",
       "SUCCESSFULLY_ADDED_PRODUCT_TO_CART": "¡Producto añadido al carrito con éxito!",
       "FAILED_TO_ADD_PRODUCT_TO_CART": "Error al añadir el producto al carrito.",
-      "RELATED_PRODUCTS": "Productos relacionados"
+      "RELATED_PRODUCTS": "Productos relacionados",
+      "QTY": "Cantidad",
+      "AVAILABLE": "disponible",
+      "PRODUCT_ALREADY_EXIST_IN_CART": "Ya está en tu carrito.",
+      "ADD_TO_SECURE_CHECKOUT": "Añadir al carrito para un pago seguro.",
+      "OUT_OF_STOCK": "Agotado"
     },
     "CHECKOUT": {
       "TITLE": "Pago",
@@ -108,7 +113,8 @@
       "SHOPPING_AND_TAX_CALCULATION_MESSAGE": "Envío e impuestos calculados al finalizar la compra.",
       "CHECKOUT": "Pagar",
       "CONTINUE_SHOPPING": "Continuar Comprando",
-      "OR": "o"
+      "OR": "o",
+      "CART_IS_EMPTY": "Tu carrito está vacío."
     },
     "CHECKOUT": {},
     "CONTENT": {},

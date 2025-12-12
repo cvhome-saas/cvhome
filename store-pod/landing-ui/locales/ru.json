@@ -13,7 +13,12 @@
       "PRODUCT_DESCRIPTION": "Описание продукта",
       "SUCCESSFULLY_ADDED_PRODUCT_TO_CART": "Товар успешно добавлен в корзину!",
       "FAILED_TO_ADD_PRODUCT_TO_CART": "Не удалось добавить товар в корзину.",
-      "RELATED_PRODUCTS": "Сопутствующие товары"
+      "RELATED_PRODUCTS": "Сопутствующие товары",
+      "QTY": "Cantidad",
+      "AVAILABLE": "disponible",
+      "PRODUCT_ALREADY_EXIST_IN_CART": "Ya está en tu carrito.",
+      "ADD_TO_SECURE_CHECKOUT": "Añadir al carrito para un pago seguro.",
+      "OUT_OF_STOCK": "Agotado"
     },
     "CHECKOUT": {
       "TITLE": "Оформление заказа",
@@ -107,7 +112,8 @@
       "SHOPPING_AND_TAX_CALCULATION_MESSAGE": "Доставка и налоги будут рассчитаны при оформлении заказа.",
       "CHECKOUT": "Оформить заказ",
       "CONTINUE_SHOPPING": "Продолжить покупки",
-      "OR": "или"
+      "OR": "или",
+      "CART_IS_EMPTY": "Ваша корзина пуста."
     },
     "CHECKOUT": {},
     "CONTENT": {},
