@@ -1,5 +1,5 @@
 import {Product} from "@/types/product-groups";
-import {ProductDetailedAddToCartBox} from "@/componantes/ProductDetails/ProductDetailedAddToCartBox";
+import {ProductDetailedActionBox} from "@/componantes/ProductDetails/ProductDetailedActionBox";
 import {parseDescription} from "@/services/description-view-util";
 import {ProductDetailsImageGallery} from "@/componantes/ProductDetails/ProductDetailsImageGallery";
 import {StoreContext} from "@/types/store-context";
@@ -43,11 +43,7 @@ export const ProductDetails = ({storeContext, p, t}: {
                 </div>
 
                 <Separator/>
-
-                <div>
-                    <ProductDetailedAddToCartBox storeContext={storeContext} product={p}/>
-                </div>
-
+                <ProductDetailedActionBox storeContext={storeContext} product={p}/>
 
                 {p.description && (
                     <Accordion type="single" collapsible defaultValue="item-1" className="w-full">

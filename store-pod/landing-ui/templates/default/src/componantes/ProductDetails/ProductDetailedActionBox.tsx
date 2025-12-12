@@ -7,7 +7,7 @@ import {useTranslations} from "next-intl";
 import {Button} from "@/components/ui/button";
 import {useProductDetailedAddToCart} from "@store-front/hooks/use-product-detailed-add-to-cart";
 
-export const ProductDetailedAddToCartBox = ({storeContext, product}: {
+export const ProductDetailedActionBox = ({storeContext, product}: {
     storeContext: StoreContext,
     product: Product
 }) => {

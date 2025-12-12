@@ -1,7 +1,6 @@
 import {CheckoutPageParams} from "@/types/params";
 import {Breadcrumb} from "@/componantes/Common/Breadcrumb";
-import {CheckoutForm} from "@/componantes/Checkout/CheckoutForm";
-import {CheckoutCartBox} from "@/componantes/Checkout/CheckoutCartBox";
+import {CheckoutCartBox, CheckoutForm} from "@/componantes/Checkout/CheckoutForm";
 import {getTranslations} from "next-intl/server";
 import {BreadcrumbItem} from "@/types/bread-crumb";
 import {extractSsrContext} from "@/services/store-context-ssr-utils";
