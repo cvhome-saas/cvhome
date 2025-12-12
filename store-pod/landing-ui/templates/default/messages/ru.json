@@ -69,6 +69,7 @@
     "PRODUCT": {
       "SUCCESSFULLY_ADDED_PRODUCT_TO_CART": "Товар успешно добавлен в корзину!",
       "FAILED_TO_ADD_PRODUCT_TO_CART": "Не удалось добавить товар в корзину.",
+      "SUCCESSFULLY_REMOVED_PRODUCT": "Продукт успешно удален",
       "IN_STOCK": "В наличии",
       "OUT_OF_STOCK": "Нет в наличии",
       "ADD_TO_CART": "Добавить в корзину",

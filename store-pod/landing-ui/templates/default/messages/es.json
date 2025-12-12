@@ -69,6 +69,7 @@
     "PRODUCT": {
       "SUCCESSFULLY_ADDED_PRODUCT_TO_CART": "¡Producto añadido al carrito con éxito!",
       "FAILED_TO_ADD_PRODUCT_TO_CART": "Error al añadir el producto al carrito.",
+      "SUCCESSFULLY_REMOVED_PRODUCT": "Producto eliminado con éxito",
       "IN_STOCK": "En stock",
       "OUT_OF_STOCK": "Agotado",
       "ADD_TO_CART": "Añadir al Carrito",
