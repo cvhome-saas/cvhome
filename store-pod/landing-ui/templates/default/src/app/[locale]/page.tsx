@@ -1,11 +1,11 @@
 import {HomePageParams} from "@/types/params";
-import CoverFlow from "@/componantes/SlideShow/CoverFlow";
+import CoverFlow from "@/shared/SlideShow/CoverFlow";
 import {ProductService} from "@/services/product-service";
-import ProductSwiperGrid from "@/componantes/ProductGrid/ProductSwiperGrid";
-import ProductGrid from "@/componantes/ProductGrid/ProductGrid";
+import ProductSwiperGrid from "@/shared/ProductGrid/ProductSwiperGrid";
+import ProductGrid from "@/shared/ProductGrid/ProductGrid";
 import {StoreService} from "@/services/store-service";
 import React from 'react';
-import {SectionTitle} from "@/componantes/Common/SectionTitle";
+import {SectionTitle} from "@/shared/Common/SectionTitle";
 import {getTranslations} from "next-intl/server";
 import {extractSsrContext} from "@/services/store-context-ssr-utils";
 

@@ -1,7 +1,7 @@
 import {Product} from "@/types/product-groups";
-import {ProductDetailedActionBox} from "@/componantes/ProductDetails/ProductDetailedActionBox";
+import {ProductDetailedActionBox} from "@/shared/ProductDetails/ProductDetailedActionBox";
 import {parseDescription} from "@/services/description-view-util";
-import {ProductDetailsImageGallery} from "@/componantes/ProductDetails/ProductDetailsImageGallery";
+import {ProductDetailsImageGallery} from "@/shared/ProductDetails/ProductDetailsImageGallery";
 import {StoreContext} from "@/types/store-context";
 import {Separator} from "@/components/ui/separator";
 import {Accordion, AccordionContent, AccordionItem, AccordionTrigger,} from "@/components/ui/accordion";

@@ -1,6 +1,6 @@
 import * as React from "react";
 import {Product} from "@/types/product-groups";
-import ProductItem from "@/componantes/ProductItem/ProductItem";
+import ProductItem from "@/shared/ProductItem/ProductItem";
 import {StoreContext} from "@/types/store-context";
 import {cn} from "@/lib/utils";
 

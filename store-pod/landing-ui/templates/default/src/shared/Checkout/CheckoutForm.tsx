@@ -25,7 +25,7 @@ import {useRouter} from "@/i18n/navigation";
 import {Box} from "@/types/content";
 import {Order} from "@/types/order";
 import {useCheckoutForm} from "@store-front/hooks/use-checkout-form";
-import {CartProductList} from "@/componantes/Cart/CartProductList";
+import {CartProductList} from "@/shared/Cart/CartProductList";
 import {Card, CardContent, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
 import {ScrollArea} from "@/components/ui/scroll-area";
 import {useCart} from "@store-front/hooks/use-cart";

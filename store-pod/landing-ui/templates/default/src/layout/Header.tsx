@@ -25,7 +25,7 @@ import {Store} from "@/types/store";
 import {parseDescription} from "@/services/description-view-util";
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "@/components/ui/dropdown-menu";
 import {StoreContext} from "@/types/store-context";
-import {CartProductList} from "@/componantes/Cart/CartProductList";
+import {CartProductList} from "@/shared/Cart/CartProductList";
 import {isRtl} from "@/services/direction-utils";
 import {useCart} from "@store-front/hooks/use-cart";
 

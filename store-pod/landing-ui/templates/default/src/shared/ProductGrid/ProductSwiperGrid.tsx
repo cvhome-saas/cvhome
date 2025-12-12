@@ -5,7 +5,7 @@ import {EffectCoverflow, Navigation, Pagination} from "swiper/modules";
 
 import {Product} from "@/types/product-groups";
 import {StoreContext} from "@/types/store-context";
-import ProductItem from "@/componantes/ProductItem/ProductItem";
+import ProductItem from "@/shared/ProductItem/ProductItem";
 import {cn} from "@/lib/utils";
 
 export interface ProductSwiperGridProps extends React.HTMLAttributes<HTMLDivElement> {

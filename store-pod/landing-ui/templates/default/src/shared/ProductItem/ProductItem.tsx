@@ -3,7 +3,7 @@ import {Link} from "@/i18n/navigation";
 import {Product} from "@/types/product-groups";
 import {StoreContext} from "@/types/store-context";
 import {Dispatch, SetStateAction, useCallback, useState} from "react";
-import {ProductDetails} from "@/componantes/ProductDetails/ProductDetails";
+import {ProductDetails} from "@/shared/ProductDetails/ProductDetails";
 import {useTranslations} from "next-intl";
 import {Dialog, DialogContent} from "@/components/ui/dialog";
 import {Button} from "@/components/ui/button";
