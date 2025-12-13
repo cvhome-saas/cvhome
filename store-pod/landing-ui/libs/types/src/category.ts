@@ -1,4 +1,4 @@
-import type { Description } from "./description";
+import type {Description} from "./description";
 
 export interface CategoryPage {
     totalPages: number

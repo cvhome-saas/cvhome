@@ -10,7 +10,8 @@ export class TemplateManager {
         private readonly baseDir: string,
         private readonly env: string,
         private readonly port: number
-    ) {}
+    ) {
+    }
 
     async getApp(templateName: string): Promise<any> {
         // Return if already initialized

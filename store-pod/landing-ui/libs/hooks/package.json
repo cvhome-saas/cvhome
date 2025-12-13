@@ -1,0 +1,33 @@
+{
+  "name": "@store-front/hooks",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./*": {
+      "types": "./dist/*.d.ts",
+      "default": "./dist/*.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "clean": "rimraf dist"
+  },
+  "dependencies": {
+    "@store-front/types": "0.0.0",
+    "html-entities": "^2.6.0",
+    "uuid": "^13.0.0"
+  },
+  "devDependencies": {
+    "typescript": "~5.9.3"
+  }
+}

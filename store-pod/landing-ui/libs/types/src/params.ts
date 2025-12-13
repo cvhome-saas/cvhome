@@ -30,7 +30,7 @@ export interface ContentsParams extends LocaleParam {
 }
 
 export interface CartParams extends LocaleParam {
-    cart: Cart;
+    cart: Cart | undefined;
 }
 
 export type Params =

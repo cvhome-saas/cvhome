@@ -1,9 +1,9 @@
-import { Cart } from "@store-front/types/cart";
-import { CheckoutCart } from "@store-front/types/checkout-cart";
-import { Order } from "@store-front/types/order";
-import { storeBaseServiceUrl, StoreContext } from "@store-front/types/store-context";
-import { handleResponse, post, put } from "./http-utils";
-import { ReadableCountryList } from "@store-front/types/country";
+import {Cart} from "@store-front/types/cart";
+import {CheckoutCart} from "@store-front/types/checkout-cart";
+import {Order} from "@store-front/types/order";
+import {storeBaseServiceUrl, StoreContext} from "@store-front/types/store-context";
+import {handleResponse, post, put} from "./http-utils";
+import {ReadableCountryList} from "@store-front/types/country";
 
 export class CartService {
 
@@ -18,6 +18,12 @@ export class CartService {
         });
     }
 
+    public static removeProduct = async (storeContext: StoreContext, cart: string, lineItemId: number) => {
+        return fetch(`${storeBaseServiceUrl('checkout', storeContext)}/api/v1/cart/${cart}/product/${lineItemId}?store=${storeContext.store}&lang=${storeContext.locale}`, {
+            method: 'DELETE',
+        }).then(() => CartService.getCart(storeContext, cart));
+    }
+
     public static removeFromCartThenGetCart = async (storeContext: StoreContext, cart: string, productSku: string) => {
         return CartService.removeFromCart(storeContext, cart, productSku).then(() => CartService.getCart(storeContext, cart));
     }
@@ -26,6 +32,23 @@ export class CartService {
         const result: Promise<Response> = cartCode ? this.appendToCart(storeContext, cartCode, product, quantity) : this.addToNewCart(storeContext, product, quantity);
         return result
             .then(it => handleResponse<Cart>(it))
+    }
+
+    public static updateProductInCart = async (storeContext: StoreContext, cartCode: string, product: string, quantity: number): Promise<Cart | undefined> => {
+        return fetch(`${storeBaseServiceUrl('checkout', storeContext)}/api/v1/cart/${cartCode}?store=${storeContext.store}&lang=${storeContext.locale}`, put({
+            product,
+            quantity
+        })).then(it => handleResponse<Cart>(it));
+    }
+
+    public static checkout = async (storeContext: StoreContext, code: string, checkoutCart: CheckoutCart): Promise<Order | undefined> => {
+        return fetch(`${storeBaseServiceUrl('checkout', storeContext)}/api/v1/cart/${code}/checkout?store=${storeContext.store}&lang=${storeContext.locale}`, post(checkoutCart))
+            .then(it => handleResponse<Order>(it))
+    }
+
+    public static getCountries = async (storeContext: StoreContext): Promise<ReadableCountryList | undefined> => {
+        return fetch(`${storeBaseServiceUrl('checkout', storeContext)}/api/v1/country?store=${storeContext.store}&lang=${storeContext.locale}`)
+            .then(it => handleResponse<ReadableCountryList>(it))
     }
 
     private static addToNewCart = async (storeContext: StoreContext, product: string, quantity: number) => {
@@ -41,16 +64,6 @@ export class CartService {
             quantity
         }));
 
-    }
-
-    public static checkout = async (storeContext: StoreContext, code: string, checkoutCart: CheckoutCart): Promise<Order | undefined> => {
-        return fetch(`${storeBaseServiceUrl('checkout', storeContext)}/api/v1/cart/${code}/checkout?store=${storeContext.store}&lang=${storeContext.locale}`, post(checkoutCart))
-            .then(it => handleResponse<Order>(it))
-    }
-
-    public static getCountries = async (storeContext: StoreContext): Promise<ReadableCountryList | undefined> => {
-        return fetch(`${storeBaseServiceUrl('checkout', storeContext)}/api/v1/country?store=${storeContext.store}&lang=${storeContext.locale}`)
-            .then(it => handleResponse<ReadableCountryList>(it))
     }
 
 }
