@@ -44,17 +44,15 @@
         </div>
       </div>
     </div>
-    <div class="row">
-      <div class="col">
-      </div>
-      <div class="col col-lg-4">
-        <button (click)="onFilterChange()"  nbButton status="primary">
-          <nb-icon icon="search-outline"></nb-icon>
-          {{ 'COMMON.SEARCH' | translate }}
-        </button>
-        <button (click)="resetFilters()" nbButton outline status="danger">
+    <div class="row mt-3 mb-3">
+      <div class="col-12 d-flex justify-content-end">
+        <button (click)="resetFilters()" class="mr-2" nbButton outline status="danger">
           <nb-icon icon="refresh-outline"></nb-icon>
           {{ 'ORDER.RESET_FILTER' | translate }}
+        </button>
+        <button (click)="onFilterChange()" nbButton status="primary">
+          <nb-icon icon="search-outline"></nb-icon>
+          {{ 'COMMON.SEARCH' | translate }}
         </button>
       </div>
     </div>
