@@ -50,7 +50,7 @@ export const Header = ({params, headerBox}: {
             <HeaderTop store={params.store} box={headerBox} locale={params.locale}/>
             <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/70">
                 <nav aria-label="Global" className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-                    <div className="flex flex-1 items-center gap-3">
+                    <div className="flex items-center gap-3">
                         <Link prefetch={false} href={"/"} className="group inline-flex items-center gap-3">
                             <span className="sr-only">{params.store.name}</span>
                             {params.store.logo && (
@@ -62,65 +62,64 @@ export const Header = ({params, headerBox}: {
                                     className="h-9 w-9 rounded-xl object-contain transition-transform duration-300 ease-out group-hover:scale-[1.03]"
                                 />
                             )}
-                            <span className="hidden sm:inline text-sm font-semibold tracking-[0.18em] uppercase text-foreground">
-                                {params.store.name}
-                            </span>
                         </Link>
                     </div>
-                    <NavigationMenu className="hidden lg:flex">
-                        <NavigationMenuList>
-                            <NavigationMenuItem>
-                                <Link href="/" legacyBehavior passHref>
-                                    <NavigationMenuLink className={cn(navigationMenuTriggerStyle(), "tracking-[0.12em] uppercase text-xs")}>
-                                        {t('HOME_TITLE')}
-                                    </NavigationMenuLink>
-                                </Link>
-                            </NavigationMenuItem>
-
-                            {params.categories?.content?.filter(it => it.description).map((category) => (
-                                <NavigationMenuItem key={category.code}>
-                                    {category.children && category.children.length > 0 ? (
-                                        <>
-                                            <Link href={`/category/${category.description.friendlyUrl}`} legacyBehavior passHref>
-                                                <NavigationMenuTrigger className="cursor-pointer tracking-[0.12em] uppercase text-xs">
-                                                    {category.description.name}
-                                                </NavigationMenuTrigger>
-                                            </Link>
-                                            <NavigationMenuContent>
-                                                <ul className="grid w-[420px] gap-3 p-4 md:w-[520px] md:grid-cols-2 lg:w-[640px]">
-                                                    {category.children.filter(child => child.description).map((child) => (
-                                                        <ListItem
-                                                            key={child.code}
-                                                            href={`/category/${child.description.friendlyUrl}`}
-                                                            title={child.description.name}
-                                                        />
-                                                    ))}
-                                                </ul>
-                                            </NavigationMenuContent>
-                                        </>
-                                    ) : (
-                                        <Link href={`/category/${category.description.friendlyUrl}`} legacyBehavior passHref>
-                                            <NavigationMenuLink className={cn(navigationMenuTriggerStyle(), "tracking-[0.12em] uppercase text-xs")}>
-                                                {category.description.name}
-                                            </NavigationMenuLink>
-                                        </Link>
-                                    )}
-                                </NavigationMenuItem>
-                            ))}
-
-                            {params.contents?.content?.filter(it => it.linkToMenu && it.visible && it.description).map(it => (
-                                <NavigationMenuItem key={it.code}>
-                                    <Link href={`/content/${it.description.friendlyUrl}`} legacyBehavior passHref>
+                    <div className="flex-1 flex justify-center">
+                        <NavigationMenu className="hidden lg:flex">
+                            <NavigationMenuList className="flex-wrap">
+                                <NavigationMenuItem>
+                                    <Link href="/" legacyBehavior passHref>
                                         <NavigationMenuLink className={cn(navigationMenuTriggerStyle(), "tracking-[0.12em] uppercase text-xs")}>
-                                            {it.description.name}
+                                            {t('HOME_TITLE')}
                                         </NavigationMenuLink>
                                     </Link>
                                 </NavigationMenuItem>
-                            ))}
-                        </NavigationMenuList>
-                    </NavigationMenu>
 
-                    <div className="flex flex-1 items-center justify-end gap-2">
+                                {params.categories?.content?.filter(it => it.description).map((category) => (
+                                    <NavigationMenuItem key={category.code}>
+                                        {category.children && category.children.length > 0 ? (
+                                            <>
+                                                <Link href={`/category/${category.description.friendlyUrl}`} legacyBehavior passHref>
+                                                    <NavigationMenuTrigger className="cursor-pointer tracking-[0.12em] uppercase text-xs">
+                                                        {category.description.name}
+                                                    </NavigationMenuTrigger>
+                                                </Link>
+                                                <NavigationMenuContent>
+                                                    <ul className="grid w-[420px] gap-3 p-4 md:w-[520px] md:grid-cols-2 lg:w-[640px]">
+                                                        {category.children.filter(child => child.description).map((child) => (
+                                                            <ListItem
+                                                                key={child.code}
+                                                                href={`/category/${child.description.friendlyUrl}`}
+                                                                title={child.description.name}
+                                                            />
+                                                        ))}
+                                                    </ul>
+                                                </NavigationMenuContent>
+                                            </>
+                                        ) : (
+                                            <Link href={`/category/${category.description.friendlyUrl}`} legacyBehavior passHref>
+                                                <NavigationMenuLink className={cn(navigationMenuTriggerStyle(), "tracking-[0.12em] uppercase text-xs")}>
+                                                    {category.description.name}
+                                                </NavigationMenuLink>
+                                            </Link>
+                                        )}
+                                    </NavigationMenuItem>
+                                ))}
+
+                                {params.contents?.content?.filter(it => it.linkToMenu && it.visible && it.description).map(it => (
+                                    <NavigationMenuItem key={it.code}>
+                                        <Link href={`/content/${it.description.friendlyUrl}`} legacyBehavior passHref>
+                                            <NavigationMenuLink className={cn(navigationMenuTriggerStyle(), "tracking-[0.12em] uppercase text-xs")}>
+                                                {it.description.name}
+                                            </NavigationMenuLink>
+                                        </Link>
+                                    </NavigationMenuItem>
+                                ))}
+                            </NavigationMenuList>
+                        </NavigationMenu>
+                    </div>
+
+                    <div className="flex items-center justify-end gap-2">
                         <div className="hidden lg:flex">
                             <LanguageSelector store={params.store} locale={params.locale}/>
                         </div>

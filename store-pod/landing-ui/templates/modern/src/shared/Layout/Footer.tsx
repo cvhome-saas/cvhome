@@ -22,8 +22,8 @@ export const Footer = ({params}: { params: LayoutParams }) => {
     return (
         <footer className="mt-auto border-t border-border bg-background">
             <div className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-                <div className="grid grid-cols-1 gap-10 md:grid-cols-12">
-                    <div className="md:col-span-5">
+                <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-10">
+                    <div className="flex flex-col items-center md:items-start">
                         <Link prefetch={false} href="/" className="group inline-flex items-center gap-3">
                             {params.store.logo && (
                                 <Image
@@ -38,38 +38,33 @@ export const Footer = ({params}: { params: LayoutParams }) => {
                                 {params.store.name}
                             </span>
                         </Link>
-                        <div className="mt-6">
+                        <div className="mt-4">
                             <FooterSocialLinks params={params}/>
                         </div>
                     </div>
 
-                    <div className="md:col-span-7">
-                        <div className="grid grid-cols-2 gap-8 sm:grid-cols-3">
-                            <div className={cn(isRtlLayout ? "text-end" : "text-start")}>
-                                <h2 className="text-xs font-semibold tracking-[0.18em] uppercase text-foreground">
-                                    {t('LEGAL')}
-                                </h2>
-                                <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
-                                    {legalLinks.map(it => (
-                                        <li key={it.id}>
-                                            <Link
-                                                prefetch={false}
-                                                href={`/content/${it.description!.friendlyUrl}`}
-                                                className="hover:text-foreground transition-colors"
-                                            >
-                                                {it.description!.name}
-                                            </Link>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-
-                            <div className="hidden sm:block"/>
-                        </div>
+                    {/* Legal Links */}
+                    <div
+                        className={cn("flex flex-col items-center md:items-start", isRtlLayout ? "md:text-right" : "md:text-left")}>
+                        <h2 className="text-xs font-semibold tracking-[0.18em] uppercase text-foreground">
+                            {t('LEGAL')}
+                        </h2>
+                        <ul className="mt-4 space-y-3 text-sm text-muted-foreground text-center md:text-start">
+                            {legalLinks.map(it => (
+                                <li key={it.id}>
+                                    <Link
+                                        prefetch={false}
+                                        href={`/content/${it.description!.friendlyUrl}`}
+                                        className="hover:text-foreground transition-colors"
+                                    >
+                                        {it.description!.name}
+                                    </Link>
+                                </li>
+                            ))}
+                        </ul>
                     </div>
                 </div>
-
-                <div className="mt-10 flex flex-col gap-4 border-t border-border pt-6 sm:flex-row sm:items-center sm:justify-between">
+                <div className="mt-10 border-t border-border pt-6 text-center">
                     <FooterRightReserved params={params}/>
                 </div>
             </div>
@@ -77,16 +72,12 @@ export const Footer = ({params}: { params: LayoutParams }) => {
     )
 }
 
-interface FooterRightReservedProps extends React.HTMLAttributes<HTMLSpanElement> {
-    params: LayoutParams;
-}
-
-function FooterRightReserved({params, className, ...props}: FooterRightReservedProps) {
+function FooterRightReserved({params}: { params: LayoutParams }) {
     const t = useTranslations("COMPONENTS.FOOTER");
     const year = new Date().getFullYear();
 
     return (
-        <span className={cn("text-xs text-muted-foreground", className)} {...props}>
+        <span className="text-xs text-muted-foreground">
             © {year}{" "}
             <Link href="/" className="font-semibold text-foreground hover:underline">
                 {params.store.name}
@@ -96,11 +87,7 @@ function FooterRightReserved({params, className, ...props}: FooterRightReservedP
     );
 }
 
-interface FooterSocialLinksProps extends React.HTMLAttributes<HTMLDivElement> {
-    params: LayoutParams;
-}
-
-function FooterSocialLinks({params, className, ...props}: FooterSocialLinksProps) {
+function FooterSocialLinks({params}: { params: LayoutParams }) {
     const iconMap: Record<string, React.ElementType> = {
         facebook: Facebook,
         twitter: Twitter,
@@ -114,7 +101,7 @@ function FooterSocialLinks({params, className, ...props}: FooterSocialLinksProps
     }
 
     return (
-        <div className={cn("flex items-center gap-2", className)} {...props}>
+        <div className="flex items-center gap-2">
             {params.store.socialLinks.map((link) => {
                 const url = link.url.startsWith("http") ? link.url : `https://${link.url}`;
                 const IconComponent = iconMap[link.provider.toLowerCase()];
