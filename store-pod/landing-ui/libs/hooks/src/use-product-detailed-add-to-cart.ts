@@ -1,6 +1,5 @@
-import {useCallback, useEffect, useState} from "react";
-import {Product} from "@store-front/types";
-import {StoreContext} from "@store-front/types";
+import {useCallback, useEffect, useMemo, useState} from "react";
+import {Product, StoreContext} from "@store-front/types";
 import {showToast} from "nextjs-toast-notify";
 import {toastDirection} from "@store-front/services/direction-utils";
 import {useTranslations} from "next-intl";
@@ -75,11 +74,21 @@ export const useProductDetailedAddToCart = (storeContext: StoreContext, product:
         }
     }, [isInCart, quantity, updateCart]);
 
+    const maxQty = useMemo(() => product.quantity ?? 0, [product.quantity]);
+    const isOutOfStock = maxQty < 1;
+    const canDecrease = quantity > 1;
+    const canIncrease = quantity < maxQty;
+
+    
     return {
         quantity,
         incrementQuantity,
         decrementQuantity,
         addToCart,
         isInCart,
+        maxQty,
+        isOutOfStock,
+        canDecrease,
+        canIncrease
     };
 };

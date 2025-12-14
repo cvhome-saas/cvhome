@@ -1,7 +1,7 @@
 'use client'
 import {Product} from "@/types/product-groups";
 import {Minus, Plus} from "lucide-react";
-import React, {useMemo} from 'react';
+import React from 'react';
 import {StoreContext} from "@/types/store-context";
 import {useTranslations} from "next-intl";
 import {Button} from "@/components/ui/button";
@@ -18,13 +18,13 @@ export const ProductDetailedActionBox = ({storeContext, product}: {
         incrementQuantity,
         decrementQuantity,
         addToCart,
-        isInCart
+        isInCart,
+        maxQty,
+        isOutOfStock,
+        canDecrease,
+        canIncrease
     } = useProductDetailedAddToCart(storeContext, product);
 
-    const maxQty = useMemo(() => product.quantity ?? 0, [product.quantity]);
-    const isOutOfStock = maxQty < 1;
-    const canDecrease = quantity > 1;
-    const canIncrease = quantity < maxQty;
 
     return (
         <div className="mt-6">

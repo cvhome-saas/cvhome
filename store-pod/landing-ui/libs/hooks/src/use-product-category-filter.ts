@@ -1,7 +1,5 @@
-import {useCallback, useEffect, useState} from "react";
-import {Category} from "@store-front/types";
-import {Manufacturer, ProductGroupPage} from "@store-front/types";
-import {StoreContext} from "@store-front/types";
+import {useCallback, useEffect, useMemo, useState} from "react";
+import {Category, Manufacturer, ProductGroupPage, StoreContext} from "@store-front/types";
 import {ProductCategory} from "@store-front/services/product-category";
 
 export const useProductCategoryFilter = (storeContext: StoreContext, category: Category) => {
@@ -25,11 +23,13 @@ export const useProductCategoryFilter = (storeContext: StoreContext, category: C
                 setProductGroup(it);
             });
     }, [storeContext, category.id]);
+    const selectedValue = useMemo(() => selectedManufacturerId?.toString() ?? "all", [selectedManufacturerId]);
 
     return {
         productGroup,
         manufacturers,
         selectedManufacturerId,
-        handleManufacturerChange
+        handleManufacturerChange,
+        selectedValue
     };
 };
