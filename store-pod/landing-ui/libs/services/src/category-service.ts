@@ -1,6 +1,6 @@
-import { Category, CategoryPage } from "@store-front/types/category";
-import { storeBaseServiceUrl, StoreContext } from "@store-front/types/store-context";
-import { handleResponse } from "./http-utils";
+import {Category, CategoryPage} from "@store-front/types/category";
+import {storeBaseServiceUrl, StoreContext} from "@store-front/types/store-context";
+import {handleResponse} from "./http-utils";
 
 export class CategoryService {
     public static getCategories = async (storeContext: StoreContext): Promise<CategoryPage | undefined> => {

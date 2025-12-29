@@ -1,6 +1,6 @@
-import { Product, ProductGroupPage } from "@store-front/types/product-groups";
-import { storeBaseServiceUrl, StoreContext } from "@store-front/types/store-context";
-import { handleResponse } from "./http-utils";
+import {Product, ProductGroupPage} from "@store-front/types/product-groups";
+import {storeBaseServiceUrl, StoreContext} from "@store-front/types/store-context";
+import {handleResponse} from "./http-utils";
 
 export class ProductService {
 

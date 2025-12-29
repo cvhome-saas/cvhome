@@ -11,9 +11,10 @@
   "scripts": {
     "start": "npm run start --workspace=app",
     "dev": "npm run dev --workspace=app",
-    "build": " npm run build:libs-types && npm run build:libs-services && npm run build:templates && npm run build:app",
+    "build": " npm run build:libs-types && npm run build:libs-services && npm run build:libs-hooks && npm run build:templates && npm run build:app",
     "build:libs-types": "npm run build --workspace=libs/types",
     "build:libs-services": "npm run build --workspace=libs/services",
+    "build:libs-hooks": "npm run build --workspace=libs/hooks",
     "build:templates": "npm run build --workspace=templates",
     "build:app": "npm run build --workspace=app",
     "build:prod": "npm run build && npm prune --production",

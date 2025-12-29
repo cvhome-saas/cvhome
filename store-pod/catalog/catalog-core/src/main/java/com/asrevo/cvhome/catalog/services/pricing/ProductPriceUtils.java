@@ -29,25 +29,6 @@ public class ProductPriceUtils {
 
 		FinalPrice finalPrice = calculateFinalPrice(product);
 
-		// attributes
-		/*
-		 * don't understood what is the relation between att and price @TODO ashraf
-		 * BigDecimal attributePrice = null; if (product.getAttributes() != null &&
-		 * !product.getAttributes().isEmpty()) { for (ProductAttribute attribute :
-		 * product.getAttributes()) { if (attribute.isAttributeDefault()) { if
-		 * (attribute.getProductAttributePrice() != null &&
-		 * attribute.getProductAttributePrice().doubleValue() > 0) { if (attributePrice ==
-		 * null) { attributePrice = new BigDecimal(0); } attributePrice =
-		 * attributePrice.add(attribute.getProductAttributePrice()); } } }
-		 *
-		 * if (attributePrice != null && attributePrice.doubleValue() > 0) { BigDecimal fp
-		 * = finalPrice.getFinalPrice(); fp = fp.add(attributePrice);
-		 * finalPrice.setFinalPrice(fp);
-		 *
-		 * BigDecimal op = finalPrice.getOriginalPrice(); op = op.add(attributePrice);
-		 * finalPrice.setOriginalPrice(op); } }
-		 */
-
 		finalPrice.setStringPrice(PriceUtils.getStringAmount(finalPrice.getFinalPrice()));
 		if (finalPrice.isDiscounted()) {
 			finalPrice.setStringDiscountedPrice(PriceUtils.getStringAmount(finalPrice.getDiscountedPrice()));

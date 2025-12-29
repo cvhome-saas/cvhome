@@ -1,6 +1,6 @@
-import { Box, ContentPage, Page } from "@store-front/types/content";
-import { storeBaseServiceUrl, StoreContext } from "@store-front/types/store-context";
-import { handleResponse } from "./http-utils";
+import {Box, ContentPage, Page} from "@store-front/types/content";
+import {storeBaseServiceUrl, StoreContext} from "@store-front/types/store-context";
+import {handleResponse} from "./http-utils";
 
 export class ContentService {
     public static getContents = async (storeContext: StoreContext): Promise<ContentPage | undefined> => {

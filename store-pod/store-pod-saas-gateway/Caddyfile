@@ -45,15 +45,15 @@
         reverse_proxy http://catalog.{$NAMESPACE}:8122
     }
 
-    handle_path /order* {
+    handle_path /checkout* {
         tracing {
-            span order
+            span checkout
         }
         header {
             response X-Trace-Id {http.vars.trace_id}
             response X-Span-Id {http.vars.span_id}
         }
-        reverse_proxy http://order.{$NAMESPACE}:8123
+        reverse_proxy http://checkout.{$NAMESPACE}:8123
     }
 
 

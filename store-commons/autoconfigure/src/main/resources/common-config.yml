@@ -62,8 +62,8 @@ com:
           schema: http
           namespace: store-pod-1.cvhome.lcl
           gateway-service-name: store-pod-gateway
-        order:
-          name: order
+        checkout:
+          name: checkout
           domain: store-pod-1.${com.asrevo.cvhome.app.domain}
           port: 8123
           schema: http

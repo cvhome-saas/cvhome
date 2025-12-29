@@ -31,3 +31,8 @@ export function buildDefaultLangRedirectionUrl(store: Store, headers: ReadonlyHe
 export function redirectToSupportedLang(store: Store, headers: ReadonlyHeaders, urlLocale: string) {
     redirect(buildDefaultLangRedirectionUrl(store, headers, urlLocale));
 }
+
+export function localSupported(urlLocale: string, store: Store): boolean {
+    const storeSupportedLanguages = store.supportedLanguages || [];
+    return storeSupportedLanguages.includes(urlLocale);
+}

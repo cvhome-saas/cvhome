@@ -8,12 +8,13 @@ import com.asrevo.cvhome.catalog.model.product.attribute.ReadableProductProperty
 import com.asrevo.cvhome.catalog.model.product.product.ProductEntity;
 import com.asrevo.cvhome.catalog.model.product.product.variant.ReadableProductVariant;
 import com.asrevo.cvhome.catalog.model.product.type.ReadableProductType;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.Getter;
-import lombok.Setter;
 
 @Setter
 @Getter
@@ -54,8 +55,5 @@ public class ReadableProduct extends ProductEntity implements Serializable {
 	private ReadableProductType type;
 
 	private boolean canBePurchased = false;
-
-	// RENTAL
-	private RentalOwner owner;
 
 }

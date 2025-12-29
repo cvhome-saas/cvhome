@@ -1,0 +1,62 @@
+package com.asrevo.cvhome.checkout.entity.order.orderstatus;
+
+import com.asrevo.cvhome.checkout.entity.order.Order;
+import com.asrevo.cvhome.store.core.constants.SchemaConstant;
+import com.asrevo.cvhome.store.core.entity.order.orderstatus.OrderStatus;
+import com.asrevo.cvhome.store.core.utils.CloneUtils;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.Date;
+import lombok.Getter;
+import lombok.Setter;
+
+@Entity
+@Table(name = "ORDER_STATUS_HISTORY")
+@Getter
+@Setter
+public class OrderStatusHistory implements Serializable {
+
+	@Serial
+	private static final long serialVersionUID = 3438730310126102187L;
+
+	@Id
+	@Column(name = "ORDER_STATUS_HISTORY_ID")
+	@TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME",
+			valueColumnName = "SEQ_COUNT", pkColumnValue = "ORDER_STATUS_HISTORY_SEQ_NEXT_VAL",
+			allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
+			initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
+	@GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
+	private Long id;
+
+	@JsonIgnore
+	@ManyToOne(targetEntity = Order.class)
+	@JoinColumn(name = "ORDER_ID", nullable = false)
+	private Order order;
+
+	@Enumerated(value = EnumType.STRING)
+	private OrderStatus status;
+
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "DATE_ADDED", nullable = false)
+	private Date dateAdded;
+
+	@Column(name = "CUSTOMER_NOTIFIED")
+	private java.lang.Integer customerNotified;
+
+	@Column(name = "COMMENTS", columnDefinition = "text")
+	private String comments;
+
+	public OrderStatusHistory() {
+	}
+
+	public Date getDateAdded() {
+		return CloneUtils.clone(dateAdded);
+	}
+
+	public void setDateAdded(Date dateAdded) {
+		this.dateAdded = CloneUtils.clone(dateAdded);
+	}
+
+}

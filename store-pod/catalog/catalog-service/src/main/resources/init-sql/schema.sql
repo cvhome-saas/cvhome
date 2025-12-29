@@ -4,19 +4,6 @@ create table if not exists catalog.sm_sequencer
     seq_name  varchar(255) not null primary key,
     seq_count bigint
 );
-create table if not exists catalog.catalog
-(
-    id                bigint       not null primary key,
-    date_created      timestamp(6),
-    date_modified     timestamp(6),
-    updt_id           varchar(60),
-    code              varchar(100) not null,
-    default_catalog   boolean,
-    sort_order        integer,
-    visible           boolean,
-    store_merchant_id varchar(50)  not null,
-    constraint UK8xm79oarfq4i82g03juxqu524 unique (store_merchant_id, code)
-);
 create table if not exists catalog.category
 (
     category_id       bigint       not null primary key,
@@ -35,19 +22,6 @@ create table if not exists catalog.category
     parent_id         bigint
         constraint fk2y94svpmqttx80mshyny85wqr references catalog.category,
     constraint UKbskw32wfw0rrbllmc0xlwo01d unique (store_merchant_id, code)
-);
-create table if not exists catalog.catalog_entry
-(
-    id            bigint not null primary key,
-    date_created  timestamp(6),
-    date_modified timestamp(6),
-    updt_id       varchar(60),
-    visible       boolean,
-    catalog_id    bigint not null
-        constraint fk5l3vrt6m79m06vyp4b290835p references catalog.catalog,
-    category_id   bigint not null
-        constraint fkhxjb7sm6l0fd0fpy2r0tcil28 references catalog.category,
-    constraint uk43dn30yr2wsmj1det6vqoxtfw unique (category_id, catalog_id)
 );
 create index if not exists idxiekj8rpfx83k5nww1flbu7tpb on catalog.category (lineage);
 create table if not exists catalog.category_description

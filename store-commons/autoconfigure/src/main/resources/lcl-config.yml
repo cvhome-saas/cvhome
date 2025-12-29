@@ -50,12 +50,12 @@ spring:
                 metadata:
                   service-name: catalog
                   instance: catalog-1
-            order:
+            checkout:
               - uri: "http://localhost:8123"
-                instance-id: order-1
+                instance-id: checkout-1
                 metadata:
-                  service-name: order
-                  instance: order-1
+                  service-name: checkout
+                  instance: checkout-1
             landing-ui:
               - uri: "http://localhost:8110"
                 instance-id: landing-ui-1

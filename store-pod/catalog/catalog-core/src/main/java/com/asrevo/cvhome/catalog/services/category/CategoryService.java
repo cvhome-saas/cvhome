@@ -26,8 +26,6 @@ public interface CategoryService extends SalesManagerEntityService<Long, Categor
 
 	Category getBySeUrl(StoreMerchantId store, String seUrl, LanguageCode language);
 
-	Category getOneByLanguage(long categoryId, LanguageCode language);
-
 	List<Category> getByProductId(Long productId, StoreMerchantId store);
 
 }
