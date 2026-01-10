@@ -64,6 +64,6 @@ public interface StoreFacade {
 
 	void updateSocialLinks(StoreMerchantId id, Set<SocialLink> socialLinks);
 
-	void updateSliderImages(StoreMerchantId id, Set<SliderImage> sliderImages);
+	void updateSliderImages(StoreMerchantId id, List<SliderImage> sliderImages);
 
 }

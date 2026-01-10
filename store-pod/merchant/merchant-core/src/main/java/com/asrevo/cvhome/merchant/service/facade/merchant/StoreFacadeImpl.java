@@ -195,7 +195,7 @@ public class StoreFacadeImpl implements StoreFacade {
 	@Override
 	public SliderImage addStoreSliderImage(StoreMerchantId storeMerchantId, InputContentFile cmsContentImage) {
 		MerchantStore store = getByMerchantStoreId(storeMerchantId);
-		Set<SliderImage> sliderImages = new HashSet<>(store.getSliderImages());
+		List<SliderImage> sliderImages = new ArrayList<>(store.getSliderImages());
 		Integer nextPriority = sliderImages.stream()
 			.map(SliderImage::priority)
 			.max(Comparator.naturalOrder())
@@ -245,7 +245,7 @@ public class StoreFacadeImpl implements StoreFacade {
 	}
 
 	@Override
-	public void updateSliderImages(StoreMerchantId id, Set<SliderImage> sliderImages) {
+	public void updateSliderImages(StoreMerchantId id, List<SliderImage> sliderImages) {
 		merchantStoreService.updateSliderImages(id, sliderImages);
 	}
 

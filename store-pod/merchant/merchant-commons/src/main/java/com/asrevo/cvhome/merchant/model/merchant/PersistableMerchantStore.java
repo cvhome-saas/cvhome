@@ -29,7 +29,7 @@ public class PersistableMerchantStore extends MerchantStoreEntity {
 
 	private Set<SocialLink> socialLinks;
 
-	private Set<SliderImage> sliderImages;
+	private List<SliderImage> sliderImages;
 
 	private Set<ManagerStoreDomain> storeDomains;
 

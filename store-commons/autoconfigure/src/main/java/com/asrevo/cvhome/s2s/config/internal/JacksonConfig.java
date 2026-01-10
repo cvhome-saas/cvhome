@@ -16,32 +16,31 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.Getter;
 import org.bson.types.ObjectId;
-import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
+import org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class JacksonConfig {
 
-	@Getter
-	private static final JsonMapper ployJson = JsonMapper.builder()
-		.visibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY)
-		.serializationInclusion(JsonInclude.Include.ALWAYS)
-		.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
-		.configure(MapperFeature.DEFAULT_VIEW_INCLUSION, false)
-		.addModules(new JavaTimeModule(), new Jdk8Module())
-		.defaultDateFormat(new StdDateFormat())
-		.activateDefaultTyping(BasicPolymorphicTypeValidator.builder()
-			.allowIfBaseType(Event.class)
-			.allowIfBaseType(Object.class)
-			.build(), ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.WRAPPER_OBJECT)
-		.build();
+	/*
+	 *
+	 * @Getter private static final JsonMapper ployJson = JsonMapper.builder()
+	 * .visibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY)
+	 * .serializationInclusion(JsonInclude.Include.ALWAYS)
+	 * .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
+	 * .configure(MapperFeature.DEFAULT_VIEW_INCLUSION, false) .addModules(new
+	 * JavaTimeModule(), new Jdk8Module()) .defaultDateFormat(new StdDateFormat())
+	 * .activateDefaultTyping(BasicPolymorphicTypeValidator.builder()
+	 * .allowIfBaseType(Event.class) .allowIfBaseType(Object.class) .build(),
+	 * ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.WRAPPER_OBJECT) .build();
+	 */
 
-	@Bean
-	public Jackson2ObjectMapperBuilderCustomizer customizer() {
-
-		return jacksonObjectMapperBuilder -> jacksonObjectMapperBuilder
-			.deserializers(new ObjectIdDeserializer(ObjectId.class));
-	}
+	/*
+	 * @Bean public JsonMapperBuilderCustomizer customizer() {
+	 *
+	 * return jacksonObjectMapperBuilder -> jacksonObjectMapperBuilder .deserializers(new
+	 * ObjectIdDeserializer(ObjectId.class)); }
+	 */
 
 }

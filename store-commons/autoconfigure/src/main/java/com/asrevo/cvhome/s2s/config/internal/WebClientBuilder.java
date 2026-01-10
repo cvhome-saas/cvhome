@@ -17,24 +17,16 @@ public class WebClientBuilder {
 
 	private final ServiceDomainProperties serviceDomainProperties;
 
-	private final ObjectMapper objectMapper;
-
 	public WebClientBuilder(Environment environment, WebClient.Builder defaultMicroServiceBuilder,
-			ServiceDomainProperties serviceDomainProperties, ObjectMapper objectMapper) {
+			ServiceDomainProperties serviceDomainProperties) {
 		this.environment = environment;
 		this.defaultMicroServiceBuilder = defaultMicroServiceBuilder;
 		this.serviceDomainProperties = serviceDomainProperties;
-		this.objectMapper = objectMapper;
 	}
 
 	public <T> T buildClient(String serviceName, Class<T> tClass) {
 		String url = new ServiceUrlBuilder(serviceDomainProperties, environment).getServiceUrl(serviceName);
-		return build(defaultMicroServiceBuilder, url, tClass, objectMapper);
-	}
-
-	public <T> T buildClient(String serviceName, Class<T> tClass, ObjectMapper objectMapper) {
-		String url = new ServiceUrlBuilder(serviceDomainProperties, environment).getServiceUrl(serviceName);
-		return build(defaultMicroServiceBuilder, url, tClass, objectMapper);
+		return build(defaultMicroServiceBuilder, url, tClass);
 	}
 
 }

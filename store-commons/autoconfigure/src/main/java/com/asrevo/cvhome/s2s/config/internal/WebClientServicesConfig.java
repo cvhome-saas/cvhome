@@ -80,9 +80,8 @@ public class WebClientServicesConfig {
 		@Bean
 		public WebClientBuilder webClientBuilder(Environment environment,
 				@Qualifier("microServiceWebClient") WebClient microServiceWebClient,
-				ServiceDomainProperties serviceDomainProperties, ObjectMapper objectMapper) {
-			return new WebClientBuilder(environment, microServiceWebClient.mutate(), serviceDomainProperties,
-					objectMapper);
+				ServiceDomainProperties serviceDomainProperties) {
+			return new WebClientBuilder(environment, microServiceWebClient.mutate(), serviceDomainProperties);
 		}
 
 	}
