@@ -18,9 +18,6 @@ dependencies {
 	compileOnly libs.spring.boot.starter.actuator
 	compileOnly libs.jackson.databind
 	compileOnly libs.jackson.core
-	compileOnly libs.jackson.datatype.jdk8
-	compileOnly libs.jackson.datatype.jsr310
-//    compileOnly libs.springdoc.openapi.starter.common
 	compileOnly libs.swagger.models
 
 	compileOnly libs.lombok

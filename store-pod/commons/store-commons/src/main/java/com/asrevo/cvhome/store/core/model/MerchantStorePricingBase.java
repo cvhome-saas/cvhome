@@ -4,10 +4,10 @@ import com.asrevo.cvhome.store.core.model.reference.CountryIsoCode;
 import com.asrevo.cvhome.store.core.model.reference.CurrencyCode;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import com.asrevo.cvhome.store.core.serializer.*;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Getter;
 import lombok.Setter;
+import tools.jackson.databind.annotation.JsonDeserialize;
+import tools.jackson.databind.annotation.JsonSerialize;
 
 @Setter
 @Getter

@@ -11,7 +11,8 @@ jakartaPersistenceApi = "3.2.0"
 lombok = "1.18.42"
 lombokMapstructBinding = "0.2.0"
 mapstruct = "1.6.3"
-jackson = "2.19.0"
+jackson = "3.0.3"
+fasterxml = "2.19.0"
 swagger = "2.2.8"
 testcontainers = "1.19.7"
 testcontainersjupiter = "2.0.3"
@@ -66,11 +67,9 @@ spring-data-relational = { module = "org.springframework.data:spring-data-relati
 lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
 lombok-mapstruct-binding = { module = "org.projectlombok:lombok-mapstruct-binding", version.ref = "lombokMapstructBinding" }
 
-jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson" }
-jackson-core = { module = "com.fasterxml.jackson.core:jackson-core", version.ref = "jackson" }
-jackson-annotations = { module = "com.fasterxml.jackson.core:jackson-annotations", version.ref = "jackson" }
-jackson-datatype-jdk8 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jdk8", version.ref = "jackson" }
-jackson-datatype-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310", version.ref = "jackson" }
+jackson-databind = { module = "tools.jackson.core:jackson-databind", version.ref = "jackson" }
+jackson-core = { module = "tools.jackson.core:jackson-core", version.ref = "jackson" }
+jackson-annotations = { module = "com.fasterxml.jackson.core:jackson-annotations", version.ref = "fasterxml" }
 
 springdoc-openapi-starter-webflux-ui = { module = "org.springdoc:springdoc-openapi-starter-webflux-ui", version.ref = "springdoc" }
 springdoc-openapi-starter-webmvc-ui = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "springdoc" }

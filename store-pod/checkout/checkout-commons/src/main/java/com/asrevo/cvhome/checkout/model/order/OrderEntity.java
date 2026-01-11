@@ -8,8 +8,6 @@ import com.asrevo.cvhome.store.core.entity.payments.PaymentType;
 import com.asrevo.cvhome.store.core.model.reference.CurrencyCode;
 import com.asrevo.cvhome.store.core.serializer.CurrencyCodeDeSerializer;
 import com.asrevo.cvhome.store.core.serializer.CurrencyCodeSerializer;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -17,6 +15,8 @@ import java.util.Date;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
+import tools.jackson.databind.annotation.JsonDeserialize;
+import tools.jackson.databind.annotation.JsonSerialize;
 
 @Setter
 @Getter

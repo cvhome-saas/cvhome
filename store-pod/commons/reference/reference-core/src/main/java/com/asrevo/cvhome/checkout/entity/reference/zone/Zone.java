@@ -7,14 +7,14 @@ import com.asrevo.cvhome.store.core.model.reference.ZoneCode;
 import com.asrevo.cvhome.store.core.serializer.ZoneCodeDeSerializer;
 import com.asrevo.cvhome.store.core.serializer.ZoneCodeSerializer;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.persistence.*;
 import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
+import tools.jackson.databind.annotation.JsonDeserialize;
+import tools.jackson.databind.annotation.JsonSerialize;
 
 @Entity
 @Table(name = "ZONE")

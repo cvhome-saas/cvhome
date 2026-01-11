@@ -3,7 +3,6 @@ package com.asrevo.cvhome.s2s.config.internal;
 import static com.asrevo.cvhome.s2s.utils.WebClientsUtils.build;
 
 import com.asrevo.cvhome.s2s.model.ServiceDomainProperties;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
 import org.springframework.web.reactive.function.client.WebClient;

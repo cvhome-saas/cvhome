@@ -6,14 +6,14 @@ import com.asrevo.cvhome.store.core.model.reference.CountryIsoCode;
 import com.asrevo.cvhome.store.core.serializer.CountryIsoCodeDeSerializer;
 import com.asrevo.cvhome.store.core.serializer.CountryIsoCodeSerializer;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.persistence.*;
 import java.io.Serial;
 import java.util.HashSet;
 import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
+import tools.jackson.databind.annotation.JsonDeserialize;
+import tools.jackson.databind.annotation.JsonSerialize;
 
 @Entity
 @Table(name = "COUNTRY")

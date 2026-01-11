@@ -1,10 +1,10 @@
 package com.asrevo.cvhome.store.core.serializer;
 
 import com.asrevo.cvhome.store.core.model.reference.CountryIsoCode;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import java.io.IOException;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ser.std.StdSerializer;
 
 public class CountryIsoCodeSerializer extends StdSerializer<CountryIsoCode> {
 
@@ -17,7 +17,8 @@ public class CountryIsoCodeSerializer extends StdSerializer<CountryIsoCode> {
 	}
 
 	@Override
-	public void serialize(CountryIsoCode value, JsonGenerator gen, SerializerProvider provider) throws IOException {
+	public void serialize(CountryIsoCode value, JsonGenerator gen, SerializationContext provider)
+			throws JacksonException {
 		gen.writeString(value.isoCode());
 	}
 

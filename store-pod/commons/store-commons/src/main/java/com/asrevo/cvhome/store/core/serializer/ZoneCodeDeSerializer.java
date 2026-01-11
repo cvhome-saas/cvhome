@@ -1,15 +1,15 @@
 package com.asrevo.cvhome.store.core.serializer;
 
 import com.asrevo.cvhome.store.core.model.reference.ZoneCode;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
-import java.io.IOException;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.deser.std.StdDeserializer;
 
 public class ZoneCodeDeSerializer extends StdDeserializer<ZoneCode> {
 
 	public ZoneCodeDeSerializer() {
-		this(null);
+		super(ZoneCode.class);
 	}
 
 	protected ZoneCodeDeSerializer(Class<ZoneCode> t) {
@@ -17,8 +17,8 @@ public class ZoneCodeDeSerializer extends StdDeserializer<ZoneCode> {
 	}
 
 	@Override
-	public ZoneCode deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
-		String code = p.getText();
+	public ZoneCode deserialize(JsonParser p, DeserializationContext ctxt) throws JacksonException {
+		String code = p.getString();
 		return new ZoneCode(code);
 	}
 

@@ -4,11 +4,11 @@ import com.asrevo.cvhome.commons.domain.Entity;
 import com.asrevo.cvhome.store.core.model.reference.CountryIsoCode;
 import com.asrevo.cvhome.store.core.serializer.CountryIsoCodeDeSerializer;
 import com.asrevo.cvhome.store.core.serializer.CountryIsoCodeSerializer;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.io.Serial;
 import lombok.Getter;
 import lombok.Setter;
+import tools.jackson.databind.annotation.JsonDeserialize;
+import tools.jackson.databind.annotation.JsonSerialize;
 
 @Setter
 @Getter

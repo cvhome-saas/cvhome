@@ -53,6 +53,7 @@ public class SecurityConfig {
 	@SneakyThrows
 	private static Set<GrantedAuthority> extractAuthority(OAuth2AccessToken accessToken) {
 		SignedJWT parsed = SignedJWT.parse(accessToken.getTokenValue());
+		@SuppressWarnings("unchecked")
 		Map<String, List<String>> realmAccess = (Map<String, List<String>>) parsed.getPayload()
 			.toJSONObject()
 			.get("realm_access");
