@@ -1,8 +1,8 @@
 package com.asrevo.cvhome.commons.domain;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import org.bson.types.ObjectId;
+import tools.jackson.databind.annotation.JsonSerialize;
+import tools.jackson.databind.ser.std.ToStringSerializer;
 
 public record ManagerStoreId(@JsonSerialize(using = ToStringSerializer.class) ObjectId id) implements Identifier {
 	public ManagerStoreId(String id) {

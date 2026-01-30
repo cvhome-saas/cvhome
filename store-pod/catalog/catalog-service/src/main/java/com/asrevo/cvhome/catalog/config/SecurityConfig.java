@@ -22,9 +22,9 @@ public class SecurityConfig {
 
 	@Bean
 	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		http.authorizeHttpRequests(it -> it.requestMatchers("api/v1/test/sign")
+		http.authorizeHttpRequests(it -> it.requestMatchers("/api/v1/test/sign")
 			.permitAll()
-			.requestMatchers("api/*/private/**")
+			.requestMatchers("/api/*/private/**")
 			.authenticated()
 			.anyRequest()
 			.permitAll())

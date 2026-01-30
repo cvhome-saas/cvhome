@@ -1,7 +1,7 @@
 FROM quay.io/keycloak/keycloak:25.0
 
 COPY keycloak/imports /opt/keycloak/data/import
-COPY keycloak/providers /opt/keycloak/providers
+#COPY keycloak/providers /opt/keycloak/providers
 COPY keycloak/themes/json-mail-theme /opt/keycloak/themes/json-mail-theme
 COPY keycloak/themes/cvhome /opt/keycloak/themes/cvhome
 

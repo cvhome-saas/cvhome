@@ -117,9 +117,11 @@ public class MerchantStore extends SalesManagerEntity<StoreMerchantId, MerchantS
 	@ElementCollection(targetClass = SliderImage.class, fetch = FetchType.LAZY)
 	@OrderColumn(name = "PRIORITY")
 	@CollectionTable(name = "MERCHANT_SLIDER_IMAGES", joinColumns = { @JoinColumn(name = "STORE_MERCHANT_ID") })
-	@AttributeOverrides(value = { @AttributeOverride(name = "priority", column = @Column(name = "PRIORITY")),
+	@AttributeOverrides(value = {
+			@AttributeOverride(name = "priority",
+					column = @Column(name = "PRIORITY", insertable = false, updatable = false)),
 			@AttributeOverride(name = "name", column = @Column(name = "NAME", length = 100)) })
-	private Set<SliderImage> sliderImages = new HashSet<>();
+	private List<SliderImage> sliderImages = new ArrayList<>();
 
 	@JsonIgnore
 	@ElementCollection(targetClass = SocialLink.class, fetch = FetchType.LAZY)

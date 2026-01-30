@@ -1,24 +1,24 @@
 package com.asrevo.cvhome.store.core.serializer;
 
 import com.asrevo.cvhome.store.core.model.reference.CountryIsoCode;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
-import java.io.IOException;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.deser.std.StdDeserializer;
 
 public class CountryIsoCodeDeSerializer extends StdDeserializer<CountryIsoCode> {
 
 	public CountryIsoCodeDeSerializer() {
-		this(null);
+		this(CountryIsoCode.class);
 	}
 
-	protected CountryIsoCodeDeSerializer(Class<CountryIsoCode> t) {
-		super(t);
+	protected CountryIsoCodeDeSerializer(Class<CountryIsoCode> vc) {
+		super(vc);
 	}
 
 	@Override
-	public CountryIsoCode deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
-		String code = p.getText();
+	public CountryIsoCode deserialize(JsonParser p, DeserializationContext ctxt) throws JacksonException {
+		String code = p.getString();
 		return new CountryIsoCode(code);
 	}
 

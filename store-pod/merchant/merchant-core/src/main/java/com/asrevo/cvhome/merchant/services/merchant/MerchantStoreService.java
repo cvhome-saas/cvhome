@@ -5,6 +5,8 @@ import com.asrevo.cvhome.commons.domain.SocialLink;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.merchant.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
+
+import java.util.List;
 import java.util.Set;
 
 public interface MerchantStoreService extends SalesManagerEntityService<StoreMerchantId, MerchantStore> {
@@ -15,6 +17,6 @@ public interface MerchantStoreService extends SalesManagerEntityService<StoreMer
 
 	void updateSocialLinks(StoreMerchantId id, Set<SocialLink> socialLinks);
 
-	void updateSliderImages(StoreMerchantId id, Set<SliderImage> sliderImages);
+	void updateSliderImages(StoreMerchantId id, List<SliderImage> sliderImages);
 
 }

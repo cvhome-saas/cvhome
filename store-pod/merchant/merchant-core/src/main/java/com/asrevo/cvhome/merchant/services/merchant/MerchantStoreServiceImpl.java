@@ -6,6 +6,8 @@ import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.merchant.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.merchant.repositories.merchant.MerchantRepository;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
+
+import java.util.List;
 import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,7 +37,7 @@ public class MerchantStoreServiceImpl extends SalesManagerEntityServiceImpl<Stor
 	}
 
 	@Override
-	public void updateSliderImages(StoreMerchantId id, Set<SliderImage> sliderImages) {
+	public void updateSliderImages(StoreMerchantId id, List<SliderImage> sliderImages) {
 		MerchantStore store = merchantRepository.findByMerchantStoreId(id);
 		store.setSliderImages(sliderImages);
 		saveOrUpdate(store);

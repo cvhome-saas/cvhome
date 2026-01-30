@@ -83,10 +83,10 @@ public class PersistableMerchantStorePopulator
 			target.setStoreDomains(source.getStoreDomains());
 		}
 		if (source.getSliderImages() != null) {
-			Set<SliderImage> sliderImages = source.getSliderImages()
+			List<SliderImage> sliderImages = source.getSliderImages()
 				.stream()
 				.map(it -> new SliderImage(it.priority(), it.name()))
-				.collect(Collectors.toSet());
+				.toList();
 			target.setSliderImages(sliderImages);
 		}
 		target.setStorephone(source.getPhone());

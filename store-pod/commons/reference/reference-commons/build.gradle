@@ -7,7 +7,6 @@ dependencies {
 	api project(':store-pod:commons:store-commons')
 	compileOnly libs.spring.data.jpa
 	compileOnly libs.jakarta.validation.api
-	compileOnly libs.jackson.annotations
 	compileOnly libs.jackson.databind
 	compileOnly libs.lombok
 	compileOnly libs.hibernate.core
