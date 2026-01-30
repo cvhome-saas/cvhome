@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 @Configuration
-@Import({ EcsInfoConfig.class, JacksonConfig.class, SwaggerConfig.class, WebConfig.class, WebClientServicesConfig.class,
+@Import({ EcsInfoConfig.class, SwaggerConfig.class, WebConfig.class, WebClientServicesConfig.class,
 		ReactiveGatewayConfig.class, IssuerUriSetJwtDecoderConfiguration.class,
 		IssuerUriSetReactiveJwtDecoderConfiguration.class })
 @EnableConfigurationProperties({ PodInfoProperties.class, ServiceDomainProperties.class, AppProperties.class,

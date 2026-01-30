@@ -8,17 +8,16 @@ dependencies {
 	compileOnly project(":store-commons:ecs-commons:fargate-task-info")
 	compileOnly libs.spring.webflux
 	compileOnly libs.spring.webmvc
+	compileOnly libs.spring.boot.starter.jackson
 	compileOnly libs.spring.data.commons
 	compileOnly libs.spring.boot.starter.oauth2.client
-	compileOnly libs.spring.cloud.gateway.server
+	compileOnly libs.spring.boot.starter.security.oauth2.resource.server
+	compileOnly libs.spring.cloud.gateway.server.webflux
 	compileOnly libs.spring.cloud.commons
 	compileOnly libs.spring.cloud.stream
 	compileOnly libs.spring.boot.starter.actuator
 	compileOnly libs.jackson.databind
 	compileOnly libs.jackson.core
-	compileOnly libs.jackson.datatype.jdk8
-	compileOnly libs.jackson.datatype.jsr310
-//    compileOnly libs.springdoc.openapi.starter.common
 	compileOnly libs.swagger.models
 
 	compileOnly libs.lombok

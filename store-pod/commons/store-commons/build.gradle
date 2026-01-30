@@ -8,7 +8,6 @@ dependencies {
 	compileOnly libs.jakarta.persistence.api
 	compileOnly libs.jakarta.validation.api
 	compileOnly libs.jackson.databind
-	compileOnly libs.jackson.annotations
 	compileOnly libs.spring.data.jpa
 	compileOnly libs.apache.commons.lang3
 	compileOnly libs.lombok

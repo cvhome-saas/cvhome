@@ -6,7 +6,6 @@ plugins {
 dependencies {
 	api libs.mongodb.bson
 	compileOnly libs.jackson.databind
-	compileOnly libs.jackson.annotations
 	compileOnly libs.spring.data.commons
 	compileOnly libs.spring.cloud.stream
 	compileOnly libs.lombok

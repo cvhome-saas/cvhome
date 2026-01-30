@@ -5,7 +5,6 @@ plugins {
 
 dependencies {
 	compileOnly libs.jackson.databind
-	compileOnly libs.jackson.annotations
 	compileOnly libs.lombok
 	annotationProcessor libs.lombok
 }

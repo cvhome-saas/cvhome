@@ -1,8 +1,8 @@
 package com.asrevo.cvhome.fargate.task;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.ObjectMapper;
+
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -21,7 +21,7 @@ public class EcsTaskFetcher {
 
 	private static ObjectMapper getObjectMapper() {
 		ObjectMapper mapper = new ObjectMapper();
-		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		mapper.isEnabled(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 		return mapper;
 	}
 
@@ -42,7 +42,7 @@ public class EcsTaskFetcher {
 		try {
 			return objectMapper.readValue(body, EcsTask.class);
 		}
-		catch (JsonProcessingException e) {
+		catch (Exception e) {
 			return new EcsTask();
 		}
 	}

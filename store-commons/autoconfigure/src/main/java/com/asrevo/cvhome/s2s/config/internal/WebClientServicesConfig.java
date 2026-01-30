@@ -1,7 +1,6 @@
 package com.asrevo.cvhome.s2s.config.internal;
 
 import com.asrevo.cvhome.s2s.model.ServiceDomainProperties;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
@@ -80,9 +79,8 @@ public class WebClientServicesConfig {
 		@Bean
 		public WebClientBuilder webClientBuilder(Environment environment,
 				@Qualifier("microServiceWebClient") WebClient microServiceWebClient,
-				ServiceDomainProperties serviceDomainProperties, ObjectMapper objectMapper) {
-			return new WebClientBuilder(environment, microServiceWebClient.mutate(), serviceDomainProperties,
-					objectMapper);
+				ServiceDomainProperties serviceDomainProperties) {
+			return new WebClientBuilder(environment, microServiceWebClient.mutate(), serviceDomainProperties);
 		}
 
 	}

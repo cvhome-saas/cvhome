@@ -1,10 +1,10 @@
 package com.asrevo.cvhome.store.core.serializer;
 
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import java.io.IOException;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ser.std.StdSerializer;
 
 public class LanguageCodeSerializer extends StdSerializer<LanguageCode> {
 
@@ -17,7 +17,8 @@ public class LanguageCodeSerializer extends StdSerializer<LanguageCode> {
 	}
 
 	@Override
-	public void serialize(LanguageCode value, JsonGenerator gen, SerializerProvider provider) throws IOException {
+	public void serialize(LanguageCode value, JsonGenerator gen, SerializationContext provider)
+			throws JacksonException {
 		gen.writeString(value.code());
 	}
 

@@ -25,7 +25,6 @@ import java.util.HashSet;
 import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.FilterDef;
 import org.hibernate.annotations.ParamDef;
@@ -94,11 +93,9 @@ public class Product extends SalesManagerEntity<Long, Product> implements Audita
 	/**
 	 * Product to category
 	 */
-	@ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.REFRESH })
+	@ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.REFRESH, CascadeType.DETACH })
 	@JoinTable(name = "PRODUCT_CATEGORY", joinColumns = { @JoinColumn(name = "PRODUCT_ID") },
 			inverseJoinColumns = { @JoinColumn(name = "CATEGORY_ID") })
-	@Cascade({ org.hibernate.annotations.CascadeType.DETACH, org.hibernate.annotations.CascadeType.LOCK,
-			org.hibernate.annotations.CascadeType.REFRESH, org.hibernate.annotations.CascadeType.REPLICATE })
 	private Set<Category> categories = new HashSet<>();
 
 	/**
