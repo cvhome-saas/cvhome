@@ -1,0 +1,82 @@
+<nb-card>
+  <nb-card-header class="d-flex justify-content-between align-items-center">
+    <span>User</span>
+    <span>{{form.value.id}}</span>
+    <div style="display: flex;gap: 1rem;">
+      <button nbButton ghost status="basic" routerLink="/home/users">Cancel</button>
+      <button nbButton status="primary" (click)="submit()">
+        <nb-icon icon="plus" style="margin-right: 0.5rem"></nb-icon>
+        Save
+      </button>
+    </div>
+  </nb-card-header>
+  <nb-card-body [formGroup]="form">
+
+    <nb-tabset>
+
+      <nb-tab tabTitle="General">
+        <div class="row">
+          <div class="col-md-4">
+            <label>Username</label>
+            <input nbInput fullWidth formControlName="username" />
+          </div>
+          <div class="col-md-4">
+            <label>Email</label>
+            <input nbInput fullWidth formControlName="email" />
+          </div>
+        </div>
+
+        <div class="row mt-4">
+          <div class="col-12">
+            <h6>Metadata</h6>
+            <div *ngFor="let control of metadataForm.controls; let i = index" [formGroup]="getGroup(control)" class="row mb-2 align-items-end">
+              <div class="col-md-5">
+                <label *ngIf="i === 0">Key</label>
+                <input nbInput fullWidth formControlName="key" placeholder="Key" />
+              </div>
+              <div class="col-md-5">
+                <label *ngIf="i === 0">Value</label>
+                <input nbInput fullWidth formControlName="value" placeholder="Value" />
+              </div>
+              <div class="col-md-2">
+                <button nbButton status="danger" size="small" (click)="removeMetadata(i)" type="button">
+                  <nb-icon icon="trash-2-outline"></nb-icon>
+                </button>
+              </div>
+            </div>
+            <button nbButton status="info" size="small" (click)="addMetadata()" type="button" class="mt-2">
+              <nb-icon icon="plus-outline"></nb-icon> Add Property
+            </button>
+          </div>
+        </div>
+      </nb-tab>
+      <nb-tab tabTitle="Roles" *ngIf="form.value.id">
+        <div class="row" [formGroup]="rolesForm">
+          <div class="col-md-4">
+            <label>Roles</label>
+            <nb-select multiple placeholder="Select Roles" formControlName="roles" fullWidth>
+              <nb-option *ngFor="let role of roles" [value]="role">{{ role }}</nb-option>
+            </nb-select>
+          </div>
+          <div class="col-md-4">
+            <label style="visibility: hidden; display: block">Assign Roles</label>
+            <button nbButton status="primary" (click)="assignRoles()">Assign Roles</button>
+          </div>
+        </div>
+      </nb-tab>
+      <nb-tab tabTitle="Password" *ngIf="form.value.id">
+        <div class="row" [formGroup]="passwordForm">
+          <div class="col-md-4">
+            <label>New Password</label>
+            <input nbInput fullWidth formControlName="password" type="password" placeholder="New Password" autocomplete="new-password"/>
+          </div>
+          <div class="col-md-4">
+            <label style="visibility: hidden; display: block">Reset Password</label>
+            <button nbButton status="warning" (click)="resetPassword()">Reset Password</button>
+          </div>
+        </div>
+      </nb-tab>
+    </nb-tabset>
+
+  </nb-card-body>
+</nb-card>

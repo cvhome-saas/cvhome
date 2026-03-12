@@ -1,0 +1,14 @@
+plugins {
+	alias(libs.plugins.java.library.conventions)
+	alias(libs.plugins.spring.javaformat)
+}
+
+dependencies {
+	compileOnly project(":store-commons:commons")
+	implementation libs.keycloak.admin.client
+	implementation libs.mapstruct
+	compileOnly libs.lombok
+	annotationProcessor libs.mapstruct.processor
+	annotationProcessor libs.lombok
+	annotationProcessor libs.lombok.mapstruct.binding
+}

@@ -1,0 +1,81 @@
+package com.asrevo.cvhome.uaa.service;
+
+import com.asrevo.cvhome.uaa.domain.SigningKey;
+import com.asrevo.cvhome.uaa.repo.SigningKeyRepository;
+import com.nimbusds.jose.JWSAlgorithm;
+import com.nimbusds.jose.jwk.JWK;
+import com.nimbusds.jose.jwk.KeyUse;
+import com.nimbusds.jose.jwk.RSAKey;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.interfaces.RSAPublicKey;
+import java.util.ArrayList;
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+@Slf4j
+public class KeyPairService {
+
+	private final SigningKeyRepository repo;
+
+	/**
+	 * Returns a list of JWKs where the first is the active signing key and the rest are
+	 * previous keys for verification. If no key exists, an RSA key is generated, stored
+	 * as active, and returned.
+	 */
+	@Transactional
+	public List<JWK> getActiveAndPreviousKeys() {
+		var activeOpt = repo.findFirstByActiveTrueOrderByCreatedAtDesc();
+		if (activeOpt.isEmpty()) {
+			// generate and persist a new RSA JWK
+			RSAKey rsa = generateRsaJwk();
+			saveActive(rsa);
+		}
+
+		List<JWK> result = new ArrayList<>();
+		repo.findTop5ByOrderByCreatedAtDesc().forEach(sk -> {
+			try {
+				result.add(JWK.parse(sk.getJwkJson()));
+			}
+			catch (Exception ignored) {
+			}
+		});
+		return result;
+	}
+
+	private void saveActive(RSAKey rsa) {
+		SigningKey sk = new SigningKey();
+		sk.setKid(rsa.getKeyID());
+		sk.setActive(true);
+		try {
+			sk.setJwkJson(rsa.toJSONString());
+		}
+		catch (Exception e) {
+			throw new IllegalStateException("Failed to serialize JWK", e);
+		}
+		repo.save(sk);
+	}
+
+	private RSAKey generateRsaJwk() {
+		try {
+			KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
+			kpg.initialize(2048);
+			KeyPair kp = kpg.generateKeyPair();
+			return new RSAKey.Builder((RSAPublicKey) kp.getPublic()).privateKey(kp.getPrivate())
+				.keyUse(KeyUse.SIGNATURE)
+				.algorithm(JWSAlgorithm.RS256)
+				.keyIDFromThumbprint()
+				.build();
+		}
+		catch (Exception e) {
+			throw new IllegalStateException("Failed to generate RSA key", e);
+		}
+	}
+
+}

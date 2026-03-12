@@ -21,13 +21,9 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
 	@Bean
-	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		http.authorizeHttpRequests(it -> it.requestMatchers("/api/v1/test/sign")
-			.permitAll()
-			.requestMatchers("/api/*/private/**")
-			.authenticated()
-			.anyRequest()
-			.permitAll())
+	SecurityFilterChain filterChain(HttpSecurity http) {
+		http.authorizeHttpRequests(
+				it -> it.requestMatchers("/api/*/private/**").authenticated().anyRequest().permitAll())
 			.oauth2ResourceServer(it -> it.jwt(Customizer.withDefaults()))
 			.csrf(AbstractHttpConfigurer::disable);
 		return http.build();

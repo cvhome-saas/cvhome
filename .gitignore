@@ -38,6 +38,6 @@ bin/
 **/dist/
 **/.next/
 /extra/test-data/generated/
-/store-core/core-auth/keycloak/providers/*.jar
 *.d.ts
 *.tsbuildinfo
+/store-core/uaa/src/main/resources/static/*

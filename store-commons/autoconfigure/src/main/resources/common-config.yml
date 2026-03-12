@@ -6,9 +6,9 @@ com:
       saas:
         domain: saas.${com.asrevo.cvhome.app.domain}
       services:
-        core-auth:
-          name: core-auth
-          domain: core-auth.${com.asrevo.cvhome.app.domain}
+        uaa:
+          name: uaa
+          domain: uaa.${com.asrevo.cvhome.app.domain}
           port: 8001
           schema: http
           namespace: store-core.cvhome.lcl
@@ -41,13 +41,6 @@ com:
           schema: https
           namespace: store-pod-1.cvhome.lcl
           gateway-service-name: store-pod-saas-gateway
-        pod-auth:
-          name: pod-auth
-          domain: pod-auth.${com.asrevo.cvhome.app.domain}
-          port: 8101
-          schema: http
-          namespace: store-pod-1.cvhome.lcl
-          gateway-service-name: store-pod-gateway
         merchant:
           name: merchant
           domain: store-pod-1.${com.asrevo.cvhome.app.domain}
@@ -87,6 +80,9 @@ spring:
     driver-class-name: org.postgresql.Driver
     hikari:
       schema: ${spring.application.name}
+  session:
+    jdbc:
+      initialize-schema: always
   jpa:
     hibernate:
       ddl-auto: update
@@ -111,29 +107,30 @@ spring:
             client-id: web-app
             client-authentication-method: client_secret_basic
             authorization-grant-type: authorization_code
-            scope: openid, profile, email
+            scope: openid
             redirect-uri: "{baseUrl}/login/oauth2/code/keycloak"
             provider: keycloak
             client-secret: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
         provider:
           keycloak:
             #            comment issuer-uri to skip validation
-            #            issuer-uri: https://gateway.com:8443/realms/cvhome
-            jwk-set-uri: ${com.asrevo.cvhome.services.core-auth.schema}://${com.asrevo.cvhome.services.core-auth.domain}:${com.asrevo.cvhome.services.core-auth.port}/realms/cvhome/protocol/openid-connect/certs
-            authorization-uri: ${com.asrevo.cvhome.services.core-auth.schema}://${com.asrevo.cvhome.services.core-auth.domain}:${com.asrevo.cvhome.services.core-auth.port}/realms/cvhome/protocol/openid-connect/auth
-            token-uri: ${com.asrevo.cvhome.services.core-auth.schema}://${com.asrevo.cvhome.services.core-auth.domain}:${com.asrevo.cvhome.services.core-auth.port}/realms/cvhome/protocol/openid-connect/token
+            #            issuer-uri: ${com.asrevo.cvhome.services.uaa.schema}://${com.asrevo.cvhome.services.uaa.domain}:${com.asrevo.cvhome.services.uaa.port}
+            jwk-set-uri: ${com.asrevo.cvhome.services.uaa.schema}://${com.asrevo.cvhome.services.uaa.domain}:${com.asrevo.cvhome.services.uaa.port}/oauth2/jwks
+            authorization-uri: ${com.asrevo.cvhome.services.uaa.schema}://${com.asrevo.cvhome.services.uaa.domain}:${com.asrevo.cvhome.services.uaa.port}/oauth2/authorize
+            user-info-uri: ${com.asrevo.cvhome.services.uaa.schema}://${com.asrevo.cvhome.services.uaa.domain}:${com.asrevo.cvhome.services.uaa.port}/userinfo
+            token-uri: ${com.asrevo.cvhome.services.uaa.schema}://${com.asrevo.cvhome.services.uaa.domain}:${com.asrevo.cvhome.services.uaa.port}/oauth2/token
+            user-name-attribute: sub
 
       #            need to trace why getting 401 error=invalid_token, auth_method=validate_access_token is by issuer?
-      #            user-info-uri: https://core-auth.gateway.com:8443/realms/cvhome/protocol/openid-connect/userinfo
+      #            user-info-uri: https://uaa.gateway.com:8443/realms/cvhome/protocol/openid-connect/userinfo
       #            user-name-attribute: sub
       resourceserver:
         jwt:
-          #          jwk-set-uri: ${com.asrevo.cvhome.services.core-auth.schema}://${com.asrevo.cvhome.services.core-auth.domain}:${com.asrevo.cvhome.services.core-auth.port}/realms/cvhome/protocol/openid-connect/certs
-          #          issuer-uri: ${com.asrevo.cvhome.services.core-auth.schema}://${com.asrevo.cvhome.services.core-auth.domain}:${com.asrevo.cvhome.services.core-auth.port}/realms/cvhome
-          issuer-uri-set: ${com.asrevo.cvhome.services.core-auth.schema}://${com.asrevo.cvhome.services.core-auth.domain}:${com.asrevo.cvhome.services.core-auth.port}/realms/cvhome
+          #          jwk-set-uri: ${com.asrevo.cvhome.services.uaa.schema}://${com.asrevo.cvhome.services.uaa.domain}:${com.asrevo.cvhome.services.uaa.port}/realms/cvhome/protocol/openid-connect/certs
+          #          issuer-uri: ${com.asrevo.cvhome.services.uaa.schema}://${com.asrevo.cvhome.services.uaa.domain}:${com.asrevo.cvhome.services.uaa.port}/realms/cvhome
+          issuer-uri-set: ${com.asrevo.cvhome.services.uaa.schema}://${com.asrevo.cvhome.services.uaa.domain}:${com.asrevo.cvhome.services.uaa.port}
 #          issuer-uri-set:
-#            - ${com.asrevo.cvhome.services.core-auth.schema}://${com.asrevo.cvhome.services.core-auth.domain}:${com.asrevo.cvhome.services.core-auth.port}/realms/cvhome
-#            - ${com.asrevo.cvhome.services.pod-auth.schema}://${com.asrevo.cvhome.services.pod-auth.domain}:${com.asrevo.cvhome.services.pod-auth.port}
+#            - ${com.asrevo.cvhome.services.uaa.schema}://${com.asrevo.cvhome.services.uaa.domain}:${com.asrevo.cvhome.services.uaa.port}/realms/cvhome
 server:
   forward-headers-strategy: NATIVE
   port: ${com.asrevo.cvhome.services.${spring.application.name}.port}
