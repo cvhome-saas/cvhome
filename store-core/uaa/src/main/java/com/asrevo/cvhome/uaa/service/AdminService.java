@@ -40,6 +40,13 @@ public class AdminService {
 
 	@Transactional(readOnly = true)
 	public Page<UserDto> getUsers(Map<String, String> metadataFilters, Pageable pageable) {
+		Specification<User> spec = buildSpec(metadataFilters);
+		Page<User> all = userRepository.findAll(spec, pageable);
+		return all.map(u -> new UserDto(u.getId(), u.getUsername(), u.getEmail(), u.getStatus(),
+				u.getRoles().stream().map(Role::getName).collect(toSet()), u.getMetadata()));
+	}
+
+	private Specification<User> buildSpec(Map<String, String> metadataFilters) {
 		Specification<User> spec = (root, query, cb) -> cb.conjunction();
 		if (metadataFilters != null) {
 			for (Map.Entry<String, String> entry : metadataFilters.entrySet()) {
@@ -48,16 +55,19 @@ public class AdminService {
 				}
 			}
 		}
-		Page<User> all = userRepository.findAll(spec, pageable);
-		return all.map(u -> new UserDto(u.getId(), u.getUsername(), u.getEmail(), u.getStatus(),
-				u.getRoles().stream().map(Role::getName).collect(toSet()), u.getMetadata()));
+		return spec;
 	}
 
-	public UserDto getUser(UUID id) {
-		return userRepository.findById(id)
-			.map(u -> new UserDto(u.getId(), u.getUsername(), u.getEmail(), u.getStatus(),
-					u.getRoles().stream().map(Role::getName).collect(toSet()), u.getMetadata()))
-			.orElseThrow(() -> new RuntimeException("Invalid user id " + id));
+	private User findUser(UUID id, Map<String, String> metadataFilters) {
+		Specification<User> spec = (root, query, cb) -> cb.equal(root.get("id"), id);
+		spec = spec.and(buildSpec(metadataFilters));
+		return userRepository.findOne(spec).orElseThrow(() -> new RuntimeException("Invalid user id " + id));
+	}
+
+	public UserDto getUser(UUID id, Map<String, String> metadataFilters) {
+		User u = findUser(id, metadataFilters);
+		return new UserDto(u.getId(), u.getUsername(), u.getEmail(), u.getStatus(),
+				u.getRoles().stream().map(Role::getName).collect(toSet()), u.getMetadata());
 	}
 
 	@Transactional
@@ -77,8 +87,8 @@ public class AdminService {
 	}
 
 	@Transactional
-	public void assignRoles(UUID userId, Set<String> roleNames) {
-		User u = userRepository.findById(userId).orElseThrow();
+	public void assignRoles(UUID userId, Set<String> roleNames, Map<String, String> metadataFilters) {
+		User u = findUser(userId, metadataFilters);
 		Set<Role> rs = new HashSet<>();
 		for (String rn : roleNames) {
 			rs.add(roleRepository.findByName(rn).orElseGet(() -> roleRepository.save(new Role(rn))));
@@ -88,8 +98,8 @@ public class AdminService {
 	}
 
 	@Transactional
-	public UserDto updateUser(UUID userId, UpdateUserRequest req) {
-		User u = userRepository.findById(userId).orElseThrow();
+	public UserDto updateUser(UUID userId, UpdateUserRequest req, Map<String, String> metadataFilters) {
+		User u = findUser(userId, metadataFilters);
 		if (req.status() != null && !req.status().isBlank())
 			u.setStatus(req.status());
 		if (req.metadata() != null) {
@@ -101,16 +111,16 @@ public class AdminService {
 	}
 
 	@Transactional
-	public void removeRoles(UUID userId, Set<String> roleNames) {
+	public void removeRoles(UUID userId, Set<String> roleNames, Map<String, String> metadataFilters) {
 		if (roleNames == null || roleNames.isEmpty())
 			return;
-		User u = userRepository.findById(userId).orElseThrow();
+		User u = findUser(userId, metadataFilters);
 		u.getRoles().removeIf(r -> roleNames.contains(r.getName()));
 	}
 
 	@Transactional
-	public void resetPassword(UUID userId, ResetUserPasswordRequest req) {
-		User u = userRepository.findById(userId).orElseThrow();
+	public void resetPassword(UUID userId, ResetUserPasswordRequest req, Map<String, String> metadataFilters) {
+		User u = findUser(userId, metadataFilters);
 		if (req.password() != null && !req.password().isBlank()) {
 			u.setPasswordHash(passwordEncoder.encode(req.password()));
 		}
@@ -123,22 +133,22 @@ public class AdminService {
 	}
 
 	@Transactional
-	public void enableUser(UUID id) {
-		User u = userRepository.findById(id).orElseThrow();
+	public void enableUser(UUID id, Map<String, String> metadataFilters) {
+		User u = findUser(id, metadataFilters);
 		u.setStatus("ACTIVE");
 		userRepository.save(u);
 	}
 
 	@Transactional
-	public void disableUser(UUID id) {
-		User u = userRepository.findById(id).orElseThrow();
+	public void disableUser(UUID id, Map<String, String> metadataFilters) {
+		User u = findUser(id, metadataFilters);
 		u.setStatus("DISABLED");
 		userRepository.save(u);
 	}
 
 	@Transactional
-	public void delete(UUID id) {
-		User user = userRepository.findById(id).orElseThrow();
+	public void delete(UUID id, Map<String, String> metadataFilters) {
+		User user = findUser(id, metadataFilters);
 		if ("super-admin@mail.com".equals(user.getEmail()))
 			throw new RuntimeException("Cannot delete admin user");
 		userRepository.deleteById(id);
