@@ -5,6 +5,12 @@ plugins {
 
 dependencies {
 	compileOnly project(":store-commons:commons")
+	implementation project(":store-commons:uaa-client")
+	implementation libs.jackson.databind
+	implementation libs.jackson.core
+	implementation libs.jackson.annotations
+
+
 	implementation libs.mapstruct
 	compileOnly libs.lombok
 	annotationProcessor libs.mapstruct.processor

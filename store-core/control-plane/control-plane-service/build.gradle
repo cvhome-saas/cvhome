@@ -55,19 +55,19 @@ dependencies {
 	implementation project(':store-commons:ecs-commons:fargate-task-info')
 	implementation project(':store-commons:ecs-commons:ecs-service-discoveryclient')
 
-	implementation libs.keycloak.admin.client
 	implementation libs.caffeine
 
 	implementation libs.mapstruct
 	annotationProcessor libs.mapstruct.processor
 	implementation libs.springdoc.openapi.starter.webflux.ui
 
+	implementation project(":store-commons:uaa-client")
+	implementation project(":store-commons:uaa-client-impl")
 	implementation project(':store-core:control-plane:manager-events')
 	implementation project(':store-core:control-plane:subscription-events')
 	implementation project(':store-pod:merchant:merchant-external-api')
 	implementation project(':store-core:control-plane:subscription-external-api')
 	implementation project(':store-commons:autoconfigure')
-	implementation project(':store-commons:keycloak-client')
 
 //    developmentOnly libs.spring.boot.docker.compose
 	compileOnly libs.lombok

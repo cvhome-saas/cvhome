@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.controlplane.manager.controller;
 
 import com.asrevo.cvhome.commons.annotation.ConditionalOnApiStatus;
-import com.asrevo.cvhome.keycloak.domain.user.ReadableUser;
+import com.asrevo.cvhome.uaa.domain.user.ReadableUser;
 import com.asrevo.cvhome.controlplane.manager.dto.CreateOrgRequest;
 import com.asrevo.cvhome.controlplane.manager.service.SignupService;
 import lombok.AllArgsConstructor;

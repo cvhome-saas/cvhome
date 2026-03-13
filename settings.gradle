@@ -23,8 +23,8 @@ include(
         'store-commons:ecs-commons:fargate-task-info',
         'store-commons:ecs-commons:ecs-service-discoveryclient',
         'store-commons:commons',
-        'store-commons:keycloak-client',
         'store-commons:uaa-client',
+        'store-commons:uaa-client-impl',
         'store-commons:autoconfigure',
 
         'store-pod:store-pod-saas-gateway',

@@ -2,9 +2,9 @@ package com.asrevo.cvhome.controlplane.manager.controller.admin;
 
 import com.asrevo.cvhome.commons.annotation.ConditionalOnApiStatus;
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
-import com.asrevo.cvhome.keycloak.domain.user.ReadableUser;
-import com.asrevo.cvhome.keycloak.domain.user.UserPassword;
-import com.asrevo.cvhome.keycloak.service.UserAccountService;
+import com.asrevo.cvhome.uaa.domain.user.ReadableUser;
+import com.asrevo.cvhome.uaa.domain.user.UserPassword;
+import com.asrevo.cvhome.uaa.service.UserAccountService;
 import com.asrevo.cvhome.controlplane.manager.commons.dto.ManagerOrgDto;
 import com.asrevo.cvhome.controlplane.manager.commons.dto.ManagerStoreDto;
 import com.asrevo.cvhome.controlplane.manager.dto.CreateOrgRequest;

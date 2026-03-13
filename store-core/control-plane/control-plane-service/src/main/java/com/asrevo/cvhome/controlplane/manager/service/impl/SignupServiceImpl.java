@@ -2,8 +2,8 @@ package com.asrevo.cvhome.controlplane.manager.service.impl;
 
 import com.asrevo.cvhome.commons.domain.Email;
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
-import com.asrevo.cvhome.keycloak.domain.user.ReadableUser;
-import com.asrevo.cvhome.keycloak.service.UserAccountService;
+import com.asrevo.cvhome.uaa.domain.user.ReadableUser;
+import com.asrevo.cvhome.uaa.service.UserAccountService;
 import com.asrevo.cvhome.controlplane.manager.dto.CreateOrgRequest;
 import com.asrevo.cvhome.controlplane.manager.service.InternalOrgService;
 import com.asrevo.cvhome.controlplane.manager.service.SignupService;
