@@ -46,6 +46,24 @@ public class AdminUserController {
 	}
 
 	@PreAuthorize("hasAuthority('SCOPE_super_admin') or hasRole('SUPER_ADMIN')")
+	@GetMapping("/exists")
+	public boolean usernameExist(@RequestParam String username) {
+		return adminService.usernameExist(username);
+	}
+
+	@PreAuthorize("hasAuthority('SCOPE_super_admin') or hasRole('SUPER_ADMIN')")
+	@PostMapping("/{id}/enable")
+	public void enable(@PathVariable UUID id) {
+		adminService.enableUser(id);
+	}
+
+	@PreAuthorize("hasAuthority('SCOPE_super_admin') or hasRole('SUPER_ADMIN')")
+	@PostMapping("/{id}/disable")
+	public void disable(@PathVariable UUID id) {
+		adminService.disableUser(id);
+	}
+
+	@PreAuthorize("hasAuthority('SCOPE_super_admin') or hasRole('SUPER_ADMIN')")
 	@DeleteMapping("/{id}")
 	public void delete(@PathVariable UUID id) {
 		adminService.delete(id);

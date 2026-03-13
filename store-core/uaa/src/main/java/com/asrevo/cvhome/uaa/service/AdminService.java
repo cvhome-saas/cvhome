@@ -117,6 +117,25 @@ public class AdminService {
 		userRepository.save(u);
 	}
 
+	@Transactional(readOnly = true)
+	public boolean usernameExist(String username) {
+		return userRepository.findByUsername(username).isPresent();
+	}
+
+	@Transactional
+	public void enableUser(UUID id) {
+		User u = userRepository.findById(id).orElseThrow();
+		u.setStatus("ACTIVE");
+		userRepository.save(u);
+	}
+
+	@Transactional
+	public void disableUser(UUID id) {
+		User u = userRepository.findById(id).orElseThrow();
+		u.setStatus("DISABLED");
+		userRepository.save(u);
+	}
+
 	@Transactional
 	public void delete(UUID id) {
 		User user = userRepository.findById(id).orElseThrow();

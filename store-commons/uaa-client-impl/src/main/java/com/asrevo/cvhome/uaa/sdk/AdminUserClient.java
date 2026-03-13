@@ -67,6 +67,26 @@ public class AdminUserClient extends AbstractAdminClient {
 		return sendAndParse(request, UserDto.class);
 	}
 
+	public boolean usernameExist(String username) {
+		String url = usersApiUrl + "/exists?username=" + URLEncoder.encode(username, StandardCharsets.UTF_8);
+		HttpRequest request = authenticatedRequestBuilder(url).GET().build();
+		return sendAndParse(request, Boolean.class);
+	}
+
+	public void enableUser(UUID id) {
+		HttpRequest request = authenticatedRequestBuilder(usersApiUrl + "/" + id + "/enable")
+			.POST(HttpRequest.BodyPublishers.noBody())
+			.build();
+		sendAndVerify(request);
+	}
+
+	public void disableUser(UUID id) {
+		HttpRequest request = authenticatedRequestBuilder(usersApiUrl + "/" + id + "/disable")
+			.POST(HttpRequest.BodyPublishers.noBody())
+			.build();
+		sendAndVerify(request);
+	}
+
 	public void deleteUser(UUID id) {
 		HttpRequest request = authenticatedRequestBuilder(usersApiUrl + "/" + id).DELETE().build();
 		sendAndVerify(request);
