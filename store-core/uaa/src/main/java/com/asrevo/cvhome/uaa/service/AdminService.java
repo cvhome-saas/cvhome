@@ -49,13 +49,13 @@ public class AdminService {
 			}
 		}
 		Page<User> all = userRepository.findAll(spec, pageable);
-		return all.map(u -> new UserDto(u.getId(), u.getUsername(), u.getEmail(),
+		return all.map(u -> new UserDto(u.getId(), u.getUsername(), u.getEmail(), u.getStatus(),
 				u.getRoles().stream().map(Role::getName).collect(toSet()), u.getMetadata()));
 	}
 
 	public UserDto getUser(UUID id) {
 		return userRepository.findById(id)
-			.map(u -> new UserDto(u.getId(), u.getUsername(), u.getEmail(),
+			.map(u -> new UserDto(u.getId(), u.getUsername(), u.getEmail(), u.getStatus(),
 					u.getRoles().stream().map(Role::getName).collect(toSet()), u.getMetadata()))
 			.orElseThrow(() -> new RuntimeException("Invalid user id " + id));
 	}
@@ -71,7 +71,7 @@ public class AdminService {
 			u.getMetadata().putAll(req.metadata());
 		}
 		User saved = userRepository.save(u);
-		return new UserDto(saved.getId(), saved.getUsername(), saved.getEmail(),
+		return new UserDto(saved.getId(), saved.getUsername(), saved.getEmail(), u.getStatus(),
 				saved.getRoles().stream().map(Role::getName).collect(toSet()), saved.getMetadata());
 
 	}
@@ -96,7 +96,7 @@ public class AdminService {
 			u.getMetadata().putAll(req.metadata());
 		}
 		User saved = userRepository.save(u);
-		return new UserDto(saved.getId(), saved.getUsername(), saved.getEmail(),
+		return new UserDto(saved.getId(), saved.getUsername(), saved.getEmail(), u.getStatus(),
 				saved.getRoles().stream().map(Role::getName).collect(toSet()), saved.getMetadata());
 	}
 
