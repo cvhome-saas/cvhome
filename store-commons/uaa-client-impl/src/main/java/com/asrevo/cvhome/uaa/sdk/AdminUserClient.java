@@ -20,15 +20,23 @@ public class AdminUserClient extends AbstractAdminClient {
 		this.usersApiUrl = baseUrl + "/api/v1/admin/users";
 	}
 
-	public PageResponse<UserDto> listUsers(Map<String, String> metadataFilters) {
+	public PageResponse<UserDto> listUsers(Map<String, String> metadataFilters, PageRequest pageRequest) {
 		String url = usersApiUrl;
+		StringJoiner sj = new StringJoiner("&", "?", "");
 		if (metadataFilters != null && !metadataFilters.isEmpty()) {
-			StringJoiner sj = new StringJoiner("&", "?", "");
 			for (Map.Entry<String, String> entry : metadataFilters.entrySet()) {
 				String key = URLEncoder.encode("metadata[" + entry.getKey() + "]", StandardCharsets.UTF_8);
 				String value = URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8);
 				sj.add(key + "=" + value);
 			}
+		}
+
+		if (pageRequest != null) {
+			sj.add("page=" + pageRequest.page());
+			sj.add("size=" + pageRequest.size());
+		}
+
+		if (sj.length() > 1) {
 			url += sj.toString();
 		}
 
