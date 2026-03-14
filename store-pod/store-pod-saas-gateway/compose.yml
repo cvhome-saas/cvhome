@@ -1,7 +1,7 @@
 version: '3'
 services:
   store-pod-saas-gateway:
-    image: ashraf1abdelrasool/saas-gateway:sha-8eed986
+    image: public.ecr.aws/b2i4h4k9/ashraf1abdelrasool/saas-gateway:sha-8eed986
     network_mode: "host"
     ports:
       - "80:80"

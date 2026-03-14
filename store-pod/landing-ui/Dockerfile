@@ -1,7 +1,7 @@
 ###############################################
 # Stage 1 — Build dependencies
 ###############################################
-FROM node:20-slim AS builder
+FROM public.ecr.aws/b2i4h4k9/node:20-slim AS builder
 WORKDIR /build
 
 RUN npm init -y
@@ -41,7 +41,7 @@ RUN apt-get update && apt-get install -y findutils && \
 ###############################################
 # Stage 2 — Distroless Runtime
 ###############################################
-FROM gcr.io/distroless/nodejs20
+FROM public.ecr.aws/b2i4h4k9/nodejs20:latest
 
 ENV NODE_ENV=production
 
