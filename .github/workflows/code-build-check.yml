@@ -41,5 +41,5 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
 
       - name: Package And Publish Docker with Gradle
-        run: ./gradlew :store-core:uaa:bootBuildImage -x test
+        run: ./gradlew build -x test -x check
 

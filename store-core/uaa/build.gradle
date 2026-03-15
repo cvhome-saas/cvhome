@@ -19,8 +19,8 @@ bootBuildImage {
 */
     environment["BP_JVM_JLINK_ENABLED"] = "true"
     environment["BP_JVM_JLINK_ARGS"] = " --compress zip-6 --no-header-files --no-man-pages --vm client --add-modules java.base,java.se,jdk.unsupported,jdk.crypto.ec"
-    imageName = createImageName("store-core/store-core-gateway", project.version)
-    tags = createImageTags("store-core/store-core-gateway", project.version)
+    imageName = createImageName("store-core/uaa", project.version)
+    tags = createImageTags("store-core/uaa", project.version)
     docker {
         publishRegistry {
             url = System.getenv("REGISTRY")
