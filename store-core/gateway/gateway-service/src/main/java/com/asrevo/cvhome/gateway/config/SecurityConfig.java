@@ -4,7 +4,7 @@ import static org.springframework.security.config.Customizer.withDefaults;
 import static org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher.MatchResult.match;
 import static org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher.MatchResult.notMatch;
 
-import com.asrevo.cvhome.s2s.jwt.KeyClockJwtGrantedAuthoritiesConverter;
+import com.asrevo.cvhome.s2s.jwt.UaaJwtGrantedAuthoritiesConverter;
 import com.nimbusds.jwt.SignedJWT;
 
 import java.util.*;
@@ -51,7 +51,7 @@ public class SecurityConfig {
 	private static Set<GrantedAuthority> extractAuthority(OAuth2AccessToken accessToken) {
 		SignedJWT parsed = SignedJWT.parse(accessToken.getTokenValue());
 		Map<String, Object> claims = parsed.getPayload().toJSONObject();
-		return KeyClockJwtGrantedAuthoritiesConverter.getGrantedAuthorities(claims);
+		return UaaJwtGrantedAuthoritiesConverter.getGrantedAuthorities(claims);
 	}
 
 	@Bean

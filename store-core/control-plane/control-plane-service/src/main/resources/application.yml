@@ -8,7 +8,7 @@ spring:
       client:
         registration:
           s2s:
-            provider: keycloak
+            provider: uaa
             client-id: control-plane@service.store-core.internal
             client-secret: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
             authorization-grant-type: client_credentials

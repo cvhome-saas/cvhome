@@ -73,7 +73,9 @@ public class MultiIssuerReactiveJwtDecoder implements ReactiveJwtDecoder {
 	private Mono<ReactiveJwtDecoder> getDecoderForIssuer(String issuer) {
 		if (!this.supportedIssuerUris.contains(issuer)) {
 			return Mono.error(new JwtException(String.format(
-					"Unsupported issuer: '%s'. Issuer not in the configured list of" + " supported issuers.", issuer)));
+					"Unsupported issuer: '%s'. Issuer not in the configured list of"
+							+ " supported issuers: %s.",
+					issuer, this.supportedIssuerUris)));
 		}
 
 		ReactiveJwtDecoder delegateDecoder = this.issuerDecoders.computeIfAbsent(issuer, this.decoderFactory);

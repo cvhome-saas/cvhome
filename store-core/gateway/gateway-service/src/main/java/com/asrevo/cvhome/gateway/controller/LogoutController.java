@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.gateway.controller;
 
 import com.asrevo.cvhome.s2s.config.internal.ReactiveGatewaySecurityConfig;
-import com.asrevo.cvhome.s2s.config.security.KeycloakLogoutSuccessHandler;
+import com.asrevo.cvhome.s2s.config.security.UaaLogoutSuccessHandler;
 import com.asrevo.cvhome.s2s.config.security.SecurityContextServerLogoutHandler;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -16,12 +16,11 @@ import reactor.core.publisher.Mono;
 @Import(ReactiveGatewaySecurityConfig.class)
 public class LogoutController {
 
-	private final KeycloakLogoutSuccessHandler successHandler;
+	private final UaaLogoutSuccessHandler successHandler;
 
 	private final SecurityContextServerLogoutHandler logoutHandler;
 
-	public LogoutController(KeycloakLogoutSuccessHandler successHandler,
-			SecurityContextServerLogoutHandler logoutHandler) {
+	public LogoutController(UaaLogoutSuccessHandler successHandler, SecurityContextServerLogoutHandler logoutHandler) {
 		this.successHandler = successHandler;
 		this.logoutHandler = logoutHandler;
 	}

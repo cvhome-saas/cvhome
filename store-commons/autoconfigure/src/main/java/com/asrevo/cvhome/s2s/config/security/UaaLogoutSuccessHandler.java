@@ -12,7 +12,7 @@ import org.springframework.security.web.server.ServerRedirectStrategy;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
-public class KeycloakLogoutSuccessHandler {
+public class UaaLogoutSuccessHandler {
 
 	public static final String DEFAULT_LOGOUT_SUCCESS_URL = "/login?logout";
 
@@ -22,7 +22,7 @@ public class KeycloakLogoutSuccessHandler {
 
 	private final String endSessionEndpoint;
 
-	public KeycloakLogoutSuccessHandler(String endSessionEndpoint) {
+	public UaaLogoutSuccessHandler(String endSessionEndpoint) {
 		this.endSessionEndpoint = endSessionEndpoint;
 	}
 
