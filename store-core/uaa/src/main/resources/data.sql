@@ -6,7 +6,7 @@ insert into uaa.oauth2_registered_client (id, client_id, client_id_issued_at, cl
                                              post_logout_redirect_uris, scopes, client_settings, token_settings)
 values ('a5c7e2c0-7e7e-8f5f-c2d2-7e7e8f5fc2d2',
         'admin-sdk', now(), '{bcrypt}$2a$10$KEyYNPGHPotegD5Ui8/yX.WzIv75INVsEzgjkD2GqQdmcBG0qke8i', 'Admin SDK',
-        'client_secret_post', 'client_credentials,refresh_token',
+        'client_secret_basic', 'client_credentials,refresh_token',
         NULL, NULL,
         'super_admin',
         '{"@class":"java.util.Collections$UnmodifiableMap","settings.client.require-proof-key":false,"settings.client.require-authorization-consent":true}',
@@ -21,7 +21,7 @@ insert into uaa.oauth2_registered_client (id, client_id, client_id_issued_at, cl
                                              post_logout_redirect_uris, scopes, client_settings, token_settings)
 values ('372178C4-D02F-446F-8981-51343C479ED2',
         'uaa@service.store-core.internal', now(), '{bcrypt}$2a$10$KEyYNPGHPotegD5Ui8/yX.WzIv75INVsEzgjkD2GqQdmcBG0qke8i', 'Uaa Service (Store Core)',
-        'client_secret_post', 'client_credentials',
+        'client_secret_basic', 'client_credentials',
         NULL, NULL,
         'internal',
         '{"@class":"java.util.Collections$UnmodifiableMap","settings.client.require-proof-key":false,"settings.client.require-authorization-consent":false}',
@@ -35,7 +35,7 @@ insert into uaa.oauth2_registered_client (id, client_id, client_id_issued_at, cl
                                              post_logout_redirect_uris, scopes, client_settings, token_settings)
 values ('1CA3DD84-48F4-4350-9765-2F9FCEC7DB3C',
         'gateway@service.store-core.internal', now(), '{bcrypt}$2a$10$KEyYNPGHPotegD5Ui8/yX.WzIv75INVsEzgjkD2GqQdmcBG0qke8i', 'Gateway Service (Store Core)',
-        'client_secret_post', 'client_credentials',
+        'client_secret_basic', 'client_credentials',
         NULL, NULL,
         'internal',
         '{"@class":"java.util.Collections$UnmodifiableMap","settings.client.require-proof-key":false,"settings.client.require-authorization-consent":false}',
@@ -49,7 +49,7 @@ insert into uaa.oauth2_registered_client (id, client_id, client_id_issued_at, cl
                                              post_logout_redirect_uris, scopes, client_settings, token_settings)
 values ('CB1916A4-E9C2-4530-BEC6-4F1575549C6C',
         'gateway@service.store-pod.internal', now(), '{bcrypt}$2a$10$KEyYNPGHPotegD5Ui8/yX.WzIv75INVsEzgjkD2GqQdmcBG0qke8i', 'Gateway Service (Store Pod)',
-        'client_secret_post', 'client_credentials',
+        'client_secret_basic', 'client_credentials',
         NULL, NULL,
         'internal',
         '{"@class":"java.util.Collections$UnmodifiableMap","settings.client.require-proof-key":false,"settings.client.require-authorization-consent":false}',
@@ -63,7 +63,7 @@ insert into uaa.oauth2_registered_client (id, client_id, client_id_issued_at, cl
                                              post_logout_redirect_uris, scopes, client_settings, token_settings)
 values ('7FE3E22A-6C00-49C8-A275-29D51FB71726',
         'gateway@service.saas-pod.internal', now(), '{bcrypt}$2a$10$KEyYNPGHPotegD5Ui8/yX.WzIv75INVsEzgjkD2GqQdmcBG0qke8i', 'Gateway Service (SaaS Pod)',
-        'client_secret_post', 'client_credentials',
+        'client_secret_basic', 'client_credentials',
         NULL, NULL,
         'internal',
         '{"@class":"java.util.Collections$UnmodifiableMap","settings.client.require-proof-key":false,"settings.client.require-authorization-consent":false}',
@@ -77,7 +77,7 @@ insert into uaa.oauth2_registered_client (id, client_id, client_id_issued_at, cl
                                              post_logout_redirect_uris, scopes, client_settings, token_settings)
 values ('BECF0252-14DD-437A-85B8-0C8EEF1BD03F',
         'store@service.store-pod.internal', now(), '{bcrypt}$2a$10$KEyYNPGHPotegD5Ui8/yX.WzIv75INVsEzgjkD2GqQdmcBG0qke8i', 'Store Service (Store Pod)',
-        'client_secret_post', 'client_credentials',
+        'client_secret_basic', 'client_credentials',
         NULL, NULL,
         'internal',
         '{"@class":"java.util.Collections$UnmodifiableMap","settings.client.require-proof-key":false,"settings.client.require-authorization-consent":false}',
@@ -91,7 +91,7 @@ insert into uaa.oauth2_registered_client (id, client_id, client_id_issued_at, cl
                                              post_logout_redirect_uris, scopes, client_settings, token_settings)
 values ('608A79F2-CB4D-42CA-8BA9-2571DE69BDE8',
         'control-plane@service.store-core.internal', now(), '{bcrypt}$2a$10$KEyYNPGHPotegD5Ui8/yX.WzIv75INVsEzgjkD2GqQdmcBG0qke8i', 'Control Plane (Store Core)',
-        'client_secret_post', 'client_credentials',
+        'client_secret_basic', 'client_credentials',
         NULL, NULL,
         'internal',
         '{"@class":"java.util.Collections$UnmodifiableMap","settings.client.require-proof-key":false,"settings.client.require-authorization-consent":false}',
@@ -106,7 +106,7 @@ insert into uaa.oauth2_registered_client (id, client_id, client_id_issued_at, cl
 values ('b6d8f3d1-8f8f-9060-d3e3-8f8f9060d3e3',
         'web-app', now(), '{bcrypt}$2a$10$KEyYNPGHPotegD5Ui8/yX.WzIv75INVsEzgjkD2GqQdmcBG0qke8i', 'Web App',
         'client_secret_basic', 'authorization_code,refresh_token',
-        'http://localhost:8000/login/oauth2/code/keycloak',
+        'http://localhost:8000/login/oauth2/code/keycloak,https://asrevo.click/login/oauth2/code/keycloak',
         NULL,
         'openid',
         '{"@class":"java.util.Collections$UnmodifiableMap","settings.client.require-proof-key":false,"settings.client.require-authorization-consent":true}',
