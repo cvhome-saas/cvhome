@@ -31,12 +31,7 @@ public class KeyPairService {
 	 */
 	@Transactional
 	public List<JWK> getActiveAndPreviousKeys() {
-		var activeOpt = repo.findFirstByActiveTrueOrderByCreatedAtDesc();
-		if (activeOpt.isEmpty()) {
-			// generate and persist a new RSA JWK
-			RSAKey rsa = generateRsaJwk();
-			saveActive(rsa);
-		}
+		ensureActiveKeyExists();
 
 		List<JWK> result = new ArrayList<>();
 		repo.findTop5ByOrderByCreatedAtDesc().forEach(sk -> {
@@ -60,6 +55,15 @@ public class KeyPairService {
 			throw new IllegalStateException("Failed to serialize JWK", e);
 		}
 		repo.save(sk);
+	}
+
+	private void ensureActiveKeyExists() {
+		var activeList = repo.findAllActiveWithLock();
+		if (activeList.isEmpty()) {
+			log.info("No active signing key found, generating a new one...");
+			RSAKey rsa = generateRsaJwk();
+			saveActive(rsa);
+		}
 	}
 
 	private RSAKey generateRsaJwk() {
