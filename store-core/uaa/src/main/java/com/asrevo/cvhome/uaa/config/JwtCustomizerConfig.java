@@ -44,6 +44,7 @@ public class JwtCustomizerConfig {
 		if (!roles.isEmpty()) {
 			context.getClaims().claim("roles", roles);
 		}
+		user.getMetadata().forEach((s, o) -> context.getClaims().claim(s, o));
 	}
 
 }

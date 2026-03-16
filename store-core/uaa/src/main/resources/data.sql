@@ -106,7 +106,7 @@ insert into uaa.oauth2_registered_client (id, client_id, client_id_issued_at, cl
 values ('b6d8f3d1-8f8f-9060-d3e3-8f8f9060d3e3',
         'web-app', now(), '{bcrypt}$2a$10$KEyYNPGHPotegD5Ui8/yX.WzIv75INVsEzgjkD2GqQdmcBG0qke8i', 'Web App',
         'client_secret_basic', 'authorization_code,refresh_token',
-        'http://localhost:8000/login/oauth2/code/keycloak,https://asrevo.click/login/oauth2/code/keycloak',
+        'http://localhost:8000/login/oauth2/code/keycloak,http://gateway.com:8000/login/oauth2/code/keycloak,http://seller-ui.gateway.com:8000/login/oauth2/code/keycloak,https://asrevo.click/login/oauth2/code/keycloak',
         NULL,
         'openid',
         '{"@class":"java.util.Collections$UnmodifiableMap","settings.client.require-proof-key":false,"settings.client.require-authorization-consent":true}',

@@ -6,10 +6,8 @@ import static org.springframework.security.web.server.util.matcher.ServerWebExch
 
 import com.asrevo.cvhome.s2s.jwt.KeyClockJwtGrantedAuthoritiesConverter;
 import com.nimbusds.jwt.SignedJWT;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
+
+import java.util.*;
 import lombok.SneakyThrows;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,7 +16,6 @@ import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcReactiveOAuth2UserService;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
@@ -53,14 +50,8 @@ public class SecurityConfig {
 	@SneakyThrows
 	private static Set<GrantedAuthority> extractAuthority(OAuth2AccessToken accessToken) {
 		SignedJWT parsed = SignedJWT.parse(accessToken.getTokenValue());
-		@SuppressWarnings("unchecked")
-		Map<String, List<String>> realmAccess = (Map<String, List<String>>) parsed.getPayload()
-			.toJSONObject()
-			.get("realm_access");
-		return KeyClockJwtGrantedAuthoritiesConverter.getRolesAuthorities(realmAccess)
-			.stream()
-			.map(SimpleGrantedAuthority::new)
-			.collect(Collectors.toSet());
+		Map<String, Object> claims = parsed.getPayload().toJSONObject();
+		return KeyClockJwtGrantedAuthoritiesConverter.getGrantedAuthorities(claims);
 	}
 
 	@Bean

@@ -26,7 +26,9 @@ public class SecurityUtils {
 	}
 
 	private static boolean hasRole(Authentication authentication, Roles role) {
-		return authentication.getAuthorities().stream().anyMatch(it -> it.getAuthority().contains(role.name()));
+		return authentication.getAuthorities()
+			.stream()
+			.anyMatch(it -> Objects.requireNonNull(it.getAuthority()).contains(role.name()));
 	}
 
 	public static UserOrgStoreIdentity getOrgStoreIdentity(Authentication authentication) {
