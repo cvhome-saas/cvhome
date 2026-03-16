@@ -30,14 +30,10 @@ public class KeycloakLogoutSuccessHandler {
 	private static String extractLogoutUrl(ServerWebExchange exchange,
 			ClientRegistration.ProviderDetails providerDetails, String idToken) {
 		ServerHttpRequest request = exchange.getRequest();
-		String redirectPath = Optional.ofNullable(exchange.getRequest().getQueryParams().getFirst("redirect_path"))
-			.orElse("");
 		String idTokenHintParam = Optional.ofNullable(idToken).map(it -> "&id_token_hint=" + it).orElse("");
-		String authorizationUri = providerDetails.getAuthorizationUri();
-		String redirectUri = request.getURI().getScheme() + "://" + request.getURI().getAuthority() + "/"
-				+ redirectPath;
-		String logoutPath = "protocol/openid-connect/logout?post_logout_redirect_uri=" + redirectUri + idTokenHintParam;
-		return authorizationUri.replace("protocol/openid-connect/auth", logoutPath);
+		String redirectUri = request.getURI().getScheme() + "://" + request.getURI().getAuthority();
+		String logoutPath = "/connect/logout?post_logout_redirect_uri=" + redirectUri + idTokenHintParam;
+		return providerDetails.getIssuerUri() + logoutPath;
 	}
 
 	public Mono<Void> onLogoutSuccess(ServerWebExchange exchange, Authentication authentication) {
