@@ -1,40 +1,30 @@
 package com.asrevo.cvhome.uaa.service;
 
-import com.asrevo.cvhome.commons.domain.ManagerOrgId;
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
-import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
 import com.asrevo.cvhome.uaa.domain.user.PersistableUser;
 import com.asrevo.cvhome.uaa.domain.user.ReadableUser;
 import com.asrevo.cvhome.uaa.domain.user.ReadableUserList;
 import com.asrevo.cvhome.uaa.domain.user.UserPassword;
 
-import java.security.Principal;
+import java.util.Map;
 
 public interface UserAccountService {
 
-	ReadableUser createOrgUser(ManagerOrgId org, PersistableUser user);
+	ReadableUser createUser(PersistableUser user);
+
+	ReadableUser updateUser(PersistableUser user);
 
 	ReadableUser current(String id);
 
-	ReadableUserList list(Principal principal, UserOrgStoreIdentity identity, ManagerStoreId store);
+	ReadableUserList list(Map<String, String> filters, Integer pageNumber, Integer pageSize);
 
-	ReadableUser createManagedUser(UserOrgStoreIdentity identity, ManagerStoreId store, PersistableUser create);
+	void deleteUser(String userId);
 
-	ReadableUser updateManagedUser(UserOrgStoreIdentity identity, ManagerStoreId store, PersistableUser user);
+	void enableUser(String userId);
 
-	void resetPassword(UserOrgStoreIdentity userOrgStoreInfo, ManagerStoreId store, UserPassword passwordRequestDto,
-			String userId, boolean temporary);
+	void disableUser(String userId);
 
-	boolean usernameExist(String username);
+	ReadableUser findOne(String userId);
 
-	void deleteUser(UserOrgStoreIdentity userOrgStoreInfo, ManagerStoreId store, String userId);
-
-	void enableUser(UserOrgStoreIdentity userOrgStoreInfo, ManagerStoreId store, String userId);
-
-	void disableUser(UserOrgStoreIdentity userOrgStoreInfo, ManagerStoreId store, String userId);
-
-	ReadableUser findOne(UserOrgStoreIdentity identity, String userId);
-
-	void changePassword(ManagerOrgId managerOrgId, UserPassword request);
+	void changePassword(String userId, UserPassword request);
 
 }

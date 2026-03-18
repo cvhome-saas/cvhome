@@ -15,9 +15,8 @@ spring:
 com:
   asrevo:
     cvhome:
-      kc:
-        credentials:
-          server-url: ${com.asrevo.cvhome.services.uaa.schema}://${com.asrevo.cvhome.services.uaa.domain}:${com.asrevo.cvhome.services.uaa.port}
-          realm: cvhome
-          client-id: internal-client
+      uaa:
+        client:
+          client-id: admin-sdk
           client-secret: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
+          base-url: ${com.asrevo.cvhome.services.uaa.schema}://${com.asrevo.cvhome.services.uaa.domain}:${com.asrevo.cvhome.services.uaa.port}

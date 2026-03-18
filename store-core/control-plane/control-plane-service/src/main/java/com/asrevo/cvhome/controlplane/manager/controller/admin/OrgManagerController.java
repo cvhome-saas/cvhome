@@ -59,7 +59,7 @@ public class OrgManagerController {
 	@PostMapping("change-password")
 	@ConditionalOnApiStatus
 	public Mono<Void> changePassword(@RequestParam ManagerOrgId id, @RequestBody UserPassword request) {
-		userAccountService.changePassword(id, request);
+		userAccountService.changePassword(id.toString(), request);
 		return Mono.empty();
 	}
 

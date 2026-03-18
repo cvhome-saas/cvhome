@@ -22,10 +22,11 @@ public class SignupServiceImpl implements SignupService {
 
 	@Override
 	public ReadableUser createOrgUser(CreateOrgRequest request) {
+		ManagerOrgId org = internalOrgService.createOrgForUser(new Email(request.user().getEmailAddress()));
 		request.user().setActive(true);
 		request.user().setUserName(request.user().getEmailAddress());
-		ManagerOrgId org = internalOrgService.createOrgForUser(new Email(request.user().getEmailAddress()));
-		return userAccountService.createOrgUser(org, request.user());
+		request.user().setOrg(org.id().toString());
+		return userAccountService.createUser(request.user());
 	}
 
 }
