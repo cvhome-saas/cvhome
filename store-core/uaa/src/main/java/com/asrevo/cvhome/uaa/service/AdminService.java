@@ -1,5 +1,7 @@
 package com.asrevo.cvhome.uaa.service;
 
+import com.asrevo.cvhome.uaa.exception.ForbiddenOperationException;
+import com.asrevo.cvhome.uaa.exception.UserNotExistException;
 import com.asrevo.cvhome.uaa.domain.Role;
 import com.asrevo.cvhome.uaa.domain.User;
 import com.asrevo.cvhome.uaa.dto.CreateUserRequest;
@@ -58,14 +60,12 @@ public class AdminService {
 		return spec;
 	}
 
-	private User findUser(UUID id, Map<String, String> metadataFilters) {
-		Specification<User> spec = (root, query, cb) -> cb.equal(root.get("id"), id);
-		spec = spec.and(buildSpec(metadataFilters));
-		return userRepository.findOne(spec).orElseThrow(() -> new RuntimeException("Invalid user id " + id));
+	private User findUser(UUID id) {
+		return userRepository.findById(id).orElseThrow(() -> new UserNotExistException("Invalid user id " + id));
 	}
 
-	public UserDto getUser(UUID id, Map<String, String> metadataFilters) {
-		User u = findUser(id, metadataFilters);
+	public UserDto getUser(UUID id) {
+		User u = findUser(id);
 		return new UserDto(u.getId(), u.getUsername(), u.getEmail(), u.getStatus(),
 				u.getRoles().stream().map(Role::getName).collect(toSet()), u.getMetadata());
 	}
@@ -87,19 +87,20 @@ public class AdminService {
 	}
 
 	@Transactional
-	public void assignRoles(UUID userId, Set<String> roleNames, Map<String, String> metadataFilters) {
-		User u = findUser(userId, metadataFilters);
+	public void assignRoles(UUID id, Set<String> roleNames) {
+		User u = getNonSuperAdmin(id);
 		Set<Role> rs = new HashSet<>();
-		for (String rn : roleNames) {
-			rs.add(roleRepository.findByName(rn).orElseGet(() -> roleRepository.save(new Role(rn))));
+		if (roleNames != null) {
+			for (String rn : roleNames) {
+				rs.add(roleRepository.findByName(rn).orElseGet(() -> roleRepository.save(new Role(rn))));
+			}
 		}
-		u.getRoles().clear();
-		u.getRoles().addAll(rs);
+		u.setRoles(rs);
 	}
 
 	@Transactional
-	public UserDto updateUser(UUID userId, UpdateUserRequest req, Map<String, String> metadataFilters) {
-		User u = findUser(userId, metadataFilters);
+	public UserDto updateUser(UUID id, UpdateUserRequest req) {
+		User u = getNonSuperAdmin(id);
 		if (req.status() != null && !req.status().isBlank())
 			u.setStatus(req.status());
 		if (req.metadata() != null) {
@@ -111,16 +112,16 @@ public class AdminService {
 	}
 
 	@Transactional
-	public void removeRoles(UUID userId, Set<String> roleNames, Map<String, String> metadataFilters) {
+	public void removeRoles(UUID id, Set<String> roleNames) {
 		if (roleNames == null || roleNames.isEmpty())
 			return;
-		User u = findUser(userId, metadataFilters);
+		User u = getNonSuperAdmin(id);
 		u.getRoles().removeIf(r -> roleNames.contains(r.getName()));
 	}
 
 	@Transactional
-	public void resetPassword(UUID userId, ResetUserPasswordRequest req, Map<String, String> metadataFilters) {
-		User u = findUser(userId, metadataFilters);
+	public void resetPassword(UUID userId, ResetUserPasswordRequest req) {
+		User u = findUser(userId);
 		if (req.password() != null && !req.password().isBlank()) {
 			u.setPasswordHash(passwordEncoder.encode(req.password()));
 		}
@@ -133,25 +134,28 @@ public class AdminService {
 	}
 
 	@Transactional
-	public void enableUser(UUID id, Map<String, String> metadataFilters) {
-		User u = findUser(id, metadataFilters);
+	public void enableUser(UUID id) {
+		User u = getNonSuperAdmin(id);
 		u.setStatus("ACTIVE");
-		userRepository.save(u);
 	}
 
 	@Transactional
-	public void disableUser(UUID id, Map<String, String> metadataFilters) {
-		User u = findUser(id, metadataFilters);
+	public void disableUser(UUID id) {
+		User u = getNonSuperAdmin(id);
 		u.setStatus("DISABLED");
-		userRepository.save(u);
 	}
 
 	@Transactional
-	public void delete(UUID id, Map<String, String> metadataFilters) {
-		User user = findUser(id, metadataFilters);
+	public void delete(UUID id) {
+		User u = getNonSuperAdmin(id);
+		userRepository.deleteById(u.getId());
+	}
+
+	private User getNonSuperAdmin(UUID id) {
+		User user = findUser(id);
 		if ("super-admin@mail.com".equals(user.getEmail()))
-			throw new RuntimeException("Cannot delete admin user");
-		userRepository.deleteById(id);
+			throw new ForbiddenOperationException("Cannot mutate admin user");
+		return user;
 	}
 
 }

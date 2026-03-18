@@ -46,8 +46,8 @@ public class AdminUserController {
 
 	@PreAuthorize("hasAuthority('SCOPE_super_admin') or hasRole('SUPER_ADMIN')")
 	@GetMapping("/{id}")
-	public UserDto user(@PathVariable UUID id, @RequestParam Map<String, String> allParams) {
-		return adminService.getUser(id, extractMetadataFilters(allParams));
+	public UserDto user(@PathVariable UUID id) {
+		return adminService.getUser(id);
 	}
 
 	@PreAuthorize("hasAuthority('SCOPE_super_admin') or hasRole('SUPER_ADMIN')")
@@ -58,20 +58,20 @@ public class AdminUserController {
 
 	@PreAuthorize("hasAuthority('SCOPE_super_admin') or hasRole('SUPER_ADMIN')")
 	@PostMapping("/{id}/enable")
-	public void enable(@PathVariable UUID id, @RequestParam Map<String, String> allParams) {
-		adminService.enableUser(id, extractMetadataFilters(allParams));
+	public void enable(@PathVariable UUID id) {
+		adminService.enableUser(id);
 	}
 
 	@PreAuthorize("hasAuthority('SCOPE_super_admin') or hasRole('SUPER_ADMIN')")
 	@PostMapping("/{id}/disable")
-	public void disable(@PathVariable UUID id, @RequestParam Map<String, String> allParams) {
-		adminService.disableUser(id, extractMetadataFilters(allParams));
+	public void disable(@PathVariable UUID id) {
+		adminService.disableUser(id);
 	}
 
 	@PreAuthorize("hasAuthority('SCOPE_super_admin') or hasRole('SUPER_ADMIN')")
 	@DeleteMapping("/{id}")
-	public void delete(@PathVariable UUID id, @RequestParam Map<String, String> allParams) {
-		adminService.delete(id, extractMetadataFilters(allParams));
+	public void delete(@PathVariable UUID id) {
+		adminService.delete(id);
 	}
 
 	@PreAuthorize("hasAuthority('SCOPE_super_admin') or hasRole('SUPER_ADMIN')")
@@ -82,30 +82,26 @@ public class AdminUserController {
 
 	@PreAuthorize("hasAuthority('SCOPE_super_admin') or hasRole('SUPER_ADMIN')")
 	@PutMapping("/{id}")
-	public UserDto update(@PathVariable UUID id, @RequestBody UpdateUserRequest req,
-			@RequestParam Map<String, String> allParams) {
-		return adminService.updateUser(id, req, extractMetadataFilters(allParams));
+	public UserDto update(@PathVariable UUID id, @RequestBody UpdateUserRequest req) {
+		return adminService.updateUser(id, req);
 	}
 
 	@PreAuthorize("hasAuthority('SCOPE_super_admin') or hasRole('SUPER_ADMIN')")
 	@PutMapping("/{id}/reset-password")
-	public void resetPassword(@PathVariable UUID id, @RequestBody ResetUserPasswordRequest req,
-			@RequestParam Map<String, String> allParams) {
-		adminService.resetPassword(id, req, extractMetadataFilters(allParams));
+	public void resetPassword(@PathVariable UUID id, @RequestBody ResetUserPasswordRequest req) {
+		adminService.resetPassword(id, req);
 	}
 
 	@PreAuthorize("hasAuthority('SCOPE_super_admin') or hasRole('SUPER_ADMIN')")
 	@PostMapping("/{id}/roles")
-	public void assign(@PathVariable UUID id, @RequestBody Set<String> roles,
-			@RequestParam Map<String, String> allParams) {
-		adminService.assignRoles(id, roles, extractMetadataFilters(allParams));
+	public void assign(@PathVariable UUID id, @RequestBody Set<String> roles) {
+		adminService.assignRoles(id, roles);
 	}
 
 	@PreAuthorize("hasAuthority('SCOPE_super_admin') or hasRole('SUPER_ADMIN')")
 	@PostMapping("/{id}/roles/remove")
-	public void removeRoles(@PathVariable UUID id, @RequestBody Set<String> roles,
-			@RequestParam Map<String, String> allParams) {
-		adminService.removeRoles(id, roles, extractMetadataFilters(allParams));
+	public void removeRoles(@PathVariable UUID id, @RequestBody Set<String> roles) {
+		adminService.removeRoles(id, roles);
 	}
 
 }

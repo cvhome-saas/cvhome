@@ -1,5 +1,7 @@
 package com.asrevo.cvhome.uaa.web;
 
+import com.asrevo.cvhome.uaa.exception.ForbiddenOperationException;
+import com.asrevo.cvhome.uaa.exception.UserNotExistException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -17,6 +19,22 @@ public class GeneralExceptionHandler {
 		ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT,
 				"This resource cannot be deleted because it is in use by another entity.");
 		problemDetail.setTitle("Resource in use");
+		return problemDetail;
+	}
+
+	@ExceptionHandler(UserNotExistException.class)
+	public ProblemDetail handleUserNotExist(UserNotExistException e) {
+		log.warn("User not found: {}", e.getMessage());
+		ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, e.getMessage());
+		problemDetail.setTitle("User Not Found");
+		return problemDetail;
+	}
+
+	@ExceptionHandler(ForbiddenOperationException.class)
+	public ProblemDetail handleForbiddenOperation(ForbiddenOperationException e) {
+		log.warn("Forbidden operation: {}", e.getMessage());
+		ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, e.getMessage());
+		problemDetail.setTitle("Forbidden Operation");
 		return problemDetail;
 	}
 

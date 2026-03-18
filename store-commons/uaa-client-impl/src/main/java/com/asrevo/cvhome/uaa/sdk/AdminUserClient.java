@@ -20,18 +20,6 @@ public class AdminUserClient extends AbstractAdminClient {
 		this.usersApiUrl = baseUrl + "/api/v1/admin/users";
 	}
 
-	private String buildUrl(String baseUrl, Map<String, String> metadataFilters) {
-		StringJoiner sj = new StringJoiner("&", "?", "");
-		if (metadataFilters != null && !metadataFilters.isEmpty()) {
-			for (Map.Entry<String, String> entry : metadataFilters.entrySet()) {
-				String key = URLEncoder.encode("metadata[" + entry.getKey() + "]", StandardCharsets.UTF_8);
-				String value = URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8);
-				sj.add(key + "=" + value);
-			}
-		}
-		return sj.length() > 1 ? baseUrl + sj : baseUrl;
-	}
-
 	public PageResponse<UserDto> listUsers(Map<String, String> metadataFilters, PageRequest pageRequest) {
 		String url = usersApiUrl;
 		StringJoiner sj = new StringJoiner("&", "?", "");
@@ -58,9 +46,8 @@ public class AdminUserClient extends AbstractAdminClient {
 		});
 	}
 
-	public UserDto getUser(UUID id, Map<String, String> metadataFilters) {
-		HttpRequest request = authenticatedRequestBuilder(buildUrl(usersApiUrl + "/" + id, metadataFilters)).GET()
-			.build();
+	public UserDto getUser(String id) {
+		HttpRequest request = authenticatedRequestBuilder(usersApiUrl + "/" + id).GET().build();
 		return sendAndParse(request, UserDto.class);
 	}
 
@@ -72,8 +59,8 @@ public class AdminUserClient extends AbstractAdminClient {
 		return sendAndParse(request, UserDto.class);
 	}
 
-	public UserDto updateUser(UUID id, UpdateUserRequest req, Map<String, String> metadataFilters) {
-		HttpRequest request = authenticatedRequestBuilder(buildUrl(usersApiUrl + "/" + id, metadataFilters))
+	public UserDto updateUser(String id, UpdateUserRequest req) {
+		HttpRequest request = authenticatedRequestBuilder(usersApiUrl + "/" + id)
 			.PUT(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(req)))
 			.header("Content-Type", "application/json")
 			.build();
@@ -86,30 +73,27 @@ public class AdminUserClient extends AbstractAdminClient {
 		return sendAndParse(request, Boolean.class);
 	}
 
-	public void enableUser(UUID id, Map<String, String> metadataFilters) {
-		HttpRequest request = authenticatedRequestBuilder(buildUrl(usersApiUrl + "/" + id + "/enable", metadataFilters))
+	public void enableUser(String id) {
+		HttpRequest request = authenticatedRequestBuilder(usersApiUrl + "/" + id + "/enable")
 			.POST(HttpRequest.BodyPublishers.noBody())
 			.build();
 		sendAndVerify(request);
 	}
 
-	public void disableUser(UUID id, Map<String, String> metadataFilters) {
-		HttpRequest request = authenticatedRequestBuilder(
-				buildUrl(usersApiUrl + "/" + id + "/disable", metadataFilters))
+	public void disableUser(String id) {
+		HttpRequest request = authenticatedRequestBuilder(usersApiUrl + "/" + id + "/disable")
 			.POST(HttpRequest.BodyPublishers.noBody())
 			.build();
 		sendAndVerify(request);
 	}
 
-	public void deleteUser(UUID id, Map<String, String> metadataFilters) {
-		HttpRequest request = authenticatedRequestBuilder(buildUrl(usersApiUrl + "/" + id, metadataFilters)).DELETE()
-			.build();
+	public void deleteUser(String id) {
+		HttpRequest request = authenticatedRequestBuilder(usersApiUrl + "/" + id).DELETE().build();
 		sendAndVerify(request);
 	}
 
-	public void resetPassword(UUID id, String newPassword, Map<String, String> metadataFilters) {
-		HttpRequest request = authenticatedRequestBuilder(
-				buildUrl(usersApiUrl + "/" + id + "/reset-password", metadataFilters))
+	public void resetPassword(String id, String newPassword) {
+		HttpRequest request = authenticatedRequestBuilder(usersApiUrl + "/" + id + "/reset-password")
 			.PUT(HttpRequest.BodyPublishers
 				.ofString(objectMapper.writeValueAsString(new ResetUserPasswordRequest(newPassword))))
 			.header("Content-Type", "application/json")
@@ -117,17 +101,16 @@ public class AdminUserClient extends AbstractAdminClient {
 		sendAndVerify(request);
 	}
 
-	public void assignRoles(UUID id, List<String> roles, Map<String, String> metadataFilters) {
-		HttpRequest request = authenticatedRequestBuilder(buildUrl(usersApiUrl + "/" + id + "/roles", metadataFilters))
+	public void assignRoles(String id, List<String> roles) {
+		HttpRequest request = authenticatedRequestBuilder(usersApiUrl + "/" + id + "/roles")
 			.POST(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(roles)))
 			.header("Content-Type", "application/json")
 			.build();
 		sendAndVerify(request);
 	}
 
-	public void removeRoles(UUID id, List<String> roles, Map<String, String> metadataFilters) {
-		HttpRequest request = authenticatedRequestBuilder(
-				buildUrl(usersApiUrl + "/" + id + "/roles/remove", metadataFilters))
+	public void removeRoles(String id, List<String> roles) {
+		HttpRequest request = authenticatedRequestBuilder(usersApiUrl + "/" + id + "/roles/remove")
 			.POST(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(roles)))
 			.header("Content-Type", "application/json")
 			.build();
