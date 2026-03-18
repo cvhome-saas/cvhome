@@ -9,7 +9,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
-import java.util.UUID;
 
 public class AdminUserClient extends AbstractAdminClient {
 
