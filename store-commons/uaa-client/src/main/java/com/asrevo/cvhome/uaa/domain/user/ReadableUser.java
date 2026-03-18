@@ -22,6 +22,8 @@ public class ReadableUser extends UserEntity implements Serializable {
 
 	private String loginTime;
 
+	private String org;
+
 	private String store;
 
 	private String userName;

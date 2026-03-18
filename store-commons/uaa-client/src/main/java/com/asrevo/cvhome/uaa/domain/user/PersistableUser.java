@@ -22,6 +22,8 @@ public class PersistableUser extends UserEntity implements Serializable {
 
 	private String repeatPassword;
 
+	private String org;
+
 	private String store;
 
 	private String userName;
