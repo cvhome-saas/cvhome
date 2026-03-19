@@ -17,8 +17,8 @@ public class SecurityUtils {
 		return hasRole(authentication, Roles.ROLE_SUPER_ADMIN);
 	}
 
-	private static boolean hasMicroServiceRole(Authentication authentication) {
-		return hasRole(authentication, Roles.ROLE_MICROSERVICE);
+	private static boolean hasScopeInternal(Authentication authentication) {
+		return hasRole(authentication, Roles.SCOPE_INTERNAL);
 	}
 
 	private static boolean hasOrgAdminRole(Authentication authentication) {
@@ -41,7 +41,7 @@ public class SecurityUtils {
 		if (hasSuperAdminRole(authentication)) {
 			return new UserOrgStoreIdentity(null, "*", roles);
 		}
-		else if (hasMicroServiceRole(authentication)) {
+		else if (hasScopeInternal(authentication)) {
 			return new UserOrgStoreIdentity(null, "*", roles);
 		}
 		else if (hasOrgAdminRole(authentication)) {

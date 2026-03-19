@@ -33,8 +33,8 @@ public class StoreSecurityServiceImpl implements StoreSecurityService {
 		return hasRole(authentication, Roles.ROLE_STORE_MODERATOR);
 	}
 
-	private static boolean hasMicroServiceRole(Authentication authentication) {
-		return hasRole(authentication, Roles.ROLE_MICROSERVICE);
+	private static boolean hasScopeInternal(Authentication authentication) {
+		return hasRole(authentication, Roles.SCOPE_INTERNAL);
 	}
 
 	private static boolean hasRole(Authentication authentication, Roles role) {
@@ -89,7 +89,7 @@ public class StoreSecurityServiceImpl implements StoreSecurityService {
 
 	@Override
 	public boolean isMicroService(Authentication authentication, ManagerStoreId requestedStoreId) {
-		if (!hasMicroServiceRole(authentication)) {
+		if (!hasScopeInternal(authentication)) {
 			log.debug("User {} does not have micro service role with roles {}", authentication.getName(),
 					StoreSecurityService.getRoles(authentication));
 			return false;
