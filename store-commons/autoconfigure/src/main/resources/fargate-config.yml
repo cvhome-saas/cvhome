@@ -35,3 +35,7 @@ spring:
           discovery:
             locator:
               enabled: false
+logging:
+  level:
+    com:
+      asrevo: DEBUG

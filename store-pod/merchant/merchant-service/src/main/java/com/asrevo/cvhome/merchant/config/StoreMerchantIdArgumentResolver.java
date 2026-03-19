@@ -3,9 +3,15 @@ package com.asrevo.cvhome.merchant.config;
 import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.s2s.services.AccessEvaluator;
+import com.asrevo.cvhome.s2s.services.StoreSecurityService;
 import com.asrevo.cvhome.store.controller.exception.UnauthorizedException;
+
+import java.util.Objects;
 import java.util.Optional;
+
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.NonNull;
 import org.springframework.core.MethodParameter;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,6 +23,7 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
 @Component
+@Slf4j
 public class StoreMerchantIdArgumentResolver implements HandlerMethodArgumentResolver {
 
 	public static final String REQUEST_PARAMETER_STORE = "store";
@@ -33,7 +40,7 @@ public class StoreMerchantIdArgumentResolver implements HandlerMethodArgumentRes
 	}
 
 	@Override
-	public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
+	public Object resolveArgument(@NonNull MethodParameter parameter, ModelAndViewContainer mavContainer,
 			NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
 		String storeCode = Optional.ofNullable(webRequest.getParameter(REQUEST_PARAMETER_STORE))
 			.filter(StringUtils::isNotBlank)
@@ -41,8 +48,14 @@ public class StoreMerchantIdArgumentResolver implements HandlerMethodArgumentRes
 
 		if (isSecuredResource(webRequest)) {
 			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+			if (Objects.isNull(authentication)) {
+				log.debug("Non-authenticated user tried to access store {}", storeCode);
+				throw new UnauthorizedException("Cannot authorize non-authenticated user for store " + storeCode);
+			}
 			boolean hasAccess = accessEvaluator.hasAccessOnStoreFindOne(authentication, new ManagerStoreId(storeCode));
 			if (!hasAccess) {
+				log.debug("User {} does not have access on store {} with roles {}", authentication.getName(), storeCode,
+						StoreSecurityService.getRoles(authentication));
 				throw new UnauthorizedException("Cannot authorize user for store " + storeCode);
 			}
 		}
