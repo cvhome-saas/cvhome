@@ -8,9 +8,11 @@ import com.asrevo.cvhome.commons.domain.Roles;
 import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
 import java.util.function.Function;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 
 @AllArgsConstructor
+@Slf4j
 public class StoreSecurityServiceImpl implements StoreSecurityService {
 
 	private final Function<ManagerStoreId, ManagerOrgId> getOwnerForStore;
@@ -36,7 +38,7 @@ public class StoreSecurityServiceImpl implements StoreSecurityService {
 	}
 
 	private static boolean hasRole(Authentication authentication, Roles role) {
-		return authentication.getAuthorities().stream().anyMatch(it -> it.getAuthority().contains(role.name()));
+		return StoreSecurityService.getRoles(authentication).stream().anyMatch(it -> it.contains(role.name()));
 	}
 
 	@Override
@@ -56,10 +58,14 @@ public class StoreSecurityServiceImpl implements StoreSecurityService {
 	@Override
 	public boolean isStoreAdmin(Authentication authentication, ManagerStoreId requestedStoreId) {
 		if (!hasStoreAdminRole(authentication)) {
+			log.debug("User {} does not have store admin role with roles {}", authentication.getName(),
+					StoreSecurityService.getRoles(authentication));
 			return false;
 		}
 		UserOrgStoreIdentity identity = getOrgStoreIdentity(authentication);
 		if (!requestedStoreId.getId().toString().equals(identity.store())) {
+			log.debug("User {} does not have store admin role with roles {}", authentication.getName(),
+					StoreSecurityService.getRoles(authentication));
 			return false;
 		}
 		return getOwnerForStore.apply((requestedStoreId)).equals(identity.org());
@@ -68,10 +74,14 @@ public class StoreSecurityServiceImpl implements StoreSecurityService {
 	@Override
 	public boolean isStoreModerator(Authentication authentication, ManagerStoreId requestedStoreId) {
 		if (!hasStoreModeratorRole(authentication)) {
+			log.debug("User {} does not have store moderator role with roles {}", authentication.getName(),
+					StoreSecurityService.getRoles(authentication));
 			return false;
 		}
 		UserOrgStoreIdentity identity = getOrgStoreIdentity(authentication);
 		if (!requestedStoreId.getId().toString().equals(identity.store())) {
+			log.debug("User {} does not have store moderator role with roles {}", authentication.getName(),
+					StoreSecurityService.getRoles(authentication));
 			return false;
 		}
 		return getOwnerForStore.apply((requestedStoreId)).equals(identity.org());
@@ -80,6 +90,8 @@ public class StoreSecurityServiceImpl implements StoreSecurityService {
 	@Override
 	public boolean isMicroService(Authentication authentication, ManagerStoreId requestedStoreId) {
 		if (!hasMicroServiceRole(authentication)) {
+			log.debug("User {} does not have micro service role with roles {}", authentication.getName(),
+					StoreSecurityService.getRoles(authentication));
 			return false;
 		}
 		return true;
