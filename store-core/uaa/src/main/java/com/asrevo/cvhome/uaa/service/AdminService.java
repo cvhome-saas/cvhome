@@ -45,7 +45,7 @@ public class AdminService {
 	}
 
 	private Specification<User> buildSpec(Map<String, String> metadataFilters) {
-		Specification<User> spec = (root, query, cb) -> cb.conjunction();
+		Specification<User> spec = (_, _, cb) -> cb.conjunction();
 		if (metadataFilters != null) {
 			for (Map.Entry<String, String> entry : metadataFilters.entrySet()) {
 				if (entry.getKey() != null && entry.getValue() != null) {
@@ -79,25 +79,24 @@ public class AdminService {
 			u.getMetadata().putAll(req.metadata());
 		}
 		User saved = userRepository.save(u);
-		return new UserDto(saved.getId(), saved.getUsername(), saved.getEmail(), saved.getFirstName(),
-				saved.getLastName(), saved.isEnabled(), saved.getRoles().stream().map(Role::getName).collect(toSet()),
-				saved.getMetadata());
-
+		if (req.roles() != null && !req.roles().isEmpty()) {
+			assignRoles(saved.getId(), req.roles());
+		}
+		return getUser(saved.getId());
 	}
 
 	@Transactional
 	public void assignRoles(UUID id, Set<String> roleNames) {
 		User u = getNonSuperAdmin(id);
-		Set<Role> rs = new HashSet<>();
 		var assignableRoles = getAssignableRoles();
 		if (roleNames != null) {
 			for (String rn : roleNames) {
 				if (!assignableRoles.contains(rn))
 					continue;
-				rs.add(roleRepository.findByName(rn).orElseGet(() -> roleRepository.save(new Role(rn))));
+				Role role = roleRepository.findByName(rn).orElseGet(() -> roleRepository.save(new Role(rn)));
+				u.getRoles().add(role);
 			}
 		}
-		u.setRoles(rs);
 	}
 
 	@Transactional
@@ -112,10 +111,12 @@ public class AdminService {
 		if (req.metadata() != null) {
 			u.getMetadata().putAll(req.metadata());
 		}
+		if (req.roles() != null) {
+			u.getRoles().clear();
+			assignRoles(u.getId(), req.roles());
+		}
 		User saved = userRepository.save(u);
-		return new UserDto(saved.getId(), saved.getUsername(), saved.getEmail(), saved.getFirstName(),
-				saved.getLastName(), saved.isEnabled(), saved.getRoles().stream().map(Role::getName).collect(toSet()),
-				saved.getMetadata());
+		return getUser(saved.getId());
 	}
 
 	@Transactional

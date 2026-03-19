@@ -9,6 +9,8 @@ import com.asrevo.cvhome.uaa.domain.user.UserPassword;
 import org.springframework.data.domain.Pageable;
 import reactor.core.publisher.Mono;
 
+import java.util.Set;
+
 public interface ManagedUserAccountService {
 
 	ReadableUser findOne(String id);
@@ -29,5 +31,7 @@ public interface ManagedUserAccountService {
 	Mono<Void> enableUser(UserOrgStoreIdentity identity, ManagerStoreId store, String userId);
 
 	Mono<Void> disableUser(UserOrgStoreIdentity identity, ManagerStoreId store, String userId);
+
+	Mono<Set<String>> getAssignableRoles();
 
 }

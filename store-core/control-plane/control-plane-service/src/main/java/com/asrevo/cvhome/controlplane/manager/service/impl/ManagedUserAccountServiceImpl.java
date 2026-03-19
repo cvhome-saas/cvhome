@@ -17,6 +17,7 @@ import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
 import java.util.Map;
+import java.util.Set;
 
 @Service
 @AllArgsConstructor
@@ -103,6 +104,11 @@ public class ManagedUserAccountServiceImpl implements ManagedUserAccountService 
 			validateUserAccess(identity, store, user);
 			userAccountService.disableUser(userId);
 		});
+	}
+
+	@Override
+	public Mono<Set<String>> getAssignableRoles() {
+		return Mono.fromCallable(userAccountService::getAssignableRoles);
 	}
 
 	private void validateUserAccess(UserOrgStoreIdentity identity, ManagerStoreId store, ReadableUser user) {

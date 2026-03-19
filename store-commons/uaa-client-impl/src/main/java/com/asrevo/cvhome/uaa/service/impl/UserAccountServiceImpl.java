@@ -10,6 +10,7 @@ import com.asrevo.cvhome.uaa.service.UserAccountService;
 import lombok.AllArgsConstructor;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 public class UserAccountServiceImpl implements UserAccountService {
@@ -23,6 +24,7 @@ public class UserAccountServiceImpl implements UserAccountService {
 			.username(user.getUserName())
 			.firstName(user.getFirstName())
 			.lastName(user.getLastName())
+			.roles(user.getRoles())
 			.metadata(extractMetadata(user))
 			.build());
 
@@ -36,8 +38,10 @@ public class UserAccountServiceImpl implements UserAccountService {
 					.firstName(user.getFirstName())
 					.lastName(user.getLastName())
 					.enabled(user.isActive())
+					.roles(user.getRoles())
 					.metadata(extractMetadata(user))
 					.build());
+
 		return toReadableUser(updatedUser);
 	}
 
@@ -62,6 +66,7 @@ public class UserAccountServiceImpl implements UserAccountService {
 		readableUser.setOrg((String) u.metadata().getOrDefault("org", null));
 		readableUser.setStore((String) u.metadata().getOrDefault("store", null));
 		readableUser.setActive(u.enabled());
+		readableUser.setRoles(u.roles());
 		return readableUser;
 	}
 
@@ -109,7 +114,11 @@ public class UserAccountServiceImpl implements UserAccountService {
 
 	@Override
 	public Set<String> getAssignableRoles() {
-		return client.getAssignableRoles();
+		Set<String> reservedRoles = Set.of("USER", "ORG_ADMIN");
+		return client.getAssignableRoles()
+			.stream()
+			.filter(it -> !reservedRoles.contains(it))
+			.collect(Collectors.toSet());
 	}
 
 }

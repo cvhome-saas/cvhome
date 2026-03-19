@@ -3,8 +3,9 @@ package com.asrevo.cvhome.uaa.sdk.dto;
 import lombok.Builder;
 
 import java.util.Map;
+import java.util.Set;
 
 @Builder
-public record CreateUserRequest(String username, String email, String firstName, String lastName,
+public record CreateUserRequest(String username, String email, String firstName, String lastName, Set<String> roles,
 		Map<String, String> metadata) {
 }

@@ -20,8 +20,8 @@ export class UserFormComponent implements OnInit {
   @Input() action: string = 'CREATE';
   @Input() store: string = '';
   @Input() user: User;
-  allGroups: string[] = [];
-  groups = [];
+  allRoles: string[] = [];
+  roles = [];
   pwdPattern = '^(?=[^A-Z]*[A-Z])(?=[^a-z]*[a-z])(?=[^0-9]*[0-9]).{6,12}$';
   emailPattern = '^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$';
   selectedItem = '0';
@@ -64,22 +64,22 @@ export class UserFormComponent implements OnInit {
     return this.form.get('repeatPassword');
   }
 
-  get userGroups() {
-    return this.form.get('groups');
+  get userRoles() {
+    return this.form.get('roles');
   }
 
   ngOnInit() {
-    this.userService.groups()
+    this.userService.roles()
       .subscribe({
         next: (it) => {
-          this.allGroups = it;
+          this.allRoles = it;
           if (this.action == 'CREATE') {
-            this.groups = this.allGroups.map(it => {
+            this.roles = this.allRoles.map(it => {
               return {name: it, checked: false}
             });
           } else {
-            this.groups = this.allGroups.map(name => {
-              const checked = this.user.groups.filter(it => it.name == name).length > 0
+            this.roles = this.allRoles.map(name => {
+              const checked = this.user.roles.includes(name)
               return {name, checked}
             });
           }
@@ -148,7 +148,7 @@ export class UserFormComponent implements OnInit {
       repeatPassword: '',
       emailAddress: this.user.emailAddress,
       active: this.user.active,
-      groups: [...this.user.groups],
+      roles: [...this.user.roles],
     });
     this.cdr.detectChanges();
     this.findInvalidControls();
@@ -156,16 +156,16 @@ export class UserFormComponent implements OnInit {
 
   save() {
     this.loader = true;
-    const newGroups = [];
-    this.groups.forEach((el) => {
+    const newRoles = [];
+    this.roles.forEach((el) => {
       if (el.checked) {
-        newGroups.push({name: el.name});
+        newRoles.push(el.name);
       }
     });
-    this.form.patchValue({groups: newGroups});
+    this.form.patchValue({roles: newRoles});
     const userData = this.form.value;
-    if (userData.groups.length === 0) {
-      this.toastr.warning(this.translate.instant('COMMON.ADDINGuser_GROUPS_ERROR'));
+    if (userData.roles.length === 0) {
+      this.toastr.warning(this.translate.instant('COMMON.ADDING_USER_ROLES_ERROR'));
       this.loader = false;
       return;
     }
@@ -215,8 +215,8 @@ export class UserFormComponent implements OnInit {
     this.router.navigate(['pages/user-management/users']);
   }
 
-  checkGroup(name) {
-    this.groups.forEach(it => {
+  checkRole(name) {
+    this.roles.forEach(it => {
       if (it.name == name) {
         it.checked = !it.checked;
       }
@@ -235,7 +235,7 @@ export class UserFormComponent implements OnInit {
       password: new FormControl({value: '', disabled: disabled}),
       repeatPassword: new FormControl({value: '', disabled: disabled}),
       active: new FormControl({value: false, disabled: disabled}),
-      groups: new FormControl({value: [], disabled: disabled}),
+      roles: new FormControl({value: [], disabled: disabled}),
     }, {validators: this.checkPasswords});
   }
 }

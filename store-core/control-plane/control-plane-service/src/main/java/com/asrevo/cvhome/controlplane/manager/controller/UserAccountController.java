@@ -12,6 +12,7 @@ import com.asrevo.cvhome.uaa.domain.user.ReadableUserList;
 import com.asrevo.cvhome.uaa.domain.user.UserPassword;
 import com.asrevo.cvhome.controlplane.manager.service.ManagedUserAccountService;
 import java.security.Principal;
+import java.util.Set;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -52,10 +53,10 @@ public class UserAccountController {
 		return managedUserAccountService.findOne(identity, store, userId);
 	}
 
-	@GetMapping("groups")
+	@GetMapping("assignable-roles")
 	@ConditionalOnApiStatus
-	public Mono<Groups[]> groups() {
-		return Mono.just(Groups.values());
+	public Mono<Set<String>> assignableRoles() {
+		return managedUserAccountService.getAssignableRoles();
 	}
 
 	@PostMapping("create")

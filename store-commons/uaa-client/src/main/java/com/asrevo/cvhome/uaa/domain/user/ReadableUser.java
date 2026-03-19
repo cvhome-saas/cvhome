@@ -1,10 +1,10 @@
 package com.asrevo.cvhome.uaa.domain.user;
 
-import com.asrevo.cvhome.uaa.domain.group.ReadableGroup;
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -30,6 +30,6 @@ public class ReadableUser extends UserEntity implements Serializable {
 
 	private boolean active;
 
-	private List<ReadableGroup> groups = new ArrayList<>();
+	private Set<String> roles = new HashSet<>();
 
 }
