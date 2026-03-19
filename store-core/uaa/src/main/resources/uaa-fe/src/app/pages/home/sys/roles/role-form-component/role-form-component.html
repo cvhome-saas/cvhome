@@ -1,0 +1,28 @@
+<nb-card>
+  <nb-card-header class="d-flex justify-content-between align-items-center">
+    <span>Role</span>
+    <span>{{form.value.id}}</span>
+    <div style="display: flex;gap: 1rem;">
+      <button nbButton ghost status="basic" routerLink="/home/roles">Cancel</button>
+      <button nbButton status="primary" (click)="submit()">
+        <nb-icon icon="plus" style="margin-right: 0.5rem"></nb-icon>
+        Save
+      </button>
+    </div>
+  </nb-card-header>
+  <nb-card-body [formGroup]="form">
+
+    <nb-tabset>
+
+      <nb-tab tabTitle="General">
+        <div class="row">
+          <div class="col-md-6">
+            <label>Name</label>
+            <input nbInput fullWidth formControlName="name" />
+          </div>
+        </div>
+      </nb-tab>
+    </nb-tabset>
+
+  </nb-card-body>
+</nb-card>

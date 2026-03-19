@@ -1,18 +1,18 @@
 package com.asrevo.cvhome.s2s.config.internal;
 
-import com.asrevo.cvhome.s2s.config.security.KeycloakLogoutSuccessHandler;
+import com.asrevo.cvhome.s2s.config.security.UaaLogoutSuccessHandler;
 import com.asrevo.cvhome.s2s.config.security.SecurityContextServerLogoutHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
+import org.springframework.core.env.Environment;
 
 @Configuration
 public class ReactiveGatewaySecurityConfig {
 
 	@Bean
-	public KeycloakLogoutSuccessHandler keycloakLogoutSuccessHandler(
-			ReactiveClientRegistrationRepository reactiveClientRegistrationRepository) {
-		return new KeycloakLogoutSuccessHandler(reactiveClientRegistrationRepository);
+	public UaaLogoutSuccessHandler logoutSuccessHandler(Environment environment) {
+		return new UaaLogoutSuccessHandler(
+				environment.getProperty("spring.security.oauth2.client.provider.uaa.end-session-endpoint"));
 	}
 
 	@Bean

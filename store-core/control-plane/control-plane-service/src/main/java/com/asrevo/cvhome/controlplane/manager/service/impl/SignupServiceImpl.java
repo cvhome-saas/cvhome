@@ -2,8 +2,8 @@ package com.asrevo.cvhome.controlplane.manager.service.impl;
 
 import com.asrevo.cvhome.commons.domain.Email;
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
-import com.asrevo.cvhome.keycloak.domain.user.ReadableUser;
-import com.asrevo.cvhome.keycloak.service.UserAccountService;
+import com.asrevo.cvhome.uaa.domain.user.ReadableUser;
+import com.asrevo.cvhome.uaa.service.UserAccountService;
 import com.asrevo.cvhome.controlplane.manager.dto.CreateOrgRequest;
 import com.asrevo.cvhome.controlplane.manager.service.InternalOrgService;
 import com.asrevo.cvhome.controlplane.manager.service.SignupService;
@@ -22,10 +22,11 @@ public class SignupServiceImpl implements SignupService {
 
 	@Override
 	public ReadableUser createOrgUser(CreateOrgRequest request) {
+		ManagerOrgId org = internalOrgService.createOrgForUser(new Email(request.user().getEmailAddress()));
 		request.user().setActive(true);
 		request.user().setUserName(request.user().getEmailAddress());
-		ManagerOrgId org = internalOrgService.createOrgForUser(new Email(request.user().getEmailAddress()));
-		return userAccountService.createOrgUser(org, request.user());
+		request.user().setOrg(org.id().toString());
+		return userAccountService.createUser(request.user());
 	}
 
 }

@@ -8,10 +8,11 @@ spring:
       client:
         registration:
           s2s:
-            provider: keycloak
+            provider: uaa
             client-id: store@service.store-pod.internal
-            client-secret: TqOdIVML83UNpley1BvQ9nHy6kaB5ZX5
+            client-secret: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
             authorization-grant-type: client_credentials
+            scope: internal
   sql:
     init:
       schema-locations: classpath:init-sql/schema.sql

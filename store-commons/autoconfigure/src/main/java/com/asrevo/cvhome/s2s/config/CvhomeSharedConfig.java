@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Import;
 		IssuerUriSetReactiveJwtDecoderConfiguration.class })
 @EnableConfigurationProperties({ PodInfoProperties.class, ServiceDomainProperties.class, AppProperties.class,
 		CdnProperties.class, StripeProperties.class, StoreProductImageProperties.class, CdnStorageProperties.class,
-		KeycloakCredentialsProperties.class, IssuerUriSetConfigrationProperties.class })
+		IssuerUriSetConfigrationProperties.class })
 public class CvhomeSharedConfig {
 
 }

@@ -45,8 +45,8 @@ export class UserService {
     return this.crudService.get(`/control-plane/api/v1/user-account/find-one?userId=${userId}`);
   }
 
-  groups(): Observable<string[]> {
-    return this.crudService.get(`/control-plane/api/v1/user-account/groups`);
+  roles(): Observable<string[]> {
+    return this.crudService.get(`/control-plane/api/v1/user-account/assignable-roles`);
   }
 
   getUsersList(params): Observable<any> {

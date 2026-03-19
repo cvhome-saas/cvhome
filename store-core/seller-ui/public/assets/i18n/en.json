@@ -185,7 +185,7 @@
     "PASSWORD_ERROR_NOT_VALID": "Password not valid.",
     "PASSWORD_ERROR_RULES": "Should contains at least 1 character lower case, at least 1 character uppercase, at least 1 digit, 6 to 12 characters",
     "ACTIVE": "Active",
-    "GROUPS": "Groups",
+    "ROLES": "Roles",
     "USER_DISABLED": "User Disabled",
     "USER_ENABLED": "User Enabled"
   },
@@ -620,7 +620,7 @@
     "ERROR": "Error",
     "ERROR_CODE": "Error Code",
     "MESSAGE": "Message",
-    "ADDING_USER_GROUPS_ERROR": "User should belongs to at least one group",
+    "ADDING_USER_ROLES_ERROR": "User should belongs to at least one role",
     "CODE": "Code",
     "CODE_REQUIRED": "Сode is required.",
     "NAME_REQUIRED": "Name is required.",

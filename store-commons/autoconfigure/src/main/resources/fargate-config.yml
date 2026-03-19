@@ -6,11 +6,10 @@ spring:
       eager-load:
         clients:
           - "store-core-gateway"
-          - "core-auth"
+          - "uaa"
           - "control-plane"
           - "seller-ui"
           - "store-pod-gateway"
-          - "pod-auth"
           - "merchant"
           - "catalog"
           - "checkout"
@@ -22,11 +21,10 @@ spring:
         enabled: true
         default-port: 8080
         service-ports:
-          "core-auth": 8001
+          "uaa": 8001
           "store-core-gateway": 8000
           "seller-ui": 8010
           "control-plane": 8020
-          "pod-auth": 8101
           "landing-ui": 8110
           "merchant": 8120
           "catalog": 8122
@@ -37,3 +35,7 @@ spring:
           discovery:
             locator:
               enabled: false
+logging:
+  level:
+    com:
+      asrevo: DEBUG

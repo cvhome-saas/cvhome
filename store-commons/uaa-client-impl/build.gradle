@@ -1,0 +1,19 @@
+plugins {
+	alias(libs.plugins.java.library.conventions)
+	alias(libs.plugins.spring.javaformat)
+}
+
+dependencies {
+	compileOnly project(":store-commons:commons")
+	implementation project(":store-commons:uaa-client")
+	implementation libs.jackson.databind
+	implementation libs.jackson.core
+	implementation libs.jackson.annotations
+
+
+	implementation libs.mapstruct
+	compileOnly libs.lombok
+	annotationProcessor libs.mapstruct.processor
+	annotationProcessor libs.lombok
+	annotationProcessor libs.lombok.mapstruct.binding
+}

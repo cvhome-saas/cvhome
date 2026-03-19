@@ -23,7 +23,8 @@ include(
         'store-commons:ecs-commons:fargate-task-info',
         'store-commons:ecs-commons:ecs-service-discoveryclient',
         'store-commons:commons',
-        'store-commons:keycloak-client',
+        'store-commons:uaa-client',
+        'store-commons:uaa-client-impl',
         'store-commons:autoconfigure',
 
         'store-pod:store-pod-saas-gateway',
@@ -47,8 +48,7 @@ include(
         'store-pod:merchant:merchant-service',
         'store-pod:merchant:merchant-external-api',
 
-        "store-core:core-auth:kc-providers",
-        'store-core:core-auth',
+        'store-core:uaa',
         'store-core:gateway:gateway-service',
         'store-core:control-plane:manager-commons',
         'store-core:control-plane:manager-events',

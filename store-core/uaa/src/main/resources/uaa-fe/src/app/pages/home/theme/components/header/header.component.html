@@ -1,0 +1,26 @@
+<div class="header-container">
+  <div>
+    <a (click)="toggleSidebar()" class="sidebar-toggle" href="#">
+      <nb-icon icon="bars"/>
+    </a>
+    <a (click)="navigateHome()" class="logo" href="">seller-ui</a>
+  </div>
+</div>
+
+<div class="header-container">
+
+  <nb-actions size="small">
+    <nb-action>
+      <nb-search type="rotate-layout"></nb-search>
+    </nb-action>
+    <nb-action icon="inbox"></nb-action>
+    <nb-action icon="bell"></nb-action>
+    <nb-action>
+      <nb-user [name]="user?.preferred_username"
+               [nbContextMenu]="userMenu"
+               nbContextMenuTag="user-menu"
+               [picture]="user?.picture">
+      </nb-user>
+    </nb-action>
+  </nb-actions>
+</div>

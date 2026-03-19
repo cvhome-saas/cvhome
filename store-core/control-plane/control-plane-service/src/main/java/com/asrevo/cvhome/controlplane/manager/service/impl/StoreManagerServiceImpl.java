@@ -58,7 +58,7 @@ public class StoreManagerServiceImpl implements StoreManagerService {
 			Pageable pageable) {
 		Page<ManagerStoreDto> internalStores = internalStoreService.findAll(identity, listManagerStoreQuery, pageable);
 		Mono<List<Object>> listMono = Flux.fromIterable(internalStores.getContent())
-			.flatMap(it -> getStore(it.id()))
+			.flatMap(it -> getStore(it.id()).onErrorResume(e -> Mono.empty()))
 			.collectList();
 		return listMono.map(it -> managerStoreMappers.toPage(it, internalStores));
 	}
@@ -67,12 +67,18 @@ public class StoreManagerServiceImpl implements StoreManagerService {
 	public Mono<Object> getStore(ManagerStoreId managerStoreId) {
 		Pod pod = internalStoreService.getStorePod(managerStoreId);
 		MerchantStorePodClient client = podClientFactory.getMerchantStorePodClient(pod.id());
-		Mono<ResponseEntity<Map<String, Object>>> store = client.getStore(managerStoreId.getId().toString());
-		return store.mapNotNull(HttpEntity::getBody).map(it -> {
-			HashMap<String, Object> newIt = new HashMap<>(it);
-			newIt.put("pod", Map.of("id", pod.id().id()));
-			return newIt;
-		}).cast(Object.class);
+		return client.getStore(managerStoreId.getId().toString()).flatMap(response -> {
+			if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+				HashMap<String, Object> newIt = new HashMap<>(response.getBody());
+				newIt.put("pod", Map.of("id", pod.id().id()));
+				return Mono.just((Object) newIt);
+			}
+			String errorMessage = "Failed to fetch store from pod: " + response.getStatusCode();
+			if (response.getBody() != null) {
+				errorMessage += " - Details: " + response.getBody();
+			}
+			return Mono.error(new RuntimeException(errorMessage));
+		});
 	}
 
 }
