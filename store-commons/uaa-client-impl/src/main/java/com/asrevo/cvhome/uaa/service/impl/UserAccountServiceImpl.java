@@ -27,7 +27,7 @@ public class UserAccountServiceImpl implements UserAccountService {
 			.roles(user.getRoles())
 			.metadata(extractMetadata(user))
 			.build());
-
+		client.resetPassword(createdUser.id().toString(), user.getPassword());
 		return toReadableUser(createdUser);
 	}
 
