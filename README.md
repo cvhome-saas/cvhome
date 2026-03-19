@@ -77,7 +77,6 @@ main documentation site: **https://cvhome-saas.github.io**
 * Spring Data JPA / Hibernate
 * Postgres SQL
 * Gradle
-* Keycloak
 
 **Frontend:**
 

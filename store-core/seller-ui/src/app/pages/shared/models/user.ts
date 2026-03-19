@@ -3,7 +3,7 @@ export class User {
   active: boolean;
   emailAddress: string;
   firstName: string;
-  groups: any[];
+  roles: any[];
   lastName: string;
   userName: string;
 }

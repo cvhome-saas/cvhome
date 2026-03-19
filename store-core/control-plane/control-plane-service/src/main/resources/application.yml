@@ -8,16 +8,16 @@ spring:
       client:
         registration:
           s2s:
-            provider: keycloak
+            provider: uaa
             client-id: control-plane@service.store-core.internal
-            client-secret: VobDxIhAGZz8hyhzz7p9G7QpfixjFjzW
+            client-secret: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
             authorization-grant-type: client_credentials
+            scope: internal
 com:
   asrevo:
     cvhome:
-      kc:
-        credentials:
-          server-url: ${com.asrevo.cvhome.services.core-auth.schema}://${com.asrevo.cvhome.services.core-auth.domain}:${com.asrevo.cvhome.services.core-auth.port}
-          realm: cvhome
-          client-id: internal-client
-          client-secret: aKl0AKjjQ6zp2bnWhKOsnTOzl3J8Vqd0
+      uaa:
+        client:
+          client-id: admin-sdk
+          client-secret: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
+          base-url: ${com.asrevo.cvhome.services.uaa.schema}://${com.asrevo.cvhome.services.uaa.domain}:${com.asrevo.cvhome.services.uaa.port}

@@ -8,12 +8,12 @@ spring:
       client:
         simple:
           instances:
-            core-auth:
+            uaa:
               - uri: "http://localhost:8001"
-                instance-id: core-auth-1
+                instance-id: uaa-1
                 metadata:
-                  service-name: core-auth
-                  instance: core-auth-1
+                  service-name: uaa
+                  instance: uaa-1
             control-plane:
               - uri: "http://localhost:8020"
                 instance-id: control-plane-1
@@ -32,12 +32,6 @@ spring:
                 metadata:
                   service-name: store-core-gateway
                   instance: store-core-gateway-1
-            pod-auth:
-              - uri: "http://localhost:8101"
-                instance-id: pod-auth-1
-                metadata:
-                  service-name: pod-auth
-                  instance: pod-auth-1
             merchant:
               - uri: "http://localhost:8120"
                 instance-id: merchant-1
@@ -68,3 +62,7 @@ spring:
           discovery:
             locator:
               enabled: false
+logging:
+  level:
+    com:
+      asrevo: DEBUG

@@ -76,6 +76,7 @@ dependencies {
 	testImplementation libs.testcontainers.postgresql
 	testImplementation libs.testcontainers.minio
 	testImplementation libs.hamcrest.record
+	testRuntimeOnly libs.junit.platform.launcher
 }
 
 dependencyManagement {

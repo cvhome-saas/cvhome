@@ -137,12 +137,12 @@
 
       <div class="form-group">
         <label class="col-sm-3 col-form-label ">
-          {{ 'USER_FORM.GROUPS' | translate }} *
+          {{ 'USER_FORM.ROLES' | translate }} *
         </label>
         <div class="col-sm-12 group-block">
-          <nb-checkbox [disabled]="action=='VIEW'" *ngFor="let group of groups" [checked]="group.checked"
-                       (change)="checkGroup(group.name)">
-            {{ group.name }}
+          <nb-checkbox [disabled]="action=='VIEW'" *ngFor="let role of roles" [checked]="role.checked"
+                       (change)="checkRole(role.name)">
+            {{ role.name }}
           </nb-checkbox>
         </div>
       </div>

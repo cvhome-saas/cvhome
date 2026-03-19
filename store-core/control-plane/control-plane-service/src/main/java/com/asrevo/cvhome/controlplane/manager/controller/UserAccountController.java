@@ -6,16 +6,17 @@ import com.asrevo.cvhome.commons.annotation.OrgStorePrincipalInfo;
 import com.asrevo.cvhome.commons.domain.Groups;
 import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
-import com.asrevo.cvhome.keycloak.domain.user.PersistableUser;
-import com.asrevo.cvhome.keycloak.domain.user.ReadableUser;
-import com.asrevo.cvhome.keycloak.domain.user.ReadableUserList;
-import com.asrevo.cvhome.keycloak.domain.user.UserPassword;
-import com.asrevo.cvhome.keycloak.service.UserAccountService;
-import com.asrevo.cvhome.controlplane.manager.commons.dto.ManagerStoreDto;
-import com.asrevo.cvhome.controlplane.manager.service.InternalStoreService;
+import com.asrevo.cvhome.uaa.domain.user.PersistableUser;
+import com.asrevo.cvhome.uaa.domain.user.ReadableUser;
+import com.asrevo.cvhome.uaa.domain.user.ReadableUserList;
+import com.asrevo.cvhome.uaa.domain.user.UserPassword;
+import com.asrevo.cvhome.controlplane.manager.service.ManagedUserAccountService;
 import java.security.Principal;
+import java.util.Set;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -27,37 +28,35 @@ import reactor.core.publisher.Mono;
 @AllArgsConstructor
 public class UserAccountController {
 
-	public final InternalStoreService internalStoreService;
-
-	private final UserAccountService userAccountService;
+	private final ManagedUserAccountService managedUserAccountService;
 
 	@GetMapping("current")
 	@ConditionalOnApiStatus
 	public Mono<ReadableUser> current(@AuthenticationPrincipal Principal principal) {
-		return Mono.just(userAccountService.current(principal.getName()));
+		return Mono.just(managedUserAccountService.findOne(principal.getName()));
 	}
 
 	@GetMapping("list")
 	@PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE.USERS.LIST')")
 	@ConditionalOnApiStatus
 	public Mono<ReadableUserList> list(@AuthenticationPrincipal Principal principal,
-			@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store) {
-		UserOrgStoreIdentity impersonateIdentity = createImpersonateIdentity(identity, store, "list-users");
-		return Mono.just(userAccountService.list(principal, impersonateIdentity, store));
+			@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store,
+			Pageable pageable) {
+		return managedUserAccountService.list(identity, store, pageable);
 	}
 
 	@GetMapping("find-one")
 	// @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE.USERS.LIST')")
 	@ConditionalOnApiStatus
 	public Mono<ReadableUser> findOne(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
-			@RequestParam String userId) {
-		return Mono.just(userAccountService.findOne(identity, userId));
+			@RequestParam ManagerStoreId store, @RequestParam String userId) {
+		return managedUserAccountService.findOne(identity, store, userId);
 	}
 
-	@GetMapping("groups")
+	@GetMapping("assignable-roles")
 	@ConditionalOnApiStatus
-	public Mono<Groups[]> groups() {
-		return Mono.just(Groups.values());
+	public Mono<Set<String>> assignableRoles() {
+		return managedUserAccountService.getAssignableRoles();
 	}
 
 	@PostMapping("create")
@@ -65,8 +64,7 @@ public class UserAccountController {
 	@ConditionalOnApiStatus
 	public Mono<ReadableUser> create(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
 			@RequestParam ManagerStoreId store, @RequestBody PersistableUser user) {
-		identity = createImpersonateIdentity(identity, store, "create-user");
-		return Mono.just(userAccountService.createManagedUser(identity, store, user));
+		return managedUserAccountService.createUser(identity, store, user);
 	}
 
 	@PutMapping("update")
@@ -74,8 +72,7 @@ public class UserAccountController {
 	@ConditionalOnApiStatus
 	public Mono<ReadableUser> update(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
 			@RequestParam ManagerStoreId store, @RequestBody PersistableUser user) {
-		UserOrgStoreIdentity impersonateIdentity = createImpersonateIdentity(identity, store, "update-user");
-		return Mono.just(userAccountService.updateManagedUser(impersonateIdentity, store, user));
+		return managedUserAccountService.updateUser(identity, store, user);
 		//
 		// {"firstName":"12313","lastName":"55555","userName":"org1-store1-moderator","emailAddress":"sfds@dfsf.vv","password":"","repeatPassword":"","active":true,"groups":[{"name":"STORE_MODERATOR"}],"id":"3dea29fd-f6b2-48b1-8231-f4b5f1c68715"}
 	}
@@ -83,10 +80,10 @@ public class UserAccountController {
 	@PostMapping("reset")
 	@PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE.USERS.RESET_PASSWORD')")
 	@ConditionalOnApiStatus(usage = ApiUsage.NOT_USED)
-	public void resetPassword(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store,
-			@RequestParam String userId, @RequestBody UserPassword passwordRequestDto) {
-		identity = createImpersonateIdentity(identity, store, "reset-user-password");
-		userAccountService.resetPassword(identity, store, passwordRequestDto, userId, false);
+	public Mono<Void> resetPassword(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
+			@RequestParam ManagerStoreId store, @RequestParam String userId,
+			@RequestBody UserPassword passwordRequestDto) {
+		return managedUserAccountService.resetPassword(identity, store, userId, passwordRequestDto);
 	}
 
 	@DeleteMapping("delete")
@@ -94,42 +91,23 @@ public class UserAccountController {
 	@ConditionalOnApiStatus
 	public Mono<Void> delete(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store,
 			@RequestParam String userId) {
-		identity = createImpersonateIdentity(identity, store, "delete-user");
-		userAccountService.deleteUser(identity, store, userId);
-		return Mono.empty();
+		return managedUserAccountService.deleteUser(identity, store, userId);
 	}
 
 	@PostMapping("enable")
 	@PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE.USERS.ENABLE')")
 	@ConditionalOnApiStatus
-	public Mono<Object> enable(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store,
+	public Mono<Void> enable(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store,
 			@RequestParam String userId) {
-		identity = createImpersonateIdentity(identity, store, "enable-user");
-		userAccountService.enableUser(identity, store, userId);
-		return Mono.empty();
+		return managedUserAccountService.enableUser(identity, store, userId);
 	}
 
 	@PostMapping("disable")
 	@PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE.USERS.DISABLE')")
 	@ConditionalOnApiStatus
-	public Mono<Object> disable(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
-			@RequestParam ManagerStoreId store, @RequestParam String userId) {
-		identity = createImpersonateIdentity(identity, store, "disable-user");
-		userAccountService.disableUser(identity, store, userId);
-		return Mono.empty();
-	}
-
-	private UserOrgStoreIdentity createImpersonateIdentity(UserOrgStoreIdentity identity, ManagerStoreId store,
-			String action) {
-		if (identity.isSuperAdmin()) {
-			ManagerStoreDto s = internalStoreService.findStore(store);
-			log.info("Impersonating user {} for action {} to org {} with store {}", identity, action, s.orgId(),
-					s.id().id().toString());
-			return new UserOrgStoreIdentity(s.orgId(), s.id().id().toString(), identity.roles());
-		}
-		else {
-			return identity;
-		}
+	public Mono<Void> disable(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store,
+			@RequestParam String userId) {
+		return managedUserAccountService.disableUser(identity, store, userId);
 	}
 
 }

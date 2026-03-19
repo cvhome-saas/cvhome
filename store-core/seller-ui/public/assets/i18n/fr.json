@@ -185,7 +185,7 @@
     "PASSWORD_ERROR_NOT_VALID": "Mot de passe non valide.",
     "PASSWORD_ERROR_RULES": "Doit contenir au moins 1 caractère minuscule, au moins 1 caractère majuscule, au moins 1 chiffre, 6 à 12 caractères",
     "ACTIVE": "Actif",
-    "GROUPS": "Groupes",
+    "ROLES": "Roles",
     "USER_DISABLED": "Utilisateur désactivé",
     "USER_ENABLED": "Utilisateur activé"
   },
@@ -573,7 +573,7 @@
     "COMPANY": "Entreprise",
     "DEFAULT_LANGUAGE": "Langue par défaut",
     "SELECT_LANGUAGE": "Sélectionner la langue",
-    "GROUPS": "Groupes",
+    "ROLES": "Roles",
     "DETAILS": "Détails du client"
   },
   "NOT_FOUND": {

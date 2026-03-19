@@ -4,7 +4,7 @@ import com.asrevo.cvhome.commons.domain.ManagerOrgId;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
 import com.asrevo.cvhome.merchant.model.merchant.ReadableMerchantStore;
-import com.asrevo.cvhome.s2s.jwt.KeyClockJwtGrantedAuthoritiesConverter;
+import com.asrevo.cvhome.s2s.jwt.UaaJwtGrantedAuthoritiesConverter;
 import com.asrevo.cvhome.s2s.services.AccessEvaluator;
 import com.asrevo.cvhome.s2s.services.AccessEvaluatorImpl;
 import com.asrevo.cvhome.s2s.services.StoreSecurityServiceImpl;
@@ -21,13 +21,9 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
 	@Bean
-	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		http.authorizeHttpRequests(it -> it.requestMatchers("/api/v1/test/sign")
-			.permitAll()
-			.requestMatchers("/api/*/private/**")
-			.authenticated()
-			.anyRequest()
-			.permitAll())
+	SecurityFilterChain filterChain(HttpSecurity http) {
+		http.authorizeHttpRequests(
+				it -> it.requestMatchers("/api/*/private/**").authenticated().anyRequest().permitAll())
 			.oauth2ResourceServer(it -> it.jwt(Customizer.withDefaults()))
 			.csrf(AbstractHttpConfigurer::disable);
 		return http.build();
@@ -36,8 +32,8 @@ public class SecurityConfig {
 	@Bean
 	public JwtAuthenticationConverter converter() {
 		JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
-		KeyClockJwtGrantedAuthoritiesConverter keyClockJwtGrantedAuthoritiesConverter = new KeyClockJwtGrantedAuthoritiesConverter();
-		jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(keyClockJwtGrantedAuthoritiesConverter);
+		UaaJwtGrantedAuthoritiesConverter uaaJwtGrantedAuthoritiesConverter = new UaaJwtGrantedAuthoritiesConverter();
+		jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(uaaJwtGrantedAuthoritiesConverter);
 		return jwtAuthenticationConverter;
 	}
 

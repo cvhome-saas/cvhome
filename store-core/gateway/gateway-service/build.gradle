@@ -48,6 +48,7 @@ dependencies {
 	testImplementation libs.reactor.test
 	testImplementation libs.spring.boot.testcontainers
 	testImplementation libs.testcontainers.junit.jupiter
+	testRuntimeOnly libs.junit.platform.launcher
 }
 
 dependencyManagement {
