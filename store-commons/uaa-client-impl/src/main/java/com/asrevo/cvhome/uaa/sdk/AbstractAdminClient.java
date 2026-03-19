@@ -41,6 +41,17 @@ public abstract class AbstractAdminClient {
 		}
 	}
 
+	protected <T> T sendAndParse(HttpRequest request, TypeReference<T> responseType) {
+		try {
+			HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+			verifyResponse(response);
+			return objectMapper.readValue(response.body(), responseType);
+		}
+		catch (IOException | InterruptedException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	protected <T> PageResponse<T> sendAndParsePage(HttpRequest request, TypeReference<PageResponse<T>> typeReference) {
 		try {
 			HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());

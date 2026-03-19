@@ -9,9 +9,7 @@ import com.asrevo.cvhome.uaa.sdk.dto.*;
 import com.asrevo.cvhome.uaa.service.UserAccountService;
 import lombok.AllArgsConstructor;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @AllArgsConstructor
 public class UserAccountServiceImpl implements UserAccountService {
@@ -107,6 +105,11 @@ public class UserAccountServiceImpl implements UserAccountService {
 	@Override
 	public void changePassword(String userId, UserPassword request) {
 		client.resetPassword(userId, request.getChangePassword());
+	}
+
+	@Override
+	public Set<String> getAssignableRoles() {
+		return client.getAssignableRoles();
 	}
 
 }

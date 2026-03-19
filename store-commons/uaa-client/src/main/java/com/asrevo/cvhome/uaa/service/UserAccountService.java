@@ -6,6 +6,7 @@ import com.asrevo.cvhome.uaa.domain.user.ReadableUserList;
 import com.asrevo.cvhome.uaa.domain.user.UserPassword;
 
 import java.util.Map;
+import java.util.Set;
 
 public interface UserAccountService {
 
@@ -26,5 +27,7 @@ public interface UserAccountService {
 	ReadableUser findOne(String userId);
 
 	void changePassword(String userId, UserPassword request);
+
+	Set<String> getAssignableRoles();
 
 }

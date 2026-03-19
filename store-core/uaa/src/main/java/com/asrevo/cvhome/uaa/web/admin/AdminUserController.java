@@ -104,4 +104,10 @@ public class AdminUserController {
 		adminService.removeRoles(id, roles);
 	}
 
+	@PreAuthorize("hasAuthority('SCOPE_super_admin') or hasRole('SUPER_ADMIN')")
+	@GetMapping("/assignable-roles")
+	public Set<String> assignableRoles() {
+		return adminService.getAssignableRoles();
+	}
+
 }

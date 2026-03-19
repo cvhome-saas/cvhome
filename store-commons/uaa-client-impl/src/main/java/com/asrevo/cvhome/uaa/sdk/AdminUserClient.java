@@ -8,6 +8,7 @@ import java.net.http.HttpRequest;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringJoiner;
 
 public class AdminUserClient extends AbstractAdminClient {
@@ -114,6 +115,12 @@ public class AdminUserClient extends AbstractAdminClient {
 			.header("Content-Type", "application/json")
 			.build();
 		sendAndVerify(request);
+	}
+
+	public Set<String> getAssignableRoles() {
+		HttpRequest request = authenticatedRequestBuilder(usersApiUrl + "/assignable-roles").GET().build();
+		return sendAndParse(request, new TypeReference<>() {
+		});
 	}
 
 }

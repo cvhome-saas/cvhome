@@ -21,11 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.asrevo.cvhome.uaa.repo.UserSpecifications;
 import org.springframework.data.jpa.domain.Specification;
 
-import java.util.Map;
-
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import static java.util.stream.Collectors.toSet;
 
@@ -93,8 +89,11 @@ public class AdminService {
 	public void assignRoles(UUID id, Set<String> roleNames) {
 		User u = getNonSuperAdmin(id);
 		Set<Role> rs = new HashSet<>();
+		var assignableRoles = getAssignableRoles();
 		if (roleNames != null) {
 			for (String rn : roleNames) {
+				if (!assignableRoles.contains(rn))
+					continue;
 				rs.add(roleRepository.findByName(rn).orElseGet(() -> roleRepository.save(new Role(rn))));
 			}
 		}
@@ -164,6 +163,14 @@ public class AdminService {
 		if ("super-admin@mail.com".equals(user.getEmail()))
 			throw new ForbiddenOperationException("Cannot mutate admin user");
 		return user;
+	}
+
+	public Set<String> getAssignableRoles() {
+		return roleRepository.findAll()
+			.stream()
+			.map(Role::getName)
+			.filter(roleName -> !roleName.equals("SUPER_ADMIN"))
+			.collect(toSet());
 	}
 
 }
