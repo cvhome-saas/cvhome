@@ -23,6 +23,8 @@ public class UserAccountServiceImpl implements UserAccountService {
 		var createdUser = client.createUser(CreateUserRequest.builder()
 			.email(user.getEmailAddress())
 			.username(user.getUserName())
+			.firstName(user.getFirstName())
+			.lastName(user.getLastName())
 			.metadata(extractMetadata(user))
 			.build());
 
@@ -33,8 +35,10 @@ public class UserAccountServiceImpl implements UserAccountService {
 	public ReadableUser updateUser(PersistableUser user) {
 		var updatedUser = client.updateUser(user.getId(),
 				UpdateUserRequest.builder()
+					.firstName(user.getFirstName())
+					.lastName(user.getLastName())
+					.enabled(user.isActive())
 					.metadata(extractMetadata(user))
-					.status(user.isActive() ? "ACTIVE" : "DISABLED")
 					.build());
 		return toReadableUser(updatedUser);
 	}
@@ -55,9 +59,11 @@ public class UserAccountServiceImpl implements UserAccountService {
 		readableUser.setId(u.id().toString());
 		readableUser.setEmailAddress(u.email());
 		readableUser.setUserName(u.username());
+		readableUser.setFirstName(u.firstName());
+		readableUser.setLastName(u.lastName());
 		readableUser.setOrg((String) u.metadata().getOrDefault("org", null));
 		readableUser.setStore((String) u.metadata().getOrDefault("store", null));
-		readableUser.setActive(u.status().equals("ACTIVE"));
+		readableUser.setActive(u.enabled());
 		return readableUser;
 	}
 

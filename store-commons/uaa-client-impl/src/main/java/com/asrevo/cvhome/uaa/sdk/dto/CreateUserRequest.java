@@ -5,5 +5,6 @@ import lombok.Builder;
 import java.util.Map;
 
 @Builder
-public record CreateUserRequest(String username, String email, Map<String, String> metadata) {
+public record CreateUserRequest(String username, String email, String firstName, String lastName,
+		Map<String, String> metadata) {
 }

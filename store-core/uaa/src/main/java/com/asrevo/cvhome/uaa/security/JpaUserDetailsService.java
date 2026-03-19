@@ -36,7 +36,7 @@ public class JpaUserDetailsService implements UserDetailsService {
 		return org.springframework.security.core.userdetails.User.withUsername(u.getUsername())
 			.password(u.getPasswordHash())
 			.authorities(authorities)
-			.accountLocked(!"ACTIVE".equalsIgnoreCase(u.getStatus()))
+			.accountLocked(!u.isEnabled())
 			.build();
 	}
 

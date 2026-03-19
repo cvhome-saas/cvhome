@@ -5,5 +5,5 @@ import lombok.Builder;
 import java.util.Map;
 
 @Builder
-public record UpdateUserRequest(String status, Map<String, String> metadata) {
+public record UpdateUserRequest(String firstName, String lastName, Boolean enabled, Map<String, String> metadata) {
 }

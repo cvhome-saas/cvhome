@@ -5,5 +5,6 @@ import jakarta.validation.constraints.NotBlank;
 
 import java.util.Map;
 
-public record CreateUserRequest(@NotBlank String username, @Email String email, Map<String, Object> metadata) {
+public record CreateUserRequest(@NotBlank String username, @Email String email, String firstName, String lastName,
+		Map<String, Object> metadata) {
 }

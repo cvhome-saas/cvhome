@@ -44,8 +44,8 @@ public class AdminService {
 	public Page<UserDto> getUsers(Map<String, String> metadataFilters, Pageable pageable) {
 		Specification<User> spec = buildSpec(metadataFilters);
 		Page<User> all = userRepository.findAll(spec, pageable);
-		return all.map(u -> new UserDto(u.getId(), u.getUsername(), u.getEmail(), u.getStatus(),
-				u.getRoles().stream().map(Role::getName).collect(toSet()), u.getMetadata()));
+		return all.map(u -> new UserDto(u.getId(), u.getUsername(), u.getEmail(), u.getFirstName(), u.getLastName(),
+				u.isEnabled(), u.getRoles().stream().map(Role::getName).collect(toSet()), u.getMetadata()));
 	}
 
 	private Specification<User> buildSpec(Map<String, String> metadataFilters) {
@@ -66,7 +66,7 @@ public class AdminService {
 
 	public UserDto getUser(UUID id) {
 		User u = findUser(id);
-		return new UserDto(u.getId(), u.getUsername(), u.getEmail(), u.getStatus(),
+		return new UserDto(u.getId(), u.getUsername(), u.getEmail(), u.getFirstName(), u.getLastName(), u.isEnabled(),
 				u.getRoles().stream().map(Role::getName).collect(toSet()), u.getMetadata());
 	}
 
@@ -77,12 +77,15 @@ public class AdminService {
 		User u = new User();
 		u.setUsername(username);
 		u.setEmail(email);
+		u.setFirstName(req.firstName());
+		u.setLastName(req.lastName());
 		if (req.metadata() != null) {
 			u.getMetadata().putAll(req.metadata());
 		}
 		User saved = userRepository.save(u);
-		return new UserDto(saved.getId(), saved.getUsername(), saved.getEmail(), u.getStatus(),
-				saved.getRoles().stream().map(Role::getName).collect(toSet()), saved.getMetadata());
+		return new UserDto(saved.getId(), saved.getUsername(), saved.getEmail(), saved.getFirstName(),
+				saved.getLastName(), saved.isEnabled(), saved.getRoles().stream().map(Role::getName).collect(toSet()),
+				saved.getMetadata());
 
 	}
 
@@ -101,14 +104,19 @@ public class AdminService {
 	@Transactional
 	public UserDto updateUser(UUID id, UpdateUserRequest req) {
 		User u = getNonSuperAdmin(id);
-		if (req.status() != null && !req.status().isBlank())
-			u.setStatus(req.status());
+		if (req.firstName() != null)
+			u.setFirstName(req.firstName());
+		if (req.lastName() != null)
+			u.setLastName(req.lastName());
+		if (req.enabled() != null)
+			u.setEnabled(req.enabled());
 		if (req.metadata() != null) {
 			u.getMetadata().putAll(req.metadata());
 		}
 		User saved = userRepository.save(u);
-		return new UserDto(saved.getId(), saved.getUsername(), saved.getEmail(), u.getStatus(),
-				saved.getRoles().stream().map(Role::getName).collect(toSet()), saved.getMetadata());
+		return new UserDto(saved.getId(), saved.getUsername(), saved.getEmail(), saved.getFirstName(),
+				saved.getLastName(), saved.isEnabled(), saved.getRoles().stream().map(Role::getName).collect(toSet()),
+				saved.getMetadata());
 	}
 
 	@Transactional
@@ -136,13 +144,13 @@ public class AdminService {
 	@Transactional
 	public void enableUser(UUID id) {
 		User u = getNonSuperAdmin(id);
-		u.setStatus("ACTIVE");
+		u.setEnabled(true);
 	}
 
 	@Transactional
 	public void disableUser(UUID id) {
 		User u = getNonSuperAdmin(id);
-		u.setStatus("DISABLED");
+		u.setEnabled(false);
 	}
 
 	@Transactional
