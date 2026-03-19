@@ -12,3 +12,4 @@ spring:
             client-id: gateway@service.store-core.internal
             client-secret: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
             authorization-grant-type: client_credentials
+            scope: internal
