@@ -18,7 +18,7 @@ com:
         pod:
           id:
             id: 1
-          name: pod-0
+          name: pod-1
           endpoint:
             endpoint: http://store-pod-saas-gateway-1.gateway.com
             type: EXTERNAL

@@ -70,7 +70,7 @@ public class AdminClientController {
 		return Map.of("clientAuthenticationMethods",
 				Stream.of(ClientAuthMethod.values()).map(ClientAuthMethod::value).toList(), "authorizationGrantTypes",
 				Stream.of(OAuthGrantType.values()).map(OAuthGrantType::value).toList(), "scopes",
-				List.of("openid", "profile", "email", "api.read", "internal", "super_admin"),
+				List.of("openid", "profile", "email", "api.read", "internal", "store", "super_admin"),
 				"idTokenSignatureAlgorithm",
 				Stream.of(SignatureAlgorithm.values()).map(SignatureAlgorithm::getName).toList(),
 				"tokenEndpointAuthenticationSigningAlgorithm",
