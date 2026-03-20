@@ -173,6 +173,39 @@
                       <input nbInput fullWidth formControlName="x509CertificateSubjectDN"/>
                     </div>
                   </div>
+
+                  <div class="mt-4">
+                    <h6>Custom Settings</h6>
+                    <div class="row mt-2 mb-3">
+                      <div class="col-md-4">
+                        <input nbInput fullWidth size="small" placeholder="New Key" #clientCustomKey (keyup.enter)="addCustomSetting('clientSettings', clientCustomKey.value); clientCustomKey.value = ''">
+                      </div>
+                      <div class="col-md-2">
+                        <button nbButton fullWidth size="small" status="primary" (click)="addCustomSetting('clientSettings', clientCustomKey.value); clientCustomKey.value = ''">
+                          Add
+                        </button>
+                      </div>
+                    </div>
+
+                    <div formGroupName="customSettings" class="bg-light p-3 rounded">
+                      <div *ngIf="getCustomSettings('clientSettings').length === 0" class="text-hint text-center py-2">
+                        No custom settings defined
+                      </div>
+                      <div *ngFor="let key of getCustomSettings('clientSettings')" class="row mb-2 align-items-center">
+                        <div class="col-md-4">
+                          <label class="mb-0 font-weight-bold">{{ key }}</label>
+                        </div>
+                        <div class="col-md-7">
+                          <input nbInput fullWidth size="small" [formControlName]="key"/>
+                        </div>
+                        <div class="col-md-1 text-right">
+                          <button nbButton ghost size="small" status="danger" (click)="removeCustomSetting('clientSettings', key)">
+                            <nb-icon icon="trash-2-outline"></nb-icon>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </nb-card-body>
               </nb-card>
             </div>
@@ -232,6 +265,39 @@
                         <nb-option *ngFor="let format of accessTokenFormatOptions" [value]="format">{{ format }}
                         </nb-option>
                       </nb-select>
+                    </div>
+                  </div>
+
+                  <div class="mt-4">
+                    <h6>Custom Settings</h6>
+                    <div class="row mt-2 mb-3">
+                      <div class="col-md-4">
+                        <input nbInput fullWidth size="small" placeholder="New Key" #tokenCustomKey (keyup.enter)="addCustomSetting('tokenSettings', tokenCustomKey.value); tokenCustomKey.value = ''">
+                      </div>
+                      <div class="col-md-2">
+                        <button nbButton fullWidth size="small" status="primary" (click)="addCustomSetting('tokenSettings', tokenCustomKey.value); tokenCustomKey.value = ''">
+                          Add
+                        </button>
+                      </div>
+                    </div>
+
+                    <div formGroupName="customSettings" class="bg-light p-3 rounded">
+                      <div *ngIf="getCustomSettings('tokenSettings').length === 0" class="text-hint text-center py-2">
+                        No custom settings defined
+                      </div>
+                      <div *ngFor="let key of getCustomSettings('tokenSettings')" class="row mb-2 align-items-center">
+                        <div class="col-md-4">
+                          <label class="mb-0 font-weight-bold">{{ key }}</label>
+                        </div>
+                        <div class="col-md-7">
+                          <input nbInput fullWidth size="small" [formControlName]="key"/>
+                        </div>
+                        <div class="col-md-1 text-right">
+                          <button nbButton ghost size="small" status="danger" (click)="removeCustomSetting('tokenSettings', key)">
+                            <nb-icon icon="trash-2-outline"></nb-icon>
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </nb-card-body>
