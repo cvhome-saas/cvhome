@@ -9,10 +9,10 @@ spring:
         registration:
           s2s:
             provider: uaa
-            client-id: control-plane@service.store-core.internal
+            client-id: store-core@service.store-core.internal
             client-secret: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
             authorization-grant-type: client_credentials
-            scope: internal
+            scope: internal,store
 com:
   asrevo:
     cvhome:
