@@ -2,6 +2,7 @@ package com.asrevo.cvhome.uaa.service;
 
 import com.asrevo.cvhome.uaa.dto.ClientDetails;
 import com.asrevo.cvhome.uaa.dto.ClientSummary;
+import com.asrevo.cvhome.uaa.exception.ResourceNotExistException;
 import com.asrevo.cvhome.uaa.mapper.ClientClientDetailsMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -50,7 +51,10 @@ public class AdminClientService {
 	}
 
 	public ClientDetails findById(String id) {
-		return ClientClientDetailsMapper.toClientDetails(Objects.requireNonNull(this.clients.findById(id)));
+		RegisteredClient client = this.clients.findById(id);
+		if (Objects.isNull(client))
+			throw new ResourceNotExistException("Client not found with id " + id);
+		return ClientClientDetailsMapper.toClientDetails(client);
 	}
 
 	public ClientDetails save(ClientDetails details) {

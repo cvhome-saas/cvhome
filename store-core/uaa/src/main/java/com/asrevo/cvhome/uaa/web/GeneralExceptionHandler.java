@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.uaa.web;
 
 import com.asrevo.cvhome.uaa.exception.ForbiddenOperationException;
-import com.asrevo.cvhome.uaa.exception.UserNotExistException;
+import com.asrevo.cvhome.uaa.exception.ResourceNotExistException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -22,8 +22,8 @@ public class GeneralExceptionHandler {
 		return problemDetail;
 	}
 
-	@ExceptionHandler(UserNotExistException.class)
-	public ProblemDetail handleUserNotExist(UserNotExistException e) {
+	@ExceptionHandler(ResourceNotExistException.class)
+	public ProblemDetail handleUserNotExist(ResourceNotExistException e) {
 		log.warn("User not found: {}", e.getMessage());
 		ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, e.getMessage());
 		problemDetail.setTitle("User Not Found");
