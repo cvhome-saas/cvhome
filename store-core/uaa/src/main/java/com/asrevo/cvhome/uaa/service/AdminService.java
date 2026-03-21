@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.uaa.service;
 
 import com.asrevo.cvhome.uaa.exception.ForbiddenOperationException;
-import com.asrevo.cvhome.uaa.exception.UserNotExistException;
+import com.asrevo.cvhome.uaa.exception.ResourceNotExistException;
 import com.asrevo.cvhome.uaa.domain.Role;
 import com.asrevo.cvhome.uaa.domain.User;
 import com.asrevo.cvhome.uaa.dto.CreateUserRequest;
@@ -57,7 +57,7 @@ public class AdminService {
 	}
 
 	private User findUser(UUID id) {
-		return userRepository.findById(id).orElseThrow(() -> new UserNotExistException("Invalid user id " + id));
+		return userRepository.findById(id).orElseThrow(() -> new ResourceNotExistException("Invalid user id " + id));
 	}
 
 	public UserDto getUser(UUID id) {
