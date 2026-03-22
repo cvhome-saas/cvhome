@@ -55,8 +55,7 @@ public class CategoryApi {
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	@ConditionalOnApiStatus
 	public ReadableCategory get(@PathVariable(name = "id") Long categoryId,
-			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language) {
+			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
 		return categoryFacade.getById(merchantStore, categoryId, LanguageCode.allLanguage());
 	}
 
@@ -71,8 +70,7 @@ public class CategoryApi {
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	@ConditionalOnApiStatus
 	public ReadableCategory getByFriendlyUrl(@PathVariable(name = "friendlyUrl") String friendlyUrl,
-			@Parameter(hidden = true) StoreMerchantId merchantStore, @Parameter(hidden = true) LanguageCode language)
-			throws Exception {
+			StoreMerchantId merchantStore, LanguageCode language) throws Exception {
 		return categoryFacade.getCategoryByFriendlyUrl(merchantStore, friendlyUrl, language);
 	}
 
@@ -87,8 +85,7 @@ public class CategoryApi {
 			responses = @ApiResponse(content = @Content(schema = @Schema(implementation = EntityExists.class))))
 	@ConditionalOnApiStatus
 	public ResponseEntity<EntityExists> exists(@RequestParam(value = "code") String code,
-			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language) {
+			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
 		boolean isCategoryExist = categoryFacade.existByCode(merchantStore, code);
 		return new ResponseEntity<>(new EntityExists(isCategoryExist), HttpStatus.OK);
 	}
@@ -110,9 +107,8 @@ public class CategoryApi {
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	@ConditionalOnApiStatus
 	public ReadableCategoryList list(@RequestParam(value = "filter", required = false) List<String> filter,
-			@RequestParam(value = "name", required = false) String name,
-			@Parameter(hidden = true) StoreMerchantId merchantStore, @Parameter(hidden = true) LanguageCode language,
-			Pageable pageable) {
+			@RequestParam(value = "name", required = false) String name, @SecuredResource StoreMerchantId merchantStore,
+			LanguageCode language, Pageable pageable) {
 
 		ListCriteria criteria = new ListCriteria();
 		criteria.setName(name);
@@ -137,9 +133,8 @@ public class CategoryApi {
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	@ConditionalOnApiStatus
 	public ReadableCategoryList hierarchyList(@RequestParam(value = "filter", required = false) List<String> filter,
-			@RequestParam(value = "name", required = false) String name,
-			@Parameter(hidden = true) StoreMerchantId merchantStore, @Parameter(hidden = true) LanguageCode language,
-			Pageable pageable) {
+			@RequestParam(value = "name", required = false) String name, @SecuredResource StoreMerchantId merchantStore,
+			LanguageCode language, Pageable pageable) {
 
 		ListCriteria criteria = new ListCriteria();
 		criteria.setName(name);
@@ -160,9 +155,8 @@ public class CategoryApi {
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	@ConditionalOnApiStatus
 	public ReadableCategoryList getHierarchyList(@RequestParam(value = "filter", required = false) List<String> filter,
-			@RequestParam(value = "name", required = false) String name,
-			@Parameter(hidden = true) StoreMerchantId merchantStore, @Parameter(hidden = true) LanguageCode language,
-			Pageable pageable) {
+			@RequestParam(value = "name", required = false) String name, StoreMerchantId merchantStore,
+			LanguageCode language, Pageable pageable) {
 
 		ListCriteria criteria = new ListCriteria();
 		criteria.setName(name);
@@ -179,7 +173,7 @@ public class CategoryApi {
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	@ConditionalOnApiStatus
 	public ReadableCategoryList list(@PathVariable(name = "productId") Long productId,
-			@Parameter(hidden = true) StoreMerchantId merchantStore, @Parameter(hidden = true) LanguageCode lang) {
+			@SecuredResource StoreMerchantId merchantStore, LanguageCode lang) {
 
 		return categoryFacade.listByProduct(merchantStore, productId, LanguageCode.nonLanguage());
 	}
@@ -190,7 +184,7 @@ public class CategoryApi {
 			schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)) })
 	@ConditionalOnApiStatus
 	public PersistableCategory create(@Valid @RequestBody PersistableCategory category,
-			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore) {
+			@SecuredResource StoreMerchantId merchantStore) {
 		return categoryFacade.saveCategory(merchantStore, category);
 	}
 
@@ -199,7 +193,7 @@ public class CategoryApi {
 			schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)) })
 	@ConditionalOnApiStatus
 	public PersistableCategory update(@PathVariable Long id, @Valid @RequestBody PersistableCategory category,
-			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore) {
+			@SecuredResource StoreMerchantId merchantStore) {
 		category.setId(id);
 		return categoryFacade.saveCategory(merchantStore, category);
 	}
@@ -209,7 +203,7 @@ public class CategoryApi {
 			schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)) })
 	@ConditionalOnApiStatus
 	public void updateVisible(@PathVariable Long id, @Valid @RequestBody PersistableCategory category,
-			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore) {
+			@SecuredResource StoreMerchantId merchantStore) {
 
 		category.setId(id);
 		categoryFacade.setVisible(category, merchantStore);
@@ -221,16 +215,14 @@ public class CategoryApi {
 	@Parameters({ @Parameter(name = "store",
 			schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)) })
 	@ConditionalOnApiStatus
-	public void move(@PathVariable Long id, @PathVariable Long parent,
-			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore) {
+	public void move(@PathVariable Long id, @PathVariable Long parent, @SecuredResource StoreMerchantId merchantStore) {
 		categoryFacade.move(id, parent, merchantStore);
 	}
 
 	@DeleteMapping(value = "/private/category/{id}", produces = { APPLICATION_JSON_VALUE })
 	@ResponseStatus(OK)
 	@ConditionalOnApiStatus
-	public void delete(@PathVariable("id") Long categoryId,
-			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore) {
+	public void delete(@PathVariable("id") Long categoryId, @SecuredResource StoreMerchantId merchantStore) {
 		categoryFacade.deleteCategory(categoryId, merchantStore);
 	}
 

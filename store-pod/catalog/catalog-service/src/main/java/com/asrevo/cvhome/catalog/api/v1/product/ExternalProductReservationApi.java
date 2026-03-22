@@ -4,6 +4,7 @@ import com.asrevo.cvhome.catalog.model.product.ProductReservationStatus;
 import com.asrevo.cvhome.catalog.services.product.ExternalProductReservationService;
 import com.asrevo.cvhome.catalog.services.product.ProductService;
 import com.asrevo.cvhome.commons.annotation.ConditionalOnApiStatus;
+import com.asrevo.cvhome.commons.annotation.SecuredResource;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
@@ -46,7 +47,7 @@ public class ExternalProductReservationApi implements ExternalProductReservation
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	@ConditionalOnApiStatus
 	@Override
-	public ProductReservationStatus reserve(StoreMerchantId store,
+	public ProductReservationStatus reserve(@SecuredResource StoreMerchantId store,
 			@RequestBody ProductReservationList productReservation) throws ServiceException {
 		return productService.reserve(store, productReservation);
 	}

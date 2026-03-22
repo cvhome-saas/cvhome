@@ -56,8 +56,7 @@ public class ProductVariantApi {
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	public @ResponseBody Entity create(@Valid @RequestBody PersistableProductVariant variant,
-			@PathVariable Long productId, @Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language) {
+			@PathVariable Long productId, @SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
 		Long id = productVariantFacade.create(variant, productId, merchantStore, language);
 		return new Entity(id);
 	}
@@ -67,9 +66,8 @@ public class ProductVariantApi {
 	@Operation(method = "PUT", description = "Update product variant",
 			responses = @ApiResponse(content = @Content(mediaType = "application/json", schema = @Schema())))
 	public @ResponseBody void update(@PathVariable Long id, @PathVariable Long variantId,
-			@Valid @RequestBody PersistableProductVariant variant,
-			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language) {
+			@Valid @RequestBody PersistableProductVariant variant, @SecuredResource StoreMerchantId merchantStore,
+			LanguageCode language) {
 		productVariantFacade.update(variantId, variant, id, merchantStore, language);
 	}
 
@@ -83,8 +81,7 @@ public class ProductVariantApi {
 	@Operation(method = "GET", description = "Check if option set code already exists",
 			responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = EntityExists.class))) })
 	public @ResponseBody ResponseEntity<EntityExists> exists(@PathVariable Long id, @PathVariable String sku,
-			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language) {
+			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
 
 		boolean exist = productVariantFacade.exists(sku, merchantStore, id, language);
 		return new ResponseEntity<>(new EntityExists(exist), HttpStatus.OK);
@@ -102,9 +99,8 @@ public class ProductVariantApi {
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	public @ResponseBody ReadableProductVariant get(@PathVariable final Long id, @PathVariable Long variantId,
-			@RequestParam(value = "lang", required = false) String lang,
-			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language) {
+			@RequestParam(value = "lang", required = false) String lang, @SecuredResource StoreMerchantId merchantStore,
+			LanguageCode language) {
 
 		return productVariantFacade.get(variantId, id, merchantStore, language);
 	}
@@ -117,8 +113,7 @@ public class ProductVariantApi {
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	public @ResponseBody ReadableEntityList<ReadableProductVariant> list(@PathVariable final Long id,
-			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language, Pageable pageable) {
+			@SecuredResource StoreMerchantId merchantStore, LanguageCode language, Pageable pageable) {
 
 		return productVariantFacade.list(id, merchantStore, language, pageable);
 	}
@@ -131,8 +126,7 @@ public class ProductVariantApi {
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	public void delete(@PathVariable Long id, @PathVariable Long variantId,
-			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language) {
+			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
 
 		productVariantFacade.delete(variantId, id, merchantStore);
 	}

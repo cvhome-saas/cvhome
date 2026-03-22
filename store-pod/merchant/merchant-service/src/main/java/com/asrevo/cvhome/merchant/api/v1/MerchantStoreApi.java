@@ -68,8 +68,7 @@ public class MerchantStoreApi {
 	@Parameters({ @Parameter(name = "lang",
 			schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	@ConditionalOnApiStatus
-	public ReadableMerchantStore storeFull(@SecuredResource StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language) {
+	public ReadableMerchantStore storeFull(@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
 		return storeFacade.getByMerchantStoreId(merchantStore, language);
 	}
 
@@ -79,7 +78,7 @@ public class MerchantStoreApi {
 			responses = @ApiResponse(
 					content = @Content(schema = @Schema(implementation = ReadableMerchantStore.class))))
 	@ConditionalOnApiStatus
-	public List<LanguageCode> supportedLanguages(@Parameter(hidden = true) StoreMerchantId merchantStore) {
+	public List<LanguageCode> supportedLanguages(StoreMerchantId merchantStore) {
 
 		return storeFacade.supportedLanguages(merchantStore);
 	}

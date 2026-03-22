@@ -3,6 +3,7 @@ package com.asrevo.cvhome.checkout.api.order.v1.order;
 import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1_STR;
 
 import com.asrevo.cvhome.commons.annotation.ConditionalOnApiStatus;
+import com.asrevo.cvhome.commons.annotation.SecuredResource;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.checkout.model.order.history.PersistableOrderStatusHistory;
 import com.asrevo.cvhome.checkout.model.order.history.ReadableOrderStatusHistory;
@@ -37,7 +38,7 @@ public class OrderStatusHistoryApi {
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	@ConditionalOnApiStatus
 	public List<ReadableOrderStatusHistory> list(@PathVariable final Long id,
-			@Parameter(hidden = true) StoreMerchantId merchantStore, @Parameter(hidden = true) LanguageCode language) {
+			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
 
 		return orderFacade.getReadableOrderHistory(id, merchantStore, language);
 	}
@@ -50,7 +51,7 @@ public class OrderStatusHistoryApi {
 			schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)) })
 	@ConditionalOnApiStatus
 	public void create(@PathVariable final Long id, @RequestBody PersistableOrderStatusHistory history,
-			@Parameter(hidden = true) StoreMerchantId merchantStore) {
+			@SecuredResource StoreMerchantId merchantStore) {
 
 		// TODO validate date format
 

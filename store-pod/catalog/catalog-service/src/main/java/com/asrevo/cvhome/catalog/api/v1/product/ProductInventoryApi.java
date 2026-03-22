@@ -42,9 +42,8 @@ public class ProductInventoryApi {
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	public @ResponseBody ReadableInventory create(@PathVariable Long productId,
-			@Valid @RequestBody PersistableInventory inventory,
-			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language) {
+			@Valid @RequestBody PersistableInventory inventory, @SecuredResource StoreMerchantId merchantStore,
+			LanguageCode language) {
 		inventory.setProductId(productId);
 		return productInventoryFacade.add(inventory, merchantStore, language);
 	}
@@ -57,9 +56,8 @@ public class ProductInventoryApi {
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	public void update(@PathVariable Long productId, @PathVariable Long id,
-			@Valid @RequestBody PersistableInventory inventory,
-			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language) {
+			@Valid @RequestBody PersistableInventory inventory, @SecuredResource StoreMerchantId merchantStore,
+			LanguageCode language) {
 		inventory.setId(id);
 		inventory.setProductId(inventory.getProductId());
 		inventory.setVariant(inventory.getVariant());
@@ -75,8 +73,7 @@ public class ProductInventoryApi {
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	public void delete(@PathVariable Long productId, @PathVariable Long id,
-			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language) {
+			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
 
 		productInventoryFacade.delete(productId, id, merchantStore);
 	}
@@ -89,8 +86,7 @@ public class ProductInventoryApi {
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	public @ResponseBody ReadableEntityList<ReadableInventory> getBySku(@PathVariable String sku,
-			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language, Pageable pageable) {
+			@SecuredResource StoreMerchantId merchantStore, LanguageCode language, Pageable pageable) {
 
 		return productInventoryFacade.get(sku, merchantStore, language, pageable);
 	}
@@ -103,8 +99,7 @@ public class ProductInventoryApi {
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	public @ResponseBody ReadableEntityList<ReadableInventory> getByProductId(@RequestParam Long productId,
-			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language, Pageable pageable) {
+			@SecuredResource StoreMerchantId merchantStore, LanguageCode language, Pageable pageable) {
 
 		if (productId == null) {
 			throw new RestApiException("Requires request parameter product id [/product/inventoty?productId");

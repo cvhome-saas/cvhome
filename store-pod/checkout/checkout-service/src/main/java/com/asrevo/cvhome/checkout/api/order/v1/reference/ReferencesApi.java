@@ -41,15 +41,14 @@ public class ReferencesApi {
 
 	@GetMapping("/zones")
 	@ConditionalOnApiStatus
-	public List<ReadableZone> getZones(@RequestParam("code") String code,
-			@Parameter(hidden = true) LanguageCode language, HttpServletRequest request) {
+	public List<ReadableZone> getZones(@RequestParam("code") String code, LanguageCode language,
+			HttpServletRequest request) {
 		StoreMerchantId merchantId = getByMerchantStoreId(request);
 		return zoneFacade.getZones(new CountryIsoCode(code), language, merchantId);
 	}
 
 	@GetMapping("/country")
-	public List<ReadableCountry> getCountry(@Parameter(hidden = true) LanguageCode language,
-			HttpServletRequest request) {
+	public List<ReadableCountry> getCountry(LanguageCode language, HttpServletRequest request) {
 		StoreMerchantId merchantId = getByMerchantStoreId(request);
 		return countryFacade.getListCountryZones(language, merchantId);
 	}

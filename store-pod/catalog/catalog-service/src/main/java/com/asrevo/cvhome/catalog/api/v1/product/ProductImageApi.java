@@ -69,8 +69,7 @@ public class ProductImageApi {
 	public void uploadImage(@PathVariable Long id, @RequestParam(value = "file") MultipartFile[] files,
 			@RequestParam(value = "order", required = false, defaultValue = "0") Integer position,
 			@RequestParam(value = "defaultImage", required = false, defaultValue = "false") boolean defaultImage,
-			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language) {
+			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
 
 		try {
 
@@ -129,36 +128,9 @@ public class ProductImageApi {
 	}
 
 	@ResponseStatus(HttpStatus.OK)
-	@RequestMapping(value = { "/private/product/image/{id}", "/auth/product/images/{id}" },
-			method = RequestMethod.DELETE)
-	public void deleteImage(@PathVariable Long id, HttpServletResponse response) {
-
-		try {
-			ProductImage productImage = productImageService.getById(id);
-
-			if (productImage != null) {
-				productImageService.delete(productImage);
-			}
-			else {
-				response.sendError(404, "No ProductImage found for ID : " + id);
-			}
-
-		}
-		catch (Exception e) {
-			log.error("Error while deleting ProductImage", e);
-			try {
-				response.sendError(503, "Error while deleting ProductImage " + e.getMessage());
-			}
-			catch (Exception ignore) {
-			}
-		}
-	}
-
-	@ResponseStatus(HttpStatus.OK)
 	@RequestMapping(value = { "/private/product/{id}/image/{imageId}" }, method = RequestMethod.DELETE)
 	public void deleteImage(@PathVariable Long id, @PathVariable Long imageId,
-			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language) {
+			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
 
 		Optional<ProductImage> productImage = productImageService.getProductImage(imageId, id, merchantStore);
 
@@ -190,8 +162,8 @@ public class ProductImageApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	public List<ReadableImage> images(@PathVariable Long productId,
-			@Parameter(hidden = true) StoreMerchantId merchantStore, @Parameter(hidden = true) LanguageCode language) {
+	public List<ReadableImage> images(@PathVariable Long productId, StoreMerchantId merchantStore,
+			LanguageCode language) {
 
 		Product p = productService.getById(productId);
 
@@ -236,8 +208,7 @@ public class ProductImageApi {
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	public void imageDetails(@PathVariable Long id, @PathVariable Long imageId,
 			@RequestParam(value = "order", required = false, defaultValue = "0") Integer position,
-			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language) {
+			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
 
 		try {
 

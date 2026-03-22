@@ -45,8 +45,7 @@ public class ProductPropertySetApi {
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	public void create(@Valid @RequestBody PersistableProductOptionSet optionSet,
-			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language) {
+			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
 
 		productOptionSetFacade.create(optionSet, merchantStore, language);
 	}
@@ -61,8 +60,7 @@ public class ProductPropertySetApi {
 	@Operation(method = "GET", description = "Check if option set code already exists",
 			responses = @ApiResponse(content = @Content(schema = @Schema(implementation = EntityExists.class))))
 	public ResponseEntity<EntityExists> exists(@RequestParam(value = "code") String code,
-			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language) {
+			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
 
 		boolean isOptionExist = productOptionSetFacade.exists(code, merchantStore);
 		return new ResponseEntity<>(new EntityExists(isOptionExist), HttpStatus.OK);
@@ -76,9 +74,8 @@ public class ProductPropertySetApi {
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	@ResponseBody
-	public ReadableProductOptionSet get(@PathVariable Long id,
-			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language) {
+	public ReadableProductOptionSet get(@PathVariable Long id, @SecuredResource StoreMerchantId merchantStore,
+			LanguageCode language) {
 
 		return productOptionSetFacade.get(id, merchantStore, language);
 	}
@@ -91,8 +88,7 @@ public class ProductPropertySetApi {
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	public void update(@Valid @RequestBody PersistableProductOptionSet option, @PathVariable Long id,
-			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language) {
+			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
 
 		option.setId(id);
 		productOptionSetFacade.update(id, option, merchantStore, language);
@@ -105,8 +101,7 @@ public class ProductPropertySetApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	public void delete(@PathVariable Long id, @Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language) {
+	public void delete(@PathVariable Long id, @SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
 
 		productOptionSetFacade.delete(id, merchantStore);
 	}
@@ -121,10 +116,8 @@ public class ProductPropertySetApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	public @ResponseBody List<ReadableProductOptionSet> list(
-			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language,
-			@RequestParam(value = "productType", required = false) String type) {
+	public @ResponseBody List<ReadableProductOptionSet> list(@SecuredResource StoreMerchantId merchantStore,
+			LanguageCode language, @RequestParam(value = "productType", required = false) String type) {
 
 		if (!StringUtils.isBlank(type)) {
 			return productOptionSetFacade.list(merchantStore, language, type);

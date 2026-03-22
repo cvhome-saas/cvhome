@@ -46,9 +46,8 @@ public class ProductPriceApi {
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	public @ResponseBody Entity save(@PathVariable String sku, @PathVariable Long inventoryId,
-			@Valid @RequestBody PersistableProductPrice price,
-			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language) {
+			@Valid @RequestBody PersistableProductPrice price, @SecuredResource StoreMerchantId merchantStore,
+			LanguageCode language) {
 
 		price.setSku(sku);
 		price.setProductAvailabilityId(inventoryId);
@@ -65,8 +64,7 @@ public class ProductPriceApi {
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	public @ResponseBody Entity save(@PathVariable String sku, @Valid @RequestBody PersistableProductPrice price,
-			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language) {
+			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
 
 		price.setSku(sku);
 
@@ -83,9 +81,8 @@ public class ProductPriceApi {
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	public void edit(@PathVariable String sku, @PathVariable Long inventoryId, @PathVariable Long priceId,
-			@Valid @RequestBody PersistableProductPrice price,
-			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language) {
+			@Valid @RequestBody PersistableProductPrice price, @SecuredResource StoreMerchantId merchantStore,
+			LanguageCode language) {
 
 		price.setSku(sku);
 		price.setProductAvailabilityId(inventoryId);
@@ -101,9 +98,8 @@ public class ProductPriceApi {
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	public ReadableProductPrice get(@PathVariable String sku, @PathVariable Long priceId,
-			@Valid @RequestBody PersistableProductPrice price,
-			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language) {
+			@Valid @RequestBody PersistableProductPrice price, @SecuredResource StoreMerchantId merchantStore,
+			LanguageCode language) {
 
 		price.setSku(sku);
 		price.setId(priceId);
@@ -118,8 +114,7 @@ public class ProductPriceApi {
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	public List<ReadableProductPrice> list(@PathVariable String sku, @PathVariable Long inventoryId,
-			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language) {
+			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
 
 		return productPriceFacade.list(sku, inventoryId, merchantStore, language);
 	}
@@ -130,9 +125,8 @@ public class ProductPriceApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	public List<ReadableProductPrice> list(@PathVariable String sku,
-			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language) {
+	public List<ReadableProductPrice> list(@PathVariable String sku, @SecuredResource StoreMerchantId merchantStore,
+			LanguageCode language) {
 
 		return productPriceFacade.list(sku, merchantStore, language);
 	}
@@ -145,8 +139,7 @@ public class ProductPriceApi {
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	public void delete(@PathVariable String sku, @PathVariable Long priceId,
-			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language) {
+			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
 
 		productPriceFacade.delete(priceId, sku, merchantStore);
 	}

@@ -53,7 +53,7 @@ public class ProductGroupApi {
 	@Parameters({ @Parameter(name = "store",
 			schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)) })
 	public @ResponseBody ProductGroup creteGroup(@RequestBody ProductGroup group,
-			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore) {
+			@SecuredResource StoreMerchantId merchantStore) {
 
 		return productItemsFacade.createProductGroup(group, merchantStore);
 	}
@@ -65,7 +65,7 @@ public class ProductGroupApi {
 	@Parameters({ @Parameter(name = "store",
 			schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)) })
 	public void updateGroup(@RequestBody ProductGroup group, @PathVariable String code,
-			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore) {
+			@SecuredResource StoreMerchantId merchantStore) {
 
 		productItemsFacade.updateProductGroup(code, group, merchantStore);
 	}
@@ -78,9 +78,8 @@ public class ProductGroupApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	public @ResponseBody ReadableProductGroupList list(
-			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language) {
+	public @ResponseBody ReadableProductGroupList list(@SecuredResource StoreMerchantId merchantStore,
+			LanguageCode language) {
 
 		return productItemsFacade.listProductGroups(merchantStore, language);
 	}
@@ -100,7 +99,7 @@ public class ProductGroupApi {
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	public @ResponseBody ReadableProductList productItemsByGroup(@PathVariable final String code,
-			@Parameter(hidden = true) StoreMerchantId merchantStore, @Parameter(hidden = true) LanguageCode language) {
+			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
 		return productItemsFacade.listTinyProductsGroup(code, merchantStore, LanguageCode.nonLanguage());
 	}
 
@@ -114,7 +113,7 @@ public class ProductGroupApi {
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	public @ResponseBody ReadableProductList getProductItemsByGroup(@PathVariable final String code,
-			@Parameter(hidden = true) StoreMerchantId merchantStore, @Parameter(hidden = true) LanguageCode language) {
+			StoreMerchantId merchantStore, LanguageCode language) {
 		return productItemsFacade.listMinimalProductsGroup(code, merchantStore, language);
 	}
 
@@ -126,8 +125,7 @@ public class ProductGroupApi {
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	public @ResponseBody void addProductToGroup(@PathVariable Long productId, @PathVariable String code,
-			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language) {
+			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
 		Product product = productService.findOne(productId, merchantStore);
 		productItemsFacade.addItemToGroup(product, code, merchantStore, language);
 	}
@@ -140,8 +138,7 @@ public class ProductGroupApi {
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	public @ResponseBody void removeProductFromGroup(@PathVariable Long productId, @PathVariable String code,
-			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language) {
+			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
 
 		Product product = productService.findOne(productId, merchantStore);
 		productItemsFacade.removeItemFromGroup(product, code, merchantStore, language);
@@ -153,7 +150,7 @@ public class ProductGroupApi {
 			responses = @ApiResponse(content = @Content(schema = @Schema(implementation = EntityExists.class))))
 	@Parameters({ @Parameter(name = "store",
 			schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)) })
-	public void deleteGroup(@PathVariable final String code, @Parameter(hidden = true) StoreMerchantId merchantStore) {
+	public void deleteGroup(@PathVariable final String code, @SecuredResource StoreMerchantId merchantStore) {
 
 		productItemsFacade.deleteGroup(code, merchantStore);
 	}
