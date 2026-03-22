@@ -57,7 +57,10 @@ public class AccessEvaluatorImpl implements AccessEvaluator {
 		else if (securityRoleCheckService.isStoreModerator(authentication, requestedStoreId)) {
 			return true;
 		}
-		else if (securityRoleCheckService.isMicroService(authentication, requestedStoreId)) {
+		else if (securityRoleCheckService.isScopeStore(authentication, requestedStoreId)) {
+			return true;
+		}
+		else if (securityRoleCheckService.isScopeInternal(authentication, requestedStoreId)) {
 			return true;
 		}
 		else {

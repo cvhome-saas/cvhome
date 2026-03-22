@@ -36,7 +36,22 @@ public class KeyPairService {
 		List<JWK> result = new ArrayList<>();
 		repo.findTop5ByOrderByCreatedAtDesc().forEach(sk -> {
 			try {
-				result.add(JWK.parse(sk.getJwkJson()));
+				JWK jwk = JWK.parse(sk.getJwkJson());
+				// Only keep the first active key if there are multiple.
+				if (sk.isActive()) {
+					boolean alreadyHasActive = result.stream().anyMatch(existing -> {
+						try {
+							return KeyUse.SIGNATURE.equals(existing.getKeyUse());
+						}
+						catch (Exception e) {
+							return false;
+						}
+					});
+					if (alreadyHasActive) {
+						return; // Skip subsequent active keys
+					}
+				}
+				result.add(jwk);
 			}
 			catch (Exception ignored) {
 			}
@@ -57,7 +72,7 @@ public class KeyPairService {
 		repo.save(sk);
 	}
 
-	private void ensureActiveKeyExists() {
+	private synchronized void ensureActiveKeyExists() {
 		var activeList = repo.findAllActiveWithLock();
 		if (activeList.isEmpty()) {
 			log.info("No active signing key found, generating a new one...");

@@ -17,10 +17,6 @@ public class SecurityUtils {
 		return hasRole(authentication, Roles.ROLE_SUPER_ADMIN);
 	}
 
-	public static boolean hasScopeInternal(Authentication authentication) {
-		return hasRole(authentication, Roles.SCOPE_INTERNAL);
-	}
-
 	public static boolean hasOrgAdminRole(Authentication authentication) {
 		return hasRole(authentication, Roles.ROLE_ORG_ADMIN);
 	}
@@ -31,6 +27,14 @@ public class SecurityUtils {
 
 	public static boolean hasStoreModeratorRole(Authentication authentication) {
 		return hasRole(authentication, Roles.ROLE_STORE_MODERATOR);
+	}
+
+	public static boolean hasScopeStore(Authentication authentication) {
+		return hasRole(authentication, Roles.SCOPE_STORE);
+	}
+
+	public static boolean hasScopeInternal(Authentication authentication) {
+		return hasRole(authentication, Roles.SCOPE_INTERNAL);
 	}
 
 	public static boolean hasRole(Authentication authentication, Roles role) {
@@ -51,7 +55,7 @@ public class SecurityUtils {
 		if (hasSuperAdminRole(authentication)) {
 			return new UserOrgStoreIdentity(null, "*", roles);
 		}
-		else if (hasScopeInternal(authentication)) {
+		else if (hasScopeStore(authentication)) {
 			return new UserOrgStoreIdentity(null, "*", roles);
 		}
 		else if (hasOrgAdminRole(authentication)) {

@@ -5,15 +5,29 @@ import static com.asrevo.cvhome.s2s.utils.SecurityUtils.getOrgStoreIdentity;
 import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import static com.asrevo.cvhome.s2s.utils.SecurityUtils.*;
 import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
-import lombok.AllArgsConstructor;
+import com.asrevo.cvhome.s2s.model.PodInfoProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
-@AllArgsConstructor
+import java.util.Objects;
+
 @Slf4j
 public class StoreSecurityServiceImpl implements StoreSecurityService {
 
+	private final PodInfoProperties podInfoProperties;
+
 	private final StoreOrgOwnerRetriever ownerRetriever;
+
+	public StoreSecurityServiceImpl(PodInfoProperties podInfoProperties, StoreOrgOwnerRetriever ownerRetriever) {
+		this.podInfoProperties = podInfoProperties;
+		this.ownerRetriever = ownerRetriever;
+	}
+
+	public StoreSecurityServiceImpl(StoreOrgOwnerRetriever ownerRetriever) {
+		this.podInfoProperties = null;
+		this.ownerRetriever = ownerRetriever;
+	}
 
 	@Override
 	public boolean isSuperAdmin(Authentication authentication, ManagerStoreId requestedStoreId) {
@@ -62,13 +76,41 @@ public class StoreSecurityServiceImpl implements StoreSecurityService {
 	}
 
 	@Override
-	public boolean isMicroService(Authentication authentication, ManagerStoreId requestedStoreId) {
-		if (!hasScopeInternal(authentication)) {
-			log.debug("User {} does not have micro service role with roles {}", authentication.getName(),
+	public boolean isScopeStore(Authentication authentication, ManagerStoreId requestedStoreId) {
+		if (!hasScopeStore(authentication)) {
+			log.debug("User {} does not have store scope with roles {}", authentication.getName(),
 					getRoles(authentication));
 			return false;
 		}
 		return true;
+	}
+
+	@Override
+	public boolean isScopeInternal(Authentication authentication, ManagerStoreId requestedStoreId) {
+		if (Objects.isNull(podInfoProperties) || Objects.isNull(podInfoProperties.pod())) {
+			log.debug("PodInfoProperties is null, cannot check internal scope");
+			return false;
+		}
+		if (!hasScopeInternal(authentication)) {
+			log.debug("User {} does not have internal scope with roles {}", authentication.getName(),
+					getRoles(authentication));
+			return false;
+		}
+		if (!(authentication instanceof JwtAuthenticationToken)) {
+			return false;
+		}
+		String resource = getResource(authentication);
+		if (!resource.equals(podInfoProperties.pod().name())) {
+			log.debug("User {} does not have internal scope with roles {} on resource {} not matched pod name {}",
+					authentication.getName(), getRoles(authentication), resource, podInfoProperties.pod().name());
+			return false;
+		}
+
+		return true;
+	}
+
+	private static String getResource(Authentication authentication) {
+		return ((JwtAuthenticationToken) authentication).getTokenAttributes().getOrDefault("resource", "").toString();
 	}
 
 }

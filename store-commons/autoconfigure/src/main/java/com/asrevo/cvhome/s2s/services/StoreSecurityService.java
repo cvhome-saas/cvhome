@@ -13,6 +13,8 @@ public interface StoreSecurityService {
 
 	boolean isStoreModerator(Authentication authentication, ManagerStoreId requestedStoreId);
 
-	boolean isMicroService(Authentication authentication, ManagerStoreId requestedStoreId);
+	boolean isScopeStore(Authentication authentication, ManagerStoreId requestedStoreId);
+
+	boolean isScopeInternal(Authentication authentication, ManagerStoreId requestedStoreId);
 
 }
