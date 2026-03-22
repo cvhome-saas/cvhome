@@ -76,8 +76,7 @@ public class ProductApiV2 {
 	@ResponseBody
 	@ConditionalOnApiStatus
 	public Entity createV2(@Valid @RequestBody PersistableProductDefinition product,
-			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language) {
+			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
 
 		// make sure product id is null
 		product.setId(null);
@@ -96,8 +95,7 @@ public class ProductApiV2 {
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	@ConditionalOnApiStatus
 	public void updateV2(@PathVariable Long id, @Valid @RequestBody PersistableProductDefinition product,
-			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language) {
+			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
 
 		productDefinitionFacade.update(id, product, merchantStore, language);
 	}
@@ -111,9 +109,8 @@ public class ProductApiV2 {
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	@ResponseBody
 	@ConditionalOnApiStatus
-	public ReadableProductDefinition getV2(@PathVariable Long id,
-			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language) {
+	public ReadableProductDefinition getV2(@PathVariable Long id, @SecuredResource StoreMerchantId merchantStore,
+			LanguageCode language) {
 
 		return productDefinitionFacade.getProduct(merchantStore, id, LanguageCode.allLanguage());
 	}
@@ -140,9 +137,8 @@ public class ProductApiV2 {
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	@ConditionalOnApiStatus(usage = ApiUsage.NOT_USED)
 	public ReadableProduct getByfriendlyUrl(@PathVariable final String friendlyUrl,
-			@RequestParam(value = "lang", required = false) String lang,
-			@Parameter(hidden = true) StoreMerchantId merchantStore, @Parameter(hidden = true) LanguageCode language,
-			HttpServletResponse response) throws Exception {
+			@RequestParam(value = "lang", required = false) String lang, StoreMerchantId merchantStore,
+			LanguageCode language, HttpServletResponse response) throws Exception {
 
 		ReadableProduct product = productFacadeV2.getProductBySeUrl(merchantStore, friendlyUrl, language);
 
@@ -162,9 +158,8 @@ public class ProductApiV2 {
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	@ConditionalOnApiStatus
-	public ReadableProductList tiny(ProductCriteria searchCriteria,
-			@Parameter(hidden = true) StoreMerchantId merchantStore, @Parameter(hidden = true) LanguageCode language,
-			Pageable pageable) {
+	public ReadableProductList tiny(ProductCriteria searchCriteria, @SecuredResource StoreMerchantId merchantStore,
+			LanguageCode language, Pageable pageable) {
 
 		searchCriteria.setPageable(pageable);
 		searchCriteria.setLanguage(language);
@@ -180,9 +175,8 @@ public class ProductApiV2 {
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	@ConditionalOnApiStatus
-	public ReadableProductList base(ProductCriteria searchCriteria,
-			@Parameter(hidden = true) StoreMerchantId merchantStore, @Parameter(hidden = true) LanguageCode language,
-			Pageable pageable) {
+	public ReadableProductList base(ProductCriteria searchCriteria, @SecuredResource StoreMerchantId merchantStore,
+			LanguageCode language, Pageable pageable) {
 
 		searchCriteria.setPageable(pageable);
 		searchCriteria.setLanguage(language);
@@ -198,9 +192,8 @@ public class ProductApiV2 {
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	@ConditionalOnApiStatus
-	public ReadableProductList getList(ProductCriteria searchCriteria,
-			@Parameter(hidden = true) StoreMerchantId merchantStore, @Parameter(hidden = true) LanguageCode language,
-			Pageable pageable) {
+	public ReadableProductList getList(ProductCriteria searchCriteria, StoreMerchantId merchantStore,
+			LanguageCode language, Pageable pageable) {
 
 		searchCriteria.setPageable(pageable);
 		searchCriteria.setLanguage(language);
@@ -223,8 +216,7 @@ public class ProductApiV2 {
 	@ConditionalOnApiStatus
 	// @TODO check if sku is id or string
 	public void update(@PathVariable String sku, @Valid @RequestBody LightPersistableProduct product,
-			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language) {
+			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
 		productCommonFacade.update(sku, product, merchantStore, language);
 	}
 

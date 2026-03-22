@@ -5,6 +5,7 @@ import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.merchant.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.merchant.service.facade.merchant.StoreFacade;
 import com.asrevo.cvhome.s2s.jwt.UaaJwtGrantedAuthoritiesConverter;
+import com.asrevo.cvhome.s2s.model.PodInfoProperties;
 import com.asrevo.cvhome.s2s.services.AccessEvaluator;
 import com.asrevo.cvhome.s2s.services.AccessEvaluatorImpl;
 import com.asrevo.cvhome.s2s.services.StoreSecurityServiceImpl;
@@ -39,8 +40,8 @@ public class SecurityConfig {
 
 	@Bean
 	@Lazy
-	public AccessEvaluator accessEvaluator(StoreFacade storeFacade) {
-		return new AccessEvaluatorImpl(new StoreSecurityServiceImpl((it) -> {
+	public AccessEvaluator accessEvaluator(StoreFacade storeFacade, PodInfoProperties podInfoProperties) {
+		return new AccessEvaluatorImpl(new StoreSecurityServiceImpl(podInfoProperties, (it) -> {
 			MerchantStore merchantStore = storeFacade.get(new StoreMerchantId(it.getId().toString()));
 			return new ManagerOrgId(merchantStore.getOrg());
 		}));

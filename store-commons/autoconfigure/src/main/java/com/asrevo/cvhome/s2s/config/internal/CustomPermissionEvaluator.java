@@ -1,15 +1,19 @@
-package com.asrevo.cvhome.controlplane.manager.service;
+package com.asrevo.cvhome.s2s.config.internal;
 
 import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.s2s.services.AccessEvaluator;
-import java.io.Serializable;
 import lombok.AllArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
-@Component
+import java.io.Serializable;
+
+@Configuration
 @AllArgsConstructor
+@ConditionalOnBean(AccessEvaluator.class)
 public class CustomPermissionEvaluator implements PermissionEvaluator {
 
 	private final AccessEvaluator rolesEvaluator;
@@ -25,6 +29,7 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
 		String action = (String) permission;
 		return switch (action) {
 			// store
+			case "STORE.CREATE" -> rolesEvaluator.hasAccessOnStoreCreate(authentication, ((String) targetId));
 			case "STORE.FIND-ONE" ->
 				rolesEvaluator.hasAccessOnStoreFindOne(authentication, ((ManagerStoreId) targetId));
 			case "STORE.FIND-ONE-DETAILED" ->

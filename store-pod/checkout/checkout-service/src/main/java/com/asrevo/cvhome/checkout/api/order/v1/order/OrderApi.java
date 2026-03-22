@@ -3,6 +3,7 @@ package com.asrevo.cvhome.checkout.api.order.v1.order;
 import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1_STR;
 
 import com.asrevo.cvhome.commons.annotation.ConditionalOnApiStatus;
+import com.asrevo.cvhome.commons.annotation.SecuredResource;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.checkout.entity.customer.Customer;
 import com.asrevo.cvhome.checkout.entity.order.Order;
@@ -66,7 +67,7 @@ public class OrderApi {
 	public ReadableOrderConfirmation checkout(@PathVariable final String code, // shopping
 																				// cart
 			@Valid @RequestBody PersistableAnonymousOrder order, // order
-			@Parameter(hidden = true) StoreMerchantId merchantStore, @Parameter(hidden = true) LanguageCode language) {
+			StoreMerchantId merchantStore, LanguageCode language) {
 
 		Assert.notNull(order.getCustomer(), "Customer must not be null");
 
@@ -116,8 +117,7 @@ public class OrderApi {
 			@RequestParam(value = "status", required = false) String status,
 			@RequestParam(value = "phone", required = false) String phone,
 			@RequestParam(value = "email", required = false) String email,
-			@Parameter(hidden = true) StoreMerchantId merchantStore, @Parameter(hidden = true) LanguageCode language,
-			Pageable pageable) {
+			@SecuredResource StoreMerchantId merchantStore, LanguageCode language, Pageable pageable) {
 
 		OrderCriteria orderCriteria = new OrderCriteria();
 		orderCriteria.setPageable(pageable);
@@ -139,8 +139,8 @@ public class OrderApi {
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	@ConditionalOnApiStatus
-	public ReadableOrder get(@PathVariable final Long id, @Parameter(hidden = true) StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language) {
+	public ReadableOrder get(@PathVariable final Long id, @SecuredResource StoreMerchantId merchantStore,
+			LanguageCode language) {
 
 		return orderFacade.getReadableOrder(id, merchantStore, language);
 	}

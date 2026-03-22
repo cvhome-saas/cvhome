@@ -82,9 +82,8 @@ public class ProductApi {
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	@ResponseBody
 	@ConditionalOnApiStatus
-	public Entity create(@Valid @RequestBody PersistableProduct product,
-			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language) {
+	public Entity create(@Valid @RequestBody PersistableProduct product, @SecuredResource StoreMerchantId merchantStore,
+			LanguageCode language) {
 
 		Long id = productCommonFacade.saveProduct(merchantStore, product, language);
 		Entity returnEntity = new Entity();
@@ -106,8 +105,7 @@ public class ProductApi {
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	@ConditionalOnApiStatus
 	public void update(@PathVariable Long id, @Valid @RequestBody LightPersistableProduct product,
-			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language) {
+			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
 		productCommonFacade.update(id, product, merchantStore, language);
 	}
 
@@ -118,8 +116,7 @@ public class ProductApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	public void delete(@PathVariable Long id, @Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language) {
+	public void delete(@PathVariable Long id, @SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
 
 		productCommonFacade.deleteProduct(id, merchantStore);
 	}
@@ -147,9 +144,8 @@ public class ProductApi {
 	// @TODO check if the friendlyUrl is id because frontend use it with id param
 	// @TODO make private api for this
 	public ReadableProduct getByfriendlyUrl(@PathVariable final String friendlyUrl,
-			@RequestParam(value = "lang", required = false) String lang,
-			@Parameter(hidden = true) StoreMerchantId merchantStore, @Parameter(hidden = true) LanguageCode language,
-			HttpServletResponse response) throws Exception {
+			@RequestParam(value = "lang", required = false) String lang, StoreMerchantId merchantStore,
+			LanguageCode language, HttpServletResponse response) throws Exception {
 		ReadableProduct product = productFacade.getProductBySeUrl(merchantStore, friendlyUrl, language);
 
 		if (product == null) {
@@ -171,8 +167,7 @@ public class ProductApi {
 			responses = @ApiResponse(content = @Content(schema = @Schema(implementation = EntityExists.class))))
 	@ConditionalOnApiStatus
 	public ResponseEntity<EntityExists> exists(@RequestParam(value = "code") String code,
-			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language) {
+			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
 
 		boolean exists = productCommonFacade.exists(code, merchantStore);
 		return new ResponseEntity<>(new EntityExists(exists), HttpStatus.OK);
@@ -187,8 +182,7 @@ public class ProductApi {
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	@ConditionalOnApiStatus
 	public void addProductToCategory(@PathVariable Long productId, @PathVariable Long categoryId,
-			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language) {
+			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
 
 		try {
 			// get the product
@@ -231,8 +225,7 @@ public class ProductApi {
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	@ConditionalOnApiStatus
 	public void removeProductFromCategory(@PathVariable Long productId, @PathVariable Long categoryId,
-			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language) {
+			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
 
 		try {
 			Product product = productService.getById(productId);
@@ -279,8 +272,7 @@ public class ProductApi {
 	@ConditionalOnApiStatus
 	public void changeProductOrder(@PathVariable Long id,
 			@RequestParam(value = "order", required = false, defaultValue = "0") Integer position,
-			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language) {
+			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
 
 		try {
 

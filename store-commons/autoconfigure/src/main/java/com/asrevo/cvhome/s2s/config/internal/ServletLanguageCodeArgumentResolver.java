@@ -1,18 +1,15 @@
-package com.asrevo.cvhome.merchant.config;
+package com.asrevo.cvhome.s2s.config.internal;
 
-import com.asrevo.cvhome.store.core.constants.Constants;
+import com.asrevo.cvhome.s2s.utils.LanguageUtils;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
-import com.asrevo.cvhome.store.utils.LanguageUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.core.MethodParameter;
-import org.springframework.stereotype.Component;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
-@Component
-public class LanguageCodeArgumentResolver implements HandlerMethodArgumentResolver {
+public class ServletLanguageCodeArgumentResolver implements HandlerMethodArgumentResolver {
 
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {
@@ -23,7 +20,7 @@ public class LanguageCodeArgumentResolver implements HandlerMethodArgumentResolv
 	public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
 			NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
 		HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
-		return LanguageUtils.getRESTLanguageCode(request.getParameter(Constants.LANG));
+		return LanguageUtils.getRESTLanguageCode(request.getParameter(LanguageUtils.LANG));
 	}
 
 }
