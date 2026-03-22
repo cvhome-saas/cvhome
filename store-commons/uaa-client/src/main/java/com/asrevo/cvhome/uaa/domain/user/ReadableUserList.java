@@ -8,7 +8,6 @@ import java.io.Serial;
 
 @Getter
 @Setter
-@Deprecated
 public class ReadableUserList extends ReadableList<ReadableUser> {
 
 	/**
