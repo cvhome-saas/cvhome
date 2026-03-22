@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.s2s.services;
 
 import com.asrevo.cvhome.commons.domain.ManagerStoreId;
+import com.asrevo.cvhome.s2s.utils.SecurityUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -61,7 +62,7 @@ public class AccessEvaluatorImpl implements AccessEvaluator {
 		}
 		else {
 			log.debug("User {} does not have read access on store {} on roles {}", authentication.getName(),
-					requestedStoreId, StoreSecurityService.getRoles(authentication));
+					requestedStoreId, SecurityUtils.getRoles(authentication));
 			return false;
 		}
 	}
@@ -75,7 +76,7 @@ public class AccessEvaluatorImpl implements AccessEvaluator {
 		}
 		else {
 			log.debug("User {} does not have maintain access on users on store {} on roles {}",
-					authentication.getName(), requestedStoreId, StoreSecurityService.getRoles(authentication));
+					authentication.getName(), requestedStoreId, SecurityUtils.getRoles(authentication));
 			return false;
 		}
 	}

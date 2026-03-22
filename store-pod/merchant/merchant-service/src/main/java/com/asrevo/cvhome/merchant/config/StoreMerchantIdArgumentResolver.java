@@ -3,7 +3,7 @@ package com.asrevo.cvhome.merchant.config;
 import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.s2s.services.AccessEvaluator;
-import com.asrevo.cvhome.s2s.services.StoreSecurityService;
+import com.asrevo.cvhome.s2s.utils.SecurityUtils;
 import com.asrevo.cvhome.store.controller.exception.UnauthorizedException;
 
 import java.util.Objects;
@@ -55,7 +55,7 @@ public class StoreMerchantIdArgumentResolver implements HandlerMethodArgumentRes
 			boolean hasAccess = accessEvaluator.hasAccessOnStoreFindOne(authentication, new ManagerStoreId(storeCode));
 			if (!hasAccess) {
 				log.debug("User {} does not have access on store {} with roles {}", authentication.getName(), storeCode,
-						StoreSecurityService.getRoles(authentication));
+						SecurityUtils.getRoles(authentication));
 				throw new UnauthorizedException("Cannot authorize user for store " + storeCode);
 			}
 		}
