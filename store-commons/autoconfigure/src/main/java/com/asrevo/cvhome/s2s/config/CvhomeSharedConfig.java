@@ -10,7 +10,8 @@ import org.springframework.context.annotation.Import;
 @Configuration
 @Import({ EcsInfoConfig.class, SwaggerConfig.class, WebConfig.class, WebClientServicesConfig.class,
 		ReactiveGatewayConfig.class, IssuerUriSetJwtDecoderConfiguration.class,
-		IssuerUriSetReactiveJwtDecoderConfiguration.class })
+		IssuerUriSetReactiveJwtDecoderConfiguration.class, CustomPermissionEvaluator.class,
+		ReactivePermissionConfig.class, ServletPermissionConfig.class })
 @EnableConfigurationProperties({ PodInfoProperties.class, ServiceDomainProperties.class, AppProperties.class,
 		CdnProperties.class, StripeProperties.class, StoreProductImageProperties.class, CdnStorageProperties.class,
 		IssuerUriSetConfigrationProperties.class })

@@ -35,6 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -89,6 +90,7 @@ public class MerchantStoreApi {
 			responses = @ApiResponse(
 					content = @Content(schema = @Schema(implementation = ReadableMerchantStore.class))))
 	@ConditionalOnApiStatus
+	@PreAuthorize("hasPermission(#store.org,'ManagerOrgId','STORE.CREATE')")
 	public void create(@Valid @RequestBody PersistableMerchantStore store) {
 		storeFacade.create(store);
 	}

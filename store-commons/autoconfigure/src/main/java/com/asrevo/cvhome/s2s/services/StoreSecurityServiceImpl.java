@@ -4,6 +4,8 @@ import static com.asrevo.cvhome.s2s.utils.SecurityUtils.getOrgStoreIdentity;
 
 import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import static com.asrevo.cvhome.s2s.utils.SecurityUtils.*;
+
+import com.asrevo.cvhome.commons.domain.Pod;
 import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
 import com.asrevo.cvhome.s2s.model.PodInfoProperties;
 import lombok.extern.slf4j.Slf4j;
@@ -76,7 +78,7 @@ public class StoreSecurityServiceImpl implements StoreSecurityService {
 	}
 
 	@Override
-	public boolean isScopeStore(Authentication authentication, ManagerStoreId requestedStoreId) {
+	public boolean isScopeStore(Authentication authentication) {
 		if (!hasScopeStore(authentication)) {
 			log.debug("User {} does not have store scope with roles {}", authentication.getName(),
 					getRoles(authentication));
@@ -86,8 +88,8 @@ public class StoreSecurityServiceImpl implements StoreSecurityService {
 	}
 
 	@Override
-	public boolean isScopeInternal(Authentication authentication, ManagerStoreId requestedStoreId) {
-		if (Objects.isNull(podInfoProperties) || Objects.isNull(podInfoProperties.pod())) {
+	public boolean isScopeInternal(Authentication authentication) {
+		if (!isPodInfoProvided()) {
 			log.debug("PodInfoProperties is null, cannot check internal scope");
 			return false;
 		}
@@ -107,6 +109,23 @@ public class StoreSecurityServiceImpl implements StoreSecurityService {
 		}
 
 		return true;
+	}
+
+	public boolean isPodInfoProvided() {
+		return (Objects.nonNull(podInfoProperties) && Objects.nonNull(podInfoProperties.pod()));
+	}
+
+	@Override
+	public boolean isOrgPod() {
+		return isPodInfoProvided() && Objects.nonNull(podInfoProperties.pod().orgId());
+	}
+
+	@Override
+	public Pod getPod() {
+		if (!isPodInfoProvided()) {
+			return null;
+		}
+		return podInfoProperties.pod();
 	}
 
 	private static String getResource(Authentication authentication) {
