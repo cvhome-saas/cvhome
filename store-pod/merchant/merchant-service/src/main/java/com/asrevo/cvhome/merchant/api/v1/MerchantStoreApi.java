@@ -8,7 +8,6 @@ import com.asrevo.cvhome.commons.annotation.SecuredResource;
 import com.asrevo.cvhome.commons.domain.ReadableSliderImage;
 import com.asrevo.cvhome.commons.domain.SliderImage;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.merchant.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.merchant.model.merchant.PersistableMerchantStore;
 import com.asrevo.cvhome.merchant.model.merchant.ReadableMerchantStore;
 import com.asrevo.cvhome.merchant.service.facade.merchant.StoreFacade;
@@ -103,7 +102,7 @@ public class MerchantStoreApi {
 	@Parameters({ @Parameter(name = "store",
 			schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)), })
 	@ConditionalOnApiStatus(usage = ApiUsage.USED)
-	public void update(@SecuredResource MerchantStore merchantStore,
+	public void update(@SecuredResource StoreMerchantId merchantStore,
 			@Valid @RequestBody PersistableMerchantStore store) {
 		storeFacade.update(store);
 	}
@@ -116,9 +115,9 @@ public class MerchantStoreApi {
 	@Parameters({ @Parameter(name = "store",
 			schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)), })
 	@ConditionalOnApiStatus(usage = ApiUsage.USED)
-	public void updateSocialLinks(@SecuredResource MerchantStore merchantStore,
+	public void updateSocialLinks(@SecuredResource StoreMerchantId merchantStore,
 			@RequestBody PersistableMerchantStore store) {
-		storeFacade.updateSocialLinks(merchantStore.getId(), store.getSocialLinks());
+		storeFacade.updateSocialLinks(merchantStore, store.getSocialLinks());
 	}
 
 	@ResponseStatus(HttpStatus.CREATED)
@@ -171,9 +170,9 @@ public class MerchantStoreApi {
 	@Parameters({ @Parameter(name = "store",
 			schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)), })
 	@ConditionalOnApiStatus
-	public void sliderImages(@SecuredResource MerchantStore merchantStore,
+	public void sliderImages(@SecuredResource StoreMerchantId merchantStore,
 			@RequestBody PersistableMerchantStore store) {
-		storeFacade.updateSliderImages(merchantStore.getId(), store.getSliderImages());
+		storeFacade.updateSliderImages(merchantStore, store.getSliderImages());
 	}
 
 	private InputContentFile createInputContentFile(MultipartFile image, FileContentType contentType) {
