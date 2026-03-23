@@ -16,8 +16,7 @@ com:
         base-path: "http://localhost:9000/d0dd4299-963a-4458-b31f-8efe31c35e8e"
       pod-info:
         pod:
-          id:
-            id: 1
+          id: 507f1f77bcf86cd799439011
           name: pod-1
           endpoint:
             endpoint: http://store-pod-saas-gateway-1.gateway.com

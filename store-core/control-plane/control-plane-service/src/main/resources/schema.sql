@@ -48,3 +48,15 @@ CREATE TABLE IF NOT EXISTS subscription.subscription_price_plan
 
 );
 
+create schema if not exists org;
+CREATE TABLE IF NOT EXISTS org.pod
+(
+    id            varchar(24) not null,
+    name          varchar(50) not null,
+    endpoint      varchar(255) not null,
+    endpoint_type varchar(20) not null,
+    org_id        varchar(24),
+    domain        varchar(255),
+    version       int,
+    constraint pod_pk primary key (id)
+    );

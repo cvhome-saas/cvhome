@@ -29,6 +29,6 @@ public interface InternalStoreService {
 
 	Boolean checkNameExists(String name);
 
-	Pod getStorePod(ManagerStoreId managerStoreId);
+	PodId getStorePod(ManagerStoreId managerStoreId);
 
 }

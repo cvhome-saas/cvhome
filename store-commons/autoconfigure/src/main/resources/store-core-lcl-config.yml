@@ -2,8 +2,7 @@ com:
   asrevo:
     cvhome:
       pods:
-        - id:
-            id: 1
+        - id: 507f1f77bcf86cd799439011
           name: pod-1
           endpoint:
             endpoint: http://store-pod-saas-gateway-1.gateway.com

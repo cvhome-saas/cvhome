@@ -1,4 +1,23 @@
 package com.asrevo.cvhome.commons.domain;
 
-public record PodId(String id) {
+import org.bson.types.ObjectId;
+import tools.jackson.databind.annotation.JsonSerialize;
+import tools.jackson.databind.ser.std.ToStringSerializer;
+
+public record PodId(@JsonSerialize(using = ToStringSerializer.class) ObjectId id) implements Identifier {
+
+	public PodId(String id) {
+		this(new ObjectId(id));
+	}
+
+	public static PodId newId() {
+		return new PodId(new ObjectId());
+	}
+
+	@JsonSerialize(using = ToStringSerializer.class)
+	@Override
+	public ObjectId getId() {
+		return this.id;
+	}
+
 }

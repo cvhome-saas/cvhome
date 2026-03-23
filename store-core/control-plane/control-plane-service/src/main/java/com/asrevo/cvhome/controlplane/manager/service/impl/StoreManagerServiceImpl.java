@@ -65,12 +65,12 @@ public class StoreManagerServiceImpl implements StoreManagerService {
 
 	@Override
 	public Mono<Object> getStore(ManagerStoreId managerStoreId) {
-		Pod pod = internalStoreService.getStorePod(managerStoreId);
-		MerchantStorePodClient client = podClientFactory.getMerchantStorePodClient(pod.id());
+		PodId podId = internalStoreService.getStorePod(managerStoreId);
+		MerchantStorePodClient client = podClientFactory.getMerchantStorePodClient(podId);
 		return client.getStore(managerStoreId.getId().toString()).flatMap(response -> {
 			if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
 				HashMap<String, Object> newIt = new HashMap<>(response.getBody());
-				newIt.put("pod", Map.of("id", pod.id().id()));
+				newIt.put("pod", Map.of("id", podId.id()));
 				return Mono.just((Object) newIt);
 			}
 			String errorMessage = "Failed to fetch store from pod: " + response.getStatusCode();

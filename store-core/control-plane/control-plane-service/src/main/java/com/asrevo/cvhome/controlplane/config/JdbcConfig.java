@@ -58,13 +58,6 @@ public class JdbcConfig extends AbstractJdbcConfiguration {
 			}
 		});
 
-		converters.add(new Converter<PodId, String>() {
-			@Override
-			public String convert(PodId source) {
-				return source.id();
-			}
-		});
-
 		return converters;
 	}
 
