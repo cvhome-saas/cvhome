@@ -1,23 +1,5 @@
 package com.asrevo.cvhome.gateway.client;
 
-/**
- * Import statements:
- * com.asrevo.cvhome.commons.domain.Pod
- * com.asrevo.cvhome.s2s.config.internal.ServiceUrlBuilder
- * com.asrevo.cvhome.s2s.model.ServiceDomainProperties
- * lombok.RequiredArgsConstructor
- * org.springframework.cloud.gateway.filter.FilterDefinition
- * org.springframework.cloud.gateway.handler.predicate.PredicateDefinition
- * org.springframework.cloud.gateway.route.RouteDefinition
- * org.springframework.cloud.gateway.route.RouteDefinitionRepository
- * org.springframework.core.env.Environment
- * org.springframework.stereotype.Component
- * reactor.core.publisher.Flux
- * reactor.core.publisher.Mono
- * java.net.URI
- * java.util.List
- * java.util.Optional
- */
 import com.asrevo.cvhome.commons.domain.Pod;
 import com.asrevo.cvhome.s2s.config.internal.ServiceUrlBuilder;
 import com.asrevo.cvhome.s2s.model.ServiceDomainProperties;
