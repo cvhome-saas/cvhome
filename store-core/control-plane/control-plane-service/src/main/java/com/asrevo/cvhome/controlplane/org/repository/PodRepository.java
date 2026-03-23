@@ -8,11 +8,14 @@ import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface PodRepository extends ListCrudRepository<PodEntity, PodId> {
 
 	List<PodEntity> findAllByOrgId(ManagerOrgId orgId);
+
+	Optional<PodEntity> findByName(String name);
 
 	default List<Pod> listAllPods() {
 		return findAll().stream().map(PodEntity::toPod).toList();

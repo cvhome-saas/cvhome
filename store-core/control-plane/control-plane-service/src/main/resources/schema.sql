@@ -58,5 +58,6 @@ CREATE TABLE IF NOT EXISTS org.pod
     org_id        varchar(24),
     domain        varchar(255),
     version       int,
-    constraint pod_pk primary key (id)
+    constraint pod_pk primary key (id),
+    constraint pod_name_uq unique (name)
     );

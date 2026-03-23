@@ -16,4 +16,8 @@ public interface PodService {
 
 	Pod pod(PodId podId);
 
+	Pod save(Pod pod);
+
+	void delete(PodId podId);
+
 }

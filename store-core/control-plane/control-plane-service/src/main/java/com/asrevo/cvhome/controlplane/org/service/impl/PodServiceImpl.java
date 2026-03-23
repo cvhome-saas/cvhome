@@ -3,6 +3,7 @@ package com.asrevo.cvhome.controlplane.org.service.impl;
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
 import com.asrevo.cvhome.commons.domain.Pod;
 import com.asrevo.cvhome.commons.domain.PodId;
+import com.asrevo.cvhome.controlplane.org.entity.PodEntity;
 import com.asrevo.cvhome.controlplane.org.repository.PodRepository;
 import com.asrevo.cvhome.controlplane.org.service.PodService;
 import lombok.AllArgsConstructor;
@@ -36,6 +37,22 @@ public class PodServiceImpl implements PodService {
 	@Override
 	public Pod pod(PodId podId) {
 		return podRepository.pod(podId);
+	}
+
+	@Override
+	public Pod save(Pod pod) {
+		podRepository.findByName(pod.name()).ifPresent(p -> {
+			if (!p.getId().equals(pod.id())) {
+				throw new RuntimeException("Pod name must be unique");
+			}
+		});
+		PodEntity entity = PodEntity.newEntity(pod);
+		return podRepository.save(entity).toPod();
+	}
+
+	@Override
+	public void delete(PodId podId) {
+		podRepository.deleteById(podId);
 	}
 
 }
