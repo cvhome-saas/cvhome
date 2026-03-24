@@ -8,6 +8,8 @@ import com.asrevo.cvhome.controlplane.org.repository.PodRepository;
 import com.asrevo.cvhome.controlplane.org.service.PodService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,18 +22,18 @@ public class PodServiceImpl implements PodService {
 	private final PodRepository podRepository;
 
 	@Override
-	public List<Pod> listAllPods() {
-		return podRepository.listAllPods();
+	public Page<Pod> listAllPods(Pageable pageable) {
+		return podRepository.listAllPods(pageable);
 	}
 
 	@Override
-	public List<Pod> listAllPods(ManagerOrgId orgId) {
-		return podRepository.listAllPods(orgId);
+	public Page<Pod> listAllPods(ManagerOrgId orgId, Pageable pageable) {
+		return podRepository.listAllPods(orgId, pageable);
 	}
 
 	@Override
 	public List<Pod> listPublicPods() {
-		return podRepository.listAllPods(null);
+		return podRepository.listAllPods(Pageable.unpaged()).toList();
 	}
 
 	@Override

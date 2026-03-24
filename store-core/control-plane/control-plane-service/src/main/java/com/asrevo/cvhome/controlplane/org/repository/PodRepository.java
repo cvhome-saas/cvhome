@@ -4,25 +4,27 @@ import com.asrevo.cvhome.commons.domain.ManagerOrgId;
 import com.asrevo.cvhome.commons.domain.Pod;
 import com.asrevo.cvhome.commons.domain.PodId;
 import com.asrevo.cvhome.controlplane.org.entity.PodEntity;
-import org.springframework.data.repository.ListCrudRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface PodRepository extends ListCrudRepository<PodEntity, PodId> {
+public interface PodRepository extends CrudRepository<PodEntity, PodId>, PagingAndSortingRepository<PodEntity, PodId> {
 
-	List<PodEntity> findAllByOrgId(ManagerOrgId orgId);
+	Page<PodEntity> findAllByOrgId(ManagerOrgId orgId, Pageable pageable);
 
 	Optional<PodEntity> findByName(String name);
 
-	default List<Pod> listAllPods() {
-		return findAll().stream().map(PodEntity::toPod).toList();
+	default Page<Pod> listAllPods(Pageable pageable) {
+		return findAll(pageable).map(PodEntity::toPod);
 	}
 
-	default List<Pod> listAllPods(ManagerOrgId orgId) {
-		return findAllByOrgId(orgId).stream().map(PodEntity::toPod).toList();
+	default Page<Pod> listAllPods(ManagerOrgId orgId, Pageable pageable) {
+		return findAllByOrgId(orgId, pageable).map(PodEntity::toPod);
 	}
 
 	default Pod pod(PodId podId) {

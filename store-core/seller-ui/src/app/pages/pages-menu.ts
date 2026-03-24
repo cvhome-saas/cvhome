@@ -25,10 +25,6 @@ const CanAccessStores = (roles: Roles) => {
   return roles.isOrgAdmin;
 };
 
-const CanAccessAdmin = (roles: Roles) => {
-  return roles.isSuperAdmin || roles.isSupport;
-};
-
 const CanAccessOrg = (roles: Roles) => {
   return roles.isSuperAdmin || roles.isSupport;
 };

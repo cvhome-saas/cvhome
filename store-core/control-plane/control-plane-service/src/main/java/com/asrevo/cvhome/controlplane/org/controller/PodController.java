@@ -4,11 +4,12 @@ import com.asrevo.cvhome.commons.annotation.OrgStorePrincipalInfo;
 import com.asrevo.cvhome.commons.domain.Pod;
 import com.asrevo.cvhome.commons.domain.PodId;
 import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
-import java.util.List;
 
 import com.asrevo.cvhome.controlplane.org.service.PodService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,12 +31,12 @@ public class PodController {
 
 	@GetMapping
 	@PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN','ROLE_ORG_ADMIN')")
-	public Mono<List<Pod>> findAllPods(@OrgStorePrincipalInfo UserOrgStoreIdentity identity) {
+	public Mono<Page<Pod>> findAllPods(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, Pageable pageable) {
 		if (identity.isSuperAdmin()) {
-			return Mono.just(podService.listAllPods());
+			return Mono.just(podService.listAllPods(pageable));
 		}
 		else {
-			return Mono.just(podService.listAllPods(identity.org()));
+			return Mono.just(podService.listAllPods(identity.org(), pageable));
 		}
 	}
 

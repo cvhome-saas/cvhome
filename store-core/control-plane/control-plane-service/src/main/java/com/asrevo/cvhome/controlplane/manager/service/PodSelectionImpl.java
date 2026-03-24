@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Random;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -21,10 +22,10 @@ public class PodSelectionImpl implements PodSelection {
 
 	@Override
 	public PodId next(ManagerOrgId orgId, PodId preferredPodId) {
-		List<Pod> allPods = podService.listAllPods();
+		List<Pod> allPods = podService.listAllPods(Pageable.unpaged()).toList();
 		log.info("querying {} namespaces to get valid for org {}", allPods.size(), orgId);
 
-		List<Pod> myPrivatePods = podService.listAllPods(orgId);
+		List<Pod> myPrivatePods = podService.listAllPods(orgId, Pageable.unpaged()).toList();
 
 		if (!myPrivatePods.isEmpty()) {
 			log.info("find {} private namespaces valid for org {}", myPrivatePods.size(), orgId);
