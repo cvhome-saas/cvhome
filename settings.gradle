@@ -57,5 +57,6 @@ include(
         'store-core:control-plane:subscription-commons',
         'store-core:control-plane:subscription-events',
         'store-core:control-plane:subscription-external-api',
+        'store-core:control-plane:pod-external-api',
         'store-core:seller-ui',
 )

@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.gateway.client;
 
 import com.asrevo.cvhome.commons.domain.Pod;
+import com.asrevo.cvhome.controlplane.pod.api.PodExternalClient;
 import com.asrevo.cvhome.s2s.config.internal.ServiceUrlBuilder;
 import com.asrevo.cvhome.s2s.model.ServiceDomainProperties;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +16,6 @@ import reactor.core.publisher.Mono;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -23,10 +23,12 @@ public class PodClient implements RouteDefinitionRepository {
 
 	private final ServiceDomainProperties serviceDomainProperties;
 
+	private final PodExternalClient podExternalClient;
+
 	private final Environment environment;
 
 	public Flux<Pod> getPods() {
-		return Flux.fromIterable(Optional.ofNullable(serviceDomainProperties.pods()).orElse(List.of()));
+		return podExternalClient.listPods().flatMapMany(Flux::fromIterable);
 	}
 
 	@Override
