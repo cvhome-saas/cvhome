@@ -7,7 +7,7 @@ import org.springframework.web.service.annotation.HttpExchange;
 import reactor.core.publisher.Mono;
 
 @HttpExchange("/api/v1/pod")
-public interface PodExternalClient {
+public interface ExternalPodClient {
 
 	@GetExchange("list")
 	Mono<List<Pod>> listPods();
