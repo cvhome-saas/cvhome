@@ -13,6 +13,7 @@ import org.springframework.cloud.gateway.route.RouteDefinition;
 import org.springframework.cloud.gateway.route.RouteDefinitionRepository;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.env.Environment;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
@@ -24,6 +25,7 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 @Slf4j
+@EnableScheduling
 public class PodClient implements RouteDefinitionRepository {
 
 	private final ServiceDomainProperties serviceDomainProperties;
