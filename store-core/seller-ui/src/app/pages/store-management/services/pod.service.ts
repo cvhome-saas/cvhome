@@ -11,7 +11,7 @@ export class PodService {
   }
 
   listPods(): Observable<Pod[]> {
-    return this.crudService.get(`/control-plane/api/v1/pod`);
+    return this.crudService.get(`/control-plane/api/v1/pod/list`);
   }
 
 }

@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("api/v1/pod")
 @AllArgsConstructor
@@ -37,6 +39,17 @@ public class PodController {
 		}
 		else {
 			return Mono.just(podService.listAllPods(identity.org(), pageable));
+		}
+	}
+
+	@GetMapping("list")
+	@PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN','ROLE_ORG_ADMIN')")
+	public Mono<List<Pod>> listPods(@OrgStorePrincipalInfo UserOrgStoreIdentity identity) {
+		if (identity.isSuperAdmin()) {
+			return Mono.just(podService.listAllPods(Pageable.unpaged()).toList());
+		}
+		else {
+			return Mono.just(podService.listAllPods(identity.org(), Pageable.unpaged()).toList());
 		}
 	}
 
