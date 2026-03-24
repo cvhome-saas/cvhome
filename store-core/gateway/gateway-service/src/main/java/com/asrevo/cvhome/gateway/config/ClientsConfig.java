@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 public class ClientsConfig {
 
 	@Bean
-	public PodExternalClient externalMerchantStoreService(WebClientBuilder webClientBuilder) {
+	public PodExternalClient podExternalClient(WebClientBuilder webClientBuilder) {
 		return webClientBuilder.buildClient("control-plane", PodExternalClient.class);
 	}
 

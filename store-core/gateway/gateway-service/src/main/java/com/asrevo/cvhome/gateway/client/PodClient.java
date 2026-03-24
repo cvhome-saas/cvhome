@@ -5,6 +5,7 @@ import com.asrevo.cvhome.controlplane.pod.api.PodExternalClient;
 import com.asrevo.cvhome.s2s.config.internal.ServiceUrlBuilder;
 import com.asrevo.cvhome.s2s.model.ServiceDomainProperties;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.FilterDefinition;
 import org.springframework.cloud.gateway.handler.predicate.PredicateDefinition;
 import org.springframework.cloud.gateway.route.RouteDefinition;
@@ -19,6 +20,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class PodClient implements RouteDefinitionRepository {
 
 	private final ServiceDomainProperties serviceDomainProperties;
@@ -28,7 +30,10 @@ public class PodClient implements RouteDefinitionRepository {
 	private final Environment environment;
 
 	public Flux<Pod> getPods() {
-		return podExternalClient.listPods().flatMapMany(Flux::fromIterable);
+		return podExternalClient.listPods().onErrorResume(e -> {
+			log.error("Could not fetch pods from control-plane", e);
+			return Mono.empty();
+		}).flatMapMany(Flux::fromIterable);
 	}
 
 	@Override
