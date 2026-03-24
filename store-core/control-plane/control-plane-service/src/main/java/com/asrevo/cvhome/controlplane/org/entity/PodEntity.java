@@ -30,9 +30,6 @@ public class PodEntity extends BaseEntity<PodEntity, PodId> {
 	@Column("org_id")
 	private ManagerOrgId orgId;
 
-	@Column("domain")
-	private String domain;
-
 	public static PodEntity newEntity(Pod pod) {
 		PodEntity entity = new PodEntity();
 		if (Objects.nonNull(pod.id())) {
@@ -45,7 +42,6 @@ public class PodEntity extends BaseEntity<PodEntity, PodId> {
 		entity.setEndpoint(pod.endpoint().endpoint());
 		entity.setEndpointType(pod.endpoint().type());
 		entity.setOrgId(pod.orgId());
-		entity.setDomain(pod.domain());
 		return entity;
 	}
 
@@ -56,7 +52,7 @@ public class PodEntity extends BaseEntity<PodEntity, PodId> {
 
 	public Pod toPod() {
 		return new Pod(this.getId(), this.getName(), new PodEndpoint(this.getEndpoint(), this.getEndpointType()),
-				this.getOrgId(), this.getDomain());
+				this.getOrgId(), null);
 	}
 
 }

@@ -61,7 +61,6 @@ public class PodDatabaseInitializer {
 			entity.setEndpointType(pod.endpoint().type());
 		}
 		entity.setOrgId(pod.orgId());
-		entity.setDomain(pod.domain());
 	}
 
 }

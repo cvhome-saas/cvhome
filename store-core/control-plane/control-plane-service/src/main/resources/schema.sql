@@ -56,7 +56,6 @@ CREATE TABLE IF NOT EXISTS org.pod
     endpoint      varchar(255) not null,
     endpoint_type varchar(20) not null,
     org_id        varchar(24),
-    domain        varchar(255),
     version       int,
     constraint pod_pk primary key (id),
     constraint pod_name_uq unique (name)
