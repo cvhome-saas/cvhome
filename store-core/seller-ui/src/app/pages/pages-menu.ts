@@ -29,6 +29,10 @@ const CanAccessOrg = (roles: Roles) => {
   return roles.isSuperAdmin || roles.isSupport;
 };
 
+const CanAccessPod = (roles: Roles) => {
+  return roles.isSuperAdmin;
+};
+
 const CanAccessContent = (roles: Roles) => {
   return roles.isOrgAdmin || roles.isStoreAdmin;
 };
@@ -92,6 +96,22 @@ export const MENU_ITEMS: MenuItem[] =
           title: 'COMPONENTS.ORG_LIST',
           key: 'COMPONENTS.ORG_LIST',
           link: '/pages/org-management/org-list',
+          hidden: false,
+        }
+      ],
+    },
+     {
+      title: 'Pod Management',
+      key: 'Pod Management',
+      icon: 'cube',
+      link: '',
+      hidden: false,
+      guards: [CanAccessPod],
+      children: [
+        {
+          title: 'Pod List',
+          key: 'Pod List',
+          link: '/pages/pod-management/list',
           hidden: false,
         }
       ],
@@ -295,4 +315,3 @@ export const MENU_ITEMS: MenuItem[] =
       ]
     },
   ];
-

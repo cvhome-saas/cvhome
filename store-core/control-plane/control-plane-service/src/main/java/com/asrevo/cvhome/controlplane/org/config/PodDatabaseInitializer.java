@@ -3,8 +3,10 @@ package com.asrevo.cvhome.controlplane.org.config;
 import com.asrevo.cvhome.commons.domain.Pod;
 import com.asrevo.cvhome.controlplane.org.entity.PodEntity;
 import com.asrevo.cvhome.controlplane.org.repository.PodRepository;
+import com.asrevo.cvhome.controlplane.org.service.PodService;
 import com.asrevo.cvhome.s2s.model.ServiceDomainProperties;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
@@ -22,7 +24,7 @@ public class PodDatabaseInitializer {
 
 	private final ServiceDomainProperties properties;
 
-	private final PodRepository podRepository;
+	private final PodService podService;
 
 	@EventListener(ApplicationReadyEvent.class)
 	@Transactional
@@ -36,22 +38,14 @@ public class PodDatabaseInitializer {
 		log.info("Syncing {} pods from properties to database", pods.size());
 
 		for (Pod pod : pods) {
-			getById(pod).ifPresentOrElse(entity -> {
-				log.debug("Updating pod {} from properties", pod);
-				updateEntity(entity, pod);
-				podRepository.save(entity);
-			}, () -> {
+			if (Objects.nonNull(podService.pod(pod.id()))) {
+				podService.update(pod.id(), pod);
+			}
+			else {
 				log.info("Creating new pod {} from properties", pod);
-				podRepository.save(PodEntity.newEntity(pod));
-			});
+				podService.save(pod);
+			}
 		}
-	}
-
-	private @NonNull Optional<PodEntity> getById(Pod pod) {
-		if (pod.id() == null) {
-			return Optional.empty();
-		}
-		return podRepository.findById(pod.id());
 	}
 
 	private void updateEntity(PodEntity entity, Pod pod) {

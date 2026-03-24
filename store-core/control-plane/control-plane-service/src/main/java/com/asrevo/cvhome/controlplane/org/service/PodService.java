@@ -22,4 +22,6 @@ public interface PodService {
 
 	void delete(PodId podId);
 
+	Pod update(PodId id, Pod pod);
+
 }

@@ -197,8 +197,8 @@
     "SEARCH": "Search a store",
     "STORE_DOMAIN": "Domain",
     "DOMAIN_REQUIRED": "Domain Required",
-    "STORE_SLIDER_IMAGES":"Slider Images",
-    "ADD_NEW_SLIDER_IMAGE":"Add New Slider Image",
+    "STORE_SLIDER_IMAGES": "Slider Images",
+    "ADD_NEW_SLIDER_IMAGE": "Add New Slider Image",
     "SLIDER_IMAGE_UPDATED": "Slider Image Updated",
     "SLIDER_IMAGE_UPLOADED_SUCCESSFULLY": "Image uploaded successfully",
     "SOCIAL_LINKS_UPDATED": "Social Links Updated",
@@ -830,13 +830,11 @@
       "LIMITED_PRODUCTS": "limited products",
       "LIMITED_VISITORS": "limited visitors",
       "LIMITED_ACCOUNTS": "limited accounts",
-
       "BASIC_STORES": "basic stores",
       "BASIC_ORDERS": "basic orders",
       "BASIC_PRODUCTS": "basic products",
       "BASIC_VISITORS": "basic visitors",
       "BASIC_ACCOUNTS": "basic accounts",
-
       "PERFORMANCE_STORES": "performance stores",
       "PERFORMANCE_ORDERS": "performance orders",
       "PERFORMANCE_PRODUCTS": "performance products",
@@ -849,5 +847,22 @@
       "BASIC": "Basic",
       "PERFORMANCE": "Performance"
     }
+  },
+  "POD": {
+    "POD_MANAGEMENT": "Pod Management",
+    "CREATE_POD": "Create Pod",
+    "EDIT_POD": "Edit Pod",
+    "POD_LIST": "Pod List"
+  },
+  "POD_FORM": {
+    "NAME": "Name",
+    "ENDPOINT_URL": "Endpoint URL",
+    "TYPE": "Type",
+    "ORG_ID": "Org ID",
+    "NAME_REQUIRED": "Name is required.",
+    "NAME_PATTERN": "Name can only contain letters, numbers, and hyphens.",
+    "ENDPOINT_URL_REQUIRED": "Endpoint URL is required.",
+    "ENDPOINT_URL_PATTERN": "Must be a valid URL (starting with http:// or https://).",
+    "SELECT_TYPE": "Select Type"
   }
 }

@@ -67,7 +67,7 @@ public class PodController {
 	@PutMapping("{id}")
 	@PreAuthorize("hasRole('ROLE_SUPER_ADMIN')")
 	public Mono<Pod> update(@PathVariable PodId id, @RequestBody Pod pod) {
-		return Mono.just(podService.save(pod));
+		return Mono.just(podService.update(id, pod));
 	}
 
 	@DeleteMapping("{id}")
