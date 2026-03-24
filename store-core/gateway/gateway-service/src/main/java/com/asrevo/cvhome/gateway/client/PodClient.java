@@ -6,11 +6,14 @@ import com.asrevo.cvhome.s2s.config.internal.ServiceUrlBuilder;
 import com.asrevo.cvhome.s2s.model.ServiceDomainProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.gateway.event.RefreshRoutesEvent;
 import org.springframework.cloud.gateway.filter.FilterDefinition;
 import org.springframework.cloud.gateway.handler.predicate.PredicateDefinition;
 import org.springframework.cloud.gateway.route.RouteDefinition;
 import org.springframework.cloud.gateway.route.RouteDefinitionRepository;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.env.Environment;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -28,6 +31,13 @@ public class PodClient implements RouteDefinitionRepository {
 	private final PodExternalClient podExternalClient;
 
 	private final Environment environment;
+
+	private final ApplicationEventPublisher publisher;
+
+	@Scheduled(fixedRateString = "${cvhome.gateway.route-refresh-rate:PT1M}")
+	public void refreshRoutes() {
+		publisher.publishEvent(new RefreshRoutesEvent(this));
+	}
 
 	public Flux<Pod> getPods() {
 		return podExternalClient.listPods().onErrorResume(e -> {
