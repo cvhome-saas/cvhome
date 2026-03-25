@@ -9,7 +9,9 @@
 pluginManagement {
     includeBuild('build-logic')
     repositories {
+        mavenLocal()
         maven { url = 'https://repo.spring.io/milestone' }
+        mavenCentral()
         gradlePluginPortal()
     }
 }
