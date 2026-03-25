@@ -20,6 +20,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -35,6 +36,12 @@ public class PodClient implements RouteDefinitionRepository {
 	private final Environment environment;
 
 	private final ApplicationEventPublisher publisher;
+
+	private final static List<FilterDefinition> commonFilters = List.of(new FilterDefinition("StripPrefix=1"),
+			new FilterDefinition("TokenRelay"));
+
+	private final static List<PredicateDefinition> commonPredicates = List
+		.of(new PredicateDefinition("Path=/store-pod-gateway/**"), new PredicateDefinition("Query=store"));
 
 	@Scheduled(fixedRateString = "${cvhome.gateway.route-refresh-rate:PT1M}")
 	public void refreshRoutes() {
@@ -56,10 +63,11 @@ public class PodClient implements RouteDefinitionRepository {
 			rd.setId("pod-" + pod.id().id());
 			rd.setUri(URI.create(serviceUrlBuilder.getServiceUrl(pod)));
 
-			rd.setPredicates(List.of(new PredicateDefinition("Path=/store-pod-gateway/**"),
-					new PredicateDefinition("Query=store"), new PredicateDefinition("Query=pod," + pod.id().id())));
+			var predicates = new ArrayList<>(commonPredicates);
+			predicates.add(new PredicateDefinition("Query=pod," + pod.id().id()));
+			rd.setPredicates(predicates);
 
-			rd.setFilters(List.of(new FilterDefinition("StripPrefix=1"), new FilterDefinition("TokenRelay")));
+			rd.setFilters(commonFilters);
 			return rd;
 		});
 	}
