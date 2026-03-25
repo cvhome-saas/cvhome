@@ -99,6 +99,15 @@ spring:
         events-out-0:
           content-type: application/json
           destination: events
+    gateway:
+      server:
+        webflux:
+          discovery:
+            locator:
+              enabled: false
+          predicate:
+            host:
+              include-port: false
   security:
     oauth2:
       client:
@@ -182,3 +191,7 @@ otel:
       experimental-span-attributes: true
     spring-webflux:
       experimental-span-attributes: true
+logging:
+  level:
+    com:
+      asrevo: DEBUG
