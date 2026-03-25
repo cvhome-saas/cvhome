@@ -47,6 +47,6 @@ VALUES ('352023632b046970c104b76f', 'FREE', 'MONTH', CURRENT_DATE, CURRENT_DATE,
 ON CONFLICT DO NOTHING;
 
 INSERT INTO org.pod(id, name, endpoint, endpoint_type, org_id, version)
-VALUES ('507f1f77bcf86cd799439011', 'pod-1', 'http://store-pod-saas-gateway-1.gateway.com', 'EXTERNAL', null, 1)
+VALUES ('507f1f77bcf86cd799439011', 'pod-507f1f77bcf86cd', 'http://spg-507f1f77bcf86cd.gateway.com', 'EXTERNAL', null, 1)
 ON CONFLICT DO NOTHING;
 

@@ -9,7 +9,7 @@ spring:
         registration:
           s2s:
             provider: uaa
-            client-id: store-pod-1@service.store-pod.internal
+            client-id: store-pod-507f1f77bcf86cd@service.store-pod.internal
             client-secret: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
             authorization-grant-type: client_credentials
             scope: internal
