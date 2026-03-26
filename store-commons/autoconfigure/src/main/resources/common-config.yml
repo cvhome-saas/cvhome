@@ -62,6 +62,13 @@ com:
           schema: http
           namespace: store-pod-507f1f77.cvhome.lcl
           gateway-service-name: store-pod-gateway
+        cua:
+          name: cua
+          domain: store-pod-1.${com.asrevo.cvhome.app.domain}
+          port: 8124
+          schema: http
+          namespace: store-pod-1.cvhome.lcl
+          gateway-service-name: store-pod-gateway
         landing-ui:
           name: landing-ui
           domain: store-pod-507f1f77.${com.asrevo.cvhome.app.domain}
