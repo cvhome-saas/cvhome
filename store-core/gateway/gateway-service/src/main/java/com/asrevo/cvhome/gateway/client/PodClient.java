@@ -60,7 +60,7 @@ public class PodClient implements RouteDefinitionRepository {
 		ServiceUrlBuilder serviceUrlBuilder = new ServiceUrlBuilder(serviceDomainProperties, environment);
 		return getPods().map(pod -> {
 			RouteDefinition rd = new RouteDefinition();
-			rd.setId("pod-" + pod.id().id());
+			rd.setId("pod-" + pod.shortenPodId());
 			rd.setUri(URI.create(serviceUrlBuilder.getServiceUrl(pod)));
 
 			var predicates = new ArrayList<>(commonPredicates);
