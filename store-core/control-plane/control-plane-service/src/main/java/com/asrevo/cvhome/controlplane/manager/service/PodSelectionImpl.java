@@ -3,12 +3,12 @@ package com.asrevo.cvhome.controlplane.manager.service;
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
 import com.asrevo.cvhome.commons.domain.Pod;
 import com.asrevo.cvhome.commons.domain.PodId;
-import com.asrevo.cvhome.s2s.model.ServiceDomainProperties;
+import com.asrevo.cvhome.controlplane.org.service.PodService;
 import java.util.List;
-import java.util.Objects;
 import java.util.Random;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -18,38 +18,26 @@ public class PodSelectionImpl implements PodSelection {
 
 	private static final Random rnd = new Random();
 
-	private final ServiceDomainProperties properties;
+	private final PodService podService;
 
 	@Override
 	public PodId next(ManagerOrgId orgId, PodId preferredPodId) {
-		log.info("querying {} namespaces to get valid for org {}", properties.pods().size(), orgId);
+		List<Pod> allPods = podService.listAllPods(Pageable.unpaged()).toList();
+		log.info("querying {} namespaces to get valid for org {}", allPods.size(), orgId);
 
-		List<Pod> myPrivatePods = listPrivatePods(orgId);
+		List<Pod> myPrivatePods = podService.listAllPods(orgId, Pageable.unpaged()).toList();
 
 		if (!myPrivatePods.isEmpty()) {
 			log.info("find {} private namespaces valid for org {}", myPrivatePods.size(), orgId);
 			return findPrivatePod(orgId, preferredPodId, myPrivatePods);
 		}
 
-		List<Pod> publicNamespaces = properties.pods()
-			.stream()
-			.filter(it -> Objects.isNull(it.orgId()) || Objects.isNull(it.orgId().getId()))
-			.toList();
+		List<Pod> publicNamespaces = podService.listPublicPods();
 
 		log.info("find {} public namespaces valid for org {}", publicNamespaces.size(), orgId);
 		Pod pod = random(publicNamespaces);
 		log.info("will select public pod {} for org {}", pod, orgId);
 		return pod.id();
-	}
-
-	@Override
-	public List<Pod> listPrivatePods(ManagerOrgId orgId) {
-		return properties.pods().stream().filter(it -> orgId.equals(it.orgId())).toList();
-	}
-
-	@Override
-	public List<Pod> listAllPods() {
-		return properties.pods();
 	}
 
 	private PodId findPrivatePod(ManagerOrgId orgId, PodId preferredPodId, List<Pod> myPrivatePods) {

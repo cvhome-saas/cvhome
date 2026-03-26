@@ -56,13 +56,3 @@ spring:
                 metadata:
                   service-name: landing-ui
                   instance: landing-ui-1
-    gateway:
-      server:
-        webflux:
-          discovery:
-            locator:
-              enabled: false
-logging:
-  level:
-    com:
-      asrevo: DEBUG

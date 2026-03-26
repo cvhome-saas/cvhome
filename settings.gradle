@@ -9,7 +9,9 @@
 pluginManagement {
     includeBuild('build-logic')
     repositories {
+        mavenLocal()
         maven { url = 'https://repo.spring.io/milestone' }
+        mavenCentral()
         gradlePluginPortal()
     }
 }
@@ -57,5 +59,6 @@ include(
         'store-core:control-plane:subscription-commons',
         'store-core:control-plane:subscription-events',
         'store-core:control-plane:subscription-external-api',
+        'store-core:control-plane:pod-external-api',
         'store-core:seller-ui',
 )

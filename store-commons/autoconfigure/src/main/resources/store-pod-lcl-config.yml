@@ -16,10 +16,9 @@ com:
         base-path: "http://localhost:9000/d0dd4299-963a-4458-b31f-8efe31c35e8e"
       pod-info:
         pod:
-          id:
-            id: 1
-          name: pod-1
+          id: 507f1f77bcf86cd799439011
+          name: pod-507f1f77bcf86cd
           endpoint:
-            endpoint: http://store-pod-saas-gateway-1.gateway.com
+            endpoint: http://spg-507f1f77.gateway.com
             type: EXTERNAL
-          domain: store-pod-saas-gateway-1.gateway.com
+          domain: spg-507f1f77.gateway.com

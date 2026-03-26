@@ -2,10 +2,9 @@ com:
   asrevo:
     cvhome:
       pods:
-        - id:
-            id: 1
-          name: pod-1
+        - id: 507f1f77bcf86cd799439011
+          name: pod-507f1f77bcf86cd
           endpoint:
-            endpoint: http://store-pod-saas-gateway-1.gateway.com
+            endpoint: http://spg-507f1f77.gateway.com
             type: EXTERNAL
-          domain: store-pod-saas-gateway-1.gateway.com
+          domain: spg-507f1f77.gateway.com

@@ -830,13 +830,11 @@
       "LIMITED_PRODUCTS": "produits limités",
       "LIMITED_VISITORS": "visiteurs limités",
       "LIMITED_ACCOUNTS": "comptes limités",
-
       "BASIC_STORES": "magasins de base",
       "BASIC_ORDERS": "commandes de base",
       "BASIC_PRODUCTS": "produits de base",
       "BASIC_VISITORS": "visiteurs de base",
       "BASIC_ACCOUNTS": "comptes de base",
-
       "PERFORMANCE_STORES": "magasins de performance",
       "PERFORMANCE_ORDERS": "commandes de performance",
       "PERFORMANCE_PRODUCTS": "produits de performance",
@@ -849,5 +847,22 @@
       "BASIC": "Basique",
       "PERFORMANCE": "Performance"
     }
+  },
+  "POD": {
+    "POD_MANAGEMENT": "Gestion des pods",
+    "CREATE_POD": "Créer un pod",
+    "EDIT_POD": "Modifier le pod",
+    "POD_LIST": "Liste des pods"
+  },
+  "POD_FORM": {
+    "NAME": "Nom",
+    "ENDPOINT_URL": "URL du point de terminaison",
+    "TYPE": "Type",
+    "ORG_ID": "ID de l'organisation",
+    "NAME_REQUIRED": "Le nom est requis.",
+    "NAME_PATTERN": "Le nom ne peut contenir que des lettres, des chiffres et des tirets.",
+    "ENDPOINT_URL_REQUIRED": "L'URL du point de terminaison est requise.",
+    "ENDPOINT_URL_PATTERN": "Doit être une URL valide (commençant par http:// ou https://).",
+    "SELECT_TYPE": "Sélectionner un type"
   }
 }

@@ -11,7 +11,6 @@ import {ErrorService} from "../../shared/services/error.service";
 })
 export class StoreDetailInfoComponent implements OnInit {
   store;
-  loader = false;
 
   constructor(
     private storeService: StoreService,
@@ -25,9 +24,7 @@ export class StoreDetailInfoComponent implements OnInit {
     this.storeService.getStore(store)
       .subscribe(res => {
         this.store = res;
-        this.loader = false;
       }, err => {
-        this.loader = false;
         this.errorService.error('ERROR.SYSTEM_ERROR', err);
       });
   }
