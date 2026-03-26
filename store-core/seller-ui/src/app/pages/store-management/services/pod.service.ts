@@ -43,6 +43,7 @@ export type Pods = Pod[]
 export interface Pod {
   id: PodId
   name: string
+  shortenPodId: string
   endpoint: Endpoint
   orgId: ManagerOrgId
 }

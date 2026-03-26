@@ -67,7 +67,7 @@ export class StoreDomainComponent implements OnInit , StoreDomainComponentValida
   form: FormGroup;
   protected readonly ColumnMode = ColumnMode;
   saasProperties = {alis: '', domain: ''};
-  podId = {id: ''};
+  shortenPodId :string;
 
   constructor(
     private storeService: StoreService,
@@ -108,7 +108,7 @@ export class StoreDomainComponent implements OnInit , StoreDomainComponentValida
         next: (it) => {
           this.loading = false;
           this.saasProperties = it[0];
-          this.podId = it[2].id;
+          this.shortenPodId = it[2].shortenPodId;
           if (it[1].length > 0) {
             this.rows = it[1];
             this.page.totalPages = 1;
@@ -198,6 +198,6 @@ export class StoreDomainComponent implements OnInit , StoreDomainComponentValida
   }
 
   public podServerDomain() {
-    return this.saasProperties.alis + "-" + this.podId.id + "." + this.saasProperties.domain;
+    return this.saasProperties.alis + "-" + this.shortenPodId + "." + this.saasProperties.domain;
   }
 }

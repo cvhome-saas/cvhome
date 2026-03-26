@@ -3,6 +3,7 @@ import {Injectable} from '@angular/core';
 import {CrudService} from '../../shared/services/crud.service';
 import {Observable} from 'rxjs';
 import {SliderImage} from "../store-slider-images/store-slider-images.component";
+import {Pod} from "./pod.service";
 
 @Injectable({
   providedIn: 'root'
@@ -22,7 +23,7 @@ export class StoreService {
     return this.crudService.get(`/store-pod-gateway/merchant/api/v1/router/private/allocates`,{store});
   }
 
-  storePodByStoreId(store:string): Observable<any> {
+  storePodByStoreId(store:string): Observable<Pod> {
     return this.crudService.get(`/control-plane/api/v1/router/store-pod-by-store-id`,{store});
   }
 
