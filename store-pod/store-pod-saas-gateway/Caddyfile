@@ -56,6 +56,19 @@
         reverse_proxy http://checkout.{$NAMESPACE}:8123
     }
 
+    handle /cua* {
+        tracing {
+            span cua
+        }
+        header {
+            response X-Trace-Id {http.vars.trace_id}
+            response X-Span-Id {http.vars.span_id}
+        }
+        reverse_proxy http://cua.{$NAMESPACE}:8124 {
+            header_up X-Forwarded-Prefix /cua
+        }
+    }
+
 
     route {
         tracing {

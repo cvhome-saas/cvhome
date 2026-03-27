@@ -1,0 +1,37 @@
+insert into cua.users (id, username, email, first_name, last_name, password_hash, enabled, metadata)
+values ('65D8419C-8765-4B8B-A15F-910DCE959931', 'super-admin', 'super-admin@mail.com', 'Super', 'Admin',
+        '{bcrypt}$2a$10$pse9zsAXkH/zOjZpfiP7X.weD6CNtVY/NR5A4mYUwbYqcYThHchRa', TRUE, '{}'),
+       ('318F2FD5-E235-4C2E-AB7E-6C949BA4CDD4', 'org1-admin', 'org1-admin@mail.com', 'Org1', 'Admin',
+        '{bcrypt}$2a$10$pse9zsAXkH/zOjZpfiP7X.weD6CNtVY/NR5A4mYUwbYqcYThHchRa', TRUE,
+        '{"org": "21f023932bc66470c104b76f"}'),
+       ('60AB49A5-7F06-4B5A-BE81-9B30BB6559AE', 'org1-store1-admin', 'org1-store1-admin@mail.com', 'Store1', 'Admin',
+        '{bcrypt}$2a$10$pse9zsAXkH/zOjZpfiP7X.weD6CNtVY/NR5A4mYUwbYqcYThHchRa', TRUE,
+        '{"org": "21f023932bc66470c104b76f", "store": "65f023632bc46470c104b76f"}'),
+       ('0C1C7C69-F504-47E2-AA5D-3348CBD1023F', 'org1-store1-moderator', 'org1-store1-moderator@mail.com', 'Store1', 'Moderator',
+        '{bcrypt}$2a$10$pse9zsAXkH/zOjZpfiP7X.weD6CNtVY/NR5A4mYUwbYqcYThHchRa', TRUE,
+        '{"org": "21f023932bc66470c104b76f", "store": "65f023632bc46470c104b76f"}'),
+       ('E91EB99A-D3C9-4FBE-8CD3-8744E4F6CA29', 'org1-store2-admin', 'org1-store2-admin@mail.com', 'Store2', 'Admin',
+        '{bcrypt}$2a$10$pse9zsAXkH/zOjZpfiP7X.weD6CNtVY/NR5A4mYUwbYqcYThHchRa', TRUE,
+        '{"org": "21f023932bc66470c104b76f", "store": "65f023632bc46470c104b75f"}'),
+       ('77E97256-9706-44A9-A640-52AF9C65E5EA', 'org1-store2-moderator', 'org1-store2-moderator@mail.com', 'Store2', 'Moderator',
+        '{bcrypt}$2a$10$pse9zsAXkH/zOjZpfiP7X.weD6CNtVY/NR5A4mYUwbYqcYThHchRa', TRUE,
+        '{"org": "21f023932bc66470c104b76f", "store": "65f023632bc46470c104b75f"}'),
+       ('7B54CF3C-5510-40BF-BD0B-14C4078EDF07', 'org2-admin', 'org2-admin@mail.com', 'Org2', 'Admin',
+        '{bcrypt}$2a$10$pse9zsAXkH/zOjZpfiP7X.weD6CNtVY/NR5A4mYUwbYqcYThHchRa', TRUE,
+        '{"org": "352023632b046970c104b76f"}'),
+       ('6C303A6A-459C-44FB-B4B2-EAB53FB2B325', 'org2-store1-admin', 'org2-store1-admin@mail.com', 'Store1', 'Admin',
+        '{bcrypt}$2a$10$pse9zsAXkH/zOjZpfiP7X.weD6CNtVY/NR5A4mYUwbYqcYThHchRa', TRUE,
+        '{"org": "352023632b046970c104b76f", "store": "65f020632bc46470c104b76f"}'),
+       ('F900B31E-376E-4757-8EAB-501ABA2CFDD3', 'org2-store1-moderator', 'org2-store1-moderator@mail.com', 'Store1', 'Moderator',
+        '{bcrypt}$2a$10$pse9zsAXkH/zOjZpfiP7X.weD6CNtVY/NR5A4mYUwbYqcYThHchRa', TRUE,
+        '{"org": "352023632b046970c104b76f", "store": "65f020632bc46470c104b76f"}'),
+       ('F1FA1FA2-51F3-41CD-A816-356F6816ABD4', 'org2-store2-admin', 'org2-store2-admin@mail.com', 'Store2', 'Admin',
+        '{bcrypt}$2a$10$pse9zsAXkH/zOjZpfiP7X.weD6CNtVY/NR5A4mYUwbYqcYThHchRa', TRUE,
+        '{"org": "352023632b046970c104b76f", "store": "65f023632bc26470c104b75f"}'),
+       ('97022CD5-CC0A-467A-A99A-460B8E2745C3', 'org2-store2-moderator', 'org2-store2-moderator@mail.com', 'Store2', 'Moderator',
+        '{bcrypt}$2a$10$pse9zsAXkH/zOjZpfiP7X.weD6CNtVY/NR5A4mYUwbYqcYThHchRa', TRUE,
+        '{"org": "352023632b046970c104b76f", "store": "65f023632bc26470c104b75f"}')
+on conflict (id) do nothing;
+
+
+

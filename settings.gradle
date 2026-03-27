@@ -49,6 +49,7 @@ include(
         'store-pod:merchant:merchant-core',
         'store-pod:merchant:merchant-service',
         'store-pod:merchant:merchant-external-api',
+        'store-pod:cua',
 
         'store-core:uaa',
         'store-core:gateway:gateway-service',
