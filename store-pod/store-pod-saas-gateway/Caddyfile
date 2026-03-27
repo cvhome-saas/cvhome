@@ -1,7 +1,6 @@
 {
 	debug
 	admin 0.0.0.0:2019
-    order domain_lookup before reverse_proxy
 
 	log {
 		format json
@@ -65,13 +64,9 @@
             response X-Trace-Id {http.vars.trace_id}
             response X-Span-Id {http.vars.span_id}
         }
-        domain_lookup {
-            lookup_url {$DOMAIN_LOOKUP_URL}
-            cache_ttl  {$DOMAIN_LOOKUP_TTL:5m}
-        }
         reverse_proxy http://cua.{$NAMESPACE}:8124 {
             header_up X-Forwarded-Prefix /cua
-            }
+        }
     }
 
 
