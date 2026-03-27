@@ -34,4 +34,3 @@ public class LoginController {
 	}
 
 }
-// http://org1-store1.spg-507f1f77.gateway.com:80/cua/oauth2/authorize?response_type=code&client_id=web-app&scope=openid&state=wluMmDBnDBX9ukT3ngWhC2vSTrhAZu10pGBXOtcZ9Qo%3D&redirect_uri=http://org1-store1.spg-507f1f77.gateway.com/callback&nonce=U6H2w96cGF3jSEpaCNNtKpkYgUWRAhGf3Wuu0W536oc&code_challenge=MOySr8hcWy7BPgvQDzx5UvuUZq-kipC298xOPA-e6r8&code_challenge_method=S256

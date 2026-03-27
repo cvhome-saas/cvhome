@@ -57,3 +57,18 @@ Content-Type: application/x-www-form-urlencoded
 Authorization: Basic store-pod-1@service.store-pod.internal hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
 
 grant_type=client_credentials&scope=internal
+
+###
+# http://org1-store1.spg-507f1f77.gateway.com:80/cua/oauth2/authorize?response_type=code&client_id=web-app&scope=openid&state=wluMmDBnDBX9ukT3ngWhC2vSTrhAZu10pGBXOtcZ9Qo%3D&redirect_uri=http://org1-store1.spg-507f1f77.gateway.com/callback&nonce=U6H2w96cGF3jSEpaCNNtKpkYgUWRAhGf3Wuu0W536oc&code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM&code_challenge_method=S256
+# code_verifier = dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk
+# BASE64URL(SHA256(code_verifier)) = E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM
+POST http://org1-store1.spg-507f1f77.gateway.com:80/cua/oauth2/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type = authorization_code &
+code = 1tRF_77x5w0wccQg0BswzeW4JlH97OB_BCzXEK5Zld_2XPwm37bZQDHP0F9yAtX9nKrWLxkSiw5Bic6L42B1tRsCE01krMOjypyi0UguGyKjpqoo38SkyDkS3h7x5Cle &
+redirect_uri = http://org1-store1.spg-507f1f77.gateway.com/callback &
+client_id = web-app &
+code_verifier = dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk
+
+###
