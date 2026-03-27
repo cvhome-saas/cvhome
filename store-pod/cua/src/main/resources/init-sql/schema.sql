@@ -1,5 +1,5 @@
 create schema if not exists cua;
--- Users table
+
 create table if not exists cua.users
 (
     id            uuid PRIMARY KEY,
@@ -17,24 +17,6 @@ create table if not exists cua.users
 );
 
 CREATE INDEX IF NOT EXISTS idx_users_metadata ON cua.users USING gin (metadata);
-
--- Roles table
-create table if not exists cua.roles
-(
-    id   uuid PRIMARY KEY,
-    name VARCHAR(80) NOT NULL,
-    constraint UKofx66keruapi6vyqpv6f2or37 unique (name)
-);
-
--- User-Roles join table
-create table if not exists cua.user_roles
-(
-    user_id uuid NOT NULL,
-    role_id uuid NOT NULL,
-    PRIMARY KEY (user_id, role_id),
-    constraint FKh8ciramu9cc9q3qcqiv4ue8a6 foreign key (role_id) references cua.roles,
-    constraint FKhfh9dx7w3ubf1co1vdev94g3f foreign key (user_id) references cua.users
-);
 
 create table if not exists cua.signing_keys
 (
