@@ -6,10 +6,8 @@ import org.springframework.security.oauth2.server.authorization.OAuth2TokenType;
 import org.springframework.security.oauth2.server.authorization.token.JwtEncodingContext;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
 
-
 @Configuration
 public class JwtCustomizerConfig {
-
 
 	@Bean
 	OAuth2TokenCustomizer<JwtEncodingContext> oauth2TokenCustomizer() {
@@ -19,11 +17,7 @@ public class JwtCustomizerConfig {
 				return;
 			}
 
-
 		};
 	}
-
-
-
 
 }
