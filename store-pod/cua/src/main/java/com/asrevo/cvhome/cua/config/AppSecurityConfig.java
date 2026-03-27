@@ -35,8 +35,6 @@ public class AppSecurityConfig {
 			.permitAll()
 			.requestMatchers("/v3/api-docs/**")
 			.permitAll()
-			.requestMatchers("/api/v1/admin/**")
-			.hasAnyAuthority("SCOPE_super_admin", "ROLE_SUPER_ADMIN")
 			.anyRequest()
 			.authenticated())
 			.formLogin(it -> it.loginPage("/login"))
