@@ -17,7 +17,8 @@
       "QTY": "Quantité",
       "AVAILABLE": "disponible",
       "PRODUCT_ALREADY_EXIST_IN_CART": "Déjà dans votre panier.",
-      "ADD_TO_SECURE_CHECKOUT": "Ajouter au panier pour un paiement sécurisé."
+      "ADD_TO_SECURE_CHECKOUT": "Ajouter au panier pour un paiement sécurisé.",
+      "OUT_OF_STOCK": "En rupture de stock"
     },
     "CHECKOUT": {
       "TITLE": "Paiement",
@@ -91,8 +92,11 @@
         "EN": "Anglais",
         "AR": "Arabe",
         "FR": "Français",
-        "RU": "Russe"
-      }
+        "RU": "Russe",
+        "ES": "Espagnol"
+      },
+      "LOGIN": "Connexion",
+      "LOGOUT": "Déconnexion"
     },
     "FOOTER": {
       "SOCIAL_FACEBOOK": "Facebook",

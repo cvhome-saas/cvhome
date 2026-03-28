@@ -150,14 +150,14 @@ export const Header = ({params, headerBox}: {
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end">
                                         <DropdownMenuItem onClick={logout} className="cursor-pointer text-destructive focus:text-destructive">
-                                            {t('LOGOUT') || 'Logout'}
+                                            {t('LOGOUT')}
                                         </DropdownMenuItem>
                                     </DropdownMenuContent>
                                 </DropdownMenu>
                             </div>
                         ) : (
                             <Button variant="ghost" onClick={login} className="text-sm font-semibold leading-6 text-foreground">
-                                {t('LOGIN') || 'Login'} <span aria-hidden="true">&rarr;</span>
+                                {t('LOGIN')} <span aria-hidden="true">&rarr;</span>
                             </Button>
                         )}
                         <Button variant="ghost" className="relative" onClick={() => setCartOpen(true)}>

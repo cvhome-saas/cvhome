@@ -141,14 +141,14 @@ export const Header = ({params, headerBox}: {
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end">
                                         <DropdownMenuItem onClick={logout} className="cursor-pointer text-destructive focus:text-destructive text-xs uppercase tracking-[0.12em]">
-                                            {t('LOGOUT') || 'Logout'}
+                                            {t('LOGOUT')}
                                         </DropdownMenuItem>
                                     </DropdownMenuContent>
                                 </DropdownMenu>
                             </div>
                         ) : (
                             <Button variant="ghost" size="sm" onClick={login} className="tracking-[0.12em] uppercase text-xs">
-                                {t('LOGIN') || 'Login'}
+                                {t('LOGIN')}
                             </Button>
                         )}
 

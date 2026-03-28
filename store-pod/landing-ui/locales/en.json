@@ -92,8 +92,11 @@
         "EN": "English",
         "AR": "Arabic",
         "FR": "French",
-        "RU": "Russian"
-      }
+        "RU": "Russian",
+        "ES": "Spanish"
+      },
+      "LOGIN": "Login",
+      "LOGOUT": "Logout"
     },
     "FOOTER": {
       "SOCIAL_FACEBOOK": "Facebook",
