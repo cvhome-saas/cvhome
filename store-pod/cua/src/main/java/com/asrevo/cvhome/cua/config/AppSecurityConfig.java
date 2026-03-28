@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.cua.config;
 
+import com.asrevo.cvhome.cua.security.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.security.autoconfigure.actuate.web.servlet.EndpointRequest;
 import org.springframework.context.annotation.Bean;
@@ -26,6 +27,8 @@ public class AppSecurityConfig {
 
 	private final SocialLoginConfigRepository socialLoginConfigRepository;
 
+	private final CustomOAuth2UserService customOAuth2UserService;
+
 	@Bean
 	SecurityFilterChain appSecurity(HttpSecurity http) throws Exception {
 		http.authorizeHttpRequests(auth -> auth.requestMatchers("/.well-known/**")
@@ -44,7 +47,8 @@ public class AppSecurityConfig {
 			.anyRequest()
 			.authenticated())
 			.formLogin(it -> it.loginPage("/login"))
-			.oauth2Login(it -> it.loginPage("/login"))
+			.oauth2Login(it -> it.loginPage("/login")
+				.userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService)))
 			.csrf(AbstractHttpConfigurer::disable)
 			.requestCache(cache -> cache.requestCache(requestCache()))
 

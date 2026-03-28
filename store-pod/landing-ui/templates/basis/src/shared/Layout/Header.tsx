@@ -28,6 +28,8 @@ import {StoreContext} from "@/types/store-context";
 import {CartProductList} from "@/shared/Cart/CartProductList";
 import {isRtl} from "@/services/direction-utils";
 import {useCart} from "@store-front/hooks/use-cart";
+import {AuthService} from "@store-front/services/auth-service";
+import {User} from "lucide-react";
 
 export const Header = ({params, headerBox}: {
     params: LayoutParams,
@@ -38,6 +40,15 @@ export const Header = ({params, headerBox}: {
     const storeContext = params.storeContext;
     const {cart} = useCart(storeContext);
     const pathname = usePathname();
+    const [user, setUser] = useState<any>(null);
+
+    useEffect(() => {
+        AuthService.getMe(storeContext).then(setUser).catch(() => setUser(null));
+    }, [storeContext]);
+
+    const handleLogin = async () => {
+        await AuthService.login(storeContext);
+    };
 
     useEffect(() => {
         setCartOpen(false);
@@ -132,7 +143,21 @@ export const Header = ({params, headerBox}: {
                         </NavigationMenuList>
                     </NavigationMenu>
 
-                    <div className="hidden lg:flex lg:flex-1 lg:justify-end">
+                    <div className="hidden lg:flex lg:flex-1 lg:justify-end gap-2 items-center">
+                        {user ? (
+                            <div className="flex items-center gap-2">
+                                <span className="text-sm font-medium text-muted-foreground hidden sm:inline">
+                                    {user.firstName || user.username}
+                                </span>
+                                <Button variant="ghost" size="icon" className="rounded-full">
+                                    <User className="size-6" />
+                                </Button>
+                            </div>
+                        ) : (
+                            <Button variant="ghost" onClick={handleLogin} className="text-sm font-semibold leading-6 text-foreground">
+                                {t('LOGIN') || 'Login'} <span aria-hidden="true">&rarr;</span>
+                            </Button>
+                        )}
                         <Button variant="ghost" className="relative" onClick={() => setCartOpen(true)}>
                             <ShoppingBag
                                 aria-hidden="true"

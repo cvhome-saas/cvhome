@@ -28,6 +28,8 @@ import {StoreContext} from "@/types/store-context";
 import {CartProductList} from "@/shared/Cart/CartProductList";
 import {isRtl} from "@/services/direction-utils";
 import {useCart} from "@store-front/hooks/use-cart";
+import {AuthService} from "@store-front/services/auth-service";
+import {User} from "lucide-react";
 
 export const Header = ({params, headerBox}: {
     params: LayoutParams,
@@ -39,6 +41,15 @@ export const Header = ({params, headerBox}: {
     const storeContext = params.storeContext;
     const {cart} = useCart(storeContext);
     const pathname = usePathname();
+    const [user, setUser] = useState<any>(null);
+
+    useEffect(() => {
+        AuthService.getMe(storeContext).then(setUser).catch(() => setUser(null));
+    }, [storeContext]);
+
+    const handleLogin = async () => {
+        await AuthService.login(storeContext);
+    };
 
     useEffect(() => {
         setCartOpen(false);
@@ -123,6 +134,22 @@ export const Header = ({params, headerBox}: {
                         <div className="hidden lg:flex">
                             <LanguageSelector store={params.store} locale={params.locale}/>
                         </div>
+
+                        {user ? (
+                            <div className="flex items-center gap-2">
+                                <span className="text-xs font-medium text-muted-foreground hidden sm:inline">
+                                    {user.firstName || user.username}
+                                </span>
+                                <Button variant="ghost" size="icon" className="rounded-full">
+                                    <User className="size-5" />
+                                </Button>
+                            </div>
+                        ) : (
+                            <Button variant="ghost" size="sm" onClick={handleLogin} className="tracking-[0.12em] uppercase text-xs">
+                                {t('LOGIN') || 'Login'}
+                            </Button>
+                        )}
+
                         <div className="flex lg:hidden">
                             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
                                 <SheetTrigger asChild>

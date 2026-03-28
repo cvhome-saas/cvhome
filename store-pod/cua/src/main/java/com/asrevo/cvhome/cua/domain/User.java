@@ -19,10 +19,13 @@ public class User {
 	@Id
 	private UUID id;
 
-	@Column(nullable = false, unique = true, length = 190)
+	@Column(name = "client_id", nullable = false, length = 190)
+	private String clientId;
+
+	@Column(nullable = false, length = 190)
 	private String username;
 
-	@Column(unique = true, length = 254)
+	@Column(length = 254)
 	private String email;
 
 	@Column(name = "first_name", length = 50)

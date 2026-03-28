@@ -7,6 +7,7 @@ import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 
 import java.util.Arrays;
+import java.util.Map;
 import java.util.function.Function;
 
 @Getter
@@ -14,7 +15,8 @@ public enum SocialProvider {
 
 	GOOGLE("google", "Google",
 			(registrationId) -> ClientRegistrations.fromOidcIssuerLocation("https://accounts.google.com")
-				.registrationId(registrationId)),
+				.registrationId(registrationId),
+			"email", "name"),
 
 	FACEBOOK("facebook", "Facebook",
 			(registrationId) -> ClientRegistration.withRegistrationId(registrationId)
@@ -26,7 +28,8 @@ public enum SocialProvider {
 				.tokenUri("https://graph.facebook.com/v19.0/oauth/access_token")
 				.userInfoUri("https://graph.facebook.com/me?fields=id,name,email,picture")
 				.userNameAttributeName("id")
-				.clientName("Facebook")),
+				.clientName("Facebook"),
+			"email", "name"),
 
 	GITHUB("github", "GitHub",
 			(registrationId) -> ClientRegistration.withRegistrationId(registrationId)
@@ -38,7 +41,8 @@ public enum SocialProvider {
 				.tokenUri("https://github.com/login/oauth/access_token")
 				.userInfoUri("https://api.github.com/user")
 				.userNameAttributeName("id")
-				.clientName("GitHub"));
+				.clientName("GitHub"),
+			"email", "name");
 
 	private final String providerId;
 
@@ -46,10 +50,17 @@ public enum SocialProvider {
 
 	private final Function<String, ClientRegistration.Builder> builderFunction;
 
-	SocialProvider(String providerId, String clientName, Function<String, ClientRegistration.Builder> builderFunction) {
+	private final String emailAttribute;
+
+	private final String nameAttribute;
+
+	SocialProvider(String providerId, String clientName, Function<String, ClientRegistration.Builder> builderFunction,
+			String emailAttribute, String nameAttribute) {
 		this.providerId = providerId;
 		this.clientName = clientName;
 		this.builderFunction = builderFunction;
+		this.emailAttribute = emailAttribute;
+		this.nameAttribute = nameAttribute;
 	}
 
 	public static SocialProvider fromProviderId(String providerId) {
@@ -57,6 +68,19 @@ public enum SocialProvider {
 			.filter(p -> p.getProviderId().equalsIgnoreCase(providerId))
 			.findFirst()
 			.orElse(null);
+	}
+
+	public String getEmail(Map<String, Object> attributes) {
+		Object email = attributes.get(emailAttribute);
+		if (email == null) {
+			// Fallback to id if email is not present
+			return (String) attributes.get("id");
+		}
+		return (String) email;
+	}
+
+	public String getName(Map<String, Object> attributes) {
+		return (String) attributes.get(nameAttribute);
 	}
 
 	public ClientRegistration.Builder createBuilder(String registrationId) {

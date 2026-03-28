@@ -3,8 +3,9 @@ create schema if not exists cua;
 create table if not exists cua.users
 (
     id            uuid PRIMARY KEY,
-    email         VARCHAR(254) NOT NULL UNIQUE,
-    username      VARCHAR(190) NOT NULL UNIQUE,
+    client_id     VARCHAR(190) NOT NULL,
+    email         VARCHAR(254) NOT NULL,
+    username      VARCHAR(190) NOT NULL,
     first_name    VARCHAR(50),
     last_name     VARCHAR(50),
     password_hash VARCHAR(100),
@@ -12,8 +13,8 @@ create table if not exists cua.users
     enabled       BOOLEAN      NOT NULL DEFAULT TRUE,
     created_at    TIMESTAMP             DEFAULT CURRENT_TIMESTAMP,
     updated_at    TIMESTAMP             DEFAULT CURRENT_TIMESTAMP,
-    constraint UK6dotkott2kjsp8vw4d0m25fb7 unique (email),
-    constraint UKr43af9ap4edm43mmtq01oddj6 unique (username)
+    constraint UK_client_email unique (client_id, email),
+    constraint UK_client_username unique (client_id, username)
 );
 
 CREATE INDEX IF NOT EXISTS idx_users_metadata ON cua.users USING gin (metadata);

@@ -1,3 +1,4 @@
+import "server-only";
 import {headers} from "next/headers";
 import {getLocale} from "next-intl/server";
 import {FALLBACK_STORE_ID, StoreContext} from "@store-front/types";
