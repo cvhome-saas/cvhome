@@ -28,6 +28,7 @@ import {StoreContext} from "@/types/store-context";
 import {CartProductList} from "@/shared/Cart/CartProductList";
 import {isRtl} from "@/services/direction-utils";
 import {useCart} from "@store-front/hooks/use-cart";
+import {useUser} from "@store-front/hooks/use-user";
 import {AuthService} from "@store-front/services/auth-service";
 import {User} from "lucide-react";
 
@@ -40,16 +41,8 @@ export const Header = ({params, headerBox}: {
     const [cartOpen, setCartOpen] = useState(false)
     const storeContext = params.storeContext;
     const {cart} = useCart(storeContext);
+    const {user, login, logout} = useUser(storeContext);
     const pathname = usePathname();
-    const [user, setUser] = useState<any>(null);
-
-    useEffect(() => {
-        AuthService.getMe(storeContext).then(setUser).catch(() => setUser(null));
-    }, [storeContext]);
-
-    const handleLogin = async () => {
-        await AuthService.login(storeContext);
-    };
 
     useEffect(() => {
         setCartOpen(false);
@@ -138,14 +131,23 @@ export const Header = ({params, headerBox}: {
                         {user ? (
                             <div className="flex items-center gap-2">
                                 <span className="text-xs font-medium text-muted-foreground hidden sm:inline">
-                                    {user.firstName || user.username}
+                                    {user.subject}
                                 </span>
-                                <Button variant="ghost" size="icon" className="rounded-full">
-                                    <User className="size-5" />
-                                </Button>
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="ghost" size="icon" className="rounded-full">
+                                            <User className="size-5" />
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                        <DropdownMenuItem onClick={logout} className="cursor-pointer text-destructive focus:text-destructive text-xs uppercase tracking-[0.12em]">
+                                            {t('LOGOUT') || 'Logout'}
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
                             </div>
                         ) : (
-                            <Button variant="ghost" size="sm" onClick={handleLogin} className="tracking-[0.12em] uppercase text-xs">
+                            <Button variant="ghost" size="sm" onClick={login} className="tracking-[0.12em] uppercase text-xs">
                                 {t('LOGIN') || 'Login'}
                             </Button>
                         )}

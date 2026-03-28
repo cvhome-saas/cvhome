@@ -1,6 +1,7 @@
 import {storeBaseServiceUrl, StoreContext} from "@store-front/types/store-context";
 import {handleResponse} from "./http-utils";
 import {generateCodeChallenge, generateCodeVerifier} from "./pkce-utils";
+import {AuthEventType, User} from "@store-front/types";
 
 export class AuthService {
 
@@ -25,7 +26,7 @@ export class AuthService {
 		window.location.href = authUrl.toString();
 	}
 
-	static async getMe(context: StoreContext): Promise<any> {
+	static async getMe(context: StoreContext): Promise<User | undefined> {
 		const url = `${storeBaseServiceUrl('cua',context)}/api/v1/auth/me`;
 		const response = await fetch(url, {
 			headers: {
@@ -33,7 +34,7 @@ export class AuthService {
 				'Authorization': `Bearer ${sessionStorage.getItem('access_token')}`,
 			},
 		});
-		return handleResponse(response);
+		return handleResponse<User>(response);
 	}
 
 	static async exchangeToken(context: StoreContext, code: string): Promise<any> {
@@ -69,8 +70,15 @@ export class AuthService {
 				sessionStorage.setItem('refresh_token', result.refresh_token);
 			}
 			sessionStorage.removeItem('code_verifier');
+			window.dispatchEvent(new CustomEvent('auth-change', {detail: {type: AuthEventType.LOGIN}}));
 		}
 		return result;
+	}
+
+	static async logout(): Promise<void> {
+		sessionStorage.removeItem('access_token');
+		sessionStorage.removeItem('refresh_token');
+		window.dispatchEvent(new CustomEvent('auth-change', {detail: {type: AuthEventType.LOGOUT}}));
 	}
 
 
