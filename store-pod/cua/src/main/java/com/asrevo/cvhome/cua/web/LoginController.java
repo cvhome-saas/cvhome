@@ -1,5 +1,7 @@
 package com.asrevo.cvhome.cua.web;
 
+import com.asrevo.cvhome.cua.domain.SocialLoginConfig;
+import com.asrevo.cvhome.cua.repo.SocialLoginConfigRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +13,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.Optional;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Controller
@@ -19,6 +22,8 @@ import java.util.Optional;
 public class LoginController {
 
 	private final RequestCache requestCache;
+
+	private final SocialLoginConfigRepository socialLoginConfigRepository;
 
 	@GetMapping("/login")
 	public String login(HttpServletRequest request, HttpServletResponse response, Model model) {
@@ -28,9 +33,18 @@ public class LoginController {
 				.build()
 				.getQueryParams()
 				.getFirst("client_id");
-			Optional.ofNullable(clientId).ifPresent(it -> model.addAttribute("clientId", it));
+			if (clientId != null) {
+				model.addAttribute("clientId", clientId);
+				List<SocialLoginConfig> configs = socialLoginConfigRepository.findAllByClientId(clientId);
+				model.addAttribute("socialLogins", configs.stream()
+					.map(config -> new SocialLoginInfo(config.getProviderId(), clientId + "." + config.getProviderId()))
+					.collect(Collectors.toList()));
+			}
 		}
 		return "login";
+	}
+
+	public record SocialLoginInfo(String providerId, String registrationId) {
 	}
 
 }

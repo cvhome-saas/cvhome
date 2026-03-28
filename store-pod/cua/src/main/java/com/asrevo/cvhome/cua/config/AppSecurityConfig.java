@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.cua.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.security.autoconfigure.actuate.web.servlet.EndpointRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,12 +17,17 @@ import org.springframework.security.web.util.matcher.AndRequestMatcher;
 import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
+import com.asrevo.cvhome.cua.repo.SocialLoginConfigRepository;
+
 @Configuration
 @EnableMethodSecurity
+@RequiredArgsConstructor
 public class AppSecurityConfig {
 
+	private final SocialLoginConfigRepository socialLoginConfigRepository;
+
 	@Bean
-	SecurityFilterChain appSecurity(HttpSecurity http) {
+	SecurityFilterChain appSecurity(HttpSecurity http) throws Exception {
 		http.authorizeHttpRequests(auth -> auth.requestMatchers("/.well-known/**")
 			.permitAll()
 			.requestMatchers(EndpointRequest.toAnyEndpoint())
@@ -38,11 +44,17 @@ public class AppSecurityConfig {
 			.anyRequest()
 			.authenticated())
 			.formLogin(it -> it.loginPage("/login"))
+			.oauth2Login(it -> it.loginPage("/login"))
 			.csrf(AbstractHttpConfigurer::disable)
 			.requestCache(cache -> cache.requestCache(requestCache()))
 
 			.oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
 		return http.build();
+	}
+
+	@Bean
+	public DynamicClientRegistrationRepository clientRegistrationRepository() {
+		return new DynamicClientRegistrationRepository(socialLoginConfigRepository);
 	}
 
 	@Bean

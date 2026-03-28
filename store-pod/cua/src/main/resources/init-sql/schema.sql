@@ -18,6 +18,17 @@ create table if not exists cua.users
 
 CREATE INDEX IF NOT EXISTS idx_users_metadata ON cua.users USING gin (metadata);
 
+CREATE TABLE IF NOT EXISTS cua.social_login_configs
+(
+    id                uuid PRIMARY KEY,
+    client_id         VARCHAR(190) NOT NULL,
+    provider_id       VARCHAR(50)  NOT NULL,
+    app_id            VARCHAR(254) NOT NULL,
+    app_secret        VARCHAR(254) NOT NULL,
+    scopes            VARCHAR(254),
+    CONSTRAINT UK_client_provider UNIQUE (client_id, provider_id)
+);
+
 create table if not exists cua.signing_keys
 (
     id         uuid                        not null,
