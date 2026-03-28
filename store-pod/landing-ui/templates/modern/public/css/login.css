@@ -1,0 +1,25 @@
+/* login.css for modern theme */
+body {
+    background-color: oklch(1 0 0); /* --background */
+    color: oklch(0.145 0 0);       /* --foreground */
+}
+
+.login-container {
+    border: 1px solid oklch(0.922 0 0); /* --border */
+    border-radius: 0.625rem;            /* --radius */
+}
+
+button {
+    background-color: oklch(0.205 0 0) !important; /* --primary */
+    color: oklch(0.985 0 0) !important;           /* --primary-foreground */
+    border-radius: 0.625rem;
+}
+
+button:hover {
+    opacity: 0.9;
+}
+
+input {
+    border-color: oklch(0.922 0 0) !important; /* --input */
+    border-radius: 0.625rem;
+}
