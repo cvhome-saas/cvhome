@@ -36,7 +36,6 @@ public class DynamicRegisteredClientRepository implements RegisteredClientReposi
 	}
 
 	private RegisteredClient createRegisteredClient(String id) {
-		String redirectUris = extractRedirectUri();
 
 		return RegisteredClient.withId(id)
 			.clientId(id)
@@ -44,11 +43,8 @@ public class DynamicRegisteredClientRepository implements RegisteredClientReposi
 			.clientName("Web App")
 			.clientAuthenticationMethod(ClientAuthenticationMethod.NONE)
 			.authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-			.redirectUris(it -> {
-				if (Objects.nonNull(redirectUris)) {
-					it.add(redirectUris);
-				}
-			})
+			.redirectUris(it -> Optional.ofNullable(extractHost()).ifPresent(host -> it.add(host + "/callback")))
+			.postLogoutRedirectUris(it -> Optional.ofNullable(extractHost()).ifPresent(it::add))
 			.scope(OidcScopes.OPENID)
 			.clientSettings(ClientSettings.builder().requireProofKey(true).requireAuthorizationConsent(false).build())
 			.tokenSettings(TokenSettings.builder()
@@ -62,9 +58,10 @@ public class DynamicRegisteredClientRepository implements RegisteredClientReposi
 			.build();
 	}
 
-	private static String extractRedirectUri() {
+	private static String extractHost() {
 		ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
 		if (attributes != null) {
+
 			HttpServletRequest request = attributes.getRequest();
 			String scheme = request.getScheme();
 			String serverName = request.getServerName();
@@ -75,10 +72,11 @@ public class DynamicRegisteredClientRepository implements RegisteredClientReposi
 			if (("http".equals(scheme) && serverPort != 80) || ("https".equals(scheme) && serverPort != 443)) {
 				dynamicUri.append(":").append(serverPort);
 			}
-			dynamicUri.append("/callback");
 			return dynamicUri.toString();
 		}
-		return null;
+		else {
+			return null;
+		}
 	}
 
 }

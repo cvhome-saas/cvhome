@@ -47,10 +47,14 @@ dependencies {
     implementation project(':store-commons:ecs-commons:fargate-task-info')
     implementation project(':store-commons:ecs-commons:ecs-service-discoveryclient')
 
+    implementation project(':store-commons:commons')
     implementation project(':store-commons:autoconfigure')
 
     compileOnly libs.lombok
     runtimeOnly libs.postgresql
+
+    implementation libs.io.opentelemetry.instrumentation.opentelemetry.spring.boot.starter
+
     annotationProcessor libs.lombok
     testImplementation libs.spring.boot.starter.test
     testImplementation libs.spring.boot.starter.actuator.test
@@ -70,6 +74,7 @@ dependencies {
 dependencyManagement {
     imports {
         mavenBom "org.springframework.cloud:spring-cloud-dependencies:2025.1.0"
+        mavenBom("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom:2.23.0")
     }
 }
 

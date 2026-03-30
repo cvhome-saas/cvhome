@@ -78,12 +78,26 @@ export class AuthService {
 		return result;
 	}
 
-	static async logout(): Promise<void> {
-		sessionStorage.removeItem('access_token');
-		sessionStorage.removeItem('id_token');
-		sessionStorage.removeItem('refresh_token');
-		window.dispatchEvent(new CustomEvent('auth-change', {detail: {type: AuthEventType.LOGOUT}}));
-	}
+  static async logout(): Promise<void> {
+    // Retrieve the id_token, if any
+    const idToken = sessionStorage.getItem('id_token');
 
+    // Clean up local tokens immediately
+    sessionStorage.removeItem('access_token');
+    sessionStorage.removeItem('id_token');
+    sessionStorage.removeItem('refresh_token');
 
+    if (idToken) {
+      // Build the logout URL for the auth server
+      const logoutUrl = new URL(`${window.location.origin}/cua/connect/logout`);
+      logoutUrl.searchParams.append('id_token_hint', idToken);
+      logoutUrl.searchParams.append('post_logout_redirect_uri', window.location.origin);
+
+      // Redirect the browser to perform server‑side logout
+      window.location.href = logoutUrl.toString();
+    } else {
+      // If no id_token, simply notify the app of the logout
+      window.dispatchEvent(new CustomEvent('auth-change', {detail: {type: AuthEventType.LOGOUT}}));
+    }
+  }
 }
