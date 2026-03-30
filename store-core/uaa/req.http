@@ -57,3 +57,33 @@ Content-Type: application/x-www-form-urlencoded
 Authorization: Basic store-pod-507f1f77bcf86cd@service.store-pod.internal hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
 
 grant_type=client_credentials&scope=internal
+
+# http://uaa.gateway.com:8001/oauth2/authorize?response_type=code&client_id=web-app&scope=openid&state=BGcm6UNZm2XPFiFDIhlWHqN9B300ii24efrfBEy6o4Y%3D&redirect_uri=http://gateway.com:8000/login/oauth2/code/uaa&nonce=9AY2XFqDO8_fVhSrfuWvnA-mj_VgT5h6nxTE008A22M&code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM&code_challenge_method=S256
+
+# when this is secret hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7 add curl to get token
+
+http://gateway.com:8000/login/oauth2/code/uaa?code=Yt69JI_0FnIXpSS31aIGLkBs3bcFWuYW8G7jJ3K7FLNwuEs_2ajVYxLX7W2j2VYiCme5FDtTiJzMu5uSDhmrDEeyenW7XGkCWBWuHvDpXGzGKRY5n50LKeHvGtsasIYk&state=BGcm6UNZm2XPFiFDIhlWHqN9B300ii24efrfBEy6o4Y%3D
+
+
+
+
+
+###
+# curl -X POST "http://uaa.gateway.com:8001/oauth2/token"
+#  -H "Content-Type: application/x-www-form-urlencoded"
+#  -u "web-app:hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7"
+#  -d "grant_type=authorization_code"
+#  -d "code=YOUR_CODE"
+#  -d "redirect_uri=http://gateway.com:8000/login/oauth2/code/uaa"
+POST http://uaa.gateway.com:8001/oauth2/token
+Content-Type: application/x-www-form-urlencoded
+Authorization: Basic web-app hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
+
+client_id = web-app &
+grant_type = authorization_code &
+code = Yt69JI_0FnIXpSS31aIGLkBs3bcFWuYW8G7jJ3K7FLNwuEs_2ajVYxLX7W2j2VYiCme5FDtTiJzMu5uSDhmrDEeyenW7XGkCWBWuHvDpXGzGKRY5n50LKeHvGtsasIYk &
+code_verifier = dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk &
+redirect_uri = http://gateway.com:8000/login/oauth2/code/uaa
+
+
+###

@@ -66,6 +66,9 @@ export class AuthService {
 		const result = await handleResponse<any>(response);
 		if (result && result.access_token) {
 			sessionStorage.setItem('access_token', result.access_token);
+			if (result.id_token) {
+				sessionStorage.setItem('id_token', result.id_token);
+			}
 			if (result.refresh_token) {
 				sessionStorage.setItem('refresh_token', result.refresh_token);
 			}
@@ -77,6 +80,7 @@ export class AuthService {
 
 	static async logout(): Promise<void> {
 		sessionStorage.removeItem('access_token');
+		sessionStorage.removeItem('id_token');
 		sessionStorage.removeItem('refresh_token');
 		window.dispatchEvent(new CustomEvent('auth-change', {detail: {type: AuthEventType.LOGOUT}}));
 	}
