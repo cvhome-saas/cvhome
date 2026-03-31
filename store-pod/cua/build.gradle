@@ -49,6 +49,7 @@ dependencies {
 
     implementation project(':store-commons:commons')
     implementation project(':store-commons:autoconfigure')
+    implementation project(':store-pod:merchant:merchant-external-api')
 
     compileOnly libs.lombok
     runtimeOnly libs.postgresql

@@ -19,14 +19,10 @@ import org.springframework.security.web.util.matcher.AndRequestMatcher;
 import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
-import com.asrevo.cvhome.cua.repo.SocialLoginConfigRepository;
-
 @Configuration
 @EnableMethodSecurity
 @RequiredArgsConstructor
 public class AppSecurityConfig {
-
-	private final SocialLoginConfigRepository socialLoginConfigRepository;
 
 	private final CustomOAuth2UserService customOAuth2UserService;
 
@@ -66,11 +62,6 @@ public class AppSecurityConfig {
 				.sessionCreationPolicy(org.springframework.security.config.http.SessionCreationPolicy.STATELESS))
 			.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.decoder(jwtDecoderByIssuerUri)));
 		return http.build();
-	}
-
-	@Bean
-	public DynamicClientRegistrationRepository clientRegistrationRepository() {
-		return new DynamicClientRegistrationRepository(socialLoginConfigRepository);
 	}
 
 	@Bean
