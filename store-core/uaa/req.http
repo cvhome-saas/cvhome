@@ -54,7 +54,7 @@ Content-Type: application/json
 ### client credentails
 POST http://localhost:8001/oauth2/token
 Content-Type: application/x-www-form-urlencoded
-Authorization: Basic store-pod-507f1f77bcf86cd@service.store-pod.internal hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
+Authorization: Basic store-pod-507f1f77@service.store-pod.internal hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
 
 grant_type=client_credentials&scope=internal
 

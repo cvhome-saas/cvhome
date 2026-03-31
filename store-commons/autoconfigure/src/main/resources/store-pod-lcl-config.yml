@@ -27,7 +27,7 @@ com:
       pod-info:
         pod:
           id: 507f1f77bcf86cd799439011
-          name: pod-507f1f77bcf86cd
+          name: pod-507f1f77
           endpoint:
             endpoint: http://spg-507f1f77.gateway.com
             type: EXTERNAL
