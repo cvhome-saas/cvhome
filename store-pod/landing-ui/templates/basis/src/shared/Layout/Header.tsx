@@ -28,6 +28,9 @@ import {StoreContext} from "@/types/store-context";
 import {CartProductList} from "@/shared/Cart/CartProductList";
 import {isRtl} from "@/services/direction-utils";
 import {useCart} from "@store-front/hooks/use-cart";
+import {useUser} from "@store-front/hooks/use-user";
+import {AuthService} from "@store-front/services/auth-service";
+import {User} from "lucide-react";
 
 export const Header = ({params, headerBox}: {
     params: LayoutParams,
@@ -37,6 +40,7 @@ export const Header = ({params, headerBox}: {
     const [cartOpen, setCartOpen] = useState(false)
     const storeContext = params.storeContext;
     const {cart} = useCart(storeContext);
+    const {user, login, logout} = useUser(storeContext);
     const pathname = usePathname();
 
     useEffect(() => {
@@ -132,7 +136,30 @@ export const Header = ({params, headerBox}: {
                         </NavigationMenuList>
                     </NavigationMenu>
 
-                    <div className="hidden lg:flex lg:flex-1 lg:justify-end">
+                    <div className="hidden lg:flex lg:flex-1 lg:justify-end gap-2 items-center">
+                        {user ? (
+                            <div className="flex items-center gap-2">
+                                <span className="text-sm font-medium text-muted-foreground hidden sm:inline">
+                                    {user.subject}
+                                </span>
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="ghost" size="icon" className="rounded-full">
+                                            <User className="size-6" />
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                        <DropdownMenuItem onClick={logout} className="cursor-pointer text-destructive focus:text-destructive">
+                                            {t('LOGOUT')}
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </div>
+                        ) : (
+                            <Button variant="ghost" onClick={login} className="text-sm font-semibold leading-6 text-foreground">
+                                {t('LOGIN')} <span aria-hidden="true">&rarr;</span>
+                            </Button>
+                        )}
                         <Button variant="ghost" className="relative" onClick={() => setCartOpen(true)}>
                             <ShoppingBag
                                 aria-hidden="true"

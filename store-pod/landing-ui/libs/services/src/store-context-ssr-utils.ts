@@ -1,3 +1,4 @@
+import "server-only";
 import {headers} from "next/headers";
 import {getLocale} from "next-intl/server";
 import {FALLBACK_STORE_ID, StoreContext} from "@store-front/types";
@@ -9,7 +10,7 @@ export const extractSsrContext = async (): Promise<StoreContext> => {
     return {
         store: store,
         locale,
-        externalGateway: process.env.EXTERNAL_STORE_POD_GATEWAY,
-        internalGateway: process.env.INTERNAL_STORE_POD_GATEWAY
+        externalGateway: process.env.EXTERNAL_SPG,
+        internalGateway: process.env.INTERNAL_SPG
     }
 }

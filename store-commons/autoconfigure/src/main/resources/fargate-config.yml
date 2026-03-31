@@ -9,10 +9,11 @@ spring:
           - "uaa"
           - "control-plane"
           - "seller-ui"
-          - "store-pod-gateway"
+          - "spg"
           - "merchant"
           - "catalog"
           - "checkout"
+          - "cua"
           - "landing-ui"
     ecs:
       discovery:

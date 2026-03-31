@@ -94,7 +94,9 @@
         "FR": "Francés",
         "RU": "Ruso",
         "ES": "Español"
-      }
+      },
+      "LOGIN": "Iniciar sesión",
+      "LOGOUT": "Cerrar sesión"
     },
     "FOOTER": {
       "SOCIAL_FACEBOOK": "Facebook",

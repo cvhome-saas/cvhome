@@ -13,8 +13,8 @@ import org.springframework.context.annotation.Import;
 		IssuerUriSetReactiveJwtDecoderConfiguration.class, CustomPermissionEvaluator.class,
 		ReactivePermissionConfig.class, ServletPermissionConfig.class })
 @EnableConfigurationProperties({ PodInfoProperties.class, ServiceDomainProperties.class, AppProperties.class,
-		CdnProperties.class, StripeProperties.class, StoreProductImageProperties.class, CdnStorageProperties.class,
-		IssuerUriSetConfigrationProperties.class })
+		PodProperties.class, CdnProperties.class, StripeProperties.class, StoreProductImageProperties.class,
+		CdnStorageProperties.class, IssuerUriSetConfigrationProperties.class })
 public class CvhomeSharedConfig {
 
 }

@@ -2,9 +2,9 @@ com:
   asrevo:
     cvhome:
       app:
-        domain: "gateway.com"
-      saas:
-        domain: saas.${com.asrevo.cvhome.app.domain}
+        domain: gateway.com
+      pod:
+        domain: spg-507f1f77.gateway.com
       services:
         uaa:
           name: uaa
@@ -34,41 +34,48 @@ com:
           schema: http
           namespace: store-core.cvhome.lcl
           gateway-service-name: store-core-gateway
-        store-pod-saas-gateway:
-          name: store-pod-saas-gateway
-          domain: ${com.asrevo.cvhome.saas.domain}
-          port: 8443
-          schema: https
+        spg:
+          name: spg
+          domain: ${com.asrevo.cvhome.pod.domain}
+          port: 80
+          schema: http
           namespace: store-pod-507f1f77.cvhome.lcl
-          gateway-service-name: store-pod-saas-gateway
+          gateway-service-name: spg
         merchant:
           name: merchant
-          domain: store-pod-507f1f77.${com.asrevo.cvhome.app.domain}
+          domain: ${com.asrevo.cvhome.pod.domain}
           port: 8120
           schema: http
           namespace: store-pod-507f1f77.cvhome.lcl
-          gateway-service-name: store-pod-gateway
+          gateway-service-name: spg
         catalog:
           name: catalog
-          domain: store-pod-507f1f77.${com.asrevo.cvhome.app.domain}
+          domain: ${com.asrevo.cvhome.pod.domain}
           port: 8122
           schema: http
           namespace: store-pod-507f1f77.cvhome.lcl
-          gateway-service-name: store-pod-gateway
+          gateway-service-name: spg
         checkout:
           name: checkout
-          domain: store-pod-507f1f77.${com.asrevo.cvhome.app.domain}
+          domain: ${com.asrevo.cvhome.pod.domain}
           port: 8123
           schema: http
           namespace: store-pod-507f1f77.cvhome.lcl
-          gateway-service-name: store-pod-gateway
+          gateway-service-name: spg
+        cua:
+          name: cua
+          domain: ${com.asrevo.cvhome.pod.domain}
+          port: 8124
+          schema: http
+          namespace: store-pod-507f1f77.cvhome.lcl
+          gateway-service-name: spg
         landing-ui:
           name: landing-ui
-          domain: store-pod-507f1f77.${com.asrevo.cvhome.app.domain}
+          domain: ${com.asrevo.cvhome.pod.domain}
           port: 8110
           schema: http
           namespace: store-pod-507f1f77.cvhome.lcl
-          gateway-service-name: store-pod-gateway
+          gateway-service-name: spg
 spring:
   docker:
     compose:
@@ -86,7 +93,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
+    show-sql: false
   cloud:
     function:
       definition: events
@@ -193,5 +200,6 @@ otel:
       experimental-span-attributes: true
 logging:
   level:
-    com:
-      asrevo: DEBUG
+    com.asrevo: DEBUG
+    org.springframework.web: DEBUG
+    org.springframework.security: DEBUG

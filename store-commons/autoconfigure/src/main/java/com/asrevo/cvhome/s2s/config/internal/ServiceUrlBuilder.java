@@ -26,7 +26,7 @@ public record ServiceUrlBuilder(ServiceDomainProperties serviceDomainProperties,
 
 	public String getServiceUrl(Pod pod) {
 		return switch (pod.endpoint().type()) {
-			case INTERNAL -> "lb://" + "store-pod-gateway" + "." + pod.endpoint().endpoint();
+			case INTERNAL -> "lb://" + "spg." + pod.endpoint().endpoint();
 			case EXTERNAL -> pod.endpoint().endpoint();
 			case null -> pod.endpoint().endpoint();
 		};

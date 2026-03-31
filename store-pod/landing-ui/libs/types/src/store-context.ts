@@ -1,4 +1,4 @@
-import {DEFAULT_STORE_POD_GATEWAY} from "./constant";
+import {DEFAULT_SPG} from "./constant";
 
 export interface StoreContext {
     store: string
@@ -18,7 +18,7 @@ const handleInternalServiceCall = (service: string, storeContext: StoreContext):
     if (storeContext.internalGateway) {
         return storeContext.internalGateway + "/" + service;
     } else {
-        return DEFAULT_STORE_POD_GATEWAY + "/" + service
+        return DEFAULT_SPG + "/" + service
     }
 }
 

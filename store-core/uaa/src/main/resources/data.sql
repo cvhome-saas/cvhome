@@ -13,17 +13,17 @@ values ('a5c7e2c0-7e7e-8f5f-c2d2-7e7e8f5fc2d2',
         '{"@class":"java.util.Collections$UnmodifiableMap","settings.token.reuse-refresh-tokens":false,"settings.token.x509-certificate-bound-access-tokens":false,"settings.token.id-token-signature-algorithm":["org.springframework.security.oauth2.jose.jws.SignatureAlgorithm","RS256"],"settings.token.access-token-time-to-live":["java.time.Duration",86400.000000000],"settings.token.access-token-format":{"@class":"org.springframework.security.oauth2.server.authorization.settings.OAuth2TokenFormat","value":"self-contained"},"settings.token.refresh-token-time-to-live":["java.time.Duration",86400.000000000],"settings.token.authorization-code-time-to-live":["java.time.Duration",86400.000000000],"settings.token.device-code-time-to-live":["java.time.Duration",300.000000000]}')
 on conflict (id) do nothing;
 
--- store-pod-507f1f77bcf86cd@service.store-pod.internal
+-- store-pod-507f1f77@service.store-pod.internal
 -- client_secret: secret
 insert into uaa.oauth2_registered_client (id, client_id, client_id_issued_at, client_secret, client_name,
                                              client_authentication_methods, authorization_grant_types, redirect_uris,
                                              post_logout_redirect_uris, scopes, client_settings, token_settings)
 values ('BECF0252-14DD-437A-85B8-0C8EEF1BD03F',
-        'store-pod-507f1f77bcf86cd@service.store-pod.internal', now(), '{bcrypt}$2a$10$KEyYNPGHPotegD5Ui8/yX.WzIv75INVsEzgjkD2GqQdmcBG0qke8i', 'Store Service (Store Pod 1)',
+        'store-pod-507f1f77@service.store-pod.internal', now(), '{bcrypt}$2a$10$KEyYNPGHPotegD5Ui8/yX.WzIv75INVsEzgjkD2GqQdmcBG0qke8i', 'Store Service (Store Pod 1)',
         'client_secret_basic', 'client_credentials',
         NULL, NULL,
         'internal',
-        '{"@class":"java.util.Collections$UnmodifiableMap","settings.client.require-proof-key":false,"settings.client.require-authorization-consent":false,"resource":"pod-507f1f77bcf86cd"}',
+        '{"@class":"java.util.Collections$UnmodifiableMap","settings.client.require-proof-key":false,"settings.client.require-authorization-consent":false,"resource":"pod-507f1f77"}',
         '{"@class":"java.util.Collections$UnmodifiableMap","settings.token.reuse-refresh-tokens":false,"settings.token.x509-certificate-bound-access-tokens":false,"settings.token.id-token-signature-algorithm":["org.springframework.security.oauth2.jose.jws.SignatureAlgorithm","RS256"],"settings.token.access-token-time-to-live":["java.time.Duration",86400.000000000],"settings.token.access-token-format":{"@class":"org.springframework.security.oauth2.server.authorization.settings.OAuth2TokenFormat","value":"self-contained"},"settings.token.refresh-token-time-to-live":["java.time.Duration",86400.000000000],"settings.token.authorization-code-time-to-live":["java.time.Duration",86400.000000000],"settings.token.device-code-time-to-live":["java.time.Duration",300.000000000]}')
 on conflict (id) do nothing;
 
