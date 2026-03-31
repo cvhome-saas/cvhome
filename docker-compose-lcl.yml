@@ -8,14 +8,14 @@ services:
       POSTGRES_DB: cvhome
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
-  store-pod-saas-gateway:
+  spg:
     image: ashraf1abdelrasool/saas-gateway:sha-4a6d381
     ports:
       - "80:80"
       - "443:443"
       - "2019:2019"
     volumes:
-      - ./store-pod/store-pod-saas-gateway/Caddyfile:/etc/caddy/Caddyfile
+      - ./store-pod/spg/Caddyfile:/etc/caddy/Caddyfile
     extra_hosts:
       - "host.docker.internal:host-gateway"
       - "merchant.gateway.com:host-gateway"
@@ -32,7 +32,7 @@ services:
       CERT_BUCKET_REGION: eu-central-1
       OTEL_EXPORTER_OTLP_ENDPOINT: http://host.docker.internal:4317
       OTEL_EXPORTER_OTLP_PROTOCOL: grpc
-      OTEL_SERVICE_NAME: store-pod-saas-gateway
+      OTEL_SERVICE_NAME: spg
   otel-collector:
     image: otel/opentelemetry-collector-contrib:0.139.0
     command: ["--config=/etc/logging-otel-collector-config.yml"]

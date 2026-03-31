@@ -2,6 +2,16 @@ spring:
   sql:
     init:
       data-locations: classpath:init-sql/data-common.sql, classpath:init-sql/data-test-stores.sql, classpath:init-sql/stores/*/*.sql
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri-set:
+            - ${com.asrevo.cvhome.services.uaa.schema}://${com.asrevo.cvhome.services.uaa.domain}
+            - ${com.asrevo.cvhome.services.uaa.schema}://${com.asrevo.cvhome.services.uaa.domain}:${com.asrevo.cvhome.services.uaa.port}
+            - ${com.asrevo.cvhome.services.spg.schema}://${com.asrevo.cvhome.services.spg.domain}/cua
+            - ${com.asrevo.cvhome.services.spg.schema}://${com.asrevo.cvhome.services.spg.domain}:${com.asrevo.cvhome.services.spg.port}/cua
+
 com:
   asrevo:
     cvhome:

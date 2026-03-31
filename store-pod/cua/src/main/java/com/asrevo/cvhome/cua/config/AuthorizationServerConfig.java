@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.cua.config;
 
+import com.asrevo.cvhome.s2s.model.PodInfoProperties;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 import org.springframework.context.annotation.Bean;
@@ -42,8 +43,8 @@ public class AuthorizationServerConfig {
 	}
 
 	@Bean
-	AuthorizationServerSettings authorizationServerSettings() {
-		return AuthorizationServerSettings.builder().build();
+	AuthorizationServerSettings authorizationServerSettings(PodInfoProperties properties) {
+		return AuthorizationServerSettings.builder().issuer(properties.pod().endpoint().endpoint() + "/cua").build();
 	}
 
 	@Bean
