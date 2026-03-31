@@ -14,8 +14,7 @@ public interface SocialLoginConfigRepository extends JpaRepository<SocialLoginCo
 	List<SocialLoginConfig> findAllByClientId(String clientId);
 
 	default List<SocialLoginInfo> findSocialLoginConfigByClientId(String clientId) {
-		return findAllByClientId(clientId)
-			.stream()
+		return findAllByClientId(clientId).stream()
 			.map(config -> new SocialLoginInfo(config.getProviderId(), clientId + "." + config.getProviderId()))
 			.toList();
 	}
