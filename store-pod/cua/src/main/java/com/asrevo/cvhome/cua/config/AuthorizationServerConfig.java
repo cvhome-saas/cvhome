@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.cua.config;
 
+import com.asrevo.cvhome.commons.domain.Pod;
 import com.asrevo.cvhome.s2s.model.PodInfoProperties;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
@@ -17,6 +18,8 @@ import org.springframework.security.config.annotation.web.configurers.oauth2.ser
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+
+import java.util.Objects;
 
 @Configuration
 @EnableWebSecurity
@@ -44,7 +47,12 @@ public class AuthorizationServerConfig {
 
 	@Bean
 	AuthorizationServerSettings authorizationServerSettings(PodInfoProperties properties) {
-		return AuthorizationServerSettings.builder().issuer(properties.pod().endpoint().endpoint() + "/cua").build();
+		Pod pod = properties.pod();
+		AuthorizationServerSettings.Builder builder = AuthorizationServerSettings.builder();
+		if (Objects.nonNull(pod) && Objects.nonNull(pod.endpoint()) && Objects.nonNull(pod.endpoint().endpoint())) {
+			builder.issuer(pod.endpoint().endpoint() + "/cua");
+		}
+		return builder.build();
 	}
 
 	@Bean
