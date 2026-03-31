@@ -93,7 +93,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
+    show-sql: false
   cloud:
     function:
       definition: events
@@ -200,5 +200,6 @@ otel:
       experimental-span-attributes: true
 logging:
   level:
-    com:
-      asrevo: DEBUG
+    com.asrevo: DEBUG
+    org.springframework.web: DEBUG
+    org.springframework.security: DEBUG
