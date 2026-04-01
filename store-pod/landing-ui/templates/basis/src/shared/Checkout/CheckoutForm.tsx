@@ -30,7 +30,10 @@ import {Card, CardContent, CardFooter, CardHeader, CardTitle} from "@/components
 import {ScrollArea} from "@/components/ui/scroll-area";
 import {useCart} from "@store-front/hooks/use-cart";
 
-export const CheckoutForm = ({storeContext}: { storeContext: StoreContext }) => {
+export const CheckoutForm = ({storeContext, requireLoginForOrderPlacement}: {
+    storeContext: StoreContext,
+    requireLoginForOrderPlacement: boolean
+}) => {
     const t = useTranslations('PAGE.CHECKOUT');
     const {
         register,
@@ -41,6 +44,8 @@ export const CheckoutForm = ({storeContext}: { storeContext: StoreContext }) => 
         setSuccessDialogOpen,
         agreeDialogOpen,
         setAgreeDialogOpen,
+        loginRequiredDialogOpen,
+        setLoginRequiredDialogOpen,
         agreement,
         order,
         isAgree,
@@ -48,13 +53,15 @@ export const CheckoutForm = ({storeContext}: { storeContext: StoreContext }) => 
         readableCountryList,
         handleClickOnAgreement,
         onSubmit,
-    } = useCheckoutForm(storeContext);
+        login,
+    } = useCheckoutForm(storeContext, requireLoginForOrderPlacement);
 
     return (
         <>
             <OrderPlacedSuccessfullyDialog order={order} isOpen={successDialogOpen} setIsOpen={setSuccessDialogOpen}/>
             <CheckoutAgreementDialog box={agreement} isOpen={agreeDialogOpen} setIsOpen={setAgreeDialogOpen}
                                      setIsAgree={setIsAgree}/>
+            <LoginRequiredDialog isOpen={loginRequiredDialogOpen} setIsOpen={setLoginRequiredDialogOpen} login={login}/>
             <form
                 onSubmit={handleSubmit(onSubmit)} noValidate
                 className="p-6 rounded-lg shadow-md col-span-8 border border-border"
@@ -186,7 +193,7 @@ export const CheckoutForm = ({storeContext}: { storeContext: StoreContext }) => 
                     <div className="space-y-2">
                         <Label htmlFor="address">
                             {t('ADDRESS')}
-                            </Label>
+                        </Label>
                         <Textarea
                             id="address"
                             {...register("customer.billing.address")}
@@ -322,6 +329,36 @@ export const OrderPlacedSuccessfullyDialog = ({order, isOpen, setIsOpen}: {
                 <AlertDialogFooter>
                     <AlertDialogAction onClick={handleContinueShopping} className="w-full">
                         {t('CONTINUE_SHOPPING')}
+                    </AlertDialogAction>
+                </AlertDialogFooter>
+            </AlertDialogContent>
+        </AlertDialog>
+    );
+};
+
+export const LoginRequiredDialog = ({isOpen, setIsOpen, login}: {
+    isOpen: boolean,
+    setIsOpen: (x: boolean) => void,
+    login: () => void,
+}) => {
+    const t = useTranslations('PAGE.CHECKOUT');
+
+    return (
+        <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
+            <AlertDialogContent>
+                <AlertDialogHeader className="items-center text-center">
+                    <HelpCircle className="h-16 w-16 text-primary"/>
+                    <AlertDialogTitle className="text-lg">
+                        {t('LOGIN_REQUIRED_TITLE')}
+                    </AlertDialogTitle>
+                    <AlertDialogDescription className="mt-4">
+                        {t('LOGIN_REQUIRED_DESCRIPTION')}
+                    </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter className="sm:justify-center">
+                    <AlertDialogCancel>{t('CANCEL')}</AlertDialogCancel>
+                    <AlertDialogAction onClick={login}>
+                        {t('LOGIN')}
                     </AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>

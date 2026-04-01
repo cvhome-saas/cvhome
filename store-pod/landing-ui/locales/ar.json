@@ -58,7 +58,11 @@
       "AGREE": "أوافق",
       "REJECT": "أرفض",
       "ORDER_ID": "رقم الطلب",
-      "FAILED_TO_PLACE_ORDER": "فشل في إتمام الطلب"
+      "FAILED_TO_PLACE_ORDER": "فشل في إتمام الطلب",
+      "LOGIN_REQUIRED_TITLE": "تسجيل الدخول مطلوب",
+      "LOGIN_REQUIRED_DESCRIPTION": "يجب تسجيل الدخول لإتمام الطلب.",
+      "CANCEL": "إلغاء",
+      "LOGIN": "تسجيل الدخول"
     },
     "CONTENT": {
       "HOME_TITLE": "المحتوى"

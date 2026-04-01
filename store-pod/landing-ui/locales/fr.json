@@ -58,7 +58,11 @@
       "AGREE": "Accepter",
       "REJECT": "Refuser",
       "ORDER_ID": "ID de commande",
-      "FAILED_TO_PLACE_ORDER": "Échec de la passation de la commande"
+      "FAILED_TO_PLACE_ORDER": "Échec de la passation de la commande",
+      "LOGIN_REQUIRED_TITLE": "Connexion requise",
+      "LOGIN_REQUIRED_DESCRIPTION": "Vous devez être connecté pour passer une commande.",
+      "CANCEL": "Annuler",
+      "LOGIN": "Connexion"
     },
     "CONTENT": {
       "HOME_TITLE": "Contenu"
