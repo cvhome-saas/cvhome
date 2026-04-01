@@ -16,6 +16,8 @@ import com.asrevo.cvhome.checkout.model.order.v1.ReadableOrderConfirmation;
 import com.asrevo.cvhome.checkout.service.facade.customer.CustomerFacade;
 import com.asrevo.cvhome.checkout.service.facade.order.OrderFacade;
 import com.asrevo.cvhome.checkout.services.shoppingcart.ShoppingCartService;
+import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
+import com.asrevo.cvhome.merchant.model.merchant.ReadableMerchantStore;
 import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
 import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
 import com.asrevo.cvhome.store.core.constants.Constants;
@@ -31,6 +33,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.hibernate.boot.beanvalidation.IntegrationException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,10 +49,14 @@ public class OrderApi {
 
 	private final CustomerFacade customerFacade;
 
-	public OrderApi(OrderFacade orderFacade, ShoppingCartService shoppingCartService, CustomerFacade customerFacade) {
+	private final ExternalMerchantStoreService externalMerchantStoreService;
+
+	public OrderApi(OrderFacade orderFacade, ShoppingCartService shoppingCartService, CustomerFacade customerFacade,
+			ExternalMerchantStoreService externalMerchantStoreService) {
 		this.orderFacade = orderFacade;
 		this.shoppingCartService = shoppingCartService;
 		this.customerFacade = customerFacade;
+		this.externalMerchantStoreService = externalMerchantStoreService;
 	}
 
 	/**
@@ -67,12 +74,20 @@ public class OrderApi {
 	public ReadableOrderConfirmation checkout(@PathVariable final String code, // shopping
 																				// cart
 			@Valid @RequestBody PersistableAnonymousOrder order, // order
-			StoreMerchantId merchantStore, LanguageCode language) {
+			StoreMerchantId merchantStore, LanguageCode language, JwtAuthenticationToken jwtAuthenticationToken) {
 
 		Assert.notNull(order.getCustomer(), "Customer must not be null");
 
 		ShoppingCart cart;
 		try {
+			ReadableMerchantStore store = externalMerchantStoreService.getStore(merchantStore);
+
+			if (store.isRequireLoginForOrderPlacement()) {
+				if (jwtAuthenticationToken == null || !jwtAuthenticationToken.isAuthenticated()) {
+					throw new ServiceRuntimeException("HTTP 401 Unauthorized - Login required for order placement");
+				}
+			}
+
 			cart = shoppingCartService.loadCartByCode(code, merchantStore, language);
 
 			if (cart == null) {
