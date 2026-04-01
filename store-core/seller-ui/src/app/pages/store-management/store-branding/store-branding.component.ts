@@ -55,6 +55,12 @@ export class StoreBrandingComponent implements OnInit {
       title: 'Store details',
       key: 'COMPONENTS.STORE_DETAILS',
       link: 'store'
+    },
+    {
+      id: '6',
+      title: 'Store Social Login',
+      key: 'COMPONENTS.STORE_SOCIAL_LOGIN',
+      link: 'store-social-login'
     }
   ];
 

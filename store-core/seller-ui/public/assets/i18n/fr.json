@@ -223,7 +223,11 @@
     "DOMAIN_DNS_CHECKING": "Vérification du DNS du domaine en cours...",
     "DOMAIN_DNS_WAITING_INFO": "En attente des informations du serveur pour vérifier le domaine...",
     "DOMAIN_HELP_TEXT": "Assurez-vous d'abord d'ajouter un enregistrement CNAME pointant vers {{podDomain}}.",
-    "PREFERRED_POD": "Pod préféré"
+    "PREFERRED_POD": "Pod préféré",
+    "STORE_SOCIAL_LOGIN": "Connexion social du magasin",
+    "SOCIAL_APP_ID": "ID d’application",
+    "SOCIAL_APP_SECRET": "Secret d’application",
+    "SOCIAL_LOGIN_UPDATED": "Configuration du login social mise à jour"
   },
   "STORE_LANDING": {
     "LANDING_PAGE_TITLE": "Titre de la page de destination",

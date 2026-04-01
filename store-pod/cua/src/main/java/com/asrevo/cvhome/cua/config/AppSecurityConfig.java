@@ -1,15 +1,26 @@
 package com.asrevo.cvhome.cua.config;
 
+import com.asrevo.cvhome.commons.domain.ManagerOrgId;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
+import com.asrevo.cvhome.merchant.model.merchant.ReadableMerchantStore;
+import com.asrevo.cvhome.s2s.jwt.UaaJwtGrantedAuthoritiesConverter;
+import com.asrevo.cvhome.s2s.model.PodInfoProperties;
+import com.asrevo.cvhome.s2s.services.AccessEvaluator;
+import com.asrevo.cvhome.s2s.services.AccessEvaluatorImpl;
+import com.asrevo.cvhome.s2s.services.StoreSecurityServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.security.autoconfigure.actuate.web.servlet.EndpointRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 import org.springframework.security.web.savedrequest.RequestCache;
@@ -51,7 +62,7 @@ public class AppSecurityConfig {
 	@Bean
 	@Order(2)
 	SecurityFilterChain customerApiSecurity(HttpSecurity http, JwtDecoder jwtDecoderByIssuerUri) throws Exception {
-		http.securityMatcher("/api/c1/customer/**")
+		http.securityMatcher("/api/v1/private/social-login-config/**")
 			.authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
 			.csrf(AbstractHttpConfigurer::disable)
 			.sessionManagement(session -> session
@@ -70,6 +81,25 @@ public class AppSecurityConfig {
 		RequestMatcher saveRequestMatcher = new AndRequestMatcher(getRequests, notFavicon, notError);
 		cache.setRequestMatcher(saveRequestMatcher);
 		return cache;
+	}
+
+	@Bean
+	public JwtAuthenticationConverter converter() {
+		JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
+		UaaJwtGrantedAuthoritiesConverter uaaJwtGrantedAuthoritiesConverter = new UaaJwtGrantedAuthoritiesConverter();
+		jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(uaaJwtGrantedAuthoritiesConverter);
+		return jwtAuthenticationConverter;
+	}
+
+	@Bean
+	@Lazy
+	public AccessEvaluator accessEvaluator(ExternalMerchantStoreService externalMerchantStoreService,
+			PodInfoProperties podInfoProperties) {
+		return new AccessEvaluatorImpl(new StoreSecurityServiceImpl(podInfoProperties, (it) -> {
+			ReadableMerchantStore merchantStore = externalMerchantStoreService
+				.getStore(new StoreMerchantId(it.getId().toString()));
+			return new ManagerOrgId(merchantStore.getOrg());
+		}));
 	}
 
 }

@@ -128,4 +128,16 @@ export class StoreService {
   updateStoreSocialLinks(storeId,request) {
     return this.crudService.put(`/store-pod-gateway/merchant/api/v1/private/store/social-links`, request);
   }
+
+  getSupportedSocialLoginProviders(): Observable<string[]> {
+    return this.crudService.get(`/store-pod-gateway/cua/api/v1/private/social-login-config/supported-social-providers`);
+  }
+
+  getSocialLoginConfigs(store: string): Observable<any> {
+    return this.crudService.get(`/store-pod-gateway/cua/api/v1/private/social-login-config`, {store});
+  }
+
+  updateSocialLoginConfigs(store: string, configs: any[]): Observable<any> {
+    return this.crudService.post(`/store-pod-gateway/cua/api/v1/private/social-login-config`, configs, {store});
+  }
 }
