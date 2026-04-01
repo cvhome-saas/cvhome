@@ -288,6 +288,7 @@
     "SIZE_UNITS": "Unités de taille",
     "OPERATING_SINCE": "Site Web fonctionnant depuis",
     "USE_CACHE": "Utiliser le cache",
+    "REQUIRE_LOGIN_FOR_ORDER_PLACEMENT": "La connexion est requise pour passer une commande",
     "SELECT_RETAILER": "Sélectionner un détaillant",
     "STORE_UPDATED": "Boutique mise à jour.",
     "STORE_CREATED": "Boutique créée.",

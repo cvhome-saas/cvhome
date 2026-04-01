@@ -15,6 +15,7 @@ export interface Store {
   phone: string
   template: any
   useCache: boolean
+  requireLoginForOrderPlacement: boolean
   dimension: string
   weight: string
   currentUserLanguage: any

@@ -143,6 +143,9 @@ public class MerchantStore extends SalesManagerEntity<StoreMerchantId, MerchantS
 	@Column(name = "USE_CACHE")
 	private boolean useCache = false;
 
+	@Column(name = "REQUIRE_LOGIN_FOR_ORDER_PLACEMENT")
+	private boolean requireLoginForOrderPlacement = false;
+
 	@Column(name = "STORE_TEMPLATE", length = 25)
 	private String storeTemplate;
 

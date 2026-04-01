@@ -7,7 +7,7 @@ import com.asrevo.cvhome.store.model.references.WeightUnit;
 import jakarta.validation.constraints.NotNull;
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Set;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -44,6 +44,8 @@ public class MerchantStoreEntity extends MerchantStorePricingBase implements Ser
 	private String template;
 
 	private boolean useCache;
+
+	private boolean requireLoginForOrderPlacement;
 
 	private MeasureUnit dimension;
 
