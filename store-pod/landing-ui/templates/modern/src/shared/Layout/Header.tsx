@@ -131,7 +131,7 @@ export const Header = ({params, headerBox}: {
                         {user ? (
                             <div className="flex items-center gap-2">
                                 <span className="text-xs font-medium text-muted-foreground hidden sm:inline">
-                                    {user.subject}
+                                    {user.claims.name}
                                 </span>
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>

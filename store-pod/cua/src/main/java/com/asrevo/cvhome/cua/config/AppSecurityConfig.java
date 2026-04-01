@@ -1,6 +1,5 @@
 package com.asrevo.cvhome.cua.config;
 
-import com.asrevo.cvhome.cua.security.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.security.autoconfigure.actuate.web.servlet.EndpointRequest;
 import org.springframework.context.annotation.Bean;
@@ -24,8 +23,6 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 @RequiredArgsConstructor
 public class AppSecurityConfig {
 
-	private final CustomOAuth2UserService customOAuth2UserService;
-
 	@Bean
 	@Order(3)
 	SecurityFilterChain appSecurity(HttpSecurity http, JwtDecoder jwtDecoder) throws Exception {
@@ -33,7 +30,7 @@ public class AppSecurityConfig {
 			.permitAll()
 			.requestMatchers(EndpointRequest.toAnyEndpoint())
 			.permitAll()
-			.requestMatchers("/login", "/api/v1/me")
+			.requestMatchers("/login", "/api/v1/auth/me")
 			.permitAll()
 			.requestMatchers("/swagger-ui.html")
 			.permitAll()
@@ -44,8 +41,7 @@ public class AppSecurityConfig {
 			.anyRequest()
 			.authenticated())
 			.formLogin(it -> it.loginPage("/login"))
-			.oauth2Login(it -> it.loginPage("/login")
-				.userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService)))
+			.oauth2Login(it -> it.loginPage("/login"))
 			.csrf(AbstractHttpConfigurer::disable)
 			.requestCache(cache -> cache.requestCache(requestCache()))
 			.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.decoder(jwtDecoder)));
