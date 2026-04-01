@@ -31,7 +31,10 @@ import {ScrollArea} from "@/components/ui/scroll-area";
 import {useCart} from "@store-front/hooks/use-cart";
 import {cn} from "@/lib/utils";
 
-export const CheckoutForm = ({storeContext}: { storeContext: StoreContext }) => {
+export const CheckoutForm = ({storeContext, requireLoginForOrderPlacement}: {
+    storeContext: StoreContext,
+    requireLoginForOrderPlacement: boolean
+}) => {
     const t = useTranslations('PAGE.CHECKOUT');
     const {
         register,
@@ -42,6 +45,8 @@ export const CheckoutForm = ({storeContext}: { storeContext: StoreContext }) => 
         setSuccessDialogOpen,
         agreeDialogOpen,
         setAgreeDialogOpen,
+        loginRequiredDialogOpen,
+        setLoginRequiredDialogOpen,
         agreement,
         order,
         isAgree,
@@ -49,7 +54,8 @@ export const CheckoutForm = ({storeContext}: { storeContext: StoreContext }) => 
         readableCountryList,
         handleClickOnAgreement,
         onSubmit,
-    } = useCheckoutForm(storeContext);
+        login,
+    } = useCheckoutForm(storeContext, requireLoginForOrderPlacement);
 
     return (
         <>
@@ -60,6 +66,7 @@ export const CheckoutForm = ({storeContext}: { storeContext: StoreContext }) => 
                 setIsOpen={setAgreeDialogOpen}
                 setIsAgree={setIsAgree}
             />
+            <LoginRequiredDialog isOpen={loginRequiredDialogOpen} setIsOpen={setLoginRequiredDialogOpen} login={login}/>
 
             <Card className="col-span-8 rounded-2xl border border-border bg-background shadow-none">
                 <CardHeader className="pb-4">
@@ -150,7 +157,8 @@ export const CheckoutForm = ({storeContext}: { storeContext: StoreContext }) => 
                                         onValueChange={(value) => setValue("customer.billing.country", value)}
                                         defaultValue={defaultCheckoutValue.customer.billing.country}
                                     >
-                                        <SelectTrigger id="country" aria-invalid={!!errors.customer?.billing?.country} className="w-full">
+                                        <SelectTrigger id="country" aria-invalid={!!errors.customer?.billing?.country}
+                                                       className="w-full">
                                             <SelectValue placeholder={t('SELECT_COUNTRY')}/>
                                         </SelectTrigger>
                                         <SelectContent>
@@ -353,6 +361,36 @@ export const OrderPlacedSuccessfullyDialog = ({order, isOpen, setIsOpen}: {
                 <AlertDialogFooter>
                     <AlertDialogAction onClick={handleContinueShopping} className="w-full rounded-xl">
                         {t('CONTINUE_SHOPPING')}
+                    </AlertDialogAction>
+                </AlertDialogFooter>
+            </AlertDialogContent>
+        </AlertDialog>
+    );
+};
+
+export const LoginRequiredDialog = ({isOpen, setIsOpen, login}: {
+    isOpen: boolean,
+    setIsOpen: (x: boolean) => void,
+    login: () => void,
+}) => {
+    const t = useTranslations('PAGE.CHECKOUT');
+
+    return (
+        <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
+            <AlertDialogContent className="rounded-2xl">
+                <AlertDialogHeader className="items-center text-center">
+                    <HelpCircle className="h-14 w-14 text-primary"/>
+                    <AlertDialogTitle className="text-lg">
+                        {t('LOGIN_REQUIRED_TITLE')}
+                    </AlertDialogTitle>
+                    <AlertDialogDescription className="mt-4">
+                        {t('LOGIN_REQUIRED_DESCRIPTION')}
+                    </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter className="sm:justify-center">
+                    <AlertDialogCancel className="rounded-xl">{t('CANCEL')}</AlertDialogCancel>
+                    <AlertDialogAction onClick={login} className="rounded-xl">
+                        {t('LOGIN')}
                     </AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>

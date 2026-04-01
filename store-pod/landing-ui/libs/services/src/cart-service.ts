@@ -2,26 +2,23 @@ import {Cart} from "@store-front/types/cart";
 import {CheckoutCart} from "@store-front/types/checkout-cart";
 import {Order} from "@store-front/types/order";
 import {storeBaseServiceUrl, StoreContext} from "@store-front/types/store-context";
-import {handleResponse, post, put} from "./http-utils";
+import {handleResponse, post, put, del, get} from "./http-utils";
 import {ReadableCountryList} from "@store-front/types/country";
 
 export class CartService {
 
     public static getCart = async (storeContext: StoreContext, cart: string): Promise<Cart | undefined> => {
-        return fetch(`${storeBaseServiceUrl('checkout', storeContext)}/api/v1/cart/${cart}?store=${storeContext.store}&lang=${storeContext.locale}`)
+        return fetch(`${storeBaseServiceUrl('checkout', storeContext)}/api/v1/cart/${cart}?store=${storeContext.store}&lang=${storeContext.locale}`, get())
             .then(it => handleResponse<Cart>(it))
     }
 
     public static removeFromCart = async (storeContext: StoreContext, cart: string, productSku: string) => {
-        return fetch(`${storeBaseServiceUrl('checkout', storeContext)}/api/v1/cart/${cart}/product/${productSku}?store=${storeContext.store}&lang=${storeContext.locale}`, {
-            method: 'DELETE',
-        });
+        return fetch(`${storeBaseServiceUrl('checkout', storeContext)}/api/v1/cart/${cart}/product/${productSku}?store=${storeContext.store}&lang=${storeContext.locale}`, del());
     }
 
     public static removeProduct = async (storeContext: StoreContext, cart: string, lineItemId: number) => {
-        return fetch(`${storeBaseServiceUrl('checkout', storeContext)}/api/v1/cart/${cart}/product/${lineItemId}?store=${storeContext.store}&lang=${storeContext.locale}`, {
-            method: 'DELETE',
-        }).then(() => CartService.getCart(storeContext, cart));
+        return fetch(`${storeBaseServiceUrl('checkout', storeContext)}/api/v1/cart/${cart}/product/${lineItemId}?store=${storeContext.store}&lang=${storeContext.locale}`, del())
+            .then(() => CartService.getCart(storeContext, cart));
     }
 
     public static removeFromCartThenGetCart = async (storeContext: StoreContext, cart: string, productSku: string) => {
@@ -47,7 +44,7 @@ export class CartService {
     }
 
     public static getCountries = async (storeContext: StoreContext): Promise<ReadableCountryList | undefined> => {
-        return fetch(`${storeBaseServiceUrl('checkout', storeContext)}/api/v1/country?store=${storeContext.store}&lang=${storeContext.locale}`)
+        return fetch(`${storeBaseServiceUrl('checkout', storeContext)}/api/v1/country?store=${storeContext.store}&lang=${storeContext.locale}`, get())
             .then(it => handleResponse<ReadableCountryList>(it))
     }
 

@@ -1,6 +1,6 @@
 import {Product, ProductGroupPage} from "@store-front/types/product-groups";
 import {storeBaseServiceUrl, StoreContext} from "@store-front/types/store-context";
-import {handleResponse} from "./http-utils";
+import {get, handleResponse} from "./http-utils";
 
 export class ProductService {
 
@@ -21,17 +21,17 @@ export class ProductService {
     }
 
     public static getRelatedProductGroup = async (storeContext: StoreContext, product: number): Promise<ProductGroupPage | undefined> => {
-        return fetch(`${storeBaseServiceUrl('catalog', storeContext)}/api/v1/products/${product}/related?store=${storeContext.store}&lang=${storeContext.locale}`)
+        return fetch(`${storeBaseServiceUrl('catalog', storeContext)}/api/v1/products/${product}/related?store=${storeContext.store}&lang=${storeContext.locale}`, get())
             .then(it => handleResponse<ProductGroupPage>(it))
     }
 
     public static getProductByGroup = async (storeContext: StoreContext, group: string): Promise<ProductGroupPage | undefined> => {
-        return fetch(`${storeBaseServiceUrl('catalog', storeContext)}/api/v1/products/group/${group}?store=${storeContext.store}&lang=${storeContext.locale}`)
+        return fetch(`${storeBaseServiceUrl('catalog', storeContext)}/api/v1/products/group/${group}?store=${storeContext.store}&lang=${storeContext.locale}`, get())
             .then(it => handleResponse<ProductGroupPage>(it))
     }
 
     public static getProductByUrl = async (url: string, storeContext: StoreContext): Promise<Product | undefined> => {
-        return fetch(`${storeBaseServiceUrl('catalog', storeContext)}/api/v2/product/name/${url}?store=${storeContext.store}&lang=${storeContext.locale}`)
+        return fetch(`${storeBaseServiceUrl('catalog', storeContext)}/api/v2/product/name/${url}?store=${storeContext.store}&lang=${storeContext.locale}`, get())
             .then(it => handleResponse<Product>(it))
     }
 }

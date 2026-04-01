@@ -58,7 +58,11 @@
       "AGREE": "Согласен",
       "REJECT": "Отклонить",
       "ORDER_ID": "ID Заказа",
-      "FAILED_TO_PLACE_ORDER": "Не удалось разместить заказ"
+      "FAILED_TO_PLACE_ORDER": "Не удалось разместить заказ",
+      "LOGIN_REQUIRED_TITLE": "Требуется вход",
+      "LOGIN_REQUIRED_DESCRIPTION": "Вы должны войти в систему, чтобы оформить заказ.",
+      "CANCEL": "Отмена",
+      "LOGIN": "Войти"
     },
     "CONTENT": {
       "HOME_TITLE": "Контент"

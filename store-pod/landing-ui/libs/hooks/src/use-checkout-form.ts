@@ -13,16 +13,19 @@ import {ContentService} from "@store-front/services/content-service";
 import {getCartManager} from "@store-front/services/cart-manager";
 import {showToast} from "nextjs-toast-notify";
 import {toastDirection} from "@store-front/services/direction-utils";
+import {useUser} from "./use-user";
 
-export const useCheckoutForm = (storeContext: StoreContext) => {
+export const useCheckoutForm = (storeContext: StoreContext, requireLoginForOrderPlacement: boolean) => {
     const t = useTranslations('PAGE.CHECKOUT');
     const [successDialogOpen, setSuccessDialogOpen] = useState(false);
     const [agreeDialogOpen, setAgreeDialogOpen] = useState(false);
+    const [loginRequiredDialogOpen, setLoginRequiredDialogOpen] = useState(false);
     const [agreement, setAgreement] = useState<Box | undefined>();
     const [order, setOrder] = useState<Order | undefined>();
     const [isAgree, setIsAgree] = useState(false);
     const [readableCountryList, setReadableCountryList] = useState<ReadableCountryList | undefined>();
     const cartManager = getCartManager(storeContext);
+    const {user, loading, login} = useUser(storeContext);
 
     const getSchema = useCallback(() => {
         return Yup.object().shape({
@@ -92,6 +95,10 @@ export const useCheckoutForm = (storeContext: StoreContext) => {
     }, []);
 
     const onSubmit = useCallback(async (checkoutCart: any) => {
+        if (requireLoginForOrderPlacement && !user) {
+            setLoginRequiredDialogOpen(true);
+            return;
+        }
         cartManager.checkout(checkoutCart, (o) => {
                 setOrder(o);
                 if (o) {
@@ -119,6 +126,8 @@ export const useCheckoutForm = (storeContext: StoreContext) => {
         setSuccessDialogOpen,
         agreeDialogOpen,
         setAgreeDialogOpen,
+        loginRequiredDialogOpen,
+        setLoginRequiredDialogOpen,
         agreement,
         order,
         setOrder,
@@ -127,5 +136,6 @@ export const useCheckoutForm = (storeContext: StoreContext) => {
         readableCountryList,
         handleClickOnAgreement,
         onSubmit,
+        login,
     };
 };

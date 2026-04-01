@@ -58,7 +58,11 @@
       "AGREE": "Aceptar",
       "REJECT": "Rechazar",
       "ORDER_ID": "ID del Pedido",
-      "FAILED_TO_PLACE_ORDER": "Error al realizar el pedido"
+      "FAILED_TO_PLACE_ORDER": "Error al realizar el pedido",
+      "LOGIN_REQUIRED_TITLE": "Inicio de sesión requerido",
+      "LOGIN_REQUIRED_DESCRIPTION": "Debes iniciar sesión para realizar un pedido.",
+      "CANCEL": "Cancelar",
+      "LOGIN": "Iniciar sesión"
     },
     "CONTENT": {
       "HOME_TITLE": "Contenido"

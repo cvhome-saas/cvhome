@@ -1,5 +1,5 @@
 import {storeBaseServiceUrl, StoreContext} from "@store-front/types/store-context";
-import {handleResponse} from "./http-utils";
+import {get, handleResponse} from "./http-utils";
 import {generateCodeChallenge, generateCodeVerifier} from "./pkce-utils";
 import {AuthEventType, User} from "@store-front/types";
 
@@ -28,12 +28,7 @@ export class AuthService {
 
 	static async getMe(context: StoreContext): Promise<User | undefined> {
 		const url = `${storeBaseServiceUrl('cua',context)}/api/v1/auth/me`;
-		const response = await fetch(url, {
-			headers: {
-				'Accept': 'application/json',
-				'Authorization': `Bearer ${sessionStorage.getItem('access_token')}`,
-			},
-		});
+		const response = await fetch(url, get());
 		return handleResponse<User>(response);
 	}
 
