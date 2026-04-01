@@ -28,7 +28,6 @@ public class SocialLoginConfig implements Serializable {
 	@Column(name = "app_secret", nullable = false)
 	private String appSecret;
 
-	// New enabled field with default true
 	@Column(name = "enabled", nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE")
 	private Boolean enabled = true;
 
