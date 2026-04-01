@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.cua.web;
 
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.cua.domain.SocialLoginConfigId;
 import com.asrevo.cvhome.cua.repo.SocialLoginConfigRepository;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
 import com.asrevo.cvhome.merchant.model.merchant.ReadableMerchantStore;
@@ -14,6 +15,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import java.util.List;
 
 @Slf4j
 @Controller
@@ -39,7 +42,8 @@ public class LoginController {
 				ReadableMerchantStore store = externalMerchantStoreService.getStore(new StoreMerchantId(clientId));
 				model.addAttribute("store", store);
 				model.addAttribute("clientId", clientId);
-				var configs = socialLoginConfigRepository.findSocialLoginConfigByClientId(clientId);
+				List<SocialLoginConfigId> configs = socialLoginConfigRepository
+					.findSocialLoginConfigByClientId(new StoreMerchantId(clientId));
 				model.addAttribute("socialLogins", configs);
 			}
 		}

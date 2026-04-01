@@ -19,7 +19,7 @@ create table if not exists cua.users
 
 CREATE INDEX IF NOT EXISTS idx_users_metadata ON cua.users USING gin (metadata);
 
-CREATE TABLE IF NOT EXISTS cua.social_login_configs
+CREATE TABLE IF NOT EXISTS cua.social_login_configs1
 (
     id                uuid PRIMARY KEY,
     client_id         VARCHAR(190) NOT NULL,
@@ -28,6 +28,18 @@ CREATE TABLE IF NOT EXISTS cua.social_login_configs
     app_secret        VARCHAR(254) NOT NULL,
     scopes            VARCHAR(254),
     CONSTRAINT UK_client_provider UNIQUE (client_id, provider_id)
+);
+
+CREATE TABLE IF NOT EXISTS cua.social_login_configs
+(
+    store_merchant_id varchar(50)  not null,
+    provider_id       varchar(50) not null,
+    app_id            varchar(255) not null,
+    app_secret        varchar(255) not null,
+    primary key (store_merchant_id, provider_id),
+    constraint social_login_configs_provider_id_check
+        check ((provider_id)::text = ANY
+               ((ARRAY ['GOOGLE'::character varying, 'FACEBOOK'::character varying, 'GITHUB'::character varying])::text[]))
 );
 
 create table if not exists cua.signing_keys

@@ -15,7 +15,8 @@ public enum SocialProvider {
 
 	GOOGLE("google", "Google",
 			(registrationId) -> ClientRegistrations.fromOidcIssuerLocation("https://accounts.google.com")
-				.registrationId(registrationId),
+				.registrationId(registrationId)
+				.scope("openid", "profile", "email"),
 			"email", "name"),
 
 	FACEBOOK("facebook", "Facebook",
@@ -28,7 +29,8 @@ public enum SocialProvider {
 				.tokenUri("https://graph.facebook.com/v19.0/oauth/access_token")
 				.userInfoUri("https://graph.facebook.com/me?fields=id,name,email,picture")
 				.userNameAttributeName("id")
-				.clientName("Facebook"),
+				.clientName("Facebook")
+				.scope("email", "public_profile"),
 			"email", "name"),
 
 	GITHUB("github", "GitHub",
@@ -41,7 +43,8 @@ public enum SocialProvider {
 				.tokenUri("https://github.com/login/oauth/access_token")
 				.userInfoUri("https://api.github.com/user")
 				.userNameAttributeName("id")
-				.clientName("GitHub"),
+				.clientName("GitHub")
+				.scope("read:user", "user:email"),
 			"email", "name");
 
 	private final String providerId;
