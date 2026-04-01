@@ -15,7 +15,7 @@
       <div class="col col-lg-2">
         <button nbButton status="success" (click)="save()"
                 type="submit">
-          {{  'COMMON.SAVE'  | translate }}
+          {{ 'COMMON.SAVE'  | translate }}
         </button>
 
       </div>
@@ -41,10 +41,25 @@
             </div>
             <div class="col-sm-4">
               <div class="form-group">
-                <nb-checkbox formControlName="enabled">{{ 'STORE.SOCIAL_APP_SECRET' | translate }}</nb-checkbox>
+                <nb-checkbox formControlName="enabled">{{ 'STORE.SOCIAL_APP_ENABLED' | translate }}</nb-checkbox>
               </div>
             </div>
           </div>
+
+          <!-- New hint for callback URL -->
+          <div class="row mt-2">
+            <div class="col">
+              <small class="text-muted">
+                <code> {{
+                    'STORE.SOCIAL_CALLBACK_URL' | translate : {
+                      storeId: store.id,
+                      provider: config.value.providerId | lowercase
+                    }
+                  }} </code>
+              </small>
+            </div>
+          </div>
+
           <hr/>
         </div>
       </div>

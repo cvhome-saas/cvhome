@@ -227,7 +227,9 @@
     "STORE_SOCIAL_LOGIN": "Connexion social du magasin",
     "SOCIAL_APP_ID": "ID d’application",
     "SOCIAL_APP_SECRET": "Secret d’application",
-    "SOCIAL_LOGIN_UPDATED": "Configuration du login social mise à jour"
+    "SOCIAL_LOGIN_UPDATED": "Configuration du login social mise à jour",
+    "SOCIAL_APP_ENABLED": "Activé",
+    "SOCIAL_CALLBACK_URL": "Format d'URL de rappel : /cua/login/oauth2/code/{{storeId}}.{{provider}}"
   },
   "STORE_LANDING": {
     "LANDING_PAGE_TITLE": "Titre de la page de destination",
