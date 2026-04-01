@@ -36,6 +36,7 @@ CREATE TABLE IF NOT EXISTS cua.social_login_configs
     provider_id       varchar(50) not null,
     app_id            varchar(255) not null,
     app_secret        varchar(255) not null,
+    enabled           boolean      NOT NULL DEFAULT TRUE, -- new enabled column
     primary key (store_merchant_id, provider_id),
     constraint social_login_configs_provider_id_check
         check ((provider_id)::text = ANY

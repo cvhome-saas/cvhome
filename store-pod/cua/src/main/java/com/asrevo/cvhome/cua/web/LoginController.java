@@ -43,7 +43,7 @@ public class LoginController {
 				model.addAttribute("store", store);
 				model.addAttribute("clientId", clientId);
 				List<SocialLoginConfigId> configs = socialLoginConfigRepository
-					.findSocialLoginConfigByClientId(new StoreMerchantId(clientId));
+					.findEnabledSocialLoginConfig(new StoreMerchantId(clientId));
 				model.addAttribute("socialLogins", configs);
 			}
 		}

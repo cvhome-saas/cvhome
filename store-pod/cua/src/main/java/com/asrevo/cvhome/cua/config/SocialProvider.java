@@ -16,8 +16,7 @@ public enum SocialProvider {
 	GOOGLE("google", "Google",
 			(registrationId) -> ClientRegistrations.fromOidcIssuerLocation("https://accounts.google.com")
 				.registrationId(registrationId)
-				.scope("openid", "profile", "email"),
-			"email", "name"),
+				.scope("openid", "profile", "email")),
 
 	FACEBOOK("facebook", "Facebook",
 			(registrationId) -> ClientRegistration.withRegistrationId(registrationId)
@@ -30,8 +29,7 @@ public enum SocialProvider {
 				.userInfoUri("https://graph.facebook.com/me?fields=id,name,email,picture")
 				.userNameAttributeName("id")
 				.clientName("Facebook")
-				.scope("email", "public_profile"),
-			"email", "name"),
+				.scope("email", "public_profile")),
 
 	GITHUB("github", "GitHub",
 			(registrationId) -> ClientRegistration.withRegistrationId(registrationId)
@@ -44,8 +42,7 @@ public enum SocialProvider {
 				.userInfoUri("https://api.github.com/user")
 				.userNameAttributeName("id")
 				.clientName("GitHub")
-				.scope("read:user", "user:email"),
-			"email", "name");
+				.scope("read:user", "user:email"));
 
 	private final String providerId;
 
@@ -53,37 +50,11 @@ public enum SocialProvider {
 
 	private final Function<String, ClientRegistration.Builder> builderFunction;
 
-	private final String emailAttribute;
-
-	private final String nameAttribute;
-
-	SocialProvider(String providerId, String clientName, Function<String, ClientRegistration.Builder> builderFunction,
-			String emailAttribute, String nameAttribute) {
+	SocialProvider(String providerId, String clientName, Function<String, ClientRegistration.Builder> builderFunction) {
 		this.providerId = providerId;
 		this.clientName = clientName;
 		this.builderFunction = builderFunction;
-		this.emailAttribute = emailAttribute;
-		this.nameAttribute = nameAttribute;
-	}
 
-	public static SocialProvider fromProviderId(String providerId) {
-		return Arrays.stream(values())
-			.filter(p -> p.getProviderId().equalsIgnoreCase(providerId))
-			.findFirst()
-			.orElse(null);
-	}
-
-	public String getEmail(Map<String, Object> attributes) {
-		Object email = attributes.get(emailAttribute);
-		if (email == null) {
-			// Fallback to id if email is not present
-			return (String) attributes.get("id");
-		}
-		return (String) email;
-	}
-
-	public String getName(Map<String, Object> attributes) {
-		return (String) attributes.get(nameAttribute);
 	}
 
 	public ClientRegistration.Builder createBuilder(String registrationId) {
