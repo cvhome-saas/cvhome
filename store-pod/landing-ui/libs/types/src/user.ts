@@ -15,6 +15,12 @@ export interface User {
         exp: string;
         iat: string;
         jti: string;
+        givenName?: string;
+        familyName?: string;
+        name?: string;
+        picture?: string;
+        email?: string;
+        emailVerified?: boolean;
     };
     audience: string[];
     id: string;

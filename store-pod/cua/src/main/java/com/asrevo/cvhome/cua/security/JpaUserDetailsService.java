@@ -30,10 +30,7 @@ public class JpaUserDetailsService implements UserDetailsService {
 			.orElseThrow(() -> new UsernameNotFoundException(
 					"User not found for client " + clientId + " and username: " + username));
 
-		return org.springframework.security.core.userdetails.User.withUsername(u.getUsername())
-			.password(u.getPasswordHash())
-			.accountLocked(!u.isEnabled())
-			.build();
+		return new SecurityUser(u);
 	}
 
 	private String getClientId() {

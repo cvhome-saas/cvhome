@@ -29,7 +29,6 @@ import {CartProductList} from "@/shared/Cart/CartProductList";
 import {isRtl} from "@/services/direction-utils";
 import {useCart} from "@store-front/hooks/use-cart";
 import {useUser} from "@store-front/hooks/use-user";
-import {AuthService} from "@store-front/services/auth-service";
 import {User} from "lucide-react";
 
 export const Header = ({params, headerBox}: {
@@ -140,7 +139,7 @@ export const Header = ({params, headerBox}: {
                         {user ? (
                             <div className="flex items-center gap-2">
                                 <span className="text-sm font-medium text-muted-foreground hidden sm:inline">
-                                    {user.subject}
+                                    {user.claims.name}
                                 </span>
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
