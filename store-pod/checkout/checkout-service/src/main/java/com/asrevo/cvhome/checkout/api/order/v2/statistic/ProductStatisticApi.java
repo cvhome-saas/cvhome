@@ -3,6 +3,7 @@ package com.asrevo.cvhome.checkout.api.order.v2.statistic;
 import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1_STR;
 
 import com.asrevo.cvhome.commons.annotation.ConditionalOnApiStatus;
+import com.asrevo.cvhome.commons.annotation.SecuredResource;
 import com.asrevo.cvhome.commons.domain.StatisticEntry;
 import com.asrevo.cvhome.commons.domain.StatisticList;
 import com.asrevo.cvhome.commons.domain.StatisticRange;
@@ -39,8 +40,8 @@ public class ProductStatisticApi {
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	@ConditionalOnApiStatus
-	public StatisticList productStatistic(@Parameter(hidden = true) StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language, @RequestBody StatisticRange range) {
+	public StatisticList productStatistic(@SecuredResource StoreMerchantId merchantStore, LanguageCode language,
+			@RequestBody StatisticRange range) {
 
 		List<StatisticEntry> entries = orderProductRepository.productStatistic(Date.from(range.fromDate().toInstant()),
 				Date.from(range.toDate().toInstant()), merchantStore);

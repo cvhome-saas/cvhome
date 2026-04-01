@@ -48,7 +48,7 @@ public class ProductRelationshipApi {
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	public @ResponseBody ReadableProductList productRelatedProducts(@PathVariable final Long id,
-			@Parameter(hidden = true) StoreMerchantId merchantStore, @Parameter(hidden = true) LanguageCode language) {
+			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
 		Product product = productService.getById(id);
 		return productItemsFacade.relatedTinyProducts(product, merchantStore, LanguageCode.nonLanguage());
 	}
@@ -63,7 +63,7 @@ public class ProductRelationshipApi {
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	public @ResponseBody ReadableProductList getProductRelatedProducts(@PathVariable final Long id,
-			@Parameter(hidden = true) StoreMerchantId merchantStore, @Parameter(hidden = true) LanguageCode language) {
+			StoreMerchantId merchantStore, LanguageCode language) {
 		Product product = productService.getById(id);
 		return productItemsFacade.relatedMinimalProducts(product, merchantStore, language);
 	}
@@ -76,8 +76,7 @@ public class ProductRelationshipApi {
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	public @ResponseBody void addProductToRelatedGroup(@PathVariable Long relatedId, @PathVariable Long productId,
-			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language) {
+			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
 
 		Product relatedProduct = productService.findOne(relatedId, merchantStore);
 
@@ -93,8 +92,7 @@ public class ProductRelationshipApi {
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	public @ResponseBody void removeProductToRelatedGroup(@PathVariable Long relatedId, @PathVariable Long productId,
-			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language) throws ServiceException {
+			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) throws ServiceException {
 
 		Product relatedProduct = productService.findOne(relatedId, merchantStore);
 

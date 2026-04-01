@@ -12,6 +12,7 @@ export interface Store {
     phone: string
     template: any
     useCache: boolean
+    requireLoginForOrderPlacement: boolean
     currencyFormatNational: boolean
     retailer: boolean
     dimension: string

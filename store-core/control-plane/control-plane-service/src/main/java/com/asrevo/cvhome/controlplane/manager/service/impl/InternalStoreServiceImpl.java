@@ -9,7 +9,6 @@ import com.asrevo.cvhome.controlplane.manager.mappers.ManagerStoreMappers;
 import com.asrevo.cvhome.controlplane.manager.repository.ManagerStoreRepository;
 import com.asrevo.cvhome.controlplane.manager.service.InternalStoreService;
 import com.asrevo.cvhome.controlplane.manager.utils.ErrorCodes;
-import com.asrevo.cvhome.s2s.model.ServiceDomainProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Example;
@@ -27,8 +26,6 @@ import java.util.Map;
 public class InternalStoreServiceImpl implements InternalStoreService {
 
 	private final ManagerStoreRepository storeRepository;
-
-	private final ServiceDomainProperties serviceDomainProperties;
 
 	private final ManagerStoreMappers storeMappers;
 
@@ -101,10 +98,9 @@ public class InternalStoreServiceImpl implements InternalStoreService {
 	}
 
 	@Override
-	public Pod getStorePod(ManagerStoreId managerStoreId) {
+	public PodId getStorePod(ManagerStoreId managerStoreId) {
 		ManagerStoreEntity store = getManagerStoreEntity(managerStoreId);
-		return serviceDomainProperties.getPodByPodId(store.getPodId())
-			.orElseThrow(() -> new OperationExecution(ErrorCodes.store_pod_not_match_any));
+		return store.getPodId();
 	}
 
 }

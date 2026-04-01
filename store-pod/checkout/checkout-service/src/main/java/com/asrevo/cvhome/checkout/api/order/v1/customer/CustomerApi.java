@@ -3,6 +3,7 @@ package com.asrevo.cvhome.checkout.api.order.v1.customer;
 import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1_STR;
 
 import com.asrevo.cvhome.commons.annotation.ConditionalOnApiStatus;
+import com.asrevo.cvhome.commons.annotation.SecuredResource;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.customer.model.customer.ReadableCustomerList;
 import com.asrevo.cvhome.checkout.entity.customer.CustomerCriteria;
@@ -37,8 +38,8 @@ public class CustomerApi {
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	@ConditionalOnApiStatus
-	public ReadableCustomerList list(@Parameter(hidden = true) StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language, Pageable pageable) {
+	public ReadableCustomerList list(@SecuredResource StoreMerchantId merchantStore, LanguageCode language,
+			Pageable pageable) {
 		CustomerCriteria customerCriteria = createCustomerCriteria(pageable);
 		return customerFacade.getListByStore(merchantStore, customerCriteria, LanguageCode.nonLanguage());
 	}

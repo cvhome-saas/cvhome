@@ -13,22 +13,36 @@ import org.springframework.security.oauth2.jwt.Jwt;
 
 public class SecurityUtils {
 
-	private static boolean hasSuperAdminRole(Authentication authentication) {
+	public static boolean hasSuperAdminRole(Authentication authentication) {
 		return hasRole(authentication, Roles.ROLE_SUPER_ADMIN);
 	}
 
-	private static boolean hasScopeInternal(Authentication authentication) {
-		return hasRole(authentication, Roles.SCOPE_INTERNAL);
-	}
-
-	private static boolean hasOrgAdminRole(Authentication authentication) {
+	public static boolean hasOrgAdminRole(Authentication authentication) {
 		return hasRole(authentication, Roles.ROLE_ORG_ADMIN);
 	}
 
-	private static boolean hasRole(Authentication authentication, Roles role) {
-		return authentication.getAuthorities()
-			.stream()
-			.anyMatch(it -> Objects.requireNonNull(it.getAuthority()).contains(role.name()));
+	public static boolean hasStoreAdminRole(Authentication authentication) {
+		return hasRole(authentication, Roles.ROLE_STORE_ADMIN);
+	}
+
+	public static boolean hasStoreModeratorRole(Authentication authentication) {
+		return hasRole(authentication, Roles.ROLE_STORE_MODERATOR);
+	}
+
+	public static boolean hasScopeStore(Authentication authentication) {
+		return hasRole(authentication, Roles.SCOPE_STORE);
+	}
+
+	public static boolean hasScopeInternal(Authentication authentication) {
+		return hasRole(authentication, Roles.SCOPE_INTERNAL);
+	}
+
+	public static boolean hasRole(Authentication authentication, Roles role) {
+		return getRoles(authentication).contains(role.name());
+	}
+
+	public static Set<String> getRoles(Authentication authentication) {
+		return authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toSet());
 	}
 
 	public static UserOrgStoreIdentity getOrgStoreIdentity(Authentication authentication) {
@@ -41,7 +55,7 @@ public class SecurityUtils {
 		if (hasSuperAdminRole(authentication)) {
 			return new UserOrgStoreIdentity(null, "*", roles);
 		}
-		else if (hasScopeInternal(authentication)) {
+		else if (hasScopeStore(authentication)) {
 			return new UserOrgStoreIdentity(null, "*", roles);
 		}
 		else if (hasOrgAdminRole(authentication)) {

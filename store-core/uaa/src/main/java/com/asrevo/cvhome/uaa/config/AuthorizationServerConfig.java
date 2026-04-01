@@ -4,6 +4,7 @@ import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -50,6 +51,7 @@ public class AuthorizationServerConfig {
 	}
 
 	@Bean
+	@Primary
 	JwtDecoder jwtDecoder(JWKSource<SecurityContext> jwkSource) {
 		// Provide JwtDecoder for resource server support without using deprecated
 		// http.oauth2ResourceServer().jwt()

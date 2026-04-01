@@ -76,6 +76,12 @@ export class StoreFormComponent implements OnInit {
       title: 'Store details',
       key: 'COMPONENTS.STORE_DETAILS',
       link: 'store'
+    },
+    {
+      id: '6',
+      title: 'Store Social Login',
+      key: 'COMPONENTS.STORE_SOCIAL_LOGIN',
+      link: 'store-social-login'
     }
   ];
 
@@ -160,6 +166,10 @@ export class StoreFormComponent implements OnInit {
     return this.form.get('dimension');
   }
 
+  get requireLoginForOrderPlacement() {
+    return this.form.get('requireLoginForOrderPlacement');
+  }
+
   ngOnInit() {
     this.loader = true;
     forkJoin([
@@ -208,6 +218,7 @@ export class StoreFormComponent implements OnInit {
       currencyFormatNational: this.store.currencyFormatNational,
       weight: this.store.weight,
       dimension: this.store.dimension,
+      requireLoginForOrderPlacement: this.store.requireLoginForOrderPlacement,
       inBusinessSince: new Date(this.store.inBusinessSince),
     });
 
@@ -328,6 +339,7 @@ export class StoreFormComponent implements OnInit {
       currencyFormatNational: [true],
       weight: ['', [Validators.required]],
       dimension: ['', [Validators.required]],
+      requireLoginForOrderPlacement: [true],
       inBusinessSince: [new Date()],
     }, {validators: defaultLanguageMustBeInSupportedValidator});
 

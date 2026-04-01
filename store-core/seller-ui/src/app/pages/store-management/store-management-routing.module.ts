@@ -10,6 +10,7 @@ import {StoreBrandingComponent} from './store-branding/store-branding.component'
 import {StoreDomainComponent} from "./store-domain/store-domain.component";
 import {StoreSocialLinksComponent} from "./store-social-links/store-social-links.component";
 import {StoreSliderImagesComponent} from "./store-slider-images/store-slider-images.component";
+import {StoreSocialLoginComponent} from "./store-social-login/store-social-login.component";
 
 const routes: Routes = [
   {
@@ -45,6 +46,10 @@ const routes: Routes = [
       {
         path: 'store-slider-images/:code',
         component: StoreSliderImagesComponent,
+      },
+      {
+        path: 'store-social-login/:code',
+        component: StoreSocialLoginComponent,
       }
     ],
   }

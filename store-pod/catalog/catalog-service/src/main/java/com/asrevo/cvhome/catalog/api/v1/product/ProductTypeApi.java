@@ -52,8 +52,8 @@ public class ProductTypeApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	public ReadableProductTypeList list(@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language, Pageable pageable) {
+	public ReadableProductTypeList list(@SecuredResource StoreMerchantId merchantStore, LanguageCode language,
+			Pageable pageable) {
 
 		return productTypeFacade.getByMerchant(merchantStore, LanguageCode.allLanguage(), pageable);
 	}
@@ -66,9 +66,8 @@ public class ProductTypeApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	public ReadableProductType get(@PathVariable Long id,
-			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language) {
+	public ReadableProductType get(@PathVariable Long id, @SecuredResource StoreMerchantId merchantStore,
+			LanguageCode language) {
 
 		return productTypeFacade.get(merchantStore, id, LanguageCode.allLanguage());
 	}
@@ -82,8 +81,7 @@ public class ProductTypeApi {
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	public ResponseEntity<EntityExists> exists(@RequestParam String code,
-			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language) {
+			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
 
 		boolean exists = productTypeFacade.exists(code, merchantStore, language);
 		return new ResponseEntity<>(new EntityExists(exists), HttpStatus.OK);
@@ -97,9 +95,8 @@ public class ProductTypeApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	public Entity create(@RequestBody PersistableProductType type,
-			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language) {
+	public Entity create(@RequestBody PersistableProductType type, @SecuredResource StoreMerchantId merchantStore,
+			LanguageCode language) {
 
 		Long id = productTypeFacade.save(type, merchantStore, LanguageCode.allLanguage());
 		Entity entity = new Entity();
@@ -116,8 +113,7 @@ public class ProductTypeApi {
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	public void update(@RequestBody PersistableProductType type, @PathVariable Long id,
-			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language) {
+			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
 
 		productTypeFacade.update(type, id, merchantStore, language);
 	}
@@ -130,8 +126,7 @@ public class ProductTypeApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	public void delete(@PathVariable Long id, @Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language) {
+	public void delete(@PathVariable Long id, @SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
 
 		productTypeFacade.delete(id, merchantStore, language);
 	}

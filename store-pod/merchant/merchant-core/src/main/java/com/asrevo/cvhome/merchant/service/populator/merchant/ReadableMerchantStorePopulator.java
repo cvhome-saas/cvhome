@@ -99,6 +99,7 @@ public class ReadableMerchantStorePopulator
 		target.setId(source.getId().getId());
 		target.setInBusinessSince(DateUtil.formatDate(source.getInBusinessSince()));
 		target.setUseCache(source.isUseCache());
+		target.setRequireLoginForOrderPlacement(source.isRequireLoginForOrderPlacement());
 
 		if (source.getSliderImages() != null && !source.getSliderImages().isEmpty()) {
 			Set<ReadableSliderImage> images = source.getSliderImages()

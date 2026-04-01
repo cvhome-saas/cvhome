@@ -223,7 +223,13 @@
     "DOMAIN_DNS_CHECKING": "Vérification du DNS du domaine en cours...",
     "DOMAIN_DNS_WAITING_INFO": "En attente des informations du serveur pour vérifier le domaine...",
     "DOMAIN_HELP_TEXT": "Assurez-vous d'abord d'ajouter un enregistrement CNAME pointant vers {{podDomain}}.",
-    "PREFERRED_POD": "Pod préféré"
+    "PREFERRED_POD": "Pod préféré",
+    "STORE_SOCIAL_LOGIN": "Connexion social du magasin",
+    "SOCIAL_APP_ID": "ID d’application",
+    "SOCIAL_APP_SECRET": "Secret d’application",
+    "SOCIAL_LOGIN_UPDATED": "Configuration du login social mise à jour",
+    "SOCIAL_APP_ENABLED": "Activé",
+    "SOCIAL_CALLBACK_URL": "Format d'URL de rappel : /cua/login/oauth2/code/{{storeId}}.{{provider}}"
   },
   "STORE_LANDING": {
     "LANDING_PAGE_TITLE": "Titre de la page de destination",
@@ -282,6 +288,7 @@
     "SIZE_UNITS": "Unités de taille",
     "OPERATING_SINCE": "Site Web fonctionnant depuis",
     "USE_CACHE": "Utiliser le cache",
+    "REQUIRE_LOGIN_FOR_ORDER_PLACEMENT": "La connexion est requise pour passer une commande",
     "SELECT_RETAILER": "Sélectionner un détaillant",
     "STORE_UPDATED": "Boutique mise à jour.",
     "STORE_CREATED": "Boutique créée.",
@@ -830,13 +837,11 @@
       "LIMITED_PRODUCTS": "produits limités",
       "LIMITED_VISITORS": "visiteurs limités",
       "LIMITED_ACCOUNTS": "comptes limités",
-
       "BASIC_STORES": "magasins de base",
       "BASIC_ORDERS": "commandes de base",
       "BASIC_PRODUCTS": "produits de base",
       "BASIC_VISITORS": "visiteurs de base",
       "BASIC_ACCOUNTS": "comptes de base",
-
       "PERFORMANCE_STORES": "magasins de performance",
       "PERFORMANCE_ORDERS": "commandes de performance",
       "PERFORMANCE_PRODUCTS": "produits de performance",
@@ -849,5 +854,22 @@
       "BASIC": "Basique",
       "PERFORMANCE": "Performance"
     }
+  },
+  "POD": {
+    "POD_MANAGEMENT": "Gestion des pods",
+    "CREATE_POD": "Créer un pod",
+    "EDIT_POD": "Modifier le pod",
+    "POD_LIST": "Liste des pods"
+  },
+  "POD_FORM": {
+    "NAME": "Nom",
+    "ENDPOINT_URL": "URL du point de terminaison",
+    "TYPE": "Type",
+    "ORG_ID": "ID de l'organisation",
+    "NAME_REQUIRED": "Le nom est requis.",
+    "NAME_PATTERN": "Le nom ne peut contenir que des lettres, des chiffres et des tirets.",
+    "ENDPOINT_URL_REQUIRED": "L'URL du point de terminaison est requise.",
+    "ENDPOINT_URL_PATTERN": "Doit être une URL valide (commençant par http:// ou https://).",
+    "SELECT_TYPE": "Sélectionner un type"
   }
 }

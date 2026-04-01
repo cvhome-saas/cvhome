@@ -50,19 +50,15 @@ spring:
                 metadata:
                   service-name: checkout
                   instance: checkout-1
+            cua:
+              - uri: "http://localhost:8124"
+                instance-id: cua-1
+                metadata:
+                  service-name: cua
+                  instance: cua-1
             landing-ui:
               - uri: "http://localhost:8110"
                 instance-id: landing-ui-1
                 metadata:
                   service-name: landing-ui
                   instance: landing-ui-1
-    gateway:
-      server:
-        webflux:
-          discovery:
-            locator:
-              enabled: false
-logging:
-  level:
-    com:
-      asrevo: DEBUG

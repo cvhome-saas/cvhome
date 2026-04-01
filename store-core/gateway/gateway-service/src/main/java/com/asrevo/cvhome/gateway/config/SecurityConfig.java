@@ -1,9 +1,6 @@
 package com.asrevo.cvhome.gateway.config;
 
 import static org.springframework.security.config.Customizer.withDefaults;
-import static org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher.MatchResult.match;
-import static org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher.MatchResult.notMatch;
-
 import com.asrevo.cvhome.s2s.jwt.UaaJwtGrantedAuthoritiesConverter;
 import com.nimbusds.jwt.SignedJWT;
 
@@ -11,8 +8,6 @@ import java.util.*;
 import lombok.SneakyThrows;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.core.GrantedAuthority;
@@ -26,9 +21,7 @@ import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.csrf.CookieServerCsrfTokenRepository;
-import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher;
 import org.springframework.util.StringUtils;
-import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.session.CookieWebSessionIdResolver;
 import org.springframework.web.server.session.WebSessionIdResolver;
 import reactor.core.publisher.Mono;
@@ -38,14 +31,6 @@ import reactor.core.publisher.Mono;
 public class SecurityConfig {
 
 	private final RedirectingServerAuthenticationSuccessHandler redirectingServerAuthenticationSuccessHandler = new RedirectingServerAuthenticationSuccessHandler();
-
-	private static Mono<ServerWebExchangeMatcher.MatchResult> matches(ServerWebExchange exchange) {
-		ServerHttpRequest request = exchange.getRequest();
-		return (request.getMethod() != HttpMethod.GET && !request.getPath().toString().startsWith("/auth")
-				&& !request.getPath().toString().startsWith("/realms")
-				&& !request.getPath().toString().startsWith("/resources")
-				&& !request.getURI().getHost().startsWith("auth.")) ? match() : notMatch();
-	}
 
 	@SneakyThrows
 	private static Set<GrantedAuthority> extractAuthority(OAuth2AccessToken accessToken) {

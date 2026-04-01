@@ -64,8 +64,7 @@ public class ProductManufacturerApi {
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	public PersistableManufacturer create(@Valid @RequestBody PersistableManufacturer manufacturer,
-			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language, HttpServletResponse response) {
+			@SecuredResource StoreMerchantId merchantStore, LanguageCode language, HttpServletResponse response) {
 
 		try {
 			manufacturerFacade.saveOrUpdateManufacturer(manufacturer, merchantStore, language);
@@ -93,8 +92,8 @@ public class ProductManufacturerApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	public ReadableManufacturer get(@PathVariable Long id, @Parameter(hidden = true) StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language, HttpServletResponse response) {
+	public ReadableManufacturer get(@PathVariable Long id, StoreMerchantId merchantStore, LanguageCode language,
+			HttpServletResponse response) {
 
 		try {
 			ReadableManufacturer manufacturer = manufacturerFacade.getManufacturer(id, merchantStore, language);
@@ -126,8 +125,8 @@ public class ProductManufacturerApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	public ReadableManufacturer getBrand(@PathVariable Long id, @Parameter(hidden = true) StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language, HttpServletResponse response) {
+	public ReadableManufacturer getBrand(@PathVariable Long id, @SecuredResource StoreMerchantId merchantStore,
+			LanguageCode language, HttpServletResponse response) {
 
 		try {
 			ReadableManufacturer manufacturer = manufacturerFacade.getManufacturer(id, merchantStore,
@@ -164,9 +163,7 @@ public class ProductManufacturerApi {
 			summary = "This request supports paging or not. Paging supports page number and request" + " count",
 			responses = @ApiResponse(
 					content = @Content(schema = @Schema(implementation = ReadableManufacturerList.class))))
-	public ReadableManufacturerList listByStore(
-			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language,
+	public ReadableManufacturerList listByStore(@SecuredResource StoreMerchantId merchantStore, LanguageCode language,
 			@RequestParam(value = "name", required = false) String name, Pageable pageable) {
 
 		ListCriteria listCriteria = new ListCriteria();
@@ -186,8 +183,7 @@ public class ProductManufacturerApi {
 			summary = "This request supports paging or not. Paging supports page number and request" + " count",
 			responses = @ApiResponse(
 					content = @Content(schema = @Schema(implementation = ReadableManufacturerList.class))))
-	public ReadableManufacturerList list(@Parameter(hidden = true) StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language,
+	public ReadableManufacturerList list(StoreMerchantId merchantStore, LanguageCode language,
 			@RequestParam(value = "name", required = false) String name, Pageable pageable) {
 
 		ListCriteria listCriteria = new ListCriteria();
@@ -205,8 +201,7 @@ public class ProductManufacturerApi {
 	@Operation(method = "GET", description = "Check if manufacturer code already exists",
 			responses = @ApiResponse(content = @Content(schema = @Schema(implementation = EntityExists.class))))
 	public ResponseEntity<EntityExists> exists(@RequestParam(value = "code") String code,
-			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language) {
+			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
 
 		boolean exists = manufacturerFacade.manufacturerExist(merchantStore, code);
 		return new ResponseEntity<>(new EntityExists(exists), HttpStatus.OK);
@@ -221,8 +216,7 @@ public class ProductManufacturerApi {
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	public void update(@PathVariable Long id, @Valid @RequestBody PersistableManufacturer manufacturer,
-			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language, HttpServletResponse response) {
+			@SecuredResource StoreMerchantId merchantStore, LanguageCode language, HttpServletResponse response) {
 
 		try {
 			manufacturer.setId(id);
@@ -246,8 +240,8 @@ public class ProductManufacturerApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	public void delete(@PathVariable Long id, @Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language, HttpServletResponse response) {
+	public void delete(@PathVariable Long id, @SecuredResource StoreMerchantId merchantStore, LanguageCode language,
+			HttpServletResponse response) {
 
 		try {
 			Manufacturer manufacturer = manufacturerService.getById(id);
@@ -282,7 +276,7 @@ public class ProductManufacturerApi {
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	public List<ReadableManufacturer> list(@PathVariable final Long id, // category
 			// id
-			@Parameter(hidden = true) StoreMerchantId merchantStore, @Parameter(hidden = true) LanguageCode language) {
+			StoreMerchantId merchantStore, LanguageCode language) {
 		return manufacturerFacade.getByProductInCategory(merchantStore, language, id);
 	}
 

@@ -92,6 +92,7 @@ public class PersistableMerchantStorePopulator
 		target.setStorephone(source.getPhone());
 		target.setStoreEmailAddress(source.getEmail());
 		target.setUseCache(source.isUseCache());
+		target.setRequireLoginForOrderPlacement(source.isRequireLoginForOrderPlacement());
 
 		try {
 

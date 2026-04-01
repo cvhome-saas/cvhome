@@ -17,12 +17,13 @@ Domain: cars
 INSERT INTO merchant.merchant_store (store_merchant_id, currency_format_national, in_business_since, org, theme,
                                      color_theme, seizeunitcode, store_email, store_logo, store_banner, store_address,
                                      store_city, store_name, store_phone, store_postal_code, store_state_prov,
-                                     use_cache, weightunitcode, country_id, currency_id, language_code)
+                                     use_cache, require_login_for_order_placement, weightunitcode, country_id,
+                                     currency_id, language_code)
 VALUES ('65f023632bc26470c104b75f', false, '2024-04-01', '352023632b046970c104b76f', 'BASIS', 'LIGHT',
         'CM', -- Changed seizeunitcode slightly
         'info@egyptcarsales.com', 'logo.jpeg', 'banner.jpeg', '123 Auto Road', 'Cairo', 'Egypt-Car-Sales',
         '+201001234567', -- Cars domain reflected
-        '11511', 'Cairo', false, 'KG', 'EG', 'EGP',
+        '11511', 'Cairo', false, true, 'KG', 'EG', 'EGP',
         'ar') -- Using 'ar' as the first language
 on conflict (store_merchant_id) do nothing;
 -- Specify conflict target for clarity
@@ -65,7 +66,6 @@ VALUES ('65f023632bc26470c104b75f', 'TIKTOK', 'https://tiktok.com/@egyptcarsales
 
 
 
-
 INSERT INTO merchant.store_domains(domain, domain_type, store_merchant_id)
 VALUES ('org2-store2.asrevo.com', 'CUSTOM_DOMAIN', '65f023632bc26470c104b75f')
 ON CONFLICT DO NOTHING;
@@ -73,7 +73,6 @@ ON CONFLICT DO NOTHING;
 INSERT INTO merchant.store_domains(domain, domain_type, store_merchant_id)
 VALUES ('org2-store2', 'SUB_DOMAIN', '65f023632bc26470c104b75f')
 ON CONFLICT DO NOTHING;
-
 
 
 /*
@@ -87,13 +86,13 @@ Starting sort_order: 1
 */
 
 INSERT INTO merchant.content (content_id, code, content_type,
-                             link_to_menu, sort_order, visible, store_merchant_id)
+                              link_to_menu, sort_order, visible, store_merchant_id)
 VALUES (21, 'about-us', 'PAGE', true, 1, true, '65f023632bc26470c104b75f')
 on conflict (content_id) do nothing;
 
 INSERT INTO merchant.content_description (description_id, date_created, date_modified, description, name, title,
-                                         meta_description, meta_keywords, meta_title, sef_url, content_id,
-                                         language_code)
+                                          meta_description, meta_keywords, meta_title, sef_url, content_id,
+                                          language_code)
 VALUES (41, now(), now(),
         '<h1>عن إيجيبت كار سيلز</h1><p>مرحبًا بكم في إيجيبت كار سيلز، وجهتكم الموثوقة لشراء وبيع السيارات في مصر. نقدم مجموعة واسعة من السيارات الجديدة والمستعملة عالية الجودة لتلبية جميع احتياجاتكم.</p><h2>مهمتنا</h2><p>توفير تجربة شفافة ومريحة لعملائنا في سوق السيارات المصري، مع التركيز على الجودة والأسعار التنافسية.</p><h2>لماذا تختارنا؟</h2><p>خبرة واسعة في السوق المحلي، تشكيلة متنوعة، خدمة عملاء متميزة.</p>',
         'عن الشركة', 'عن إيجيبت كار سيلز',
@@ -103,8 +102,8 @@ VALUES (41, now(), now(),
         'about-us', 21, 'ar')
 on conflict (description_id) do nothing;
 INSERT INTO merchant.content_description (description_id, date_created, date_modified, description, name, title,
-                                         meta_description, meta_keywords, meta_title, sef_url, content_id,
-                                         language_code)
+                                          meta_description, meta_keywords, meta_title, sef_url, content_id,
+                                          language_code)
 VALUES (42, now(), now(),
         '<h1>À Propos d''Egypt Car Sales</h1><p>Bienvenue chez Egypt Car Sales, votre destination de confiance pour l''achat et la vente de voitures en Égypte. Nous proposons une large sélection de véhicules neufs et d''occasion de haute qualité pour répondre à tous vos besoins.</p><h2>Notre Mission</h2><p>Offrir une expérience transparente et pratique à nos clients sur le marché automobile égyptien, en mettant l''accent sur la qualité et des prix compétitifs.</p><h2>Pourquoi Nous Choisir ?</h2><p>Vaste expérience du marché local, sélection variée, service client exceptionnel.</p>',
         'À Propos', 'À Propos d''Egypt Car Sales',
@@ -115,13 +114,13 @@ VALUES (42, now(), now(),
 on conflict (description_id) do nothing;
 
 INSERT INTO merchant.content (content_id, code, content_type,
-                             link_to_menu, sort_order, visible, store_merchant_id)
+                              link_to_menu, sort_order, visible, store_merchant_id)
 VALUES (22, 'contact-us', 'PAGE', true, 2, true, '65f023632bc26470c104b75f')
 on conflict (content_id) do nothing;
 
 INSERT INTO merchant.content_description (description_id, date_created, date_modified, description, name, title,
-                                         meta_description, meta_keywords, meta_title, sef_url, content_id,
-                                         language_code)
+                                          meta_description, meta_keywords, meta_title, sef_url, content_id,
+                                          language_code)
 VALUES (43, now(), now(),
         '<h1>اتصل بنا</h1><p>هل لديك سؤال حول سيارة معينة، أو تحتاج إلى مساعدة في عملية الشراء أو البيع؟ فريق إيجيبت كار سيلز جاهز للمساعدة.</p><h2>معلومات الاتصال:</h2><ul><li>البريد الإلكتروني: info@egyptcarsales.eg</li><li>الهاتف: 01xxxxxxxxx (مصر)</li><li>العنوان: [أضف عنوانًا في مصر، مثال: شارع التسعين، التجمع الخامس، القاهرة]</li><li>ساعات العمل: السبت - الخميس، 10 صباحًا - 6 مساءً</li></ul><!-- Contact Form Placeholder -->',
         'اتصل بنا', 'اتصل بإيجيبت كار سيلز',
@@ -130,8 +129,8 @@ VALUES (43, now(), now(),
         'contact-us', 22, 'ar')
 on conflict (description_id) do nothing;
 INSERT INTO merchant.content_description (description_id, date_created, date_modified, description, name, title,
-                                         meta_description, meta_keywords, meta_title, sef_url, content_id,
-                                         language_code)
+                                          meta_description, meta_keywords, meta_title, sef_url, content_id,
+                                          language_code)
 VALUES (44, now(), now(),
         '<h1>Contactez-Nous</h1><p>Vous avez une question sur une voiture spécifique, ou besoin d''aide pour l''achat ou la vente ? L''équipe d''Egypt Car Sales est prête à vous aider.</p><h2>Coordonnées :</h2><ul><li>Email : info@egyptcarsales.eg</li><li>Téléphone : 01xxxxxxxxx (Égypte)</li><li>Adresse : [Ajouter une adresse en Égypte, ex: 90 Street, Fifth Settlement, Le Caire]</li><li>Heures d''ouverture : Samedi - Jeudi, 10h - 18h</li></ul><!-- Placeholder Formulaire de Contact -->',
         'Contactez-Nous', 'Contactez Egypt Car Sales',
@@ -141,13 +140,13 @@ VALUES (44, now(), now(),
 on conflict (description_id) do nothing;
 
 INSERT INTO merchant.content (content_id, code, content_type,
-                             link_to_menu, sort_order, visible, store_merchant_id)
+                              link_to_menu, sort_order, visible, store_merchant_id)
 VALUES (23, 'terms', 'PAGE', false, 3, true, '65f023632bc26470c104b75f')
 on conflict (content_id) do nothing;
 
 INSERT INTO merchant.content_description (description_id, date_created, date_modified, description, name, title,
-                                         meta_description, meta_keywords, meta_title, sef_url, content_id,
-                                         language_code)
+                                          meta_description, meta_keywords, meta_title, sef_url, content_id,
+                                          language_code)
 VALUES (45, now(), now(),
         '<h1>الشروط والأحكام</h1><p>يرجى قراءة الشروط والأحكام بعناية قبل استخدام موقع إيجيبت كار سيلز أو إجراء أي معاملة.</p><h2>1. استخدام الموقع</h2><p>استخدامك لهذا الموقع يعني موافقتك على هذه الشروط.</p><h2>2. عرض وشراء المركبات</h2><p>المعلومات المعروضة عن السيارات هي لأغراض إعلامية وقد تخضع للتغيير. تخضع عمليات الشراء لعقود منفصلة.</p><h2>3. مسؤولية المستخدم</h2><p>المستخدم مسؤول عن صحة المعلومات المقدمة وعن أي استخدام للموقع.</p>',
         'الشروط والأحكام', 'الشروط والأحكام | إيجيبت كار سيلز',
@@ -156,8 +155,8 @@ VALUES (45, now(), now(),
         'terms', 23, 'ar')
 on conflict (description_id) do nothing;
 INSERT INTO merchant.content_description (description_id, date_created, date_modified, description, name, title,
-                                         meta_description, meta_keywords, meta_title, sef_url, content_id,
-                                         language_code)
+                                          meta_description, meta_keywords, meta_title, sef_url, content_id,
+                                          language_code)
 VALUES (46, now(), now(),
         '<h1>Conditions Générales</h1><p>Veuillez lire attentivement les conditions générales avant d''utiliser le site web d''Egypt Car Sales ou d''effectuer toute transaction.</p><h2>1. Utilisation du Site</h2><p>Votre utilisation de ce site implique votre acceptation de ces conditions.</p><h2>2. Affichage et Achat de Véhicules</h2><p>Les informations affichées sur les voitures sont à titre informatif et peuvent être sujettes à modification. Les achats sont régis par des contrats distincts.</p><h2>3. Responsabilité de l''Utilisateur</h2><p>L''utilisateur est responsable de l''exactitude des informations fournies et de toute utilisation du site.</p>',
         'Conditions Générales', 'Conditions Générales | Egypt Car Sales',
@@ -168,13 +167,13 @@ VALUES (46, now(), now(),
 on conflict (description_id) do nothing;
 
 INSERT INTO merchant.content (content_id, code, content_type,
-                             link_to_menu, sort_order, visible, store_merchant_id)
+                              link_to_menu, sort_order, visible, store_merchant_id)
 VALUES (24, 'privacy', 'PAGE', false, 4, true, '65f023632bc26470c104b75f')
 on conflict (content_id) do nothing;
 
 INSERT INTO merchant.content_description (description_id, date_created, date_modified, description, name, title,
-                                         meta_description, meta_keywords, meta_title, sef_url, content_id,
-                                         language_code)
+                                          meta_description, meta_keywords, meta_title, sef_url, content_id,
+                                          language_code)
 VALUES (47, now(), now(),
         '<h1>سياسة الخصوصية</h1><p>في إيجيبت كار سيلز، نحترم خصوصيتك ونلتزم بحماية بياناتك الشخصية. توضح هذه السياسة كيفية تعاملنا مع معلوماتك.</p><h2>جمع المعلومات</h2><p>نقوم بجمع المعلومات التي تقدمها لنا (مثل الاسم، رقم الهاتف، البريد الإلكتروني) والمعلومات التي يتم جمعها تلقائيًا عند استخدامك للموقع.</p><h2>استخدام المعلومات</h2><p>نستخدم معلوماتك لتسهيل عمليات البيع والشراء، التواصل معك، وتحسين خدماتنا.</p><h2>مشاركة المعلومات</h2><p>لا نشارك معلوماتك الشخصية مع أطراف ثالثة إلا بموافقتك أو عند الضرورة القانونية.</p>',
         'سياسة الخصوصية', 'سياسة الخصوصية | إيجيبت كار سيلز',
@@ -183,8 +182,8 @@ VALUES (47, now(), now(),
         'privacy', 24, 'ar')
 on conflict (description_id) do nothing;
 INSERT INTO merchant.content_description (description_id, date_created, date_modified, description, name, title,
-                                         meta_description, meta_keywords, meta_title, sef_url, content_id,
-                                         language_code)
+                                          meta_description, meta_keywords, meta_title, sef_url, content_id,
+                                          language_code)
 VALUES (48, now(), now(),
         '<h1>Politique de Confidentialité</h1><p>Chez Egypt Car Sales, nous respectons votre vie privée et nous nous engageons à protéger vos données personnelles. Cette politique explique comment nous traitons vos informations.</p><h2>Collecte d''Informations</h2><p>Nous collectons les informations que vous nous fournissez (telles que nom, numéro de téléphone, email) et les informations collectées automatiquement lors de votre utilisation du site.</p><h2>Utilisation des Informations</h2><p>Nous utilisons vos informations pour faciliter les processus de vente et d''achat, communiquer avec vous et améliorer nos services.</p><h2>Partage des Informations</h2><p>Nous ne partageons pas vos informations personnelles avec des tiers sans votre consentement ou lorsque la loi l''exige.</p>',
         'Politique de Confidentialité', 'Politique de Confidentialité | Egypt Car Sales',
@@ -195,13 +194,13 @@ VALUES (48, now(), now(),
 on conflict (description_id) do nothing;
 
 INSERT INTO merchant.content (content_id, code, content_type,
-                             link_to_menu, sort_order, visible, store_merchant_id)
+                              link_to_menu, sort_order, visible, store_merchant_id)
 VALUES (25, 'location', 'PAGE', false, 5, true, '65f023632bc26470c104b75f')
 on conflict (content_id) do nothing;
 
 INSERT INTO merchant.content_description (description_id, date_created, date_modified, description, name, title,
-                                         meta_description, meta_keywords, meta_title, sef_url, content_id,
-                                         language_code)
+                                          meta_description, meta_keywords, meta_title, sef_url, content_id,
+                                          language_code)
 VALUES (49, now(), now(),
         '<h1>موقعنا</h1><p>تفضل بزيارة معرضنا الرئيسي في القاهرة للاطلاع على تشكيلتنا المختارة من السيارات.</p><h2>معرض القاهرة</h2><p>[أضف عنوانًا في مصر، مثال: شارع التسعين، التجمع الخامس، القاهرة]<br>ساعات العمل: السبت - الخميس، 10 صباحًا - 6 مساءً</p><p><i>يمكنك أيضًا تصفح وشراء سياراتنا عبر الإنترنت.</i></p><!-- Map Placeholder -->',
         'موقعنا', 'موقع معرض إيجيبت كار سيلز',
@@ -210,8 +209,8 @@ VALUES (49, now(), now(),
         'location', 25, 'ar')
 on conflict (description_id) do nothing;
 INSERT INTO merchant.content_description (description_id, date_created, date_modified, description, name, title,
-                                         meta_description, meta_keywords, meta_title, sef_url, content_id,
-                                         language_code)
+                                          meta_description, meta_keywords, meta_title, sef_url, content_id,
+                                          language_code)
 VALUES (50, now(), now(),
         '<h1>Notre Emplacement</h1><p>Visitez notre showroom principal au Caire pour découvrir notre sélection de voitures.</p><h2>Showroom Le Caire</h2><p>[Ajouter une adresse en Égypte, ex: 90 Street, Fifth Settlement, Le Caire]<br>Heures d''ouverture : Samedi - Jeudi, 10h - 18h</p><p><i>Vous pouvez également parcourir et acheter nos voitures en ligne.</i></p><!-- Placeholder Carte -->',
         'Notre Emplacement', 'Emplacement Showroom Egypt Car Sales',
@@ -222,13 +221,13 @@ VALUES (50, now(), now(),
 on conflict (description_id) do nothing;
 
 INSERT INTO merchant.content (content_id, code, content_type,
-                             link_to_menu, sort_order, visible, store_merchant_id)
+                              link_to_menu, sort_order, visible, store_merchant_id)
 VALUES (26, 'faq', 'PAGE', false, 6, true, '65f023632bc26470c104b75f')
 on conflict (content_id) do nothing;
 
 INSERT INTO merchant.content_description (description_id, date_created, date_modified, description, name, title,
-                                         meta_description, meta_keywords, meta_title, sef_url, content_id,
-                                         language_code)
+                                          meta_description, meta_keywords, meta_title, sef_url, content_id,
+                                          language_code)
 VALUES (51, now(), now(),
         '<h1>الأسئلة الشائعة</h1><p>تجد هنا إجابات للأسئلة الأكثر شيوعًا حول شراء وبيع السيارات من خلال إيجيبت كار سيلز.</p><h2>الشراء</h2><p><strong>س: ما هي المستندات المطلوبة لشراء سيارة مستعملة؟</strong><br>ج: بطاقة الرقم القومي سارية المفعول، وقد تطلب مستندات إضافية حسب حالة السيارة ونظام الدفع.</p><h2>البيع</h2><p><strong>س: كيف يمكنني عرض سيارتي للبيع؟</strong><br>ج: يمكنك التواصل معنا لتقييم سيارتك وعرضها من خلال منصتنا.</p><h2>التمويل</h2><p><strong>س: هل تساعدون في إجراءات التمويل البنكي؟</strong><br>ج: يمكننا تقديم المشورة وتوجيهك للجهات المختصة بالتمويل.</p>',
         'الأسئلة الشائعة', 'الأسئلة الشائعة | إيجيبت كار سيلز',
@@ -237,8 +236,8 @@ VALUES (51, now(), now(),
         'faq', 26, 'ar')
 on conflict (description_id) do nothing;
 INSERT INTO merchant.content_description (description_id, date_created, date_modified, description, name, title,
-                                         meta_description, meta_keywords, meta_title, sef_url, content_id,
-                                         language_code)
+                                          meta_description, meta_keywords, meta_title, sef_url, content_id,
+                                          language_code)
 VALUES (52, now(), now(),
         '<h1>Questions Fréquemment Posées (FAQ)</h1><p>Trouvez ici les réponses aux questions les plus courantes concernant l''achat et la vente de voitures via Egypt Car Sales.</p><h2>Achat</h2><p><strong>Q : Quels documents sont nécessaires pour acheter une voiture d''occasion ?</strong><br>R : Une carte d''identité nationale valide. Des documents supplémentaires peuvent être requis selon l''état de la voiture et le mode de paiement.</p><h2>Vente</h2><p><strong>Q : Comment puis-je proposer ma voiture à la vente ?</strong><br>R : Vous pouvez nous contacter pour évaluer votre voiture et la proposer via notre plateforme.</p><h2>Financement</h2><p><strong>Q : Aidez-vous avec les procédures de financement bancaire ?</strong><br>R : Nous pouvons vous conseiller et vous orienter vers les entités de financement compétentes.</p>',
         'FAQ', 'FAQ | Egypt Car Sales',
@@ -248,21 +247,21 @@ VALUES (52, now(), now(),
 on conflict (description_id) do nothing;
 
 INSERT INTO merchant.content (content_id, code, content_type,
-                             link_to_menu, sort_order, visible, store_merchant_id)
+                              link_to_menu, sort_order, visible, store_merchant_id)
 VALUES (27, 'header-message', 'BOX', false, 7, true, '65f023632bc26470c104b75f')
 on conflict (content_id) do nothing;
 
 INSERT INTO merchant.content_description (description_id, date_created, date_modified, description, name, title,
-                                         meta_description, meta_keywords, meta_title, sef_url, content_id,
-                                         language_code)
+                                          meta_description, meta_keywords, meta_title, sef_url, content_id,
+                                          language_code)
 VALUES (53, now(), now(),
         'عروض حصرية! تصفح أحدث السيارات المستعملة بحالة ممتازة وأسعار لا تقبل المنافسة.',
         'رسالة الترويسة', 'رسالة الترويسة',
         '', '', '', '', 27, 'ar')
 on conflict (description_id) do nothing;
 INSERT INTO merchant.content_description (description_id, date_created, date_modified, description, name, title,
-                                         meta_description, meta_keywords, meta_title, sef_url, content_id,
-                                         language_code)
+                                          meta_description, meta_keywords, meta_title, sef_url, content_id,
+                                          language_code)
 VALUES (54, now(), now(),
         'Offres Exclusives! Découvrez nos dernières voitures d''occasion en excellent état à des prix imbattables.',
         'Message d''En-tête', 'Message d''En-tête',
@@ -270,21 +269,21 @@ VALUES (54, now(), now(),
 on conflict (description_id) do nothing;
 
 INSERT INTO merchant.content (content_id, code, content_type,
-                             link_to_menu, sort_order, visible, store_merchant_id)
+                              link_to_menu, sort_order, visible, store_merchant_id)
 VALUES (28, 'agreement', 'BOX', false, 8, true, '65f023632bc26470c104b75f')
 on conflict (content_id) do nothing;
 
 INSERT INTO merchant.content_description (description_id, date_created, date_modified, description, name, title,
-                                         meta_description, meta_keywords, meta_title, sef_url, content_id,
-                                         language_code)
+                                          meta_description, meta_keywords, meta_title, sef_url, content_id,
+                                          language_code)
 VALUES (55, now(), now(),
         '<p style="text-align:center; font-size:0.9em; padding:5px;">باستخدام هذا الموقع، فإنك توافق على <a href="/terms">الشروط والأحكام</a>.</p>',
         'اتفاقية الاستخدام', 'اتفاقية الاستخدام',
         '', '', '', '', 28, 'ar')
 on conflict (description_id) do nothing;
 INSERT INTO merchant.content_description (description_id, date_created, date_modified, description, name, title,
-                                         meta_description, meta_keywords, meta_title, sef_url, content_id,
-                                         language_code)
+                                          meta_description, meta_keywords, meta_title, sef_url, content_id,
+                                          language_code)
 VALUES (56, now(), now(),
         '<p style="text-align:center; font-size:0.9em; padding:5px;">En utilisant ce site, vous acceptez nos <a href="/conditions-generales">Conditions Générales</a>.</p>',
         'Accord Utilisateur', 'Accord Utilisateur',
@@ -292,40 +291,40 @@ VALUES (56, now(), now(),
 on conflict (description_id) do nothing;
 
 INSERT INTO merchant.content (content_id, code, content_type,
-                             link_to_menu, sort_order, visible, store_merchant_id)
+                              link_to_menu, sort_order, visible, store_merchant_id)
 VALUES (29, 'meta-title', 'BOX', false, 9, true, '65f023632bc26470c104b75f')
 on conflict (content_id) do nothing;
 
 INSERT INTO merchant.content_description (description_id, date_created, date_modified, description, name, title,
-                                         meta_description, meta_keywords, meta_title, sef_url, content_id,
-                                         language_code)
+                                          meta_description, meta_keywords, meta_title, sef_url, content_id,
+                                          language_code)
 VALUES (57, now(), now(),
         'إيجيبت كار سيلز | شراء وبيع السيارات الجديدة والمستعملة في مصر',
         '', '', '', '', '', '', 29, 'ar')
 on conflict (description_id) do nothing;
 INSERT INTO merchant.content_description (description_id, date_created, date_modified, description, name, title,
-                                         meta_description, meta_keywords, meta_title, sef_url, content_id,
-                                         language_code)
+                                          meta_description, meta_keywords, meta_title, sef_url, content_id,
+                                          language_code)
 VALUES (58, now(), now(),
         'Egypt Car Sales | Achat et Vente de Voitures Neuves et d''Occasion en Égypte',
         '', '', '', '', '', '', 29, 'fr')
 on conflict (description_id) do nothing;
 
 INSERT INTO merchant.content (content_id, code, content_type,
-                             link_to_menu, sort_order, visible, store_merchant_id)
+                              link_to_menu, sort_order, visible, store_merchant_id)
 VALUES (30, 'meta-description', 'BOX', false, 10, true, '65f023632bc26470c104b75f')
 on conflict (content_id) do nothing;
 
 INSERT INTO merchant.content_description (description_id, date_created, date_modified, description, name, title,
-                                         meta_description, meta_keywords, meta_title, sef_url, content_id,
-                                         language_code)
+                                          meta_description, meta_keywords, meta_title, sef_url, content_id,
+                                          language_code)
 VALUES (59, now(), now(),
         'منصة موثوقة لشراء وبيع السيارات في مصر. تصفح تشكيلة واسعة من السيارات الجديدة والمستعملة بأسعار تنافسية وجودة مضمونة مع إيجيبت كار سيلز.',
         '', '', '', '', '', '', 30, 'ar')
 on conflict (description_id) do nothing;
 INSERT INTO merchant.content_description (description_id, date_created, date_modified, description, name, title,
-                                         meta_description, meta_keywords, meta_title, sef_url, content_id,
-                                         language_code)
+                                          meta_description, meta_keywords, meta_title, sef_url, content_id,
+                                          language_code)
 VALUES (60, now(), now(),
         'Plateforme de confiance pour l''achat et la vente de voitures en Égypte. Découvrez une large sélection de véhicules neufs et d''occasion à des prix compétitifs et une qualité garantie avec Egypt Car Sales.',
         '', '', '', '', '', '', 30, 'fr')

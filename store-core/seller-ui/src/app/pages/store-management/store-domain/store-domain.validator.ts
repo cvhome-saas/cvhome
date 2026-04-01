@@ -8,7 +8,7 @@ import {DnsCheckService} from "../services/dns-check.service"; // Import necessa
 export interface StoreDomainComponentValidatorContext {
   podServerDomain: () => string;
   saasProperties: { alis: string, domain: string }; // Include properties needed by podServerDomain
-  podId: { id: string }; // Include properties needed by podServerDomain
+  shortenPodId: string; // Include properties needed by podServerDomain
 }
 
 
@@ -35,7 +35,7 @@ export function dnsPointsToPodValidatorFactory(
 
     // 2. Return a specific error or null if the necessary infrastructure info isn't loaded yet
     // Check if podServerDomain can be generated (i.e., saasProperties and podId are available)
-    if (!componentContext.saasProperties || !componentContext.saasProperties.alis || !componentContext.saasProperties.domain || !componentContext.podId || !componentContext.podId.id) {
+    if (!componentContext.saasProperties || !componentContext.saasProperties.alis || !componentContext.saasProperties.domain || !componentContext.shortenPodId) {
       console.log(componentContext.saasProperties)
       console.warn('DNS Validator: Infrastructure info (saasProperties or podId) not yet fully available.');
       // You can return null, or a specific error indicating it's waiting

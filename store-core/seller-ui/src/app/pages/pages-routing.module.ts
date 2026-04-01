@@ -28,6 +28,10 @@ const routes: Routes = [{
       loadChildren: () => import('./store-management/store-management.module')
         .then(m => m.StoreManagementModule),
     }, {
+      path: 'pod-management',
+      loadChildren: () => import('./pod-management/pod-management.module')
+        .then(m => m.PodManagementModule),
+    }, {
       path: 'subscription-and-usage',
       loadChildren: () => import('./subscription-and-usage/subscription-and-usage.module')
         .then(m => m.SubscriptionAndUsageModule),

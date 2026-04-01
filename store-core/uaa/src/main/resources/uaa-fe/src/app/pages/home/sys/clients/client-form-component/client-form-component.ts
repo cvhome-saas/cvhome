@@ -89,6 +89,7 @@ export class ClientFormComponent implements OnInit {
         jwkSetUrl: [''],
         tokenEndpointAuthenticationSigningAlgorithm: ["RS256"],
         x509CertificateSubjectDN: [''],
+        customSettings: this.fb.group({})
       }),
 
       tokenSettings: this.fb.group({
@@ -102,6 +103,7 @@ export class ClientFormComponent implements OnInit {
         accessTokenFormat: this.fb.group({
           value: ['self-contained']
         }),
+        customSettings: this.fb.group({})
       })
     }, {validators: redirectUrisValidator});
 
@@ -144,6 +146,41 @@ export class ClientFormComponent implements OnInit {
     let postLogoutRedirectUris = v.postLogoutRedirectUris || [];
     if (postLogoutRedirectUris.length == 0) postLogoutRedirectUris.push('')
     postLogoutRedirectUris.forEach((x: string) => this.postLogoutRedirectUris.push(this.createControl(x)));
+
+    this.patchCustomSettings('clientSettings', v.clientSettings?.customSettings);
+    this.patchCustomSettings('tokenSettings', v.tokenSettings?.customSettings);
+  }
+
+  patchCustomSettings(groupName: string, customSettings: any) {
+    const group = this.form.get(groupName)?.get('customSettings') as FormGroup;
+    if (!group) return;
+
+    Object.keys(group.controls).forEach(key => group.removeControl(key));
+    if (customSettings) {
+      Object.keys(customSettings).forEach(key => {
+        group.addControl(key, new FormControl(customSettings[key]));
+      });
+    }
+  }
+
+  getCustomSettings(groupName: string): string[] {
+    const group = this.form.get(groupName)?.get('customSettings') as FormGroup;
+    return group ? Object.keys(group.controls) : [];
+  }
+
+  addCustomSetting(groupName: string, key: string) {
+    if (!key || key.trim() === '') return;
+    const group = this.form.get(groupName)?.get('customSettings') as FormGroup;
+    if (group && !group.contains(key)) {
+      group.addControl(key, new FormControl(''));
+    }
+  }
+
+  removeCustomSetting(groupName: string, key: string) {
+    const group = this.form.get(groupName)?.get('customSettings') as FormGroup;
+    if (group) {
+      group.removeControl(key);
+    }
   }
 
   createControl(value: string = ''): FormControl {

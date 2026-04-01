@@ -12,6 +12,7 @@ import org.springframework.security.oauth2.server.authorization.client.Registere
 import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
 import org.springframework.security.oauth2.server.authorization.settings.TokenSettings;
 
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -35,17 +36,40 @@ public class ClientClientDetailsMapper {
 				toTokenSetting(client.getTokenSettings()));
 	}
 
+	public static final Set<String> KNOWN_TOKEN_SETTINGS = Set.of("settings.token.authorization-code-time-to-live",
+			"settings.token.access-token-time-to-live", "settings.token.access-token-format",
+			"settings.token.device-code-time-to-live", "settings.token.reuse-refresh-tokens",
+			"settings.token.refresh-token-time-to-live", "settings.token.id-token-signature-algorithm",
+			"settings.token.x509-certificate-bound-access-tokens");
+
 	private static ClientDetailsTokens toTokenSetting(TokenSettings settings) {
+		Map<String, Object> customSettings = settings.getSettings()
+			.entrySet()
+			.stream()
+			.filter(entry -> !KNOWN_TOKEN_SETTINGS.contains(entry.getKey()))
+			.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
 		return new ClientDetailsTokens(settings.getAuthorizationCodeTimeToLive(), settings.getAccessTokenTimeToLive(),
 				settings.getAccessTokenFormat(), settings.getDeviceCodeTimeToLive(), settings.isReuseRefreshTokens(),
 				settings.getRefreshTokenTimeToLive(), settings.getIdTokenSignatureAlgorithm(),
-				settings.isX509CertificateBoundAccessTokens());
+				settings.isX509CertificateBoundAccessTokens(), customSettings);
 	}
 
+	public static final Set<String> KNOWN_CLIENT_SETTINGS = Set.of("settings.client.require-proof-key",
+			"settings.client.require-authorization-consent", "settings.client.jwk-set-url",
+			"settings.client.token-endpoint-authentication-signing-algorithm",
+			"settings.client.x509-certificate-subject-dn");
+
 	private static ClientDetailsSettings toClientSetting(ClientSettings settings) {
+		Map<String, Object> customSettings = settings.getSettings()
+			.entrySet()
+			.stream()
+			.filter(entry -> !KNOWN_CLIENT_SETTINGS.contains(entry.getKey()))
+			.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
 		return new ClientDetailsSettings(settings.isRequireProofKey(), settings.isRequireAuthorizationConsent(),
 				settings.getJwkSetUrl(), (SignatureAlgorithm) settings.getTokenEndpointAuthenticationSigningAlgorithm(),
-				settings.getX509CertificateSubjectDN());
+				settings.getX509CertificateSubjectDN(), customSettings);
 	}
 
 	public static RegisteredClient toRegisteredClient(ClientDetails details) {
@@ -71,6 +95,10 @@ public class ClientClientDetailsMapper {
 			tokenSettingsBuilder.reuseRefreshTokens(clientDetailsTokens.reuseRefreshTokens());
 			tokenSettingsBuilder
 				.x509CertificateBoundAccessTokens(clientDetailsTokens.x509CertificateBoundAccessTokens());
+
+			if (clientDetailsTokens.customSettings() != null) {
+				tokenSettingsBuilder.settings(settings -> settings.putAll(clientDetailsTokens.customSettings()));
+			}
 		}
 		var clientSettingsBuilder = ClientSettings.builder();
 		ClientDetailsSettings clientDetailsSettings = details.clientSettings();
@@ -86,6 +114,10 @@ public class ClientClientDetailsMapper {
 						clientDetailsSettings.tokenEndpointAuthenticationSigningAlgorithm());
 			if (Objects.nonNull(clientDetailsSettings.x509CertificateSubjectDN()))
 				clientSettingsBuilder.x509CertificateSubjectDN(clientDetailsSettings.x509CertificateSubjectDN());
+
+			if (clientDetailsSettings.customSettings() != null) {
+				clientSettingsBuilder.settings(settings -> settings.putAll(clientDetailsSettings.customSettings()));
+			}
 
 		}
 		RegisteredClient.Builder builder = RegisteredClient.withId(details.id())

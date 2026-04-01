@@ -8,9 +8,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class LocaleUtils {
 
+	static Locale[] locales = Locale.getAvailableLocales();
+
 	public static Locale getLocale(LanguageCode language) {
 		Locale defaultLocale = Constants.DEFAULT_LOCALE;
-		Locale[] locales = Locale.getAvailableLocales();
 		for (Locale l : locales) {
 			try {
 				if (l.toLanguageTag().equals(language.code())) {

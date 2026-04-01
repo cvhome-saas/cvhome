@@ -3,6 +3,7 @@ package com.asrevo.cvhome.s2s.config.internal;
 import com.asrevo.cvhome.s2s.model.ServiceDomainProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
@@ -28,6 +29,7 @@ public class WebClientServicesConfig {
 
 	@Configuration
 	@ConditionalOnWebApplication(type = REACTIVE)
+	@ConditionalOnClass(OAuth2AuthorizedClientManager.class)
 	static class ReactiveWebClientServicesConfig {
 
 		@Bean
@@ -87,6 +89,7 @@ public class WebClientServicesConfig {
 
 	@Configuration
 	@ConditionalOnWebApplication(type = SERVLET)
+	@ConditionalOnClass(OAuth2AuthorizedClientManager.class)
 	static class ServletWebClientServicesConfig {
 
 		@Bean

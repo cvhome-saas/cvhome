@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.s2s.services;
 
 import com.asrevo.cvhome.commons.domain.ManagerStoreId;
+import com.asrevo.cvhome.s2s.utils.SecurityUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -46,6 +47,24 @@ public class AccessEvaluatorImpl implements AccessEvaluator {
 		return hasReadAccessOnStore(authentication, requestedStoreId);
 	}
 
+	@Override
+	public boolean hasAccessOnStoreCreate(Authentication authentication, String org) {
+		if (!securityRoleCheckService.isScopeStore(authentication)) {
+			log.debug("User {} does not have store scope with roles {}", authentication.getName(),
+					SecurityUtils.getRoles(authentication));
+			return false;
+		}
+		if (securityRoleCheckService.isOrgPod()) {
+			log.debug("will check Org match pod org");
+			if (!securityRoleCheckService.getPod().orgId().toString().equals(org)) {
+				log.debug("Org {} does not match pod org {}", org,
+						securityRoleCheckService.getPod().orgId().toString());
+				return false;
+			}
+		}
+		return true;
+	}
+
 	private boolean hasReadAccessOnStore(Authentication authentication, ManagerStoreId requestedStoreId) {
 		if (securityRoleCheckService.isOrgAdmin(authentication, requestedStoreId)) {
 			return true;
@@ -56,12 +75,15 @@ public class AccessEvaluatorImpl implements AccessEvaluator {
 		else if (securityRoleCheckService.isStoreModerator(authentication, requestedStoreId)) {
 			return true;
 		}
-		else if (securityRoleCheckService.isMicroService(authentication, requestedStoreId)) {
+		else if (securityRoleCheckService.isScopeStore(authentication)) {
+			return true;
+		}
+		else if (securityRoleCheckService.isScopeInternal(authentication)) {
 			return true;
 		}
 		else {
 			log.debug("User {} does not have read access on store {} on roles {}", authentication.getName(),
-					requestedStoreId, StoreSecurityService.getRoles(authentication));
+					requestedStoreId, SecurityUtils.getRoles(authentication));
 			return false;
 		}
 	}
@@ -75,7 +97,7 @@ public class AccessEvaluatorImpl implements AccessEvaluator {
 		}
 		else {
 			log.debug("User {} does not have maintain access on users on store {} on roles {}",
-					authentication.getName(), requestedStoreId, StoreSecurityService.getRoles(authentication));
+					authentication.getName(), requestedStoreId, SecurityUtils.getRoles(authentication));
 			return false;
 		}
 	}

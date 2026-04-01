@@ -44,8 +44,7 @@ public class ProductVariantGroupApi {
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	public @ResponseBody Entity create(@Valid @RequestBody PersistableProductVariantGroup instanceGroup,
-			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language) {
+			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
 		Long id = productVariantGroupFacade.create(instanceGroup, merchantStore, language);
 
 		return new Entity(id);
@@ -56,8 +55,7 @@ public class ProductVariantGroupApi {
 	@Operation(method = "PUT", description = "Update product instance group",
 			responses = @ApiResponse(content = @Content(mediaType = "application/json", schema = @Schema())))
 	public @ResponseBody void update(@PathVariable Long id, @Valid @RequestBody PersistableProductVariantGroup instance,
-			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language) {
+			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
 
 		productVariantGroupFacade.update(id, instance, merchantStore, language);
 	}
@@ -67,8 +65,7 @@ public class ProductVariantGroupApi {
 	@Operation(method = "GET", description = "Get product instance group",
 			responses = @ApiResponse(content = @Content(mediaType = "application/json", schema = @Schema())))
 	public @ResponseBody ReadableProductVariantGroup get(@PathVariable Long id,
-			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language) {
+			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
 		return productVariantGroupFacade.get(id, merchantStore, language);
 	}
 
@@ -78,9 +75,8 @@ public class ProductVariantGroupApi {
 	@DeleteMapping(value = { "/private/product/productVariantGroup/{id}" })
 	@Operation(method = "DELETE", description = "Delete product instance group",
 			responses = @ApiResponse(content = @Content(mediaType = "application/json", schema = @Schema())))
-	public @ResponseBody void delete(@PathVariable Long id,
-			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language) {
+	public @ResponseBody void delete(@PathVariable Long id, @SecuredResource StoreMerchantId merchantStore,
+			LanguageCode language) {
 		productVariantGroupFacade.delete(id, id, merchantStore);
 	}
 
@@ -90,8 +86,7 @@ public class ProductVariantGroupApi {
 	@Operation(method = "GET", description = "Delete product instance group",
 			responses = @ApiResponse(content = @Content(mediaType = "application/json", schema = @Schema())))
 	public @ResponseBody ReadableEntityList<ReadableProductVariantGroup> list(@PathVariable final Long id,
-			@Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language, Pageable pageable) {
+			@SecuredResource StoreMerchantId merchantStore, LanguageCode language, Pageable pageable) {
 		return productVariantGroupFacade.list(id, merchantStore, language, pageable);
 	}
 
@@ -111,8 +106,8 @@ public class ProductVariantGroupApi {
 	// @RequestParam(value = "file") MultipartFile file,
 	// @RequestParam(value = "order", required = false, defaultValue = "0") Integer
 	// position,
-	// @Parameter(hidden = true) @SecuredResource StoreMerchantId merchantStore,
-	// @Parameter(hidden = true) LanguageCode language) {
+	// @SecuredResource StoreMerchantId merchantStore,
+	// LanguageCode language) {
 	// productVariantGroupFacade.addImage(file, id, merchantStore, language);
 	//
 	// }
@@ -124,11 +119,10 @@ public class ProductVariantGroupApi {
 	 * @RequestMapping(value = {
 	 * "/private/product/productVariantGroup/{id}/image/{imageId}"}, method =
 	 * RequestMethod.DELETE) public void removeImage(@PathVariable Long id, @PathVariable
-	 * Long imageId, @Parameter(hidden = true) @SecuredResource StoreMerchantId
-	 * merchantStore,
+	 * Long imageId, @SecuredResource StoreMerchantId merchantStore,
 	 *
-	 * @Parameter(hidden = true) LanguageCode language) {
-	 * productVariantGroupFacade.removeImage(imageId, id, merchantStore);
+	 * LanguageCode language) { productVariantGroupFacade.removeImage(imageId, id,
+	 * merchantStore);
 	 *
 	 * }
 	 */

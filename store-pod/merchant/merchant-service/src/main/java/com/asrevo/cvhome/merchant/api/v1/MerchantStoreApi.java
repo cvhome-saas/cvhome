@@ -8,7 +8,6 @@ import com.asrevo.cvhome.commons.annotation.SecuredResource;
 import com.asrevo.cvhome.commons.domain.ReadableSliderImage;
 import com.asrevo.cvhome.commons.domain.SliderImage;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.merchant.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.merchant.model.merchant.PersistableMerchantStore;
 import com.asrevo.cvhome.merchant.model.merchant.ReadableMerchantStore;
 import com.asrevo.cvhome.merchant.service.facade.merchant.StoreFacade;
@@ -36,6 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -69,8 +69,7 @@ public class MerchantStoreApi {
 	@Parameters({ @Parameter(name = "lang",
 			schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	@ConditionalOnApiStatus
-	public ReadableMerchantStore storeFull(@SecuredResource StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language) {
+	public ReadableMerchantStore storeFull(@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
 		return storeFacade.getByMerchantStoreId(merchantStore, language);
 	}
 
@@ -80,7 +79,7 @@ public class MerchantStoreApi {
 			responses = @ApiResponse(
 					content = @Content(schema = @Schema(implementation = ReadableMerchantStore.class))))
 	@ConditionalOnApiStatus
-	public List<LanguageCode> supportedLanguages(@Parameter(hidden = true) StoreMerchantId merchantStore) {
+	public List<LanguageCode> supportedLanguages(StoreMerchantId merchantStore) {
 
 		return storeFacade.supportedLanguages(merchantStore);
 	}
@@ -91,6 +90,7 @@ public class MerchantStoreApi {
 			responses = @ApiResponse(
 					content = @Content(schema = @Schema(implementation = ReadableMerchantStore.class))))
 	@ConditionalOnApiStatus
+	@PreAuthorize("hasPermission(#store.org,'ManagerOrgId','STORE.CREATE')")
 	public void create(@Valid @RequestBody PersistableMerchantStore store) {
 		storeFacade.create(store);
 	}
@@ -103,7 +103,7 @@ public class MerchantStoreApi {
 	@Parameters({ @Parameter(name = "store",
 			schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)), })
 	@ConditionalOnApiStatus(usage = ApiUsage.USED)
-	public void update(@SecuredResource MerchantStore merchantStore,
+	public void update(@SecuredResource StoreMerchantId merchantStore,
 			@Valid @RequestBody PersistableMerchantStore store) {
 		storeFacade.update(store);
 	}
@@ -116,9 +116,9 @@ public class MerchantStoreApi {
 	@Parameters({ @Parameter(name = "store",
 			schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)), })
 	@ConditionalOnApiStatus(usage = ApiUsage.USED)
-	public void updateSocialLinks(@SecuredResource MerchantStore merchantStore,
+	public void updateSocialLinks(@SecuredResource StoreMerchantId merchantStore,
 			@RequestBody PersistableMerchantStore store) {
-		storeFacade.updateSocialLinks(merchantStore.getId(), store.getSocialLinks());
+		storeFacade.updateSocialLinks(merchantStore, store.getSocialLinks());
 	}
 
 	@ResponseStatus(HttpStatus.CREATED)
@@ -171,9 +171,9 @@ public class MerchantStoreApi {
 	@Parameters({ @Parameter(name = "store",
 			schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)), })
 	@ConditionalOnApiStatus
-	public void sliderImages(@SecuredResource MerchantStore merchantStore,
+	public void sliderImages(@SecuredResource StoreMerchantId merchantStore,
 			@RequestBody PersistableMerchantStore store) {
-		storeFacade.updateSliderImages(merchantStore.getId(), store.getSliderImages());
+		storeFacade.updateSliderImages(merchantStore, store.getSliderImages());
 	}
 
 	private InputContentFile createInputContentFile(MultipartFile image, FileContentType contentType) {

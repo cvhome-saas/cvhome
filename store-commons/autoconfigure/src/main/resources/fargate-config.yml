@@ -9,14 +9,15 @@ spring:
           - "uaa"
           - "control-plane"
           - "seller-ui"
-          - "store-pod-gateway"
+          - "spg"
           - "merchant"
           - "catalog"
           - "checkout"
+          - "cua"
           - "landing-ui"
     ecs:
       discovery:
-        namespace: "store-pod-1.cvhome.lcl"
+        namespace: "store-pod-507f1f77.cvhome.lcl"
         namespace-id: "ns-je7qri6wn7fbsrpn"
         enabled: true
         default-port: 8080
@@ -29,13 +30,3 @@ spring:
           "merchant": 8120
           "catalog": 8122
           "checkout": 8123
-    gateway:
-      server:
-        webflux:
-          discovery:
-            locator:
-              enabled: false
-logging:
-  level:
-    com:
-      asrevo: DEBUG

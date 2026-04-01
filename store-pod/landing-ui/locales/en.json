@@ -58,7 +58,11 @@
       "AGREE": "Agree",
       "REJECT": "Reject",
       "ORDER_ID": "Order Id",
-      "FAILED_TO_PLACE_ORDER": "Failed to place order"
+      "FAILED_TO_PLACE_ORDER": "Failed to place order",
+      "LOGIN_REQUIRED_TITLE": "Login Required",
+      "LOGIN_REQUIRED_DESCRIPTION": "You must be logged in to place an order.",
+      "CANCEL": "Cancel",
+      "LOGIN": "Login"
     },
     "CONTENT": {
       "HOME_TITLE": "Content"
@@ -92,8 +96,11 @@
         "EN": "English",
         "AR": "Arabic",
         "FR": "French",
-        "RU": "Russian"
-      }
+        "RU": "Russian",
+        "ES": "Spanish"
+      },
+      "LOGIN": "Login",
+      "LOGOUT": "Logout"
     },
     "FOOTER": {
       "SOCIAL_FACEBOOK": "Facebook",

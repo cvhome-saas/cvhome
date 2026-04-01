@@ -64,8 +64,8 @@ public class ShoppingCartApi {
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	@ConditionalOnApiStatus
 	public @ResponseBody ReadableShoppingCart addToCart(
-			@Valid @RequestBody PersistableShoppingCartItem shoppingCartItem,
-			@Parameter(hidden = true) StoreMerchantId merchantStore, @Parameter(hidden = true) LanguageCode language) {
+			@Valid @RequestBody PersistableShoppingCartItem shoppingCartItem, StoreMerchantId merchantStore,
+			LanguageCode language) {
 		return shoppingCartFacade.addToCart(shoppingCartItem, merchantStore, language);
 	}
 
@@ -80,8 +80,8 @@ public class ShoppingCartApi {
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	@ConditionalOnApiStatus
 	public ResponseEntity<ReadableShoppingCart> modifyCart(@PathVariable String code,
-			@Valid @RequestBody PersistableShoppingCartItem shoppingCartItem,
-			@Parameter(hidden = true) StoreMerchantId merchantStore, @Parameter(hidden = true) LanguageCode language) {
+			@Valid @RequestBody PersistableShoppingCartItem shoppingCartItem, StoreMerchantId merchantStore,
+			LanguageCode language) {
 
 		try {
 			ReadableShoppingCart cart = shoppingCartFacade.modifyCart(code, shoppingCartItem, merchantStore, language);
@@ -112,9 +112,8 @@ public class ShoppingCartApi {
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	@ConditionalOnApiStatus
-	public @ResponseBody ReadableShoppingCart getByCode(@PathVariable String code,
-			@Parameter(hidden = true) StoreMerchantId merchantStore, @Parameter(hidden = true) LanguageCode language,
-			HttpServletResponse response) {
+	public @ResponseBody ReadableShoppingCart getByCode(@PathVariable String code, StoreMerchantId merchantStore,
+			LanguageCode language, HttpServletResponse response) {
 
 		try {
 
@@ -150,9 +149,8 @@ public class ShoppingCartApi {
 			@Parameter(name = "body", schema = @Schema(name = "body", type = "boolean", defaultValue = "false")) })
 	@ConditionalOnApiStatus
 	public ResponseEntity<ReadableShoppingCart> deleteCartItem(@PathVariable("code") String cartCode,
-			@PathVariable("sku") String sku, @Parameter(hidden = true) StoreMerchantId merchantStore,
-			@Parameter(hidden = true) LanguageCode language, @RequestParam(defaultValue = "false") boolean body)
-			throws Exception {
+			@PathVariable("sku") String sku, StoreMerchantId merchantStore, LanguageCode language,
+			@RequestParam(defaultValue = "false") boolean body) throws Exception {
 
 		ReadableShoppingCart updatedCart = shoppingCartFacade.removeShoppingCartItem(cartCode, sku, merchantStore,
 				language, body);

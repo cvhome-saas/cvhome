@@ -8,10 +8,7 @@ import com.asrevo.cvhome.store.controller.exception.ConversionRuntimeException;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.mapper.Mapper;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
-import com.asrevo.cvhome.store.utils.LabelUtils;
-import com.asrevo.cvhome.store.utils.LocaleUtils;
 import com.asrevo.cvhome.store.utils.PriceUtils;
-import java.util.Locale;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Component;
@@ -21,11 +18,8 @@ public class ReadableOrderTotalMapper implements Mapper<OrderTotal, ReadableOrde
 
 	private final ExternalMerchantStoreService externalMerchantStoreService;
 
-	private final LabelUtils messages;
-
-	public ReadableOrderTotalMapper(ExternalMerchantStoreService externalMerchantStoreService, LabelUtils messages) {
+	public ReadableOrderTotalMapper(ExternalMerchantStoreService externalMerchantStoreService) {
 		this.externalMerchantStoreService = externalMerchantStoreService;
-		this.messages = messages;
 	}
 
 	@Override
@@ -43,8 +37,6 @@ public class ReadableOrderTotalMapper implements Mapper<OrderTotal, ReadableOrde
 		Validate.notNull(store, "MerchantStore must not be null");
 		Validate.notNull(language, "Language must not be null");
 
-		Locale locale = LocaleUtils.getLocale(language);
-
 		try {
 
 			target.setCode(source.getOrderTotalCode());
@@ -52,7 +44,7 @@ public class ReadableOrderTotalMapper implements Mapper<OrderTotal, ReadableOrde
 			target.setModule(source.getModule());
 			target.setOrder(source.getSortOrder());
 
-			target.setTitle(messages.getMessage(source.getOrderTotalCode(), locale, source.getOrderTotalCode()));
+			target.setTitle(source.getOrderTotalCode());
 			target.setText(source.getText());
 
 			target.setValue(source.getValue());

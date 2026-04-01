@@ -1,0 +1,104 @@
+{
+	debug
+	admin 0.0.0.0:2019
+
+	log {
+		format json
+		level ERROR
+	}
+
+	storage s3 {
+		bucket              {$CERT_BUCKET}
+		region              {$CERT_BUCKET_REGION}
+	}
+
+	on_demand_tls {
+		ask {$ASK_TLS_URL}
+	}
+    
+    acme_ca {$ACME_CA_URL:https://acme-staging-v02.api.letsencrypt.org/directory}
+
+    
+}
+
+(routes) {
+
+    handle_path /merchant* {
+        tracing {
+            span merchant
+        }
+        header {
+            response X-Trace-Id {http.vars.trace_id}
+            response X-Span-Id {http.vars.span_id}
+        }
+        reverse_proxy http://merchant.{$NAMESPACE}:8120
+    }
+
+    handle_path /catalog* {
+        tracing {
+            span catalog
+        }
+        header {
+            response X-Trace-Id {http.vars.trace_id}
+            response X-Span-Id {http.vars.span_id}
+        }
+        reverse_proxy http://catalog.{$NAMESPACE}:8122
+    }
+
+    handle_path /checkout* {
+        tracing {
+            span checkout
+        }
+        header {
+            response X-Trace-Id {http.vars.trace_id}
+            response X-Span-Id {http.vars.span_id}
+        }
+        reverse_proxy http://checkout.{$NAMESPACE}:8123
+    }
+
+    handle /cua* {
+        tracing {
+            span cua
+        }
+        header {
+            response X-Trace-Id {http.vars.trace_id}
+            response X-Span-Id {http.vars.span_id}
+        }
+        reverse_proxy http://cua.{$NAMESPACE}:8124 {
+            header_up X-Forwarded-Prefix /cua
+        }
+    }
+
+
+    route {
+        tracing {
+            span landing-ui
+        }
+        header {
+            response X-Trace-Id {http.vars.trace_id}
+            response X-Span-Id {http.vars.span_id}
+        }
+        domain_lookup {
+            lookup_url {$DOMAIN_LOOKUP_URL}
+            cache_ttl  {$DOMAIN_LOOKUP_TTL:5m}
+        }
+
+        reverse_proxy http://landing-ui.{$NAMESPACE}:8110
+    }
+    
+}
+
+http:// {
+	log
+    import routes
+}
+
+https:// {
+	log
+
+	tls {
+		on_demand
+	}
+
+    import routes
+}

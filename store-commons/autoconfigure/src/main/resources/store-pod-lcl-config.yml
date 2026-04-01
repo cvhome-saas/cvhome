@@ -2,6 +2,16 @@ spring:
   sql:
     init:
       data-locations: classpath:init-sql/data-common.sql, classpath:init-sql/data-test-stores.sql, classpath:init-sql/stores/*/*.sql
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri-set:
+            - ${com.asrevo.cvhome.services.uaa.schema}://${com.asrevo.cvhome.services.uaa.domain}
+            - ${com.asrevo.cvhome.services.uaa.schema}://${com.asrevo.cvhome.services.uaa.domain}:${com.asrevo.cvhome.services.uaa.port}
+            - ${com.asrevo.cvhome.services.spg.schema}://${com.asrevo.cvhome.services.spg.domain}/cua
+            - ${com.asrevo.cvhome.services.spg.schema}://${com.asrevo.cvhome.services.spg.domain}:${com.asrevo.cvhome.services.spg.port}/cua
+
 com:
   asrevo:
     cvhome:
@@ -16,10 +26,9 @@ com:
         base-path: "http://localhost:9000/d0dd4299-963a-4458-b31f-8efe31c35e8e"
       pod-info:
         pod:
-          id:
-            id: 1
-          name: pod-0
+          id: 507f1f77bcf86cd799439011
+          name: pod-507f1f77
           endpoint:
-            endpoint: http://store-pod-saas-gateway-1.gateway.com
+            endpoint: http://spg-507f1f77.gateway.com
             type: EXTERNAL
-          domain: store-pod-saas-gateway-1.gateway.com
+          domain: spg-507f1f77.gateway.com

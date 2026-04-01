@@ -19,4 +19,6 @@ public interface AccessEvaluator {
 
 	boolean hasAccessOnStoreFindOne(Authentication authentication, ManagerStoreId requestedStoreId);
 
+	boolean hasAccessOnStoreCreate(Authentication authentication, String org);
+
 }

@@ -8,7 +8,6 @@ import java.io.Serial;
 
 @Setter
 @Getter
-@Deprecated
 public class ReadableCategoryList extends ReadableList<ReadableCategory> {
 
 	/**
