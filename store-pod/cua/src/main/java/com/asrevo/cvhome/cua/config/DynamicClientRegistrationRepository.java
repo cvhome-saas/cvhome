@@ -1,12 +1,13 @@
 package com.asrevo.cvhome.cua.config;
 
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.cua.domain.SocialLoginConfig;
+import com.asrevo.cvhome.cua.domain.SocialLoginConfigId;
 import com.asrevo.cvhome.cua.repo.SocialLoginConfigRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
-import org.springframework.util.StringUtils;
 
 import java.util.*;
 
@@ -38,39 +39,23 @@ public class DynamicClientRegistrationRepository implements ClientRegistrationRe
 			return null;
 		}
 
-		int lastDotIndex = registrationId.lastIndexOf(".");
-		String clientId = registrationId.substring(0, lastDotIndex);
-		String providerId = registrationId.substring(lastDotIndex + 1);
-
-		return socialLoginConfigRepository.findByClientIdAndProviderId(clientId, providerId)
+		return socialLoginConfigRepository.findById(SocialLoginConfigId.fromRegistrationId(registrationId))
 			.map(config -> createClientRegistration(registrationId, config))
 			.orElse(null);
 	}
 
 	private ClientRegistration.Builder createBuilder(String registrationId, SocialLoginConfig config) {
-		SocialProvider socialProvider = SocialProvider.fromProviderId(config.getProviderId());
-		if (socialProvider != null) {
-			return socialProvider.createBuilder(registrationId);
-		}
-
-		throw new IllegalArgumentException("Unknown social provider: " + config.getProviderId());
+		return config.getId().providerId().createBuilder(registrationId);
 	}
 
 	private ClientRegistration createClientRegistration(String registrationId, SocialLoginConfig config) {
-		SocialProvider socialProvider = SocialProvider.fromProviderId(config.getProviderId());
+
 		ClientRegistration.Builder builder = createBuilder(registrationId, config);
 
 		builder.clientId(config.getAppId()).clientSecret(config.getAppSecret());
 
-		if (socialProvider != null) {
-			builder.clientName(socialProvider.getClientName());
-		}
-		else {
-			builder.clientName(config.getProviderId());
-		}
-
-		if (StringUtils.hasText(config.getScopes())) {
-			builder.scope(config.getScopes().split(","));
+		if (config.getId().providerId() != null) {
+			builder.clientName(config.getId().providerId().getClientName());
 		}
 
 		return builder.build();

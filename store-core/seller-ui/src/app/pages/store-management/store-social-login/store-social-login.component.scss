@@ -1,0 +1,10 @@
+.provider-config {
+  margin-bottom: 2rem;
+}
+
+nb-list-item {
+  cursor: pointer;
+  &.selected {
+    background-color: var(--card-header-background-color);
+  }
+}

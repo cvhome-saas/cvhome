@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {FormBuilder, FormGroup} from '@angular/forms';
+import {FormArray, FormBuilder, FormGroup} from '@angular/forms';
 import {ActivatedRoute, Router} from '@angular/router';
 import {StoreService} from '../services/store.service';
 import {NbToastrService} from "@nebular/theme";
@@ -8,18 +8,17 @@ import {ErrorService} from "../../shared/services/error.service";
 import {zip} from "rxjs";
 
 @Component({
-  selector: 'ngx-store-social-links',
+  selector: 'ngx-store-social-login',
   standalone: false,
-  templateUrl: './store-social-links.component.html',
-  styleUrls: ['./store-social-links.component.scss']
+  templateUrl: './store-social-login.component.html',
+  styleUrls: ['./store-social-login.component.scss']
 })
-export class StoreSocialLinksComponent implements OnInit {
+export class StoreSocialLoginComponent implements OnInit {
   isSubmited = false
   store;
   providers: string[] = [];
   loading = false;
-  rows = [];
-  selectedItem = '3';
+  selectedItem = '6';
   sidemenuLinks = [
     {
       id: '0',
@@ -77,66 +76,64 @@ export class StoreSocialLinksComponent implements OnInit {
   ) {
   }
 
-  get domain() {
-    return this.form.get('domain');
-  }
-
   ngOnInit() {
-    zip(this.storeService.getStore(this.activatedRoute.snapshot.paramMap.get('code')), this.storeService.getSupportedSocialLinkProviders())
-      .subscribe({
-        next: ([store, providers]) => {
-          this.store = store;
-          this.providers = providers;
-          this.createForm();
-
-        },
-        error: (err) => {
-          this.loading = false;
-          this.errorService.error('ERROR.SYSTEM_ERROR', err);
-        }
-      })
+    const storeCode = this.activatedRoute.snapshot.paramMap.get('code');
+    zip(
+      this.storeService.getStore(storeCode),
+      this.storeService.getSupportedSocialLoginProviders(),
+      this.storeService.getSocialLoginConfigs(storeCode)
+    ).subscribe({
+      next: ([store, providers, configs]) => {
+        this.store = store;
+        this.providers = providers;
+        this.createForm(configs);
+      },
+      error: (err) => {
+        this.errorService.error('ERROR.SYSTEM_ERROR', err);
+      }
+    });
   }
 
   route(link) {
     this.router.navigate(['pages/store-management/' + link + "/", this.store.id]);
   }
 
-
   save() {
     this.isSubmited = true;
-    this.form.markAllAsTouched();
     if (!this.form.valid) {
       return;
     }
-    const socialLinks = [];
-    Object.keys(this.form.value).forEach((it, i) => {
-      socialLinks.push({provider: it, url: this.form.value[it]})
-    })
-    // this.store.socialLinks = data;
-    this.storeService.updateStoreSocialLinks(this.store.id, {
-      socialLinks
-    })
-      .subscribe(store => {
-        this.toastr.success(this.translate.instant('STORE.SOCIAL_LINKS_UPDATED'));
+    const configs = this.form.value.configs.map(it => ({
+        id: { providerId: it.providerId },
+        appId: it.appId,
+        appSecret: it.appSecret,
+        enabled: it.enabled
+    }));
+
+    this.storeService.updateSocialLoginConfigs(this.store.id, configs)
+      .subscribe(() => {
+        this.toastr.success(this.translate.instant('STORE.SOCIAL_LOGIN_UPDATED'));
       }, err => {
         this.errorService.error('ERROR.SYSTEM_ERROR', err);
       });
-
-
   }
 
-  private createForm() {
-    const links = {};
-    let controls = {};
-    this.store.socialLinks.forEach(it => {
-      links[it.provider] = it.url;
-    })
-
-    this.providers.forEach(it => {
-      controls[it] = [links[it], []]
-    })
-
-    this.form = this.fb.group(controls);
+  private createForm(configs: any[]) {
+    const configGroups = this.providers.map(provider => {
+      const config = configs.find(c => c.id.providerId === provider) || {};
+      return this.fb.group({
+        providerId: [provider],
+        appId: [config.appId || ''],
+        appSecret: [config.appSecret || ''],
+        enabled: [config.enabled !== undefined ? config.enabled : false]
+      });
+    });
+    this.form = this.fb.group({
+      configs: this.fb.array(configGroups)
+    });
   }
 
+  get configForms() {
+    return this.form.get('configs') as FormArray;
+  }
 }

@@ -1,34 +1,34 @@
 package com.asrevo.cvhome.cua.domain;
 
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.cua.config.SocialProvider;
+import com.asrevo.cvhome.store.core.converter.ZoneCodeConverter;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.UUID;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "social_login_configs")
 @Data
 @NoArgsConstructor
-public class SocialLoginConfig {
+@AllArgsConstructor
+@Builder
+public class SocialLoginConfig implements Serializable {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.UUID)
-	private UUID id;
-
-	@Column(name = "client_id", nullable = false)
-	private String clientId;
-
-	@Column(name = "provider_id", nullable = false)
-	private String providerId; // google, facebook, etc.
+	@EmbeddedId
+	private SocialLoginConfigId id;
 
 	@Column(name = "app_id", nullable = false)
-	private String appId; // OAuth2 Client ID for the provider
+	private String appId;
 
 	@Column(name = "app_secret", nullable = false)
-	private String appSecret; // OAuth2 Client Secret for the provider
+	private String appSecret;
 
-	@Column(name = "scopes")
-	private String scopes; // Comma-separated scopes
+	@Column(name = "enabled", nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE")
+	private Boolean enabled = true;
 
 }

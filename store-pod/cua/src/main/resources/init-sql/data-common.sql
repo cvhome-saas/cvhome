@@ -6,14 +6,15 @@ values ('318F2FD5-E235-4C2E-AB7E-6C949BA4CDD4', '65f023632bc46470c104b76f', 'org
 
 on conflict (id) do nothing;
 
-INSERT INTO cua.social_login_configs (id, client_id, provider_id, app_id, app_secret, scopes)
-VALUES ('00000000-0000-0000-0000-65f020632bc4', '65f020632bc46470c104b76f', 'google', 'google-app-id-1', 'google-secret-1', 'openid,profile,email'),
-       ('00000000-0000-0000-0000-65f020632bc5', '65f020632bc46470c104b76f', 'facebook', 'fb-app-id-1', 'fb-secret-1', 'email,public_profile'),
-       ('00000000-0000-0000-0000-65f023632bc2', '65f023632bc26470c104b75f', 'google', 'google-app-id-2', 'google-secret-2', 'openid,profile,email'),
-       ('00000000-0000-0000-0000-65f023632bc4', '65f023632bc46470c104b75f', 'google', 'google-app-id-3', 'google-secret-3', 'openid,profile,email'),
-       ('00000000-0000-0000-0000-65f023632bc6', '65f023632bc46470c104b76f', 'google', 'google-app-id-4', 'google-secret-4', 'openid,profile,email'),
-       ('00000000-0000-0000-0000-65f023632bc7', '65f023632bc26470c104b75f', 'github', 'github-app-id-1', 'github-secret-1', 'read:user,user:email')
-ON CONFLICT (id) DO NOTHING;
+INSERT INTO cua.social_login_configs (store_merchant_id, provider_id, app_id, app_secret, enabled)
+VALUES ( '65f020632bc46470c104b76f', 'GOOGLE', 'google-app-id-1', 'google-secret-1',true),
+       ('65f023632bc26470c104b75f', 'GOOGLE', 'google-app-id-2', 'google-secret-2',true),
+       ('65f023632bc46470c104b75f', 'GOOGLE', 'google-app-id-3', 'google-secret-3',true),
+       ('65f023632bc46470c104b76f', 'GOOGLE', 'g_app', 'g_secret',true),
+       ( '65f023632bc46470c104b76f', 'GITHUB', 'gh_app', 'gh_secret',true),
+       ( '65f023632bc46470c104b76f', 'FACEBOOK', 'fb_app', 'fb_secret',true)
+
+ON CONFLICT (store_merchant_id, provider_id) DO NOTHING;
 
 
 

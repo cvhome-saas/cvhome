@@ -223,7 +223,13 @@
     "DOMAIN_DNS_CHECKING": "Verifying domain DNS...",
     "DOMAIN_DNS_WAITING_INFO": "Waiting for server information to verify domain...",
     "DOMAIN_HELP_TEXT": "Make sure to add CNAME record points to {{podDomain}} firsts.",
-    "PREFERRED_POD": "Preferred Pod"
+    "PREFERRED_POD": "Preferred Pod",
+    "STORE_SOCIAL_LOGIN": "Store Social Login",
+    "SOCIAL_APP_ID": "App ID",
+    "SOCIAL_APP_SECRET": "App Secret",
+    "SOCIAL_LOGIN_UPDATED": "Social login configuration updated",
+    "SOCIAL_APP_ENABLED": "Enabled",
+    "SOCIAL_CALLBACK_URL": "Callback URL format: /cua/login/oauth2/code/{{storeId}}.{{provider}}"
   },
   "STORE_LANDING": {
     "LANDING_PAGE_TITLE": "Landing page title",

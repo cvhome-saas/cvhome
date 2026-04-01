@@ -1,27 +1,23 @@
 package com.asrevo.cvhome.cua.repo;
 
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.cua.domain.SocialLoginConfig;
+import com.asrevo.cvhome.cua.domain.SocialLoginConfigId;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 @Repository
-public interface SocialLoginConfigRepository extends JpaRepository<SocialLoginConfig, UUID> {
+public interface SocialLoginConfigRepository extends JpaRepository<SocialLoginConfig, SocialLoginConfigId> {
 
-	List<SocialLoginConfig> findAllByClientId(String clientId);
+	List<SocialLoginConfig> findAllById_StoreMerchantId(StoreMerchantId storeMerchantId);
 
-	default List<SocialLoginInfo> findSocialLoginConfigByClientId(String clientId) {
-		return findAllByClientId(clientId).stream()
-			.map(config -> new SocialLoginInfo(config.getProviderId(), clientId + "." + config.getProviderId()))
+	default List<SocialLoginConfigId> findEnabledSocialLoginConfig(StoreMerchantId storeMerchantId) {
+		return findAllById_StoreMerchantId(storeMerchantId).stream()
+			.filter(SocialLoginConfig::getEnabled)
+			.map(SocialLoginConfig::getId)
 			.toList();
-	}
-
-	Optional<SocialLoginConfig> findByClientIdAndProviderId(String clientId, String providerId);
-
-	record SocialLoginInfo(String providerId, String registrationId) {
 	}
 
 }
