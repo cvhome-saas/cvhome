@@ -40,7 +40,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 			clientId = registrationId.substring(0, registrationId.lastIndexOf("."));
 		}
 		else {
-			// Fallback if it doesn't follow the pattern (e.g. YAML configured ones might not)
+			// Fallback if it doesn't follow the pattern (e.g. YAML configured ones might
+			// not)
 			// But for our dynamic ones it should.
 			clientId = registrationId;
 		}
