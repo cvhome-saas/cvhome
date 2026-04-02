@@ -18,7 +18,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @Slf4j
@@ -33,50 +32,48 @@ public class RegistrationController {
 	private final UserService userService;
 
 	@GetMapping("/register")
-	public String showRegistrationForm(HttpServletRequest request, HttpServletResponse response, Model model,
-			@RequestParam(value = "client_id", required = false) String clientId) {
+	public String showRegistrationForm(HttpServletRequest request, HttpServletResponse response, Model model) {
+		SavedRequest savedRequest = requestCache.getRequest(request, response);
+		if (savedRequest != null) {
+			String clientId = UriComponentsBuilder.fromUriString(savedRequest.getRedirectUrl())
+				.build()
+				.getQueryParams()
+				.getFirst("client_id");
+			if (clientId != null) {
 
-		if (clientId == null) {
-			SavedRequest savedRequest = requestCache.getRequest(request, response);
-			if (savedRequest != null) {
-				clientId = UriComponentsBuilder.fromUriString(savedRequest.getRedirectUrl())
-					.build()
-					.getQueryParams()
-					.getFirst("client_id");
-			}
-		}
-
-		if (clientId != null) {
-			try {
 				ReadableMerchantStore store = externalMerchantStoreService.getStore(new StoreMerchantId(clientId));
+
 				model.addAttribute("store", store);
 				model.addAttribute("clientId", clientId);
-			}
-			catch (Exception e) {
-				log.warn("Failed to load store for clientId: {}", clientId, e);
+				RegistrationRequest registrationRequest = new RegistrationRequest();
+				registrationRequest.setClientId(clientId);
+				model.addAttribute("registrationRequest", registrationRequest);
+
 			}
 		}
-
-		RegistrationRequest registrationRequest = new RegistrationRequest();
-		registrationRequest.setClientId(clientId);
-		model.addAttribute("registrationRequest", registrationRequest);
-
 		return "register";
 	}
 
 	@PostMapping("/register")
-	public String registerUser(@Valid @ModelAttribute("registrationRequest") RegistrationRequest registrationRequest,
+	public String registerUser(HttpServletRequest request, HttpServletResponse response,
+			@Valid @ModelAttribute("registrationRequest") RegistrationRequest registrationRequest,
 			BindingResult bindingResult, Model model) {
 
-		if (registrationRequest.getClientId() != null) {
-			try {
-				ReadableMerchantStore store = externalMerchantStoreService
-					.getStore(new StoreMerchantId(registrationRequest.getClientId()));
+		SavedRequest savedRequest = requestCache.getRequest(request, response);
+		if (savedRequest != null) {
+			String clientId = UriComponentsBuilder.fromUriString(savedRequest.getRedirectUrl())
+				.build()
+				.getQueryParams()
+				.getFirst("client_id");
+			if (clientId != null) {
+
+				ReadableMerchantStore store = externalMerchantStoreService.getStore(new StoreMerchantId(clientId));
+
 				model.addAttribute("store", store);
-				model.addAttribute("clientId", registrationRequest.getClientId());
-			}
-			catch (Exception e) {
-				log.warn("Failed to load store for clientId: {}", registrationRequest.getClientId(), e);
+				model.addAttribute("clientId", clientId);
+				registrationRequest.setClientId(clientId);
+				model.addAttribute("registrationRequest", registrationRequest);
+
 			}
 		}
 
@@ -97,7 +94,7 @@ public class RegistrationController {
 			return "register";
 		}
 
-		return "redirect:../../";
+		return "redirect:/login";
 	}
 
 }
