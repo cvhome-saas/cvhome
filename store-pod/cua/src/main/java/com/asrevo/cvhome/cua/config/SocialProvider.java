@@ -50,6 +50,10 @@ public enum SocialProvider {
 
 	private final Function<String, ClientRegistration.Builder> builderFunction;
 
+	public record ExtractedAttributes(String name, String email, String phone, String firstname, String lastname) {
+
+	}
+
 	SocialProvider(String providerId, String clientName, Function<String, ClientRegistration.Builder> builderFunction) {
 		this.providerId = providerId;
 		this.clientName = clientName;
@@ -59,6 +63,56 @@ public enum SocialProvider {
 
 	public ClientRegistration.Builder createBuilder(String registrationId) {
 		return builderFunction.apply(registrationId);
+	}
+
+	public ExtractedAttributes extractAttributes(Map<String, Object> attributes) {
+		String name = null;
+		String email = null;
+		String phone = null;
+		String firstname = null;
+		String lastname = null;
+
+		switch (this) {
+			case GOOGLE -> {
+				name = (String) attributes.get("name");
+				email = (String) attributes.get("email");
+				firstname = (String) attributes.get("given_name");
+				lastname = (String) attributes.get("family_name");
+			}
+
+			case FACEBOOK -> {
+				name = (String) attributes.get("name");
+				email = (String) attributes.get("email");
+
+				// Facebook does not always split names
+				if (name != null) {
+					String[] parts = name.split(" ", 2);
+					firstname = parts[0];
+					lastname = parts.length > 1 ? parts[1] : null;
+				}
+			}
+
+			case GITHUB -> {
+				name = (String) attributes.get("name");
+				email = (String) attributes.get("email");
+
+				// GitHub may not provide name → fallback to login
+				if (name == null) {
+					name = (String) attributes.get("login");
+				}
+
+				if (name != null) {
+					String[] parts = name.split(" ", 2);
+					firstname = parts[0];
+					lastname = parts.length > 1 ? parts[1] : null;
+				}
+			}
+		}
+		if (email == null) {
+			email = name;
+		}
+
+		return new ExtractedAttributes(name, email, phone, firstname, lastname);
 	}
 
 }

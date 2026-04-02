@@ -5,7 +5,6 @@ import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal;
 import org.springframework.security.oauth2.core.oidc.OidcIdToken;
 import org.springframework.security.oauth2.core.oidc.OidcUserInfo;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
@@ -18,7 +17,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @Getter
-public class SecurityUser implements UserDetails, OAuth2AuthenticatedPrincipal, OAuth2User, OidcUser {
+public class SecurityUser implements UserDetails, OAuth2User, OidcUser {
 
 	private final UUID id;
 
