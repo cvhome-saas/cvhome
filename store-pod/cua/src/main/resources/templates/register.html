@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8" />
-    <title>Login</title>
+    <title>Register</title>
     <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAFklEQVQYV2P8z8DAwMDAwMDAwMAAEYACV6tDkYAAAAAElFTkSuQmCC">
     <style>
         body { font-family: Arial, sans-serif; margin: 2rem; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f4f4f4; }
@@ -18,14 +18,12 @@
         .store-header { display: flex; flex-direction: column; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; }
         .store-logo { max-width: 96px; max-height: 96px; object-fit: contain; border-radius: 8px; }
         .store-name { margin: 0; text-align: center; color: #333; font-size: 1.25rem; font-weight: 700; }
-        .social-login { margin-top: 1.5rem; border-top: 1px solid #eee; padding-top: 1rem; display: grid; gap: 0.5rem; }
-        .social-button { padding: 0.75rem; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; font-size: 1rem; text-align: center; text-decoration: none; color: #333; background-color: white; }
-        .social-button:hover { background-color: #f8f9fa; }
         .footer { margin-top: 1.5rem; border-top: 1px solid #eee; padding-top: 1rem; text-align: center; font-size: 0.9rem; }
         .footer a { color: #007bff; text-decoration: none; }
         .footer a:hover { text-decoration: underline; }
     </style>
     <link rel="stylesheet" href="../css/login.css">
+
 </head>
 <body>
 <div class="login-container">
@@ -37,35 +35,41 @@
         <h2 class="store-name" th:text="${store.name}">Store Name</h2>
     </div>
 
-    <h2 th:if="${store == null}">Login</h2>
+    <h2 th:if="${store == null}">Create Account</h2>
+    <h2 th:if="${store != null}">Register at <span th:text="${store.name}"></span></h2>
 
-    <div th:if="${param.error}" class="error">
-        Invalid username or password.
-    </div>
+    <div th:if="${error}" class="error" th:text="${error}"></div>
 
-    <form method="post" th:action="@{/login}">
-        <input type="hidden" name="client_id" th:value="${clientId}">
+    <form method="post" th:action="@{/register}" th:object="${registrationRequest}">
+        <input type="hidden" th:field="*{clientId}">
         <div class="form-group">
             <label for="username">Username</label>
-            <input type="text" id="username" name="username" required autofocus />
+            <input type="text" id="username" th:field="*{username}" required autofocus />
+            <div th:if="${#fields.hasErrors('username')}" th:errors="*{username}" class="error"></div>
+        </div>
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" th:field="*{email}" required />
+            <div th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="error"></div>
         </div>
         <div class="form-group">
             <label for="password">Password</label>
-            <input type="password" id="password" name="password" required />
+            <input type="password" id="password" th:field="*{password}" required />
+            <div th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="error"></div>
         </div>
-        <button type="submit">Sign In</button>
+        <div class="form-group">
+            <label for="firstName">First Name</label>
+            <input type="text" id="firstName" th:field="*{firstName}" />
+        </div>
+        <div class="form-group">
+            <label for="lastName">Last Name</label>
+            <input type="text" id="lastName" th:field="*{lastName}" />
+        </div>
+        <button type="submit">Sign Up</button>
     </form>
 
-    <div th:if="${socialLogins}" class="social-login">
-        <div style="text-align: center; margin-bottom: 0.5rem; color: #666; font-size: 0.8rem;">OR</div>
-        <a th:each="login : ${socialLogins}"
-           th:href="@{/oauth2/authorization/{id}(id=${login.toRegistrationId()})}"
-           class="social-button"
-           th:text="'Sign in with ' + ${#strings.capitalize(login.providerId)}"></a>
-    </div>
-
     <div class="footer">
-        Don't have an account? <a th:href="@{/register(client_id=${clientId})}">Sign Up</a>
+        Already have an account? <a th:href="@{/login(client_id=${clientId})}">Sign In</a>
     </div>
 </div>
 </body>
