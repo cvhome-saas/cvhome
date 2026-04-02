@@ -86,6 +86,9 @@ public class OrderApi {
 				if (jwtAuthenticationToken == null || !jwtAuthenticationToken.isAuthenticated()) {
 					throw new ServiceRuntimeException("HTTP 401 Unauthorized - Login required for order placement");
 				}
+				if (!merchantStore.getId().equals(jwtAuthenticationToken.getTokenAttributes().get("client_id"))) {
+					throw new ServiceRuntimeException("HTTP 401 Unauthorized - Invalid clientId");
+				}
 			}
 
 			cart = shoppingCartService.loadCartByCode(code, merchantStore, language);
