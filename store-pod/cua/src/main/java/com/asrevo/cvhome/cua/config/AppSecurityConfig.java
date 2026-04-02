@@ -41,7 +41,7 @@ public class AppSecurityConfig {
 			.permitAll()
 			.requestMatchers(EndpointRequest.toAnyEndpoint())
 			.permitAll()
-			.requestMatchers("/login", "/api/v1/auth/me")
+			.requestMatchers("/login", "/register", "/api/v1/auth/me")
 			.permitAll()
 			.requestMatchers("/swagger-ui.html")
 			.permitAll()
