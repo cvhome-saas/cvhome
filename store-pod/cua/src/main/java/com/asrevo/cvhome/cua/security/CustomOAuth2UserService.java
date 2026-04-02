@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -54,7 +53,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 		User user = new User();
 		user.setClientId(socialLoginConfigId.storeMerchantId().storeMerchantId());
 		user.setEmail(extractedAttributes.email());
-		user.setUsername(extractedAttributes.name());
+		user.setUsername(extractedAttributes.username());
 		user.setFirstName(extractedAttributes.firstname());
 		user.setLastName(extractedAttributes.lastname());
 		user.setEnabled(true);

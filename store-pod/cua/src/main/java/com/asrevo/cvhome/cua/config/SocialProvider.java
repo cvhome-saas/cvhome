@@ -6,7 +6,6 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 
-import java.util.Arrays;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -50,7 +49,7 @@ public enum SocialProvider {
 
 	private final Function<String, ClientRegistration.Builder> builderFunction;
 
-	public record ExtractedAttributes(String name, String email, String phone, String firstname, String lastname) {
+	public record ExtractedAttributes(String username, String email, String phone, String firstname, String lastname) {
 
 	}
 

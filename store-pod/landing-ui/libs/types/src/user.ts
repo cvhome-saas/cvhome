@@ -15,9 +15,10 @@ export interface User {
         exp: string;
         iat: string;
         jti: string;
-        givenName?: string;
-        familyName?: string;
-        name?: string;
+        firstName?: string;
+        lastName?: string;
+        username?: string;
+        clientId?: string;
         picture?: string;
         email?: string;
         emailVerified?: boolean;
