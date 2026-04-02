@@ -2,6 +2,8 @@ package com.asrevo.cvhome.cua.config;
 
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.cua.security.CustomOAuth2UserService;
+import com.asrevo.cvhome.cua.security.CustomOidcUserService;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
 import com.asrevo.cvhome.merchant.model.merchant.ReadableMerchantStore;
 import com.asrevo.cvhome.s2s.jwt.UaaJwtGrantedAuthoritiesConverter;
@@ -36,7 +38,8 @@ public class AppSecurityConfig {
 
 	@Bean
 	@Order(3)
-	SecurityFilterChain appSecurity(HttpSecurity http, JwtDecoder jwtDecoder) throws Exception {
+	SecurityFilterChain appSecurity(HttpSecurity http, JwtDecoder jwtDecoder,
+			CustomOAuth2UserService customOAuth2UserService, CustomOidcUserService customOidcUserService) {
 		http.authorizeHttpRequests(auth -> auth.requestMatchers("/.well-known/**")
 			.permitAll()
 			.requestMatchers(EndpointRequest.toAnyEndpoint())
@@ -52,7 +55,9 @@ public class AppSecurityConfig {
 			.anyRequest()
 			.authenticated())
 			.formLogin(it -> it.loginPage("/login"))
-			.oauth2Login(it -> it.loginPage("/login"))
+			.oauth2Login(it -> it.loginPage("/login")
+				.userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService)
+					.oidcUserService(customOidcUserService)))
 			.csrf(AbstractHttpConfigurer::disable)
 			.requestCache(cache -> cache.requestCache(requestCache()))
 			.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.decoder(jwtDecoder)));
