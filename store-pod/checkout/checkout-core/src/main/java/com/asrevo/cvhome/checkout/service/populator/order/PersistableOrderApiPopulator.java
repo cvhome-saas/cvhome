@@ -3,15 +3,10 @@ package com.asrevo.cvhome.checkout.service.populator.order;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
 import com.asrevo.cvhome.merchant.model.merchant.ReadableMerchantStore;
-import com.asrevo.cvhome.checkout.entity.customer.Customer;
 import com.asrevo.cvhome.checkout.entity.order.Order;
 import com.asrevo.cvhome.checkout.entity.order.OrderChannel;
 import com.asrevo.cvhome.checkout.entity.order.orderstatus.OrderStatusHistory;
 import com.asrevo.cvhome.checkout.model.order.v1.PersistableOrder;
-import com.asrevo.cvhome.checkout.service.populator.customer.CustomerPopulator;
-import com.asrevo.cvhome.checkout.services.customer.CustomerService;
-import com.asrevo.cvhome.store.core.entity.common.Billing;
-import com.asrevo.cvhome.store.core.entity.common.Delivery;
 import com.asrevo.cvhome.store.core.entity.order.orderstatus.OrderStatus;
 import com.asrevo.cvhome.store.core.entity.payments.PaymentType;
 import com.asrevo.cvhome.store.core.exception.ConversionException;
@@ -27,16 +22,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class PersistableOrderApiPopulator extends AbstractDataPopulator<PersistableOrder, StoreMerchantId, Order> {
 
-	private final CustomerService customerService;
-
-	private final CustomerPopulator customerPopulator;
-
 	private final ExternalMerchantStoreService externalMerchantStoreService;
 
-	public PersistableOrderApiPopulator(CustomerService customerService, CustomerPopulator customerPopulator,
-			ExternalMerchantStoreService externalMerchantStoreService) {
-		this.customerService = customerService;
-		this.customerPopulator = customerPopulator;
+	public PersistableOrderApiPopulator(ExternalMerchantStoreService externalMerchantStoreService) {
 		this.externalMerchantStoreService = externalMerchantStoreService;
 	}
 
@@ -52,21 +40,8 @@ public class PersistableOrderApiPopulator extends AbstractDataPopulator<Persista
 				target = new Order();
 			}
 
-			// target.setLocale(LocaleUtils.getLocale(store));
-
 			ReadableMerchantStore baseStore = externalMerchantStoreService.getStore(store);
 			target.setLocale(LocaleUtils.getLocale(baseStore.getDefaultLanguage()));
-
-			// Customer
-			Customer customer = customerService.getById(source.getCustomerId());
-
-			target.setCustomerEmailAddress(customer.getEmailAddress());
-
-			Delivery delivery = customer.getDelivery();
-			target.setDelivery(delivery);
-
-			Billing billing = customer.getBilling();
-			target.setBilling(billing);
 
 			target.setDatePurchased(new Date());
 			target.setCurrency(baseStore.getCurrency());
@@ -79,8 +54,7 @@ public class PersistableOrderApiPopulator extends AbstractDataPopulator<Persista
 			target.setPaymentType(PaymentType.valueOf(source.getPayment().getPaymentType()));
 
 			target.setCustomerAgreement(source.isCustomerAgreement());
-			target.setConfirmedAddress(true); // force this to true, cannot perform this
-												// activity from the API
+			target.setConfirmedAddress(true);
 
 			if (!StringUtils.isBlank(source.getComments())) {
 				OrderStatusHistory statusHistory = new OrderStatusHistory();

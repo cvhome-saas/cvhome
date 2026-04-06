@@ -38,6 +38,8 @@ import com.asrevo.cvhome.customer.model.customer.ReadableCustomer;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
 import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
 import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
+import com.asrevo.cvhome.store.core.entity.common.Billing;
+import com.asrevo.cvhome.store.core.entity.common.Delivery;
 import com.asrevo.cvhome.store.core.exception.ConversionException;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.catalog.ProductReservationList;
@@ -136,6 +138,14 @@ public class OrderFacadeImpl implements OrderFacade {
 
 			Order modelOrder = new Order();
 			persistableOrderApiPopulator.populate(order, modelOrder, store, language);
+
+			modelOrder.setCustomerEmailAddress(customer.getEmailAddress());
+
+			Delivery delivery = customer.getDelivery();
+			modelOrder.setDelivery(delivery);
+
+			Billing billing = customer.getBilling();
+			modelOrder.setBilling(billing);
 
 			Long shoppingCartId = order.getShoppingCartId();
 			ShoppingCart cart = shoppingCartService.findCart(shoppingCartId, store);
