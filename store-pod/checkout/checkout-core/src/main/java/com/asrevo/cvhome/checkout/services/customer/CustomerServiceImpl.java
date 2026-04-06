@@ -11,6 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service("customerService")
 @Slf4j
 public class CustomerServiceImpl extends SalesManagerEntityServiceImpl<Long, Customer> implements CustomerService {
@@ -29,13 +31,13 @@ public class CustomerServiceImpl extends SalesManagerEntityServiceImpl<Long, Cus
 	}
 
 	@Override
-	public Customer getByNick(String nick, StoreMerchantId storeMerchantId) {
-		return customerRepository.findByNick(nick, storeMerchantId);
+	public CustomerList getListByStore(StoreMerchantId store, CustomerCriteria criteria) {
+		return customerRepository.listByStore(store, criteria);
 	}
 
 	@Override
-	public CustomerList getListByStore(StoreMerchantId store, CustomerCriteria criteria) {
-		return customerRepository.listByStore(store, criteria);
+	public Optional<Customer> getByCuaExternalId(String sub) {
+		return customerRepository.findByCuaExternalId(sub);
 	}
 
 	@Override

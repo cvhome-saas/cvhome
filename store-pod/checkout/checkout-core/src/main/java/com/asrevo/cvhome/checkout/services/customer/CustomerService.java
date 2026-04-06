@@ -7,12 +7,14 @@ import com.asrevo.cvhome.checkout.entity.customer.CustomerList;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
 
+import java.util.Optional;
+
 public interface CustomerService extends SalesManagerEntityService<Long, Customer> {
 
 	void saveOrUpdate(Customer customer) throws ServiceException;
 
 	CustomerList getListByStore(StoreMerchantId store, CustomerCriteria criteria);
 
-	Customer getByNick(String nick, StoreMerchantId storeMerchantId);
+	Optional<Customer> getByCuaExternalId(String sub);
 
 }

@@ -26,20 +26,12 @@ public class ReadableCustomerPopulator extends AbstractDataPopulator<Customer, S
 			}
 			target.setEmailAddress(source.getEmailAddress());
 
-			if (StringUtils.isNotEmpty(source.getNick())) {
-				target.setUserName(source.getNick());
+			if (StringUtils.isNotEmpty(source.getUsername())) {
+				target.setUsername(source.getUsername());
 			}
 
-			if (source.getDefaultLanguageCode() != null) {
-				target.setLanguage(source.getDefaultLanguageCode());
-			}
-
-			if (source.getGender() != null) {
-				target.setGender(source.getGender().name());
-			}
-
-			if (StringUtils.isNotEmpty(source.getProvider())) {
-				target.setProvider(source.getProvider());
+			if (StringUtils.isNotEmpty(source.getCuaExternalId())) {
+				target.setCuaExternalId(source.getCuaExternalId());
 			}
 
 			if (source.getBilling() != null) {
@@ -65,14 +57,6 @@ public class ReadableCustomerPopulator extends AbstractDataPopulator<Customer, S
 				target.setLastName(address.getLastName());
 
 				target.setBilling(address);
-			}
-
-			if (source.getCustomerReviewAvg() != null) {
-				target.setRating(source.getCustomerReviewAvg().doubleValue());
-			}
-
-			if (source.getCustomerReviewCount() != null) {
-				target.setRatingCount(source.getCustomerReviewCount());
 			}
 
 			if (source.getDelivery() != null) {

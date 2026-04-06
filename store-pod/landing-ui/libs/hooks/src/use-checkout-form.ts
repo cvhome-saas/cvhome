@@ -89,12 +89,32 @@ export const useCheckoutForm = (storeContext: StoreContext, requireLoginForOrder
         });
     }, [storeContext]);
 
+    // Handle initial login required dialog
+    useEffect(() => {
+        if (!loading && requireLoginForOrderPlacement && !user) {
+            setLoginRequiredDialogOpen(true);
+        } else {
+            setLoginRequiredDialogOpen(false);
+        }
+    }, [loading, requireLoginForOrderPlacement, user]);
+
+    // Pre-populate form when user data is available
+    useEffect(() => {
+        if (user) {
+            setValue("customer.emailAddress", user.claims.email || "");
+            setValue("customer.billing.firstName", user.claims.firstName || "");
+            setValue("customer.billing.lastName", user.claims.lastName || "");
+        }
+    }, [user, setValue]);
+
     const handleClickOnAgreement = useCallback((event: React.UIEvent) => {
         event.preventDefault();
         setAgreeDialogOpen(true);
     }, []);
 
     const onSubmit = useCallback(async (checkoutCart: any) => {
+        if (loading) return; // Prevent submission while loading user status
+
         if (requireLoginForOrderPlacement && !user) {
             setLoginRequiredDialogOpen(true);
             return;
@@ -113,7 +133,7 @@ export const useCheckoutForm = (storeContext: StoreContext, requireLoginForOrder
                 sound: false,
             })
         );
-    }, [cartManager, reset, storeContext.locale, t]);
+    }, [cartManager, loading, requireLoginForOrderPlacement, reset, storeContext.locale, t, user]);
 
     return {
         register,

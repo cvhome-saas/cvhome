@@ -2,7 +2,8 @@ export function handleResponse<T>(it: Response): T | undefined {
     if (it.ok) {
         return it.json() as unknown as T;
     } else {
-        return undefined;
+        console.error(it);
+        throw new Error(it.statusText);
     }
 }
 
