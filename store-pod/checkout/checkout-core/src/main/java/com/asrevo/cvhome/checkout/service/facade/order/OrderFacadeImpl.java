@@ -44,9 +44,9 @@ import com.asrevo.cvhome.store.utils.ImageFilePath;
 import com.asrevo.cvhome.store.utils.PriceUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import java.math.BigDecimal;
@@ -114,6 +114,7 @@ public class OrderFacadeImpl implements OrderFacade {
 	}
 
 	@Override
+	@Transactional(rollbackFor = Exception.class)
 	public Order processOrder(PersistableOrder order, Customer customer, StoreMerchantId store, LanguageCode language,
 			Locale locale) throws ServiceException {
 
@@ -198,19 +199,16 @@ public class OrderFacadeImpl implements OrderFacade {
 			modelOrder = orderService.processOrder(modelOrder, customer, items, orderTotalSummary, paymentModel, store);
 
 			// update cart
-			try {
-				cart.setOrderId(modelOrder.getId());
-				shoppingCartFacade.saveOrUpdateShoppingCart(cart);
-			}
-			catch (Exception e) {
-				log.error("Cannot delete cart {}", cart.getId(), e);
-			}
+			cart.setOrderId(modelOrder.getId());
+			shoppingCartFacade.saveOrUpdateShoppingCart(cart);
 
 			return modelOrder;
 
 		}
+		catch (ServiceException e) {
+			throw e;
+		}
 		catch (Exception e) {
-
 			throw new ServiceException(e);
 		}
 	}
