@@ -83,6 +83,11 @@ spring:
   sql:
     init:
       mode: always
+  flyway:
+    enabled: true
+    schemas: ${spring.application.name}
+    locations: classpath:db/migration
+    baseline-on-migrate: true
   datasource:
     driver-class-name: org.postgresql.Driver
     hikari:

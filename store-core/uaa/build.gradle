@@ -43,6 +43,8 @@ dependencies {
     implementation libs.spring.cloud.starter
     implementation libs.thymeleaf.extras.springsecurity6
     implementation libs.springdoc.openapi.starter.webmvc.ui
+    implementation libs.spring.boot.starter.flyway
+    implementation libs.flyway.database.postgresql
 
     implementation project(':store-commons:ecs-commons:fargate-task-info')
     implementation project(':store-commons:ecs-commons:ecs-service-discoveryclient')
@@ -69,6 +71,7 @@ dependencies {
     testImplementation libs.spring.boot.testcontainers
     testImplementation libs.testcontainers.junit.jupiter
     testImplementation libs.testcontainers.postgresql
+    testImplementation libs.spring.boot.starter.flyway.test
     testRuntimeOnly libs.junit.platform.launcher
 }
 
