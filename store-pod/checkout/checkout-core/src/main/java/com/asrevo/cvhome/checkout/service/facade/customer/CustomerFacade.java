@@ -12,6 +12,8 @@ import com.asrevo.cvhome.checkout.entity.customer.CustomerCriteria;
 import com.asrevo.cvhome.checkout.services.customer.CustomerService;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 
+import java.util.Optional;
+
 /**
  * <p>
  * Customer facade working as a bridge between {@link CustomerService} and Controller It
@@ -29,10 +31,8 @@ public interface CustomerFacade {
 	 */
 	ReadableCustomer getCustomerById(Long id, StoreMerchantId store, LanguageCode language);
 
-	boolean checkIfUserExists(String userName, StoreMerchantId store);
-
-	Customer populateCustomerModel(Customer customerModel, PersistableCustomer customer, StoreMerchantId store,
-			LanguageCode language) throws Exception;
+	Optional<Customer> getOrCreateCustomer(PersistableCustomer customer, StoreMerchantId store, LanguageCode language)
+			throws Exception;
 
 	ReadableCustomerList getListByStore(StoreMerchantId store, CustomerCriteria criteria, LanguageCode language);
 

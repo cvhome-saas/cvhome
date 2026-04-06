@@ -151,18 +151,12 @@ public class OrderFacadeImpl implements OrderFacade {
 
 			modelOrder.setOrderProducts(orderProducts);
 
-			// requires Order Totals, this needs recalculation and then compare
-			// total with the amount sent as part
-			// of process order request. If totals does not match, an error
-			// should be thrown.
-
-			OrderTotalSummary orderTotalSummary;
-
 			OrderSummary orderSummary = new OrderSummary();
 			List<ShoppingCartItem> itemsSet = new ArrayList<>(cart.getLineItems());
 			orderSummary.setProducts(itemsSet);
 
-			orderTotalSummary = orderService.caculateOrderTotal(orderSummary, customer, store, language);
+			OrderTotalSummary orderTotalSummary = orderService.caculateOrderTotal(orderSummary, customer, store,
+					language);
 
 			if (order.getPayment().getAmount() == null) {
 				throw new ConversionException("Requires Payment.amount");
@@ -200,18 +194,6 @@ public class OrderFacadeImpl implements OrderFacade {
 
 			modelOrder.setShoppingCartCode(cart.getShoppingCartCode());
 
-			// lookup existing customer
-			// if customer exist then do not set authentication for this customer and send
-			// an
-			// instructions email
-			if (!StringUtils.isBlank(customer.getNick()) && !customer.isAnonymous()) {
-				if (order.getCustomerId() == null && (customerFacade.checkIfUserExists(customer.getNick(), store))) {
-					customer.setAnonymous(true);
-					customer.setNick(null);
-					// send email instructions
-				}
-			}
-
 			// order service
 			modelOrder = orderService.processOrder(modelOrder, customer, items, orderTotalSummary, paymentModel, store);
 
@@ -223,17 +205,6 @@ public class OrderFacadeImpl implements OrderFacade {
 			catch (Exception e) {
 				log.error("Cannot delete cart {}", cart.getId(), e);
 			}
-
-			// email management
-			/*
-			 * if (this.storeProperties.enableOrderMailApi()) { // send email try {
-			 *
-			 * notify(modelOrder, customer, store, language, locale);
-			 *
-			 *
-			 * } catch (Exception e) { log.error("Cannot send order confirmation email",
-			 * e); } }
-			 */
 
 			return modelOrder;
 

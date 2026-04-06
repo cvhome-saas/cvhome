@@ -17,11 +17,12 @@ import com.asrevo.cvhome.store.controller.exception.ConversionRuntimeException;
 import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
 import com.asrevo.cvhome.store.core.exception.ConversionException;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 /**
@@ -47,21 +48,6 @@ public class CustomerFacadeImpl implements CustomerFacade {
 	}
 
 	@Override
-	public boolean checkIfUserExists(String userName, StoreMerchantId store) {
-		if (StringUtils.isNotBlank(userName) && store != null) {
-			Customer customer = customerService.getByNick(userName, store);
-			if (customer != null) {
-				log.info("Customer with userName {} already exists for store {} ", userName, store);
-				return true;
-			}
-
-			return false;
-		}
-		log.info("Either userName is empty or we have not found any value for store");
-		return false;
-	}
-
-	@Override
 	public ReadableCustomer getCustomerById(Long id, final StoreMerchantId store, final LanguageCode language) {
 
 		Customer customerModel = Optional.ofNullable(customerService.getById(id))
@@ -71,15 +57,30 @@ public class CustomerFacadeImpl implements CustomerFacade {
 	}
 
 	@Override
-	public Customer populateCustomerModel(Customer customerModel, PersistableCustomer customer, StoreMerchantId store,
-			LanguageCode language) throws Exception {
+	public Optional<Customer> getOrCreateCustomer(PersistableCustomer customer, StoreMerchantId store,
+			LanguageCode language) {
 		log.info("Starting to populate customer model from customer data");
 
-		customerModel = customerPopulator.populate(customer, customerModel, store, language);
+		return Optional.ofNullable(customer.getCuaExternalId())
+			.flatMap(customerService::getByCuaExternalId)
+			.or(() -> populateNewCustomer(customer, store, language));
 
-		log.info("About to persist customer to database.");
-		customerService.saveOrUpdate(customerModel);
-		return customerModel;
+	}
+
+	private Optional<Customer> populateNewCustomer(PersistableCustomer customer, StoreMerchantId store,
+			LanguageCode language) {
+		Customer customerModel = new Customer();
+
+		try {
+			customerModel = customerPopulator.populate(customer, customerModel, store, language);
+			log.info("About to persist customer to database.");
+			customerService.saveOrUpdate(customerModel);
+			return Optional.ofNullable(customerModel);
+		}
+		catch (Exception e) {
+			log.error("Error while persisting customer", e);
+			return Optional.empty();
+		}
 	}
 
 	@Override

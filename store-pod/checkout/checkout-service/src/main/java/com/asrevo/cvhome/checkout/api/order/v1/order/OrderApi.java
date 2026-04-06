@@ -29,13 +29,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.hibernate.boot.beanvalidation.IntegrationException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -71,10 +71,9 @@ public class OrderApi {
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	@ConditionalOnApiStatus
-	public ReadableOrderConfirmation checkout(@PathVariable final String code, // shopping
-																				// cart
-			@Valid @RequestBody PersistableAnonymousOrder order, // order
-			StoreMerchantId merchantStore, LanguageCode language, JwtAuthenticationToken jwtAuthenticationToken) {
+	public ReadableOrderConfirmation checkout(@PathVariable String code,
+			@Valid @RequestBody PersistableAnonymousOrder order, JwtAuthenticationToken auth,
+			StoreMerchantId merchantStore, LanguageCode language) {
 
 		Assert.notNull(order.getCustomer(), "Customer must not be null");
 
@@ -83,10 +82,10 @@ public class OrderApi {
 			ReadableMerchantStore store = externalMerchantStoreService.getStore(merchantStore);
 
 			if (store.isRequireLoginForOrderPlacement()) {
-				if (jwtAuthenticationToken == null || !jwtAuthenticationToken.isAuthenticated()) {
+				if (auth == null || !auth.isAuthenticated()) {
 					throw new ServiceRuntimeException("HTTP 401 Unauthorized - Login required for order placement");
 				}
-				if (!merchantStore.getId().equals(jwtAuthenticationToken.getTokenAttributes().get("clientId"))) {
+				if (!merchantStore.getId().equals(auth.getTokenAttributes().get("clientId"))) {
 					throw new ServiceRuntimeException("HTTP 401 Unauthorized - Invalid clientId");
 				}
 			}
@@ -96,33 +95,28 @@ public class OrderApi {
 			if (cart == null) {
 				throw new ResourceNotFoundException("Cart code " + code + " does not exist");
 			}
+			else {
+				order.setShoppingCartId(cart.getId());
+			}
 
-			Customer customer = new Customer();
-			customer = customerFacade.populateCustomerModel(customer, order.getCustomer(), merchantStore, language);
+			Optional.ofNullable(auth)
+				.filter(JwtAuthenticationToken::isAuthenticated)
+				.flatMap(token -> Optional.ofNullable(token.getTokenAttributes().get("sub")))
+				.map(Object::toString)
+				.ifPresent(it -> order.getCustomer().setCuaExternalId(it));
 
-			order.setShoppingCartId(cart.getId());
+			Customer customer = customerFacade.getOrCreateCustomer(order.getCustomer(), merchantStore, language)
+				.orElseThrow(() -> new ServiceRuntimeException(
+						"Unable to create or retrieve customer for cart placement " + cart.getCustomerId()));
 
 			Order modelOrder = orderFacade.processOrder(order, customer, merchantStore, language,
 					LocaleUtils.getLocale(language));
-			Long orderId = modelOrder.getId();
-			// populate order confirmation
-			order.setId(orderId);
-			// set customer id
-			order.getCustomer().setId(modelOrder.getCustomerId());
 
 			return orderFacade.orderConfirmation(modelOrder, customer, merchantStore, language);
 
 		}
 		catch (Exception e) {
-
-			String message = e.getMessage();
-			if (StringUtils.isBlank(message)) { // exception type
-				message = "APP-BACKEND";
-				if (e.getCause() instanceof IntegrationException) {
-					message = "Integration problen occured to complete order";
-				}
-			}
-			throw new ServiceRuntimeException("Error during checkout [" + message + "]", e);
+			throw new ServiceRuntimeException("Error during checkout", e);
 		}
 	}
 

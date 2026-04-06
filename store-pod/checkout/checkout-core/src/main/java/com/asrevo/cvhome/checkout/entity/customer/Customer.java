@@ -22,7 +22,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "CUSTOMER", uniqueConstraints = @UniqueConstraint(columnNames = { "STORE_MERCHANT_ID", "CUSTOMER_NICK" }))
+@Table(name = "CUSTOMER")
 @Getter
 @Setter
 public class Customer extends SalesManagerEntity<Long, Customer> implements Auditable {
@@ -43,44 +43,16 @@ public class Customer extends SalesManagerEntity<Long, Customer> implements Audi
 	@Embedded
 	private AuditSection auditSection = new AuditSection();
 
-	@Column(name = "CUSTOMER_GENDER", length = 1)
-	@Enumerated(value = EnumType.STRING)
-	private CustomerGender gender;
-
-	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = "CUSTOMER_DOB")
-	private Date dateOfBirth;
-
 	@Email
 	@NotEmpty
-	@Column(name = "CUSTOMER_EMAIL_ADDRESS", length = 96, nullable = false)
+	@Column(name = "CUSTOMER_EMAIL_ADDRESS", length = 96)
 	private String emailAddress;
 
-	@Column(name = "CUSTOMER_NICK", length = 96)
-	private String nick; // unique username per store
+	@Column(name = "CUSTOMER_USERNAME", length = 96)
+	private String username;
 
-	@Column(name = "CUSTOMER_COMPANY", length = 100)
-	private String company;
-
-	@JsonIgnore
-	@Column(name = "CUSTOMER_PASSWORD", length = 60)
-	private String password;
-
-	@Column(name = "CUSTOMER_ANONYMOUS")
-	private boolean anonymous;
-
-	@Column(name = "REVIEW_AVG")
-	private BigDecimal customerReviewAvg;
-
-	@Column(name = "REVIEW_COUNT")
-	private Integer customerReviewCount;
-
-	@Column(name = "PROVIDER")
-	private String provider;
-
-	// @ManyToOne(fetch = FetchType.LAZY, targetEntity = Language.class)
-	// @JoinColumn(name = "LANGUAGE_ID", nullable = false)
-	// private Language defaultLanguage;
+	@Column(name = "CUA_EXTERNAL_ID", length = 96)
+	private String cuaExternalId;
 
 	@Column(name = "LANGUAGE_CODE", length = 6)
 	@Convert(converter = LanguageCodeConverter.class)
@@ -97,21 +69,6 @@ public class Customer extends SalesManagerEntity<Long, Customer> implements Audi
 	@Valid
 	@Embedded
 	private Billing billing = null;
-
-	@JsonIgnore
-	@Transient
-	private String showCustomerStateList;
-
-	@JsonIgnore
-	@Transient
-	private String showBillingStateList;
-
-	@JsonIgnore
-	@Transient
-	private String showDeliveryStateList;
-
-	@Embedded
-	private CredentialsReset credentialsResetRequest = null;
 
 	public Customer() {
 	}

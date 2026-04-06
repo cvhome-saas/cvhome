@@ -1,14 +1,12 @@
 package com.asrevo.cvhome.checkout.service.populator.order;
 
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.customer.model.customer.PersistableCustomer;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
 import com.asrevo.cvhome.merchant.model.merchant.ReadableMerchantStore;
 import com.asrevo.cvhome.checkout.entity.customer.Customer;
 import com.asrevo.cvhome.checkout.entity.order.Order;
 import com.asrevo.cvhome.checkout.entity.order.OrderChannel;
 import com.asrevo.cvhome.checkout.entity.order.orderstatus.OrderStatusHistory;
-import com.asrevo.cvhome.checkout.model.order.v1.PersistableAnonymousOrder;
 import com.asrevo.cvhome.checkout.model.order.v1.PersistableOrder;
 import com.asrevo.cvhome.checkout.service.populator.customer.CustomerPopulator;
 import com.asrevo.cvhome.checkout.services.customer.CustomerService;
@@ -60,27 +58,7 @@ public class PersistableOrderApiPopulator extends AbstractDataPopulator<Persista
 			target.setLocale(LocaleUtils.getLocale(baseStore.getDefaultLanguage()));
 
 			// Customer
-			Customer customer;
-			if (source.getCustomerId() != null && source.getCustomerId() > 0) {
-				Long customerId = source.getCustomerId();
-				customer = customerService.getById(customerId);
-
-				if (customer == null) {
-					throw new ConversionException("Customer with id " + source.getCustomerId() + " does not exist");
-				}
-				target.setCustomerId(customerId);
-
-			}
-			else {
-				if (source instanceof PersistableAnonymousOrder) {
-					PersistableCustomer persistableCustomer = ((PersistableAnonymousOrder) source).getCustomer();
-					customer = new Customer();
-					customer = customerPopulator.populate(persistableCustomer, customer, store, language);
-				}
-				else {
-					throw new ConversionException("Customer details or id not set in request");
-				}
-			}
+			Customer customer = customerService.getById(source.getCustomerId());
 
 			target.setCustomerEmailAddress(customer.getEmailAddress());
 

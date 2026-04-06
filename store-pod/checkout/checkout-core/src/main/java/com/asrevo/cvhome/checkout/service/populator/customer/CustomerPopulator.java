@@ -50,6 +50,9 @@ public class CustomerPopulator extends AbstractDataPopulator<PersistableCustomer
 				target.setId(source.getId());
 			}
 
+			if (source.getCuaExternalId() != null) {
+				target.setCuaExternalId(source.getCuaExternalId());
+			}
 			if (source.getBilling() != null) {
 				target.setBilling(new Billing());
 				if (!StringUtils.isEmpty(source.getFirstName())) {
@@ -60,19 +63,8 @@ public class CustomerPopulator extends AbstractDataPopulator<PersistableCustomer
 				}
 			}
 
-			if (!StringUtils.isBlank(source.getProvider())) {
-				target.setProvider(source.getProvider());
-			}
-
 			if (!StringUtils.isBlank(source.getEmailAddress())) {
 				target.setEmailAddress(source.getEmailAddress());
-			}
-
-			if (source.getGender() != null && target.getGender() == null) {
-				target.setGender(CustomerGender.valueOf(source.getGender()));
-			}
-			if (target.getGender() == null) {
-				target.setGender(CustomerGender.M);
 			}
 
 			Map<CountryIsoCode, Country> countries = countryService.getCountriesMap(language);
@@ -158,14 +150,6 @@ public class CustomerPopulator extends AbstractDataPopulator<PersistableCustomer
 				target.setDelivery(delivery);
 			}
 
-			if (source.getRating() != null && source.getRating() > 0) {
-				target.setCustomerReviewAvg(BigDecimal.valueOf(source.getRating()));
-			}
-
-			if (source.getRatingCount() > 0) {
-				target.setCustomerReviewCount(source.getRatingCount());
-			}
-
 			if (target.getDelivery() == null && source.getDelivery() != null) {
 				log.info("Setting default value for delivery");
 				Delivery delivery = new Delivery();
@@ -181,13 +165,6 @@ public class CustomerPopulator extends AbstractDataPopulator<PersistableCustomer
 					delivery.setCountry(deliveryCountry.getIsoCode());
 					target.setDelivery(delivery);
 				}
-			}
-
-			if (target.getDefaultLanguageCode() == null) {
-
-				LanguageCode lang = source.getLanguage() == null ? language : source.getLanguage();
-
-				target.setDefaultLanguageCode(lang);
 			}
 
 		}

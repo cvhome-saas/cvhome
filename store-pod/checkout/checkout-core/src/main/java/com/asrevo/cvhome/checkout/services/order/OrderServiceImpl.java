@@ -207,14 +207,6 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
 		Assert.notNull(store, "Store cannot be null");
 		Assert.notNull(summary, "Order total Summary cannot be null");
 
-		// @TODO check if we can store ip address
-		// order.setIpAddress(ipAddress);
-
-		// first process payment
-		// @TODO ASHRAF
-		// Transaction processTransaction = paymentService.processPayment(customer, store,
-		// payment, items, order);
-
 		if (order.getOrderHistory() == null || order.getOrderHistory().isEmpty() || order.getStatus() == null) {
 			OrderStatus status = order.getStatus();
 			if (status == null) {
@@ -236,22 +228,6 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
 
 		order.setCustomerId(customer.getId());
 		this.create(order);
-
-		/*
-		 * @TODO ASHRAF
-		 *
-		 * if(transaction!=null) { transaction.setOrder(order);
-		 * if(transaction.getId()==null || transaction.getId()==0) {
-		 * transactionService.create(transaction); } else {
-		 * transactionService.update(transaction); } }
-		 *
-		 *
-		 *
-		 * if(processTransaction!=null) { processTransaction.setOrder(order);
-		 * if(processTransaction.getId()==null || processTransaction.getId()==0) {
-		 * transactionService.create(processTransaction); } else {
-		 * transactionService.update(processTransaction); } }
-		 */
 
 		log.debug("Update inventory");
 		ProductReservationList productReservation = order.getOrderProducts()
