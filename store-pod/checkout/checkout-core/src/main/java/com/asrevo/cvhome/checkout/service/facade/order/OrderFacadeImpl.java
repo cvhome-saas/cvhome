@@ -1,5 +1,7 @@
 package com.asrevo.cvhome.checkout.service.facade.order;
 
+import com.asrevo.cvhome.catalog.model.product.ProductReservationStatus;
+import com.asrevo.cvhome.catalog.services.product.ExternalProductReservationService;
 import com.asrevo.cvhome.catalog.services.product.ExternalProductService;
 import com.asrevo.cvhome.checkout.entity.customer.Customer;
 import com.asrevo.cvhome.checkout.entity.order.*;
@@ -38,6 +40,8 @@ import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
 import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
 import com.asrevo.cvhome.store.core.exception.ConversionException;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
+import com.asrevo.cvhome.store.core.model.catalog.ProductReservationList;
+import com.asrevo.cvhome.store.core.model.catalog.ReserveProductEntry;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import com.asrevo.cvhome.store.utils.DateUtil;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
@@ -65,6 +69,8 @@ public class OrderFacadeImpl implements OrderFacade {
 
 	private final ExternalProductService externalProductService;
 
+	private final ExternalProductReservationService externalProductReservationService;
+
 	private final PersistableOrderApiPopulator persistableOrderApiPopulator;
 
 	private final CustomerFacade customerFacade;
@@ -89,6 +95,7 @@ public class OrderFacadeImpl implements OrderFacade {
 
 	public OrderFacadeImpl(ShoppingCartFacade shoppingCartFacade, ShoppingCartService shoppingCartService,
 			OrderService orderService, ExternalProductService externalProductService,
+			ExternalProductReservationService externalProductReservationService,
 			PersistableOrderApiPopulator persistableOrderApiPopulator,
 			ReadableOrderProductMapper readableOrderProductMapper, CustomerFacade customerFacade,
 			ReadableCustomerMapper readableCustomerMapper, ReadableOrderTotalMapper readableOrderTotalMapper,
@@ -100,6 +107,7 @@ public class OrderFacadeImpl implements OrderFacade {
 		this.shoppingCartService = shoppingCartService;
 		this.orderService = orderService;
 		this.externalProductService = externalProductService;
+		this.externalProductReservationService = externalProductReservationService;
 		this.persistableOrderApiPopulator = persistableOrderApiPopulator;
 		this.readableOrderProductMapper = readableOrderProductMapper;
 		this.customerFacade = customerFacade;
@@ -197,6 +205,19 @@ public class OrderFacadeImpl implements OrderFacade {
 
 			// order service
 			modelOrder = orderService.processOrder(modelOrder, customer, items, orderTotalSummary, paymentModel, store);
+
+			// Reserve inventory
+			log.debug("Update inventory");
+			ProductReservationList productReservation = modelOrder.getOrderProducts()
+				.stream()
+				.map(it -> new ReserveProductEntry(it.getSku(), it.getProductQuantity()))
+				.collect(Collectors.collectingAndThen(Collectors.toSet(), ProductReservationList::new));
+
+			ProductReservationStatus reservationStatus = externalProductReservationService.reserve(store,
+					productReservation);
+			if (!reservationStatus.status()) {
+				throw new ServiceException("error updating inventory with new qty");
+			}
 
 			// update cart
 			cart.setOrderId(modelOrder.getId());
