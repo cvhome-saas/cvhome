@@ -13,3 +13,11 @@ spring:
             client-secret: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
             authorization-grant-type: client_credentials
             scope: internal,store
+  flyway:
+    placeholders:
+      admin_sdk_secret_hash: ${ADMIN_SDK_SECRET_HASH:{bcrypt}$2a$10$KEyYNPGHPotegD5Ui8/yX.WzIv75INVsEzgjkD2GqQdmcBG0qke8i}
+      web_app_secret_hash: ${WEB_APP_SECRET_HASH:{bcrypt}$2a$10$KEyYNPGHPotegD5Ui8/yX.WzIv75INVsEzgjkD2GqQdmcBG0qke8i}
+      store_pod_secret_hash: ${STORE_POD_SECRET_HASH:{bcrypt}$2a$10$KEyYNPGHPotegD5Ui8/yX.WzIv75INVsEzgjkD2GqQdmcBG0qke8i}
+      store_core_secret_hash: ${STORE_CORE_SECRET_HASH:{bcrypt}$2a$10$KEyYNPGHPotegD5Ui8/yX.WzIv75INVsEzgjkD2GqQdmcBG0qke8i}
+      super_admin_password_hash: ${SUPER_ADMIN_PASSWORD_HASH:{bcrypt}$2a$10$pse9zsAXkH/zOjZpfiP7X.weD6CNtVY/NR5A4mYUwbYqcYThHchRa}
+      default_user_password_hash: ${DEFAULT_USER_PASSWORD_HASH:{bcrypt}$2a$10$pse9zsAXkH/zOjZpfiP7X.weD6CNtVY/NR5A4mYUwbYqcYThHchRa}
