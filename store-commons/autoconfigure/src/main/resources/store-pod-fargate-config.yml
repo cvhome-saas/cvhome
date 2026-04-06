@@ -1,0 +1,10 @@
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri-set:
+            - ${com.asrevo.cvhome.services.uaa.schema}://${com.asrevo.cvhome.services.uaa.domain}
+            - ${com.asrevo.cvhome.services.uaa.schema}://${com.asrevo.cvhome.services.uaa.domain}:${com.asrevo.cvhome.services.uaa.port}
+            - ${com.asrevo.cvhome.services.spg.schema}://${com.asrevo.cvhome.services.spg.domain}/cua
+            - ${com.asrevo.cvhome.services.spg.schema}://${com.asrevo.cvhome.services.spg.domain}:${com.asrevo.cvhome.services.spg.port}/cua

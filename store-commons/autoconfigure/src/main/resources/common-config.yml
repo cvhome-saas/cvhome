@@ -137,17 +137,11 @@ spring:
             token-uri: ${com.asrevo.cvhome.services.uaa.schema}://${com.asrevo.cvhome.services.uaa.domain}:${com.asrevo.cvhome.services.uaa.port}/oauth2/token
             end-session-endpoint: ${com.asrevo.cvhome.services.uaa.schema}://${com.asrevo.cvhome.services.uaa.domain}:${com.asrevo.cvhome.services.uaa.port}/connect/logout
             user-name-attribute: sub
-
-      #            need to trace why getting 401 error=invalid_token, auth_method=validate_access_token is by issuer?
-      #            user-info-uri: https://uaa.gateway.com:8443/realms/cvhome/protocol/openid-connect/userinfo
-      #            user-name-attribute: sub
       resourceserver:
         jwt:
-          #          jwk-set-uri: ${com.asrevo.cvhome.services.uaa.schema}://${com.asrevo.cvhome.services.uaa.domain}:${com.asrevo.cvhome.services.uaa.port}/realms/cvhome/protocol/openid-connect/certs
-          #          issuer-uri: ${com.asrevo.cvhome.services.uaa.schema}://${com.asrevo.cvhome.services.uaa.domain}:${com.asrevo.cvhome.services.uaa.port}/realms/cvhome
-          issuer-uri-set: ${com.asrevo.cvhome.services.uaa.schema}://${com.asrevo.cvhome.services.uaa.domain}:${com.asrevo.cvhome.services.uaa.port}
-#          issuer-uri-set:
-#            - ${com.asrevo.cvhome.services.uaa.schema}://${com.asrevo.cvhome.services.uaa.domain}:${com.asrevo.cvhome.services.uaa.port}/realms/cvhome
+          issuer-uri-set:
+            - ${com.asrevo.cvhome.services.uaa.schema}://${com.asrevo.cvhome.services.uaa.domain}
+            - ${com.asrevo.cvhome.services.uaa.schema}://${com.asrevo.cvhome.services.uaa.domain}:${com.asrevo.cvhome.services.uaa.port}
 server:
   forward-headers-strategy: NATIVE
   port: ${com.asrevo.cvhome.services.${spring.application.name}.port}
@@ -174,13 +168,6 @@ management:
     web:
       exposure:
         include: [ '*' ]
-          #logging:
-          #  level:
-          #    org.springframework.boot: debug
-          #    org.springframework.web: debug
-          #    org.springframework.cloud.gateway: debug
-          #    org.springframework.security: debug
-          #    reactor.netty.http: debug
 info:
   app:
     name: ${spring.application.name}
