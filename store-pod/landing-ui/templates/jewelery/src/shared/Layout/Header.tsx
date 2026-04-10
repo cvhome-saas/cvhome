@@ -295,13 +295,14 @@ const MobileNavContent = ({params, cart, setCartOpen}: {
     );
 };
 
-const ListItem = React.forwardRef<HTMLAnchorElement, React.ComponentPropsWithoutRef<"a">>(
-    ({className, title, children, ...props}, ref) => {
+const ListItem = React.forwardRef<HTMLAnchorElement, React.ComponentPropsWithoutRef<typeof Link>>(
+    ({className, title, children, href, ...props}, ref) => {
         return (
             <li>
                 <NavigationMenuLink asChild>
-                    <a
+                    <Link
                         ref={ref}
+                        href={href}
                         className={cn(
                             "block select-none p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
                             className
@@ -314,7 +315,7 @@ const ListItem = React.forwardRef<HTMLAnchorElement, React.ComponentPropsWithout
                                 {children}
                             </p>
                         )}
-                    </a>
+                    </Link>
                 </NavigationMenuLink>
             </li>
         );
