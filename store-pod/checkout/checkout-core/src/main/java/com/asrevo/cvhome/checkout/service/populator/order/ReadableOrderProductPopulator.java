@@ -29,7 +29,6 @@ import org.springframework.stereotype.Component;
  * @author carlsamson
  */
 @Getter
-@Deprecated
 @AllArgsConstructor
 @Component
 public class ReadableOrderProductPopulator

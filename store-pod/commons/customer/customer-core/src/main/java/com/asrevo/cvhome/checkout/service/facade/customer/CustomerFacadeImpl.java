@@ -9,7 +9,6 @@ import com.asrevo.cvhome.customer.model.customer.ReadableCustomer;
 import com.asrevo.cvhome.customer.model.customer.ReadableCustomerList;
 import com.asrevo.cvhome.checkout.entity.customer.Customer;
 import com.asrevo.cvhome.checkout.entity.customer.CustomerCriteria;
-import com.asrevo.cvhome.checkout.entity.customer.CustomerList;
 import com.asrevo.cvhome.checkout.service.populator.customer.CustomerPopulator;
 import com.asrevo.cvhome.checkout.service.populator.customer.ReadableCustomerPopulator;
 import com.asrevo.cvhome.checkout.services.customer.CustomerService;
@@ -113,6 +112,12 @@ public class CustomerFacadeImpl implements CustomerFacade {
 		catch (ConversionException e) {
 			throw new ConversionRuntimeException(e);
 		}
+	}
+
+	@Override
+	public Optional<ReadableCustomer> getCustomerByCuaExternalId(String cuaExternalId) {
+		return customerService.getByCuaExternalId(cuaExternalId)
+			.map(it -> convertCustomerToReadableCustomer(it, it.getStoreMerchantId(), LanguageCode.defaultLanguage()));
 	}
 
 }

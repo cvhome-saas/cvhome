@@ -27,7 +27,12 @@ public interface OrderFacade {
 
 	ReadableOrder getReadableOrder(Long orderId, StoreMerchantId store, LanguageCode language);
 
+	ReadableOrder getReadableOrder(Long orderId, Long customerId, StoreMerchantId store, LanguageCode language);
+
 	List<ReadableOrderStatusHistory> getReadableOrderHistory(Long orderId, StoreMerchantId store,
+			LanguageCode language);
+
+	List<ReadableOrderStatusHistory> getReadableOrderHistory(Long orderId, Long customerId, StoreMerchantId store,
 			LanguageCode language);
 
 	void createOrderStatus(PersistableOrderStatusHistory status, Long id, StoreMerchantId store);
