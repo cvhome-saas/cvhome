@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" th:lang="${#locale.language}" th:dir="${#locale.language == 'ar' ? 'rtl' : 'ltr'}">
 <head>
     <meta charset="UTF-8" />
-    <title>Login</title>
+    <title th:text="#{login.title}">Login</title>
     <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAFklEQVQYV2P8z8DAwMDAwMDAwMAAEYACV6tDkYAAAAAElFTkSuQmCC">
     <style>
         body { font-family: Arial, sans-serif; margin: 2rem; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f4f4f4; }
@@ -24,6 +24,10 @@
         .footer { margin-top: 1.5rem; border-top: 1px solid #eee; padding-top: 1rem; text-align: center; font-size: 0.9rem; }
         .footer a { color: #007bff; text-decoration: none; }
         .footer a:hover { text-decoration: underline; }
+
+        /* RTL Specific Adjustments */
+        [dir="rtl"] .form-group label { text-align: right; }
+        [dir="rtl"] input { text-align: right; }
     </style>
     <link rel="stylesheet" href="../css/login.css">
 </head>
@@ -32,40 +36,41 @@
     <div th:if="${store}" class="store-header">
         <img th:if="${store.logo != null}"
              th:src="${store.logo.path}"
-             th:alt="${store.name + ' logo'}"
+             th:alt="#{login.store.logo.alt(${store.name})}"
              class="store-logo" />
         <h2 class="store-name" th:text="${store.name}">Store Name</h2>
     </div>
 
-    <h2 th:if="${store == null}">Login</h2>
+    <h2 th:if="${store == null}" th:text="#{login.header}">Login</h2>
 
-    <div th:if="${param.error}" class="error">
+    <div th:if="${param.error}" class="error" th:text="#{login.error.invalid}">
         Invalid username or password.
     </div>
 
     <form method="post" th:action="@{/login}">
         <input type="hidden" name="client_id" th:value="${clientId}">
         <div class="form-group">
-            <label for="username">Username</label>
+            <label for="username" th:text="#{login.username}">Username</label>
             <input type="text" id="username" name="username" required autofocus />
         </div>
         <div class="form-group">
-            <label for="password">Password</label>
+            <label for="password" th:text="#{login.password}">Password</label>
             <input type="password" id="password" name="password" required />
         </div>
-        <button type="submit">Sign In</button>
+        <button type="submit" th:text="#{login.button.signin}">Sign In</button>
     </form>
 
     <div th:if="${socialLogins}" class="social-login">
-        <div style="text-align: center; margin-bottom: 0.5rem; color: #666; font-size: 0.8rem;">OR</div>
+        <div style="text-align: center; margin-bottom: 0.5rem; color: #666; font-size: 0.8rem;" th:text="#{login.social.or}">OR</div>
         <a th:each="login : ${socialLogins}"
            th:href="@{/oauth2/authorization/{id}(id=${login.toRegistrationId()})}"
            class="social-button"
-           th:text="'Sign in with ' + ${#strings.capitalize(login.providerId)}"></a>
+           th:text="#{login.social.signinwith(#{'provider.' + ${#strings.toLowerCase(login.providerId)}})}"></a>
     </div>
 
     <div class="footer">
-        Don't have an account? <a th:href="@{/register(client_id=${clientId})}">Sign Up</a>
+        <span th:text="#{login.footer.noaccount}">Don't have an account?</span>
+        <a th:href="@{/register}" th:text="#{login.footer.signup}">Sign Up</a>
     </div>
 </div>
 </body>
