@@ -37,7 +37,7 @@ export function useUser(storeContext: StoreContext) {
   }, [storeContext]);
 
   const login = () => AuthService.login(storeContext);
-  const logout = () => AuthService.logout();
+  const logout = () => AuthService.logout(storeContext);
 
   return {
     user,

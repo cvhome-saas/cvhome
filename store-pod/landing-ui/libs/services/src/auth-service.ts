@@ -11,7 +11,7 @@ export class AuthService {
         const challenge = await generateCodeChallenge(verifier);
 
 
-        const redirectUri = `${window.location.origin}/callback`;
+        const redirectUri = `${window.location.origin}/${context.locale}/callback`;
         const clientId = context.store;
 
         const authUrl = new URL(`${window.location.origin}/cua/oauth2/authorize`);
@@ -54,7 +54,7 @@ export class AuthService {
         }
 
         const baseUrl = storeBaseServiceUrl('cua', context);
-        const redirectUri = `${window.location.origin}/callback`;
+        const redirectUri = `${window.location.origin}/${context.locale}/callback`;
         const clientId = context.store;
 
         const tokenUrl = `${baseUrl}/oauth2/token`;
@@ -88,7 +88,7 @@ export class AuthService {
         return result;
     }
 
-    static async logout(): Promise<void> {
+    static async logout(context:StoreContext): Promise<void> {
         // Retrieve the id_token, if any
         const idToken = sessionStorage.getItem('id_token');
 
@@ -101,8 +101,9 @@ export class AuthService {
             // Build the logout URL for the auth server
             const logoutUrl = new URL(`${window.location.origin}/cua/connect/logout`);
             logoutUrl.searchParams.append('id_token_hint', idToken);
-            const post_redirect_uri = window.location.origin;
+            const post_redirect_uri = window.location.origin+"/"+context.locale
             logoutUrl.searchParams.append('post_logout_redirect_uri', post_redirect_uri);
+            logoutUrl.searchParams.append('lang', context.locale);
 
             // Redirect the browser to perform server‑side logout
             window.location.href = logoutUrl.toString();

@@ -29,7 +29,6 @@ import {CartProductList} from "@/shared/Cart/CartProductList";
 import {isRtl} from "@/services/direction-utils";
 import {useCart} from "@store-front/hooks/use-cart";
 import {useUser} from "@store-front/hooks/use-user";
-import {AuthService} from "@store-front/services/auth-service";
 import {User} from "lucide-react";
 
 export const Header = ({params, headerBox}: {
@@ -276,13 +275,14 @@ const MobileNavContent = ({params, cart, setCartOpen}: {
     );
 }
 
-const ListItem = React.forwardRef<HTMLAnchorElement, React.ComponentPropsWithoutRef<"a">>(
-    ({className, title, children, ...props}, ref) => {
+const ListItem = React.forwardRef<HTMLAnchorElement, React.ComponentPropsWithoutRef<typeof Link>>(
+    ({className, title, children, href, ...props}, ref) => {
         return (
             <li>
                 <NavigationMenuLink asChild>
-                    <a
+                    <Link
                         ref={ref}
+                        href={href}
                         className={cn(
                             "block select-none rounded-xl bg-transparent p-4 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
                             className
@@ -290,10 +290,12 @@ const ListItem = React.forwardRef<HTMLAnchorElement, React.ComponentPropsWithout
                         {...props}
                     >
                         <div className="text-sm font-medium leading-none">{title}</div>
-                        <p className="mt-1 line-clamp-2 text-sm leading-snug text-muted-foreground">
-                            {children}
-                        </p>
-                    </a>
+                        {children && (
+                            <p className="mt-1 line-clamp-2 text-sm leading-snug text-muted-foreground">
+                                {children}
+                            </p>
+                        )}
+                    </Link>
                 </NavigationMenuLink>
             </li>
         );
@@ -437,7 +439,7 @@ export const NavCartDialog = (
                         </>
                     )}
 
-                    <div className="mt-4 flex justify-center text-center text-xs text-muted-foreground">
+                    <div className="mt-4 flex justify-center text-center text-sm text-muted-foreground">
                         <p>
                             {t('OR')}{' '}
                             <SheetClose type="button" className="font-semibold text-foreground hover:underline">

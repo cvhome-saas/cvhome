@@ -43,8 +43,8 @@ public class DynamicRegisteredClientRepository implements RegisteredClientReposi
 			.clientName("Web App")
 			.clientAuthenticationMethod(ClientAuthenticationMethod.NONE)
 			.authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-			.redirectUris(it -> Optional.ofNullable(extractHost()).ifPresent(host -> it.add(host + "/callback")))
-			.postLogoutRedirectUris(it -> Optional.ofNullable(extractHost()).ifPresent(it::add))
+			.redirectUris(it -> Optional.ofNullable(extractHost(true)).ifPresent(host -> it.add(host + "/callback")))
+			.postLogoutRedirectUris(it -> Optional.ofNullable(extractHost(true)).ifPresent(it::add))
 			.scope(OidcScopes.OPENID)
 			.clientSettings(ClientSettings.builder().requireProofKey(true).requireAuthorizationConsent(false).build())
 			.tokenSettings(TokenSettings.builder()
@@ -58,7 +58,7 @@ public class DynamicRegisteredClientRepository implements RegisteredClientReposi
 			.build();
 	}
 
-	private static String extractHost() {
+	private static String extractHost(boolean useLang) {
 		ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
 		if (attributes != null) {
 
@@ -71,6 +71,12 @@ public class DynamicRegisteredClientRepository implements RegisteredClientReposi
 			dynamicUri.append(scheme).append("://").append(serverName);
 			if (("http".equals(scheme) && serverPort != 80) || ("https".equals(scheme) && serverPort != 443)) {
 				dynamicUri.append(":").append(serverPort);
+			}
+			if (useLang) {
+				String lang = request.getParameter("lang");
+				if (Objects.nonNull(lang)) {
+					dynamicUri.append("/").append(lang);
+				}
 			}
 			return dynamicUri.toString();
 		}
