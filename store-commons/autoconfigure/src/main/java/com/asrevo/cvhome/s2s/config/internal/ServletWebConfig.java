@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
@@ -25,6 +26,13 @@ public class ServletWebConfig {
 	static class InternalServletWebConfig implements WebMvcConfigurer {
 
 		private final AccessEvaluator accessEvaluator;
+
+		@Override
+		public void addInterceptors(InterceptorRegistry registry) {
+			var lci = new RequestCacheAwareLocaleInterceptor();
+			lci.setParamName("lang");
+			registry.addInterceptor(lci);
+		}
 
 		@Override
 		public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {

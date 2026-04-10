@@ -21,6 +21,9 @@ export class AuthService {
         authUrl.searchParams.append('scope', 'openid');
         authUrl.searchParams.append('code_challenge', challenge);
         authUrl.searchParams.append('code_challenge_method', 'S256');
+        authUrl.searchParams.append('prompt', 'login');
+        authUrl.searchParams.append('store', context.store);
+        authUrl.searchParams.append('lang', context.locale);
 
         this.setPostLoginRedirect()
         window.location.href = authUrl.toString();
