@@ -93,8 +93,9 @@ export const Header = ({params, headerBox}: {
                     </div>
 
                     {/* Desktop nav links */}
-                    <NavigationMenu className="hidden lg:flex">
-                        <NavigationMenuList className="gap-1">
+                    <div className="flex-1 flex justify-center">
+                        <NavigationMenu className="hidden lg:flex">
+                        <NavigationMenuList className="flex-wrap">
                             <NavigationMenuItem>
                                 <Link href="/" legacyBehavior passHref>
                                     <NavigationMenuLink
@@ -151,6 +152,7 @@ export const Header = ({params, headerBox}: {
                             ))}
                         </NavigationMenuList>
                     </NavigationMenu>
+                    </div>
 
                     {/* Right side: user + cart */}
                     <div className="flex items-center gap-1">
