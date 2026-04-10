@@ -98,7 +98,8 @@ export class AuthService {
             // Build the logout URL for the auth server
             const logoutUrl = new URL(`${window.location.origin}/cua/connect/logout`);
             logoutUrl.searchParams.append('id_token_hint', idToken);
-            logoutUrl.searchParams.append('post_logout_redirect_uri', window.location.origin);
+            const post_redirect_uri = window.location.origin;
+            logoutUrl.searchParams.append('post_logout_redirect_uri', post_redirect_uri);
 
             // Redirect the browser to perform server‑side logout
             window.location.href = logoutUrl.toString();
