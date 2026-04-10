@@ -1,0 +1,30 @@
+/* login.css for jewelery theme */
+body {
+    background-color: oklch(0.98 0.008 80); /* --background: warm ivory */
+    color: oklch(0.16 0.012 60);           /* --foreground: deep charcoal */
+    font-family: 'Jost', 'Helvetica Neue', sans-serif;
+}
+
+.login-container {
+    border: 1px solid oklch(0.86 0.025 75); /* --border */
+    border-radius: 0.25rem;
+}
+
+button {
+    background-color: oklch(0.62 0.10 70) !important; /* --primary: gold */
+    color: oklch(0.99 0.005 80) !important;
+    border-radius: 0.25rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-size: 0.875rem;
+}
+
+button:hover {
+    opacity: 0.88;
+}
+
+input {
+    border-color: oklch(0.88 0.018 75) !important; /* --input */
+    border-radius: 0.25rem;
+    background-color: oklch(0.99 0.005 80);
+}
