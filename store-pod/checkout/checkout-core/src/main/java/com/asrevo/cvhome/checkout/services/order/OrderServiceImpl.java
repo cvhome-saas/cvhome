@@ -11,7 +11,6 @@ import com.asrevo.cvhome.checkout.model.order.OrderCriteria;
 import com.asrevo.cvhome.checkout.model.order.OrderSummaryType;
 import com.asrevo.cvhome.checkout.model.payments.Payment;
 import com.asrevo.cvhome.checkout.repositories.order.OrderRepository;
-import com.asrevo.cvhome.checkout.services.customer.CustomerService;
 import com.asrevo.cvhome.checkout.services.shoppingcart.ShoppingCartService;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.entity.order.orderstatus.OrderStatus;
@@ -29,6 +28,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -39,15 +39,11 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
 
 	private final ShoppingCartService shoppingCartService;
 
-	private final CustomerService customerService;
-
 	private final OrderRepository orderRepository;
 
-	public OrderServiceImpl(OrderRepository orderRepository, ShoppingCartService shoppingCartService,
-			CustomerService customerService) {
+	public OrderServiceImpl(OrderRepository orderRepository, ShoppingCartService shoppingCartService) {
 		super(orderRepository);
 		this.shoppingCartService = shoppingCartService;
-		this.customerService = customerService;
 		this.orderRepository = orderRepository;
 	}
 
@@ -159,7 +155,7 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
 	}
 
 	@Override
-	public OrderList getOrders(final OrderCriteria criteria, StoreMerchantId store) {
+	public Page<Order> getOrders(OrderCriteria criteria, StoreMerchantId store) {
 		return orderRepository.listOrders(store, criteria);
 	}
 
@@ -186,10 +182,6 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
 			statusHistory.setOrder(order);
 			statusHistorySet.add(statusHistory);
 			order.setOrderHistory(statusHistorySet);
-		}
-
-		if (customer.getId() == null || customer.getId() == 0) {
-			customerService.create(customer);
 		}
 
 		order.setCustomerId(customer.getId());

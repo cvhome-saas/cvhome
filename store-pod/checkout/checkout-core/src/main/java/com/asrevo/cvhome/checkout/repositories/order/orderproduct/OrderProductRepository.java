@@ -15,7 +15,7 @@ public interface OrderProductRepository extends JpaRepository<OrderProduct, Long
 			select new com.asrevo.cvhome.commons.domain.StatisticEntry(null ,op.sku ,count(o.id))
 			from OrderProduct op
 			join op.order o
-			where o.store=:storeId
+			where o.storeMerchantId=:storeId
 			and o.datePurchased between :from and :to
 			group by op.sku
 			""")

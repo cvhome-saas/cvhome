@@ -3,12 +3,12 @@ package com.asrevo.cvhome.checkout.services.customer;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.checkout.entity.customer.Customer;
 import com.asrevo.cvhome.checkout.entity.customer.CustomerCriteria;
-import com.asrevo.cvhome.checkout.entity.customer.CustomerList;
 import com.asrevo.cvhome.checkout.repositories.customer.CustomerRepository;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -31,8 +31,8 @@ public class CustomerServiceImpl extends SalesManagerEntityServiceImpl<Long, Cus
 	}
 
 	@Override
-	public CustomerList getListByStore(StoreMerchantId store, CustomerCriteria criteria) {
-		return customerRepository.listByStore(store, criteria);
+	public Page<Customer> getListByStore(StoreMerchantId store, CustomerCriteria criteria) {
+		return customerRepository.findByStoreMerchantId(store, criteria);
 	}
 
 	@Override

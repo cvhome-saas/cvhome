@@ -23,6 +23,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 /**
@@ -86,25 +87,19 @@ public class CustomerFacadeImpl implements CustomerFacade {
 	@Override
 	public ReadableCustomerList getListByStore(StoreMerchantId store, CustomerCriteria criteria,
 			LanguageCode language) {
-		CustomerList customerList = customerService.getListByStore(store, criteria);
-		return convertCustomerListToReadableCustomerList(customerList, store, language);
-	}
+		Page<Customer> listByStore = customerService.getListByStore(store, criteria);
 
-	private ReadableCustomerList convertCustomerListToReadableCustomerList(CustomerList customerList,
-			StoreMerchantId store, LanguageCode language) {
-		List<ReadableCustomer> readableCustomers = customerList.getCustomers()
+		List<ReadableCustomer> readableCustomers = listByStore.getContent()
 			.stream()
 			.map(customer -> convertCustomerToReadableCustomer(customer, store, language))
 			.collect(Collectors.toList());
 
 		ReadableCustomerList readableCustomerList = new ReadableCustomerList();
-		readableCustomerList.setTotalPages(1);
-		readableCustomerList.setPageNumber(0);
+		readableCustomerList.setTotalPages(listByStore.getTotalPages());
+		readableCustomerList.setPageNumber(listByStore.getNumber());
 		readableCustomerList.setContent(readableCustomers);
-		readableCustomerList.setTotalElements(customerList.getTotalCount());
-		readableCustomerList.setSize(customerList.getCustomers().size());
-		readableCustomerList
-			.setTotalPages((int) Math.ceil((double) customerList.getTotalCount() / readableCustomerList.getSize()));
+		readableCustomerList.setTotalElements(listByStore.getTotalElements());
+		readableCustomerList.setSize(listByStore.getSize());
 
 		return readableCustomerList;
 	}
