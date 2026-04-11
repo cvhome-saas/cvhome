@@ -1,20 +1,4 @@
-export interface Customer {
-    emailAddress: string
-    billing: Billing
-}
-
-export interface Billing {
-    address: string
-    city: string
-    company: string
-    firstName: string
-    isAgree: boolean
-    lastName: string
-    phone: string
-    postalCode: string,
-    country: string
-
-}
+import {Customer} from "./customer";
 
 export interface payment {
     paymentType: string

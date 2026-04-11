@@ -1,7 +1,7 @@
 import {storeBaseServiceUrl, StoreContext} from "@store-front/types/store-context";
 import {get, handleResponse} from "./http-utils";
 import {generateCodeChallenge, generateCodeVerifier} from "./pkce-utils";
-import {AuthEventType, User} from "@store-front/types";
+import {AuthEventType, AuthUser} from "@store-front/types";
 
 export class AuthService {
 
@@ -41,10 +41,10 @@ export class AuthService {
     }
 
 
-    static async getMe(context: StoreContext): Promise<User | undefined> {
+    static async getMe(context: StoreContext): Promise<AuthUser | undefined> {
         const url = `${storeBaseServiceUrl('cua', context)}/api/v1/auth/me`;
         const response = await fetch(url, get());
-        return handleResponse<User>(response);
+        return handleResponse<AuthUser>(response);
     }
 
     static async exchangeToken(context: StoreContext, code: string): Promise<any> {

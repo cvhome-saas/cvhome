@@ -139,7 +139,7 @@ export const Header = ({params, headerBox}: {
                         {user ? (
                             <div className="flex items-center gap-2">
                                 <span className="text-sm font-medium text-muted-foreground hidden sm:inline">
-                                    {user?.claims?.username}
+                                    {user?.username}
                                 </span>
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
