@@ -128,7 +128,7 @@ public class Order extends SalesManagerEntity<Long, Order> {
 	@Embedded
 	@AttributeOverrides(@AttributeOverride(name = "storeMerchantId",
 			column = @Column(name = "STORE_MERCHANT_ID", nullable = false, length = 50)))
-	private StoreMerchantId store;
+	private StoreMerchantId storeMerchantId;
 
 	@OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
 	private Set<OrderProduct> orderProducts = new LinkedHashSet<>();

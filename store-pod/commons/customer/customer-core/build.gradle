@@ -5,11 +5,8 @@ plugins {
 
 dependencies {
 	api project(':store-pod:commons:store-commons')
-	api project(':store-pod:merchant:merchant-external-api')
-	api project(':store-pod:catalog:catalog-external-api')
-	api project(':store-pod:checkout:checkout-commons')
-	api project(':store-pod:commons:customer:customer-core')
-	implementation project(':store-pod:commons:reference:reference-core')
+	api project(':store-pod:commons:reference:reference-core')
+	implementation project(':store-pod:commons:customer:customer-commons')
 	implementation libs.commons.beanutils
 	compileOnly libs.spring.data.jpa
 	compileOnly libs.jakarta.validation.api

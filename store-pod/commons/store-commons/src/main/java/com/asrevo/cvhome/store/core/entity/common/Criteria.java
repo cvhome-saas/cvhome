@@ -18,15 +18,7 @@ public class Criteria {
 
 	private LanguageCode language;
 
-	private String user;
-
-	private String storeCode;
-
-	private List<Integer> storeIds;
-
 	private CriteriaOrderBy orderBy = CriteriaOrderBy.DESC;
-
-	private String criteriaOrderByField;
 
 	private String search;
 

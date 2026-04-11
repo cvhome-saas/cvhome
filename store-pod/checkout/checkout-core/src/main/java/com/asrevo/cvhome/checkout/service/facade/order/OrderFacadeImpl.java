@@ -51,6 +51,7 @@ import com.asrevo.cvhome.store.utils.PriceUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.Validate;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -292,15 +293,10 @@ public class OrderFacadeImpl implements OrderFacade {
 	@Override
 	public ReadableOrderList getReadableOrderList(OrderCriteria criteria, StoreMerchantId store) {
 		try {
-			OrderList orderList = orderService.getOrders(criteria, store);
+			Page<Order> ordersList = orderService.getOrders(criteria, store);
 
-			List<Order> orders = orderList.getOrders();
+			List<Order> orders = ordersList.getContent();
 			ReadableOrderList returnList = new ReadableOrderList();
-
-			if (CollectionUtils.isEmpty(orders)) {
-				returnList.setTotalElements(0);
-				return returnList;
-			}
 
 			List<ReadableOrder> readableOrders = new ArrayList<>();
 			for (Order order : orders) {
@@ -310,11 +306,11 @@ public class OrderFacadeImpl implements OrderFacade {
 			}
 			returnList.setContent(readableOrders);
 
-			returnList.setTotalElements(orderList.getTotalCount());
-			returnList.setTotalPages(orderList.getTotalPages());
-			returnList.setSize(orderList.getOrders().size());
-			returnList.setRecordsFiltered(orderList.getOrders().size());
-			returnList.setPageNumber(0);
+			returnList.setTotalElements(ordersList.getTotalElements());
+			returnList.setTotalPages(ordersList.getTotalPages());
+			returnList.setSize(ordersList.getSize());
+			returnList.setRecordsFiltered(ordersList.getSize());
+			returnList.setPageNumber(ordersList.getNumber());
 
 			return returnList;
 
