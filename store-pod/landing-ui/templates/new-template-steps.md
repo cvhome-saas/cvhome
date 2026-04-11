@@ -80,6 +80,8 @@ src/app/[locale]/product/[url]/page.tsx    ← copy, no changes
 src/app/[locale]/category/[url]/page.tsx   ← copy, no changes
 src/app/[locale]/checkout/page.tsx         ← copy, no changes
 src/app/[locale]/content/[url]/page.tsx    ← copy, no changes
+src/app/[locale]/customer/page.tsx         ← copy, no changes
+src/app/[locale]/customer/order/[id]/page.tsx ← copy, no changes
 src/app/[locale]/favicon.ico              ← copy or replace with your own
 ```
 
@@ -95,14 +97,15 @@ These are low-level Radix UI wrappers. Copy from `basis/src/components/ui/`:
 accordion.tsx, alert-dialog.tsx, badge.tsx, breadcrumb.tsx,
 button.tsx, card.tsx, checkbox.tsx, dialog.tsx, dropdown-menu.tsx,
 form.tsx, input.tsx, label.tsx, navigation-menu.tsx, radio-group.tsx,
-scroll-area.tsx, select.tsx, separator.tsx, sheet.tsx, textarea.tsx, tooltip.tsx
+scroll-area.tsx, select.tsx, separator.tsx, sheet.tsx, textarea.tsx, 
+tooltip.tsx, tabs.tsx
 ```
 
 You can regenerate any of these via `npx shadcn add <component>` if you want a different variant.
 
 ---
 
-### Step 7 — Shared Components (THE BRAND NEW DESIGN — 14 files)
+### Step 7 — Shared Components (THE BRAND NEW DESIGN — 17 files)
 
 These are the files you actually design from scratch for your new template. This is NOT a copy-paste job; it should be a **completely brand new design** for this template. They all receive the same props as basis/modern — only the JSX and Tailwind classes differ.
 
@@ -137,6 +140,10 @@ src/shared/
   Checkout/
     CheckoutForm.tsx            ← checkout form (CheckoutForm) + cart summary sidebar (CheckoutCartBox)
 
+  Customer/
+    CustomerDashboard.tsx       ← Tabs for Customer Info, Addresses, and Orders List
+    OrderDetails.tsx            ← Order products, total, status, and history timeline
+
   Common/
     Breadcrumb.tsx              ← page breadcrumb trail
     SectionTitle.tsx            ← section heading component
@@ -152,15 +159,21 @@ Each component receives typed props from the page server components. The hooks u
 | `CartProductList` | `useCart` |
 | `ProductCategoryFilter` | `useProductCategoryFilter` |
 | `CheckoutForm` | `useCheckoutForm` |
-| `CheckoutCartBox` | `useCart` (cart summary sidebar on checkout page) |
+| `CheckoutCartBox` | `useCart` |
 | `ProductDetailedActionBox` | `useProductDetailedAddToCart` |
+| `CustomerDashboard` | `useUser`, `useCustomer` |
+| `OrderDetails` | `useUser`, `useCustomer` |
 | `ProductGrid` / `ProductItem` | Props only (no hooks) |
 | `ProductSwiperGrid` | Props only (Swiper.js) |
 | `CoverFlow` | Props only (Swiper.js) |
 
 ---
 
-### Step 8 — Utilities (1 file, copy as-is)
+### Step 8 — Secured pages
+
+all /customer, /customer/* should be secured access `useUser` and redirect to login if not authenticated.
+
+### Step 9 — Utilities (1 file, copy as-is)
 
 ```
 src/lib/utils.ts    ← cn() classname helper, do not change
@@ -168,7 +181,7 @@ src/lib/utils.ts    ← cn() classname helper, do not change
 
 ---
 
-### Step 9 — Register the Theme Enum
+### Step 10 — Register the Theme Enum
 
 Add your new template name to the `Theme` enum in the shared types package:
 
@@ -177,17 +190,7 @@ Add your new template name to the `Theme` enum in the shared types package:
 ```typescript
 export enum Theme {
     DEFAULT = 'DEFAULT',
-    FASHION = 'FASHION',
-    FURNITURE = 'FURNITURE',
-    SPORTS = 'SPORTS',
-    ELECTRONICS = 'ELECTRONICS',
-    FOOD = 'FOOD',
-    GLASSES = 'GLASSES',
-    COSMETICS = 'COSMETICS',
-    WATCHES = 'WATCHES',
-    BABY = 'BABY',
-    JEWELERY = 'JEWELERY',
-    TOOLS = 'TOOLS',
+    // ...
     HEALTH = 'HEALTH',
     BEAUTY = 'BEAUTY',   // ← add your new theme here
 }
@@ -206,7 +209,7 @@ For example: `BEAUTY` → `templates/beauty/`, `HEALTH` → `templates/health/`.
 
 ---
 
-### Step 10 — Install Dependencies & Run
+### Step 11 — Install Dependencies & Run
 
 ```bash
 # Option A: Run just your template in dev mode
@@ -247,18 +250,17 @@ npm run dev          # starts Express server on port 8110
 — Pages (copy, no changes) —
 [ ] src/app/[locale]/layout.tsx
 [ ] src/app/[locale]/page.tsx
-[ ] src/app/[locale]/favicon.ico (copy or replace)
 [ ] src/app/[locale]/login/page.tsx
-[ ] src/app/[locale]/login/login-client.tsx
 [ ] src/app/[locale]/callback/page.tsx
-[ ] src/app/[locale]/callback/callback-client.tsx
 [ ] src/app/[locale]/product/[url]/page.tsx
 [ ] src/app/[locale]/category/[url]/page.tsx
 [ ] src/app/[locale]/checkout/page.tsx
 [ ] src/app/[locale]/content/[url]/page.tsx
+[ ] src/app/[locale]/customer/page.tsx
+[ ] src/app/[locale]/customer/order/[id]/page.tsx
 
 — UI primitives (copy or regenerate) —
-[ ] src/components/ui/* (20 files)
+[ ] src/components/ui/* (21 files)
 
 — Utilities (copy) —
 [ ] src/lib/utils.ts
@@ -276,7 +278,9 @@ npm run dev          # starts Express server on port 8110
 [ ] src/shared/ProductDetails/ProductDetailsImageGallery.tsx
 [ ] src/shared/Category/ProductCategoryFilter.tsx
 [ ] src/shared/Cart/CartProductList.tsx
-[ ] src/shared/Checkout/CheckoutForm.tsx (includes CheckoutCartBox)
+[ ] src/shared/Checkout/CheckoutForm.tsx
+[ ] src/shared/Customer/CustomerDashboard.tsx
+[ ] src/shared/Customer/OrderDetails.tsx
 [ ] src/shared/Common/Breadcrumb.tsx
 [ ] src/shared/Common/SectionTitle.tsx
 
@@ -286,8 +290,6 @@ npm run dev          # starts Express server on port 8110
 — Shared locales (add new keys if needed) —
 [ ] landing-ui/locales/en.json (+ ar, es, fr, ru) → add any new literal text
 ```
-
-**Total: ~58 files — ~38 copied unchanged, ~15 designed from scratch, ~5 lightly customized.**
 
 ---
 
@@ -309,6 +311,7 @@ import { getDirection } from '@store-front/services/direction-utils'
 // Hooks (used in client components only — 'use client')
 import { useCart } from '@store-front/hooks/use-cart'
 import { useUser } from '@store-front/hooks/use-user'
+import { useCustomer } from '@store-front/hooks/use-customer'
 import { useCheckoutForm } from '@store-front/hooks/use-checkout-form'
 import { useProductCategoryFilter } from '@store-front/hooks/use-product-category-filter'
 import { useProductDetailedAddToCart } from '@store-front/hooks/use-product-detailed-add-to-cart'
@@ -362,26 +365,17 @@ When designing the 14 shared components for your new template, follow these rule
 
 ---
 
-## Verification
+## Customer Pages Flow (Logged In Only)
 
-### Build
-1. Run `npm run build` from `landing-ui/` root — should complete with **no TypeScript errors**
-2. Confirm your new `Theme` enum value appears in `libs/types/src/store.ts`
+The new customer pages should be protected by checking the user's session.
 
-### Functionality
-3. Run `npm run dev` — homepage should load with real data
-4. Navigate to `/en/product/[any-slug]` — product page should display
-5. Navigate to `/en/category/[any-slug]` — category filter should work
-6. Add to cart — cart sheet/sidebar should update
-7. Go to `/en/checkout` — form should validate and submit
-8. Test login/logout flow — click login → redirect → callback → logged in state
+### 1. Customer Dashboard (`/customer`)
+- Utilize `tabs.tsx` to separate content.
+- **Tab 1: Profile Info** — Display `firstName`, `lastName`, `phone`, `email`, `username` from `getCustomerInfo`.
+- **Tab 2: Addresses** — Display `billing` and `delivery` address details.
+- **Tab 3: Orders** — List all orders using `listOrders` with pagination.
 
-### Responsiveness & i18n
-9. Test Arabic locale (`/ar/`) — layout should flip to RTL
-10. Verify all 5 locales load: `/en/`, `/ar/`, `/es/`, `/fr/`, `/ru/`
-11. Test mobile viewport — header hamburger menu, responsive product grid
-
-### Edge Cases
-12. Verify a product with no image shows `placeholder.png`
-13. Verify "Out of Stock" products show disabled add-to-cart button
-14. Verify long product names don't break card layout
+### 2. Order Details (`/customer/order/[id]`)
+- Display full details of a specific order using `getOrder`.
+- Include product list, totals, and current status.
+- **Order History** — Show the timeline of events (ORDERED, PROCESSED, etc.) using `getOrderHistory`.
