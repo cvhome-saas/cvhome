@@ -72,6 +72,41 @@
       "FILTER_BY_MANUFACTURER": "Filter by Manufacturer",
       "ALL": "All",
       "NO_PRODUCTS_FOUND": "No products found."
+    },
+    "CUSTOMER": {
+      "TITLE": "My Account",
+      "HOME_TITLE": "My Account",
+      "PROFILE": "Profile",
+      "ADDRESSES": "Addresses",
+      "ORDERS": "Orders",
+      "ORDER_ID": "Order ID",
+      "DATE": "Date",
+      "TOTAL": "Total",
+      "STATUS": "Status",
+      "ACTIONS": "Actions",
+      "VIEW_ORDER": "View Details",
+      "ORDER_DETAILS": "Order Details",
+      "BILLING_ADDRESS": "Billing Address",
+      "SHIPPING_ADDRESS": "Shipping Address",
+      "ORDER_ITEMS": "Order Items",
+      "ORDER_HISTORY": "Order History",
+      "NO_ORDERS": "You haven't placed any orders yet.",
+      "PERSONAL_INFO": "Personal Information",
+      "FIRST_NAME": "First Name",
+      "LAST_NAME": "Last Name",
+      "EMAIL": "Email",
+      "PHONE": "Phone",
+      "USERNAME": "Username",
+      "LOADING": "Loading...",
+      "PRODUCT": "Product",
+      "QTY": "Qty",
+      "PRICE": "Price",
+      "SUB_TOTAL": "Subtotal",
+      "ORDERED": "Ordered",
+      "PROCESSED": "Processed",
+      "DELIVERED": "Delivered",
+      "REFUNDED": "Refunded",
+      "CANCELED": "Canceled"
     }
   },
   "COMPONENTS": {
@@ -100,7 +135,8 @@
         "ES": "Spanish"
       },
       "LOGIN": "Login",
-      "LOGOUT": "Logout"
+      "LOGOUT": "Logout",
+      "PROFILE": "Profile"
     },
     "FOOTER": {
       "SOCIAL_FACEBOOK": "Facebook",

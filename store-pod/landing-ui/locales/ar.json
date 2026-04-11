@@ -72,6 +72,41 @@
       "FILTER_BY_MANUFACTURER": "تصفية حسب الشركة المصنعة",
       "ALL": "الكل",
       "NO_PRODUCTS_FOUND": "لم يتم العثور على منتجات."
+    },
+    "CUSTOMER": {
+      "TITLE": "حسابي",
+      "HOME_TITLE": "حسابي",
+      "PROFILE": "الملف الشخصي",
+      "ADDRESSES": "العناوين",
+      "ORDERS": "الطلبات",
+      "ORDER_ID": "رقم الطلب",
+      "DATE": "التاريخ",
+      "TOTAL": "الإجمالي",
+      "STATUS": "الحالة",
+      "ACTIONS": "إجراءات",
+      "VIEW_ORDER": "عرض التفاصيل",
+      "ORDER_DETAILS": "تفاصيل الطلب",
+      "BILLING_ADDRESS": "عنوان الفواتير",
+      "SHIPPING_ADDRESS": "عنوان الشحن",
+      "ORDER_ITEMS": "منتجات الطلب",
+      "ORDER_HISTORY": "سجل الطلب",
+      "NO_ORDERS": "لم تقم بإجراء أي طلبات بعد.",
+      "PERSONAL_INFO": "المعلومات الشخصية",
+      "FIRST_NAME": "الاسم الأول",
+      "LAST_NAME": "الاسم الأخير",
+      "EMAIL": "البريد الإلكتروني",
+      "PHONE": "الهاتف",
+      "USERNAME": "اسم المستخدم",
+      "LOADING": "تحميل...",
+      "PRODUCT": "المنتج",
+      "QTY": "الكمية",
+      "PRICE": "السعر",
+      "SUB_TOTAL": "المجموع الفرعي",
+      "ORDERED": "تم الطلب",
+      "PROCESSED": "قيد المعالجة",
+      "DELIVERED": "تم التوصيل",
+      "REFUNDED": "تم الاسترجاع",
+      "CANCELED": "ملغى"
     }
   },
   "COMPONENTS": {
@@ -100,7 +135,8 @@
         "ES": "الإسبانية"
       },
       "LOGIN": "تسجيل الدخول",
-      "LOGOUT": "تسجيل الخروج"
+      "LOGOUT": "تسجيل الخروج",
+      "PROFILE": "الملف الشخصي"
     },
     "FOOTER": {
       "SOCIAL_FACEBOOK": "فيسبوك",
