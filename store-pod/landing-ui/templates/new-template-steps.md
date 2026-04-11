@@ -98,7 +98,7 @@ accordion.tsx, alert-dialog.tsx, badge.tsx, breadcrumb.tsx,
 button.tsx, card.tsx, checkbox.tsx, dialog.tsx, dropdown-menu.tsx,
 form.tsx, input.tsx, label.tsx, navigation-menu.tsx, radio-group.tsx,
 scroll-area.tsx, select.tsx, separator.tsx, sheet.tsx, textarea.tsx, 
-tooltip.tsx, tabs.tsx
+tooltip.tsx, tabs.tsx, table.tsx
 ```
 
 You can regenerate any of these via `npx shadcn add <component>` if you want a different variant.
@@ -260,7 +260,7 @@ npm run dev          # starts Express server on port 8110
 [ ] src/app/[locale]/customer/order/[id]/page.tsx
 
 — UI primitives (copy or regenerate) —
-[ ] src/components/ui/* (21 files)
+[ ] src/components/ui/* (22 files)
 
 — Utilities (copy) —
 [ ] src/lib/utils.ts
@@ -363,19 +363,3 @@ When designing the 14 shared components for your new template, follow these rule
 - Add `aria-label` to icon-only buttons (e.g., cart icon, close button).
 - Ensure color contrast meets WCAG AA standards.
 
----
-
-## Customer Pages Flow (Logged In Only)
-
-The new customer pages should be protected by checking the user's session.
-
-### 1. Customer Dashboard (`/customer`)
-- Utilize `tabs.tsx` to separate content.
-- **Tab 1: Profile Info** — Display `firstName`, `lastName`, `phone`, `email`, `username` from `getCustomerInfo`.
-- **Tab 2: Addresses** — Display `billing` and `delivery` address details.
-- **Tab 3: Orders** — List all orders using `listOrders` with pagination.
-
-### 2. Order Details (`/customer/order/[id]`)
-- Display full details of a specific order using `getOrder`.
-- Include product list, totals, and current status.
-- **Order History** — Show the timeline of events (ORDERED, PROCESSED, etc.) using `getOrderHistory`.
