@@ -101,9 +101,9 @@ export const useCheckoutForm = (storeContext: StoreContext, requireLoginForOrder
     // Pre-populate form when user data is available
     useEffect(() => {
         if (user) {
-            setValue("customer.emailAddress", user.claims.email || "");
-            setValue("customer.billing.firstName", user.claims.firstName || "");
-            setValue("customer.billing.lastName", user.claims.lastName || "");
+            setValue("customer.emailAddress", user.email || "");
+            setValue("customer.billing.firstName", user.firstName || "");
+            setValue("customer.billing.lastName", user.lastName || "");
         }
     }, [user, setValue]);
 
