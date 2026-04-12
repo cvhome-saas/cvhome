@@ -6,8 +6,6 @@ import com.asrevo.cvhome.checkout.model.order.v0.ReadableOrder;
 import com.asrevo.cvhome.checkout.model.order.v0.ReadableOrderList;
 import com.asrevo.cvhome.checkout.service.facade.customer.CustomerFacade;
 import com.asrevo.cvhome.checkout.service.facade.order.OrderFacade;
-import com.asrevo.cvhome.commons.annotation.ConditionalOnApiStatus;
-import com.asrevo.cvhome.commons.annotation.SecuredResource;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
 import com.asrevo.cvhome.store.core.constants.Constants;
@@ -20,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,11 +38,9 @@ public class CustomerOrderApi {
 	private final CustomerFacade customerFacade;
 
 	@RequestMapping(value = { "/private/customer/orders" }, method = RequestMethod.GET)
-	@ResponseStatus(HttpStatus.OK)
-	@ResponseBody
-	@ConditionalOnApiStatus
-	public ReadableOrderList list(@SecuredResource StoreMerchantId merchantStore, LanguageCode language,
-			Pageable pageable, JwtAuthenticationToken auth) {
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CUSTOMER.*')")
+	public ReadableOrderList list(StoreMerchantId merchantStore, LanguageCode language, Pageable pageable,
+			JwtAuthenticationToken auth) {
 
 		OrderCriteria orderCriteria = new OrderCriteria();
 		orderCriteria.setPageable(pageable);
@@ -58,15 +55,14 @@ public class CustomerOrderApi {
 
 	@RequestMapping(value = { "/private/customer/{id}/order" }, method = RequestMethod.GET)
 	@ResponseStatus(HttpStatus.OK)
-	@ResponseBody
 	@Parameters({
 			@Parameter(name = "store",
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	@ConditionalOnApiStatus
-	public ReadableOrder get(@PathVariable final Long id, @SecuredResource StoreMerchantId merchantStore,
-			LanguageCode language, JwtAuthenticationToken auth) {
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CUSTOMER.*')")
+	public ReadableOrder get(@PathVariable final Long id, StoreMerchantId merchantStore, LanguageCode language,
+			JwtAuthenticationToken auth) {
 		String cuaExternalId = (String) auth.getTokenAttributes().get("sub");
 		return customerFacade.getCustomerByCuaExternalId(cuaExternalId)
 			.map(it -> orderFacade.getReadableOrder(id, it.getId(), merchantStore, language))
@@ -75,15 +71,14 @@ public class CustomerOrderApi {
 
 	@RequestMapping(value = { "/private/customer/{id}/order/history" }, method = RequestMethod.GET)
 	@ResponseStatus(HttpStatus.OK)
-	@ResponseBody
 	@Parameters({
 			@Parameter(name = "store",
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	@ConditionalOnApiStatus
-	public List<ReadableOrderStatusHistory> history(@PathVariable final Long id,
-			@SecuredResource StoreMerchantId merchantStore, LanguageCode language, JwtAuthenticationToken auth) {
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CUSTOMER.*')")
+	public List<ReadableOrderStatusHistory> history(@PathVariable final Long id, StoreMerchantId merchantStore,
+			LanguageCode language, JwtAuthenticationToken auth) {
 
 		String cuaExternalId = (String) auth.getTokenAttributes().get("sub");
 		return customerFacade.getCustomerByCuaExternalId(cuaExternalId)

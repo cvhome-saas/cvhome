@@ -47,7 +47,7 @@ export const OrderDetails = ({ storeContext, orderId }: { storeContext: StoreCon
     return (
         <div className={cn("max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8 bg-background", isRtlLayout ? "text-right" : "text-left")}>
             <Breadcrumb breadcrumbs={breadcrumbs} />
-            
+
             <div className="flex items-center justify-between mb-8 mt-6">
                 <h1 className="text-3xl font-bold text-foreground">{t('ORDER_DETAILS')}</h1>
                 <Badge variant="outline" className="text-lg px-4 py-1">{t(order?.orderStatus??'UNKNOWN')}</Badge>

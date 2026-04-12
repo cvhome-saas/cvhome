@@ -19,7 +19,7 @@ import {Button} from "@/components/ui/button";
 import {Sheet, SheetClose, SheetContent, SheetHeader, SheetTitle, SheetTrigger} from "@/components/ui/sheet";
 import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from "@/components/ui/accordion";
 import {cn} from "@/lib/utils";
-import {Globe, Menu, ShoppingBag, X} from "lucide-react";
+import {Globe, Menu, ShoppingBag, X, User} from "lucide-react";
 import {Box} from "@/types/content";
 import {Store} from "@/types/store";
 import {parseDescription} from "@/services/description-view-util";
@@ -29,7 +29,6 @@ import {CartProductList} from "@/shared/Cart/CartProductList";
 import {isRtl} from "@/services/direction-utils";
 import {useCart} from "@store-front/hooks/use-cart";
 import {useUser} from "@store-front/hooks/use-user";
-import {User} from "lucide-react";
 
 export const Header = ({params, headerBox}: {
     params: LayoutParams,
@@ -139,6 +138,11 @@ export const Header = ({params, headerBox}: {
                                         </Button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end">
+                                        <DropdownMenuItem asChild>
+                                            <Link href="/customer" className="cursor-pointer text-xs uppercase tracking-[0.12em]">
+                                                {t('PROFILE')}
+                                            </Link>
+                                        </DropdownMenuItem>
                                         <DropdownMenuItem onClick={logout} className="cursor-pointer text-destructive focus:text-destructive text-xs uppercase tracking-[0.12em]">
                                             {t('LOGOUT')}
                                         </DropdownMenuItem>
@@ -197,6 +201,7 @@ const MobileNavContent = ({params, cart, setCartOpen}: {
     setCartOpen: (open: boolean) => void
 }) => {
     const t = useTranslations('COMPONENTS.HEADER');
+    const { user, login, logout } = useUser(params.storeContext);
     return (
         <div className="mt-6 flow-root">
             <div className="-my-6 divide-y divide-border">
@@ -256,7 +261,21 @@ const MobileNavContent = ({params, cart, setCartOpen}: {
                     ))}
                 </div>
 
-                <div className="py-6">
+                <div className="py-6 space-y-4">
+                    {user ? (
+                        <>
+                            <div className="px-3 flex items-center justify-between">
+                                <span className="text-sm font-semibold tracking-[0.12em] uppercase">{user.username}</span>
+                                <Button variant="ghost" size="sm" onClick={logout} className="text-xs tracking-[0.12em] uppercase">{t('LOGOUT')}</Button>
+                            </div>
+                            <Link href="/customer"
+                                  className="-mx-3 block rounded-xl px-3 py-3 text-sm font-semibold tracking-[0.12em] uppercase text-foreground hover:bg-accent">
+                                {t('PROFILE')}
+                            </Link>
+                        </>
+                    ) : (
+                        <Button variant="outline" className="w-full rounded-xl tracking-[0.12em] uppercase text-xs" onClick={login}>{t('LOGIN')}</Button>
+                    )}
                     <LanguageSelector store={params.store} locale={params.locale} className="w-full"/>
                 </div>
                 <div className="py-6">
