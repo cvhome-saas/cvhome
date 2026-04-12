@@ -15,7 +15,6 @@ import com.asrevo.cvhome.catalog.service.facade.product.ProductVariationFacade;
 import com.asrevo.cvhome.catalog.service.populator.catalog.ReadableFinalPricePopulator;
 import com.asrevo.cvhome.catalog.services.pricing.PricingService;
 import com.asrevo.cvhome.catalog.services.product.ProductService;
-import com.asrevo.cvhome.commons.annotation.SecuredResource;
 import com.asrevo.cvhome.commons.domain.Entity;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.constants.Constants;
@@ -39,7 +38,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -51,7 +50,7 @@ import org.springframework.web.bind.annotation.*;
  *
  * @author Carl Samson
  */
-@Controller
+@RestController
 @RequestMapping("/api/v2")
 @Tags(value = @Tag(name = "Product variation resource (Product variant Api)"))
 @Slf4j
@@ -81,7 +80,7 @@ public class ProductVariationApi {
 	@Operation(method = "POST", description = "Get product price variation based on selected product",
 			responses = @ApiResponse(content = @Content(mediaType = "application/json",
 					schema = @Schema(implementation = ReadableProductPrice.class))))
-	@ResponseBody
+
 	@Parameters({
 			@Parameter(name = "store",
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
@@ -117,7 +116,7 @@ public class ProductVariationApi {
 	@Operation(method = "GET", description = "Get all variation for all items in a given category",
 			responses = @ApiResponse(
 					content = @Content(mediaType = "application/json", schema = @Schema(implementation = List.class))))
-	@ResponseBody
+
 	@Parameters({
 			@Parameter(name = "store",
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
@@ -139,8 +138,9 @@ public class ProductVariationApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	public @ResponseBody Entity create(@Valid @RequestBody PersistableProductVariation variation,
-			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
+	public Entity create(@Valid @RequestBody PersistableProductVariation variation, StoreMerchantId merchantStore,
+			LanguageCode language) {
 
 		Long variantId = productVariationFacade.create(variation, merchantStore, language);
 		return new Entity(variantId);
@@ -155,8 +155,9 @@ public class ProductVariationApi {
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	@Operation(method = "GET", description = "Check if option set code already exists",
 			responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = EntityExists.class))) })
-	public ResponseEntity<EntityExists> exists(@RequestParam(value = "code") String code,
-			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
+	public ResponseEntity<EntityExists> exists(@RequestParam(value = "code") String code, StoreMerchantId merchantStore,
+			LanguageCode language) {
 
 		boolean isOptionExist = productVariationFacade.exists(code, merchantStore);
 		return new ResponseEntity<>(new EntityExists(isOptionExist), HttpStatus.OK);
@@ -169,8 +170,9 @@ public class ProductVariationApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	@ResponseBody
-	public ReadableProductVariation get(@PathVariable Long variationId, @SecuredResource StoreMerchantId merchantStore,
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
+
+	public ReadableProductVariation get(@PathVariable Long variationId, StoreMerchantId merchantStore,
 			LanguageCode language) {
 
 		return productVariationFacade.get(variationId, merchantStore, language);
@@ -183,8 +185,9 @@ public class ProductVariationApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
 	public void update(@Valid @RequestBody PersistableProductVariation variation, @PathVariable Long variationId,
-			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
+			StoreMerchantId merchantStore, LanguageCode language) {
 
 		variation.setId(variationId);
 		productVariationFacade.update(variationId, variation, merchantStore, language);
@@ -197,8 +200,8 @@ public class ProductVariationApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	public void delete(@PathVariable Long variationId, @SecuredResource StoreMerchantId merchantStore,
-			LanguageCode language) {
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
+	public void delete(@PathVariable Long variationId, StoreMerchantId merchantStore, LanguageCode language) {
 
 		productVariationFacade.delete(variationId, merchantStore);
 	}
@@ -210,8 +213,9 @@ public class ProductVariationApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	public @ResponseBody ReadableEntityList<ReadableProductVariation> list(
-			@SecuredResource StoreMerchantId merchantStore, LanguageCode language, Pageable pageable) {
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
+	public ReadableEntityList<ReadableProductVariation> list(StoreMerchantId merchantStore, LanguageCode language,
+			Pageable pageable) {
 
 		return productVariationFacade.list(merchantStore, language, pageable);
 	}

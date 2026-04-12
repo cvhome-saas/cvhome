@@ -1,6 +1,5 @@
 package com.asrevo.cvhome.controlplane.manager.controller.statistic;
 
-import com.asrevo.cvhome.commons.annotation.ConditionalOnApiStatus;
 import com.asrevo.cvhome.commons.domain.StatisticEntry;
 import com.asrevo.cvhome.commons.domain.StatisticList;
 import com.asrevo.cvhome.commons.domain.StatisticRange;
@@ -24,7 +23,7 @@ public class SubscriptionStatisticApi {
 	@RequestMapping(value = { "/private/subscription-statistic" }, method = RequestMethod.POST)
 	@ResponseStatus(HttpStatus.OK)
 	@ResponseBody
-	@ConditionalOnApiStatus
+
 	public StatisticList subscriptionStatistic(@RequestBody StatisticRange range) {
 		List<StatisticEntry> entries = managerOrgRepository.subscriptionStatistic(range.fromDate().toInstant(),
 				range.toDate().toInstant());

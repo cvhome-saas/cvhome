@@ -2,9 +2,7 @@ package com.asrevo.cvhome.s2s.config.internal;
 
 import java.util.List;
 
-import com.asrevo.cvhome.s2s.services.AccessEvaluator;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Configuration;
@@ -18,14 +16,11 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 @ConditionalOnClass(WebMvcConfigurer.class)
 @Import(ServletWebConfig.InternalServletWebConfig.class)
-@ConditionalOnBean(AccessEvaluator.class)
 public class ServletWebConfig {
 
 	@Configuration
 	@RequiredArgsConstructor
 	static class InternalServletWebConfig implements WebMvcConfigurer {
-
-		private final AccessEvaluator accessEvaluator;
 
 		@Override
 		public void addInterceptors(InterceptorRegistry registry) {
@@ -41,7 +36,7 @@ public class ServletWebConfig {
 			e.setSizeParameterName("count");
 			argumentResolvers.add(e);
 			argumentResolvers.add(new ServletOrgStorePrincipalInfoArgumentResolver());
-			argumentResolvers.add(new ServletStoreMerchantIdArgumentResolver(accessEvaluator));
+			argumentResolvers.add(new ServletStoreMerchantIdArgumentResolver());
 			argumentResolvers.add(new ServletLanguageCodeArgumentResolver());
 		}
 

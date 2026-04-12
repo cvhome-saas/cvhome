@@ -2,8 +2,6 @@ package com.asrevo.cvhome.checkout.api.order.v1.customer;
 
 import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1_STR;
 
-import com.asrevo.cvhome.commons.annotation.ConditionalOnApiStatus;
-import com.asrevo.cvhome.commons.annotation.SecuredResource;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.customer.model.customer.ReadableCustomerList;
 import com.asrevo.cvhome.checkout.entity.customer.CustomerCriteria;
@@ -16,6 +14,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -37,9 +36,9 @@ public class CustomerApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	@ConditionalOnApiStatus
-	public ReadableCustomerList list(@SecuredResource StoreMerchantId merchantStore, LanguageCode language,
-			Pageable pageable) {
+
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CHECKOUT.*')")
+	public ReadableCustomerList list(StoreMerchantId merchantStore, LanguageCode language, Pageable pageable) {
 		CustomerCriteria customerCriteria = createCustomerCriteria(pageable);
 		return customerFacade.getListByStore(merchantStore, customerCriteria, LanguageCode.nonLanguage());
 	}

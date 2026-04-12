@@ -8,7 +8,7 @@ import com.asrevo.cvhome.catalog.model.manufacturer.ReadableManufacturer;
 import com.asrevo.cvhome.catalog.model.manufacturer.ReadableManufacturerList;
 import com.asrevo.cvhome.catalog.service.facade.manufacturer.ManufacturerFacade;
 import com.asrevo.cvhome.catalog.services.product.manufacturer.ManufacturerService;
-import com.asrevo.cvhome.commons.annotation.SecuredResource;
+
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.model.entity.EntityExists;
@@ -29,6 +29,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,7 +38,7 @@ import org.springframework.web.bind.annotation.*;
  *
  * @author c.samson
  */
-@Controller
+@RestController
 @RequestMapping("/api/v1")
 @Tag(name = "Manufacturer / Brand management resource (Manufacturer / Brand Management Api)")
 @Slf4j
@@ -57,14 +58,15 @@ public class ProductManufacturerApi {
 	 */
 	@RequestMapping(value = "/private/manufacturer", method = RequestMethod.POST)
 	@ResponseStatus(HttpStatus.CREATED)
-	@ResponseBody
+
 	@Parameters({
 			@Parameter(name = "store",
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
 	public PersistableManufacturer create(@Valid @RequestBody PersistableManufacturer manufacturer,
-			@SecuredResource StoreMerchantId merchantStore, LanguageCode language, HttpServletResponse response) {
+			StoreMerchantId merchantStore, LanguageCode language, HttpServletResponse response) {
 
 		try {
 			manufacturerFacade.saveOrUpdateManufacturer(manufacturer, merchantStore, language);
@@ -86,7 +88,7 @@ public class ProductManufacturerApi {
 
 	@RequestMapping(value = "/manufacturer/{id}", method = RequestMethod.GET)
 	@ResponseStatus(HttpStatus.OK)
-	@ResponseBody
+
 	@Parameters({
 			@Parameter(name = "store",
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
@@ -119,14 +121,15 @@ public class ProductManufacturerApi {
 
 	@RequestMapping(value = "/private/manufacturer/{id}", method = RequestMethod.GET)
 	@ResponseStatus(HttpStatus.OK)
-	@ResponseBody
+
 	@Parameters({
 			@Parameter(name = "store",
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	public ReadableManufacturer getBrand(@PathVariable Long id, @SecuredResource StoreMerchantId merchantStore,
-			LanguageCode language, HttpServletResponse response) {
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
+	public ReadableManufacturer getBrand(@PathVariable Long id, StoreMerchantId merchantStore, LanguageCode language,
+			HttpServletResponse response) {
 
 		try {
 			ReadableManufacturer manufacturer = manufacturerFacade.getManufacturer(id, merchantStore,
@@ -153,7 +156,7 @@ public class ProductManufacturerApi {
 
 	@RequestMapping(value = "/private/manufacturers", method = RequestMethod.GET)
 	@ResponseStatus(HttpStatus.OK)
-	@ResponseBody
+
 	@Parameters({
 			@Parameter(name = "store",
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
@@ -163,7 +166,8 @@ public class ProductManufacturerApi {
 			summary = "This request supports paging or not. Paging supports page number and request" + " count",
 			responses = @ApiResponse(
 					content = @Content(schema = @Schema(implementation = ReadableManufacturerList.class))))
-	public ReadableManufacturerList listByStore(@SecuredResource StoreMerchantId merchantStore, LanguageCode language,
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
+	public ReadableManufacturerList listByStore(StoreMerchantId merchantStore, LanguageCode language,
 			@RequestParam(value = "name", required = false) String name, Pageable pageable) {
 
 		ListCriteria listCriteria = new ListCriteria();
@@ -173,7 +177,7 @@ public class ProductManufacturerApi {
 
 	@RequestMapping(value = "/manufacturers", method = RequestMethod.GET)
 	@ResponseStatus(HttpStatus.OK)
-	@ResponseBody
+
 	@Parameters({
 			@Parameter(name = "store",
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
@@ -200,8 +204,9 @@ public class ProductManufacturerApi {
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	@Operation(method = "GET", description = "Check if manufacturer code already exists",
 			responses = @ApiResponse(content = @Content(schema = @Schema(implementation = EntityExists.class))))
-	public ResponseEntity<EntityExists> exists(@RequestParam(value = "code") String code,
-			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
+	public ResponseEntity<EntityExists> exists(@RequestParam(value = "code") String code, StoreMerchantId merchantStore,
+			LanguageCode language) {
 
 		boolean exists = manufacturerFacade.manufacturerExist(merchantStore, code);
 		return new ResponseEntity<>(new EntityExists(exists), HttpStatus.OK);
@@ -209,14 +214,15 @@ public class ProductManufacturerApi {
 
 	@RequestMapping(value = "/private/manufacturer/{id}", method = RequestMethod.PUT)
 	@ResponseStatus(HttpStatus.OK)
-	@ResponseBody
+
 	@Parameters({
 			@Parameter(name = "store",
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
 	public void update(@PathVariable Long id, @Valid @RequestBody PersistableManufacturer manufacturer,
-			@SecuredResource StoreMerchantId merchantStore, LanguageCode language, HttpServletResponse response) {
+			StoreMerchantId merchantStore, LanguageCode language, HttpServletResponse response) {
 
 		try {
 			manufacturer.setId(id);
@@ -234,13 +240,13 @@ public class ProductManufacturerApi {
 
 	@RequestMapping(value = "/private/manufacturer/{id}", method = RequestMethod.DELETE)
 	@ResponseStatus(HttpStatus.OK)
-	@ResponseBody
 	@Parameters({
 			@Parameter(name = "store",
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	public void delete(@PathVariable Long id, @SecuredResource StoreMerchantId merchantStore, LanguageCode language,
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
+	public void delete(@PathVariable Long id, StoreMerchantId merchantStore, LanguageCode language,
 			HttpServletResponse response) {
 
 		try {
@@ -268,7 +274,7 @@ public class ProductManufacturerApi {
 	@ResponseStatus(HttpStatus.OK)
 	@Operation(method = "GET", description = "Get all manufacturers for all items in a given category",
 			responses = @ApiResponse(content = @Content(schema = @Schema(implementation = List.class))))
-	@ResponseBody
+
 	@Parameters({
 			@Parameter(name = "store",
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),

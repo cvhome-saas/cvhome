@@ -12,7 +12,7 @@ spring:
             client-id: store-core@service.store-core.internal
             client-secret: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
             authorization-grant-type: client_credentials
-            scope: internal,store
+            scope: store_core
 com:
   asrevo:
     cvhome:

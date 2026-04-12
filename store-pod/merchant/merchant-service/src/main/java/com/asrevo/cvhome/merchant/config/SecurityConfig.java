@@ -1,17 +1,8 @@
 package com.asrevo.cvhome.merchant.config;
 
-import com.asrevo.cvhome.commons.domain.ManagerOrgId;
-import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.merchant.entity.merchant.MerchantStore;
-import com.asrevo.cvhome.merchant.service.facade.merchant.StoreFacade;
 import com.asrevo.cvhome.s2s.jwt.UaaJwtGrantedAuthoritiesConverter;
-import com.asrevo.cvhome.s2s.model.PodInfoProperties;
-import com.asrevo.cvhome.s2s.services.AccessEvaluator;
-import com.asrevo.cvhome.s2s.services.AccessEvaluatorImpl;
-import com.asrevo.cvhome.s2s.services.StoreSecurityServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -38,14 +29,6 @@ public class SecurityConfig {
 		return jwtAuthenticationConverter;
 	}
 
-	@Bean
-	@Lazy
-	public AccessEvaluator accessEvaluator(StoreFacade storeFacade, PodInfoProperties podInfoProperties) {
-		return new AccessEvaluatorImpl(new StoreSecurityServiceImpl(podInfoProperties, (it) -> {
-			MerchantStore merchantStore = storeFacade.get(new StoreMerchantId(it.getId().toString()));
-			return new ManagerOrgId(merchantStore.getOrg());
-		}));
-	}
 	/*
 	 * @Bean public CorsConfigurationSource corsConfigurationSource() { final
 	 * CorsConfiguration configuration = new CorsConfiguration();

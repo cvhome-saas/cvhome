@@ -2,8 +2,6 @@ package com.asrevo.cvhome.checkout.api.order.v1.order;
 
 import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1_STR;
 
-import com.asrevo.cvhome.commons.annotation.ConditionalOnApiStatus;
-import com.asrevo.cvhome.commons.annotation.SecuredResource;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.checkout.model.order.history.PersistableOrderStatusHistory;
 import com.asrevo.cvhome.checkout.model.order.history.ReadableOrderStatusHistory;
@@ -18,6 +16,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -30,28 +29,29 @@ public class OrderStatusHistoryApi {
 
 	@RequestMapping(value = { "private/orders/{id}/history" }, method = RequestMethod.GET)
 	@ResponseStatus(HttpStatus.OK)
-	@ResponseBody
 	@Parameters({
 			@Parameter(name = "store",
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	@ConditionalOnApiStatus
-	public List<ReadableOrderStatusHistory> list(@PathVariable final Long id,
-			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
+
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CHECKOUT.*')")
+	public List<ReadableOrderStatusHistory> list(@PathVariable final Long id, StoreMerchantId merchantStore,
+			LanguageCode language) {
 
 		return orderFacade.getReadableOrderHistory(id, merchantStore, language);
 	}
 
 	@RequestMapping(value = { "private/orders/{id}/history" }, method = RequestMethod.POST)
 	@ResponseStatus(HttpStatus.CREATED)
-	@ResponseBody
+
 	@Operation(method = "POST", description = "Add order history", summary = "Adds a new status to an order")
 	@Parameters({ @Parameter(name = "store",
 			schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)) })
-	@ConditionalOnApiStatus
+
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CHECKOUT.*')")
 	public void create(@PathVariable final Long id, @RequestBody PersistableOrderStatusHistory history,
-			@SecuredResource StoreMerchantId merchantStore) {
+			StoreMerchantId merchantStore) {
 
 		// TODO validate date format
 

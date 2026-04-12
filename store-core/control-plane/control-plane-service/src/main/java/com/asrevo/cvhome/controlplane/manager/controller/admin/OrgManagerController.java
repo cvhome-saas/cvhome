@@ -1,6 +1,5 @@
 package com.asrevo.cvhome.controlplane.manager.controller.admin;
 
-import com.asrevo.cvhome.commons.annotation.ConditionalOnApiStatus;
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
 import com.asrevo.cvhome.uaa.domain.user.ReadableUser;
 import com.asrevo.cvhome.uaa.domain.user.UserPassword;
@@ -35,7 +34,7 @@ public class OrgManagerController {
 
 	@PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN')")
 	@GetMapping("find-all")
-	@ConditionalOnApiStatus
+
 	public Mono<Page<ManagerOrgDto>> findAllOrg(Pageable pageable) {
 		log.info("findAllOrg {}", pageable);
 		return Mono.just(internalOrgService.findAll(pageable));
@@ -43,28 +42,28 @@ public class OrgManagerController {
 
 	@PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN')")
 	@GetMapping("find-one")
-	@ConditionalOnApiStatus
+
 	public Mono<ManagerOrgDto> findOne(@RequestParam ManagerOrgId id) {
 		return Mono.just(internalOrgService.findOne(id));
 	}
 
 	@PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN')")
 	@PostMapping("create")
-	@ConditionalOnApiStatus
+
 	public Mono<ReadableUser> create(@RequestBody CreateOrgRequest request) {
 		return Mono.just(signupService.createOrgUser(request));
 	}
 
 	@PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN')")
 	@PostMapping("change-password")
-	@ConditionalOnApiStatus
+
 	public Mono<Void> changePassword(@RequestParam ManagerOrgId id, @RequestBody UserPassword request) {
 		userAccountService.changePassword(id.toString(), request);
 		return Mono.empty();
 	}
 
 	@GetMapping("stores")
-	@ConditionalOnApiStatus
+
 	public Mono<Page<ManagerStoreDto>> findAllStores(@RequestParam ManagerOrgId id, Pageable pageable) {
 		return Mono.just(internalStoreService.findAll(id, pageable));
 	}

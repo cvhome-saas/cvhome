@@ -1,6 +1,5 @@
 package com.asrevo.cvhome.controlplane.subscription.controller;
 
-import com.asrevo.cvhome.commons.annotation.ConditionalOnApiStatus;
 import com.asrevo.cvhome.commons.annotation.OrgStorePrincipalInfo;
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
 import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
@@ -23,7 +22,7 @@ public class SubscriptionPlanDetailsController {
 	private final SubscriptionService subscriptionService;
 
 	@GetMapping("subscription-plan-details")
-	@ConditionalOnApiStatus
+
 	public ResponseEntity<SubscriptionPlanDetails> currentSubscriptionPlanDetails(
 			@OrgStorePrincipalInfo UserOrgStoreIdentity identity) {
 		return subscriptionService.subscriptionPlanDetails(identity.org())
@@ -32,7 +31,7 @@ public class SubscriptionPlanDetailsController {
 	}
 
 	@GetMapping(value = "subscription-plan-details", params = "org-id")
-	@ConditionalOnApiStatus
+
 	public ResponseEntity<SubscriptionPlanDetails> subscriptionPlanDetails(@RequestParam("org-id") ManagerOrgId orgId) {
 		return subscriptionService.subscriptionPlanDetails(orgId)
 			.map(ResponseEntity::ok)

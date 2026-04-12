@@ -2,7 +2,6 @@ package com.asrevo.cvhome.merchant.api.v1;
 
 import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1_STR;
 
-import com.asrevo.cvhome.commons.annotation.ConditionalOnApiStatus;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
 import com.asrevo.cvhome.merchant.model.merchant.ReadableMerchantStore;
@@ -35,7 +34,7 @@ public class ExternalMerchantStoreApi implements ExternalMerchantStoreService {
 					content = @Content(schema = @Schema(implementation = ReadableMerchantStore.class))))
 	@Parameters({ @Parameter(name = "store",
 			schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)), })
-	@ConditionalOnApiStatus
+
 	@Override
 	public ReadableMerchantStore getStore(StoreMerchantId merchantStore) {
 		return storeFacade.getReadableMerchantStoreId(merchantStore);

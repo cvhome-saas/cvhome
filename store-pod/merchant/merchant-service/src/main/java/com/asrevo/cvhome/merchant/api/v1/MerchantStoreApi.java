@@ -2,9 +2,6 @@ package com.asrevo.cvhome.merchant.api.v1;
 
 import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1_STR;
 
-import com.asrevo.cvhome.commons.annotation.ApiUsage;
-import com.asrevo.cvhome.commons.annotation.ConditionalOnApiStatus;
-import com.asrevo.cvhome.commons.annotation.SecuredResource;
 import com.asrevo.cvhome.commons.domain.ReadableSliderImage;
 import com.asrevo.cvhome.commons.domain.SliderImage;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
@@ -56,7 +53,7 @@ public class MerchantStoreApi {
 					content = @Content(schema = @Schema(implementation = ReadableMerchantStore.class))))
 	@Parameters({ @Parameter(name = "lang",
 			schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	@ConditionalOnApiStatus
+
 	public ReadableMerchantStore store(@PathVariable String code,
 			@RequestParam(value = "lang", required = false) String lang) {
 		return storeFacade.getByMerchantStoreId(new StoreMerchantId(code), new LanguageCode(lang));
@@ -68,17 +65,17 @@ public class MerchantStoreApi {
 					content = @Content(schema = @Schema(implementation = ReadableMerchantStore.class))))
 	@Parameters({ @Parameter(name = "lang",
 			schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	@ConditionalOnApiStatus
-	public ReadableMerchantStore storeFull(@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
+
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.MERCHANT.*') or hasAnyAuthority('SCOPE_STORE_CORE')")
+	public ReadableMerchantStore storeFull(StoreMerchantId merchantStore, LanguageCode language) {
 		return storeFacade.getByMerchantStoreId(merchantStore, language);
 	}
 
 	@ResponseStatus(HttpStatus.OK)
 	@GetMapping(value = { "/store/languages" }, produces = MediaType.APPLICATION_JSON_VALUE)
-	@Operation(method = "GET", description = "Get list of store supported languages.",
-			responses = @ApiResponse(
-					content = @Content(schema = @Schema(implementation = ReadableMerchantStore.class))))
-	@ConditionalOnApiStatus
+	@Operation(method = "GET", description = "Get list of store supported languages.", responses = @ApiResponse(
+			content = @Content(schema = @Schema(implementation = ReadableMerchantStore.class))))
+
 	public List<LanguageCode> supportedLanguages(StoreMerchantId merchantStore) {
 
 		return storeFacade.supportedLanguages(merchantStore);
@@ -89,8 +86,8 @@ public class MerchantStoreApi {
 	@Operation(method = "POST", description = "Creates a new store",
 			responses = @ApiResponse(
 					content = @Content(schema = @Schema(implementation = ReadableMerchantStore.class))))
-	@ConditionalOnApiStatus
-	@PreAuthorize("hasPermission(#store.org,'ManagerOrgId','STORE.CREATE')")
+
+	@PreAuthorize("hasPermission(#store.org,'String','STORE-POD.MERCHANT.STORE-CREATE')")
 	public void create(@Valid @RequestBody PersistableMerchantStore store) {
 		storeFacade.create(store);
 	}
@@ -102,9 +99,8 @@ public class MerchantStoreApi {
 					content = @Content(schema = @Schema(implementation = ReadableMerchantStore.class))))
 	@Parameters({ @Parameter(name = "store",
 			schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)), })
-	@ConditionalOnApiStatus(usage = ApiUsage.USED)
-	public void update(@SecuredResource StoreMerchantId merchantStore,
-			@Valid @RequestBody PersistableMerchantStore store) {
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.MERCHANT.*')")
+	public void update(StoreMerchantId merchantStore, @Valid @RequestBody PersistableMerchantStore store) {
 		storeFacade.update(store);
 	}
 
@@ -115,9 +111,8 @@ public class MerchantStoreApi {
 					content = @Content(schema = @Schema(implementation = ReadableMerchantStore.class))))
 	@Parameters({ @Parameter(name = "store",
 			schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)), })
-	@ConditionalOnApiStatus(usage = ApiUsage.USED)
-	public void updateSocialLinks(@SecuredResource StoreMerchantId merchantStore,
-			@RequestBody PersistableMerchantStore store) {
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.MERCHANT.*')")
+	public void updateSocialLinks(StoreMerchantId merchantStore, @RequestBody PersistableMerchantStore store) {
 		storeFacade.updateSocialLinks(merchantStore, store.getSocialLinks());
 	}
 
@@ -126,9 +121,9 @@ public class MerchantStoreApi {
 	@Operation(method = "POST", description = "Add store logo")
 	@Parameters({ @Parameter(name = "store",
 			schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)), })
-	@ConditionalOnApiStatus
-	public void addLogo(@SecuredResource StoreMerchantId merchantStore,
-			@RequestParam("file") MultipartFile uploadfile) {
+
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.MERCHANT.*')")
+	public void addLogo(StoreMerchantId merchantStore, @RequestParam("file") MultipartFile uploadfile) {
 
 		InputContentFile cmsContentImage = createInputContentFile(uploadfile, FileContentType.LOGO);
 		storeFacade.addStoreLogo(merchantStore, cmsContentImage);
@@ -139,9 +134,9 @@ public class MerchantStoreApi {
 	@Operation(method = "POST", description = "Add store banner")
 	@Parameters({ @Parameter(name = "store",
 			schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)), })
-	@ConditionalOnApiStatus
-	public void addBanner(@SecuredResource StoreMerchantId merchantStore,
-			@RequestParam("file") MultipartFile uploadfile) {
+
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.MERCHANT.*')")
+	public void addBanner(StoreMerchantId merchantStore, @RequestParam("file") MultipartFile uploadfile) {
 
 		InputContentFile cmsContentImage = createInputContentFile(uploadfile, FileContentType.BANNER);
 		storeFacade.addStoreBanner(merchantStore, cmsContentImage);
@@ -152,9 +147,9 @@ public class MerchantStoreApi {
 	@Operation(method = "POST", description = "Add image")
 	@Parameters({ @Parameter(name = "store",
 			schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)), })
-	@ConditionalOnApiStatus
-	public ReadableSliderImage addSliderImage(@SecuredResource StoreMerchantId merchantStore,
-			@RequestParam("file") MultipartFile file) {
+
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.MERCHANT.*')")
+	public ReadableSliderImage addSliderImage(StoreMerchantId merchantStore, @RequestParam("file") MultipartFile file) {
 
 		InputContentFile cmsContentImage = createInputContentFile(file, FileContentType.SLIDER);
 		String extension = FilenameUtils.getExtension(file.getOriginalFilename());
@@ -170,9 +165,9 @@ public class MerchantStoreApi {
 	@Operation(method = "PUT", description = "Save slider images with its order")
 	@Parameters({ @Parameter(name = "store",
 			schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)), })
-	@ConditionalOnApiStatus
-	public void sliderImages(@SecuredResource StoreMerchantId merchantStore,
-			@RequestBody PersistableMerchantStore store) {
+
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.MERCHANT.*')")
+	public void sliderImages(StoreMerchantId merchantStore, @RequestBody PersistableMerchantStore store) {
 		storeFacade.updateSliderImages(merchantStore, store.getSliderImages());
 	}
 
@@ -203,8 +198,9 @@ public class MerchantStoreApi {
 			responses = @ApiResponse(content = @Content(schema = @Schema())))
 	@Parameters({ @Parameter(name = "store",
 			schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)), })
-	@ConditionalOnApiStatus
-	public void delete(@SecuredResource StoreMerchantId merchantStore) {
+
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.MERCHANT.*')")
+	public void delete(StoreMerchantId merchantStore) {
 		storeFacade.delete(merchantStore);
 	}
 

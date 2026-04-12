@@ -3,8 +3,7 @@ package com.asrevo.cvhome.catalog.api.v1.product;
 import com.asrevo.cvhome.catalog.model.product.ProductReservationStatus;
 import com.asrevo.cvhome.catalog.services.product.ExternalProductReservationService;
 import com.asrevo.cvhome.catalog.services.product.ProductService;
-import com.asrevo.cvhome.commons.annotation.ConditionalOnApiStatus;
-import com.asrevo.cvhome.commons.annotation.SecuredResource;
+
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
@@ -18,6 +17,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -45,11 +45,12 @@ public class ExternalProductReservationApi implements ExternalProductReservation
 			@Parameter(name = "sku", schema = @Schema(name = "sku", type = "string")),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	@ConditionalOnApiStatus
+
 	@Override
-	public ProductReservationStatus reserve(@SecuredResource StoreMerchantId store,
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.RESERVE')")
+	public ProductReservationStatus reserve(StoreMerchantId merchantStore,
 			@RequestBody ProductReservationList productReservation) throws ServiceException {
-		return productService.reserve(store, productReservation);
+		return productService.reserve(merchantStore, productReservation);
 	}
 
 }

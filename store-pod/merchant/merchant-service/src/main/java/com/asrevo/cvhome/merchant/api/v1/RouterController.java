@@ -1,7 +1,5 @@
 package com.asrevo.cvhome.merchant.api.v1;
 
-import com.asrevo.cvhome.commons.annotation.ConditionalOnApiStatus;
-import com.asrevo.cvhome.commons.annotation.SecuredResource;
 import com.asrevo.cvhome.commons.domain.Domain;
 import com.asrevo.cvhome.commons.domain.ManagerStoreDomain;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
@@ -11,6 +9,7 @@ import com.asrevo.cvhome.merchant.service.RoutingService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
@@ -30,7 +29,7 @@ public class RouterController {
 	private final LookupDomainHeadersService lookupDomainHeadersService;
 
 	@GetMapping("public/ask-for-tls")
-	@ConditionalOnApiStatus
+
 	public ResponseEntity<Object> ask(Domain domain) {
 		log.info("tls ask: {}", domain);
 		if (askTlsService.ask(domain)) {
@@ -42,29 +41,32 @@ public class RouterController {
 	}
 
 	@GetMapping("public/lookup-by-domain")
-	@ConditionalOnApiStatus
+
 	public Map<String, String> getLookupHeadersByDomain(Domain domain) {
 		log.info("header lookup: {}", domain);
 		return lookupDomainHeadersService.lookupHeaders(domain);
 	}
 
 	@GetMapping("private/allocates")
-	@ConditionalOnApiStatus
-	public Mono<Set<ManagerStoreDomain>> allocatedDomains(@SecuredResource StoreMerchantId store) {
-		return Mono.just(routingService.domains(store));
+
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.MERCHANT.*')")
+	public Mono<Set<ManagerStoreDomain>> allocatedDomains(StoreMerchantId merchantStore) {
+		return Mono.just(routingService.domains(merchantStore));
 	}
 
 	@PostMapping("private/allocate")
-	@ConditionalOnApiStatus
-	public Mono<Void> allocate(@SecuredResource StoreMerchantId store, Domain domain) {
-		routingService.addDomain(store, domain);
+
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.MERCHANT.*')")
+	public Mono<Void> allocate(StoreMerchantId merchantStore, Domain domain) {
+		routingService.addDomain(merchantStore, domain);
 		return Mono.empty();
 	}
 
 	@DeleteMapping("private/remove")
-	@ConditionalOnApiStatus
-	public Mono<Void> remove(@SecuredResource StoreMerchantId store, Domain domain) {
-		routingService.removeDomain(store, domain);
+
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.MERCHANT.*')")
+	public Mono<Void> remove(StoreMerchantId merchantStore, Domain domain) {
+		routingService.removeDomain(merchantStore, domain);
 		return Mono.empty();
 	}
 
