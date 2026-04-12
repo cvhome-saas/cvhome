@@ -21,7 +21,7 @@ Copy the folder structure of an existing template (e.g. `basis`). Every file bel
 
 ---
 
-### Step 2 — Configuration Files (5 files, no logic changes needed)
+### Step 2 — Configuration & Static Files
 
 | File | Action |
 |------|--------|
@@ -31,7 +31,8 @@ Copy the folder structure of an existing template (e.g. `basis`). Every file bel
 | `postcss.config.mjs` | Copy as-is. |
 | `eslint.config.mjs` | Copy as-is. |
 | `components.json` | Copy as-is (shadcn config). |
-| `public/` | Copy entire directory — contains `css/login.css` (login page styles), `placeholder.png` (fallback product image), and SVG assets. |
+| `public/` | Copy entire directory. contains `placeholder.png` and SVG assets. |
+| `public/css/login.css` | **CUSTOMIZE** — Update with your new template's brand styles for the login/auth pages. |
 
 ---
 
@@ -237,7 +238,8 @@ npm run dev          # starts Express server on port 8110
 [ ] postcss.config.mjs (copied)
 [ ] eslint.config.mjs (copied)
 [ ] components.json (copied)
-[ ] public/ (copy entire directory — login.css, placeholder.png, SVGs)
+[ ] public/ (copy entire directory — placeholder.png, SVGs)
+[ ] public/css/login.css (CUSTOMIZE brand styles)
 
 — i18n (copy) —
 [ ] src/proxy.ts (copied)
