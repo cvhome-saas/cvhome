@@ -284,6 +284,7 @@ npm run dev          # starts Express server on port 8110
 [ ] src/shared/Customer/OrderDetails.tsx
 [ ] src/shared/Common/Breadcrumb.tsx
 [ ] src/shared/Common/SectionTitle.tsx
+[ ] src/shared/Common/Secured.tsx
 
 — Shared types (one-line change) —
 [ ] libs/types/src/store.ts → add new value to Theme enum
