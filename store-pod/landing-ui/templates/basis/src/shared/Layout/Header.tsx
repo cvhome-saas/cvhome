@@ -52,7 +52,7 @@ export const Header = ({params, headerBox}: {
             <HeaderTop store={params.store} box={headerBox} locale={params.locale}/>
             <header className="bg-background">
                 <nav aria-label="Global" className="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8">
-                    <div className="flex lg:flex-1">
+                    <div className="flex items-center">
                         <Link prefetch={false} href={"/"} className="-m-1.5 p-1.5 group">
                             <span className="sr-only">{params.store.name}</span>
                             {
@@ -80,8 +80,9 @@ export const Header = ({params, headerBox}: {
                             </SheetContent>
                         </Sheet>
                     </div>
+                    <div className="flex-1 flex justify-center">
                     <NavigationMenu className="hidden lg:flex">
-                        <NavigationMenuList>
+                        <NavigationMenuList className="flex-wrap">
                             <NavigationMenuItem>
                                 <Link href="/" legacyBehavior passHref>
                                     <NavigationMenuLink className={navigationMenuTriggerStyle()}>
@@ -134,8 +135,9 @@ export const Header = ({params, headerBox}: {
                             ))}
                         </NavigationMenuList>
                     </NavigationMenu>
+                    </div>
 
-                    <div className="hidden lg:flex lg:flex-1 lg:justify-end gap-2 items-center">
+                    <div className="hidden lg:flex items-center gap-2">
                         {user ? (
                             <div className="flex items-center gap-2">
                                 <span className="text-sm font-medium text-muted-foreground hidden sm:inline">
