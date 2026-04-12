@@ -2,7 +2,6 @@ package com.asrevo.cvhome.checkout.api.order.v1.reference;
 
 import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1;
 
-import com.asrevo.cvhome.commons.annotation.ConditionalOnApiStatus;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.checkout.service.facade.country.CountryFacade;
 import com.asrevo.cvhome.checkout.service.facade.zone.ZoneFacade;
@@ -40,7 +39,7 @@ public class ReferencesApi {
 	}
 
 	@GetMapping("/zones")
-	@ConditionalOnApiStatus
+
 	public List<ReadableZone> getZones(@RequestParam("code") String code, LanguageCode language,
 			HttpServletRequest request) {
 		StoreMerchantId merchantId = getByMerchantStoreId(request);

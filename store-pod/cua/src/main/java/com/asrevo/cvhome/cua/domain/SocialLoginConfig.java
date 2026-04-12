@@ -1,11 +1,7 @@
 package com.asrevo.cvhome.cua.domain;
 
-import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.cua.config.SocialProvider;
-import com.asrevo.cvhome.store.core.converter.ZoneCodeConverter;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -16,7 +12,6 @@ import java.io.Serializable;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class SocialLoginConfig implements Serializable {
 
 	@EmbeddedId

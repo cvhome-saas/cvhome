@@ -5,7 +5,10 @@ import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal;
+import org.springframework.security.oauth2.core.oidc.OidcIdToken;
+import org.springframework.security.oauth2.core.oidc.OidcUserInfo;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -14,7 +17,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @Getter
-public class SecurityUser implements UserDetails, OAuth2AuthenticatedPrincipal {
+public class SecurityUser implements UserDetails, OAuth2User, OidcUser {
 
 	private final UUID id;
 
@@ -38,7 +41,17 @@ public class SecurityUser implements UserDetails, OAuth2AuthenticatedPrincipal {
 
 	private final Map<String, Object> attributes;
 
+	private final Map<String, Object> claims;
+
+	private final OidcIdToken idToken;
+
+	private final OidcUserInfo userInfo;
+
 	public SecurityUser(User user) {
+		this(user, null, null, null);
+	}
+
+	public SecurityUser(User user, Map<String, Object> attributes, OidcIdToken idToken, OidcUserInfo userInfo) {
 		this.id = user.getId();
 		this.username = user.getUsername();
 		this.password = user.getPasswordHash();
@@ -57,6 +70,9 @@ public class SecurityUser implements UserDetails, OAuth2AuthenticatedPrincipal {
 		if (this.metadata != null) {
 			this.attributes.putAll(this.metadata);
 		}
+		if (attributes != null) {
+			this.attributes.putAll(attributes);
+		}
 		this.attributes.put("sub", this.id.toString());
 		this.attributes.put("username", this.username);
 		this.attributes.put("email", this.email);
@@ -64,6 +80,25 @@ public class SecurityUser implements UserDetails, OAuth2AuthenticatedPrincipal {
 		this.attributes.put("family_name", this.lastName);
 		this.attributes.put("name", this.firstName + " " + this.lastName);
 		this.attributes.put("client_id", this.clientId);
+
+		this.idToken = idToken;
+		this.userInfo = userInfo;
+		this.claims = (idToken != null) ? idToken.getClaims() : this.attributes;
+	}
+
+	@Override
+	public Map<String, Object> getClaims() {
+		return claims;
+	}
+
+	@Override
+	public OidcIdToken getIdToken() {
+		return idToken;
+	}
+
+	@Override
+	public OidcUserInfo getUserInfo() {
+		return userInfo;
 	}
 
 	@Override

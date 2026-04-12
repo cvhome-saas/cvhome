@@ -5,7 +5,7 @@ import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1_STR;
 import com.asrevo.cvhome.catalog.model.product.PersistableProductPrice;
 import com.asrevo.cvhome.catalog.model.product.ReadableProductPrice;
 import com.asrevo.cvhome.catalog.service.facade.product.ProductPriceFacade;
-import com.asrevo.cvhome.commons.annotation.SecuredResource;
+
 import com.asrevo.cvhome.commons.domain.Entity;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.constants.Constants;
@@ -18,6 +18,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,7 +27,7 @@ import org.springframework.web.bind.annotation.*;
  *
  * @author carlsamson
  */
-@Controller
+@RestController
 @RequestMapping("/api/v1")
 @Tag(name = "Product price api")
 @Slf4j
@@ -45,9 +46,9 @@ public class ProductPriceApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	public @ResponseBody Entity save(@PathVariable String sku, @PathVariable Long inventoryId,
-			@Valid @RequestBody PersistableProductPrice price, @SecuredResource StoreMerchantId merchantStore,
-			LanguageCode language) {
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
+	public Entity save(@PathVariable String sku, @PathVariable Long inventoryId,
+			@Valid @RequestBody PersistableProductPrice price, StoreMerchantId merchantStore, LanguageCode language) {
 
 		price.setSku(sku);
 		price.setProductAvailabilityId(inventoryId);
@@ -63,8 +64,9 @@ public class ProductPriceApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	public @ResponseBody Entity save(@PathVariable String sku, @Valid @RequestBody PersistableProductPrice price,
-			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
+	public Entity save(@PathVariable String sku, @Valid @RequestBody PersistableProductPrice price,
+			StoreMerchantId merchantStore, LanguageCode language) {
 
 		price.setSku(sku);
 
@@ -80,9 +82,9 @@ public class ProductPriceApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
 	public void edit(@PathVariable String sku, @PathVariable Long inventoryId, @PathVariable Long priceId,
-			@Valid @RequestBody PersistableProductPrice price, @SecuredResource StoreMerchantId merchantStore,
-			LanguageCode language) {
+			@Valid @RequestBody PersistableProductPrice price, StoreMerchantId merchantStore, LanguageCode language) {
 
 		price.setSku(sku);
 		price.setProductAvailabilityId(inventoryId);
@@ -97,9 +99,9 @@ public class ProductPriceApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
 	public ReadableProductPrice get(@PathVariable String sku, @PathVariable Long priceId,
-			@Valid @RequestBody PersistableProductPrice price, @SecuredResource StoreMerchantId merchantStore,
-			LanguageCode language) {
+			@Valid @RequestBody PersistableProductPrice price, StoreMerchantId merchantStore, LanguageCode language) {
 
 		price.setSku(sku);
 		price.setId(priceId);
@@ -113,8 +115,9 @@ public class ProductPriceApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
 	public List<ReadableProductPrice> list(@PathVariable String sku, @PathVariable Long inventoryId,
-			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
+			StoreMerchantId merchantStore, LanguageCode language) {
 
 		return productPriceFacade.list(sku, inventoryId, merchantStore, language);
 	}
@@ -125,7 +128,8 @@ public class ProductPriceApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	public List<ReadableProductPrice> list(@PathVariable String sku, @SecuredResource StoreMerchantId merchantStore,
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
+	public List<ReadableProductPrice> list(@PathVariable String sku, StoreMerchantId merchantStore,
 			LanguageCode language) {
 
 		return productPriceFacade.list(sku, merchantStore, language);
@@ -138,8 +142,9 @@ public class ProductPriceApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	public void delete(@PathVariable String sku, @PathVariable Long priceId,
-			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
+	public void delete(@PathVariable String sku, @PathVariable Long priceId, StoreMerchantId merchantStore,
+			LanguageCode language) {
 
 		productPriceFacade.delete(priceId, sku, merchantStore);
 	}

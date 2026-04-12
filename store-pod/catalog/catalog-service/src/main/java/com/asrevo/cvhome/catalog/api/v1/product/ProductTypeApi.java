@@ -6,7 +6,7 @@ import com.asrevo.cvhome.catalog.model.product.type.PersistableProductType;
 import com.asrevo.cvhome.catalog.model.product.type.ReadableProductType;
 import com.asrevo.cvhome.catalog.model.product.type.ReadableProductTypeList;
 import com.asrevo.cvhome.catalog.service.facade.product.ProductTypeFacade;
-import com.asrevo.cvhome.commons.annotation.SecuredResource;
+
 import com.asrevo.cvhome.commons.domain.Entity;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.constants.Constants;
@@ -25,6 +25,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -52,8 +53,8 @@ public class ProductTypeApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	public ReadableProductTypeList list(@SecuredResource StoreMerchantId merchantStore, LanguageCode language,
-			Pageable pageable) {
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
+	public ReadableProductTypeList list(StoreMerchantId merchantStore, LanguageCode language, Pageable pageable) {
 
 		return productTypeFacade.getByMerchant(merchantStore, LanguageCode.allLanguage(), pageable);
 	}
@@ -66,8 +67,8 @@ public class ProductTypeApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	public ReadableProductType get(@PathVariable Long id, @SecuredResource StoreMerchantId merchantStore,
-			LanguageCode language) {
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
+	public ReadableProductType get(@PathVariable Long id, StoreMerchantId merchantStore, LanguageCode language) {
 
 		return productTypeFacade.get(merchantStore, id, LanguageCode.allLanguage());
 	}
@@ -80,8 +81,9 @@ public class ProductTypeApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	public ResponseEntity<EntityExists> exists(@RequestParam String code,
-			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
+	public ResponseEntity<EntityExists> exists(@RequestParam String code, StoreMerchantId merchantStore,
+			LanguageCode language) {
 
 		boolean exists = productTypeFacade.exists(code, merchantStore, language);
 		return new ResponseEntity<>(new EntityExists(exists), HttpStatus.OK);
@@ -95,7 +97,8 @@ public class ProductTypeApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	public Entity create(@RequestBody PersistableProductType type, @SecuredResource StoreMerchantId merchantStore,
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
+	public Entity create(@RequestBody PersistableProductType type, StoreMerchantId merchantStore,
 			LanguageCode language) {
 
 		Long id = productTypeFacade.save(type, merchantStore, LanguageCode.allLanguage());
@@ -112,8 +115,9 @@ public class ProductTypeApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	public void update(@RequestBody PersistableProductType type, @PathVariable Long id,
-			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
+	public void update(@RequestBody PersistableProductType type, @PathVariable Long id, StoreMerchantId merchantStore,
+			LanguageCode language) {
 
 		productTypeFacade.update(type, id, merchantStore, language);
 	}
@@ -126,7 +130,8 @@ public class ProductTypeApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	public void delete(@PathVariable Long id, @SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
+	public void delete(@PathVariable Long id, StoreMerchantId merchantStore, LanguageCode language) {
 
 		productTypeFacade.delete(id, merchantStore, language);
 	}

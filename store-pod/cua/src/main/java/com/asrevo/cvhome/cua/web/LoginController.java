@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
+import java.util.Locale;
 
 @Slf4j
 @Controller
@@ -30,7 +31,7 @@ public class LoginController {
 	private final ExternalMerchantStoreService externalMerchantStoreService;
 
 	@GetMapping("/login")
-	public String login(HttpServletRequest request, HttpServletResponse response, Model model) {
+	public String login(HttpServletRequest request, Locale locale, HttpServletResponse response, Model model) {
 		SavedRequest savedRequest = requestCache.getRequest(request, response);
 		if (savedRequest != null) {
 			String clientId = UriComponentsBuilder.fromUriString(savedRequest.getRedirectUrl())

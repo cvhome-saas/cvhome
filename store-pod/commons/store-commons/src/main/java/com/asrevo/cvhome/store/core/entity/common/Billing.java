@@ -43,19 +43,13 @@ public class Billing {
 	@Column(name = "BILLING_STATE", length = 100)
 	private String state;
 
-	@Column(name = "LONGITUDE", length = 100)
-	private String longitude;
-
-	@Column(name = "LATITUDE", length = 100)
-	private String latitude;
-
 	@JsonIgnore
-	@Column(name = "BILLING_COUNTRY_ID", length = 6)
+	@Column(name = "BILLING_COUNTRY_CODE", length = 6)
 	@Convert(converter = CountryIsoCodeConverter.class)
 	private CountryIsoCode country;
 
 	@JsonIgnore
-	@Column(name = "BILLING_ZONE_ID", length = 100)
+	@Column(name = "BILLING_ZONE_CODE", length = 6)
 	@Convert(converter = ZoneCodeConverter.class)
 	private ZoneCode zone;
 

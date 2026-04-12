@@ -1,6 +1,5 @@
 package com.asrevo.cvhome.controlplane.manager.controller;
 
-import com.asrevo.cvhome.commons.annotation.ConditionalOnApiStatus;
 import com.asrevo.cvhome.commons.annotation.OrgStorePrincipalInfo;
 import com.asrevo.cvhome.commons.domain.*;
 import com.asrevo.cvhome.controlplane.manager.commons.dto.ListManagerStoreQuery;
@@ -28,7 +27,7 @@ public class StoreManagerController {
 	private final InternalStoreService internalStoreService;
 
 	@PostMapping("list")
-	@ConditionalOnApiStatus
+
 	public Mono<Page<ManagerStoreDto>> findAllStores(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
 			@RequestBody ListManagerStoreQuery listManagerStoreQuery, Pageable pageable) {
 		return Mono.just(internalStoreService.findAll(identity, listManagerStoreQuery, pageable));
@@ -36,35 +35,35 @@ public class StoreManagerController {
 
 	@PostMapping("private/store")
 	@PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN','ROLE_ORG_ADMIN')")
-	@ConditionalOnApiStatus
+
 	public Mono<ManagerStoreDto> create(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
 			@RequestBody Map<Object, Object> request) {
 		return Mono.just(this.managerService.createStore(identity.org(), request));
 	}
 
 	@GetMapping(value = "private/store/unique", params = "name")
-	@ConditionalOnApiStatus
+
 	public Mono<Map<String, Boolean>> checkExist(@RequestParam("name") String name) {
 		return Mono.just(Map.of("exists", internalStoreService.checkNameExists(name)));
 	}
 
 	@GetMapping("private/store")
 	// @PreAuthorize("hasAnyRole('ROLE_ORG_ADMIN')")
-	@ConditionalOnApiStatus
+
 	public Mono<Page<ManagerStoreDto>> findAllStoresDetailed(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
 			Pageable pageable) {
 		return Mono.just(internalStoreService.findAll(identity, new ListManagerStoreQuery(null, null, null), pageable));
 	}
 
 	@GetMapping("private/store/{code}")
-	@PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE.FIND-ONE-DETAILED')")
+	@PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE-CORE.STORE-FIND-ONE')")
 	public Mono<Object> getStoreDetailed(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
 			@PathVariable("code") ManagerStoreId store) {
 		return managerService.getStore(store);
 	}
 
 	@GetMapping("store-info")
-	@PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE.FIND-ONE')")
+	@PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE-CORE.STORE-FIND-ONE')")
 	public Mono<ManagerStoreDto> storeInfo(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
 			@RequestParam ManagerStoreId store) {
 		return Mono.just(internalStoreService.findStore(store));

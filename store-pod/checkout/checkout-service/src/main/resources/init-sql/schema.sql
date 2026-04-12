@@ -79,7 +79,9 @@ create table if not exists checkout.zone_description
 create table if not exists checkout.customer
 (
     customer_id             bigint      not null primary key,
-    customer_anonymous      boolean,
+    customer_email_address  varchar(96),
+    customer_username       varchar(96),
+    cua_external_id         varchar(96),
     date_created            timestamp(6),
     date_modified           timestamp(6),
     updt_id                 varchar(60),
@@ -88,17 +90,11 @@ create table if not exists checkout.customer
     billing_company         varchar(100),
     billing_first_name      varchar(64) not null,
     billing_last_name       varchar(64) not null,
-    latitude                varchar(100),
-    longitude               varchar(100),
     billing_postcode        varchar(20),
     billing_state           varchar(100),
     billing_telephone       varchar(32),
-    customer_company        varchar(100),
-    reset_credentials_req   varchar(256),
-    reset_credentials_exp   date,
-    review_avg              numeric(38, 2),
-    review_count            integer,
-    customer_dob            timestamp(6),
+    billing_country_code    varchar(6)  not null,
+    billing_zone_code       varchar(100),
     delivery_street_address varchar(256),
     delivery_city           varchar(100),
     delivery_company        varchar(100),
@@ -107,21 +103,9 @@ create table if not exists checkout.customer
     delivery_postcode       varchar(20),
     delivery_state          varchar(100),
     delivery_telephone      varchar(32),
-    customer_email_address  varchar(96) not null,
-    customer_gender         char
-        constraint customer_customer_gender_check check (
-            customer_gender = ANY (ARRAY [ 'M' :: bpchar, 'F' :: bpchar])
-            ),
-    customer_nick           varchar(96),
-    customer_password       varchar(60),
-    provider                varchar(255),
-    billing_country_id      varchar(6)  not null,
-    billing_zone_id         varchar(100),
-    language_code           varchar(6)  not null,
-    DELIVERY_COUNTRY_CODE   varchar(6),
-    delivery_zone_id        varchar(100),
-    store_merchant_id       varchar(50) not null,
-    constraint UKsniymsufa1eqq35pc8kfgyo7p unique (store_merchant_id, customer_nick)
+    delivery_country_code   varchar(6),
+    delivery_zone_code      varchar(100),
+    store_merchant_id       varchar(50) not null
 );
 create table if not exists checkout.customer_group
 (
@@ -285,11 +269,11 @@ create table if not exists checkout.orders
                 )
             ),
     order_total             numeric(38, 2),
-    billing_country_id      varchar(6)  not null,
-    billing_zone_id         varchar(100),
+    billing_country_code      varchar(6)  not null,
+    billing_zone_code         varchar(100),
     currency_id             varchar(6),
-    DELIVERY_COUNTRY_CODE   varchar(6),
-    delivery_zone_id        varchar(100),
+    delivery_country_CODE   varchar(6),
+    delivery_zone_code        varchar(100),
     store_merchant_id       varchar(50)
 );
 create table if not exists checkout.order_account

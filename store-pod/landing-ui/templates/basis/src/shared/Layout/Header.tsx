@@ -52,7 +52,7 @@ export const Header = ({params, headerBox}: {
             <HeaderTop store={params.store} box={headerBox} locale={params.locale}/>
             <header className="bg-background">
                 <nav aria-label="Global" className="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8">
-                    <div className="flex lg:flex-1">
+                    <div className="flex items-center">
                         <Link prefetch={false} href={"/"} className="-m-1.5 p-1.5 group">
                             <span className="sr-only">{params.store.name}</span>
                             {
@@ -80,8 +80,9 @@ export const Header = ({params, headerBox}: {
                             </SheetContent>
                         </Sheet>
                     </div>
+                    <div className="flex-1 flex justify-center">
                     <NavigationMenu className="hidden lg:flex">
-                        <NavigationMenuList>
+                        <NavigationMenuList className="flex-wrap">
                             <NavigationMenuItem>
                                 <Link href="/" legacyBehavior passHref>
                                     <NavigationMenuLink className={navigationMenuTriggerStyle()}>
@@ -134,12 +135,13 @@ export const Header = ({params, headerBox}: {
                             ))}
                         </NavigationMenuList>
                     </NavigationMenu>
+                    </div>
 
-                    <div className="hidden lg:flex lg:flex-1 lg:justify-end gap-2 items-center">
+                    <div className="hidden lg:flex items-center gap-2">
                         {user ? (
                             <div className="flex items-center gap-2">
                                 <span className="text-sm font-medium text-muted-foreground hidden sm:inline">
-                                    {user?.claims?.name}
+                                    {user?.username}
                                 </span>
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
@@ -148,6 +150,11 @@ export const Header = ({params, headerBox}: {
                                         </Button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end">
+                                        <DropdownMenuItem asChild>
+                                            <Link href="/customer" className="cursor-pointer">
+                                                {t('PROFILE')}
+                                            </Link>
+                                        </DropdownMenuItem>
                                         <DropdownMenuItem onClick={logout} className="cursor-pointer text-destructive focus:text-destructive">
                                             {t('LOGOUT')}
                                         </DropdownMenuItem>
@@ -187,6 +194,7 @@ const MobileNavContent = ({params, cart, setCartOpen}: {
     setCartOpen: (open: boolean) => void
 }) => {
     const t = useTranslations('COMPONENTS.HEADER');
+    const { user, login, logout } = useUser(params.storeContext);
     return (
         <div className="mt-6 flow-root">
             <div className="-my-6 divide-y divide-border">
@@ -232,7 +240,21 @@ const MobileNavContent = ({params, cart, setCartOpen}: {
                         </Link>
                     ))}
                 </div>
-                <div className="py-6">
+                <div className="py-6 space-y-4">
+                    {user ? (
+                        <>
+                            <div className="px-3 flex items-center justify-between">
+                                <span className="font-medium">{user.username}</span>
+                                <Button variant="ghost" size="sm" onClick={logout}>{t('LOGOUT')}</Button>
+                            </div>
+                            <Link href="/customer"
+                                  className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-foreground hover:bg-accent">
+                                {t('PROFILE')}
+                            </Link>
+                        </>
+                    ) : (
+                        <Button variant="outline" className="w-full" onClick={login}>{t('LOGIN')}</Button>
+                    )}
                     <Button variant="ghost" className="relative" onClick={() => setCartOpen(true)}>
                         <ShoppingBag aria-hidden="true" className="size-6 text-foreground"/>
                         {cart && cart.quantity > 0 && (
@@ -249,13 +271,14 @@ const MobileNavContent = ({params, cart, setCartOpen}: {
     );
 }
 
-const ListItem = React.forwardRef<HTMLAnchorElement, React.ComponentPropsWithoutRef<"a">>(
-    ({className, title, children, ...props}, ref) => {
+const ListItem = React.forwardRef<HTMLAnchorElement, React.ComponentPropsWithoutRef<typeof Link>>(
+    ({className, title, children, href, ...props}, ref) => {
         return (
             <li>
                 <NavigationMenuLink asChild>
-                    <a
+                    <Link
                         ref={ref}
+                        href={href}
                         className={cn(
                             "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
                             className
@@ -263,10 +286,12 @@ const ListItem = React.forwardRef<HTMLAnchorElement, React.ComponentPropsWithout
                         {...props}
                     >
                         <div className="text-sm font-medium leading-none">{title}</div>
-                        <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                            {children}
-                        </p>
-                    </a>
+                        {children && (
+                            <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                                {children}
+                            </p>
+                        )}
+                    </Link>
                 </NavigationMenuLink>
             </li>
         );

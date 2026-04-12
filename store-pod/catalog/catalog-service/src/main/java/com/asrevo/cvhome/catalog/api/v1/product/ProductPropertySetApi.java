@@ -5,7 +5,7 @@ import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1_STR;
 import com.asrevo.cvhome.catalog.model.product.attribute.optionset.PersistableProductOptionSet;
 import com.asrevo.cvhome.catalog.model.product.attribute.optionset.ReadableProductOptionSet;
 import com.asrevo.cvhome.catalog.service.facade.product.ProductOptionSetFacade;
-import com.asrevo.cvhome.commons.annotation.SecuredResource;
+
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.model.entity.EntityExists;
@@ -23,10 +23,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-@Controller
+@RestController
 @RequestMapping("/api/v1")
 @Tag(name = "Product property set regroupment management resource (Product Options Set" + " Management Api)")
 public class ProductPropertySetApi {
@@ -44,8 +45,9 @@ public class ProductPropertySetApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	public void create(@Valid @RequestBody PersistableProductOptionSet optionSet,
-			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
+	public void create(@Valid @RequestBody PersistableProductOptionSet optionSet, StoreMerchantId merchantStore,
+			LanguageCode language) {
 
 		productOptionSetFacade.create(optionSet, merchantStore, language);
 	}
@@ -59,8 +61,9 @@ public class ProductPropertySetApi {
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	@Operation(method = "GET", description = "Check if option set code already exists",
 			responses = @ApiResponse(content = @Content(schema = @Schema(implementation = EntityExists.class))))
-	public ResponseEntity<EntityExists> exists(@RequestParam(value = "code") String code,
-			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
+	public ResponseEntity<EntityExists> exists(@RequestParam(value = "code") String code, StoreMerchantId merchantStore,
+			LanguageCode language) {
 
 		boolean isOptionExist = productOptionSetFacade.exists(code, merchantStore);
 		return new ResponseEntity<>(new EntityExists(isOptionExist), HttpStatus.OK);
@@ -73,9 +76,9 @@ public class ProductPropertySetApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	@ResponseBody
-	public ReadableProductOptionSet get(@PathVariable Long id, @SecuredResource StoreMerchantId merchantStore,
-			LanguageCode language) {
+
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
+	public ReadableProductOptionSet get(@PathVariable Long id, StoreMerchantId merchantStore, LanguageCode language) {
 
 		return productOptionSetFacade.get(id, merchantStore, language);
 	}
@@ -87,8 +90,9 @@ public class ProductPropertySetApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
 	public void update(@Valid @RequestBody PersistableProductOptionSet option, @PathVariable Long id,
-			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
+			StoreMerchantId merchantStore, LanguageCode language) {
 
 		option.setId(id);
 		productOptionSetFacade.update(id, option, merchantStore, language);
@@ -101,7 +105,8 @@ public class ProductPropertySetApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	public void delete(@PathVariable Long id, @SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
+	public void delete(@PathVariable Long id, StoreMerchantId merchantStore, LanguageCode language) {
 
 		productOptionSetFacade.delete(id, merchantStore);
 	}
@@ -116,8 +121,9 @@ public class ProductPropertySetApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	public @ResponseBody List<ReadableProductOptionSet> list(@SecuredResource StoreMerchantId merchantStore,
-			LanguageCode language, @RequestParam(value = "productType", required = false) String type) {
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
+	public List<ReadableProductOptionSet> list(StoreMerchantId merchantStore, LanguageCode language,
+			@RequestParam(value = "productType", required = false) String type) {
 
 		if (!StringUtils.isBlank(type)) {
 			return productOptionSetFacade.list(merchantStore, language, type);

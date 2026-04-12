@@ -15,7 +15,7 @@ export default function CallbackClient({storeContext}: { storeContext: StoreCont
 			const exchange = async () => {
 				try {
 					await AuthService.exchangeToken(storeContext, code);
-					router.push('/');
+					router.push(AuthService.getPostLoginRedirect());
 				} catch (error) {
 					console.error('Failed to exchange token', error);
 					router.push('/login?error=true');

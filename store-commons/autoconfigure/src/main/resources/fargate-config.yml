@@ -30,3 +30,4 @@ spring:
           "merchant": 8120
           "catalog": 8122
           "checkout": 8123
+          "cua": 8124

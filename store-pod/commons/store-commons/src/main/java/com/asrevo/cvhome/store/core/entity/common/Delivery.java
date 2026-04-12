@@ -44,14 +44,8 @@ public class Delivery {
 	@Convert(converter = CountryIsoCodeConverter.class)
 	private CountryIsoCode country;
 
-	@Column(name = "DELIVERY_ZONE_ID", length = 100)
+	@Column(name = "DELIVERY_ZONE_CODE", length = 6)
 	@Convert(converter = ZoneCodeConverter.class)
 	private ZoneCode zone;
-
-	@Transient
-	private String latitude = null;
-
-	@Transient
-	private String longitude = null;
 
 }

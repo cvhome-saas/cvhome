@@ -2,14 +2,9 @@ package com.asrevo.cvhome.controlplane.config;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
-import com.asrevo.cvhome.controlplane.manager.service.InternalStoreService;
 import com.asrevo.cvhome.s2s.jwt.UaaJwtGrantedAuthoritiesConverter;
-import com.asrevo.cvhome.s2s.services.AccessEvaluator;
-import com.asrevo.cvhome.s2s.services.AccessEvaluatorImpl;
-import com.asrevo.cvhome.s2s.services.StoreSecurityServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.oauth2.server.resource.authentication.ReactiveJwtAuthenticationConverter;
@@ -45,12 +40,6 @@ public class SecurityConfig {
 		converter.setJwtGrantedAuthoritiesConverter(
 				source -> Flux.fromIterable(uaaJwtGrantedAuthoritiesConverter.convert(source)));
 		return converter;
-	}
-
-	@Bean
-	@Lazy
-	public AccessEvaluator accessEvaluator(InternalStoreService internalStoreService) {
-		return new AccessEvaluatorImpl(new StoreSecurityServiceImpl(internalStoreService::getStoreOwner));
 	}
 
 }

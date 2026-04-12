@@ -8,8 +8,7 @@ import com.asrevo.cvhome.catalog.model.category.PersistableCategory;
 import com.asrevo.cvhome.catalog.model.category.ReadableCategory;
 import com.asrevo.cvhome.catalog.model.category.ReadableCategoryList;
 import com.asrevo.cvhome.catalog.service.facade.category.CategoryFacade;
-import com.asrevo.cvhome.commons.annotation.ConditionalOnApiStatus;
-import com.asrevo.cvhome.commons.annotation.SecuredResource;
+
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.model.entity.EntityExists;
@@ -29,6 +28,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -53,9 +53,10 @@ public class CategoryApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	@ConditionalOnApiStatus
-	public ReadableCategory get(@PathVariable(name = "id") Long categoryId,
-			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
+
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
+	public ReadableCategory get(@PathVariable(name = "id") Long categoryId, StoreMerchantId merchantStore,
+			LanguageCode language) {
 		return categoryFacade.getById(merchantStore, categoryId, LanguageCode.allLanguage());
 	}
 
@@ -68,7 +69,7 @@ public class CategoryApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	@ConditionalOnApiStatus
+
 	public ReadableCategory getByFriendlyUrl(@PathVariable(name = "friendlyUrl") String friendlyUrl,
 			StoreMerchantId merchantStore, LanguageCode language) throws Exception {
 		return categoryFacade.getCategoryByFriendlyUrl(merchantStore, friendlyUrl, language);
@@ -83,9 +84,10 @@ public class CategoryApi {
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	@Operation(method = "GET", description = "Check if category code already exists",
 			responses = @ApiResponse(content = @Content(schema = @Schema(implementation = EntityExists.class))))
-	@ConditionalOnApiStatus
-	public ResponseEntity<EntityExists> exists(@RequestParam(value = "code") String code,
-			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
+
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
+	public ResponseEntity<EntityExists> exists(@RequestParam(value = "code") String code, StoreMerchantId merchantStore,
+			LanguageCode language) {
 		boolean isCategoryExist = categoryFacade.existByCode(merchantStore, code);
 		return new ResponseEntity<>(new EntityExists(isCategoryExist), HttpStatus.OK);
 	}
@@ -105,9 +107,10 @@ public class CategoryApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	@ConditionalOnApiStatus
+
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
 	public ReadableCategoryList list(@RequestParam(value = "filter", required = false) List<String> filter,
-			@RequestParam(value = "name", required = false) String name, @SecuredResource StoreMerchantId merchantStore,
+			@RequestParam(value = "name", required = false) String name, StoreMerchantId merchantStore,
 			LanguageCode language, Pageable pageable) {
 
 		ListCriteria criteria = new ListCriteria();
@@ -131,9 +134,10 @@ public class CategoryApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	@ConditionalOnApiStatus
+
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
 	public ReadableCategoryList hierarchyList(@RequestParam(value = "filter", required = false) List<String> filter,
-			@RequestParam(value = "name", required = false) String name, @SecuredResource StoreMerchantId merchantStore,
+			@RequestParam(value = "name", required = false) String name, StoreMerchantId merchantStore,
 			LanguageCode language, Pageable pageable) {
 
 		ListCriteria criteria = new ListCriteria();
@@ -153,7 +157,7 @@ public class CategoryApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	@ConditionalOnApiStatus
+
 	public ReadableCategoryList getHierarchyList(@RequestParam(value = "filter", required = false) List<String> filter,
 			@RequestParam(value = "name", required = false) String name, StoreMerchantId merchantStore,
 			LanguageCode language, Pageable pageable) {
@@ -171,9 +175,10 @@ public class CategoryApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	@ConditionalOnApiStatus
-	public ReadableCategoryList list(@PathVariable(name = "productId") Long productId,
-			@SecuredResource StoreMerchantId merchantStore, LanguageCode lang) {
+
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
+	public ReadableCategoryList list(@PathVariable(name = "productId") Long productId, StoreMerchantId merchantStore,
+			LanguageCode lang) {
 
 		return categoryFacade.listByProduct(merchantStore, productId, LanguageCode.nonLanguage());
 	}
@@ -182,18 +187,19 @@ public class CategoryApi {
 	@PostMapping(value = "/private/category", produces = { APPLICATION_JSON_VALUE })
 	@Parameters({ @Parameter(name = "store",
 			schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)) })
-	@ConditionalOnApiStatus
-	public PersistableCategory create(@Valid @RequestBody PersistableCategory category,
-			@SecuredResource StoreMerchantId merchantStore) {
+
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
+	public PersistableCategory create(@Valid @RequestBody PersistableCategory category, StoreMerchantId merchantStore) {
 		return categoryFacade.saveCategory(merchantStore, category);
 	}
 
 	@PutMapping(value = "/private/category/{id}", produces = { APPLICATION_JSON_VALUE })
 	@Parameters({ @Parameter(name = "store",
 			schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)) })
-	@ConditionalOnApiStatus
+
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
 	public PersistableCategory update(@PathVariable Long id, @Valid @RequestBody PersistableCategory category,
-			@SecuredResource StoreMerchantId merchantStore) {
+			StoreMerchantId merchantStore) {
 		category.setId(id);
 		return categoryFacade.saveCategory(merchantStore, category);
 	}
@@ -201,9 +207,10 @@ public class CategoryApi {
 	@PatchMapping(value = "/private/category/{id}/visible", produces = { APPLICATION_JSON_VALUE })
 	@Parameters({ @Parameter(name = "store",
 			schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)) })
-	@ConditionalOnApiStatus
+
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
 	public void updateVisible(@PathVariable Long id, @Valid @RequestBody PersistableCategory category,
-			@SecuredResource StoreMerchantId merchantStore) {
+			StoreMerchantId merchantStore) {
 
 		category.setId(id);
 		categoryFacade.setVisible(category, merchantStore);
@@ -214,15 +221,17 @@ public class CategoryApi {
 			summary = "Move category {id} under category {parent}")
 	@Parameters({ @Parameter(name = "store",
 			schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)) })
-	@ConditionalOnApiStatus
-	public void move(@PathVariable Long id, @PathVariable Long parent, @SecuredResource StoreMerchantId merchantStore) {
+
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
+	public void move(@PathVariable Long id, @PathVariable Long parent, StoreMerchantId merchantStore) {
 		categoryFacade.move(id, parent, merchantStore);
 	}
 
 	@DeleteMapping(value = "/private/category/{id}", produces = { APPLICATION_JSON_VALUE })
 	@ResponseStatus(OK)
-	@ConditionalOnApiStatus
-	public void delete(@PathVariable("id") Long categoryId, @SecuredResource StoreMerchantId merchantStore) {
+
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
+	public void delete(@PathVariable("id") Long categoryId, StoreMerchantId merchantStore) {
 		categoryFacade.deleteCategory(categoryId, merchantStore);
 	}
 

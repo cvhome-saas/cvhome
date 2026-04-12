@@ -8,6 +8,7 @@ dependencies {
 	api project(':store-pod:merchant:merchant-external-api')
 	api project(':store-pod:catalog:catalog-external-api')
 	api project(':store-pod:checkout:checkout-commons')
+	api project(':store-pod:commons:customer:customer-core')
 	implementation project(':store-pod:commons:reference:reference-core')
 	implementation libs.commons.beanutils
 	compileOnly libs.spring.data.jpa

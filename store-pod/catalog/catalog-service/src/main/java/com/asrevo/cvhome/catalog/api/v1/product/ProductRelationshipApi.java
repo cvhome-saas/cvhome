@@ -6,7 +6,7 @@ import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.model.product.ReadableProductList;
 import com.asrevo.cvhome.catalog.service.facade.items.ProductItemsFacade;
 import com.asrevo.cvhome.catalog.services.product.ProductService;
-import com.asrevo.cvhome.commons.annotation.SecuredResource;
+
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
@@ -20,10 +20,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-@Controller
+@RestController
 @RequestMapping("/api/v1")
 @Tag(name = "Product groups management resource (Product Groups Management Api)")
 @Slf4j
@@ -47,8 +48,9 @@ public class ProductRelationshipApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	public @ResponseBody ReadableProductList productRelatedProducts(@PathVariable final Long id,
-			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
+	public ReadableProductList productRelatedProducts(@PathVariable final Long id, StoreMerchantId merchantStore,
+			LanguageCode language) {
 		Product product = productService.getById(id);
 		return productItemsFacade.relatedTinyProducts(product, merchantStore, LanguageCode.nonLanguage());
 	}
@@ -62,8 +64,8 @@ public class ProductRelationshipApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	public @ResponseBody ReadableProductList getProductRelatedProducts(@PathVariable final Long id,
-			StoreMerchantId merchantStore, LanguageCode language) {
+	public ReadableProductList getProductRelatedProducts(@PathVariable final Long id, StoreMerchantId merchantStore,
+			LanguageCode language) {
 		Product product = productService.getById(id);
 		return productItemsFacade.relatedMinimalProducts(product, merchantStore, language);
 	}
@@ -75,8 +77,9 @@ public class ProductRelationshipApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	public @ResponseBody void addProductToRelatedGroup(@PathVariable Long relatedId, @PathVariable Long productId,
-			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
+	public void addProductToRelatedGroup(@PathVariable Long relatedId, @PathVariable Long productId,
+			StoreMerchantId merchantStore, LanguageCode language) {
 
 		Product relatedProduct = productService.findOne(relatedId, merchantStore);
 
@@ -91,8 +94,9 @@ public class ProductRelationshipApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	public @ResponseBody void removeProductToRelatedGroup(@PathVariable Long relatedId, @PathVariable Long productId,
-			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) throws ServiceException {
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
+	public void removeProductToRelatedGroup(@PathVariable Long relatedId, @PathVariable Long productId,
+			StoreMerchantId merchantStore, LanguageCode language) throws ServiceException {
 
 		Product relatedProduct = productService.findOne(relatedId, merchantStore);
 

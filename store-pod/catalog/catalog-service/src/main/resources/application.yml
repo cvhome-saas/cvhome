@@ -12,7 +12,7 @@ spring:
             client-id: store-pod-507f1f77@service.store-pod.internal
             client-secret: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
             authorization-grant-type: client_credentials
-            scope: internal
+            scope: store_pod
   sql:
     init:
       schema-locations: classpath:init-sql/schema.sql

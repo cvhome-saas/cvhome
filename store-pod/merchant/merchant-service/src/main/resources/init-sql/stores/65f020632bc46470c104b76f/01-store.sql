@@ -10,7 +10,7 @@ INSERT INTO merchant.merchant_store (store_merchant_id, currency_format_national
                                      store_city, store_name, store_phone, store_postal_code, store_state_prov,
                                      use_cache, require_login_for_order_placement, weightunitcode, country_id,
                                      currency_id, language_code)
-VALUES ('65f020632bc46470c104b76f', false, '2024-03-31', '352023632b046970c104b76f', 'MODERN', 'LIGHT',
+VALUES ('65f020632bc46470c104b76f', false, '2024-03-31', '352023632b046970c104b76f', 'JEWELERY', 'LIGHT',
         'CM', -- Changed seizeunitcode to CM
         'contact@beaute-elegante.fr', 'logo.jpeg', 'banner.jpeg', '15 Rue de la Paix', 'Paris', 'Beauté-Élégante-Paris',
         '+33 1 23 45 67 89',

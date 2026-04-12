@@ -1,9 +1,20 @@
+export interface OrderPage {
+    content: Order[];
+    pageNumber: number;
+    recordsFiltered: number;
+    size: number;
+    totalElements: number;
+    totalPages: number;
+}
+
 export interface Order {
     id: number
     billing: OrderAddress
     delivery: OrderAddress
     shipping: any
     payment: string
+    orderStatus: string
+    datePurchased: string
     total: OrderTotal | undefined
     products: ProductItem[] | undefined
 }
@@ -27,6 +38,7 @@ export interface OrderAddress {
 }
 
 export interface OrderTotal {
+    value:number
     totals: TotalItem[] | undefined
     grandTotal: any
 }
@@ -54,3 +66,15 @@ export interface ProductItem {
     attributes: any[]
     image: any
 }
+
+// order-history.ts
+
+export interface OrderHistoryItem {
+    id: number;
+    orderId: number;
+    comments: string | null;
+    date: string;
+    orderStatus: string;
+}
+
+export type OrderHistoryList = OrderHistoryItem[];

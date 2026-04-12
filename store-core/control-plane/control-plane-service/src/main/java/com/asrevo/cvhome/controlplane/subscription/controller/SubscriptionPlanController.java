@@ -1,6 +1,5 @@
 package com.asrevo.cvhome.controlplane.subscription.controller;
 
-import com.asrevo.cvhome.commons.annotation.ConditionalOnApiStatus;
 import com.asrevo.cvhome.commons.domain.SubscriptionPlan;
 import com.asrevo.cvhome.controlplane.subscription.commons.SubscriptionPlanTables;
 import com.asrevo.cvhome.controlplane.subscription.service.SubscriptionPlanTablesService;
@@ -19,7 +18,7 @@ public class SubscriptionPlanController {
 	private final SubscriptionPlanTablesService subscriptionPlanTablesService;
 
 	@GetMapping("list")
-	@ConditionalOnApiStatus
+
 	public SubscriptionPlan[] list() {
 		return SubscriptionPlan.values();
 	}

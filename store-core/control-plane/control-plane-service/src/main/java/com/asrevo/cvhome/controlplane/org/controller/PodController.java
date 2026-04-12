@@ -32,14 +32,14 @@ public class PodController {
 	private final PodService podService;
 
 	@GetMapping
-	@PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN','ROLE_ORG_ADMIN') or hasAuthority('SCOPE_INTERNAL')")
+	@PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN','ROLE_ORG_ADMIN') or hasAuthority('SCOPE_STORE_CORE')")
 	public Mono<Page<Pod>> findAllPods(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, Pageable pageable) {
 		return Mono.fromCallable(() -> identity.isSuperAdmin() ? podService.listAllPods(pageable)
 				: podService.listAllPods(identity.org(), pageable));
 	}
 
 	@GetMapping("list")
-	@PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN','ROLE_ORG_ADMIN') or hasAuthority('SCOPE_INTERNAL')")
+	@PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN','ROLE_ORG_ADMIN') or hasAuthority('SCOPE_STORE_CORE')")
 	public Mono<List<Pod>> listPods(@OrgStorePrincipalInfo UserOrgStoreIdentity identity) {
 		Pageable pageable = Pageable.unpaged();
 		return Mono.fromCallable(() -> identity.isSuperAdmin() ? podService.listAllPods(pageable).toList()

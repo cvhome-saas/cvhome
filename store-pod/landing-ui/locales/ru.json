@@ -72,6 +72,41 @@
       "FILTER_BY_MANUFACTURER": "Фильтр по производителю",
       "ALL": "Все",
       "NO_PRODUCTS_FOUND": "Товаров не найдено."
+    },
+    "CUSTOMER": {
+      "TITLE": "Мой аккаунт",
+      "HOME_TITLE": "Мой аккаунт",
+      "PROFILE": "Профиль",
+      "ADDRESSES": "Адреса",
+      "ORDERS": "Заказы",
+      "ORDER_ID": "Номер заказа",
+      "DATE": "Дата",
+      "TOTAL": "Итого",
+      "STATUS": "Статус",
+      "ACTIONS": "Действия",
+      "VIEW_ORDER": "Просмотреть детали",
+      "ORDER_DETAILS": "Детали заказа",
+      "BILLING_ADDRESS": "Платёжный адрес",
+      "SHIPPING_ADDRESS": "Адрес доставки",
+      "ORDER_ITEMS": "Товары в заказе",
+      "ORDER_HISTORY": "История заказов",
+      "NO_ORDERS": "Вы ещё не сделали ни одного заказа.",
+      "PERSONAL_INFO": "Личная информация",
+      "FIRST_NAME": "Имя",
+      "LAST_NAME": "Фамилия",
+      "EMAIL": "Электронная почта",
+      "PHONE": "Телефон",
+      "USERNAME": "Имя пользователя",
+      "LOADING": "Загрузка...",
+      "PRODUCT": "Товар",
+      "QTY": "Кол-во",
+      "PRICE": "Цена",
+      "SUB_TOTAL": "Промежуточный итог",
+      "ORDERED": "Заказан",
+      "PROCESSED": "Обработан",
+      "DELIVERED": "Доставлен",
+      "REFUNDED": "Возвращён",
+      "CANCELED": "Отменён"
     }
   },
   "COMPONENTS": {
@@ -100,7 +135,8 @@
         "ES": "Испанский"
       },
       "LOGIN": "Войти",
-      "LOGOUT": "Выйти"
+      "LOGOUT": "Выйти",
+      "PROFILE": "Профиль"
     },
     "FOOTER": {
       "SOCIAL_FACEBOOK": "Facebook",

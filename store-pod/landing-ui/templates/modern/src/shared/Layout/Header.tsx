@@ -19,7 +19,7 @@ import {Button} from "@/components/ui/button";
 import {Sheet, SheetClose, SheetContent, SheetHeader, SheetTitle, SheetTrigger} from "@/components/ui/sheet";
 import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from "@/components/ui/accordion";
 import {cn} from "@/lib/utils";
-import {Globe, Menu, ShoppingBag, X} from "lucide-react";
+import {Globe, Menu, ShoppingBag, X, User} from "lucide-react";
 import {Box} from "@/types/content";
 import {Store} from "@/types/store";
 import {parseDescription} from "@/services/description-view-util";
@@ -29,8 +29,6 @@ import {CartProductList} from "@/shared/Cart/CartProductList";
 import {isRtl} from "@/services/direction-utils";
 import {useCart} from "@store-front/hooks/use-cart";
 import {useUser} from "@store-front/hooks/use-user";
-import {AuthService} from "@store-front/services/auth-service";
-import {User} from "lucide-react";
 
 export const Header = ({params, headerBox}: {
     params: LayoutParams,
@@ -131,7 +129,7 @@ export const Header = ({params, headerBox}: {
                         {user ? (
                             <div className="flex items-center gap-2">
                                 <span className="text-xs font-medium text-muted-foreground hidden sm:inline">
-                                    {user?.claims?.name}
+                                    {user?.username}
                                 </span>
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
@@ -140,6 +138,11 @@ export const Header = ({params, headerBox}: {
                                         </Button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end">
+                                        <DropdownMenuItem asChild>
+                                            <Link href="/customer" className="cursor-pointer text-xs uppercase tracking-[0.12em]">
+                                                {t('PROFILE')}
+                                            </Link>
+                                        </DropdownMenuItem>
                                         <DropdownMenuItem onClick={logout} className="cursor-pointer text-destructive focus:text-destructive text-xs uppercase tracking-[0.12em]">
                                             {t('LOGOUT')}
                                         </DropdownMenuItem>
@@ -198,6 +201,7 @@ const MobileNavContent = ({params, cart, setCartOpen}: {
     setCartOpen: (open: boolean) => void
 }) => {
     const t = useTranslations('COMPONENTS.HEADER');
+    const { user, login, logout } = useUser(params.storeContext);
     return (
         <div className="mt-6 flow-root">
             <div className="-my-6 divide-y divide-border">
@@ -257,7 +261,21 @@ const MobileNavContent = ({params, cart, setCartOpen}: {
                     ))}
                 </div>
 
-                <div className="py-6">
+                <div className="py-6 space-y-4">
+                    {user ? (
+                        <>
+                            <div className="px-3 flex items-center justify-between">
+                                <span className="text-sm font-semibold tracking-[0.12em] uppercase">{user.username}</span>
+                                <Button variant="ghost" size="sm" onClick={logout} className="text-xs tracking-[0.12em] uppercase">{t('LOGOUT')}</Button>
+                            </div>
+                            <Link href="/customer"
+                                  className="-mx-3 block rounded-xl px-3 py-3 text-sm font-semibold tracking-[0.12em] uppercase text-foreground hover:bg-accent">
+                                {t('PROFILE')}
+                            </Link>
+                        </>
+                    ) : (
+                        <Button variant="outline" className="w-full rounded-xl tracking-[0.12em] uppercase text-xs" onClick={login}>{t('LOGIN')}</Button>
+                    )}
                     <LanguageSelector store={params.store} locale={params.locale} className="w-full"/>
                 </div>
                 <div className="py-6">
@@ -276,13 +294,14 @@ const MobileNavContent = ({params, cart, setCartOpen}: {
     );
 }
 
-const ListItem = React.forwardRef<HTMLAnchorElement, React.ComponentPropsWithoutRef<"a">>(
-    ({className, title, children, ...props}, ref) => {
+const ListItem = React.forwardRef<HTMLAnchorElement, React.ComponentPropsWithoutRef<typeof Link>>(
+    ({className, title, children, href, ...props}, ref) => {
         return (
             <li>
                 <NavigationMenuLink asChild>
-                    <a
+                    <Link
                         ref={ref}
+                        href={href}
                         className={cn(
                             "block select-none rounded-xl bg-transparent p-4 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
                             className
@@ -290,10 +309,12 @@ const ListItem = React.forwardRef<HTMLAnchorElement, React.ComponentPropsWithout
                         {...props}
                     >
                         <div className="text-sm font-medium leading-none">{title}</div>
-                        <p className="mt-1 line-clamp-2 text-sm leading-snug text-muted-foreground">
-                            {children}
-                        </p>
-                    </a>
+                        {children && (
+                            <p className="mt-1 line-clamp-2 text-sm leading-snug text-muted-foreground">
+                                {children}
+                            </p>
+                        )}
+                    </Link>
                 </NavigationMenuLink>
             </li>
         );
@@ -437,7 +458,7 @@ export const NavCartDialog = (
                         </>
                     )}
 
-                    <div className="mt-4 flex justify-center text-center text-xs text-muted-foreground">
+                    <div className="mt-4 flex justify-center text-center text-sm text-muted-foreground">
                         <p>
                             {t('OR')}{' '}
                             <SheetClose type="button" className="font-semibold text-foreground hover:underline">

@@ -33,26 +33,12 @@ public class CustomerEntity extends Customer implements Serializable {
 
 	private Address delivery;
 
-	private String gender;
-
-	@JsonSerialize(using = LanguageCodeSerializer.class)
-	@JsonDeserialize(using = LanguageCodeDeSerializer.class)
-	private LanguageCode language;
-
 	private String firstName;
 
 	private String lastName;
 
-	private String provider; // online, facebook ...
+	private String username;
 
-	private String storeCode;
-
-	// @NotEmpty(message="{NotEmpty.customer.userName}")
-	// can be email or anything else
-	private String userName;
-
-	private Double rating = 0D;
-
-	private int ratingCount;
+	private String cuaExternalId;
 
 }

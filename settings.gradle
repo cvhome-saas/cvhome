@@ -36,6 +36,7 @@ include(
         'store-pod:commons:reference:reference-commons',
         'store-pod:commons:reference:reference-core',
         'store-pod:commons:customer:customer-commons',
+        'store-pod:commons:customer:customer-core',
         'store-pod:catalog:catalog-commons',
         'store-pod:catalog:catalog-external-api',
         'store-pod:catalog:catalog-core',

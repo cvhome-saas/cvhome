@@ -1,9 +1,9 @@
 import {useEffect, useState} from "react";
 import {AuthService} from "@store-front/services/auth-service";
-import {AuthEventDetail, AuthEventType, StoreContext, User} from "@store-front/types";
+import {AuthEventDetail, AuthEventType, StoreContext, AuthUser} from "@store-front/types";
 
 export function useUser(storeContext: StoreContext) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
 
   const fetchUser = async () => {
@@ -37,7 +37,7 @@ export function useUser(storeContext: StoreContext) {
   }, [storeContext]);
 
   const login = () => AuthService.login(storeContext);
-  const logout = () => AuthService.logout();
+  const logout = () => AuthService.logout(storeContext);
 
   return {
     user,

@@ -15,4 +15,5 @@ export * from "./params";
 export * from "./checkout-cart";
 export * from "./checkout-constants";
 export * from "./auth";
-export * from "./user";
+export * from "./auth-user";
+export * from "./customer";

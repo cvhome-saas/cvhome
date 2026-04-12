@@ -32,4 +32,7 @@ public class PersistableOrder extends Order {
 	@JsonIgnore
 	private Long customerId;
 
+	@JsonIgnore
+	private String cuaExternalId;
+
 }

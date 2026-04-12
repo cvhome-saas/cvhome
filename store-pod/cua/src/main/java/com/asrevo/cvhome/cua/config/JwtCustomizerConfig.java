@@ -1,22 +1,16 @@
 package com.asrevo.cvhome.cua.config;
 
-import java.util.Map;
+import com.asrevo.cvhome.cua.security.SecurityUser;
 import java.util.Objects;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal;
 import org.springframework.security.oauth2.server.authorization.OAuth2TokenType;
 import org.springframework.security.oauth2.server.authorization.token.JwtEncodingContext;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 
 @Configuration
 public class JwtCustomizerConfig {
-
-	private final static Map<String, String> attributeLookup = Map.of("email", "email", "name", "name", "given_name",
-			"givenName", "family_name", "familyName", "picture", "picture", "avatar_url", "picture", "email_verified",
-			"emailVerified");
 
 	@Bean
 	OAuth2TokenCustomizer<JwtEncodingContext> oauth2TokenCustomizer() {
@@ -26,32 +20,29 @@ public class JwtCustomizerConfig {
 				return; // only modify access tokens
 			}
 
-			Map<String, Object> attrs = getOAuth2UserAttr(context);
+			Authentication rawPrincipal = context.getPrincipal();
 
-			attrs.forEach((key, value) -> {
-				if (attributeLookup.containsKey(key) && Objects.nonNull(value)) {
-					String claimKey = attributeLookup.get(key);
-					context.getClaims().claim(claimKey, value);
+			if (rawPrincipal.getPrincipal() instanceof SecurityUser principal) {
+				if (Objects.nonNull(principal.getEmail())) {
+					context.getClaims().claim("email", principal.getEmail());
 				}
-			});
+				if (Objects.nonNull(principal.getFirstName())) {
+					context.getClaims().claim("firstName", principal.getFirstName());
+				}
+				if (Objects.nonNull(principal.getLastName())) {
+					context.getClaims().claim("lastName", principal.getLastName());
+				}
+				if (Objects.nonNull(principal.getClientId())) {
+					context.getClaims().claim("clientId", principal.getClientId());
+				}
+				if (Objects.nonNull(principal.getId())) {
+					context.getClaims().claim("sub", principal.getId().toString());
+				}
+				context.getClaims().claim("username", principal.getUsername());
+				context.getClaims().claim("roles", new String[] { "CUSTOMER" });
+			}
 
 		};
-	}
-
-	private static Map<String, Object> getOAuth2UserAttr(JwtEncodingContext context) {
-		Authentication rawPrincipal = context.getPrincipal();
-
-		if (rawPrincipal instanceof OAuth2AuthenticatedPrincipal principal) {
-			return principal.getAttributes();
-		}
-		else if (rawPrincipal instanceof OAuth2AuthenticationToken authToken
-				&& Objects.nonNull(authToken.getPrincipal())) {
-			return authToken.getPrincipal().getAttributes();
-		}
-		else if (rawPrincipal.getPrincipal() instanceof OAuth2AuthenticatedPrincipal principal) {
-			return principal.getAttributes();
-		}
-		return Map.of();
 	}
 
 }

@@ -1,7 +1,5 @@
 package com.asrevo.cvhome.checkout.controller.v1.auth;
 
-import com.asrevo.cvhome.commons.annotation.ApiUsage;
-import com.asrevo.cvhome.commons.annotation.ConditionalOnApiStatus;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
 	@GetMapping("current")
-	@ConditionalOnApiStatus(usage = ApiUsage.WILL_USED)
+
 	public ResponseEntity<Jwt> current(JwtAuthenticationToken jwtAuthenticationToken) {
 		return Optional.ofNullable((Jwt) jwtAuthenticationToken.getPrincipal())
 			.map(ResponseEntity::ok)
@@ -29,7 +27,7 @@ public class AuthController {
 	}
 
 	@GetMapping("me")
-	@ConditionalOnApiStatus(usage = ApiUsage.WILL_USED)
+
 	public JwtAuthenticationToken me() {
 		return ((JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication());
 	}

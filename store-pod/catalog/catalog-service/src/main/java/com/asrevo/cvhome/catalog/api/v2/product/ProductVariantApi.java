@@ -5,7 +5,7 @@ import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1_STR;
 import com.asrevo.cvhome.catalog.model.product.product.variant.PersistableProductVariant;
 import com.asrevo.cvhome.catalog.model.product.product.variant.ReadableProductVariant;
 import com.asrevo.cvhome.catalog.service.facade.product.ProductVariantFacade;
-import com.asrevo.cvhome.commons.annotation.SecuredResource;
+
 import com.asrevo.cvhome.commons.domain.Entity;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.constants.Constants;
@@ -25,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,7 +37,7 @@ import org.springframework.web.bind.annotation.*;
  *
  * @author carlsamson
  */
-@Controller
+@RestController
 @RequestMapping("/api/v2")
 @Tags(value = @Tag(name = "Product variants api"))
 @Slf4j
@@ -55,8 +56,9 @@ public class ProductVariantApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	public @ResponseBody Entity create(@Valid @RequestBody PersistableProductVariant variant,
-			@PathVariable Long productId, @SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
+	public Entity create(@Valid @RequestBody PersistableProductVariant variant, @PathVariable Long productId,
+			StoreMerchantId merchantStore, LanguageCode language) {
 		Long id = productVariantFacade.create(variant, productId, merchantStore, language);
 		return new Entity(id);
 	}
@@ -65,8 +67,9 @@ public class ProductVariantApi {
 	@PutMapping(value = { "/private/product/{id}/variant/{variantId}" })
 	@Operation(method = "PUT", description = "Update product variant",
 			responses = @ApiResponse(content = @Content(mediaType = "application/json", schema = @Schema())))
-	public @ResponseBody void update(@PathVariable Long id, @PathVariable Long variantId,
-			@Valid @RequestBody PersistableProductVariant variant, @SecuredResource StoreMerchantId merchantStore,
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
+	public void update(@PathVariable Long id, @PathVariable Long variantId,
+			@Valid @RequestBody PersistableProductVariant variant, StoreMerchantId merchantStore,
 			LanguageCode language) {
 		productVariantFacade.update(variantId, variant, id, merchantStore, language);
 	}
@@ -80,8 +83,9 @@ public class ProductVariantApi {
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	@Operation(method = "GET", description = "Check if option set code already exists",
 			responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = EntityExists.class))) })
-	public @ResponseBody ResponseEntity<EntityExists> exists(@PathVariable Long id, @PathVariable String sku,
-			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
+	public ResponseEntity<EntityExists> exists(@PathVariable Long id, @PathVariable String sku,
+			StoreMerchantId merchantStore, LanguageCode language) {
 
 		boolean exist = productVariantFacade.exists(sku, merchantStore, id, language);
 		return new ResponseEntity<>(new EntityExists(exist), HttpStatus.OK);
@@ -98,8 +102,9 @@ public class ProductVariantApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	public @ResponseBody ReadableProductVariant get(@PathVariable final Long id, @PathVariable Long variantId,
-			@RequestParam(value = "lang", required = false) String lang, @SecuredResource StoreMerchantId merchantStore,
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
+	public ReadableProductVariant get(@PathVariable final Long id, @PathVariable Long variantId,
+			@RequestParam(value = "lang", required = false) String lang, StoreMerchantId merchantStore,
 			LanguageCode language) {
 
 		return productVariantFacade.get(variantId, id, merchantStore, language);
@@ -112,8 +117,9 @@ public class ProductVariantApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	public @ResponseBody ReadableEntityList<ReadableProductVariant> list(@PathVariable final Long id,
-			@SecuredResource StoreMerchantId merchantStore, LanguageCode language, Pageable pageable) {
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
+	public ReadableEntityList<ReadableProductVariant> list(@PathVariable final Long id, StoreMerchantId merchantStore,
+			LanguageCode language, Pageable pageable) {
 
 		return productVariantFacade.list(id, merchantStore, language, pageable);
 	}
@@ -125,8 +131,9 @@ public class ProductVariantApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	public void delete(@PathVariable Long id, @PathVariable Long variantId,
-			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
+	public void delete(@PathVariable Long id, @PathVariable Long variantId, StoreMerchantId merchantStore,
+			LanguageCode language) {
 
 		productVariantFacade.delete(variantId, id, merchantStore);
 	}

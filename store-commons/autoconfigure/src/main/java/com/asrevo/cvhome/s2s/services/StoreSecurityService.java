@@ -6,7 +6,7 @@ import org.springframework.security.core.Authentication;
 
 public interface StoreSecurityService {
 
-	boolean isSuperAdmin(Authentication authentication, ManagerStoreId requestedStoreId);
+	boolean isSuperAdmin(Authentication authentication);
 
 	boolean isOrgAdmin(Authentication authentication, ManagerStoreId requestedStoreId);
 
@@ -14,12 +14,16 @@ public interface StoreSecurityService {
 
 	boolean isStoreModerator(Authentication authentication, ManagerStoreId requestedStoreId);
 
-	boolean isScopeStore(Authentication authentication);
+	boolean isOrgAdmin(Authentication authentication, ManagerStoreId requestedStoreId, Pod pod);
 
-	boolean isScopeInternal(Authentication authentication);
+	boolean isStoreAdmin(Authentication authentication, ManagerStoreId requestedStoreId, Pod pod);
 
-	boolean isOrgPod();
+	boolean isStoreModerator(Authentication authentication, ManagerStoreId requestedStoreId, Pod pod);
 
-	Pod getPod();
+	boolean isStoreCustomer(Authentication authentication, ManagerStoreId requestedStoreId);
+
+	boolean isScopeStoreCore(Authentication authentication);
+
+	boolean isScopeStorePod(Authentication authentication, Pod pod);
 
 }

@@ -51,6 +51,10 @@ export interface ReadableAudit {
 }
 
 export enum Theme {
+    BASIS = 'BASIS',
+    MODERN = 'MODERN',
+    JEWELERY = 'JEWELERY',
+    BEAUTY = 'BEAUTY',
     DEFAULT = 'DEFAULT',
     FASHION = 'FASHION',
     FURNITURE = 'FURNITURE',
@@ -61,7 +65,6 @@ export enum Theme {
     COSMETICS = 'COSMETICS',
     WATCHES = 'WATCHES',
     BABY = 'BABY',
-    JEWELERY = 'JEWELERY',
     TOOLS = 'TOOLS',
 }
 
