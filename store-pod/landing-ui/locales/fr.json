@@ -72,6 +72,41 @@
       "FILTER_BY_MANUFACTURER": "Filtrer par fabricant",
       "ALL": "Tout",
       "NO_PRODUCTS_FOUND": "Aucun produit trouvé."
+    },
+    "CUSTOMER": {
+      "TITLE": "Mon compte",
+      "HOME_TITLE": "Mon compte",
+      "PROFILE": "Profil",
+      "ADDRESSES": "Adresses",
+      "ORDERS": "Commandes",
+      "ORDER_ID": "ID de commande",
+      "DATE": "Date",
+      "TOTAL": "Total",
+      "STATUS": "Statut",
+      "ACTIONS": "Actions",
+      "VIEW_ORDER": "Voir les détails",
+      "ORDER_DETAILS": "Détails de la commande",
+      "BILLING_ADDRESS": "Adresse de facturation",
+      "SHIPPING_ADDRESS": "Adresse de livraison",
+      "ORDER_ITEMS": "Articles de la commande",
+      "ORDER_HISTORY": "Historique des commandes",
+      "NO_ORDERS": "Vous n'avez pas encore passé de commande.",
+      "PERSONAL_INFO": "Informations personnelles",
+      "FIRST_NAME": "Prénom",
+      "LAST_NAME": "Nom de famille",
+      "EMAIL": "E-mail",
+      "PHONE": "Téléphone",
+      "USERNAME": "Nom d'utilisateur",
+      "LOADING": "Chargement...",
+      "PRODUCT": "Produit",
+      "QTY": "Qté",
+      "PRICE": "Prix",
+      "SUB_TOTAL": "Sous-total",
+      "ORDERED": "Commandé",
+      "PROCESSED": "Traitée",
+      "DELIVERED": "Livrée",
+      "REFUNDED": "Remboursée",
+      "CANCELED": "Annulée"
     }
   },
   "COMPONENTS": {
@@ -100,7 +135,8 @@
         "ES": "Espagnol"
       },
       "LOGIN": "Connexion",
-      "LOGOUT": "Déconnexion"
+      "LOGOUT": "Se déconnecter",
+      "PROFILE": "Profil"
     },
     "FOOTER": {
       "SOCIAL_FACEBOOK": "Facebook",

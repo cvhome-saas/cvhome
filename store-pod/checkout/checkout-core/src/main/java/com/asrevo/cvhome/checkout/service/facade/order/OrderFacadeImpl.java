@@ -365,12 +365,73 @@ public class OrderFacadeImpl implements OrderFacade {
 	}
 
 	@Override
+	public ReadableOrder getReadableOrder(Long orderId, Long customerId, StoreMerchantId store, LanguageCode language) {
+		Validate.notNull(store, "store cannot be null");
+		Order modelOrder = orderService.getOrder(orderId, store);
+		if (modelOrder == null) {
+			throw new ResourceNotFoundException("Order not found with id " + orderId);
+		}
+		if (modelOrder.getCustomerId() == null || !modelOrder.getCustomerId().equals(customerId)) {
+			throw new ResourceNotFoundException("Order not found with id " + orderId + " for customer " + customerId);
+		}
+
+		ReadableOrder readableOrder = new ReadableOrder();
+
+		ReadableCustomer readableCustomer = customerFacade.getCustomerById(customerId, store, language);
+		if (readableCustomer == null) {
+			log.warn("Customer id {} not found in order {}", customerId, orderId);
+		}
+		else {
+			readableOrder.setCustomer(readableCustomer);
+		}
+
+		try {
+			readableOrderPopulator.populate(modelOrder, readableOrder, store, language);
+
+			// order products
+			List<ReadableOrderProduct> orderProducts = new ArrayList<>();
+			for (OrderProduct p : modelOrder.getOrderProducts()) {
+				ReadableOrderProductPopulator orderProductPopulator = new ReadableOrderProductPopulator(
+						externalProductService, imageUtils, externalMerchantStoreService);
+
+				ReadableOrderProduct orderProduct = new ReadableOrderProduct();
+				orderProductPopulator.populate(p, orderProduct, store, language);
+				orderProducts.add(orderProduct);
+			}
+
+			readableOrder.setProducts(orderProducts);
+		}
+		catch (Exception e) {
+			throw new ServiceRuntimeException("Error while getting order [" + orderId + "]");
+		}
+
+		return readableOrder;
+	}
+
+	@Override
 	public List<ReadableOrderStatusHistory> getReadableOrderHistory(Long orderId, StoreMerchantId store,
 			LanguageCode language) {
 
 		Order order = orderService.getOrder(orderId, store);
 		if (order == null) {
 			throw new ResourceNotFoundException("Order id [" + orderId + "] not found for merchand [" + store + "]");
+		}
+
+		Set<OrderStatusHistory> historyList = order.getOrderHistory();
+		return historyList.stream().map(this::mapToReadbleOrderStatusHistory).collect(Collectors.toList());
+	}
+
+	@Override
+	public List<ReadableOrderStatusHistory> getReadableOrderHistory(Long orderId, Long customerId,
+			StoreMerchantId store, LanguageCode language) {
+
+		Order order = orderService.getOrder(orderId, store);
+		if (order == null) {
+			throw new ResourceNotFoundException("Order id [" + orderId + "] not found for merchand [" + store + "]");
+		}
+
+		if (order.getCustomerId() == null || !order.getCustomerId().equals(customerId)) {
+			throw new ResourceNotFoundException("Order not found with id " + orderId + " for customer " + customerId);
 		}
 
 		Set<OrderStatusHistory> historyList = order.getOrderHistory();

@@ -72,6 +72,41 @@
       "FILTER_BY_MANUFACTURER": "Filtrar por Fabricante",
       "ALL": "Todos",
       "NO_PRODUCTS_FOUND": "No se encontraron productos."
+    },
+    "CUSTOMER": {
+      "TITLE": "Mi cuenta",
+      "HOME_TITLE": "Mi cuenta",
+      "PROFILE": "Perfil",
+      "ADDRESSES": "Direcciones",
+      "ORDERS": "Pedidos",
+      "ORDER_ID": "ID del pedido",
+      "DATE": "Fecha",
+      "TOTAL": "Total",
+      "STATUS": "Estado",
+      "ACTIONS": "Acciones",
+      "VIEW_ORDER": "Ver detalles",
+      "ORDER_DETAILS": "Detalles del pedido",
+      "BILLING_ADDRESS": "Dirección de facturación",
+      "SHIPPING_ADDRESS": "Dirección de envío",
+      "ORDER_ITEMS": "Artículos del pedido",
+      "ORDER_HISTORY": "Historial de pedidos",
+      "NO_ORDERS": "Aún no has realizado ningún pedido.",
+      "PERSONAL_INFO": "Información personal",
+      "FIRST_NAME": "Nombre",
+      "LAST_NAME": "Apellido",
+      "EMAIL": "Correo electrónico",
+      "PHONE": "Teléfono",
+      "USERNAME": "Nombre de usuario",
+      "LOADING": "Cargando...",
+      "PRODUCT": "Producto",
+      "QTY": "Cant.",
+      "PRICE": "Precio",
+      "SUB_TOTAL": "Subtotal",
+      "ORDERED": "Pedido",
+      "PROCESSED": "Procesado",
+      "DELIVERED": "Entregado",
+      "REFUNDED": "Reembolsado",
+      "CANCELED": "Cancelado"
     }
   },
   "COMPONENTS": {
@@ -100,7 +135,8 @@
         "ES": "Español"
       },
       "LOGIN": "Iniciar sesión",
-      "LOGOUT": "Cerrar sesión"
+      "LOGOUT": "Cerrar sesión",
+      "PROFILE": "Perfil"
     },
     "FOOTER": {
       "SOCIAL_FACEBOOK": "Facebook",

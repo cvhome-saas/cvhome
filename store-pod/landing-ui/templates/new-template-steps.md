@@ -21,7 +21,7 @@ Copy the folder structure of an existing template (e.g. `basis`). Every file bel
 
 ---
 
-### Step 2 — Configuration Files (5 files, no logic changes needed)
+### Step 2 — Configuration & Static Files
 
 | File | Action |
 |------|--------|
@@ -31,7 +31,8 @@ Copy the folder structure of an existing template (e.g. `basis`). Every file bel
 | `postcss.config.mjs` | Copy as-is. |
 | `eslint.config.mjs` | Copy as-is. |
 | `components.json` | Copy as-is (shadcn config). |
-| `public/` | Copy entire directory — contains `css/login.css` (login page styles), `placeholder.png` (fallback product image), and SVG assets. |
+| `public/` | Copy entire directory. contains `placeholder.png` and SVG assets. |
+| `public/css/login.css` | **CUSTOMIZE** — Update with your new template's brand styles for the login/auth pages. |
 
 ---
 
@@ -105,7 +106,7 @@ You can regenerate any of these via `npx shadcn add <component>` if you want a d
 
 ---
 
-### Step 7 — Shared Components (THE BRAND NEW DESIGN — 17 files)
+### Step 7 — Shared Components (THE BRAND NEW DESIGN — 18 files)
 
 These are the files you actually design from scratch for your new template. This is NOT a copy-paste job; it should be a **completely brand new design** for this template. They all receive the same props as basis/modern — only the JSX and Tailwind classes differ.
 
@@ -147,6 +148,7 @@ src/shared/
   Common/
     Breadcrumb.tsx              ← page breadcrumb trail
     SectionTitle.tsx            ← section heading component
+    Secured.tsx                 ← securing page filter component
 ```
 
 #### Props Contract for each component (do not break these):
@@ -236,7 +238,8 @@ npm run dev          # starts Express server on port 8110
 [ ] postcss.config.mjs (copied)
 [ ] eslint.config.mjs (copied)
 [ ] components.json (copied)
-[ ] public/ (copy entire directory — login.css, placeholder.png, SVGs)
+[ ] public/ (copy entire directory — placeholder.png, SVGs)
+[ ] public/css/login.css (CUSTOMIZE brand styles)
 
 — i18n (copy) —
 [ ] src/proxy.ts (copied)
@@ -283,6 +286,7 @@ npm run dev          # starts Express server on port 8110
 [ ] src/shared/Customer/OrderDetails.tsx
 [ ] src/shared/Common/Breadcrumb.tsx
 [ ] src/shared/Common/SectionTitle.tsx
+[ ] src/shared/Common/Secured.tsx
 
 — Shared types (one-line change) —
 [ ] libs/types/src/store.ts → add new value to Theme enum

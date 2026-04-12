@@ -158,7 +158,7 @@ public class StoreRoleAccessChecker {
 		return authentication.getTokenAttributes().getOrDefault("resource", "").toString();
 	}
 
-	private static String getStoreId(JwtAuthenticationToken authentication) {
+	private String getStoreId(JwtAuthenticationToken authentication) {
 		return authentication.getTokenAttributes().getOrDefault("clientId", "").toString();
 	}
 

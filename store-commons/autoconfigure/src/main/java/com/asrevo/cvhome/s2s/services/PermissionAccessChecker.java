@@ -146,4 +146,13 @@ public class PermissionAccessChecker {
 		}
 	}
 
+	public boolean isCustomerInSameStore(Authentication authentication, ManagerStoreId requestedStoreId) {
+		if (!storeRoleAccessChecker.isStoreCustomer(authentication, requestedStoreId)) {
+			log.debug("Customer {} does not have maintain access on customer on store {} on roles {}",
+					authentication.getName(), requestedStoreId, SecurityUtils.getRoles(authentication));
+			return false;
+		}
+		return true;
+	}
+
 }

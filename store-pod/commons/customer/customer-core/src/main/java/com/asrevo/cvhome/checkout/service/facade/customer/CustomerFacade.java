@@ -36,4 +36,6 @@ public interface CustomerFacade {
 
 	ReadableCustomerList getListByStore(StoreMerchantId store, CustomerCriteria criteria, LanguageCode language);
 
+	Optional<ReadableCustomer> getCustomerByCuaExternalId(String cuaExternalId);
+
 }
