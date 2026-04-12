@@ -105,7 +105,7 @@ You can regenerate any of these via `npx shadcn add <component>` if you want a d
 
 ---
 
-### Step 7 — Shared Components (THE BRAND NEW DESIGN — 17 files)
+### Step 7 — Shared Components (THE BRAND NEW DESIGN — 18 files)
 
 These are the files you actually design from scratch for your new template. This is NOT a copy-paste job; it should be a **completely brand new design** for this template. They all receive the same props as basis/modern — only the JSX and Tailwind classes differ.
 
@@ -147,6 +147,7 @@ src/shared/
   Common/
     Breadcrumb.tsx              ← page breadcrumb trail
     SectionTitle.tsx            ← section heading component
+    Secured.tsx                 ← securing page filter component
 ```
 
 #### Props Contract for each component (do not break these):
