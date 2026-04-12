@@ -1,30 +1,188 @@
-/* login.css for jewelery theme */
+:root {
+    --background: #ffffff;
+    --foreground: #1a1a1a;
+    --primary: #8b7355; /* Golden/Bronze jewelery primary */
+    --primary-foreground: #ffffff;
+    --muted: #737373;
+    --border: #e5e5e5;
+    --error: #ef4444;
+    --radius: 0.25rem; /* More classic/elegant for jewelery */
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
 body {
-    background-color: oklch(0.98 0.008 80); /* --background: warm ivory */
-    color: oklch(0.16 0.012 60);           /* --foreground: deep charcoal */
-    font-family: 'Jost', 'Helvetica Neue', sans-serif;
+    font-family: 'Playfair Display', serif, -apple-system, sans-serif;
+    background-color: #faf9f6;
+    color: var(--foreground);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 1.5rem;
 }
 
 .login-container {
-    border: 1px solid oklch(0.86 0.025 75); /* --border */
-    border-radius: 0.25rem;
+    width: 100%;
+    max-width: 420px;
+    background: var(--background);
+    padding: 3rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    box-shadow: 0 10px 30px -10px rgb(0 0 0 / 0.05);
 }
 
-button {
-    background-color: oklch(0.62 0.10 70) !important; /* --primary: gold */
-    color: oklch(0.99 0.005 80) !important;
-    border-radius: 0.25rem;
-    letter-spacing: 0.05em;
+.store-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+
+.store-logo {
+    height: 4rem;
+    width: auto;
+    margin-bottom: 1.25rem;
+    object-contain: contain;
+}
+
+.store-name {
+    font-size: 1.25rem;
+    font-weight: 400;
+    letter-spacing: 0.2em;
     text-transform: uppercase;
-    font-size: 0.875rem;
+    color: var(--primary);
 }
 
-button:hover {
-    opacity: 0.88;
+h2 {
+    text-align: center;
+    font-size: 1.75rem;
+    font-weight: 400;
+    margin-bottom: 2.5rem;
+    letter-spacing: 0.05em;
+    font-family: 'Playfair Display', serif;
+}
+
+.error {
+    background-color: #fef2f2;
+    color: var(--error);
+    padding: 0.875rem;
+    border-radius: var(--radius);
+    font-size: 0.875rem;
+    margin-bottom: 2rem;
+    border: 1px solid #fee2e2;
+    text-align: center;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.625rem;
+    color: var(--muted);
 }
 
 input {
-    border-color: oklch(0.88 0.018 75) !important; /* --input */
-    border-radius: 0.25rem;
-    background-color: oklch(0.99 0.005 80);
+    width: 100%;
+    padding: 0.875rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background-color: #ffffff;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 1px var(--primary);
+}
+
+button[type="submit"] {
+    width: 100%;
+    padding: 1rem;
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+    border: 1px solid var(--primary);
+    border-radius: var(--radius);
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 1rem;
+}
+
+button[type="submit"]:hover {
+    background-color: transparent;
+    color: var(--primary);
+}
+
+.social-login {
+    margin-top: 2.5rem;
+    padding-top: 2.5rem;
+    border-top: 1px solid var(--border);
+}
+
+.social-button {
+    display: block;
+    width: 100%;
+    padding: 0.875rem;
+    text-align: center;
+    text-decoration: none;
+    color: var(--foreground);
+    background-color: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.75rem;
+    transition: all 0.3s ease;
+}
+
+.social-button:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.footer {
+    margin-top: 2.5rem;
+    text-align: center;
+    font-size: 0.8125rem;
+    color: var(--muted);
+}
+
+.footer a {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-inline-start: 0.5rem;
+    border-bottom: 1px solid transparent;
+}
+
+.footer a:hover {
+    border-bottom-color: var(--primary);
+}
+
+/* RTL Support */
+[dir="rtl"] .footer a {
+    margin-inline-start: 0;
+    margin-inline-end: 0.5rem;
+}
+
+[dir="rtl"] .store-name {
+    letter-spacing: 0;
 }

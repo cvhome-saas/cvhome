@@ -19,7 +19,7 @@ import {Button} from "@/components/ui/button";
 import {Sheet, SheetClose, SheetContent, SheetHeader, SheetTitle, SheetTrigger} from "@/components/ui/sheet";
 import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from "@/components/ui/accordion";
 import {cn} from "@/lib/utils";
-import {Globe, Menu, ShoppingBag, X} from "lucide-react";
+import {Globe, Menu, ShoppingBag, X, User} from "lucide-react";
 import {Box} from "@/types/content";
 import {Store} from "@/types/store";
 import {parseDescription} from "@/services/description-view-util";
@@ -29,7 +29,6 @@ import {CartProductList} from "@/shared/Cart/CartProductList";
 import {isRtl} from "@/services/direction-utils";
 import {useCart} from "@store-front/hooks/use-cart";
 import {useUser} from "@store-front/hooks/use-user";
-import {User} from "lucide-react";
 
 export const Header = ({params, headerBox}: {
     params: LayoutParams,
@@ -117,7 +116,7 @@ export const Header = ({params, headerBox}: {
                                     ) : (
                                         <Link href={`/category/${category.description.friendlyUrl}`} legacyBehavior
                                               passHref>
-                                            <NavigationMenuLink className={cn(navigationMenuTriggerStyle(), "bg-transparent hover:bg-primary/5 text-foreground hover:text-primary transition-colors font-serif font-medium uppercase tracking-wider text-sm")}>
+                                            <NavigationMenuLink className={navigationMenuTriggerStyle(), "bg-transparent hover:bg-primary/5 text-foreground hover:text-primary transition-colors font-serif font-medium uppercase tracking-wider text-sm"}>
                                                 {category.description.name}
                                             </NavigationMenuLink>
                                         </Link>
@@ -142,7 +141,7 @@ export const Header = ({params, headerBox}: {
                         {user ? (
                             <div className="flex items-center gap-2">
                                 <span className="text-sm font-medium text-muted-foreground hidden sm:inline">
-                                    {user?.claims?.username}
+                                    {user?.username}
                                 </span>
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
@@ -151,6 +150,11 @@ export const Header = ({params, headerBox}: {
                                         </Button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end">
+                                        <DropdownMenuItem asChild>
+                                            <Link href="/customer" className="cursor-pointer">
+                                                {t('PROFILE')}
+                                            </Link>
+                                        </DropdownMenuItem>
                                         <DropdownMenuItem onClick={logout} className="cursor-pointer text-destructive focus:text-destructive">
                                             {t('LOGOUT')}
                                         </DropdownMenuItem>
@@ -190,6 +194,7 @@ const MobileNavContent = ({params, cart, setCartOpen}: {
     setCartOpen: (open: boolean) => void
 }) => {
     const t = useTranslations('COMPONENTS.HEADER');
+    const { user, login, logout } = useUser(params.storeContext);
     return (
         <div className="mt-6 flow-root">
             <div className="-my-6 divide-y divide-border">
@@ -235,7 +240,21 @@ const MobileNavContent = ({params, cart, setCartOpen}: {
                         </Link>
                     ))}
                 </div>
-                <div className="py-6">
+                <div className="py-6 space-y-4">
+                    {user ? (
+                        <>
+                            <div className="px-3 flex items-center justify-between">
+                                <span className="font-medium">{user.username}</span>
+                                <Button variant="ghost" size="sm" onClick={logout}>{t('LOGOUT')}</Button>
+                            </div>
+                            <Link href="/customer"
+                                  className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-foreground hover:bg-accent">
+                                {t('PROFILE')}
+                            </Link>
+                        </>
+                    ) : (
+                        <Button variant="outline" className="w-full" onClick={login}>{t('LOGIN')}</Button>
+                    )}
                     <Button variant="ghost" className="relative" onClick={() => setCartOpen(true)}>
                         <ShoppingBag aria-hidden="true" className="size-6 text-foreground"/>
                         {cart && cart.quantity > 0 && (

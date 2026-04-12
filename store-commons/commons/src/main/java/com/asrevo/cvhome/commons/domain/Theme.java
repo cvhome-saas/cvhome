@@ -7,8 +7,8 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public enum Theme {
 
-	BASIS(true), MODERN(true), FURNITURE(false), SPORTS(false), ELECTRONICS(false), FOOD(false), GLASSES(false),
-	COSMETICS(false), WATCHES(false), BABY(false), JEWELERY(false), TOOLS(false);
+	BASIS(true), MODERN(true), JEWELERY(true), BEAUTY(true), FURNITURE(false), SPORTS(false), ELECTRONICS(false),
+	FOOD(false), GLASSES(false), COSMETICS(false), WATCHES(false), BABY(false), TOOLS(false);
 
 	private final boolean implemented;
 

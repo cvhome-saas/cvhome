@@ -32,8 +32,7 @@ import {useUser} from "@store-front/hooks/use-user";
 
 export const Header = ({params, headerBox}: {
     params: LayoutParams,
-    headerBox: Box | undefined,
-}) => {
+    headerBox: Box | undefined,}) => {
     const t = useTranslations('COMPONENTS.HEADER');
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [cartOpen, setCartOpen] = useState(false);
@@ -159,7 +158,7 @@ export const Header = ({params, headerBox}: {
                         {user ? (
                             <div className="flex items-center gap-2">
                                 <span className="text-xs tracking-wider text-muted-foreground hidden sm:inline uppercase">
-                                    {user?.claims?.username}
+                                    {user?.username}
                                 </span>
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
@@ -168,6 +167,11 @@ export const Header = ({params, headerBox}: {
                                         </Button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end" className="rounded-none">
+                                        <DropdownMenuItem asChild>
+                                            <Link href="/customer" className="cursor-pointer text-xs tracking-widest uppercase">
+                                                {t('PROFILE')}
+                                            </Link>
+                                        </DropdownMenuItem>
                                         <DropdownMenuItem
                                             onClick={logout}
                                             className="cursor-pointer text-xs tracking-widest uppercase text-destructive focus:text-destructive">
@@ -221,6 +225,7 @@ const MobileNavContent = ({params, cart, setCartOpen}: {
     setCartOpen: (open: boolean) => void
 }) => {
     const t = useTranslations('COMPONENTS.HEADER');
+    const { user, login, logout } = useUser(params.storeContext);
     return (
         <div className="mt-6 flow-root">
             <div className="-my-6 divide-y divide-border">
@@ -275,7 +280,21 @@ const MobileNavContent = ({params, cart, setCartOpen}: {
                     ))}
                 </div>
 
-                <div className="py-6">
+                <div className="py-6 space-y-4">
+                    {user ? (
+                        <>
+                            <div className="px-3 flex items-center justify-between">
+                                <span className="text-xs font-semibold tracking-widest uppercase">{user.username}</span>
+                                <Button variant="ghost" size="sm" onClick={logout} className="text-[10px] tracking-widest uppercase">{t('LOGOUT')}</Button>
+                            </div>
+                            <Link href="/customer"
+                                  className="block px-3 py-2 text-xs tracking-widest uppercase font-medium text-foreground hover:text-primary hover:bg-accent rounded-sm transition-colors">
+                                {t('PROFILE')}
+                            </Link>
+                        </>
+                    ) : (
+                        <Button variant="outline" className="w-full rounded-none tracking-widest uppercase text-[10px]" onClick={login}>{t('LOGIN')}</Button>
+                    )}
                     <Button
                         variant="ghost"
                         size="icon"
