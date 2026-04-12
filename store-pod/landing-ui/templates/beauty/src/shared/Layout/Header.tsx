@@ -116,7 +116,7 @@ export const Header = ({params, headerBox}: {
                                     ) : (
                                         <Link href={`/category/${category.description.friendlyUrl}`} legacyBehavior
                                               passHref>
-                                            <NavigationMenuLink className={navigationMenuTriggerStyle(), "bg-transparent hover:bg-primary/5 text-foreground hover:text-primary transition-colors font-serif font-medium uppercase tracking-wider text-sm"}>
+                                            <NavigationMenuLink className={cn(navigationMenuTriggerStyle(), "bg-transparent hover:bg-primary/5 text-foreground hover:text-primary transition-colors font-serif font-medium uppercase tracking-wider text-sm")}>
                                                 {category.description.name}
                                             </NavigationMenuLink>
                                         </Link>
