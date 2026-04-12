@@ -3,7 +3,6 @@ package com.asrevo.cvhome.controlplane.subscription.controller;
 import static com.asrevo.cvhome.s2s.utils.RedirectionUrlBuilder.getPort;
 import static com.asrevo.cvhome.s2s.utils.RedirectionUrlBuilder.getScheme;
 
-import com.asrevo.cvhome.commons.annotation.ConditionalOnApiStatus;
 import com.asrevo.cvhome.commons.annotation.OrgStorePrincipalInfo;
 import com.asrevo.cvhome.commons.domain.ServiceDomain;
 import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
@@ -34,7 +33,7 @@ public class SubscriptionController {
 	private final ServiceDomainProperties serviceDomainProperties;
 
 	@GetMapping("subscribe")
-	@ConditionalOnApiStatus
+
 	public ResponseEntity<Void> subscribe(ServerWebExchange exchange,
 			@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam PriceId priceId) {
 		ServerHttpRequest request = exchange.getRequest();

@@ -1,6 +1,5 @@
 package com.asrevo.cvhome.controlplane.manager.controller;
 
-import com.asrevo.cvhome.commons.annotation.ConditionalOnApiStatus;
 import com.asrevo.cvhome.uaa.domain.user.ReadableUser;
 import com.asrevo.cvhome.controlplane.manager.dto.CreateOrgRequest;
 import com.asrevo.cvhome.controlplane.manager.service.SignupService;
@@ -21,7 +20,7 @@ public class SignUpController {
 	private final SignupService signupService;
 
 	@PostMapping("public/create")
-	@ConditionalOnApiStatus
+
 	public Mono<ReadableUser> create(@RequestBody CreateOrgRequest request) {
 		return Mono.just(signupService.createOrgUser(request));
 	}

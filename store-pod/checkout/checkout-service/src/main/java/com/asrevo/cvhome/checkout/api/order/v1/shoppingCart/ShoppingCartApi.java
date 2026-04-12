@@ -3,7 +3,6 @@ package com.asrevo.cvhome.checkout.api.order.v1.shoppingCart;
 import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1_STR;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
-import com.asrevo.cvhome.commons.annotation.ConditionalOnApiStatus;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.checkout.model.shoppingcart.PersistableShoppingCartItem;
 import com.asrevo.cvhome.checkout.model.shoppingcart.ReadableShoppingCart;
@@ -25,26 +24,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-@Controller
+@RestController
 @RequestMapping("/api/v1")
 @Tag(name = "Shopping cart resource", description = "Add, remove and retrieve shopping carts")
 @Slf4j
 public class ShoppingCartApi {
 
-	/*
-	 *
-	 * @Autowired private
-	 * com.salesmanager.shop.store.controller.shoppingCart.facade.v1.ShoppingCartFacade
-	 * shoppingCartFacadev1;
-	 *
-	 * @Autowired private CustomerService customerService;
-	 *
-	 * @Autowired private CustomerFacade customerFacadev1;
-	 *
-	 * @Autowired private
-	 * com.salesmanager.shop.store.controller.customer.facade.CustomerFacade
-	 * customerFacade;
-	 */
 	private final ShoppingCartFacade shoppingCartFacade;
 
 	public ShoppingCartApi(ShoppingCartFacade shoppingCartFacade) {
@@ -62,10 +47,9 @@ public class ShoppingCartApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	@ConditionalOnApiStatus
-	public @ResponseBody ReadableShoppingCart addToCart(
-			@Valid @RequestBody PersistableShoppingCartItem shoppingCartItem, StoreMerchantId merchantStore,
-			LanguageCode language) {
+
+	public ReadableShoppingCart addToCart(@Valid @RequestBody PersistableShoppingCartItem shoppingCartItem,
+			StoreMerchantId merchantStore, LanguageCode language) {
 		return shoppingCartFacade.addToCart(shoppingCartItem, merchantStore, language);
 	}
 
@@ -78,7 +62,7 @@ public class ShoppingCartApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	@ConditionalOnApiStatus
+
 	public ResponseEntity<ReadableShoppingCart> modifyCart(@PathVariable String code,
 			@Valid @RequestBody PersistableShoppingCartItem shoppingCartItem, StoreMerchantId merchantStore,
 			LanguageCode language) {
@@ -111,8 +95,8 @@ public class ShoppingCartApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	@ConditionalOnApiStatus
-	public @ResponseBody ReadableShoppingCart getByCode(@PathVariable String code, StoreMerchantId merchantStore,
+
+	public ReadableShoppingCart getByCode(@PathVariable String code, StoreMerchantId merchantStore,
 			LanguageCode language, HttpServletResponse response) {
 
 		try {
@@ -147,7 +131,7 @@ public class ShoppingCartApi {
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)),
 			@Parameter(name = "body", schema = @Schema(name = "body", type = "boolean", defaultValue = "false")) })
-	@ConditionalOnApiStatus
+
 	public ResponseEntity<ReadableShoppingCart> deleteCartItem(@PathVariable("code") String cartCode,
 			@PathVariable("sku") String sku, StoreMerchantId merchantStore, LanguageCode language,
 			@RequestParam(defaultValue = "false") boolean body) throws Exception {

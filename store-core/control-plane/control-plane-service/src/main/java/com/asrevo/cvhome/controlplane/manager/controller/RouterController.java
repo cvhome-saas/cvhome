@@ -1,6 +1,5 @@
 package com.asrevo.cvhome.controlplane.manager.controller;
 
-import com.asrevo.cvhome.commons.annotation.ConditionalOnApiStatus;
 import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.commons.domain.Pod;
 import com.asrevo.cvhome.controlplane.manager.service.InternalStoreService;
@@ -23,7 +22,7 @@ public class RouterController {
 	private final PodService podService;
 
 	@GetMapping("store-pod-by-store-id")
-	@ConditionalOnApiStatus
+
 	public Pod getStorePodByStoreId(@RequestParam ManagerStoreId store) {
 		return podService.pod(internalStoreService.getStorePod(store));
 	}

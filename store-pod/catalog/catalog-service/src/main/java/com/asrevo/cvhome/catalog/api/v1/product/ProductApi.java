@@ -12,8 +12,7 @@ import com.asrevo.cvhome.catalog.service.facade.product.ProductCommonFacade;
 import com.asrevo.cvhome.catalog.service.facade.product.ProductFacade;
 import com.asrevo.cvhome.catalog.services.category.CategoryService;
 import com.asrevo.cvhome.catalog.services.product.ProductService;
-import com.asrevo.cvhome.commons.annotation.ConditionalOnApiStatus;
-import com.asrevo.cvhome.commons.annotation.SecuredResource;
+
 import com.asrevo.cvhome.commons.domain.Entity;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
@@ -38,6 +37,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,7 +46,7 @@ import org.springframework.web.bind.annotation.*;
  *
  * @author Carl Samson
  */
-@Controller
+@RestController
 @RequestMapping("/api/v1")
 @Tag(name = "Product definition resource (Create udtate and delete product definition. Serves"
 		+ " api v1 and v2 with backward compatibility)")
@@ -80,9 +80,9 @@ public class ProductApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	@ResponseBody
-	@ConditionalOnApiStatus
-	public Entity create(@Valid @RequestBody PersistableProduct product, @SecuredResource StoreMerchantId merchantStore,
+
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
+	public Entity create(@Valid @RequestBody PersistableProduct product, StoreMerchantId merchantStore,
 			LanguageCode language) {
 
 		Long id = productCommonFacade.saveProduct(merchantStore, product, language);
@@ -103,9 +103,10 @@ public class ProductApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	@ConditionalOnApiStatus
+
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
 	public void update(@PathVariable Long id, @Valid @RequestBody LightPersistableProduct product,
-			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
+			StoreMerchantId merchantStore, LanguageCode language) {
 		productCommonFacade.update(id, product, merchantStore, language);
 	}
 
@@ -116,7 +117,8 @@ public class ProductApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	public void delete(@PathVariable Long id, @SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
+	public void delete(@PathVariable Long id, StoreMerchantId merchantStore, LanguageCode language) {
 
 		productCommonFacade.deleteProduct(id, merchantStore);
 	}
@@ -134,13 +136,13 @@ public class ProductApi {
 			summary = "For administration and shop purpose. Specifying ?merchant is "
 					+ "required otherwise it falls back to DEFAULT")
 	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Single product found") })
-	@ResponseBody
+
 	@Parameters({
 			@Parameter(name = "store",
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	@ConditionalOnApiStatus
+
 	// @TODO check if the friendlyUrl is id because frontend use it with id param
 	// @TODO make private api for this
 	public ReadableProduct getByfriendlyUrl(@PathVariable final String friendlyUrl,
@@ -165,9 +167,10 @@ public class ProductApi {
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	@Operation(method = "GET", description = "Check if product code already exists",
 			responses = @ApiResponse(content = @Content(schema = @Schema(implementation = EntityExists.class))))
-	@ConditionalOnApiStatus
-	public ResponseEntity<EntityExists> exists(@RequestParam(value = "code") String code,
-			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
+
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
+	public ResponseEntity<EntityExists> exists(@RequestParam(value = "code") String code, StoreMerchantId merchantStore,
+			LanguageCode language) {
 
 		boolean exists = productCommonFacade.exists(code, merchantStore);
 		return new ResponseEntity<>(new EntityExists(exists), HttpStatus.OK);
@@ -180,9 +183,10 @@ public class ProductApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	@ConditionalOnApiStatus
+
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
 	public void addProductToCategory(@PathVariable Long productId, @PathVariable Long categoryId,
-			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
+			StoreMerchantId merchantStore, LanguageCode language) {
 
 		try {
 			// get the product
@@ -223,9 +227,10 @@ public class ProductApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	@ConditionalOnApiStatus
+
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
 	public void removeProductFromCategory(@PathVariable Long productId, @PathVariable Long categoryId,
-			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
+			StoreMerchantId merchantStore, LanguageCode language) {
 
 		try {
 			Product product = productService.getById(productId);
@@ -269,10 +274,11 @@ public class ProductApi {
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
 	@Operation(method = "POST", description = "Patch product sort order", summary = "Change product sortOrder")
-	@ConditionalOnApiStatus
+
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
 	public void changeProductOrder(@PathVariable Long id,
 			@RequestParam(value = "order", required = false, defaultValue = "0") Integer position,
-			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
+			StoreMerchantId merchantStore, LanguageCode language) {
 
 		try {
 

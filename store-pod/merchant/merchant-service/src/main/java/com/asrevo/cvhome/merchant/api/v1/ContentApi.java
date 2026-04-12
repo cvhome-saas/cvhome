@@ -1,13 +1,10 @@
 package com.asrevo.cvhome.merchant.api.v1;
 
-import com.asrevo.cvhome.commons.annotation.ConditionalOnApiStatus;
-import com.asrevo.cvhome.commons.annotation.SecuredResource;
 import com.asrevo.cvhome.commons.domain.Entity;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.merchant.content.model.content.ContentFile;
 import com.asrevo.cvhome.merchant.content.model.content.ContentFolder;
 import com.asrevo.cvhome.merchant.content.model.content.ContentName;
-import com.asrevo.cvhome.merchant.content.model.content.PersistableContentEntity;
 import com.asrevo.cvhome.merchant.content.model.content.box.PersistableContentBox;
 import com.asrevo.cvhome.merchant.content.model.content.box.ReadableContentBox;
 import com.asrevo.cvhome.merchant.content.model.content.box.ReadableContentBoxList;
@@ -32,6 +29,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -67,9 +65,9 @@ public class ContentApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	@ConditionalOnApiStatus
-	public ReadableContentPageList pages(@SecuredResource StoreMerchantId merchantStore, LanguageCode language,
-			Pageable pageable) {
+
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CONTENT.*')")
+	public ReadableContentPageList pages(StoreMerchantId merchantStore, LanguageCode language, Pageable pageable) {
 		return contentFacade.getContentPages(merchantStore, LanguageCode.nonLanguage(), pageable);
 	}
 
@@ -84,7 +82,7 @@ public class ContentApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	@ConditionalOnApiStatus
+
 	public ReadableContentPageList getPages(StoreMerchantId merchantStore, LanguageCode language, Pageable pageable) {
 		return contentFacade.getContentPages(merchantStore, language, pageable);
 	}
@@ -100,9 +98,9 @@ public class ContentApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	@ConditionalOnApiStatus
-	public ReadableContentBoxList boxes(@SecuredResource StoreMerchantId merchantStore, LanguageCode language,
-			Pageable pageable) {
+
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CONTENT.*')")
+	public ReadableContentBoxList boxes(StoreMerchantId merchantStore, LanguageCode language, Pageable pageable) {
 		return contentFacade.getContentBoxes(merchantStore, LanguageCode.nonLanguage(), pageable);
 	}
 
@@ -117,7 +115,7 @@ public class ContentApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	@ConditionalOnApiStatus
+
 	public ReadableContentBoxList getBoxes(StoreMerchantId merchantStore, LanguageCode language, Pageable pageable) {
 		return contentFacade.getContentBoxes(merchantStore, language, pageable);
 	}
@@ -133,8 +131,9 @@ public class ContentApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	@ConditionalOnApiStatus
-	public ReadableContentPage page(@PathVariable("code") String code, @SecuredResource StoreMerchantId merchantStore,
+
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CONTENT.*')")
+	public ReadableContentPage page(@PathVariable("code") String code, StoreMerchantId merchantStore,
 			LanguageCode language) {
 
 		return contentFacade.getContentPage(code, merchantStore, LanguageCode.allLanguage());
@@ -151,7 +150,7 @@ public class ContentApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	@ConditionalOnApiStatus
+
 	public ReadableContentPage getPage(@PathVariable("code") String code, StoreMerchantId merchantStore,
 			LanguageCode language) {
 
@@ -166,8 +165,9 @@ public class ContentApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	@ConditionalOnApiStatus
-	public ReadableContentBox box(@PathVariable("code") String code, @SecuredResource StoreMerchantId merchantStore,
+
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CONTENT.*')")
+	public ReadableContentBox box(@PathVariable("code") String code, StoreMerchantId merchantStore,
 			LanguageCode language) {
 		return contentFacade.getContentBox(code, merchantStore, LanguageCode.allLanguage());
 	}
@@ -180,7 +180,7 @@ public class ContentApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	@ConditionalOnApiStatus
+
 	public ReadableContentBox getBox(@PathVariable("code") String code, StoreMerchantId merchantStore,
 			LanguageCode language) {
 		return contentFacade.getContentBox(code, merchantStore, language);
@@ -197,7 +197,7 @@ public class ContentApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	@ConditionalOnApiStatus
+
 	public ReadableContentPage pageByName(@PathVariable("name") String name, StoreMerchantId merchantStore,
 			LanguageCode language) {
 
@@ -216,9 +216,10 @@ public class ContentApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	@ConditionalOnApiStatus
-	public Entity createBox(@RequestBody @Valid PersistableContentBox box,
-			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
+
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CONTENT.*')")
+	public Entity createBox(@RequestBody @Valid PersistableContentBox box, StoreMerchantId merchantStore,
+			LanguageCode language) {
 
 		Long id = contentFacade.saveContentBox(box, merchantStore, language);
 		Entity entity = new Entity();
@@ -235,9 +236,9 @@ public class ContentApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	@ConditionalOnApiStatus
-	public EntityExists boxExists(@PathVariable String code, @SecuredResource StoreMerchantId merchantStore,
-			LanguageCode language) {
+
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CONTENT.*')")
+	public EntityExists boxExists(@PathVariable String code, StoreMerchantId merchantStore, LanguageCode language) {
 
 		boolean exists = contentFacade.codeExist(code, BOX, merchantStore);
 		return new EntityExists(exists);
@@ -252,9 +253,9 @@ public class ContentApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	@ConditionalOnApiStatus
-	public EntityExists pageExists(@PathVariable String code, @SecuredResource StoreMerchantId merchantStore,
-			LanguageCode language) {
+
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CONTENT.*')")
+	public EntityExists pageExists(@PathVariable String code, StoreMerchantId merchantStore, LanguageCode language) {
 
 		boolean exists = contentFacade.codeExist(code, PAGE, merchantStore);
 		return new EntityExists(exists);
@@ -272,9 +273,10 @@ public class ContentApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	@ConditionalOnApiStatus
-	public Entity createPage(@RequestBody @Valid PersistableContentPage page,
-			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
+
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CONTENT.*')")
+	public Entity createPage(@RequestBody @Valid PersistableContentPage page, StoreMerchantId merchantStore,
+			LanguageCode language) {
 
 		Long id = contentFacade.saveContentPage(page, merchantStore, language);
 		Entity entity = new Entity();
@@ -291,9 +293,10 @@ public class ContentApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	@ConditionalOnApiStatus
+
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CONTENT.*')")
 	public void updatePage(@RequestBody @Valid PersistableContentPage page, @PathVariable Long id,
-			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
+			StoreMerchantId merchantStore, LanguageCode language) {
 
 		contentFacade.updateContentPage(id, page, merchantStore, language);
 	}
@@ -307,9 +310,10 @@ public class ContentApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	@ConditionalOnApiStatus
+
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CONTENT.*')")
 	public void updateBox(@RequestBody @Valid PersistableContentBox box, @PathVariable Long id,
-			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
+			StoreMerchantId merchantStore, LanguageCode language) {
 
 		contentFacade.updateContentBox(id, box, merchantStore, language);
 	}
@@ -325,7 +329,7 @@ public class ContentApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	@ConditionalOnApiStatus
+
 	// @TODO create another one for private so seller-ui call it in private
 	public ContentFolder images(StoreMerchantId merchantStore, LanguageCode language,
 			@RequestParam(value = "path", required = false) String path) throws Exception {
@@ -340,9 +344,10 @@ public class ContentApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	@ConditionalOnApiStatus
-	public void uploadMultipleFiles(@RequestParam(value = "files") MultipartFile[] files,
-			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
+
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CONTENT.*')")
+	public void uploadMultipleFiles(@RequestParam(value = "files") MultipartFile[] files, StoreMerchantId merchantStore,
+			LanguageCode language) {
 
 		for (MultipartFile f : files) {
 			ContentFile cf = new ContentFile();
@@ -367,8 +372,9 @@ public class ContentApi {
 			responses = @ApiResponse(content = @Content(schema = @Schema())))
 	@Parameters({ @Parameter(name = "store",
 			schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)), })
-	@ConditionalOnApiStatus
-	public void deleteContent(Long id, @SecuredResource StoreMerchantId merchantStore) {
+
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CONTENT.*')")
+	public void deleteContent(Long id, StoreMerchantId merchantStore) {
 		contentFacade.delete(merchantStore, id);
 	}
 
@@ -377,8 +383,9 @@ public class ContentApi {
 			responses = @ApiResponse(content = @Content(schema = @Schema())))
 	@Parameters({ @Parameter(name = "store",
 			schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)) })
-	@ConditionalOnApiStatus
-	public void deleteFile(@Valid ContentName name, @SecuredResource StoreMerchantId merchantStore) {
+
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CONTENT.*')")
+	public void deleteFile(@Valid ContentName name, StoreMerchantId merchantStore) {
 		contentFacade.delete(merchantStore, name.getName(), name.getContentType());
 	}
 

@@ -8,7 +8,6 @@ import com.asrevo.cvhome.catalog.model.product.group.ProductGroup;
 import com.asrevo.cvhome.catalog.model.product.group.ReadableProductGroupList;
 import com.asrevo.cvhome.catalog.service.facade.items.ProductItemsFacade;
 import com.asrevo.cvhome.catalog.services.product.ProductService;
-import com.asrevo.cvhome.commons.annotation.SecuredResource;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.model.entity.EntityExists;
@@ -23,7 +22,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Controller;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -31,7 +30,7 @@ import org.springframework.web.bind.annotation.*;
  *
  * @author carlsamson
  */
-@Controller
+@RestController
 @RequestMapping("/api/v1")
 @Tag(name = "Product groups management resource (Product Groups Management Api)")
 @Slf4j
@@ -52,8 +51,8 @@ public class ProductGroupApi {
 			responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ProductGroup.class))))
 	@Parameters({ @Parameter(name = "store",
 			schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)) })
-	public @ResponseBody ProductGroup creteGroup(@RequestBody ProductGroup group,
-			@SecuredResource StoreMerchantId merchantStore) {
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
+	public ProductGroup creteGroup(@RequestBody ProductGroup group, StoreMerchantId merchantStore) {
 
 		return productItemsFacade.createProductGroup(group, merchantStore);
 	}
@@ -64,8 +63,8 @@ public class ProductGroupApi {
 			responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ProductGroup.class))))
 	@Parameters({ @Parameter(name = "store",
 			schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)) })
-	public void updateGroup(@RequestBody ProductGroup group, @PathVariable String code,
-			@SecuredResource StoreMerchantId merchantStore) {
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
+	public void updateGroup(@RequestBody ProductGroup group, @PathVariable String code, StoreMerchantId merchantStore) {
 
 		productItemsFacade.updateProductGroup(code, group, merchantStore);
 	}
@@ -78,8 +77,8 @@ public class ProductGroupApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	public @ResponseBody ReadableProductGroupList list(@SecuredResource StoreMerchantId merchantStore,
-			LanguageCode language) {
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
+	public ReadableProductGroupList list(StoreMerchantId merchantStore, LanguageCode language) {
 
 		return productItemsFacade.listProductGroups(merchantStore, language);
 	}
@@ -98,8 +97,9 @@ public class ProductGroupApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	public @ResponseBody ReadableProductList productItemsByGroup(@PathVariable final String code,
-			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
+	public ReadableProductList productItemsByGroup(@PathVariable final String code, StoreMerchantId merchantStore,
+			LanguageCode language) {
 		return productItemsFacade.listTinyProductsGroup(code, merchantStore, LanguageCode.nonLanguage());
 	}
 
@@ -112,8 +112,8 @@ public class ProductGroupApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	public @ResponseBody ReadableProductList getProductItemsByGroup(@PathVariable final String code,
-			StoreMerchantId merchantStore, LanguageCode language) {
+	public ReadableProductList getProductItemsByGroup(@PathVariable final String code, StoreMerchantId merchantStore,
+			LanguageCode language) {
 		return productItemsFacade.listMinimalProductsGroup(code, merchantStore, language);
 	}
 
@@ -124,8 +124,9 @@ public class ProductGroupApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	public @ResponseBody void addProductToGroup(@PathVariable Long productId, @PathVariable String code,
-			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
+	public void addProductToGroup(@PathVariable Long productId, @PathVariable String code,
+			StoreMerchantId merchantStore, LanguageCode language) {
 		Product product = productService.findOne(productId, merchantStore);
 		productItemsFacade.addItemToGroup(product, code, merchantStore, language);
 	}
@@ -137,8 +138,9 @@ public class ProductGroupApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	public @ResponseBody void removeProductFromGroup(@PathVariable Long productId, @PathVariable String code,
-			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
+	public void removeProductFromGroup(@PathVariable Long productId, @PathVariable String code,
+			StoreMerchantId merchantStore, LanguageCode language) {
 
 		Product product = productService.findOne(productId, merchantStore);
 		productItemsFacade.removeItemFromGroup(product, code, merchantStore, language);
@@ -150,7 +152,8 @@ public class ProductGroupApi {
 			responses = @ApiResponse(content = @Content(schema = @Schema(implementation = EntityExists.class))))
 	@Parameters({ @Parameter(name = "store",
 			schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)) })
-	public void deleteGroup(@PathVariable final String code, @SecuredResource StoreMerchantId merchantStore) {
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
+	public void deleteGroup(@PathVariable final String code, StoreMerchantId merchantStore) {
 
 		productItemsFacade.deleteGroup(code, merchantStore);
 	}

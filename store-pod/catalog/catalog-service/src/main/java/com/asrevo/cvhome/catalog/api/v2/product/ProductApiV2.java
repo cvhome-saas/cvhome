@@ -12,9 +12,7 @@ import com.asrevo.cvhome.catalog.model.product.product.definition.ReadableProduc
 import com.asrevo.cvhome.catalog.service.facade.product.ProductCommonFacade;
 import com.asrevo.cvhome.catalog.service.facade.product.ProductDefinitionFacade;
 import com.asrevo.cvhome.catalog.service.facade.product.ProductFacade;
-import com.asrevo.cvhome.commons.annotation.ApiUsage;
-import com.asrevo.cvhome.commons.annotation.ConditionalOnApiStatus;
-import com.asrevo.cvhome.commons.annotation.SecuredResource;
+
 import com.asrevo.cvhome.commons.domain.Entity;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.constants.Constants;
@@ -32,7 +30,7 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Controller;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -40,7 +38,7 @@ import org.springframework.web.bind.annotation.*;
  *
  * @author Carl Samson
  */
-@Controller
+@RestController
 @RequestMapping("/api/v2")
 @Tags(value = @Tag(name = "Product display and management resource (Product display and"
 		+ " Management Api such as adding a product to category. Serves"
@@ -73,10 +71,10 @@ public class ProductApiV2 {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	@ResponseBody
-	@ConditionalOnApiStatus
-	public Entity createV2(@Valid @RequestBody PersistableProductDefinition product,
-			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
+
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
+	public Entity createV2(@Valid @RequestBody PersistableProductDefinition product, StoreMerchantId merchantStore,
+			LanguageCode language) {
 
 		// make sure product id is null
 		product.setId(null);
@@ -93,9 +91,10 @@ public class ProductApiV2 {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	@ConditionalOnApiStatus
+
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
 	public void updateV2(@PathVariable Long id, @Valid @RequestBody PersistableProductDefinition product,
-			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
+			StoreMerchantId merchantStore, LanguageCode language) {
 
 		productDefinitionFacade.update(id, product, merchantStore, language);
 	}
@@ -107,9 +106,9 @@ public class ProductApiV2 {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	@ResponseBody
-	@ConditionalOnApiStatus
-	public ReadableProductDefinition getV2(@PathVariable Long id, @SecuredResource StoreMerchantId merchantStore,
+
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
+	public ReadableProductDefinition getV2(@PathVariable Long id, StoreMerchantId merchantStore,
 			LanguageCode language) {
 
 		return productDefinitionFacade.getProduct(merchantStore, id, LanguageCode.allLanguage());
@@ -129,13 +128,13 @@ public class ProductApiV2 {
 			summary = "For shop purpose. Specifying ?merchant is " + "required otherwise it falls back to DEFAULT")
 	@ApiResponse(responseCode = "200", description = "Single product found",
 			content = @Content(schema = @Schema(implementation = ReadableProduct.class)))
-	@ResponseBody
+
 	@Parameters({
 			@Parameter(name = "store",
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	@ConditionalOnApiStatus(usage = ApiUsage.NOT_USED)
+
 	public ReadableProduct getByfriendlyUrl(@PathVariable final String friendlyUrl,
 			@RequestParam(value = "lang", required = false) String lang, StoreMerchantId merchantStore,
 			LanguageCode language, HttpServletResponse response) throws Exception {
@@ -151,14 +150,15 @@ public class ProductApiV2 {
 	}
 
 	@RequestMapping(value = "/private/tiny-products", method = RequestMethod.GET)
-	@ResponseBody
+
 	@Parameters({
 			@Parameter(name = "store",
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	@ConditionalOnApiStatus
-	public ReadableProductList tiny(ProductCriteria searchCriteria, @SecuredResource StoreMerchantId merchantStore,
+
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
+	public ReadableProductList tiny(ProductCriteria searchCriteria, StoreMerchantId merchantStore,
 			LanguageCode language, Pageable pageable) {
 
 		searchCriteria.setPageable(pageable);
@@ -168,14 +168,15 @@ public class ProductApiV2 {
 	}
 
 	@RequestMapping(value = "/private/base-products", method = RequestMethod.GET)
-	@ResponseBody
+
 	@Parameters({
 			@Parameter(name = "store",
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	@ConditionalOnApiStatus
-	public ReadableProductList base(ProductCriteria searchCriteria, @SecuredResource StoreMerchantId merchantStore,
+
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
+	public ReadableProductList base(ProductCriteria searchCriteria, StoreMerchantId merchantStore,
 			LanguageCode language, Pageable pageable) {
 
 		searchCriteria.setPageable(pageable);
@@ -185,13 +186,13 @@ public class ProductApiV2 {
 	}
 
 	@RequestMapping(value = "/products", method = RequestMethod.GET)
-	@ResponseBody
+
 	@Parameters({
 			@Parameter(name = "store",
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	@ConditionalOnApiStatus
+
 	public ReadableProductList getList(ProductCriteria searchCriteria, StoreMerchantId merchantStore,
 			LanguageCode language, Pageable pageable) {
 
@@ -213,10 +214,11 @@ public class ProductApiV2 {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	@ConditionalOnApiStatus
+
 	// @TODO check if sku is id or string
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
 	public void update(@PathVariable String sku, @Valid @RequestBody LightPersistableProduct product,
-			@SecuredResource StoreMerchantId merchantStore, LanguageCode language) {
+			StoreMerchantId merchantStore, LanguageCode language) {
 		productCommonFacade.update(sku, product, merchantStore, language);
 	}
 

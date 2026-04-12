@@ -39,6 +39,7 @@ public class JwtCustomizerConfig {
 					context.getClaims().claim("sub", principal.getId().toString());
 				}
 				context.getClaims().claim("username", principal.getUsername());
+				context.getClaims().claim("roles", new String[] { "CUSTOMER" });
 			}
 
 		};

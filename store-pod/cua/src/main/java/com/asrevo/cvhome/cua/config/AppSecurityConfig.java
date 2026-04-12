@@ -1,21 +1,12 @@
 package com.asrevo.cvhome.cua.config;
 
-import com.asrevo.cvhome.commons.domain.ManagerOrgId;
-import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.cua.security.CustomOAuth2UserService;
 import com.asrevo.cvhome.cua.security.CustomOidcUserService;
-import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
-import com.asrevo.cvhome.merchant.model.merchant.ReadableMerchantStore;
 import com.asrevo.cvhome.s2s.jwt.UaaJwtGrantedAuthoritiesConverter;
-import com.asrevo.cvhome.s2s.model.PodInfoProperties;
-import com.asrevo.cvhome.s2s.services.AccessEvaluator;
-import com.asrevo.cvhome.s2s.services.AccessEvaluatorImpl;
-import com.asrevo.cvhome.s2s.services.StoreSecurityServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.security.autoconfigure.actuate.web.servlet.EndpointRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -94,17 +85,6 @@ public class AppSecurityConfig {
 		UaaJwtGrantedAuthoritiesConverter uaaJwtGrantedAuthoritiesConverter = new UaaJwtGrantedAuthoritiesConverter();
 		jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(uaaJwtGrantedAuthoritiesConverter);
 		return jwtAuthenticationConverter;
-	}
-
-	@Bean
-	@Lazy
-	public AccessEvaluator accessEvaluator(ExternalMerchantStoreService externalMerchantStoreService,
-			PodInfoProperties podInfoProperties) {
-		return new AccessEvaluatorImpl(new StoreSecurityServiceImpl(podInfoProperties, (it) -> {
-			ReadableMerchantStore merchantStore = externalMerchantStoreService
-				.getStore(new StoreMerchantId(it.getId().toString()));
-			return new ManagerOrgId(merchantStore.getOrg());
-		}));
 	}
 
 }

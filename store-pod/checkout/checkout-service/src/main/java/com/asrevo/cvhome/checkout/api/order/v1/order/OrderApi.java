@@ -2,8 +2,6 @@ package com.asrevo.cvhome.checkout.api.order.v1.order;
 
 import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1_STR;
 
-import com.asrevo.cvhome.commons.annotation.ConditionalOnApiStatus;
-import com.asrevo.cvhome.commons.annotation.SecuredResource;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.checkout.entity.customer.Customer;
 import com.asrevo.cvhome.checkout.entity.order.Order;
@@ -31,6 +29,7 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
@@ -64,13 +63,12 @@ public class OrderApi {
 	 */
 	@RequestMapping(value = { "/cart/{code}/checkout" }, method = RequestMethod.POST)
 	@ResponseStatus(HttpStatus.OK)
-	@ResponseBody
 	@Parameters({
 			@Parameter(name = "store",
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	@ConditionalOnApiStatus
+
 	public ReadableOrderConfirmation checkout(@PathVariable String code,
 			@Valid @RequestBody PersistableAnonymousOrder order, JwtAuthenticationToken auth,
 			StoreMerchantId merchantStore, LanguageCode language) {
@@ -123,13 +121,14 @@ public class OrderApi {
 	@RequestMapping(value = { "/private/orders" }, method = RequestMethod.GET)
 	@ResponseStatus(HttpStatus.OK)
 	@ResponseBody
-	@ConditionalOnApiStatus
+
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CHECKOUT.*')")
 	public ReadableOrderList list(@RequestParam(value = "name", required = false) String name,
 			@RequestParam(value = "id", required = false) Long id,
 			@RequestParam(value = "status", required = false) String status,
 			@RequestParam(value = "phone", required = false) String phone,
-			@RequestParam(value = "email", required = false) String email,
-			@SecuredResource StoreMerchantId merchantStore, LanguageCode language, Pageable pageable) {
+			@RequestParam(value = "email", required = false) String email, StoreMerchantId merchantStore,
+			LanguageCode language, Pageable pageable) {
 
 		OrderCriteria orderCriteria = new OrderCriteria();
 		orderCriteria.setPageable(pageable);
@@ -150,9 +149,9 @@ public class OrderApi {
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	@ConditionalOnApiStatus
-	public ReadableOrder get(@PathVariable final Long id, @SecuredResource StoreMerchantId merchantStore,
-			LanguageCode language) {
+
+	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CHECKOUT.*')")
+	public ReadableOrder get(@PathVariable final Long id, StoreMerchantId merchantStore, LanguageCode language) {
 
 		return orderFacade.getReadableOrder(id, merchantStore, language);
 	}

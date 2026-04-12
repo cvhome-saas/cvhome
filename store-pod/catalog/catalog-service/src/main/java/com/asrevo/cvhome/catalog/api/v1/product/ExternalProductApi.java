@@ -4,7 +4,7 @@ import com.asrevo.cvhome.catalog.model.product.ProductDetails;
 import com.asrevo.cvhome.catalog.model.product.ReadableProduct;
 import com.asrevo.cvhome.catalog.services.product.ExternalProductService;
 import com.asrevo.cvhome.catalog.services.product.ProductService;
-import com.asrevo.cvhome.commons.annotation.ConditionalOnApiStatus;
+
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
@@ -43,7 +43,7 @@ public class ExternalProductApi implements ExternalProductService {
 			@Parameter(name = "sku", schema = @Schema(name = "sku", type = "string")),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	@ConditionalOnApiStatus
+
 	@Override
 	public ProductDetails getDetailedProduct(StoreMerchantId store, @RequestParam String sku, LanguageCode lang) {
 		return productService.getDetailedProduct(store, sku, lang);
