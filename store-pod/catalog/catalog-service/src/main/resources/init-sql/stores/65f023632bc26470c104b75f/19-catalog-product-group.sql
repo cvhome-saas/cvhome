@@ -5,42 +5,124 @@ Generated SQL inserts for product groups based on product relationship file.
 */
 
 -- Product Groups
-INSERT INTO catalog.product_group (product_group_id, active, code, store_merchant_id, parent_product_id, date_created, date_modified)
-VALUES (201, true, 'HOME_PAGE', '65f023632bc26470c104b75f', null, NOW(), NOW()) on conflict do nothing;
-INSERT INTO catalog.product_group (product_group_id, active, code, store_merchant_id, parent_product_id, date_created, date_modified)
-VALUES (202, true, 'RECOMMENDED', '65f023632bc26470c104b75f', null, NOW(), NOW()) on conflict do nothing;
-INSERT INTO catalog.product_group (product_group_id, active, code, store_merchant_id, parent_product_id, date_created, date_modified)
-VALUES (203, true, 'NEWLY_ADDED', '65f023632bc26470c104b75f', null, NOW(), NOW()) on conflict do nothing;
-INSERT INTO catalog.product_group (product_group_id, active, code, store_merchant_id, parent_product_id, date_created, date_modified)
-VALUES (204, true, 'FEATURED_ITEMS', '65f023632bc26470c104b75f', null, NOW(), NOW()) on conflict do nothing;
+INSERT INTO catalog.product_group (product_group_id, active, code, store_merchant_id, parent_product_id, date_created,
+                                   date_modified)
+VALUES (9, true, 'HOME_PAGE', '65f023632bc26470c104b75f', null, NOW(), NOW())
+on conflict do nothing;
+INSERT INTO catalog.product_group (product_group_id, active, code, store_merchant_id, parent_product_id, date_created,
+                                   date_modified)
+VALUES (10, true, 'RECOMMENDED', '65f023632bc26470c104b75f', null, NOW(), NOW())
+on conflict do nothing;
+INSERT INTO catalog.product_group (product_group_id, active, code, store_merchant_id, parent_product_id, date_created,
+                                   date_modified)
+VALUES (11, true, 'NEWLY_ADDED', '65f023632bc26470c104b75f', null, NOW(), NOW())
+on conflict do nothing;
+INSERT INTO catalog.product_group (product_group_id, active, code, store_merchant_id, parent_product_id, date_created,
+                                   date_modified)
+VALUES (12, true, 'FEATURED_ITEMS', '65f023632bc26470c104b75f', null, NOW(), NOW())
+on conflict do nothing;
 
 -- Group Descriptions (English & Arabic)
 -- HOME_PAGE
-INSERT INTO catalog.product_group_description (description_id, name, language_code, product_group_id, date_created, date_modified)
-VALUES (201, 'Home Page', 'en', 201, NOW(), NOW()) on conflict do nothing;
-INSERT INTO catalog.product_group_description (description_id, name, language_code, product_group_id, date_created, date_modified)
-VALUES (202, 'الصفحة الرئيسية', 'ar', 201, NOW(), NOW()) on conflict do nothing;
+INSERT INTO catalog.product_group_description (description_id, name, language_code, product_group_id, date_created,
+                                               date_modified)
+VALUES (17, 'Home Page', 'en', 9, NOW(), NOW())
+on conflict do nothing;
+INSERT INTO catalog.product_group_description (description_id, name, language_code, product_group_id, date_created,
+                                               date_modified)
+VALUES (18, 'الصفحة الرئيسية', 'ar', 9, NOW(), NOW())
+on conflict do nothing;
 
 -- RECOMMENDED
-INSERT INTO catalog.product_group_description (description_id, name, language_code, product_group_id, date_created, date_modified)
-VALUES (203, 'Recommended', 'en', 202, NOW(), NOW()) on conflict do nothing;
-INSERT INTO catalog.product_group_description (description_id, name, language_code, product_group_id, date_created, date_modified)
-VALUES (204, 'مقترح لك', 'ar', 202, NOW(), NOW()) on conflict do nothing;
+INSERT INTO catalog.product_group_description (description_id, name, language_code, product_group_id, date_created,
+                                               date_modified)
+VALUES (19, 'Recommended', 'en', 10, NOW(), NOW())
+on conflict do nothing;
+INSERT INTO catalog.product_group_description (description_id, name, language_code, product_group_id, date_created,
+                                               date_modified)
+VALUES (20, 'مقترح لك', 'ar', 10, NOW(), NOW())
+on conflict do nothing;
 
 -- NEWLY_ADDED
-INSERT INTO catalog.product_group_description (description_id, name, language_code, product_group_id, date_created, date_modified)
-VALUES (205, 'Newly Added', 'en', 203, NOW(), NOW()) on conflict do nothing;
-INSERT INTO catalog.product_group_description (description_id, name, language_code, product_group_id, date_created, date_modified)
-VALUES (206, 'أضيف حديثا', 'ar', 203, NOW(), NOW()) on conflict do nothing;
+INSERT INTO catalog.product_group_description (description_id, name, language_code, product_group_id, date_created,
+                                               date_modified)
+VALUES (21, 'Newly Added', 'en', 11, NOW(), NOW())
+on conflict do nothing;
+INSERT INTO catalog.product_group_description (description_id, name, language_code, product_group_id, date_created,
+                                               date_modified)
+VALUES (22, 'أضيف حديثا', 'ar', 11, NOW(), NOW())
+on conflict do nothing;
 
 -- FEATURED_ITEMS
-INSERT INTO catalog.product_group_description (description_id, name, language_code, product_group_id, date_created, date_modified)
-VALUES (207, 'Featured Items', 'en', 204, NOW(), NOW()) on conflict do nothing;
-INSERT INTO catalog.product_group_description (description_id, name, language_code, product_group_id, date_created, date_modified)
-VALUES (208, 'منتجات مميزة', 'ar', 204, NOW(), NOW()) on conflict do nothing;
+INSERT INTO catalog.product_group_description (description_id, name, language_code, product_group_id, date_created,
+                                               date_modified)
+VALUES (23, 'Featured Items', 'en', 12, NOW(), NOW())
+on conflict do nothing;
+INSERT INTO catalog.product_group_description (description_id, name, language_code, product_group_id, date_created,
+                                               date_modified)
+VALUES (24, 'منتجات مميزة', 'ar', 12, NOW(), NOW())
+on conflict do nothing;
 
 -- Product Group Memberships
-INSERT INTO catalog.product_group_product (product_group_id, product_id) VALUES (201, 1), (201, 2), (201, 3), (201, 4), (201, 5), (201, 6), (201, 7), (201, 8), (201, 9), (201, 10), (201, 11), (201, 12), (201, 13), (201, 14), (201, 15), (201, 16), (201, 17), (201, 18), (201, 19), (201, 20), (201, 21), (201, 22), (201, 23), (201, 24) on conflict do nothing;
-INSERT INTO catalog.product_group_product (product_group_id, product_id) VALUES (202, 16), (202, 17), (202, 18), (202, 19), (202, 20), (202, 21), (202, 22), (202, 23), (202, 24), (202, 25), (202, 26), (202, 27) on conflict do nothing;
-INSERT INTO catalog.product_group_product (product_group_id, product_id) VALUES (203, 31), (203, 32), (203, 33), (203, 34), (203, 35), (203, 36), (203, 37), (203, 38), (203, 39), (203, 40), (203, 41), (203, 42), (203, 43), (203, 44), (203, 45) on conflict do nothing;
-INSERT INTO catalog.product_group_product (product_group_id, product_id) VALUES (204, 5), (204, 6), (204, 11), (204, 12), (204, 17), (204, 18), (204, 23), (204, 24), (204, 29), (204, 30) on conflict do nothing;
+INSERT INTO catalog.product_group_product (product_group_id, product_id)
+VALUES (9, 91),
+       (9, 92),
+       (9, 93),
+       (9, 94),
+       (9, 95),
+       (9, 96),
+       (9, 97),
+       (9, 98),
+       (9, 99),
+       (9, 100),
+       (9, 101),
+       (9, 102),
+       (9, 103),
+       (9, 104),
+       (9, 105),
+       (9, 106),
+       (9, 107),
+       (9, 108),
+       (9, 109),
+       (9, 110),
+       (9, 111),
+       (9, 112),
+       (9, 113),
+       (9, 114)
+ON CONFLICT DO NOTHING;
+INSERT INTO catalog.product_group_product (product_group_id, product_id)
+VALUES (10, 115),
+       (10, 117),
+       (10, 119),
+       (10, 121),
+       (10, 123),
+       (10, 125),
+       (10, 127),
+       (10, 129),
+       (10, 131),
+       (10, 133)
+ON CONFLICT DO NOTHING;
+INSERT INTO catalog.product_group_product (product_group_id, product_id)
+VALUES (11, 135),
+       (11, 134),
+       (11, 132),
+       (11, 130),
+       (11, 128),
+       (11, 126),
+       (11, 124),
+       (11, 122),
+       (11, 120),
+       (11, 118),
+       (11, 116),
+       (11, 114)
+ON CONFLICT DO NOTHING;
+INSERT INTO catalog.product_group_product (product_group_id, product_id)
+VALUES (12, 91),
+       (12, 95),
+       (12, 99),
+       (12, 103),
+       (12, 107),
+       (12, 111),
+       (12, 115),
+       (12, 119)
+ON CONFLICT DO NOTHING;
